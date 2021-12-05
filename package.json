@@ -1,0 +1,69 @@
+{
+  "name": "kubevirt-openshift-plugin",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack",
+    "dev": "NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node ./node_modules/.bin/webpack serve --progress",
+    "lint": "eslint src --ext .tsx --ext .ts",
+    "lint:fix": "yarn lint --fix",
+    "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
+    "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'"
+  },
+  "devDependencies": {
+    "@openshift-console/dynamic-plugin-sdk": "0.0.3",
+    "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.4",
+    "@patternfly/react-core": "4.175.4",
+    "@types/react": "17.0.37",
+    "@types/webpack-dev-server": "^4.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "copy-webpack-plugin": "^6.4.1",
+    "css-loader": "6.2.0",
+    "eslint": "^8.4.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.27.1",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "fork-ts-checker-webpack-plugin": "^6.5.0",
+    "i18next-parser": "3.x",
+    "prettier": "^2.5.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-helmet": "^6.1.0",
+    "react-i18next": "^11.14.3",
+    "react-router-dom": "5.2.0",
+    "style-loader": "^3.2.1",
+    "ts-loader": "9.x",
+    "ts-node": "10.x",
+    "tsconfig-paths-webpack-plugin": "^3.5.1",
+    "typescript": "4.x",
+    "webpack": "^5.64.4",
+    "webpack-cli": "4.9.x",
+    "webpack-dev-server": "^4.6.0"
+  },
+  "consolePlugin": {
+    "name": "console-demo-plugin",
+    "version": "0.0.0",
+    "displayName": "Console Demo Plugin",
+    "description": "Plasma reactors online. Initiating hyper drive.",
+    "exposedModules": {
+      "kubevirtFlags": "./flags",
+      "vmListPage": "./components/vms/vm-page"
+    },
+    "dependencies": {
+      "@console/pluginAPI": "*"
+    },
+    "disableStaticPlugins": [
+      "@console/kubevirt-plugin"
+    ]
+  },
+  "dependencies": {
+    "@openshift-console/dynamic-plugin-sdk-internal-kubevirt": "^0.0.10",
+    "lodash": "^4.17.21"
+  }
+}

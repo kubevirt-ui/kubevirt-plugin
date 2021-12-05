@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "target": "es2016",
+    "lib": ["es2016", "es2019", "es2020.promise", "dom", "dom.iterable"],
+    "jsx": "react",
+    "allowJs": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "paths": {
+      "@kubevirt-types": ["src/types"],
+      "@kubevirt-types/*": ["src/types/*"],
+      "@kubevirt-models": ["src/models"],
+      "@kubevirt-models/*": ["src/models/*"],
+      "@kubevirt-components": ["src/components"],
+      "@kubevirt-components/*": ["src/components/*"],
+      "@kubevirt-utils": ["src/utils"],
+      "@kubevirt-utils/*": ["src/utils/*"],
+      "@kubevirt-constants": ["src/constants"],
+      "@kubevirt-constants/*": ["src/constants/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["**/node_modules", "**/dist"]
+}

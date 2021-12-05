@@ -1,0 +1,24 @@
+reviewers:
+  - mareklibra
+  - rawagner
+  - suomiy
+  - vojtechszocs
+  - pcbailey
+  - jelkosz
+  - rhrazdil
+  - yaacov
+  - glekner
+  - irosenzw
+  - gouyang
+approvers:
+  - mareklibra
+  - rawagner
+  - suomiy
+  - jelkosz
+  - rhrazdil
+  - yaacov
+  - glekner
+  - pcbailey
+  - irosenzw
+labels:
+  - component/kubevirt
