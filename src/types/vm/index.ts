@@ -2,7 +2,6 @@ import { V1DataVolumeTemplateSpec, V1VolumeStatus } from '@kubevirt-types';
 import { K8sResourceCondition, K8sResourceKind } from '@kubevirt-types/internal';
 import { ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
 
-// https://kubevirt.io/api-reference/v0.38.1/definitions.html#_v1_virtualmachineinstancespec
 export type VMISpec = {
   affinity: any;
   dnsConfig: any;
@@ -21,7 +20,6 @@ export type VMISpec = {
   accessCredentials?: any;
 };
 
-// https://kubevirt.io/api-reference/v0.38.1/definitions.html#_v1_virtualmachineinstancestatus
 export type VMIStatus = {
   conditions: any[];
   interfaces: any[];
@@ -64,7 +62,6 @@ export type VMStatusStateChangeRequest = {
   data: { [key: string]: string };
 };
 
-// https://kubevirt.io/api-reference/v0.38.1/definitions.html#_v1_virtualmachine
 export type VMKind = {
   spec: VMSpec;
   status: VMStatus;

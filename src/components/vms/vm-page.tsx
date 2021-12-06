@@ -1,12 +1,9 @@
 import { TFunction } from 'i18next';
-import * as _ from 'lodash';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { printableVMStatuses } from '@kubevirt-constants/vm-status';
-import { VirtualMachineModel } from '@kubevirt-models';
+import { printableVMStatus } from '@kubevirt-constants/vm-status';
 import { VMKind } from '@kubevirt-types/vm';
-import { kubevirtReferenceForModel } from '@kubevirt-utils/ref';
 import {
   K8sResourceCommon,
   ListPageBody,
@@ -43,15 +40,15 @@ const columns: (t: TFunction) => TableColumn<K8sResourceCommon>[] = () => [
   },
 ];
 
-const VMRow: React.FC<RowProps<VMKind>> = ({ obj, activeColumnIDs }) => {
+const VMRow: React.FC<RowProps<VMKind, { kind: string }>> = ({
+  obj,
+  activeColumnIDs,
+  rowData: { kind },
+}) => {
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        <ResourceLink
-          kind={kubevirtReferenceForModel(VirtualMachineModel)}
-          name={obj.metadata.name}
-          namespace={obj.metadata.namespace}
-        />
+        <ResourceLink kind={kind} name={obj.metadata.name} namespace={obj.metadata.namespace} />
       </TableData>
       <TableData id="namespace" activeColumnIDs={activeColumnIDs}>
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
@@ -67,13 +64,14 @@ const VMRow: React.FC<RowProps<VMKind>> = ({ obj, activeColumnIDs }) => {
 };
 
 type VMTableProps = {
+  kind: string;
   data: K8sResourceCommon[];
   unfilteredData: K8sResourceCommon[];
   loaded: boolean;
   loadError: any;
 };
 
-const VMTable: React.FC<VMTableProps> = ({ data, unfilteredData, loaded, loadError }) => {
+const VMTable: React.FC<VMTableProps> = ({ data, unfilteredData, loaded, loadError, kind }) => {
   const { t } = useTranslation('plugin__kubevirt-plugin');
   return (
     <VirtualizedTable<K8sResourceCommon>
@@ -83,6 +81,7 @@ const VMTable: React.FC<VMTableProps> = ({ data, unfilteredData, loaded, loadErr
       loadError={loadError}
       columns={columns(t)}
       Row={VMRow}
+      rowData={{ kind }}
     />
   );
 };
@@ -97,21 +96,21 @@ export const filters: RowFilter[] = [
       return (
         statuses.selected?.length === 0 ||
         statuses.selected?.includes(status) ||
-        !_.includes(statuses?.all, status)
+        !statuses?.all?.find((s) => s === status)
       );
     },
-    items: Object.keys(printableVMStatuses).map((status) => ({
+    items: Object.keys(printableVMStatus).map((status) => ({
       id: status,
       title: status,
     })),
   },
 ];
 
-const VMListPage = () => {
+const VMListPage = ({ kind }: { kind: string }) => {
   const { t } = useTranslation('plugin__kubevirt-plugin');
 
   const [vms, loaded, loadError] = useK8sWatchResource<VMKind[]>({
-    kind: kubevirtReferenceForModel(VirtualMachineModel),
+    kind,
     isList: true,
     namespaced: true,
   });
@@ -121,9 +120,7 @@ const VMListPage = () => {
   return (
     <>
       <ListPageHeader title={t('Virtual Machines')}>
-        <ListPageCreate groupVersionKind={kubevirtReferenceForModel(VirtualMachineModel)}>
-          {t('Create Virtual Machine')}
-        </ListPageCreate>
+        <ListPageCreate groupVersionKind={kind}>{t('Create Virtual Machine')}</ListPageCreate>
       </ListPageHeader>
       <ListPageBody>
         <ListPageFilter
@@ -132,7 +129,13 @@ const VMListPage = () => {
           rowFilters={filters}
           onFilterChange={onFilterChange}
         />
-        <VMTable data={filteredData} unfilteredData={data} loaded={loaded} loadError={loadError} />
+        <VMTable
+          data={filteredData}
+          unfilteredData={data}
+          loaded={loaded}
+          loadError={loadError}
+          kind={kind}
+        />
       </ListPageBody>
     </>
   );

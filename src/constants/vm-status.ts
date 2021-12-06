@@ -1,4 +1,4 @@
-export const printableVMStatuses = {
+export const printableVMStatus = {
   Stopped: 'Stopped',
   Migrating: 'Migrating',
   Provisioning: 'Provisioning',
