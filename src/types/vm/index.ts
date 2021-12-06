@@ -1,19 +1,6 @@
+import { V1DataVolumeTemplateSpec, V1VolumeStatus } from '@kubevirt-types';
 import { K8sResourceCondition, K8sResourceKind } from '@kubevirt-types/internal';
 import { ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
-
-import {
-  V1alpha1DataVolumeSpec,
-  V1alpha1DataVolumeStatus,
-  V1ObjectMeta,
-  V1VolumeStatus,
-} from '../api';
-
-// https://kubevirt.io/api-reference/v0.38.1/definitions.html#_v1_datavolumetemplatespec
-export interface V1DataVolumeTemplateSpec {
-  metadata?: V1ObjectMeta;
-  spec: V1alpha1DataVolumeSpec;
-  status?: V1alpha1DataVolumeStatus;
-}
 
 // https://kubevirt.io/api-reference/v0.38.1/definitions.html#_v1_virtualmachineinstancespec
 export type VMISpec = {
@@ -105,15 +92,6 @@ export type V1NetworkInterface = {
   masquerade?: {};
   sriov?: {};
   slirp?: {};
-};
-
-export type V1Network = {
-  name?: string;
-  multus?: {
-    networkName: string;
-  };
-  pod?: {};
-  genie?: {};
 };
 
 export type NodeSelector = {

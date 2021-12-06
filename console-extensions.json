@@ -1,22 +1,5 @@
 [
   {
-    "type": "console.flag",
-    "properties": {
-      "handler": { "$codeRef": "kubevirtFlags.detectKubevirtVirtualMachines" }
-    }
-  },
-  {
-    "type": "console.flag/model",
-    "properties": {
-      "flag": "KUBEVIRT_CDI",
-      "model": {
-        "group": "cdi.kubevirt.io",
-        "version": "v1beta1",
-        "kind": "CDIConfig"
-      }
-    }
-  },
-  {
     "type": "console.navigation/section",
     "properties": {
       "id": "virtualization",
@@ -28,21 +11,30 @@
     }
   },
   {
-    "type": "console.page/route",
+    "type": "console.page/resource/list",
     "properties": {
-      "path": "/virtualization",
+      "model": {
+        "group": "kubevirt.io",
+        "kind": "VirtualMachine",
+        "version": "v1"
+      },
       "component": { "$codeRef": "vmListPage" }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
     }
   },
   {
-    "type": "console.navigation/href",
+    "type": "console.navigation/resource-ns",
     "properties": {
-      "id": "virtualizationvirtualmachines",
+      "id": "virtualmachines",
       "section": "virtualization",
-      "perspective": "admin",
-      "name": "plugin__kubevirt-plugin~Virtual Machines%",
-      "href": "/virtualization",
-      "prefixNamespaced": true
+      "name": "plugin__kubevirt-plugin~VirtualMachines%",
+      "model": {
+        "group": "kubevirt.io",
+        "kind": "VirtualMachine",
+        "version": "v1"
+      }
     },
     "flags": {
       "required": ["KUBEVIRT"]

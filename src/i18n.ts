@@ -4,9 +4,5 @@
 // TODO: We should make the custom i18next JSON lexer available to plugins so
 // that they do not need this file.
 
-// t('plugin__kubevirt-plugin~Demo')
-// t('plugin__kubevirt-plugin~Demo Plugin')
-// t('plugin__kubevirt-plugin~Dynamic Nav 1')
-// t('plugin__kubevirt-plugin~Dynamic Nav 2')
-// t('plugin__kubevirt-plugin~Test Consumer')
-// t('plugin__kubevirt-plugin~Test Utilities')
+// t('plugin__kubevirt-plugin~VirtualMachines')
+// t('plugin__kubevirt-plugin~Create Virtual Machine')

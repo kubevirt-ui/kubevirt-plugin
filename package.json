@@ -11,9 +11,14 @@
     "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'"
   },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
   "devDependencies": {
     "@openshift-console/dynamic-plugin-sdk": "0.0.3",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.4",
+    "@openshift-console/dynamic-plugin-sdk-internal-kubevirt": "^0.0.10",
+    "@kubevirt-ui/kubevirt-api": "^0.0.21",
     "@patternfly/react-core": "4.175.4",
     "@types/react": "17.0.37",
     "@types/webpack-dev-server": "^4.5.0",
@@ -47,12 +52,10 @@
     "webpack-dev-server": "^4.6.0"
   },
   "consolePlugin": {
-    "name": "console-demo-plugin",
+    "name": "kubevirt",
     "version": "0.0.0",
-    "displayName": "Console Demo Plugin",
-    "description": "Plasma reactors online. Initiating hyper drive.",
+    "displayName": "Kubevirt Plugin",
     "exposedModules": {
-      "kubevirtFlags": "./flags",
       "vmListPage": "./components/vms/vm-page"
     },
     "dependencies": {
@@ -61,9 +64,5 @@
     "disableStaticPlugins": [
       "@console/kubevirt-plugin"
     ]
-  },
-  "dependencies": {
-    "@openshift-console/dynamic-plugin-sdk-internal-kubevirt": "^0.0.10",
-    "lodash": "^4.17.21"
   }
 }

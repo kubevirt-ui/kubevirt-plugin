@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { printableVMStatuses } from '@kubevirt-constants/vm-status';
 import { VirtualMachineModel } from '@kubevirt-models';
-import { VMIKind, VMKind } from '@kubevirt-types/vm';
+import { VMKind } from '@kubevirt-types/vm';
 import { kubevirtReferenceForModel } from '@kubevirt-utils/ref';
 import {
   K8sResourceCommon,
@@ -39,27 +39,27 @@ const columns: (t: TFunction) => TableColumn<K8sResourceCommon>[] = () => [
   },
   {
     title: 'Created',
-    id: 'Created',
+    id: 'created',
   },
 ];
 
-const VMRow: React.FC<RowProps<VMRowObjType>> = ({ obj, activeColumnIDs }) => {
+const VMRow: React.FC<RowProps<VMKind>> = ({ obj, activeColumnIDs }) => {
   return (
     <>
-      <TableData id={columns[0].id} activeColumnIDs={activeColumnIDs}>
+      <TableData id="name" activeColumnIDs={activeColumnIDs}>
         <ResourceLink
           kind={kubevirtReferenceForModel(VirtualMachineModel)}
           name={obj.metadata.name}
           namespace={obj.metadata.namespace}
         />
       </TableData>
-      <TableData id={columns[1].id} activeColumnIDs={activeColumnIDs}>
+      <TableData id="namespace" activeColumnIDs={activeColumnIDs}>
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
       </TableData>
-      <TableData id={columns[2].id} activeColumnIDs={activeColumnIDs}>
-        {obj?.metadata?.status}
+      <TableData id="status" activeColumnIDs={activeColumnIDs}>
+        {obj?.status?.printableStatus}
       </TableData>
-      <TableData id={columns[3].id} activeColumnIDs={activeColumnIDs}>
+      <TableData id="created" activeColumnIDs={activeColumnIDs}>
         <Timestamp timestamp={obj?.metadata?.creationTimestamp} />
       </TableData>
     </>
@@ -91,9 +91,9 @@ export const filters: RowFilter[] = [
   {
     filterGroupName: 'Status',
     type: 'vm-status',
-    reducer: (obj) => obj?.metadata?.status,
+    reducer: (obj) => obj?.status?.printableStatus,
     filter: (statuses, obj) => {
-      const status = obj?.metadata?.status;
+      const status = obj?.status?.printableStatus;
       return (
         statuses.selected?.length === 0 ||
         statuses.selected?.includes(status) ||
@@ -116,9 +116,7 @@ const VMListPage = () => {
     namespaced: true,
   });
 
-  const [data, filteredData, onFilterChange] = useListPageFilter(vms, filters, {
-    name: { selected: ['openshift'] },
-  });
+  const [data, filteredData, onFilterChange] = useListPageFilter(vms, filters);
 
   return (
     <>
@@ -141,20 +139,3 @@ const VMListPage = () => {
 };
 
 export default VMListPage;
-
-type ObjectBundle = {
-  vm: VMKind;
-  vmi: VMIKind;
-};
-
-export type VMRowObjType = {
-  metadata: {
-    name: string;
-    namespace: string;
-    status: string;
-    node: string;
-    creationTimestamp: string;
-    uid: string;
-    lookupID: string;
-  };
-} & ObjectBundle;
