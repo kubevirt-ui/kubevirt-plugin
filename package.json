@@ -6,10 +6,11 @@
     "clean": "rm -rf dist",
     "build": "NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack",
     "dev": "NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node ./node_modules/.bin/webpack serve --progress",
-    "lint": "eslint src --ext .tsx --ext .ts",
+    "lint": "eslint src --color",
     "lint:fix": "yarn lint --fix",
     "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
-    "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'"
+    "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
+    "prepare": "husky install"
   },
   "dependencies": {},
   "devDependencies": {
@@ -19,6 +20,7 @@
     "@openshift-console/dynamic-plugin-sdk-internal-kubevirt": "^0.0.10",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.4",
     "@patternfly/react-core": "4.175.4",
+    "@types/node": "^16.11.12",
     "@types/react": "17.0.37",
     "@types/webpack-dev-server": "^4.5.0",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
@@ -34,7 +36,10 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "fork-ts-checker-webpack-plugin": "^6.5.0",
+    "husky": "^7.0.0",
+    "i18next": "^21.6.0",
     "i18next-parser": "3.x",
+    "lint-staged": "^12.1.2",
     "prettier": "^2.5.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -49,6 +54,14 @@
     "webpack": "^5.64.4",
     "webpack-cli": "4.9.x",
     "webpack-dev-server": "^4.6.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,gql,graphql}": "eslint src --color --fix"
   },
   "consolePlugin": {
     "name": "kubevirt",
