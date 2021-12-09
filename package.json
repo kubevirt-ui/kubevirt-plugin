@@ -10,7 +10,8 @@
     "lint:fix": "yarn lint --fix",
     "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "pre-commit": "lint-staged"
   },
   "dependencies": {},
   "devDependencies": {
@@ -61,7 +62,9 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,gql,graphql}": "eslint src --color --fix"
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write"
+    ]
   },
   "consolePlugin": {
     "name": "kubevirt",
