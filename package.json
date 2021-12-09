@@ -8,10 +8,11 @@
     "dev": "NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node ./node_modules/.bin/webpack serve --progress",
     "lint": "eslint src --color",
     "lint:fix": "yarn lint --fix",
+    "check-types": "tsc",
     "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
     "prepare": "husky install",
-    "pre-commit": "lint-staged"
+    "pre-commit": "yarn check-types && yarn lint-staged"
   },
   "dependencies": {},
   "devDependencies": {
