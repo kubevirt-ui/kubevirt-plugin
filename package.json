@@ -1,10 +1,10 @@
 {
-  "name": "kubevirt-openshift-plugin",
+  "name": "kubevirt-plugin",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack",
+    "build": "NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node node_modules/.bin/webpack",
     "dev": "NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node ./node_modules/.bin/webpack serve --progress",
     "lint": "eslint src --color",
     "lint:fix": "yarn lint --fix",
@@ -68,7 +68,7 @@
     ]
   },
   "consolePlugin": {
-    "name": "kubevirt",
+    "name": "kubevirt-plugin",
     "version": "0.0.0",
     "displayName": "Kubevirt Plugin",
     "exposedModules": {

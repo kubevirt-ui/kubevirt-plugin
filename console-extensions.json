@@ -3,7 +3,7 @@
     "type": "console.navigation/section",
     "properties": {
       "id": "virtualization",
-      "name": "plugin__kubevirt-plugin~Virtualization%",
+      "name": "%plugin__kubevirt-plugin~Virtualization%",
       "insertAfter": "workloads"
     },
     "flags": {
@@ -29,7 +29,7 @@
     "properties": {
       "id": "virtualmachines",
       "section": "virtualization",
-      "name": "plugin__kubevirt-plugin~VirtualMachines%",
+      "name": "%plugin__kubevirt-plugin~VirtualMachines%",
       "model": {
         "group": "kubevirt.io",
         "kind": "VirtualMachine",
