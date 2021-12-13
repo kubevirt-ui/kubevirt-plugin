@@ -48,8 +48,17 @@ export type VMSpec = {
   dataVolumeTemplates?: V1DataVolumeTemplateSpec[];
 };
 
+export type VMStatusCondition = {
+  lastProbeTime?: string;
+  lastTransitionTime: string;
+  message: string;
+  reason: string;
+  status: string;
+  type: string;
+};
+
 export type VMStatus = {
-  conditions?: any[];
+  conditions?: VMStatusCondition[];
   created?: boolean;
   ready?: boolean;
   printableStatus?: string;
