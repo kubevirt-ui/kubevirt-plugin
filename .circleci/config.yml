@@ -25,7 +25,7 @@ jobs:
           command: yarn build
           name: Run Build
 workflows:
-  kubevirt_lint:
+  lint_and_build:
     jobs:
       - lint
       - build
