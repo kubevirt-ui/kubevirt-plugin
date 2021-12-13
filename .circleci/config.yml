@@ -13,7 +13,16 @@ jobs:
       - run:
           command: yarn lint
           name: Run Lint
+  build:
+    executor:
+      name: node/default
+      tag: '14.18.2'
+    steps:
+      - run:
+          command: yarn build
+          name: Run Build
 workflows:
   kubevirt_lint:
     jobs:
       - lint
+      - build
