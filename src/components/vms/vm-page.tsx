@@ -72,6 +72,7 @@ type VMTableProps = {
 };
 
 const VMTable: React.FC<VMTableProps> = ({ data, unfilteredData, loaded, loadError, kind }) => {
+  const check_codefactor = 'check_codefactor';
   const { t } = useTranslation('plugin__kubevirt-plugin');
   return (
     <VirtualizedTable<K8sResourceCommon>
