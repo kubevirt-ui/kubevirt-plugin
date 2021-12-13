@@ -18,6 +18,9 @@ jobs:
       name: node/default
       tag: '14.18.2'
     steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
       - run:
           command: yarn build
           name: Run Build
