@@ -7,9 +7,7 @@ orbs:
   node: circleci/node@4.9.0
 jobs:
   lint:
-    executor:
-      name: node/default
-      tag: '14'
+    executor: node/default
     steps:
       - checkout
       - node/install-packages:
