@@ -1,5 +1,7 @@
 # OpenShift Console Kubevirt Plugin
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0b50c092972846eaadddbc78ce3eba21)](https://app.codacy.com/gh/kubevirt-ui/kubevirt-plugin?utm_source=github.com&utm_medium=referral&utm_content=kubevirt-ui/kubevirt-plugin&utm_campaign=Badge_Grade_Settings)
+
 This project is a standalone repository hosting the Kubevirt plugin
 for OpenShift Console.
 
