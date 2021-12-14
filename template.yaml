@@ -1,34 +1,34 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  name: console-plugin-template
+  name: kubevirt-plugin
   annotations:
-    openshift.io/display-name: OpenShift Console Plugin Template
-    openshift.io/documentation-url: 'https://github.com/spadgett/console-plugin-template'
+    openshift.io/display-name: OpenShift Kubevirt Plugin
+    openshift.io/documentation-url: 'https://quay.io/repository/kubevirt-ui/kubevirt-plugin'
     description: >-
-      nginx HTTP server for an OpenShift console plugin creating using the
-      template at https://github.com/spadgett/console-plugin-template
+      nginx HTTP server for an OpenShift Kubevirt plugin creating using the
+      template at https://quay.io/repository/kubevirt-ui/kubevirt-plugin
     iconClass: icon-nginx
     tags: openshift,console,plugin,nginx
 parameters:
   - description: Name of your plugin. This name must match the name in the consolePlugin declaration in package.json.
-    name: PLUGIN_NAME
-    value: console-plugin-template
+    name: kubevirt-plugin
+    value: kubevirt-plugin
     required: true
   - description: Namespace for your plugin. The namespace will be created by the template.
     name: NAMESPACE
-    value: console-plugin-template
+    value: kubevirt-plugin
     required: true
   - description: Container image of the plugin.
     name: IMAGE
-    value: quay.io/spadgett/console-plugin-template:latest
+    value: quay.io/spadgett/kubevirt-plugin:latest
     required: true
 message: >-
   To enable the plugin on the cluster, run the following command:
 
-  oc patch consoles.operator.openshift.io cluster --patch '{ "spec": { "plugins": ["${PLUGIN_NAME}"] } }' --type=merge
+  oc patch consoles.operator.openshift.io cluster --patch '{ "spec": { "plugins": ["${kubevirt-plugin}"] } }' --type=merge
 
-  For more information about using this template, see https://github.com/spadgett/console-plugin-template
+  For more information about using this template, see https://quay.io/repository/kubevirt-ui/kubevirt-plugin
 objects:
   - apiVersion: v1
     kind: Namespace
@@ -37,26 +37,26 @@ objects:
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      name: '${PLUGIN_NAME}'
+      name: '${kubevirt-plugin}'
       namespace: '${NAMESPACE}'
       labels:
-        app: '${PLUGIN_NAME}'
-        app.kubernetes.io/component: '${PLUGIN_NAME}'
-        app.kubernetes.io/instance: '${PLUGIN_NAME}'
-        app.kubernetes.io/part-of: '${PLUGIN_NAME}'
+        app: '${kubevirt-plugin}'
+        app.kubernetes.io/component: '${kubevirt-plugin}'
+        app.kubernetes.io/instance: '${kubevirt-plugin}'
+        app.kubernetes.io/part-of: '${kubevirt-plugin}'
         app.openshift.io/runtime-namespace: '${NAMESPACE}'
     spec:
       replicas: 1
       selector:
         matchLabels:
-          app: '${PLUGIN_NAME}'
+          app: '${kubevirt-plugin}'
       template:
         metadata:
           labels:
-            app: '${PLUGIN_NAME}'
+            app: '${kubevirt-plugin}'
         spec:
           containers:
-            - name: '${PLUGIN_NAME}'
+            - name: '${kubevirt-plugin}'
               image: '${IMAGE}'
               ports:
                 - containerPort: 9443
@@ -92,8 +92,8 @@ objects:
       name: nginx-conf
       namespace: '${NAMESPACE}'
       labels:
-        app: '${PLUGIN_NAME}'
-        app.kubernetes.io/part-of: '${PLUGIN_NAME}'
+        app: '${kubevirt-plugin}'
+        app.kubernetes.io/part-of: '${kubevirt-plugin}'
     data:
       nginx.conf: |
         error_log /dev/stdout info;
@@ -115,13 +115,13 @@ objects:
     metadata:
       annotations:
         service.alpha.openshift.io/serving-cert-secret-name: plugin-serving-cert
-      name: '${PLUGIN_NAME}'
+      name: '${kubevirt-plugin}'
       namespace: '${NAMESPACE}'
       labels:
-        app: '${PLUGIN_NAME}'
-        app.kubernetes.io/component: '${PLUGIN_NAME}'
-        app.kubernetes.io/instance: '${PLUGIN_NAME}'
-        app.kubernetes.io/part-of: '${PLUGIN_NAME}'
+        app: '${kubevirt-plugin}'
+        app.kubernetes.io/component: '${kubevirt-plugin}'
+        app.kubernetes.io/instance: '${kubevirt-plugin}'
+        app.kubernetes.io/part-of: '${kubevirt-plugin}'
     spec:
       ports:
         - name: 9443-tcp
@@ -129,17 +129,17 @@ objects:
           port: 9443
           targetPort: 9443
       selector:
-        app: '${PLUGIN_NAME}'
+        app: '${kubevirt-plugin}'
       type: ClusterIP
       sessionAffinity: None
   - apiVersion: console.openshift.io/v1alpha1
     kind: ConsolePlugin
     metadata:
-      name: '${PLUGIN_NAME}'
+      name: '${kubevirt-plugin}'
     spec:
       displayName: 'Console Plugin Template'
       service:
-        name: '${PLUGIN_NAME}'
+        name: '${kubevirt-plugin}'
         namespace: '${NAMESPACE}'
         port: 9443
         basePath: '/'
