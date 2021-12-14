@@ -28,6 +28,6 @@ jobs:
         with:
           cmd: test-cov # will run `yarn test-cov` command- uses: codecov/codecov-action@v2
       - name: Coverage Upload
-      - uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
