@@ -50,6 +50,24 @@ const VMRow: React.FC<RowProps<VMKind, { kind: string }>> = ({
   activeColumnIDs,
   rowData: { kind },
 }) => {
+  let lol;
+
+  if (kind === 'VirtualMachine') {
+    lol = obj.metadata.name;
+  } else {
+    lol = obj.metadata.name;
+    if (obj.spec.template) {
+      lol += ` (${obj.spec.template.metadata.name})`;
+    } else if (obj.spec.templateRef) {
+      lol += ` (${obj.spec.templateRef.name})`;
+    } else if (obj.spec.templateName) {
+      lol += ` (${obj.spec.templateName})`;
+    } else if (obj.spec.templateNamespace) {
+      lol += ` (${obj.spec.templateNamespace})`;
+    } else if (obj.spec.templateNamespace) {
+      lol += ` (${obj.spec.templateNamespace})`;
+    }
+  }
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
@@ -60,6 +78,7 @@ const VMRow: React.FC<RowProps<VMKind, { kind: string }>> = ({
       </TableData>
       <TableData id="status" activeColumnIDs={activeColumnIDs}>
         {obj?.status?.printableStatus}
+        {lol}
       </TableData>
       <TableData id="conditions" activeColumnIDs={activeColumnIDs}>
         <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
