@@ -11,7 +11,8 @@
     "check-types": "tsc",
     "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
-    "test": "jest"
+    "test": "jest",
+    "test-cov": "jest --coverage"
   },
   "dependencies": {},
   "devDependencies": {
