@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 
-import { VMStatusConditionLabelList } from '@kubevirt-components/VMStatusConditionLabel';
+import { VMStatusConditionLabelList } from '@kubevirt-components/VMStatusConditionLabel/VMStatusConditionLabel';
 import { printableVMStatus } from '@kubevirt-constants/vm-status';
 import { VMKind } from '@kubevirt-types/vm';
 import {
