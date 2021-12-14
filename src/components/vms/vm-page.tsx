@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 
-import { VMStatusConditionLabelList } from '@kubevirt-components/VMStatusConditionLabel';
+import { VMStatusConditionLabelList } from '@kubevirt-components/VMStatusConditionLabel/VMStatusConditionLabel';
 import { printableVMStatus } from '@kubevirt-constants/vm-status';
 import { VMKind } from '@kubevirt-types/vm';
 import {
@@ -81,6 +81,7 @@ type VMTableProps = {
 
 const VMTable: React.FC<VMTableProps> = ({ data, unfilteredData, loaded, loadError, kind }) => {
   const { t } = useTranslation('plugin__kubevirt-plugin');
+
   return (
     <VirtualizedTable<K8sResourceCommon>
       data={data}

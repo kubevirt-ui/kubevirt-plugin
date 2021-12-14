@@ -10,7 +10,9 @@
     "lint:fix": "yarn lint --fix",
     "check-types": "tsc",
     "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
-    "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'"
+    "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
+    "test": "jest",
+    "test-cov": "jest --coverage"
   },
   "dependencies": {},
   "devDependencies": {
@@ -20,8 +22,10 @@
     "@openshift-console/dynamic-plugin-sdk-internal-kubevirt": "^0.0.10",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.4",
     "@patternfly/react-core": "4.175.4",
+    "@types/jest": "^27.0.3",
     "@types/node": "^16.11.12",
     "@types/react": "17.0.37",
+    "@types/react-test-renderer": "^17.0.1",
     "@types/webpack-dev-server": "^4.5.0",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
@@ -38,13 +42,16 @@
     "fork-ts-checker-webpack-plugin": "^6.5.0",
     "i18next": "^21.6.0",
     "i18next-parser": "3.x",
+    "jest": "^27.4.5",
     "prettier": "^2.5.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.14.3",
     "react-router-dom": "5.2.0",
+    "react-test-renderer": "^17.0.2",
     "style-loader": "^3.2.1",
+    "ts-jest": "^27.1.1",
     "ts-loader": "9.x",
     "ts-node": "10.x",
     "tsconfig-paths-webpack-plugin": "^3.5.1",
@@ -52,6 +59,19 @@
     "webpack": "^5.64.4",
     "webpack-cli": "4.9.x",
     "webpack-dev-server": "^4.6.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "preset": "ts-jest",
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+      "\\.(css|less|scss)$": "<rootDir>/__mocks__/styleMock.js"
+    },
+    "testRegex": ".*\\.test\\.(ts|tsx|js|jsx)$",
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/dist/"
+    ]
   },
   "consolePlugin": {
     "name": "kubevirt-plugin",

@@ -4,5 +4,6 @@ yarn-debug.log
 yarn-error.log
 dist
 **/.env
+/coverage
 
 .DS_Store
