@@ -27,7 +27,11 @@ jobs:
         uses: borales/actions-yarn@v2.3.0
         with:
           cmd: test-cov # will run `yarn test-cov` command- uses: codecov/codecov-action@v2
-      - name: Coverage Upload
+      - name: Codecov Coverage Upload
         uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Codacy Coverage Upload
+        uses: codacy/codacy-coverage-reporter-action@v1.1.0
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
