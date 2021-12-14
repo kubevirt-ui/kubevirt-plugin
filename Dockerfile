@@ -1,6 +1,6 @@
 FROM node:16 AS build
 
-ADD . /usr/src/app
+COPY . /usr/src/app
 WORKDIR /usr/src/app
 RUN yarn install && yarn build
 
