@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 
+import { VMStatusConditionLabelList } from '@kubevirt-components/VMStatusConditionLabel';
 import { printableVMStatus } from '@kubevirt-constants/vm-status';
 import { VMKind } from '@kubevirt-types/vm';
 import {
@@ -21,21 +22,25 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk-internal-kubevirt';
 
-const columns: (t: TFunction) => TableColumn<K8sResourceCommon>[] = () => [
+const columns: (t: TFunction) => TableColumn<K8sResourceCommon>[] = (t) => [
   {
-    title: 'Name',
+    title: t('Name'),
     id: 'name',
   },
   {
-    title: 'Namespace',
+    title: t('Namespace'),
     id: 'namespace',
   },
   {
-    title: 'Status',
+    title: t('Status'),
     id: 'status',
   },
   {
-    title: 'Created',
+    title: t('Conditions'),
+    id: 'conditions',
+  },
+  {
+    title: t('Created'),
     id: 'created',
   },
 ];
@@ -55,6 +60,9 @@ const VMRow: React.FC<RowProps<VMKind, { kind: string }>> = ({
       </TableData>
       <TableData id="status" activeColumnIDs={activeColumnIDs}>
         {obj?.status?.printableStatus}
+      </TableData>
+      <TableData id="conditions" activeColumnIDs={activeColumnIDs}>
+        <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
       </TableData>
       <TableData id="created" activeColumnIDs={activeColumnIDs}>
         <Timestamp timestamp={obj?.metadata?.creationTimestamp} />
