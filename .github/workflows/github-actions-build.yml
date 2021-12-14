@@ -26,8 +26,8 @@ jobs:
       - name: Unit Testing
         uses: borales/actions-yarn@v2.3.0
         with:
-          cmd: test-cov # will run `yarn test-cov` command
-      - name: Codacy Coverage Reporter
-        uses: codacy/codacy-coverage-reporter-action@v1.1.0
+          cmd: test-cov # will run `yarn test-cov` command- uses: codecov/codecov-action@v2
+      - name: Coverage Upload
+      - uses: codecov/codecov-action@v2
         with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
