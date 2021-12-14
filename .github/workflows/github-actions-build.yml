@@ -1,4 +1,4 @@
-name: Node CI
+name: CI
 on: [push]
 jobs:
   build:
@@ -14,3 +14,20 @@ jobs:
         uses: borales/actions-yarn@v2.3.0
         with:
           cmd: build # will run `yarn build` command
+  unit-test:
+    name: unit-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: install # will run `yarn install` command
+      - name: Unit Testing
+        uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: test-cov # will run `yarn test-cov` command
+      - name: Codacy Coverage Reporter
+        uses: codacy/codacy-coverage-reporter-action@v1.1.0
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
