@@ -94,10 +94,10 @@ export type V1NetworkInterface = {
   model?: string;
   macAddress?: string;
   bootOrder?: number;
-  bridge?: {};
-  masquerade?: {};
-  sriov?: {};
-  slirp?: {};
+  bridge?: any;
+  masquerade?: any;
+  sriov?: any;
+  slirp?: any;
 };
 
 export type NodeSelector = {
