@@ -1,61 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Render VMStatusConditionLabelList 1`] = `
-<div
-  className="pf-c-label-group"
->
+<DocumentFragment>
   <div
-    className="pf-c-label-group__main"
+    class="pf-c-label-group"
   >
-    
-    <ul
-      aria-label="Label group category"
-      className="pf-c-label-group__list"
-      role="list"
+    <div
+      class="pf-c-label-group__main"
     >
-      <li
-        className="pf-c-label-group__list-item"
+      <ul
+        aria-label="Label group category"
+        class="pf-c-label-group__list"
+        role="list"
       >
-        <span
-          className="pf-c-label"
-          onClick={[Function]}
+        <li
+          class="pf-c-label-group__list-item"
         >
-          <a
-            className="pf-c-label__content"
-            href="#"
+          <span
+            class="pf-c-label"
           >
-            <span
-              className="pf-c-label__text"
+            <a
+              class="pf-c-label__content"
+              href="#"
             >
-              no_vmi
-              =
-              true
-            </span>
-          </a>
-        </span>
-      </li>
-      <li
-        className="pf-c-label-group__list-item"
-      >
-        <span
-          className="pf-c-label"
-          onClick={[Function]}
+              <span
+                class="pf-c-label__text"
+              >
+                no_vmi=true
+              </span>
+            </a>
+          </span>
+        </li>
+        <li
+          class="pf-c-label-group__list-item"
         >
-          <a
-            className="pf-c-label__content"
-            href="#"
+          <span
+            class="pf-c-label"
           >
-            <span
-              className="pf-c-label__text"
+            <a
+              class="pf-c-label__content"
+              href="#"
             >
-              ready
-              =
-              true
-            </span>
-          </a>
-        </span>
-      </li>
-    </ul>
+              <span
+                class="pf-c-label__text"
+              >
+                ready=true
+              </span>
+            </a>
+          </span>
+        </li>
+      </ul>
+    </div>
   </div>
-</div>
+</DocumentFragment>
 `;
