@@ -1,21 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Render VMStatusConditionLabel 1`] = `
-<span
-  className="pf-c-label"
-  onClick={[Function]}
->
-  <a
-    className="pf-c-label__content"
-    href="#"
+exports[`VMStatusConditionLabel 1`] = `
+<DocumentFragment>
+  <span
+    class="pf-c-label"
   >
-    <span
-      className="pf-c-label__text"
+    <a
+      class="pf-c-label__content"
+      href="#"
     >
-      no_vmi
-      =
-      true
-    </span>
-  </a>
-</span>
+      <span
+        class="pf-c-label__text"
+      >
+        no_vmi=true
+      </span>
+    </a>
+  </span>
+</DocumentFragment>
 `;

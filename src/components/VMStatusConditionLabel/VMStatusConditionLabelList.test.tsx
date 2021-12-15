@@ -1,10 +1,13 @@
 import * as React from 'react';
-import * as renderer from 'react-test-renderer';
+
+import { cleanup, render } from '@testing-library/react';
 
 import { conditionsMock } from './mocks';
 import { VMStatusConditionLabelList } from './VMStatusConditionLabel';
 
+afterEach(cleanup);
+
 test('Render VMStatusConditionLabelList', () => {
-  const tree = renderer.create(<VMStatusConditionLabelList conditions={conditionsMock} />).toJSON();
-  expect(tree).toMatchSnapshot();
+  const { asFragment } = render(<VMStatusConditionLabelList conditions={conditionsMock} />);
+  expect(asFragment()).toMatchSnapshot();
 });
