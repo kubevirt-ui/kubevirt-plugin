@@ -60,6 +60,20 @@
     "webpack-cli": "4.9.x",
     "webpack-dev-server": "^4.6.0"
   },
+  "consolePlugin": {
+    "name": "kubevirt-plugin",
+    "version": "0.0.0",
+    "displayName": "Kubevirt Plugin",
+    "exposedModules": {
+      "vmListPage": "./components/vms/vm-page"
+    },
+    "dependencies": {
+      "@console/pluginAPI": "*"
+    },
+    "disableStaticPlugins": [
+      "@console/kubevirt-plugin"
+    ]
+  },
   "jest": {
     "testEnvironment": "jsdom",
     "preset": "ts-jest",
@@ -74,20 +88,15 @@
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/jest-setup.ts"
-    ]
-  },
-  "consolePlugin": {
-    "name": "kubevirt-plugin",
-    "version": "0.0.0",
-    "displayName": "Kubevirt Plugin",
-    "exposedModules": {
-      "vmListPage": "./components/vms/vm-page"
-    },
-    "dependencies": {
-      "@console/pluginAPI": "*"
-    },
-    "disableStaticPlugins": [
-      "@console/kubevirt-plugin"
-    ]
+    ],
+    "globals": {
+      "ts-jest": {
+        "diagnostics": {
+          "ignoreCodes": [
+            "TS151001"
+          ]
+        }
+      }
+    }
   }
 }

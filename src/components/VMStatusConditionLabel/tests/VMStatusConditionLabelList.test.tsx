@@ -2,8 +2,9 @@ import * as React from 'react';
 
 import { cleanup, render } from '@testing-library/react';
 
+import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
+
 import { conditionsMock } from './mocks';
-import { VMStatusConditionLabelList } from './VMStatusConditionLabel';
 
 afterEach(cleanup);
 
