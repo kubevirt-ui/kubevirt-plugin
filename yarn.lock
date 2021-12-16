@@ -588,19 +588,6 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openshift-console/dynamic-plugin-sdk-internal-kubevirt@^0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-internal-kubevirt/-/dynamic-plugin-sdk-internal-kubevirt-0.0.10.tgz#082695a86da3dd2b85348c039c8f0444130ca28f"
-  integrity sha512-vOXTULwUFfVEkM1SuOh05FR0F7dT2i0FSyAvkGwASdQKqUfCtZCmr65qSKGD2VqqJVbEUXXjapjY+0+CizTPmA==
-  dependencies:
-    "@patternfly/react-core" "4.168.8"
-    "@patternfly/react-table" "4.37.8"
-    react "^17.0.1"
-    react-helmet "^6.1.0"
-    react-i18next "^11.7.3"
-    react-router "5.2.0"
-    react-router-dom "5.2.0"
-
 "@openshift-console/dynamic-plugin-sdk-internal@^0.0.2-wp5":
   version "0.0.2-wp5"
   resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-internal/-/dynamic-plugin-sdk-internal-0.0.2-wp5.tgz#291946915a9a9543b0f47ebaec18977d1583c190"
@@ -1015,7 +1002,7 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.4.tgz#cd667bcfdd025213aafb7ca5915a932590acdcdc"
   integrity sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==
 
-"@types/react@17.0.37":
+"@types/react@^17.0.37":
   version "17.0.37"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.37.tgz#6884d0aa402605935c397ae689deed115caad959"
   integrity sha512-2FS1oTqBGcH/s0E+CjrCCR9+JMpsu9b69RTFO+40ua43ZqP5MmQ4iUde/dMjWR909KxZwmOQIFq6AV6NjEG5xg==

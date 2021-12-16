@@ -20,7 +20,6 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Timestamp } from '@openshift-console/dynamic-plugin-sdk-internal-kubevirt';
 
 const columns: (t: TFunction) => TableColumn<K8sResourceCommon>[] = (t) => [
   {
@@ -65,7 +64,7 @@ const VMRow: React.FC<RowProps<VMKind, { kind: string }>> = ({
         <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
       </TableData>
       <TableData id="created" activeColumnIDs={activeColumnIDs}>
-        <Timestamp timestamp={obj?.metadata?.creationTimestamp} />
+        {obj?.metadata?.creationTimestamp}
       </TableData>
     </>
   );
