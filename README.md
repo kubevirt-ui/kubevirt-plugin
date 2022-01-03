@@ -13,7 +13,7 @@ for OpenShift Console.
 
 ## i18n
 
-The plugin uses the
+The plugin uses the following
 `plugin__kubevirt-plugin` namespace. You should use the `useTranslation` hook
 with this namespace as follows:
 
