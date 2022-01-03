@@ -32,6 +32,7 @@ jobs:
           add-labels: 'lgtm'
 
   automerge:
+    needs: [labeler]
     runs-on: ubuntu-latest
     steps:
       - name: auto-merge
