@@ -5,10 +5,8 @@ on:
 jobs:
   merge:
     name: merge
-    needs:
-      - "build"
-      - "unit-test"
     if: |
+      github.event.check_suite.status == 'completed' &&
       contains(github.event.pull_request.labels.*.name, 'approved') &&
       contains(github.event.pull_request.labels.*.name, 'lgtm')
     runs-on: ubuntu-latest
