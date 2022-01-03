@@ -9,14 +9,6 @@ jobs:
   labeler:
     runs-on: ubuntu-latest
     steps:
-      - name: Check for /lgtm comment
-        uses: khan/pull-request-comment-trigger@master
-        id: check
-        with:
-          trigger: '/lgtm'
-          reaction: rocket
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
       - name: Add Approve label
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
