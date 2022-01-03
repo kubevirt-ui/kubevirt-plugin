@@ -15,4 +15,11 @@ jobs:
           (contains(github.event.comment.body, '/approve') || contains(github.event.comment.body, '/lgtm'))
         uses: andymckay/labeler@master
         with:
-          add-labels: "approve, lgtm"
+          add-labels: 'approve'
+      - name: Add LGTM label
+        if: |
+          contains(github.event.comment.html_url, '/pull/') && 
+          contains(github.event.comment.body, '/lgtm')
+        uses: andymckay/labeler@master
+        with:
+          add-labels: 'lgtm'
