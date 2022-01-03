@@ -48,7 +48,7 @@ add the message from `console-extensions.json` to your message catalog as follow
 // t('plugin__kubevirt-plugin~VirtualMachines')
 ```
 
-Running `yarn i18n` updates the JSON files in the `locales` folder of the
+Run `yarn i18n` to update the JSON files in the `locales` folder of the
 dynamic plugin when adding or changing messages.
 
 ## Docker image
