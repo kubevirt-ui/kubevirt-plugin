@@ -66,4 +66,4 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: kubevirt-plugin:latest
+          tags: quay.io/kubevirt-ui/kubevirt-plugin:latest
