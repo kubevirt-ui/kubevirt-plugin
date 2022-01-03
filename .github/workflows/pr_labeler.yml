@@ -6,7 +6,7 @@ on:
     types: [created]
 
 jobs:
-  deploy:
+  labeler:
     runs-on: ubuntu-latest
     steps:
       - name: Check for /lgtm comment
