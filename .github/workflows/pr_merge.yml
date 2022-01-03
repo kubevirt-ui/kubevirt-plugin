@@ -7,7 +7,7 @@ on:
       - unlabeled
       - synchronize
   issue_comment:
-    types: [created]
+    types: [created, edited]
   check_suite:
     types:
       - completed
