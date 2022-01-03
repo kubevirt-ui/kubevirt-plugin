@@ -8,15 +8,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install Dependencies
-        uses: borales/actions-yarn@v2.3.0
+      - name: Setup Yarn
+        uses: actions/setup-node@v2
         with:
-          cmd: install
-
-      - name: Build
-        uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: build
+          node-version: '14'
+          cache: 'yarn'
+      - run: yarn install
 
   unit-test:
     name: unit-test
@@ -25,12 +22,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install Dependencies
-        uses: borales/actions-yarn@v2.3.0
+      - name: Setup Yarn
+        uses: actions/setup-node@v2
         with:
-          cmd: install
-
-      - name: Unit Testing
-        uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: test-cov
+          node-version: '14'
+          cache: 'yarn'
+      - run: yarn install
+      - run: yarn test
