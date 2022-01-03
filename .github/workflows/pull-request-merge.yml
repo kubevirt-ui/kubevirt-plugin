@@ -1,27 +1,28 @@
-name: CI
+name: automerge
 on:
   pull_request:
-    types: [ labeled ]
+    types:
+      - labeled
+      - unlabeled
+      - synchronize
+      - opened
+      - edited
+      - ready_for_review
+      - reopened
+      - unlocked
+  pull_request_review:
+    types:
+      - submitted
+  check_suite:
+    types:
+      - completed
+  status: {}
 jobs:
-  merge:
-    name: merge
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'approved') &&
-      contains(github.event.pull_request.labels.*.name, 'lgtm')
+  automerge:
     runs-on: ubuntu-latest
-
     steps:
-    - name: "Merge pull request"
-      uses: "actions/github-script@v2"
-      with:
-        github-token: "${{ secrets.GITHUB_TOKEN }}"
-        script: |
-          const pullRequest = context.payload.pull_request
-          const repository = context.repo
-
-          await github.pulls.merge({
-            merge_method: "merge",
-            owner: repository.owner,
-            pull_number: pullRequest.number,
-            repo: repository.repo,
-          })
+      - name: automerge
+        uses: "pascalgn/automerge-action@v0.14.3"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          MERGE_LABELS: "approved,lgtm,!WIP"
