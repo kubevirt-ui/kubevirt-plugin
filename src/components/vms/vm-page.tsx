@@ -123,7 +123,7 @@ const VMListPage = ({ kind }: { kind: string }) => {
     namespaced: true,
   });
 
-  const [data, filteredData, onFilterChange] = useListPageFilter(vms, filters);
+  const [vmData, filteredData, onFilterChange] = useListPageFilter(vms, filters);
 
   return (
     <>
@@ -132,14 +132,14 @@ const VMListPage = ({ kind }: { kind: string }) => {
       </ListPageHeader>
       <ListPageBody>
         <ListPageFilter
-          data={data}
+          data={vmData}
           loaded={loaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
         />
         <VMTable
           data={filteredData}
-          unfilteredData={data}
+          unfilteredData={vmData}
           loaded={loaded}
           loadError={loadError}
           kind={kind}
