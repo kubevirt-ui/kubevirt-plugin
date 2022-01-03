@@ -8,7 +8,7 @@ for OpenShift Console.
 
 ## Local development
 
-1. `yarn dev` to serve the plugin with `webpack-dev-server`, generating output to `dist` directory
+1. `yarn dev` to serve the plugin with webpack dev server, generating output to `dist` directory
 2. run bridge with `-plugins kubevirt-plugin=http://localhost:9001`
 
 ## i18n
@@ -42,7 +42,7 @@ namespace. For example:
 
 Note that you will need to include a comment in a TypeScript file like the
 following for [i18next-parser](https://github.com/i18next/i18next-parser) to
-add the message from `console-extensions.json` to your message catalog.
+add the message from `console-extensions.json` to your message catalog as follows:
 
 ```ts
 // t('plugin__kubevirt-plugin~VirtualMachines')
