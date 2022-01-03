@@ -115,6 +115,8 @@ export const filters: RowFilter[] = [
 ];
 
 const VMListPage = ({ kind }: { kind: string }) => {
+
+  
   const { t } = useTranslation('plugin__kubevirt-plugin');
 
   const [vms, loaded, loadError] = useK8sWatchResource<VMKind[]>({
