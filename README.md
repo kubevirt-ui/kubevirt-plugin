@@ -14,7 +14,7 @@ for OpenShift Console.
 ## i18n
 
 The plugin uses the
-`plugin__kubevirt-plugin` namespace. You can use the `useTranslation` hook
+`plugin__kubevirt-plugin` namespace. You should use the `useTranslation` hook
 with this namespace as follows:
 
 ```tsx
@@ -24,7 +24,7 @@ conster Header: React.FC = () => {
 };
 ```
 
-For labels in `console-extensions.json`, you can use the format
+For labels in `console-extensions.json`, you should use the format
 `%plugin__kubevirt-plugin~My Label%`. Console will replace the value with
 the message for the current language from the `plugin__kubevirt-plugin`
 namespace. For example:
