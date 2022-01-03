@@ -2,8 +2,12 @@ name: CI
 on:
   pull_request:
     types:
+      - opened
       - labeled
       - unlabeled
+      - synchronize
+  issue_comment:
+    types: [created]
   check_suite:
     types:
       - completed
@@ -13,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: auto-merge
-        uses: "pascalgn/automerge-action@v0.14.3"
+        uses: 'pascalgn/automerge-action@v0.14.3'
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          MERGE_LABELS: "approve,lgtm,!WIP"
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          MERGE_LABELS: 'approve,lgtm,!WIP'
