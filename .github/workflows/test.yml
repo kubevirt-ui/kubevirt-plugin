@@ -1,0 +1,24 @@
+name: TEST
+on:
+  pull_request:
+    types:
+      - opened
+      - labeled
+      - unlabeled
+      - synchronize
+  issue_comment:
+    types: [created, edited]
+  check_suite:
+    types:
+      - completed
+jobs:
+  envtest:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - run: export OWNERS=$(cat ./OWNERS)
+      - run: export OWNERS_STAT="hello world"
+      - run: echo the owners are ${{ env.OWNERS }}
+      - run: echo the owners are ${{ env.OWNERS_STAT }}
+      - run: echo the owners are $OWNERS
+      - run: echo the owners are $OWNERS_STAT
