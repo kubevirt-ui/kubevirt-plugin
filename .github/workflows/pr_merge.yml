@@ -16,6 +16,7 @@ jobs:
   labeler:
     runs-on: ubuntu-latest
     env:
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       APPROVERS: 'tnisan, yaacov, metalice, pcbailey, avivtur, vojtechszocs'
     steps:
       - name: Add WIP label
