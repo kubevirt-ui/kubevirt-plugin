@@ -16,9 +16,14 @@ on:
 jobs:
   labeler:
     runs-on: ubuntu-latest
-    env:
-      APPROVERS: 'tnisan, yaacov, metalice, pcbailey, avivtur, vojtechszocs'
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get Approvers
+        id: approvers
+        run: echo ::set-output name=approvers::$(cat ./OWNERS)
+
       - name: Add WIP label
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
@@ -30,7 +35,8 @@ jobs:
       - name: Add Approve label
         if: |
           contains(github.event.comment.html_url, '/pull/') &&
-          (contains(github.event.comment.body, '/approve') || contains(github.event.comment.body, '/lgtm'))
+          (contains(github.event.comment.body, '/approve') || contains(github.event.comment.body, '/lgtm')) &&
+          contains(steps.approvers.outputs.approvers, github.event.comment.sender.login)
         uses: andymckay/labeler@master
         with:
           add-labels: 'approve'
@@ -39,6 +45,7 @@ jobs:
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
           contains(github.event.comment.body, '/lgtm') &&
+          contains(steps.approvers.outputs.approvers, github.event.comment.sender.login) &&
           github.event.issue.user.login != github.event.comment.sender.login
         uses: andymckay/labeler@master
         with:
