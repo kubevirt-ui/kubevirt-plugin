@@ -52,19 +52,6 @@ jobs:
           add-labels: 'lgtm'
           remove-labels: 'WIP'
 
-      - name: Test output
-        run: echo ${{ steps.approvers.outputs.approvers }}
-
-      - name: Test Login Ouput
-        env:
-          LOGIN: ${{ github.event.comment.user.login }}
-        run: echo "$LOGIN"
-
-      - name: GithubContext
-        env:
-          GH_CONTEXT: ${{ toJSON(github) }}
-        run: echo "$GH_CONTEXT"
-
   automerge:
     needs: [labeler]
     runs-on: ubuntu-latest
