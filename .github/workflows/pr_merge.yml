@@ -1,4 +1,3 @@
-#           contains(${{ env.APPROVERS }}, github.event.comment.user.login)
 name: PR
 on:
   pull_request:
@@ -24,14 +23,6 @@ jobs:
         id: approvers
         run: echo ::set-output name=approvers::$(cat ./OWNERS)
 
-      - name: Add WIP label
-        if: |
-          contains(github.event.comment.html_url, '/pull/') && 
-          contains(github.event.comment.body, '/wip')
-        uses: andymckay/labeler@master
-        with:
-          add-labels: 'WIP'
-
       - name: Add Approve label
         if: |
           contains(github.event.comment.html_url, '/pull/') &&
@@ -50,6 +41,22 @@ jobs:
         uses: andymckay/labeler@master
         with:
           add-labels: 'lgtm'
+          remove-labels: 'WIP'
+
+      - name: Add WIP label
+        if: |
+          contains(github.event.comment.html_url, '/pull/') && 
+          contains(github.event.comment.body, '/wip')
+        uses: andymckay/labeler@master
+        with:
+          add-labels: 'WIP'
+
+      - name: Remove WIP label
+        if: |
+          contains(github.event.comment.html_url, '/pull/') && 
+          contains(github.event.comment.body, '/wip remove')
+        uses: andymckay/labeler@master
+        with:
           remove-labels: 'WIP'
 
   automerge:
