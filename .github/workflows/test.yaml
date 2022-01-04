@@ -5,6 +5,5 @@ jobs:
     name: test
     runs-on: ubuntu-latest
     steps:
-      - name: Get Enviorment var from file
       - run: export OWNERS=$(cat ./OWNERS)
       - run: echo the owners are $env.OWNERS
