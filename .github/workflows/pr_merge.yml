@@ -56,6 +56,11 @@ jobs:
         run: echo ${{ steps.approvers.outputs.approvers }}
       - run: echo ${{ github.event.comment.sender.login }}
 
+      - name: GithubContext
+        env:
+          GH_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GH_CONTEXT"
+
   automerge:
     needs: [labeler]
     runs-on: ubuntu-latest
