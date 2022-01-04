@@ -15,6 +15,8 @@ on:
 jobs:
   labeler:
     runs-on: ubuntu-latest
+    env:
+      APPROVERS: 'tnisan, yaacov, metalice, pcbailey, avivtur, vojtechszocs'
     steps:
       - name: Add WIP label
         if: |
@@ -26,8 +28,9 @@ jobs:
 
       - name: Add Approve label
         if: |
-          contains(github.event.comment.html_url, '/pull/') && 
-          (contains(github.event.comment.body, '/approve') || contains(github.event.comment.body, '/lgtm'))
+          contains(github.event.comment.html_url, '/pull/') &&
+          (contains(github.event.comment.body, '/approve') || contains(github.event.comment.body, '/lgtm')) &&
+          contains(${{ env.APPROVERS }}, github.event.comment.sender.login)
         uses: andymckay/labeler@master
         with:
           add-labels: 'approve'
@@ -35,10 +38,13 @@ jobs:
       - name: Add LGTM label
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
-          contains(github.event.comment.body, '/lgtm')
+          contains(github.event.comment.body, '/lgtm') &&
+          contains(${{ env.APPROVERS }}, github.event.comment.sender.login) &&
+          github.event.issue.user.login != github.event.comment.sender.login
         uses: andymckay/labeler@master
         with:
           add-labels: 'lgtm'
+          remove-labels: 'WIP'
 
   automerge:
     needs: [labeler]
