@@ -19,6 +19,11 @@ jobs:
     env:
       APPROVERS: 'tnisan, yaacov, metalice, pcbailey, avivtur, vojtechszocs'
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
       - name: Add WIP label
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
