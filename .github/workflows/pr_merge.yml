@@ -1,4 +1,4 @@
-#           contains(${{ env.APPROVERS }}, github.event.comment.sender.login)
+#           contains(${{ env.APPROVERS }}, github.event.comment.user.login)
 name: PR
 on:
   pull_request:
@@ -36,7 +36,7 @@ jobs:
         if: |
           contains(github.event.comment.html_url, '/pull/') &&
           (contains(github.event.comment.body, '/approve') || contains(github.event.comment.body, '/lgtm')) &&
-          contains(steps.approvers.outputs.approvers, github.event.comment.sender.login)
+          contains(steps.approvers.outputs.approvers, github.event.comment.user.login)
         uses: andymckay/labeler@master
         with:
           add-labels: 'approve'
@@ -45,8 +45,8 @@ jobs:
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
           contains(github.event.comment.body, '/lgtm') &&
-          contains(steps.approvers.outputs.approvers, github.event.comment.sender.login) &&
-          github.event.issue.user.login != github.event.comment.sender.login
+          contains(steps.approvers.outputs.approvers, github.event.comment.user.login) &&
+          github.event.issue.user.login != github.event.comment.user.login
         uses: andymckay/labeler@master
         with:
           add-labels: 'lgtm'
@@ -54,7 +54,11 @@ jobs:
 
       - name: Test output
         run: echo ${{ steps.approvers.outputs.approvers }}
-      - run: echo ${{ github.event.comment.sender.login }}
+
+      - name: Test Login Ouput
+        env:
+          LOGIN: ${{ github.event.comment.user.login }}
+        run: echo "$LOGIN"
 
       - name: GithubContext
         env:
