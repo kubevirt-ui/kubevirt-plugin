@@ -9,4 +9,10 @@ jobs:
     steps:
       - uses: actions/github-script@v5
         with:
-          script: console.log(context)
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Thanks for the contribution!'
+            })
