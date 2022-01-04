@@ -1,3 +1,4 @@
+#           contains(${{ env.APPROVERS }}, github.event.comment.sender.login)
 name: PR
 on:
   pull_request:
@@ -16,7 +17,6 @@ jobs:
   labeler:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       APPROVERS: 'tnisan, yaacov, metalice, pcbailey, avivtur, vojtechszocs'
     steps:
       - name: Add WIP label
@@ -31,7 +31,6 @@ jobs:
         if: |
           contains(github.event.comment.html_url, '/pull/') &&
           (contains(github.event.comment.body, '/approve') || contains(github.event.comment.body, '/lgtm')) &&
-          contains(${{ env.APPROVERS }}, github.event.comment.sender.login)
         uses: andymckay/labeler@master
         with:
           add-labels: 'approve'
@@ -40,7 +39,6 @@ jobs:
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
           contains(github.event.comment.body, '/lgtm') &&
-          contains(${{ env.APPROVERS }}, github.event.comment.sender.login) &&
           github.event.issue.user.login != github.event.comment.sender.login
         uses: andymckay/labeler@master
         with:
