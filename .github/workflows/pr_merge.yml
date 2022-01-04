@@ -21,8 +21,9 @@ jobs:
     steps:
       - name: Dump GitHub context
         env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
-        run: echo "$GITHUB_CONTEXT"
+          PR_OWNER: ${{ toJSON(github.event.issue.user.login) }}
+          PR_COMMENT_OWNER: ${{ toJSON(github.event.comment.sender.login) }}
+        run: echo "$PR_OWNER $PR_COMMENT_OWNER"
 
       - name: Add WIP label
         if: |
