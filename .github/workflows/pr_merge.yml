@@ -52,6 +52,10 @@ jobs:
           add-labels: 'lgtm'
           remove-labels: 'WIP'
 
+      - name: Test output
+        run: echo ${{ steps.approvers.outputs.approvers }}
+      - run: echo ${{ github.event.comment.sender.login }}
+
   automerge:
     needs: [labeler]
     runs-on: ubuntu-latest
