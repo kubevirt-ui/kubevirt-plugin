@@ -3,7 +3,6 @@ on:
   pull_request:
     types:
       - opened
-      - edited
       - labeled
       - unlabeled
       - synchronize
@@ -46,30 +45,19 @@ jobs:
 
       - name: Add WIP label
         if: |
-          contains(github.event.pull_request.title, 'WIP') ||
-          (contains(github.event.comment.html_url, '/pull/') && 
-          contains(github.event.comment.body, '/wip'))
+          contains(github.event.comment.html_url, '/pull/') && 
+          contains(github.event.comment.body, '/wip')
         uses: andymckay/labeler@master
         with:
           add-labels: 'WIP'
 
       - name: Remove WIP label
         if: |
-          !contains(github.event.pull_request.title, 'WIP') ||
-          (contains(github.event.comment.html_url, '/pull/') && 
-          contains(github.event.comment.body, '/remove_wip'))
+          contains(github.event.comment.html_url, '/pull/') && 
+          contains(github.event.comment.body, '/remove_wip')
         uses: andymckay/labeler@master
         with:
           remove-labels: 'WIP'
-
-      - name: Add bug label
-        if: |
-          contains(github.event.pull_request.title, 'bug') ||
-          (contains(github.event.comment.html_url, '/pull/') && 
-          contains(github.event.comment.body, '/bug'))
-        uses: andymckay/labeler@master
-        with:
-          add-labels: 'bug'
 
   automerge:
     needs: [labeler]
