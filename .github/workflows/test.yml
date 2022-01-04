@@ -16,9 +16,10 @@ jobs:
     name: test
     runs-on: ubuntu-latest
     steps:
-      - run: export OWNERS=$(cat ./OWNERS)
-      - run: export OWNERS_STAT="hello world"
-      - run: echo the owners are ${{ env.OWNERS }}
-      - run: echo the owners are ${{ env.OWNERS_STAT }}
-      - run: echo the owners are $OWNERS
-      - run: echo the owners are $OWNERS_STAT
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get Approvers
+        id: approvers
+        run: echo ::set-output name=approvers::$(cat ./OWNERS)
+      - name: Test output
+        run: echo ${{ steps.approvers.outputs.approvers }}
