@@ -8,7 +8,7 @@ for OpenShift Console.
 
 ## Local development
 
-1. `yarn dev` to serve the plugin with webpack-dev-server, generating output to `dist` directory
+1. `yarn dev` to serve the plugin with `webpack-dev-server`, generating output to `dist` directory
 2. run bridge with `-plugins kubevirt-plugin=http://localhost:9001`
 
 ## i18n
