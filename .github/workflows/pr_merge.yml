@@ -63,7 +63,7 @@ jobs:
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
           contains(github.event.comment.body, '/hold') &&
-          contains(steps.approvers.outputs.approvers, github.event.comment.user.login || 'null') &&
+          contains(steps.approvers.outputs.approvers, github.event.comment.user.login || 'null')
         uses: andymckay/labeler@master
         with:
           add-labels: 'hold'
@@ -72,7 +72,7 @@ jobs:
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
           contains(github.event.comment.body, '/remove hold') &&
-          contains(steps.approvers.outputs.approvers, github.event.comment.user.login || 'null') &&
+          contains(steps.approvers.outputs.approvers, github.event.comment.user.login || 'null')
         uses: andymckay/labeler@master
         with:
           remove-labels: 'hold'
