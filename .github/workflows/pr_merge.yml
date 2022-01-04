@@ -54,7 +54,7 @@ jobs:
       - name: Remove WIP label
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
-          contains(github.event.comment.body, '/wip remove')
+          contains(github.event.comment.body, '/remove_wip')
         uses: andymckay/labeler@master
         with:
           remove-labels: 'WIP'
