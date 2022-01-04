@@ -1,0 +1,9 @@
+name: TEST
+on: [pull_request]
+jobs:
+  envtest:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - run: export OWNERS=$(cat ./OWNERS)
+      - run: echo the owners are ${{ env.OWNERS }}
