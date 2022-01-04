@@ -4,7 +4,7 @@ Thanks for creating a Pull Request 💖!
 Please read the following before submitting:
 - PRs that adds new external dependencies might take a while to review.
 - Keep your PR as small as possible.
-- Limit your PR to one type (feature, refactoring, ci, or bugfix)
+- Limit your PR to one type (feature, refactoring, ci, and bugfix)
 -->
 
 ### 📝 Description
