@@ -11,13 +11,20 @@ on:
       - completed
   status: {}
 jobs:
+  printcontext:
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo context
+        env: { CONTENT: '${{ toJSON(github) }}' }
+        run: 'echo $CONTENT'
+
   automerge:
     runs-on: ubuntu-latest
     if: |
-      !contains( github.event.pull_request.labels.*.name, 'hold') &&
-      !contains( github.event.pull_request.labels.*.name, 'WIP') &&
-      contains( github.event.pull_request.labels.*.name, 'approved') &&
-      contains( github.event.pull_request.labels.*.name, 'lgtm')
+      !contains(github.event.pull_request.labels.*.name, 'hold') &&
+      !contains(github.event.pull_request.labels.*.name, 'WIP') &&
+      contains(github.event.pull_request.labels.*.name, 'approved') &&
+      contains(github.event.pull_request.labels.*.name, 'lgtm')
     steps:
       - name: Automerge
         run: gh pr merge --auto --squash "$PR_URL"
