@@ -1,5 +1,8 @@
 name: PR
 on:
+  pull_request:
+    types:
+      - opened
   issue_comment:
     types: [created, edited]
 jobs:
@@ -33,10 +36,18 @@ jobs:
           add-labels: 'lgtm'
           remove-labels: 'WIP'
 
-      - name: Add WIP label
+      - name: Add WIP label / comment trigger
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
           contains(github.event.comment.body, '/wip')
+        uses: andymckay/labeler@master
+        with:
+          add-labels: 'WIP'
+
+      - name: Add WIP label / title trigger
+        if: |
+          contains(github.event.pull_request.title, 'wip') ||
+          contains(github.event.pull_request.title, 'WIP')
         uses: andymckay/labeler@master
         with:
           add-labels: 'WIP'
@@ -66,3 +77,11 @@ jobs:
         uses: andymckay/labeler@master
         with:
           remove-labels: 'hold'
+
+      - name: Add Bug label / title trigger
+        if: |
+          contains(github.event.pull_request.title, 'bug') ||
+          contains(github.event.pull_request.title, 'BUG')
+        uses: andymckay/labeler@master
+        with:
+          add-labels: 'bug'
