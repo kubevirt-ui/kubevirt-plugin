@@ -16,7 +16,7 @@ jobs:
       - name: Add Approve label
         if: |
           contains(github.event.comment.html_url, '/pull/') &&
-          (contains(github.event.comment.body, '/approved') || contains(github.event.comment.body, '/lgtm')) &&
+          (contains(github.event.comment.body, '/approve') || contains(github.event.comment.body, '/lgtm')) &&
           contains(steps.approvers.outputs.approvers, github.event.comment.user.login || 'null')
         uses: andymckay/labeler@master
         with:
