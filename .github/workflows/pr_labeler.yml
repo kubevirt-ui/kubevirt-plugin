@@ -1,17 +1,7 @@
 name: PR
 on:
-  pull_request:
-    types:
-      - opened
-      - labeled
-      - unlabeled
-      - synchronize
   issue_comment:
     types: [created, edited]
-  check_suite:
-    types:
-      - completed
-  status: {}
 jobs:
   labeler:
     runs-on: ubuntu-latest
@@ -26,11 +16,11 @@ jobs:
       - name: Add Approve label
         if: |
           contains(github.event.comment.html_url, '/pull/') &&
-          (contains(github.event.comment.body, '/approve') || contains(github.event.comment.body, '/lgtm')) &&
+          (contains(github.event.comment.body, '/approved') || contains(github.event.comment.body, '/lgtm')) &&
           contains(steps.approvers.outputs.approvers, github.event.comment.user.login || 'null')
         uses: andymckay/labeler@master
         with:
-          add-labels: 'approve'
+          add-labels: 'approved'
 
       - name: Add LGTM label
         if: |
@@ -76,14 +66,3 @@ jobs:
         uses: andymckay/labeler@master
         with:
           remove-labels: 'hold'
-
-  automerge:
-    needs: [labeler]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Merge
-        uses: 'pascalgn/automerge-action@v0.14.3'
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          MERGE_LABELS: 'approve,lgtm,!WIP,!hold'
-          MERGE_METHOD: squash
