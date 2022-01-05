@@ -11,13 +11,6 @@ on:
       - completed
   status: {}
 jobs:
-  printcontext:
-    runs-on: ubuntu-latest
-    steps:
-      - name: echo context
-        env: { CONTENT: '${{ toJSON(github) }}' }
-        run: 'echo $CONTENT'
-
   automerge:
     runs-on: ubuntu-latest
     if: |
@@ -26,8 +19,9 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'approved') &&
       contains(github.event.pull_request.labels.*.name, 'lgtm')
     steps:
-      - name: Automerge
-        run: gh pr merge --auto --squash "$PR_URL"
+      - name: Auto Merge
+        uses: 'pascalgn/automerge-action@v0.14.3'
         env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          MERGE_LABELS: 'approve,lgtm,!WIP'
+          MERGE_METHOD: squash
