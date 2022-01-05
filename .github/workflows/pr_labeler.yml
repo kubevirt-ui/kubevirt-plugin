@@ -45,14 +45,6 @@ jobs:
         with:
           add-labels: 'WIP'
 
-      - name: Add WIP label / title trigger
-        if: |
-          contains(github.event.pull_request.title, 'wip') ||
-          contains(github.event.pull_request.title, 'WIP')
-        uses: andymckay/labeler@master
-        with:
-          add-labels: 'WIP'
-
       - name: Remove WIP label
         if: |
           contains(github.event.comment.html_url, '/pull/') && 
@@ -78,11 +70,3 @@ jobs:
         uses: andymckay/labeler@master
         with:
           remove-labels: 'hold'
-
-      - name: Add Bug label / title trigger
-        if: |
-          contains(github.event.pull_request.title, 'bug') ||
-          contains(github.event.pull_request.title, 'BUG')
-        uses: andymckay/labeler@master
-        with:
-          add-labels: 'bug'
