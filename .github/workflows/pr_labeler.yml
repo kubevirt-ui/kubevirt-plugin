@@ -40,7 +40,7 @@ jobs:
 
       - name: Add WIP label / comment trigger
         if: |
-          contains(github.event.pull_request_target.title, 'wip') ||
+          contains(github.event.pull_request.title, 'wip') ||
           (contains(github.event.comment.html_url, '/pull/') && 
           contains(github.event.comment.body, '/wip'))
         uses: andymckay/labeler@master
