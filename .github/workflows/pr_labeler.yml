@@ -5,6 +5,7 @@ on:
       - opened
       - edited
       - ready_for_review
+      - synchronize
   issue_comment:
     types: [created, edited]
 jobs:
@@ -72,3 +73,17 @@ jobs:
         uses: andymckay/labeler@master
         with:
           remove-labels: 'hold'
+
+      - name: Add Bug label / comment trigger
+        if: |
+          contains(github.event.pull_request.title, 'bug') ||
+          (contains(github.event.comment.html_url, '/pull/') && 
+          contains(github.event.comment.body, '/bug'))
+        uses: andymckay/labeler@master
+        with:
+          add-labels: 'bug'
+      
+      - name: Add Size label
+        uses: "pascalgn/size-label-action@v0.4.3"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
