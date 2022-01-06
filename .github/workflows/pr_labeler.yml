@@ -1,9 +1,10 @@
 name: PR
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
       - edited
+      - ready_for_review
   issue_comment:
     types: [created, edited]
 jobs:
@@ -12,6 +13,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Print Context
+        env:
+          CONTEXT: ${{ toJSON(github) }}
+        run: echo "$CONTEXT"
 
       - name: Get Approvers
         id: approvers
