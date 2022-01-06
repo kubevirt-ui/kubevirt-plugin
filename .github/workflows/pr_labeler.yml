@@ -14,12 +14,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Print Context
-        env:
-          PR_TARGET_TITLE: ${{ github.event.pull_request_target.title }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: echo "$PR_TARGET_TITLE $PR_TITLE"
-
       - name: Get Approvers
         id: approvers
         run: echo ::set-output name=approvers::$(cat ./OWNERS)
@@ -46,8 +40,9 @@ jobs:
 
       - name: Add WIP label / comment trigger
         if: |
-          contains(github.event.comment.html_url, '/pull/') && 
-          contains(github.event.comment.body, '/wip')
+          contains(github.event.pull_request_target.title, 'wip') ||
+          (contains(github.event.comment.html_url, '/pull/') && 
+          contains(github.event.comment.body, '/wip'))
         uses: andymckay/labeler@master
         with:
           add-labels: 'WIP'
