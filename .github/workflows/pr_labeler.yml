@@ -16,8 +16,9 @@ jobs:
 
       - name: Print Context
         env:
-          CONTEXT: ${{ toJSON(github) }}
-        run: echo "$CONTEXT"
+          PR_TARGET_TITLE: ${{ github.event.pull_request_target.title }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: echo "$PR_TARGET_TITLE $PR_TITLE"
 
       - name: Get Approvers
         id: approvers
