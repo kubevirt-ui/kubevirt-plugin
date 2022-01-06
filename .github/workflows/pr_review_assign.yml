@@ -7,7 +7,14 @@ jobs:
   assign-reviewers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: uesteibar/reviewer-lottery@v2
+        steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Assign author to PR
+        uses: technote-space/assign-author@v1
+
+      - name: Request review
+        uses: uesteibar/reviewer-lottery@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
