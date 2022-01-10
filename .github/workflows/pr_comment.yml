@@ -22,8 +22,8 @@ jobs:
           hide_classify: "OUTDATED"
           message: |
             PR Status
-            - Has required labels `approved, lgtm` - ${{ contains( github.event.issue.labels.*.name, 'approved') &&
-              contains( github.event.issue.labels.*.name, 'lgtm') && '✅' || '❌' }}
-            - No blocking labels `wip, hold` - ${{ (contains( github.event.issue.labels.*.name, 'wip') ||
-              contains( github.event.issue.labels.*.name, 'hold')) && '❌' || '✅' }}
+            - Has required labels `approved, lgtm` - ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
+              contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
+            - No blocking labels `wip, hold` - ${{ (contains( github.event.pull_request.labels.*.name, 'wip') ||
+              contains( github.event.pull_request.labels.*.name, 'hold')) && '❌' || '✅' }}
  
