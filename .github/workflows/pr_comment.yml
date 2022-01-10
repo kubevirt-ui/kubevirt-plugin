@@ -13,6 +13,7 @@ jobs:
       - name: Merge Comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
+          delete: true
           recreate: true
           message: |
             PR Status
@@ -21,5 +22,5 @@ jobs:
             - No blocking labels `wip, hold` - ${{ (contains( github.event.pull_request.labels.*.name, 'wip') ||
               contains( github.event.pull_request.labels.*.name, 'hold')) && '❌' || '✅' }}
               
-              _This Pull Request will not merge until all required tests passed_
+              _This Pull Request will not merge until all required tests have passed_
  
