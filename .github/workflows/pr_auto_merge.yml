@@ -37,6 +37,6 @@ jobs:
           message: |
             PR Status
             - Has required labels `approved, lgtm`: ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
-              contains( github.event.pull_request.labels.*.name, 'lgtm') && '💚' || ':x:' }}
-            - No blocking labels `wip, hold`: ${{ contains( github.event.pull_request.labels.*.name, 'wip') ||
-              contains( github.event.pull_request.labels.*.name, 'hold') && ':x:' || '💚' }}
+              contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
+            - No blocking labels `wip, hold`: ${{ (!contains( github.event.pull_request.labels.*.name, 'wip') &&
+              !contains( github.event.pull_request.labels.*.name, 'hold')) && '✅' || '❌' }}
