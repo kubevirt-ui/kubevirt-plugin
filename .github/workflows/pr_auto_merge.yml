@@ -6,6 +6,8 @@ on:
       - labeled
       - unlabeled
       - synchronize
+  issue_comment:
+    types: [created, edited]
   check_suite:
     types:
       - completed
@@ -35,6 +37,6 @@ jobs:
           message: |
             PR Status
             - Has required labels `approved, lgtm`: ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
-              contains( github.event.pull_request.labels.*.name, 'lgtm') && ':white_check_mark:' || ':x:' }}
+              contains( github.event.pull_request.labels.*.name, 'lgtm') && '💚' || ':x:' }}
             - No blocking labels `wip, hold`: ${{ contains( github.event.pull_request.labels.*.name, 'wip') ||
-              contains( github.event.pull_request.labels.*.name, 'hold') && ':x:' || ':white_check_mark:' }}
+              contains( github.event.pull_request.labels.*.name, 'hold') && ':x:' || '💚' }}
