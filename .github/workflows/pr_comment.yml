@@ -1,0 +1,28 @@
+name: PR
+on:
+  pull_request_target:
+    types:
+      - opened
+      - labeled
+      - unlabeled
+      - synchronize
+jobs:
+  pr-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print
+        env:
+          CONTEXT: ${{ toJSON(github) }}
+        run: echo "$CONTEXT"
+      
+      - name: Merge Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          delete: true
+          message: |
+            PR Status
+            - Has required labels `approved, lgtm` - ${{ contains( github.event.issue.labels.*.name, 'approved') &&
+              contains( github.event.issue.labels.*.name, 'lgtm') && '✅' || '❌' }}
+            - No blocking labels `wip, hold` - ${{ (contains( github.event.issue.labels.*.name, 'wip') ||
+              contains( github.event.issue.labels.*.name, 'hold')) && '❌' || '✅' }}
+ 
