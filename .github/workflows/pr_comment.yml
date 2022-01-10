@@ -13,7 +13,6 @@ jobs:
       - name: Merge Comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          delete: true
           recreate: true
           message: |
             PR Status
