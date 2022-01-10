@@ -18,7 +18,8 @@ jobs:
       - name: Merge Comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          delete: true
+          hide_and_recreate: true
+          hide_classify: "OUTDATED"
           message: |
             PR Status
             - Has required labels `approved, lgtm` - ${{ contains( github.event.issue.labels.*.name, 'approved') &&
