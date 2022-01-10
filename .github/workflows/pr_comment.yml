@@ -7,23 +7,19 @@ on:
       - unlabeled
       - synchronize
 jobs:
-  pr-comment:
+  status-comment:
     runs-on: ubuntu-latest
-    steps:
-      - name: Print
-        env:
-          CONTEXT: ${{ toJSON(github) }}
-        run: echo "$CONTEXT"
-      
+    steps:     
       - name: Merge Comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          hide_and_recreate: true
-          hide_classify: "OUTDATED"
+          recreate: true
           message: |
             PR Status
             - Has required labels `approved, lgtm` - ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
               contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
             - No blocking labels `wip, hold` - ${{ (contains( github.event.pull_request.labels.*.name, 'wip') ||
               contains( github.event.pull_request.labels.*.name, 'hold')) && '❌' || '✅' }}
+              
+              _This Pull Request will not merge until all required tests passed_
  
