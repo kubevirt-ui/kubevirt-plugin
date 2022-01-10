@@ -1,6 +1,6 @@
 name: PR
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
       - labeled
@@ -14,6 +14,11 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     steps:
+      - name: Print
+        env:
+          CONTEXT: ${{ toJSON(github) }}
+        run: echo "$CONTEXT"
+
       - name: Auto Merge
         id: automerge
         uses: 'pascalgn/automerge-action@v0.14.3'
