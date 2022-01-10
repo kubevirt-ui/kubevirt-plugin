@@ -19,7 +19,7 @@ jobs:
         id: approvers
         run: echo ::set-output name=approvers::$(cat ./OWNERS)
 
-      - name: Add Approve label
+      - name: Add Approved label
         if: |
           contains(github.event.comment.html_url, '/pull/') &&
           (contains(github.event.comment.body, '/approve') || contains(github.event.comment.body, '/lgtm')) &&
