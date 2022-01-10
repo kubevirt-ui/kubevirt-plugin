@@ -33,8 +33,8 @@ jobs:
           hide_and_recreate: true
           hide_classify: "OUTDATED"
           message: |
-            PR Status:
-            - Has required labels (approved, lgtm): ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
-              contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
-            - Does not have blocking labels (wip, hold): ${{ contains( github.event.pull_request.labels.*.name, 'wip') ||
-              contains( github.event.pull_request.labels.*.name, 'hold') && '❌' || '✅' }}
+            PR Status
+            - Has required labels `approved, lgtm`: ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
+              contains( github.event.pull_request.labels.*.name, 'lgtm') && ':white_check_mark:' || ':x:' }}
+            - No blocking labels `wip, hold`: ${{ contains( github.event.pull_request.labels.*.name, 'wip') ||
+              contains( github.event.pull_request.labels.*.name, 'hold') && ':x:' || ':white_check_mark:' }}
