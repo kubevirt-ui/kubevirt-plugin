@@ -22,7 +22,14 @@ jobs:
           MERGE_LABELS: 'approve,lgtm,!WIP,!hold'
           MERGE_METHOD: squash
       
-      - name: Merge Status
-        env:
-          MERGE_OUTPUT: '${{ toJSON(steps.automerge) }}'
-        run: echo "merge $MERGE_OUTPUT"
+      - name: Merge Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          hide_and_recreate: true
+          hide_classify: "OUTDATED"
+          message: |
+            PR Status:
+            - Has required labels (approved, lgtm): ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
+              contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
+            - Does not have blocking labels (wip, hold): ${{ contains( github.event.pull_request.labels.*.name, 'wip') ||
+              contains( github.event.pull_request.labels.*.name, 'hold') && '❌' || '✅' }}
