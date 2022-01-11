@@ -2,7 +2,6 @@ name: PR
 on:
   pull_request_target:
     types:
-      - opened
       - labeled
       - unlabeled
       - synchronize
@@ -27,13 +26,16 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
-          recreate: true
+          hide_and_recreate: true
+          hide_classify: "OUTDATED"
           message: |
-            PR Status ✨
-            - Has required labels `approved, lgtm` - ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
-              contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
-            - No blocking labels `wip, hold` - ${{ (contains( github.event.pull_request.labels.*.name, 'wip') ||
-              contains( github.event.pull_request.labels.*.name, 'hold')) && '❌' || '✅' }}
+            ✨PR Status ✨
+            | Condition |  |
+            | ------------- | ------------- |
+            | Has Required Labels `approved, lgtm` | ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
+              contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }} |
+            | No Blocking Labels `wip, hold` | ${{ (contains( github.event.pull_request.labels.*.name, 'wip') ||
+              contains( github.event.pull_request.labels.*.name, 'hold')) && '❌' || '✅' }} |
               
               _This Pull Request will not merge until all required tests have passed_
  
