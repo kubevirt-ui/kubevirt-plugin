@@ -1,6 +1,6 @@
 name: PR
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - labeled
@@ -13,6 +13,9 @@ on:
 jobs:
   automerge:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - name: Auto Merge
         id: automerge
@@ -23,7 +26,7 @@ jobs:
           MERGE_METHOD: squash
             
       - name: Merge Comment
-        if: github.event_name == 'pull_request_target'
+        if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           recreate: true
