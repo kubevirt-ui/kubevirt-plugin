@@ -13,14 +13,6 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     steps:
-      - name: Auto Merge
-        id: automerge
-        uses: 'pascalgn/automerge-action@v0.14.3'
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          MERGE_LABELS: 'approved,lgtm,!WIP,!hold'
-          MERGE_METHOD: squash
-            
       - name: Merge Comment
         if: github.event_name == 'pull_request_target'
         uses: marocchino/sticky-pull-request-comment@v2
@@ -39,3 +31,10 @@ jobs:
               
               _This Pull Request will not merge until all required tests have passed_
  
+      - name: Auto Merge
+        id: automerge
+        uses: 'pascalgn/automerge-action@v0.14.3'
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          MERGE_LABELS: 'approved,lgtm,!WIP,!hold'
+          MERGE_METHOD: squash
