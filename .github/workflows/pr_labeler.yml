@@ -41,7 +41,7 @@ jobs:
 
       - name: Remove LGTM Label if new push is made
         if: |
-         github.event_name == 'pull_request' && github.event.action == 'synchronize' &&
+         github.event_name == 'pull_request_target' && github.event.action == 'synchronize' &&
          contains(github.event.pull_request.labels.*.name, 'lgtm')
         uses: andymckay/labeler@master
         with:
@@ -92,6 +92,7 @@ jobs:
           add-labels: 'bug'
       
       - name: Add Size label
+        if: github.event_name == 'pull_request_target'
         uses: "pascalgn/size-label-action@v0.4.3"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
