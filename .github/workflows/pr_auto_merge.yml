@@ -13,9 +13,6 @@ on:
 jobs:
   automerge:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
     steps:
       - name: Auto Merge
         id: automerge
@@ -24,26 +21,20 @@ jobs:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           MERGE_LABELS: 'approved,lgtm,!WIP,!hold'
           MERGE_METHOD: squash
-
-      - name: Add comment
-        if: github.event_name == 'pull_request_target'
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            This issue is available for anyone to work on. **Make sure to reference this issue in your pull request.** :sparkles: Thank you for your contribution! :sparkles:
             
-      # - name: Merge Comment
-      #   if: github.event_name == 'pull_request'
-      #   uses: marocchino/sticky-pull-request-comment@v2
-      #   with:
-      #     recreate: true
-      #     message: |
-      #       PR Status
-      #       - Has required labels `approved, lgtm` - ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
-      #         contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
-      #       - No blocking labels `wip, hold` - ${{ (contains( github.event.pull_request.labels.*.name, 'wip') ||
-      #         contains( github.event.pull_request.labels.*.name, 'hold')) && '❌' || '✅' }}
+      - name: Merge Comment
+        if: github.event_name == 'pull_request_target'
+        uses: marocchino/sticky-pull-request-comment@v2
+        env:
+          GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
+        with:
+          recreate: true
+          message: |
+            PR Status ✨
+            - Has required labels `approved, lgtm` - ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
+              contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
+            - No blocking labels `wip, hold` - ${{ (contains( github.event.pull_request.labels.*.name, 'wip') ||
+              contains( github.event.pull_request.labels.*.name, 'hold')) && '❌' || '✅' }}
               
-      #         _This Pull Request will not merge until all required tests have passed_
+              _This Pull Request will not merge until all required tests have passed_
  
