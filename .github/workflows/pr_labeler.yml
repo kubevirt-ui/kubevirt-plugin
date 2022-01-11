@@ -39,6 +39,14 @@ jobs:
           add-labels: 'lgtm'
           remove-labels: 'WIP'
 
+      - name: Remove LGTM Label if new push is made
+        if: |
+         github.event_name == 'pull_request' && github.event.action == 'synchronize' &&
+         contains(github.event.pull_request.labels.*.name, 'lgtm')
+        uses: andymckay/labeler@master
+        with:
+          remove-labels: 'lgtm'
+
       - name: Add WIP label / comment trigger
         if: |
           contains(github.event.pull_request.title, 'wip') ||

@@ -1,6 +1,6 @@
 name: PR
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
       - labeled
@@ -21,3 +21,18 @@ jobs:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           MERGE_LABELS: 'approved,lgtm,!WIP,!hold'
           MERGE_METHOD: squash
+            
+      - name: Merge Comment
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          message: |
+            PR Status
+            - Has required labels `approved, lgtm` - ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
+              contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
+            - No blocking labels `wip, hold` - ${{ (contains( github.event.pull_request.labels.*.name, 'wip') ||
+              contains( github.event.pull_request.labels.*.name, 'hold')) && '❌' || '✅' }}
+              
+              _This Pull Request will not merge until all required tests have passed_
+ 
