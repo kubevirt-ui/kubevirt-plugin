@@ -13,6 +13,15 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     steps:
+      - name: Remove LGTM Label if new push is made
+        if: |
+         github.event_name == 'pull_request_target' && github.event.action == 'synchronize' &&
+         contains(github.event.pull_request.labels.*.name, 'lgtm')
+        uses: andymckay/labeler@master
+        with:
+          repo-token: ${{ secrets.BOT_PAT }}
+          remove-labels: 'lgtm'
+
       - name: Merge Comment
         if: github.event_name == 'pull_request_target'
         uses: marocchino/sticky-pull-request-comment@v2
