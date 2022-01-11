@@ -12,6 +12,15 @@ jobs:
   labeler:
     runs-on: ubuntu-latest
     steps:
+      - name: Remove LGTM Label if new push is made
+        if: |
+         github.event_name == 'pull_request_target' && github.event.action == 'synchronize' &&
+         contains(github.event.pull_request.labels.*.name, 'lgtm')
+        uses: andymckay/labeler@master
+        with:
+          repo-token: ${{ secrets.BOT_PAT }}
+          remove-labels: 'lgtm'
+
       - name: Add Bug label / comment trigger
         if: |
           contains(github.event.pull_request.title, 'bug') ||
