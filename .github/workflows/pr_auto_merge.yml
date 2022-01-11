@@ -1,6 +1,6 @@
 name: PR
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
       - labeled
@@ -26,7 +26,7 @@ jobs:
           MERGE_METHOD: squash
 
       - name: Add comment
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
