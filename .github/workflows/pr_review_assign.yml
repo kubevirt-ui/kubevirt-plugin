@@ -15,8 +15,11 @@ jobs:
 
       - name: Assign author to PR
         uses: technote-space/assign-author@v1
+        env:
+          GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
+
 
       - name: Request review
         uses: uesteibar/reviewer-lottery@v2
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.BOT_PAT }}
