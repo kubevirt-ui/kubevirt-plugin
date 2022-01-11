@@ -27,7 +27,7 @@ jobs:
         with:
           GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
           header: 'pr-status'
-          delete: true
+          recreate: true
           message: |
             ✨PR Status ✨
             | Condition |  |
