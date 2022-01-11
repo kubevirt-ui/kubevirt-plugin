@@ -29,8 +29,16 @@ export const VMStatusConditionLabelList: React.FC<{ conditions: VMStatusConditio
   ({ conditions }) => {
     return (
       <LabelGroup>
-        {conditions.map((condition) => (
-          <VMStatusConditionLabel key={condition?.lastTransitionTime} {...condition} />
+        {conditions.map(({ lastProbeTime, lastTransitionTime, message, reason, status, type }) => (
+          <VMStatusConditionLabel
+            key={lastTransitionTime}
+            lastTransitionTime={lastTransitionTime}
+            lastProbeTime={lastProbeTime}
+            message={message}
+            reason={reason}
+            status={status}
+            type={type}
+          />
         ))}
       </LabelGroup>
     );

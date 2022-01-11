@@ -9,8 +9,17 @@ import { conditionsMock } from './mocks';
 afterEach(cleanup);
 
 test('VMStatusConditionLabel', async () => {
-  const { reason, status, message } = conditionsMock[0];
-  const { asFragment, getByText } = render(<VMStatusConditionLabel {...conditionsMock[0]} />);
+  const { lastProbeTime, lastTransitionTime, message, reason, status, type } = conditionsMock[0];
+  const { asFragment, getByText } = render(
+    <VMStatusConditionLabel
+      lastTransitionTime={lastTransitionTime}
+      lastProbeTime={lastProbeTime}
+      message={message}
+      reason={reason}
+      status={status}
+      type={type}
+    />,
+  );
   const firstRender = asFragment();
 
   expect(firstRender).toMatchSnapshot();
