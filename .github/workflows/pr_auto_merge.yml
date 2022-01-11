@@ -23,7 +23,7 @@ jobs:
           MERGE_METHOD: squash
             
       - name: Merge Comment
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           recreate: true
