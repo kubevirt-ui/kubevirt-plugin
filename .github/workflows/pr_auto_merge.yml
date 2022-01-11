@@ -26,8 +26,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
-          hide_and_recreate: true
-          hide_classify: "OUTDATED"
+          recreate: true
           message: |
             ✨PR Status ✨
             | Condition |  |
