@@ -66,6 +66,7 @@ jobs:
           contains(github.event.comment.body, '/remove wip')
         uses: andymckay/labeler@master
         with:
+          repo-token: ${{ secrets.BOT_PAT }}
           remove-labels: 'WIP'
 
       - name: Add Hold label
