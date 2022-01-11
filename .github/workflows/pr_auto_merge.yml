@@ -26,23 +26,24 @@ jobs:
           MERGE_METHOD: squash
 
       - name: Add comment
-        uses: peter-evans/create-or-update-comment@a35cf36e5301d70b76f316e867e7788a55a31dae
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             This issue is available for anyone to work on. **Make sure to reference this issue in your pull request.** :sparkles: Thank you for your contribution! :sparkles:
             
-      - name: Merge Comment
-        if: github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          recreate: true
-          message: |
-            PR Status
-            - Has required labels `approved, lgtm` - ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
-              contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
-            - No blocking labels `wip, hold` - ${{ (contains( github.event.pull_request.labels.*.name, 'wip') ||
-              contains( github.event.pull_request.labels.*.name, 'hold')) && '❌' || '✅' }}
+      # - name: Merge Comment
+      #   if: github.event_name == 'pull_request'
+      #   uses: marocchino/sticky-pull-request-comment@v2
+      #   with:
+      #     recreate: true
+      #     message: |
+      #       PR Status
+      #       - Has required labels `approved, lgtm` - ${{ contains( github.event.pull_request.labels.*.name, 'approved') &&
+      #         contains( github.event.pull_request.labels.*.name, 'lgtm') && '✅' || '❌' }}
+      #       - No blocking labels `wip, hold` - ${{ (contains( github.event.pull_request.labels.*.name, 'wip') ||
+      #         contains( github.event.pull_request.labels.*.name, 'hold')) && '❌' || '✅' }}
               
-              _This Pull Request will not merge until all required tests have passed_
+      #         _This Pull Request will not merge until all required tests have passed_
  
