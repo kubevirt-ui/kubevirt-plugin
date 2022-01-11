@@ -6,7 +6,3 @@ enabled = true
 
   [analyzers.meta]
   plugins = ["react"]
-
-[[analyzers]]
-name = "test-coverage"
-enabled = true
