@@ -26,6 +26,7 @@ jobs:
           contains(steps.approvers.outputs.approvers, github.event.comment.user.login || 'null')
         uses: andymckay/labeler@master
         with:
+          repo-token: ${{ secrets.BOT_PAT }}
           add-labels: 'approved'
 
       - name: Add LGTM label
@@ -36,6 +37,7 @@ jobs:
           github.event.issue.user.login != github.event.comment.user.login
         uses: andymckay/labeler@master
         with:
+          repo-token: ${{ secrets.BOT_PAT }}
           add-labels: 'lgtm'
           remove-labels: 'WIP'
 
@@ -45,6 +47,7 @@ jobs:
          contains(github.event.pull_request.labels.*.name, 'lgtm')
         uses: andymckay/labeler@master
         with:
+          repo-token: ${{ secrets.BOT_PAT }}
           remove-labels: 'lgtm'
 
       - name: Add WIP label / comment trigger
@@ -54,6 +57,7 @@ jobs:
           contains(github.event.comment.body, '/wip'))
         uses: andymckay/labeler@master
         with:
+          repo-token: ${{ secrets.BOT_PAT }}
           add-labels: 'WIP'
 
       - name: Remove WIP label
@@ -71,6 +75,7 @@ jobs:
           contains(steps.approvers.outputs.approvers, github.event.comment.user.login || 'null')
         uses: andymckay/labeler@master
         with:
+          repo-token: ${{ secrets.BOT_PAT }}
           add-labels: 'hold'
 
       - name: Remove Hold label
@@ -80,6 +85,7 @@ jobs:
           contains(steps.approvers.outputs.approvers, github.event.comment.user.login || 'null')
         uses: andymckay/labeler@master
         with:
+          repo-token: ${{ secrets.BOT_PAT }}
           remove-labels: 'hold'
 
       - name: Add Bug label / comment trigger
@@ -89,10 +95,11 @@ jobs:
           contains(github.event.comment.body, '/bug'))
         uses: andymckay/labeler@master
         with:
+          repo-token: ${{ secrets.BOT_PAT }}
           add-labels: 'bug'
       
       - name: Add Size label
         if: github.event_name == 'pull_request_target'
         uses: "pascalgn/size-label-action@v0.4.3"
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
