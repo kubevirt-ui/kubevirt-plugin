@@ -15,7 +15,7 @@ jobs:
 
       - name: Assign author to PR
         uses: technote-space/assign-author@v1
-        env:
+        with:
           GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
 
 
