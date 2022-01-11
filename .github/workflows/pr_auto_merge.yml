@@ -25,9 +25,8 @@ jobs:
       - name: Merge Comment
         if: github.event_name == 'pull_request_target'
         uses: marocchino/sticky-pull-request-comment@v2
-        env:
-          GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
         with:
+          GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
           recreate: true
           message: |
             PR Status ✨
