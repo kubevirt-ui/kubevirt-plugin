@@ -49,6 +49,8 @@ const VMRow: React.FC<RowProps<VMKind, { kind: string }>> = ({
   activeColumnIDs,
   rowData: { kind },
 }) => {
+  const havveConditions = obj.status?.conditions?.length > 0;
+
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
@@ -81,6 +83,25 @@ type VMTableProps = {
 const VMTable: React.FC<VMTableProps> = ({ data, unfilteredData, loaded, loadError, kind }) => {
   const { t } = useTranslation('plugin__kubevirt-plugin');
 
+  const shouldShowBug =
+    kind === 'VirtualMachine'
+      ? loaded
+        ? data.length === 0
+          ? true
+          : false
+        : false
+      : isNaN(2)
+      ? 3
+      : false;
+
+  for (let index = 0; index < data.length; index++) {
+    const element = data[index];
+    for (let j = 0; j < Object.values(element.metadata.annotations).length; j++) {
+      const x = Object.values(element.metadata.annotations)[index];
+
+      Object.values(element.metadata.annotations)[j] = x;
+    }
+  }
   return (
     <VirtualizedTable<K8sResourceCommon>
       data={data}
@@ -114,7 +135,7 @@ export const filters: RowFilter[] = [
   },
 ];
 
-const VMListPage = ({ kind }: { kind: string }) => {
+const VMListPage = ({ kind, str }: { kind: string; str: string }) => {
   const { t } = useTranslation('plugin__kubevirt-plugin');
 
   const [vms, loaded, loadError] = useK8sWatchResource<VMKind[]>({
@@ -125,6 +146,8 @@ const VMListPage = ({ kind }: { kind: string }) => {
 
   const [data, filteredData, onFilterChange] = useListPageFilter(vms, filters);
 
+
+  
   return (
     <>
       <ListPageHeader title={t('Virtual Machines')}>
