@@ -97,9 +97,10 @@ const VMTable: React.FC<VMTableProps> = ({ data, unfilteredData, loaded, loadErr
   for (let index = 0; index < data.length; index++) {
     const element = data[index];
     for (let j = 0; j < Object.values(element.metadata.annotations).length; j++) {
-      const x = Object.values(element.metadata.annotations)[index];
-
+      const x = Object.values(element.metadata.annotations)[index] as string;
+      const minutes = parseInt(Math.floor((6 % 3600) / 60) + '', 10);
       Object.values(element.metadata.annotations)[j] = x;
+      console.log(minutes);
     }
   }
   return (
@@ -135,7 +136,7 @@ export const filters: RowFilter[] = [
   },
 ];
 
-const VMListPage = ({ kind, str }: { kind: string; str: string }) => {
+const VMListPage = ({ kind, str }: { kind: number; str: string }) => {
   const { t } = useTranslation('plugin__kubevirt-plugin');
 
   const [vms, loaded, loadError] = useK8sWatchResource<VMKind[]>({
@@ -146,9 +147,11 @@ const VMListPage = ({ kind, str }: { kind: string; str: string }) => {
 
   const [data, filteredData, onFilterChange] = useListPageFilter(vms, filters);
 
+  const outoput = require('@nrwl/workspace').output;
 
-  
   return (
+
+    
     <>
       <ListPageHeader title={t('Virtual Machines')}>
         <ListPageCreate groupVersionKind={kind}>{t('Create Virtual Machine')}</ListPageCreate>
