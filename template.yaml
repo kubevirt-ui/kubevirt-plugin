@@ -17,7 +17,7 @@ parameters:
     required: true
   - description: Namespace for your plugin. The namespace will be created by the template.
     name: NAMESPACE
-    value: kubevirt-plugin
+    value: openshift-cnv
     required: true
   - description: Container image of the plugin.
     name: IMAGE
@@ -135,7 +135,7 @@ objects:
     metadata:
       name: '${PLUGIN_NAME}'
     spec:
-      displayName: 'Console Plugin Template'
+      displayName: 'Kubevirt'
       service:
         name: '${PLUGIN_NAME}'
         namespace: '${NAMESPACE}'

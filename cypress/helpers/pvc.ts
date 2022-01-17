@@ -2,8 +2,8 @@ export const getPVCJSON = (
   name: string,
   namespace: string,
   storageClassName: string,
-  size: string = '5Gi',
-  volumeMode: string = 'Filesystem',
+  size = '5Gi',
+  volumeMode = 'Filesystem',
 ) => ({
   apiVersion: 'v1',
   kind: 'PersistentVolumeClaim',
