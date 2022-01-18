@@ -5,7 +5,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node node_modules/.bin/webpack",
-    "dev": "NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node ./node_modules/.bin/webpack serve --progress",
+    "dev": "NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node ./node_modules/.bin/webpack serve",
     "lint": "eslint src --color",
     "lint:fix": "yarn lint --fix",
     "check-types": "tsc",
