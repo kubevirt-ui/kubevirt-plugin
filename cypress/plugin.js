@@ -22,7 +22,7 @@ module.exports = (on, config) => {
       output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'cypress-dist'),
-  },
+      },
     },
   };
   // `on` is used to hook into various events Cypress emits
