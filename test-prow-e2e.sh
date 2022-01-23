@@ -4,7 +4,7 @@ set -eExuo pipefail
 
 if [ $# -eq 0 ]
   then
-    echo "kubevirt image not provided"
+    echo "kubevirt plugin image not provided"
     echo "exiting..."
     exit 1
 fi
