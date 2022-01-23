@@ -17,6 +17,8 @@ function generateLogsAndCopyArtifacts {
   oc get catalogsource -A -o yaml >> ${ARTIFACT_DIR}/catalogsource.yaml
   oc get subscriptions -n ${NS} -o wide > ${ARTIFACT_DIR}/subscription_details.yaml
   oc get subscriptions -n ${NS} -o yaml >> ${ARTIFACT_DIR}/subscription_details.yaml
+  oc get csvs -n ${NS} -o wide > ${ARTIFACT_DIR}/csvs.yaml
+  oc get csvs -n ${NS} -o yaml >> ${ARTIFACT_DIR}/csvs.yaml
   oc get deployments -n ${NS} -o wide > ${ARTIFACT_DIR}/deployment_details.yaml
   oc get deployments -n ${NS} -o yaml >> ${ARTIFACT_DIR}/deployment_details.yaml
   oc get installplan -n ${NS} -o wide > ${ARTIFACT_DIR}/installplan.yaml
@@ -107,12 +109,6 @@ sleep 120
 export CONSOLE_CONFIG_NAME="cluster"
 export KUBEVIRT_PLUGIN_NAME="kubevirt-plugin"
 KUBEVIRT_PLUGIN_IMAGE="$1"
-
-oc process -f template.yaml \
-  -p PLUGIN_NAME=${KUBEVIRT_PLUGIN_NAME} \
-  -p NAMESPACE=${NS} \
-  -p IMAGE=${KUBEVIRT_PLUGIN_IMAGE} \
-  | oc create -f -
 
 echo "Enabling Console Plugin for Kubevirt"
 oc patch console.v1.operator.openshift.io ${CONSOLE_CONFIG_NAME} --type=json -p="[{'op': 'add', 'path': '/spec/plugins', 'value':["${KUBEVIRT_PLUGIN_NAME}"]}]"
