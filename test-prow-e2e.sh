@@ -51,7 +51,7 @@ trap generateLogsAndCopyArtifacts ERR
 PULL_SECRET_PATH="/var/run/operator-secret/dockerconfig" 
 NAMESPACE="openshift-marketplace"
 SECRET_NAME="ocs-secret"
-NS="kubevirt-plugin"
+NS="kubevirt-hyperconverged"
 ARTIFACT_DIR=${ARTIFACT_DIR:=/tmp/artifacts}
 SCREENSHOTS_DIR=gui-test-screenshots
 
