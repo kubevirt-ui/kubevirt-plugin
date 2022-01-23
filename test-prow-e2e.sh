@@ -109,8 +109,8 @@ export KUBEVIRT_PLUGIN_NAME="kubevirt-plugin"
 KUBEVIRT_PLUGIN_IMAGE="$1"
 
 oc process -f template.yaml \
-  -p PLUGIN_NAME=kubevirt-plugin \
-  -p NAMESPACE=kubevirt-plugin \
+  -p PLUGIN_NAME=${KUBEVIRT_PLUGIN_NAME} \
+  -p NAMESPACE=${NS} \
   -p IMAGE=${KUBEVIRT_PLUGIN_IMAGE} \
   | oc create -f -
 
