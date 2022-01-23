@@ -17,7 +17,7 @@ parameters:
     required: true
   - description: Namespace for your plugin. The namespace will be created by the template.
     name: NAMESPACE
-    value: openshift-cnv
+    value: kubevirt-plugin
     required: true
   - description: Container image of the plugin.
     name: IMAGE
