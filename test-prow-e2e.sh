@@ -25,8 +25,8 @@ function generateLogsAndCopyArtifacts {
   oc get installplan -n ${NS} -o yaml >> ${ARTIFACT_DIR}/installplan.yaml
   oc get nodes -o wide > ${ARTIFACT_DIR}/node.yaml
   oc get nodes -o yaml >> ${ARTIFACT_DIR}/node.yaml
-  oc get pods -n ${NS} -o wide >> ${ARTIFACT_DIR}/pod_details_openshift-storage.yaml
-  oc get pods -n ${NS} -o yaml >> ${ARTIFACT_DIR}/pod_details_openshift-storage.yaml
+  oc get pods -n ${NS} -o wide >> ${ARTIFACT_DIR}/pod_details_openshift-kubevirt.yaml
+  oc get pods -n ${NS} -o yaml >> ${ARTIFACT_DIR}/pod_details_openshift-kubevirt.yaml
   for pod in `oc get pods -n ${NS} --no-headers -o custom-columns=":metadata.name" | grep "kubevirt"`; do
         echo $pod 
         oc logs $pod -n ${NS} > ${ARTIFACT_DIR}/${pod}.logs
@@ -112,6 +112,20 @@ KUBEVIRT_PLUGIN_IMAGE="$1"
 
 echo "Enabling Console Plugin for Kubevirt"
 oc patch console.v1.operator.openshift.io ${CONSOLE_CONFIG_NAME} --type=json -p="[{'op': 'add', 'path': '/spec/plugins', 'value':["${KUBEVIRT_PLUGIN_NAME}"]}]"
+
+export KUBEVIRT_CSV_NAME="$(oc get csv -n kubevirt-hyperconverged -o=jsonpath='{.items[?(@.spec.displayName=="KubeVirt HyperConverged Cluster Operator")].metadata.name}')"
+
+oc patch csv ${KUBEVIRT_CSV_NAME} -n kubevirt-hyperconverged --type='json' -p \
+  "[{'op': 'replace', 'path': '/spec/install/spec/deployments/1/spec/template/spec/containers/0/image', 'value': \"${KUBEVIRT_PLUGIN_IMAGE}\"}]"
+
+# Installation occurs.
+# This is also the default case if the CSV is in "Installing" state initially.
+timeout 15m bash <<-'EOF'
+echo "waiting for ${KUBEVIRT_CSV_NAME} clusterserviceversion to succeed"
+until [ "$(oc -n kubevirt-hyperconverged get csv -o=jsonpath="{.items[?(@.metadata.name==\"${KUBEVIRT_CSV_NAME}\")].status.phase}")" == "Succeeded" ]; do
+  sleep 1
+done
+EOF
 
 INSTALLER_DIR=${INSTALLER_DIR:=${ARTIFACT_DIR}/installer}
 
