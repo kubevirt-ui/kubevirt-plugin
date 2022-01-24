@@ -17,8 +17,8 @@ function generateLogsAndCopyArtifacts {
   oc get catalogsource -A -o yaml >> ${ARTIFACT_DIR}/catalogsource.yaml
   oc get subscriptions -n ${NS} -o wide > ${ARTIFACT_DIR}/subscription_details.yaml
   oc get subscriptions -n ${NS} -o yaml >> ${ARTIFACT_DIR}/subscription_details.yaml
-  oc get csvs --all-namespaces -o wide > ${ARTIFACT_DIR}/csvs.yaml
-  oc get csvs --all-namespaces -o yaml >> ${ARTIFACT_DIR}/csvs.yaml
+  oc get csvs -n ${NS} -o wide > ${ARTIFACT_DIR}/csvs.yaml
+  oc get csvs -n ${NS} -o yaml >> ${ARTIFACT_DIR}/csvs.yaml
   oc get deployments -n ${NS} -o wide > ${ARTIFACT_DIR}/deployment_details.yaml
   oc get deployments -n ${NS} -o yaml >> ${ARTIFACT_DIR}/deployment_details.yaml
   oc get installplan -n ${NS} -o wide > ${ARTIFACT_DIR}/installplan.yaml
@@ -53,7 +53,7 @@ trap generateLogsAndCopyArtifacts ERR
 PULL_SECRET_PATH="/var/run/operator-secret/dockerconfig" 
 NAMESPACE="openshift-marketplace"
 SECRET_NAME="ocs-secret"
-NS="kubevirt-ui"
+NS="kubevirt-hyperconverged"
 ARTIFACT_DIR=${ARTIFACT_DIR:=/tmp/artifacts}
 SCREENSHOTS_DIR=gui-test-screenshots
 
