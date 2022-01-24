@@ -53,7 +53,7 @@ trap generateLogsAndCopyArtifacts ERR
 PULL_SECRET_PATH="/var/run/operator-secret/dockerconfig" 
 NAMESPACE="openshift-marketplace"
 SECRET_NAME="ocs-secret"
-NS="kubevirt-hyperconverged"
+NS="kubevirt-ui"
 ARTIFACT_DIR=${ARTIFACT_DIR:=/tmp/artifacts}
 SCREENSHOTS_DIR=gui-test-screenshots
 
@@ -108,19 +108,22 @@ export CONSOLE_CONFIG_NAME="cluster"
 export KUBEVIRT_PLUGIN_NAME="kubevirt-plugin"
 KUBEVIRT_PLUGIN_IMAGE="$1"
 
+echo "Deploy Kubevirt Plugin"
+oc process -f openshift-ci/template.yaml \
+  -p PLUGIN_NAME=${KUBEVIRT_PLUGIN_NAME} \
+  -p NAMESPACE=${NS} \
+  -p IMAGE=${KUBEVIRT_PLUGIN_IMAGE} \
+  | oc create -f -
+
 echo "Enabling Console Plugin for Kubevirt"
-oc patch console.v1.operator.openshift.io ${CONSOLE_CONFIG_NAME} --type=json -p="[{'op': 'add', 'path': '/spec/plugins', 'value':["${KUBEVIRT_PLUGIN_NAME}"]}]"
-
-export KUBEVIRT_CSV_NAME="$(oc get csv -n kubevirt-hyperconverged -o=jsonpath='{.items[?(@.spec.displayName=="KubeVirt HyperConverged Cluster Operator")].metadata.name}')"
-
-oc patch csv ${KUBEVIRT_CSV_NAME} -n kubevirt-hyperconverged --type='json' -p \
-  "[{'op': 'replace', 'path': '/spec/install/spec/deployments/1/spec/template/spec/containers/0/image', 'value': \"${KUBEVIRT_PLUGIN_IMAGE}\"}]"
+oc patch consoles.operator.openshift.io ${CONSOLE_CONFIG_NAME} \
+  --patch '{ "spec": { "plugins": ["${KUBEVIRT_PLUGIN_NAME}"] } }' --type=merge
 
 # Installation occurs.
 # This is also the default case if the CSV is in "Installing" state initially.
 timeout 15m bash <<-'EOF'
-echo "waiting for ${KUBEVIRT_CSV_NAME} clusterserviceversion to succeed"
-until [ "$(oc -n kubevirt-hyperconverged get csv -o=jsonpath="{.items[?(@.metadata.name==\"${KUBEVIRT_CSV_NAME}\")].status.phase}")" == "Succeeded" ]; do
+echo "waiting for deployment rollout to complete"
+until grep -q "successfully" <<< "$(oc rollout status -w deploy/console -n openshift-console)"; do
   sleep 1
 done
 EOF
