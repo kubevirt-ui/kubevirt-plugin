@@ -74,7 +74,7 @@ the plugin to a cluster by instantiating the template:
 ```sh
 oc process -f template.yaml \
   -p PLUGIN_NAME=kubevirt-plugin \
-  -p NAMESPACE=kubevirt-plugin \
+  -p NAMESPACE=kubevirt-ui \
   -p IMAGE=quay.io/kubevirt-ui/kubevirt-plugin:latest \
   | oc create -f -
 ```
