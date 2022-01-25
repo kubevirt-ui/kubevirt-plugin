@@ -123,7 +123,7 @@ oc patch -n ${NS} consoles.operator.openshift.io ${CONSOLE_CONFIG_NAME} \
 # This is also the default case if the CSV is in "Installing" state initially.
 timeout 15m bash <<-'EOF'
 echo "waiting for deployment rollout to complete"
-until grep -q "successfully" <<< "$(oc rollout status -w deploy/console -n openshift-console)"; do
+until grep -q "successfully" <<< "$(oc rollout status -w deploy/kubevirt-plugin -n kubevirt-hyperconverged)"; do
   sleep 1
 done
 EOF
