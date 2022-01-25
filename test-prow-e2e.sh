@@ -109,14 +109,14 @@ export KUBEVIRT_PLUGIN_NAME="kubevirt-plugin"
 KUBEVIRT_PLUGIN_IMAGE="$1"
 
 echo "Deploy Kubevirt Plugin"
-oc process -f openshift-ci/template.yaml \
+oc process -n ${NS} -f openshift-ci/template.yaml \
   -p PLUGIN_NAME=${KUBEVIRT_PLUGIN_NAME} \
   -p NAMESPACE=${NS} \
   -p IMAGE=${KUBEVIRT_PLUGIN_IMAGE} \
-  | oc create -f -
+  | oc create -n ${NS} -f -
 
 echo "Enabling Console Plugin for Kubevirt"
-oc patch consoles.operator.openshift.io ${CONSOLE_CONFIG_NAME} \
+oc patch -n ${NS} consoles.operator.openshift.io ${CONSOLE_CONFIG_NAME} \
   --patch '{ "spec": { "plugins": ["${KUBEVIRT_PLUGIN_NAME}"] } }' --type=merge
 
 # Installation occurs.

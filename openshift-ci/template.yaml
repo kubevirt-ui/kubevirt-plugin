@@ -30,6 +30,10 @@ message: >-
 
   For more information about using this template, see https://github.com/spadgett/console-plugin-template
 objects:
+  - apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: '${NAMESPACE}'
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
