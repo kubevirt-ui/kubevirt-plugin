@@ -1,12 +1,13 @@
 version = 1
 
+test_patterns = [
+  "cypress/tests/**",
+  "**/*.test.*"
+]
+
 [[analyzers]]
 name = "javascript"
 enabled = true
 
   [analyzers.meta]
   plugins = ["react"]
-
-[[transformers]]
-name = "prettier"
-enabled = true
