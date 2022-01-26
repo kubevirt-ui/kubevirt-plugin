@@ -26,8 +26,6 @@ declare global {
   }
 }
 
-const { $ } = Cypress;
-
 Cypress.Commands.add(
   'byTestID',
   (selector: string, options?: Partial<Loggable & Timeoutable & Withinable & Shadow>) => {
@@ -52,11 +50,11 @@ Cypress.Commands.add('byTestOperatorRow', (selector: string, options?: object) =
   cy.get(`[data-test-operator-row="${selector}"]`, options),
 );
 Cypress.Commands.add('clickNavLink', (path: [string, string?]) => {
-  cy.byTestID('nav')
-    .contains(path[0], { timeout: 10 * 1000 })
-    .should((el) => {
-      if ($(el).attr('aria-expanded') == 'false') {
-        $(el).click();
+  cy.byTestID('nav', { timeout: 10000 })
+    .contains(path[0], { timeout: 10000 })
+    .should(($el) => {
+      if ($el.attr('aria-expanded') == 'false') {
+        $el.click();
       }
     });
   if (path.length > 1) {

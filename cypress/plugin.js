@@ -6,7 +6,6 @@ const path = require('path');
 const wp = require('@cypress/webpack-preprocessor');
 
 module.exports = (on, config) => {
-  require('cypress-log-to-output').install(on);
   const options = {
     webpackOptions: {
       resolve: {
