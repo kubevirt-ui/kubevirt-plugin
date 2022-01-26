@@ -108,13 +108,6 @@ export CONSOLE_CONFIG_NAME="cluster"
 export KUBEVIRT_PLUGIN_NAME="kubevirt-plugin"
 KUBEVIRT_PLUGIN_IMAGE="$1"
 
-timeout 15m bash <<-'EOF'
-echo "waiting for deployment rollout to complete"
-until grep -q "successfully" <<< "$(oc rollout status -w deploy/console -n openshift-console)"; do
-  sleep 1
-done
-EOF
-
 echo "Deploy Kubevirt Plugin"
 oc process -n ${NS} -f openshift-ci/template.yaml \
   -p PLUGIN_NAME=${KUBEVIRT_PLUGIN_NAME} \
@@ -125,13 +118,6 @@ oc process -n ${NS} -f openshift-ci/template.yaml \
 echo "Enabling Console Plugin for Kubevirt"
 oc patch -n ${NS} consoles.operator.openshift.io ${CONSOLE_CONFIG_NAME} \
   --patch '{ "spec": { "plugins": ["${KUBEVIRT_PLUGIN_NAME}"] } }' --type=merge
-
-timeout 15m bash <<-'EOF'
-echo "waiting for deployment rollout to complete"
-until grep -q "successfully" <<< "$(oc rollout status -w deploy/console -n openshift-console)"; do
-  sleep 1
-done
-EOF
 
 # Installation occurs.
 # This is also the default case if the CSV is in "Installing" state initially.
