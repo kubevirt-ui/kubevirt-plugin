@@ -6,8 +6,9 @@ import Shadow = Cypress.Shadow;
 
 export {};
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
-    interface Chainable<Subject> {
+    interface Chainable {
       byTestID(
         selector: string,
         options?: Partial<Loggable & Timeoutable & Withinable & Shadow>,

@@ -2,7 +2,6 @@ describe('Tests VM List page', () => {
   before(() => {
     cy.login();
     cy.visit('/');
-    // cy.install();
   });
 
   after(() => {

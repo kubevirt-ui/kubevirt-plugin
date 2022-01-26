@@ -1,9 +1,11 @@
 import { KUBEADMIN_IDP, KUBEADMIN_USERNAME } from '../consts';
-import { submitButton, masthead } from './views';
+
+import { masthead, submitButton } from './views';
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
-    interface Chainable<Subject> {
+    interface Chainable {
       login(providerName?: string, username?: string, password?: string): Chainable<Element>;
       logout(): Chainable<Element>;
     }
@@ -46,6 +48,7 @@ Cypress.Commands.add('logout', () => {
     cy.task('log', '  Logging out');
     cy.byTestID('user-dropdown').click();
     cy.byTestID('log-out').should('be.visible');
+    // eslint-disable-next-line cypress/no-force
     cy.byTestID('log-out').click({ force: true });
     cy.byLegacyTestID('login').should('be.visible');
   });
