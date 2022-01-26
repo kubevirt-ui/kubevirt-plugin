@@ -140,7 +140,7 @@ export BRIDGE_BASE_ADDRESS
 export NO_COLOR=1
 
 # Install dependencies.
-yarn install
+yarn install --ignore-engines
 
 # Run tests.
 yarn run test-cypress-headless
