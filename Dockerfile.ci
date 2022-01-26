@@ -1,15 +1,10 @@
-FROM node:16 AS builder
-WORKDIR /app
-COPY . /app
+FROM registry.ci.openshift.org/open-cluster-management/builder:nodejs14-linux AS builder
+
+ADD . /plugin
+WORKDIR /plugin
 RUN yarn install && yarn build
 
-
-FROM cypress/browsers:node14.17.0-chrome91-ff89 as serverpackage
-RUN yarn global add http-server
-RUN export PATH="$(yarn global bin):$PATH"
-
-FROM serverpackage
-COPY --from=builder /app/dist /app
-COPY --from=builder /app/dist /app/compatibility
-COPY --from=builder /app/http-server.sh .
-ENTRYPOINT [ "./http-server.sh", "./app" ]
+FROM registry.access.redhat.com/ubi8/nginx-118
+ADD default.conf "${NGINX_CONFIGURATION_PATH}"
+COPY --from=builder /plugin/dist .
+CMD /usr/libexec/s2i/run
