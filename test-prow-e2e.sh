@@ -117,7 +117,7 @@ oc process -n ${NS} -f openshift-ci/template.yaml \
 
 echo "Enabling Console Plugin for Kubevirt"
 oc patch -n ${NS} consoles.operator.openshift.io ${CONSOLE_CONFIG_NAME} \
-  --patch '{ "spec": { "plugins": ["${KUBEVIRT_PLUGIN_NAME}"] } }' --type=merge
+  --patch '{ "spec": { "plugins": ["kubevirt-plugin"] } }' --type=merge
 
 # Installation occurs.
 # This is also the default case if the CSV is in "Installing" state initially.
