@@ -1,15 +1,10 @@
-FROM node:16 AS builder
-WORKDIR /app
-COPY . /app
+FROM node:14 AS build
+
+COPY . /usr/src/app
+WORKDIR /usr/src/app
 RUN yarn install && yarn build
 
+FROM nginx:stable
 
-FROM cypress/browsers:node14.17.0-chrome91-ff89 as serverpackage
-RUN yarn global add http-server
-RUN export PATH="$(yarn global bin):$PATH"
-
-FROM serverpackage
-COPY --from=builder /app/dist /app
-COPY --from=builder /app/dist /app/compatibility
-COPY --from=builder /app/http-server.sh .
-ENTRYPOINT [ "./http-server.sh", "./app" ]
+RUN chmod g+rwx /var/cache/nginx /var/run /var/log/nginx
+COPY --from=build /usr/src/app/dist /usr/share/nginx/html
