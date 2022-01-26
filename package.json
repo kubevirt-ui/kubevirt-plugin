@@ -19,6 +19,20 @@
     "test-cypress": "node_modules/.bin/cypress open --config-file ./cypress/cypress.json --env openshift=true",
     "test-cypress-headless": "node --max-old-space-size=4096 node_modules/.bin/cypress run --config-file ./cypress/cypress.json --env openshift=true --browser ${BRIDGE_E2E_BROWSER_NAME:=chrome} --headless"
   },
+  "consolePlugin": {
+    "name": "kubevirt-plugin",
+    "version": "0.0.0",
+    "displayName": "Kubevirt Plugin",
+    "exposedModules": {
+      "vmListPage": "./components/vms/vm-page"
+    },
+    "dependencies": {
+      "@console/pluginAPI": "*"
+    },
+    "disableStaticPlugins": [
+      "@console/kubevirt-plugin"
+    ]
+  },
   "dependencies": {
     "@patternfly/react-core": "4.175.4",
     "react": "17.0.2",
@@ -43,16 +57,16 @@
     "@typescript-eslint/parser": "^5.9.1",
     "copy-webpack-plugin": "^6.4.1",
     "css-loader": "6.2.0",
-    "cypress": "^9.2.1",
+    "cypress": "^9.3.1",
     "cypress-log-to-output": "^1.1.2",
     "cypress-multi-reporters": "^1.5.0",
-    "eslint": "^8.4.0",
+    "eslint": "^8.7.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-typescript": "^2.5.0",
     "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react": "^7.27.1",
+    "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "fork-ts-checker-webpack-plugin": "^6.5.0",
@@ -73,19 +87,5 @@
     "webpack": "^5.64.4",
     "webpack-cli": "4.9.x",
     "webpack-dev-server": "^4.6.0"
-  },
-  "consolePlugin": {
-    "name": "kubevirt-plugin",
-    "version": "0.0.0",
-    "displayName": "Kubevirt Plugin",
-    "exposedModules": {
-      "vmListPage": "./components/vms/vm-page"
-    },
-    "dependencies": {
-      "@console/pluginAPI": "*"
-    },
-    "disableStaticPlugins": [
-      "@console/kubevirt-plugin"
-    ]
   }
 }
