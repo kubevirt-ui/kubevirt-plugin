@@ -1,0 +1,21 @@
+{
+  "viewportWidth": 1920,
+  "viewportHeight": 1080,
+  "integrationFolder": "cypress/tests/",
+  "screenshotsFolder": "gui-test-screenshots/screenshots/",
+  "videosFolder": "gui-test-screenshots/videos/",
+  "video": true,
+  "reporter": "node_modules/cypress-multi-reporters",
+  "reporterOptions": {
+    "configFile": "cypress/reporter-config.json"
+  },
+  "screenshotOnRunFailure": true,
+  "supportFile": "cypress/support.ts",
+  "pluginsFile": "cypress/plugin.js",
+  "fixturesFolder": false,
+  "defaultCommandTimeout": 30000,
+  "retries": {
+    "runMode": 1,
+    "openMode": 0
+  }
+}
