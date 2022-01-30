@@ -5,5 +5,7 @@ yarn-error.log
 dist
 **/.env
 /coverage
-
+/gui-test-screenshots
+cypress/cypress-a11y-report.json
 .DS_Store
+.devcontainer/dev.env
