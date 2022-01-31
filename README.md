@@ -10,7 +10,7 @@ for OpenShift Console.
 
 ### Option 1 (recommended): VSCode Remote Container
 
-This method is recommended for development. It will fire up docker compose with one container being the console and the bridge,
+This method is recommended for development. It will set up docker compose with one container being the console and the bridge,
 and the second container being the plugin with VSCode. After initial build, the cached containers will help you start developing in seconds.
 Make sure you have 8GB of RAM or more dedicated to docker.
 
