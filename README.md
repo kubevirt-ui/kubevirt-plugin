@@ -7,25 +7,33 @@ This project is a standalone repository hosting the Kubevirt plugin
 for OpenShift Console.
 
 ## Local development
+
 ### Option 1 (recommended): VSCode Remote Container
+
 This method is recommended for development. It will fire up docker compose with one container being the console and the bridge,
 and the second container being the plugin with VSCode. After initial build, the cached containers will help you start developing in seconds.
+Make sure you have 8GB of RAM or more dedicated to docker.
+
 1. create `dev.env` file inside `.devcontainer` folder with the following values:
+
 ```bash
 OC_PLUGIN_NAME=kubevirt-plugin
 OC_URL=
 OC_USER=
 OC_PASS=
 ```
+
 2. Make sure you are connected to VPN and run the remote environment `(Ctrl+Shift+P) => Remote Containers: Open Folder in Container...`
-3. `yarn dev`
+3. Run `yarn dev` inside the container.
 
-### Option 2 (local console):
-1. Run [console](https://github.com/openshift/console) in development mode 
-2. Run `yarn dev` to serve the plugin with `webpack-dev-server`, generating output to `dist` directory
-3. Run bridge with `-plugins kubevirt-plugin=http://localhost:9001`
+### Option 2:
 
---------------------
+1. Set up [Console](https://github.com/openshift/console) and See the plugin development section in [Console Dynamic Plugins README](https://github.com/openshift/console/blob/master/frontend/packages/console-dynamic-plugin-sdk/README.md) for details on how to run OpenShift console using local plugins.
+2. Run bridge with `-plugins kubevirt-plugin=http://localhost:9001`
+3. Run `yarn dev` inside the plugin.
+
+---
+
 ## i18n
 
 The plugin uses the following
