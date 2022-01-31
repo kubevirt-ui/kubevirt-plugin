@@ -8,6 +8,8 @@ for OpenShift Console.
 
 ## Local development
 ### Option 1 (recommended): VSCode Remote Container
+This method is recommended for development. It will fire up docker compose with one container being the console and the bridge,
+and the second container being the plugin with VSCode. After initial build, the cached containers will help you start developing in seconds.
 1. create `dev.env` file inside `.devcontainer` folder with the following values:
 ```bash
 OC_PLUGIN_NAME=kubevirt-plugin
@@ -16,6 +18,7 @@ OC_USER=
 OC_PASS=
 ```
 2. Make sure you are connected to VPN and run the remote environment `(Ctrl+Shift+P) => Remote Containers: Open Folder in Container...`
+3. `yarn dev`
 
 ### Option 2 (local console):
 1. Run [console](https://github.com/openshift/console) in development mode 
