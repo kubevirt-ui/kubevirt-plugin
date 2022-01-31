@@ -1,19 +1,17 @@
-FROM openshift/origin-cli:latest AS cli
-FROM quay.io/coreos/tectonic-console-builder:v23 AS build
-SHELL ["/bin/bash", "-c"]
-
-COPY --from=cli /usr/bin/oc /usr/local/bin/oc
-RUN git clone https://github.com/openshift/console /console
-
-WORKDIR /console
-RUN [ ! -f "./bin/bridge" ] && ./build-backend.sh
-RUN [ ! -d "./frontend/public/dist" ] && ./build-frontend.sh
+FROM quay.io/openshift/origin-console:latest
+COPY --from=openshift/origin-cli:latest /usr/bin/oc /usr/local/bin/oc
 
 ENV OC_URL=$OC_URL
 ENV OC_PASS=$OC_PASS
 ENV OC_USER=$OC_USER
 ENV OC_PLUGIN_NAME=$OC_PLUGIN_NAME
 
+USER root
 CMD eval "oc login $OC_URL -u $OC_USER -p $OC_PASS --insecure-skip-tls-verify" && \
-    source ./contrib/oc-environment.sh && \
-    ./bin/bridge -plugins $OC_PLUGIN_NAME=http://localhost:9001 --k8s-mode-off-cluster-thanos=$(oc -n openshift-monitoring get configmap sharing-config -o jsonpath='{.data.prometheusURL}')
+    /opt/bridge/bin/bridge -public-dir=/opt/bridge/static \
+    -plugins $OC_PLUGIN_NAME=http://localhost:9001 \
+    -k8s-mode-off-cluster-thanos=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.thanosPublicURL}') \
+    -user-auth="disabled" -k8s-mode="off-cluster" \
+    -k8s-mode-off-cluster-endpoint=$(oc whoami --show-server) \
+    -k8s-mode-off-cluster-skip-verify-tls=true \
+    -k8s-auth="bearer-token" -k8s-auth-bearer-token=$(oc whoami --show-token)
