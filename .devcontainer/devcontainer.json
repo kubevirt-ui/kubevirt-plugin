@@ -4,6 +4,7 @@
 	"service": "plugin",
 	"workspaceFolder": "/workspace",
 	"settings": {},
+	"initializeCommand": ".devcontainer/init.sh",
 	"postCreateCommand": "yarn && eval 'oc login $OC_URL -u $OC_USER -p $OC_PASS --insecure-skip-tls-verify'",
 	"forwardPorts": [9000,9001],
 	"portsAttributes": {
