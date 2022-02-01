@@ -10,11 +10,13 @@ for OpenShift Console.
 
 ### Option 1 (recommended): Docker + VSCode Remote Container
 
-Make sure [Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension is installed. 
-This method uses docker compose with one container being the console and the bridge,
-and the second container being the plugin with VSCode. After initial build, the cached containers will help you start developing in seconds.
+Make sure the [Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+extension is installed. This method uses Docker Compose where one container is
+the OpenShift console and the second container is the plugin. It requires that
+you have access to an existing OpenShift cluster. After the initial build, the
+cached containers will help you start developing in seconds.
 
-1. Create a `dev.env` file inside `.devcontainer` folder with the correct values for your cluster:
+1. Create a `dev.env` file inside the `.devcontainer` folder with the correct values for your cluster:
 
 ```bash
 OC_PLUGIN_NAME=kubevirt-plugin
@@ -25,7 +27,7 @@ OC_PASS=<password>
 
 2. `(Ctrl+Shift+P) => Remote Containers: Open Folder in Container...`
 3. `yarn dev`
-4. Navigate to `http://localhost:9000`
+4. Navigate to <http://localhost:9000>`
 
 ### Option 2:
 
