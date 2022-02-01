@@ -12,7 +12,7 @@ services:
     env_file: dev.env
     restart: unless-stopped
     healthcheck:
-      test: oc get projects
+      test: oc whoami
       interval: 1m30s
       timeout: 10s
       retries: 5
@@ -22,7 +22,7 @@ services:
       context: ..
       dockerfile: .devcontainer/Dockerfile.plugin
     env_file: dev.env
-    depends_on: 
+    depends_on:
       - console
     network_mode: service:console
     # Overrides default command so things don't shut down after the process ends.
