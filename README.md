@@ -27,7 +27,7 @@ OC_PASS=<password>
 
 2. `(Ctrl+Shift+P) => Remote Containers: Open Folder in Container...`
 3. `yarn dev`
-4. Navigate to <http://localhost:9000>`
+4. Navigate to <http://localhost:9000>
 
 ### Option 2:
 
