@@ -2,7 +2,13 @@
 
 if [[ ! -f .devcontainer/dev.env ]]
 then
-    echo 'env file 'dev.env' does not exist in .devcontainer, aborting.'
+    cat << EOF
+    env file 'dev.env' does not exist in .devcontainer, please create it and add the the correct values for your cluster.
+    OC_PLUGIN_NAME=my-plugin
+    OC_URL=https://api.example.com:6443
+    OC_USER=kubeadmin
+    OC_PASS=<password>
+EOF
     exit 2
 else
     echo 'found 'dev.env' in .devcontainer'
