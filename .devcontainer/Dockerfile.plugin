@@ -1,3 +1,2 @@
-FROM openshift/origin-cli:latest AS cli
 FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:16 as build
-COPY --from=cli /usr/bin/oc /usr/local/bin/oc
+COPY --from=openshift/origin-cli:latest /usr/bin/oc /usr/local/bin/oc
