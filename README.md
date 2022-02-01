@@ -8,24 +8,24 @@ for OpenShift Console.
 
 ## Local development
 
-### Option 1 (recommended): VSCode Remote Container
+### Option 1 (recommended): Docker + VSCode Remote Container
 
 Make sure [Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension is installed. 
-This method is recommended for development. It will fire up docker compose with one container being the console and the bridge,
+This method uses docker compose with one container being the console and the bridge,
 and the second container being the plugin with VSCode. After initial build, the cached containers will help you start developing in seconds.
-Make sure you have 8GB of RAM or more dedicated to docker.
 
-1. create `dev.env` file inside `.devcontainer` folder with the following values:
+1. Create a `dev.env` file inside `.devcontainer` folder with the correct values for your cluster:
 
 ```bash
 OC_PLUGIN_NAME=kubevirt-plugin
-OC_URL=
-OC_USER=
-OC_PASS=
+OC_URL=https://api.example.com:6443
+OC_USER=kubeadmin
+OC_PASS=<password>
 ```
 
-2. Make sure you are connected to VPN and run the remote environment `(Ctrl+Shift+P) => Remote Containers: Open Folder in Container...`
-3. Run `yarn dev` inside the container.
+2. `(Ctrl+Shift+P) => Remote Containers: Open Folder in Container...`
+3. `yarn dev`
+4. Navigate to `http://localhost:9000`
 
 ### Option 2:
 
