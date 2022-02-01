@@ -11,7 +11,9 @@ CMD eval "oc login $OC_URL -u $OC_USER -p $OC_PASS --insecure-skip-tls-verify" &
     /opt/bridge/bin/bridge -public-dir=/opt/bridge/static \
     -plugins $OC_PLUGIN_NAME=http://localhost:9001 \
     -k8s-mode-off-cluster-thanos=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.thanosPublicURL}') \
-    -user-auth="disabled" -k8s-mode="off-cluster" \
     -k8s-mode-off-cluster-endpoint=$(oc whoami --show-server) \
     -k8s-mode-off-cluster-skip-verify-tls=true \
-    -k8s-auth="bearer-token" -k8s-auth-bearer-token=$(oc whoami --show-token)
+    -k8s-auth-bearer-token=$(oc whoami --show-token) \
+    -k8s-auth="bearer-token" \
+    -user-auth="disabled" \
+    -k8s-mode="off-cluster"
