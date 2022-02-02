@@ -139,7 +139,7 @@ const VirtualMachinesList = ({ kind }: { kind: string }) => {
 
   return (
     <>
-      <ListPageHeader title={t('Virtual Dynamic Machines')}>
+      <ListPageHeader title={t('Virtual Machines')}>
         <ListPageCreate groupVersionKind={kind}>{t('Create Virtual Machine')}</ListPageCreate>
       </ListPageHeader>
       <ListPageBody>
