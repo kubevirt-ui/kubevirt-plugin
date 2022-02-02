@@ -13,14 +13,8 @@
     "sourceMap": true,
     "noUnusedLocals": true,
     "paths": {
-      "@kubevirt-types": ["src/types"],
-      "@kubevirt-types/*": ["src/types/*"],
-      "@kubevirt-components": ["src/components"],
-      "@kubevirt-components/*": ["src/components/*"],
       "@kubevirt-utils": ["src/utils"],
       "@kubevirt-utils/*": ["src/utils/*"],
-      "@kubevirt-constants": ["src/constants"],
-      "@kubevirt-constants/*": ["src/constants/*"]
     }
   },
   "include": ["src"],
