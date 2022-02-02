@@ -66,7 +66,7 @@ namespace. For example:
 }
 ```
 
-Note that you will need to include a comment in a TypeScript file like the
+Note that you will need to include a comment in `utils/i18n.ts` like the
 following for [i18next-parser](https://github.com/i18next/i18next-parser) to
 add the message from `console-extensions.json` to your message catalog as follows:
 
