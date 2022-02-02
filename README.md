@@ -29,6 +29,12 @@ OC_PASS=<password>
 3. `yarn dev`
 4. Navigate to <http://localhost:9000>
 
+#### Cypress Testing inside the container
+
+1. `yarn test-cypress-docker`
+2. Navigate to <http://localhost:10000>
+3. login with password `kubevirt` (no need for username)
+
 ### Option 2:
 
 1. Set up [Console](https://github.com/openshift/console) and See the plugin development section in [Console Dynamic Plugins README](https://github.com/openshift/console/blob/master/frontend/packages/console-dynamic-plugin-sdk/README.md) for details on how to run OpenShift console using local plugins.
