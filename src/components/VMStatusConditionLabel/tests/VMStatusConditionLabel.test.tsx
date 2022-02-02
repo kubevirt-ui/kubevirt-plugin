@@ -9,16 +9,9 @@ import { conditionsMock } from './mocks';
 afterEach(cleanup);
 
 test('VMStatusConditionLabel', async () => {
-  const { lastProbeTime, lastTransitionTime, message, reason, status, type } = conditionsMock[0];
+  const { message, reason, status, type } = conditionsMock[0];
   const { asFragment, getByText } = render(
-    <VMStatusConditionLabel
-      lastTransitionTime={lastTransitionTime}
-      lastProbeTime={lastProbeTime}
-      message={message}
-      reason={reason}
-      status={status}
-      type={type}
-    />,
+    <VMStatusConditionLabel message={message} reason={reason} status={status} type={type} />,
   );
   const firstRender = asFragment();
 

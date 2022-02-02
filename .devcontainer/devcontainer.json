@@ -5,14 +5,22 @@
 	"workspaceFolder": "/workspace",
 	"settings": {},
 	"initializeCommand": ".devcontainer/init.sh",
-	"postCreateCommand": "yarn && eval 'oc login $OC_URL -u $OC_USER -p $OC_PASS --insecure-skip-tls-verify'",
-	"forwardPorts": [9000,9001],
+	"postCreateCommand": "eval 'oc login $OC_URL -u $OC_USER -p $OC_PASS --insecure-skip-tls-verify' && yarn && yarn cypress install",
+	"forwardPorts": [
+		9000,
+		9001,
+		10000,
+	],
 	"portsAttributes": {
 		"9000": {
 			"label": "Console",
 		},
 		"9001": {
 			"label": "Plugin static files",
+			"onAutoForward": "silent"
+		},
+		"10000": {
+			"label": "X11 Server (Cypress)",
 			"onAutoForward": "silent"
 		}
 	},

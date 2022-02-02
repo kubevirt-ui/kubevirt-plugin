@@ -1,15 +1,13 @@
-import { VMStatusCondition } from '@kubevirt-types/vm';
+import { V1VirtualMachineCondition } from '@kubevirt-types';
 
-export const conditionsMock: VMStatusCondition[] = [
+export const conditionsMock: V1VirtualMachineCondition[] = [
   {
-    lastTransitionTime: new Date().toString(),
     message: 'no vmi found',
     reason: 'no_vmi',
     status: 'true',
     type: 'Failure',
   },
   {
-    lastTransitionTime: new Date().toString(),
     message: 'success',
     reason: 'ready',
     status: 'true',

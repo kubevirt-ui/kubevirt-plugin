@@ -4,7 +4,7 @@ import { TFunction } from 'i18next';
 
 import { VMStatusConditionLabelList } from '@kubevirt-components/VMStatusConditionLabel/VMStatusConditionLabel';
 import { printableVMStatus } from '@kubevirt-constants/vm-status';
-import { VMKind } from '@kubevirt-types/vm';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   K8sResourceCommon,
   ListPageBody,
@@ -44,7 +44,7 @@ const columns: (t: TFunction) => TableColumn<K8sResourceCommon>[] = (t) => [
   },
 ];
 
-const VMRow: React.FC<RowProps<VMKind, { kind: string }>> = ({
+const VMRow: React.FC<RowProps<V1VirtualMachine, { kind: string }>> = ({
   obj,
   activeColumnIDs,
   rowData: { kind },
@@ -117,7 +117,7 @@ export const filters: RowFilter[] = [
 const VMListPage = ({ kind }: { kind: string }) => {
   const { t } = useTranslation('plugin__kubevirt-plugin');
 
-  const [vms, loaded, loadError] = useK8sWatchResource<VMKind[]>({
+  const [vms, loaded, loadError] = useK8sWatchResource<V1VirtualMachine[]>({
     kind,
     isList: true,
     namespaced: true,

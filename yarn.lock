@@ -592,10 +592,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@kubevirt-ui/kubevirt-api@^0.0.21":
-  version "0.0.21"
-  resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-0.0.21.tgz#659ee9aaccb3244577e00b2de9bad18f11da27f8"
-  integrity sha512-VAM9Uw+fflAO9VPwaoDpm0K//CyCVf14Ey7W3CkQZ7bGb8QTu9FuEVR/Q/XmPXGlf6fQgKNFU9hU8GDYB2cIAw==
+"@kubevirt-ui/kubevirt-api@^0.0.30":
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-0.0.30.tgz#f9506090e27120f143cd58a7e9fc8538c435a2b4"
+  integrity sha512-ePFTvdrjQHy3PBFkPA0QJeDA/cbFO/W4wT9SxEbOZF8AD2XMMx5qrB3Orqe2XtWygviceTljhBP6yS6cF4r/rA==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

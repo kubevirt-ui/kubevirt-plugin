@@ -1,39 +1,39 @@
 import * as React from 'react';
 
-import { VMStatusCondition } from '@kubevirt-types';
+import { V1VirtualMachineCondition } from '@kubevirt-types';
 import { Label, LabelGroup, Popover, PopoverPosition } from '@patternfly/react-core';
 
-export const VMStatusConditionLabel: React.FC<VMStatusCondition> = React.memo((condition) => {
-  return (
-    <Popover
-      position={PopoverPosition.top}
-      aria-label="Condition Popover"
-      bodyContent={() => <div>{condition?.message}</div>}
-    >
-      <Label
-        color="grey"
-        isTruncated
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-        }}
+export const VMStatusConditionLabel: React.FC<V1VirtualMachineCondition> = React.memo(
+  (condition) => {
+    return (
+      <Popover
+        position={PopoverPosition.top}
+        aria-label="Condition Popover"
+        bodyContent={() => <div>{condition?.message}</div>}
       >
-        {condition?.reason}={condition?.status}
-      </Label>
-    </Popover>
-  );
-});
+        <Label
+          color="grey"
+          isTruncated
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+        >
+          {condition?.reason}={condition?.status}
+        </Label>
+      </Popover>
+    );
+  },
+);
 VMStatusConditionLabel.displayName = 'VMStatusConditionLabel';
 
-export const VMStatusConditionLabelList: React.FC<{ conditions: VMStatusCondition[] }> = React.memo(
-  ({ conditions }) => {
+export const VMStatusConditionLabelList: React.FC<{ conditions: V1VirtualMachineCondition[] }> =
+  React.memo(({ conditions }) => {
     return (
       <LabelGroup>
-        {conditions.map(({ lastProbeTime, lastTransitionTime, message, reason, status, type }) => (
+        {conditions.map(({ message, reason, status, type }) => (
           <VMStatusConditionLabel
-            key={lastTransitionTime}
-            lastTransitionTime={lastTransitionTime}
-            lastProbeTime={lastProbeTime}
+            key={`${reason}-${type}`}
             message={message}
             reason={reason}
             status={status}
@@ -42,6 +42,5 @@ export const VMStatusConditionLabelList: React.FC<{ conditions: VMStatusConditio
         ))}
       </LabelGroup>
     );
-  },
-);
+  });
 VMStatusConditionLabelList.displayName = 'VMStatusConditionLabelList';

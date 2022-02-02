@@ -17,14 +17,15 @@
     "cypress-generate": "marge -o ./gui-test-screenshots/ -f cypress-report -t 'OpenShift Console Cypress Test Results' -p 'OpenShift Cypress Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",
     "cypress-postreport": "yarn cypress-merge && yarn cypress-generate",
     "test-cypress": "node_modules/.bin/cypress open --config-file ./cypress/cypress.json --env openshift=true",
-    "test-cypress-headless": "node --max-old-space-size=4096 node_modules/.bin/cypress run --config-file ./cypress/cypress.json --env openshift=true --browser ${BRIDGE_E2E_BROWSER_NAME:=chrome} --headless"
+    "test-cypress-docker": "DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 $(npm bin)/cypress open --config-file ./cypress/cypress.json --env openshift=true",
+    "test-cypress-headless": "node --max-old-space-size=4096 $(npm bin)/cypress run --config-file ./cypress/cypress.json --env openshift=true --headless"
   },
   "consolePlugin": {
     "name": "kubevirt-plugin",
     "version": "0.0.0",
     "displayName": "Kubevirt Plugin",
     "exposedModules": {
-      "vmListPage": "./components/vms/vm-page"
+      "vmListPage": "./components/vms/vm-list-page"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
@@ -43,7 +44,7 @@
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.11.0",
-    "@kubevirt-ui/kubevirt-api": "^0.0.21",
+    "@kubevirt-ui/kubevirt-api": "^0.0.30",
     "@openshift-console/dynamic-plugin-sdk": "0.0.3",
     "@openshift-console/dynamic-plugin-sdk-internal": "^0.0.2-wp5",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.4",

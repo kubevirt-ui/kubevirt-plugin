@@ -15,8 +15,6 @@
     "paths": {
       "@kubevirt-types": ["src/types"],
       "@kubevirt-types/*": ["src/types/*"],
-      "@kubevirt-models": ["src/models"],
-      "@kubevirt-models/*": ["src/models/*"],
       "@kubevirt-components": ["src/components"],
       "@kubevirt-components/*": ["src/components/*"],
       "@kubevirt-utils": ["src/utils"],

@@ -24,6 +24,7 @@ services:
     env_file: dev.env
     depends_on:
       - console
+      - x11-bridge
     network_mode: service:console
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
@@ -32,3 +33,19 @@ services:
       - ..:/workspace:cached
       - ~/.bash_history:/root/.bash_history
       - ~/.zsh_history:/root/.zsh_history
+    volumes_from:
+      - x11-bridge:rw
+
+  # x11 service for cypress
+  x11-bridge:
+    image: jare/x11-bridge
+    volumes:
+      - '/tmp/.X11-unix:/tmp/.X11-unix:rw'
+    ports:
+      - '10000:10000'
+    restart: unless-stopped
+    environment:
+      MODE: tcp
+      XPRA_HTML: 'yes'
+      DISPLAY: :14
+      XPRA_PASSWORD: kubevirt
