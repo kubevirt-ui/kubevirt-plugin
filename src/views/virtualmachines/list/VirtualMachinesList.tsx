@@ -2,8 +2,6 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 
-import { VMStatusConditionLabelList } from '@kubevirt-components/VMStatusConditionLabel/VMStatusConditionLabel';
-import { printableVMStatus } from '@kubevirt-constants/vm-status';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   K8sResourceCommon,
@@ -20,6 +18,20 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
+
+import { VMStatusConditionLabelList } from './components/VMStatusConditionLabel';
+
+export const printableVMStatus = {
+  Stopped: 'Stopped',
+  Migrating: 'Migrating',
+  Provisioning: 'Provisioning',
+  Starting: 'Starting',
+  Running: 'Running',
+  Paused: 'Paused',
+  Stopping: 'Stopping',
+  Terminating: 'Terminating',
+  Unknown: 'Unknown',
+};
 
 const columns: (t: TFunction) => TableColumn<K8sResourceCommon>[] = (t) => [
   {
@@ -114,7 +126,7 @@ export const filters: RowFilter[] = [
   },
 ];
 
-const VMListPage = ({ kind }: { kind: string }) => {
+const VirtualMachinesList = ({ kind }: { kind: string }) => {
   const { t } = useTranslation('plugin__kubevirt-plugin');
 
   const [vms, loaded, loadError] = useK8sWatchResource<V1VirtualMachine[]>({
@@ -127,7 +139,7 @@ const VMListPage = ({ kind }: { kind: string }) => {
 
   return (
     <>
-      <ListPageHeader title={t('Virtual Machines')}>
+      <ListPageHeader title={t('Virtual Dynamic Machines')}>
         <ListPageCreate groupVersionKind={kind}>{t('Create Virtual Machine')}</ListPageCreate>
       </ListPageHeader>
       <ListPageBody>
@@ -149,4 +161,4 @@ const VMListPage = ({ kind }: { kind: string }) => {
   );
 };
 
-export default VMListPage;
+export default VirtualMachinesList;

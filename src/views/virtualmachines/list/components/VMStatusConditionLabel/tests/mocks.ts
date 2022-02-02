@@ -1,4 +1,4 @@
-import { V1VirtualMachineCondition } from '@kubevirt-types';
+import { V1VirtualMachineCondition } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export const conditionsMock: V1VirtualMachineCondition[] = [
   {
