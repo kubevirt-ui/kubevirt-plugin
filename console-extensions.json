@@ -5,23 +5,6 @@
       "id": "virtualization",
       "name": "%plugin__kubevirt-plugin~Virtualization%",
       "insertAfter": "workloads"
-    },
-    "flags": {
-      "required": ["KUBEVIRT"]
-    }
-  },
-  {
-    "type": "console.page/resource/list",
-    "properties": {
-      "model": {
-        "group": "kubevirt.io",
-        "kind": "VirtualMachine",
-        "version": "v1"
-      },
-      "component": { "$codeRef": "vmListPage" }
-    },
-    "flags": {
-      "required": ["KUBEVIRT"]
     }
   },
   {
@@ -35,9 +18,17 @@
         "kind": "VirtualMachine",
         "version": "v1"
       }
-    },
-    "flags": {
-      "required": ["KUBEVIRT"]
+    }
+  },
+  {
+    "type": "console.page/resource/list",
+    "properties": {
+      "model": {
+        "group": "kubevirt.io",
+        "kind": "VirtualMachine",
+        "version": "v1"
+      },
+      "component": { "$codeRef": "VirtualMachinesList" }
     }
   }
 ]

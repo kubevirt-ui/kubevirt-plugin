@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { V1VirtualMachineCondition } from '@kubevirt-types';
+import { V1VirtualMachineCondition } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Label, LabelGroup, Popover, PopoverPosition } from '@patternfly/react-core';
 
 export const VMStatusConditionLabel: React.FC<V1VirtualMachineCondition> = React.memo(
@@ -33,7 +33,7 @@ export const VMStatusConditionLabelList: React.FC<{ conditions: V1VirtualMachine
       <LabelGroup>
         {conditions.map(({ message, reason, status, type }) => (
           <VMStatusConditionLabel
-            key={reason}
+            key={type}
             message={message}
             reason={reason}
             status={status}
