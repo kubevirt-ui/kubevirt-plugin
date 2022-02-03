@@ -4,7 +4,11 @@
     "properties": {
       "id": "virtualization",
       "name": "%plugin__kubevirt-plugin~Virtualization%",
-      "insertAfter": "workloads"
+      "insertAfter": "workloads",
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-sec-virtualization",
+        "data-test-id": "virtualization-nav-item"
+      }
     }
   },
   {
@@ -17,7 +21,44 @@
         "group": "kubevirt.io",
         "kind": "VirtualMachine",
         "version": "v1"
+      },
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualmachines",
+        "data-test-id": "virtualmachines-nav-item"
       }
+    }
+  },
+  {
+    "type": "console.navigation/resource-ns",
+    "properties": {
+      "id": "virtualmachineinstances",
+      "section": "virtualization",
+      "name": "%plugin__kubevirt-plugin~VirtualMachineInstances%",
+      "model": {
+        "group": "kubevirt.io",
+        "kind": "VirtualMachineInstance",
+        "version": "v1"
+      },
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualmachineinstances",
+        "data-test-id": "virtualmachineinstances-nav-item"
+      }
+    }
+  },{
+    "type": "console.navigation/href",
+    "properties": {
+      "id": "templates",
+      "section": "virtualization",
+      "name": "%plugin__kubevirt-plugin~Templates%",
+      "href": "/templates",
+      "prefixNamespaced": true,
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-templates",
+        "data-test-id": "templates-nav-item"
+      }
+    },
+    "flags": {
+      "required": ["OPENSHIFT"]
     }
   },
   {
