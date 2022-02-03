@@ -5,7 +5,7 @@
 	"workspaceFolder": "/workspace",
 	"settings": {},
 	"initializeCommand": ".devcontainer/init.sh",
-	"postCreateCommand": "eval 'oc login $OC_URL -u $OC_USER -p $OC_PASS --insecure-skip-tls-verify' && yarn && yarn cypress install",
+	"postCreateCommand": "eval 'oc login $OC_URL -u $OC_USER -p $OC_PASS --insecure-skip-tls-verify' && yarn",
 	"forwardPorts": [
 		9000,
 		9001,

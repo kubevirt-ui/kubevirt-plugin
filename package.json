@@ -11,6 +11,7 @@
     "check-types": "tsc",
     "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
+    "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/doc/console-extensions.md .",
     "test": "jest",
     "test-cov": "jest --coverage",
     "cypress-merge": "mochawesome-merge ./gui-test-screenshots/cypress_report*.json > ./gui-test-screenshots/cypress.json",
