@@ -7,6 +7,9 @@ on:
   push:
     branches:
       - main
+env:
+  GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
+
 jobs:
   build:
     name: build
@@ -57,5 +60,3 @@ jobs:
       - name: Add Size label
         if: github.event_name == 'pull_request'
         uses: 'pascalgn/size-label-action@v0.4.3'
-        env:
-          GITHUB_TOKEN: '${{ secrets.BOT_PAT }}'
