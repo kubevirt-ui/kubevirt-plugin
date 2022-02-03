@@ -50,13 +50,3 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-  size-label:
-    name: size-label
-    runs-on: ubuntu-latest
-    steps:
-      - name: Add Size label
-        if: github.event_name == 'pull_request'
-        uses: 'pascalgn/size-label-action@v0.4.3'
-        env:
-          GITHUB_TOKEN: "${{ secrets.KUBEVIRT_BOT_PAT }}"
