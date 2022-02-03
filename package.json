@@ -17,7 +17,7 @@
     "cypress-generate": "marge -o ./gui-test-screenshots/ -f cypress-report -t 'OpenShift Console Cypress Test Results' -p 'OpenShift Cypress Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",
     "cypress-postreport": "yarn cypress-merge && yarn cypress-generate",
     "test-cypress": "node_modules/.bin/cypress open --config-file ./cypress/cypress.json --env openshift=true",
-    "test-cypress-docker": "DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 $(npm bin)/cypress open --config-file ./cypress/cypress.json --env openshift=true",
+    "test-cypress-docker": "echo 'visit http://localhost:10000' && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 $(npm bin)/cypress open --config-file ./cypress/cypress.json --env openshift=true",
     "test-cypress-headless": "node --max-old-space-size=4096 $(npm bin)/cypress run --config-file ./cypress/cypress.json --env openshift=true --headless"
   },
   "consolePlugin": {
