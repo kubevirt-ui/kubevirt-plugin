@@ -10,7 +10,6 @@ services:
       context: ..
       dockerfile: .devcontainer/Dockerfile.console
     env_file: dev.env
-    restart: unless-stopped
     healthcheck:
       test: oc whoami
       interval: 1m30s

@@ -64,10 +64,10 @@ const config: webpack.Configuration = {
         ],
       },
       {
-        test: /\.(scss|css)$/,
-        exclude: /node_modules\/(?!(@patternfly)\/)/,
+        test: /\.scss$/,
+        exclude: /node_modules/,
         use: [
-          'style-loader',
+          { loader: 'style-loader' },
           {
             loader: 'css-loader',
             options: {
@@ -90,6 +90,10 @@ const config: webpack.Configuration = {
             },
           },
         ],
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(png|jpg|jpeg|gif|svg|woff2?|ttf|eot|otf)(\?.*$|$)/,
