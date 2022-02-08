@@ -7,3 +7,6 @@
 // t('plugin__kubevirt-plugin~Virtualization')
 // t('plugin__kubevirt-plugin~VirtualMachines')
 // t('plugin__kubevirt-plugin~Create Virtual Machine')
+// t('plugin__kubevirt-plugin~Catalog')
+// t('plugin__kubevirt-plugin~VirtualMachineInstances')
+// t('plugin__kubevirt-plugin~Templates')
