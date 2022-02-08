@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import {
   K8sResourceCommon,
@@ -7,11 +8,10 @@ import {
   useK8sWatchResources,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { TemplateKind } from '../types/template';
 import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../utils/constants';
 
 export const useVmTemplates = (): useVmTemplatesValues => {
-  const [templates, setTemplates] = React.useState<TemplateKind[]>([]);
+  const [templates, setTemplates] = React.useState<V1Template[]>([]);
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [loadError, setLoadError] = React.useState<string>('');
   const [isAdmin] = useIsAdmin();
@@ -66,7 +66,7 @@ export const useVmTemplates = (): useVmTemplatesValues => {
     [isAdmin, projects],
   );
 
-  const resources = useK8sWatchResources(templatesResources);
+  const resources = useK8sWatchResources<{ [key: string]: V1Template[] }>(templatesResources);
 
   React.useEffect(() => {
     const errorKey = Object.keys(resources).find((key) => resources[key].loadError);
@@ -88,7 +88,7 @@ export const useVmTemplates = (): useVmTemplatesValues => {
 };
 
 type useVmTemplatesValues = {
-  templates: TemplateKind[];
+  templates: V1Template[];
   loaded: boolean;
   loadError: any;
 };

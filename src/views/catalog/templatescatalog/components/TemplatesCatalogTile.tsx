@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { CatalogTile } from '@patternfly/react-catalog-view-extension';
 import { capitalize, Stack, StackItem } from '@patternfly/react-core';
 
-import { TemplateKind } from '../types/template';
 import { WORKLOADS_LABELS } from '../utils/constants';
 import {
   getTemplateFlavor,
@@ -15,8 +15,8 @@ import {
 import { getTemplateOSIcon } from '../utils/os-icons';
 
 export type TemplateTileProps = {
-  template: TemplateKind;
-  onClick: (template: TemplateKind) => void;
+  template: V1Template;
+  onClick: (template: V1Template) => void;
   isSelected?: boolean;
 };
 
@@ -29,6 +29,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(({ template,
 
   return (
     <CatalogTile
+      data-test-id={template.metadata.name}
       featured={false}
       icon={<img src={getTemplateOSIcon(template)} alt="os-icon" />}
       title={

@@ -599,10 +599,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@kubevirt-ui/kubevirt-api@^0.0.30":
-  version "0.0.30"
-  resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-0.0.30.tgz#f9506090e27120f143cd58a7e9fc8538c435a2b4"
-  integrity sha512-ePFTvdrjQHy3PBFkPA0QJeDA/cbFO/W4wT9SxEbOZF8AD2XMMx5qrB3Orqe2XtWygviceTljhBP6yS6cF4r/rA==
+"@kubevirt-ui/kubevirt-api@^0.0.34":
+  version "0.0.34"
+  resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-0.0.34.tgz#e24ef67f134e46d99e95a4db32767edd587585a9"
+  integrity sha512-itIopNiQViRRQ8YLnLo/8RVBKDLZ1AOBUgxf2Cv3YtrdjWeUOaPdrhs0Yut3wpYGsNloQYMSj7CiKc0o5+ElfQ==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -703,7 +703,7 @@
     tippy.js "5.1.2"
     tslib "^2.0.0"
 
-"@patternfly/react-core@4.168.8", "@patternfly/react-core@^4.168.8":
+"@patternfly/react-core@4.168.8":
   version "4.168.8"
   resolved "https://registry.yarnpkg.com/@patternfly/react-core/-/react-core-4.168.8.tgz#6f200dba7bb83423144db34bbd2ffc833b097566"
   integrity sha512-wfG52saibeAXRoBYytzMgVGANoInbPuhUK0y6AynVp3/QKAPCKHpaI4nCh9ytNZ+UjiT2KGOcunhavsOw5+iMA==
@@ -716,20 +716,7 @@
     tippy.js "5.1.2"
     tslib "^2.0.0"
 
-"@patternfly/react-core@4.175.4", "@patternfly/react-core@^4.157.2":
-  version "4.175.4"
-  resolved "https://registry.yarnpkg.com/@patternfly/react-core/-/react-core-4.175.4.tgz#1dae2a6b5eb58209a47bdc3bf457c47b68ccee54"
-  integrity sha512-bnQhvXKbprni5WhlbMI+nbYxwMR03bFZtUk+F7JiLM96uk/yCrPjUes6u8Pbgkh/HhsRYx8K1kx84WmC+MyD5w==
-  dependencies:
-    "@patternfly/react-icons" "^4.26.4"
-    "@patternfly/react-styles" "^4.25.4"
-    "@patternfly/react-tokens" "^4.27.4"
-    focus-trap "6.2.2"
-    react-dropzone "9.0.0"
-    tippy.js "5.1.2"
-    tslib "^2.0.0"
-
-"@patternfly/react-core@^4.192.15":
+"@patternfly/react-core@4.192.15", "@patternfly/react-core@^4.157.2", "@patternfly/react-core@^4.168.8", "@patternfly/react-core@^4.192.15":
   version "4.192.15"
   resolved "https://registry.yarnpkg.com/@patternfly/react-core/-/react-core-4.192.15.tgz#ee664054233add748321871a6c6f746b974b3e6a"
   integrity sha512-nYNhuWeRegZ89WY4OKa4bX06DYsEDCmNYDEq8Jp9CHPVm/6UzmPmWA/Y5MTbLPZN6w2i0cvLHf2wQVrHSzwVvg==
@@ -742,7 +729,7 @@
     tippy.js "5.1.2"
     tslib "^2.0.0"
 
-"@patternfly/react-icons@^4.11.17", "@patternfly/react-icons@^4.26.4":
+"@patternfly/react-icons@^4.11.17":
   version "4.26.4"
   resolved "https://registry.yarnpkg.com/@patternfly/react-icons/-/react-icons-4.26.4.tgz#3cd6c2d8405027e25b847e24d8a000d4af88537a"
   integrity sha512-h1NJixtNVK+nYxLON3HOO0xguA9qXQ5rkGUo4TZJ/kRehFCJMH8PPeebdOAKgAo38NjS2/06+atNKjDRl6zYcA==
@@ -757,7 +744,7 @@
   resolved "https://registry.yarnpkg.com/@patternfly/react-icons/-/react-icons-4.43.15.tgz#8dd696ba92867b1074eee6ef7c672833197f6046"
   integrity sha512-b1fcPpIsQVJBGG1onpNTDiGqVJ60BVNy3qvzUu4Ea+lOwP83oIlhODtS792wx1B284a4wxP3uMc6uXCfdULD/w==
 
-"@patternfly/react-styles@^4.11.16", "@patternfly/react-styles@^4.25.4":
+"@patternfly/react-styles@^4.11.16":
   version "4.25.4"
   resolved "https://registry.yarnpkg.com/@patternfly/react-styles/-/react-styles-4.25.4.tgz#e49c9b290d1e48a12e9d62f3e57079fccf758392"
   integrity sha512-GHFLzsvyimymkGTTyTW8HZDlhYbGpCqw/69Se1EHCaZnbTYluiJMRI6YfNTRC5ZvYF+x4GMAG5AjwQ5LfbZ/xg==
@@ -796,7 +783,7 @@
     lodash "^4.17.19"
     tslib "^2.0.0"
 
-"@patternfly/react-tokens@^4.12.18", "@patternfly/react-tokens@^4.27.4":
+"@patternfly/react-tokens@^4.12.18":
   version "4.27.4"
   resolved "https://registry.yarnpkg.com/@patternfly/react-tokens/-/react-tokens-4.27.4.tgz#9a292a2ac24e17714456a0b6ee5b512a0850ec05"
   integrity sha512-+DVCp4edPwORQF2zH6aG8e7FhLBXKsZgxMEYBU1/3qQSp+gf6Q8M4HiqbNnR6uo99tYJ9JiEcbGZu4Mx+nDIuA==
@@ -839,6 +826,20 @@
     lz-string "^1.4.4"
     pretty-format "^27.0.2"
 
+"@testing-library/dom@^8.11.3":
+  version "8.11.3"
+  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.11.3.tgz#38fd63cbfe14557021e88982d931e33fb7c1a808"
+  integrity sha512-9LId28I+lx70wUiZjLvi1DB/WT2zGOxUh46glrSNMaWVx849kKAluezVzZrXJfTKKoQTmEOutLes/bHg4Bj3aA==
+  dependencies:
+    "@babel/code-frame" "^7.10.4"
+    "@babel/runtime" "^7.12.5"
+    "@types/aria-query" "^4.2.0"
+    aria-query "^5.0.0"
+    chalk "^4.1.0"
+    dom-accessibility-api "^0.5.9"
+    lz-string "^1.4.4"
+    pretty-format "^27.0.2"
+
 "@testing-library/jest-dom@^5.16.1":
   version "5.16.1"
   resolved "https://registry.yarnpkg.com/@testing-library/jest-dom/-/jest-dom-5.16.1.tgz#3db7df5ae97596264a7da9696fe14695ba02e51f"
@@ -861,6 +862,13 @@
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@testing-library/dom" "^8.0.0"
+
+"@testing-library/user-event@^13.5.0":
+  version "13.5.0"
+  resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-13.5.0.tgz#69d77007f1e124d55314a2b73fd204b333b13295"
+  integrity sha512-5Kwtbo3Y/NowpkbRuSepbyMFkZmHgD+vPzYB/RJ4oxt5Gj/avFFBYjhw27cqSVPVw/3a67NK1PbiIr9k4Gwmdg==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
 
 "@tootallnate/once@1":
   version "1.1.2"

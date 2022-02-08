@@ -21,15 +21,11 @@ export type TemplateFilters = TemplateCountFilters & {
 
 export const useTemplatesFilters = (
   isAdmin: boolean,
-): [
-  TemplateFilters,
-  (type: string, value: string) => void,
-  (type?: string | { key: string; name: string }, id?: string) => void,
-] => {
+): [TemplateFilters, (type: string, value: string) => void] => {
   const { params, appendParam, setParam, deleteParam } = useURLParams();
   const onlyDefaultParam = params.get('onlyDefault');
 
-  const [onlyDefault, setOnlyDefault] = React.useState(true);
+  const [onlyDefault, setOnlyDefault] = React.useState(isAdmin);
   const [query, setQuery] = React.useState(params.get('query') || '');
   const [filters, setFilters] = React.useState<TemplateCountFilters>({
     support: {
@@ -49,9 +45,6 @@ export const useTemplatesFilters = (
       value: new Set([...params.getAll('flavor')]),
     },
   });
-
-  const resetFilter = (type: string) =>
-    setFilters((prev) => ({ ...prev, [type]: { ...prev[type], value: undefined } }));
 
   const onSelect = (type: string, value: any) => {
     if (type === 'onlyDefault') {
@@ -79,17 +72,6 @@ export const useTemplatesFilters = (
     }
   };
 
-  const clearFilter = (type?: string | { key: string; name: string }, id?: string) => {
-    if (!type && !id) {
-      setQuery('');
-      setOnlyDefault(true);
-      resetFilter('support');
-      resetFilter('osName');
-      resetFilter('workload');
-      resetFilter('flavor');
-    }
-  };
-
   React.useEffect(() => {
     if (onlyDefaultParam) {
       setOnlyDefault(onlyDefaultParam === 'true');
@@ -97,7 +79,8 @@ export const useTemplatesFilters = (
       setOnlyDefault(isAdmin);
       setParam('onlyDefault', isAdmin.toString());
     }
-  }, [isAdmin, onlyDefaultParam, setParam]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin, onlyDefaultParam]);
 
-  return [{ ...filters, onlyDefault, query }, onSelect, clearFilter];
+  return [{ ...filters, onlyDefault, query }, onSelect];
 };

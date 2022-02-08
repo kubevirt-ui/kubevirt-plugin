@@ -29,7 +29,8 @@ export const TemplateFilterGroup: React.FC<{
       () =>
         filters.map(({ count, value, label }) => (
           <FilterSidePanelCategoryItem
-            key={value}
+            key={`${groupKey}-${label}`}
+            data-test-id={`${groupKey}-${label}`}
             count={count}
             checked={pickedFilters?.has(value)}
             onClick={() => onFilterClick(groupKey, value)}
