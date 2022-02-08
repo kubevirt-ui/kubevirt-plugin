@@ -26,7 +26,8 @@
     "version": "0.0.0",
     "displayName": "Kubevirt Plugin",
     "exposedModules": {
-      "VirtualMachinesList": "./views/virtualmachines/list/VirtualMachinesList.tsx"
+      "VirtualMachinesList": "./views/virtualmachines/list/VirtualMachinesList.tsx",
+      "TemplatesCatalog": "./views/catalog/templatescatalog/TemplatesCatalog.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"

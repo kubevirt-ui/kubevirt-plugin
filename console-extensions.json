@@ -12,6 +12,17 @@
     }
   },
   {
+    "type": "console.navigation/href",
+    "properties": {
+      "prefixNamespaced": true,
+      "id": "virtualization-catalog",
+      "section": "virtualization",
+      "insertBefore": "virtualmachines",
+      "name": "%plugin__kubevirt-plugin~Catalog%",
+      "href": "templatescatalog"
+    }
+  },
+  {
     "type": "console.navigation/resource-ns",
     "properties": {
       "id": "virtualmachines",
@@ -44,7 +55,8 @@
         "data-test-id": "virtualmachineinstances-nav-item"
       }
     }
-  },{
+  },
+  {
     "type": "console.navigation/href",
     "properties": {
       "id": "templates",
@@ -69,7 +81,18 @@
         "kind": "VirtualMachine",
         "version": "v1"
       },
-      "component": { "$codeRef": "VirtualMachinesList" }
+      "component": {
+        "$codeRef": "VirtualMachinesList"
+      }
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
+      "path": ["/k8s/ns/:ns/templatescatalog", "/k8s/all-namespaces/templatescatalog"],
+      "component": {
+        "$codeRef": "TemplatesCatalog"
+      }
     }
   }
 ]
