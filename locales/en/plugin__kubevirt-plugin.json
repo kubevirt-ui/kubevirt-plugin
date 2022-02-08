@@ -5,6 +5,7 @@
   "Catalog": "Catalog",
   "VirtualMachineInstances": "VirtualMachineInstances",
   "Templates": "Templates",
+  "test i18n pr": "test i18n pr",
   "All Items": "All Items",
   "Default Templates": "Default Templates",
   "Support level": "Support level",
@@ -22,6 +23,5 @@
   "Status": "Status",
   "Conditions": "Conditions",
   "Created": "Created",
-  "Virtual Machines": "Virtual Machines",
-  "Virtual Machiness": "Virtual Machiness"
+  "Virtual Machines": "Virtual Machines"
 }
