@@ -1,4 +1,7 @@
+import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
+
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Disk, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAnnotation, getLabel } from '@kubevirt-utils/selectors';
 
 import { TemplateFilters } from '../hooks/useVmTemplatesFilters';
@@ -7,7 +10,10 @@ import { ANNOTATIONS } from './annotations';
 import {
   FLAVORS,
   OS_NAME_TYPES,
+  TEMPLATE_BASE_IMAGE_NAME_PARAMETER,
+  TEMPLATE_DATA_SOURCE_NAME_PARAMETER,
   TEMPLATE_DEFAULT_VARIANT_LABEL,
+  TEMPLATE_DESCRIPTION_ANNOTATION,
   TEMPLATE_FLAVOR_LABEL,
   TEMPLATE_OS_TEMPLATE_ANNOTATION,
   TEMPLATE_PROVIDER_NAME_ANNOTATION,
@@ -20,16 +26,22 @@ export const isDefaultVariantTemplate = (template: V1Template): boolean =>
   template?.metadata?.labels?.[TEMPLATE_DEFAULT_VARIANT_LABEL] === 'true';
 
 export const getTemplateName = (template: V1Template): string =>
-  getAnnotation(template, ANNOTATIONS.displayName, template?.metadata.name);
+  getAnnotation(template, ANNOTATIONS.displayName, template?.metadata?.name);
 
 export const getTemplateOSLabelName = (template: V1Template): string =>
-  getLabel(template, TEMPLATE_OS_TEMPLATE_ANNOTATION, template?.metadata.name);
+  getLabel(template, TEMPLATE_OS_TEMPLATE_ANNOTATION, template?.metadata?.name);
 
 export const getTemplateProviderName = (template: V1Template): string =>
-  getAnnotation(template, TEMPLATE_PROVIDER_NAME_ANNOTATION, template?.metadata.name);
+  getAnnotation(template, TEMPLATE_PROVIDER_NAME_ANNOTATION, template?.metadata?.name);
 
 export const getTemplateSupportLevel = (template: V1Template): string =>
   getAnnotation(template, TEMPLATE_SUPPORT_LEVEL_ANNOTATION);
+
+export const getTemplateDocumentationURL = (template: V1Template): string =>
+  getAnnotation(template, ANNOTATIONS.documentationURL);
+
+export const getTemplateDescription = (template: V1Template): string =>
+  getAnnotation(template, TEMPLATE_DESCRIPTION_ANNOTATION);
 
 export const getTemplateFlavor = (template: V1Template): string => {
   const isFlavorExist = (flavor: string) =>
@@ -52,6 +64,27 @@ export const getTemplateOS = (template: V1Template): string => {
     ) ?? OS_NAME_TYPES.other
   );
 };
+
+export const getTemplateParameterValue = (template: V1Template, parameter): string => {
+  return template?.parameters?.find((param) => param.name === parameter)?.value ?? '';
+};
+
+export const getTemplateVirtualMachineObject = (template: V1Template): V1VirtualMachine =>
+  template?.objects?.find((obj) => obj.kind === 'VirtualMachine');
+
+export const getTemplateNetworkInterfaces = (template: V1Template): V1Network[] => {
+  return getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.networks ?? [];
+};
+
+export const getTemplateDisks = (template: V1Template): V1Disk[] => {
+  return (
+    getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.devices?.disks ?? []
+  );
+};
+
+export const getTemplatePVCName = (template: V1Template): string =>
+  getTemplateParameterValue(template, TEMPLATE_BASE_IMAGE_NAME_PARAMETER) ||
+  getTemplateParameterValue(template, TEMPLATE_DATA_SOURCE_NAME_PARAMETER);
 
 export const filterTemplates = (templates: V1Template[], filters: TemplateFilters): V1Template[] =>
   templates.filter((tmp) => {
@@ -87,3 +120,10 @@ export const filterTemplates = (templates: V1Template[], filters: TemplateFilter
       osNameFilter
     );
   });
+
+export const generateVMName = (template: V1Template): string => {
+  return `${getTemplatePVCName(template) ?? template?.metadata?.name}-${uniqueNamesGenerator({
+    dictionaries: [adjectives, animals],
+    separator: '-',
+  })}`;
+};

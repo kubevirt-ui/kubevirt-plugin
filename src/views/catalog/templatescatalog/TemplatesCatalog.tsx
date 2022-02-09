@@ -1,10 +1,14 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
+import { RouteComponentProps } from 'react-router-dom';
 
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Gallery, Stack, StackItem, Title } from '@patternfly/react-core';
 
+import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
+import { TemplatesCatalogEmptyState } from './components/TemplatesCatalogEmptyState';
 import { CatalogTemplateFilters } from './components/TemplatesCatalogFilters/CatalogTemplateFilters';
 import { TemplatesCatalogHeader } from './components/TemplatesCatalogHeader';
 import { skeletonCatalog } from './components/TemplatesCatalogSkeleton';
@@ -15,12 +19,17 @@ import { filterTemplates } from './utils/helpers';
 
 import './TemplatesCatalog.scss';
 
-const TemplatesCatalog: React.FC = () => {
+const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
+  match: {
+    params: { ns: namespace },
+  },
+}) => {
   const { t } = useKubevirtTranslation();
   const [isAdmin, isAdminLoaded] = useIsAdmin();
+  const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
 
   const { templates, loaded: templatedLoaded } = useVmTemplates();
-  const [filters, onFilterChange] = useTemplatesFilters(isAdmin);
+  const [filters, onFilterChange, clearAll] = useTemplatesFilters(isAdmin);
 
   const filteredTemplates = React.useMemo(
     () => filterTemplates(templates, filters),
@@ -63,22 +72,32 @@ const TemplatesCatalog: React.FC = () => {
                 onFilterChange={onFilterChange}
               />
             </StackItem>
-            <StackItem className="co-catalog-page__grid vm-catalog-grid-container">
-              <Gallery hasGutter className="vm-catalog-grid">
-                {filteredTemplates.map((tmp) => (
-                  <TemplateTile
-                    key={tmp?.metadata?.uid}
-                    template={tmp}
-                    onClick={(temp) => console.log('clicked', temp?.metadata?.name)}
-                  />
-                ))}
-              </Gallery>
-            </StackItem>
+            {filteredTemplates?.length > 0 ? (
+              <StackItem className="co-catalog-page__grid vm-catalog-grid-container">
+                <Gallery hasGutter className="vm-catalog-grid">
+                  {filteredTemplates.map((template) => (
+                    <TemplateTile
+                      key={template?.metadata?.uid}
+                      template={template}
+                      onClick={setSelectedTemplate}
+                    />
+                  ))}
+                </Gallery>
+              </StackItem>
+            ) : (
+              <TemplatesCatalogEmptyState onClearFilters={clearAll} />
+            )}
           </Stack>
         </div>
       ) : (
         skeletonCatalog
       )}
+      <TemplatesCatalogDrawer
+        namespace={namespace}
+        isOpen={!!selectedTemplate}
+        template={selectedTemplate}
+        onClose={() => setSelectedTemplate(undefined)}
+      />
     </Stack>
   );
 };

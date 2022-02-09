@@ -21,7 +21,7 @@ export type TemplateFilters = TemplateCountFilters & {
 
 export const useTemplatesFilters = (
   isAdmin: boolean,
-): [TemplateFilters, (type: string, value: string) => void] => {
+): [TemplateFilters, (type: string, value: string) => void, () => void] => {
   const { params, appendParam, setParam, deleteParam } = useURLParams();
   const onlyDefaultParam = params.get('onlyDefault');
 
@@ -72,6 +72,35 @@ export const useTemplatesFilters = (
     }
   };
 
+  const clearAll = () => {
+    setQuery('');
+    setParam('query', '');
+    deleteParam('query');
+    deleteParam('support');
+    deleteParam('osName');
+    deleteParam('workload');
+    deleteParam('flavor');
+
+    setFilters({
+      support: {
+        count: 0,
+        value: new Set([]),
+      },
+      osName: {
+        count: 0,
+        value: new Set([]),
+      },
+      workload: {
+        count: 0,
+        value: new Set([]),
+      },
+      flavor: {
+        count: 0,
+        value: new Set([]),
+      },
+    });
+  };
+
   React.useEffect(() => {
     if (onlyDefaultParam) {
       setOnlyDefault(onlyDefaultParam === 'true');
@@ -82,5 +111,5 @@ export const useTemplatesFilters = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin, onlyDefaultParam]);
 
-  return [{ ...filters, onlyDefault, query }, onSelect];
+  return [{ ...filters, onlyDefault, query }, onSelect, clearAll];
 };

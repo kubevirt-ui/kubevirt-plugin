@@ -25,6 +25,6 @@ const iconMap = {
 };
 
 export const getTemplateOSIcon = (template: K8sResourceCommon): string => {
-  const icon = template.metadata.annotations?.iconClass;
+  const icon = template?.metadata?.annotations?.iconClass;
   return iconMap[icon] || iconMap['icon-other'];
 };

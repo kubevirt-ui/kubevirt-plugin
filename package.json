@@ -47,7 +47,8 @@
     "react-dom": "17.0.2",
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.14.3",
-    "react-router-dom": "5.x"
+    "react-router-dom": "5.x",
+    "unique-names-generator": "^4.6.0"
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.11.0",
@@ -55,7 +56,6 @@
     "@openshift-console/dynamic-plugin-sdk": "0.0.3",
     "@openshift-console/dynamic-plugin-sdk-internal": "^0.0.2-wp5",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.4",
-    "@testing-library/dom": "^8.11.3",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",

@@ -1,13 +1,11 @@
 import * as React from 'react';
 
-import { act, cleanup, fireEvent, queryByAttribute, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import TemplatesCatalog from '../TemplatesCatalog';
 
 import { containerTemplateMock, urlTemplateMock } from './mocks';
-
-const getByDataTestId = queryByAttribute.bind(null, 'data-test-id');
 
 jest.mock('@kubevirt-utils/hooks/useIsAdmin', () => ({
   useIsAdmin: () => [false, true],
@@ -20,26 +18,37 @@ jest.mock('../hooks/useVmTemplates', () => ({
 afterEach(cleanup);
 
 test('TemplatesCatalog', async () => {
-  const { container } = render(<TemplatesCatalog />);
+  const { getByTestId, queryByTestId, getByText } = render(
+    <TemplatesCatalog
+      history={{} as any}
+      location={{} as any}
+      match={{
+        isExact: false,
+        path: '/templatescatalog',
+        url: '/templatescatalog',
+        params: { ns: 'default' },
+      }}
+    />,
+  );
 
   // non admin user, should see all templates by default
   // default variant template, should be in catalog
-  expect(getByDataTestId(container, 'container-template')).toBeInTheDocument();
+  expect(getByTestId('container-template')).toBeInTheDocument();
 
   // not default variant template, should be in catalog
-  expect(getByDataTestId(container, 'url-template')).toBeInTheDocument();
+  expect(getByTestId('url-template')).toBeInTheDocument();
 
   // switching to default templates, url template should not be in catalog
-  fireEvent.click(screen.getByText('Default Templates'));
-  expect(getByDataTestId(container, 'url-template')).toBeNull();
+  fireEvent.click(getByText('Default Templates'));
+  expect(queryByTestId('url-template')).toBeNull();
 
   // picking RHEL filter, container-template should not be in catalog
-  fireEvent.click(screen.getByText('RHEL'));
-  expect(getByDataTestId(container, 'container-template')).toBeNull();
+  fireEvent.click(getByText('RHEL'));
+  expect(queryByTestId('container-template')).toBeNull();
 
   // removing RHEL filter
-  fireEvent.click(screen.getByText('RHEL'));
-  expect(getByDataTestId(container, 'container-template')).toBeInTheDocument();
+  fireEvent.click(getByText('RHEL'));
+  expect(getByTestId('container-template')).toBeInTheDocument();
 
   // searching unknown query, no templates should be in catalog.
   // fake timers are used because of debounced input
@@ -50,5 +59,9 @@ test('TemplatesCatalog', async () => {
     jest.runOnlyPendingTimers();
   });
 
-  expect(getByDataTestId(container, 'container-template')).toBeNull();
+  expect(queryByTestId('container-template')).toBeNull();
+
+  // clear all filters, all templates should be in catalog
+  fireEvent.click(getByText('Clear All Filters'));
+  expect(getByTestId('container-template')).toBeInTheDocument();
 });
