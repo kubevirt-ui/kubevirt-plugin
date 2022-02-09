@@ -3,6 +3,8 @@
 [![DeepSource](https://deepsource.io/gh/kubevirt-ui/kubevirt-plugin.svg/?label=active+issues&show_trend=true&token=EL0lOflk4suZx1hYxP2bbqPP)](https://deepsource.io/gh/kubevirt-ui/kubevirt-plugin/?ref=repository-badge)
 [![codecov](https://codecov.io/gh/kubevirt-ui/kubevirt-plugin/branch/main/graph/badge.svg?token=W9I1PI7C4O)](https://codecov.io/gh/kubevirt-ui/kubevirt-plugin)
 
+![alt kubevirt ui logos](https://raw.githubusercontent.com/kubevirt-ui/kubevirt-plugin/main/images/logos.png)
+
 This project is a standalone repository hosting the Kubevirt plugin
 for OpenShift Console.
 
