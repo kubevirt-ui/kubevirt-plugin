@@ -1,7 +1,7 @@
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { getAnnotation, getLabel } from '@kubevirt-utils/selectors';
 
 import { TemplateFilters } from '../hooks/useVmTemplatesFilters';
-import { TemplateKind } from '../types/template';
 
 import { ANNOTATIONS } from './annotations';
 import {
@@ -16,36 +16,36 @@ import {
   WORKLOADS,
 } from './constants';
 
-export const isDefaultVariantTemplate = (template: TemplateKind): boolean =>
+export const isDefaultVariantTemplate = (template: V1Template): boolean =>
   template?.metadata?.labels?.[TEMPLATE_DEFAULT_VARIANT_LABEL] === 'true';
 
-export const getTemplateName = (template: TemplateKind): string =>
+export const getTemplateName = (template: V1Template): string =>
   getAnnotation(template, ANNOTATIONS.displayName, template?.metadata.name);
 
-export const getTemplateOSLabelName = (template: TemplateKind): string =>
+export const getTemplateOSLabelName = (template: V1Template): string =>
   getLabel(template, TEMPLATE_OS_TEMPLATE_ANNOTATION, template?.metadata.name);
 
-export const getTemplateProviderName = (template: TemplateKind): string =>
+export const getTemplateProviderName = (template: V1Template): string =>
   getAnnotation(template, TEMPLATE_PROVIDER_NAME_ANNOTATION, template?.metadata.name);
 
-export const getTemplateSupportLevel = (template: TemplateKind): string =>
+export const getTemplateSupportLevel = (template: V1Template): string =>
   getAnnotation(template, TEMPLATE_SUPPORT_LEVEL_ANNOTATION);
 
-export const getTemplateFlavor = (template: TemplateKind): string => {
+export const getTemplateFlavor = (template: V1Template): string => {
   const isFlavorExist = (flavor: string) =>
     getLabel(template, `${TEMPLATE_FLAVOR_LABEL}/${flavor}`) === 'true';
 
   return Object.values(FLAVORS).find((flavor) => isFlavorExist(flavor)) ?? 'unknown';
 };
 
-export const getTemplateWorkload = (template: TemplateKind): string => {
+export const getTemplateWorkload = (template: V1Template): string => {
   const isWorkloadExist = (workload: string) =>
     getLabel(template, `${TEMPLATE_WORKLOAD_LABEL}/${workload}`) === 'true';
 
   return Object.values(WORKLOADS).find((flavor) => isWorkloadExist(flavor)) ?? 'unknown';
 };
 
-export const getTemplateOS = (template: TemplateKind): string => {
+export const getTemplateOS = (template: V1Template): string => {
   return (
     Object.values(OS_NAME_TYPES).find((osName) =>
       getTemplateOSLabelName(template).includes(osName),
@@ -53,10 +53,7 @@ export const getTemplateOS = (template: TemplateKind): string => {
   );
 };
 
-export const filterTemplates = (
-  templates: TemplateKind[],
-  filters: TemplateFilters,
-): TemplateKind[] =>
+export const filterTemplates = (templates: V1Template[], filters: TemplateFilters): V1Template[] =>
   templates.filter((tmp) => {
     const textFilterLowerCase = filters?.query.toLowerCase();
     const supportLevel = getTemplateSupportLevel(tmp);

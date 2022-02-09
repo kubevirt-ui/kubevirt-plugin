@@ -17,8 +17,10 @@ const config: Config.InitialOptions = {
   transformIgnorePatterns: ['<rootDir>/node_modules/(?!(@patternfly|@openshift-console\\S*?)/.*)'],
   setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
   moduleNameMapper: {
-    '\\.(css|less)$': '<rootDir>/__mocks__/dummy.ts',
+    '\\.(css|less|scss|svg)$': '<rootDir>/__mocks__/dummy.ts',
     '@console/*': '<rootDir>/__mocks__/dummy.ts',
+    'react-i18next': '<rootDir>/__mocks__/react-i18next.ts',
+    'react-router-dom': '<rootDir>/__mocks__/react-router-dom.ts',
     ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
   },
   globals: {

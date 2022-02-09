@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@patternfly/react-catalog-view-extension": "^4.43.15",
-    "@patternfly/react-core": "4.175.4",
+    "@patternfly/react-core": "4.192.15",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-helmet": "^6.1.0",
@@ -47,17 +47,19 @@
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.11.0",
-    "@kubevirt-ui/kubevirt-api": "^0.0.30",
+    "@kubevirt-ui/kubevirt-api": "^0.0.34",
     "@openshift-console/dynamic-plugin-sdk": "0.0.3",
     "@openshift-console/dynamic-plugin-sdk-internal": "^0.0.2-wp5",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.4",
+    "@testing-library/dom": "^8.11.3",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
+    "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.0.3",
     "@types/node": "^16.11.12",
     "@types/react": "^17.0.37",
-    "@types/webpack-dev-server": "^4.5.0",
     "@types/react-router-dom": "5.x",
+    "@types/webpack-dev-server": "^4.5.0",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
     "copy-webpack-plugin": "^6.4.1",
@@ -95,5 +97,9 @@
     "webpack": "^5.64.4",
     "webpack-cli": "4.9.x",
     "webpack-dev-server": "^4.6.0"
+  },
+  "resolutions": {
+    "**/react": "17.0.2",
+    "**/react-dom": "17.0.2"
   }
 }

@@ -27,12 +27,14 @@ export const CatalogTemplateFilters: React.FC<{
     <div className="co-catalog-page__tabs">
       <VerticalTabs>
         <VerticalTabsTab
+          data-test-id="catalog-template-filter-all-items"
           id={'all-templates'}
           title={t('All Items')}
           onActivate={() => onFilterChange('onlyDefault', false)}
           active={!filters?.onlyDefault}
         />
         <VerticalTabsTab
+          data-test-id="catalog-template-filter-default-templates"
           id={'default-templates'}
           title={t('Default Templates')}
           onActivate={() => onFilterChange('onlyDefault', true)}
