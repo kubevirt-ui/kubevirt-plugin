@@ -69,5 +69,6 @@
   "Console": "Console",
   "Network Interfaces": "Network Interfaces",
   "Events": "Events",
-  "VMI": "VMI"
+  "VMI": "VMI",
+  "Virtual Machines Instances": "Virtual Machines Instances"
 }

@@ -87,6 +87,17 @@
     }
   },
   {
+    "type": "console.page/resource/list",
+    "properties": {
+      "model": {
+        "group": "kubevirt.io",
+        "kind": "VirtualMachineInstance",
+        "version": "v1"
+      },
+      "component": { "$codeRef": "VirtualMachinesInstancesList" }
+    }
+  },
+  {
     "type": "console.page/route",
     "properties": {
       "path": ["/k8s/ns/:ns/templatescatalog/customize", "/k8s/all-namespaces/templatescatalog/customize"],
