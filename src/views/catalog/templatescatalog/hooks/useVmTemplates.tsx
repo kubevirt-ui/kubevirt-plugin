@@ -67,7 +67,7 @@ export const useVmTemplates = (): useVmTemplatesValues => {
     [isAdmin, projects],
   );
 
-  const resources: WatchK8sResultsObject<V1Template>[] =
+  const resources: WatchK8sResultsObject<{ [key: string]: V1Template[] }> =
     useK8sWatchResources<{ [key: string]: V1Template[] }>(templatesResources);
 
   React.useEffect(() => {
