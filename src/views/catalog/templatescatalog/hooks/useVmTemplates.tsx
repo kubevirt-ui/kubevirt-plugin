@@ -70,8 +70,6 @@ export const useVmTemplates = (): useVmTemplatesValues => {
   const resources: WatchK8sResults<{ [key: string]: V1Template[] }> =
     useK8sWatchResources<{ [key: string]: V1Template[] }>(templatesResources);
 
-  console.log(resources);
-  console.log(Object.values(resources).flatMap((r) => r.data));
   React.useEffect(() => {
     const errorKey = Object.keys(resources).find((key) => resources[key].loadError);
     if (errorKey) {
