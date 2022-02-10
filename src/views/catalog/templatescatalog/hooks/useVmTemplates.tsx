@@ -6,6 +6,7 @@ import {
   K8sResourceCommon,
   useK8sWatchResource,
   useK8sWatchResources,
+  WatchK8sResults,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../utils/constants';
@@ -66,8 +67,11 @@ export const useVmTemplates = (): useVmTemplatesValues => {
     [isAdmin, projects],
   );
 
-  const resources = useK8sWatchResources<{ [key: string]: V1Template[] }>(templatesResources);
+  const resources: WatchK8sResults<{ [key: string]: V1Template[] }> =
+    useK8sWatchResources<{ [key: string]: V1Template[] }>(templatesResources);
 
+  console.log(resources);
+  console.log(Object.values(resources).flatMap((r) => r.data));
   React.useEffect(() => {
     const errorKey = Object.keys(resources).find((key) => resources[key].loadError);
     if (errorKey) {
