@@ -140,7 +140,10 @@ export BRIDGE_BASE_ADDRESS
 export NO_COLOR=1
 
 # Install dependencies.
-yarn install --ignore-engines
+yarn install
+
+# Add mochawesome-report-generator
+yarn add global mochawesome-report-generator
 
 # Run tests.
 yarn run test-cypress-headless

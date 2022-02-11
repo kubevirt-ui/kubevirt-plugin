@@ -3,9 +3,14 @@
 
 import * as path from 'path';
 
-import * as webpack from 'webpack';
+import { Configuration as WebpackConfiguration } from 'webpack';
+import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
 
 import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk-webpack';
+
+interface Configuration extends WebpackConfiguration {
+  devServer?: WebpackDevServerConfiguration;
+}
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -13,7 +18,7 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const KUBEVIRT_PLUGIN_PORT = process.env.KUBEVIRT_PLUGIN_PORT || 9001;
 
-const config: webpack.Configuration = {
+const config: Configuration = {
   mode: 'development',
   context: path.resolve(__dirname, 'src'),
   entry: {},
