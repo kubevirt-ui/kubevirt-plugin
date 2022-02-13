@@ -2,7 +2,7 @@ FROM node:16 AS build
 
 COPY . /usr/src/app
 WORKDIR /usr/src/app
-RUN yarn install --ignore-engines && yarn build
+RUN yarn install && yarn build
 
 FROM nginxinc/nginx-unprivileged
 

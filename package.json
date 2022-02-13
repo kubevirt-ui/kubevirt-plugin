@@ -5,17 +5,17 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node node_modules/.bin/webpack",
-    "dev": "NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node ./node_modules/.bin/webpack serve",
+    "dev": "NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 rm -rf dist && yarn ts-node ./node_modules/.bin/webpack serve --progress",
     "lint": "eslint src cypress --color",
     "lint:fix": "yarn lint --fix",
     "check-types": "tsc",
-    "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
+    "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" -c i18next-parser.config.js",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
     "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/doc/console-extensions.md .",
     "test": "jest",
     "test-cov": "jest --coverage",
     "cypress-merge": "mochawesome-merge ./gui-test-screenshots/cypress_report*.json > ./gui-test-screenshots/cypress.json",
-    "cypress-generate": "marge -o ./gui-test-screenshots/ -f cypress-report -t 'OpenShift Console Cypress Test Results' -p 'OpenShift Cypress Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",
+    "cypress-generate": "marge -o ./gui-test-screenshots/ -f cypress-report -t 'Kubevirt Cypress Test Results' -p 'Kubevirt Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",
     "cypress-postreport": "yarn cypress-merge && yarn cypress-generate",
     "test-cypress": "node_modules/.bin/cypress open --config-file ./cypress/cypress.json --env openshift=true",
     "test-cypress-docker": "echo 'visit http://localhost:10000' && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 $(npm bin)/cypress open --config-file ./cypress/cypress.json --env openshift=true",
@@ -39,6 +39,8 @@
   "dependencies": {
     "@patternfly/react-catalog-view-extension": "^4.43.15",
     "@patternfly/react-core": "4.192.15",
+    "global": "^4.4.0",
+    "mochawesome-report-generator": "^6.0.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-helmet": "^6.1.0",
@@ -64,7 +66,7 @@
     "@typescript-eslint/parser": "^5.9.1",
     "copy-webpack-plugin": "^6.4.1",
     "css-loader": "6.6.0",
-    "cypress": "^9.4.1",
+    "cypress": "8.5.x",
     "cypress-multi-reporters": "^1.5.0",
     "eslint": "^8.8.0",
     "eslint-config-prettier": "^8.3.0",
@@ -80,7 +82,7 @@
     "i18next": "^21.6.0",
     "i18next-parser": "3.x",
     "jest": "^27.4.5",
-    "marge": "^1.0.1",
+    "mocha": "^9.2.0",
     "mocha-junit-reporter": "^2.0.2",
     "mochawesome": "^7.0.1",
     "mochawesome-merge": "^4.2.1",
@@ -93,13 +95,13 @@
     "ts-loader": "9.x",
     "ts-node": "10.x",
     "tsconfig-paths-webpack-plugin": "^3.5.1",
-    "typescript": "4.x",
-    "webpack": "^5.64.4",
+    "typescript": "^4.5.5",
+    "webpack": "^5.68.0",
     "webpack-cli": "4.9.x",
-    "webpack-dev-server": "^4.6.0"
+    "webpack-dev-server": "^4.7.4"
   },
   "resolutions": {
-    "**/react": "17.0.2",
-    "**/react-dom": "17.0.2"
-  }
+    "webpack": "^5.68.0"
+  },
+  "packageManager": "yarn@3.1.1"
 }
