@@ -21,7 +21,7 @@ export const CatalogTemplateFilters: React.FC<{
   filters: TemplateFilters;
   onFilterChange: (type: string, value: string | boolean) => void;
 }> = React.memo(({ filters, onFilterChange }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useTranslation();
 
   return (
     <div className="co-catalog-page__tabs">

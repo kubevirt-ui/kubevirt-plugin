@@ -21,7 +21,7 @@ export type TemplateTileProps = {
 };
 
 export const TemplateTile: React.FC<TemplateTileProps> = React.memo(({ template, onClick }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useTranslation();
 
   const provider = getTemplateProviderName(template);
   const workload = getTemplateWorkload(template);

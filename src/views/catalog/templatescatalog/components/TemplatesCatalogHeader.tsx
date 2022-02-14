@@ -11,7 +11,7 @@ export const TemplatesCatalogHeader: React.FC<{
   onFilterChange: (type: string, value: string | boolean) => void;
   itemCount: number;
 }> = React.memo(({ filters, onFilterChange, itemCount }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useTranslation();
   const { inputRef } = useInputDebounce({
     delay: 150,
     updateURLParam: 'query',

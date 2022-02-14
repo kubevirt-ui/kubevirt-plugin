@@ -15,7 +15,7 @@ import { filterTemplates } from './utils/helpers';
 import './TemplatesCatalog.scss';
 
 const TemplatesCatalog: React.FC = () => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useTranslation();
   const [isAdmin, isAdminLoaded] = useIsAdmin();
 
   const { templates, loaded: templatedLoaded } = useVmTemplates();
