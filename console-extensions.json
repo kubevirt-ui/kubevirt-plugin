@@ -100,6 +100,17 @@
     "properties": {
       "model": {
         "group": "kubevirt.io",
+        "kind": "VirtualMachine",
+        "version": "v1"
+      },
+      "component": { "$codeRef": "VirtualMachinePage" }
+    }
+  },
+  {
+    "type": "console.page/resource/details",
+    "properties": {
+      "model": {
+        "group": "kubevirt.io",
         "kind": "VirtualMachineInstance",
         "version": "v1"
       },
@@ -107,3 +118,4 @@
     }
   }
 ]
+
