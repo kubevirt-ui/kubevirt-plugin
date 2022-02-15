@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
   ListPageBody,
@@ -91,7 +91,7 @@ type VMTableProps = {
 };
 
 const VMTable: React.FC<VMTableProps> = ({ data, unfilteredData, loaded, loadError, kind }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useKubevirtTranslation();
 
   return (
     <VirtualizedTable<K8sResourceCommon>
@@ -127,7 +127,7 @@ export const filters: RowFilter[] = [
 ];
 
 const VirtualMachinesList = ({ kind }: { kind: string }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useKubevirtTranslation();
 
   const [vms, loaded, loadError] = useK8sWatchResource<V1VirtualMachine[]>({
     kind,

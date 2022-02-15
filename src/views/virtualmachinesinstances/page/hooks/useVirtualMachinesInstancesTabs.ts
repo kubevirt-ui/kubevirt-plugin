@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
+
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import VirtualMachinesInstancesPageConsoleTab from '../tabs/console/VirtualMachinesInstancesPageConsoleTab';
 import VirtualMachinesInstancesPageDetailsTab from '../tabs/details/VirtualMachinesInstancesPageDetailsTab';
@@ -9,7 +10,7 @@ import VirtualMachinesInstancesPageNetworkTab from '../tabs/network/VirtualMachi
 import VirtualMachinesInstancesPageYAMLTab from '../tabs/yaml/VirtualMachinesInstancesPageYAMLTab';
 
 const useVirtualMachinesInstancesTabs = () => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useKubevirtTranslation();
 
   const tabs = React.useMemo(
     () => [

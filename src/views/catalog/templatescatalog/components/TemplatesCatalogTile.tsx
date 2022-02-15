@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { CatalogTile } from '@patternfly/react-catalog-view-extension';
 import { capitalize, Stack, StackItem } from '@patternfly/react-core';
 
@@ -21,7 +21,7 @@ export type TemplateTileProps = {
 };
 
 export const TemplateTile: React.FC<TemplateTileProps> = React.memo(({ template, onClick }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useKubevirtTranslation();
 
   const provider = getTemplateProviderName(template);
   const workload = getTemplateWorkload(template);

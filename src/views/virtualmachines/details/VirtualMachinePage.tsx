@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HorizontalNav, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 
 import { vmPageNav } from './tabs';
@@ -10,7 +10,7 @@ export type VirtualMachineDetailsPageProps = {
 };
 
 const VirtualMachinePage: React.FC<VirtualMachineDetailsPageProps> = ({ name: vmName }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useKubevirtTranslation();
 
   return (
     <>

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { useInputDebounce } from '@kubevirt-utils/hooks/useInputDebounce';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { pluralize, TextInput } from '@patternfly/react-core';
 
 import { TemplateFilters } from '../hooks/useVmTemplatesFilters';
@@ -11,7 +11,7 @@ export const TemplatesCatalogHeader: React.FC<{
   onFilterChange: (type: string, value: string | boolean) => void;
   itemCount: number;
 }> = React.memo(({ filters, onFilterChange, itemCount }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useKubevirtTranslation();
   const { inputRef } = useInputDebounce({
     delay: 150,
     updateURLParam: 'query',

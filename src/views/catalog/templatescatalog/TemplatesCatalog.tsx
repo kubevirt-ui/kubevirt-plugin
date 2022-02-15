@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { Trans } from 'react-i18next';
 
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Gallery, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import { CatalogTemplateFilters } from './components/TemplatesCatalogFilters/CatalogTemplateFilters';
@@ -15,7 +16,7 @@ import { filterTemplates } from './utils/helpers';
 import './TemplatesCatalog.scss';
 
 const TemplatesCatalog: React.FC = () => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useKubevirtTranslation();
   const [isAdmin, isAdminLoaded] = useIsAdmin();
 
   const { templates, loaded: templatedLoaded } = useVmTemplates();

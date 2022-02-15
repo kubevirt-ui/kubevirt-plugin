@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VerticalTabs, VerticalTabsTab } from '@patternfly/react-catalog-view-extension';
 import { FilterSidePanel } from '@patternfly/react-catalog-view-extension/dist/esm/components/FilterSidePanel';
 import { capitalize } from '@patternfly/react-core';
@@ -21,7 +21,7 @@ export const CatalogTemplateFilters: React.FC<{
   filters: TemplateFilters;
   onFilterChange: (type: string, value: string | boolean) => void;
 }> = React.memo(({ filters, onFilterChange }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useKubevirtTranslation();
 
   return (
     <div className="co-catalog-page__tabs">
