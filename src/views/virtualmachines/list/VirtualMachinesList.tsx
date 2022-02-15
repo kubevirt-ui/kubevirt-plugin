@@ -91,7 +91,7 @@ type VMTableProps = {
 };
 
 const VMTable: React.FC<VMTableProps> = ({ data, unfilteredData, loaded, loadError, kind }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useTranslation();
 
   return (
     <VirtualizedTable<K8sResourceCommon>
@@ -127,7 +127,7 @@ export const filters: RowFilter[] = [
 ];
 
 const VirtualMachinesList = ({ kind }: { kind: string }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useTranslation();
 
   const [vms, loaded, loadError] = useK8sWatchResource<V1VirtualMachine[]>({
     kind,

@@ -4,5 +4,6 @@ module.exports = {
   locales: ['en'],
   namespaceSeparator: '~',
   reactNamespace: false,
+  defaultNamespace: 'plugin__kubevirt-plugin',
   useKeysAsDefaultValue: true,
 };
