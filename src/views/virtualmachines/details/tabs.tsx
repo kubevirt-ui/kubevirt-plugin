@@ -2,6 +2,8 @@ import * as React from 'react';
 
 import { NavPage } from '@openshift-console/dynamic-plugin-sdk';
 
+import NetworkInterfaceListPage from './components/network/NetworkInterfaceListPage';
+
 export const vmPageNav: NavPage[] = [
   {
     href: '',
@@ -34,9 +36,9 @@ export const vmPageNav: NavPage[] = [
     component: () => <>Console</>,
   },
   {
-    href: 'network',
-    name: 'Network',
-    component: () => <>Network</>,
+    href: 'network-interfaces',
+    name: 'Network Interfaces',
+    component: NetworkInterfaceListPage,
   },
   {
     href: 'disks',

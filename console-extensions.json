@@ -103,7 +103,7 @@
         "kind": "VirtualMachine",
         "version": "v1"
       },
-      "component": { "$codeRef": "VirtualMachinePage" }
+      "component": { "$codeRef": "VirtualMachineNavPage" }
     }
   },
   {
