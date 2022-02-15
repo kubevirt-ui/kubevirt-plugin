@@ -18,9 +18,21 @@
   "Select a template": "Select a template",
   "You can filter the templates to reflect the current variety that is available in the cluster. Then select a template to start your VirtualMachine from. Some settings can be customized during the VirtualMachine creation flow.": "You can filter the templates to reflect the current variety that is available in the cluster. Then select a template to start your VirtualMachine from. Some settings can be customized during the VirtualMachine creation flow.",
   "Name": "Name",
+  "Model": "Model",
+  "Network": "Network",
+  "Type": "Type",
+  "MAC address": "MAC address",
+  "Add network interface": "Add network interface",
   "Namespace": "Namespace",
   "Status": "Status",
   "Conditions": "Conditions",
   "Created": "Created",
-  "Virtual Machines": "Virtual Machines"
+  "Virtual Machines": "Virtual Machines",
+  "Details": "Details",
+  "YAML": "YAML",
+  "Console": "Console",
+  "Disks": "Disks",
+  "Network Interfaces": "Network Interfaces",
+  "Events": "Events",
+  "VMI": "VMI"
 }
