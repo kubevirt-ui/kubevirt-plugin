@@ -1115,22 +1115,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/dom@npm:^8.11.3":
-  version: 8.11.3
-  resolution: "@testing-library/dom@npm:8.11.3"
-  dependencies:
-    "@babel/code-frame": ^7.10.4
-    "@babel/runtime": ^7.12.5
-    "@types/aria-query": ^4.2.0
-    aria-query: ^5.0.0
-    chalk: ^4.1.0
-    dom-accessibility-api: ^0.5.9
-    lz-string: ^1.4.4
-    pretty-format: ^27.0.2
-  checksum: 2245d254b6058590e25de86fb7b3c75e4a31096901a191f80d3efb9fa7e1e273043416f370c8770feb9f3ccc73a1550a877a3b003b593f1728ae828fcb52cd62
-  languageName: node
-  linkType: hard
-
 "@testing-library/jest-dom@npm:^5.16.1":
   version: 5.16.1
   resolution: "@testing-library/jest-dom@npm:5.16.1"
@@ -7182,7 +7166,6 @@ __metadata:
     "@openshift-console/dynamic-plugin-sdk-webpack": 0.0.4
     "@patternfly/react-catalog-view-extension": ^4.43.15
     "@patternfly/react-core": 4.192.15
-    "@testing-library/dom": ^8.11.3
     "@testing-library/jest-dom": ^5.16.1
     "@testing-library/react": ^12.1.2
     "@testing-library/user-event": ^13.5.0
@@ -7231,6 +7214,7 @@ __metadata:
     ts-node: 10.x
     tsconfig-paths-webpack-plugin: ^3.5.1
     typescript: ^4.5.5
+    unique-names-generator: ^4.6.0
     webpack: ^5.68.0
     webpack-cli: 4.9.x
     webpack-dev-server: ^4.7.4
@@ -10838,6 +10822,13 @@ __metadata:
   dependencies:
     unique-slug: ^2.0.0
   checksum: cf4998c9228cc7647ba7814e255dec51be43673903897b1786eff2ac2d670f54d4d733357eb08dea969aa5e6875d0e1bd391d668fbdb5a179744e7c7551a6f80
+  languageName: node
+  linkType: hard
+
+"unique-names-generator@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "unique-names-generator@npm:4.6.0"
+  checksum: c28968845a0ee5fc607c079788efc0e6cb0e8526d6d60c9ffb9ac51404a147eb9f94201280f2ded0896a1e402e1fd802b40ffa0f94de7c617784cd7ae4b6386c
   languageName: node
   linkType: hard
 

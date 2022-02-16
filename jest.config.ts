@@ -6,6 +6,7 @@ const { compilerOptions } = require('./tsconfig');
 
 // Sync object
 const config: Config.InitialOptions = {
+  testEnvironment: 'jest-environment-jsdom',
   preset: 'ts-jest',
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
   transform: {

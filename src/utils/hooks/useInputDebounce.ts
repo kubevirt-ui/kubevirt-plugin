@@ -45,10 +45,8 @@ export const useInputDebounce = ({
 
   React.useEffect(() => {
     if (updateURLParam) {
-      if (param && !inputRef.current.value) {
-        setValue(param);
-        inputRef.current.value = param;
-      }
+      setValue(param ?? '');
+      inputRef.current.value = param;
     }
   }, [param, updateURLParam]);
 
