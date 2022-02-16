@@ -47,12 +47,11 @@ OC_PASS=<password>
 
 ## i18n
 
-The plugin uses the following
-`plugin__kubevirt-plugin` namespace as default. You should use the `useTranslation` hook:
+You should use the `useKubevirtTranslation` hook as follows:
 
 ```tsx
 conster Header: React.FC = () => {
-  const { t } = useTranslation();
+  const { t } = useKubevirtTranslation();
   return <h1>{t('Hello, World!')}</h1>;
 };
 ```

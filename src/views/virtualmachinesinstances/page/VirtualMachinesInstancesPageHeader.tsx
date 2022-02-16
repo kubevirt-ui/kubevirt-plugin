@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
+
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type VirtualMachinesInstancesPageHeaderProps = {
   name: string;
@@ -8,7 +9,7 @@ type VirtualMachinesInstancesPageHeaderProps = {
 const VirtualMachinesInstancesPageHeader: React.FC<VirtualMachinesInstancesPageHeaderProps> = ({
   name,
 }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useKubevirtTranslation();
 
   return (
     <div className="co-m-nav-title co-m-nav-title--detail">
