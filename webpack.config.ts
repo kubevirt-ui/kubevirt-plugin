@@ -57,7 +57,7 @@ const config: Configuration = {
     rules: [
       {
         test: /\.(jsx?|tsx?)$/,
-        exclude: /node_modules/,
+        exclude: /node_modules\/(?!(@kubevirt-ui)\/kubevirt-api).*/,
         use: [
           {
             loader: 'ts-loader',

@@ -10,6 +10,7 @@ import {
   DescriptionListGroup,
   DescriptionListTerm,
   FormGroup,
+  Skeleton,
   Split,
   SplitItem,
   Stack,
@@ -26,6 +27,8 @@ import { generateVMName } from '../../utils/helpers';
 type TemplateCatalogDrawerFooterProps = {
   namespace: string;
   template: V1Template | undefined;
+  canQuickCreate: boolean;
+  canQuickCreateLoaded: boolean;
   onCreate: (template: V1Template) => void;
   onCancel: () => void;
 };
@@ -33,14 +36,15 @@ type TemplateCatalogDrawerFooterProps = {
 export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterProps> = ({
   namespace,
   template,
+  canQuickCreate,
+  canQuickCreateLoaded,
   onCreate,
   onCancel,
 }) => {
   const { t } = useKubevirtTranslation();
   const [vmName, setVmName] = React.useState(generateVMName(template));
-  const canQuickCreate = true;
 
-  return (
+  return canQuickCreateLoaded ? (
     <Stack className="template-catalog-drawer-info">
       <StackItem className="template-catalog-drawer-footer-section">
         <Split hasGutter>
@@ -134,6 +138,25 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
           </Stack>
         </div>
       )}
+    </Stack>
+  ) : (
+    <Stack className="template-catalog-drawer-info" hasGutter>
+      <StackItem className="template-catalog-drawer-footer-section">
+        <Skeleton height="50px" width="30%" />
+      </StackItem>
+      <StackItem className="template-catalog-drawer-footer-section">
+        <Stack hasGutter>
+          <StackItem>
+            <Skeleton height="40px" width="40%" />
+          </StackItem>
+          <StackItem>
+            <Skeleton height="30px" width="40%" />
+          </StackItem>
+          <StackItem>
+            <Skeleton height="35px" width="40%" />
+          </StackItem>
+        </Stack>
+      </StackItem>
     </Stack>
   );
 };

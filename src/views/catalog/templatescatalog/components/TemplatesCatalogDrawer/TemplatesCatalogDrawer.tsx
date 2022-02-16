@@ -5,6 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { CatalogItemHeader } from '@patternfly/react-catalog-view-extension';
 import { Modal, Split, SplitItem } from '@patternfly/react-core';
 
+import { useProcessedTemplate } from '../../hooks/useProcessedTemplate';
 import {
   getTemplateName,
   getTemplateProviderName,
@@ -31,10 +32,13 @@ export const TemplatesCatalogDrawer: React.FC<TemplatesCatalogDrawerProps> = ({
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
+  const [processedTemplate, processedTemplateLoaded] = useProcessedTemplate(template);
+
   const provider = getTemplateProviderName(template);
   const support = getTemplateSupportLevel(template);
   const templateName = getTemplateName(template);
   const osIcon = getTemplateOSIcon(template);
+  const canQuickCreate = !!processedTemplate;
 
   return (
     <Modal
@@ -55,10 +59,14 @@ export const TemplatesCatalogDrawer: React.FC<TemplatesCatalogDrawerProps> = ({
               <SplitItem>
                 <strong>{t('Support level: ')}</strong> {support || 'N/A'}
               </SplitItem>
-              <SplitItem> | </SplitItem>
-              <SplitItem>
-                <strong>{t('Supports quick create VM')}</strong>
-              </SplitItem>
+              {canQuickCreate && (
+                <>
+                  <SplitItem> | </SplitItem>
+                  <SplitItem>
+                    <strong>{t('Supports quick create VM')}</strong>
+                  </SplitItem>
+                </>
+              )}
             </Split>
           }
           iconImg={osIcon}
@@ -70,6 +78,8 @@ export const TemplatesCatalogDrawer: React.FC<TemplatesCatalogDrawerProps> = ({
           template={template}
           onCreate={(tmp) => console.log(tmp)}
           onCancel={onClose}
+          canQuickCreate={canQuickCreate}
+          canQuickCreateLoaded={processedTemplateLoaded}
         />
       }
     >
