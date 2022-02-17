@@ -2,11 +2,11 @@ import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-type VirtualMachinesInstancesPageHeaderProps = {
+type VirtualMachinesInstancePageHeaderProps = {
   name: string;
 };
 
-const VirtualMachinesInstancesPageHeader: React.FC<VirtualMachinesInstancesPageHeaderProps> = ({
+const VirtualMachinesInstancePageHeader: React.FC<VirtualMachinesInstancePageHeaderProps> = ({
   name,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -25,4 +25,4 @@ const VirtualMachinesInstancesPageHeader: React.FC<VirtualMachinesInstancesPageH
   );
 };
 
-export default VirtualMachinesInstancesPageHeader;
+export default VirtualMachinesInstancePageHeader;
