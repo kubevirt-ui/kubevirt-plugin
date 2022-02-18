@@ -800,10 +800,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubevirt-ui/kubevirt-api@npm:^0.0.34":
-  version: 0.0.34
-  resolution: "@kubevirt-ui/kubevirt-api@npm:0.0.34"
-  checksum: 001fdcf512259425890661a9a9ad5ac2033e98b596f40a1e8dec3c3ef8dd235143d3d88843b46003ed15f0be7c5ff6282166d32ee3a9f5e876221eb9f6ce5537
+"@kubevirt-ui/kubevirt-api@npm:^0.0.35":
+  version: 0.0.35
+  resolution: "@kubevirt-ui/kubevirt-api@npm:0.0.35"
+  checksum: eb6427e372bc736b0c177aacfbbd32108e0e4ea8eb64f5abf07f5e85330ff5571adc4e088afb0ae26cf2fb00ab01bd6209966d253471cd528dfaa81306ba7412
   languageName: node
   linkType: hard
 
@@ -7125,7 +7125,7 @@ __metadata:
   resolution: "kubevirt-plugin@workspace:."
   dependencies:
     "@cypress/webpack-preprocessor": ^5.11.0
-    "@kubevirt-ui/kubevirt-api": ^0.0.34
+    "@kubevirt-ui/kubevirt-api": ^0.0.35
     "@openshift-console/dynamic-plugin-sdk": 0.0.5
     "@openshift-console/dynamic-plugin-sdk-internal": ^0.0.4
     "@openshift-console/dynamic-plugin-sdk-webpack": 0.0.4

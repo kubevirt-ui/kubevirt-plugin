@@ -1,11 +1,15 @@
 import * as React from 'react';
 
-import { cleanup, fireEvent, render } from '@testing-library/react';
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { TemplatesCatalogDrawer } from '../components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
 
 import { containerTemplateMock } from './mocks';
+
+jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
+  k8sCreate: jest.fn().mockResolvedValue({}),
+}));
 
 afterEach(cleanup);
 
@@ -27,6 +31,11 @@ test('TemplatesCatalogDrawer', async () => {
 
   // test doc btn
   fireEvent.click(getByText('Refer to documentation'));
+
+  // wait for mocked useIsTemplateSupportsQuickCreate to return true and render the quick create form
+  await waitFor(() => {
+    expect(getByTestId('vm-name-input')).toBeInTheDocument();
+  });
 
   // change vm name
   userEvent.clear(getByTestId('vm-name-input'));

@@ -15,6 +15,11 @@ jest.mock('../hooks/useVmTemplates', () => ({
   useVmTemplates: () => ({ templates: [urlTemplateMock, containerTemplateMock], loaded: true }),
 }));
 
+// render template drawer without quick create
+jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
+  k8sCreate: jest.fn().mockRejectedValue({}),
+}));
+
 afterEach(cleanup);
 
 test('TemplatesCatalog', async () => {
