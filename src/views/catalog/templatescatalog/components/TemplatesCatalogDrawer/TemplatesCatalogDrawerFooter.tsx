@@ -5,6 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   Button,
   ButtonVariant,
+  Checkbox,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
@@ -22,29 +23,31 @@ import {
 } from '@patternfly/react-core';
 import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
+import { useVmTemplateSource } from '../../../utils/vm-template-source/useVmTemplateSource';
+import { useProcessedTemplate } from '../../hooks/useProcessedTemplate';
 import { generateVMName } from '../../utils/helpers';
 
 type TemplateCatalogDrawerFooterProps = {
   namespace: string;
   template: V1Template | undefined;
-  canQuickCreate: boolean;
-  canQuickCreateLoaded: boolean;
-  onCreate: (template: V1Template) => void;
   onCancel: () => void;
 };
 
 export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterProps> = ({
   namespace,
   template,
-  canQuickCreate,
-  canQuickCreateLoaded,
-  onCreate,
   onCancel,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVmTemplateSource(template);
+  const [processedTemplate, processedTemplateLoaded] = useProcessedTemplate(template);
   const [vmName, setVmName] = React.useState(generateVMName(template));
+  const [startAfterCreate, setStartAfterCreate] = React.useState(true);
 
-  return canQuickCreateLoaded ? (
+  const canQuickCreate = !!processedTemplate && isBootSourceAvailable;
+  const loaded = bootSourceLoaded && processedTemplateLoaded;
+
+  return loaded ? (
     <Stack className="template-catalog-drawer-info">
       <StackItem className="template-catalog-drawer-footer-section">
         <Split hasGutter>
@@ -116,14 +119,23 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
                 </StackItem>
                 <StackItem />
                 <StackItem>
+                  <Checkbox
+                    id="start-after-create-checkbox"
+                    isChecked={startAfterCreate}
+                    onChange={(v) => setStartAfterCreate(v)}
+                    label={t('Start this VirtualMachine after creation')}
+                  />
+                </StackItem>
+                <StackItem />
+                <StackItem>
                   <Split hasGutter>
                     <Button
                       data-test-id="quick-create-vm-btn"
                       type="submit"
                       form="quick-create-form"
+                      isDisabled={!isBootSourceAvailable}
                       onClick={(e) => {
                         e.preventDefault();
-                        onCreate(template);
                       }}
                     >
                       {t('Quick create VirtualMachine')}
@@ -142,20 +154,7 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
   ) : (
     <Stack className="template-catalog-drawer-info" hasGutter>
       <StackItem className="template-catalog-drawer-footer-section">
-        <Skeleton height="50px" width="30%" />
-      </StackItem>
-      <StackItem className="template-catalog-drawer-footer-section">
-        <Stack hasGutter>
-          <StackItem>
-            <Skeleton height="40px" width="40%" />
-          </StackItem>
-          <StackItem>
-            <Skeleton height="30px" width="40%" />
-          </StackItem>
-          <StackItem>
-            <Skeleton height="35px" width="40%" />
-          </StackItem>
-        </Stack>
+        <Skeleton height="35px" width="40%" />
       </StackItem>
     </Stack>
   );

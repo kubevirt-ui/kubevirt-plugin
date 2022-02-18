@@ -2,7 +2,6 @@ export const TEMPLATE_TYPE_LABEL = 'template.kubevirt.io/type';
 export const TEMPLATE_DEFAULT_VARIANT_LABEL = 'template.kubevirt.io/default-os-variant';
 export const TEMPLATE_TYPE_VM = 'vm';
 export const TEMPLATE_TYPE_BASE = 'base';
-export const TEMPLATE_DISK_PARAMETER_NAME = '${NAME}';
 export const TEMPLATE_FLAVOR_LABEL = 'flavor.template.kubevirt.io';
 export const TEMPLATE_WORKLOAD_LABEL = 'workload.template.kubevirt.io';
 export const TEMPLATE_SUPPORT_LEVEL_ANNOTATION = 'template.kubevirt.io/provider-support-level';

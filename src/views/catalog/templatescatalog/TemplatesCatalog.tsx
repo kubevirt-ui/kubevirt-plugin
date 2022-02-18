@@ -39,25 +39,16 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   const loaded = isAdminLoaded && templatedLoaded;
 
   return (
-    <Stack>
+    <Stack hasGutter>
       <StackItem className="co-m-nav-title co-m-nav-title--row">
         <Stack>
           <StackItem className="co-m-pane__heading">
-            <Title headingLevel="h1">{t('Create VirtualMachine from template')}</Title>
+            <Title headingLevel="h1">{t('Create new VirtualMachine from catalog')}</Title>
           </StackItem>
           <StackItem>
-            <StackItem>
-              <Title headingLevel="h5" size="lg">
-                {t('Select a template')}
-              </Title>
-            </StackItem>
-            <StackItem className="vm-catalog-page-p">
-              <Trans t={t} ns="plugin__kubevirt-plugin">
-                You can filter the templates to reflect the current variety that is available in the
-                cluster. Then select a template to start your VirtualMachine from. Some settings can
-                be customized during the VirtualMachine creation flow.
-              </Trans>
-            </StackItem>
+            <Trans t={t} ns="plugin__kubevirt-plugin">
+              Select an option to create a VirtualMachine
+            </Trans>
           </StackItem>
         </Stack>
       </StackItem>

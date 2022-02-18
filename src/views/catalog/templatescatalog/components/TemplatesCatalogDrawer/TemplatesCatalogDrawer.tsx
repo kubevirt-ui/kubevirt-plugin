@@ -1,16 +1,10 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { CatalogItemHeader } from '@patternfly/react-catalog-view-extension';
-import { Modal, Split, SplitItem } from '@patternfly/react-core';
+import { Modal } from '@patternfly/react-core';
 
-import { useProcessedTemplate } from '../../hooks/useProcessedTemplate';
-import {
-  getTemplateName,
-  getTemplateProviderName,
-  getTemplateSupportLevel,
-} from '../../utils/helpers';
+import { getTemplateName } from '../../utils/helpers';
 import { getTemplateOSIcon } from '../../utils/os-icons';
 
 import { TemplatesCatalogDrawerFooter } from './TemplatesCatalogDrawerFooter';
@@ -31,14 +25,8 @@ export const TemplatesCatalogDrawer: React.FC<TemplatesCatalogDrawerProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { t } = useKubevirtTranslation();
-  const [processedTemplate, processedTemplateLoaded] = useProcessedTemplate(template);
-
-  const provider = getTemplateProviderName(template);
-  const support = getTemplateSupportLevel(template);
   const templateName = getTemplateName(template);
   const osIcon = getTemplateOSIcon(template);
-  const canQuickCreate = !!processedTemplate;
 
   return (
     <Modal
@@ -50,37 +38,18 @@ export const TemplatesCatalogDrawer: React.FC<TemplatesCatalogDrawerProps> = ({
         <CatalogItemHeader
           className="co-catalog-page__overlay-header"
           title={templateName}
-          vendor={
-            <Split hasGutter>
-              <SplitItem>
-                <strong>{t('Provided by: ')}</strong> {provider}
-              </SplitItem>{' '}
-              <SplitItem> | </SplitItem>
-              <SplitItem>
-                <strong>{t('Support level: ')}</strong> {support || 'N/A'}
-              </SplitItem>
-              {canQuickCreate && (
-                <>
-                  <SplitItem> | </SplitItem>
-                  <SplitItem>
-                    <strong>{t('Supports quick create VM')}</strong>
-                  </SplitItem>
-                </>
-              )}
-            </Split>
-          }
+          vendor={template?.metadata?.name}
           iconImg={osIcon}
         />
       }
       footer={
-        <TemplatesCatalogDrawerFooter
-          namespace={namespace}
-          template={template}
-          onCreate={(tmp) => console.log(tmp)}
-          onCancel={onClose}
-          canQuickCreate={canQuickCreate}
-          canQuickCreateLoaded={processedTemplateLoaded}
-        />
+        template && (
+          <TemplatesCatalogDrawerFooter
+            namespace={namespace}
+            template={template}
+            onCancel={onClose}
+          />
+        )
       }
     >
       <TemplatesCatalogDrawerPanel template={template} />
