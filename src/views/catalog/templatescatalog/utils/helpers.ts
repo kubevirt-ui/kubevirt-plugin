@@ -1,9 +1,10 @@
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1Disk, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Disk, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAnnotation, getLabel } from '@kubevirt-utils/selectors';
 
+import { getTemplateVirtualMachineObject } from '../../utils/vm-template-source/utils';
 import { TemplateFilters } from '../hooks/useVmTemplatesFilters';
 
 import { ANNOTATIONS } from './annotations';
@@ -68,9 +69,6 @@ export const getTemplateOS = (template: V1Template): string => {
 export const getTemplateParameterValue = (template: V1Template, parameter): string => {
   return template?.parameters?.find((param) => param.name === parameter)?.value ?? '';
 };
-
-export const getTemplateVirtualMachineObject = (template: V1Template): V1VirtualMachine =>
-  template?.objects?.find((obj) => obj.kind === 'VirtualMachine');
 
 export const getTemplateNetworkInterfaces = (template: V1Template): V1Network[] => {
   return getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.networks ?? [];
