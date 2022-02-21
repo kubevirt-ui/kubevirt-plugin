@@ -1,0 +1,37 @@
+.customize-vm {
+  &__container {
+
+    .customize-vm__content, & > * {
+      height: 100%; 
+    }
+
+
+    padding: var(--pf-global--spacer--lg);
+
+    form {
+      position: relative;
+      padding-top: var(--pf-global--spacer--lg);
+      min-height: 100%;
+    }
+  }
+
+  &__right-header {
+    & > * {
+      padding-bottom: var(--pf-global--spacer--sm);
+    }
+
+    a {
+      padding-left: 0;
+    }
+  }
+
+  &__footer {
+    background-color: var(--pf-global--BackgroundColor--100);
+    position: sticky;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    padding-bottom: var(--pf-global--spacer--2xl);
+    align-self: flex-end;
+  }
+}

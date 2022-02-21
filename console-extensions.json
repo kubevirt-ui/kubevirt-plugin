@@ -89,6 +89,15 @@
   {
     "type": "console.page/route",
     "properties": {
+      "path": ["/k8s/ns/:ns/templatescatalog/customize", "/k8s/all-namespaces/templatescatalog/customize"],
+      "component": {
+        "$codeRef": "CustomizeVirtualMachine"
+      }
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
       "path": ["/k8s/ns/:ns/templatescatalog", "/k8s/all-namespaces/templatescatalog"],
       "component": {
         "$codeRef": "TemplatesCatalog"
