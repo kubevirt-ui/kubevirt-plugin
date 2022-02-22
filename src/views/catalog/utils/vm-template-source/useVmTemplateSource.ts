@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import {
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSourceRef,
@@ -17,21 +16,23 @@ import {
 
 export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceValue => {
   const [templateBootSource, setTemplateBootSource] = React.useState<TemplateBootSource>(undefined);
+  const [isBootSourceAvailable, setIsBootSourceAvailable] = React.useState<boolean>(false);
   const [loaded, setLoaded] = React.useState<boolean>(true);
   const [error, setError] = React.useState<any>();
 
   const bootSource = React.useMemo(() => getTemplateBootSourceType(template), [template]);
 
-  const getPVCSource = (pvc: V1beta1DataVolumeSourcePVC) => {
+  const getPVCSource = ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
     setLoaded(false);
-    return getPVC(pvc?.name, pvc?.namespace)
-      .then((foundPvc: any) => {
+    return getPVC(name, namespace)
+      .then((pvc: any) => {
+        setIsBootSourceAvailable(true);
         setTemplateBootSource({
           type: BOOT_SOURCE.PVC,
           source: {
             pvc,
           },
-          sourceValue: { pvc: foundPvc },
+          sourceValue: { pvc },
         });
       })
       .catch((e) => {
@@ -40,20 +41,15 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
       .finally(() => setLoaded(true));
   };
 
-  const getDataSourcePVCSource = (dataSource: V1beta1DataVolumeSourceRef) => {
+  const getDataSourcePVCSource = ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
     setLoaded(false);
-    return getDataSourcePVC(dataSource.name, dataSource.namespace)
+    return getDataSourcePVC(name, namespace)
       .then((pvc: any) => {
+        setIsBootSourceAvailable(true);
         setTemplateBootSource({
           type: BOOT_SOURCE.PVC_AUTO_UPLOAD,
-          source: {
-            sourceRef: {
-              kind: DataSourceModel.kind,
-              name: bootSource?.source?.sourceRef?.name,
-              namespace: bootSource?.source?.sourceRef?.namespace,
-            },
-          },
-          sourceValue: { pvc },
+          source: bootSource.source,
+          sourceValue: { sourceRef: pvc },
         });
       })
       .catch((e) => {
@@ -65,6 +61,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
   React.useEffect(() => {
     setError(undefined);
     setTemplateBootSource(undefined);
+    setIsBootSourceAvailable(false);
 
     switch (bootSource?.type) {
       case BOOT_SOURCE.PVC:
@@ -80,7 +77,11 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
           setTemplateBootSource({
             type: bootSource.type,
             source: bootSource.source,
+            sourceValue: {
+              http: bootSource?.source?.http,
+            },
           });
+          setIsBootSourceAvailable(true);
         }
         break;
 
@@ -89,7 +90,11 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
           setTemplateBootSource({
             type: bootSource.type,
             source: bootSource.source,
+            sourceValue: {
+              registry: bootSource?.source?.registry,
+            },
           });
+          setIsBootSourceAvailable(true);
         }
         break;
     }
@@ -98,6 +103,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
 
   return {
     templateBootSource,
+    isBootSourceAvailable,
     loaded,
     error,
   };
@@ -105,6 +111,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
 
 type useVmTemplateSourceValue = {
   templateBootSource: TemplateBootSource;
+  isBootSourceAvailable: boolean;
   loaded: boolean;
   error: any;
 };

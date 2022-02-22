@@ -5,11 +5,6 @@ import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
-  DataList,
-  DataListCell,
-  DataListItem,
-  DataListItemCells,
-  DataListItemRow,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
@@ -39,22 +34,14 @@ type TemplatesCatalogDrawerPanelProps = {
 
 const TemplateDisksTable: React.FC<{ disks: V1Disk[] }> = ({ disks }) => {
   return (
-    <DataList aria-label="disk list" isCompact>
+    <DescriptionList isCompact isHorizontal>
       {disks.map((disk) => (
-        <DataListItem key={disk.name} aria-labelledby="simple-item1">
-          <DataListItemRow>
-            <DataListItemCells
-              dataListCells={[
-                <DataListCell key="primary content">
-                  <span id="disk">{disk.name}</span>
-                </DataListCell>,
-                <DataListCell key="secondary content">{disk?.disk?.bus}</DataListCell>,
-              ]}
-            />
-          </DataListItemRow>
-        </DataListItem>
+        <DescriptionListGroup key={disk.name}>
+          <DescriptionListTerm>{disk.name}</DescriptionListTerm>
+          <DescriptionListDescription>{disk?.disk?.bus}</DescriptionListDescription>
+        </DescriptionListGroup>
       ))}
-    </DataList>
+    </DescriptionList>
   );
 };
 
@@ -62,7 +49,7 @@ const TemplateExpandableDescription: React.FC<{ description: string }> = ({ desc
   const { t } = useKubevirtTranslation();
   const [isExpanded, setIsExpanded] = React.useState(description?.length <= 120);
   return (
-    <Stack>
+    <Stack className="template-catalog-drawer-description">
       <StackItem>
         <ExpandableSection isExpanded isDetached contentId="expandable-content">
           {isExpanded ? description : description.slice(0, 120).concat('...')}
@@ -115,31 +102,9 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                       <DescriptionListDescription>{displayName}</DescriptionListDescription>
                     </DescriptionListGroup>
                     <DescriptionListGroup>
-                      <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
-                      <DescriptionListDescription>
-                        {<TemplateExpandableDescription description={description} />}
-                      </DescriptionListDescription>
-                    </DescriptionListGroup>
-                    <DescriptionListGroup>
                       <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
                       <DescriptionListDescription>
                         {t('{{cpuCount}} CPU | {{memory}} Memory', { cpuCount, memory })}
-                      </DescriptionListDescription>
-                    </DescriptionListGroup>
-                    <DescriptionListGroup>
-                      <DescriptionListTerm>{t('Documentation')}</DescriptionListTerm>
-                      <DescriptionListDescription>
-                        <Button
-                          isSmall
-                          isInline
-                          variant="link"
-                          icon={<ExternalLinkSquareAltIcon />}
-                          iconPosition="right"
-                        >
-                          <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
-                            {t('Refer to documentation')}
-                          </a>
-                        </Button>
                       </DescriptionListDescription>
                     </DescriptionListGroup>
                     <DescriptionListGroup>
@@ -158,6 +123,12 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                         {networkInterfaces.map((n) => n.name).join(', ')}
                       </DescriptionListDescription>
                     </DescriptionListGroup>
+                    <DescriptionListGroup>
+                      <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
+                      <DescriptionListDescription>
+                        {<TemplateExpandableDescription description={description} />}
+                      </DescriptionListDescription>
+                    </DescriptionListGroup>
                     <DescriptionListGroup className="template-catalog-drawer-disks">
                       <DescriptionListTerm>
                         {t('Disks')}
@@ -165,6 +136,22 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                       </DescriptionListTerm>
                       <DescriptionListDescription>
                         <TemplateDisksTable disks={disks} />
+                      </DescriptionListDescription>
+                    </DescriptionListGroup>
+                    <DescriptionListGroup>
+                      <DescriptionListTerm>{t('Documentation')}</DescriptionListTerm>
+                      <DescriptionListDescription>
+                        <Button
+                          isSmall
+                          isInline
+                          variant="link"
+                          icon={<ExternalLinkSquareAltIcon />}
+                          iconPosition="right"
+                        >
+                          <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
+                            {t('Refer to documentation')}
+                          </a>
+                        </Button>
                       </DescriptionListDescription>
                     </DescriptionListGroup>
                   </DescriptionList>
