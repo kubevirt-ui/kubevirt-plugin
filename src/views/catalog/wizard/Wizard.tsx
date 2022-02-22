@@ -5,10 +5,14 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem, Title } from '@patternfly/react-core';
 
+import { useWizardTemplateContext } from '../utils/WizardTemplateContext';
+
 import { wizardNavPages } from './tabs';
 
 const Wizard: React.FC = () => {
   const { t } = useKubevirtTranslation();
+  const { template } = useWizardTemplateContext();
+
   return (
     <Stack hasGutter>
       <StackItem className="co-m-nav-title co-m-nav-title--row">
@@ -24,7 +28,7 @@ const Wizard: React.FC = () => {
         </Stack>
       </StackItem>
       <StackItem>
-        <HorizontalNav pages={wizardNavPages} />
+        <HorizontalNav pages={wizardNavPages} resource={template} />
       </StackItem>
     </Stack>
   );
