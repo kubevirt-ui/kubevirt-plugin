@@ -15,6 +15,7 @@ import {
 } from '@patternfly/react-core';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
 
+import { CustomizeError } from './components/CustomizeError';
 import { CustomizeForm } from './components/CustomizeForm';
 import { CustomizeVirtualMachineScheleton } from './components/CustomizeVirtualMachineScheleton';
 
@@ -77,14 +78,14 @@ const CustomizeVirtualMachine: React.FC = () => {
 
   const loading = !loaded && !error;
 
+  if (error) return <CustomizeError />;
+
   return (
     <Sidebar isPanelRight hasGutter className="customize-vm__container">
       <SidebarContent className="customize-vm__content">
         <Title headingLevel="h1">{t('Create VirtualMachine from template')}</Title>
         {template && <CustomizeForm template={template} />}
         {loading && <CustomizeVirtualMachineScheleton />}
-
-        {error && <div data-test-id="error-message">Error</div>}
       </SidebarContent>
 
       <SidebarPanel width={{ '2xl': 'width_50', default: 'width_33' }}>
