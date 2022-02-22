@@ -1,8 +1,12 @@
 import * as React from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getResourceUrl } from '@kubevirt-utils/resource';
 import {
+  Alert,
   Button,
   ButtonVariant,
   Checkbox,
@@ -23,6 +27,7 @@ import {
 } from '@patternfly/react-core';
 import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
+import { quickCreateVM } from '../../..//utils/quick-create-vm';
 import { useVmTemplateSource } from '../../../utils/vm-template-source/useVmTemplateSource';
 import { useProcessedTemplate } from '../../hooks/useProcessedTemplate';
 import { generateVMName } from '../../utils/helpers';
@@ -38,11 +43,27 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
   template,
   onCancel,
 }) => {
+  const history = useHistory();
   const { t } = useKubevirtTranslation();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVmTemplateSource(template);
   const [processedTemplate, processedTemplateLoaded] = useProcessedTemplate(template);
   const [vmName, setVmName] = React.useState(generateVMName(template));
-  const [startAfterCreate, setStartAfterCreate] = React.useState(true);
+  const [startVM, setStartVM] = React.useState(true);
+  const [isQuickCreating, setIsQuickCreating] = React.useState(false);
+  const [quickCreateError, setQuickCreateError] = React.useState(undefined);
+
+  const onQuickCreate = () => {
+    setIsQuickCreating(true);
+    quickCreateVM(template, { name: vmName, namespace, startVM })
+      .then((vm: any) => {
+        setIsQuickCreating(false);
+        history.push(getResourceUrl(VirtualMachineModel, vm));
+      })
+      .catch((err) => {
+        setIsQuickCreating(false);
+        setQuickCreateError(err);
+      });
+  };
 
   const canQuickCreate = !!processedTemplate && isBootSourceAvailable;
   const loaded = bootSourceLoaded && processedTemplateLoaded;
@@ -121,21 +142,30 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
                 <StackItem>
                   <Checkbox
                     id="start-after-create-checkbox"
-                    isChecked={startAfterCreate}
-                    onChange={(v) => setStartAfterCreate(v)}
+                    isChecked={startVM}
+                    onChange={(v) => setStartVM(v)}
                     label={t('Start this VirtualMachine after creation')}
                   />
                 </StackItem>
                 <StackItem />
+                {quickCreateError && (
+                  <StackItem>
+                    <Alert variant="danger" title={t('Quick create error')} isInline>
+                      {quickCreateError.message}
+                    </Alert>
+                  </StackItem>
+                )}
                 <StackItem>
                   <Split hasGutter>
                     <Button
                       data-test-id="quick-create-vm-btn"
                       type="submit"
                       form="quick-create-form"
-                      isDisabled={!isBootSourceAvailable}
+                      isLoading={isQuickCreating}
+                      isDisabled={!isBootSourceAvailable || isQuickCreating || !vmName}
                       onClick={(e) => {
                         e.preventDefault();
+                        onQuickCreate();
                       }}
                     >
                       {t('Quick create VirtualMachine')}
