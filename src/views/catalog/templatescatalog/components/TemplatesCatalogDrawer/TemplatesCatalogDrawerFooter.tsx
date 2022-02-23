@@ -75,7 +75,11 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
           <Button
             data-test-id="customize-vm-btn"
             variant={canQuickCreate ? ButtonVariant.secondary : ButtonVariant.primary}
-            onClick={() => onCancel()}
+            onClick={() =>
+              history.push(
+                `templatescatalog/customize?name=${template.metadata.name}&namespace=${template.metadata.namespace}`,
+              )
+            }
           >
             {t('Customize VirtualMachine')}
           </Button>
