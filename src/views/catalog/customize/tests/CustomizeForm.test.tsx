@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { CustomizeForm } from '../components/CustomizeForm';
@@ -62,5 +62,21 @@ describe('Test CustomizeForm', () => {
 
     expect(k8sCreate).not.toBeCalled();
     screen.getAllByTitle('Error');
+  });
+
+  it('Hide optional fields', () => {
+    render(<CustomizeForm template={mockVirtualMachineTemplate} />);
+
+    const oneOptionalField = mockVirtualMachineTemplate.parameters.find(
+      (parameter) => !parameter.required,
+    );
+
+    expect(screen.getByText(oneOptionalField.description)).toBeVisible();
+
+    act(() => {
+      fireEvent.click(within(screen.getByTestId('expandable-section')).getByRole('button'));
+    });
+
+    expect(screen.getByText(oneOptionalField.description)).not.toBeVisible();
   });
 });
