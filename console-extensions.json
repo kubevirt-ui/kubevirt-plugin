@@ -135,6 +135,19 @@
         "$codeRef": "Wizard"
       }
     }
+  },
+  {
+    "type": "console.action/resource-provider",
+    "properties": {
+      "model": {
+        "group": "kubevirt.io",
+        "version": "v1",
+        "kind": "VirtualMachine"
+      },
+      "provider": {
+        "$codeRef": "useVirtualMachineActionsProvider"
+      }
+    }
   }
 ]
 

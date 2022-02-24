@@ -31,7 +31,8 @@
       "CustomizeVirtualMachine": "./views/catalog/customize/CustomizeVirtualMachine.tsx",
       "VirtualMachineNavPage": "./views/virtualmachines/details/VirtualMachineNavPage.tsx",
       "VirtualMachinesInstancePage": "./views/virtualmachinesinstance/details/VirtualMachinesInstancePage.tsx",
-      "Wizard": "./views/catalog/wizard/Wizard.tsx"
+      "Wizard": "./views/catalog/wizard/Wizard.tsx",
+      "useVirtualMachineActionsProvider": "./views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
@@ -60,6 +61,7 @@
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.4",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
+    "@testing-library/react-hooks": "^7.0.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.0.3",
     "@types/node": "^16.11.12",
