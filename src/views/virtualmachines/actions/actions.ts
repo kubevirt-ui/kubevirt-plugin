@@ -33,7 +33,7 @@ export enum VMActionType {
   RemoveVolume = 'removevolume',
 }
 
-const VMActionRequest = async (
+export const VMActionRequest = async (
   vm: V1VirtualMachine,
   action: VMActionType,
   body?: V1AddVolumeOptions | V1RemoveVolumeOptions,
@@ -64,11 +64,11 @@ const VMActionRequest = async (
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    await response.text();
+    return response.text();
   } catch (error) {
     console.error(error);
+    return;
   }
-  return;
 };
 
 export const startVM = async (vm: V1VirtualMachine) => VMActionRequest(vm, VMActionType.Start);
