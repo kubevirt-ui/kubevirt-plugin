@@ -1,0 +1,360 @@
+{
+    "kind": "Template",
+    "apiVersion": "template.openshift.io/v1",
+    "metadata": {
+      "name": "rhel8-saphana-tiny",
+      "namespace": "openshift",
+      "uid": "5b9bf2ed-a561-4340-b8d7-3727b023dec4",
+      "resourceVersion": "181790",
+      "creationTimestamp": "2022-01-27T09:20:57Z",
+      "labels": {
+        "flavor.template.kubevirt.io/tiny": "true",
+        "app.kubernetes.io/part-of": "hyperconverged-cluster",
+        "template.kubevirt.io/version": "v0.19.1",
+        "app.kubernetes.io/version": "1.6.0",
+        "template.kubevirt.io/type": "base",
+        "app.kubernetes.io/component": "templating",
+        "app.kubernetes.io/managed-by": "ssp-operator",
+        "workload.template.kubevirt.io/saphana": "true",
+        "app.kubernetes.io/name": "common-templates",
+        "os.template.kubevirt.io/rhel8.4": "true"
+      },
+      "annotations": {
+        "template.kubevirt.io/version": "v1alpha1",
+        "openshift.io/display-name": "Red Hat Enterprise Linux 8.4 VM for SAP HANA workloads",
+        "openshift.io/documentation-url": "https://github.com/kubevirt/common-templates",
+        "operator-sdk/primary-resource-type": "SSP.ssp.kubevirt.io",
+        "defaults.template.kubevirt.io/disk": "rootdisk",
+        "template.openshift.io/bindable": "false",
+        "operator-sdk/primary-resource": "kubevirt-hyperconverged/ssp-kubevirt-hyperconverged",
+        "name.os.template.kubevirt.io/rhel8.4": "Red Hat Enterprise Linux 8.0 or higher",
+        "tags": "hidden,kubevirt,virtualmachine,linux,rhel,sap,hana",
+        "description": "Template for Red Hat Enterprise Linux 8.4 for SAP HANA workloads. Please consult the SAP HANA guide for node setup requirements.",
+        "openshift.io/support-url": "https://github.com/kubevirt/common-templates/issues",
+        "iconClass": "icon-rhel",
+        "openshift.io/provider-display-name": "KubeVirt"
+      },
+      "managedFields": [
+        {
+          "manager": "manager",
+          "operation": "Update",
+          "apiVersion": "template.openshift.io/v1",
+          "time": "2022-01-27T09:20:57Z",
+          "fieldsType": "FieldsV1",
+          "fieldsV1": {
+            "f:metadata": {
+              "f:annotations": {
+                "f:operator-sdk/primary-resource": {},
+                "f:operator-sdk/primary-resource-type": {},
+                "f:defaults.template.kubevirt.io/disk": {},
+                "f:description": {},
+                "f:template.openshift.io/bindable": {},
+                "f:name.os.template.kubevirt.io/rhel8.4": {},
+                "f:iconClass": {},
+                "f:tags": {},
+                ".": {},
+                "f:openshift.io/support-url": {},
+                "f:openshift.io/provider-display-name": {},
+                "f:openshift.io/display-name": {},
+                "f:template.kubevirt.io/version": {},
+                "f:openshift.io/documentation-url": {}
+              },
+              "f:labels": {
+                "f:workload.template.kubevirt.io/saphana": {},
+                "f:os.template.kubevirt.io/rhel8.4": {},
+                "f:app.kubernetes.io/managed-by": {},
+                "f:app.kubernetes.io/name": {},
+                ".": {},
+                "f:app.kubernetes.io/part-of": {},
+                "f:flavor.template.kubevirt.io/tiny": {},
+                "f:app.kubernetes.io/version": {},
+                "f:template.kubevirt.io/type": {},
+                "f:template.kubevirt.io/version": {},
+                "f:app.kubernetes.io/component": {}
+              }
+            },
+            "f:objects": {},
+            "f:parameters": {}
+          }
+        }
+      ]
+    },
+    "objects": [
+      {
+        "apiVersion": "kubevirt.io/v1",
+        "kind": "VirtualMachine",
+        "metadata": {
+          "annotations": {
+            "vm.kubevirt.io/validations": "[\n   {\n     \"name\": \"minimal-required-memory\",\n     \"path\": \"jsonpath::.spec.domain.resources.requests.memory\",\n     \"rule\": \"integer\",\n     \"message\": \"This VM requires more memory.\",\n     \"min\": 1610612736\n   }\n]\n"
+          },
+          "labels": {
+            "app": "${NAME}",
+            "vm.kubevirt.io/template": "rhel8-saphana-tiny",
+            "vm.kubevirt.io/template.revision": "1",
+            "vm.kubevirt.io/template.version": "v0.19.1"
+          },
+          "name": "${NAME}"
+        },
+        "spec": {
+          "dataVolumeTemplates": [
+            {
+              "apiVersion": "cdi.kubevirt.io/v1beta1",
+              "kind": "DataVolume",
+              "metadata": {
+                "name": "${NAME}"
+              },
+              "spec": {
+                "source": {
+                  "registry": {
+                    "pullMethod": "node",
+                    "url": "${SRC_CONTAINERDISK}"
+                  }
+                },
+                "storage": {
+                  "resources": {
+                    "requests": {
+                      "storage": "50Gi"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "running": false,
+          "template": {
+            "metadata": {
+              "annotations": {
+                "vm.kubevirt.io/flavor": "tiny",
+                "vm.kubevirt.io/os": "rhel8",
+                "vm.kubevirt.io/workload": "saphana"
+              },
+              "labels": {
+                "kubevirt.io/domain": "${NAME}",
+                "kubevirt.io/size": "tiny"
+              }
+            },
+            "spec": {
+              "domain": {
+                "cpu": {
+                  "cores": "${{CPU_CORES}}",
+                  "dedicatedCpuPlacement": true,
+                  "features": [
+                    {
+                      "name": "invtsc",
+                      "policy": "require"
+                    }
+                  ],
+                  "isolateEmulatorThread": true,
+                  "model": "host-passthrough",
+                  "numa": {
+                    "guestMappingPassthrough": {}
+                  },
+                  "sockets": "${{CPU_SOCKETS}}",
+                  "threads": "${{CPU_THREADS}}"
+                },
+                "devices": {
+                  "blockMultiQueue": true,
+                  "disks": [
+                    {
+                      "dedicatedIOThread": true,
+                      "disk": {
+                        "bus": "virtio"
+                      },
+                      "name": "${NAME}"
+                    },
+                    {
+                      "disk": {
+                        "bus": "virtio"
+                      },
+                      "name": "cloudinitdisk"
+                    },
+                    {
+                      "disk": {
+                        "bus": "virtio"
+                      },
+                      "name": "downwardmetrics"
+                    }
+                  ],
+                  "interfaces": [
+                    {
+                      "masquerade": {},
+                      "model": "virtio",
+                      "name": "default"
+                    },
+                    {
+                      "model": "virtio",
+                      "name": "sriov-net1",
+                      "sriov": {}
+                    },
+                    {
+                      "model": "virtio",
+                      "name": "sriov-net2",
+                      "sriov": {}
+                    },
+                    {
+                      "model": "virtio",
+                      "name": "sriov-net3",
+                      "sriov": {}
+                    }
+                  ],
+                  "networkInterfaceMultiqueue": true
+                },
+                "ioThreadsPolicy": "auto",
+                "machine": {
+                  "type": ""
+                },
+                "memory": {
+                  "guest": "${MEMORY}",
+                  "hugepages": {
+                    "pageSize": "${HUGEPAGES_PAGE_SIZE}"
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "memory": "${MEMORY_OVERHEAD}"
+                  }
+                }
+              },
+              "hostname": "${NAME}",
+              "networks": [
+                {
+                  "name": "default",
+                  "pod": {}
+                },
+                {
+                  "multus": {
+                    "networkName": "${SRIOV_NETWORK_NAME1}"
+                  },
+                  "name": "sriov-net1"
+                },
+                {
+                  "multus": {
+                    "networkName": "${SRIOV_NETWORK_NAME2}"
+                  },
+                  "name": "sriov-net2"
+                },
+                {
+                  "multus": {
+                    "networkName": "${SRIOV_NETWORK_NAME3}"
+                  },
+                  "name": "sriov-net3"
+                }
+              ],
+              "nodeSelector": {
+                "kubevirt.io/workload": "${WORKLOAD_NODE_LABEL_VALUE}"
+              },
+              "terminationGracePeriodSeconds": 3600,
+              "tolerations": [
+                {
+                  "effect": "NoSchedule",
+                  "key": "kubevirt.io/workload",
+                  "operator": "Equal",
+                  "value": "hana"
+                }
+              ],
+              "volumes": [
+                {
+                  "dataVolume": {
+                    "name": "${NAME}"
+                  },
+                  "name": "${NAME}"
+                },
+                {
+                  "cloudInitNoCloud": {
+                    "userData": "#cloud-config\nuser: cloud-user\npassword: ${CLOUD_USER_PASSWORD}\nchpasswd: { expire: False }"
+                  },
+                  "name": "cloudinitdisk"
+                },
+                {
+                  "downwardMetrics": {},
+                  "name": "downwardmetrics"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": [
+      {
+        "name": "NAME",
+        "displayName": "Name",
+        "description": "Name for the new VM",
+        "required": true
+      },
+      {
+        "name": "WORKLOAD_NODE_LABEL_VALUE",
+        "displayName": "The value of the kubevirt.io/workload node selector label key. The target node needs to match this label",
+        "description": "Value of the node label selector key",
+        "required": true
+      },
+      {
+        "name": "MEMORY",
+        "displayName": "Memory",
+        "description": "Amount of memory",
+        "value": "24Gi"
+      },
+      {
+        "name": "MEMORY_OVERHEAD",
+        "displayName": "Memory Overhead",
+        "description": "Amount of memory overhead for qemu",
+        "value": "44Gi"
+      },
+      {
+        "name": "CPU_CORES",
+        "displayName": "CPU Cores",
+        "description": "Amount of cores",
+        "value": "4"
+      },
+      {
+        "name": "CPU_THREADS",
+        "displayName": "CPU Threads",
+        "description": "Amount of threads",
+        "value": "1"
+      },
+      {
+        "name": "CPU_SOCKETS",
+        "displayName": "CPU Sockets",
+        "description": "Amount of sockets",
+        "value": "1"
+      },
+      {
+        "name": "SRIOV_NETWORK_NAME1",
+        "displayName": "SR-IOV network1",
+        "description": "Name of the SR-IOV network1",
+        "required": true
+      },
+      {
+        "name": "SRIOV_NETWORK_NAME2",
+        "displayName": "SR-IOV network2",
+        "description": "Name of the SR-IOV network2",
+        "required": true
+      },
+      {
+        "name": "SRIOV_NETWORK_NAME3",
+        "displayName": "SR-IOV network3",
+        "description": "Name of the SR-IOV network3",
+        "required": true
+      },
+      {
+        "name": "HUGEPAGES_PAGE_SIZE",
+        "displayName": "Huge page size",
+        "description": "Page size of huge pages",
+        "value": "1Gi"
+      },
+      {
+        "name": "SRC_CONTAINERDISK",
+        "displayName": "Source container disk",
+        "description": "Name of the source container disk to import",
+        "value": "docker://registry.redhat.io/rhel8/rhel-guest-image:8.4.0"
+      },
+      {
+        "name": "CLOUD_USER_PASSWORD",
+        "displayName": "Cloud user password",
+        "description": "Randomized password for the cloud-init user cloud-user",
+        "generate": "expression",
+        "from": "[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}"
+      }
+    ]
+  }
+  
