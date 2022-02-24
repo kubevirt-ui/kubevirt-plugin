@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { TFunction } from 'i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,134 +8,34 @@ import {
   ListPageCreate,
   ListPageFilter,
   ListPageHeader,
-  ResourceLink,
-  RowFilter,
-  RowProps,
-  TableColumn,
-  TableData,
   useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { VMStatusConditionLabelList } from './components/VMStatusConditionLabel';
+import { filters } from '../utils';
 
-export const printableVMStatus = {
-  Stopped: 'Stopped',
-  Migrating: 'Migrating',
-  Provisioning: 'Provisioning',
-  Starting: 'Starting',
-  Running: 'Running',
-  Paused: 'Paused',
-  Stopping: 'Stopping',
-  Terminating: 'Terminating',
-  Unknown: 'Unknown',
-};
+import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
+import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 
-const columns: (t: TFunction) => TableColumn<K8sResourceCommon>[] = (t) => [
-  {
-    title: t('Name'),
-    id: 'name',
-  },
-  {
-    title: t('Namespace'),
-    id: 'namespace',
-  },
-  {
-    title: t('Status'),
-    id: 'status',
-  },
-  {
-    title: t('Conditions'),
-    id: 'conditions',
-  },
-  {
-    title: t('Created'),
-    id: 'created',
-  },
-];
-
-const VMRow: React.FC<RowProps<V1VirtualMachine, { kind: string }>> = ({
-  obj,
-  activeColumnIDs,
-  rowData: { kind },
-}) => {
-  return (
-    <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        <ResourceLink kind={kind} name={obj.metadata.name} namespace={obj.metadata.namespace} />
-      </TableData>
-      <TableData id="namespace" activeColumnIDs={activeColumnIDs}>
-        <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
-      </TableData>
-      <TableData id="status" activeColumnIDs={activeColumnIDs}>
-        {obj?.status?.printableStatus}
-      </TableData>
-      <TableData id="conditions" activeColumnIDs={activeColumnIDs}>
-        <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
-      </TableData>
-      <TableData id="created" activeColumnIDs={activeColumnIDs}>
-        {obj?.metadata?.creationTimestamp}
-      </TableData>
-    </>
-  );
-};
-
-type VMTableProps = {
+type VirtualMachinesListProps = {
   kind: string;
-  data: K8sResourceCommon[];
-  unfilteredData: K8sResourceCommon[];
-  loaded: boolean;
-  loadError: any;
+  namespace: string;
 };
 
-const VMTable: React.FC<VMTableProps> = ({ data, unfilteredData, loaded, loadError, kind }) => {
-  const { t } = useKubevirtTranslation();
-
-  return (
-    <VirtualizedTable<K8sResourceCommon>
-      data={data}
-      unfilteredData={unfilteredData}
-      loaded={loaded}
-      loadError={loadError}
-      columns={columns(t)}
-      Row={VMRow}
-      rowData={{ kind }}
-    />
-  );
-};
-
-export const filters: RowFilter[] = [
-  {
-    filterGroupName: 'Status',
-    type: 'vm-status',
-    reducer: (obj) => obj?.status?.printableStatus,
-    filter: (statuses, obj) => {
-      const status = obj?.status?.printableStatus;
-      return (
-        statuses.selected?.length === 0 ||
-        statuses.selected?.includes(status) ||
-        !statuses?.all?.find((s) => s === status)
-      );
-    },
-    items: Object.keys(printableVMStatus).map((status) => ({
-      id: status,
-      title: status,
-    })),
-  },
-];
-
-const VirtualMachinesList = ({ kind }: { kind: string }) => {
+const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
 
   const [vms, loaded, loadError] = useK8sWatchResource<V1VirtualMachine[]>({
     kind,
     isList: true,
     namespaced: true,
+    namespace,
   });
 
-  const [data, filteredData, onFilterChange] = useListPageFilter(vms, filters);
+  const [unfilteredData, data, onFilterChange] = useListPageFilter(vms, filters);
 
+  const columns = useVirtualMachineColumns();
   return (
     <>
       <ListPageHeader title={t('Virtual Machines')}>
@@ -149,12 +48,14 @@ const VirtualMachinesList = ({ kind }: { kind: string }) => {
           rowFilters={filters}
           onFilterChange={onFilterChange}
         />
-        <VMTable
-          data={filteredData}
-          unfilteredData={data}
+        <VirtualizedTable<K8sResourceCommon>
+          data={data}
+          unfilteredData={unfilteredData}
           loaded={loaded}
           loadError={loadError}
-          kind={kind}
+          columns={columns}
+          Row={VirtualMachineRow}
+          rowData={{ kind }}
         />
       </ListPageBody>
     </>
