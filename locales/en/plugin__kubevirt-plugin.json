@@ -52,6 +52,8 @@
   "Memory": "Memory",
   "Create new VirtualMachine from catalog": "Create new VirtualMachine from catalog",
   "Select an option to create a VirtualMachine": "Select an option to create a VirtualMachine",
+  "Review and Create VirtualMachine": "Review and Create VirtualMachine",
+  "You can click the Create Virtual Machine button to create your Virtual Machine or customize it by editing each of the tabs below. When done, click the Create Virtual Machine button.": "You can click the Create Virtual Machine button to create your Virtual Machine or customize it by editing each of the tabs below. When done, click the Create Virtual Machine button.",
   "Model": "Model",
   "Network": "Network",
   "Type": "Type",

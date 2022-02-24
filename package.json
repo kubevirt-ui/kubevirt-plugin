@@ -30,7 +30,8 @@
       "TemplatesCatalog": "./views/catalog/templatescatalog/TemplatesCatalog.tsx",
       "CustomizeVirtualMachine": "./views/catalog/customize/CustomizeVirtualMachine.tsx",
       "VirtualMachineNavPage": "./views/virtualmachines/details/VirtualMachineNavPage.tsx",
-      "VirtualMachinesInstancePage": "./views/virtualmachinesinstance/details/VirtualMachinesInstancePage.tsx"
+      "VirtualMachinesInstancePage": "./views/virtualmachinesinstance/details/VirtualMachinesInstancePage.tsx",
+      "Wizard": "./views/catalog/wizard/Wizard.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
