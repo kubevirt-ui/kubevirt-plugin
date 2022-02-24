@@ -5,13 +5,11 @@ import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk'
 import {
   Checkbox,
   FormGroup,
-  Popover,
   Select,
   SelectOption,
   SelectVariant,
   TextInput,
 } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
 
 import { PersistentVolumeClaimSelect } from '../PersistentVolumeClaimSelect';
 
@@ -22,6 +20,7 @@ import {
   PVC_DISK_SOURCE_NAME,
   REGISTRY_DISK_SOURCE_NAME,
 } from './constants';
+import { SelectDiskSourceLabel } from './SelectDiskSourceLabel';
 import { getGenericDiskSourceCustomization, getPVCDiskSource } from './utils';
 import { VolumeSize } from './VolumeSize';
 import { DISK_SOURCE_OPTIONS_IDS } from '.';
@@ -58,24 +57,6 @@ export const DiskSource: React.FC<DiskSourceProps> = ({
     setIsOpen(false);
   }, []);
 
-  const diskSourceLabel = (
-    <>
-      {t('Disk source')}{' '}
-      <Popover
-        aria-label={t('Help')}
-        bodyContent={() => (
-          <div>
-            {t(
-              'Disk Source represents the source for our Disk, this can be HTTP, Registry or an excisting PVC',
-            )}
-          </div>
-        )}
-      >
-        <HelpIcon />
-      </Popover>
-    </>
-  );
-
   React.useEffect(() => {
     switch (selectedSourceType) {
       case DEFAULT_DISK_SOURCE:
@@ -104,7 +85,7 @@ export const DiskSource: React.FC<DiskSourceProps> = ({
   return (
     <>
       <FormGroup
-        label={diskSourceLabel}
+        label={<SelectDiskSourceLabel />}
         fieldId={`disk-source-required-disk`}
         isRequired
         className="disk-source-form-group"

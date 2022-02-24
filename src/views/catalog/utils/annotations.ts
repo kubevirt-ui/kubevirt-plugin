@@ -3,4 +3,5 @@ export const ANNOTATIONS = Object.freeze({
   providerDisplayName: 'openshift.io/provider-display-name',
   documentationURL: 'openshift.io/documentation-url',
   supportURL: 'openshift.io/support-url',
+  description: 'description',
 });

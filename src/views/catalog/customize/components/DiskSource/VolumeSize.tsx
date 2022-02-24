@@ -46,7 +46,7 @@ export const VolumeSize: React.FC<VolumeSizeProps> = ({ quantity, onChange, erro
   );
 
   const _onChangeSize = React.useCallback(
-    (event) => onChange(ISUnitFromBytes(`${event.currentTarget.value}${quantityUnit}`)),
+    (event) => onChange(ISUnitFromBytes(`${Number(event.currentTarget.value)}${quantityUnit}`)),
     [onChange, quantityUnit],
   );
 

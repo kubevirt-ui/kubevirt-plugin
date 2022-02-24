@@ -16,13 +16,15 @@ import {
 } from '@patternfly/react-core';
 import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
 
+import {
+  getTemplateDescription,
+  getTemplateDocumentationURL,
+  getTemplateName,
+} from '../../../utils/templateGetters';
 import { WORKLOADS_LABELS } from '../../utils/constants';
 import { getFlavorData } from '../../utils/flavor';
 import {
-  getTemplateDescription,
   getTemplateDisks,
-  getTemplateDocumentationURL,
-  getTemplateName,
   getTemplateNetworkInterfaces,
   getTemplateWorkload,
   isDefaultVariantTemplate,

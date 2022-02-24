@@ -1,6 +1,10 @@
 import * as React from 'react';
 
-import { PersistentVolumeClaimModel, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  modelToGroupVersionKind,
+  PersistentVolumeClaimModel,
+  ProjectModel,
+} from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -34,20 +38,13 @@ export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectPr
   const [isNamespacePVCOpen, setNamespaceOpen] = React.useState(false);
 
   const [projects, projectsLoaded] = useK8sWatchResource<K8sResourceCommon[]>({
-    groupVersionKind: {
-      group: ProjectModel.apiGroup,
-      version: ProjectModel.apiVersion,
-      kind: ProjectModel.kind,
-    },
+    groupVersionKind: modelToGroupVersionKind(ProjectModel),
     namespaced: false,
     isList: true,
   });
 
   const [pvcOptions, pvcsLoaded] = useK8sWatchResource<V1alpha1PersistentVolumeClaim[]>({
-    groupVersionKind: {
-      version: PersistentVolumeClaimModel.apiVersion,
-      kind: PersistentVolumeClaimModel.kind,
-    },
+    groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     namespaced: false,
     isList: true,
   });

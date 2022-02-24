@@ -5,13 +5,14 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { CatalogTile } from '@patternfly/react-catalog-view-extension';
 import { Stack, StackItem } from '@patternfly/react-core';
 
+import { getTemplateName } from '../../utils/templateGetters';
 import {
   BOOT_SOURCE_LABELS,
   getTemplateBootSourceType,
 } from '../../utils/vm-template-source/utils';
 import { WORKLOADS_LABELS } from '../utils/constants';
 import { getFlavorData } from '../utils/flavor';
-import { getTemplateName, getTemplateProviderName, getTemplateWorkload } from '../utils/helpers';
+import { getTemplateProviderName, getTemplateWorkload } from '../utils/helpers';
 import { getTemplateOSIcon } from '../utils/os-icons';
 
 export type TemplateTileProps = {
