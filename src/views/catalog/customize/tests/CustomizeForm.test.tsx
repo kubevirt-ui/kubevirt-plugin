@@ -53,7 +53,7 @@ describe('Test CustomizeForm', () => {
     await waitFor(() => expect(k8sCreate).toBeCalled());
   });
 
-  it('Shows error message if required params are missing', () => {
+  it('Shows error message if required params are missing', async () => {
     render(<CustomizeForm template={mockVirtualMachineTemplate} />);
 
     act(() => {
@@ -62,6 +62,23 @@ describe('Test CustomizeForm', () => {
 
     expect(k8sCreate).not.toBeCalled();
     screen.getAllByTitle('Error');
+
+    expect(
+      within(screen.getByTestId('customize-vm-submit-button')).queryByRole('progressbar'),
+    ).toBeNull();
+
+    (screen.getAllByRole('textbox') as HTMLInputElement[]).forEach((inputText) => {
+      const mockTestInput = 'test-input-string';
+      if (!inputText.value) {
+        act(() => userEvent.type(inputText, mockTestInput));
+      }
+    });
+
+    act(() => {
+      fireEvent.click(screen.getByTestId('customize-vm-submit-button'));
+    });
+
+    await waitFor(() => expect(k8sCreate).toBeCalled());
   });
 
   it('Hide optional fields', () => {
