@@ -33,13 +33,6 @@ const {
 
 export const VirtualMachineActionFactory = {
   start: (vm: V1VirtualMachine): Action => {
-    // const StartMessege: React.FC = () => {
-    //   const { t } = useKubevirtTranslation();
-    //   const {
-    //     metadata: { name, namespace },
-    //   } = vm;
-    //   return <>{t(`Start ${name} in namespace`)}</>;
-    // };
     return {
       id: 'vm-action-start',
       disabled: [
