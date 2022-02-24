@@ -38,9 +38,11 @@ export const CustomizeForm: React.FC<CustomizeFormProps> = ({ template }) => {
       const formData = new FormData(event.currentTarget as HTMLFormElement);
 
       const requiredFieldNoValue = requiredFields.find((field) => isFieldInvalid(field, formData));
-      if (requiredFieldNoValue) return setValidationError(true);
-
-      await createVirtualMachine(template, ns, parameterForName, formData);
+      if (requiredFieldNoValue) {
+        setValidationError(true);
+      } else {
+        await createVirtualMachine(template, ns, parameterForName, formData);
+      }
     } catch (error) {
       console.error(error);
     }
