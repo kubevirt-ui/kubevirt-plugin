@@ -4,3 +4,7 @@ export const getNetworks = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.n
 
 export const getInterfaces = (vm: V1VirtualMachine) =>
   vm?.spec?.template?.spec?.domain?.devices?.interfaces;
+
+export const getDisks = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.domain?.devices?.disks;
+
+export const getVolumes = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.volumes;

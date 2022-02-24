@@ -9,27 +9,27 @@ import {
   ListPageHeader,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import NetworkInterfaceList from './NetworkInterfaceList';
+import DiskList from './DiskList';
 
-type NetworkInterfaceListPageProps = RouteComponentProps<{
+type DiskListPageProps = RouteComponentProps<{
   ns: string;
   name: string;
 }> & {
   obj?: V1VirtualMachine;
 };
 
-const NetworkInterfaceListPage: React.FC<NetworkInterfaceListPageProps> = ({ obj }) => {
+const DiskListPage: React.FC<DiskListPageProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>
       <ListPageHeader title="">
-        <ListPageCreateButton>{t('Add network interface')}</ListPageCreateButton>
+        <ListPageCreateButton>{t('Add disk')}</ListPageCreateButton>
       </ListPageHeader>
       <ListPageBody>
-        <NetworkInterfaceList vm={obj} />
+        <DiskList vm={obj} />
       </ListPageBody>
     </>
   );
 };
 
-export default NetworkInterfaceListPage;
+export default DiskListPage;
