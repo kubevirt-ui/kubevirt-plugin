@@ -27,11 +27,9 @@
     "displayName": "Kubevirt Plugin",
     "exposedModules": {
       "VirtualMachinesList": "./views/virtualmachines/list/VirtualMachinesList.tsx",
-      "TemplatesCatalog": "./views/catalog/templatescatalog/TemplatesCatalog.tsx",
-      "CustomizeVirtualMachine": "./views/catalog/customize/CustomizeVirtualMachine.tsx",
+      "TemplatesCatalog": "./views/catalog/Catalog.tsx",
       "VirtualMachineNavPage": "./views/virtualmachines/details/VirtualMachineNavPage.tsx",
       "VirtualMachinesInstancePage": "./views/virtualmachinesinstance/details/VirtualMachinesInstancePage.tsx",
-      "Wizard": "./views/catalog/wizard/Wizard.tsx",
       "useVirtualMachineActionsProvider": "./views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts",
       "VirtualMachinesInstancesList": "./views/virtualmachinesinstance/list/VirtualMachinesInstancesList.tsx"
     },

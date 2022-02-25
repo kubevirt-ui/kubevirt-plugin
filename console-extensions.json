@@ -100,16 +100,6 @@
   {
     "type": "console.page/route",
     "properties": {
-      "path": ["/k8s/ns/:ns/templatescatalog/customize", "/k8s/all-namespaces/templatescatalog/customize"],
-      "component": {
-        "$codeRef": "CustomizeVirtualMachine"
-      }
-    }
-  },
-  {
-    "type": "console.page/route",
-    "properties": {
-      "exact": true,
       "path": ["/k8s/ns/:ns/templatescatalog", "/k8s/all-namespaces/templatescatalog"],
       "component": {
         "$codeRef": "TemplatesCatalog"
@@ -136,15 +126,6 @@
         "version": "v1"
       },
       "component": { "$codeRef": "VirtualMachinesInstancePage" }
-    }
-  },
-  {
-    "type": "console.page/route",
-    "properties": {
-      "path": ["/k8s/ns/:ns/templatescatalog/review", "/k8s/all-namespaces/templatescatalog/review"],
-      "component": {
-        "$codeRef": "Wizard"
-      }
     }
   },
   {
