@@ -38,7 +38,7 @@ const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
     return getDiskRowDataLayout(diskDevices);
   }, [pvcs, vmDisks, vmVolumes]);
 
-  return [disks, loaded, loadingError];
+  return [disks || [], loaded, loadingError];
 };
 
 export default useDisksTableData;
