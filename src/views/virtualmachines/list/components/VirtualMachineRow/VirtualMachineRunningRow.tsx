@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink, RowProps, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import FirstItemListPopover, {
@@ -15,7 +15,7 @@ const VirtualMachineRunningRow: React.FC<RowProps<V1VirtualMachine, { kind: stri
   activeColumnIDs,
   rowData: { kind },
 }) => {
-  const { t } = useTranslation('plugin__kubevirt-plugin');
+  const { t } = useKubevirtTranslation();
 
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: {
