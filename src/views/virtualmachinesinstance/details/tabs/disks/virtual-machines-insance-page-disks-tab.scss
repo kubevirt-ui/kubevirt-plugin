@@ -1,0 +1,17 @@
+.VirtualMachinesInstancePageDisksTab {
+  .co-m-nav-title.co-m-nav-title--row {
+    justify-content: unset;
+    align-items: baseline;
+
+    .DisksTableTitle-icon,
+    .FileSystemTableTitle-icon {
+      margin-left: var(--pf-global--spacer--xs);
+      opacity: 0.5;
+      cursor: pointer;
+    }
+  }
+
+  td#drive {
+    text-transform: capitalize;
+  }
+}

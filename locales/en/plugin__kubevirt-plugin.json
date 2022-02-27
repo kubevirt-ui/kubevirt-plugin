@@ -69,6 +69,18 @@
   "Console": "Console",
   "Network Interfaces": "Network Interfaces",
   "Events": "Events",
+  "Source": "Source",
+  "Size": "Size",
+  "Drive": "Drive",
+  "Interface": "Interface",
+  "Storage Class": "Storage Class",
+  "File System Type": "File System Type",
+  "Mount Point": "Mount Point",
+  "Total Bytes": "Total Bytes",
+  "Used Bytes": "Used Bytes",
+  "The following information is provided by the OpenShift Virtualization operator.": "The following information is provided by the OpenShift Virtualization operator.",
+  "File Systems": "File Systems",
+  "The following information regarding how the disks are partitioned is provided by the guest agent.": "The following information regarding how the disks are partitioned is provided by the guest agent.",
   "VMI": "VMI",
   "Virtual Machines Instances": "Virtual Machines Instances"
 }

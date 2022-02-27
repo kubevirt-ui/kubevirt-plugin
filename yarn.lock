@@ -981,6 +981,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@patternfly/react-core@npm:^4.198.8":
+  version: 4.198.8
+  resolution: "@patternfly/react-core@npm:4.198.8"
+  dependencies:
+    "@patternfly/react-icons": ^4.49.8
+    "@patternfly/react-styles": ^4.48.8
+    "@patternfly/react-tokens": ^4.50.8
+    focus-trap: 6.2.2
+    react-dropzone: 9.0.0
+    tippy.js: 5.1.2
+    tslib: ^2.0.0
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0
+    react-dom: ^16.8.0 || ^17.0.0
+  checksum: 6cb9e556930d7a865eb20abcd04535bb50e94d2ec5b78764f163d58b722994cf8a766179a50a04e8f326627314755a90f5948a91683ef60aea4753f4567ae1c4
+  languageName: node
+  linkType: hard
+
 "@patternfly/react-icons@npm:^4.26.4, @patternfly/react-icons@npm:^4.49.2":
   version: 4.49.2
   resolution: "@patternfly/react-icons@npm:4.49.2"
@@ -1001,6 +1019,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@patternfly/react-icons@npm:^4.49.8":
+  version: 4.49.8
+  resolution: "@patternfly/react-icons@npm:4.49.8"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0
+    react-dom: ^16.8.0 || ^17.0.0
+  checksum: 61443a465ca1770229159fbce5d78b335defb60514a2649a2cef206ae0bfc211d3ba3b965aa6e8833f21c59ceec15e2a6d39c5c46b25305d447bb7eb4966f10b
+  languageName: node
+  linkType: hard
+
 "@patternfly/react-styles@npm:^4.25.4, @patternfly/react-styles@npm:^4.48.2":
   version: 4.48.2
   resolution: "@patternfly/react-styles@npm:4.48.2"
@@ -1012,6 +1040,13 @@ __metadata:
   version: 4.42.15
   resolution: "@patternfly/react-styles@npm:4.42.15"
   checksum: 7dc76f0bda471f99b0e1927292994c438bdc43b4b00bffd9e2840586b9692555d5a7cc81cc10d2a0dee9f9db33eb29f2bb2b2a704574f1e6027dc96d29061a9d
+  languageName: node
+  linkType: hard
+
+"@patternfly/react-styles@npm:^4.48.8":
+  version: 4.48.8
+  resolution: "@patternfly/react-styles@npm:4.48.8"
+  checksum: 0d1cf95af1204c62ba319021ce485d5b66608b563a68e9b92a61b4db829f6f725f9d698a28926f7b796fbcf03df5bd2fb0118a8aa5985c451a297a5eef67bde4
   languageName: node
   linkType: hard
 
@@ -1032,6 +1067,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@patternfly/react-table@npm:^4.67.5":
+  version: 4.67.8
+  resolution: "@patternfly/react-table@npm:4.67.8"
+  dependencies:
+    "@patternfly/react-core": ^4.198.8
+    "@patternfly/react-icons": ^4.49.8
+    "@patternfly/react-styles": ^4.48.8
+    "@patternfly/react-tokens": ^4.50.8
+    lodash: ^4.17.19
+    tslib: ^2.0.0
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0
+    react-dom: ^16.8.0 || ^17.0.0
+  checksum: 964b7064b81ff7802b16bda9750307c84727bdb383f4c58e31b16b5f4184c7abb08838a7e225dcb38739b84e64ae83fa4bc77ab355d7d5c1b4458d82253d99c9
+  languageName: node
+  linkType: hard
+
 "@patternfly/react-tokens@npm:^4.27.4, @patternfly/react-tokens@npm:^4.50.2":
   version: 4.50.2
   resolution: "@patternfly/react-tokens@npm:4.50.2"
@@ -1043,6 +1095,13 @@ __metadata:
   version: 4.44.15
   resolution: "@patternfly/react-tokens@npm:4.44.15"
   checksum: db6426142f0f7a31de3a4af556b3cb69d7c9e12b13ae640e973cc2a2658c327817d67ee781640d9a4cbf336537f92c4221fa31ad2c7283df5f550b71b3a7cbe4
+  languageName: node
+  linkType: hard
+
+"@patternfly/react-tokens@npm:^4.50.8":
+  version: 4.50.8
+  resolution: "@patternfly/react-tokens@npm:4.50.8"
+  checksum: 46bde8f27ab499da58c8adcb019eb10244b8b4d898f7b72f9664e4411e12927e1b6e93b132e04807017680224a88b79bc78282d4ac545f2ac44638ee2d8f4b08
   languageName: node
   linkType: hard
 
@@ -1242,6 +1301,13 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: bfcadb042a41b124c4e3de4925e3be6d35b78f93f27c4535d5ff86980dc0f8bc407ed99b9b54528952dc62834d5a779392f7a12c2947dd19330eb05a6bcae15a
+  languageName: node
+  linkType: hard
+
+"@types/byte-size@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "@types/byte-size@npm:8.1.0"
+  checksum: 1096338db57f01c341a7c548b2635f59a97801d9066fcfc555d8dc3943a7ba219df737dbfc5fd6f875254b167e68953563f8420c22ac493530809b84c4619653
   languageName: node
   linkType: hard
 
@@ -2766,6 +2832,13 @@ __metadata:
   version: 1.1.1
   resolution: "buffer-indexof@npm:1.1.1"
   checksum: 0967abc2981a8e7d776324c6b84811e4d84a7ead89b54a3bb8791437f0c4751afd060406b06db90a436f1cf771867331b5ecf5c4aca95b4ccb9f6cb146c22ebc
+  languageName: node
+  linkType: hard
+
+"byte-size@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "byte-size@npm:8.1.0"
+  checksum: 8395264954f0792b6a9500148473042c5a47932e06c673adbe584ef25e86d6c9bb1490ae275c4d83a41fcfd9b489b5522ee1627cc6f1414e29bd371839cf796e
   languageName: node
   linkType: hard
 
@@ -7171,16 +7244,19 @@ __metadata:
     "@openshift-console/dynamic-plugin-sdk-webpack": 0.0.4
     "@patternfly/react-catalog-view-extension": ^4.43.15
     "@patternfly/react-core": 4.192.15
+    "@patternfly/react-table": ^4.67.5
     "@testing-library/jest-dom": ^5.16.1
     "@testing-library/react": ^12.1.2
     "@testing-library/react-hooks": ^7.0.2
     "@testing-library/user-event": ^13.5.0
+    "@types/byte-size": ^8.1.0
     "@types/jest": ^27.0.3
     "@types/node": ^16.11.12
     "@types/react": ^17.0.37
     "@types/react-router-dom": 5.x
     "@typescript-eslint/eslint-plugin": ^5.9.1
     "@typescript-eslint/parser": ^5.9.1
+    byte-size: ^8.1.0
     copy-webpack-plugin: ^6.4.1
     css-loader: 6.6.0
     cypress: 8.5.x
