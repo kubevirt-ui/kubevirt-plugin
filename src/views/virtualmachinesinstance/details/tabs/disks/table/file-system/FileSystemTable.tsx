@@ -11,9 +11,10 @@ import FileSystemTableTitle from './FileSystemTableTitle';
 
 type FileSystemTableProps = {
   vmi: V1VirtualMachineInstance;
+  noDataEmptyMsg?: any;
 };
 
-const FileSystemTable: React.FC<FileSystemTableProps> = ({ vmi }) => {
+const FileSystemTable: React.FC<FileSystemTableProps> = ({ vmi, noDataEmptyMsg }) => {
   const [data, loaded, loadingError] = useFileSystemTableGuestOS(vmi);
   const columns = useFileSystemTableColumns();
   const fileSystems = data?.fsInfo?.disks || [];
@@ -29,6 +30,7 @@ const FileSystemTable: React.FC<FileSystemTableProps> = ({ vmi }) => {
           loadError={loadingError}
           columns={columns}
           Row={FileSystemTableRow}
+          NoDataEmptyMsg={noDataEmptyMsg}
         />
       </ListPageBody>
     </>
