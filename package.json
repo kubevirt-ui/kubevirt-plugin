@@ -46,6 +46,7 @@
     "@patternfly/react-table": "^4.67.5",
     "@types/byte-size": "^8.1.0",
     "byte-size": "^8.1.0",
+    "date-fns": "^2.28.0",
     "global": "^4.4.0",
     "mochawesome-report-generator": "^6.0.1",
     "react": "17.0.2",

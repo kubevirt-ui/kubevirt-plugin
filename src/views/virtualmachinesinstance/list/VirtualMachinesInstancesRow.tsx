@@ -1,8 +1,10 @@
 import * as React from 'react';
+import format from 'date-fns/format';
 import { VMStatusConditionLabelList } from 'src/views/virtualmachines/list/components/VMStatusConditionLabel';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { GlobeAmericasIcon } from '@patternfly/react-icons';
 
 import VirtualMachinesInstancesStatus from './VirtualMachinesInstancesStatus';
 
@@ -28,7 +30,8 @@ const VirtualMachinesInstancesRow: React.FC<VirtualMachinesInstancesRowProps> = 
         <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
       </TableData>
       <TableData id="created" activeColumnIDs={activeColumnIDs}>
-        {obj?.metadata?.creationTimestamp}
+        <GlobeAmericasIcon />{' '}
+        {format(new Date(obj?.metadata?.creationTimestamp), 'MMM dd, yyyy, h:mm a')}
       </TableData>
     </>
   );

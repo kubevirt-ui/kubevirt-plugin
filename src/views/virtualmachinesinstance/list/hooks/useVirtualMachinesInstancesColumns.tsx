@@ -6,6 +6,7 @@ import {
   TableColumn,
   useActiveColumns,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { sortable } from '@patternfly/react-table';
 
 const useVirtualMachinesInstancesColumns = (): { title: string; id: string }[] => {
   const { t } = useKubevirtTranslation();
@@ -15,22 +16,26 @@ const useVirtualMachinesInstancesColumns = (): { title: string; id: string }[] =
       {
         title: t('Name'),
         id: 'name',
+        transforms: [sortable],
+        sort: 'metadata.name',
       },
       {
         title: t('Namespace'),
         id: 'namespace',
+        transforms: [sortable],
+        sort: 'metadata.namespace',
       },
       {
         title: t('Status'),
         id: 'status',
-      },
-      {
-        title: t('Conditions'),
-        id: 'conditions',
+        transforms: [sortable],
+        sort: 'status.phase',
       },
       {
         title: t('Created'),
         id: 'created',
+        transforms: [sortable],
+        sort: 'metadata.creationTimestamp',
       },
     ],
     [t],
