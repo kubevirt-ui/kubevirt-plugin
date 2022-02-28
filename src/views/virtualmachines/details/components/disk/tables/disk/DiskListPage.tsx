@@ -2,12 +2,6 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ListPageBody,
-  ListPageCreateButton,
-  ListPageHeader,
-} from '@openshift-console/dynamic-plugin-sdk';
 
 import FilesystemList from '../filesystem/FilesystemList';
 
@@ -21,17 +15,11 @@ type DiskListPageProps = RouteComponentProps<{
 };
 
 const DiskListPage: React.FC<DiskListPageProps> = ({ obj }) => {
-  const { t } = useKubevirtTranslation();
   return (
-    <>
-      <ListPageHeader title="">
-        <ListPageCreateButton>{t('Add disk')}</ListPageCreateButton>
-      </ListPageHeader>
-      <ListPageBody>
-        <DiskList vm={obj} />
-        <FilesystemList vm={obj} />
-      </ListPageBody>
-    </>
+    <div className="VirtualMachinesInstancePageDisksTab">
+      <DiskList vm={obj} />
+      <FilesystemList vm={obj} />
+    </div>
   );
 };
 

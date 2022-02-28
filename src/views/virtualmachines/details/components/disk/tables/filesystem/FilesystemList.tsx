@@ -21,7 +21,7 @@ const FilesystemList: React.FC<FilesystemListProps> = ({ vm }) => {
   });
 
   const guestOS = vmi?.status?.guestOSInfo?.id;
-  let noDataEmptyMsg;
+  let noDataEmptyMsg = undefined;
   if (loadError) {
     noDataEmptyMsg = () => <>{t('Virtual machine is not running')}</>;
   } else if (!guestOS) {
