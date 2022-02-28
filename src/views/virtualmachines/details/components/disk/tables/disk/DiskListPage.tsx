@@ -9,6 +9,8 @@ import {
   ListPageHeader,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import FilesystemList from '../filesystem/FilesystemList';
+
 import DiskList from './DiskList';
 
 type DiskListPageProps = RouteComponentProps<{
@@ -27,6 +29,7 @@ const DiskListPage: React.FC<DiskListPageProps> = ({ obj }) => {
       </ListPageHeader>
       <ListPageBody>
         <DiskList vm={obj} />
+        <FilesystemList vm={obj} />
       </ListPageBody>
     </>
   );

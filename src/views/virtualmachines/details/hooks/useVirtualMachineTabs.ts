@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import DiskListPage from '../components/disk/DiskListPage';
+import DiskListPage from '../components/disk/tables/disk/DiskListPage';
 import NetworkInterfaceListPage from '../components/network/NetworkInterfaceListPage';
 
 export const useVirtualMachineTabs = () => {

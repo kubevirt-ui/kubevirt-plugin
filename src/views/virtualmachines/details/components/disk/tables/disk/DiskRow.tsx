@@ -3,7 +3,7 @@ import * as React from 'react';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
-import { DiskRowDataLayout } from './utils/VirtualMachineDisksTabUtils';
+import { DiskRowDataLayout } from '../../utils/VirtualMachineDisksTabUtils';
 
 const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ obj, activeColumnIDs }) => {
   const isPVCSource = !['Container (Ephemeral)', 'Other'].includes(obj?.source);

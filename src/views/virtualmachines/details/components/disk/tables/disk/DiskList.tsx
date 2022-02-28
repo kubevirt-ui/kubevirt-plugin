@@ -7,9 +7,10 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import useDiskColumns from './hooks/useDiskColumns';
-import useDisksTableData from './hooks/useDisksTableData';
-import { filters } from './utils/VirtualMachineDisksTabUtils';
+import useDiskColumns from '../../hooks/useDiskColumns';
+import useDisksTableData from '../../hooks/useDisksTableData';
+import { filters } from '../../utils/VirtualMachineDisksTabUtils';
+
 import DiskRow from './DiskRow';
 
 type DiskListProps = {
