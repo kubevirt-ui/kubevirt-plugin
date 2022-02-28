@@ -13,8 +13,8 @@ const osTitles = {
 };
 
 const getOSName = (obj: V1VirtualMachineInstance): string | undefined => {
-  const osAnnotation = obj?.metadata?.annotations[VM_KUBEVIRT_OS_ANNOTATION];
-  const [osName] = osAnnotation?.split(/(\d.*)/);
+  const osAnnotation = obj?.metadata?.annotations?.[VM_KUBEVIRT_OS_ANNOTATION];
+  const [osName] = osAnnotation?.split(/(\d.*)/) || [];
   return osTitles[osName] ? osName : 'other';
 };
 
