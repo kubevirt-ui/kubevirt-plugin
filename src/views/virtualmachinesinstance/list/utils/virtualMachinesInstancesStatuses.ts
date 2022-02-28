@@ -20,7 +20,7 @@ export const vmiStatuses = {
   Failed: 'Failed',
 };
 
-export const osNames = ['centos', 'fedora', 'windows', 'opensuse', 'rhel', 'ubuntu'];
+export const osNames = ['centos', 'fedora', 'windows', 'rhel', 'other'];
 
 const iconHandler = {
   get: (mapper: typeof iconMapper, prop: string) => {
