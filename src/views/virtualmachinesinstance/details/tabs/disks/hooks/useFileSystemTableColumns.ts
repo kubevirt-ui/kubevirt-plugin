@@ -1,52 +1,41 @@
-import * as React from 'react';
-
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { sortable } from '@patternfly/react-table';
-
-import {
-  columnsNumberSorting,
-  columnsStringSorting,
-  FileSystemPresentation,
-} from '../utils/virtualMachinesInstancePageDisksTabUtils';
 
 const useFileSystemTableColumns = () => {
   const { t } = useKubevirtTranslation();
 
-  const columns = React.useMemo(
-    () => [
-      {
-        title: t('Name'),
-        id: 'diskName',
-        transforms: [sortable],
-        sort: columnsStringSorting<FileSystemPresentation>('diskName'),
-      },
-      {
-        title: t('File System Type'),
-        id: 'fileSystemType',
-        transforms: [sortable],
-        sort: columnsStringSorting<FileSystemPresentation>('fileSystemType'),
-      },
-      {
-        title: t('Mount Point'),
-        id: 'mountPoint',
-        transforms: [sortable],
-        sort: columnsStringSorting<FileSystemPresentation>('mountPoint'),
-      },
-      {
-        title: t('Total Bytes'),
-        id: 'totalBytes',
-        transforms: [sortable],
-        sort: columnsNumberSorting<FileSystemPresentation>('totalBytes'),
-      },
-      {
-        title: t('Used Bytes'),
-        id: 'usedBytes',
-        transforms: [sortable],
-        sort: columnsNumberSorting<FileSystemPresentation>('usedBytes'),
-      },
-    ],
-    [t],
-  );
+  const columns = [
+    {
+      title: t('Name'),
+      id: 'diskName',
+      transforms: [sortable],
+      sort: 'diskName',
+    },
+    {
+      title: t('File System Type'),
+      id: 'fileSystemType',
+      transforms: [sortable],
+      sort: 'fileSystemType',
+    },
+    {
+      title: t('Mount Point'),
+      id: 'mountPoint',
+      transforms: [sortable],
+      sort: 'mountPoint',
+    },
+    {
+      title: t('Total Bytes'),
+      id: 'totalBytes',
+      transforms: [sortable],
+      sort: 'totalBytes',
+    },
+    {
+      title: t('Used Bytes'),
+      id: 'usedBytes',
+      transforms: [sortable],
+      sort: 'usedBytes',
+    },
+  ];
 
   return columns;
 };

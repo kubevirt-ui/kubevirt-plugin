@@ -37,6 +37,6 @@ const useDisksTableDisks: UseDisksTableDisks = (vmi) => {
     return diskStructureCreator(diskDevices);
   }, [pvcs, vmiDisks, vmiVolumes]);
 
-  return [disks, loaded, loadingError];
+  return [disks || [], loaded, loadingError];
 };
 export default useDisksTableDisks;
