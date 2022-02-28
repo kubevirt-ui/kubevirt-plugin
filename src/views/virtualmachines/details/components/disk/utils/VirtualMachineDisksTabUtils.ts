@@ -56,7 +56,7 @@ export const getDiskDrive = (disk: V1Disk): string => {
 
 export const getPrintableDiskDrive = (disk: V1Disk): string => diskTypes[getDiskDrive(disk)];
 
-export const getDiskInterface = (disk: V1Disk): string => disk[getDiskDrive(disk)].bus;
+export const getDiskInterface = (disk: V1Disk): string => disk[getDiskDrive(disk)]?.bus;
 
 export const getPrintableDiskInterface = (disk: V1Disk): string => {
   const diskInterface = getDiskInterface(disk);
@@ -67,10 +67,22 @@ export const getPrintableDiskInterface = (disk: V1Disk): string => {
     : '';
 };
 
-export const formatBytes = (rawSize: number, unit?: string): string => {
-  const sizeUnits = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
-  let unitIndex = (unit && sizeUnits.findIndex((sizeUnit) => sizeUnit === unit)) || 0;
-  let convertedSize = rawSize;
+export const hasNumber = (rawSize: string): number => {
+  const number = rawSize.match(/\d+/g);
+  return Number(number);
+};
+
+export const hasSizeUnit = (rawSize: string): string => {
+  const unit = rawSize.match(/[a-zA-Z]+/g);
+  return unit?.[0];
+};
+
+export const formatBytes = (rawSize: string, unit?: string): string => {
+  const size = hasNumber(rawSize);
+  const sizeUnit = hasSizeUnit(rawSize) || unit;
+  const sizeUnits = ['B', 'Ki', 'Mi', 'Gi', 'Ti'];
+  let unitIndex = (sizeUnit && sizeUnits.findIndex((sUnit) => sUnit === sizeUnit)) || 0;
+  let convertedSize = size;
   while (convertedSize >= 1024) {
     convertedSize = convertedSize / 1024;
     ++unitIndex;
@@ -89,7 +101,7 @@ export const getDiskRowDataLayout = (disks: DiskRawData[]): DiskRowDataLayout[] 
       : 'Other';
 
     const size = device?.pvc
-      ? formatBytes(Number(device?.pvc?.spec?.resources?.requests?.storage))
+      ? formatBytes(device?.pvc?.spec?.resources?.requests?.storage)
       : device?.volume?.containerDisk
       ? 'Dynamic'
       : '-';
