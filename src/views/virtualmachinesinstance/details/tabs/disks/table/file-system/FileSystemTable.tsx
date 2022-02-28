@@ -16,7 +16,7 @@ type FileSystemTableProps = {
 const FileSystemTable: React.FC<FileSystemTableProps> = ({ vmi }) => {
   const [data, loaded, loadingError] = useFileSystemTableGuestOS(vmi);
   const columns = useFileSystemTableColumns();
-  const fileSystems = data?.fsInfo?.disks;
+  const fileSystems = data?.fsInfo?.disks || [];
 
   return (
     <>
