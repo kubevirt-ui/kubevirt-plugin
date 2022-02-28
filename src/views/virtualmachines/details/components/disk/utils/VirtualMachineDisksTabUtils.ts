@@ -18,6 +18,8 @@ export type DiskRowDataLayout = {
   drive: string;
   interface: string;
   storageClass: string;
+  metadata: { name: string };
+  namespace?: string;
 };
 
 export const diskTypes = {
@@ -37,21 +39,19 @@ export const filters: RowFilter[] = [
       return (
         drives.selected?.length === 0 ||
         drives.selected?.includes(drive) ||
-        !drives?.all?.find((d) => d === drive)
+        !drives?.all?.find((item) => item === drive)
       );
     },
     items: Object.keys(diskTypes).map((type) => ({
-      id: type,
+      id: diskTypes[type],
       title: diskTypes[type],
     })),
   },
 ];
 
 export const getDiskDrive = (disk: V1Disk): string => {
-  const type = Object.keys(diskTypes).find((driveType: string) =>
-    Object.keys(disk).includes(driveType),
-  );
-  return type || 'disk';
+  const drive = Object.keys(diskTypes).find((driveType: string) => disk[driveType] ?? 'disk');
+  return drive;
 };
 
 export const getPrintableDiskDrive = (disk: V1Disk): string => diskTypes[getDiskDrive(disk)];
@@ -103,6 +103,8 @@ export const getDiskRowDataLayout = (disks: DiskRawData[]): DiskRowDataLayout[] 
       storageClass,
       interface: getPrintableDiskInterface(device?.disk),
       drive: getPrintableDiskDrive(device?.disk),
+      metadata: { name: device?.disk?.name },
+      namespace: device?.pvc?.metadata?.namespace,
     };
   });
 };
