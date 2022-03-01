@@ -3,12 +3,13 @@ import * as React from 'react';
 import { NavPage } from '@openshift-console/dynamic-plugin-sdk';
 
 import NetworkInterfaceListPage from './components/network/NetworkInterfaceListPage';
+import VirtualMachinesOverviewTab from './components/overview/VirtualMachinesOverviewTab';
 
 export const vmPageNav: NavPage[] = [
   {
     href: '',
     name: 'Overview',
-    component: () => <>Overview</>,
+    component: VirtualMachinesOverviewTab,
   },
   {
     href: 'details',
