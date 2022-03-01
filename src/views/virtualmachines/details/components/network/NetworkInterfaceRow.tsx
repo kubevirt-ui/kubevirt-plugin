@@ -10,7 +10,7 @@ export type NetworkInterfaceRowProps = {
   network: V1Network;
 };
 
-const NetworkInterfaceRow: React.FC<RowProps<NetworkInterfaceRowProps, { kind: string }>> = ({
+const NetworkInterfaceRow: React.FC<RowProps<NetworkInterfaceRowProps>> = ({
   obj: { iface, network },
   activeColumnIDs,
 }) => {

@@ -1,24 +1,37 @@
 import * as React from 'react';
 
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   HorizontalNav,
-  K8sGroupVersionKind,
   ListPageHeader,
+  useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { vmPageNav } from './tabs';
+import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
 
 export type VirtualMachineDetailsPageProps = {
   name: string;
   namespace: string;
-  kind: K8sGroupVersionKind;
+  kind: string;
 };
 
-const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({ name: vmName }) => (
-  <>
-    <ListPageHeader title={vmName} />
-    <HorizontalNav pages={vmPageNav} />
-  </>
-);
+const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
+  name,
+  namespace,
+  kind,
+}) => {
+  const [vm] = useK8sWatchResource<V1VirtualMachine>({
+    kind,
+    name,
+    namespace,
+  });
+  const pages = useVirtualMachineTabs();
+  return (
+    <>
+      <ListPageHeader title={name} />
+      <HorizontalNav pages={pages} resource={vm} />
+    </>
+  );
+};
 
 export default VirtualMachineNavPage;

@@ -1,33 +1,32 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
+import { RouteComponentProps } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ListPageBody,
   ListPageCreateButton,
   ListPageHeader,
-  useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import NetworkInterfaceList from './NetworkInterfaceList';
 
-const NetworkInterfaceListPage: React.FC<any> = ({ match }) => {
-  const { t } = useTranslation();
-  const { ns, name, plural } = match.params;
+type NetworkInterfaceListPageProps = RouteComponentProps<{
+  ns: string;
+  name: string;
+}> & {
+  obj?: V1VirtualMachine;
+};
 
-  const [vm] = useK8sWatchResource<V1VirtualMachine>({
-    isList: false,
-    name,
-    namespace: ns,
-    groupVersionKind: plural,
-  });
+const NetworkInterfaceListPage: React.FC<NetworkInterfaceListPageProps> = ({ obj }) => {
+  const { t } = useKubevirtTranslation();
   return (
     <>
       <ListPageHeader title="">
         <ListPageCreateButton>{t('Add network interface')}</ListPageCreateButton>
       </ListPageHeader>
       <ListPageBody>
-        <NetworkInterfaceList vm={vm} />
+        <NetworkInterfaceList vm={obj} />
       </ListPageBody>
     </>
   );

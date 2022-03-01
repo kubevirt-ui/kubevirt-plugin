@@ -3,7 +3,7 @@ import * as React from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getInterfaces, getNetworks } from '../../../../virtualmachines/utils/selectors';
+import { getInterfaces, getNetworks } from '../../../utils/selectors';
 
 import useNetworkColumns from './hooks/useNetworkColumns';
 import NetworkInterfaceRow, { NetworkInterfaceRowProps } from './NetworkInterfaceRow';
@@ -28,7 +28,6 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceTableProps> = ({ vm }) => {
       loadError={false}
       columns={columns}
       Row={NetworkInterfaceRow}
-      rowData={{ kind: '' }}
     />
   );
 };
