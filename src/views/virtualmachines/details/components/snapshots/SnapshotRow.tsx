@@ -1,14 +1,16 @@
 import * as React from 'react';
 
+import { VirtualMachineSnapshotModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1alpha1VirtualMachineRestore,
   V1alpha1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+
+import Timestamp from '../../../list/components/Timestamp/Timestamp';
 
 import IndicationLabelList from './components/IndicationLabel/IndicationLabelList';
 import { useSnapshotStatus } from './hooks/useSnapshotStatus';
-import Timestamp from '../../../list/components/Timestamp/Timestamp';
 
 const SnapshotRow: React.FC<
   RowProps<V1alpha1VirtualMachineSnapshot, { restores: V1alpha1VirtualMachineRestore[] }>
@@ -20,7 +22,11 @@ const SnapshotRow: React.FC<
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        {snapshot?.metadata?.name}
+        <ResourceLink
+          groupVersionKind={VirtualMachineSnapshotModelGroupVersionKind}
+          name={snapshot?.metadata?.name}
+          namespace={snapshot?.metadata?.namespace}
+        />
       </TableData>
       <TableData id="created" activeColumnIDs={activeColumnIDs}>
         <Timestamp timestamp={snapshot?.metadata?.creationTimestamp} />
