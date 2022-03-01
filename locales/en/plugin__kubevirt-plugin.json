@@ -84,6 +84,9 @@
   "The following information is provided by the OpenShift Virtualization operator.": "The following information is provided by the OpenShift Virtualization operator.",
   "File Systems": "File Systems",
   "The following information regarding how the disks are partitioned is provided by the guest agent.": "The following information regarding how the disks are partitioned is provided by the guest agent.",
+  "MAC Address": "MAC Address",
+  "Pod networking": "Pod networking",
+  "masquerade": "masquerade",
   "VMI": "VMI",
   "Virtual Machines Instances": "Virtual Machines Instances"
 }
