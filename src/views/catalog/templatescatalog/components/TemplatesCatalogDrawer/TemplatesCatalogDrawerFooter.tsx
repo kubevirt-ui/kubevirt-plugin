@@ -55,7 +55,7 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
   const onQuickCreate = () => {
     setIsQuickCreating(true);
     quickCreateVM(template, { name: vmName, namespace, startVM })
-      .then((vm: any) => {
+      .then((vm) => {
         setIsQuickCreating(false);
         history.push(getResourceUrl(VirtualMachineModel, vm));
       })

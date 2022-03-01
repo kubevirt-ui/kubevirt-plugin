@@ -21,7 +21,7 @@ export const useProcessedTemplate = (template: V1Template): [V1Template, boolean
           dryRun: 'All',
         },
       })
-        .then((temp: any) => {
+        .then((temp) => {
           setProcessedTemplate(temp);
           setLoaded(true);
         })

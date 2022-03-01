@@ -79,7 +79,7 @@ export const createVirtualMachine = async (
   namespace: string,
   parameterForName: string,
   formData: FormData,
-): Promise<Response> => {
+): Promise<V1Template> => {
   const virtualMachineName = formData.get(NAME_INPUT_FIELD) as string;
 
   setTemplateParameters(template, formData);

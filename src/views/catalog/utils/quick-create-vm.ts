@@ -15,7 +15,7 @@ export const quickCreateVM = (
     queryParams: {
       dryRun: 'All',
     },
-  }).then((processedTemplate: any) => {
+  }).then((processedTemplate) => {
     const vm = getTemplateVirtualMachineObject(processedTemplate);
     vm.metadata.namespace = namespace;
     vm.metadata.name = name;

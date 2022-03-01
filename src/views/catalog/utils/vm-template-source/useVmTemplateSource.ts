@@ -25,12 +25,15 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
   const getPVCSource = ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
     setLoaded(false);
     return getPVC(name, namespace)
-      .then((pvc: any) => {
+      .then((pvc) => {
         setIsBootSourceAvailable(true);
         setTemplateBootSource({
           type: BOOT_SOURCE.PVC,
           source: {
-            pvc,
+            pvc: {
+              name,
+              namespace,
+            },
           },
           sourceValue: { pvc },
         });
@@ -44,7 +47,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
   const getDataSourcePVCSource = ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
     setLoaded(false);
     return getDataSourcePVC(name, namespace)
-      .then((pvc: any) => {
+      .then((pvc) => {
         setIsBootSourceAvailable(true);
         setTemplateBootSource({
           type: BOOT_SOURCE.PVC_AUTO_UPLOAD,
