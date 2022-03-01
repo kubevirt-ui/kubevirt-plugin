@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { NavPage } from '@openshift-console/dynamic-plugin-sdk';
 
-import DiskListPage from './components/disk/DiskListPage';
+import DiskListPage from './components/disk/tables/disk/DiskListPage';
 import NetworkInterfaceListPage from './components/network/NetworkInterfaceListPage';
 import VirtualMachinesOverviewTab from './components/overview/VirtualMachinesOverviewTab';
 

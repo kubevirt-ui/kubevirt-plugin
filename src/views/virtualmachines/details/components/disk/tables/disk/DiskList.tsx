@@ -15,8 +15,8 @@ import useDiskColumns from '../../hooks/useDiskColumns';
 import useDisksTableData from '../../hooks/useDisksTableData';
 import { filters } from '../../utils/VirtualMachineDisksTabUtils';
 
+import DiskListTitle from './DiskListTitle';
 import DiskRow from './DiskRow';
-import DiskTableTitle from './DiskTableTitle';
 
 type DiskListProps = {
   vm?: V1VirtualMachine;
@@ -33,13 +33,13 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
         <ListPageCreateButton>{t('Add disk')}</ListPageCreateButton>
       </ListPageHeader>
       <ListPageBody>
+        <DiskListTitle />
         <ListPageFilter
           data={data}
           loaded={loaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
         />
-        <DiskTableTitle />
         <VirtualizedTable
           data={filteredData}
           unfilteredData={data}

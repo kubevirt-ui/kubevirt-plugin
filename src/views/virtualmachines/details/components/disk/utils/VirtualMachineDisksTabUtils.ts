@@ -68,16 +68,19 @@ export const getPrintableDiskInterface = (disk: V1Disk): string => {
 };
 
 export const hasNumber = (rawSize: string): number => {
-  const number = rawSize.match(/\d+/g);
+  const number = rawSize?.match(/\d+/g);
   return Number(number);
 };
 
 export const hasSizeUnit = (rawSize: string): string => {
-  const unit = rawSize.match(/[a-zA-Z]+/g);
+  const unit = rawSize?.match(/[a-zA-Z]+/g);
   return unit?.[0];
 };
 
 export const formatBytes = (rawSize: string, unit?: string): string => {
+  if (!rawSize) {
+    return '-';
+  }
   const size = hasNumber(rawSize);
   const sizeUnit = hasSizeUnit(rawSize) || unit;
   const sizeUnits = ['B', 'Ki', 'Mi', 'Gi', 'Ti'];
@@ -94,23 +97,23 @@ export const formatBytes = (rawSize: string, unit?: string): string => {
 
 export const getDiskRowDataLayout = (disks: DiskRawData[]): DiskRowDataLayout[] => {
   return disks?.map((device) => {
-    const source = device?.pvc
-      ? device?.pvc?.metadata?.name
-      : device?.volume?.containerDisk
-      ? 'Container (Ephemeral)'
-      : 'Other';
+    const source = () => {
+      if (device?.volume?.containerDisk) {
+        return 'Container (Ephemeral)';
+      }
+      const sourceName = device?.pvc?.metadata?.name || 'Other';
+      return sourceName;
+    };
 
-    const size = device?.pvc
-      ? formatBytes(device?.pvc?.spec?.resources?.requests?.storage)
-      : device?.volume?.containerDisk
+    const size = device?.volume?.containerDisk
       ? 'Dynamic'
-      : '-';
+      : formatBytes(device?.pvc?.spec?.resources?.requests?.storage);
 
     const storageClass = device?.pvc?.spec?.storageClassName || '-';
 
     return {
       name: device?.disk?.name,
-      source,
+      source: source(),
       size,
       storageClass,
       interface: getPrintableDiskInterface(device?.disk),

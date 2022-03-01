@@ -16,10 +16,10 @@ type DiskListPageProps = RouteComponentProps<{
 
 const DiskListPage: React.FC<DiskListPageProps> = ({ obj }) => {
   return (
-    <div className="VirtualMachinesInstancePageDisksTab">
+    <>
       <DiskList vm={obj} />
       <FilesystemList vm={obj} />
-    </div>
+    </>
   );
 };
 

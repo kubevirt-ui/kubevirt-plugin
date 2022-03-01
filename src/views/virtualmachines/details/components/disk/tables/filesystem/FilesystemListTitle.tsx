@@ -4,24 +4,26 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Popover, PopoverPosition } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
-const DiskTableTitle = () => {
+const FilesystemListTitle = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <h3>
-      {t('Disks')}{' '}
+    <span>
+      <h3 className="HeaderWithIcon">{t('File System')} </h3>
       <Popover
         bodyContent={
           <div>
-            {t('The following information is provided by the OpenShift Virtualization operator.')}
+            {t(
+              'The following information regarding how the disks are partitioned is provided by the guest agent.',
+            )}
           </div>
         }
         position={PopoverPosition.right}
       >
-        <HelpIcon size="sm" className="DisksTableTitle-icon" />
+        <HelpIcon />
       </Popover>
-    </h3>
+    </span>
   );
 };
 
-export default DiskTableTitle;
+export default FilesystemListTitle;
