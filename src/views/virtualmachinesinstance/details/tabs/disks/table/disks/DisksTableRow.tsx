@@ -15,7 +15,8 @@ type DiskTableRowProps = {
 
 const DisksTableRow: React.FC<DiskTableRowProps> = ({ obj, activeColumnIDs }) => {
   const convertedSize = convertBytes(Number(obj?.size));
-  const size = obj?.size ? `${convertedSize.value} ${convertedSize.unit}` : '-';
+  const size = obj?.size && convertedSize?.unit && `${convertedSize.value} ${convertedSize.unit}`;
+  const defaultSize = obj?.size || '-';
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
@@ -33,7 +34,7 @@ const DisksTableRow: React.FC<DiskTableRowProps> = ({ obj, activeColumnIDs }) =>
         )}
       </TableData>
       <TableData id="size" activeColumnIDs={activeColumnIDs}>
-        {size}
+        {size || defaultSize}
       </TableData>
       <TableData id="drive" activeColumnIDs={activeColumnIDs}>
         {obj?.drive}

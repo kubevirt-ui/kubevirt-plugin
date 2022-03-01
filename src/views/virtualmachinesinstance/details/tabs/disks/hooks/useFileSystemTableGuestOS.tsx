@@ -19,7 +19,8 @@ const useFileSystemTableGuestOS: UseFileSystemTableGuestOS = (vmi) => {
   React.useEffect(() => {
     const guestOS = vmi?.status?.guestOSInfo?.id;
 
-    if (guestOS && !loaded) {
+    setError(null);
+    if (guestOS) {
       (async () => {
         const response = await consoleFetch(
           `api/kubernetes/apis/subresources.${VirtualMachineInstanceModel.apiGroup}/${VirtualMachineInstanceModel.apiVersion}/namespaces/${vmi?.metadata?.namespace}/${VirtualMachineInstanceModel.plural}/${vmi?.metadata?.name}/guestosinfo`,
@@ -27,8 +28,12 @@ const useFileSystemTableGuestOS: UseFileSystemTableGuestOS = (vmi) => {
         const jsonData = await response.json();
         setData(jsonData);
         setLoaded(true);
-      })().catch((err) => setError(err));
+      })().catch((err) => {
+        setError(err);
+        setLoaded(true);
+      });
     }
+    !guestOS && vmi?.metadata && setLoaded(true);
   }, [loaded, vmi]);
 
   return [data, loaded, error];
