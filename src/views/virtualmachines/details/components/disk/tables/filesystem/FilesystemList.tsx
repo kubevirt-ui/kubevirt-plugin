@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { printableVMStatus } from 'src/views/virtualmachines/list/VirtualMachinesList';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+
+import { printableVMStatus } from '../../../../../utils';
 
 import FileSystemListLayout from './FilesystemListLayout';
 
