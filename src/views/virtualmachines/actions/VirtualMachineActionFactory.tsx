@@ -6,7 +6,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 
-import { printableVMStatus } from '../list/VirtualMachinesList';
+import { printableVMStatus } from '../utils';
 
 import {
   cancelMigration,

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 
-import { printableVMStatus } from '../../list/VirtualMachinesList';
+import { printableVMStatus } from '../../utils';
 import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
 import useVirtualMachineInstanceMigration from './useVirtualMachineInstanceMigration';
