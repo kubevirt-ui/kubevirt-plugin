@@ -872,9 +872,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openshift-console/dynamic-plugin-sdk-webpack@npm:0.0.4":
-  version: 0.0.4
-  resolution: "@openshift-console/dynamic-plugin-sdk-webpack@npm:0.0.4"
+"@openshift-console/dynamic-plugin-sdk-webpack@npm:0.0.6":
+  version: 0.0.6
+  resolution: "@openshift-console/dynamic-plugin-sdk-webpack@npm:0.0.6"
   dependencies:
     ajv: ^6.12.3
     chalk: 2.4.x
@@ -883,14 +883,14 @@ __metadata:
     lodash: ^4.17.21
     read-pkg: 5.x
     semver: 6.x
-    webpack: ^5.62.1
-  checksum: 9979028d3d8fd5225af08f24e7cbad18b12d9f256737ce92dde49e6a23f5ab3b120beca1355a11fd216905f006ff2b15d6d350abf64a1ade52ee1cf160885ff4
+    webpack: ^5.68.0
+  checksum: 500c35e1de98c5904b67d36df83b04cd546e40417b73855c49a829904c27f1a0d12d17dfd1ff81419c220780e2aec0e36218e5c07c4c6ba38b50b2b4bcea3eef
   languageName: node
   linkType: hard
 
-"@openshift-console/dynamic-plugin-sdk@npm:0.0.5":
-  version: 0.0.5
-  resolution: "@openshift-console/dynamic-plugin-sdk@npm:0.0.5"
+"@openshift-console/dynamic-plugin-sdk@npm:0.0.6":
+  version: 0.0.6
+  resolution: "@openshift-console/dynamic-plugin-sdk@npm:0.0.6"
   dependencies:
     "@patternfly/react-core": 4.175.4
     "@patternfly/react-table": 4.44.4
@@ -902,7 +902,7 @@ __metadata:
     react-router-dom: 5.2.0
     redux: 4.0.1
     redux-thunk: 2.4.0
-  checksum: ba29eeb6554c2b6b4c19a83bd5bc83bd08738e3bb8dc74aab830021bb98416a16fa9380034a92e8ea8f52025853d319b04dd84c9592972af17ef395126cee6d9
+  checksum: 49e5a77388cffd2ca44d1a5c988ace25fbb4dd92aac0946922d46bacfa12cdf56e971d9cc6c20add194daf7a6055f7b80a249c4c288bb0afcf958e834ba1f717
   languageName: node
   linkType: hard
 
@@ -7246,9 +7246,9 @@ __metadata:
   dependencies:
     "@cypress/webpack-preprocessor": ^5.11.0
     "@kubevirt-ui/kubevirt-api": ^0.0.35
-    "@openshift-console/dynamic-plugin-sdk": 0.0.5
+    "@openshift-console/dynamic-plugin-sdk": 0.0.6
     "@openshift-console/dynamic-plugin-sdk-internal": ^0.0.4
-    "@openshift-console/dynamic-plugin-sdk-webpack": 0.0.4
+    "@openshift-console/dynamic-plugin-sdk-webpack": 0.0.6
     "@patternfly/react-catalog-view-extension": ^4.43.15
     "@patternfly/react-core": 4.192.15
     "@patternfly/react-table": ^4.67.5

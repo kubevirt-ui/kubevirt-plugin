@@ -109,7 +109,7 @@ export const getTemplateBootSourceType = (template: V1Template): TemplateBootSou
 };
 
 export const getPVC = (name: string, ns: string) =>
-  k8sGet({
+  k8sGet<V1alpha1PersistentVolumeClaim>({
     model: PersistentVolumeClaimModel,
     name,
     ns,
