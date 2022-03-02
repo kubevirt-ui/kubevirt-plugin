@@ -1,16 +1,20 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
+import { VirtualMachineModelRef } from '@kubevirt-utils/models';
+import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../../utils';
 import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
 import useVirtualMachineInstanceMigration from './useVirtualMachineInstanceMigration';
 
-const useVirtualMachineActionsProvider = (vm: V1VirtualMachine) => {
+type UseVirtualMachineActionsProvider = (vm: V1VirtualMachine) => [Action[], boolean, any];
+
+const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) => {
   const vmim = useVirtualMachineInstanceMigration(vm);
 
+  const [, inFlight] = useK8sModel(VirtualMachineModelRef);
   const actions: Action[] = React.useMemo(() => {
     const printableStatus = vm?.status?.printableStatus;
     const { Stopped, Paused, Migrating } = printableVMStatus;
@@ -39,7 +43,7 @@ const useVirtualMachineActionsProvider = (vm: V1VirtualMachine) => {
     ];
   }, [vm, vmim]);
 
-  return { actions, loaded: true, loadError: undefined };
+  return [actions, inFlight, undefined];
 };
 
 export default useVirtualMachineActionsProvider;
