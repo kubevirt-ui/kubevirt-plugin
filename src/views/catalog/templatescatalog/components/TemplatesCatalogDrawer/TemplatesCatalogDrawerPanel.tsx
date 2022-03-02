@@ -4,7 +4,6 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
-import { getFlavorData } from '@kubevirt-utils/resources/template/utils/flavor';
 import {
   getTemplateDescription,
   getTemplateDisks,
@@ -26,6 +25,8 @@ import {
   Title,
 } from '@patternfly/react-core';
 import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
+
+import { getTemplateFlavorData } from '../../../utils/flavor';
 
 type TemplatesCatalogDrawerPanelProps = {
   template: V1Template;
@@ -77,7 +78,7 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
     const networkInterfaces = getTemplateNetworkInterfaces(template);
     const disks = getTemplateDisks(template);
     const isDefaultTemplate = isDefaultVariantTemplate(template);
-    const { memory, cpuCount } = getFlavorData(template);
+    const { memory, cpuCount } = getTemplateFlavorData(template);
 
     return (
       <div className="modal-body modal-body-border">
