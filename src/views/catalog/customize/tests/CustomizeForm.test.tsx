@@ -10,6 +10,7 @@ import { getMockTemplate } from './mocks';
 
 jest.mock('react-router-dom', () => ({
   useParams: () => ({ ns: 'mock-namespace' }),
+  useHistory: () => ({ push: jest.fn() }),
 }));
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => {

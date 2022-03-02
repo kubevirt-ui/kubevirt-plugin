@@ -1,10 +1,12 @@
 import * as React from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ActionGroup, Button, ExpandableSection, Form } from '@patternfly/react-core';
 
+import { getTemplateVirtualMachineObject } from '../../utils/vm-template-source/utils';
+import { useWizardVMContext } from '../../utils/WizardVMContext';
 import {
   buildFields,
   createVirtualMachine,
@@ -20,7 +22,8 @@ type CustomizeFormProps = {
 
 export const CustomizeForm: React.FC<CustomizeFormProps> = ({ template }) => {
   const { ns } = useParams<{ ns: string }>();
-
+  const history = useHistory();
+  const { updateVM } = useWizardVMContext();
   const { t } = useKubevirtTranslation();
   const [optionalFieldsExpanded, setOptionalFieldsExpanded] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
@@ -41,7 +44,20 @@ export const CustomizeForm: React.FC<CustomizeFormProps> = ({ template }) => {
       if (requiredFieldNoValue) {
         setValidationError(true);
       } else {
-        await createVirtualMachine(template, ns, parameterForName, formData);
+        const processedTemplate = await createVirtualMachine(
+          template,
+          ns,
+          parameterForName,
+          formData,
+        );
+        const vm = getTemplateVirtualMachineObject(processedTemplate);
+        vm.metadata.namespace = ns;
+        updateVM(vm);
+        history.push(
+          `/k8s/ns/${ns || 'default'}/templatescatalog/review?name=${
+            template.metadata.name
+          }&namespace=${template.metadata.namespace}`,
+        );
       }
     } catch (error) {
       console.error(error);
