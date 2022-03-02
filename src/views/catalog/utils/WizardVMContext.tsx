@@ -1,6 +1,8 @@
 import * as React from 'react';
 
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 export const setSessionStorageVM = (value: V1VirtualMachine) => {
   try {
@@ -30,11 +32,35 @@ type WizardVMContextType = {
    * update the VirtualMachine used for the wizard
    * @param vm V1VirtualMachine
    */
-  updateVM?: React.Dispatch<React.SetStateAction<V1VirtualMachine>>;
+  updateVM?: (vm: V1VirtualMachine) => Promise<void>;
+  /** loaded state of the vm context */
+  loaded?: boolean;
+  /** error state of the vm context */
+  error?: any;
 };
 
 export const useWizardVM = (): WizardVMContextType => {
-  const [vm, updateVM] = React.useState<V1VirtualMachine>(getSessionStorageVM());
+  const [vm, setVM] = React.useState<V1VirtualMachine>(getSessionStorageVM());
+  const [loaded, setLoaded] = React.useState(true);
+  const [error, setError] = React.useState<any>();
+
+  const updateVM = (updatedVM: V1VirtualMachine) => {
+    setLoaded(false);
+    setError(undefined);
+
+    // validate the updated vm with the backend (dry run)
+    return k8sCreate<V1VirtualMachine>({
+      model: VirtualMachineModel,
+      data: updatedVM,
+      queryParams: {
+        dryRun: 'All',
+        fieldManager: 'kubectl-create',
+      },
+    })
+      .then(setVM)
+      .catch(setError)
+      .finally(() => setLoaded(true));
+  };
 
   React.useEffect(() => {
     // whenever the vm changes, save the vm in session storage
@@ -46,6 +72,8 @@ export const useWizardVM = (): WizardVMContextType => {
   return {
     vm,
     updateVM,
+    loaded,
+    error,
   };
 };
 
