@@ -4,6 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 import DiskListPage from '../components/disk/tables/disk/DiskListPage';
 import NetworkInterfaceListPage from '../components/network/NetworkInterfaceListPage';
+import VirtualMachinesOverviewTab from '../components/overview/VirtualMachinesOverviewTab';
 
 export const useVirtualMachineTabs = () => {
   const { t } = useKubevirtTranslation();
@@ -13,7 +14,7 @@ export const useVirtualMachineTabs = () => {
       {
         href: '',
         name: t('Overview'),
-        component: React.Fragment,
+        component: VirtualMachinesOverviewTab,
       },
       {
         href: 'details',
