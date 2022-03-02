@@ -31,7 +31,8 @@
       "VirtualMachineNavPage": "./views/virtualmachines/details/VirtualMachineNavPage.tsx",
       "VirtualMachinesInstancePage": "./views/virtualmachinesinstance/details/VirtualMachinesInstancePage.tsx",
       "useVirtualMachineActionsProvider": "./views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts",
-      "VirtualMachinesInstancesList": "./views/virtualmachinesinstance/list/VirtualMachinesInstancesList.tsx"
+      "VirtualMachinesInstancesList": "./views/virtualmachinesinstance/list/VirtualMachinesInstancesList.tsx",
+      "useVirtualMachineInstanceActionsProvider": "./views/virtualmachinesinstance/actions/hooks/useVirtualMachineInstanceActionsProvider.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"

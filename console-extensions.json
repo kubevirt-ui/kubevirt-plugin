@@ -140,6 +140,18 @@
         "$codeRef": "useVirtualMachineActionsProvider"
       }
     }
+  },
+  {
+    "type": "console.action/resource-provider",
+    "properties": {
+      "model": {
+        "group": "kubevirt.io",
+        "version": "v1",
+        "kind": "VirtualMachineInstance"
+      },
+      "provider": {
+        "$codeRef": "useVirtualMachineInstanceActionsProvider"
+      }
+    }
   }
 ]
-
