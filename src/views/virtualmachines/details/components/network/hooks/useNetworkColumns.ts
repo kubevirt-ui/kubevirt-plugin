@@ -2,33 +2,44 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
+import { sortable } from '@patternfly/react-table';
 
-import { NetworkInterfaceRowProps } from '../NetworkInterfaceRow';
+import { NetworkPresentation } from '../utils/utils';
 
 const useNetworkColumns = () => {
   const { t } = useTranslation();
 
-  const columns: TableColumn<NetworkInterfaceRowProps>[] = React.useMemo(
+  const columns: TableColumn<NetworkPresentation>[] = React.useMemo(
     () => [
       {
         title: t('Name'),
         id: 'name',
+        transforms: [sortable],
+        sort: 'network.name',
       },
       {
         title: t('Model'),
         id: 'model',
+        transforms: [sortable],
+        sort: 'iface.model',
       },
       {
         title: t('Network'),
         id: 'network',
+        transforms: [sortable],
+        sort: 'network.pod' || 'network.multus.networkName',
       },
       {
         title: t('Type'),
         id: 'type',
+        transforms: [sortable],
+        sort: 'iface.masquerade' || 'iface.bridge' || 'iface.sriov',
       },
       {
         title: t('MAC address'),
-        id: 'mac-address',
+        id: 'macAddress',
+        transforms: [sortable],
+        sort: 'iface.macAddress',
       },
       {
         title: '',
