@@ -1,51 +1,44 @@
 import * as React from 'react';
 
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
-  V1alpha1VirtualMachineRestore,
-  V1alpha1VirtualMachineSnapshot,
-  V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  VirtualMachineRestoreModelGroupVersionKind,
-  VirtualMachineSnapshotModelGroupVersionKind,
-} from '@kubevirt-utils/models';
-import { useK8sWatchResource, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+  ListPageFilter,
+  useListPageFilter,
+  VirtualizedTable,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 import useSnapshotColumns from './hooks/useSnapshotColumns';
+import useSnapshotData from './hooks/useSnapshotData';
+import { filters } from './utils/filters';
 import SnapshotRow from './SnapshotRow';
 
-type NetworkInterfaceTableProps = {
+type SnapshotsListProps = {
   vm?: V1VirtualMachine;
 };
 
-const NetworkInterfaceList: React.FC<NetworkInterfaceTableProps> = ({ vm }) => {
+const SnapshotsList: React.FC<SnapshotsListProps> = ({ vm }) => {
   const columns = useSnapshotColumns();
-  const [snapshots, snapshotsLoaded, snapshotsError] = useK8sWatchResource<
-    V1alpha1VirtualMachineSnapshot[]
-  >({
-    isList: true,
-    groupVersionKind: VirtualMachineSnapshotModelGroupVersionKind,
-    namespaced: true,
-    namespace: vm?.metadata?.namespace,
-  });
-
-  const [restores] = useK8sWatchResource<V1alpha1VirtualMachineRestore[]>({
-    isList: true,
-    groupVersionKind: VirtualMachineRestoreModelGroupVersionKind,
-    namespaced: true,
-    namespace: vm?.metadata?.namespace,
-  });
+  const [snapshots, restoresMap, loaded, loadError] = useSnapshotData(vm?.metadata?.namespace);
+  const [data, filteredData, onFilterChange] = useListPageFilter(snapshots, filters);
   return (
-    <VirtualizedTable
-      data={snapshots}
-      unfilteredData={snapshots}
-      loaded={snapshotsLoaded}
-      loadError={snapshotsError}
-      columns={columns}
-      Row={SnapshotRow}
-      rowData={{ restores }}
-    />
+    <>
+      <ListPageFilter
+        data={data}
+        loaded={loaded}
+        rowFilters={filters}
+        onFilterChange={onFilterChange}
+      />
+      <VirtualizedTable
+        data={filteredData}
+        unfilteredData={data}
+        loaded={loaded}
+        loadError={loadError}
+        columns={columns}
+        Row={SnapshotRow}
+        rowData={{ restores: restoresMap }}
+      />
+    </>
   );
 };
 
-export default NetworkInterfaceList;
+export default SnapshotsList;
