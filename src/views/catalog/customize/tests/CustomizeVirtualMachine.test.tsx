@@ -26,9 +26,9 @@ jest.mock('@kubevirt-utils/hooks/useURLParams', () => ({
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { getMockTemplate: getTemplate } = require('./mocks');
+  const { mockUseK8sWatchResource } = require('./mocks');
   return {
-    useK8sWatchResource: jest.fn().mockReturnValue([getTemplate(), true, undefined]),
+    useK8sWatchResource: mockUseK8sWatchResource,
   };
 });
 
@@ -45,6 +45,14 @@ describe('Test CustomizeVirtualMachine', () => {
     const nParameters = mockVirtualMachineTemplate.parameters.length;
 
     expect(screen.getAllByRole('textbox')).toHaveLength(nParameters);
+
+    expect(screen.getByLabelText('Name', { exact: false }));
+
+    expect(
+      screen.getByText(
+        mockVirtualMachineTemplate.metadata.annotations['openshift.io/display-name'],
+      ),
+    );
   });
 
   it('It render the loading properly on loading', () => {

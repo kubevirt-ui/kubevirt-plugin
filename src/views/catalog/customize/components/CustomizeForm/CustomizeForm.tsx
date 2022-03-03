@@ -5,16 +5,13 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ActionGroup, Button, ExpandableSection, Form } from '@patternfly/react-core';
 
-import { getTemplateVirtualMachineObject } from '../../utils/templateGetters';
-import { useWizardVMContext } from '../../utils/WizardVMContext';
-import {
-  buildFields,
-  createVirtualMachine,
-  extractParameterNameFromMetadataName,
-  isFieldInvalid,
-} from '../utils';
+import { getTemplateVirtualMachineObject } from '../../../utils/templateGetters';
+import { useWizardVMContext } from '../../../utils/WizardVMContext';
+import { formValidation, processTemplate } from '../../utils';
+import { FieldGroup } from '../FieldGroup';
 
-import { FieldGroup } from './FieldGroup';
+import { CustomizeFormActions } from './actions';
+import customizeFormReducer, { initializeReducer } from './reducer';
 
 type CustomizeFormProps = {
   template: V1Template;
@@ -26,30 +23,27 @@ export const CustomizeForm: React.FC<CustomizeFormProps> = ({ template }) => {
   const { updateVM } = useWizardVMContext();
   const { t } = useKubevirtTranslation();
   const [optionalFieldsExpanded, setOptionalFieldsExpanded] = React.useState(true);
-  const [loading, setLoading] = React.useState(false);
-  const [validationError, setValidationError] = React.useState(false);
 
-  const parameterForName = extractParameterNameFromMetadataName(template);
+  const [state, dispatch] = React.useReducer(customizeFormReducer, null, () =>
+    initializeReducer(template, t),
+  );
 
-  const [requiredFields, optionalFields] = buildFields(template, [parameterForName], t);
+  const { parametersErrors, loading, requiredFields, optionalFields } = state;
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setLoading(true);
+    dispatch({ type: CustomizeFormActions.Loading });
 
     try {
       const formData = new FormData(event.currentTarget as HTMLFormElement);
 
-      const requiredFieldNoValue = requiredFields.find((field) => isFieldInvalid(field, formData));
-      if (requiredFieldNoValue) {
-        setValidationError(true);
+      const errors = formValidation(t, formData, requiredFields);
+
+      if (errors) {
+        dispatch({ type: CustomizeFormActions.FormError, payload: errors });
       } else {
-        const processedTemplate = await createVirtualMachine(
-          template,
-          ns,
-          parameterForName,
-          formData,
-        );
+        const processedTemplate = await processTemplate(template, ns, formData);
+        dispatch({ type: CustomizeFormActions.Success });
         const vm = getTemplateVirtualMachineObject(processedTemplate);
         vm.metadata.namespace = ns;
         updateVM(vm);
@@ -60,22 +54,20 @@ export const CustomizeForm: React.FC<CustomizeFormProps> = ({ template }) => {
         );
       }
     } catch (error) {
+      dispatch({ type: CustomizeFormActions.ApiError, payload: error.message });
       console.error(error);
     }
-
-    setLoading(false);
   };
 
   return (
     <Form onSubmit={onSubmit}>
       {requiredFields?.map((field) => (
-        <FieldGroup key={field.name} field={field} showError={validationError} />
+        <FieldGroup key={field.name} field={field} error={parametersErrors?.[field.name]} />
       ))}
-
       {optionalFields && optionalFields.length > 0 && (
         <ExpandableSection
           toggleText={t('Optional parameters')}
-          data-test-id="expandable-section"
+          data-test-id="expandable-optional-section"
           onToggle={() => setOptionalFieldsExpanded(!optionalFieldsExpanded)}
           isExpanded={optionalFieldsExpanded}
         >
@@ -85,19 +77,17 @@ export const CustomizeForm: React.FC<CustomizeFormProps> = ({ template }) => {
         </ExpandableSection>
       )}
 
-      <div className="customize-vm__footer">
-        <ActionGroup>
-          <Button
-            variant="primary"
-            type="submit"
-            isLoading={loading}
-            data-test-id="customize-vm-submit-button"
-          >
-            {t('Review and create Virtual Machine')}
-          </Button>
-          <Button variant="link">{t('Cancel')}</Button>
-        </ActionGroup>
-      </div>
+      <ActionGroup>
+        <Button
+          variant="primary"
+          type="submit"
+          isLoading={loading}
+          data-test-id="customize-vm-submit-button"
+        >
+          {t('Review and create Virtual Machine')}
+        </Button>
+        <Button variant="link">{t('Cancel')}</Button>
+      </ActionGroup>
     </Form>
   );
 };

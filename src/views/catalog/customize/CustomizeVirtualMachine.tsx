@@ -1,13 +1,17 @@
 import * as React from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  modelToGroupVersionKind,
+  TemplateModel,
+  V1Template,
+} from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { CustomizeError } from './components/CustomizeError';
-import { CustomizeForm } from './components/CustomizeForm';
-import { CustomizeVirtualMachineSkeleton } from './components/CustomizeVirtualMachineSkeleton';
+import { CustomizeError } from './components/CustomizeForm/CustomizeError';
+import { CustomizeForm } from './components/CustomizeForm/CustomizeForm';
+import { CustomizeVirtualMachineSkeleton } from './components/CustomizeForm/CustomizeVirtualMachineSkeleton';
 import { RightHeader } from './components/RightHeading';
 
 import './CustomizeVirtualMachine.scss';
@@ -19,11 +23,7 @@ const CustomizeVirtualMachine: React.FC = () => {
   const templateNamespace = params.get('namespace');
 
   const [template, loaded, error] = useK8sWatchResource<V1Template>({
-    groupVersionKind: {
-      group: 'template.openshift.io',
-      version: 'v1',
-      kind: 'Template',
-    },
+    groupVersionKind: modelToGroupVersionKind(TemplateModel),
     isList: false,
     namespaced: true,
     name,
