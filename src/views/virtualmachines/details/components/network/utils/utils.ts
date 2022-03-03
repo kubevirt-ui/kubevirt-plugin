@@ -1,7 +1,6 @@
 import { NO_DATA_DASH } from 'src/views/virtualmachines/utils/constants';
 
 import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 export type NetworkPresentation = {
   iface: V1Interface;
@@ -36,23 +35,3 @@ export const getNetworkInterfaceType = (iface: V1Interface): string => {
 
 export const getPrintableNetworkInterfaceType = (iface: V1Interface): string =>
   interfacesTypes[getNetworkInterfaceType(iface)];
-
-export const filters: RowFilter[] = [
-  {
-    filterGroupName: 'Interface Type',
-    type: 'interface-type',
-    reducer: (obj) => getNetworkInterfaceType(obj?.iface),
-    filter: (drives, obj) => {
-      const drive = getNetworkInterfaceType(obj?.iface);
-      return (
-        drives.selected?.length === 0 ||
-        drives.selected?.includes(drive) ||
-        !drives?.all?.find((item) => item === drive)
-      );
-    },
-    items: Object.keys(interfacesTypes).map((type) => ({
-      id: type,
-      title: interfacesTypes[type],
-    })),
-  },
-];

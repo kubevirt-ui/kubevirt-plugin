@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import { NO_DATA_DASH } from '../../../utils/constants';
@@ -15,6 +16,7 @@ const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation>> = ({
   obj: { iface, network },
   activeColumnIDs,
 }) => {
+  const { t } = useKubevirtTranslation();
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
@@ -24,7 +26,7 @@ const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation>> = ({
         {iface.model || NO_DATA_DASH}
       </TableData>
       <TableData id="network" activeColumnIDs={activeColumnIDs}>
-        {network.pod ? 'Pod networking' : network.multus?.networkName || NO_DATA_DASH}
+        {network.pod ? t('Pod networking') : network.multus?.networkName || NO_DATA_DASH}
       </TableData>
       <TableData id="type" activeColumnIDs={activeColumnIDs}>
         {getPrintableNetworkInterfaceType(iface)}

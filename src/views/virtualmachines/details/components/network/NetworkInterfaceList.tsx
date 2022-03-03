@@ -10,7 +10,8 @@ import {
 import { getInterfaces, getNetworks } from '../../../utils/selectors';
 
 import useNetworkColumns from './hooks/useNetworkColumns';
-import { filters, getNetworkInterfaceRowData } from './utils/utils';
+import useNetworkRowFilters from './hooks/useNetworkRowFilters';
+import { getNetworkInterfaceRowData } from './utils/utils';
 import NetworkInterfaceRow from './NetworkInterfaceRow';
 
 type NetworkInterfaceTableProps = {
@@ -20,6 +21,7 @@ type NetworkInterfaceTableProps = {
 const NetworkInterfaceList: React.FC<NetworkInterfaceTableProps> = ({ vm }) => {
   const networks = getNetworks(vm);
   const interfaces = getInterfaces(vm);
+  const filters = useNetworkRowFilters();
 
   const networkInterfacesData = getNetworkInterfaceRowData(networks, interfaces);
   const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);

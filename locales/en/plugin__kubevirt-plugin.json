@@ -73,7 +73,9 @@
   "Network": "Network",
   "Type": "Type",
   "MAC address": "MAC address",
+  "Interface Type": "Interface Type",
   "Add network interface": "Add network interface",
+  "Pod networking": "Pod networking",
   "Overview": "Overview",
   "Details": "Details",
   "Enviornment": "Enviornment",
@@ -93,7 +95,6 @@
   "Storage Class": "Storage Class",
   "File Systems": "File Systems",
   "MAC Address": "MAC Address",
-  "Pod networking": "Pod networking",
   "masquerade": "masquerade",
   "VMI": "VMI",
   "Virtual Machines Instances": "Virtual Machines Instances"
