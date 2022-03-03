@@ -1,13 +1,18 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  ListPageFilter,
+  useListPageFilter,
+  VirtualizedTable,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 import { getInterfaces, getNetworks } from '../../../utils/selectors';
 
 import useNetworkColumns from './hooks/useNetworkColumns';
-import NetworkInterfaceRow, { NetworkInterfaceRowProps } from './NetworkInterfaceRow';
-import { getNetworkInterfaceRowData } from './utils';
+import useNetworkRowFilters from './hooks/useNetworkRowFilters';
+import { getNetworkInterfaceRowData } from './utils/utils';
+import NetworkInterfaceRow from './NetworkInterfaceRow';
 
 type NetworkInterfaceTableProps = {
   vm?: V1VirtualMachine;
@@ -16,19 +21,24 @@ type NetworkInterfaceTableProps = {
 const NetworkInterfaceList: React.FC<NetworkInterfaceTableProps> = ({ vm }) => {
   const networks = getNetworks(vm);
   const interfaces = getInterfaces(vm);
+  const filters = useNetworkRowFilters();
 
-  const data = getNetworkInterfaceRowData(networks, interfaces);
+  const networkInterfacesData = getNetworkInterfaceRowData(networks, interfaces);
+  const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
 
   const columns = useNetworkColumns();
   return (
-    <VirtualizedTable<NetworkInterfaceRowProps>
-      data={data}
-      unfilteredData={data}
-      loaded
-      loadError={false}
-      columns={columns}
-      Row={NetworkInterfaceRow}
-    />
+    <>
+      <ListPageFilter data={data} loaded rowFilters={filters} onFilterChange={onFilterChange} />
+      <VirtualizedTable
+        data={filteredData}
+        unfilteredData={data}
+        loaded
+        loadError={false}
+        columns={columns}
+        Row={NetworkInterfaceRow}
+      />
+    </>
   );
 };
 
