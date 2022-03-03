@@ -37,6 +37,10 @@ const useVirtualMachinesInstancesColumns = (): { title: string; id: string }[] =
         transforms: [sortable],
         sort: 'metadata.creationTimestamp',
       },
+      {
+        title: '',
+        id: 'actions',
+      },
     ],
     [t],
   );
