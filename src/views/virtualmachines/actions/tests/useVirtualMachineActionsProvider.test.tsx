@@ -8,6 +8,7 @@ import { exampleRunningVirtualMachine } from './mocks';
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   useK8sWatchResource: jest.fn(() => [[], true]),
+  useK8sModel: jest.fn(() => [[], true]),
 }));
 afterEach(cleanup);
 
@@ -18,7 +19,8 @@ describe('useVirtualMachineActionsProvider tests', () => {
     );
     // expect(result.current).toMatchSnapshot();
 
-    const runningVMActions = result.current.actions.map((action) => action.id);
+    const [actions] = result.current;
+    const runningVMActions = actions.map((action) => action.id);
 
     // Running vm should have stop, restart, pause, migrate and delete actions
     expect(runningVMActions).toEqual([
@@ -37,7 +39,8 @@ describe('useVirtualMachineActionsProvider tests', () => {
     };
     const { result } = renderHook(() => useVirtualMachineActionsProvider(stoppedVM));
 
-    const stoppedVMActions = result.current.actions.map((action) => action.id);
+    const [actions] = result.current;
+    const stoppedVMActions = actions.map((action) => action.id);
 
     // Stopped vm should have start, restart, pause, migrate and delete actions
     expect(stoppedVMActions).toEqual([
@@ -56,7 +59,8 @@ describe('useVirtualMachineActionsProvider tests', () => {
     };
     const { result } = renderHook(() => useVirtualMachineActionsProvider(pausedVM));
 
-    const pausedVMActions = result.current.actions.map((action) => action.id);
+    const [actions] = result.current;
+    const pausedVMActions = actions.map((action) => action.id);
 
     // Paused vm should have start, restart, unpause, migrate and delete actions
     expect(pausedVMActions).toEqual([
@@ -75,7 +79,8 @@ describe('useVirtualMachineActionsProvider tests', () => {
     };
     const { result } = renderHook(() => useVirtualMachineActionsProvider(migratingVM));
 
-    const migratingVMActions = result.current.actions.map((action) => action.id);
+    const [actions] = result.current;
+    const migratingVMActions = actions.map((action) => action.id);
 
     // Migrating vm should have stop, restart, pause, migrate and delete actions
     expect(migratingVMActions).toEqual([

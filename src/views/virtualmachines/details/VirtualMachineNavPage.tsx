@@ -6,6 +6,9 @@ import {
   ListPageHeader,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
+
+import VirtualMachineActions from '../list/components/VirtualMachineActions/VirtualMachineActions';
 
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
 
@@ -28,7 +31,9 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   const pages = useVirtualMachineTabs();
   return (
     <>
-      <ListPageHeader title={name} />
+      <ListPageHeader title={name}>
+        <VirtualMachineActions vm={vm} variant={ActionMenuVariant.DROPDOWN} />
+      </ListPageHeader>
       <HorizontalNav pages={pages} resource={vm} />
     </>
   );
