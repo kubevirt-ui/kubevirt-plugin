@@ -5,7 +5,6 @@ import { VerticalTabs, VerticalTabsTab } from '@patternfly/react-catalog-view-ex
 import { FilterSidePanel } from '@patternfly/react-catalog-view-extension/dist/esm/components/FilterSidePanel';
 import { capitalize } from '@patternfly/react-core';
 
-import { TemplateFilters } from '../../hooks/useVmTemplatesFilters';
 import {
   FLAVORS,
   OS_NAME_LABELS,
@@ -13,7 +12,8 @@ import {
   SUPPORT_TYPES,
   WORKLOADS,
   WORKLOADS_LABELS,
-} from '../../utils/constants';
+} from '../../../utils/constants';
+import { TemplateFilters } from '../../hooks/useVmTemplatesFilters';
 
 import { TemplateFilterGroup } from './CatalogTemplateFilterGroup';
 

@@ -1,15 +1,15 @@
 import { PersistentVolumeClaimModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
   V1alpha1PersistentVolumeClaim,
   V1beta1DataVolumeSourceHTTP,
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSourceRef,
   V1beta1DataVolumeSourceRegistry,
-  V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
+
+import { getTemplateVirtualMachineObject } from '../templateGetters';
 
 export enum BOOT_SOURCE {
   PVC = 'PVC',
@@ -42,9 +42,6 @@ export type TemplateBootSource = {
 };
 
 export const TEMPLATE_ROOTDISK_VOLUME_NAME = '${NAME}';
-
-export const getTemplateVirtualMachineObject = (template: V1Template): V1VirtualMachine =>
-  template?.objects?.find((obj) => obj.kind === VirtualMachineModel.kind);
 
 // Only used for replacing parameters in the template, do not use for anything else
 const poorManProcess = (template: V1Template): V1Template => {
