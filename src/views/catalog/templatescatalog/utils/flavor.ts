@@ -1,7 +1,7 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { getTemplateVirtualMachineObject } from '../../utils/vm-template-source/utils';
+import { getTemplateVirtualMachineObject } from '../../utils/templateGetters';
 
 import { getTemplateFlavor } from './helpers';
 

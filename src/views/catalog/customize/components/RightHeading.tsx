@@ -5,6 +5,12 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Button } from '@patternfly/react-core';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
 
+import {
+  getTemplateDescription,
+  getTemplateDocumentationURL,
+  getTemplateName,
+} from '../../utils/templateGetters';
+
 type RightHeadingProps = {
   template: V1Template;
 };
@@ -13,9 +19,9 @@ export const RightHeader: React.FC<RightHeadingProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   if (!template?.metadata?.annotations) return null;
 
-  const displayName = template.metadata?.annotations['openshift.io/display-name'];
-  const documentationLink = template.metadata?.annotations['openshift.io/documentation-url'];
-  const description = template.metadata?.annotations?.description;
+  const displayName = getTemplateName(template);
+  const documentationLink = getTemplateDocumentationURL(template);
+  const description = getTemplateDescription(template);
   return (
     <div className="co-catalog-item-info customize-vm__right-header">
       <div>

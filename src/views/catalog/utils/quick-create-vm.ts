@@ -3,7 +3,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getTemplateVirtualMachineObject } from './vm-template-source/utils';
+import { getTemplateVirtualMachineObject } from './templateGetters';
 
 export const quickCreateVM = (
   template: V1Template,

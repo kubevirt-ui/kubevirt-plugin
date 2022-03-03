@@ -28,9 +28,9 @@ import {
 import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
 import { quickCreateVM } from '../../..//utils/quick-create-vm';
+import { generateVMName } from '../../../utils/templateGetters';
 import { useVmTemplateSource } from '../../../utils/vm-template-source/useVmTemplateSource';
 import { useProcessedTemplate } from '../../hooks/useProcessedTemplate';
-import { generateVMName } from '../../utils/helpers';
 
 type TemplateCatalogDrawerFooterProps = {
   namespace: string;
