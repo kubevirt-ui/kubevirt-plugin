@@ -8,6 +8,7 @@ import { exampleRunningVirtualMachine } from './mocks';
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   useK8sWatchResource: jest.fn(() => [[], true]),
+  useK8sModel: jest.fn(() => [[], true]),
 }));
 afterEach(cleanup);
 
