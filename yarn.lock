@@ -1573,6 +1573,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/webpack-dev-server@npm:^4.5.0":
+  version: 4.7.1
+  resolution: "@types/webpack-dev-server@npm:4.7.1"
+  dependencies:
+    webpack-dev-server: "*"
+  checksum: b5192c1f88e8f07e4604575dc69187f0efa146525e986b7e066e6547a385a9788f95ca1569ccbb6f54a2cdf90857bc0018991eb4ccd0c6de969cbdfaa98cdd1b
+  languageName: node
+  linkType: hard
+
 "@types/ws@npm:^8.2.2":
   version: 8.5.2
   resolution: "@types/ws@npm:8.5.2"
@@ -6950,6 +6959,7 @@ __metadata:
     "@types/node": ^16.11.12
     "@types/react": ^17.0.37
     "@types/react-router-dom": 5.x
+    "@types/webpack-dev-server": ^4.5.0
     "@typescript-eslint/eslint-plugin": ^5.9.1
     "@typescript-eslint/parser": ^5.9.1
     byte-size: ^8.1.0
@@ -10950,7 +10960,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-server@npm:^4.7.4":
+"webpack-dev-server@npm:*, webpack-dev-server@npm:^4.7.4":
   version: 4.7.4
   resolution: "webpack-dev-server@npm:4.7.4"
   dependencies:

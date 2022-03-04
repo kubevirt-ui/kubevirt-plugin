@@ -153,5 +153,28 @@
         "$codeRef": "useVirtualMachineInstanceActionsProvider"
       }
     }
+  },
+  {
+    "type": "console.navigation/href",
+    "properties": {
+      "id": "overview",
+      "section": "virtualization",
+      "insertBefore": "virtualization-catalog",
+      "name": "%plugin__kubevirt-plugin~Overview%",
+      "href": "/overview",
+      "prefixNamespaced": false
+    },
+    "flags": {
+      "required": ["OPENSHIFT"]
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
+      "path": "/overview",
+      "component": {
+        "$codeRef": "ClusterOverviewPage"
+      }
+    }
   }
 ]
