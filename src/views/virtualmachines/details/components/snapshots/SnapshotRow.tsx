@@ -14,7 +14,7 @@ import IndicationLabelList from './components/IndicationLabel/IndicationLabelLis
 const SnapshotRow: React.FC<
   RowProps<V1alpha1VirtualMachineSnapshot, { restores: Map<string, V1alpha1VirtualMachineRestore> }>
 > = ({ obj: snapshot, activeColumnIDs, rowData: { restores } }) => {
-  const relevantRestore = restores?.get(snapshot?.metadata?.name);
+  const relevantRestore = restores?.[snapshot?.metadata?.name];
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>

@@ -18,7 +18,7 @@ type SnapshotsListProps = {
 
 const SnapshotsList: React.FC<SnapshotsListProps> = ({ vm }) => {
   const columns = useSnapshotColumns();
-  const [snapshots, restoresMap, loaded, loadError] = useSnapshotData(vm?.metadata?.namespace);
+  const { snapshots, restoresMap, loaded, error } = useSnapshotData(vm?.metadata?.namespace);
   const [data, filteredData, onFilterChange] = useListPageFilter(snapshots, filters);
   return (
     <>
@@ -32,7 +32,7 @@ const SnapshotsList: React.FC<SnapshotsListProps> = ({ vm }) => {
         data={filteredData}
         unfilteredData={data}
         loaded={loaded}
-        loadError={loadError}
+        loadError={error}
         columns={columns}
         Row={SnapshotRow}
         rowData={{ restores: restoresMap }}
