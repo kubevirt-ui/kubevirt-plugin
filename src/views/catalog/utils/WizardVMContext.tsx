@@ -25,7 +25,7 @@ export const clearSessionStorageVM = () => {
   } catch (e) {}
 };
 
-type WizardVMContextType = {
+export type WizardVMContextType = {
   /** the vm used for the wizard */
   vm?: V1VirtualMachine;
   /**

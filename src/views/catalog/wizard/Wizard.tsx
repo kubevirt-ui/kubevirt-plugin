@@ -22,7 +22,7 @@ const Wizard: React.FC = () => {
   return (
     <Stack hasGutter>
       <WizardHeader />
-      <StackItem isFilled>
+      <StackItem className="vm-wizard-body" isFilled>
         <HorizontalNav pages={wizardNavPages} />
       </StackItem>
       <WizardFooter namespace={ns} />
