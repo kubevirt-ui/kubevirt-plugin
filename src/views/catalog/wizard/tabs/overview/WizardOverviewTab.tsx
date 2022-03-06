@@ -1,9 +1,9 @@
 import * as React from 'react';
 
-// import { useWizardVMContext } from '../../../utils/WizardVMContext';
+import { WizardVMContextType } from '../../../utils/WizardVMContext';
 
-const WizardOverviewTab = () => {
-  // const { vm, updateVM, loaded, error } = useWizardVMContext();
+const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, updateVM, loaded, error }) => {
+  console.log(vm, updateVM, loaded, error);
 
   return <div>WizardOverviewTab</div>;
 };
