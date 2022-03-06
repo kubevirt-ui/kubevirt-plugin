@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { WORKLOADS_LABELS } from 'src/views/catalog/utils/constants';
-import { getVmCPUMemory } from 'src/views/catalog/utils/flavor';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAnnotation } from '@kubevirt-utils/selectors';
+import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { ANNOTATIONS, getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import { WizardVMContextType } from '../../../utils/WizardVMContext';
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
 
-import { WizardOverviewNetworksTable } from './components/WizardOverviewNetworksTable';
+import { WizardOverviewDisksTable } from './components/WizardOverviewDisksTable/WizardOverviewDisksTable';
+import { WizardOverviewNetworksTable } from './components/WizardOverviewNetworksTable/WizardOverviewNetworksTable';
 
 import './WizardOverviewTab.scss';
 
@@ -19,12 +19,17 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm }) => {
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
 
+  const os = getAnnotation(
+    vm,
+    ANNOTATIONS.displayName,
+    vm?.spec?.template?.metadata?.annotations?.['vm.kubevirt.io/os'],
+  );
+  const flavor = getVmCPUMemory(vm);
   const description = getAnnotation(vm, 'description');
   const workloadAnnotation = vm?.spec?.template?.metadata?.annotations?.['vm.kubevirt.io/workload'];
-  const os = vm?.spec?.template?.metadata?.annotations?.['vm.kubevirt.io/os'];
   const networks = vm?.spec?.template?.spec?.networks;
+  const interfaces = vm?.spec?.template?.spec?.domain?.devices?.interfaces;
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
-  const flavor = getVmCPUMemory(vm);
 
   return (
     <div className="co-m-pane__body">
@@ -86,14 +91,16 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm }) => {
               onTitleClick={() =>
                 history.push(`/k8s/ns/${ns}/templatescatalog/review/network-interfaces`)
               }
-              description={<WizardOverviewNetworksTable networks={networks} />}
+              description={
+                <WizardOverviewNetworksTable networks={networks} interfaces={interfaces} />
+              }
             />
 
             <WizardDescriptionItem
               title={t('Disks')}
               count={disks?.length}
               onTitleClick={() => history.push(`/k8s/ns/${ns}/templatescatalog/review/disks`)}
-              description={disks?.map((d) => d?.name).join(', ')}
+              description={<WizardOverviewDisksTable vm={vm} />}
             />
 
             <WizardDescriptionItem title={t('Hardware Devices')} />

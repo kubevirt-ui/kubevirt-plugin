@@ -54,21 +54,28 @@ export const WizardDescriptionItem: React.FC<WizardDescriptionItemProps> = React
     const { t } = useKubevirtTranslation();
     const titleWithCount = title.concat(count ? ` (${count})` : '');
 
+    const getItemHeader = () => {
+      if (onTitleClick)
+        return (
+          <Button isInline isDisabled={isDisabled} onClick={onTitleClick} variant="link">
+            <DescriptionListTerm>{titleWithCount}</DescriptionListTerm>
+          </Button>
+        );
+
+      if (helperPopover) {
+        return (
+          <Popover headerContent={helperPopover?.header} bodyContent={helperPopover?.content}>
+            <DescriptionListTermHelpTextButton> {title} </DescriptionListTermHelpTextButton>
+          </Popover>
+        );
+      }
+
+      return <DescriptionListTerm>{titleWithCount}</DescriptionListTerm>;
+    };
+
     return (
       <DescriptionListGroup className={className}>
-        <DescriptionListTermHelpText>
-          {onTitleClick ? (
-            <Button isInline isDisabled={isDisabled} onClick={onTitleClick} variant="link">
-              <DescriptionListTerm>{titleWithCount}</DescriptionListTerm>
-            </Button>
-          ) : helperPopover ? (
-            <Popover headerContent={helperPopover?.header} bodyContent={helperPopover?.content}>
-              <DescriptionListTermHelpTextButton> {title} </DescriptionListTermHelpTextButton>
-            </Popover>
-          ) : (
-            <DescriptionListTerm>{titleWithCount}</DescriptionListTerm>
-          )}
-        </DescriptionListTermHelpText>
+        <DescriptionListTermHelpText>{getItemHeader()}</DescriptionListTermHelpText>
         {isEdit ? (
           <Button
             data-test-id={testId}

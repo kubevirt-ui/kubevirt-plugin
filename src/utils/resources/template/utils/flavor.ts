@@ -1,5 +1,5 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1CPU, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 import { getTemplateFlavor, getTemplateVirtualMachineObject } from './selectors';
 
@@ -45,4 +45,39 @@ export const getFlavorData = (
   const flavor = getTemplateFlavor(template);
 
   return { flavor, cpuCount, memory };
+};
+
+/**
+ * parses vm and returns its cpu and memory data
+ * @param {V1VirtualMachine} vm - vm to parse
+ */
+export const getVmCPUMemory = (
+  vm: V1VirtualMachine,
+): {
+  cpuCount: number;
+  memory: string;
+} => {
+  const cpu = vm?.spec?.template?.spec?.domain?.cpu;
+  const memory = (vm?.spec?.template?.spec?.domain?.resources?.requests as { memory: string })
+    ?.memory;
+
+  const cpuCount = vCPUCount(cpu);
+
+  return { cpuCount, memory };
+};
+
+/**
+ * parses template and returns its cpu and memory data
+ * @param {V1Template} template - template to parse
+ */
+export const getTemplateFlavorData = (
+  template: V1Template,
+): {
+  flavor: string;
+  cpuCount: number;
+  memory: string;
+} => {
+  const flavor = getTemplateFlavor(template);
+
+  return { flavor, ...getVmCPUMemory(getTemplateVirtualMachineObject(template)) };
 };

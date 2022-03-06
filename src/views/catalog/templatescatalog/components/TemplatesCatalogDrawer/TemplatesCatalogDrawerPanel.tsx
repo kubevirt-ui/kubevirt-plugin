@@ -3,6 +3,7 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateFlavorData } from '@kubevirt-utils/resources/template/utils';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
 import {
   getTemplateDescription,
@@ -25,8 +26,6 @@ import {
   Title,
 } from '@patternfly/react-core';
 import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
-
-import { getTemplateFlavorData } from '../../../utils/flavor';
 
 type TemplatesCatalogDrawerPanelProps = {
   template: V1Template;

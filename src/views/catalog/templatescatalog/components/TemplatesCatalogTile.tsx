@@ -2,7 +2,11 @@ import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { BOOT_SOURCE_LABELS, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
+import {
+  BOOT_SOURCE_LABELS,
+  getTemplateFlavorData,
+  WORKLOADS_LABELS,
+} from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import {
   getTemplateName,
@@ -12,7 +16,6 @@ import {
 import { CatalogTile } from '@patternfly/react-catalog-view-extension';
 import { Stack, StackItem } from '@patternfly/react-core';
 
-import { getTemplateFlavorData } from '../../utils/flavor';
 import { getTemplateOSIcon } from '../utils/os-icons';
 
 export type TemplateTileProps = {
