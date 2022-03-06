@@ -34,15 +34,15 @@ export const getVMStatusIcon = (
     icon = SyncAltIcon;
   } else if (status === printableVMStatus.Stopped) {
     icon = OffIcon;
-  } else if (status.toLowerCase().includes('error')) {
+  } else if (status?.toLowerCase().includes('error')) {
     icon = ExclamationCircleIcon;
   } else if (
-    status.toLowerCase().includes('pending') ||
-    status.toLowerCase().includes('provisioning')
+    status?.toLowerCase().includes('pending') ||
+    status?.toLowerCase().includes('provisioning')
   ) {
     // should be called before inProgress
     icon = HourglassHalfIcon;
-  } else if (status.toLowerCase().includes('starting')) {
+  } else if (status?.toLowerCase().includes('starting')) {
     icon = InProgressIcon;
   }
 
