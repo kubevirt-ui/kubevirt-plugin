@@ -2,17 +2,20 @@ import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  BOOT_SOURCE_LABELS,
+  getFlavorData,
+  WORKLOADS_LABELS,
+} from '@kubevirt-utils/resources/template';
+import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import {
+  getTemplateName,
+  getTemplateProviderName,
+  getTemplateWorkload,
+} from '@kubevirt-utils/resources/template/utils/selectors';
 import { CatalogTile } from '@patternfly/react-catalog-view-extension';
 import { Stack, StackItem } from '@patternfly/react-core';
 
-import { WORKLOADS_LABELS } from '../../utils/constants';
-import { getTemplateName } from '../../utils/templateGetters';
-import {
-  BOOT_SOURCE_LABELS,
-  getTemplateBootSourceType,
-} from '../../utils/vm-template-source/utils';
-import { getFlavorData } from '../utils/flavor';
-import { getTemplateProviderName, getTemplateWorkload } from '../utils/helpers';
 import { getTemplateOSIcon } from '../utils/os-icons';
 
 export type TemplateTileProps = {

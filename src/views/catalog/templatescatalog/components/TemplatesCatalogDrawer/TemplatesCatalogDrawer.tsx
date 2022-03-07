@@ -1,10 +1,10 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';
 import { CatalogItemHeader } from '@patternfly/react-catalog-view-extension';
 import { Modal } from '@patternfly/react-core';
 
-import { getTemplateName } from '../../../utils/templateGetters';
 import { getTemplateOSIcon } from '../../utils/os-icons';
 
 import { TemplatesCatalogDrawerFooter } from './TemplatesCatalogDrawerFooter';

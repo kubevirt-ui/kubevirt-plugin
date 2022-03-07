@@ -48,3 +48,17 @@ export const OS_NAME_LABELS = {
   [OS_NAME_TYPES.windows]: 'Windows',
   [OS_NAME_TYPES.other]: 'Other',
 };
+
+export enum BOOT_SOURCE {
+  PVC = 'PVC',
+  PVC_AUTO_UPLOAD = 'PVC_AUTO_UPLOAD',
+  URL = 'URL',
+  REGISTRY = 'REGISTRY',
+}
+
+export const BOOT_SOURCE_LABELS = {
+  [BOOT_SOURCE.PVC]: 'PVC',
+  [BOOT_SOURCE.PVC_AUTO_UPLOAD]: 'PVC (auto upload)',
+  [BOOT_SOURCE.URL]: 'URL',
+  [BOOT_SOURCE.REGISTRY]: 'Registry',
+};

@@ -3,9 +3,9 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
 import { ActionGroup, Button, ExpandableSection, Form } from '@patternfly/react-core';
 
-import { getTemplateVirtualMachineObject } from '../../utils/templateGetters';
 import { useWizardVMContext } from '../../utils/WizardVMContext';
 import {
   buildFields,

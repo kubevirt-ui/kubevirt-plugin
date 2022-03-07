@@ -1,9 +1,9 @@
 import * as React from 'react';
 
+import { BOOT_SOURCE } from '@kubevirt-utils/resources/template/utils/constants';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { BOOT_SOURCE } from '../../utils/vm-template-source/utils';
 import TemplatesCatalog from '../TemplatesCatalog';
 
 import { containerTemplateMock, urlTemplateMock } from './mocks';
@@ -12,7 +12,7 @@ jest.mock('@kubevirt-utils/hooks/useIsAdmin', () => ({
   useIsAdmin: () => [false, true],
 }));
 
-jest.mock('../hooks/useVmTemplates', () => ({
+jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplates', () => ({
   useVmTemplates: () => ({ templates: [urlTemplateMock, containerTemplateMock], loaded: true }),
 }));
 
@@ -21,7 +21,7 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   k8sCreate: jest.fn().mockRejectedValue({}),
 }));
 
-jest.mock('../../utils/vm-template-source/useVmTemplateSource', () => ({
+jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => ({
   useVmTemplateSource: () => ({
     isBootSourceAvailable: true,
     loaded: true,

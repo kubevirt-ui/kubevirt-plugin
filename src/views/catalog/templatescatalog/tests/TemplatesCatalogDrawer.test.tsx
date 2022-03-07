@@ -1,9 +1,9 @@
 import * as React from 'react';
 
+import { BOOT_SOURCE } from '@kubevirt-utils/resources/template';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { BOOT_SOURCE } from '../../utils/vm-template-source/utils';
 import { TemplatesCatalogDrawer } from '../components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
 
 import { containerTemplateMock } from './mocks';
@@ -12,7 +12,7 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   k8sCreate: jest.fn().mockResolvedValue({}),
 }));
 
-jest.mock('../../utils/vm-template-source/useVmTemplateSource', () => ({
+jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => ({
   useVmTemplateSource: () => ({
     isBootSourceAvailable: true,
     loaded: true,

@@ -3,6 +3,17 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
+import { getFlavorData } from '@kubevirt-utils/resources/template/utils/flavor';
+import {
+  getTemplateDescription,
+  getTemplateDisks,
+  getTemplateDocumentationURL,
+  getTemplateName,
+  getTemplateNetworkInterfaces,
+  getTemplateWorkload,
+  isDefaultVariantTemplate,
+} from '@kubevirt-utils/resources/template/utils/selectors';
 import {
   Button,
   DescriptionList,
@@ -15,20 +26,6 @@ import {
   Title,
 } from '@patternfly/react-core';
 import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
-
-import { WORKLOADS_LABELS } from '../../../utils/constants';
-import {
-  getTemplateDescription,
-  getTemplateDocumentationURL,
-  getTemplateName,
-} from '../../../utils/templateGetters';
-import { getFlavorData } from '../../utils/flavor';
-import {
-  getTemplateDisks,
-  getTemplateNetworkInterfaces,
-  getTemplateWorkload,
-  isDefaultVariantTemplate,
-} from '../../utils/helpers';
 
 type TemplatesCatalogDrawerPanelProps = {
   template: V1Template;
