@@ -771,6 +771,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kubevirt-ui/components@npm:^0.0.10":
+  version: 0.0.10
+  resolution: "@kubevirt-ui/components@npm:0.0.10"
+  dependencies:
+    "@kubevirt-ui/kubevirt-api": ^0.0.35
+    "@patternfly/patternfly": ^4.171.1
+    "@patternfly/react-core": ^4.192.15
+    classnames: ^2.3.1
+  peerDependencies:
+    react: ^17.0.2
+    react-dom: ^17.0.2
+  checksum: adb22b8b9f6ac30302eb4f0af49818e2fff64a986191debba1c7d1ac8fda1f77fbc6ecf7e4b381121c714eb218ce849b1ec26b8bbab8d861b71f1411d0f14813
+  languageName: node
+  linkType: hard
+
 "@kubevirt-ui/kubevirt-api@npm:^0.0.35":
   version: 0.0.35
   resolution: "@kubevirt-ui/kubevirt-api@npm:0.0.35"
@@ -884,6 +899,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@patternfly/patternfly@npm:^4.171.1":
+  version: 4.183.0
+  resolution: "@patternfly/patternfly@npm:4.183.0"
+  checksum: 3c1fbfd37073e970d7583323cc1272d2ff988d5f4931a2c6e8cfb58bce3c1add0f2affa900ca36758058bdacbaa557db427c9763a0ec611f2440c626ef171522
+  languageName: node
+  linkType: hard
+
 "@patternfly/react-catalog-view-extension@npm:^4.43.15":
   version: 4.49.9
   resolution: "@patternfly/react-catalog-view-extension@npm:4.49.9"
@@ -952,6 +974,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@patternfly/react-core@npm:^4.192.15":
+  version: 4.198.16
+  resolution: "@patternfly/react-core@npm:4.198.16"
+  dependencies:
+    "@patternfly/react-icons": ^4.49.16
+    "@patternfly/react-styles": ^4.48.16
+    "@patternfly/react-tokens": ^4.50.16
+    focus-trap: 6.2.2
+    react-dropzone: 9.0.0
+    tippy.js: 5.1.2
+    tslib: ^2.0.0
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0
+    react-dom: ^16.8.0 || ^17.0.0
+  checksum: 9de2bce9671a85135e0f6ca015c1317d5f85377cd7b029b7abd46e0b3841d78a584eba050efa42297d3cf0a5418f60ae969e064ca9279aa3f6edd2af5fc7ca3d
+  languageName: node
+  linkType: hard
+
 "@patternfly/react-icons@npm:^4.26.4, @patternfly/react-icons@npm:^4.43.15, @patternfly/react-icons@npm:^4.49.9":
   version: 4.49.9
   resolution: "@patternfly/react-icons@npm:4.49.9"
@@ -962,10 +1002,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@patternfly/react-icons@npm:^4.49.16":
+  version: 4.49.16
+  resolution: "@patternfly/react-icons@npm:4.49.16"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0
+    react-dom: ^16.8.0 || ^17.0.0
+  checksum: 04c900a7d0841a44363bc0c1d0b6616838a15ada08f06cb47ada1690c44038d0c67d415ede1d83424526243d2315c5d0268812c9d3571c8794314a87f00fcbca
+  languageName: node
+  linkType: hard
+
 "@patternfly/react-styles@npm:^4.25.4, @patternfly/react-styles@npm:^4.42.15, @patternfly/react-styles@npm:^4.48.9":
   version: 4.48.9
   resolution: "@patternfly/react-styles@npm:4.48.9"
   checksum: 8bc8fb04cfcd1d02644987060853d02dbcd6c808e0fbf7ccee07f61c58a5f128c5e7cdf0f3b834196bf2c09a1acd372877878d51557376bb65df2bdf05b5b9d7
+  languageName: node
+  linkType: hard
+
+"@patternfly/react-styles@npm:^4.48.16":
+  version: 4.48.16
+  resolution: "@patternfly/react-styles@npm:4.48.16"
+  checksum: 6832fd2127cbf074d35a0923ddf11a0f794f7f9de5c3ec01486b8704ab15fab059e8238f03147f2adb25a9c493c962961fdcd69f827838b5b90f0640977eb8ad
   languageName: node
   linkType: hard
 
@@ -1007,6 +1064,13 @@ __metadata:
   version: 4.50.9
   resolution: "@patternfly/react-tokens@npm:4.50.9"
   checksum: 0e9fcaa3ee86a5050aba5940ef89840e4468115d4955d09d21e9e7b6030b733fedbedff06070be3a802bd20445fbe987d56890c598d7d98a8a5e4bb0da4a9c39
+  languageName: node
+  linkType: hard
+
+"@patternfly/react-tokens@npm:^4.50.16":
+  version: 4.50.16
+  resolution: "@patternfly/react-tokens@npm:4.50.16"
+  checksum: de3a01588ecba701dfaae00ab1418166e2cdf84ab2a219cb0908a54e0a164ec3857c72069a1a35ffe866e5e76196c21822a00db0d37194f416b9829e85365571
   languageName: node
   linkType: hard
 
@@ -2927,6 +2991,13 @@ __metadata:
   version: 1.2.2
   resolution: "cjs-module-lexer@npm:1.2.2"
   checksum: 977f3f042bd4f08e368c890d91eecfbc4f91da0bc009a3c557bc4dfbf32022ad1141244ac1178d44de70fc9f3dea7add7cd9a658a34b9fae98a55d8f92331ce5
+  languageName: node
+  linkType: hard
+
+"classnames@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "classnames@npm:2.3.1"
+  checksum: 14db8889d56c267a591f08b0834989fe542d47fac659af5a539e110cc4266694e8de86e4e3bbd271157dbd831361310a8293e0167141e80b0f03a0f175c80960
   languageName: node
   linkType: hard
 
@@ -6934,6 +7005,7 @@ __metadata:
   resolution: "kubevirt-plugin@workspace:."
   dependencies:
     "@cypress/webpack-preprocessor": ^5.11.0
+    "@kubevirt-ui/components": ^0.0.10
     "@kubevirt-ui/kubevirt-api": ^0.0.35
     "@openshift-console/dynamic-plugin-sdk": 0.0.6
     "@openshift-console/dynamic-plugin-sdk-internal": ^0.0.5

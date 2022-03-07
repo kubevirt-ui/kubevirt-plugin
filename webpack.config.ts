@@ -30,6 +30,8 @@ const config: Configuration = {
   devServer: {
     hot: true,
     port: KUBEVIRT_PLUGIN_PORT,
+    // Allow bridge running in a container to connect to the plugin dev server.
+    allowedHosts: 'all',
     client: {
       progress: true,
       webSocketURL: {
