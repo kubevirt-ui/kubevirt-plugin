@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
-import { getResourceUrl } from '@kubevirt-utils/resource';
+import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   Alert,
   Button,
