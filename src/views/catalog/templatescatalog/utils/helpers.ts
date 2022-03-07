@@ -22,7 +22,8 @@ export const filterTemplates = (templates: V1Template[], filters: TemplateFilter
         tmp?.metadata?.name?.includes(textFilterLowerCase)
       : true;
 
-    const defaultVariantFilter = filters?.onlyDefault ? isDefaultVariantTemplate(tmp) : true;
+    const defaultVariantFilter =
+      filters?.tabView === 'onlyDefault' ? isDefaultVariantTemplate(tmp) : true;
 
     const supportedFilter =
       filters?.support?.value?.size > 0 ? filters?.support?.value?.has(supportLevel) : true;

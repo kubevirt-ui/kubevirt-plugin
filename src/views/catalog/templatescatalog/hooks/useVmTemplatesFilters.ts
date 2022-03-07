@@ -15,17 +15,18 @@ export type TemplateCountFilters = {
 };
 
 export type TemplateFilters = TemplateCountFilters & {
-  onlyDefault: boolean;
+  tabView: 'all' | 'onlyDefault' | 'onlyAvailable';
   query: string;
 };
 
-export const useTemplatesFilters = (
-  isAdmin: boolean,
-): [TemplateFilters, (type: string, value: string) => void, () => void] => {
+export const useTemplatesFilters = (): [
+  TemplateFilters,
+  (type: string, value: string) => void,
+  () => void,
+] => {
   const { params, appendParam, setParam, deleteParam } = useURLParams();
-  const onlyDefaultParam = params.get('onlyDefault');
 
-  const [onlyDefault, setOnlyDefault] = React.useState(isAdmin);
+  const [tabView, setTabView] = React.useState<TemplateFilters['tabView']>('onlyDefault');
   const [query, setQuery] = React.useState(params.get('query') || '');
   const [filters, setFilters] = React.useState<TemplateCountFilters>({
     support: {
@@ -47,28 +48,37 @@ export const useTemplatesFilters = (
   });
 
   const onSelect = (type: string, value: any) => {
-    if (type === 'onlyDefault') {
-      setOnlyDefault(value);
-      setParam('onlyDefault', value.toString());
-    } else if (type === 'query') {
-      setQuery(value);
-    } else {
-      const filterSet = new Set<string>(filters?.[type]?.value);
-      if (filterSet.has(value)) {
-        filterSet.delete(value);
-        deleteParam(type, value);
-      } else {
-        filterSet.add(value);
-        appendParam(type, value);
-      }
+    switch (type) {
+      case 'tabView':
+        {
+          setTabView(value);
+        }
+        break;
 
-      setFilters({
-        ...filters,
-        [type]: {
-          ...filters?.[type],
-          value: filterSet,
-        },
-      });
+      case 'query':
+        {
+          setQuery(value);
+        }
+        break;
+
+      default: {
+        const filterSet = new Set<string>(filters?.[type]?.value);
+        if (filterSet.has(value)) {
+          filterSet.delete(value);
+          deleteParam(type, value);
+        } else {
+          filterSet.add(value);
+          appendParam(type, value);
+        }
+
+        setFilters({
+          ...filters,
+          [type]: {
+            ...filters?.[type],
+            value: filterSet,
+          },
+        });
+      }
     }
   };
 
@@ -101,15 +111,5 @@ export const useTemplatesFilters = (
     });
   };
 
-  React.useEffect(() => {
-    if (onlyDefaultParam) {
-      setOnlyDefault(onlyDefaultParam === 'true');
-    } else {
-      setOnlyDefault(isAdmin);
-      setParam('onlyDefault', isAdmin.toString());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin, onlyDefaultParam]);
-
-  return [{ ...filters, onlyDefault, query }, onSelect, clearAll];
+  return [{ ...filters, tabView, query }, onSelect, clearAll];
 };

@@ -12,8 +12,12 @@ jest.mock('@kubevirt-utils/hooks/useIsAdmin', () => ({
   useIsAdmin: () => [false, true],
 }));
 
-jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplates', () => ({
-  useVmTemplates: () => ({ templates: [urlTemplateMock, containerTemplateMock], loaded: true }),
+jest.mock('../hooks/useVmTemplatesWithAvailableSource', () => ({
+  useVmTemplatesWithAvailableSource: () => ({
+    templates: [urlTemplateMock, containerTemplateMock],
+    loaded: true,
+    templatesWithSourceLoaded: true,
+  }),
 }));
 
 // render template drawer without quick create
@@ -58,15 +62,10 @@ test('TemplatesCatalog', async () => {
     />,
   );
 
-  // non admin user, should see all templates by default
   // default variant template, should be in catalog
   expect(getByTestId('container-template')).toBeInTheDocument();
 
-  // not default variant template, should be in catalog
-  expect(getByTestId('url-template')).toBeInTheDocument();
-
-  // switching to default templates, url template should not be in catalog
-  fireEvent.click(getByText('Default Templates'));
+  // not default variant template, should not be in catalog
   expect(queryByTestId('url-template')).toBeNull();
 
   // picking RHEL filter, container-template should not be in catalog

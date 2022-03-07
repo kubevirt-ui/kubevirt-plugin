@@ -99,11 +99,14 @@ export const getPVC = (name: string, ns: string) =>
     ns,
   });
 
-export const getDataSourcePVC = (name: string, ns: string) =>
+export const getDataSource = (name: string, ns: string) =>
   k8sGet({
     model: DataSourceModel,
     name,
     ns,
-  })
+  });
+
+export const getDataSourcePVC = (name: string, ns: string) =>
+  getDataSource(name, ns)
     .then((data: any) => data?.spec?.source?.pvc)
     .then((pvc) => getPVC(pvc.name, pvc.namespace));

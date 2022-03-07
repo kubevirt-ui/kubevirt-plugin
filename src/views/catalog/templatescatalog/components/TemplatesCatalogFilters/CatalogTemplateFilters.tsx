@@ -30,15 +30,22 @@ export const CatalogTemplateFilters: React.FC<{
           data-test-id="catalog-template-filter-all-items"
           id={'all-templates'}
           title={t('All Items')}
-          onActivate={() => onFilterChange('onlyDefault', false)}
-          active={!filters?.onlyDefault}
+          onActivate={() => onFilterChange('tabView', 'all')}
+          active={filters?.tabView === 'all'}
         />
         <VerticalTabsTab
           data-test-id="catalog-template-filter-default-templates"
           id={'default-templates'}
           title={t('Default Templates')}
-          onActivate={() => onFilterChange('onlyDefault', true)}
-          active={filters?.onlyDefault}
+          onActivate={() => onFilterChange('tabView', 'onlyDefault')}
+          active={filters?.tabView === 'onlyDefault'}
+        />
+        <VerticalTabsTab
+          data-test-id="catalog-template-filter-default-templates"
+          id={'default-templates'}
+          title={t('Boot source available')}
+          onActivate={() => onFilterChange('tabView', 'onlyAvailable')}
+          active={filters?.tabView === 'onlyAvailable'}
         />
       </VerticalTabs>
       <FilterSidePanel className="co-catalog-page__tabs" id="vm-catalog-filter-panel">

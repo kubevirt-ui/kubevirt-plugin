@@ -6,6 +6,12 @@ import { pluralize, TextInput } from '@patternfly/react-core';
 
 import { TemplateFilters } from '../hooks/useVmTemplatesFilters';
 
+enum TAB_LABEL {
+  'all' = 'All Items',
+  'onlyDefault' = 'Default Templates',
+  'onlyAvailable' = 'Boot source available',
+}
+
 export const TemplatesCatalogHeader: React.FC<{
   filters: TemplateFilters;
   onFilterChange: (type: string, value: string | boolean) => void;
@@ -21,7 +27,7 @@ export const TemplatesCatalogHeader: React.FC<{
   return (
     <div className="co-catalog-page__header">
       <div className="co-catalog-page__heading text-capitalize">
-        {filters?.onlyDefault ? t('Default Templates') : t('All Items')}
+        {t(TAB_LABEL[filters?.tabView])}
       </div>
       <div className="co-catalog-page__filter">
         <TextInput

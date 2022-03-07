@@ -3,18 +3,18 @@ import { Trans } from 'react-i18next';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useVmTemplates } from '@kubevirt-utils/resources/template/hooks/useVmTemplates';
 import { Gallery, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
 import { TemplatesCatalogEmptyState } from './components/TemplatesCatalogEmptyState';
 import { CatalogTemplateFilters } from './components/TemplatesCatalogFilters/CatalogTemplateFilters';
 import { TemplatesCatalogHeader } from './components/TemplatesCatalogHeader';
+import { TemplatesCatalogLoadingSources } from './components/TemplatesCatalogLoadingSources';
 import { skeletonCatalog } from './components/TemplatesCatalogSkeleton';
 import { TemplateTile } from './components/TemplatesCatalogTile';
 import { useTemplatesFilters } from './hooks/useVmTemplatesFilters';
+import { useVmTemplatesWithAvailableSource } from './hooks/useVmTemplatesWithAvailableSource';
 import { filterTemplates } from './utils/helpers';
 
 import './TemplatesCatalog.scss';
@@ -25,18 +25,20 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   },
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isAdmin, isAdminLoaded] = useIsAdmin();
   const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
 
-  const { templates, loaded: templatedLoaded } = useVmTemplates();
-  const [filters, onFilterChange, clearAll] = useTemplatesFilters(isAdmin);
+  const [filters, onFilterChange, clearAll] = useTemplatesFilters();
+  const { templates, loaded, templatesWithSourceLoaded } = useVmTemplatesWithAvailableSource(
+    filters?.tabView === 'onlyAvailable',
+  );
 
   const filteredTemplates = React.useMemo(
     () => filterTemplates(templates, filters),
     [templates, filters],
   );
 
-  const loaded = isAdminLoaded && templatedLoaded;
+  const isLoadingAvailableSources =
+    filters.tabView === 'onlyAvailable' && !templatesWithSourceLoaded;
 
   return (
     <Stack hasGutter>
@@ -63,7 +65,11 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
                 onFilterChange={onFilterChange}
               />
             </StackItem>
-            {filteredTemplates?.length > 0 ? (
+            {isLoadingAvailableSources ? (
+              <TemplatesCatalogLoadingSources />
+            ) : filteredTemplates.length === 0 ? (
+              <TemplatesCatalogEmptyState onClearFilters={clearAll} />
+            ) : (
               <StackItem className="co-catalog-page__grid vm-catalog-grid-container">
                 <Gallery hasGutter className="vm-catalog-grid">
                   {filteredTemplates.map((template) => (
@@ -75,8 +81,6 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
                   ))}
                 </Gallery>
               </StackItem>
-            ) : (
-              <TemplatesCatalogEmptyState onClearFilters={clearAll} />
             )}
           </Stack>
         </div>
