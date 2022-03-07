@@ -6,13 +6,9 @@ import {
   V1beta1DataVolumeSourceRef,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import {
-  BOOT_SOURCE,
-  getDataSourcePVC,
-  getPVC,
-  getTemplateBootSourceType,
-  TemplateBootSource,
-} from './utils';
+import { BOOT_SOURCE } from '../../utils/constants';
+
+import { getDataSourcePVC, getPVC, getTemplateBootSourceType, TemplateBootSource } from './utils';
 
 export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceValue => {
   const [templateBootSource, setTemplateBootSource] = React.useState<TemplateBootSource>(undefined);

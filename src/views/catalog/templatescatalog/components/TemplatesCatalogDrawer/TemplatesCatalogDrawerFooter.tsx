@@ -6,6 +6,11 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
+  useProcessedTemplate,
+  useVmTemplateSource,
+} from '@kubevirt-utils/resources/template/hooks';
+import { generateVMName } from '@kubevirt-utils/resources/template/utils/selectors';
+import {
   Alert,
   Button,
   ButtonVariant,
@@ -28,9 +33,6 @@ import {
 import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
 import { quickCreateVM } from '../../..//utils/quick-create-vm';
-import { generateVMName } from '../../../utils/templateGetters';
-import { useVmTemplateSource } from '../../../utils/vm-template-source/useVmTemplateSource';
-import { useProcessedTemplate } from '../../hooks/useProcessedTemplate';
 
 type TemplateCatalogDrawerFooterProps = {
   namespace: string;

@@ -5,6 +5,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useVmTemplates } from '@kubevirt-utils/resources/template/hooks/useVmTemplates';
 import { Gallery, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
@@ -13,7 +14,6 @@ import { CatalogTemplateFilters } from './components/TemplatesCatalogFilters/Cat
 import { TemplatesCatalogHeader } from './components/TemplatesCatalogHeader';
 import { skeletonCatalog } from './components/TemplatesCatalogSkeleton';
 import { TemplateTile } from './components/TemplatesCatalogTile';
-import { useVmTemplates } from './hooks/useVmTemplates';
 import { useTemplatesFilters } from './hooks/useVmTemplatesFilters';
 import { filterTemplates } from './utils/helpers';
 

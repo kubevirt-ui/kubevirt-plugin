@@ -9,21 +9,8 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getTemplateVirtualMachineObject } from '../templateGetters';
-
-export enum BOOT_SOURCE {
-  PVC = 'PVC',
-  PVC_AUTO_UPLOAD = 'PVC_AUTO_UPLOAD',
-  URL = 'URL',
-  REGISTRY = 'REGISTRY',
-}
-
-export const BOOT_SOURCE_LABELS = {
-  [BOOT_SOURCE.PVC]: 'PVC',
-  [BOOT_SOURCE.PVC_AUTO_UPLOAD]: 'PVC (auto upload)',
-  [BOOT_SOURCE.URL]: 'URL',
-  [BOOT_SOURCE.REGISTRY]: 'Registry',
-};
+import { BOOT_SOURCE } from '../../utils/constants';
+import { getTemplateVirtualMachineObject } from '../../utils/selectors';
 
 export type TemplateBootSource = {
   type: BOOT_SOURCE;

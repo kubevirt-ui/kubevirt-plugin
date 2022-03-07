@@ -1,9 +1,7 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { getTemplateVirtualMachineObject } from '../../utils/templateGetters';
-
-import { getTemplateFlavor } from './helpers';
+import { getTemplateFlavor, getTemplateVirtualMachineObject } from './selectors';
 
 export const parseCPU = (cpu: V1CPU): V1CPU => {
   return {

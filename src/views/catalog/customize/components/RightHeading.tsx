@@ -2,14 +2,13 @@ import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button } from '@patternfly/react-core';
-import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
-
 import {
   getTemplateDescription,
   getTemplateDocumentationURL,
   getTemplateName,
-} from '../../utils/templateGetters';
+} from '@kubevirt-utils/resources/template/utils/selectors';
+import { Button } from '@patternfly/react-core';
+import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
 
 type RightHeadingProps = {
   template: V1Template;

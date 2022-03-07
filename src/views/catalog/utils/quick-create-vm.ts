@@ -1,9 +1,8 @@
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-
-import { getTemplateVirtualMachineObject } from './templateGetters';
 
 export const quickCreateVM = (
   template: V1Template,

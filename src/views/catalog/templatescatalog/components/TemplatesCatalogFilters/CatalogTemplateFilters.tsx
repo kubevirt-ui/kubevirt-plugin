@@ -1,10 +1,6 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { VerticalTabs, VerticalTabsTab } from '@patternfly/react-catalog-view-extension';
-import { FilterSidePanel } from '@patternfly/react-catalog-view-extension/dist/esm/components/FilterSidePanel';
-import { capitalize } from '@patternfly/react-core';
-
 import {
   FLAVORS,
   OS_NAME_LABELS,
@@ -12,7 +8,11 @@ import {
   SUPPORT_TYPES,
   WORKLOADS,
   WORKLOADS_LABELS,
-} from '../../../utils/constants';
+} from '@kubevirt-utils/resources/template/utils/constants';
+import { VerticalTabs, VerticalTabsTab } from '@patternfly/react-catalog-view-extension';
+import { FilterSidePanel } from '@patternfly/react-catalog-view-extension/dist/esm/components/FilterSidePanel';
+import { capitalize } from '@patternfly/react-core';
+
 import { TemplateFilters } from '../../hooks/useVmTemplatesFilters';
 
 import { TemplateFilterGroup } from './CatalogTemplateFilterGroup';

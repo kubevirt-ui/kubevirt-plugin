@@ -8,7 +8,7 @@ import {
   useK8sWatchResources,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../../utils/constants';
+import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../utils/constants';
 
 export const useVmTemplates = (): useVmTemplatesValues => {
   const [templates, setTemplates] = React.useState<V1Template[]>([]);
