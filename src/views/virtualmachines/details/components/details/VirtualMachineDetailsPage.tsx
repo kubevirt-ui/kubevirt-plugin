@@ -16,16 +16,16 @@ type VirtualMachineDetailsPageProps = RouteComponentProps<{
   obj?: V1VirtualMachine;
 };
 
-const VirtualMachineDetailsPage: React.FC<VirtualMachineDetailsPageProps> = ({ obj }) => {
+const VirtualMachineDetailsPage: React.FC<VirtualMachineDetailsPageProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>
       <ListPageHeader title={t('Virtual Machine Details')} />
       <ListPageBody>
         <Grid hasGutter>
-          <VirtualMachineDetailsLeftGrid obj={obj} />
+          <VirtualMachineDetailsLeftGrid vm={vm} />
           <GridItem span={1}>{/* Spacer */}</GridItem>
-          <VirtualMachineDetailsRightGrid obj={obj} />
+          <VirtualMachineDetailsRightGrid vm={vm} />
         </Grid>
       </ListPageBody>
     </>

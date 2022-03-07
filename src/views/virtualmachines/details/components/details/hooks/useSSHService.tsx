@@ -4,11 +4,11 @@ import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseSSHServiceProps = (vmi: V1VirtualMachineInstance) => {
+type UseSSHServiceValues = {
   sshService: any;
 };
 
-const useSSHService: UseSSHServiceProps = (vmi: V1VirtualMachineInstance) => {
+const useSSHService = (vmi: V1VirtualMachineInstance): UseSSHServiceValues => {
   const [sshService, setSSHService] = React.useState<any>(undefined);
   const sshServiceModal = React.useMemo(
     () => ({

@@ -16,13 +16,12 @@ const EmptyBootOrderSummary: React.FC<BootOrderSummaryProps> = ({ devices }) => 
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
   const options = devices?.filter((device) => !device?.value?.bootOrder);
 
-  console.log(devices);
   return (
     <>
       <Text component={TextVariants.p}>{t('No resource selected')}</Text>
       <MutedTextDiv
         text={t(
-          'Virtual Machine will attempt to boot from disks by order of apearance in YAML file',
+          'Virtual Machine will attempt to boot from disks by order of appearance in YAML file',
         )}
       />
       {options?.length > 0 && (

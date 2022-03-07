@@ -2,11 +2,11 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { NAME_OS_TEMPLATE_ANNOTATION, OS_TEMPLATE_LABEL } from '../../../../utils/constants';
 
-type StringHashMap = {
+type LabelsOrAnnotationsMap = {
   [key: string]: string;
 };
 
-const getPrefixedKey = (obj: StringHashMap, keyPrefix: string) =>
+const getPrefixedKey = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
   obj ? Object.keys(obj).find((key) => key.startsWith(keyPrefix)) : null;
 
 const getSuffixValue = (key: string) => {
@@ -14,10 +14,10 @@ const getSuffixValue = (key: string) => {
   return index > 0 ? key.substring(index + 1) : null;
 };
 
-export const findKeySuffixValue = (obj: StringHashMap, keyPrefix: string) =>
+export const findKeySuffixValue = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
   getSuffixValue(getPrefixedKey(obj, keyPrefix));
 
-export const getValueByPrefix = (obj: StringHashMap, keyPrefix: string): string => {
+export const getValueByPrefix = (obj: LabelsOrAnnotationsMap, keyPrefix: string): string => {
   const objectKey = Object.keys(obj || {}).find((key) => key.startsWith(keyPrefix));
   return objectKey ? obj[objectKey] : null;
 };

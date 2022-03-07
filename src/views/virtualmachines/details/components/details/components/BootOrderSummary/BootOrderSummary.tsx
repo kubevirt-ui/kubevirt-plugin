@@ -22,8 +22,8 @@ const BootOrderSummary: React.FC<BootOrderSummaryProps> = ({ vm }) => {
 
   const filtered = [...transformedDevices]?.filter((device) => device?.value?.bootOrder);
 
-  const isNoDevices = filtered?.length === 0;
-  return isNoDevices ? (
+  const noDevices = filtered?.length === 0;
+  return noDevices ? (
     <EmptyBootOrderSummary devices={transformedDevices} />
   ) : (
     <BootableDevicesList devices={filtered} />

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { TFunction } from 'i18next';
 
 import { NodeModel, PodModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
@@ -12,7 +13,6 @@ import FirstItemListPopover, {
 } from '../../../../list/components/FirstItemListPopover/FirstItemListPopover';
 import MutedTextDiv from '../components/MutedTextDiv/MutedTextDiv';
 
-// import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVMIPod } from './vmiHelper';
 
 export type VirtualMachineDetailsRightGridLayoutPresentation = {
@@ -25,35 +25,37 @@ export type VirtualMachineDetailsRightGridLayoutPresentation = {
   sshAccess: React.ReactNode;
 };
 
-export const getStoppedVMRightGridPresentation =
-  (): VirtualMachineDetailsRightGridLayoutPresentation => {
-    const notAvailable = <MutedTextDiv text="Not available" />;
-    const virtualMachineIsNotRunning = <MutedTextDiv text="Virtual machine is not running" />;
+export const getStoppedVMRightGridPresentation = (
+  t: TFunction,
+): VirtualMachineDetailsRightGridLayoutPresentation => {
+  const NotAvailable = <MutedTextDiv text={t('Not available')} />;
+  const VirtualMachineIsNotRunning = <MutedTextDiv text={t('Virtual machine is not running')} />;
 
-    return {
-      pod: notAvailable,
-      ipAddress: virtualMachineIsNotRunning,
-      hostname: notAvailable,
-      timezone: virtualMachineIsNotRunning,
-      node: notAvailable,
-      userCredentials: virtualMachineIsNotRunning,
-      sshAccess: virtualMachineIsNotRunning,
-    };
+  return {
+    pod: NotAvailable,
+    ipAddress: VirtualMachineIsNotRunning,
+    hostname: NotAvailable,
+    timezone: VirtualMachineIsNotRunning,
+    node: NotAvailable,
+    userCredentials: VirtualMachineIsNotRunning,
+    sshAccess: VirtualMachineIsNotRunning,
   };
+};
 
 export const getRunningVMRightGridPresentation = (
+  t: TFunction,
   vmi: V1VirtualMachineInstance,
   pods: K8sResourceCommon[],
   guestAgentData?: V1VirtualMachineInstanceGuestAgentInfo,
   sshService?: any,
 ): VirtualMachineDetailsRightGridLayoutPresentation => {
   const vmiPod = getVMIPod(vmi, pods);
-  const ipAddressess = getVMIIPAddresses(vmi);
+  const ipAddresses = getVMIIPAddresses(vmi);
   const nodeName = vmi?.status?.nodeName;
   const guestAgentIsRequired = guestAgentData && Object.keys(guestAgentData)?.length === 0;
 
-  const sshNotAvailableText = <MutedTextDiv text="SSH service is not available" />;
-  const guestAgentIsRequiredText = <MutedTextDiv text="Guest agent is required" />;
+  const SshNotAvailableText = <MutedTextDiv text={t('SSH service is not available')} />;
+  const GuestAgentIsRequiredText = <MutedTextDiv text={t('Guest agent is required')} />;
   console.log(sshService);
   return {
     pod: (
@@ -63,13 +65,13 @@ export const getRunningVMRightGridPresentation = (
         namespace={vmiPod?.metadata?.namespace}
       />
     ),
-    ipAddress: <FirstItemListPopover items={ipAddressess} headerContent={'IP Addresses'} />,
-    hostname: guestAgentIsRequired ? guestAgentIsRequiredText : guestAgentData?.hostname,
+    ipAddress: <FirstItemListPopover items={ipAddresses} headerContent={'IP Addresses'} />,
+    hostname: guestAgentIsRequired ? GuestAgentIsRequiredText : guestAgentData?.hostname,
     timezone: guestAgentIsRequired
-      ? guestAgentIsRequiredText
+      ? GuestAgentIsRequiredText
       : guestAgentData?.timezone?.split(',')[0],
     node: <ResourceLink kind={NodeModel.kind} name={nodeName} />,
-    userCredentials: sshNotAvailableText,
-    sshAccess: sshNotAvailableText,
+    userCredentials: SshNotAvailableText,
+    sshAccess: SshNotAvailableText,
   };
 };

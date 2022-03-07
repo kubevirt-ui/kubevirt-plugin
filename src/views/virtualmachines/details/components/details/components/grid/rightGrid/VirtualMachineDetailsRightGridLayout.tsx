@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAnnotation } from '@kubevirt-utils/selectors';
+import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { DetailItem } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { GridItem } from '@patternfly/react-core';
 
@@ -15,11 +15,11 @@ import MutedTextDiv from '../../MutedTextDiv/MutedTextDiv';
 
 type VirtualMachineDetailsRightGridLayout = {
   vm: V1VirtualMachine;
-  obj: VirtualMachineDetailsRightGridLayoutPresentation;
+  vmDetailsRightGridObj: VirtualMachineDetailsRightGridLayoutPresentation;
 };
 
 const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightGridLayout> = ({
-  obj,
+  vmDetailsRightGridObj,
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -31,22 +31,22 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         <VirtualMachineStatus printableStatus={vm?.status?.printableStatus} />
       </DetailItem>
       <DetailItem key="pod" title={t('Pod')}>
-        {obj?.pod}
+        {vmDetailsRightGridObj?.pod}
       </DetailItem>
       <DetailItem key="bootOrder" title={t('Boot Order')}>
         <BootOrderSummary vm={vm} />
       </DetailItem>
       <DetailItem key="ipAddress" title={t('IP Address')}>
-        {obj?.ipAddress}
+        {vmDetailsRightGridObj?.ipAddress}
       </DetailItem>
       <DetailItem key="hostname" title={t('Hostname')}>
-        {obj?.hostname}
+        {vmDetailsRightGridObj?.hostname}
       </DetailItem>
       <DetailItem key="timezone" title={t('Time Zone')}>
-        {obj?.timezone}
+        {vmDetailsRightGridObj?.timezone}
       </DetailItem>
       <DetailItem key="node" title={t('Node')}>
-        {obj?.node}
+        {vmDetailsRightGridObj?.node}
       </DetailItem>
       <DetailItem key="workloadProfile" title={t('Workload Profile')}>
         {getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) || (
@@ -54,10 +54,10 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         )}
       </DetailItem>
       <DetailItem key="userCrediantials" title={t('User credentials')}>
-        {obj?.userCredentials}
+        {vmDetailsRightGridObj?.userCredentials}
       </DetailItem>
       <DetailItem key="sshAccess" title={t('SSH Access')}>
-        {obj?.sshAccess}
+        {vmDetailsRightGridObj?.sshAccess}
       </DetailItem>
       <DetailItem key="hardwareDevices" title={t('Hardware devices')}>
         <MutedTextDiv text={t(`${(gpus || []).length} GPU devices`)} />

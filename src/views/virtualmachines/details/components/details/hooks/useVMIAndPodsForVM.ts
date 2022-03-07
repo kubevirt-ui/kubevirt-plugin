@@ -6,14 +6,14 @@ import {
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseVMIPod = {
+type UseVMIAndPodsForVMValues = {
   vmi: V1VirtualMachineInstance;
   pods: K8sResourceCommon[];
   loaded: boolean;
   error: any;
 };
 
-const useVMIPod = (vmName: string, vmNamespace: string): UseVMIPod => {
+const useVMIAndPodsForVM = (vmName: string, vmNamespace: string): UseVMIAndPodsForVMValues => {
   const [vmi, vmiLoaded, vmiLoadError] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     name: vmName,
@@ -38,4 +38,4 @@ const useVMIPod = (vmName: string, vmNamespace: string): UseVMIPod => {
   };
 };
 
-export default useVMIPod;
+export default useVMIAndPodsForVM;
