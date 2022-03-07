@@ -1,0 +1,326 @@
+[
+  {
+    "kind": "PersistentVolumeClaim",
+    "apiVersion": "v1",
+    "metadata": {
+      "annotations": {
+        "cdi.kubevirt.io/storage.pod.restarts": "0",
+        "pv.kubernetes.io/bind-completed": "yes",
+        "volume.beta.kubernetes.io/storage-provisioner": "csi.ovirt.org",
+        "cdi.kubevirt.io/storage.import.endpoint": "docker://quay.io/kubevirt/fedora-cloud-container-disk-demo:latest",
+        "cdi.kubevirt.io/storage.preallocation.requested": "false",
+        "cdi.kubevirt.io/storage.import.source": "registry",
+        "cdi.kubevirt.io/storage.condition.running.message": "Import Complete",
+        "cdi.kubevirt.io/storage.condition.running": "false",
+        "cdi.kubevirt.io/storage.import.importPodName": "importer-rhel7-private-zebra",
+        "cdi.kubevirt.io/storage.import.requiresScratch": "true",
+        "pv.kubernetes.io/bound-by-controller": "yes",
+        "volume.kubernetes.io/storage-provisioner": "csi.ovirt.org",
+        "cdi.kubevirt.io/storage.pod.phase": "Succeeded",
+        "cdi.kubevirt.io/storage.condition.running.reason": "Completed",
+        "cdi.kubevirt.io/storage.contentType": ""
+      },
+      "resourceVersion": "344202",
+      "name": "rhel7-private-zebra",
+      "uid": "f3e3f8c5-a635-40df-93e5-65d534d88220",
+      "creationTimestamp": "2022-01-27T13:16:05Z",
+      "managedFields": [
+        {
+          "manager": "kube-controller-manager",
+          "operation": "Update",
+          "apiVersion": "v1",
+          "time": "2022-01-27T13:16:06Z",
+          "fieldsType": "FieldsV1",
+          "fieldsV1": {
+            "f:metadata": {
+              "f:annotations": {
+                "f:pv.kubernetes.io/bind-completed": {},
+                "f:pv.kubernetes.io/bound-by-controller": {},
+                "f:volume.beta.kubernetes.io/storage-provisioner": {},
+                "f:volume.kubernetes.io/storage-provisioner": {}
+              }
+            },
+            "f:spec": {
+              "f:volumeName": {}
+            }
+          }
+        },
+        {
+          "manager": "kube-controller-manager",
+          "operation": "Update",
+          "apiVersion": "v1",
+          "time": "2022-01-27T13:16:06Z",
+          "fieldsType": "FieldsV1",
+          "fieldsV1": {
+            "f:status": {
+              "f:accessModes": {},
+              "f:capacity": {
+                ".": {},
+                "f:storage": {}
+              },
+              "f:phase": {}
+            }
+          },
+          "subresource": "status"
+        },
+        {
+          "manager": "cdi-controller",
+          "operation": "Update",
+          "apiVersion": "v1",
+          "time": "2022-01-27T13:17:16Z",
+          "fieldsType": "FieldsV1",
+          "fieldsV1": {
+            "f:metadata": {
+              "f:annotations": {
+                "f:cdi.kubevirt.io/storage.condition.running": {},
+                "f:cdi.kubevirt.io/storage.pod.phase": {},
+                "f:cdi.kubevirt.io/storage.contentType": {},
+                "f:cdi.kubevirt.io/storage.import.importPodName": {},
+                "f:cdi.kubevirt.io/storage.import.requiresScratch": {},
+                ".": {},
+                "f:cdi.kubevirt.io/storage.condition.running.reason": {},
+                "f:cdi.kubevirt.io/storage.import.endpoint": {},
+                "f:cdi.kubevirt.io/storage.pod.restarts": {},
+                "f:cdi.kubevirt.io/storage.preallocation.requested": {},
+                "f:cdi.kubevirt.io/storage.import.source": {},
+                "f:cdi.kubevirt.io/storage.condition.running.message": {}
+              },
+              "f:labels": {
+                ".": {},
+                "f:app": {},
+                "f:app.kubernetes.io/component": {},
+                "f:app.kubernetes.io/managed-by": {},
+                "f:app.kubernetes.io/part-of": {},
+                "f:app.kubernetes.io/version": {}
+              },
+              "f:ownerReferences": {
+                ".": {},
+                "k:{\"uid\":\"2bb1759c-2549-4c68-827b-9bd65f4392c3\"}": {}
+              }
+            },
+            "f:spec": {
+              "f:accessModes": {},
+              "f:resources": {
+                "f:requests": {
+                  ".": {},
+                  "f:storage": {}
+                }
+              },
+              "f:storageClassName": {},
+              "f:volumeMode": {}
+            }
+          }
+        }
+      ],
+      "namespace": "default",
+      "ownerReferences": [
+        {
+          "apiVersion": "cdi.kubevirt.io/v1beta1",
+          "kind": "DataVolume",
+          "name": "rhel7-private-zebra",
+          "uid": "2bb1759c-2549-4c68-827b-9bd65f4392c3",
+          "controller": true,
+          "blockOwnerDeletion": true
+        }
+      ],
+      "finalizers": [
+        "kubernetes.io/pvc-protection"
+      ],
+      "labels": {
+        "app": "containerized-data-importer",
+        "app.kubernetes.io/component": "storage",
+        "app.kubernetes.io/managed-by": "cdi-controller",
+        "app.kubernetes.io/part-of": "hyperconverged-cluster",
+        "app.kubernetes.io/version": "1.6.0"
+      }
+    },
+    "spec": {
+      "accessModes": [
+        "ReadWriteOnce"
+      ],
+      "resources": {
+        "requests": {
+          "storage": "22724694688"
+        }
+      },
+      "volumeName": "pvc-f3e3f8c5-a635-40df-93e5-65d534d88220",
+      "storageClassName": "ovirt-csi-sc",
+      "volumeMode": "Filesystem"
+    },
+    "status": {
+      "phase": "Bound",
+      "accessModes": [
+        "ReadWriteOnce"
+      ],
+      "capacity": {
+        "storage": "22724694688"
+      }
+    }
+  },
+  {
+    "kind": "PersistentVolumeClaim",
+    "apiVersion": "v1",
+    "metadata": {
+      "annotations": {
+        "kubevirt.ui/provider": "gili",
+        "cdi.kubevirt.io/storage.pod.restarts": "0",
+        "cdi.kubevirt.io/storage.pod.ready": "true",
+        "pv.kubernetes.io/bind-completed": "yes",
+        "volume.beta.kubernetes.io/storage-provisioner": "csi.ovirt.org",
+        "cdi.kubevirt.io/storage.upload.target": "",
+        "cdi.kubevirt.io/storage.preallocation.requested": "false",
+        "cdi.kubevirt.io/storage.condition.bound.message": "",
+        "cdi.kubevirt.io/storage.condition.running.message": "",
+        "cdi.kubevirt.io/storage.condition.bound": "true",
+        "cdi.kubevirt.io/storage.bind.immediate.requested": "true",
+        "cdi.kubevirt.io/storage.condition.running": "true",
+        "cdi.kubevirt.io/storage.uploadPodName": "cdi-upload-rhel7",
+        "pv.kubernetes.io/bound-by-controller": "yes",
+        "volume.kubernetes.io/storage-provisioner": "csi.ovirt.org",
+        "cdi.kubevirt.io/storage.pod.phase": "Running",
+        "cdi.kubevirt.io/storage.condition.running.reason": "Pod is running",
+        "cdi.kubevirt.io/storage.condition.bound.reason": "",
+        "cdi.kubevirt.io/storage.contentType": ""
+      },
+      "resourceVersion": "7253259",
+      "name": "rhel7",
+      "uid": "3e157c0f-9cf7-4765-ab21-91c8b1b32a2a",
+      "creationTimestamp": "2022-02-03T15:30:25Z",
+      "managedFields": [
+        {
+          "manager": "kube-controller-manager",
+          "operation": "Update",
+          "apiVersion": "v1",
+          "time": "2022-02-03T15:30:29Z",
+          "fieldsType": "FieldsV1",
+          "fieldsV1": {
+            "f:metadata": {
+              "f:annotations": {
+                "f:pv.kubernetes.io/bind-completed": {},
+                "f:pv.kubernetes.io/bound-by-controller": {},
+                "f:volume.beta.kubernetes.io/storage-provisioner": {},
+                "f:volume.kubernetes.io/storage-provisioner": {}
+              }
+            },
+            "f:spec": {
+              "f:volumeName": {}
+            }
+          }
+        },
+        {
+          "manager": "kube-controller-manager",
+          "operation": "Update",
+          "apiVersion": "v1",
+          "time": "2022-02-03T15:30:29Z",
+          "fieldsType": "FieldsV1",
+          "fieldsV1": {
+            "f:status": {
+              "f:accessModes": {},
+              "f:capacity": {
+                ".": {},
+                "f:storage": {}
+              },
+              "f:phase": {}
+            }
+          },
+          "subresource": "status"
+        },
+        {
+          "manager": "cdi-controller",
+          "operation": "Update",
+          "apiVersion": "v1",
+          "time": "2022-02-03T15:30:30Z",
+          "fieldsType": "FieldsV1",
+          "fieldsV1": {
+            "f:metadata": {
+              "f:annotations": {
+                "f:cdi.kubevirt.io/storage.condition.bound": {},
+                "f:cdi.kubevirt.io/storage.condition.running": {},
+                "f:cdi.kubevirt.io/storage.uploadPodName": {},
+                "f:cdi.kubevirt.io/storage.pod.phase": {},
+                "f:cdi.kubevirt.io/storage.contentType": {},
+                "f:cdi.kubevirt.io/storage.bind.immediate.requested": {},
+                ".": {},
+                "f:cdi.kubevirt.io/storage.pod.ready": {},
+                "f:cdi.kubevirt.io/storage.condition.running.reason": {},
+                "f:cdi.kubevirt.io/storage.condition.bound.reason": {},
+                "f:kubevirt.ui/provider": {},
+                "f:cdi.kubevirt.io/storage.upload.target": {},
+                "f:cdi.kubevirt.io/storage.pod.restarts": {},
+                "f:cdi.kubevirt.io/storage.preallocation.requested": {},
+                "f:cdi.kubevirt.io/storage.condition.bound.message": {},
+                "f:cdi.kubevirt.io/storage.condition.running.message": {}
+              },
+              "f:labels": {
+                ".": {},
+                "f:app": {},
+                "f:app.kubernetes.io/component": {},
+                "f:app.kubernetes.io/managed-by": {},
+                "f:app.kubernetes.io/part-of": {},
+                "f:app.kubernetes.io/version": {}
+              },
+              "f:ownerReferences": {
+                ".": {},
+                "k:{\"uid\":\"a2077658-dbf2-47e4-93a3-6552402cf4c6\"}": {}
+              }
+            },
+            "f:spec": {
+              "f:accessModes": {},
+              "f:resources": {
+                "f:requests": {
+                  ".": {},
+                  "f:storage": {}
+                }
+              },
+              "f:storageClassName": {},
+              "f:volumeMode": {}
+            }
+          }
+        }
+      ],
+      "namespace": "kubevirt-os-images",
+      "ownerReferences": [
+        {
+          "apiVersion": "cdi.kubevirt.io/v1beta1",
+          "kind": "DataVolume",
+          "name": "rhel7",
+          "uid": "a2077658-dbf2-47e4-93a3-6552402cf4c6",
+          "controller": true,
+          "blockOwnerDeletion": true
+        }
+      ],
+      "finalizers": [
+        "kubernetes.io/pvc-protection"
+      ],
+      "labels": {
+        "app": "containerized-data-importer",
+        "app.kubernetes.io/component": "storage",
+        "app.kubernetes.io/managed-by": "cdi-controller",
+        "app.kubernetes.io/part-of": "hyperconverged-cluster",
+        "app.kubernetes.io/version": "1.6.0"
+      }
+    },
+    "spec": {
+      "accessModes": [
+        "ReadWriteOnce"
+      ],
+      "resources": {
+        "requests": {
+          "storage": "22724694688"
+        }
+      },
+      "volumeName": "pvc-3e157c0f-9cf7-4765-ab21-91c8b1b32a2a",
+      "storageClassName": "ovirt-csi-sc",
+      "volumeMode": "Filesystem"
+    },
+    "status": {
+      "phase": "Bound",
+      "accessModes": [
+        "ReadWriteOnce"
+      ],
+      "capacity": {
+        "storage": "22724694688"
+      }
+    }
+  }
+]
