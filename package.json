@@ -19,7 +19,8 @@
     "cypress-postreport": "yarn cypress-merge && yarn cypress-generate",
     "test-cypress": "node_modules/.bin/cypress open --config-file ./cypress/cypress.json --env openshift=true",
     "test-cypress-docker": "echo 'visit http://localhost:10000' && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 $(npm bin)/cypress open --config-file ./cypress/cypress.json --env openshift=true",
-    "test-cypress-headless": "node --max-old-space-size=4096 $(npm bin)/cypress run --config-file ./cypress/cypress.json --env openshift=true --headless"
+    "test-cypress-headless": "node --max-old-space-size=4096 $(npm bin)/cypress run --config-file ./cypress/cypress.json --env openshift=true --headless",
+    "start-console": "./start-console.sh"
   },
   "consolePlugin": {
     "name": "kubevirt-plugin",
@@ -42,6 +43,7 @@
     ]
   },
   "dependencies": {
+    "@kubevirt-ui/components": "^0.0.10",
     "@patternfly/react-catalog-view-extension": "^4.43.15",
     "@patternfly/react-core": "4.192.15",
     "@patternfly/react-table": "^4.67.5",
