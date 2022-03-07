@@ -3,7 +3,7 @@ import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generato
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getAnnotation } from '@kubevirt-utils/selectors';
+import { getAnnotation } from '@kubevirt-utils/resources/shared';
 
 import { ANNOTATIONS } from './annotations';
 import {

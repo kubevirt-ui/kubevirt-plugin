@@ -1,6 +1,6 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1Disk, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getAnnotation, getLabel } from '@kubevirt-utils/selectors';
+import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 
 import { ANNOTATIONS } from '../../utils/annotations';
 import {

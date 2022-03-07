@@ -1,5 +1,6 @@
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { getResourceUrl } from '@kubevirt-utils/resource';
+
+import { getResourceUrl } from '../resources/shared';
 
 test('getResourceUrl', () => {
   const resource = {
