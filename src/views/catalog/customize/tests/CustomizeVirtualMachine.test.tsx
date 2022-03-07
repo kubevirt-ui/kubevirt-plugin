@@ -102,4 +102,20 @@ describe('Test CustomizeVirtualMachine', () => {
       mockVirtualMachineTemplate.parameters.length,
     );
   });
+
+  it('with disk source customization', async () => {
+    (useK8sWatchResource as jest.Mock).mockReturnValueOnce([
+      mockVirtualMachineTemplate,
+      true,
+      undefined,
+    ]);
+
+    render(<CustomizeVirtualMachine />);
+
+    expect(screen.queryByText('Storage')).not.toBeNull();
+
+    expect(screen.getAllByRole('textbox')).toHaveLength(
+      mockVirtualMachineTemplate.parameters.length,
+    );
+  });
 });

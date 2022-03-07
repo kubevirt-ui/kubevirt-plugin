@@ -5,6 +5,7 @@ import {
   TemplateParameter,
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   generateVMName,
   getTemplateVirtualMachineObject,
@@ -55,6 +56,7 @@ export const extractParameterNameFromMetadataName = (template: V1Template): stri
 export const processTemplate = async (
   template: V1Template,
   formData: FormData,
+  customSource?: V1beta1DataVolumeSpec,
 ): Promise<V1Template> => {
   const virtualMachineName = formData.get(NAME_INPUT_FIELD) as string;
 
@@ -66,7 +68,7 @@ export const processTemplate = async (
 
   const processedTemplate = await k8sCreate<V1Template>({
     model: ProcessedTemplatesModel,
-    data: overrideTemplate(template, virtualMachineName),
+    data: overrideTemplate(template, virtualMachineName, customSource),
     queryParams: {
       dryRun: 'All',
     },
@@ -100,18 +102,15 @@ export const getTemplateStorageQuantity = (template: V1Template): string | undef
   return dataVolumeTemplates?.[0]?.spec?.storage?.resources?.requests?.storage;
 };
 
-export const buildFields = (
-  template: V1Template,
-  parametersToFilter: string[],
-  t: TFunction,
-): Array<TemplateParameter[]> => {
+export const buildFields = (template: V1Template): Array<TemplateParameter[]> => {
+  const parameterForName = extractParameterNameFromMetadataName(template);
+
   const optionalFields = template.parameters?.filter(
-    (parameter) => !parameter.required && !parametersToFilter.includes(parameter.name),
+    (parameter) => !parameter.required && parameterForName !== parameter.name,
   );
   const requiredFields = template.parameters?.filter(
-    (parameter) => parameter.required && !parametersToFilter.includes(parameter.name),
+    (parameter) => parameter.required && parameterForName !== parameter.name,
   );
-  requiredFields?.unshift(getVirtualMachineNameField(template, t));
 
   return [requiredFields, optionalFields];
 };
