@@ -2,11 +2,11 @@ import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import VirtualMachineDetailsPage from '../components/details/VirtualMachineDetailsPage';
-import DiskListPage from '../components/disk/tables/disk/DiskListPage';
-import NetworkInterfaceListPage from '../components/network/NetworkInterfaceListPage';
-import VirtualMachinesOverviewTab from '../components/overview/VirtualMachinesOverviewTab';
-import SnapshotListPage from '../components/snapshots/SnapshotListPage';
+import VirtualMachineDetailsPage from '../tabs/details/VirtualMachineDetailsPage';
+import DiskListPage from '../tabs/disk/tables/disk/DiskListPage';
+import NetworkInterfaceListPage from '../tabs/network/NetworkInterfaceListPage';
+import VirtualMachinesOverviewTab from '../tabs/overview/VirtualMachinesOverviewTab';
+import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
 
 export const useVirtualMachineTabs = () => {
   const { t } = useKubevirtTranslation();

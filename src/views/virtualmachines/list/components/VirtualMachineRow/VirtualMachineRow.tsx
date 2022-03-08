@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { RowProps } from '@openshift-console/dynamic-plugin-sdk';
 
-import { NO_DATA_DASH } from '../../../../virtualmachines/utils/constants';
 import { printableVMStatus } from '../../../utils';
 
 import VirtualMachineRowLayout from './VirtualMachineRowLayout';
