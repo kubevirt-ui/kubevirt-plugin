@@ -10,7 +10,7 @@ type FirstItemListPopoverProps = {
 };
 
 export const getVMIIPAddresses = (vmi: V1VirtualMachineInstance): string[] => {
-  const namedInterfaces = vmi.status?.interfaces?.filter((iface) => !!iface.name) || [];
+  const namedInterfaces = vmi?.status?.interfaces?.filter((iface) => !!iface.name) || [];
   const ipAddresses = namedInterfaces?.flatMap((iface) => [
     iface?.ipAddress,
     ...(iface?.ipAddresses || []),
