@@ -19,7 +19,6 @@ export const overrideStorage = (dataVolumeStorage, newStorage: string) => {
 
 export const overrideVirtualMachineObject = (
   template: V1Template,
-  namespace: string,
   name: string,
 ): V1VirtualMachine => {
   const virtualMachine = getTemplateVirtualMachineObject(template);
@@ -29,18 +28,13 @@ export const overrideVirtualMachineObject = (
     metadata: {
       ...virtualMachine.metadata,
       name,
-      namespace,
     },
   };
 };
 
-export const overrideTemplate = (
-  template: V1Template,
-  namespace: string,
-  name: string,
-): V1Template => {
+export const overrideTemplate = (template: V1Template, name: string): V1Template => {
   return {
     ...template,
-    objects: [overrideVirtualMachineObject(template, namespace, name)],
+    objects: [overrideVirtualMachineObject(template, name)],
   };
 };
