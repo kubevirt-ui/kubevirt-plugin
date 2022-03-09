@@ -4,6 +4,8 @@ import FeatureHighlightsSection from './feature-highlights-section/FeatureHighli
 import RecommendedOperatorsSection from './recommended-operators-section/RecommendedOperatorsSection';
 import { GettingStartedGrid } from './utils/getting-started-grid/GettingStartedGrid';
 
+import './GettingStartedCard.scss';
+
 const GettingStartedCard: React.FC = () => (
   <div className="kv-overview-getting-started-section">
     <GettingStartedGrid>
