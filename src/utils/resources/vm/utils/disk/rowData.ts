@@ -7,8 +7,15 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 
+/**
+ *  A function for getting disks row data for a VM
+ * @param {DiskRawData[]} disks - disks to get row data from
+ * @param {TFunction} t - T function for i18n
+ * @returns returns DiskRowDataLayout[]
+ */
 export const getDiskRowDataLayout = (disks: DiskRawData[], t: TFunction): DiskRowDataLayout[] => {
   return disks?.map((device) => {
+    // eslint-disable-next-line require-jsdoc
     const source = () => {
       if (device?.volume?.containerDisk) {
         return t('Container (Ephemeral)');

@@ -10,6 +10,11 @@ import { BOOT_SOURCE } from '../../utils/constants';
 
 import { getDataSourcePVC, getPVC, getTemplateBootSourceType, TemplateBootSource } from './utils';
 
+/**
+ * A Hook that returns the boot source status of a given template
+ * @param {V1Template} template - template to check
+ * @returns the boot source and its status
+ */
 export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceValue => {
   const [templateBootSource, setTemplateBootSource] = React.useState<TemplateBootSource>(undefined);
   const [isBootSourceAvailable, setIsBootSourceAvailable] = React.useState<boolean>(false);
@@ -18,6 +23,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
 
   const bootSource = React.useMemo(() => getTemplateBootSourceType(template), [template]);
 
+  // eslint-disable-next-line require-jsdoc
   const getPVCSource = ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
     setLoaded(false);
     return getPVC(name, namespace)
@@ -40,6 +46,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
       .finally(() => setLoaded(true));
   };
 
+  // eslint-disable-next-line require-jsdoc
   const getDataSourcePVCSource = ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
     setLoaded(false);
     return getDataSourcePVC(name, namespace)

@@ -31,6 +31,7 @@ export type TemplateBootSource = {
 export const TEMPLATE_ROOTDISK_VOLUME_NAME = '${NAME}';
 
 // Only used for replacing parameters in the template, do not use for anything else
+// eslint-disable-next-line require-jsdoc
 const poorManProcess = (template: V1Template): V1Template => {
   if (!template) return null;
 
@@ -45,6 +46,11 @@ const poorManProcess = (template: V1Template): V1Template => {
   return JSON.parse(templateString);
 };
 
+/**
+ * a function to get the boot source from a template and its status
+ * @param {V1Template} template - the template to get the boot source from
+ * @returns the template's boot source and its status
+ */
 export const getTemplateBootSourceType = (template: V1Template): TemplateBootSource => {
   const vmObject = getTemplateVirtualMachineObject(poorManProcess(template));
 
@@ -92,6 +98,12 @@ export const getTemplateBootSourceType = (template: V1Template): TemplateBootSou
   return null;
 };
 
+/**
+ * a function to k8sGet a PVC
+ * @param name the name of the PVC
+ * @param ns  the namespace of the PVC
+ * @returns a promise that resolves into the PVC
+ */
 export const getPVC = (name: string, ns: string) =>
   k8sGet<V1alpha1PersistentVolumeClaim>({
     model: PersistentVolumeClaimModel,
@@ -99,6 +111,12 @@ export const getPVC = (name: string, ns: string) =>
     ns,
   });
 
+/**
+ * a function to k8sGet a DataSource
+ * @param name the name of the DataSource
+ * @param ns  the namespace of the DataSource
+ * @returns a promise that resolves into the DataSource
+ */
 export const getDataSourcePVC = (name: string, ns: string) =>
   k8sGet({
     model: DataSourceModel,

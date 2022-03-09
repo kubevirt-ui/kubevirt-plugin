@@ -20,7 +20,7 @@
   "plugins": ["react", "@typescript-eslint", "react-hooks", "prettier", "simple-import-sort"],
   "settings": {
     "react": {
-      "version": "latest"
+      "version": "detect"
     },
     "import/resolver": {
       "typescript": {}, // this loads <rootdir>/tsconfig.json to eslint
@@ -39,6 +39,7 @@
         "endOfLine": "auto"
       }
     ],
+    "no-nested-ternary": "error",
     "simple-import-sort/exports": "error",
     "@typescript-eslint/no-shadow": ["error"],
     "simple-import-sort/imports": [

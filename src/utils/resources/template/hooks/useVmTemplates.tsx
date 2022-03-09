@@ -10,6 +10,7 @@ import {
 
 import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../utils/constants';
 
+/** A Hook that returns VM Templates from allowed namespaces */
 export const useVmTemplates = (): useVmTemplatesValues => {
   const [templates, setTemplates] = React.useState<V1Template[]>([]);
   const [loaded, setLoaded] = React.useState<boolean>(false);
