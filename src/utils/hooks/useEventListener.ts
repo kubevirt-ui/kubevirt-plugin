@@ -9,6 +9,12 @@ function useEventListener<
   T extends HTMLElement = HTMLDivElement,
 >(eventName: K, handler: (event: HTMLElementEventMap[K]) => void, element: RefObject<T>): void;
 
+/**
+ * Hook that creates an event listener.
+ * @param eventName The name of the event to listen to.
+ * @param handler The handler to call when the event is triggered.
+ * @param element The element to attach the event listener to.
+ */
 function useEventListener<
   KW extends keyof WindowEventMap,
   KH extends keyof HTMLElementEventMap,
@@ -34,6 +40,7 @@ function useEventListener<
     }
 
     // Create event listener that calls handler function stored in ref
+    // eslint-disable-next-line require-jsdoc
     const eventListener: typeof handler = (event) => {
       if (savedHandler?.current) {
         savedHandler.current(event);

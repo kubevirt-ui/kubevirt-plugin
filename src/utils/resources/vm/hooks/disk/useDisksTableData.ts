@@ -11,6 +11,11 @@ import { getDiskRowDataLayout } from '../../utils/disk/rowData';
 
 type UseDisksTableDisks = (vm: V1VirtualMachine) => [DiskRowDataLayout[], boolean, any];
 
+/**
+ * A Hook for getting disks data for a VM
+ * @param vm - virtual machine to get disks from
+ * @returns disks data and loading state
+ */
 const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
   const { t } = useKubevirtTranslation();
   const vmDisks = getDisks(vm);

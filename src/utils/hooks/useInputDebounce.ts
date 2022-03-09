@@ -4,6 +4,12 @@ import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 
 import useEventListener from './useEventListener';
 
+/**
+ * A Hook that returns an input field reference for debouncing the input change callback.
+ * @param {number} delay - delay in ms
+ * @param callback - callback to be executed after delay
+ * @param {string} updateURLParam - name of the URL param to update
+ */
 export const useInputDebounce = ({
   delay,
   onChange,
@@ -20,6 +26,7 @@ export const useInputDebounce = ({
   const param = params.get(updateURLParam);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
+  // eslint-disable-next-line require-jsdoc
   const updateValue = (v: string) => {
     setValue(v || '');
     if (updateURLParam) {
@@ -30,6 +37,7 @@ export const useInputDebounce = ({
     }
   };
 
+  // eslint-disable-next-line require-jsdoc
   const resetValue = () => {
     setValue('');
     if (inputRef?.current?.value) {
