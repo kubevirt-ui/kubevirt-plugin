@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { cleanup, render, screen } from '@testing-library/react';
 
@@ -26,9 +27,9 @@ jest.mock('@kubevirt-utils/hooks/useURLParams', () => ({
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { getMockTemplate: getTemplate } = require('./mocks');
+  const { mockUseK8sWatchResource } = require('./mocks');
   return {
-    useK8sWatchResource: jest.fn().mockReturnValue([getTemplate(), true, undefined]),
+    useK8sWatchResource: mockUseK8sWatchResource,
   };
 });
 
@@ -36,15 +37,25 @@ const mockVirtualMachineTemplate = getMockTemplate();
 
 describe('Test CustomizeVirtualMachine', () => {
   beforeEach(() => {
+    (useK8sWatchResource as jest.Mock).mockReset();
     cleanup();
   });
 
   it('It render the form on template loaded', () => {
+    (useK8sWatchResource as jest.Mock).mockReturnValueOnce([
+      mockVirtualMachineTemplate,
+      true,
+      undefined,
+    ]);
     render(<CustomizeVirtualMachine />);
 
-    const nParameters = mockVirtualMachineTemplate.parameters.length;
+    expect(screen.getByLabelText('Name', { exact: false }));
 
-    expect(screen.getAllByRole('textbox')).toHaveLength(nParameters);
+    expect(
+      screen.getByText(
+        mockVirtualMachineTemplate.metadata.annotations['openshift.io/display-name'],
+      ),
+    );
   });
 
   it('It render the loading properly on loading', () => {
@@ -64,5 +75,31 @@ describe('Test CustomizeVirtualMachine', () => {
     render(<CustomizeVirtualMachine />);
     expect(screen.queryByTestId('scheleton')).toBeNull();
     screen.getByTestId('error-message');
+  });
+
+  it('without disk source customization', async () => {
+    const virtualMachine = mockVirtualMachineTemplate.objects[0];
+    const mockTemplate: V1Template = {
+      ...mockVirtualMachineTemplate,
+      objects: [
+        {
+          ...virtualMachine,
+          spec: {
+            ...virtualMachine.spec,
+            dataVolumeTemplates: [],
+          },
+        },
+      ],
+    };
+
+    (useK8sWatchResource as jest.Mock).mockReturnValueOnce([mockTemplate, true, undefined]);
+
+    render(<CustomizeVirtualMachine />);
+
+    expect(screen.queryByText('Storage')).toBeNull();
+
+    expect(screen.getAllByRole('textbox')).toHaveLength(
+      mockVirtualMachineTemplate.parameters.length,
+    );
   });
 });

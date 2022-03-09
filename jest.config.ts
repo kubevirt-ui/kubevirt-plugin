@@ -16,7 +16,7 @@ const config: Config.InitialOptions = {
   testRegex: '.*\\.test\\.(ts|tsx|js|jsx)$',
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
   transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!(@kubevirt-ui/kubevirt-api|@patternfly|@openshift-console\\S*?)/.*)',
+    '<rootDir>/node_modules/(?!(@kubevirt-ui/kubevirt-api|byte-size|@patternfly|@openshift-console\\S*?)/.*)',
   ],
   setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
   moduleNameMapper: {
