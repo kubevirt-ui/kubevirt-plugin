@@ -804,6 +804,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kubevirt-ui/kubevirt-api@npm:^0.0.37":
+  version: 0.0.37
+  resolution: "@kubevirt-ui/kubevirt-api@npm:0.0.37"
+  checksum: 4a3b41b37c9d9dee8c02b6e2d2686566dd4966d4820189cb24a659e2cd315048f9f290e995a5ef9c8565121c0fd2283792bd39f8d7e4f72ddbb995d3073afc99
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -7058,7 +7065,7 @@ __metadata:
   dependencies:
     "@cypress/webpack-preprocessor": ^5.11.0
     "@kubevirt-ui/components": ^0.0.10
-    "@kubevirt-ui/kubevirt-api": ^0.0.35
+    "@kubevirt-ui/kubevirt-api": ^0.0.37
     "@openshift-console/dynamic-plugin-sdk": 0.0.6
     "@openshift-console/dynamic-plugin-sdk-internal": ^0.0.5
     "@openshift-console/dynamic-plugin-sdk-webpack": 0.0.6
