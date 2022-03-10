@@ -59,10 +59,10 @@ const SnapshotDeadlineFormField: React.FC<SnapshotDeadlineFormFieldProps> = ({
     >
       <Grid hasGutter>
         <GridItem span={8}>
-          <TextInput type="text" value={deadline} onChange={handleDeadlineChange} />
+          <TextInput type="text" value={deadline} onChange={handleDeadlineChange} id="deadline" />
         </GridItem>
         <GridItem span={4}>
-          <FormSelect value={deadlineUnit} onChange={handleDeadlineUnitChange}>
+          <FormSelect value={deadlineUnit} onChange={handleDeadlineUnitChange} id="deadline-unit">
             {Object.entries(deadlineUnits).map(([key, value]) => (
               <FormSelectOption key={key} value={value} label={`${key} (${value})`} />
             ))}

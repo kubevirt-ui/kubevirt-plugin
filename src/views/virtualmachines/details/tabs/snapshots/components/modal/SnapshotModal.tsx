@@ -1,17 +1,19 @@
 import * as React from 'react';
-import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1alpha1VirtualMachineSnapshot,
+  // V1alpha1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, Modal, TextArea } from '@patternfly/react-core';
+import { Form, FormGroup, TextArea } from '@patternfly/react-core';
 
+import { printableVMStatus } from '../../../../../utils';
 import { deadlineUnits } from '../../utils/consts';
 import {
   generateSnapshotName,
@@ -19,14 +21,12 @@ import {
   getVolumeSnapshotStatusesPartition,
 } from '../../utils/helpers';
 
-import CreateErrorAlert from './alerts/CreateErrorAlert';
 import NoSupportedVolumesAlert from './alerts/NoSupportedVolumesAlert';
 import SupportedVolumesAlert from './alerts/SupportedVolumesAlert';
 import UnsupportedVolumesAlert from './alerts/UnsupportedVolumesAlert';
 import SnapshotDeadlineFormField from './SnapshotFormFields/SnapshotDeadlineFormField';
 import SnapshotNameFormField from './SnapshotFormFields/SnapshotNameFormField';
 import SnapshotSupportedVolumeList from './SnapshotFormFields/SnapshotSupportedVolumeList';
-import SnapshotModalFooter from './SnapshotModalFooter/SnapshotModalFooter';
 
 type SnapshotModalProps = {
   vm: V1VirtualMachine;
@@ -42,19 +42,16 @@ const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, usedNames, isOpen, on
   const [description, setDescription] = React.useState<string>(undefined);
   const [deadline, setDeadline] = React.useState<string>(undefined);
   const [deadlineUnit, setDeadlineUnit] = React.useState<deadlineUnits>(deadlineUnits.Seconds);
-  const [isCreating, setIsCreating] = React.useState<boolean>(false);
 
   const volumeSnapshotStatuses = getVolumeSnapshotStatuses(vm);
   const { supportedVolumes, unsupportedVolumes } =
     getVolumeSnapshotStatusesPartition(volumeSnapshotStatuses);
 
   const [isSubmitDisabled, setSubmitDisabled] = React.useState<boolean>(false);
-  const [createSnapshotError, setCreateSnapshotError] = React.useState(undefined);
 
-  const onSubmit = async () => {
-    setIsCreating(true);
+  const resultSnapshot = React.useMemo(() => {
     const snapshot = getEmptyVMSnapshotResource(vm);
-    const ownerReference = buildOwnerReference(vm);
+    const ownerReference = buildOwnerReference(vm, { blockOwnerDeletion: false });
 
     snapshot.metadata.name = snapshotName;
     snapshot.metadata.ownerReferences = [ownerReference];
@@ -64,31 +61,22 @@ const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, usedNames, isOpen, on
     if (deadline) {
       snapshot.spec.failureDeadline = `${deadline}${deadlineUnit}`;
     }
-    await k8sCreate<V1alpha1VirtualMachineSnapshot>({
-      model: VirtualMachineSnapshotModel,
-      data: snapshot,
-    })
-      .then(() => onClose())
-      .catch((error) => setCreateSnapshotError(error))
-      .finally(() => setIsCreating(false));
-  };
+    return snapshot;
+  }, [deadline, deadlineUnit, description, snapshotName, vm]);
 
   return (
-    <Modal
-      variant="small"
-      position="top"
-      className="ocs-modal co-catalog-page__overlay"
-      header={<h1>{t('Add snapshot')}</h1>}
-      footer={
-        <SnapshotModalFooter
-          onSubmit={onSubmit}
-          onClose={onClose}
-          isDisabled={isSubmitDisabled}
-          isProcessing={isCreating}
-        />
+    <TabModal<V1alpha1VirtualMachineSnapshot>
+      isOpen={isOpen}
+      obj={resultSnapshot}
+      onSubmit={(obj) =>
+        k8sCreate<V1alpha1VirtualMachineSnapshot>({
+          model: VirtualMachineSnapshotModel,
+          data: obj,
+        })
       }
       onClose={onClose}
-      isOpen={isOpen}
+      headerText={t('Add snapshot')}
+      isDisabled={isSubmitDisabled}
     >
       {supportedVolumes?.length === 0 ? (
         <NoSupportedVolumesAlert />
@@ -104,7 +92,7 @@ const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, usedNames, isOpen, on
             setIsError={setSubmitDisabled}
           />
           <FormGroup label={t('Description')} fieldId="description">
-            <TextArea value={description} onChange={setDescription} />
+            <TextArea value={description} onChange={setDescription} id="description" />
           </FormGroup>
           <SnapshotDeadlineFormField
             deadline={deadline}
@@ -115,10 +103,9 @@ const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, usedNames, isOpen, on
           />
           <SnapshotSupportedVolumeList supportedVolumes={supportedVolumes} />
           <UnsupportedVolumesAlert unsupportedVolumes={unsupportedVolumes} />
-          <CreateErrorAlert createSnapshotError={createSnapshotError} />
         </Form>
       )}
-    </Modal>
+    </TabModal>
   );
 };
 

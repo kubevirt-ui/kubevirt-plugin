@@ -12,9 +12,15 @@ import { filters } from '../../utils/filters';
 
 import SnapshotRow from './SnapshotRow';
 
-type SnapshotsListProps = UseSnapshotData;
+type SnapshotsListProps = UseSnapshotData & { isVMRunning?: boolean };
 
-const SnapshotsList: React.FC<SnapshotsListProps> = ({ snapshots, restoresMap, loaded, error }) => {
+const SnapshotsList: React.FC<SnapshotsListProps> = ({
+  snapshots,
+  restoresMap,
+  loaded,
+  error,
+  isVMRunning,
+}) => {
   const columns = useSnapshotColumns();
   const [data, filteredData, onFilterChange] = useListPageFilter(snapshots, filters);
   return (
@@ -32,7 +38,7 @@ const SnapshotsList: React.FC<SnapshotsListProps> = ({ snapshots, restoresMap, l
         loadError={error}
         columns={columns}
         Row={SnapshotRow}
-        rowData={{ restores: restoresMap }}
+        rowData={{ restores: restoresMap, isVMRunning }}
       />
     </>
   );

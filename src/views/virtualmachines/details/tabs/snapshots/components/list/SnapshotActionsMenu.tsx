@@ -1,74 +1,70 @@
 import * as React from 'react';
 
-import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
-import {
-  V1alpha1VirtualMachineRestore,
-  V1alpha1VirtualMachineSnapshot,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
-import DeleteResourceModal from '@kubevirt-utils/components/modals/DeleteResourceModal';
+import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import TabModal, { DeleteResourceMessege } from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
-import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
+import {
+  ButtonVariant,
+  Dropdown,
+  DropdownItem,
+  DropdownPosition,
+  KebabToggle,
+} from '@patternfly/react-core';
 
 type SnapshotActionsMenuProps = {
   snapshot: V1alpha1VirtualMachineSnapshot;
-  restore: V1alpha1VirtualMachineRestore;
 };
 
-const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({ snapshot, restore }) => {
+const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({ snapshot }) => {
   const { t } = useKubevirtTranslation();
-  const [isDropDropdownOpen, setIsDropDropdownOpen] = React.useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
-  const [isDeleting, setIsDeleting] = React.useState(false);
+  const label = t('Delete VirtualMachineSnapshot');
 
   const onDeleteModalToggle = () => {
     setIsDeleteModalOpen(true);
-    setIsDropDropdownOpen(false);
+    setIsDropdownOpen(false);
   };
 
-  const handleDeleteVMSnapshot = async () => {
-    setIsDeleting(true);
-    await k8sDelete({
-      model: VirtualMachineSnapshotModel,
-      resource: snapshot,
-      json: undefined,
-      requestInit: undefined,
-    });
-
-    await k8sDelete({
-      model: VirtualMachineRestoreModel,
-      resource: restore,
-      json: undefined,
-      requestInit: undefined,
-    });
-    setIsDeleting(false);
-  };
+  const snapshotResult = React.useMemo(() => snapshot, [snapshot]);
 
   const items = [
     <DropdownItem onClick={onDeleteModalToggle} key="snapshot-delete">
-      {t('Delete VirtualMachineSnapshot')}
+      {label}
     </DropdownItem>,
   ];
 
   return (
     <>
       <Dropdown
-        onSelect={() => setIsDropDropdownOpen(false)}
-        toggle={<KebabToggle onToggle={setIsDropDropdownOpen} id="toggle-id-6" />}
-        isOpen={isDropDropdownOpen}
+        onSelect={() => setIsDropdownOpen(false)}
+        toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-6" />}
+        isOpen={isDropdownOpen}
         isPlain
         dropdownItems={items}
         position={DropdownPosition.right}
       />
       {isDeleteModalOpen && (
-        <DeleteResourceModal
-          obj={snapshot}
+        <TabModal<V1alpha1VirtualMachineSnapshot>
           onClose={() => setIsDeleteModalOpen(false)}
           isOpen={isDeleteModalOpen}
-          onDelete={handleDeleteVMSnapshot}
-          isProcessing={isDeleting}
-        />
+          obj={snapshotResult}
+          onSubmit={(obj) =>
+            k8sDelete({
+              model: VirtualMachineSnapshotModel,
+              resource: obj,
+              json: undefined,
+              requestInit: undefined,
+            })
+          }
+          headerText={label}
+          submitBtnText={t('Delete')}
+          submitBtnVariant={ButtonVariant.danger}
+        >
+          <DeleteResourceMessege obj={snapshot} />
+        </TabModal>
       )}
     </>
   );

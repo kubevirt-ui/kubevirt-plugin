@@ -40,7 +40,7 @@ const SnapshotNameFormField: React.FC<SnapshotNameFormFieldProps> = ({
       helperTextInvalidIcon={snapshotNameError && <RedExclamationCircleIcon title="Error" />}
       validated={snapshotNameError ? 'error' : 'default'}
     >
-      <TextInput type="text" value={snapshotName} onChange={handleNameChange} />
+      <TextInput type="text" value={snapshotName} onChange={handleNameChange} id="name" />
     </FormGroup>
   );
 };

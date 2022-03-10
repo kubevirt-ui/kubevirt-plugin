@@ -9,6 +9,8 @@ import {
   ListPageHeader,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import { printableVMStatus } from '../../../utils';
+
 import SnapshotList from './components/list/SnapshotList';
 import SnapshotModal from './components/modal/SnapshotModal';
 import useSnapshotData from './hooks/useSnapshotData';
@@ -21,12 +23,12 @@ type SnapshotListPageProps = RouteComponentProps<{
   obj?: V1VirtualMachine;
 };
 
-const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj }) => {
+const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
   const { snapshots, restoresMap, loaded, error } = useSnapshotData(
-    obj?.metadata?.name,
-    obj?.metadata?.namespace,
+    vm?.metadata?.name,
+    vm?.metadata?.namespace,
   );
 
   return (
@@ -42,12 +44,13 @@ const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj }) => {
           restoresMap={restoresMap}
           loaded={loaded}
           error={error}
+          isVMRunning={vm?.status?.printableStatus !== printableVMStatus.Stopped}
         />
       </ListPageBody>
       {isOpen && (
         <SnapshotModal
           usedNames={getUsedSnapshotNames(snapshots)}
-          vm={obj}
+          vm={vm}
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
         />

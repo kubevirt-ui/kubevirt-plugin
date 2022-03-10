@@ -2,8 +2,10 @@ import { TFunction } from 'i18next';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
+  V1alpha1VirtualMachineRestore,
   V1alpha1VirtualMachineSnapshot,
   V1VirtualMachine,
   V1VolumeSnapshotStatus,
@@ -77,4 +79,27 @@ export const getEmptyVMSnapshotResource = (
     },
   };
   return snapshotResource;
+};
+
+export const getVMRestoreSnapshotResource = (
+  snapshot: V1alpha1VirtualMachineSnapshot,
+): V1alpha1VirtualMachineRestore => {
+  const restoreResource: V1alpha1VirtualMachineRestore = {
+    apiVersion: `${VirtualMachineRestoreModel.apiGroup}/${VirtualMachineRestoreModel.apiVersion}`,
+    kind: VirtualMachineRestoreModel.kind,
+    metadata: {
+      name: `resotre-${snapshot.metadata.name}-${new Date().getTime()}`,
+      namespace: snapshot.metadata.namespace,
+      ownerReferences: [...(snapshot.metadata.ownerReferences || [])],
+    },
+    spec: {
+      target: {
+        apiGroup: VirtualMachineModel.apiGroup,
+        kind: VirtualMachineModel.kind,
+        name: snapshot.spec.source.name,
+      },
+      virtualMachineSnapshotName: snapshot.metadata.name,
+    },
+  };
+  return restoreResource;
 };
