@@ -5,15 +5,16 @@ import {
   TemplateParameter,
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1DataVolumeTemplateSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   generateVMName,
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template/utils/selectors';
+import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { NAME_INPUT_FIELD } from './constants';
-import { overrideTemplate } from './overrides';
+import { overrideTemplateVirtualMachine } from './overrides';
 
 export const isFieldInvalid = (field: TemplateParameter, formData: FormData): boolean =>
   (formData.get(field.name) as string).length === 0;
@@ -23,6 +24,14 @@ export const setTemplateParameters = (template: V1Template, formData: FormData):
     const formParameter = formData.get(parameter.name) as string;
     if (formParameter.length > 0) parameter.value = formParameter;
   });
+};
+
+export const getVirtualMachineDataVolumeTemplate = (
+  template: V1Template,
+): V1DataVolumeTemplateSpec | undefined => {
+  const dataVolumeTemplates = getTemplateVirtualMachineObject(template)?.spec?.dataVolumeTemplates;
+
+  return dataVolumeTemplates?.[0];
 };
 
 export const replaceTemplateParameterValue = (
@@ -48,6 +57,19 @@ export const hasCustomizableDiskSource = (template: V1Template): boolean => {
   return true;
 };
 
+export const hasCustomizableCDSource = (template): boolean => {
+  const virtualMachine = getTemplateVirtualMachineObject(template);
+
+  const dataVolumeTemplate = getVirtualMachineDataVolumeTemplate(template);
+  const volumeWithDataVolume = getVolumes(virtualMachine)?.find(
+    (volume) => volume.name === volume.dataVolume?.name,
+  );
+  const diskByName = getDisks(virtualMachine)?.find(
+    (disk) => disk.name === volumeWithDataVolume?.name,
+  );
+  return !!volumeWithDataVolume && !!diskByName && !!dataVolumeTemplate;
+};
+
 export const extractParameterNameFromMetadataName = (template: V1Template): string => {
   const virtualMachineObject = getTemplateVirtualMachineObject(template);
   return virtualMachineObject?.metadata.name?.replace(/[${}\"]+/g, '');
@@ -56,7 +78,6 @@ export const extractParameterNameFromMetadataName = (template: V1Template): stri
 export const processTemplate = async (
   template: V1Template,
   formData: FormData,
-  customSource?: V1beta1DataVolumeSpec,
 ): Promise<V1Template> => {
   const virtualMachineName = formData.get(NAME_INPUT_FIELD) as string;
 
@@ -68,7 +89,7 @@ export const processTemplate = async (
 
   const processedTemplate = await k8sCreate<V1Template>({
     model: ProcessedTemplatesModel,
-    data: overrideTemplate(template, virtualMachineName, customSource),
+    data: overrideTemplateVirtualMachine(template, virtualMachineName),
     queryParams: {
       dryRun: 'All',
     },
@@ -90,16 +111,8 @@ export const getVirtualMachineNameField = (
   };
 };
 
-export type FormErrors = {
-  parameters?: { [key: string]: string };
-  diskSource?: string;
-  volume?: string;
-};
-
 export const getTemplateStorageQuantity = (template: V1Template): string | undefined => {
-  const dataVolumeTemplates = getTemplateVirtualMachineObject(template)?.spec?.dataVolumeTemplates;
-
-  return dataVolumeTemplates?.[0]?.spec?.storage?.resources?.requests?.storage;
+  return getVirtualMachineDataVolumeTemplate(template)?.spec?.storage?.resources?.requests?.storage;
 };
 
 export const buildFields = (template: V1Template): Array<TemplateParameter[]> => {

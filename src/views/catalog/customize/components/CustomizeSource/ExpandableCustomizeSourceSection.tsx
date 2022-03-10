@@ -18,6 +18,7 @@ import { CustomizeSource, CustomizeSourceProps } from './CustomizeSource';
 export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = ({
   onChange,
   initialVolumeQuantity,
+  sourceLabel,
 }) => {
   const { t } = useKubevirtTranslation();
   const [storageFieldsExpanded, setStorageFieldsExpanded] = React.useState(true);
@@ -56,7 +57,11 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
           isExpanded={storageFieldsExpanded}
           isDetached
         >
-          <CustomizeSource onChange={onChange} initialVolumeQuantity={initialVolumeQuantity} />
+          <CustomizeSource
+            onChange={onChange}
+            initialVolumeQuantity={initialVolumeQuantity}
+            sourceLabel={sourceLabel}
+          />
         </ExpandableSection>
       </StackItem>
     </Stack>

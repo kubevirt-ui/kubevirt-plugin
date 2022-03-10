@@ -20,7 +20,6 @@ import {
   PVC_SOURCE_NAME,
   REGISTRY_SOURCE_NAME,
 } from './constants';
-import { SelectDiskSourceLabel } from './SelectDiskSourceLabel';
 import { getGenericSourceCustomization, getPVCSource } from './utils';
 import { VolumeSize } from './VolumeSize';
 import { SOURCE_OPTIONS_IDS } from '.';
@@ -30,11 +29,13 @@ import './CustomizeSource.scss';
 export type CustomizeSourceProps = {
   onChange: (customSource: V1beta1DataVolumeSpec) => void;
   initialVolumeQuantity?: string;
+  sourceLabel: string | React.ReactNode;
 };
 
 export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
   onChange,
   initialVolumeQuantity,
+  sourceLabel,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -78,8 +79,8 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
   return (
     <>
       <FormGroup
-        label={<SelectDiskSourceLabel />}
-        fieldId={`disk-source-required-disk`}
+        label={sourceLabel}
+        fieldId="disk-source-required-disk"
         isRequired
         className="disk-source-form-group"
       >
@@ -169,7 +170,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         <VolumeSize quantity={volumeQuantity} onChange={setVolumeQuantity} />
       )}
 
-      <FormGroup label={t('CD-ROM boot source')} fieldId={`customize-cdrom`}>
+      <FormGroup fieldId={`customize-cdrom`}>
         <Checkbox isChecked={false} label={t('Mount disk drive')} id="cdrom" />
       </FormGroup>
     </>

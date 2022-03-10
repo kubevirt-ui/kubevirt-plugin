@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
 
 import { useWizardVMContext } from '../../../utils/WizardVMContext';
@@ -15,10 +14,7 @@ type useCustomizeFormSubmitType = [
   error: any,
 ];
 
-export const useCustomizeFormSubmit = (
-  template: V1Template,
-  customSource?: V1beta1DataVolumeSpec,
-): useCustomizeFormSubmitType => {
+export const useCustomizeFormSubmit = (template: V1Template): useCustomizeFormSubmitType => {
   const { ns } = useParams<{ ns: string }>();
   const history = useHistory();
   const [templateLoaded, setTemplateLoaded] = React.useState(true);
@@ -32,7 +28,7 @@ export const useCustomizeFormSubmit = (
     try {
       const formData = new FormData(event.currentTarget as HTMLFormElement);
 
-      const processedTemplate = await processTemplate(template, formData, customSource);
+      const processedTemplate = await processTemplate(template, formData);
 
       const vm = getTemplateVirtualMachineObject(processedTemplate);
       vm.metadata.namespace = ns || DEFAULT_NAMESPACE;
@@ -43,6 +39,8 @@ export const useCustomizeFormSubmit = (
           template.metadata.name
         }&namespace=${template.metadata.namespace}`,
       );
+
+      setTemplateError(undefined);
     } catch (error) {
       console.error(error);
       setTemplateError(error);

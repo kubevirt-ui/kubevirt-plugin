@@ -3,6 +3,8 @@ import * as React from 'react';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { SelectCDSourceLabel } from '../components/CustomizeForms/SelectCDSourceLabel';
+import { SelectDiskSourceLabel } from '../components/CustomizeForms/SelectDiskSourceLabel';
 import {
   CustomizeSource,
   DEFAULT_SOURCE,
@@ -21,15 +23,15 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
 
 const onChangeMock = jest.fn();
 
-describe('Test DiskSource', () => {
+describe('Test CustomizeSource', () => {
   afterEach(() => {
     onChangeMock.mockReset();
     cleanup();
   });
 
-  it('Select HTTP disk source', () => {
+  it('Select HTTP source', () => {
     const testImageUrl = 'imageUrl';
-    render(<CustomizeSource onChange={onChangeMock} />);
+    render(<CustomizeSource onChange={onChangeMock} sourceLabel={<SelectDiskSourceLabel />} />);
 
     act(() => {
       fireEvent.click(screen.getByTestId(DEFAULT_SOURCE));
@@ -54,9 +56,9 @@ describe('Test DiskSource', () => {
     });
   });
 
-  it('Select Container disk source and change volume', () => {
+  it('Select Container source and change volume', () => {
     const testContainer = 'containerurl';
-    render(<CustomizeSource onChange={onChangeMock} />);
+    render(<CustomizeSource onChange={onChangeMock} sourceLabel={<SelectCDSourceLabel />} />);
 
     act(() => {
       fireEvent.click(screen.getByTestId(DEFAULT_SOURCE));
