@@ -3,8 +3,8 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateFlavorData } from '@kubevirt-utils/resources/template/utils';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
-import { getFlavorData } from '@kubevirt-utils/resources/template/utils/flavor';
 import {
   getTemplateDescription,
   getTemplateDisks,
@@ -77,7 +77,7 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
     const networkInterfaces = getTemplateNetworkInterfaces(template);
     const disks = getTemplateDisks(template);
     const isDefaultTemplate = isDefaultVariantTemplate(template);
-    const { memory, cpuCount } = getFlavorData(template);
+    const { memory, cpuCount } = getTemplateFlavorData(template);
 
     return (
       <div className="modal-body modal-body-border">

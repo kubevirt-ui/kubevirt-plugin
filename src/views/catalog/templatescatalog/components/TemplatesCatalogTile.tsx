@@ -4,7 +4,7 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   BOOT_SOURCE_LABELS,
-  getFlavorData,
+  getTemplateFlavorData,
   WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
@@ -31,7 +31,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(({ template,
   const workload = getTemplateWorkload(template);
   const displayName = getTemplateName(template);
   const bootSourceType = getTemplateBootSourceType(template)?.type;
-  const { memory, cpuCount } = getFlavorData(template);
+  const { memory, cpuCount } = getTemplateFlavorData(template);
 
   return (
     <CatalogTile
