@@ -2,11 +2,10 @@ import * as React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { getAnnotation } from '@kubevirt-utils/resources/shared';
-import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
 
 import { useWizardVMContext } from '../../../utils/WizardVMContext';
+import { DEFAULT_NAMESPACE } from '../../constants';
 import { processTemplate } from '../../utils';
 
 type useCustomizeFormSubmitType = [
@@ -29,15 +28,10 @@ export const useCustomizeFormSubmit = (template: V1Template): useCustomizeFormSu
     try {
       const formData = new FormData(event.currentTarget as HTMLFormElement);
 
-      const processedTemplate = await processTemplate(template, ns, formData);
+      const processedTemplate = await processTemplate(template, formData);
 
       const vm = getTemplateVirtualMachineObject(processedTemplate);
-
-      const displayName = getAnnotation(template, ANNOTATIONS.displayName);
-
-      if (displayName) {
-        vm.metadata.annotations[ANNOTATIONS.displayName] = displayName;
-      }
+      vm.metadata.namespace = ns || DEFAULT_NAMESPACE;
 
       await updateVM(vm);
       history.push(
