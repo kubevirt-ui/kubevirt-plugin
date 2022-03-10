@@ -9,7 +9,10 @@ import {
   ListPageHeader,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import SnapshotList from './SnapshotList';
+import SnapshotList from './components/list/SnapshotList';
+import SnapshotModal from './components/modal/SnapshotModal';
+import useSnapshotData from './hooks/useSnapshotData';
+import { getUsedSnapshotNames } from './utils/selectors';
 
 type SnapshotListPageProps = RouteComponentProps<{
   ns: string;
@@ -20,15 +23,35 @@ type SnapshotListPageProps = RouteComponentProps<{
 
 const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const { snapshots, restoresMap, loaded, error } = useSnapshotData(
+    obj?.metadata?.name,
+    obj?.metadata?.namespace,
+  );
 
   return (
     <>
       <ListPageHeader title="">
-        <ListPageCreateButton>{t('Add snapshot')}</ListPageCreateButton>
+        <ListPageCreateButton onClick={() => setIsOpen(true)}>
+          {t('Add snapshot')}
+        </ListPageCreateButton>
       </ListPageHeader>
       <ListPageBody>
-        <SnapshotList vm={obj} />
+        <SnapshotList
+          snapshots={snapshots}
+          restoresMap={restoresMap}
+          loaded={loaded}
+          error={error}
+        />
       </ListPageBody>
+      {isOpen && (
+        <SnapshotModal
+          usedNames={getUsedSnapshotNames(snapshots)}
+          vm={obj}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+        />
+      )}
     </>
   );
 };

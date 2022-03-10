@@ -1,24 +1,21 @@
 import * as React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   ListPageFilter,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import useSnapshotColumns from './hooks/useSnapshotColumns';
-import useSnapshotData from './hooks/useSnapshotData';
-import { filters } from './utils/filters';
+import useSnapshotColumns from '../../hooks/useSnapshotColumns';
+import { UseSnapshotData } from '../../hooks/useSnapshotData';
+import { filters } from '../../utils/filters';
+
 import SnapshotRow from './SnapshotRow';
 
-type SnapshotsListProps = {
-  vm?: V1VirtualMachine;
-};
+type SnapshotsListProps = UseSnapshotData;
 
-const SnapshotsList: React.FC<SnapshotsListProps> = ({ vm }) => {
+const SnapshotsList: React.FC<SnapshotsListProps> = ({ snapshots, restoresMap, loaded, error }) => {
   const columns = useSnapshotColumns();
-  const { snapshots, restoresMap, loaded, error } = useSnapshotData(vm?.metadata?.namespace);
   const [data, filteredData, onFilterChange] = useListPageFilter(snapshots, filters);
   return (
     <>

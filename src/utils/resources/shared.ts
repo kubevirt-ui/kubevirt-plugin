@@ -1,5 +1,5 @@
 import { V1alpha1Condition } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { K8sModel, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sModel, K8sResourceCommon, OwnerReference } from '@openshift-console/dynamic-plugin-sdk';
 
 /**
  * function for getting an entity's annotation
@@ -73,3 +73,23 @@ export const getStatusConditions = (entity): V1alpha1Condition[] =>
  */
 export const getStatusConditionsByType = (entity, type: string): V1alpha1Condition =>
   getStatusConditions(entity)?.find((condition) => condition?.type === type);
+
+/**
+ * function for creating a resource's owner reference from a resource
+ * @param {K8sResourceCommon} owner resource to create an owner reference from
+ * @param opts optional addinional options
+ * @param {boolean} opts.blockOwnerDeletion http://kubevirt.io/api-reference/v0.51.0/definitions.html#_k8s_io_apimachinery_pkg_apis_meta_v1_ownerreference
+ * @param {boolean} opts.controller http://kubevirt.io/api-reference/v0.51.0/definitions.html#_k8s_io_apimachinery_pkg_apis_meta_v1_ownerreference
+ * @returns a resource's owner reference
+ */
+export const buildOwnerReference = (
+  owner: K8sResourceCommon,
+  opts: { blockOwnerDeletion?: boolean; controller?: boolean } = { blockOwnerDeletion: true },
+): OwnerReference => ({
+  apiVersion: owner?.apiVersion,
+  kind: owner?.kind,
+  name: owner?.metadata?.name,
+  uid: owner?.metadata?.uid,
+  blockOwnerDeletion: opts && opts.blockOwnerDeletion,
+  controller: opts && opts.controller,
+});

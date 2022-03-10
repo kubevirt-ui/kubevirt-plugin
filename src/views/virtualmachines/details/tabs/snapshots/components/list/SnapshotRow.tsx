@@ -8,12 +8,14 @@ import {
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
-import IndicationLabelList from './components/IndicationLabel/IndicationLabelList';
+import IndicationLabelList from '../IndicationLabel/IndicationLabelList';
+
+import SnapshotActionsMenu from './SnapshotActionsMenu';
 
 const SnapshotRow: React.FC<
   RowProps<V1alpha1VirtualMachineSnapshot, { restores: Map<string, V1alpha1VirtualMachineRestore> }>
 > = ({ obj: snapshot, activeColumnIDs, rowData: { restores } }) => {
-  const relevantRestore = restores?.[snapshot?.metadata?.name];
+  const relevantRestore: V1alpha1VirtualMachineRestore = restores?.[snapshot?.metadata?.name];
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
@@ -40,7 +42,7 @@ const SnapshotRow: React.FC<
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
-        {/* TODO */}
+        <SnapshotActionsMenu snapshot={snapshot} restore={relevantRestore} />
       </TableData>
     </>
   );
