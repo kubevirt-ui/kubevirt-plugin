@@ -58,7 +58,10 @@ export const useWizardVM = (): WizardVMContextType => {
       },
     })
       .then(setVM)
-      .catch(setError)
+      .catch((err) => {
+        setError(err);
+        return Promise.reject(err);
+      })
       .finally(() => setLoaded(true));
   };
 

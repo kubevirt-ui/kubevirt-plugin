@@ -6,9 +6,9 @@ import { Bullseye } from '@patternfly/react-core';
 
 import { useWizardVMContext, WizardVMContextType } from '../utils/WizardVMContext';
 
-import WizardAdvancedTab from './tabs/advanced/WizardAdvancedTab';
 import WizardDisksTab from './tabs/disks/WizardDisksTab';
 import WizardEnvironmentTab from './tabs/environment/WizardEnvironmentTab';
+import WizardMetadataTab from './tabs/metadata/WizardMetadataTab';
 import WizardNetworkTab from './tabs/network/WizardNetworkTab';
 import WizardOverviewTab from './tabs/overview/WizardOverviewTab';
 import WizardSchedulingTab from './tabs/scheduling/WizardSchedulingTab';
@@ -66,8 +66,8 @@ export const wizardNavPages: NavPage[] = [
     component: withVmContext(WizardScriptsTab),
   },
   {
-    href: 'advanced',
-    name: 'Advanced',
-    component: withVmContext(WizardAdvancedTab),
+    href: 'metadata',
+    name: 'Metadata',
+    component: withVmContext(WizardMetadataTab),
   },
 ];
