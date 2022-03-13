@@ -12,8 +12,12 @@ jest.mock('@kubevirt-utils/hooks/useIsAdmin', () => ({
   useIsAdmin: () => [false, true],
 }));
 
-jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplates', () => ({
-  useVmTemplates: () => ({ templates: [urlTemplateMock, containerTemplateMock], loaded: true }),
+jest.mock('../hooks/useAvailableSourceTemplates', () => ({
+  useAvailableSourceTemplates: () => ({
+    templates: [urlTemplateMock, containerTemplateMock],
+    loaded: true,
+    initialSourcesLoaded: true,
+  }),
 }));
 
 // render template drawer without quick create

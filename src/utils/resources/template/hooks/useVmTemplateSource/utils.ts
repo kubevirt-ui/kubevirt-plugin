@@ -118,11 +118,20 @@ export const getPVC = (name: string, ns: string) =>
  * @param ns  the namespace of the DataSource
  * @returns a promise that resolves into the DataSource
  */
-export const getDataSourcePVC = (name: string, ns: string) =>
+export const getDataSource = (name: string, ns: string) =>
   k8sGet<V1beta1DataSource>({
     model: DataSourceModel,
     name,
     ns,
-  })
+  });
+
+/**
+ * a function to k8sGet a DataSource
+ * @param name the name of the DataSource
+ * @param ns  the namespace of the DataSource
+ * @returns a promise that resolves into the DataSource
+ */
+export const getDataSourcePVC = (name: string, ns: string) =>
+  getDataSource(name, ns)
     .then((data) => data?.spec?.source?.pvc)
     .then((pvc) => getPVC(pvc.name, pvc.namespace));
