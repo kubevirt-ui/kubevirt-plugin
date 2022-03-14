@@ -3,7 +3,7 @@
   "Are you sure you want to delete <1>{obj.metadata.name} </1>from namespace <4>{obj.metadata.namespace}?</4>": "Are you sure you want to delete <1>{obj.metadata.name} </1>from namespace <4>{obj.metadata.namespace}?</4>",
   "Submit": "Submit",
   "Cancel": "Cancel",
-  "Error": "Error",
+  "An error occurred": "An error occurred",
   "Virtualization": "Virtualization",
   "VirtualMachines": "VirtualMachines",
   "Create Virtual Machine": "Create Virtual Machine",
