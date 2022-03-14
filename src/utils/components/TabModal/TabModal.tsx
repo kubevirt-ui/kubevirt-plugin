@@ -4,6 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   ActionGroup,
   Alert,
+  AlertVariant,
   Button,
   ButtonVariant,
   Modal,
@@ -27,7 +28,7 @@ export const DeleteResourceMessege: React.FC<{ obj: K8sResourceCommon }> = ({ ob
 type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   isOpen: boolean;
   obj: T;
-  promise: (obj: T) => Promise<T | void>;
+  onSubmit: (obj: T) => Promise<T | void>;
   onClose: () => void;
   headerText: string;
   children: React.ReactNode;
@@ -44,7 +45,7 @@ export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(
 const TabModal: TabModalFC = React.memo(
   ({
     obj,
-    promise,
+    onSubmit,
     isOpen,
     onClose,
     headerText,
@@ -59,38 +60,45 @@ const TabModal: TabModalFC = React.memo(
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [error, setError] = React.useState(undefined);
 
-    const handlePromise = () => {
+    const handleSubmit = () => {
       setIsSubmitting(true);
       setError(undefined);
 
-      promise(obj)
+      onSubmit(obj)
         .then(() => {
-          setIsSubmitting(false);
           onClose();
         })
         .catch((err) => {
-          setIsSubmitting(false);
           setError(err);
-        });
+        })
+        .finally(() => setIsSubmitting(false));
     };
+
+    const closeModal = () => {
+      setError(undefined);
+      setIsSubmitting(false);
+      onClose();
+    };
+
     return (
       <Modal
         variant={modalVariant ?? 'small'}
         position="top"
         className="ocs-modal co-catalog-page__overlay"
-        onClose={onClose}
+        onClose={closeModal}
         title={headerText}
         footer={
           <ActionGroup>
             <Button
+              isSmall
               isDisabled={isDisabled}
               isLoading={isSubmitting}
-              onClick={handlePromise}
+              onClick={handleSubmit}
               variant={submitBtnVariant ?? 'primary'}
             >
               {submitBtnText || t('Submit')}
             </Button>
-            <Button onClick={onClose} variant="link">
+            <Button isSmall onClick={closeModal} variant="link">
               {t('Cancel')}
             </Button>
           </ActionGroup>
@@ -101,7 +109,7 @@ const TabModal: TabModalFC = React.memo(
           <StackItem>{children}</StackItem>
           {error && (
             <StackItem>
-              <Alert isInline variant="danger" title={t('Error')}>
+              <Alert isInline variant={AlertVariant.danger} title={t('An error occurred')}>
                 {error.message}
               </Alert>
             </StackItem>
