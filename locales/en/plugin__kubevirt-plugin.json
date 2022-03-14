@@ -1,5 +1,9 @@
 {
   "No owner": "No owner",
+  "Are you sure you want to delete <1>{obj.metadata.name} </1>from namespace <4>{obj.metadata.namespace}?</4>": "Are you sure you want to delete <1>{obj.metadata.name} </1>from namespace <4>{obj.metadata.namespace}?</4>",
+  "Submit": "Submit",
+  "Cancel": "Cancel",
+  "Error": "Error",
   "Virtualization": "Virtualization",
   "VirtualMachines": "VirtualMachines",
   "Create Virtual Machine": "Create Virtual Machine",
@@ -15,7 +19,6 @@
   "Optional parameters": "Optional parameters",
   "This field is required": "This field is required",
   "Review and create Virtual Machine": "Review and create Virtual Machine",
-  "Cancel": "Cancel",
   "Create VirtualMachine error": "Create VirtualMachine error",
   "View documentation": "View documentation",
   "Create VirtualMachine from template": "Create VirtualMachine from template",
