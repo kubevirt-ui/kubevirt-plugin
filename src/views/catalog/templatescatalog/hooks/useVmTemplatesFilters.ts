@@ -1,115 +1,96 @@
 import * as React from 'react';
 
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 
-type CountFilter = {
-  value: Set<string>;
-  count: number;
-};
-
-export type TemplateCountFilters = {
-  support: CountFilter;
-  osName: CountFilter;
-  workload: CountFilter;
-  flavor: CountFilter;
-};
-
-export type TemplateFilters = TemplateCountFilters & {
+export type TemplateFilters = {
   onlyDefault: boolean;
+  onlyAvailable: boolean;
   query: string;
+  osName: Set<string>;
+  workload: Set<string>;
 };
 
-export const useTemplatesFilters = (
-  isAdmin: boolean,
-): [TemplateFilters, (type: string, value: string) => void, () => void] => {
+export const useTemplatesFilters = (): [
+  TemplateFilters,
+  (type: string, value: string) => void,
+  () => void,
+] => {
+  const [isAdmin] = useIsAdmin();
   const { params, appendParam, setParam, deleteParam } = useURLParams();
   const onlyDefaultParam = params.get('onlyDefault');
 
-  const [onlyDefault, setOnlyDefault] = React.useState(isAdmin);
-  const [query, setQuery] = React.useState(params.get('query') || '');
-  const [filters, setFilters] = React.useState<TemplateCountFilters>({
-    support: {
-      count: 0,
-      value: new Set([...params.getAll('support')]),
-    },
-    osName: {
-      count: 0,
-      value: new Set([...params.getAll('osName')]),
-    },
-    workload: {
-      count: 0,
-      value: new Set([...params.getAll('workload')]),
-    },
-    flavor: {
-      count: 0,
-      value: new Set([...params.getAll('flavor')]),
-    },
+  const [filters, setFilters] = React.useState<TemplateFilters>({
+    onlyDefault: isAdmin,
+    onlyAvailable: params.get('onlyAvailable') === 'true',
+    query: params.get('query') || '',
+    osName: new Set([...params.getAll('osName')]),
+    workload: new Set([...params.getAll('workload')]),
   });
 
-  const onSelect = (type: string, value: any) => {
-    if (type === 'onlyDefault') {
-      setOnlyDefault(value);
-      setParam('onlyDefault', value.toString());
-    } else if (type === 'query') {
-      setQuery(value);
-    } else {
-      const filterSet = new Set<string>(filters?.[type]?.value);
-      if (filterSet.has(value)) {
-        filterSet.delete(value);
-        deleteParam(type, value);
-      } else {
-        filterSet.add(value);
-        appendParam(type, value);
-      }
+  const updateFilter = (type: string, value: string | boolean) =>
+    setFilters((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
 
-      setFilters({
-        ...filters,
-        [type]: {
-          ...filters?.[type],
-          value: filterSet,
-        },
-      });
+  const onSelect = (type: string, value: any) => {
+    switch (type) {
+      case 'onlyDefault':
+        {
+          updateFilter('onlyDefault', value);
+          setParam('onlyDefault', value.toString());
+        }
+        break;
+      case 'onlyAvailable':
+        {
+          updateFilter('onlyAvailable', value);
+          setParam('onlyAvailable', value.toString());
+        }
+        break;
+      case 'query':
+        updateFilter('query', value);
+        break;
+
+      default: {
+        const filterSet = new Set<string>(filters?.[type]);
+        if (filterSet.has(value)) {
+          filterSet.delete(value);
+          deleteParam(type, value);
+        } else {
+          filterSet.add(value);
+          appendParam(type, value);
+        }
+
+        setFilters({
+          ...filters,
+          [type]: filterSet,
+        });
+      }
     }
   };
 
   const clearAll = () => {
-    setQuery('');
-    setParam('query', '');
-    deleteParam('query');
-    deleteParam('support');
-    deleteParam('osName');
-    deleteParam('workload');
-    deleteParam('flavor');
-
     setFilters({
-      support: {
-        count: 0,
-        value: new Set([]),
-      },
-      osName: {
-        count: 0,
-        value: new Set([]),
-      },
-      workload: {
-        count: 0,
-        value: new Set([]),
-      },
-      flavor: {
-        count: 0,
-        value: new Set([]),
-      },
+      onlyDefault: isAdmin,
+      onlyAvailable: false,
+      query: '',
+      osName: new Set(),
+      workload: new Set(),
+    });
+    Object.keys(filters).forEach((key) => {
+      deleteParam(key);
     });
   };
 
   React.useEffect(() => {
     if (onlyDefaultParam) {
-      setOnlyDefault(onlyDefaultParam === 'true');
+      updateFilter('onlyDefault', onlyDefaultParam === 'true');
     } else {
-      setOnlyDefault(isAdmin);
-      setParam('onlyDefault', isAdmin.toString());
+      updateFilter('onlyDefault', isAdmin);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin, onlyDefaultParam]);
 
-  return [{ ...filters, onlyDefault, query }, onSelect, clearAll];
+  return [filters, onSelect, clearAll];
 };

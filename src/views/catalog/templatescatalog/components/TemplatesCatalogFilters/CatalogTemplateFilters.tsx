@@ -2,16 +2,13 @@ import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  FLAVORS,
   OS_NAME_LABELS,
   OS_NAME_TYPES,
-  SUPPORT_TYPES,
   WORKLOADS,
   WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template/utils/constants';
 import { VerticalTabs, VerticalTabsTab } from '@patternfly/react-catalog-view-extension';
 import { FilterSidePanel } from '@patternfly/react-catalog-view-extension/dist/esm/components/FilterSidePanel';
-import { capitalize } from '@patternfly/react-core';
 
 import { TemplateFilters } from '../../hooks/useVmTemplatesFilters';
 
@@ -43,16 +40,15 @@ export const CatalogTemplateFilters: React.FC<{
       </VerticalTabs>
       <FilterSidePanel className="co-catalog-page__tabs" id="vm-catalog-filter-panel">
         <TemplateFilterGroup
-          groupKey="support"
-          groupLabel={t('Support level')}
-          pickedFilters={filters.support.value}
-          onFilterClick={onFilterChange}
-          filters={Object.values(SUPPORT_TYPES).map((v) => ({ label: capitalize(v), value: v }))}
+          groupKey={'boot-source-available'}
+          pickedFilters={new Set(filters?.onlyAvailable ? ['only-available'] : [])}
+          onFilterClick={() => onFilterChange('onlyAvailable', !filters?.onlyAvailable)}
+          filters={[{ label: t('Boot source available'), value: 'only-available' }]}
         />
         <TemplateFilterGroup
           groupKey="osName"
-          groupLabel={t('OS name')}
-          pickedFilters={filters.osName.value}
+          groupLabel={t('OS')}
+          pickedFilters={filters.osName}
           onFilterClick={onFilterChange}
           filters={Object.values(OS_NAME_TYPES).map((v) => ({
             label: OS_NAME_LABELS?.[v],
@@ -60,23 +56,14 @@ export const CatalogTemplateFilters: React.FC<{
           }))}
         />
         <TemplateFilterGroup
-          defaultExpanded={false}
           groupKey="workload"
           groupLabel={t('Workload')}
-          pickedFilters={filters.workload.value}
+          pickedFilters={filters.workload}
           onFilterClick={onFilterChange}
           filters={Object.values(WORKLOADS).map((v) => ({
             label: WORKLOADS_LABELS?.[v],
             value: v,
           }))}
-        />
-        <TemplateFilterGroup
-          defaultExpanded={false}
-          groupKey="flavor"
-          groupLabel={t('Flavor')}
-          pickedFilters={filters.flavor.value}
-          onFilterClick={onFilterChange}
-          filters={Object.values(FLAVORS).map((v) => ({ label: capitalize(v), value: v }))}
         />
       </FilterSidePanel>
     </div>

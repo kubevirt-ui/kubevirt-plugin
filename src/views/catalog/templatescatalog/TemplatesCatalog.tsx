@@ -1,11 +1,8 @@
 import * as React from 'react';
-import { Trans } from 'react-i18next';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useVmTemplates } from '@kubevirt-utils/resources/template/hooks/useVmTemplates';
 import { Gallery, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
@@ -14,6 +11,7 @@ import { CatalogTemplateFilters } from './components/TemplatesCatalogFilters/Cat
 import { TemplatesCatalogHeader } from './components/TemplatesCatalogHeader';
 import { skeletonCatalog } from './components/TemplatesCatalogSkeleton';
 import { TemplateTile } from './components/TemplatesCatalogTile';
+import { useAvailableSourceTemplates } from './hooks/useAvailableSourceTemplates';
 import { useTemplatesFilters } from './hooks/useVmTemplatesFilters';
 import { filterTemplates } from './utils/helpers';
 
@@ -25,18 +23,17 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   },
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isAdmin, isAdminLoaded] = useIsAdmin();
   const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
 
-  const { templates, loaded: templatedLoaded } = useVmTemplates();
-  const [filters, onFilterChange, clearAll] = useTemplatesFilters(isAdmin);
+  const [filters, onFilterChange, clearAll] = useTemplatesFilters();
+  const { templates, loaded, initialSourcesLoaded } = useAvailableSourceTemplates(
+    filters.onlyAvailable,
+  );
 
   const filteredTemplates = React.useMemo(
     () => filterTemplates(templates, filters),
     [templates, filters],
   );
-
-  const loaded = isAdminLoaded && templatedLoaded;
 
   return (
     <Stack hasGutter>
@@ -45,11 +42,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
           <StackItem className="co-m-pane__heading">
             <Title headingLevel="h1">{t('Create new VirtualMachine from catalog')}</Title>
           </StackItem>
-          <StackItem>
-            <Trans t={t} ns="plugin__kubevirt-plugin">
-              Select an option to create a VirtualMachine
-            </Trans>
-          </StackItem>
+          <StackItem>{t('Select an option to create a VirtualMachine')}</StackItem>
         </Stack>
       </StackItem>
       {loaded ? (
@@ -65,7 +58,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
             </StackItem>
             {filteredTemplates?.length > 0 ? (
               <StackItem className="co-catalog-page__grid vm-catalog-grid-container">
-                <Gallery hasGutter className="vm-catalog-grid">
+                <Gallery hasGutter className="vm-catalog-grid" id="vm-catalog-grid">
                   {filteredTemplates.map((template) => (
                     <TemplateTile
                       key={template?.metadata?.uid}
@@ -76,7 +69,10 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
                 </Gallery>
               </StackItem>
             ) : (
-              <TemplatesCatalogEmptyState onClearFilters={clearAll} />
+              <TemplatesCatalogEmptyState
+                loadingSources={filters?.onlyAvailable && !initialSourcesLoaded}
+                onClearFilters={clearAll}
+              />
             )}
           </Stack>
         </div>
