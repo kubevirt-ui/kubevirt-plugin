@@ -6,6 +6,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Button, Grid } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
+import { ContextUpdateVM } from '../../../../../utils/WizardVMContext';
+
 import { WizardAnnotationsModalRow } from './WizardAnnotationsModalRow';
 
 import './WizardAnnotationsModal.scss';
@@ -15,7 +17,7 @@ const getIdAnnotations = (annotations: { [key: string]: string }) =>
 
 export const WizardAnnotationsModal: React.FC<{
   vm: V1VirtualMachine;
-  updateVM: (vm: V1VirtualMachine) => Promise<void>;
+  updateVM: ContextUpdateVM;
   isOpen: boolean;
   onClose: () => void;
 }> = ({ vm, isOpen, updateVM, onClose }) => {
@@ -40,7 +42,7 @@ export const WizardAnnotationsModal: React.FC<{
     });
   };
 
-  const onSubmit = (vmObj: V1VirtualMachine) => {
+  const onSubmit = () => {
     const uniqWith = (arr, fn) =>
       arr.filter((element, index) => arr.findIndex((step) => fn(element, step)) === index);
 
@@ -51,12 +53,13 @@ export const WizardAnnotationsModal: React.FC<{
       return Promise.reject({ message: t('Duplicate keys found') });
     }
 
-    const updatedVM = { ...vmObj };
-    updatedVM.metadata.annotations = Object.fromEntries(
+    const updatedAnnotations = Object.fromEntries(
       Object.entries(annotations).map(([, { key, value }]) => [key, value]),
     );
 
-    return updateVM(updatedVM);
+    return updateVM((vmDraft) => {
+      vmDraft.metadata.annotations = updatedAnnotations;
+    });
   };
 
   // reset annotations when modal is closed

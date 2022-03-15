@@ -1,4 +1,7 @@
 import * as React from 'react';
+import produce from 'immer';
+import { WritableDraft } from 'immer/dist/internal';
+import { useImmer } from 'use-immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -25,6 +28,10 @@ export const clearSessionStorageVM = () => {
   } catch (e) {}
 };
 
+export type ContextUpdateVM = (
+  updateVM: V1VirtualMachine | ((prevState: WritableDraft<V1VirtualMachine>) => void),
+) => Promise<void>;
+
 export type WizardVMContextType = {
   /** the vm used for the wizard */
   vm?: V1VirtualMachine;
@@ -32,7 +39,7 @@ export type WizardVMContextType = {
    * update the VirtualMachine used for the wizard
    * @param vm V1VirtualMachine
    */
-  updateVM?: (vm: V1VirtualMachine) => Promise<void>;
+  updateVM?: ContextUpdateVM;
   /** loaded state of the vm context */
   loaded?: boolean;
   /** error state of the vm context */
@@ -40,18 +47,20 @@ export type WizardVMContextType = {
 };
 
 export const useWizardVM = (): WizardVMContextType => {
-  const [vm, setVM] = React.useState<V1VirtualMachine>(getSessionStorageVM());
+  const [vm, setVM] = useImmer<V1VirtualMachine>(getSessionStorageVM());
   const [loaded, setLoaded] = React.useState(true);
   const [error, setError] = React.useState<any>();
 
-  const updateVM = (updatedVM: V1VirtualMachine) => {
+  const updateVM = (
+    updatedVM: V1VirtualMachine | ((vmDraft: WritableDraft<V1VirtualMachine>) => void),
+  ) => {
     setLoaded(false);
     setError(undefined);
 
     // validate the updated vm with the backend (dry run)
     return k8sCreate<V1VirtualMachine>({
       model: VirtualMachineModel,
-      data: updatedVM,
+      data: typeof updatedVM === 'function' ? produce<V1VirtualMachine>(vm, updatedVM) : updatedVM,
       queryParams: {
         dryRun: 'All',
         fieldManager: 'kubectl-create',
