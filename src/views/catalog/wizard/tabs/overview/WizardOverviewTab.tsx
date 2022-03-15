@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
+import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS, getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
@@ -14,7 +15,7 @@ import { WizardOverviewNetworksTable } from './components/WizardOverviewNetworks
 
 import './WizardOverviewTab.scss';
 
-const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm }) => {
+const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
   const history = useHistory();
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
@@ -30,6 +31,8 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm }) => {
   const networks = vm?.spec?.template?.spec?.networks;
   const interfaces = vm?.spec?.template?.spec?.domain?.devices?.interfaces;
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
+
+  const [isDescriptionModalOpen, setIsDescriptionModalOpen] = React.useState(false);
 
   return (
     <div className="co-m-pane__body">
@@ -55,10 +58,24 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm }) => {
               title={t('Description')}
               description={description}
               isEdit
-              onEditClick={() => console.log('edit description')}
+              onEditClick={() => setIsDescriptionModalOpen(true)}
               helperPopover={{
                 header: t('Description'),
                 content: t('Description of the VirtualMachine'),
+              }}
+            />
+            <DescriptionModal
+              obj={vm}
+              isOpen={isDescriptionModalOpen}
+              onClose={() => setIsDescriptionModalOpen(false)}
+              onSubmit={(updatedDescription) => {
+                return updateVM((vmDraft) => {
+                  if (updatedDescription) {
+                    vmDraft.metadata.annotations['description'] = updatedDescription;
+                  } else {
+                    delete vmDraft.metadata.annotations['description'];
+                  }
+                });
               }}
             />
 
