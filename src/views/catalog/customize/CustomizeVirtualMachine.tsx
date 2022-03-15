@@ -11,8 +11,10 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CustomizeError } from './components/CustomizeError';
 import { CustomizeForm } from './components/CustomizeForms/CustomizeForm';
+import { CustomizeFormWithDisk } from './components/CustomizeForms/CustomizeFormWithDisk';
 import { CustomizeVirtualMachineSkeleton } from './components/CustomizeVirtualMachineSkeleton';
 import { RightHeader } from './components/RightHeading';
+import { hasCustomizableDiskSource } from './utils';
 
 import './CustomizeVirtualMachine.scss';
 
@@ -30,6 +32,15 @@ const CustomizeVirtualMachine: React.FC = () => {
     namespace: templateNamespace,
   });
 
+  const Form = React.useMemo(() => {
+    const withDiskSource = hasCustomizableDiskSource(template);
+    if (withDiskSource) {
+      return CustomizeFormWithDisk;
+    } else {
+      return CustomizeForm;
+    }
+  }, [template]);
+
   if (error) return <CustomizeError />;
 
   return (
@@ -40,7 +51,7 @@ const CustomizeVirtualMachine: React.FC = () => {
           <RightHeader template={template} />
         </div>
         <div className="col-md-5 col-md-pull-7">
-          {template && loaded && <CustomizeForm template={template} />}
+          {template && loaded && <Form template={template} />}
           {!loaded && <CustomizeVirtualMachineSkeleton />}
         </div>
       </div>

@@ -3,12 +3,12 @@
       "kind": "Project",
       "apiVersion": "project.openshift.io/v1",
       "metadata": {
-        "name": "openshift-controller-manager-operator",
+        "name": "default",
         "uid": "e9f44576-9909-4f47-a2ff-a527b3f61aab",
         "resourceVersion": "8962",
         "creationTimestamp": "2022-01-27T00:58:21Z",
         "labels": {
-          "kubernetes.io/metadata.name": "openshift-controller-manager-operator",
+          "kubernetes.io/metadata.name": "default",
           "olm.operatorgroup.uid/be5e23b9-c849-45c4-9eca-6404b4a5bea7": "",
           "openshift.io/cluster-monitoring": "true"
         },
