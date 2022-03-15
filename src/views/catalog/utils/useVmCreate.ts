@@ -1,11 +1,11 @@
 import { useState } from 'react';
+import produce from 'immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 type CreateVMArguments = {
-  name?: string;
   namespace: string;
   startVM: boolean;
   onFullfilled: (vm: V1VirtualMachine) => void;
@@ -14,7 +14,7 @@ type CreateVMArguments = {
 export const useVmCreate = (): {
   createVM: (
     vm: V1VirtualMachine,
-    { name, namespace, startVM, onFullfilled }: CreateVMArguments,
+    { namespace, startVM, onFullfilled }: CreateVMArguments,
   ) => Promise<void>;
   loaded: boolean;
   error: any;
@@ -24,22 +24,19 @@ export const useVmCreate = (): {
 
   const createVM = (
     vm: V1VirtualMachine,
-    { name, namespace, startVM, onFullfilled }: CreateVMArguments,
+    { namespace, startVM, onFullfilled }: CreateVMArguments,
   ) => {
     setLoaded(false);
     setError(undefined);
 
-    vm.metadata.namespace = namespace;
-    if (name) {
-      vm.metadata.name = name;
-    }
-    if (startVM) {
-      vm.spec.running = true;
-    }
+    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
+      vmDraft.metadata.namespace = namespace;
+      vmDraft.spec.running = startVM;
+    });
 
     return k8sCreate<V1VirtualMachine>({
       model: VirtualMachineModel,
-      data: vm,
+      data: updatedVM,
     })
       .then(onFullfilled)
       .catch(setError)
