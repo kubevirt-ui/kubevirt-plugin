@@ -8,9 +8,13 @@ import {
   DescriptionListTerm,
   DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
+  Flex,
+  FlexItem,
   Popover,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
+
+import './WizardDescriptionItem.scss';
 
 type WizardDescriptionItemProps = {
   /** title */
@@ -21,6 +25,8 @@ type WizardDescriptionItemProps = {
   testId?: string;
   /** is the description group editable */
   isEdit?: boolean;
+  /** show edit button besides title */
+  showEditOnTitle?: boolean;
   /** onClick callback for the edit button */
   onEditClick?: () => void;
   /** disabled state of the description group */
@@ -44,6 +50,7 @@ export const WizardDescriptionItem: React.FC<WizardDescriptionItemProps> = React
     description,
     isDisabled,
     isEdit,
+    showEditOnTitle,
     helperPopover,
     testId,
     count,
@@ -75,10 +82,29 @@ export const WizardDescriptionItem: React.FC<WizardDescriptionItemProps> = React
 
     return (
       <DescriptionListGroup className={className}>
-        <DescriptionListTermHelpText>{getItemHeader()}</DescriptionListTermHelpText>
-        {isEdit ? (
+        <DescriptionListTermHelpText>
+          <Flex className="wizard-description-item__title">
+            <FlexItem>{getItemHeader()}</FlexItem>
+            {isEdit && showEditOnTitle && (
+              <FlexItem>
+                <Button
+                  data-test-id={`${testId}-edit`}
+                  type="button"
+                  isInline
+                  isDisabled={isDisabled}
+                  onClick={onEditClick}
+                  variant="link"
+                >
+                  {t('Edit')}
+                  <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+                </Button>
+              </FlexItem>
+            )}
+          </Flex>
+        </DescriptionListTermHelpText>
+        {isEdit && !showEditOnTitle ? (
           <Button
-            data-test-id={testId}
+            data-test-id={`${testId}-edit`}
             type="button"
             isInline
             isDisabled={isDisabled}

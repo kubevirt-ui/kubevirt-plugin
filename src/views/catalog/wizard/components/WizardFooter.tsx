@@ -26,7 +26,7 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
   const templateNamespace = params.get('namespace');
 
   const [startVM, setStartVM] = React.useState(true);
-  const { vm, loaded: vmContextLoaded, error: vmContextError } = useWizardVMContext();
+  const { vm, loaded: vmContextLoaded } = useWizardVMContext();
   const { createVM, loaded: vmCreateLoaded, error: vmCreateError } = useVmCreate();
 
   const onCreate = () =>
@@ -40,7 +40,6 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
     });
 
   const loaded = vmContextLoaded && vmCreateLoaded;
-  const error = vmContextError || vmCreateError;
 
   return (
     <footer className="vm-wizard-footer">
@@ -54,10 +53,10 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
           />
         </StackItem>
         <StackItem />
-        {error && (
+        {vmCreateError && (
           <StackItem>
             <Alert variant="danger" title={t('Create VirtualMachine error')} isInline>
-              {error.message}
+              {vmCreateError.message}
             </Alert>
           </StackItem>
         )}

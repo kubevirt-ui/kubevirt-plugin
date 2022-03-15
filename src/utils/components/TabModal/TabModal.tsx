@@ -110,7 +110,7 @@ const TabModal: TabModalFC = React.memo(
           {error && (
             <StackItem>
               <Alert isInline variant={AlertVariant.danger} title={t('An error occurred')}>
-                {error.message}
+                {error?.message}
               </Alert>
             </StackItem>
           )}
