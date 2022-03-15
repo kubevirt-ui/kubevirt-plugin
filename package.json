@@ -59,6 +59,7 @@
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.14.3",
     "react-router-dom": "5.x",
+    "react-tagsinput": "^3.19.0",
     "unique-names-generator": "^4.6.0",
     "use-immer": "^0.6.0"
   },

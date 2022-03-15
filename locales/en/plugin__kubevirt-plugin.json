@@ -1,6 +1,8 @@
 {
   "Description": "Description",
   "description text area": "description text area",
+  "Edit labels": "Edit labels",
+  "Labels help you organize and select resources. Adding labels below will let you query for objects that have similar, overlapping or dissimilar labels.": "Labels help you organize and select resources. Adding labels below will let you query for objects that have similar, overlapping or dissimilar labels.",
   "No owner": "No owner",
   "Are you sure you want to delete <1>{obj.metadata.name} </1>from namespace <4>{obj.metadata.namespace}?</4>": "Are you sure you want to delete <1>{obj.metadata.name} </1>from namespace <4>{obj.metadata.namespace}?</4>",
   "Submit": "Submit",
