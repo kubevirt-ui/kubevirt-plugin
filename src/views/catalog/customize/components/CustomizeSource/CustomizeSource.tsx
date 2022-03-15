@@ -30,12 +30,16 @@ export type CustomizeSourceProps = {
   onChange: (customSource: V1beta1DataVolumeSpec) => void;
   initialVolumeQuantity?: string;
   sourceLabel: string | React.ReactNode;
+  withDrivers: boolean;
+  setDrivers: (withDrivers: boolean) => void;
 };
 
 export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
   onChange,
   initialVolumeQuantity,
   sourceLabel,
+  withDrivers,
+  setDrivers,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -170,8 +174,13 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         <VolumeSize quantity={volumeQuantity} onChange={setVolumeQuantity} />
       )}
 
-      <FormGroup fieldId={`customize-cdrom`}>
-        <Checkbox isChecked={false} label={t('Mount disk drive')} id="cdrom" />
+      <FormGroup fieldId="customize-cdrom-drivers">
+        <Checkbox
+          isChecked={withDrivers}
+          onChange={setDrivers}
+          label={t('Mount Windows drivers disk')}
+          id="cdrom-drivers"
+        />
       </FormGroup>
     </>
   );

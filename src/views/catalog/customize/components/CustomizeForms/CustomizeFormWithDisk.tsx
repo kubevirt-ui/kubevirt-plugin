@@ -12,6 +12,7 @@ import { ExpandableCustomizeSourceSection } from '../CustomizeSource/ExpandableC
 import { ExpandableOptionsFields } from '../ExpandableOptionalFields';
 import { FieldGroup } from '../FieldGroup';
 import { FormActionGroup } from '../FormActionGroup';
+import { FormError } from '../FormError';
 
 import { SelectDiskSourceLabel } from './SelectDiskSourceLabel';
 import { useCustomizeFormSubmit } from './useCustomizeFormSubmit';
@@ -31,7 +32,8 @@ export const CustomizeFormWithDisk: React.FC<CustomizeFormWithDiskProps> = ({ te
     return { ...template, objects: [virtualMachine] };
   }, [template, customDiskSource]);
 
-  const [onSubmit, loaded, error] = useCustomizeFormSubmit(templateWithDiskSource);
+  const [windowsDrivers, setWindowsDrivers] = React.useState(false);
+  const [onSubmit, loaded, error] = useCustomizeFormSubmit(templateWithDiskSource, windowsDrivers);
 
   const [requiredFields, optionalFields] = buildFields(template);
   const nameField = getVirtualMachineNameField(template, t);
@@ -48,6 +50,8 @@ export const CustomizeFormWithDisk: React.FC<CustomizeFormWithDiskProps> = ({ te
         onChange={onDiskSourceChange}
         initialVolumeQuantity={getTemplateStorageQuantity(template)}
         sourceLabel={<SelectDiskSourceLabel />}
+        withDrivers={windowsDrivers}
+        setDrivers={setWindowsDrivers}
       />
 
       {requiredFields?.map((field) => (
@@ -56,6 +60,7 @@ export const CustomizeFormWithDisk: React.FC<CustomizeFormWithDiskProps> = ({ te
 
       <ExpandableOptionsFields optionalFields={optionalFields} />
 
+      <FormError error={error} />
       <FormActionGroup loading={!loaded} />
     </Form>
   );

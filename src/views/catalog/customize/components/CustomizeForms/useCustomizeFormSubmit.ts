@@ -14,7 +14,10 @@ type useCustomizeFormSubmitType = [
   error: any,
 ];
 
-export const useCustomizeFormSubmit = (template: V1Template): useCustomizeFormSubmitType => {
+export const useCustomizeFormSubmit = (
+  template: V1Template,
+  withWinDrivers?: boolean,
+): useCustomizeFormSubmitType => {
   const { ns } = useParams<{ ns: string }>();
   const history = useHistory();
   const [templateLoaded, setTemplateLoaded] = React.useState(true);
@@ -27,8 +30,7 @@ export const useCustomizeFormSubmit = (template: V1Template): useCustomizeFormSu
     setTemplateLoaded(false);
     try {
       const formData = new FormData(event.currentTarget as HTMLFormElement);
-
-      const processedTemplate = await processTemplate(template, formData);
+      const processedTemplate = await processTemplate(template, formData, withWinDrivers);
 
       const vm = getTemplateVirtualMachineObject(processedTemplate);
       vm.metadata.namespace = ns || DEFAULT_NAMESPACE;
