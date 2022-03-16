@@ -5,11 +5,14 @@ import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerRef
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import {
+  getOperatingSystem,
+  getOperatingSystemName,
+} from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
 import Timestamp from '../../../../../../list/components/Timestamp/Timestamp';
-import { getOperatingSystem, getOperatingSystemName } from '../../../utils/operatingSystemHelper';
 import MutedTextDiv from '../../MutedTextDiv/MutedTextDiv';
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
