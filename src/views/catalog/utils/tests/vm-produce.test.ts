@@ -1,6 +1,6 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { ensurePath } from '../vm-produce';
+import { ensurePath } from '../WizardVMContext/utils/vm-produce';
 
 describe('Test ensurePath', () => {
   describe('Only one path', () => {

@@ -1,12 +1,11 @@
 import * as React from 'react';
 
+import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Grid } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
-
-import { ContextUpdateVM } from '../../../../../utils/WizardVMContext';
 
 import { WizardAnnotationsModalRow } from './WizardAnnotationsModalRow';
 
@@ -17,7 +16,7 @@ const getIdAnnotations = (annotations: { [key: string]: string }) =>
 
 export const WizardAnnotationsModal: React.FC<{
   vm: V1VirtualMachine;
-  updateVM: ContextUpdateVM;
+  updateVM: UpdateValidatedVM;
   isOpen: boolean;
   onClose: () => void;
 }> = ({ vm, isOpen, updateVM, onClose }) => {
