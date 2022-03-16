@@ -1,4 +1,6 @@
 {
+  "Description": "Description",
+  "description text area": "description text area",
   "No owner": "No owner",
   "Are you sure you want to delete <1>{obj.metadata.name} </1>from namespace <4>{obj.metadata.namespace}?</4>": "Are you sure you want to delete <1>{obj.metadata.name} </1>from namespace <4>{obj.metadata.namespace}?</4>",
   "Submit": "Submit",
@@ -64,7 +66,6 @@
   "Workload type": "Workload type",
   "(default)": "(default)",
   "Network interfaces": "Network interfaces",
-  "Description": "Description",
   "Disks": "Disks",
   "Documentation": "Documentation",
   "Refer to documentation": "Refer to documentation",
