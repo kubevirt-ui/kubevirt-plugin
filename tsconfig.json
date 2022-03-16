@@ -14,7 +14,8 @@
     "noUnusedLocals": true,
     "paths": {
       "@kubevirt-utils": ["src/utils"],
-      "@kubevirt-utils/*": ["src/utils/*"]
+      "@kubevirt-utils/*": ["src/utils/*"],
+      "@catalog/*": ["src/views/catalog/*"]
     }
   },
   "include": ["src"],
