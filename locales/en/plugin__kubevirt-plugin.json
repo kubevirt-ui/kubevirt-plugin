@@ -77,6 +77,7 @@
   "Are you sure you want to delete <1>{obj.metadata.name} </1>from namespace <4>{obj.metadata.namespace}?</4>": "Are you sure you want to delete <1>{obj.metadata.name} </1>from namespace <4>{obj.metadata.namespace}?</4>",
   "An error occurred": "An error occurred",
   "Submit": "Submit",
+  "Successfully updated the VM": "Successfully updated the VM",
   "Virtualization": "Virtualization",
   "VirtualMachines": "VirtualMachines",
   "Create Virtual Machine": "Create Virtual Machine",

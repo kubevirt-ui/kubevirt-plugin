@@ -1,0 +1,22 @@
+.yaml-container {
+  height: 100%;
+
+
+  .yaml-editor {
+    height: calc(100% - 50px);
+    position: relative;
+
+    .co-alert {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  .yaml-controls {
+    padding: var(--pf-global--spacer--md) var(--pf-global--spacer--lg);
+    height: 50px;
+  }
+}

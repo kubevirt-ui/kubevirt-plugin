@@ -8,6 +8,8 @@ import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-serv
 
 import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+
 interface Configuration extends WebpackConfiguration {
   devServer?: WebpackDevServerConfiguration;
 }
@@ -125,6 +127,9 @@ const config: Configuration = {
     }),
     new CopyWebpackPlugin({
       patterns: [{ from: path.resolve(__dirname, 'locales'), to: 'locales' }],
+    }),
+    new MonacoWebpackPlugin({
+      languages: ['yaml', 'dockerfile'],
     }),
   ],
   devtool: 'source-map',

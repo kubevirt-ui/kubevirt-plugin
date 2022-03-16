@@ -977,6 +977,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@patternfly/react-code-editor@npm:^4.39.19":
+  version: 4.43.5
+  resolution: "@patternfly/react-code-editor@npm:4.43.5"
+  dependencies:
+    "@patternfly/react-core": ^4.202.5
+    "@patternfly/react-icons": ^4.53.5
+    "@patternfly/react-styles": ^4.52.5
+    react-dropzone: 9.0.0
+    tslib: ^2.0.0
+  peerDependencies:
+    monaco-editor-webpack-plugin: ^2.1.0
+    react: ^16.8.0 || ^17.0.0
+    react-dom: ^16.8.0 || ^17.0.0
+    react-monaco-editor: ^0.41.2
+  checksum: 57d2109d8f14dfe51589883f616e9aebe92fa3dee09cf7a559a68f113e147130755fce72e1bcbb086fd3fed7fecd187476d15bc1b0cc54352c63a35551771804
+  languageName: node
+  linkType: hard
+
 "@patternfly/react-core@npm:4.175.4":
   version: 4.175.4
   resolution: "@patternfly/react-core@npm:4.175.4"
@@ -1067,6 +1085,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@patternfly/react-core@npm:^4.202.5":
+  version: 4.202.5
+  resolution: "@patternfly/react-core@npm:4.202.5"
+  dependencies:
+    "@patternfly/react-icons": ^4.53.5
+    "@patternfly/react-styles": ^4.52.5
+    "@patternfly/react-tokens": ^4.54.5
+    focus-trap: 6.2.2
+    react-dropzone: 9.0.0
+    tippy.js: 5.1.2
+    tslib: ^2.0.0
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0
+    react-dom: ^16.8.0 || ^17.0.0
+  checksum: 5b16cbeebecb3ad5b5c583ec803a476d7606cfb9f0f67131597fe2bb03c67e4400ebd76fd86fae88037822e49b19f70ccd585fce7156981d38e32497072013bb
+  languageName: node
+  linkType: hard
+
 "@patternfly/react-icons@npm:^4.26.4, @patternfly/react-icons@npm:^4.43.15, @patternfly/react-icons@npm:^4.49.9":
   version: 4.49.9
   resolution: "@patternfly/react-icons@npm:4.49.9"
@@ -1097,6 +1133,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@patternfly/react-icons@npm:^4.53.5":
+  version: 4.53.5
+  resolution: "@patternfly/react-icons@npm:4.53.5"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0
+    react-dom: ^16.8.0 || ^17.0.0
+  checksum: edff51dd24969586927e95a39bbd14e120ff17d72e83a0f5ea06f1c1e3c93bebeedfcad9a650f6442f08245abf9348ebf9906c522b5badcddd6062c32f33a190
+  languageName: node
+  linkType: hard
+
 "@patternfly/react-styles@npm:^4.11.4, @patternfly/react-styles@npm:^4.48.12":
   version: 4.48.12
   resolution: "@patternfly/react-styles@npm:4.48.12"
@@ -1115,6 +1161,13 @@ __metadata:
   version: 4.48.16
   resolution: "@patternfly/react-styles@npm:4.48.16"
   checksum: 6832fd2127cbf074d35a0923ddf11a0f794f7f9de5c3ec01486b8704ab15fab059e8238f03147f2adb25a9c493c962961fdcd69f827838b5b90f0640977eb8ad
+  languageName: node
+  linkType: hard
+
+"@patternfly/react-styles@npm:^4.52.5":
+  version: 4.52.5
+  resolution: "@patternfly/react-styles@npm:4.52.5"
+  checksum: 1bc98aa61b905df48432adb57442de773f49387acc307bc663aec4ac5796bedca4133706fb6e33508f5f9bb4448d6d4a07c2a4fa8933878d036eef82e55dfa77
   languageName: node
   linkType: hard
 
@@ -1170,6 +1223,13 @@ __metadata:
   version: 4.50.16
   resolution: "@patternfly/react-tokens@npm:4.50.16"
   checksum: de3a01588ecba701dfaae00ab1418166e2cdf84ab2a219cb0908a54e0a164ec3857c72069a1a35ffe866e5e76196c21822a00db0d37194f416b9829e85365571
+  languageName: node
+  linkType: hard
+
+"@patternfly/react-tokens@npm:^4.54.5":
+  version: 4.54.5
+  resolution: "@patternfly/react-tokens@npm:4.54.5"
+  checksum: 9846391358959feeb38ecc131a0e1b4671dad461df3aa7153211283acc3db758ccf28b0fb33fce2a8e7ef2a457c51511c04e2f5a0e983b2cc5609e1497cacb08
   languageName: node
   linkType: hard
 
@@ -7302,6 +7362,7 @@ __metadata:
     "@openshift-console/dynamic-plugin-sdk-webpack": 0.0.6
     "@patternfly/quickstarts": 2.0.1
     "@patternfly/react-catalog-view-extension": ^4.43.15
+    "@patternfly/react-code-editor": ^4.39.19
     "@patternfly/react-core": 4.192.15
     "@patternfly/react-table": ^4.67.5
     "@testing-library/jest-dom": ^5.16.1
@@ -7347,11 +7408,14 @@ __metadata:
     mochawesome: ^7.0.1
     mochawesome-merge: ^4.2.1
     mochawesome-report-generator: ^6.0.1
+    monaco-editor: ^0.33.0
+    monaco-editor-webpack-plugin: ^7.0.1
     prettier: ^2.5.1
     react: 17.0.2
     react-dom: 17.0.2
     react-helmet: ^6.1.0
     react-i18next: ^11.14.3
+    react-monaco-editor: ^0.47.0
     react-router-dom: 5.x
     react-tagsinput: ^3.19.0
     resolve-url-loader: ^5.0.0
@@ -7468,7 +7532,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"loader-utils@npm:^2.0.0":
+"loader-utils@npm:^2.0.0, loader-utils@npm:^2.0.2":
   version: 2.0.2
   resolution: "loader-utils@npm:2.0.2"
   dependencies:
@@ -8070,6 +8134,25 @@ __metadata:
   peerDependencies:
     mocha: ">=7"
   checksum: 5ec035b970edaefd2ad935ac32f6b85dcd89f23deb0fe25012c134124d3cfe02db2ad1b7626fd327ad7bee6f6b92c54f41746c8d2c7b74590b5a84dafead37b3
+  languageName: node
+  linkType: hard
+
+"monaco-editor-webpack-plugin@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "monaco-editor-webpack-plugin@npm:7.0.1"
+  dependencies:
+    loader-utils: ^2.0.2
+  peerDependencies:
+    monaco-editor: ">= 0.31.0"
+    webpack: ^4.5.0 || 5.x
+  checksum: 436814c724d5033254519ef8203f0df600d15c6bf0a3bf48a42ea678086becb56ed5685df2bca4cd4107855ecf8cea73722e52b63573edba5c020ff51b4f2d31
+  languageName: node
+  linkType: hard
+
+"monaco-editor@npm:^0.33.0":
+  version: 0.33.0
+  resolution: "monaco-editor@npm:0.33.0"
+  checksum: f88fd1c9be0d6845436aa92ee7f7bcc49f9e9bf452f73bb5efbbe52e50678d1c2aec4d612a943310f5e2282c1d9fcc41b792b65a5b9008e6054908e7e10311ea
   languageName: node
   linkType: hard
 
@@ -9214,6 +9297,19 @@ __metadata:
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 9d6d111d8990dc98bc5402c1266a808b0459b5d54830bbea24c12d908b536df7883f268a7868cfaedde3dd9d4e0d574db456f84d2e6df9c4526f99bb4b5344d8
+  languageName: node
+  linkType: hard
+
+"react-monaco-editor@npm:^0.47.0":
+  version: 0.47.0
+  resolution: "react-monaco-editor@npm:0.47.0"
+  dependencies:
+    prop-types: ^15.8.1
+  peerDependencies:
+    "@types/react": ^17.x
+    monaco-editor: ^0.31.1
+    react: ^17.x
+  checksum: 647d84cfcf06f177559bec874eb7312b98b91dd7a2b251c882cff9c2d1dfffaf4099ff4ea410d6aed125f4045ca470e7efdec4d14bec90296383f240f96f2560
   languageName: node
   linkType: hard
 
