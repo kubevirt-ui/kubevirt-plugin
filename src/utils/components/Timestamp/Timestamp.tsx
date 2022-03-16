@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Tooltip } from '@patternfly/react-core';
 import { GlobeAmericasIcon } from '@patternfly/react-icons';
 
-import { isValid, timestampFor, utcDateTimeFormatter } from './datetime';
+import { isValid, timestampFor, utcDateTimeFormatter } from './utils/datetime';
 
 export type TimestampProps = {
   timestamp: string | number;

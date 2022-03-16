@@ -5,9 +5,8 @@ import {
   V1alpha1VirtualMachineRestore,
   V1alpha1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-
-import Timestamp from '../../../list/components/Timestamp/Timestamp';
 
 import IndicationLabelList from './components/IndicationLabel/IndicationLabelList';
 
