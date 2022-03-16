@@ -7125,6 +7125,7 @@ __metadata:
     react-helmet: ^6.1.0
     react-i18next: ^11.14.3
     react-router-dom: 5.x
+    react-tagsinput: ^3.19.0
     resolve-url-loader: ^5.0.0
     sass: ^1.49.7
     sass-loader: ^12.4.0
@@ -9005,6 +9006,15 @@ __metadata:
   peerDependencies:
     react: ^16.3.0 || ^17.0.0
   checksum: 324511ea8f6669555e166b4af280cdf46034bf0e33c486711e3ce17f88f6f21fed17055098408be1347657d0cbcd614bca944cf9f8e4ecfa96a21d13893fe9fc
+  languageName: node
+  linkType: hard
+
+"react-tagsinput@npm:^3.19.0":
+  version: 3.19.0
+  resolution: "react-tagsinput@npm:3.19.0"
+  peerDependencies:
+    react: ^16.0.0 || ^15.0.0 || ^0.14.0
+  checksum: 59948271e7b776b12abe6400bbb3e55a55fd8143384b4bab72112ae43ff049ad2b43907026ac3fd6a80baf959326a701151442dddee6b3ac24a21ce6d1afd125
   languageName: node
   linkType: hard
 

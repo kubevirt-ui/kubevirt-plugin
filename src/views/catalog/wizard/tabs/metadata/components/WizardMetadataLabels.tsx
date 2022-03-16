@@ -12,7 +12,7 @@ const WizardMetadataLabels: React.FC<WizardMetadataLabelsProps> = ({ labels }) =
   return (
     <LabelGroup numLabels={10} className="wizard-metadata-labels-group">
       {Object.keys(labels || {})?.map((key) => {
-        return <Label key={key}>{`${key}=${labels[key]}`}</Label>;
+        return <Label key={key}>{labels[key] ? `${key}=${labels[key]}` : key}</Label>;
       })}
     </LabelGroup>
   );

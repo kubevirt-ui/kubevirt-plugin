@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DescriptionList, Grid, GridItem, pluralize } from '@patternfly/react-core';
 
@@ -15,6 +16,7 @@ const WizardMetadataTab: React.FC<WizardVMContextType> = ({ vm, updateVM, loaded
   const annotations = vm?.metadata?.annotations;
 
   const [isAnnotationsModalOpen, setAnnotationsModalOpen] = React.useState(false);
+  const [isLabelsModalOpen, setLabelsModalOpen] = React.useState(false);
 
   return (
     <div className="co-m-pane__body">
@@ -26,7 +28,7 @@ const WizardMetadataTab: React.FC<WizardVMContextType> = ({ vm, updateVM, loaded
               description={<WizardMetadataLabels labels={labels} />}
               isDisabled={!loaded}
               isEdit
-              onEditClick={() => console.log('edit labels')}
+              onEditClick={() => setLabelsModalOpen(true)}
               testId="wizard-metadata-labels"
               showEditOnTitle
               helperPopover={{
@@ -59,6 +61,16 @@ const WizardMetadataTab: React.FC<WizardVMContextType> = ({ vm, updateVM, loaded
         updateVM={updateVM}
         isOpen={isAnnotationsModalOpen}
         onClose={() => setAnnotationsModalOpen(false)}
+      />
+      <LabelsModal
+        obj={vm}
+        onLabelsSubmit={(updatedLabels) =>
+          updateVM((vmDraft) => {
+            vmDraft.metadata.labels = updatedLabels;
+          })
+        }
+        isOpen={isLabelsModalOpen}
+        onClose={() => setLabelsModalOpen(false)}
       />
     </div>
   );
