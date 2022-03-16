@@ -5,6 +5,7 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Divider, PageSection } from '@patternfly/react-core';
 
 import Scheduling from './components/Scheduling/Scheduling';
+import VirtualMachinesInstancesPageDetailsTabDetails from './VirtualMachinesInstancesPageDetailsTabDetails';
 
 import './virtual-machines-instance-details-tab.scss';
 
@@ -16,7 +17,9 @@ const VirtualMachinesInstancePageDetailsTab: React.FC<
 > = ({ obj: vmi, location }) => {
   return (
     <div className="VirtualMachinesInstanceDetailsTab co-m-pane__body">
-      <PageSection>Details</PageSection>
+      <PageSection>
+        <VirtualMachinesInstancesPageDetailsTabDetails vmi={vmi} pathname={location?.pathname} />
+      </PageSection>
       <Divider />
       <PageSection>
         <Scheduling vmi={vmi} pathname={location?.pathname} />
