@@ -14,7 +14,6 @@ import { printableVMStatus } from '../../../utils';
 import SnapshotList from './components/list/SnapshotList';
 import SnapshotModal from './components/modal/SnapshotModal';
 import useSnapshotData from './hooks/useSnapshotData';
-import { getUsedSnapshotNames } from './utils/selectors';
 
 type SnapshotListPageProps = RouteComponentProps<{
   ns: string;
@@ -35,7 +34,7 @@ const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
     <>
       <ListPageHeader title="">
         <ListPageCreateButton onClick={() => setIsOpen(true)}>
-          {t('Add snapshot')}
+          {t('Add Snapshot')}
         </ListPageCreateButton>
       </ListPageHeader>
       <ListPageBody>
@@ -47,14 +46,7 @@ const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
           isVMRunning={vm?.status?.printableStatus !== printableVMStatus.Stopped}
         />
       </ListPageBody>
-      {isOpen && (
-        <SnapshotModal
-          usedNames={getUsedSnapshotNames(snapshots)}
-          vm={vm}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        />
-      )}
+      {isOpen && <SnapshotModal vm={vm} isOpen={isOpen} onClose={() => setIsOpen(false)} />}
     </>
   );
 };

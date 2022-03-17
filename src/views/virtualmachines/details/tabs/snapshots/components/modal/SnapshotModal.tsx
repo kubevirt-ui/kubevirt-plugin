@@ -11,12 +11,12 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, TextArea } from '@patternfly/react-core';
+import { Form, FormGroup, TextArea, TextInput } from '@patternfly/react-core';
 
 import { printableVMStatus } from '../../../../../utils';
 import { deadlineUnits } from '../../utils/consts';
 import {
-  generateSnapshotName,
+  createSnapshotName,
   getEmptyVMSnapshotResource,
   getVolumeSnapshotStatusesPartition,
 } from '../../utils/helpers';
@@ -25,20 +25,18 @@ import NoSupportedVolumesAlert from './alerts/NoSupportedVolumesAlert';
 import SupportedVolumesAlert from './alerts/SupportedVolumesAlert';
 import UnsupportedVolumesAlert from './alerts/UnsupportedVolumesAlert';
 import SnapshotDeadlineFormField from './SnapshotFormFields/SnapshotDeadlineFormField';
-import SnapshotNameFormField from './SnapshotFormFields/SnapshotNameFormField';
 import SnapshotSupportedVolumeList from './SnapshotFormFields/SnapshotSupportedVolumeList';
 
 type SnapshotModalProps = {
   vm: V1VirtualMachine;
-  usedNames?: string[];
   isOpen: boolean;
   onClose: () => void;
 };
 
-const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, usedNames, isOpen, onClose }) => {
+const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
   // fields input values
-  const [snapshotName, setSnapshotName] = React.useState<string>(generateSnapshotName(usedNames));
+  const [snapshotName, setSnapshotName] = React.useState<string>(createSnapshotName());
   const [description, setDescription] = React.useState<string>(undefined);
   const [deadline, setDeadline] = React.useState<string>(undefined);
   const [deadlineUnit, setDeadlineUnit] = React.useState<deadlineUnits>(deadlineUnits.Seconds);
@@ -75,7 +73,7 @@ const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, usedNames, isOpen, on
         })
       }
       onClose={onClose}
-      headerText={t('Add snapshot')}
+      headerText={t('Add Snapshot')}
       isDisabled={isSubmitDisabled}
     >
       {supportedVolumes?.length === 0 ? (
@@ -85,14 +83,11 @@ const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, usedNames, isOpen, on
           <SupportedVolumesAlert
             isVMRunning={vm?.status?.printableStatus === printableVMStatus.Running}
           />
-          <SnapshotNameFormField
-            snapshotName={snapshotName}
-            setSnapshotName={setSnapshotName}
-            usedNames={usedNames}
-            setIsError={setSubmitDisabled}
-          />
+          <FormGroup label={t('Name')} fieldId="name" isRequired>
+            <TextInput id="name" type="text" value={snapshotName} onChange={setSnapshotName} />
+          </FormGroup>
           <FormGroup label={t('Description')} fieldId="description">
-            <TextArea value={description} onChange={setDescription} id="description" />
+            <TextArea id="description" value={description} onChange={setDescription} />
           </FormGroup>
           <SnapshotDeadlineFormField
             deadline={deadline}

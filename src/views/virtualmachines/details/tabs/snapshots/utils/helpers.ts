@@ -29,24 +29,6 @@ export const createSnapshotName = () => {
   })}`;
 };
 
-export const generateSnapshotName = (usedNames: string[]): string => {
-  let generatedName = createSnapshotName();
-  while (usedNames?.includes(generatedName)) {
-    generatedName = createSnapshotName();
-  }
-  return generatedName;
-};
-
-export const validateSnapshotName = (name: string, usedNames: string[], t: TFunction): string => {
-  if (name?.length === 0) {
-    return t('Name is required');
-  }
-  if (usedNames?.includes(name)) {
-    return t('Name is already in use');
-  }
-  return undefined;
-};
-
 export const validateSnapshotDeadline = (deadline: string, t: TFunction): string => {
   if (deadline?.length > 0) {
     if (!Number(deadline)) {
