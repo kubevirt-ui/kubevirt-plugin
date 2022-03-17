@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
+import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
@@ -12,7 +13,6 @@ import {
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
-import Timestamp from '../../../../../../list/components/Timestamp/Timestamp';
 import MutedTextDiv from '../../MutedTextDiv/MutedTextDiv';
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';

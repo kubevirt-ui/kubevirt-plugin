@@ -6,7 +6,7 @@ import {
   MINTUE,
   MINUTE_IN_MS,
   TEN_AND_HALF_MINUTES_IN_MS,
-} from '../../../../virtualmachines/utils/constants';
+} from './constants';
 
 const dateTimeFormatterOptions: Intl.DateTimeFormatOptions = {
   month: 'short',
