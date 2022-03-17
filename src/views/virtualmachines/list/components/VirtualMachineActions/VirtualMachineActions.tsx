@@ -1,21 +1,63 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import { LazyActionMenu } from '@openshift-console/dynamic-plugin-sdk-internal';
-import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/internal-types';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Action } from '@openshift-console/dynamic-plugin-sdk';
+// import { LazyActionMenu } from '@openshift-console/dynamic-plugin-sdk-internal';
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownPosition,
+  DropdownToggle,
+  KebabToggle,
+} from '@patternfly/react-core';
 
-type VirtualMachinesInsanceActionsProps = { vm: V1VirtualMachine; variant?: ActionMenuVariant };
+import useVirtualMachineActionsProvider from '../../../actions/hooks/useVirtualMachineActionsProvider';
+
+type VirtualMachinesInsanceActionsProps = { vm: V1VirtualMachine; isKebabToggle?: boolean };
 
 const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
   vm,
-  variant = ActionMenuVariant.KEBAB,
-}) => (
-  <LazyActionMenu
-    variant={variant}
-    key={vm?.metadata?.name}
-    context={{ [VirtualMachineModelRef]: vm }}
-  />
-);
+  isKebabToggle,
+}) => {
+  const { t } = useKubevirtTranslation();
+  // TODO: use LazyActionMenu when fixed
+  // return (
+  //   <LazyActionMenu
+  //     variant={variant}
+  //     key={vm?.metadata?.name}
+  //     context={{ [VirtualMachineModelRef]: vm }}
+  //   />
+  // );
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [actions] = useVirtualMachineActionsProvider(vm);
+
+  const handleClick = (action: Action) => {
+    if (typeof action?.cta === 'function') {
+      action?.cta();
+      setIsOpen(false);
+    }
+  };
+
+  return (
+    <Dropdown
+      isPlain={isKebabToggle}
+      isOpen={isOpen}
+      position={DropdownPosition.right}
+      toggle={
+        isKebabToggle ? (
+          <KebabToggle onToggle={setIsOpen} />
+        ) : (
+          <DropdownToggle onToggle={setIsOpen}>{t('Actions')}</DropdownToggle>
+        )
+      }
+      dropdownItems={actions?.map((action) => (
+        <DropdownItem key={action?.id} onClick={() => handleClick(action)}>
+          {action?.label}
+        </DropdownItem>
+      ))}
+    />
+  );
+};
 
 export default VirtualMachineActions;
