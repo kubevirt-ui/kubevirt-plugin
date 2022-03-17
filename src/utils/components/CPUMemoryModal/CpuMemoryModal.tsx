@@ -1,10 +1,8 @@
 import * as React from 'react';
 import produce from 'immer';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   Button,
@@ -28,9 +26,10 @@ type CPUMemoryModalProps = {
   vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
+  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>
 };
 
-const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose }) => {
+const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
   const {
     data: templateDefaultsData,
@@ -45,7 +44,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose }) 
   const [memoryUnit, setMemoryUnit] = React.useState<string>();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
 
-  const resultVirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine = React.useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       vmDraft.spec.template.spec.domain.resources.requests = {
         ...vm?.spec?.template?.spec?.domain?.resources?.requests,
@@ -68,15 +67,10 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose }) 
     }
   }, [vm]);
 
-  const onSubmit = () => {
+  const handleSubmit = () => {
     setUpdateInProcess(true);
 
-    k8sUpdate({
-      model: VirtualMachineModel,
-      data: resultVirtualMachine,
-      ns: resultVirtualMachine.metadata.namespace,
-      name: resultVirtualMachine.metadata.name,
-    })
+    onSubmit(updatedVirtualMachine)
       .then(() => {
         setUpdateInProcess(false);
         onClose();
@@ -98,7 +92,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose }) 
         <Button
           key="confirm"
           variant={ButtonVariant.primary}
-          onClick={onSubmit}
+          onClick={handleSubmit}
           isLoading={updateInProcess}
         >
           {t('Save')}
