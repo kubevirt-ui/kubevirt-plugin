@@ -2,11 +2,10 @@ import * as React from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { ResourceLink, RowProps, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import FirstItemListPopover, {
-  getVMIIPAddresses,
-} from '../FirstItemListPopover/FirstItemListPopover';
+import FirstItemListPopover from '../FirstItemListPopover/FirstItemListPopover';
 
 import VirtualMachineRowLayout from './VirtualMachineRowLayout';
 

@@ -6,11 +6,10 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
-import FirstItemListPopover, {
-  getVMIIPAddresses,
-} from '../../../../list/components/FirstItemListPopover/FirstItemListPopover';
+import FirstItemListPopover from '../../../../list/components/FirstItemListPopover/FirstItemListPopover';
 import MutedTextDiv from '../components/MutedTextDiv/MutedTextDiv';
 
 import { getVMIPod } from './vmiHelper';
