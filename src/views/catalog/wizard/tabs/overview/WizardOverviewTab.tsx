@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
+import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -33,6 +34,7 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
 
   const [isDescriptionModalOpen, setIsDescriptionModalOpen] = React.useState(false);
+  const [isCPUMemoryModalOpen, setIsCPUMemoryModalOpen] = React.useState(false);
 
   return (
     <div className="co-m-pane__body">
@@ -85,12 +87,18 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
               className="wizard-overview-description-left-column"
               title={t('CPU | Memory')}
               isEdit
-              onEditClick={() => console.log('edit flavor')}
+              onEditClick={() => setIsCPUMemoryModalOpen(true)}
               description={
                 <>
                   {t('CPU')} {flavor?.cpuCount} | {t('Memory')} {flavor?.memory}
                 </>
               }
+            />
+            <CPUMemoryModal
+              vm={vm}
+              isOpen={isCPUMemoryModalOpen}
+              onClose={() => setIsCPUMemoryModalOpen(false)}
+              onSubmit={updateVM}
             />
 
             <WizardDescriptionItem
