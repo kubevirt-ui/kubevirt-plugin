@@ -79,7 +79,7 @@ export const processTemplate = async (
 
 export const getVirtualMachineNameField = (
   template: V1Template,
-  t: TFunction,
+  t: TFunction<'plugin__kubevirt-plugin', undefined>,
 ): TemplateParameter => {
   return {
     required: true,
