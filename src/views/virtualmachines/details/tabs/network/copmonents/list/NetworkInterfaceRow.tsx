@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -12,9 +13,10 @@ export type NetworkInterfaceRowProps = {
   obj: NetworkPresentation;
 };
 
-const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation>> = ({
+const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation, { vm: V1VirtualMachine }>> = ({
   obj: { iface, network },
   activeColumnIDs,
+  rowData: { vm },
 }) => {
   const { t } = useKubevirtTranslation();
   return (
@@ -39,7 +41,11 @@ const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation>> = ({
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
-        <NetworkInterfaceActions />
+        <NetworkInterfaceActions
+          vm={vm}
+          nicName={network.name}
+          nicPresentation={{ iface, network }}
+        />
       </TableData>
     </>
   );

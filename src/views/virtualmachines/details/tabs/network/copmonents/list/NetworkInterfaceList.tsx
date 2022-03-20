@@ -9,8 +9,9 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import useNetworkColumns from './hooks/useNetworkColumns';
-import useNetworkRowFilters from './hooks/useNetworkRowFilters';
+import useNetworkColumns from '../..//hooks/useNetworkColumns';
+import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
+
 import NetworkInterfaceRow from './NetworkInterfaceRow';
 
 type NetworkInterfaceTableProps = {
@@ -36,6 +37,7 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceTableProps> = ({ vm }) => {
         loadError={false}
         columns={columns}
         Row={NetworkInterfaceRow}
+        rowData={{ vm }}
       />
     </>
   );
