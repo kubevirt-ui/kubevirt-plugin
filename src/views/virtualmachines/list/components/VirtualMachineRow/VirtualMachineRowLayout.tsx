@@ -42,7 +42,7 @@ const VirtualMachineRowLayout: React.FC<
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
-        <VirtualMachineActions vm={obj} />
+        <VirtualMachineActions vm={obj} isKebabToggle />
       </TableData>
     </>
   );
