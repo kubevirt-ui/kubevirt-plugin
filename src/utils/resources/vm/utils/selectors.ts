@@ -44,3 +44,11 @@ export const getGPUDevices = (vm: V1VirtualMachine) =>
  */
 export const getHostDevices = (vm: V1VirtualMachine) =>
   vm?.spec?.template?.spec?.domain?.devices?.hostDevices;
+
+/**
+ * A selector for the virtual machine's volumes snapshot statuses
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine volumes snapshot statuses
+ */
+export const getVolumeSnapshotStatuses = (vm: V1VirtualMachine) =>
+  vm?.status?.volumeSnapshotStatuses;
