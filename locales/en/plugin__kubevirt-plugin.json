@@ -190,7 +190,6 @@
   "Delete": "Delete",
   "Edit Network Interface": "Edit Network Interface",
   "MAC address": "MAC address",
-  "Error": "Error",
   "virtio": "virtio",
   "Optimized for best performance. Supported by most Linux distributions. Windows requires additional drivers to use this model": "Optimized for best performance. Supported by most Linux distributions. Windows requires additional drivers to use this model",
   "e1000e": "e1000e",
