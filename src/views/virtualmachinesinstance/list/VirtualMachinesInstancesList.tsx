@@ -18,15 +18,19 @@ import VirtualMachinesInstancesRow from './VirtualMachinesInstancesRow';
 
 type VirtualMachinesInstancesListProps = {
   kind: string;
+  namespace: string;
 };
 
-const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> = ({ kind }) => {
+const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> = ({
+  kind,
+  namespace,
+}) => {
   const { t } = useKubevirtTranslation();
 
   const [vmis, loaded, loadError] = useK8sWatchResource<V1VirtualMachineInstance[]>({
     kind,
     isList: true,
-    namespaced: true,
+    namespace,
   });
   const [data, filteredData, onFilterChange] = useListPageFilter(vmis, filters);
   const columns = useVirtualMachinesInstancesColumns();
