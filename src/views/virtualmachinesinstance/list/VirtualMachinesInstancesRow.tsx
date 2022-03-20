@@ -7,8 +7,7 @@ import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-pl
 import { GlobeAmericasIcon } from '@patternfly/react-icons';
 
 import VirtualMachinesInsanceActions from '../actions/VirtualMachinesInstanceActions';
-
-import VirtualMachinesInstancesStatus from './VirtualMachinesInstancesStatus';
+import VirtualMachinesInstancesStatus from '../components/VirtualMachinesInstancesStatus';
 
 type VirtualMachinesInstancesRowProps = RowProps<V1VirtualMachineInstance, { kind: string }>;
 

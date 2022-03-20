@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { icon } from './utils';
+import { icon } from '../list/utils';
 
 type VirtualMachinesInstancesStatusProps = {
   status: string;
