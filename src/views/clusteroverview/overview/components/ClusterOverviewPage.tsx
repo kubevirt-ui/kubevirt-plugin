@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Overview, OverviewGrid } from '@openshift-console/dynamic-plugin-sdk';
 
+import GettingStartedCard from './getting-started-card/GettingStartedCard';
 import PageHeader from './PageHeader';
 
 const leftCards = [];
@@ -21,6 +22,7 @@ const ClusterOverviewPage: React.FC = () => {
       </Helmet>
       <PageHeader title={title} />
       <Overview>
+        <GettingStartedCard />
         <OverviewGrid leftCards={leftCards} mainCards={mainCards} rightCards={rightCards} />
       </Overview>
     </>

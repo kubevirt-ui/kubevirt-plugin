@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@kubevirt-ui/components": "^0.0.10",
+    "@patternfly/quickstarts": "2.0.1",
     "@patternfly/react-catalog-view-extension": "^4.43.15",
     "@patternfly/react-core": "4.192.15",
     "@patternfly/react-table": "^4.67.5",
