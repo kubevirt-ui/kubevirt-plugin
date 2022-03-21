@@ -62,3 +62,11 @@ export const BOOT_SOURCE_LABELS = {
   [BOOT_SOURCE.URL]: 'URL',
   [BOOT_SOURCE.REGISTRY]: 'Registry',
 };
+
+export const OS_IMAGE_LINKS = {
+  [OS_NAME_TYPES.rhel]: 'https://access.redhat.com/downloads/content/479/ver=/rhel---8/',
+  [OS_NAME_TYPES.fedora]: 'https://alt.fedoraproject.org/cloud/',
+  [OS_NAME_TYPES.centos]: 'https://cloud.centos.org/centos/',
+  [OS_NAME_TYPES.windows]: 'https://www.microsoft.com/en-us/software-download/windows10ISO',
+  [OS_NAME_TYPES.other]: 'https://alt.fedoraproject.org/cloud/',
+};

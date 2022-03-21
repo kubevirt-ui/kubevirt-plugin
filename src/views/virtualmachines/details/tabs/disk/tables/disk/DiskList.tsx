@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,6 +15,7 @@ import {
 
 import useDiskColumns from '../../hooks/useDiskColumns';
 import useDisksFilters from '../../hooks/useDisksFilters';
+import DiskModal from '../../modal/DiskModal';
 
 import DiskListTitle from './DiskListTitle';
 import DiskRow from './DiskRow';
@@ -24,14 +26,22 @@ type DiskListProps = {
 
 const DiskList: React.FC<DiskListProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const columns = useDiskColumns();
   const [disks, loaded, loadError] = useDisksTableData(vm);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
+  const headerText =
+    vm?.status?.printableStatus === printableVMStatus.Running
+      ? t('Add disk (hot plugged)')
+      : t('Add disk');
+
   return (
     <>
       <ListPageHeader title="">
-        <ListPageCreateButton>{t('Add disk')}</ListPageCreateButton>
+        <ListPageCreateButton onClick={() => setIsModalOpen(true)}>
+          {t('Add disk')}
+        </ListPageCreateButton>
       </ListPageHeader>
       <ListPageBody>
         <DiskListTitle />
@@ -50,6 +60,14 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
           Row={DiskRow}
         />
       </ListPageBody>
+      {isModalOpen && (
+        <DiskModal
+          vm={vm}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          headerText={headerText}
+        />
+      )}
     </>
   );
 };
