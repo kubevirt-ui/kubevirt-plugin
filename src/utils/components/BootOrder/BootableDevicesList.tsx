@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { List, ListComponent, ListItem, OrderType } from '@patternfly/react-core';
 
-import { BootableDeviceType } from '../../utils/bootOrderHelper';
+import { BootableDeviceType } from '../../resources/vm/utils/boot-order/bootOrder';
 
 type BootableDevicesListProps = {
   devices: BootableDeviceType[];
