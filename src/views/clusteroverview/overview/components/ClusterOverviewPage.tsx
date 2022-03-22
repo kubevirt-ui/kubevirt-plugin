@@ -10,13 +10,14 @@ import GettingStartedCard from './getting-started-card/GettingStartedCard';
 import InventoryCard from './inventory-card/InventoryCard';
 import PermissionsCard from './permissions-card/PermissionsCard';
 import RunningVMsPerTemplateCard from './running-vms-per-template-card/RunningVMsPerTemplateCard';
+import StatusCard from './status-card/StatusCard';
 import TopConsumersCard from './top-consumers-card/TopConsumersCard';
 import { KUBEVIRT_QUICK_START_USER_SETTINGS_KEY } from './utils/constants';
 import PageHeader from './utils/PageHeader';
 import RestoreGettingStartedButton from './utils/RestoreGettingStartedButton';
 
 const leftCards = [{ Card: DetailsCard }, { Card: RunningVMsPerTemplateCard }];
-const mainCards = [{ Card: InventoryCard }];
+const mainCards = [{ Card: StatusCard }, { Card: InventoryCard }];
 const rightCards = [{ Card: ActivityCard }, { Card: PermissionsCard }];
 
 const ClusterOverviewPage: React.FC = () => {
