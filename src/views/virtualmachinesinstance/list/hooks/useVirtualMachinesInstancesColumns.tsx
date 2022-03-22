@@ -32,14 +32,29 @@ const useVirtualMachinesInstancesColumns = (): { title: string; id: string }[] =
         sort: 'status.phase',
       },
       {
+        title: t('Conditions'),
+        id: 'conditions',
+      },
+      {
         title: t('Created'),
         id: 'created',
         transforms: [sortable],
         sort: 'metadata.creationTimestamp',
       },
       {
+        title: t('Node'),
+        id: 'node',
+        transforms: [sortable],
+        sort: 'metadata.creationTimestamp',
+      },
+      {
+        title: t('IP Address'),
+        id: 'ipAddress',
+      },
+      {
         title: '',
         id: 'actions',
+        props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
     [t],
