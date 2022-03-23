@@ -37,6 +37,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
             'Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. ',
           )}
           moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
+          breadcrumb="VirtualMachine.metadata.name"
         />
         <VirtualMachineDescriptionItem
           descriptionData={<ResourceLink kind="Namespace" name={vm?.metadata?.namespace} />}
@@ -47,6 +48,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
             'Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated. ',
           )}
           moreInfoURL="http://kubernetes.io/docs/user-guide/namespaces"
+          breadcrumb="VirtualMachine.metadata.namespace"
         />
         <VirtualMachineDescriptionItem
           descriptionData={<VirtualMachineLabels labels={vm?.metadata?.labels} />}
@@ -57,6 +59,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
             'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ',
           )}
           moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
+          breadcrumb="VirtualMachine.metadata.labels"
         />
         <VirtualMachineDescriptionItem
           descriptionData={<VirtualMachineAnnotations annotations={vm?.metadata?.annotations} />}
@@ -67,6 +70,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
             'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. ',
           )}
           moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
+          breadcrumb="VirtualMachine.metadata.annotations"
         />
         <VirtualMachineDescriptionItem
           descriptionData={getAnnotation(vm, DESCRIPTION_ANNOTATION) || None}
@@ -88,6 +92,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           bodyContent={t(
             'Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.',
           )}
+          breadcrumb="VirtualMachine.metadata.creationTimestamp"
         />
         <VirtualMachineDescriptionItem
           descriptionData={<OwnerReferences obj={vm} />}
@@ -97,6 +102,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           bodyContent={t(
             'List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.',
           )}
+          breadcrumb="VirtualMachine.metadata.ownerReferences"
         />
       </DescriptionList>
     </GridItem>

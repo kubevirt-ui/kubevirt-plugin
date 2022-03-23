@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  Breadcrumb,
+  BreadcrumbItem,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTermHelpText,
@@ -16,6 +18,7 @@ type VirtualMachineDescriptionItemProps = {
   bodyContent?: React.ReactNode;
   moreInfoURL?: string;
   isPopover?: boolean;
+  breadcrumb?: string;
 };
 
 const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps> = ({
@@ -24,6 +27,7 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
   bodyContent,
   moreInfoURL,
   isPopover,
+  breadcrumb,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -32,8 +36,15 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
       headerContent={descriptionHeader}
       bodyContent={
         <>
-          {bodyContent}
-          {moreInfoURL && <Link to={moreInfoURL}>{t('Learn more')}</Link>}
+          {bodyContent} {t('More info: ')}
+          {moreInfoURL && <Link to={moreInfoURL}>{moreInfoURL}</Link>}
+          {breadcrumb && (
+            <Breadcrumb>
+              {breadcrumb.split('.').map((item) => (
+                <BreadcrumbItem key={item}>{item}</BreadcrumbItem>
+              ))}
+            </Breadcrumb>
+          )}
         </>
       }
     >
