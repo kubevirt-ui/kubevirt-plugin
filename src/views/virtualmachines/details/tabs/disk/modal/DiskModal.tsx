@@ -1,12 +1,7 @@
 import * as React from 'react';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import {
-  V1DataVolumeTemplateSpec,
-  V1VirtualMachine,
-  V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { Form } from '@patternfly/react-core';
@@ -23,14 +18,16 @@ import NameFormField from './DiskFormFields/NameFormField';
 import StorageClassSelect from './DiskFormFields/StorageClassSelect';
 import { sourceTypes } from './DiskFormFields/utils/constants';
 import VolumeMode from './DiskFormFields/VolumeMode';
-import { diskReducer, diskSourceReducer } from './state/diskReducer';
 import { initialStateDiskForm, initialStateDiskSource } from './state/initialState';
+import { diskReducer, diskSourceReducer } from './state/reducers';
 import {
   getDataVolumeFromState,
   getDataVolumeHotplugPromise,
   getDataVolumeTemplate,
   getDiskFromState,
   getPersistentVolumeClaimHotplugPromise,
+  getVolumeFromState,
+  requiresDataVolume,
   updateVMDisks,
 } from './utils/helpers';
 
@@ -50,8 +47,7 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
     initialStateDiskSource,
   );
   const sourceRequiresDataVolume = React.useMemo(
-    () =>
-      diskState.diskSource !== sourceTypes.EPHEMERAL && diskState.diskSource !== sourceTypes.PVC,
+    () => requiresDataVolume(diskState.diskSource),
     [diskState.diskSource],
   );
 
@@ -79,31 +75,12 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
 
   const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {
     const updatedVM = { ...vm };
+    const dvName = `${vm?.metadata?.name}-${diskState.diskName}`;
 
     const resultDisk = getDiskFromState(diskState);
-
-    const resultVolume: V1Volume = {
-      name: diskState.diskName,
-    };
-    let resultDataVolume: V1beta1DataVolume = undefined;
-    let resultDataVolumeTemplate: V1DataVolumeTemplateSpec = undefined;
-    const dvName = `${vm?.metadata?.name}-${diskState.diskName}`;
-    if (sourceRequiresDataVolume) {
-      resultVolume.dataVolume = {
-        name: dvName,
-      };
-      resultDataVolume = getDataVolumeFromState(updatedVM, diskState, diskSourceState);
-      resultDataVolumeTemplate = getDataVolumeTemplate(resultDataVolume);
-    } else if (diskState.diskSource === sourceTypes.PVC) {
-      resultVolume.persistentVolumeClaim = {
-        claimName: diskSourceState.pvcSourceName,
-      };
-    } else {
-      // EPHEMERAL
-      resultVolume.containerDisk = {
-        image: diskSourceState.ephemeralSource,
-      };
-    }
+    const resultVolume = getVolumeFromState(diskState, diskSourceState, dvName);
+    const resultDataVolume = getDataVolumeFromState(updatedVM, diskState, diskSourceState);
+    const resultDataVolumeTemplate = getDataVolumeTemplate(resultDataVolume);
 
     if (!isVMRunning) {
       const updatedDisks = [...(getDisks(vm) || []), resultDisk];
@@ -116,7 +93,7 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
     }
 
     return vm; // we will create DataVolume and make a API call to attach the hotplug disk
-  }, [vm, diskState, sourceRequiresDataVolume, isVMRunning, diskSourceState]);
+  }, [vm, diskState, isVMRunning, diskSourceState]);
 
   return (
     <TabModal

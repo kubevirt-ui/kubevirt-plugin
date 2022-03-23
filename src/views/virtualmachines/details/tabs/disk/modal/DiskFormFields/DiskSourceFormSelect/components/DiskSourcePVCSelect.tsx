@@ -10,7 +10,6 @@ type DiskSourcePVCSelectProps = {
   pvcNamespaceSelected: string;
   selectPVCName: (value: string) => void;
   selectPVCNamespace?: (value: string) => void;
-  filter?: boolean;
 };
 
 const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({

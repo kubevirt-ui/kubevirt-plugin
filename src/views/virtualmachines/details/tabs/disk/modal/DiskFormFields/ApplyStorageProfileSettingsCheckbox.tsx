@@ -40,10 +40,9 @@ const ApplyStorageProfileSettingsCheckbox: React.FC<ApplyStorageProfileSettingsC
       type: diskReducerActions.SET_STORAGE_PROFILE_SETTINGS_CHECKBOX_DISABLED,
       payload: !loaded || !claimPropertySets,
     });
-    if (!loaded) {
-      return;
-    }
 
+    // only if claimPropertySets is not empty and the user checked for the optimized settings checkbox
+    // we set the values from claimPropertySets
     if (applyStorageProfileSettings && claimPropertySets?.length > 0) {
       const firstCliamPropertySet = claimPropertySets?.[0];
       dispatchDiskState({

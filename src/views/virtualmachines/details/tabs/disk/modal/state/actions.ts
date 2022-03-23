@@ -17,7 +17,7 @@ export const diskReducerActions = Object.freeze({
 
 export type DiskReducerActionType = {
   type: string;
-  payload?: any;
+  payload?: string | boolean | any; // removing the any causes a TS error in reducers.ts
 };
 
 export const diskSourceReducerActions = Object.freeze({

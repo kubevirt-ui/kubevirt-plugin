@@ -54,12 +54,42 @@ export const updateVMDisks = (
   return updatedVM;
 };
 
+export const requiresDataVolume = (diskSource: string): boolean => {
+  return diskSource !== sourceTypes.EPHEMERAL && diskSource !== sourceTypes.PVC;
+};
+
 export const getDiskFromState = (diskState: DiskFormState): V1Disk => ({
   name: diskState.diskName,
   [diskState.diskType]: {
     bus: diskState.diskInterface,
   },
 });
+
+export const getVolumeFromState = (
+  diskState: DiskFormState,
+  diskSourceState: DiskSourceState,
+  dvName: string,
+): V1Volume => {
+  const volume: V1Volume = {
+    name: diskState.diskName,
+  };
+  if (requiresDataVolume(diskState.diskSource)) {
+    volume.dataVolume = {
+      name: dvName,
+    };
+  } else if (diskState.diskSource === sourceTypes.EPHEMERAL) {
+    volume.containerDisk = {
+      image: diskSourceState.ephemeralSource,
+    };
+  } else {
+    // diskState.diskSource === sourceTypes.PVC
+    volume.persistentVolumeClaim = {
+      claimName: diskSourceState.pvcSourceName,
+    };
+  }
+
+  return volume;
+};
 
 export const getDataVolumeFromState = (
   vm: V1VirtualMachine,

@@ -34,6 +34,7 @@ const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
   };
 
   React.useEffect(() => {
+    // only SCSI is supported for hotplug
     if (isVMRunning && diskInterface !== interfaceTypes.SCSI) {
       dispatchDiskState({
         type: diskReducerActions.SET_DISK_INTERFACE,
@@ -43,6 +44,7 @@ const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
   }, [dispatchDiskState, isVMRunning, diskInterface]);
 
   React.useEffect(() => {
+    // virtio is not supported for CDROM
     if (isCDROMType && diskInterface === interfaceTypes.VIRTIO) {
       dispatchDiskState({
         type: diskReducerActions.SET_DISK_INTERFACE,
