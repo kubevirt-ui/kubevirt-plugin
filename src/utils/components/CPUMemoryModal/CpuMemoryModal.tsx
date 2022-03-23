@@ -69,6 +69,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
 
   const handleSubmit = () => {
     setUpdateInProcess(true);
+    setUpdateError(null);
 
     onSubmit(updatedVirtualMachine)
       .then(() => {
