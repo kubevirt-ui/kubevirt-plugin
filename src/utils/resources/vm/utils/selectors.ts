@@ -52,3 +52,10 @@ export const getHostDevices = (vm: V1VirtualMachine) =>
  */
 export const getVolumeSnapshotStatuses = (vm: V1VirtualMachine) =>
   vm?.status?.volumeSnapshotStatuses;
+
+/**
+ * A selector for the virtual machine's data volumes templates
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine host devices
+ */
+export const getDataVolumeTemplates = (vm: V1VirtualMachine) => vm?.spec?.dataVolumeTemplates;

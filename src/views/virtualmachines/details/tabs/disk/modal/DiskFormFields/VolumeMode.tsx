@@ -3,8 +3,8 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../reducer/actions';
-import { DiskFormState } from '../reducer/initialState';
+import { diskReducerActions } from '../state/actions';
+import { DiskFormState } from '../state/initialState';
 
 import {
   AccessMode,
@@ -14,10 +14,10 @@ import {
 
 type VolumeModeProps = {
   diskState: DiskFormState;
-  dispatch: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<any>;
 };
 
-const VolumeMode: React.FC<VolumeModeProps> = ({ diskState, dispatch }) => {
+const VolumeMode: React.FC<VolumeModeProps> = ({ diskState, dispatchDiskState }) => {
   const { t } = useKubevirtTranslation();
 
   const {
@@ -39,7 +39,9 @@ const VolumeMode: React.FC<VolumeModeProps> = ({ diskState, dispatch }) => {
       isChecked={value === volumeMode}
       key={value}
       label={label}
-      onChange={() => dispatch({ type: diskReducerActions.SET_VOLUME_MODE, payload: value })}
+      onChange={() =>
+        dispatchDiskState({ type: diskReducerActions.SET_VOLUME_MODE, payload: value })
+      }
       isDisabled={!allowedVolumeModes?.includes(value)}
     />
   ));

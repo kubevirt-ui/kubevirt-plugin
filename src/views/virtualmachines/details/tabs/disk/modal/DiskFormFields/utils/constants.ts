@@ -3,8 +3,8 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 export const sourceTypes = {
   BLANK: 'blank',
   HTTP: 'http',
-  PVC: 'pvc',
-  CLONE_PVC: 'clonePvc',
+  PVC: 'existingPvc',
+  CLONE_PVC: 'pvc',
   REGISTRY: 'registry',
   EPHEMERAL: 'containerDisk',
 };

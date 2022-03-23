@@ -7,17 +7,20 @@ import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/mode
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Select, SelectVariant } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../reducer/actions';
+import { diskReducerActions } from '../state/actions';
 
 import { FilterSCSelect, getSCSelectOptions } from './utils/Filters';
 import { getDefaultStorageClass } from './utils/helpers';
 
 type StorageClassSelectProps = {
   storageClass: string;
-  dispatch: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<any>;
 };
 
-const StorageClassSelect: React.FC<StorageClassSelectProps> = ({ storageClass, dispatch }) => {
+const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
+  storageClass,
+  dispatchDiskState,
+}) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -28,12 +31,15 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({ storageClass, d
 
   const onSelect = React.useCallback(
     (event: React.MouseEvent<Element, MouseEvent>, selection: string) => {
-      dispatch({ type: diskReducerActions.SET_STORAGE_CLASS, payload: selection });
+      dispatchDiskState({ type: diskReducerActions.SET_STORAGE_CLASS, payload: selection });
       setIsOpen(false);
       const provisioner = storageClasses.find(
         (sc) => sc?.metadata?.name === selection,
       )?.provisioner;
-      dispatch({ type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER, payload: provisioner });
+      dispatchDiskState({
+        type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER,
+        payload: provisioner,
+      });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [storageClasses],
@@ -44,14 +50,14 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({ storageClass, d
     if (!loaded) {
       return;
     } else if (storageClasses.length === 0) {
-      dispatch({ type: diskReducerActions.SET_STORAGE_CLASS, payload: null });
+      dispatchDiskState({ type: diskReducerActions.SET_STORAGE_CLASS, payload: null });
     } else if (!storageClass) {
       const defaultSC = getDefaultStorageClass(storageClasses);
-      dispatch({
+      dispatchDiskState({
         type: diskReducerActions.SET_STORAGE_CLASS,
         payload: defaultSC?.metadata.name || storageClasses?.[0].metadata.name,
       });
-      dispatch({
+      dispatchDiskState({
         type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER,
         payload: defaultSC?.provisioner || storageClasses?.[0].provisioner,
       });

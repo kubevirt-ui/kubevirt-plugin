@@ -8,8 +8,8 @@ import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { hasSizeUnit as getOSNameWithoutVersionNumber } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../../reducer/actions';
-import { DiskFormState } from '../../reducer/initialState';
+import { diskReducerActions, diskSourceReducerActions } from '../../state/actions';
+import { DiskFormState, DiskSourceState } from '../../state/initialState';
 import { sourceTypes } from '../utils/constants';
 import { getSourceOptions } from '../utils/helpers';
 
@@ -20,26 +20,32 @@ import DiskSourceUrlInput from './components/DiskSourceUrlInput';
 type DiskSourceFormSelectProps = {
   vm: V1VirtualMachine;
   diskState: DiskFormState;
-  dispatch: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<any>;
   isVMRunning: boolean;
+  diskSourceState: DiskSourceState;
+  dispatchDiskSourceState: React.Dispatch<any>;
 };
 
 const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
   vm,
   diskState,
-  dispatch,
+  dispatchDiskState,
   isVMRunning,
+  diskSourceState,
+  dispatchDiskSourceState,
 }) => {
   const { t } = useKubevirtTranslation();
   const { diskSource, diskType } = diskState || {};
   const isCDROMType = diskType === diskTypes.cdrom;
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
-  const [urlSource, setURLSource] = React.useState<string>();
-  const [pvcSourceName, setPVCSourceName] = React.useState<string>();
-  const [pvcCloneSourceName, setPVCCloneSourceName] = React.useState<string>();
-  const [pvcCloneSourceNamespace, setPVCCloneSourceNamespace] = React.useState<string>();
-  const [registerySource, setRegisterySource] = React.useState<string>();
-  const [ephemeralSource, setEphemeralSource] = React.useState<string>();
+  const {
+    urlSource,
+    pvcSourceName,
+    pvcCloneSourceName,
+    pvcCloneSourceNamespace,
+    registrySource,
+    ephemeralSource,
+  } = diskSourceState || {};
 
   const os = getAnnotation(vm?.spec?.template, ANNOTATIONS.os);
 
@@ -47,16 +53,16 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
 
   const onSelect = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
     event.preventDefault();
-    dispatch({ type: diskReducerActions.SET_DISK_SOURCE, payload: value });
+    dispatchDiskState({ type: diskReducerActions.SET_DISK_SOURCE, payload: value });
     setIsOpen(false);
     // setDiskSource(value);
   };
 
   React.useEffect(() => {
     if (isCDROMType && [sourceTypes.BLANK, sourceTypes.EPHEMERAL].includes(diskSource)) {
-      dispatch({ type: diskReducerActions.SET_DISK_SOURCE, payload: sourceTypes.HTTP });
+      dispatchDiskState({ type: diskReducerActions.SET_DISK_SOURCE, payload: sourceTypes.HTTP });
     }
-  }, [dispatch, isCDROMType, diskSource]);
+  }, [dispatchDiskState, isCDROMType, diskSource]);
   return (
     <>
       <FormGroup label={t('Source')} fieldId="disk-source" isRequired>
@@ -83,30 +89,63 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
       {diskSource === sourceTypes.HTTP && (
         <DiskSourceUrlInput
           url={urlSource}
-          setURL={setURLSource}
+          dispatch={dispatchDiskSourceState}
           os={OS_NAME_TYPES[getOSNameWithoutVersionNumber(os)]}
         />
       )}
       {diskSource === sourceTypes.REGISTRY && (
-        <DiskSourceContainer url={registerySource} setURL={setRegisterySource} os={os} />
+        <DiskSourceContainer
+          url={registrySource}
+          onChange={(value) =>
+            dispatchDiskSourceState({
+              type: diskSourceReducerActions.SET_REGISTRY_SOURCE,
+              payload: value,
+            })
+          }
+          os={os}
+        />
       )}
       {diskSource === sourceTypes.EPHEMERAL && (
-        <DiskSourceContainer url={ephemeralSource} setURL={setEphemeralSource} os={os} />
+        <DiskSourceContainer
+          url={ephemeralSource}
+          onChange={(value) =>
+            dispatchDiskSourceState({
+              type: diskSourceReducerActions.SET_EPHEMERAL_SOURCE,
+              payload: value,
+            })
+          }
+          os={os}
+        />
       )}
       {diskSource === sourceTypes.PVC && (
         <DiskSourcePVCSelect
           pvcNameSelected={pvcSourceName}
           // we allow to use only PVCs from the same namespace of the VM
           pvcNamespaceSelected={vm?.metadata?.namespace}
-          selectPVCName={setPVCSourceName}
+          selectPVCName={(value) =>
+            dispatchDiskSourceState({
+              type: diskSourceReducerActions.SET_PVC_SOURCE_NAME,
+              payload: value,
+            })
+          }
         />
       )}
       {diskSource === sourceTypes.CLONE_PVC && (
         <DiskSourcePVCSelect
           pvcNameSelected={pvcCloneSourceName}
           pvcNamespaceSelected={pvcCloneSourceNamespace}
-          selectPVCName={setPVCCloneSourceName}
-          selectNamespace={setPVCCloneSourceNamespace}
+          selectPVCName={(value) =>
+            dispatchDiskSourceState({
+              type: diskSourceReducerActions.SET_PVC_CLONE_SOURCE_NAME,
+              payload: value,
+            })
+          }
+          selectPVCNamespace={(value) =>
+            dispatchDiskSourceState({
+              type: diskSourceReducerActions.SET_PVC_CLONE_SOURCE_NAMESPACE,
+              payload: value,
+            })
+          }
         />
       )}
     </>

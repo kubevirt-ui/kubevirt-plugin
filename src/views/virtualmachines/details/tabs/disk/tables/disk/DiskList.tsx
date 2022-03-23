@@ -1,10 +1,13 @@
 import * as React from 'react';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import {
+  k8sUpdate,
   ListPageBody,
   ListPageCreateButton,
   ListPageFilter,
@@ -35,6 +38,7 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
     vm?.status?.printableStatus === printableVMStatus.Running
       ? t('Add disk (hot plugged)')
       : t('Add disk');
+  const vmVolumes = getVolumes(vm);
 
   return (
     <>
@@ -58,6 +62,7 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
           loadError={loadError}
           columns={columns}
           Row={DiskRow}
+          rowData={{ vmVolumes }}
         />
       </ListPageBody>
       {isModalOpen && (
@@ -66,6 +71,14 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           headerText={headerText}
+          onSubmit={(obj) =>
+            k8sUpdate({
+              model: VirtualMachineModel,
+              data: obj,
+              ns: obj.metadata.namespace,
+              name: obj.metadata.name,
+            })
+          }
         />
       )}
     </>

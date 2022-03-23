@@ -3,18 +3,18 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../reducer/actions';
+import { diskReducerActions } from '../state/actions';
 
 type DetachHotplugDiskCheckboxProps = {
   detachHotplug: boolean;
-  dispatch: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<any>;
   isVMRunning: boolean;
 };
 
 const DetachHotplugDiskCheckbox: React.FC<DetachHotplugDiskCheckboxProps> = ({
   isVMRunning,
   detachHotplug,
-  dispatch,
+  dispatchDiskState,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -32,7 +32,7 @@ const DetachHotplugDiskCheckbox: React.FC<DetachHotplugDiskCheckboxProps> = ({
         label={t('Detach this hotplugged disk upon VM restart')}
         isChecked={detachHotplug}
         onChange={(checked) =>
-          dispatch({
+          dispatchDiskState({
             type: diskReducerActions.SET_DETACH_HOTPLUG,
             payload: checked,
           })

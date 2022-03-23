@@ -5,17 +5,17 @@ import { Link } from 'react-router-dom';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../reducer/actions';
+import { diskReducerActions } from '../state/actions';
 
 type EnablePreallocationCheckboxProps = {
   enablePreallocation: boolean;
-  dispatch: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<any>;
   isDisabled: boolean;
 };
 
 const EnablePreallocationCheckbox: React.FC<EnablePreallocationCheckboxProps> = ({
   enablePreallocation,
-  dispatch,
+  dispatchDiskState,
   isDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -32,7 +32,7 @@ const EnablePreallocationCheckbox: React.FC<EnablePreallocationCheckboxProps> = 
               Documentation{' '}
             </Link>
             or contact your system administrator for more information. Enabling preallocation is
-            available only for blank disk source.
+            available only for DataVolumes.
           </Trans>
         </>
       }
@@ -42,7 +42,7 @@ const EnablePreallocationCheckbox: React.FC<EnablePreallocationCheckboxProps> = 
         label={t('Enable preallocation')}
         isChecked={enablePreallocation}
         onChange={(checked) =>
-          dispatch({ type: diskReducerActions.SET_ENABLE_PREALLOCATION, payload: checked })
+          dispatchDiskState({ type: diskReducerActions.SET_ENABLE_PREALLOCATION, payload: checked })
         }
         isDisabled={isDisabled}
       />

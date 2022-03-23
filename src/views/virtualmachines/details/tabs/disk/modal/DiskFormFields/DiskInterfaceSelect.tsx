@@ -4,21 +4,21 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../reducer/actions';
-import { DiskFormState } from '../reducer/initialState';
+import { diskReducerActions } from '../state/actions';
+import { DiskFormState } from '../state/initialState';
 
 import { interfaceTypes } from './utils/constants';
 import { getInterfaceOptions } from './utils/helpers';
 
 type DiskInterfaceSelectProps = {
   diskState: DiskFormState;
-  dispatch: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<any>;
   isVMRunning: boolean;
 };
 
 const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
   diskState,
-  dispatch,
+  dispatchDiskState,
   isVMRunning,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -30,20 +30,26 @@ const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
 
   const onSelect = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
     setIsOpen(false);
-    dispatch({ type: diskReducerActions.SET_DISK_INTERFACE, payload: value });
+    dispatchDiskState({ type: diskReducerActions.SET_DISK_INTERFACE, payload: value });
   };
 
   React.useEffect(() => {
     if (isVMRunning && diskInterface !== interfaceTypes.SCSI) {
-      dispatch({ type: diskReducerActions.SET_DISK_INTERFACE, payload: interfaceTypes.SCSI });
+      dispatchDiskState({
+        type: diskReducerActions.SET_DISK_INTERFACE,
+        payload: interfaceTypes.SCSI,
+      });
     }
-  }, [dispatch, isVMRunning, diskInterface]);
+  }, [dispatchDiskState, isVMRunning, diskInterface]);
 
   React.useEffect(() => {
     if (isCDROMType && diskInterface === interfaceTypes.VIRTIO) {
-      dispatch({ type: diskReducerActions.SET_DISK_INTERFACE, payload: interfaceTypes.SATA });
+      dispatchDiskState({
+        type: diskReducerActions.SET_DISK_INTERFACE,
+        payload: interfaceTypes.SATA,
+      });
     }
-  }, [diskInterface, dispatch, isCDROMType]);
+  }, [diskInterface, dispatchDiskState, isCDROMType]);
   return (
     <>
       <FormGroup

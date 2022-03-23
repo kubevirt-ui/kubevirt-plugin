@@ -1,5 +1,5 @@
 export const diskReducerActions = Object.freeze({
-  SET_DISK_MAME: 'setDiskName',
+  SET_DISK_NAME: 'setDiskName',
   SET_DISK_SOURCE: 'setDiskSource',
   SET_DISK_SIZE: 'setDiskSize',
   SET_DISK_TYPE: 'setDiskType',
@@ -12,4 +12,15 @@ export const diskReducerActions = Object.freeze({
   SET_VOLUME_MODE: 'setVolumeMode',
   SET_STORAGE_CLASS_PROVISIONER: 'setStorageClassProvisioner',
   SET_ENABLE_PREALLOCATION: 'setEnablePreallocation',
+  RESET: 'reset',
+});
+
+export const diskSourceReducerActions = Object.freeze({
+  SET_URL_SOURCE: 'setUrlSource',
+  SET_PVC_SOURCE_NAME: 'setPvcSourceName',
+  SET_PVC_CLONE_SOURCE_NAME: 'setPvcCloneSourceName',
+  SET_PVC_CLONE_SOURCE_NAMESPACE: 'setPvcCloneSourceNamespace',
+  SET_REGISTRY_SOURCE: 'setRegistrySource',
+  SET_EPHEMERAL_SOURCE: 'setEphemeralSource',
+  RESET: 'reset',
 });

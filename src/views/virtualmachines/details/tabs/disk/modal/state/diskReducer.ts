@@ -1,9 +1,14 @@
-import { diskReducerActions } from './actions';
-import { DiskFormState } from './initialState';
+import { diskReducerActions, diskSourceReducerActions } from './actions';
+import {
+  DiskFormState,
+  DiskSourceState,
+  initialStateDiskForm,
+  initialStateDiskSource,
+} from './initialState';
 
 export const diskReducer = (state: DiskFormState, action): DiskFormState => {
   switch (action.type) {
-    case diskReducerActions.SET_DISK_MAME:
+    case diskReducerActions.SET_DISK_NAME:
       return { ...state, diskName: action.payload };
     case diskReducerActions.SET_DISK_SOURCE:
       return { ...state, diskSource: action.payload };
@@ -29,6 +34,29 @@ export const diskReducer = (state: DiskFormState, action): DiskFormState => {
       return { ...state, storageClassProvisioner: action.payload };
     case diskReducerActions.SET_ENABLE_PREALLOCATION:
       return { ...state, enablePreallocation: action.payload };
+    case diskReducerActions.RESET:
+      return initialStateDiskForm;
+    default:
+      return state;
+  }
+};
+
+export const diskSourceReducer = (state: DiskSourceState, action): DiskSourceState => {
+  switch (action.type) {
+    case diskSourceReducerActions.SET_URL_SOURCE:
+      return { ...state, urlSource: action.payload };
+    case diskSourceReducerActions.SET_PVC_SOURCE_NAME:
+      return { ...state, pvcSourceName: action.payload };
+    case diskSourceReducerActions.SET_PVC_CLONE_SOURCE_NAME:
+      return { ...state, pvcCloneSourceName: action.payload };
+    case diskSourceReducerActions.SET_PVC_CLONE_SOURCE_NAMESPACE:
+      return { ...state, pvcCloneSourceNamespace: action.payload };
+    case diskSourceReducerActions.SET_REGISTRY_SOURCE:
+      return { ...state, registrySource: action.payload };
+    case diskSourceReducerActions.SET_EPHEMERAL_SOURCE:
+      return { ...state, ephemeralSource: action.payload };
+    case diskSourceReducerActions.RESET:
+      return initialStateDiskSource;
     default:
       return state;
   }

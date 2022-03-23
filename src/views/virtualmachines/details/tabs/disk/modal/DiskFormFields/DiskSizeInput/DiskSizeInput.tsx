@@ -4,27 +4,27 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { FormGroup } from '@openshift-console/dynamic-plugin-sdk-internal/node_modules/@patternfly/react-core';
 import { TextInput } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../../reducer/actions';
-import { DiskFormState } from '../../reducer/initialState';
+import { diskReducerActions } from '../../state/actions';
+import { DiskFormState } from '../../state/initialState';
 import { sourceTypes } from '../utils/constants';
 
 import DiskSizeNumberInput from './DiskSizeNumberInput';
 
 type DiskSizeInputProps = {
   diskState: DiskFormState;
-  dispatch: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<any>;
 };
 
-const DiskSizeInput: React.FC<DiskSizeInputProps> = ({ diskState, dispatch }) => {
+const DiskSizeInput: React.FC<DiskSizeInputProps> = ({ diskState, dispatchDiskState }) => {
   const { t } = useKubevirtTranslation();
   const { diskSource, diskSize } = diskState || {};
   const dynamicSize = t('Dynamic');
 
   const onChange = React.useCallback(
     (value: string) => {
-      dispatch({ type: diskReducerActions.SET_DISK_SIZE, payload: value });
+      dispatchDiskState({ type: diskReducerActions.SET_DISK_SIZE, payload: value });
     },
-    [dispatch],
+    [dispatchDiskState],
   );
 
   if (sourceTypes.PVC === diskSource) {
@@ -39,7 +39,7 @@ const DiskSizeInput: React.FC<DiskSizeInputProps> = ({ diskState, dispatch }) =>
     );
   }
 
-  return <DiskSizeNumberInput quantity={diskSize} onChange={onChange} />;
+  return <DiskSizeNumberInput diskSize={diskSize} onChange={onChange} />;
 };
 
 export default DiskSizeInput;

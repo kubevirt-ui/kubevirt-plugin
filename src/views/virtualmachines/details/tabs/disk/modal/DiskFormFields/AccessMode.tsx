@@ -3,8 +3,8 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../reducer/actions';
-import { DiskFormState } from '../reducer/initialState';
+import { diskReducerActions } from '../state/actions';
+import { DiskFormState } from '../state/initialState';
 
 import {
   getAccessModeForProvisioner,
@@ -14,10 +14,10 @@ import {
 
 type AccessModeProps = {
   diskState: DiskFormState;
-  dispatch: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<any>;
 };
 
-const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatch }) => {
+const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatchDiskState }) => {
   const { t } = useKubevirtTranslation();
 
   const {
@@ -37,14 +37,19 @@ const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatch }) => {
       isChecked={value === accessMode}
       key={value}
       label={label}
-      onChange={() => dispatch({ type: diskReducerActions.SET_ACCESS_MODE, payload: value })}
+      onChange={() =>
+        dispatchDiskState({ type: diskReducerActions.SET_ACCESS_MODE, payload: value })
+      }
       isDisabled={!allowedAccessModes?.includes(value)}
     />
   ));
 
   React.useEffect(() => {
     if (storageProfileSettingsCheckboxDisabled && !allowedAccessModes?.includes(accessMode)) {
-      dispatch({ type: diskReducerActions.SET_ACCESS_MODE, payload: allowedAccessModes[0] });
+      dispatchDiskState({
+        type: diskReducerActions.SET_ACCESS_MODE,
+        payload: allowedAccessModes[0],
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessMode, allowedAccessModes, storageProfileSettingsCheckboxDisabled]);

@@ -6,19 +6,19 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../reducer/actions';
-import { DiskFormState } from '../reducer/initialState';
+import { diskReducerActions } from '../state/actions';
+import { DiskFormState } from '../state/initialState';
 
 import { StorageProfile } from './utils/constants';
 
 type ApplyStorageProfileSettingsCheckboxProps = {
   diskState: DiskFormState;
-  dispatch: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<any>;
 };
 
 const ApplyStorageProfileSettingsCheckbox: React.FC<ApplyStorageProfileSettingsCheckboxProps> = ({
   diskState,
-  dispatch,
+  dispatchDiskState,
 }) => {
   const { t } = useKubevirtTranslation();
   const { storageClass, applyStorageProfileSettings } = diskState || {};
@@ -37,7 +37,7 @@ const ApplyStorageProfileSettingsCheckbox: React.FC<ApplyStorageProfileSettingsC
 
   React.useEffect(() => {
     // onDisableCheckbox(!loaded || !claimPropertySets);
-    dispatch({
+    dispatchDiskState({
       type: diskReducerActions.SET_STORAGE_PROFILE_SETTINGS_CHECKBOX_DISABLED,
       payload: !loaded || !claimPropertySets,
     });
@@ -47,11 +47,11 @@ const ApplyStorageProfileSettingsCheckbox: React.FC<ApplyStorageProfileSettingsC
 
     if (applyStorageProfileSettings && claimPropertySets?.length > 0) {
       const firstCliamPropertySet = claimPropertySets?.[0];
-      dispatch({
+      dispatchDiskState({
         type: diskReducerActions.SET_ACCESS_MODE,
         payload: firstCliamPropertySet?.accessModes?.[0],
       });
-      dispatch({
+      dispatchDiskState({
         type: diskReducerActions.SET_VOLUME_MODE,
         payload: firstCliamPropertySet?.volumeMode,
       });
@@ -73,7 +73,7 @@ const ApplyStorageProfileSettingsCheckbox: React.FC<ApplyStorageProfileSettingsC
         label={t('Apply optimized StorageProfile settings')}
         isChecked={applyStorageProfileSettings}
         onChange={(checked) =>
-          dispatch({
+          dispatchDiskState({
             type: diskReducerActions.SET_APPLY_STORAGE_PROFILE_SETTINGS,
             payload: checked,
           })

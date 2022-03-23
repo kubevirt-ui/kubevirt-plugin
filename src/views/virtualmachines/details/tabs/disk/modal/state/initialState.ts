@@ -1,7 +1,6 @@
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
 import { interfaceTypes, sourceTypes } from '../DiskFormFields/utils/constants';
-import { generateDiskName } from '../DiskFormFields/utils/helpers';
 
 export type DiskFormState = {
   diskName: string;
@@ -20,17 +19,35 @@ export type DiskFormState = {
 };
 
 export const initialStateDiskForm: DiskFormState = {
-  diskName: generateDiskName(),
+  diskName: null,
   diskSource: sourceTypes.BLANK,
   diskSize: '30Gi',
   diskType: diskTypes.disk,
   detachHotplug: false,
   diskInterface: interfaceTypes.VIRTIO,
-  storageClass: undefined as string,
+  storageClass: null,
   applyStorageProfileSettings: true,
   storageProfileSettingsCheckboxDisabled: true,
-  accessMode: undefined as string,
-  volumeMode: undefined as string,
-  storageClassProvisioner: undefined as string,
+  accessMode: null,
+  volumeMode: null,
+  storageClassProvisioner: null,
   enablePreallocation: false,
+};
+
+export type DiskSourceState = {
+  urlSource: string;
+  pvcSourceName: string;
+  pvcCloneSourceName: string;
+  pvcCloneSourceNamespace: string;
+  registrySource: string;
+  ephemeralSource: string;
+};
+
+export const initialStateDiskSource: DiskSourceState = {
+  urlSource: null,
+  pvcSourceName: null,
+  pvcCloneSourceName: null,
+  pvcCloneSourceNamespace: null,
+  registrySource: null,
+  ephemeralSource: null,
 };

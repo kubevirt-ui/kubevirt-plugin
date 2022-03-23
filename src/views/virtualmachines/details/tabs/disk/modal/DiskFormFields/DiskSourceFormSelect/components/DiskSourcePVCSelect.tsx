@@ -4,29 +4,30 @@ import { useProjectsAndPVCs } from '../../hooks/useProjectsAndPVCs';
 
 import DiskSourcePVCSelectName from './DiskSourcePVCSelectName';
 import DiskSourcePVCSelectNamespace from './DiskSourcePVCSelectNamespace';
-import DiskSourcePVCSelectSkeleton from './DiskSourcePVCSelectSkeleton';
 
 type DiskSourcePVCSelectProps = {
   pvcNameSelected: string;
   pvcNamespaceSelected: string;
-  selectPVCName: React.Dispatch<React.SetStateAction<string>>;
-  selectNamespace?: React.Dispatch<React.SetStateAction<string>>;
+  selectPVCName: (value: string) => void;
+  selectPVCNamespace?: (value: string) => void;
+  filter?: boolean;
 };
 
 const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
   pvcNameSelected,
   pvcNamespaceSelected,
   selectPVCName,
-  selectNamespace,
+  selectPVCNamespace,
 }) => {
-  const { projectsNames, filteredPVCNames, loaded } = useProjectsAndPVCs(pvcNamespaceSelected);
+  const { projectsNames, pvcs, projectsLoaded, pvcsLoaded } =
+    useProjectsAndPVCs(pvcNamespaceSelected);
 
   const onSelectProject = React.useCallback(
     (newProject) => {
-      selectNamespace && selectNamespace(newProject);
+      selectPVCNamespace && selectPVCNamespace(newProject);
       selectPVCName(undefined);
     },
-    [selectNamespace, selectPVCName],
+    [selectPVCNamespace, selectPVCName],
   );
 
   const onPVCSelected = React.useCallback(
@@ -36,21 +37,21 @@ const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
     [selectPVCName],
   );
 
-  if (!loaded) return <DiskSourcePVCSelectSkeleton />;
-
   return (
     <div>
       <DiskSourcePVCSelectNamespace
         projectsName={projectsNames}
         selectedProject={pvcNamespaceSelected}
         onChange={onSelectProject}
-        isDisabled={!selectNamespace}
+        isDisabled={!selectPVCNamespace}
+        projectsLoaded={projectsLoaded}
       />
       <DiskSourcePVCSelectName
         onChange={onPVCSelected}
         pvcNameSelected={pvcNameSelected}
-        pvcNames={filteredPVCNames}
+        pvcNames={pvcs?.map((pvc) => pvc.metadata.name)}
         isDisabled={!pvcNamespaceSelected}
+        pvcsLoaded={pvcsLoaded}
       />
     </div>
   );

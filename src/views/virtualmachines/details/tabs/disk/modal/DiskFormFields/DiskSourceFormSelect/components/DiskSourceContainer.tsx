@@ -8,11 +8,11 @@ import { OS_REGISTERY_LINKS } from '../../utils/constants';
 
 type DiskSourceUrlInputProps = {
   url: string;
-  setURL: React.Dispatch<React.SetStateAction<string>>;
+  onChange: (value: string) => void;
   os: string;
 };
 
-const DiskSourceContainer: React.FC<DiskSourceUrlInputProps> = ({ url, setURL, os }) => {
+const DiskSourceContainer: React.FC<DiskSourceUrlInputProps> = ({ url, onChange, os }) => {
   const { t } = useKubevirtTranslation();
   const isUpstream = (window as any).SERVER_FLAGS.branding === 'okd';
   const isRHELOS = os?.includes(OS_NAME_TYPES.rhel);
@@ -34,7 +34,7 @@ const DiskSourceContainer: React.FC<DiskSourceUrlInputProps> = ({ url, setURL, o
       fieldId="disk-source-container"
       isRequired
     >
-      <TextInput id="disk-source-container" type="text" value={url} onChange={setURL} />
+      <TextInput id="disk-source-container" type="text" value={url} onChange={onChange} />
     </FormGroup>
   );
 };

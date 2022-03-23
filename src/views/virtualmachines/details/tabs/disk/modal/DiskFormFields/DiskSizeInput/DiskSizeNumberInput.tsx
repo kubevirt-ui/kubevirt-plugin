@@ -19,14 +19,14 @@ import {
 } from '@patternfly/react-core';
 
 type DiskSizeNumberInputProps = {
-  quantity: string;
+  diskSize: string;
   onChange: (quantity: string) => void;
 };
 
-const DiskSizeNumberInput: React.FC<DiskSizeNumberInputProps> = ({ quantity, onChange }) => {
+const DiskSizeNumberInput: React.FC<DiskSizeNumberInputProps> = ({ diskSize, onChange }) => {
   const { t } = useKubevirtTranslation();
 
-  const [value, quantityUnit] = bytesFromQuantity(quantity);
+  const [value, quantityUnit] = bytesFromQuantity(diskSize);
 
   const [selectOpen, toggleSelect] = React.useState(false);
 

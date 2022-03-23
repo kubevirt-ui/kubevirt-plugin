@@ -1,4 +1,4 @@
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
@@ -8,8 +8,9 @@ import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynam
 
 type useProjectsAndPVCsReturnType = {
   projectsNames: string[];
-  filteredPVCNames: string[];
-  loaded: boolean;
+  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
+  projectsLoaded: boolean;
+  pvcsLoaded: boolean;
   error: Error;
 };
 
@@ -22,20 +23,20 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
 
   const projectsNames = projects.map((project) => project.metadata.name);
 
-  const [pvcs, pvcsLoaded, pvcsErrors] = useK8sWatchResource<V1alpha1PersistentVolumeClaim[]>({
-    groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-    namespaced: false,
-    isList: true,
-  });
-
-  const pvcNamesFilteredByProjects = pvcs
-    .filter((pvc) => pvc.metadata.namespace === projectSelected)
-    .map((pvc) => pvc.metadata.name);
+  const [pvcs, pvcsLoaded, pvcsErrors] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>(
+    {
+      groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
+      namespaced: true,
+      isList: true,
+      namespace: projectSelected,
+    },
+  );
 
   return {
     projectsNames,
-    filteredPVCNames: pvcNamesFilteredByProjects,
-    loaded: projectsLoaded && pvcsLoaded,
+    pvcs,
+    projectsLoaded,
+    pvcsLoaded,
     error: projectsErrors || pvcsErrors,
   };
 };

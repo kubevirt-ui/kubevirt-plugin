@@ -4,15 +4,19 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { diskTypes, diskTypesLabels } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../reducer/actions';
+import { diskReducerActions } from '../state/actions';
 
 type DiskTypeSelectProps = {
   diskType: string;
-  dispatch: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<any>;
   isVMRunning?: boolean;
 };
 
-const DiskTypeSelect: React.FC<DiskTypeSelectProps> = ({ diskType, dispatch, isVMRunning }) => {
+const DiskTypeSelect: React.FC<DiskTypeSelectProps> = ({
+  diskType,
+  dispatchDiskState,
+  isVMRunning,
+}) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -20,10 +24,10 @@ const DiskTypeSelect: React.FC<DiskTypeSelectProps> = ({ diskType, dispatch, isV
 
   const onSelectDiskSource = React.useCallback(
     (event: React.MouseEvent<Element, MouseEvent>, selection: string) => {
-      dispatch({ type: diskReducerActions.SET_DISK_TYPE, payload: selection });
+      dispatchDiskState({ type: diskReducerActions.SET_DISK_TYPE, payload: selection });
       setIsOpen(false);
     },
-    [dispatch],
+    [dispatchDiskState],
   );
   return (
     <FormGroup

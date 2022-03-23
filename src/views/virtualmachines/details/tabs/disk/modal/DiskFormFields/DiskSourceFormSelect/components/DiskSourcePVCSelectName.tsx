@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
@@ -10,14 +11,16 @@ type DiskSourcePVCSelectNameProps = {
   pvcNameSelected: string;
   pvcNames: string[];
   onChange: React.Dispatch<React.SetStateAction<string>>;
+  pvcsLoaded: boolean;
   isDisabled?: boolean;
 };
 
 const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
-  isDisabled,
   pvcNameSelected,
   pvcNames,
   onChange,
+  pvcsLoaded,
+  isDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setSelectOpen] = React.useState(false);
@@ -34,24 +37,28 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
 
   return (
     <FormGroup label={t('Persistent Volume Claim name')} fieldId={fieldId} id={fieldId} isRequired>
-      <Select
-        menuAppendTo="parent"
-        aria-labelledby={fieldId}
-        isOpen={isOpen}
-        onToggle={() => setSelectOpen(!isOpen)}
-        onSelect={onSelect}
-        variant={SelectVariant.single}
-        hasInlineFilter
-        selections={pvcNameSelected}
-        onFilter={FilterPVCSelect(pvcNames)}
-        placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} name ---`)}
-        isDisabled={isDisabled}
-        maxHeight={400}
-      >
-        {pvcNames.map((name) => (
-          <SelectOption key={name} value={name} />
-        ))}
-      </Select>
+      {pvcsLoaded ? (
+        <Select
+          menuAppendTo="parent"
+          aria-labelledby={fieldId}
+          isOpen={isOpen}
+          onToggle={() => setSelectOpen(!isOpen)}
+          onSelect={onSelect}
+          variant={SelectVariant.single}
+          hasInlineFilter
+          selections={pvcNameSelected}
+          onFilter={FilterPVCSelect(pvcNames)}
+          placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} name ---`)}
+          isDisabled={isDisabled}
+          maxHeight={400}
+        >
+          {pvcNames.map((name) => (
+            <SelectOption key={name} value={name} />
+          ))}
+        </Select>
+      ) : (
+        <Loading />
+      )}
     </FormGroup>
   );
 };

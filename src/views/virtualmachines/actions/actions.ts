@@ -30,6 +30,7 @@ export enum VMActionType {
   Pause = 'pause',
   Unpause = 'unpause',
   AddVolume = 'addvolume',
+  AddPersistentVolume = 'addvolume',
   RemoveVolume = 'removevolume',
 }
 
@@ -76,7 +77,26 @@ export const stopVM = async (vm: V1VirtualMachine) => VMActionRequest(vm, VMActi
 export const restartVM = async (vm: V1VirtualMachine) => VMActionRequest(vm, VMActionType.Restart);
 export const pauseVM = async (vm: V1VirtualMachine) => VMActionRequest(vm, VMActionType.Pause);
 export const unpauseVM = async (vm: V1VirtualMachine) => VMActionRequest(vm, VMActionType.Unpause);
+export const addPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolumeOptions) =>
+  VMActionRequest(vm, VMActionType.AddVolume, body);
+export const addNonPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolumeOptions) => {
+  try {
+    const {
+      metadata: { name, namespace },
+    } = vm;
+    const model = VirtualMachineInstanceModel;
+    const url = `/api/kubernetes/apis/subresources.${model.apiGroup}/${model.apiVersion}/namespaces/${namespace}/${model.plural}/${name}/${VMActionType.AddVolume}`;
+    const response = await consoleFetch(url, {
+      method: 'PUT',
+      body: body ? JSON.stringify(body) : undefined,
+    });
 
+    return response.text();
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+};
 export const migrateVM = async (vm: V1VirtualMachine) => {
   const { name, namespace } = vm?.metadata;
   const migrationData: V1VirtualMachineInstanceMigration = {
