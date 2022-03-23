@@ -6,7 +6,13 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { consoleFetch, k8sCreate, k8sDelete, K8sKind } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  consoleFetch,
+  k8sCreate,
+  k8sDelete,
+  K8sKind,
+  K8sModel,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 export const VirtualMachineInstanceMigrationModel: K8sKind = {
   label: 'Virtual Machine Instance Migration',
@@ -30,13 +36,13 @@ export enum VMActionType {
   Pause = 'pause',
   Unpause = 'unpause',
   AddVolume = 'addvolume',
-  AddPersistentVolume = 'addvolume',
   RemoveVolume = 'removevolume',
 }
 
 export const VMActionRequest = async (
   vm: V1VirtualMachine,
   action: VMActionType,
+  model: K8sModel,
   body?: V1AddVolumeOptions | V1RemoveVolumeOptions,
 ) => {
   const {
@@ -55,9 +61,6 @@ export const VMActionRequest = async (
     //   path: action,
     // });
     // Promise.resolve(promise);
-    const model = [VMActionType.Pause, VMActionType.Unpause].includes(action)
-      ? VirtualMachineInstanceModel
-      : VirtualMachineModel;
     const url = `/api/kubernetes/apis/subresources.${model.apiGroup}/${model.apiVersion}/namespaces/${namespace}/${model.plural}/${name}/${action}`;
 
     const response = await consoleFetch(url, {
@@ -72,31 +75,20 @@ export const VMActionRequest = async (
   }
 };
 
-export const startVM = async (vm: V1VirtualMachine) => VMActionRequest(vm, VMActionType.Start);
-export const stopVM = async (vm: V1VirtualMachine) => VMActionRequest(vm, VMActionType.Stop);
-export const restartVM = async (vm: V1VirtualMachine) => VMActionRequest(vm, VMActionType.Restart);
-export const pauseVM = async (vm: V1VirtualMachine) => VMActionRequest(vm, VMActionType.Pause);
-export const unpauseVM = async (vm: V1VirtualMachine) => VMActionRequest(vm, VMActionType.Unpause);
+export const startVM = async (vm: V1VirtualMachine) =>
+  VMActionRequest(vm, VMActionType.Start, VirtualMachineModel);
+export const stopVM = async (vm: V1VirtualMachine) =>
+  VMActionRequest(vm, VMActionType.Stop, VirtualMachineModel);
+export const restartVM = async (vm: V1VirtualMachine) =>
+  VMActionRequest(vm, VMActionType.Restart, VirtualMachineModel);
+export const pauseVM = async (vm: V1VirtualMachine) =>
+  VMActionRequest(vm, VMActionType.Pause, VirtualMachineInstanceModel);
+export const unpauseVM = async (vm: V1VirtualMachine) =>
+  VMActionRequest(vm, VMActionType.Unpause, VirtualMachineInstanceModel);
 export const addPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolumeOptions) =>
-  VMActionRequest(vm, VMActionType.AddVolume, body);
-export const addNonPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolumeOptions) => {
-  try {
-    const {
-      metadata: { name, namespace },
-    } = vm;
-    const model = VirtualMachineInstanceModel;
-    const url = `/api/kubernetes/apis/subresources.${model.apiGroup}/${model.apiVersion}/namespaces/${namespace}/${model.plural}/${name}/${VMActionType.AddVolume}`;
-    const response = await consoleFetch(url, {
-      method: 'PUT',
-      body: body ? JSON.stringify(body) : undefined,
-    });
-
-    return response.text();
-  } catch (error) {
-    console.error(error);
-    return;
-  }
-};
+  VMActionRequest(vm, VMActionType.AddVolume, VirtualMachineModel, body);
+export const addNonPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolumeOptions) =>
+  VMActionRequest(vm, VMActionType.AddVolume, VirtualMachineInstanceModel, body);
 export const migrateVM = async (vm: V1VirtualMachine) => {
   const { name, namespace } = vm?.metadata;
   const migrationData: V1VirtualMachineInstanceMigration = {

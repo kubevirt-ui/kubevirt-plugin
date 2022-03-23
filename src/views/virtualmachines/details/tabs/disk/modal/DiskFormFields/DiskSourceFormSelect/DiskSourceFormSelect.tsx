@@ -6,6 +6,7 @@ import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { hasSizeUnit as getOSNameWithoutVersionNumber } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import { diskReducerActions, diskSourceReducerActions } from '../../state/actions';
@@ -47,7 +48,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
     ephemeralSource,
   } = diskSourceState || {};
 
-  const os = getAnnotation(vm?.spec?.template, ANNOTATIONS.os);
+  const os = getAnnotation(vm?.spec?.template, ANNOTATIONS.os) || getOperatingSystem(vm);
 
   const sourceOptions = React.useMemo(() => Object.values(getSourceOptions(t)), [t]);
 

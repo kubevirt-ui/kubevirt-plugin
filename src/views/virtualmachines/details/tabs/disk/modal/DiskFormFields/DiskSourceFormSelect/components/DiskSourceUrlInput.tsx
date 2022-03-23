@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_IMAGE_LINKS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
@@ -16,7 +15,9 @@ const URLSourceHelperText: React.FC<{ os: OS_NAME_TYPES }> = ({ os }) => {
     <>
       {beforeLabelText}
       <strong>
-        <Link to={OS_IMAGE_LINKS[os]}>{label}</Link>
+        <a href={OS_IMAGE_LINKS[os]} target="_blank" rel="noreferrer">
+          {label}
+        </a>
       </strong>
       {afterLabelText}
     </>
