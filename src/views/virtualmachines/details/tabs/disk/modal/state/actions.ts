@@ -15,6 +15,11 @@ export const diskReducerActions = Object.freeze({
   RESET: 'reset',
 });
 
+export type DiskReducerActionType = {
+  type: string;
+  payload?: any;
+};
+
 export const diskSourceReducerActions = Object.freeze({
   SET_URL_SOURCE: 'setUrlSource',
   SET_PVC_SOURCE_NAME: 'setPvcSourceName',
@@ -24,3 +29,8 @@ export const diskSourceReducerActions = Object.freeze({
   SET_EPHEMERAL_SOURCE: 'setEphemeralSource',
   RESET: 'reset',
 });
+
+export type DiskSourceReducerActionType = {
+  type: string;
+  payload?: string;
+};

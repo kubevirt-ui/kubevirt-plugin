@@ -4,11 +4,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { diskTypes, diskTypesLabels } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../state/actions';
+import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 
 type DiskTypeSelectProps = {
   diskType: string;
-  dispatchDiskState: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
   isVMRunning?: boolean;
 };
 

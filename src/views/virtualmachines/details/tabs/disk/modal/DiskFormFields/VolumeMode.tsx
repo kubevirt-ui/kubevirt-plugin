@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../state/actions';
+import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 import { DiskFormState } from '../state/initialState';
 
 import {
@@ -14,7 +14,7 @@ import {
 
 type VolumeModeProps = {
   diskState: DiskFormState;
-  dispatchDiskState: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
 };
 
 const VolumeMode: React.FC<VolumeModeProps> = ({ diskState, dispatchDiskState }) => {

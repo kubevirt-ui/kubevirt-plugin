@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../state/actions';
+import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 import { DiskFormState } from '../state/initialState';
 
 import { interfaceTypes } from './utils/constants';
@@ -12,7 +12,7 @@ import { getInterfaceOptions } from './utils/helpers';
 
 type DiskInterfaceSelectProps = {
   diskState: DiskFormState;
-  dispatchDiskState: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
   isVMRunning: boolean;
 };
 

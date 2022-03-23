@@ -3,13 +3,13 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../state/actions';
+import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 
 import { generateDiskName } from './utils/helpers';
 
 type NameFormFieldProps = {
   objName: string;
-  dispatchDiskState: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
 };
 
 const NameFormField: React.FC<NameFormFieldProps> = ({ objName, dispatchDiskState }) => {

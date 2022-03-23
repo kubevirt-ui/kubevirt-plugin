@@ -3,11 +3,11 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../state/actions';
+import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 
 type DetachHotplugDiskCheckboxProps = {
   detachHotplug: boolean;
-  dispatchDiskState: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
   isVMRunning: boolean;
 };
 

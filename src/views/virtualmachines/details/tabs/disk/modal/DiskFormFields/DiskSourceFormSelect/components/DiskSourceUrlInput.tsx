@@ -5,7 +5,6 @@ import { OS_IMAGE_LINKS, OS_NAME_TYPES } from '@kubevirt-utils/resources/templat
 import { hasSizeUnit as getOSNameWithoutVersionNumber } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
-import { diskSourceReducerActions } from '../../../state/actions';
 import { getURLSourceHelpertText } from '../../utils/helpers';
 
 const URLSourceHelperText: React.FC<{ os: OS_NAME_TYPES }> = ({ os }) => {
@@ -26,20 +25,13 @@ const URLSourceHelperText: React.FC<{ os: OS_NAME_TYPES }> = ({ os }) => {
 
 type DiskSourceUrlInputProps = {
   url: string;
-  dispatch: React.Dispatch<any>;
+  onChange: (value: string) => void;
   os: string;
 };
 
-const DiskSourceUrlInput: React.FC<DiskSourceUrlInputProps> = ({ url, dispatch, os }) => {
+const DiskSourceUrlInput: React.FC<DiskSourceUrlInputProps> = ({ url, onChange, os }) => {
   const { t } = useKubevirtTranslation();
 
-  const onChange = React.useCallback(
-    (value: string, event: React.FormEvent<HTMLInputElement>) => {
-      event.preventDefault();
-      dispatch({ type: diskSourceReducerActions.SET_URL_SOURCE, payload: value });
-    },
-    [dispatch],
-  );
   return (
     <FormGroup
       helperText={<URLSourceHelperText os={OS_NAME_TYPES[getOSNameWithoutVersionNumber(os)]} />}

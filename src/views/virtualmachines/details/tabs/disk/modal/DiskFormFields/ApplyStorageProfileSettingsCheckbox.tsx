@@ -6,14 +6,14 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../state/actions';
+import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 import { DiskFormState } from '../state/initialState';
 
 import { StorageProfile } from './utils/constants';
 
 type ApplyStorageProfileSettingsCheckboxProps = {
   diskState: DiskFormState;
-  dispatchDiskState: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
 };
 
 const ApplyStorageProfileSettingsCheckbox: React.FC<ApplyStorageProfileSettingsCheckboxProps> = ({
@@ -36,7 +36,6 @@ const ApplyStorageProfileSettingsCheckbox: React.FC<ApplyStorageProfileSettingsC
   const { claimPropertySets } = storageProfile?.status || {};
 
   React.useEffect(() => {
-    // onDisableCheckbox(!loaded || !claimPropertySets);
     dispatchDiskState({
       type: diskReducerActions.SET_STORAGE_PROFILE_SETTINGS_CHECKBOX_DISABLED,
       payload: !loaded || !claimPropertySets,

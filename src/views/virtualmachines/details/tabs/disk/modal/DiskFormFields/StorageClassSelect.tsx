@@ -7,14 +7,14 @@ import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/mode
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Select, SelectVariant } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../state/actions';
+import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 
 import { FilterSCSelect, getSCSelectOptions } from './utils/Filters';
 import { getDefaultStorageClass } from './utils/helpers';
 
 type StorageClassSelectProps = {
   storageClass: string;
-  dispatchDiskState: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
 };
 
 const StorageClassSelect: React.FC<StorageClassSelectProps> = ({

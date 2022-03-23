@@ -1,4 +1,9 @@
-import { diskReducerActions, diskSourceReducerActions } from './actions';
+import {
+  diskReducerActions,
+  DiskReducerActionType,
+  diskSourceReducerActions,
+  DiskSourceReducerActionType,
+} from './actions';
 import {
   DiskFormState,
   DiskSourceState,
@@ -6,7 +11,7 @@ import {
   initialStateDiskSource,
 } from './initialState';
 
-export const diskReducer = (state: DiskFormState, action): DiskFormState => {
+export const diskReducer = (state: DiskFormState, action: DiskReducerActionType): DiskFormState => {
   switch (action.type) {
     case diskReducerActions.SET_DISK_NAME:
       return { ...state, diskName: action.payload };
@@ -41,7 +46,10 @@ export const diskReducer = (state: DiskFormState, action): DiskFormState => {
   }
 };
 
-export const diskSourceReducer = (state: DiskSourceState, action): DiskSourceState => {
+export const diskSourceReducer = (
+  state: DiskSourceState,
+  action: DiskSourceReducerActionType,
+): DiskSourceState => {
   switch (action.type) {
     case diskSourceReducerActions.SET_URL_SOURCE:
       return { ...state, urlSource: action.payload };

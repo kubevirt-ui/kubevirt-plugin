@@ -9,7 +9,12 @@ import { hasSizeUnit as getOSNameWithoutVersionNumber } from '@kubevirt-utils/re
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import { diskReducerActions, diskSourceReducerActions } from '../../state/actions';
+import {
+  diskReducerActions,
+  DiskReducerActionType,
+  diskSourceReducerActions,
+  DiskSourceReducerActionType,
+} from '../../state/actions';
 import { DiskFormState, DiskSourceState } from '../../state/initialState';
 import { sourceTypes } from '../utils/constants';
 import { getSourceOptions } from '../utils/helpers';
@@ -21,10 +26,10 @@ import DiskSourceUrlInput from './components/DiskSourceUrlInput';
 type DiskSourceFormSelectProps = {
   vm: V1VirtualMachine;
   diskState: DiskFormState;
-  dispatchDiskState: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
   isVMRunning: boolean;
   diskSourceState: DiskSourceState;
-  dispatchDiskSourceState: React.Dispatch<any>;
+  dispatchDiskSourceState: React.Dispatch<DiskSourceReducerActionType>;
 };
 
 const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
@@ -90,7 +95,12 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
       {diskSource === sourceTypes.HTTP && (
         <DiskSourceUrlInput
           url={urlSource}
-          dispatch={dispatchDiskSourceState}
+          onChange={(value) =>
+            dispatchDiskSourceState({
+              type: diskSourceReducerActions.SET_URL_SOURCE,
+              payload: value,
+            })
+          }
           os={OS_NAME_TYPES[getOSNameWithoutVersionNumber(os)]}
         />
       )}

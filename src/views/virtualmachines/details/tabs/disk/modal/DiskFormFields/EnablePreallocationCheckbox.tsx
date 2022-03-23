@@ -5,11 +5,11 @@ import { Link } from 'react-router-dom';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../state/actions';
+import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 
 type EnablePreallocationCheckboxProps = {
   enablePreallocation: boolean;
-  dispatchDiskState: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
   isDisabled: boolean;
 };
 

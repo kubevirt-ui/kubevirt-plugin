@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { FormGroup } from '@openshift-console/dynamic-plugin-sdk-internal/node_modules/@patternfly/react-core';
 import { TextInput } from '@patternfly/react-core';
 
-import { diskReducerActions } from '../../state/actions';
+import { diskReducerActions, DiskReducerActionType } from '../../state/actions';
 import { DiskFormState } from '../../state/initialState';
 import { sourceTypes } from '../utils/constants';
 
@@ -12,7 +12,7 @@ import DiskSizeNumberInput from './DiskSizeNumberInput';
 
 type DiskSizeInputProps = {
   diskState: DiskFormState;
-  dispatchDiskState: React.Dispatch<any>;
+  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
 };
 
 const DiskSizeInput: React.FC<DiskSizeInputProps> = ({ diskState, dispatchDiskState }) => {
