@@ -6,7 +6,7 @@ import TabModal from '../TabModal/TabModal';
 
 type DescriptionModalProps = {
   obj: K8sResourceCommon;
-  onSubmit: (description: string) => Promise<void>;
+  onSubmit: (description: string) => Promise<void | K8sResourceCommon>;
   isOpen: boolean;
   onClose: () => void;
 };

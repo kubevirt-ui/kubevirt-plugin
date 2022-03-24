@@ -5,12 +5,16 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   Breadcrumb,
   BreadcrumbItem,
+  Button,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
   Popover,
 } from '@patternfly/react-core';
+import { PencilAltIcon } from '@patternfly/react-icons';
+
+import MutedTextDiv from '../MutedTextDiv/MutedTextDiv';
 
 type VirtualMachineDescriptionItemProps = {
   descriptionData: any;
@@ -19,6 +23,9 @@ type VirtualMachineDescriptionItemProps = {
   moreInfoURL?: string;
   isPopover?: boolean;
   breadcrumb?: string;
+  isEdit?: boolean;
+  onEditClick?: () => void;
+  isDisabled?: boolean;
 };
 
 const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps> = ({
@@ -28,6 +35,9 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
   moreInfoURL,
   isPopover,
   breadcrumb,
+  isEdit,
+  onEditClick,
+  isDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -51,12 +61,21 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
       <DescriptionListTermHelpTextButton>{descriptionHeader}</DescriptionListTermHelpTextButton>
     </Popover>
   );
+
+  const description = (
+    <Button type="button" isInline isDisabled={isDisabled} onClick={onEditClick} variant="link">
+      {descriptionData ?? <MutedTextDiv text={t('Not available')} />}
+      <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+    </Button>
+  );
   return (
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
         {isPopover ? popover : descriptionHeader}
       </DescriptionListTermHelpText>
-      <DescriptionListDescription>{descriptionData}</DescriptionListDescription>
+      <DescriptionListDescription>
+        {isEdit ? description : descriptionData}
+      </DescriptionListDescription>
     </DescriptionListGroup>
   );
 };
