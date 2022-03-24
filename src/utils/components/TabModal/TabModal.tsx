@@ -115,6 +115,7 @@ const TabModal: TabModalFC = React.memo(
           </Stack>
         }
         isOpen={isOpen}
+        id="tab-modal"
       >
         {children}
       </Modal>
