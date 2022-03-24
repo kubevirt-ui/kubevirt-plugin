@@ -1,5 +1,7 @@
 import produce from 'immer';
+import { WritableDraft } from 'immer/dist/internal';
 
+import { ensurePath } from '@catalog/utils/WizardVMContext';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
@@ -40,18 +42,22 @@ export const getEmptyVMDataVolumeResource = (vm: V1VirtualMachine): V1beta1DataV
   return dataVolumeResource;
 };
 
-export const updateVMDisks = (
+export const produceVMDisks = (
   vm: V1VirtualMachine,
-  updatedDisks: V1Disk[],
-  updatedVolumes: V1Volume[],
-  updatedDataVolumeTemplates: V1DataVolumeTemplateSpec[],
+  updateDisks: (vmDraft: WritableDraft<V1VirtualMachine>) => void,
 ) => {
-  const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-    vmDraft.spec.template.spec.domain.devices.disks = updatedDisks;
-    vmDraft.spec.template.spec.volumes = updatedVolumes;
-    vmDraft.spec.dataVolumeTemplates = updatedDataVolumeTemplates;
+  return produce(vm, (draftVM) => {
+    ensurePath(draftVM, ['spec.template.spec.domain.devices']);
+
+    if (!draftVM.spec.template.spec.domain.devices.disks)
+      draftVM.spec.template.spec.domain.devices.disks = [];
+
+    if (!draftVM.spec.template.spec.volumes) draftVM.spec.template.spec.volumes = [];
+
+    if (!draftVM.spec.dataVolumeTemplates) draftVM.spec.dataVolumeTemplates = [];
+
+    updateDisks(draftVM);
   });
-  return updatedVM;
 };
 
 export const requiresDataVolume = (diskSource: string): boolean => {

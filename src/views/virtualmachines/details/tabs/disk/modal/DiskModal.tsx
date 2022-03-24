@@ -27,8 +27,8 @@ import {
   getDiskFromState,
   getPersistentVolumeClaimHotplugPromise,
   getVolumeFromState,
+  produceVMDisks,
   requiresDataVolume,
-  updateVMDisks,
 } from './utils/helpers';
 
 type DiskModalProps = {
@@ -74,25 +74,29 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
   );
 
   const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {
-    const updatedVM = { ...vm };
-    const dvName = `${vm?.metadata?.name}-${diskState.diskName}`;
+    const updatedVM = produceVMDisks(vm, (vmDraft) => {
+      const dvName = `${vmDraft?.metadata?.name}-${diskState.diskName}`;
 
-    const resultDisk = getDiskFromState(diskState);
-    const resultVolume = getVolumeFromState(diskState, diskSourceState, dvName);
-    const resultDataVolume = getDataVolumeFromState(updatedVM, diskState, diskSourceState);
-    const resultDataVolumeTemplate = getDataVolumeTemplate(resultDataVolume);
+      const resultDisk = getDiskFromState(diskState);
+      const resultVolume = getVolumeFromState(diskState, diskSourceState, dvName);
+      const resultDataVolume = getDataVolumeFromState(vmDraft, diskState, diskSourceState);
+      const resultDataVolumeTemplate = getDataVolumeTemplate(resultDataVolume);
 
-    if (!isVMRunning) {
-      const updatedDisks = [...(getDisks(vm) || []), resultDisk];
-      const updatedVolumes = [...(getVolumes(vm) || []), resultVolume];
-      const updatedDataVolumeTemplates = resultDataVolumeTemplate && [
-        ...(getDataVolumeTemplates(vm) || []),
-        resultDataVolumeTemplate,
-      ];
-      return updateVMDisks(updatedVM, updatedDisks, updatedVolumes, updatedDataVolumeTemplates);
-    }
+      if (!isVMRunning) {
+        vmDraft.spec.template.spec.domain.devices.disks = [
+          ...(getDisks(vmDraft) || []),
+          resultDisk,
+        ];
+        vmDraft.spec.template.spec.volumes = [...(getVolumes(vmDraft) || []), resultVolume];
+        vmDraft.spec.dataVolumeTemplates = resultDataVolumeTemplate && [
+          ...(getDataVolumeTemplates(vmDraft) || []),
+          resultDataVolumeTemplate,
+        ];
+        return vmDraft;
+      }
+    });
 
-    return vm; // we will create DataVolume and make a API call to attach the hotplug disk
+    return isVMRunning ? vm : updatedVM; // we will create DataVolume and make a API call to attach the hotplug disk
   }, [vm, diskState, isVMRunning, diskSourceState]);
 
   return (
