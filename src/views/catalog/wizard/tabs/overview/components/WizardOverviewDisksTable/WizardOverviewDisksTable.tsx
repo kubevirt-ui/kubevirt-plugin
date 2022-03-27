@@ -1,8 +1,8 @@
 import * as React from 'react';
 
+import useWizardDisksTableData from '@catalog/wizard/tabs/disks/hooks/useWizardDisksTableData';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import {
   DescriptionList,
   DescriptionListDescription,
@@ -15,7 +15,7 @@ import {
 export const WizardOverviewDisksTable: React.FC<{
   vm: V1VirtualMachine;
 }> = React.memo(({ vm }) => {
-  const [disks] = useDisksTableData(vm);
+  const [disks] = useWizardDisksTableData(vm);
 
   const { t } = useKubevirtTranslation();
   return (
