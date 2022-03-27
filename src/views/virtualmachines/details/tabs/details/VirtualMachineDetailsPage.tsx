@@ -2,12 +2,9 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
-import { Grid, GridItem } from '@patternfly/react-core';
+import { Divider, PageSection } from '@patternfly/react-core';
 
-import VirtualMachineDetailsLeftGrid from './components/grid/leftGrid/VirtualMachineDetailsLeftGrid';
-import VirtualMachineDetailsRightGrid from './components/grid/rightGrid/VirtualMachineDetailsRightGrid';
+import DetailsSection from './components/sections/DetailsSection';
 
 type VirtualMachineDetailsPageProps = RouteComponentProps<{
   ns: string;
@@ -17,18 +14,16 @@ type VirtualMachineDetailsPageProps = RouteComponentProps<{
 };
 
 const VirtualMachineDetailsPage: React.FC<VirtualMachineDetailsPageProps> = ({ obj: vm }) => {
-  const { t } = useKubevirtTranslation();
   return (
-    <>
-      <ListPageHeader title={t('Virtual Machine Details')} />
-      <ListPageBody>
-        <Grid hasGutter>
-          <VirtualMachineDetailsLeftGrid vm={vm} />
-          <GridItem span={1}>{/* Spacer */}</GridItem>
-          <VirtualMachineDetailsRightGrid vm={vm} />
-        </Grid>
-      </ListPageBody>
-    </>
+    <div>
+      <PageSection>
+        <DetailsSection vm={vm} pathname={location?.pathname} />
+      </PageSection>
+      <Divider />
+      <PageSection>{/* <Scheduling vmi={vmi} pathname={location?.pathname} /> */}</PageSection>
+      <Divider />
+      <PageSection>Services</PageSection>
+    </div>
   );
 };
 
