@@ -6,6 +6,7 @@ import { ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
 import { WizardVMContextType } from '../../../utils/WizardVMContext';
 
 import Cloudinit from './components/CloudInit';
+import Sysprep from './components/sysprep/Sysprep';
 import { CLOUD, SYSPREP } from './utils/consts';
 
 const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
@@ -35,7 +36,7 @@ const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
             isExpanded={expanded === SYSPREP}
             id={SYSPREP}
           >
-            SYSPREP
+            <Sysprep />
           </ExpandableSection>
         </StackItem>
       </Stack>

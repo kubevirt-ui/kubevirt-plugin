@@ -1,8 +1,15 @@
 import * as React from 'react';
+import { Updater, useImmer } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { getSessionStorageVM, setSessionStorageVM } from './utils/session';
+import {
+  getSessionStorageTabsData,
+  getSessionStorageVM,
+  setSessionStorageTabsData,
+  setSessionStorageVM,
+} from './utils/session';
+import { TabsData } from './utils/tabs-data';
 import { UpdateValidatedVM, useValidatedVM } from './useValidatedVm';
 
 export type WizardVMContextType = {
@@ -17,10 +24,15 @@ export type WizardVMContextType = {
   loaded?: boolean;
   /** error state of the vm context */
   error?: any;
+  /** additional tabs data, not related to the vm */
+  tabsData?: TabsData;
+  /** update tabs data */
+  updateTabsData?: Updater<TabsData>;
 };
 
 export const useWizardVM = (): WizardVMContextType => {
   const { vm, updateVM, loaded, error } = useValidatedVM(getSessionStorageVM());
+  const [tabsData, updateTabsData] = useImmer<TabsData>(getSessionStorageTabsData());
 
   React.useEffect(() => {
     // whenever the vm changes, save the vm in session storage
@@ -29,11 +41,20 @@ export const useWizardVM = (): WizardVMContextType => {
     }
   }, [vm]);
 
+  React.useEffect(() => {
+    // whenever the tabs data changes, save the data in session storage
+    if (tabsData) {
+      setSessionStorageTabsData(tabsData);
+    }
+  }, [tabsData]);
+
   return {
     vm,
     updateVM,
     loaded,
     error,
+    tabsData,
+    updateTabsData,
   };
 };
 
