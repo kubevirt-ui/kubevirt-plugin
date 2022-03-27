@@ -54,6 +54,7 @@
     "date-fns": "^2.28.0",
     "global": "^4.4.0",
     "immer": "^9.0.12",
+    "js-yaml": "^4.1.0",
     "mochawesome-report-generator": "^6.0.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -62,7 +63,8 @@
     "react-router-dom": "5.x",
     "react-tagsinput": "^3.19.0",
     "unique-names-generator": "^4.6.0",
-    "use-immer": "^0.6.0"
+    "use-immer": "^0.6.0",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.11.0",
@@ -75,6 +77,7 @@
     "@testing-library/react-hooks": "^7.0.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.0.3",
+    "@types/js-yaml": "^4.0.5",
     "@types/node": "^16.11.12",
     "@types/react": "^17.0.37",
     "@types/react-router-dom": "5.x",

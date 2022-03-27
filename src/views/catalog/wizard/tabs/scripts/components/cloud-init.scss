@@ -1,0 +1,53 @@
+.kubevirt-create-vm-modal__cloud-init-help-link {
+  padding-left: var(--pf-global--spacer--xs);
+}
+
+.kv-cloudinit-advanced-tab--form,
+.kv-cloudinit-advanced-tab--main {
+  width: 50vh;
+  margin-left: var(--pf-global--spacer--md);
+}
+
+.kv-cloudinit-advanced-tab--title_main {
+  display: inline-flex;
+  align-items: center;
+}
+
+.kv-cloudinit-advanced-tab--title_radio_buttons {
+  display: inline-flex;
+  margin-left: var(--pf-global--spacer--lg);
+  label {
+    margin-right: var(--pf-global--spacer--lg);
+  }
+}
+
+.kv-cloudint-advanced-tab--validation-text .pf-c-form {
+  --pf-c-form__helper-text--m-success--Color: var(--pf-c-form__group-label-help--Color);
+}
+
+.kv-cloudint-advanced-tab--ssh-key-row.pf-l-split {
+  margin-bottom: var(--pf-global--spacer--sm);
+}
+
+.kv-cloudinit-info-helper--muted {
+  display: inline-flex;
+}
+
+.kv-cloudinit-info-helper--link {
+  margin-left: var(--pf-global--spacer--xs);
+}
+
+.kv-cloudinit-info-helper--main {
+  margin-bottom: var(--pf-global--spacer--md);
+  margin-top: var(--pf-global--spacer--sm);
+}
+
+.kv-cloudint-form-or-yaml-selector--main,
+.kv-cloudinit-info-helper--main {
+  margin-left: var(--pf-global--spacer--lg);
+}
+
+.kv-cloudint-form-or-yaml-selector--main {
+  display: inline-flex;
+  align-items: center;
+}

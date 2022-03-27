@@ -1,11 +1,46 @@
 import * as React from 'react';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
+
 import { WizardVMContextType } from '../../../utils/WizardVMContext';
 
-const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM, loaded, error }) => {
-  console.log(vm, updateVM, loaded, error);
+import Cloudinit from './components/CloudInit';
+import { CLOUD, SYSPREP } from './utils/consts';
 
-  return <div>WizardScriptsTab</div>;
+const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
+  const { t } = useKubevirtTranslation();
+  const [expanded, setExpanded] = React.useState<string>(CLOUD);
+
+  const onToggle = (value: string) =>
+    setExpanded((expandedValue) => (expandedValue === value ? '' : value));
+
+  return (
+    <div className="co-m-pane__body">
+      <Stack hasGutter>
+        <StackItem>
+          <ExpandableSection
+            toggleText={t('Cloud-init')}
+            onToggle={() => onToggle(CLOUD)}
+            isExpanded={expanded === CLOUD}
+            id={CLOUD}
+          >
+            <Cloudinit vm={vm} updateVM={updateVM} />
+          </ExpandableSection>
+        </StackItem>
+        <StackItem>
+          <ExpandableSection
+            toggleText={t('Sysprep')}
+            onToggle={() => onToggle(SYSPREP)}
+            isExpanded={expanded === SYSPREP}
+            id={SYSPREP}
+          >
+            SYSPREP
+          </ExpandableSection>
+        </StackItem>
+      </Stack>
+    </div>
+  );
 };
 
 export default WizardScriptsTab;

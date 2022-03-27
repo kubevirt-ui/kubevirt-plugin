@@ -1516,6 +1516,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/js-yaml@npm:^4.0.5":
+  version: 4.0.5
+  resolution: "@types/js-yaml@npm:4.0.5"
+  checksum: 7dcac8c50fec31643cc9d6444b5503239a861414cdfaa7ae9a38bc22597c4d850c4b8cec3d82d73b3fbca408348ce223b0408d598b32e094470dfffc6d486b4d
+  languageName: node
+  linkType: hard
+
 "@types/json-schema@npm:*, @types/json-schema@npm:^7.0.4, @types/json-schema@npm:^7.0.5, @types/json-schema@npm:^7.0.8, @types/json-schema@npm:^7.0.9":
   version: 7.0.9
   resolution: "@types/json-schema@npm:7.0.9"
@@ -7292,6 +7299,7 @@ __metadata:
     "@testing-library/user-event": ^13.5.0
     "@types/byte-size": ^8.1.0
     "@types/jest": ^27.0.3
+    "@types/js-yaml": ^4.0.5
     "@types/node": ^16.11.12
     "@types/react": ^17.0.37
     "@types/react-router-dom": 5.x
@@ -7321,6 +7329,7 @@ __metadata:
     i18next-parser: 3.x
     immer: ^9.0.12
     jest: ^27.4.5
+    js-yaml: ^4.1.0
     mocha: ^9.2.0
     mocha-junit-reporter: ^2.0.2
     mochawesome: ^7.0.1
@@ -7344,6 +7353,7 @@ __metadata:
     typescript: ^4.5.5
     unique-names-generator: ^4.6.0
     use-immer: ^0.6.0
+    validator: ^13.7.0
     webpack: ^5.68.0
     webpack-cli: 4.9.x
     webpack-dev-server: ^4.7.4
@@ -11250,7 +11260,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"validator@npm:^13.6.0":
+"validator@npm:^13.6.0, validator@npm:^13.7.0":
   version: 13.7.0
   resolution: "validator@npm:13.7.0"
   checksum: 2b83283de1222ca549a7ef57f46e8d49c6669213348db78b7045bce36a3b5843ff1e9f709ebf74574e06223461ee1f264f8cc9a26a0060a79a27de079d8286ef
