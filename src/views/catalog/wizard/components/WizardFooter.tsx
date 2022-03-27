@@ -15,7 +15,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-import { useVmCreate } from '../../utils/useVmCreate';
+import { useWizardVmCreate } from '../../utils/useWizardVmCreate';
 import { clearSessionStorageVM, useWizardVMContext } from '../../utils/WizardVMContext';
 
 export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => {
@@ -27,7 +27,7 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
 
   const [startVM, setStartVM] = React.useState(true);
   const { vm, loaded: vmContextLoaded } = useWizardVMContext();
-  const { createVM, loaded: vmCreateLoaded, error: vmCreateError } = useVmCreate();
+  const { createVM, loaded: vmCreateLoaded, error: vmCreateError } = useWizardVmCreate();
 
   const onCreate = () =>
     createVM(vm, {
