@@ -88,33 +88,35 @@ const TabModal: TabModalFC = React.memo(
         onClose={closeModal}
         title={headerText}
         footer={
-          <ActionGroup>
-            <Button
-              isSmall
-              isDisabled={isDisabled}
-              isLoading={isSubmitting}
-              onClick={handleSubmit}
-              variant={submitBtnVariant ?? 'primary'}
-            >
-              {submitBtnText || t('Submit')}
-            </Button>
-            <Button isSmall onClick={closeModal} variant="link">
-              {t('Cancel')}
-            </Button>
-          </ActionGroup>
+          <Stack hasGutter>
+            {error && (
+              <StackItem>
+                <Alert isInline variant={AlertVariant.danger} title={t('An error occurred')}>
+                  {error?.message}
+                </Alert>
+              </StackItem>
+            )}
+            <StackItem>
+              <ActionGroup>
+                <Button
+                  isSmall
+                  isDisabled={isDisabled}
+                  isLoading={isSubmitting}
+                  onClick={handleSubmit}
+                  variant={submitBtnVariant ?? 'primary'}
+                >
+                  {submitBtnText || t('Submit')}
+                </Button>
+                <Button isSmall onClick={closeModal} variant="link">
+                  {t('Cancel')}
+                </Button>
+              </ActionGroup>
+            </StackItem>
+          </Stack>
         }
         isOpen={isOpen}
       >
-        <Stack hasGutter>
-          <StackItem>{children}</StackItem>
-          {error && (
-            <StackItem>
-              <Alert isInline variant={AlertVariant.danger} title={t('An error occurred')}>
-                {error?.message}
-              </Alert>
-            </StackItem>
-          )}
-        </Stack>
+        {children}
       </Modal>
     );
   },

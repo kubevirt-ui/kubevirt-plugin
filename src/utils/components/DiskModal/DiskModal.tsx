@@ -88,10 +88,12 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
           resultDisk,
         ];
         vmDraft.spec.template.spec.volumes = [...(getVolumes(vmDraft) || []), resultVolume];
-        vmDraft.spec.dataVolumeTemplates = resultDataVolumeTemplate && [
-          ...(getDataVolumeTemplates(vmDraft) || []),
-          resultDataVolumeTemplate,
-        ];
+        if(sourceRequiresDataVolume) {
+          vmDraft.spec.dataVolumeTemplates = resultDataVolumeTemplate && [
+            ...(getDataVolumeTemplates(vmDraft) || []),
+            resultDataVolumeTemplate,
+          ];
+        }
         return vmDraft;
       }
     });

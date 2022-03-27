@@ -61,7 +61,6 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
     event.preventDefault();
     dispatchDiskState({ type: diskReducerActions.SET_DISK_SOURCE, payload: value });
     setIsOpen(false);
-    // setDiskSource(value);
   };
 
   React.useEffect(() => {
@@ -159,6 +158,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
               payload: value,
             })
           }
+          setDiskSize={(value) => dispatchDiskState({ type: diskReducerActions.SET_DISK_SIZE, payload: value })}
         />
       )}
     </>

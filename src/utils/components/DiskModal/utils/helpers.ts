@@ -125,7 +125,7 @@ export const getDataVolumeFromState = (
   } else if (diskState.diskSource === sourceTypes.REGISTRY) {
     dataVolume.spec.source = {
       [diskState.diskSource]: {
-        url: diskSourceState.registrySource,
+        url: `docker://${diskSourceState.registrySource}`,
       },
     };
   } else {

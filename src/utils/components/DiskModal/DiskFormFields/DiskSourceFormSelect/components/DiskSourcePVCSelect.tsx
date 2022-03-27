@@ -10,6 +10,7 @@ type DiskSourcePVCSelectProps = {
   pvcNamespaceSelected: string;
   selectPVCName: (value: string) => void;
   selectPVCNamespace?: (value: string) => void;
+  setDiskSize?: (value: string) => void;
 };
 
 const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
@@ -17,6 +18,7 @@ const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
   pvcNamespaceSelected,
   selectPVCName,
   selectPVCNamespace,
+  setDiskSize,
 }) => {
   const { projectsNames, pvcs, projectsLoaded, pvcsLoaded } =
     useProjectsAndPVCs(pvcNamespaceSelected);
@@ -32,9 +34,16 @@ const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
   const onPVCSelected = React.useCallback(
     (selection) => {
       selectPVCName(selection);
+      const selectedPVC = pvcs?.find((pvc) => pvc.metadata.name === selection);
+      const selectedPVCSize = selectedPVC?.spec?.resources?.requests?.storage;
+      setDiskSize && setDiskSize(selectedPVCSize);
     },
     [selectPVCName],
   );
+
+  const pvcNames = React.useMemo(() => {
+    return pvcs?.map((pvc) => pvc?.metadata?.name); 
+  }, [pvcs]);
 
   return (
     <div>
@@ -48,7 +57,7 @@ const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
       <DiskSourcePVCSelectName
         onChange={onPVCSelected}
         pvcNameSelected={pvcNameSelected}
-        pvcNames={pvcs?.map((pvc) => pvc.metadata.name)}
+        pvcNames={pvcNames}
         isDisabled={!pvcNamespaceSelected}
         pvcsLoaded={pvcsLoaded}
       />
