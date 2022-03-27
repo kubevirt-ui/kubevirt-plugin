@@ -3,6 +3,7 @@ import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
@@ -18,7 +19,6 @@ import {
 
 import useDiskColumns from '../../hooks/useDiskColumns';
 import useDisksFilters from '../../hooks/useDisksFilters';
-import DiskModal from '../../modal/DiskModal';
 
 import DiskListTitle from './DiskListTitle';
 import DiskRow from './DiskRow';

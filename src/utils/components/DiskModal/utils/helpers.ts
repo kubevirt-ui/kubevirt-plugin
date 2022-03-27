@@ -14,7 +14,7 @@ import {
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
-import { addNonPersistentVolume, addPersistentVolume } from '../../../../../actions/actions';
+import { addNonPersistentVolume, addPersistentVolume } from '../../../../views/virtualmachines/actions/actions';
 import { sourceTypes } from '../DiskFormFields/utils/constants';
 import { DiskFormState, DiskSourceState } from '../state/initialState';
 
