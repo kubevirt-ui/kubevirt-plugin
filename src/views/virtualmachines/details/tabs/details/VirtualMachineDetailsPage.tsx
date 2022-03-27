@@ -15,7 +15,7 @@ type VirtualMachineDetailsPageProps = RouteComponentProps<{
 
 const VirtualMachineDetailsPage: React.FC<VirtualMachineDetailsPageProps> = ({ obj: vm }) => {
   return (
-    <div className="co-m-pane__body">
+    <div>
       <PageSection>
         <DetailsSection vm={vm} pathname={location?.pathname} />
       </PageSection>
