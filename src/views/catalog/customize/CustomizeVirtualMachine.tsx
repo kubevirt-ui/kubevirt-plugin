@@ -11,10 +11,11 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CustomizeError } from './components/CustomizeError';
 import { CustomizeForm } from './components/CustomizeForms/CustomizeForm';
+import { CustomizeFormWithCD } from './components/CustomizeForms/CustomizeFormWithCD';
 import { CustomizeFormWithDisk } from './components/CustomizeForms/CustomizeFormWithDisk';
 import { CustomizeVirtualMachineSkeleton } from './components/CustomizeVirtualMachineSkeleton';
 import { RightHeader } from './components/RightHeading';
-import { hasCustomizableDiskSource } from './utils';
+import { hasCustomizableCDSource, hasCustomizableDiskSource } from './utils';
 
 import './CustomizeVirtualMachine.scss';
 
@@ -33,8 +34,12 @@ const CustomizeVirtualMachine: React.FC = () => {
   });
 
   const Form = React.useMemo(() => {
+    const withCDSource = hasCustomizableCDSource(template);
     const withDiskSource = hasCustomizableDiskSource(template);
-    if (withDiskSource) {
+
+    if (withCDSource) {
+      return CustomizeFormWithCD;
+    } else if (withDiskSource) {
       return CustomizeFormWithDisk;
     } else {
       return CustomizeForm;
