@@ -28,11 +28,16 @@ export type WizardVMContextType = {
   tabsData?: TabsData;
   /** update tabs data */
   updateTabsData?: Updater<TabsData>;
+  /** is the virtual machine creation disabled */
+  disableVmCreate?: boolean;
+  /** Set the isCreatedDisabled variable */
+  setDisableVmCreate?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const useWizardVM = (): WizardVMContextType => {
   const { vm, updateVM, loaded, error } = useValidatedVM(getSessionStorageVM());
   const [tabsData, updateTabsData] = useImmer<TabsData>(getSessionStorageTabsData());
+  const [disableVmCreate, setDisableVmCreate] = React.useState(false);
 
   React.useEffect(() => {
     // whenever the vm changes, save the vm in session storage
@@ -55,6 +60,8 @@ export const useWizardVM = (): WizardVMContextType => {
     error,
     tabsData,
     updateTabsData,
+    disableVmCreate,
+    setDisableVmCreate,
   };
 };
 

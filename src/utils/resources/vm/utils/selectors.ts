@@ -59,3 +59,27 @@ export const getVolumeSnapshotStatuses = (vm: V1VirtualMachine) =>
  * @returns the virtual machine host devices
  */
 export const getDataVolumeTemplates = (vm: V1VirtualMachine) => vm?.spec?.dataVolumeTemplates;
+
+/**
+ * A selector for the virtual machine's config maps
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine config maps
+ */
+export const getConfigMaps = (vm: V1VirtualMachine) =>
+  getVolumes(vm).filter((volume) => volume.configMap);
+
+/**
+ * A selector for the virtual machine's secrets
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine secrets
+ */
+export const getSecrets = (vm: V1VirtualMachine) =>
+  getVolumes(vm).filter((volume) => volume.secret);
+
+/**
+ * A selector for the virtual machine's service accounts
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine service accounts
+ */
+export const getServiceAccounts = (vm: V1VirtualMachine) =>
+  getVolumes(vm).filter((volume) => volume.serviceAccount);

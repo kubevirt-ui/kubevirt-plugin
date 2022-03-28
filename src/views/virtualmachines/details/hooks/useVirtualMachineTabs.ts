@@ -29,8 +29,8 @@ export const useVirtualMachineTabs = () => {
         component: React.Fragment,
       },
       {
-        href: 'enviornment',
-        name: t('Enviornment'),
+        href: 'environment',
+        name: t('Environment'),
         component: React.Fragment,
       },
       {

@@ -26,7 +26,7 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
   const templateNamespace = params.get('namespace');
 
   const [startVM, setStartVM] = React.useState(true);
-  const { vm, loaded: vmContextLoaded } = useWizardVMContext();
+  const { vm, loaded: vmContextLoaded, disableVmCreate } = useWizardVMContext();
   const { createVM, loaded: vmCreateLoaded, error: vmCreateError } = useWizardVmCreate();
 
   const onCreate = () =>
@@ -63,7 +63,7 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
         <Split hasGutter>
           <SplitItem>
             <Button
-              isDisabled={!vm || !loaded}
+              isDisabled={!vm || !loaded || disableVmCreate}
               isLoading={!vmCreateLoaded}
               variant="primary"
               onClick={onCreate}
