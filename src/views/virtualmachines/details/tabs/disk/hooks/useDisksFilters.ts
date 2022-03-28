@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { diskTypesLabels } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 const useDisksFilters = (): RowFilter[] => {
@@ -20,9 +20,9 @@ const useDisksFilters = (): RowFilter[] => {
             !drives?.all?.find((item) => item === drive)
           );
         },
-        items: Object.keys(diskTypes).map((type) => ({
-          id: diskTypes[type],
-          title: diskTypes[type],
+        items: Object.keys(diskTypesLabels).map((type) => ({
+          id: diskTypesLabels[type],
+          title: diskTypesLabels[type],
         })),
       },
     ],

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
 
+import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Breadcrumb,
@@ -10,7 +11,6 @@ import {
   DescriptionListTermHelpTextButton,
   Popover,
 } from '@patternfly/react-core';
-import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 
 type CreateAtProps = {
   timestamp: string;

@@ -20,7 +20,7 @@ const useVirtualMachineInstanceMigration = (vm: V1VirtualMachine) => {
   // we will need to find the one which is related to VMI and is not copmleted.
 
   const obj = vmims?.find(
-    (vmim) => vmim?.status?.phase !== 'Succeeded' && vmim?.spec?.vmiName === vm.metadata.name,
+    (vmim) => vmim?.status?.phase !== 'Succeeded' && vmim?.spec?.vmiName === vm?.metadata?.name,
   );
   return obj;
 };

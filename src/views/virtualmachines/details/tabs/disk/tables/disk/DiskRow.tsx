@@ -1,15 +1,40 @@
 import * as React from 'react';
 
+import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { Label } from '@patternfly/react-core';
 
-const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ obj, activeColumnIDs }) => {
+const DiskRow: React.FC<RowProps<DiskRowDataLayout, { vmVolumes: V1Volume[] }>> = ({
+  obj,
+  activeColumnIDs,
+  rowData: { vmVolumes },
+}) => {
+  const { t } = useKubevirtTranslation();
   const isPVCSource = !['Container (Ephemeral)', 'Other'].includes(obj?.source);
+  const HotplugLabel = React.useMemo(() => {
+    const volume = vmVolumes?.find((vol) => vol.name === obj?.name);
+    let hotplugLabel: string = null;
+    if (!volume) {
+      hotplugLabel = t('AutoDetach Hotplug');
+    }
+    if (volume?.persistentVolumeClaim?.hotpluggable || volume?.dataVolume?.hotpluggable) {
+      hotplugLabel = t('Persistent Hotplug');
+    }
+    return hotplugLabel ? (
+      <Label variant="filled" color="purple">
+        {hotplugLabel}
+      </Label>
+    ) : (
+      hotplugLabel
+    );
+  }, [obj, vmVolumes, t]);
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        {obj?.name}
+        {obj?.name} {HotplugLabel}
       </TableData>
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
         {isPVCSource ? (

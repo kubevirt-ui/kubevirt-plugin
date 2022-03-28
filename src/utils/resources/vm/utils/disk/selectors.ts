@@ -1,6 +1,6 @@
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { diskTypes } from './constants';
+import { diskTypesLabels } from './constants';
 
 /**
  * returns a drive type from a disk
@@ -8,7 +8,7 @@ import { diskTypes } from './constants';
  * @returns drive type
  */
 export const getDiskDrive = (disk: V1Disk): string => {
-  const drive = Object.keys(diskTypes).find((driveType: string) => disk[driveType] ?? 'disk');
+  const drive = Object.keys(diskTypesLabels).find((driveType: string) => disk[driveType] ?? 'disk');
   return drive;
 };
 
@@ -17,7 +17,7 @@ export const getDiskDrive = (disk: V1Disk): string => {
  * @param {V1Disk} disk disk
  * @returns drive type
  */
-export const getPrintableDiskDrive = (disk: V1Disk): string => diskTypes[getDiskDrive(disk)];
+export const getPrintableDiskDrive = (disk: V1Disk): string => diskTypesLabels[getDiskDrive(disk)];
 
 /**
  * returns a drive interface from a disk

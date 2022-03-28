@@ -1,9 +1,14 @@
 import * as React from 'react';
+import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import {
+  k8sUpdate,
   ListPageBody,
   ListPageCreateButton,
   ListPageFilter,
@@ -24,14 +29,23 @@ type DiskListProps = {
 
 const DiskList: React.FC<DiskListProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const columns = useDiskColumns();
   const [disks, loaded, loadError] = useDisksTableData(vm);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
+  const headerText =
+    vm?.status?.printableStatus === printableVMStatus.Running
+      ? t('Add disk (hot plugged)')
+      : t('Add disk');
+  const vmVolumes = getVolumes(vm);
+
   return (
     <>
       <ListPageHeader title="">
-        <ListPageCreateButton>{t('Add disk')}</ListPageCreateButton>
+        <ListPageCreateButton onClick={() => setIsModalOpen(true)}>
+          {t('Add disk')}
+        </ListPageCreateButton>
       </ListPageHeader>
       <ListPageBody>
         <DiskListTitle />
@@ -48,8 +62,25 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
           loadError={loadError}
           columns={columns}
           Row={DiskRow}
+          rowData={{ vmVolumes }}
         />
       </ListPageBody>
+      {isModalOpen && (
+        <DiskModal
+          vm={vm}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          headerText={headerText}
+          onSubmit={(obj) =>
+            k8sUpdate({
+              model: VirtualMachineModel,
+              data: obj,
+              ns: obj.metadata.namespace,
+              name: obj.metadata.name,
+            })
+          }
+        />
+      )}
     </>
   );
 };
