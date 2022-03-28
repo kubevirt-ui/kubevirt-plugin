@@ -5,6 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Divider, PageSection } from '@patternfly/react-core';
 
 import DetailsSection from './components/sections/DetailsSection';
+import SchedulingSection from './components/sections/SchedulingSection';
 
 type VirtualMachineDetailsPageProps = RouteComponentProps<{
   ns: string;
@@ -20,7 +21,9 @@ const VirtualMachineDetailsPage: React.FC<VirtualMachineDetailsPageProps> = ({ o
         <DetailsSection vm={vm} pathname={location?.pathname} />
       </PageSection>
       <Divider />
-      <PageSection>{/* <Scheduling vmi={vmi} pathname={location?.pathname} /> */}</PageSection>
+      <PageSection>
+        <SchedulingSection vm={vm} pathname={location?.pathname} />{' '}
+      </PageSection>
       <Divider />
       <PageSection>Services</PageSection>
     </div>
