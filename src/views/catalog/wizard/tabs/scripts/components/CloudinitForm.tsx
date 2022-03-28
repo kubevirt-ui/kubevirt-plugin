@@ -62,8 +62,23 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume, updateVM
     () =>
       updateVM((vmToUpdate) =>
         produceVMDisks(vmToUpdate, (vmDraft) => {
+          const cloudInitDiskName = cloudInitVolume?.name || 'cloudinitdisk';
+          const cloudInitDisk = vmDraft.spec.template.spec.domain.devices.disks.find(
+            (disk) => disk.name === cloudInitDiskName,
+          );
+
+          // cloudinitdisk deleted or doesn't exist, we need to re-create it
+          if (!cloudInitDisk) {
+            vmDraft.spec.template.spec.domain.devices.disks.push({
+              name: cloudInitDiskName,
+              disk: {
+                bus: 'virtio',
+              },
+            });
+          }
+
           const updatedCloudinitVolume = {
-            ...(cloudInitVolume || { name: 'cloudinitdisk' }),
+            ...(cloudInitVolume || { name: cloudInitDiskName }),
             cloudInitNoCloud: CloudInitDataHelper.toCloudInitNoCloudSource(yaml, isBase64),
           };
 
