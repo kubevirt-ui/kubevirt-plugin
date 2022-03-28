@@ -252,6 +252,8 @@
   "File System": "File System",
   "The following information regarding how the disks are partitioned is provided by the guest agent.": "The following information regarding how the disks are partitioned is provided by the guest agent.",
   "Invalid MAC address format": "Invalid MAC address format",
+  "Disk ({{count}})": "Disk ({{count}})",
+  "Disk ({{count}})_plural": "Disk ({{count}})",
   "Delete VirtualMachineSnapshot": "Delete VirtualMachineSnapshot",
   "Restore is enabled only for offline virtual machine.": "Restore is enabled only for offline virtual machine.",
   "Restore": "Restore",
