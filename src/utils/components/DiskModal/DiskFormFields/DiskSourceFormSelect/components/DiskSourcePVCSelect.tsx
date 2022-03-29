@@ -38,7 +38,7 @@ const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
       const selectedPVCSize = selectedPVC?.spec?.resources?.requests?.storage;
       setDiskSize && setDiskSize(selectedPVCSize);
     },
-    [selectPVCName],
+    [selectPVCName, pvcs, setDiskSize],
   );
 
   const pvcNames = React.useMemo(() => {
