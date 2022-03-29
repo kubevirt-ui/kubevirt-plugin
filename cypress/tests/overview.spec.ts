@@ -1,4 +1,4 @@
-import { adminOnlyDescribe } from '../consts';
+import { adminOnlyDescribe } from '../utils/const/index';
 import * as overview from '../views/overview';
 
 adminOnlyDescribe('Test Getting started card of the Virtualization Overview page', () => {
