@@ -55,7 +55,7 @@ NAMESPACE="openshift-marketplace"
 SECRET_NAME="ocs-secret"
 NS="kubevirt-hyperconverged"
 ARTIFACT_DIR=${ARTIFACT_DIR:=/tmp/artifacts}
-SCREENSHOTS_DIR=gui-test-screenshots
+SCREENSHOTS_DIR="cypress/gui-test-screenshots"
 
 function createSecret {
     oc create secret generic ${SECRET_NAME} --from-file=.dockerconfigjson=${PULL_SECRET_PATH} --type=kubernetes.io/dockerconfigjson -n $1

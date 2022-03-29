@@ -1,17 +1,17 @@
 {
   "viewportWidth": 1920,
   "viewportHeight": 1080,
-  "integrationFolder": "cypress/tests/",
-  "screenshotsFolder": "gui-test-screenshots/screenshots/",
-  "videosFolder": "gui-test-screenshots/videos/",
+  "integrationFolder": "tests",
+  "screenshotsFolder": "../gui-test-screenshots/screenshots/",
+  "videosFolder": "../gui-test-screenshots/videos/",
   "video": true,
-  "reporter": "node_modules/cypress-multi-reporters",
+  "reporter": "../node_modules/cypress-multi-reporters",
   "reporterOptions": {
-    "configFile": "cypress/reporter-config.json"
+    "configFile": "reporter-config.json"
   },
   "screenshotOnRunFailure": true,
-  "supportFile": "cypress/support.ts",
-  "pluginsFile": "cypress/plugin.js",
+  "supportFile": "support.ts",
+  "pluginsFile": "plugin.js",
   "fixturesFolder": false,
   "defaultCommandTimeout": 30000,
   "retries": {
