@@ -1,12 +1,40 @@
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
+export const OTHER = 'Other';
+export const CONTAINER_EPHERMAL = 'Container (Ephemeral)';
+export const DYNAMIC = 'Dynamic';
+
 export const sourceTypes = {
   BLANK: 'blank',
   HTTP: 'http',
-  PVC: 'existingPvc',
   CLONE_PVC: 'pvc',
   REGISTRY: 'registry',
+  PVC: 'persistentVolumeClaim', // Existing PVC
   EPHEMERAL: 'containerDisk',
+};
+
+export const volumeTypes = {
+  DATA_VOLUME: 'dataVolume',
+  PERSISTENT_VOLUME_CLAIM: 'persistentVolumeClaim',
+  CONTAINER_DISK: 'containerDisk',
+  CLOUD_INIT_NO_CLOUD: 'cloudInitNoCloud',
+  CONFIG_MAP: 'configMap',
+  SECRET: 'secret',
+  SERVICE_ACCOUNT: 'serviceAccount',
+};
+
+export const mapSourceTypeToVolumeType = {
+  [sourceTypes.BLANK]: volumeTypes.DATA_VOLUME,
+  [sourceTypes.HTTP]: volumeTypes.DATA_VOLUME,
+  [sourceTypes.CLONE_PVC]: volumeTypes.DATA_VOLUME,
+  [sourceTypes.REGISTRY]: volumeTypes.DATA_VOLUME,
+  [sourceTypes.PVC]: volumeTypes.PERSISTENT_VOLUME_CLAIM,
+  [sourceTypes.EPHEMERAL]: volumeTypes.CONTAINER_DISK,
+  [volumeTypes.CLOUD_INIT_NO_CLOUD]: OTHER,
+  [volumeTypes.CONFIG_MAP]: OTHER,
+  [volumeTypes.SECRET]: OTHER,
+  [volumeTypes.SERVICE_ACCOUNT]: OTHER,
+  [OTHER]: OTHER,
 };
 
 export const interfaceTypes = {

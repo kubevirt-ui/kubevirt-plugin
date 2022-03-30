@@ -6,7 +6,7 @@ import { TextInput } from '@patternfly/react-core';
 
 import { diskReducerActions, DiskReducerActionType } from '../../state/actions';
 import { DiskFormState } from '../../state/initialState';
-import { sourceTypes } from '../utils/constants';
+import { DYNAMIC, OTHER, sourceTypes } from '../utils/constants';
 
 import DiskSizeNumberInput from './DiskSizeNumberInput';
 
@@ -18,7 +18,7 @@ type DiskSizeInputProps = {
 const DiskSizeInput: React.FC<DiskSizeInputProps> = ({ diskState, dispatchDiskState }) => {
   const { t } = useKubevirtTranslation();
   const { diskSource, diskSize } = diskState || {};
-  const dynamicSize = t('Dynamic');
+  const dynamicSize = t(DYNAMIC);
 
   const onChange = React.useCallback(
     (value: string) => {
@@ -27,7 +27,7 @@ const DiskSizeInput: React.FC<DiskSizeInputProps> = ({ diskState, dispatchDiskSt
     [dispatchDiskState],
   );
 
-  if (sourceTypes.PVC === diskSource) {
+  if (sourceTypes.PVC === diskSource || OTHER === diskSource) {
     return null;
   }
 

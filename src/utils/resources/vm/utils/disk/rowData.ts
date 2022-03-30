@@ -1,11 +1,19 @@
 import { TFunction } from 'i18next';
 
+import {
+  CONTAINER_EPHERMAL,
+  DYNAMIC,
+  OTHER,
+  sourceTypes,
+} from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import {
   getPrintableDiskDrive,
   getPrintableDiskInterface,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
+
+import { NO_DATA_DASH } from '../constants';
 
 /**
  *  A function for getting disks row data for a VM
@@ -16,29 +24,30 @@ import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 export const getDiskRowDataLayout = (disks: DiskRawData[], t: TFunction): DiskRowDataLayout[] => {
   return disks?.map((device) => {
     // eslint-disable-next-line require-jsdoc
-    const source = () => {
-      if (device?.volume?.containerDisk) {
-        return t('Container (Ephemeral)');
-      }
-      const sourceName = device?.pvc?.metadata?.name || t('Other');
-      return sourceName;
-    };
+    const volumeSource = Object.keys(device?.volume).find((key) => key !== 'name');
 
-    const size = device?.volume?.containerDisk
-      ? t('Dynamic')
-      : formatBytes(device?.pvc?.spec?.resources?.requests?.storage);
-
-    const storageClass = device?.pvc?.spec?.storageClassName || '-';
-
-    return {
+    const diskRowDataObject: DiskRowDataLayout = {
       name: device?.disk?.name,
-      source: source(),
-      size,
-      storageClass,
       interface: getPrintableDiskInterface(device?.disk),
       drive: getPrintableDiskDrive(device?.disk),
       metadata: { name: device?.disk?.name },
       namespace: device?.pvc?.metadata?.namespace,
+      source: t(OTHER),
+      size: NO_DATA_DASH,
+      storageClass: NO_DATA_DASH,
     };
+
+    if (device?.pvc) {
+      diskRowDataObject.source = device?.pvc?.metadata?.name;
+      diskRowDataObject.size = formatBytes(device?.pvc?.spec?.resources?.requests?.storage);
+      diskRowDataObject.storageClass = device?.pvc?.spec?.storageClassName;
+    }
+
+    if (volumeSource === sourceTypes.EPHEMERAL) {
+      diskRowDataObject.source = t(CONTAINER_EPHERMAL);
+      diskRowDataObject.size = t(DYNAMIC);
+    }
+
+    return diskRowDataObject;
   });
 };

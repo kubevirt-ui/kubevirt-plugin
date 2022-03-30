@@ -77,7 +77,7 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
           onFilter={FilterSCSelect(storageClasses, t)}
           hasInlineFilter
           maxHeight={200}
-          direction="up" // if we sta
+          direction="up"
         >
           {getSCSelectOptions(storageClasses, t)}
         </Select>

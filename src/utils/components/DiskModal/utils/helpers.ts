@@ -14,8 +14,11 @@ import {
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
-import { addNonPersistentVolume, addPersistentVolume } from '../../../../views/virtualmachines/actions/actions';
-import { sourceTypes } from '../DiskFormFields/utils/constants';
+import {
+  addNonPersistentVolume,
+  addPersistentVolume,
+} from '../../../../views/virtualmachines/actions/actions';
+import { mapSourceTypeToVolumeType, sourceTypes } from '../DiskFormFields/utils/constants';
 import { DiskFormState, DiskSourceState } from '../state/initialState';
 
 export const getEmptyVMDataVolumeResource = (vm: V1VirtualMachine): V1beta1DataVolume => {
@@ -61,7 +64,12 @@ export const produceVMDisks = (
 };
 
 export const requiresDataVolume = (diskSource: string): boolean => {
-  return diskSource !== sourceTypes.EPHEMERAL && diskSource !== sourceTypes.PVC;
+  return [
+    sourceTypes.BLANK,
+    sourceTypes.HTTP,
+    sourceTypes.CLONE_PVC,
+    sourceTypes.REGISTRY,
+  ].includes(diskSource);
 };
 
 export const getDiskFromState = (diskState: DiskFormState): V1Disk => ({
@@ -87,14 +95,46 @@ export const getVolumeFromState = (
     volume.containerDisk = {
       image: diskSourceState.ephemeralSource,
     };
-  } else {
-    // diskState.diskSource === sourceTypes.PVC
+  } else if (diskState.diskSource === sourceTypes.PVC) {
     volume.persistentVolumeClaim = {
       claimName: diskSourceState.pvcSourceName,
     };
   }
 
   return volume;
+};
+
+export const updateVolume = (
+  oldVolume: V1Volume,
+  diskState: DiskFormState,
+  diskSourceState: DiskSourceState,
+  dvName: string,
+): V1Volume => {
+  const updatedVolume = { ...oldVolume };
+  if (updatedVolume.name !== diskState.diskName) {
+    updatedVolume.name = diskState.diskName;
+  }
+  const oldVolumeSourceKey = Object.keys(oldVolume).find((key) => key !== 'name');
+  const oldVolumeSource = mapSourceTypeToVolumeType[oldVolumeSourceKey];
+  const newVolumeSource = mapSourceTypeToVolumeType[diskState.diskSource];
+  if (oldVolumeSource !== newVolumeSource) {
+    delete updatedVolume[oldVolumeSource];
+    
+    if (requiresDataVolume(diskState.diskSource)) {
+      updatedVolume.dataVolume = {
+        name: dvName,
+      };
+    } else if (diskState.diskSource === sourceTypes.EPHEMERAL) {
+      updatedVolume.containerDisk = {
+        image: diskSourceState.ephemeralSource,
+      };
+    } else if (diskState.diskSource === sourceTypes.PVC) {
+      updatedVolume.persistentVolumeClaim = {
+        claimName: diskSourceState.pvcSourceName,
+      };
+    }
+  }
+  return updatedVolume;
 };
 
 export const getDataVolumeFromState = (
