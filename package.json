@@ -35,7 +35,8 @@
       "VirtualMachinesInstancesList": "./views/virtualmachinesinstance/list/VirtualMachinesInstancesList.tsx",
       "useVirtualMachineInstanceActionsProvider": "./views/virtualmachinesinstance/actions/hooks/useVirtualMachineInstanceActionsProvider.tsx",
       "ClusterOverviewPage": "./views/clusteroverview/overview/components/ClusterOverviewPage.tsx",
-      "VirtualMachineTemplatesList": "./views/templates/list/VirtualMachineTemplatesList.tsx"
+      "VirtualMachineTemplatesList": "./views/templates/list/VirtualMachineTemplatesList.tsx",
+      "modalProvider": "./utils/components/ModalProvider/ModalProvider.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
