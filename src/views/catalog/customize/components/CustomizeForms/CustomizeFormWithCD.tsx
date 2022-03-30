@@ -27,8 +27,9 @@ export const CustomizeFormWithCD: React.FC<CustomizeFormWithCDProps> = ({ templa
     () => addCDToTemplate(template, customCDSource),
     [template, customCDSource],
   );
+  const [windowsDrivers, setWindowsDrivers] = React.useState(false);
 
-  const [onSubmit, loaded, error] = useCustomizeFormSubmit(templateWithCDVolume);
+  const [onSubmit, loaded, error] = useCustomizeFormSubmit(templateWithCDVolume, windowsDrivers);
 
   const [requiredFields, optionalFields] = buildFields(template);
   const nameField = getVirtualMachineNameField(template, t);
@@ -45,6 +46,8 @@ export const CustomizeFormWithCD: React.FC<CustomizeFormWithCDProps> = ({ templa
         onChange={onDiskSourceChange}
         initialVolumeQuantity={getTemplateStorageQuantity(template)}
         sourceLabel={<SelectCDSourceLabel />}
+        withDrivers={windowsDrivers}
+        setDrivers={setWindowsDrivers}
       />
 
       {requiredFields?.map((field) => (

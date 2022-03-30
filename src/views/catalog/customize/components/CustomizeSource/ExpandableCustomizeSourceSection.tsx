@@ -19,6 +19,8 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
   onChange,
   initialVolumeQuantity,
   sourceLabel,
+  withDrivers,
+  setDrivers,
 }) => {
   const { t } = useKubevirtTranslation();
   const [storageFieldsExpanded, setStorageFieldsExpanded] = React.useState(true);
@@ -61,6 +63,8 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
             onChange={onChange}
             initialVolumeQuantity={initialVolumeQuantity}
             sourceLabel={sourceLabel}
+            withDrivers={withDrivers}
+            setDrivers={setDrivers}
           />
         </ExpandableSection>
       </StackItem>

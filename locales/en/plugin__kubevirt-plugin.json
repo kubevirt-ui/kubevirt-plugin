@@ -96,7 +96,7 @@
   "Default": "Default",
   "Image URL": "Image URL",
   "Container Image": "Container Image",
-  "Mount disk drive": "Mount disk drive",
+  "Mount Windows drivers disk": "Mount Windows drivers disk",
   "Storage": "Storage",
   "You can customize the templates storage by overriding the original parameters": "You can customize the templates storage by overriding the original parameters",
   "Volume size cannot be zero": "Volume size cannot be zero",

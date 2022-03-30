@@ -14,6 +14,7 @@ import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { NAME_INPUT_FIELD } from './constants';
+import { mountWinDriversToTemplate } from './drivers';
 import { overrideTemplateVirtualMachine } from './overrides';
 
 export const isFieldInvalid = (field: TemplateParameter, formData: FormData): boolean =>
@@ -78,6 +79,7 @@ export const extractParameterNameFromMetadataName = (template: V1Template): stri
 export const processTemplate = async (
   template: V1Template,
   formData: FormData,
+  withWindowsDrivers?: boolean,
 ): Promise<V1Template> => {
   const virtualMachineName = formData.get(NAME_INPUT_FIELD) as string;
 
@@ -87,9 +89,15 @@ export const processTemplate = async (
 
   replaceTemplateParameterValue(template, parameterForName, virtualMachineName);
 
+  let templateToProcess = template;
+
+  if (withWindowsDrivers) {
+    templateToProcess = await mountWinDriversToTemplate(template);
+  }
+
   const processedTemplate = await k8sCreate<V1Template>({
     model: ProcessedTemplatesModel,
-    data: overrideTemplateVirtualMachine(template, virtualMachineName),
+    data: overrideTemplateVirtualMachine(templateToProcess, virtualMachineName),
     queryParams: {
       dryRun: 'All',
     },

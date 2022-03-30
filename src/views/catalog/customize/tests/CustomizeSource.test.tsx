@@ -22,6 +22,7 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
 });
 
 const onChangeMock = jest.fn();
+const setDrivers = jest.fn();
 
 describe('Test CustomizeSource', () => {
   afterEach(() => {
@@ -31,7 +32,14 @@ describe('Test CustomizeSource', () => {
 
   it('Select HTTP source', () => {
     const testImageUrl = 'imageUrl';
-    render(<CustomizeSource onChange={onChangeMock} sourceLabel={<SelectDiskSourceLabel />} />);
+    render(
+      <CustomizeSource
+        onChange={onChangeMock}
+        sourceLabel={<SelectDiskSourceLabel />}
+        setDrivers={setDrivers}
+        withDrivers={false}
+      />,
+    );
 
     act(() => {
       fireEvent.click(screen.getByTestId(DEFAULT_SOURCE));
@@ -58,7 +66,14 @@ describe('Test CustomizeSource', () => {
 
   it('Select Container source and change volume', () => {
     const testContainer = 'containerurl';
-    render(<CustomizeSource onChange={onChangeMock} sourceLabel={<SelectCDSourceLabel />} />);
+    render(
+      <CustomizeSource
+        onChange={onChangeMock}
+        sourceLabel={<SelectCDSourceLabel />}
+        setDrivers={setDrivers}
+        withDrivers={false}
+      />,
+    );
 
     act(() => {
       fireEvent.click(screen.getByTestId(DEFAULT_SOURCE));
