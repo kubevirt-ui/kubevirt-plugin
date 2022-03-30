@@ -3,8 +3,8 @@ import * as React from 'react';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 
+import useGuestOS from '../../../../hooks/useGuestOS';
 import useFileSystemTableColumns from '../../hooks/useFileSystemTableColumns';
-import useFileSystemTableGuestOS from '../../hooks/useFileSystemTableGuestOS';
 
 import FileSystemTableRow from './FileSystemTableRow';
 import FileSystemTableTitle from './FileSystemTableTitle';
@@ -14,7 +14,7 @@ type FileSystemTableProps = {
 };
 
 const FileSystemTable: React.FC<FileSystemTableProps> = ({ vmi }) => {
-  const [data, loaded, loadingError] = useFileSystemTableGuestOS(vmi);
+  const [data, loaded, loadingError] = useGuestOS(vmi);
   const columns = useFileSystemTableColumns();
   const fileSystems = data?.fsInfo?.disks || [];
 
