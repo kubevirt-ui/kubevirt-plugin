@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { Button, ButtonVariant, Popover, PopoverPosition } from '@patternfly/react-core';
 
 type FirstItemListPopoverProps = {
@@ -14,7 +15,7 @@ const FirstItemListPopover: React.FC<FirstItemListPopoverProps> = ({
   className,
 }) => (
   <div className={className}>
-    <div>{items?.[0]}</div>
+    <div>{items?.[0] || NO_DATA_DASH}</div>
     {items?.length > 1 && (
       <Popover
         headerContent={headerContent}
