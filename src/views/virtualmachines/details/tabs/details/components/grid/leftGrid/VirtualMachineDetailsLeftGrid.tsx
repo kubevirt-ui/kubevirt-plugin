@@ -30,6 +30,27 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   const { t } = useKubevirtTranslation();
   const [descriptionModalOpen, setDescriptionModalOpen] = React.useState(false);
   const None = <MutedTextDiv text={t('None')} />;
+
+  const updateDescription = (updatedDescription) => {
+    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
+      ensurePath(vmDraft, ['metadata.annotations']);
+      if (!vmDraft.metadata.annotations) vmDraft.metadata.annotations = {};
+
+      if (updatedDescription) {
+        vmDraft.metadata.annotations[DESCRIPTION_ANNOTATION] = updatedDescription;
+      } else {
+        delete vmDraft.metadata.annotations[DESCRIPTION_ANNOTATION];
+      }
+      return vmDraft;
+    });
+    return k8sUpdate({
+      model: VirtualMachineModel,
+      data: updatedVM,
+      ns: updatedVM?.metadata?.namespace,
+      name: updatedVM?.metadata?.name,
+    });
+  };
+
   return (
     <GridItem span={5}>
       <DescriptionList>
@@ -87,25 +108,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           obj={vm}
           isOpen={descriptionModalOpen}
           onClose={() => setDescriptionModalOpen(false)}
-          onSubmit={(updatedDescription) => {
-            const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-              ensurePath(vmDraft, ['metadata.annotations']);
-              if (!vmDraft.metadata.annotations) vmDraft.metadata.annotations = {};
-
-              if (updatedDescription) {
-                vmDraft.metadata.annotations[DESCRIPTION_ANNOTATION] = updatedDescription;
-              } else {
-                delete vmDraft.metadata.annotations[DESCRIPTION_ANNOTATION];
-              }
-              return vmDraft;
-            });
-            return k8sUpdate({
-              model: VirtualMachineModel,
-              data: updatedVM,
-              ns: updatedVM?.metadata?.namespace,
-              name: updatedVM?.metadata?.name,
-            });
-          }}
+          onSubmit={updateDescription}
         />
         <VirtualMachineDescriptionItem
           descriptionData={getOperatingSystemName(vm) || getOperatingSystem(vm)}

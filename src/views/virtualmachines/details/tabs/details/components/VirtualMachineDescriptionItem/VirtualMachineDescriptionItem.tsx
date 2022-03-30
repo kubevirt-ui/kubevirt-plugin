@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 
+import MutedTextDiv from '@kubevirt-utils/components/MutedTextDiv/MutedTextDiv';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Breadcrumb,
@@ -13,8 +14,6 @@ import {
   Popover,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
-
-import MutedTextDiv from '../MutedTextDiv/MutedTextDiv';
 
 type VirtualMachineDescriptionItemProps = {
   descriptionData: any;
