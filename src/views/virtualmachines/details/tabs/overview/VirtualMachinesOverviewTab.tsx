@@ -16,11 +16,10 @@ type VirtualMachinesOverviewTabProps = RouteComponentProps & {
   obj: V1VirtualMachine;
 };
 
-const VirtualMachinesOverviewTab: React.FC<VirtualMachinesOverviewTabProps> = () => {
+const VirtualMachinesOverviewTab: React.FC<VirtualMachinesOverviewTabProps> = ({ obj: vm }) => {
   return (
-    <Grid hasGutter>
-      {/* remove style */}
-      <GridItem span={8} style={{ textAlign: 'center' }}>
+    <Grid hasGutter className="co-dashboard-body">
+      <GridItem span={8}>
         <Grid hasGutter>
           <GridItem>
             <VirtualMachinesOverviewTabDetails />
@@ -33,8 +32,7 @@ const VirtualMachinesOverviewTab: React.FC<VirtualMachinesOverviewTabProps> = ()
           </GridItem>
         </Grid>
       </GridItem>
-      {/* remove style */}
-      <GridItem span={4} style={{ textAlign: 'center' }}>
+      <GridItem span={4}>
         <Grid hasGutter>
           <GridItem>
             <VirtualMachinesOverviewTabAlerts />
@@ -46,7 +44,7 @@ const VirtualMachinesOverviewTab: React.FC<VirtualMachinesOverviewTabProps> = ()
             <VirtualMachinesOverviewTabNetworkInterfaces />
           </GridItem>
           <GridItem>
-            <VirtualMachinesOverviewTabDisks />
+            <VirtualMachinesOverviewTabDisks vm={vm} />
           </GridItem>
         </Grid>
       </GridItem>
