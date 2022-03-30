@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import MutedTextDiv from '@kubevirt-utils/components/MutedTextDiv/MutedTextDiv';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import {
@@ -13,7 +14,6 @@ import { DescriptionList, GridItem } from '@patternfly/react-core';
 import VirtualMachineStatus from '../../../../../../list/components/VirtualMachineStatus/VirtualMachineStatus';
 import { VirtualMachineDetailsRightGridLayoutPresentation } from '../../../utils/gridHelper';
 import BootOrderSummary from '../../BootOrderSummary/BootOrderSummary';
-import MutedTextDiv from '../../MutedTextDiv/MutedTextDiv';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 type VirtualMachineDetailsRightGridLayout = {

@@ -1,12 +1,10 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import BootableDevicesList from '@kubevirt-utils/components/BootOrder/BootableDevicesList';
+import EmptyBootOrderSummary from '@kubevirt-utils/components/BootOrder/EmptyBootSourceSummary';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
-
-import { transformDevices } from '../../utils/bootOrderHelper';
-import BootableDevicesList from '../BootableDevicesList/BootableDevicesList';
-
-import EmptyBootOrderSummary from './EmptyBootSourceSummary';
+import { transformDevices } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 
 type BootOrderSummaryProps = {
   vm: V1VirtualMachine;

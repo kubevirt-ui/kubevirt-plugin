@@ -3,8 +3,8 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ExpandableSection, Text, TextVariants } from '@patternfly/react-core';
 
-import { BootableDeviceType } from '../../utils/bootOrderHelper';
-import BootableDevicesList from '../BootableDevicesList/BootableDevicesList';
+import { BootableDeviceType } from '../../resources/vm/utils/boot-order/bootOrder';
+import BootableDevicesList from './BootableDevicesList';
 import MutedTextDiv from '../MutedTextDiv/MutedTextDiv';
 
 type BootOrderSummaryProps = {

@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import MutedTextDiv from '@kubevirt-utils/components/MutedTextDiv/MutedTextDiv';
 import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +14,6 @@ import {
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
-import MutedTextDiv from '../../MutedTextDiv/MutedTextDiv';
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import VirtualMachineLabels from '../../VirtualMachineLabels/VirtualMachineLabels';
