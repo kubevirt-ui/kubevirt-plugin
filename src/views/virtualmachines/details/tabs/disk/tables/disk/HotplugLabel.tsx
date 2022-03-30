@@ -23,7 +23,11 @@ export const HotplugLabel: React.FC<HotplugLabelProps> = ({ vm, diskName, vmi })
     if (!vmVolume && vmi) {
       return t('AutoDetach Hotplug');
     }
-    if (!!volumeStatus?.hotplugVolume) {
+    if (
+      volumeStatus?.hotplugVolume ||
+      vmVolume?.dataVolume?.hotpluggable ||
+      vmVolume?.persistentVolumeClaim?.hotpluggable
+    ) {
       return t('Persistent Hotplug');
     }
     return null;
