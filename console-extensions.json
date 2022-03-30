@@ -74,6 +74,15 @@
     }
   },
   {
+    "type": "console.page/route",
+    "properties": {
+      "path": ["/k8s/ns/:ns/templates", "/k8s/all-namespaces/templates"],
+      "component": {
+        "$codeRef": "VirtualMachineTemplatesList"
+      }
+    }
+  },
+  {
     "type": "console.page/resource/list",
     "properties": {
       "model": {

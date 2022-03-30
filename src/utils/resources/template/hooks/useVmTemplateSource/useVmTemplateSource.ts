@@ -8,7 +8,7 @@ import {
 
 import { BOOT_SOURCE } from '../../utils/constants';
 
-import { getDataSourcePVC, getPVC, getTemplateBootSourceType, TemplateBootSource } from './utils';
+import { getDataSource, getPVC, getTemplateBootSourceType, TemplateBootSource } from './utils';
 
 /**
  * A Hook that returns the boot source status of a given template
@@ -47,16 +47,21 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
   };
 
   // eslint-disable-next-line require-jsdoc
-  const getDataSourcePVCSource = ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
+  const getDataSourceCondition = ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
     setLoaded(false);
-    return getDataSourcePVC(name, namespace)
-      .then((pvc) => {
-        setIsBootSourceAvailable(true);
-        setTemplateBootSource({
-          type: BOOT_SOURCE.PVC_AUTO_UPLOAD,
-          source: bootSource.source,
-          sourceValue: { sourceRef: pvc },
-        });
+    return getDataSource(name, namespace)
+      .then((dataSource) => {
+        if (
+          dataSource?.status?.conditions?.find((c) => c.type === 'Ready' && c.status === 'True')
+        ) {
+          setIsBootSourceAvailable(true);
+          setTemplateBootSource({
+            type: BOOT_SOURCE.PVC_AUTO_UPLOAD,
+            source: {
+              pvc: dataSource?.spec?.source?.pvc,
+            },
+          });
+        }
       })
       .catch((e) => {
         setError(e);
@@ -75,7 +80,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
         break;
 
       case BOOT_SOURCE.PVC_AUTO_UPLOAD:
-        getDataSourcePVCSource(bootSource?.source?.sourceRef);
+        getDataSourceCondition(bootSource?.source?.sourceRef);
         break;
 
       case BOOT_SOURCE.URL:

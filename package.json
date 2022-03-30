@@ -34,7 +34,8 @@
       "useVirtualMachineActionsProvider": "./views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts",
       "VirtualMachinesInstancesList": "./views/virtualmachinesinstance/list/VirtualMachinesInstancesList.tsx",
       "useVirtualMachineInstanceActionsProvider": "./views/virtualmachinesinstance/actions/hooks/useVirtualMachineInstanceActionsProvider.tsx",
-      "ClusterOverviewPage": "./views/clusteroverview/overview/components/ClusterOverviewPage.tsx"
+      "ClusterOverviewPage": "./views/clusteroverview/overview/components/ClusterOverviewPage.tsx",
+      "VirtualMachineTemplatesList": "./views/templates/list/VirtualMachineTemplatesList.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
