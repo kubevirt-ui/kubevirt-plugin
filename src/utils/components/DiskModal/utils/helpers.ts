@@ -119,20 +119,20 @@ export const updateVolume = (
   const newVolumeSource = mapSourceTypeToVolumeType[diskState.diskSource];
   if (oldVolumeSource !== newVolumeSource) {
     delete updatedVolume[oldVolumeSource];
+  }
     
-    if (requiresDataVolume(diskState.diskSource)) {
-      updatedVolume.dataVolume = {
-        name: dvName,
-      };
-    } else if (diskState.diskSource === sourceTypes.EPHEMERAL) {
-      updatedVolume.containerDisk = {
-        image: diskSourceState.ephemeralSource,
-      };
-    } else if (diskState.diskSource === sourceTypes.PVC) {
-      updatedVolume.persistentVolumeClaim = {
-        claimName: diskSourceState.pvcSourceName,
-      };
-    }
+  if (requiresDataVolume(diskState.diskSource)) {
+    updatedVolume.dataVolume = {
+      name: dvName,
+    };
+  } else if (diskState.diskSource === sourceTypes.EPHEMERAL) {
+    updatedVolume.containerDisk = {
+      image: diskSourceState.ephemeralSource,
+    };
+  } else if (diskState.diskSource === sourceTypes.PVC) {
+    updatedVolume.persistentVolumeClaim = {
+      claimName: diskSourceState.pvcSourceName,
+    };
   }
   return updatedVolume;
 };
