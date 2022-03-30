@@ -6,3 +6,5 @@ export enum CLUSTER_STATUS {
   PROGRESSING = 'Progressing',
   HEALTH_ERROR = 'HEALTH_ERR',
 }
+
+export const adminOnlyDescribe = Cypress.env('NON_PRIV') ? xdescribe : describe;
