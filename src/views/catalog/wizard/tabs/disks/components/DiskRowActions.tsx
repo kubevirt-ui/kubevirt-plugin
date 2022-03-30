@@ -43,10 +43,11 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
         (volume) => volume.name === diskName,
       );
 
-      if (volumeToDelete?.dataVolume?.name)
-        draftVM.spec.dataVolumeTemplates.filter(
+      if (volumeToDelete?.dataVolume?.name) {
+        draftVM.spec.dataVolumeTemplates = draftVM.spec.dataVolumeTemplates.filter(
           (dataVolume) => dataVolume.metadata.name !== volumeToDelete.dataVolume.name,
         );
+      }
 
       draftVM.spec.template.spec.volumes = draftVM.spec.template.spec.volumes.filter(
         (volume) => volume.name !== diskName,
