@@ -12,7 +12,9 @@ import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynam
 import { getDisks, getVolumes } from '../../utils';
 import { getDiskRowDataLayout } from '../../utils/disk/rowData';
 
-type UseDisksTableDisks = (vm: V1VirtualMachine) => [DiskRowDataLayout[], boolean, any];
+type UseDisksTableDisks = (
+  vm: V1VirtualMachine,
+) => [DiskRowDataLayout[], boolean, any, V1VirtualMachineInstance];
 
 /**
  * A Hook for getting disks data for a VM
@@ -54,7 +56,7 @@ const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
     return getDiskRowDataLayout(diskDevices, t);
   }, [pvcs, vmDisks, vmVolumes, t]);
 
-  return [disks || [], loaded, loadingError];
+  return [disks || [], loaded, loadingError, vmi || null];
 };
 
 export default useDisksTableData;

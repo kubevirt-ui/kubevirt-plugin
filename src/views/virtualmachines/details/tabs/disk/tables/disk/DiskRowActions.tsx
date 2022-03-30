@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
@@ -15,14 +15,20 @@ type DiskRowActionsProps = {
   vm: V1VirtualMachine;
   diskName: string;
   pvcResourceExists: boolean;
+  vmi?: V1VirtualMachineInstance;
 };
 
-const DiskRowActions: React.FC<DiskRowActionsProps> = ({ vm, diskName, pvcResourceExists }) => {
+const DiskRowActions: React.FC<DiskRowActionsProps> = ({
+  vm,
+  diskName,
+  pvcResourceExists,
+  vmi,
+}) => {
   const { t } = useKubevirtTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
 
-  const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName);
+  const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName, vmi);
 
   const isVMRunning = vm?.status?.printableStatus !== printableVMStatus.Stopped;
   const editBtnText = t('Edit');

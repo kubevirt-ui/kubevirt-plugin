@@ -30,7 +30,7 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const columns = useDiskColumns();
-  const [disks, loaded, loadError] = useDisksTableData(vm);
+  const [disks, loaded, loadError, vmi] = useDisksTableData(vm);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
   const headerText =
@@ -60,7 +60,7 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
           loadError={loadError}
           columns={columns}
           Row={DiskRow}
-          rowData={{ vm }}
+          rowData={{ vm, vmi }}
         />
       </ListPageBody>
       {isModalOpen && (

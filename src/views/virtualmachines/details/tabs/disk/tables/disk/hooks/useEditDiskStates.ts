@@ -1,10 +1,11 @@
 import * as React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   DYNAMIC,
   OTHER,
   sourceTypes,
+  volumeTypes,
 } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
 import {
   DiskFormState,
@@ -18,28 +19,36 @@ import { getDiskDrive, getDiskInterface } from '@kubevirt-utils/resources/vm/uti
 type UseEditDiskStates = (
   vm: V1VirtualMachine,
   diskName: string,
+  vmi?: V1VirtualMachineInstance,
 ) => {
   initialDiskState: DiskFormState;
   initialDiskSourceState: DiskSourceState;
 };
 
-export const useEditDiskStates: UseEditDiskStates = (vm: V1VirtualMachine, diskName: string) => {
+export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
   const initialDiskSourceState = React.useMemo(() => ({ ...initialStateDiskSource }), []);
+  const disks = !vmi ? getDisks(vm) : vmi?.spec?.domain?.devices?.disks;
+  const disk = disks?.find(({ name }) => name === diskName);
 
   const { diskSource, diskSize } = React.useMemo(() => {
-    const volume = getVolumes(vm)?.find(({ name }) => name === diskName);
+    const volumes = !vmi ? getVolumes(vm) : vmi?.spec?.volumes;
+    const volume = volumes?.find(({ name }) => name === diskName);
     // volume consists of 2 keys:
     // name and one of: containerDisk/cloudInitNoCloud
-    const volumeSource = Object.keys(volume).filter((key) => key !== 'name')?.[0];
+    const volumeSource = Object.keys(volume).find((key) =>
+      [
+        volumeTypes.CONTAINER_DISK,
+        volumeTypes.DATA_VOLUME,
+        volumeTypes.PERSISTENT_VOLUME_CLAIM,
+      ].includes(key),
+    );
 
     if (volumeSource === sourceTypes.EPHEMERAL) {
       initialDiskSourceState.ephemeralSource = volume.containerDisk?.image;
       return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC };
     }
     return { diskSource: OTHER, diskSize: null };
-  }, [initialDiskSourceState, vm, diskName]);
-
-  const disk = getDisks(vm)?.find(({ name }) => name === diskName);
+  }, [initialDiskSourceState, vm, vmi, diskName]);
 
   const initialDiskState: DiskFormState = {
     diskName,
