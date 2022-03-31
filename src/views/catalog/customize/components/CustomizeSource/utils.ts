@@ -24,7 +24,18 @@ export const getGenericSourceCustomization = (
   };
 };
 
-export const getPVCSource = (pvcName: string, pvcNamespace: string): V1beta1DataVolumeSpec => ({
+export const getPVCSource = (
+  pvcName: string,
+  pvcNamespace: string,
+  storage: string,
+): V1beta1DataVolumeSpec => ({
+  pvc: {
+    resources: {
+      requests: {
+        storage,
+      },
+    },
+  },
   source: {
     pvc: {
       name: pvcName,

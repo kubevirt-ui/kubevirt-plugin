@@ -1,3 +1,9 @@
-.disk-source-form-group {
-  margin-bottom: var(--pf-global--spacer--md);
+.customize-source {
+  .disk-source-form-group {
+    margin-bottom: var(--pf-global--spacer--md);
+  }
+  
+  .co-section-heading {
+    margin-top: var(--pf-global--spacer--lg);
+  }
 }

@@ -18,7 +18,7 @@ import {
   INSTALLATION_CDROM_VOLUME,
   INSTALLATION_CDROM_VOLUME_NAME,
 } from './constants';
-import { overrideVirtualMachineDataVolumeSpec } from './overrides';
+import { overrideVirtualMachineDataVolumeSpec } from './utils';
 
 export const addInstallationCDRom = (
   virtualMachine: V1VirtualMachine,

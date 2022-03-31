@@ -3,8 +3,6 @@ import * as React from 'react';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { SelectCDSourceLabel } from '../components/CustomizeForms/SelectCDSourceLabel';
-import { SelectDiskSourceLabel } from '../components/CustomizeForms/SelectDiskSourceLabel';
 import {
   CustomizeSource,
   DEFAULT_SOURCE,
@@ -23,6 +21,7 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
 
 const onChangeMock = jest.fn();
 const setDrivers = jest.fn();
+const setCDSource = jest.fn();
 
 describe('Test CustomizeSource', () => {
   afterEach(() => {
@@ -30,14 +29,47 @@ describe('Test CustomizeSource', () => {
     cleanup();
   });
 
+  it('Switch to cd Source with checkbox', () => {
+    const { rerender } = render(
+      <CustomizeSource
+        onChange={onChangeMock}
+        setDrivers={setDrivers}
+        withDrivers={false}
+        setCDSource={setCDSource}
+        cdSource={false}
+      />,
+    );
+
+    screen.getByText('Disk source');
+
+    act(() => {
+      fireEvent.click(screen.getByLabelText('Boot from CD', { exact: false }));
+    });
+
+    expect(setCDSource).toBeCalledWith(true, expect.anything());
+
+    rerender(
+      <CustomizeSource
+        onChange={onChangeMock}
+        setDrivers={setDrivers}
+        withDrivers={false}
+        setCDSource={setCDSource}
+        cdSource
+      />,
+    );
+
+    screen.getByText('CD source');
+  });
+
   it('Select HTTP source', () => {
     const testImageUrl = 'imageUrl';
     render(
       <CustomizeSource
         onChange={onChangeMock}
-        sourceLabel={<SelectDiskSourceLabel />}
         setDrivers={setDrivers}
         withDrivers={false}
+        setCDSource={setCDSource}
+        cdSource={false}
       />,
     );
 
@@ -69,9 +101,10 @@ describe('Test CustomizeSource', () => {
     render(
       <CustomizeSource
         onChange={onChangeMock}
-        sourceLabel={<SelectCDSourceLabel />}
         setDrivers={setDrivers}
         withDrivers={false}
+        setCDSource={setCDSource}
+        cdSource={false}
       />,
     );
 
