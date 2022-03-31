@@ -18,7 +18,7 @@ import {
   addNonPersistentVolume,
   addPersistentVolume,
 } from '../../../../views/virtualmachines/actions/actions';
-import { mapSourceTypeToVolumeType, sourceTypes } from '../DiskFormFields/utils/constants';
+import { sourceTypes } from '../DiskFormFields/utils/constants';
 import { DiskFormState, DiskSourceState } from '../state/initialState';
 
 export const getEmptyVMDataVolumeResource = (vm: V1VirtualMachine): V1beta1DataVolume => {
@@ -102,39 +102,6 @@ export const getVolumeFromState = (
   }
 
   return volume;
-};
-
-export const updateVolume = (
-  oldVolume: V1Volume,
-  diskState: DiskFormState,
-  diskSourceState: DiskSourceState,
-  dvName: string,
-): V1Volume => {
-  const updatedVolume = { ...oldVolume };
-  if (updatedVolume.name !== diskState.diskName) {
-    updatedVolume.name = diskState.diskName;
-  }
-  const oldVolumeSourceKey = Object.keys(oldVolume).find((key) => key !== 'name');
-  const oldVolumeSource = mapSourceTypeToVolumeType[oldVolumeSourceKey];
-  const newVolumeSource = mapSourceTypeToVolumeType[diskState.diskSource];
-  if (oldVolumeSource !== newVolumeSource) {
-    delete updatedVolume[oldVolumeSource];
-  }
-    
-  if (requiresDataVolume(diskState.diskSource)) {
-    updatedVolume.dataVolume = {
-      name: dvName,
-    };
-  } else if (diskState.diskSource === sourceTypes.EPHEMERAL) {
-    updatedVolume.containerDisk = {
-      image: diskSourceState.ephemeralSource,
-    };
-  } else if (diskState.diskSource === sourceTypes.PVC) {
-    updatedVolume.persistentVolumeClaim = {
-      claimName: diskSourceState.pvcSourceName,
-    };
-  }
-  return updatedVolume;
 };
 
 export const getDataVolumeFromState = (

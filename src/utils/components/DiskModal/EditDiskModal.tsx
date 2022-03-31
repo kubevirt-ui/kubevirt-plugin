@@ -19,12 +19,17 @@ import VolumeMode from './DiskFormFields/VolumeMode';
 import { DiskFormState, DiskSourceState } from './state/initialState';
 import { diskReducer, diskSourceReducer } from './state/reducers';
 import {
+  updateVMDataVolumeTemplates,
+  updateVMDisks,
+  updateVMVolumes,
+  updateVolume,
+} from './utils/editDiskModalHelpers';
+import {
   getDataVolumeFromState,
   getDataVolumeTemplate,
   getDiskFromState,
   produceVMDisks,
   requiresDataVolume,
-  updateVolume,
 } from './utils/helpers';
 
 type DiskModalProps = {
@@ -72,50 +77,25 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     const resultDataVolumeTemplate =
       sourceRequiresDataVolume && getDataVolumeTemplate(resultDataVolume);
 
-    const updatedVMDisks = [
-      ...(getDisks(vm)?.map((disk) => {
-        if (disk?.name === initialDiskState.diskName) {
-          return resultDisk;
-        }
-        return disk;
-      }) || [resultDisk]),
-    ];
+    const updatedVMDisks = updateVMDisks(getDisks(vm), resultDisk, initialDiskState.diskName);
 
-    const updatedVmVolumes = [
-      ...(getVolumes(vm)?.map((volume) => {
-        if (volume?.name === initialDiskState.diskName) {
-          return resultVolume;
-        }
-        return volume;
-      }) || [resultVolume]),
-    ];
+    const updatedVmVolumes = updateVMVolumes(
+      currentVmVolumes,
+      resultVolume,
+      initialDiskState.diskName,
+    );
 
-    const updatedDataVolumeTemplates = () => {
-      const dvTemplates = getDataVolumeTemplates(vm);
-      const { diskSource: initialDiskSource } = initialDiskState;
-      if (sourceRequiresDataVolume) {
-        if (requiresDataVolume(initialDiskSource)) {
-          return [
-            ...dvTemplates?.map((dataVolumeTemplate) => {
-              if (dataVolumeTemplate?.metadata?.name === resultDataVolumeTemplate?.metadata?.name) {
-                return resultDataVolumeTemplate;
-              }
-              return dataVolumeTemplate;
-            }),
-          ];
-        } else {
-          return dvTemplates?.length > 0
-            ? [...dvTemplates, resultDataVolumeTemplate]
-            : [resultDataVolumeTemplate];
-        }
-      }
-      return dvTemplates;
-    };
+    const updatedDataVolumeTemplates = updateVMDataVolumeTemplates(
+      getDataVolumeTemplates(vm),
+      resultDataVolumeTemplate,
+      initialDiskState.diskSource,
+      sourceRequiresDataVolume,
+    );
 
     const updatedVM = produceVMDisks(vm, (vmDraft) => {
       vmDraft.spec.template.spec.domain.devices.disks = updatedVMDisks;
       vmDraft.spec.template.spec.volumes = updatedVmVolumes;
-      vmDraft.spec.dataVolumeTemplates = updatedDataVolumeTemplates();
+      vmDraft.spec.dataVolumeTemplates = updatedDataVolumeTemplates;
       return vmDraft;
     });
 
