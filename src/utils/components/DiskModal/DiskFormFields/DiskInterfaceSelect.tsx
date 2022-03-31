@@ -67,6 +67,7 @@ const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
           onSelect={onSelect}
           variant={SelectVariant.single}
           selections={diskInterface}
+          direction="up"
         >
           {interfaceOptions.map(({ id, description, name }) => {
             const isDisabled =

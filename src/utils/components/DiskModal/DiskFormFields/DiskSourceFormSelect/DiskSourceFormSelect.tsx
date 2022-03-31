@@ -16,7 +16,7 @@ import {
   DiskSourceReducerActionType,
 } from '../../state/actions';
 import { DiskFormState, DiskSourceState } from '../../state/initialState';
-import { sourceTypes } from '../utils/constants';
+import { OTHER, sourceTypes } from '../utils/constants';
 import { getSourceOptions } from '../utils/helpers';
 
 import DiskSourceContainer from './components/DiskSourceContainer';
@@ -80,6 +80,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
           onSelect={onSelect}
           variant={SelectVariant.single}
           selections={diskSource}
+          isDisabled={diskSource === OTHER}
         >
           {sourceOptions.map(({ id, description, name }) => {
             const isDisabled =
@@ -158,7 +159,9 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
               payload: value,
             })
           }
-          setDiskSize={(value) => dispatchDiskState({ type: diskReducerActions.SET_DISK_SIZE, payload: value })}
+          setDiskSize={(value) =>
+            dispatchDiskState({ type: diskReducerActions.SET_DISK_SIZE, payload: value })
+          }
         />
       )}
     </>

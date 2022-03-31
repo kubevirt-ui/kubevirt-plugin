@@ -5,7 +5,6 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getVolumes } from '@kubevirt-utils/resources/vm';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import {
   k8sUpdate,
@@ -31,14 +30,13 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const columns = useDiskColumns();
-  const [disks, loaded, loadError] = useDisksTableData(vm);
+  const [disks, loaded, loadError, vmi] = useDisksTableData(vm);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
   const headerText =
     vm?.status?.printableStatus === printableVMStatus.Running
       ? t('Add disk (hot plugged)')
       : t('Add disk');
-  const vmVolumes = getVolumes(vm);
 
   return (
     <>
@@ -62,7 +60,7 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
           loadError={loadError}
           columns={columns}
           Row={DiskRow}
-          rowData={{ vmVolumes }}
+          rowData={{ vm, vmi }}
         />
       </ListPageBody>
       {isModalOpen && (

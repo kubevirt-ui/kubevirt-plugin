@@ -14,7 +14,10 @@ import {
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
-import { addNonPersistentVolume, addPersistentVolume } from '../../../../views/virtualmachines/actions/actions';
+import {
+  addNonPersistentVolume,
+  addPersistentVolume,
+} from '../../../../views/virtualmachines/actions/actions';
 import { sourceTypes } from '../DiskFormFields/utils/constants';
 import { DiskFormState, DiskSourceState } from '../state/initialState';
 
@@ -61,7 +64,12 @@ export const produceVMDisks = (
 };
 
 export const requiresDataVolume = (diskSource: string): boolean => {
-  return diskSource !== sourceTypes.EPHEMERAL && diskSource !== sourceTypes.PVC;
+  return [
+    sourceTypes.BLANK,
+    sourceTypes.HTTP,
+    sourceTypes.CLONE_PVC,
+    sourceTypes.REGISTRY,
+  ].includes(diskSource);
 };
 
 export const getDiskFromState = (diskState: DiskFormState): V1Disk => ({
@@ -87,8 +95,7 @@ export const getVolumeFromState = (
     volume.containerDisk = {
       image: diskSourceState.ephemeralSource,
     };
-  } else {
-    // diskState.diskSource === sourceTypes.PVC
+  } else if (diskState.diskSource === sourceTypes.PVC) {
     volume.persistentVolumeClaim = {
       claimName: diskSourceState.pvcSourceName,
     };

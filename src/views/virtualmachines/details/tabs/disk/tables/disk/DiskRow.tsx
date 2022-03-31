@@ -1,40 +1,26 @@
 import * as React from 'react';
 
-import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  CONTAINER_EPHERMAL,
+  OTHER,
+} from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Label } from '@patternfly/react-core';
 
-const DiskRow: React.FC<RowProps<DiskRowDataLayout, { vmVolumes: V1Volume[] }>> = ({
-  obj,
-  activeColumnIDs,
-  rowData: { vmVolumes },
-}) => {
-  const { t } = useKubevirtTranslation();
-  const isPVCSource = !['Container (Ephemeral)', 'Other'].includes(obj?.source);
-  const HotplugLabel = React.useMemo(() => {
-    const volume = vmVolumes?.find((vol) => vol.name === obj?.name);
-    let hotplugLabel: string = null;
-    if (!volume) {
-      hotplugLabel = t('AutoDetach Hotplug');
-    }
-    if (volume?.persistentVolumeClaim?.hotpluggable || volume?.dataVolume?.hotpluggable) {
-      hotplugLabel = t('Persistent Hotplug');
-    }
-    return hotplugLabel ? (
-      <Label variant="filled" color="purple">
-        {hotplugLabel}
-      </Label>
-    ) : (
-      hotplugLabel
-    );
-  }, [obj, vmVolumes, t]);
+import DiskRowActions from './DiskRowActions';
+import { HotplugLabel } from './HotplugLabel';
+
+const DiskRow: React.FC<
+  RowProps<DiskRowDataLayout, { vm: V1VirtualMachine; vmi?: V1VirtualMachineInstance }>
+> = ({ obj, activeColumnIDs, rowData: { vm, vmi } }) => {
+  const isPVCSource = ![CONTAINER_EPHERMAL, OTHER].includes(obj?.source);
+
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        {obj?.name} {HotplugLabel}
+        {obj?.name} <HotplugLabel vm={vm} diskName={obj?.name} vmi={vmi} />
       </TableData>
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
         {isPVCSource ? (
@@ -60,7 +46,7 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout, { vmVolumes: V1Volume[] }>> 
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
-        ...
+        <DiskRowActions vm={vm} diskName={obj?.name} pvcResourceExists={isPVCSource} vmi={vmi} />
       </TableData>
     </>
   );

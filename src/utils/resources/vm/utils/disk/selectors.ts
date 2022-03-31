@@ -1,6 +1,7 @@
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { interfaceTypes } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
 
-import { diskTypesLabels } from './constants';
+import { diskTypes, diskTypesLabels } from './constants';
 
 /**
  * returns a drive type from a disk
@@ -8,8 +9,8 @@ import { diskTypesLabels } from './constants';
  * @returns drive type
  */
 export const getDiskDrive = (disk: V1Disk): string => {
-  const drive = Object.keys(diskTypesLabels).find((driveType: string) => disk[driveType] ?? 'disk');
-  return drive;
+  const drive = Object.keys(diskTypesLabels).find((driveType: string) => disk[driveType]);
+  return drive ?? diskTypes.disk;
 };
 
 /**
@@ -33,7 +34,7 @@ export const getDiskInterface = (disk: V1Disk): string => disk[getDiskDrive(disk
  */
 export const getPrintableDiskInterface = (disk: V1Disk): string => {
   const diskInterface = getDiskInterface(disk);
-  if (diskInterface === 'scsi' || diskInterface === 'sata') {
+  if (diskInterface === interfaceTypes.SCSI || diskInterface === interfaceTypes.SATA) {
     return diskInterface.toUpperCase();
   }
   return diskInterface ?? '';
