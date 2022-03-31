@@ -17,7 +17,7 @@ const VirtualMachinesInstancePageDetailsTab: React.FC<
   VirtualMachinesInstancePageDetailsTabProps
 > = ({ obj: vmi, location }) => {
   return (
-    <div className="VirtualMachinesInstanceDetailsTab co-m-pane__body">
+    <div className="VirtualMachinesInstanceDetailsTab">
       <PageSection>
         <Details vmi={vmi} pathname={location?.pathname} />
       </PageSection>
