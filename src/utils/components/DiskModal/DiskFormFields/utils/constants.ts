@@ -1,3 +1,5 @@
+import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { ConfigMapModel, PersistentVolumeClaimModel, SecretModel, ServiceAccountModel } from '@kubevirt-utils/models';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export const OTHER = 'Other';
@@ -17,11 +19,20 @@ export const volumeTypes = {
   DATA_VOLUME: 'dataVolume',
   PERSISTENT_VOLUME_CLAIM: 'persistentVolumeClaim',
   CONTAINER_DISK: 'containerDisk',
+  CLOUD_INIT_CONFIG_DRIVE: 'cloudInitConfigDrive',
   CLOUD_INIT_NO_CLOUD: 'cloudInitNoCloud',
   CONFIG_MAP: 'configMap',
   SECRET: 'secret',
   SERVICE_ACCOUNT: 'serviceAccount',
 };
+
+export const mapVolumeTypeToK8sModel = {
+  [volumeTypes.DATA_VOLUME]: DataVolumeModel,
+  [volumeTypes.PERSISTENT_VOLUME_CLAIM]: PersistentVolumeClaimModel,
+  [volumeTypes.CONFIG_MAP]: ConfigMapModel,
+  [volumeTypes.SECRET]: SecretModel,
+  [volumeTypes.SERVICE_ACCOUNT]: ServiceAccountModel,
+}
 
 export const mapSourceTypeToVolumeType = {
   [sourceTypes.BLANK]: volumeTypes.DATA_VOLUME,

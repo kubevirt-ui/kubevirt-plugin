@@ -93,3 +93,25 @@ export const buildOwnerReference = (
   blockOwnerDeletion: opts && opts.blockOwnerDeletion,
   controller: opts && opts.controller,
 });
+
+/**
+ * function to compare two OwnerReference objects
+ * @param {OwnerReference} obj first object to compare
+ * @param {OwnerReference} otherObj second object to compare
+ * @returns a boolean indicating if the objects are equal
+ */
+export const compareOwnerReferences = (obj: OwnerReference, otherObj: OwnerReference): boolean => {
+  if (obj === otherObj) {
+    return true;
+  }
+  if (!obj || !otherObj) {
+    return false;
+  }
+
+  return (
+    obj?.uid === otherObj?.uid ||
+    obj?.name === otherObj?.name ||
+    obj?.apiVersion === otherObj?.apiVersion ||
+    obj?.kind === otherObj?.kind
+  );
+};

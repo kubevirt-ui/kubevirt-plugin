@@ -4,7 +4,8 @@ import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generato
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 
-import { interfaceTypes, sourceTypes } from './constants';
+import { interfaceTypes, sourceTypes, volumeTypes } from './constants';
+import { V1DataVolumeTemplateSpec, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export const getSourceOptions = (t: TFunction) => ({
   blank: {
@@ -98,6 +99,33 @@ export const getInterfaceOptions = (t: TFunction) => ({
     ),
   },
 });
+
+export const getVolumeType = (volume: V1Volume): string => {
+  const volumeType = Object.keys(volume)?.find((key) => Object.values(volumeTypes).includes(key));
+  return volumeType;
+};
+
+export const getDataVolumeTemplateSourceType = (dvTemplate: V1DataVolumeTemplateSpec): string => {
+  const sourceType = Object.keys(dvTemplate?.spec?.source).find((key) => Object.values(sourceTypes).includes(key));
+  return sourceType;
+}
+
+export const getVolumeResourceName = (volume: V1Volume): string => {
+  const volumeType = getVolumeType(volume);
+  if (volumeType === volumeTypes.PERSISTENT_VOLUME_CLAIM) {
+    return volume?.persistentVolumeClaim?.claimName;
+  }
+  if (volumeType === volumeTypes.DATA_VOLUME || volumeType === volumeTypes.CONFIG_MAP) {
+    return volume?.[volumeType]?.name;
+  }
+  if (volumeType === volumeTypes.SECRET) {
+    return volume?.[volumeType]?.secretName;
+  }
+  if (volumeType === volumeTypes.SERVICE_ACCOUNT) {
+    return volume?.[volumeType]?.serviceAccountName;
+  }
+  return null;
+};
 
 export const isDefaultStorageClass = (storageClass: IoK8sApiStorageV1StorageClass): boolean =>
   Boolean(storageClass?.metadata?.annotations?.['storageclass.kubernetes.io/is-default-class']);
