@@ -2,9 +2,12 @@ import * as React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
+import {
+  getTemplateName,
+  getTemplateVirtualMachineObject,
+} from '@kubevirt-utils/resources/template/utils/selectors';
 
-import { useWizardVMContext } from '../../../utils/WizardVMContext';
+import { ensurePath, useWizardVMContext } from '../../../utils/WizardVMContext';
 import { DEFAULT_NAMESPACE } from '../../constants';
 import { processTemplate } from '../../utils';
 
@@ -23,7 +26,7 @@ export const useCustomizeFormSubmit = (
   const [templateLoaded, setTemplateLoaded] = React.useState(true);
   const [templateError, setTemplateError] = React.useState<any>();
 
-  const { updateVM, loaded: vmLoaded, error: vmError } = useWizardVMContext();
+  const { updateVM, updateTabsData, loaded: vmLoaded, error: vmError } = useWizardVMContext();
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -35,12 +38,15 @@ export const useCustomizeFormSubmit = (
       const vm = getTemplateVirtualMachineObject(processedTemplate);
       vm.metadata.namespace = ns || DEFAULT_NAMESPACE;
 
+      // keep template's name and namespace for navigation
+      updateTabsData((tabsDataDraft) => {
+        ensurePath(tabsDataDraft, 'overview.templateMetadata');
+        tabsDataDraft.overview.templateMetadata.name = template.metadata.name;
+        tabsDataDraft.overview.templateMetadata.namespace = template.metadata.namespace;
+        tabsDataDraft.overview.templateMetadata.displayName = getTemplateName(template);
+      });
       await updateVM(vm);
-      history.push(
-        `/k8s/ns/${ns || 'default'}/templatescatalog/review?name=${
-          template.metadata.name
-        }&namespace=${template.metadata.namespace}`,
-      );
+      history.push(`/k8s/ns/${ns || 'default'}/templatescatalog/review`);
 
       setTemplateError(undefined);
     } catch (error) {

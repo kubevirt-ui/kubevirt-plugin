@@ -6,7 +6,7 @@ import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/De
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
-import { ANNOTATIONS, getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
+import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import { WizardVMContextType } from '../../../utils/WizardVMContext';
@@ -17,23 +17,19 @@ import { WizardOverviewNetworksTable } from './components/WizardOverviewNetworks
 
 import './WizardOverviewTab.scss';
 
-const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
+const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, tabsData, updateVM }) => {
   const history = useHistory();
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const os = getAnnotation(
-    vm,
-    ANNOTATIONS.displayName,
-    vm?.spec?.template?.metadata?.annotations?.['vm.kubevirt.io/os'],
-  );
   const flavor = getVmCPUMemory(vm);
   const description = getAnnotation(vm, 'description');
   const workloadAnnotation = vm?.spec?.template?.metadata?.annotations?.['vm.kubevirt.io/workload'];
   const networks = vm?.spec?.template?.spec?.networks;
   const interfaces = vm?.spec?.template?.spec?.domain?.devices?.interfaces;
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
+  const displayName = tabsData?.overview?.templateMetadata?.displayName;
 
   return (
     <div className="co-m-pane__body">
@@ -83,7 +79,7 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
               }}
             />
 
-            <WizardDescriptionItem title={t('Operating system')} description={os} />
+            <WizardDescriptionItem title={t('Operating system')} description={displayName} />
 
             <WizardDescriptionItem
               className="wizard-overview-description-left-column"
