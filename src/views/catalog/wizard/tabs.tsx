@@ -16,7 +16,7 @@ import WizardScriptsTab from './tabs/scripts/WizardScriptsTab';
 import WizardYAMLTab from './tabs/yaml/WizardYAMLTab';
 
 const withVmContext = (Page: React.FC<WizardVMContextType>) => (props) => {
-  const { vm, updateVM, loaded, error } = useWizardVMContext();
+  const { vm, updateVM, loaded, error, disableVmCreate, setDisableVmCreate } = useWizardVMContext();
 
   if (!vm && !loaded) {
     return (
@@ -26,7 +26,17 @@ const withVmContext = (Page: React.FC<WizardVMContextType>) => (props) => {
     );
   }
 
-  return <Page vm={vm} loaded={loaded} updateVM={updateVM} error={error} {...props} />;
+  return (
+    <Page
+      vm={vm}
+      loaded={loaded}
+      updateVM={updateVM}
+      error={error}
+      disableVmCreate={disableVmCreate}
+      setDisableVmCreate={setDisableVmCreate}
+      {...props}
+    />
+  );
 };
 
 export const wizardNavPages: NavPage[] = [
@@ -46,8 +56,8 @@ export const wizardNavPages: NavPage[] = [
     component: withVmContext(WizardSchedulingTab),
   },
   {
-    href: 'enviornment',
-    name: 'Enviornment',
+    href: 'environment',
+    name: 'Environment',
     component: withVmContext(WizardEnvironmentTab),
   },
   {
