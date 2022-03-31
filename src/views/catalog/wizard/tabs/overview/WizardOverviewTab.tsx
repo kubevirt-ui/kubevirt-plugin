@@ -3,6 +3,7 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS, getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
@@ -20,6 +21,7 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
   const history = useHistory();
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
 
   const os = getAnnotation(
     vm,
@@ -32,9 +34,6 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
   const networks = vm?.spec?.template?.spec?.networks;
   const interfaces = vm?.spec?.template?.spec?.domain?.devices?.interfaces;
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
-
-  const [isDescriptionModalOpen, setIsDescriptionModalOpen] = React.useState(false);
-  const [isCPUMemoryModalOpen, setIsCPUMemoryModalOpen] = React.useState(false);
 
   return (
     <div className="co-m-pane__body">
@@ -60,24 +59,27 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
               title={t('Description')}
               description={description}
               isEdit
-              onEditClick={() => setIsDescriptionModalOpen(true)}
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <DescriptionModal
+                    obj={vm}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onSubmit={(updatedDescription) => {
+                      return updateVM((vmDraft) => {
+                        if (updatedDescription) {
+                          vmDraft.metadata.annotations['description'] = updatedDescription;
+                        } else {
+                          delete vmDraft.metadata.annotations['description'];
+                        }
+                      });
+                    }}
+                  />
+                ))
+              }
               helperPopover={{
                 header: t('Description'),
                 content: t('Description of the VirtualMachine'),
-              }}
-            />
-            <DescriptionModal
-              obj={vm}
-              isOpen={isDescriptionModalOpen}
-              onClose={() => setIsDescriptionModalOpen(false)}
-              onSubmit={(updatedDescription) => {
-                return updateVM((vmDraft) => {
-                  if (updatedDescription) {
-                    vmDraft.metadata.annotations['description'] = updatedDescription;
-                  } else {
-                    delete vmDraft.metadata.annotations['description'];
-                  }
-                });
               }}
             />
 
@@ -87,18 +89,16 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
               className="wizard-overview-description-left-column"
               title={t('CPU | Memory')}
               isEdit
-              onEditClick={() => setIsCPUMemoryModalOpen(true)}
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <CPUMemoryModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
+                ))
+              }
               description={
                 <>
                   {t('CPU')} {flavor?.cpuCount} | {t('Memory')} {flavor?.memory}
                 </>
               }
-            />
-            <CPUMemoryModal
-              vm={vm}
-              isOpen={isCPUMemoryModalOpen}
-              onClose={() => setIsCPUMemoryModalOpen(false)}
-              onSubmit={updateVM}
             />
 
             <WizardDescriptionItem

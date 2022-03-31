@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { WizardVMContextType } from 'src/views/catalog/utils/WizardVMContext';
 
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ListPageBody,
@@ -13,26 +14,31 @@ import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
 
 const WizardNetworkTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
   const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
 
   const actionText = t('Add Network Interface');
-  const [isOpen, setIsOpen] = React.useState(false);
   return (
     <>
       <ListPageHeader title="">
-        <ListPageCreateButton onClick={() => setIsOpen(true)}>{actionText}</ListPageCreateButton>
+        <ListPageCreateButton
+          onClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <NetworkInterfaceModal
+                isOpen={isOpen}
+                onClose={onClose}
+                headerText={actionText}
+                vm={vm}
+                updateVM={updateVM}
+              />
+            ))
+          }
+        >
+          {actionText}
+        </ListPageCreateButton>
       </ListPageHeader>
       <ListPageBody>
         <NetworkInterfaceList vm={vm} />
       </ListPageBody>
-      {isOpen && (
-        <NetworkInterfaceModal
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          headerText={actionText}
-          vm={vm}
-          updateVM={updateVM}
-        />
-      )}
     </>
   );
 };
