@@ -1,0 +1,120 @@
+import * as React from 'react';
+import produce from 'immer';
+
+import { V1GPU, V1HostDevice, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { Button, Form, FormGroup, Grid } from '@patternfly/react-core';
+import { CheckCircleIcon, PlusCircleIcon, TrashIcon } from '@patternfly/react-icons';
+
+import DeviceNameSelect from './form/DeviceNameSelect';
+import NameFormField from './form/NameFormField';
+import PlainIconButton from './form/PlainIconButton';
+import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
+import HardwareDevicesList from './list/HardwareDevicesList';
+import { HARDWARE_DEVICE_TYPE } from './utils/constants';
+
+type HardwareDevicesModalProps = {
+  vm: V1VirtualMachine;
+  isOpen: boolean;
+  onClose: () => void;
+  headerText: string;
+  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  initialDevices: V1GPU[] | V1HostDevice[];
+  btnText: string;
+  type: HARDWARE_DEVICE_TYPE.GPUS | HARDWARE_DEVICE_TYPE.HOST_DEVICES;
+};
+
+const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
+  vm,
+  isOpen,
+  onClose,
+  headerText,
+  onSubmit,
+  initialDevices,
+  btnText,
+  type,
+}) => {
+  const [devices, setDevices] = React.useState<V1GPU[] | V1HostDevice[]>(initialDevices);
+  const [name, setName] = React.useState<string>();
+  const [deviceName, setDeviceName] = React.useState<string>();
+  const [showForm, setShowForm] = React.useState<boolean>(false);
+  const [addButtonDisabled, setAddButtonDisabled] = React.useState<boolean>(false);
+
+  const permittedHostDevices = useHCPermittedHostDevices();
+
+  const onAddDevice = () => {
+    setShowForm(true);
+    setAddButtonDisabled(true);
+  };
+
+  const onRemoveDevice = (device: V1GPU | V1HostDevice) => {
+    setDevices((prevDevices) => prevDevices?.filter((d) => d.name !== device.name));
+  };
+
+  const onCancel = () => {
+    setShowForm(false);
+    setAddButtonDisabled(false);
+    setName(null);
+    setDeviceName(null);
+  };
+
+  const onConfirm = () => {
+    setDevices((prevDevices) => [...(prevDevices || []), { name, deviceName }]);
+    setShowForm(false);
+    setAddButtonDisabled(false);
+    setName(null);
+    setDeviceName(null);
+  };
+
+  const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {
+    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
+      if (type === 'gpus') {
+        vmDraft.spec.template.spec.domain.devices.gpus = [...(devices || [])];
+      } else {
+        vmDraft.spec.template.spec.domain.devices.hostDevices = [...(devices || [])];
+      }
+    });
+    return updatedVM;
+  }, [devices, type, vm]);
+  return (
+    <TabModal
+      obj={updatedVirtualMachine}
+      onSubmit={onSubmit}
+      isOpen={isOpen}
+      onClose={onClose}
+      headerText={headerText}
+    >
+      <Form>
+        <HardwareDevicesList devices={devices} handleRemoveDevice={onRemoveDevice} />
+        {showForm && (
+          <Grid hasGutter>
+            <NameFormField name={name} setName={setName} />
+            <DeviceNameSelect
+              deviceName={deviceName}
+              setDeviceName={setDeviceName}
+              permittedHostDevices={permittedHostDevices}
+            />
+            <PlainIconButton
+              onClick={onConfirm}
+              icon={<CheckCircleIcon />}
+              fieldId="confirm-add-device"
+            />
+            <PlainIconButton onClick={onCancel} icon={<TrashIcon />} fieldId="cancel-add-device" />
+          </Grid>
+        )}
+        <FormGroup fieldId="add-button">
+          <Button
+            variant="link"
+            icon={<PlusCircleIcon />}
+            onClick={onAddDevice}
+            isDisabled={addButtonDisabled}
+          >
+            {btnText}
+          </Button>
+        </FormGroup>
+      </Form>
+    </TabModal>
+  );
+};
+
+export default HardwareDevicesModal;
