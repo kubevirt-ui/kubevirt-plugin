@@ -36,7 +36,7 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
         return sourceName;
       };
       const dataVolumeTemplate = vm?.spec?.dataVolumeTemplates?.find(
-        (dvTemplate) => dvTemplate?.metadata.name === device?.volume?.name,
+        (dvTemplate) => dvTemplate?.metadata.name === device?.volume?.dataVolume?.name,
       );
 
       const size =
