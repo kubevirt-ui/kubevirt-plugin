@@ -19,7 +19,13 @@ const useVirtualMachineTemplatesColumns = (): TableColumn<K8sResourceCommon>[] =
       sort: 'metadata.namespace',
     },
     {
-      title: t('Boot source availability'),
+      title: t('Workload profile'),
+      id: 'workload',
+      transforms: [sortable],
+      sort: 'objects[0].spec.template.metadata.annotations.["vm.kubevirt.io/workload"]',
+    },
+    {
+      title: t('Boot source'),
       id: 'availability',
     },
     {

@@ -49,6 +49,25 @@ export const OS_NAME_LABELS = {
   [OS_NAME_TYPES.other]: 'Other',
 };
 
+export const OS_NAMES = [
+  {
+    id: OS_NAME_TYPES.rhel,
+    title: OS_NAME_LABELS.rhel,
+  },
+  {
+    id: OS_NAME_TYPES.fedora,
+    title: OS_NAME_LABELS.fedora,
+  },
+  {
+    id: OS_NAME_TYPES.centos,
+    title: OS_NAME_LABELS.centos,
+  },
+  {
+    id: OS_NAME_TYPES.windows,
+    title: OS_NAME_LABELS.windows,
+  },
+];
+
 export enum BOOT_SOURCE {
   PVC = 'PVC',
   PVC_AUTO_UPLOAD = 'PVC_AUTO_UPLOAD',
