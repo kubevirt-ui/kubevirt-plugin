@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   Alert,
@@ -21,13 +20,12 @@ import { clearSessionStorageVM, useWizardVMContext } from '../../utils/WizardVMC
 export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => {
   const history = useHistory();
   const { t } = useKubevirtTranslation();
-  const { params } = useURLParams();
-  const templateName = params.get('name');
-  const templateNamespace = params.get('namespace');
 
   const [startVM, setStartVM] = React.useState(true);
-  const { vm, loaded: vmContextLoaded, disableVmCreate } = useWizardVMContext();
+  const { vm, loaded: vmContextLoaded, disableVmCreate, tabsData } = useWizardVMContext();
   const { createVM, loaded: vmCreateLoaded, error: vmCreateError } = useWizardVmCreate();
+  const templateName = tabsData?.overview?.templateMetadata?.name;
+  const templateNamespace = tabsData?.overview?.templateMetadata?.namespace;
 
   const onCreate = () =>
     createVM(vm, {
@@ -76,6 +74,7 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
               <Button
                 variant="secondary"
                 onClick={() =>
+                  confirm(t('Are you sure you want to go back?')) &&
                   history.push(
                     `/k8s/ns/${namespace}/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
                   )
@@ -88,7 +87,10 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
           <SplitItem>
             <Button
               variant="link"
-              onClick={() => history.push(`/k8s/ns/${namespace}/templatescatalog`)}
+              onClick={() =>
+                confirm(t('Are you sure you want to cancel?')) &&
+                history.push(`/k8s/ns/${namespace}/templatescatalog`)
+              }
             >
               {t('Cancel')}
             </Button>

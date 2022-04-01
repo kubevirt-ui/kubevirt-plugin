@@ -16,7 +16,16 @@ import WizardScriptsTab from './tabs/scripts/WizardScriptsTab';
 import WizardYAMLTab from './tabs/yaml/WizardYAMLTab';
 
 const withVmContext = (Page: React.FC<WizardVMContextType>) => (props) => {
-  const { vm, updateVM, loaded, error, disableVmCreate, setDisableVmCreate } = useWizardVMContext();
+  const {
+    vm,
+    updateVM,
+    loaded,
+    error,
+    disableVmCreate,
+    setDisableVmCreate,
+    tabsData,
+    updateTabsData,
+  } = useWizardVMContext();
 
   if (!vm && !loaded) {
     return (
@@ -34,6 +43,8 @@ const withVmContext = (Page: React.FC<WizardVMContextType>) => (props) => {
       error={error}
       disableVmCreate={disableVmCreate}
       setDisableVmCreate={setDisableVmCreate}
+      tabsData={tabsData}
+      updateTabsData={updateTabsData}
       {...props}
     />
   );
