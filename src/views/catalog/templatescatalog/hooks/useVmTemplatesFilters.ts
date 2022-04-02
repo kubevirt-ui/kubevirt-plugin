@@ -3,53 +3,66 @@ import * as React from 'react';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 
+import { CATALOG_FILTERS } from '../utils/consts';
+
 export type TemplateFilters = {
-  onlyDefault: boolean;
-  onlyAvailable: boolean;
-  query: string;
-  osName: Set<string>;
-  workload: Set<string>;
+  [CATALOG_FILTERS.ONLY_DEFAULT]: boolean;
+  [CATALOG_FILTERS.ONLY_AVAILABLE]: boolean;
+  [CATALOG_FILTERS.IS_LIST]: boolean;
+  [CATALOG_FILTERS.QUERY]: string;
+  [CATALOG_FILTERS.OS_NAME]: Set<string>;
+  [CATALOG_FILTERS.WORKLOAD]: Set<string>;
 };
 
 export const useTemplatesFilters = (): [
   TemplateFilters,
-  (type: string, value: string) => void,
+  (type: CATALOG_FILTERS, value: string | boolean) => void,
   () => void,
 ] => {
   const [isAdmin] = useIsAdmin();
   const { params, appendParam, setParam, deleteParam } = useURLParams();
-  const onlyDefaultParam = params.get('onlyDefault');
+  const onlyDefaultParam = params.get(CATALOG_FILTERS.ONLY_DEFAULT);
 
   const [filters, setFilters] = React.useState<TemplateFilters>({
-    onlyDefault: isAdmin,
-    onlyAvailable: params.get('onlyAvailable') === 'true',
-    query: params.get('query') || '',
-    osName: new Set([...params.getAll('osName')]),
-    workload: new Set([...params.getAll('workload')]),
+    [CATALOG_FILTERS.ONLY_DEFAULT]: isAdmin,
+    [CATALOG_FILTERS.ONLY_AVAILABLE]: params.get(CATALOG_FILTERS.ONLY_AVAILABLE) === 'true',
+    [CATALOG_FILTERS.IS_LIST]: params.get(CATALOG_FILTERS.IS_LIST) === 'true',
+    [CATALOG_FILTERS.QUERY]: params.get(CATALOG_FILTERS.QUERY) || '',
+    [CATALOG_FILTERS.OS_NAME]: new Set([...params.getAll(CATALOG_FILTERS.OS_NAME)]),
+    [CATALOG_FILTERS.WORKLOAD]: new Set([...params.getAll(CATALOG_FILTERS.WORKLOAD)]),
   });
 
-  const updateFilter = (type: string, value: string | boolean) =>
+  const updateFilter = (type: CATALOG_FILTERS, value: string | boolean) =>
     setFilters((prev) => ({
       ...prev,
       [type]: value,
     }));
 
-  const onSelect = (type: string, value: any) => {
+  const onFilterChange = (type: CATALOG_FILTERS, value: any) => {
     switch (type) {
-      case 'onlyDefault':
+      case CATALOG_FILTERS.ONLY_DEFAULT:
         {
-          updateFilter('onlyDefault', value);
-          setParam('onlyDefault', value.toString());
+          updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, value);
+          setParam(CATALOG_FILTERS.ONLY_DEFAULT, value.toString());
         }
         break;
-      case 'onlyAvailable':
+
+      case CATALOG_FILTERS.ONLY_AVAILABLE:
         {
-          updateFilter('onlyAvailable', value);
-          setParam('onlyAvailable', value.toString());
+          updateFilter(CATALOG_FILTERS.ONLY_AVAILABLE, value);
+          setParam(CATALOG_FILTERS.ONLY_AVAILABLE, value.toString());
         }
         break;
-      case 'query':
-        updateFilter('query', value);
+
+      case CATALOG_FILTERS.IS_LIST:
+        {
+          updateFilter(CATALOG_FILTERS.IS_LIST, value);
+          setParam(CATALOG_FILTERS.IS_LIST, value.toString());
+        }
+        break;
+
+      case CATALOG_FILTERS.QUERY:
+        updateFilter(CATALOG_FILTERS.QUERY, value);
         break;
 
       default: {
@@ -72,11 +85,12 @@ export const useTemplatesFilters = (): [
 
   const clearAll = () => {
     setFilters({
-      onlyDefault: isAdmin,
-      onlyAvailable: false,
-      query: '',
-      osName: new Set(),
-      workload: new Set(),
+      [CATALOG_FILTERS.ONLY_DEFAULT]: isAdmin,
+      [CATALOG_FILTERS.ONLY_AVAILABLE]: false,
+      [CATALOG_FILTERS.IS_LIST]: filters.isList,
+      [CATALOG_FILTERS.QUERY]: '',
+      [CATALOG_FILTERS.OS_NAME]: new Set(),
+      [CATALOG_FILTERS.WORKLOAD]: new Set(),
     });
     Object.keys(filters).forEach((key) => {
       deleteParam(key);
@@ -85,12 +99,12 @@ export const useTemplatesFilters = (): [
 
   React.useEffect(() => {
     if (onlyDefaultParam) {
-      updateFilter('onlyDefault', onlyDefaultParam === 'true');
+      updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, onlyDefaultParam === 'true');
     } else {
-      updateFilter('onlyDefault', isAdmin);
+      updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, isAdmin);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin, onlyDefaultParam]);
 
-  return [filters, onSelect, clearAll];
+  return [filters, onFilterChange, clearAll];
 };
