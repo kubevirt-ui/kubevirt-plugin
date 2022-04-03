@@ -13,15 +13,16 @@ import {
 import { css } from '@patternfly/react-styles';
 import styles from '@patternfly/react-styles/css/components/Consoles/VncConsole';
 
-import { VNCState, WS, WSS } from './utils/VNCConsoleConsts';
+import { ConsoleState, WS, WSS } from '../utils/ConsoleConsts';
+
 import { VncConsoleProps } from './utils/VncConsoleTypes';
 import VncConsoleActions from './VncConsoleActions';
 
 import '@patternfly/react-styles/css/components/Consoles/VncConsole.css';
 
-const { connected, connecting, disconnected } = VNCState;
+const { connected, connecting, disconnected } = ConsoleState;
 
-export const VncConsole: React.FunctionComponent<VncConsoleProps> = ({
+export const VncConsole: React.FC<VncConsoleProps> = ({
   children,
   host,
   port = '80',
@@ -48,7 +49,7 @@ export const VncConsole: React.FunctionComponent<VncConsoleProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [rfb, setRfb] = React.useState<any>();
-  const [status, setStatus] = React.useState<VNCState>(disconnected);
+  const [status, setStatus] = React.useState<ConsoleState>(disconnected);
   const staticRenderLocaitonRef = React.useRef(null);
   const StaticRenderLocaiton = React.useMemo(
     () => <div id={consoleContainerId} ref={staticRenderLocaitonRef} />,
