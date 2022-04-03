@@ -14,11 +14,11 @@ type DescriptionModalProps = {
 export const DescriptionModal: React.FC<DescriptionModalProps> = React.memo(
   ({ isOpen, obj, onClose, onSubmit }) => {
     const { t } = useKubevirtTranslation();
-    const [description, setDescription] = React.useState(obj.metadata?.annotations?.description);
+    const [description, setDescription] = React.useState(obj?.metadata?.annotations?.description);
 
     // reset description when modal is closed
     React.useEffect(() => {
-      setDescription(obj.metadata?.annotations?.description);
+      setDescription(obj?.metadata?.annotations?.description);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen]);
 
@@ -32,7 +32,7 @@ export const DescriptionModal: React.FC<DescriptionModalProps> = React.memo(
       >
         <TextArea
           autoFocus
-          defaultValue={obj.metadata?.annotations?.description}
+          defaultValue={obj?.metadata?.annotations?.description}
           value={description}
           onChange={setDescription}
           resizeOrientation="vertical"

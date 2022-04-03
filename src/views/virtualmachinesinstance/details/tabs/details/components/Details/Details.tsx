@@ -49,7 +49,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               <Namespace namespace={vmi?.metadata?.namespace} />
               <Labels labels={vmi?.metadata?.labels} />
               <Annotations annotations={vmi?.metadata?.annotations} />
-              <Description description={vmi?.metadata?.labels?.description} />
+              <Description vmi={vmi} />
               <OperationSystem vmi={vmi} />
               <CreateAt timestamp={vmi?.metadata?.creationTimestamp} />
               <Owner
