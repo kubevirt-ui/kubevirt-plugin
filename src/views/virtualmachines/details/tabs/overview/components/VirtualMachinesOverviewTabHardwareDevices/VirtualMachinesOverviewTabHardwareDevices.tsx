@@ -1,7 +1,77 @@
 import * as React from 'react';
 
-const VirtualMachinesOverviewTabHardwareDevices = () => {
-  return <div>VirtualMachinesOverviewTabHardwareDevices</div>;
+import { V1GPU, V1HostDevice, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  Card,
+  CardBody,
+  CardTitle,
+  Divider,
+  Tab,
+  Tabs,
+  TabTitleText,
+} from '@patternfly/react-core';
+
+import useHardwareDevicesColumns from './hooks/useHardwareDevicesColumns';
+import VirtualMachinesOverviewTabHardwareDevicesRow from './VirtualMachinesOverviewTabHardwareDevicesRow';
+
+import './virtual-machines-overview-tab-hardware-devices.scss';
+type VirtualMachinesOverviewTabHardwareDevicesProps = {
+  vm: V1VirtualMachine;
+};
+
+const VirtualMachinesOverviewTabHardwareDevices: React.FC<
+  VirtualMachinesOverviewTabHardwareDevicesProps
+> = ({ vm }) => {
+  const { t } = useKubevirtTranslation();
+  const columns = useHardwareDevicesColumns();
+  const [activeTabKey, setActiveTabKey] = React.useState<string | number>(0);
+  const hostDevices = getHostDevices(vm);
+  const gpus = getGPUDevices(vm);
+
+  const handleTabClick = (
+    _: React.MouseEvent<HTMLElement, MouseEvent>,
+    tabIndex: string | number,
+  ) => {
+    setActiveTabKey(tabIndex);
+  };
+
+  return (
+    <div className="VirtualMachinesOverviewTabHardware--main">
+      <Card>
+        <CardTitle className="text-muted">
+          {t('Hardware Devices ({{count}})', { count: hostDevices?.length + gpus?.length || 0 })}
+        </CardTitle>
+        <Divider />
+        <CardBody isFilled>
+          <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
+            <Tab eventKey={0} title={<TabTitleText>{t('GPU Devices')}</TabTitleText>}>
+              <VirtualizedTable<V1GPU>
+                data={gpus}
+                unfilteredData={gpus}
+                loaded
+                loadError={false}
+                columns={columns}
+                Row={VirtualMachinesOverviewTabHardwareDevicesRow}
+              />
+            </Tab>
+            <Tab eventKey={1} title={<TabTitleText>{t('Host Devices')}</TabTitleText>}>
+              <VirtualizedTable<V1HostDevice>
+                data={hostDevices}
+                unfilteredData={hostDevices}
+                loaded
+                loadError={false}
+                columns={columns}
+                Row={VirtualMachinesOverviewTabHardwareDevicesRow}
+              />
+            </Tab>
+          </Tabs>
+        </CardBody>
+      </Card>
+    </div>
+  );
 };
 
 export default VirtualMachinesOverviewTabHardwareDevices;

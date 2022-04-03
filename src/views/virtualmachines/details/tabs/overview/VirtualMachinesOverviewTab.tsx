@@ -28,7 +28,7 @@ const VirtualMachinesOverviewTab: React.FC<VirtualMachinesOverviewTabProps> = ({
             <VirtualMachinesOverviewTabUtilization />
           </GridItem>
           <GridItem>
-            <VirtualMachinesOverviewTabHardwareDevices />
+            <VirtualMachinesOverviewTabHardwareDevices vm={vm} />
           </GridItem>
         </Grid>
       </GridItem>
