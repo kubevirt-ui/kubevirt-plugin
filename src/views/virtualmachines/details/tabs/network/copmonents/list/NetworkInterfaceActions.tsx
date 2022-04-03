@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal, { DeleteResourceMessege } from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
@@ -30,20 +31,45 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   nicPresentation,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const deleteModalHeader = t('Delete {{nicName}} NIC', { nicName });
   const editBtnText = t('Edit');
   const deleteBtnText = t('Delete');
 
   const onEditModalOpen = () => {
-    setIsEditModalOpen(true);
+    createModal(({ isOpen, onClose }) => (
+      <EditNetworkInterfaceModal
+        vm={vm}
+        isOpen={isOpen}
+        onClose={onClose}
+        nicPresentation={nicPresentation}
+      />
+    ));
     setIsDropdownOpen(false);
   };
 
   const onDeleteModalOpen = () => {
-    setIsDeleteModalOpen(true);
+    createModal(({ isOpen, onClose }) => (
+      <TabModal<V1VirtualMachine>
+        isOpen={isOpen}
+        onClose={onClose}
+        obj={resultVirtualMachine}
+        onSubmit={(obj) =>
+          k8sUpdate({
+            model: VirtualMachineModel,
+            data: obj,
+            ns: obj?.metadata?.namespace,
+            name: obj?.metadata?.name,
+          })
+        }
+        headerText={deleteModalHeader}
+        submitBtnText={deleteBtnText}
+        submitBtnVariant={ButtonVariant.danger}
+      >
+        <DeleteResourceMessege obj={{ metadata: { name: nicName } }} />
+      </TabModal>
+    ));
     setIsDropdownOpen(false);
   };
 
@@ -72,34 +98,6 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
         dropdownItems={items}
         position={DropdownPosition.right}
       />
-      {isDeleteModalOpen && (
-        <TabModal<V1VirtualMachine>
-          onClose={() => setIsDeleteModalOpen(false)}
-          isOpen={isDeleteModalOpen}
-          obj={resultVirtualMachine}
-          onSubmit={(obj) =>
-            k8sUpdate({
-              model: VirtualMachineModel,
-              data: obj,
-              ns: obj?.metadata?.namespace,
-              name: obj?.metadata?.name,
-            })
-          }
-          headerText={deleteModalHeader}
-          submitBtnText={deleteBtnText}
-          submitBtnVariant={ButtonVariant.danger}
-        >
-          <DeleteResourceMessege obj={{ metadata: { name: nicName } }} />
-        </TabModal>
-      )}
-      {isEditModalOpen && (
-        <EditNetworkInterfaceModal
-          vm={vm}
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          nicPresentation={nicPresentation}
-        />
-      )}
     </>
   );
 };

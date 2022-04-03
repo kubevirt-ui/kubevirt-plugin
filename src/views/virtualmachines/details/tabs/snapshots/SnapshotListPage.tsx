@@ -2,6 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ListPageBody,
@@ -24,7 +25,7 @@ type SnapshotListPageProps = RouteComponentProps<{
 
 const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const { createModal } = useModal();
   const { snapshots, restoresMap, loaded, error } = useSnapshotData(
     vm?.metadata?.name,
     vm?.metadata?.namespace,
@@ -33,7 +34,13 @@ const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
   return (
     <>
       <ListPageHeader title="">
-        <ListPageCreateButton onClick={() => setIsOpen(true)}>
+        <ListPageCreateButton
+          onClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <SnapshotModal vm={vm} isOpen={isOpen} onClose={onClose} />
+            ))
+          }
+        >
           {t('Add Snapshot')}
         </ListPageCreateButton>
       </ListPageHeader>
@@ -46,7 +53,6 @@ const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
           isVMRunning={vm?.status?.printableStatus !== printableVMStatus.Stopped}
         />
       </ListPageBody>
-      {isOpen && <SnapshotModal vm={vm} isOpen={isOpen} onClose={() => setIsOpen(false)} />}
     </>
   );
 };

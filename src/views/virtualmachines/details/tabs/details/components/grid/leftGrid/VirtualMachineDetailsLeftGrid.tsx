@@ -5,6 +5,7 @@ import { ensurePath } from '@catalog/utils/WizardVMContext';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextDiv from '@kubevirt-utils/components/MutedTextDiv/MutedTextDiv';
 import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
@@ -28,7 +29,7 @@ type VirtualMachineDetailsLeftGridProps = {
 
 const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
-  const [descriptionModalOpen, setDescriptionModalOpen] = React.useState(false);
+  const { createModal } = useModal();
   const None = <MutedTextDiv text={t('None')} />;
 
   const updateDescription = (updatedDescription) => {
@@ -102,13 +103,16 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           descriptionData={getAnnotation(vm, DESCRIPTION_ANNOTATION) || None}
           descriptionHeader={t('Description')}
           isEdit
-          onEditClick={() => setDescriptionModalOpen(true)}
-        />
-        <DescriptionModal
-          obj={vm}
-          isOpen={descriptionModalOpen}
-          onClose={() => setDescriptionModalOpen(false)}
-          onSubmit={updateDescription}
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <DescriptionModal
+                obj={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={updateDescription}
+              />
+            ))
+          }
         />
         <VirtualMachineDescriptionItem
           descriptionData={getOperatingSystemName(vm) || getOperatingSystem(vm)}

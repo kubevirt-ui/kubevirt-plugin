@@ -4,6 +4,7 @@ import { printableVMStatus } from 'src/views/virtualmachines/utils';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import {
@@ -28,7 +29,7 @@ type DiskListProps = {
 
 const DiskList: React.FC<DiskListProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const { createModal } = useModal();
   const columns = useDiskColumns();
   const [disks, loaded, loadError, vmi] = useDisksTableData(vm);
   const filters = useDisksFilters();
@@ -41,7 +42,26 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
   return (
     <>
       <ListPageHeader title="">
-        <ListPageCreateButton onClick={() => setIsModalOpen(true)}>
+        <ListPageCreateButton
+          onClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <DiskModal
+                vm={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                headerText={headerText}
+                onSubmit={(obj) =>
+                  k8sUpdate({
+                    model: VirtualMachineModel,
+                    data: obj,
+                    ns: obj.metadata.namespace,
+                    name: obj.metadata.name,
+                  })
+                }
+              />
+            ))
+          }
+        >
           {t('Add disk')}
         </ListPageCreateButton>
       </ListPageHeader>
@@ -63,22 +83,6 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
           rowData={{ vm, vmi }}
         />
       </ListPageBody>
-      {isModalOpen && (
-        <DiskModal
-          vm={vm}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          headerText={headerText}
-          onSubmit={(obj) =>
-            k8sUpdate({
-              model: VirtualMachineModel,
-              data: obj,
-              ns: obj.metadata.namespace,
-              name: obj.metadata.name,
-            })
-          }
-        />
-      )}
     </>
   );
 };

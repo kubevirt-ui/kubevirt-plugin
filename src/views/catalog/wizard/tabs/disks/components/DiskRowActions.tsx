@@ -3,6 +3,7 @@ import { Trans } from 'react-i18next';
 
 import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -18,16 +19,31 @@ type DiskRowActionsProps = {
 };
 
 const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
-  const { vm, updateVM } = useWizardVMContext();
-
   const { t } = useKubevirtTranslation();
+  const { vm, updateVM } = useWizardVMContext();
+  const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
+
+  // const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const label = t('Delete {{diskName}} disk', { diskName: diskName });
   const submitBtnText = t('Delete');
 
   const onDeleteModalToggle = () => {
-    setIsDeleteModalOpen(true);
+    createModal(({ isOpen, onClose }) => (
+      <TabModal<V1VirtualMachine>
+        isOpen={isOpen}
+        onClose={onClose}
+        obj={vm}
+        onSubmit={onDelete}
+        headerText={label}
+        submitBtnText={submitBtnText}
+        submitBtnVariant={ButtonVariant.danger}
+      >
+        <Trans t={t}>
+          Are you sure you want to delete <strong>{diskName} </strong>
+        </Trans>
+      </TabModal>
+    ));
     setIsDropdownOpen(false);
   };
 
@@ -69,21 +85,6 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
         dropdownItems={items}
         position={DropdownPosition.right}
       />
-      {isDeleteModalOpen && (
-        <TabModal<V1VirtualMachine>
-          onClose={() => setIsDeleteModalOpen(false)}
-          isOpen={isDeleteModalOpen}
-          obj={vm}
-          onSubmit={onDelete}
-          headerText={label}
-          submitBtnText={submitBtnText}
-          submitBtnVariant={ButtonVariant.danger}
-        >
-          <Trans t={t}>
-            Are you sure you want to delete <strong>{diskName} </strong>
-          </Trans>
-        </TabModal>
-      )}
     </>
   );
 };
