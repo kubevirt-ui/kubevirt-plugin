@@ -24,6 +24,8 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({ snapshot }) =
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const label = t('Delete VirtualMachineSnapshot');
 
+  const snapshotResult = React.useMemo(() => snapshot, [snapshot]);
+
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1alpha1VirtualMachineSnapshot>
@@ -47,8 +49,6 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({ snapshot }) =
     ));
     setIsDropdownOpen(false);
   };
-
-  const snapshotResult = React.useMemo(() => snapshot, [snapshot]);
 
   const items = [
     <DropdownItem onClick={onDeleteModalToggle} key="snapshot-delete">

@@ -49,6 +49,17 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
     setIsDropdownOpen(false);
   };
 
+  const onDelete = React.useCallback(() => {
+    const updatedVM = produceVMNetworks(vm, (draftVM) => {
+      draftVM.spec.template.spec.networks = draftVM.spec.template.spec.networks.filter(
+        ({ name }) => name !== nicName,
+      );
+      draftVM.spec.template.spec.domain.devices.interfaces =
+        draftVM.spec.template.spec.domain.devices.interfaces.filter(({ name }) => name !== nicName);
+    });
+    return updateVM(updatedVM);
+  }, [nicName, updateVM, vm]);
+
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
@@ -76,17 +87,6 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
       {submitBtnText}
     </DropdownItem>,
   ];
-
-  const onDelete = React.useCallback(() => {
-    const updatedVM = produceVMNetworks(vm, (draftVM) => {
-      draftVM.spec.template.spec.networks = draftVM.spec.template.spec.networks.filter(
-        ({ name }) => name !== nicName,
-      );
-      draftVM.spec.template.spec.domain.devices.interfaces =
-        draftVM.spec.template.spec.domain.devices.interfaces.filter(({ name }) => name !== nicName);
-    });
-    return updateVM(updatedVM);
-  }, [nicName, updateVM, vm]);
 
   return (
     <>

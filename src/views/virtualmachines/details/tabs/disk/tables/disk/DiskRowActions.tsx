@@ -44,6 +44,14 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
     return null;
   }, [isVMRunning, pvcResourceExists, t]);
 
+  const onSubmit = (updatedVM) =>
+    k8sUpdate({
+      model: VirtualMachineModel,
+      data: updatedVM,
+      ns: updatedVM?.metadata?.namespace,
+      name: updatedVM?.metadata?.name,
+    });
+
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <EditDiskModal
@@ -58,14 +66,6 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
     ));
     setIsDropdownOpen(false);
   };
-
-  const onSubmit = (updatedVM) =>
-    k8sUpdate({
-      model: VirtualMachineModel,
-      data: updatedVM,
-      ns: updatedVM?.metadata?.namespace,
-      name: updatedVM?.metadata?.name,
-    });
 
   const items = [
     <DropdownItem

@@ -37,6 +37,13 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const editBtnText = t('Edit');
   const deleteBtnText = t('Delete');
 
+  const resultVirtualMachine = React.useMemo(() => {
+    const networks = getNetworks(vm)?.filter(({ name }) => name !== nicName);
+    const interfaces = getInterfaces(vm)?.filter(({ name }) => name !== nicName);
+
+    return updateVMNetworkInterface(vm, networks, interfaces);
+  }, [nicName, vm]);
+
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <EditNetworkInterfaceModal
@@ -82,12 +89,6 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
     </DropdownItem>,
   ];
 
-  const resultVirtualMachine = React.useMemo(() => {
-    const networks = getNetworks(vm)?.filter(({ name }) => name !== nicName);
-    const interfaces = getInterfaces(vm)?.filter(({ name }) => name !== nicName);
-
-    return updateVMNetworkInterface(vm, networks, interfaces);
-  }, [nicName, vm]);
   return (
     <>
       <Dropdown

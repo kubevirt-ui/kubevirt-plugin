@@ -28,6 +28,28 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const label = t('Delete {{diskName}} disk', { diskName: diskName });
   const submitBtnText = t('Delete');
 
+  const onDelete = React.useCallback(() => {
+    const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
+      const volumeToDelete = draftVM.spec.template.spec.volumes.find(
+        (volume) => volume.name === diskName,
+      );
+
+      if (volumeToDelete?.dataVolume?.name) {
+        draftVM.spec.dataVolumeTemplates = draftVM.spec.dataVolumeTemplates.filter(
+          (dataVolume) => dataVolume.metadata.name !== volumeToDelete.dataVolume.name,
+        );
+      }
+
+      draftVM.spec.template.spec.volumes = draftVM.spec.template.spec.volumes.filter(
+        (volume) => volume.name !== diskName,
+      );
+      draftVM.spec.template.spec.domain.devices.disks =
+        draftVM.spec.template.spec.domain.devices.disks.filter((disk) => disk.name !== diskName);
+    });
+
+    return updateVM(vmWithDeletedDisk);
+  }, [diskName, updateVM, vm]);
+
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
@@ -52,28 +74,6 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
       {submitBtnText}
     </DropdownItem>,
   ];
-
-  const onDelete = React.useCallback(() => {
-    const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
-      const volumeToDelete = draftVM.spec.template.spec.volumes.find(
-        (volume) => volume.name === diskName,
-      );
-
-      if (volumeToDelete?.dataVolume?.name) {
-        draftVM.spec.dataVolumeTemplates = draftVM.spec.dataVolumeTemplates.filter(
-          (dataVolume) => dataVolume.metadata.name !== volumeToDelete.dataVolume.name,
-        );
-      }
-
-      draftVM.spec.template.spec.volumes = draftVM.spec.template.spec.volumes.filter(
-        (volume) => volume.name !== diskName,
-      );
-      draftVM.spec.template.spec.domain.devices.disks =
-        draftVM.spec.template.spec.domain.devices.disks.filter((disk) => disk.name !== diskName);
-    });
-
-    return updateVM(vmWithDeletedDisk);
-  }, [diskName, updateVM, vm]);
 
   return (
     <>
