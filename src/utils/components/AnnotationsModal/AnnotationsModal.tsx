@@ -1,25 +1,24 @@
 import * as React from 'react';
 
-import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, Grid } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
-import { WizardAnnotationsModalRow } from './WizardAnnotationsModalRow';
+import { AnnotationsModalRow } from './AnnotationsModalRow';
 
-import './WizardAnnotationsModal.scss';
+import './AnnotationsModal.scss';
 
 const getIdAnnotations = (annotations: { [key: string]: string }) =>
   Object.fromEntries(Object.entries(annotations).map(([key, value], i) => [i, { key, value }]));
 
-export const WizardAnnotationsModal: React.FC<{
-  vm: V1VirtualMachine;
-  updateVM: UpdateValidatedVM;
+export const AnnotationsModal: React.FC<{
+  obj: K8sResourceCommon;
+  onSubmit: (annotations: { [key: string]: string }) => Promise<void | K8sResourceCommon>;
   isOpen: boolean;
   onClose: () => void;
-}> = ({ vm, isOpen, updateVM, onClose }) => {
+}> = ({ obj, isOpen, onSubmit, onClose }) => {
   const { t } = useKubevirtTranslation();
 
   const [annotations, setAnnotations] =
@@ -41,7 +40,7 @@ export const WizardAnnotationsModal: React.FC<{
     });
   };
 
-  const onSubmit = () => {
+  const onAnnotationsSubmit = () => {
     const uniqWith = (arr, fn) =>
       arr.filter((element, index) => arr.findIndex((step) => fn(element, step)) === index);
 
@@ -56,30 +55,28 @@ export const WizardAnnotationsModal: React.FC<{
       Object.entries(annotations).map(([, { key, value }]) => [key, value]),
     );
 
-    return updateVM((vmDraft) => {
-      vmDraft.metadata.annotations = updatedAnnotations;
-    });
+    return onSubmit(updatedAnnotations);
   };
 
   // reset annotations when modal is closed
   React.useEffect(() => {
-    if (vm.metadata.annotations) {
-      setAnnotations(getIdAnnotations(vm.metadata.annotations));
+    if (obj.metadata.annotations) {
+      setAnnotations(getIdAnnotations(obj.metadata.annotations));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   return (
-    <TabModal<V1VirtualMachine>
-      obj={vm}
+    <TabModal<K8sResourceCommon>
+      obj={obj}
       headerText={t('Edit annotations')}
-      onSubmit={onSubmit}
+      onSubmit={onAnnotationsSubmit}
       isOpen={isOpen}
       onClose={onClose}
     >
       <Grid hasGutter>
         {Object.entries(annotations || {}).map(([id, { key, value }]) => (
-          <WizardAnnotationsModalRow
+          <AnnotationsModalRow
             key={id}
             annotation={{ key, value }}
             onChange={(annotation) =>

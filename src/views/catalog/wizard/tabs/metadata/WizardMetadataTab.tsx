@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +9,6 @@ import { DescriptionList, Grid, GridItem, pluralize } from '@patternfly/react-co
 import { WizardVMContextType } from '../../../utils/WizardVMContext';
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
 
-import { WizardAnnotationsModal } from './components/WizardAnnotationsModal/WizardAnnotationsModal';
 import WizardMetadataLabels from './components/WizardMetadataLabels';
 
 const WizardMetadataTab: React.FC<WizardVMContextType> = ({ vm, updateVM, loaded }) => {
@@ -59,9 +59,13 @@ const WizardMetadataTab: React.FC<WizardVMContextType> = ({ vm, updateVM, loaded
               isEdit
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
-                  <WizardAnnotationsModal
-                    vm={vm}
-                    updateVM={updateVM}
+                  <AnnotationsModal
+                    obj={vm}
+                    onSubmit={(updatedAnnotations) =>
+                      updateVM((vmDraft) => {
+                        vmDraft.metadata.annotations = updatedAnnotations;
+                      })
+                    }
                     isOpen={isOpen}
                     onClose={onClose}
                   />

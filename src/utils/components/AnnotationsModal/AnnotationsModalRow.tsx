@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Button, GridItem, TextInput } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-export const WizardAnnotationsModalRow: React.FC<{
+export const AnnotationsModalRow: React.FC<{
   annotation: { key: string; value: string };
   onChange: ({ key, value }: { key: string; value: string }) => void;
   onDelete: () => void;
@@ -45,4 +45,4 @@ export const WizardAnnotationsModalRow: React.FC<{
     </>
   );
 });
-WizardAnnotationsModalRow.displayName = 'AnnotationModalRow';
+AnnotationsModalRow.displayName = 'AnnotationModalRow';
