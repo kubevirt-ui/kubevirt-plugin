@@ -1,10 +1,15 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
 
+import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
+import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Breadcrumb,
   BreadcrumbItem,
+  Button,
   DescriptionListDescription,
   DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
@@ -12,15 +17,17 @@ import {
   LabelGroup,
   Popover,
 } from '@patternfly/react-core';
+import { PencilAltIcon } from '@patternfly/react-icons';
+
+import './labels.scss';
 
 type LabelsProps = {
-  labels: {
-    [key: string]: string;
-  };
+  vmi: V1VirtualMachineInstance;
 };
 
-const Labels: React.FC<LabelsProps> = ({ labels }) => {
+const Labels: React.FC<LabelsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
+  const [isLabelsModalOpen, setIsLabelsModalOpen] = React.useState(false);
   return (
     <>
       <DescriptionListTermHelpText>
@@ -49,12 +56,39 @@ const Labels: React.FC<LabelsProps> = ({ labels }) => {
           <DescriptionListTermHelpTextButton>{t('Labels')}</DescriptionListTermHelpTextButton>
         </Popover>
       </DescriptionListTermHelpText>
-      <DescriptionListDescription>
+      <DescriptionListDescription className="Labels--container">
         <LabelGroup>
-          {Object.entries(labels || {})?.map(([key, value]) => (
+          {Object.entries(vmi?.metadata?.labels || {})?.map(([key, value]) => (
             <Label color="blue" variant="outline" key={key}>{`${key}=${value}`}</Label>
           ))}
         </LabelGroup>
+        <Button
+          isInline
+          onClick={() => setIsLabelsModalOpen(true)}
+          variant="link"
+          icon={
+            <PencilAltIcon className="co-icon-space-l co-icon-space-r pf-c-button-icon--plain" />
+          }
+          iconPosition={'right'}
+        ></Button>
+        <LabelsModal
+          obj={vmi}
+          isOpen={isLabelsModalOpen}
+          onClose={() => setIsLabelsModalOpen(false)}
+          onLabelsSubmit={(labels) =>
+            k8sPatch({
+              model: VirtualMachineInstanceModel,
+              resource: vmi,
+              data: [
+                {
+                  op: 'replace',
+                  path: '/metadata/labels',
+                  value: labels,
+                },
+              ],
+            })
+          }
+        />
       </DescriptionListDescription>
     </>
   );

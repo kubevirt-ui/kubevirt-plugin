@@ -11,15 +11,15 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 type LabelsModalProps = {
   isOpen: boolean;
   obj: K8sResourceCommon;
-  onLabelsSubmit: (labels: { [key: string]: string }) => Promise<void>;
+  onLabelsSubmit: (labels: { [key: string]: string }) => Promise<void | K8sResourceCommon>;
   onClose: () => void;
-}
+};
 
 export const LabelsModal: React.FC<LabelsModalProps> = React.memo(({ isOpen, obj, onLabelsSubmit, onClose }) => {
   const { t } = useKubevirtTranslation();
   const [inputValue, setInputValue] = React.useState('');
   const [isInputValid, setIsInputValid] = React.useState(true);
-  const [labels, setLabels] = React.useState<string[]>(labelsToArray(obj.metadata.labels || {}));
+  const [labels, setLabels] = React.useState<string[]>(labelsToArray(obj?.metadata?.labels || {}));
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -72,8 +72,8 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(({ isOpen, obj
 
   // reset labels when modal is closed
   React.useEffect(() => {
-    if (obj.metadata.labels) {
-      setLabels(labelsToArray(obj.metadata.labels || {}));
+    if (obj?.metadata?.labels) {
+      setLabels(labelsToArray(obj?.metadata?.labels || {}));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
