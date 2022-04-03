@@ -2,10 +2,10 @@ import { TFunction } from 'i18next';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { V1DataVolumeTemplateSpec, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 
 import { interfaceTypes, sourceTypes, volumeTypes } from './constants';
-import { V1DataVolumeTemplateSpec, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export const getSourceOptions = (t: TFunction) => ({
   blank: {
@@ -106,9 +106,11 @@ export const getVolumeType = (volume: V1Volume): string => {
 };
 
 export const getDataVolumeTemplateSourceType = (dvTemplate: V1DataVolumeTemplateSpec): string => {
-  const sourceType = Object.keys(dvTemplate?.spec?.source).find((key) => Object.values(sourceTypes).includes(key));
+  const sourceType = Object.keys(dvTemplate?.spec?.source).find((key) =>
+    Object.values(sourceTypes).includes(key),
+  );
   return sourceType;
-}
+};
 
 export const getVolumeResourceName = (volume: V1Volume): string => {
   const volumeType = getVolumeType(volume);

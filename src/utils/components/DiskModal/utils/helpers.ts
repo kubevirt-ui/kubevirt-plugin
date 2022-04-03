@@ -207,4 +207,4 @@ export const getRemoveHotplugPromise = (vm: V1VirtualMachine, diskName: string) 
     name: diskName,
   };
   return removeVolume(vm, bodyRequestRemoveVolume);
-}
+};
