@@ -2,20 +2,29 @@ import * as React from 'react';
 
 import { useInputDebounce } from '@kubevirt-utils/hooks/useInputDebounce';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { pluralize, TextInput } from '@patternfly/react-core';
+import {
+  pluralize,
+  Split,
+  SplitItem,
+  TextInput,
+  ToggleGroup,
+  ToggleGroupItem,
+} from '@patternfly/react-core';
+import { ListIcon, ThIcon } from '@patternfly/react-icons';
 
 import { TemplateFilters } from '../hooks/useVmTemplatesFilters';
+import { CATALOG_FILTERS } from '../utils/consts';
 
 export const TemplatesCatalogHeader: React.FC<{
   filters: TemplateFilters;
-  onFilterChange: (type: string, value: string | boolean) => void;
+  onFilterChange: (type: CATALOG_FILTERS, value: string | boolean) => void;
   itemCount: number;
 }> = React.memo(({ filters, onFilterChange, itemCount }) => {
   const { t } = useKubevirtTranslation();
   const { inputRef } = useInputDebounce({
     delay: 150,
-    updateURLParam: 'query',
-    onChange: (value) => onFilterChange('query', value),
+    updateURLParam: CATALOG_FILTERS.QUERY,
+    onChange: (value) => onFilterChange(CATALOG_FILTERS.QUERY, value),
   });
 
   return (
@@ -32,7 +41,30 @@ export const TemplatesCatalogHeader: React.FC<{
           placeholder={t('Filter by name')}
           aria-label="filter text input"
         />
-        <div className="co-catalog-page__num-items">{pluralize(itemCount, 'item')}</div>
+
+        <Split hasGutter>
+          <SplitItem>
+            <div className="co-catalog-page__num-items">{pluralize(itemCount, 'item')}</div>
+          </SplitItem>
+          <SplitItem>
+            <ToggleGroup isCompact aria-label="list-or-grid-toggle">
+              <ToggleGroupItem
+                icon={<ListIcon />}
+                aria-label="template list button"
+                buttonId="template-list-btn"
+                isSelected={filters?.isList}
+                onChange={() => onFilterChange(CATALOG_FILTERS.IS_LIST, true)}
+              />
+              <ToggleGroupItem
+                icon={<ThIcon />}
+                aria-label="template grid button"
+                buttonId="template-grid-btn"
+                isSelected={!filters?.isList}
+                onChange={() => onFilterChange(CATALOG_FILTERS.IS_LIST, false)}
+              />
+            </ToggleGroup>
+          </SplitItem>
+        </Split>
       </div>
     </div>
   );

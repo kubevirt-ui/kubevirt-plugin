@@ -3,15 +3,18 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Gallery, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
 import { TemplatesCatalogEmptyState } from './components/TemplatesCatalogEmptyState';
 import { CatalogTemplateFilters } from './components/TemplatesCatalogFilters/CatalogTemplateFilters';
 import { TemplatesCatalogHeader } from './components/TemplatesCatalogHeader';
+import { TemplatesCatalogRow } from './components/TemplatesCatalogRow';
 import { skeletonCatalog } from './components/TemplatesCatalogSkeleton';
 import { TemplateTile } from './components/TemplatesCatalogTile';
 import { useAvailableSourceTemplates } from './hooks/useAvailableSourceTemplates';
+import useTemplatesCatalogColumns from './hooks/useTemplatesCatalogColumns';
 import { useTemplatesFilters } from './hooks/useVmTemplatesFilters';
 import { filterTemplates } from './utils/helpers';
 
@@ -26,13 +29,42 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
-  const { templates, loaded, initialSourcesLoaded } = useAvailableSourceTemplates(
+  const { templates, loaded, initialSourcesLoaded, error } = useAvailableSourceTemplates(
     filters.onlyAvailable,
   );
+  const columns = useTemplatesCatalogColumns();
 
   const filteredTemplates = React.useMemo(
     () => filterTemplates(templates, filters),
     [templates, filters],
+  );
+
+  const renderTemplates = React.useMemo(
+    () =>
+      filters?.isList ? (
+        <VirtualizedTable
+          data={filteredTemplates}
+          unfilteredData={filteredTemplates}
+          loaded={loaded}
+          loadError={error}
+          columns={columns}
+          Row={TemplatesCatalogRow}
+          rowData={{ onTemplateClick: setSelectedTemplate }}
+        />
+      ) : (
+        <StackItem className="co-catalog-page__grid vm-catalog-grid-container">
+          <Gallery hasGutter className="vm-catalog-grid" id="vm-catalog-grid">
+            {filteredTemplates.map((template) => (
+              <TemplateTile
+                key={template?.metadata?.uid}
+                template={template}
+                onClick={setSelectedTemplate}
+              />
+            ))}
+          </Gallery>
+        </StackItem>
+      ),
+    [columns, error, filteredTemplates, filters?.isList, loaded],
   );
 
   return (
@@ -57,17 +89,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
               />
             </StackItem>
             {filteredTemplates?.length > 0 ? (
-              <StackItem className="co-catalog-page__grid vm-catalog-grid-container">
-                <Gallery hasGutter className="vm-catalog-grid" id="vm-catalog-grid">
-                  {filteredTemplates.map((template) => (
-                    <TemplateTile
-                      key={template?.metadata?.uid}
-                      template={template}
-                      onClick={setSelectedTemplate}
-                    />
-                  ))}
-                </Gallery>
-              </StackItem>
+              <>{renderTemplates}</>
             ) : (
               <TemplatesCatalogEmptyState
                 loadingSources={filters?.onlyAvailable && !initialSourcesLoaded}

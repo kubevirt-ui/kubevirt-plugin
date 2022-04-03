@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { CATALOG_FILTERS } from '@catalog/templatescatalog/utils/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   OS_NAME_LABELS,
@@ -16,7 +17,7 @@ import { TemplateFilterGroup } from './CatalogTemplateFilterGroup';
 
 export const CatalogTemplateFilters: React.FC<{
   filters: TemplateFilters;
-  onFilterChange: (type: string, value: string | boolean) => void;
+  onFilterChange: (type: CATALOG_FILTERS, value: string | boolean) => void;
 }> = React.memo(({ filters, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
 
@@ -27,14 +28,14 @@ export const CatalogTemplateFilters: React.FC<{
           data-test-id="catalog-template-filter-all-items"
           id={'all-templates'}
           title={t('All Items')}
-          onActivate={() => onFilterChange('onlyDefault', false)}
+          onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_DEFAULT, false)}
           active={!filters?.onlyDefault}
         />
         <VerticalTabsTab
           data-test-id="catalog-template-filter-default-templates"
           id={'default-templates'}
           title={t('Default Templates')}
-          onActivate={() => onFilterChange('onlyDefault', true)}
+          onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_DEFAULT, true)}
           active={filters?.onlyDefault}
         />
       </VerticalTabs>
@@ -42,7 +43,9 @@ export const CatalogTemplateFilters: React.FC<{
         <TemplateFilterGroup
           groupKey={'boot-source-available'}
           pickedFilters={new Set(filters?.onlyAvailable ? ['only-available'] : [])}
-          onFilterClick={() => onFilterChange('onlyAvailable', !filters?.onlyAvailable)}
+          onFilterClick={() =>
+            onFilterChange(CATALOG_FILTERS.ONLY_AVAILABLE, !filters?.onlyAvailable)
+          }
           filters={[{ label: t('Boot source available'), value: 'only-available' }]}
         />
         <TemplateFilterGroup
