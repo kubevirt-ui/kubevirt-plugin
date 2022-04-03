@@ -5,7 +5,7 @@ import { ExpandableSection, Text, TextVariants } from '@patternfly/react-core';
 
 import { BootableDeviceType } from '../../resources/vm/utils/boot-order/bootOrder';
 import BootableDevicesList from './BootableDevicesList';
-import MutedTextDiv from '../MutedTextDiv/MutedTextDiv';
+import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 
 type BootOrderSummaryProps = {
   devices: BootableDeviceType[];
@@ -19,7 +19,7 @@ const EmptyBootOrderSummary: React.FC<BootOrderSummaryProps> = ({ devices }) => 
   return (
     <>
       <Text component={TextVariants.p}>{t('No resource selected')}</Text>
-      <MutedTextDiv
+      <MutedTextSpan
         text={t(
           'Virtual Machine will attempt to boot from disks by order of appearance in YAML file',
         )}

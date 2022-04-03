@@ -3,7 +3,7 @@ import * as React from 'react';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import MutedTextDiv from '@kubevirt-utils/components/MutedTextDiv/MutedTextDiv';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import {
@@ -80,7 +80,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         <VirtualMachineDescriptionItem
           descriptionData={
             getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) || (
-              <MutedTextDiv text={t('Not available')} />
+              <MutedTextSpan text={t('Not available')} />
             )
           }
           descriptionHeader={t('Workload Profile')}

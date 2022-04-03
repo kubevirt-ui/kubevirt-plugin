@@ -3,7 +3,7 @@ import * as React from 'react';
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
-import MutedTextDiv from '@kubevirt-utils/components/MutedTextDiv/MutedTextDiv';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, DescriptionListDescription, DescriptionListTerm } from '@patternfly/react-core';
@@ -31,7 +31,7 @@ const Description: React.FC<DescriptionProps> = ({ vmi }) => {
           iconPosition={'right'}
           className="Description--edit-button"
         >
-          {vmi?.metadata?.annotations?.description ?? <MutedTextDiv text={t('Not available')} />}
+          {vmi?.metadata?.annotations?.description ?? <MutedTextSpan text={t('Not available')} />}
         </Button>
         <DescriptionModal
           obj={vmi}

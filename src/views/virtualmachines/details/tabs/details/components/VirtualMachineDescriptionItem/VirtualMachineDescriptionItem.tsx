@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 
-import MutedTextDiv from '@kubevirt-utils/components/MutedTextDiv/MutedTextDiv';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Breadcrumb,
@@ -63,7 +63,7 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
 
   const description = (
     <Button type="button" isInline isDisabled={isDisabled} onClick={onEditClick} variant="link">
-      {descriptionData ?? <MutedTextDiv text={t('Not available')} />}
+      {descriptionData ?? <MutedTextSpan text={t('Not available')} />}
       <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
     </Button>
   );
