@@ -24,7 +24,6 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
 
-  // const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const label = t('Delete {{diskName}} disk', { diskName: diskName });
   const submitBtnText = t('Delete');
 
