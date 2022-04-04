@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextDiv from '@kubevirt-utils/components/MutedTextDiv/MutedTextDiv';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -30,8 +31,8 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [gpuModalOpen, setGPUModalOpen] = React.useState(false);
-  const [hostDevModalOpen, setHostDevModalOpen] = React.useState(false);
+  const { createModal } = useModal();
+
   const hostDevices = getHostDevices(vm);
   const gpus = getGPUDevices(vm);
 
@@ -95,35 +96,43 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         <VirtualMachineDescriptionItem
           descriptionData={
             <>
-              <a onClick={() => setGPUModalOpen(true)}>{t(`${(gpus || []).length} GPU devices`)}</a>
-              {gpuModalOpen && (
-                <HardwareDevicesModal
-                  vm={vm}
-                  isOpen={gpuModalOpen}
-                  onClose={() => setGPUModalOpen(false)}
-                  headerText={t('GPU Devices')}
-                  onSubmit={onSubmit}
-                  initialDevices={gpus}
-                  btnText={t('Add GPU device')}
-                  type={HARDWARE_DEVICE_TYPE.GPUS}
-                />
-              )}
+              <a
+                onClick={() =>
+                  createModal(({ isOpen, onClose }) => (
+                    <HardwareDevicesModal
+                      vm={vm}
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      headerText={t('GPU Devices')}
+                      onSubmit={onSubmit}
+                      initialDevices={gpus}
+                      btnText={t('Add GPU device')}
+                      type={HARDWARE_DEVICE_TYPE.GPUS}
+                    />
+                  ))
+                }
+              >
+                {t(`${(gpus || []).length} GPU devices`)}
+              </a>
               <br />
-              <a onClick={() => setHostDevModalOpen(true)}>
+              <a
+                onClick={() =>
+                  createModal(({ isOpen, onClose }) => (
+                    <HardwareDevicesModal
+                      vm={vm}
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      headerText={t('Host Devices')}
+                      onSubmit={onSubmit}
+                      initialDevices={hostDevices}
+                      btnText={t('Add Host device')}
+                      type={HARDWARE_DEVICE_TYPE.HOST_DEVICES}
+                    />
+                  ))
+                }
+              >
                 {t(`${(hostDevices || []).length} Host devices`)}
               </a>
-              {hostDevModalOpen && (
-                <HardwareDevicesModal
-                  vm={vm}
-                  isOpen={hostDevModalOpen}
-                  onClose={() => setHostDevModalOpen(false)}
-                  headerText={t('Host Devices')}
-                  onSubmit={onSubmit}
-                  initialDevices={hostDevices}
-                  btnText={t('Add Host device')}
-                  type={HARDWARE_DEVICE_TYPE.HOST_DEVICES}
-                />
-              )}
             </>
           }
           descriptionHeader={t('Hardware devices')}

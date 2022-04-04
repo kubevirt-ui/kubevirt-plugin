@@ -5,6 +5,7 @@ import {
   V1alpha1VirtualMachineRestore,
   V1alpha1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
@@ -23,7 +24,7 @@ const SnapshotRow: React.FC<
   >
 > = ({ obj: snapshot, activeColumnIDs, rowData: { restores, isVMRunning } }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const { createModal } = useModal();
   const relevantRestore: V1alpha1VirtualMachineRestore = restores?.[snapshot?.metadata?.name];
   const snapshotStatus = snapshot?.status?.phase;
   const isRestoreDisabled = isVMRunning || snapshotStatus !== snapshotStatuses.Succeeded;
@@ -53,14 +54,15 @@ const SnapshotRow: React.FC<
           <Button
             isAriaDisabled={isRestoreDisabled}
             variant="secondary"
-            onClick={() => setIsOpen(true)}
+            onClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <RestoreModal snapshot={snapshot} isOpen={isOpen} onClose={onClose} />
+              ))
+            }
           >
             {t('Restore')}
           </Button>
         </Tooltip>
-        {isOpen && (
-          <RestoreModal snapshot={snapshot} onClose={() => setIsOpen(false)} isOpen={isOpen} />
-        )}
       </TableData>
       <TableData
         id="actions"

@@ -3,6 +3,7 @@ import { Trans } from 'react-i18next';
 
 import { produceVMNetworks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -25,34 +26,28 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   nicName,
   nicPresentation,
 }) => {
-  const { vm, updateVM } = useWizardVMContext();
-
   const { t } = useKubevirtTranslation();
+  const { vm, updateVM } = useWizardVMContext();
+  const { createModal } = useModal();
+
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const label = t('Delete {{nicName}} NIC', { nicName });
   const editBtnText = t('Edit');
   const submitBtnText = t('Delete');
 
   const onEditModalOpen = () => {
-    setIsEditModalOpen(true);
+    createModal(({ isOpen, onClose }) => (
+      <EditNetworkInterfaceModal
+        vm={vm}
+        updateVM={updateVM}
+        isOpen={isOpen}
+        onClose={onClose}
+        nicPresentation={nicPresentation}
+      />
+    ));
+
     setIsDropdownOpen(false);
   };
-
-  const onDeleteModalToggle = () => {
-    setIsDeleteModalOpen(true);
-    setIsDropdownOpen(false);
-  };
-
-  const items = [
-    <DropdownItem onClick={onEditModalOpen} key="network-interface-edit">
-      {editBtnText}
-    </DropdownItem>,
-    <DropdownItem onClick={onDeleteModalToggle} key="network-interface-delete">
-      {submitBtnText}
-    </DropdownItem>,
-  ];
 
   const onDelete = React.useCallback(() => {
     const updatedVM = produceVMNetworks(vm, (draftVM) => {
@@ -65,6 +60,34 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
     return updateVM(updatedVM);
   }, [nicName, updateVM, vm]);
 
+  const onDeleteModalToggle = () => {
+    createModal(({ isOpen, onClose }) => (
+      <TabModal<V1VirtualMachine>
+        isOpen={isOpen}
+        onClose={onClose}
+        obj={vm}
+        onSubmit={onDelete}
+        headerText={label}
+        submitBtnText={submitBtnText}
+        submitBtnVariant={ButtonVariant.danger}
+      >
+        <Trans t={t}>
+          Are you sure you want to delete <strong>{nicName} </strong>
+        </Trans>
+      </TabModal>
+    ));
+    setIsDropdownOpen(false);
+  };
+
+  const items = [
+    <DropdownItem onClick={onEditModalOpen} key="network-interface-edit">
+      {editBtnText}
+    </DropdownItem>,
+    <DropdownItem onClick={onDeleteModalToggle} key="network-interface-delete">
+      {submitBtnText}
+    </DropdownItem>,
+  ];
+
   return (
     <>
       <Dropdown
@@ -75,30 +98,6 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
         dropdownItems={items}
         position={DropdownPosition.right}
       />
-      {isDeleteModalOpen && (
-        <TabModal<V1VirtualMachine>
-          onClose={() => setIsDeleteModalOpen(false)}
-          isOpen={isDeleteModalOpen}
-          obj={vm}
-          onSubmit={onDelete}
-          headerText={label}
-          submitBtnText={submitBtnText}
-          submitBtnVariant={ButtonVariant.danger}
-        >
-          <Trans t={t}>
-            Are you sure you want to delete <strong>{nicName} </strong>
-          </Trans>
-        </TabModal>
-      )}
-      {isEditModalOpen && (
-        <EditNetworkInterfaceModal
-          vm={vm}
-          updateVM={updateVM}
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          nicPresentation={nicPresentation}
-        />
-      )}
     </>
   );
 };

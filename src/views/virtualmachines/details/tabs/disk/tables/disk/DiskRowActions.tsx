@@ -3,6 +3,7 @@ import * as React from 'react';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
@@ -25,8 +26,8 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
 
   const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName, vmi);
 
@@ -43,11 +44,6 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
     return null;
   }, [isVMRunning, pvcResourceExists, t]);
 
-  const onEditModalOpen = () => {
-    setIsEditModalOpen(true);
-    setIsDropdownOpen(false);
-  };
-
   const onSubmit = (updatedVM) =>
     k8sUpdate({
       model: VirtualMachineModel,
@@ -55,6 +51,21 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
       ns: updatedVM?.metadata?.namespace,
       name: updatedVM?.metadata?.name,
     });
+
+  const onEditModalOpen = () => {
+    createModal(({ isOpen, onClose }) => (
+      <EditDiskModal
+        vm={vm}
+        isOpen={isOpen}
+        onClose={onClose}
+        headerText={t('Edit disk')}
+        onSubmit={onSubmit}
+        initialDiskState={initialDiskState}
+        initialDiskSourceState={initialDiskSourceState}
+      />
+    ));
+    setIsDropdownOpen(false);
+  };
 
   const items = [
     <DropdownItem
@@ -77,17 +88,6 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
         dropdownItems={items}
         position={DropdownPosition.right}
       />
-      {isEditModalOpen && (
-        <EditDiskModal
-          vm={vm}
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          headerText={t('Edit disk')}
-          onSubmit={onSubmit}
-          initialDiskState={initialDiskState}
-          initialDiskSourceState={initialDiskSourceState}
-        />
-      )}
     </>
   );
 };

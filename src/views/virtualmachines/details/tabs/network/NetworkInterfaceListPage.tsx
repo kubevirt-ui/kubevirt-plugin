@@ -2,6 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ListPageBody,
@@ -21,24 +22,29 @@ type NetworkInterfaceListPageProps = RouteComponentProps<{
 
 const NetworkInterfaceListPage: React.FC<NetworkInterfaceListPageProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
   const actionText = t('Add Network Interface');
-  const [isOpen, setIsOpen] = React.useState(false);
   return (
     <>
       <ListPageHeader title="">
-        <ListPageCreateButton onClick={() => setIsOpen(true)}>{actionText}</ListPageCreateButton>
+        <ListPageCreateButton
+          onClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <NetworkInterfaceModal
+                vm={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                headerText={actionText}
+              />
+            ))
+          }
+        >
+          {actionText}
+        </ListPageCreateButton>
       </ListPageHeader>
       <ListPageBody>
         <NetworkInterfaceList vm={vm} />
       </ListPageBody>
-      {isOpen && (
-        <NetworkInterfaceModal
-          vm={vm}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          headerText={actionText}
-        />
-      )}
     </>
   );
 };
