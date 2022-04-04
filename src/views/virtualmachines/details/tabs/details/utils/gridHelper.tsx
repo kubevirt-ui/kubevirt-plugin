@@ -6,7 +6,7 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import MutedTextDiv from '@kubevirt-utils/components/MutedTextDiv/MutedTextDiv';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -27,8 +27,8 @@ export type VirtualMachineDetailsRightGridLayoutPresentation = {
 export const getStoppedVMRightGridPresentation = (
   t: TFunction,
 ): VirtualMachineDetailsRightGridLayoutPresentation => {
-  const NotAvailable = <MutedTextDiv text={t('Not available')} />;
-  const VirtualMachineIsNotRunning = <MutedTextDiv text={t('Virtual machine is not running')} />;
+  const NotAvailable = <MutedTextSpan text={t('Not available')} />;
+  const VirtualMachineIsNotRunning = <MutedTextSpan text={t('Virtual machine is not running')} />;
 
   return {
     pod: NotAvailable,
@@ -53,8 +53,8 @@ export const getRunningVMRightGridPresentation = (
   const nodeName = vmi?.status?.nodeName;
   const guestAgentIsRequired = guestAgentData && Object.keys(guestAgentData)?.length === 0;
 
-  const SshNotAvailableText = <MutedTextDiv text={t('SSH service is not available')} />;
-  const GuestAgentIsRequiredText = <MutedTextDiv text={t('Guest agent is required')} />;
+  const SshNotAvailableText = <MutedTextSpan text={t('SSH service is not available')} />;
+  const GuestAgentIsRequiredText = <MutedTextSpan text={t('Guest agent is required')} />;
   console.log(sshService);
   return {
     pod: (
