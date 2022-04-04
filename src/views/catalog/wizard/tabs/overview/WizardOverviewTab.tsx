@@ -3,10 +3,12 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
+import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
+import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import { WizardVMContextType } from '../../../utils/WizardVMContext';
@@ -30,6 +32,10 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, tabsData, update
   const interfaces = vm?.spec?.template?.spec?.domain?.devices?.interfaces;
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
   const displayName = tabsData?.overview?.templateMetadata?.displayName;
+
+  const hostDevicesCount = getHostDevices(vm)?.length || 0;
+  const gpusCount = getGPUDevices(vm)?.length || 0;
+  const nDevices = hostDevicesCount + gpusCount;
 
   return (
     <div className="co-m-pane__body">
@@ -124,7 +130,11 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, tabsData, update
               description={<WizardOverviewDisksTable vm={vm} />}
             />
 
-            <WizardDescriptionItem title={t('Hardware Devices')} />
+            <WizardDescriptionItem
+              count={nDevices}
+              description={<HardwareDevices vm={vm} onSubmit={updateVM} />}
+              title={t('Hardware devices')}
+            />
           </DescriptionList>
         </GridItem>
       </Grid>
