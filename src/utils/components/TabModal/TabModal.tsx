@@ -12,18 +12,7 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import { Trans } from 'react-i18next';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-
-export const DeleteResourceMessege: React.FC<{ obj: K8sResourceCommon }> = ({ obj }) => {
-  const { t } = useKubevirtTranslation();
-  return (
-    <Trans t={t}>
-      Are you sure you want to delete <strong>{obj.metadata.name} </strong>from namespace{' '}
-      <strong>{obj.metadata.namespace}?</strong>
-    </Trans>
-  );
-};
 
 type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   isOpen: boolean;

@@ -2,8 +2,9 @@ import * as React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DeleteResourceMessage from '@kubevirt-utils/components/DeleteResourceMessage/DeleteResourceMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import TabModal, { DeleteResourceMessege } from '@kubevirt-utils/components/TabModal/TabModal';
+import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -74,7 +75,9 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
-        <DeleteResourceMessege obj={{ metadata: { name: nicName } }} />
+        <DeleteResourceMessage
+          obj={{ metadata: { name: nicName, namespace: vm?.metadata?.namespace } }}
+        />
       </TabModal>
     ));
     setIsDropdownOpen(false);

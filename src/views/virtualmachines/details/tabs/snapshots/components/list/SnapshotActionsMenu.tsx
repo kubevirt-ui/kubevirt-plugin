@@ -2,8 +2,9 @@ import * as React from 'react';
 
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DeleteResourceMessage from '@kubevirt-utils/components/DeleteResourceMessage/DeleteResourceMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import TabModal, { DeleteResourceMessege } from '@kubevirt-utils/components/TabModal/TabModal';
+import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -44,7 +45,7 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({ snapshot }) =
         submitBtnText={t('Delete')}
         submitBtnVariant={ButtonVariant.danger}
       >
-        <DeleteResourceMessege obj={snapshot} />
+        <DeleteResourceMessage obj={snapshot} />
       </TabModal>
     ));
     setIsDropdownOpen(false);

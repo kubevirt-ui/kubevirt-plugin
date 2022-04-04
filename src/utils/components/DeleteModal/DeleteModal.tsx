@@ -1,10 +1,11 @@
 import * as React from 'react';
 
-import TabModal, { DeleteResourceMessege } from '@kubevirt-utils/components/TabModal/TabModal';
+import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant } from '@patternfly/react-core';
+import DeleteResourceMessage from '../DeleteResourceMessage/DeleteResourceMessage';
 
 type DeleteModalProps = {
   isOpen: boolean;
@@ -29,7 +30,7 @@ const DeleteModal: React.FC<DeleteModalProps> = React.memo(
         submitBtnVariant={ButtonVariant.danger}
         titleIconVariant={'warning'}
       >
-        <DeleteResourceMessege obj={obj} />
+        <DeleteResourceMessage obj={obj} />
       </TabModal>
     );
   },
