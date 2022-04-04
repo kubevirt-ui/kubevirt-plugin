@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -12,6 +13,7 @@ import useVirtualMachineInstanceMigration from './useVirtualMachineInstanceMigra
 type UseVirtualMachineActionsProvider = (vm: V1VirtualMachine) => [Action[], boolean, any];
 
 const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) => {
+  const { createModal } = useModal();
   const vmim = useVirtualMachineInstanceMigration(vm);
 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
@@ -39,9 +41,11 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
       // VirtualMachineActionFactory.clone(vm),
       migrateOrCancelMigration,
       // VirtualMachineActionFactory.openConsole(vm),
+      VirtualMachineActionFactory.editAnnotations(vm, createModal),
+      VirtualMachineActionFactory.editLabels(vm, createModal),
       VirtualMachineActionFactory.delete(vm),
     ];
-  }, [vm, vmim]);
+  }, [vm, vmim, createModal]);
 
   return [actions, inFlight, undefined];
 };

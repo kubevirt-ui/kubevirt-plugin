@@ -1,10 +1,13 @@
-// import * as React from 'react';
+import * as React from 'react';
 
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
+import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
+import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../utils';
 
@@ -132,6 +135,62 @@ export const VirtualMachineActionFactory = {
   //       ),
   //   };
   // },
+  editLabels: (vm: V1VirtualMachine, createModal): Action => {
+    return {
+      id: 'vm-action-edit-labels',
+      disabled: false,
+      label: 'Edit labels',
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <LabelsModal
+            obj={vm}
+            isOpen={isOpen}
+            onClose={onClose}
+            onLabelsSubmit={(labels) =>
+              k8sPatch({
+                model: VirtualMachineModel,
+                resource: vm,
+                data: [
+                  {
+                    op: 'replace',
+                    path: '/metadata/labels',
+                    value: labels,
+                  },
+                ],
+              })
+            }
+          />
+        )),
+    };
+  },
+  editAnnotations: (vm: V1VirtualMachine, createModal): Action => {
+    return {
+      id: 'vm-action-edit-annotations',
+      disabled: false,
+      label: 'Edit annotations',
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <AnnotationsModal
+            obj={vm}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={(updatedAnnotations) =>
+              k8sPatch({
+                model: VirtualMachineModel,
+                resource: vm,
+                data: [
+                  {
+                    op: 'replace',
+                    path: '/metadata/annotations',
+                    value: updatedAnnotations,
+                  },
+                ],
+              })
+            }
+          />
+        )),
+    };
+  },
   delete: (vm: V1VirtualMachine): Action => {
     return {
       id: 'vm-action-delete',

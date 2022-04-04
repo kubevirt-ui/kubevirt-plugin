@@ -8,9 +8,9 @@ type VirtualMachineLabelsProps = {
 
 const VirtualMachineLabels: React.FC<VirtualMachineLabelsProps> = ({ labels }) => {
   return (
-    <LabelGroup>
+    <LabelGroup numLabels={10} className="wizard-metadata-labels-group">
       {Object.keys(labels || {})?.map((key) => {
-        return <Label color="blue" variant="outline" key={key}>{`${key}=${labels[key]}`}</Label>;
+        return <Label key={key}>{labels[key] ? `${key}=${labels[key]}` : key}</Label>;
       })}
     </LabelGroup>
   );
