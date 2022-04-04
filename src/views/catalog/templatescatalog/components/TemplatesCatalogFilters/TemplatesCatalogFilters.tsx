@@ -12,10 +12,11 @@ import { VerticalTabs, VerticalTabsTab } from '@patternfly/react-catalog-view-ex
 import { FilterSidePanel } from '@patternfly/react-catalog-view-extension/dist/esm/components/FilterSidePanel';
 
 import { TemplateFilters } from '../../hooks/useVmTemplatesFilters';
+import { TemplatesCatalogProjectsDropdown } from '../TemplatesCatalogProjectsDropdown/TemplatesCatalogProjectsDropdown';
 
-import { TemplateFilterGroup } from './CatalogTemplateFilterGroup';
+import { TemplatesCatalogFiltersGroup } from './TemplatesCatalogFiltersGroup';
 
-export const CatalogTemplateFilters: React.FC<{
+export const TemplatesCatalogFilters: React.FC<{
   filters: TemplateFilters;
   onFilterChange: (type: CATALOG_FILTERS, value: string | boolean) => void;
 }> = React.memo(({ filters, onFilterChange }) => {
@@ -23,6 +24,11 @@ export const CatalogTemplateFilters: React.FC<{
 
   return (
     <div className="co-catalog-page__tabs">
+      <TemplatesCatalogProjectsDropdown
+        selectedProject={filters.namespace}
+        onChange={(project) => onFilterChange(CATALOG_FILTERS.NAMESPACE, project)}
+      />
+
       <VerticalTabs>
         <VerticalTabsTab
           data-test-id="catalog-template-filter-all-items"
@@ -40,7 +46,7 @@ export const CatalogTemplateFilters: React.FC<{
         />
       </VerticalTabs>
       <FilterSidePanel className="co-catalog-page__tabs" id="vm-catalog-filter-panel">
-        <TemplateFilterGroup
+        <TemplatesCatalogFiltersGroup
           groupKey={'boot-source-available'}
           pickedFilters={new Set(filters?.onlyAvailable ? ['only-available'] : [])}
           onFilterClick={() =>
@@ -48,7 +54,7 @@ export const CatalogTemplateFilters: React.FC<{
           }
           filters={[{ label: t('Boot source available'), value: 'only-available' }]}
         />
-        <TemplateFilterGroup
+        <TemplatesCatalogFiltersGroup
           groupKey="osName"
           groupLabel={t('OS')}
           pickedFilters={filters.osName}
@@ -58,7 +64,7 @@ export const CatalogTemplateFilters: React.FC<{
             value: v,
           }))}
         />
-        <TemplateFilterGroup
+        <TemplatesCatalogFiltersGroup
           groupKey="workload"
           groupLabel={t('Workload')}
           pickedFilters={filters.workload}

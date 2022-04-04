@@ -8,9 +8,9 @@ import { Split, SplitItem } from '@patternfly/react-core';
 import { Title } from '@patternfly/react-core/dist/esm/components/Title';
 import { AngleDownIcon, AngleRightIcon } from '@patternfly/react-icons';
 
-import './CatalogTemplateFilterGroup.scss';
+import './TemplatesCatalogFiltersGroup.scss';
 
-export const TemplateFilterGroup: React.FC<{
+export const TemplatesCatalogFiltersGroup: React.FC<{
   defaultExpanded?: boolean;
   groupKey: string;
   groupLabel?: string;
@@ -64,4 +64,4 @@ export const TemplateFilterGroup: React.FC<{
     );
   },
 );
-TemplateFilterGroup.displayName = 'TemplateFilterGroup';
+TemplatesCatalogFiltersGroup.displayName = 'TemplateFilterGroup';

@@ -9,6 +9,7 @@ export type TemplateFilters = {
   [CATALOG_FILTERS.ONLY_DEFAULT]: boolean;
   [CATALOG_FILTERS.ONLY_AVAILABLE]: boolean;
   [CATALOG_FILTERS.IS_LIST]: boolean;
+  [CATALOG_FILTERS.NAMESPACE]: string;
   [CATALOG_FILTERS.QUERY]: string;
   [CATALOG_FILTERS.OS_NAME]: Set<string>;
   [CATALOG_FILTERS.WORKLOAD]: Set<string>;
@@ -28,6 +29,7 @@ export const useTemplatesFilters = (): [
     [CATALOG_FILTERS.ONLY_AVAILABLE]: params.get(CATALOG_FILTERS.ONLY_AVAILABLE) === 'true',
     [CATALOG_FILTERS.IS_LIST]: params.get(CATALOG_FILTERS.IS_LIST) === 'true',
     [CATALOG_FILTERS.QUERY]: params.get(CATALOG_FILTERS.QUERY) || '',
+    [CATALOG_FILTERS.NAMESPACE]: params.get(CATALOG_FILTERS.NAMESPACE) || '',
     [CATALOG_FILTERS.OS_NAME]: new Set([...params.getAll(CATALOG_FILTERS.OS_NAME)]),
     [CATALOG_FILTERS.WORKLOAD]: new Set([...params.getAll(CATALOG_FILTERS.WORKLOAD)]),
   });
@@ -41,23 +43,12 @@ export const useTemplatesFilters = (): [
   const onFilterChange = (type: CATALOG_FILTERS, value: any) => {
     switch (type) {
       case CATALOG_FILTERS.ONLY_DEFAULT:
-        {
-          updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, value);
-          setParam(CATALOG_FILTERS.ONLY_DEFAULT, value.toString());
-        }
-        break;
-
       case CATALOG_FILTERS.ONLY_AVAILABLE:
-        {
-          updateFilter(CATALOG_FILTERS.ONLY_AVAILABLE, value);
-          setParam(CATALOG_FILTERS.ONLY_AVAILABLE, value.toString());
-        }
-        break;
-
       case CATALOG_FILTERS.IS_LIST:
+      case CATALOG_FILTERS.NAMESPACE:
         {
-          updateFilter(CATALOG_FILTERS.IS_LIST, value);
-          setParam(CATALOG_FILTERS.IS_LIST, value.toString());
+          updateFilter(type, value);
+          setParam(type, value.toString());
         }
         break;
 
@@ -89,6 +80,7 @@ export const useTemplatesFilters = (): [
       [CATALOG_FILTERS.ONLY_AVAILABLE]: false,
       [CATALOG_FILTERS.IS_LIST]: filters.isList,
       [CATALOG_FILTERS.QUERY]: '',
+      [CATALOG_FILTERS.NAMESPACE]: '',
       [CATALOG_FILTERS.OS_NAME]: new Set(),
       [CATALOG_FILTERS.WORKLOAD]: new Set(),
     });

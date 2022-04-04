@@ -8,10 +8,16 @@ import {
   getTemplateBootSourceType,
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 
-export const useAvailableSourceTemplates = (
-  showOnlyAvailable = false,
-): useAvailableSourceTemplatesValues => {
-  const { templates, loaded, loadError } = useVmTemplates();
+type useAvailableSourceTemplatesProps = {
+  onlyAvailable: boolean;
+  namespace: string;
+};
+
+export const useAvailableSourceTemplates = ({
+  onlyAvailable,
+  namespace,
+}: useAvailableSourceTemplatesProps): useAvailableSourceTemplatesValues => {
+  const { templates, loaded, loadError } = useVmTemplates(namespace);
 
   const [templatesWithSource, setTemplatesWithSource] = React.useState<{
     [uid: string]: V1Template;
@@ -30,7 +36,7 @@ export const useAvailableSourceTemplates = (
 
   const promises = React.useMemo(
     () =>
-      showOnlyAvailable &&
+      onlyAvailable &&
       templates
         .filter((template) => {
           const bootSource = getTemplateBootSourceType(template);
@@ -59,19 +65,19 @@ export const useAvailableSourceTemplates = (
           });
         }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [showOnlyAvailable, templates],
+    [onlyAvailable, templates],
   );
 
   const templatesToRender = React.useMemo(
     () =>
-      showOnlyAvailable
+      onlyAvailable
         ? [...initialAvailableTemplates, ...Object.values(templatesWithSource)]
         : templates,
-    [showOnlyAvailable, initialAvailableTemplates, templatesWithSource, templates],
+    [onlyAvailable, initialAvailableTemplates, templatesWithSource, templates],
   );
 
   React.useEffect(() => {
-    if (showOnlyAvailable) {
+    if (onlyAvailable) {
       Promise.allSettled(promises)
         .then(() => setTemplatesWithSourceLoaded(true))
         .catch(setError);

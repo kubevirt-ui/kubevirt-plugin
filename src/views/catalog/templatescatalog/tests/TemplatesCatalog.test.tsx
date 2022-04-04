@@ -23,6 +23,7 @@ jest.mock('../hooks/useAvailableSourceTemplates', () => ({
 // render template drawer without quick create
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   k8sCreate: jest.fn().mockRejectedValue({}),
+  useK8sWatchResource: jest.fn().mockReturnValue([[], true, undefined]),
 }));
 
 jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => ({

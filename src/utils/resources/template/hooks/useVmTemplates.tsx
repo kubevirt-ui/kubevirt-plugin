@@ -1,6 +1,10 @@
 import * as React from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  modelToGroupVersionKind,
+  ProjectModel,
+  V1Template,
+} from '@kubevirt-ui/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import {
   K8sResourceCommon,
@@ -10,62 +14,63 @@ import {
 
 import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../utils/constants';
 
-/** A Hook that returns VM Templates from allowed namespaces */
-export const useVmTemplates = (): useVmTemplatesValues => {
+/** A Hook that returns VM Templates from allowed namespaces
+ * @param namespace - The namespace to filter the templates by
+ */
+export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
   const [templates, setTemplates] = React.useState<V1Template[]>([]);
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [loadError, setLoadError] = React.useState<string>('');
   const [isAdmin] = useIsAdmin();
+  modelToGroupVersionKind(ProjectModel);
 
   const [projects] = useK8sWatchResource<K8sResourceCommon[]>({
-    groupVersionKind: {
-      group: 'project.openshift.io',
-      version: 'v1',
-      kind: 'Project',
-    },
+    groupVersionKind: modelToGroupVersionKind(ProjectModel),
     namespaced: false,
     isList: true,
   });
 
-  const templatesResources = React.useMemo(
-    () =>
-      isAdmin
-        ? {
-            templates: {
-              kind: 'Template',
-              selector: {
-                matchExpressions: [
-                  {
-                    operator: 'In',
-                    key: TEMPLATE_TYPE_LABEL,
-                    values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
-                  },
-                ],
-              },
-              isList: true,
-            },
-          }
-        : Object.fromEntries(
-            projects.map((p) => [
-              p.metadata.name,
+  const templatesResources = React.useMemo(() => {
+    // If the user is an admin, or we have a specific namespace - return one resource to watch
+    if (isAdmin || namespace) {
+      return {
+        templates: {
+          ...(namespace ? { namespace } : {}),
+          kind: 'Template',
+          selector: {
+            matchExpressions: [
               {
-                kind: 'Template',
-                namespace: p.metadata.name,
-                selector: {
-                  matchExpressions: [
-                    {
-                      operator: 'In',
-                      key: TEMPLATE_TYPE_LABEL,
-                      values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
-                    },
-                  ],
-                },
-                isList: true,
+                operator: 'In',
+                key: TEMPLATE_TYPE_LABEL,
+                values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
               },
-            ]),
-          ),
-    [isAdmin, projects],
-  );
+            ],
+          },
+          isList: true,
+        },
+      };
+    }
+    // if the user is not an admin, and we don't have a specific namespace - return all permitted resources to watch
+    return Object.fromEntries(
+      projects.map((p) => [
+        p.metadata.name,
+        {
+          kind: 'Template',
+          namespace: p.metadata.name,
+          selector: {
+            matchExpressions: [
+              {
+                operator: 'In',
+                key: TEMPLATE_TYPE_LABEL,
+                values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
+              },
+            ],
+          },
+          isList: true,
+        },
+      ]),
+    );
+  }, [isAdmin, namespace, projects]);
 
   const resources = useK8sWatchResources<{ [key: string]: V1Template[] }>(templatesResources);
 

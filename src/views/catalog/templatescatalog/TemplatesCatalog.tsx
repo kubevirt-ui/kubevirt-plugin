@@ -8,7 +8,7 @@ import { Gallery, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
 import { TemplatesCatalogEmptyState } from './components/TemplatesCatalogEmptyState';
-import { CatalogTemplateFilters } from './components/TemplatesCatalogFilters/CatalogTemplateFilters';
+import { TemplatesCatalogFilters } from './components/TemplatesCatalogFilters/TemplatesCatalogFilters';
 import { TemplatesCatalogHeader } from './components/TemplatesCatalogHeader';
 import { TemplatesCatalogRow } from './components/TemplatesCatalogRow';
 import { skeletonCatalog } from './components/TemplatesCatalogSkeleton';
@@ -29,9 +29,10 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
-  const { templates, loaded, initialSourcesLoaded, error } = useAvailableSourceTemplates(
-    filters.onlyAvailable,
-  );
+  const { templates, loaded, initialSourcesLoaded, error } = useAvailableSourceTemplates({
+    namespace: filters.namespace,
+    onlyAvailable: filters.onlyAvailable,
+  });
   const columns = useTemplatesCatalogColumns();
 
   const filteredTemplates = React.useMemo(
@@ -79,7 +80,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
       </StackItem>
       {loaded ? (
         <div className="co-catalog-page co-catalog-page--with-sidebar">
-          <CatalogTemplateFilters filters={filters} onFilterChange={onFilterChange} />
+          <TemplatesCatalogFilters filters={filters} onFilterChange={onFilterChange} />
           <Stack className="co-catalog-page__content">
             <StackItem>
               <TemplatesCatalogHeader

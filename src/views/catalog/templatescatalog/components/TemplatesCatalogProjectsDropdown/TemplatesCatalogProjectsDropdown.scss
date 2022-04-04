@@ -1,0 +1,14 @@
+.templates-catalog-project-dropdown {
+  width: 220px;
+  padding: 0 var(--pf-global--spacer--sm);
+  margin-bottom: var(--pf-global--spacer--md);
+
+  .pf-c-context-selector__menu {
+    width: 385px;
+  }
+
+  .templates-catalog-project-dropdown-label {
+    padding: 0 var(--pf-global--spacer--sm);
+    margin: 0;
+  }
+}
