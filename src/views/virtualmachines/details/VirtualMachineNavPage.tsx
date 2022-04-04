@@ -1,15 +1,10 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  HorizontalNav,
-  ListPageHeader,
-  useK8sWatchResource,
-} from '@openshift-console/dynamic-plugin-sdk';
-
-import VirtualMachineActions from '../list/components/VirtualMachineActions/VirtualMachineActions';
+import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
+import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
 
 export type VirtualMachineDetailsPageProps = {
   name: string;
@@ -30,9 +25,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   const pages = useVirtualMachineTabs();
   return (
     <>
-      <ListPageHeader title={name}>
-        <VirtualMachineActions vm={vm} />
-      </ListPageHeader>
+      <VirtualMachineNavPageTitle vm={vm} />
       <HorizontalNav pages={pages} resource={vm} />
     </>
   );
