@@ -2,10 +2,12 @@ import * as React from 'react';
 import { Trans } from 'react-i18next';
 
 import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import {
   ButtonVariant,
   Dropdown,
@@ -14,8 +16,27 @@ import {
   KebabToggle,
 } from '@patternfly/react-core';
 
+import { useEditDiskStates } from '../hooks/useEditDiskState';
+
 type DiskRowActionsProps = {
   diskName: string;
+};
+
+const getDiskDataVolume = (
+  vm: V1VirtualMachine,
+  diskName: string,
+): V1DataVolumeTemplateSpec | undefined => {
+  const disk = getDisks(vm)?.find((d) => d.name === diskName);
+
+  if (!disk) return;
+
+  const volume = getVolumes(vm)?.find((v) => v.name === diskName);
+
+  if (!volume || !volume.dataVolume) return;
+
+  return getDataVolumeTemplates(vm)?.find(
+    (dataVolume) => dataVolume.metadata?.name === volume.dataVolume.name,
+  );
 };
 
 const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
@@ -23,9 +44,12 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const { vm, updateVM } = useWizardVMContext();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const deleteBtnText = t('Delete');
 
-  const label = t('Delete {{diskName}} disk', { diskName: diskName });
-  const submitBtnText = t('Delete');
+  const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName);
+  const diskDataVolume = getDiskDataVolume(vm, diskName);
+  /** TODO: add editing support for sourceRef in 4.12 */
+  const hasSourceRef = !!diskDataVolume?.spec?.sourceRef;
 
   const onDelete = React.useCallback(() => {
     const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
@@ -52,12 +76,12 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
-        isOpen={isOpen}
         onClose={onClose}
+        isOpen={isOpen}
         obj={vm}
         onSubmit={onDelete}
-        headerText={label}
-        submitBtnText={submitBtnText}
+        headerText={t('Delete {{diskName}} disk', { diskName })}
+        submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
         <Trans t={t}>
@@ -65,26 +89,43 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
         </Trans>
       </TabModal>
     ));
-    setIsDropdownOpen(false);
   };
 
-  const items = [
-    <DropdownItem onClick={onDeleteModalToggle} key="disk-delete">
-      {submitBtnText}
-    </DropdownItem>,
-  ];
+  const onEditModalToggle = () => {
+    createModal(({ isOpen, onClose }) => (
+      <EditDiskModal
+        vm={vm}
+        isOpen={isOpen}
+        onClose={onClose}
+        headerText={t('Edit disk')}
+        onSubmit={updateVM}
+        initialDiskState={initialDiskState}
+        initialDiskSourceState={initialDiskSourceState}
+      />
+    ));
+  };
 
   return (
-    <>
-      <Dropdown
-        onSelect={() => setIsDropdownOpen(false)}
-        toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-disk" />}
-        isOpen={isDropdownOpen}
-        isPlain
-        dropdownItems={items}
-        position={DropdownPosition.right}
-      />
-    </>
+    <Dropdown
+      onSelect={() => setIsDropdownOpen(false)}
+      toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-disk" />}
+      isOpen={isDropdownOpen}
+      isPlain
+      dropdownItems={[
+        <DropdownItem
+          onClick={onEditModalToggle}
+          key="disk-edit"
+          isDisabled={hasSourceRef}
+          description={hasSourceRef ? t("This disk's source is not editable") : null}
+        >
+          {t('Edit')}
+        </DropdownItem>,
+        <DropdownItem onClick={onDeleteModalToggle} key="disk-delete">
+          {deleteBtnText}
+        </DropdownItem>,
+      ]}
+      position={DropdownPosition.right}
+    />
   );
 };
 
