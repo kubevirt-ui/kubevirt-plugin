@@ -14,12 +14,15 @@ import {
 
 import { PersistentVolumeClaimSelect } from '../PersistentVolumeClaimSelect';
 
+import BootCDCheckboxLabel from './BootCDCheckboxLabel';
 import {
   DEFAULT_SOURCE,
   HTTP_SOURCE_NAME,
   PVC_SOURCE_NAME,
   REGISTRY_SOURCE_NAME,
 } from './constants';
+import { SelectCDSourceLabel } from './SelectCDSourceLabel';
+import { SelectDiskSourceLabel } from './SelectDiskSourceLabel';
 import { getGenericSourceCustomization, getPVCSource } from './utils';
 import { VolumeSize } from './VolumeSize';
 import { SOURCE_OPTIONS_IDS } from '.';
@@ -29,17 +32,19 @@ import './CustomizeSource.scss';
 export type CustomizeSourceProps = {
   onChange: (customSource: V1beta1DataVolumeSpec) => void;
   initialVolumeQuantity?: string;
-  sourceLabel: string | React.ReactNode;
   withDrivers: boolean;
   setDrivers: (withDrivers: boolean) => void;
+  cdSource: boolean;
+  setCDSource: (cdSource: boolean) => void;
 };
 
 export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
   onChange,
   initialVolumeQuantity,
-  sourceLabel,
   withDrivers,
   setDrivers,
+  cdSource,
+  setCDSource,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -62,7 +67,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
       case DEFAULT_SOURCE:
         return onChange(undefined);
       case PVC_SOURCE_NAME:
-        return onChange(getPVCSource(pvcNameSelected, pvcNamespaceSelected));
+        return onChange(getPVCSource(pvcNameSelected, pvcNamespaceSelected, volumeQuantity));
       case HTTP_SOURCE_NAME:
         return onChange(getGenericSourceCustomization(selectedSourceType, httpURL, volumeQuantity));
       case REGISTRY_SOURCE_NAME:
@@ -81,9 +86,21 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
   ]);
 
   return (
-    <>
+    <div className="customize-source">
+      <FormGroup fieldId="customize-boot-from-cd" className="disk-source-form-group">
+        <Checkbox
+          isChecked={cdSource}
+          onChange={setCDSource}
+          label={<BootCDCheckboxLabel />}
+          id="boot-cd"
+        />
+      </FormGroup>
+
+      <h2 className="co-section-heading">
+        {cdSource ? t('CD information') : t('Disk information')}
+      </h2>
       <FormGroup
-        label={sourceLabel}
+        label={cdSource ? <SelectCDSourceLabel /> : <SelectDiskSourceLabel />}
         fieldId="disk-source-required-disk"
         isRequired
         className="disk-source-form-group"
@@ -170,7 +187,27 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         </FormGroup>
       )}
 
-      {[HTTP_SOURCE_NAME, REGISTRY_SOURCE_NAME].includes(selectedSourceType) && (
+      {cdSource && (
+        <>
+          <h2 className="co-section-heading">{t('Disk information')}</h2>
+          <FormGroup
+            label={t('Disk source')}
+            fieldId={`disk-source-blank`}
+            isRequired
+            className="disk-source-form-group"
+          >
+            <TextInput
+              isDisabled
+              placeholder={t('Blank')}
+              type="text"
+              readOnly
+              aria-label={t('Disk source')}
+            />
+          </FormGroup>
+        </>
+      )}
+
+      {selectedSourceType !== DEFAULT_SOURCE && (
         <VolumeSize quantity={volumeQuantity} onChange={setVolumeQuantity} />
       )}
 
@@ -182,6 +219,6 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
           id="cdrom-drivers"
         />
       </FormGroup>
-    </>
+    </div>
   );
 };

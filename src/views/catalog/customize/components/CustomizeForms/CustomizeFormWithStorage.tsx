@@ -6,57 +6,67 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { Form } from '@patternfly/react-core';
 
-import { overrideVirtualMachineDataVolumeSpec } from '../../overrides';
-import { buildFields, getTemplateStorageQuantity, getVirtualMachineNameField } from '../../utils';
+import { addCDToTemplate } from '../../cd';
+import {
+  buildFields,
+  getTemplateStorageQuantity,
+  getVirtualMachineNameField,
+  overrideVirtualMachineDataVolumeSpec,
+} from '../../utils';
 import { ExpandableCustomizeSourceSection } from '../CustomizeSource/ExpandableCustomizeSourceSection';
 import { ExpandableOptionsFields } from '../ExpandableOptionalFields';
 import { FieldGroup } from '../FieldGroup';
 import { FormActionGroup } from '../FormActionGroup';
 import { FormError } from '../FormError';
 
-import { SelectDiskSourceLabel } from './SelectDiskSourceLabel';
 import { useCustomizeFormSubmit } from './useCustomizeFormSubmit';
 
-type CustomizeFormWithDiskProps = {
+type CustomizeFormWithStorageProps = {
   template: V1Template;
 };
 
-export const CustomizeFormWithDisk: React.FC<CustomizeFormWithDiskProps> = ({ template }) => {
+const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
-  const [customDiskSource, setCustomDiskSource] = React.useState<V1beta1DataVolumeSpec>();
+  const [customSource, setCustomSource] = React.useState<V1beta1DataVolumeSpec>();
+  const [cdSource, setCDSource] = React.useState(false);
 
-  const templateWithDiskSource = React.useMemo(() => {
-    let virtualMachine = getTemplateVirtualMachineObject(template);
+  const templateWithCDVolume = React.useMemo(() => {
+    if (cdSource) return addCDToTemplate(template, customSource);
+    else {
+      let virtualMachine = getTemplateVirtualMachineObject(template);
 
-    virtualMachine = overrideVirtualMachineDataVolumeSpec(virtualMachine, customDiskSource);
-    return { ...template, objects: [virtualMachine] };
-  }, [template, customDiskSource]);
+      virtualMachine = overrideVirtualMachineDataVolumeSpec(virtualMachine, customSource);
+      return { ...template, objects: [virtualMachine] };
+    }
+  }, [cdSource, template, customSource]);
 
   const [windowsDrivers, setWindowsDrivers] = React.useState(false);
-  const [onSubmit, loaded, error] = useCustomizeFormSubmit(templateWithDiskSource, windowsDrivers);
+
+  const [onSubmit, loaded, error] = useCustomizeFormSubmit(templateWithCDVolume, windowsDrivers);
 
   const [requiredFields, optionalFields] = buildFields(template);
   const nameField = getVirtualMachineNameField(template, t);
 
   const onDiskSourceChange = React.useCallback((newDiskSource) => {
-    setCustomDiskSource(newDiskSource);
+    setCustomSource(newDiskSource);
   }, []);
 
   return (
     <Form onSubmit={onSubmit}>
       <FieldGroup field={nameField} showError={error} />
 
-      <ExpandableCustomizeSourceSection
-        onChange={onDiskSourceChange}
-        initialVolumeQuantity={getTemplateStorageQuantity(template)}
-        sourceLabel={<SelectDiskSourceLabel />}
-        withDrivers={windowsDrivers}
-        setDrivers={setWindowsDrivers}
-      />
-
       {requiredFields?.map((field) => (
         <FieldGroup key={field.name} field={field} showError={error} />
       ))}
+
+      <ExpandableCustomizeSourceSection
+        onChange={onDiskSourceChange}
+        initialVolumeQuantity={getTemplateStorageQuantity(template)}
+        withDrivers={windowsDrivers}
+        setDrivers={setWindowsDrivers}
+        cdSource={cdSource}
+        setCDSource={setCDSource}
+      />
 
       <ExpandableOptionsFields optionalFields={optionalFields} />
 
@@ -65,3 +75,5 @@ export const CustomizeFormWithDisk: React.FC<CustomizeFormWithDiskProps> = ({ te
     </Form>
   );
 };
+
+export default CustomizeFormWithStorage;

@@ -38,35 +38,33 @@ const getVmwareConfigMap = async (): Promise<any> => {
   throw lastException;
 };
 
-export const mountWinDriversToTemplate = async (template: V1Template) => {
-  let driversImage = DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE;
+export const mountWinDriversToTemplate = async (template: V1Template): Promise<V1Template> => {
+  return await produce(template, async (draftTemplate) => {
+    let driversImage = DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE;
 
-  try {
-    const configMap = await getVmwareConfigMap();
-    if (configMap?.data?.[VIRTIO_WIN_IMAGE]) driversImage = configMap.data[VIRTIO_WIN_IMAGE];
-  } catch (error) {
-    console.error(error);
-  }
+    try {
+      const configMap = await getVmwareConfigMap();
+      if (configMap?.data?.[VIRTIO_WIN_IMAGE]) driversImage = configMap.data[VIRTIO_WIN_IMAGE];
+    } catch (error) {
+      console.error(error);
+    }
 
-  const virtualMachine = getTemplateVirtualMachineObject(template);
+    const virtualMachine = getTemplateVirtualMachineObject(draftTemplate);
 
-  const virtualMachineWithDrivers = produceVMDisks(virtualMachine, (draftVM) => {
-    draftVM.spec.template.spec.domain.devices.disks.push({
-      name: WINDOWS_DRIVERS_DISK,
-      cdrom: {
-        bus: 'sata',
-      },
+    draftTemplate.objects[0] = produceVMDisks(virtualMachine, (draftVM) => {
+      draftVM.spec.template.spec.domain.devices.disks.push({
+        name: WINDOWS_DRIVERS_DISK,
+        cdrom: {
+          bus: 'sata',
+        },
+      });
+
+      draftVM.spec.template.spec.volumes.push({
+        name: WINDOWS_DRIVERS_DISK,
+        containerDisk: {
+          image: driversImage,
+        },
+      });
     });
-
-    draftVM.spec.template.spec.volumes.push({
-      name: WINDOWS_DRIVERS_DISK,
-      containerDisk: {
-        image: driversImage,
-      },
-    });
-  });
-
-  return produce(template, (draftTemplate) => {
-    draftTemplate.objects = [virtualMachineWithDrivers];
   });
 };

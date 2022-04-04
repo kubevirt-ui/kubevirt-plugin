@@ -41,12 +41,12 @@ export const produceVMDisks = (
   return produce(vm, (draftVM) => {
     ensurePath(draftVM, ['spec.template.spec.domain.devices']);
 
-    if (!vm.spec.template.spec.domain.devices.disks)
-      vm.spec.template.spec.domain.devices.disks = [];
+    if (!draftVM.spec.template.spec.domain.devices.disks)
+      draftVM.spec.template.spec.domain.devices.disks = [];
 
-    if (!vm.spec.template.spec.volumes) vm.spec.template.spec.volumes = [];
+    if (!draftVM.spec.template.spec.volumes) draftVM.spec.template.spec.volumes = [];
 
-    if (!vm.spec.dataVolumeTemplates) vm.spec.dataVolumeTemplates = [];
+    if (!draftVM.spec.dataVolumeTemplates) draftVM.spec.dataVolumeTemplates = [];
 
     updateDisks(draftVM);
   });
