@@ -41,8 +41,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
       // VirtualMachineActionFactory.clone(vm),
       migrateOrCancelMigration,
       // VirtualMachineActionFactory.openConsole(vm),
-      VirtualMachineActionFactory.editAnnotations(vm, createModal),
       VirtualMachineActionFactory.editLabels(vm, createModal),
+      VirtualMachineActionFactory.editAnnotations(vm, createModal),
       VirtualMachineActionFactory.delete(vm),
     ];
   }, [vm, vmim, createModal]);
