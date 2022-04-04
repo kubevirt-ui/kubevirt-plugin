@@ -1,15 +1,15 @@
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { V1Template } from '@kubevirt-utils/models';
+import { getTemplateOS, OS_NAME_TYPES, OS_NAMES } from '@kubevirt-utils/resources/template';
 import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getTemplateProviderName } from '../../utils/selectors';
 
-type TemplateProviderProps = {
+type ItemsToFilterProps = {
   id: string;
   title: string;
 };
 
-const useTemplateProviders = (): TemplateProviderProps[] => {
+const useTemplateProviders = (): ItemsToFilterProps[] => {
   const { t } = useKubevirtTranslation();
 
   return [
@@ -24,22 +24,18 @@ const useTemplateProviders = (): TemplateProviderProps[] => {
   ];
 };
 
-// return VM template provider name or 'Other' if the provider name not included in the array of providers available for filtering
-const getTemplateProviderNameWithOther = (template: V1Template, templateProviders): string => {
-  const providerName = getTemplateProviderName(template);
-
-  return !templateProviders?.find((s: TemplateProviderProps) => s.id === providerName) ||
-    providerName === 'Other'
+// return the name (of VM template provider/OS) or 'Other' if the name not included in the array of available items for filtering
+const getItemNameWithOther = (itemName: string, items: ItemsToFilterProps[]): string =>
+  !items?.find((s: ItemsToFilterProps) => s.id === itemName) || itemName === 'Other'
     ? 'Other'
-    : providerName;
-};
+    : itemName;
 
 const includeFilter = (
   compareData: FilterValue,
-  providers: TemplateProviderProps[],
-  template: V1Template,
+  items: ItemsToFilterProps[],
+  itemName: string,
 ): boolean => {
-  const compareString = getTemplateProviderNameWithOther(template, providers);
+  const compareString = getItemNameWithOther(itemName, items);
 
   return compareData.selected?.length === 0 || compareData.selected?.includes(compareString);
 };
@@ -47,15 +43,30 @@ const includeFilter = (
 const useVirtualMachineTemplatesFilters = (): RowFilter[] => {
   const { t } = useKubevirtTranslation();
   const providers = useTemplateProviders();
+  const osNames = [
+    ...OS_NAMES,
+    {
+      id: OS_NAME_TYPES.other,
+      title: t('Other'),
+    },
+  ];
 
   return [
     {
       filterGroupName: t('Template provider'),
       type: 'template-provider',
-      reducer: (obj) => getTemplateProviderNameWithOther(obj, providers),
+      reducer: (obj) => getItemNameWithOther(getTemplateProviderName(obj), providers),
       filter: (availableTemplateProviders, obj) =>
-        includeFilter(availableTemplateProviders, providers, obj),
+        includeFilter(availableTemplateProviders, providers, getTemplateProviderName(obj)),
       items: providers,
+    },
+    {
+      filterGroupName: t('OS'),
+      type: 'osName',
+      reducer: (obj) => getItemNameWithOther(getTemplateOS(obj), osNames),
+      filter: (availableOsNames, obj) =>
+        includeFilter(availableOsNames, osNames, getTemplateOS(obj)),
+      items: osNames,
     },
   ];
 };

@@ -4,6 +4,7 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import { useVirtualMachineTemplatesCPUMemory } from '../hooks/useVirtualMachineTemplatesCPUMemory';
+import useWorkloadProfile from '../hooks/useWorkloadProfile';
 
 import VirtualMachineTemplatesSource from './VirtualMachineTemplatesSource';
 
@@ -19,6 +20,9 @@ const VirtualMachineTemplatesRow: React.FC<RowProps<V1Template, { kind: string }
       </TableData>
       <TableData id="namespace" activeColumnIDs={activeColumnIDs}>
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
+      </TableData>
+      <TableData id="workload" activeColumnIDs={activeColumnIDs}>
+        {useWorkloadProfile(obj)}
       </TableData>
       <TableData id="availability" activeColumnIDs={activeColumnIDs}>
         <VirtualMachineTemplatesSource template={obj} />
