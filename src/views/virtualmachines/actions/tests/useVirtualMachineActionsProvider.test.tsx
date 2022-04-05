@@ -28,6 +28,8 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-restart',
       'vm-action-pause',
       'vm-action-migrate',
+      'vm-action-edit-labels',
+      'vm-action-edit-annotations',
       'vm-action-delete',
     ]);
   });
@@ -48,6 +50,8 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-restart',
       'vm-action-pause',
       'vm-action-migrate',
+      'vm-action-edit-labels',
+      'vm-action-edit-annotations',
       'vm-action-delete',
     ]);
   });
@@ -68,6 +72,8 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-restart',
       'vm-action-unpause',
       'vm-action-migrate',
+      'vm-action-edit-labels',
+      'vm-action-edit-annotations',
       'vm-action-delete',
     ]);
   });
@@ -88,6 +94,8 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-restart',
       'vm-action-pause',
       'vm-action-cancel-migrate',
+      'vm-action-edit-labels',
+      'vm-action-edit-annotations',
       'vm-action-delete',
     ]);
   });

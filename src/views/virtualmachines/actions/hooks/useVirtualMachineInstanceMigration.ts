@@ -2,15 +2,14 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+
+import { VirtualMachineInstanceMigrationModel } from '../actions';
 
 const useVirtualMachineInstanceMigration = (vm: V1VirtualMachine) => {
   const [vmims] = useK8sWatchResource<V1VirtualMachineInstanceMigration[]>({
-    groupVersionKind: {
-      version: 'v1',
-      kind: 'VirtualMachineInstanceMigration',
-      group: 'kubevirt.io',
-    },
+    groupVersionKind: modelToGroupVersionKind(VirtualMachineInstanceMigrationModel),
     isList: true,
     namespace: vm?.metadata?.namespace,
     name: `${vm?.metadata?.name}-migration`,

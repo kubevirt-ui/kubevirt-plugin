@@ -4,7 +4,9 @@ import produce from 'immer';
 import { ensurePath } from '@catalog/utils/WizardVMContext';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
+import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
@@ -16,7 +18,7 @@ import {
   getOperatingSystem,
   getOperatingSystemName,
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { k8sUpdate, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sPatch, k8sUpdate, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
@@ -87,6 +89,29 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           )}
           moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
           breadcrumb="VirtualMachine.metadata.labels"
+          isEdit
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <LabelsModal
+                obj={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                onLabelsSubmit={(labels) =>
+                  k8sPatch({
+                    model: VirtualMachineModel,
+                    resource: vm,
+                    data: [
+                      {
+                        op: 'replace',
+                        path: '/metadata/labels',
+                        value: labels,
+                      },
+                    ],
+                  })
+                }
+              />
+            ))
+          }
         />
         <VirtualMachineDescriptionItem
           descriptionData={<VirtualMachineAnnotations annotations={vm?.metadata?.annotations} />}
@@ -98,6 +123,29 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           )}
           moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
           breadcrumb="VirtualMachine.metadata.annotations"
+          isEdit
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <AnnotationsModal
+                obj={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={(updatedAnnotations) =>
+                  k8sPatch({
+                    model: VirtualMachineModel,
+                    resource: vm,
+                    data: [
+                      {
+                        op: 'replace',
+                        path: '/metadata/annotations',
+                        value: updatedAnnotations,
+                      },
+                    ],
+                  })
+                }
+              />
+            ))
+          }
         />
         <VirtualMachineDescriptionItem
           descriptionData={getAnnotation(vm, DESCRIPTION_ANNOTATION) || None}
