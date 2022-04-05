@@ -4,6 +4,7 @@ import { Trans } from 'react-i18next';
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -27,7 +28,7 @@ type LabelsProps = {
 
 const Labels: React.FC<LabelsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [isLabelsModalOpen, setIsLabelsModalOpen] = React.useState(false);
+  const { createModal } = useModal();
   return (
     <>
       <DescriptionListTermHelpText>
@@ -64,31 +65,33 @@ const Labels: React.FC<LabelsProps> = ({ vmi }) => {
         </LabelGroup>
         <Button
           isInline
-          onClick={() => setIsLabelsModalOpen(true)}
+          onClick={() =>
+            createModal((props) => (
+              <LabelsModal
+                obj={vmi}
+                {...props}
+                onLabelsSubmit={(labels) =>
+                  k8sPatch({
+                    model: VirtualMachineInstanceModel,
+                    resource: vmi,
+                    data: [
+                      {
+                        op: 'replace',
+                        path: '/metadata/labels',
+                        value: labels,
+                      },
+                    ],
+                  })
+                }
+              />
+            ))
+          }
           variant="link"
           icon={
             <PencilAltIcon className="co-icon-space-l co-icon-space-r pf-c-button-icon--plain" />
           }
           iconPosition={'right'}
         ></Button>
-        <LabelsModal
-          obj={vmi}
-          isOpen={isLabelsModalOpen}
-          onClose={() => setIsLabelsModalOpen(false)}
-          onLabelsSubmit={(labels) =>
-            k8sPatch({
-              model: VirtualMachineInstanceModel,
-              resource: vmi,
-              data: [
-                {
-                  op: 'replace',
-                  path: '/metadata/labels',
-                  value: labels,
-                },
-              ],
-            })
-          }
-        />
       </DescriptionListDescription>
     </>
   );
