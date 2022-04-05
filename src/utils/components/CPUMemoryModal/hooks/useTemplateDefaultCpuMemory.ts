@@ -21,10 +21,18 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (vm) => {
   const templateName = vm?.metadata?.labels?.['vm.kubevirt.io/template'];
   const templateNamespace = vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'];
 
+  if (!templateName || !templateNamespace) {
+    return {
+      data: null,
+      loaded: true,
+      error: null,
+    }
+  }
   const [template, templateLoaded, templateError] = useK8sWatchResource<V1Template>({
     groupVersionKind: modelToGroupVersionKind(TemplateModel),
     name: templateName,
     namespace: templateNamespace,
+    isList: false,
   });
 
   const defaultMemory = getMemorySize(
