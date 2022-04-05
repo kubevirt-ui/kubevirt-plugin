@@ -89,11 +89,22 @@ export const getTemplateOS = (template: V1Template): string => {
 };
 
 /**
- * A selector that returns the network interfaces of a given template
+ * A selector that returns the networks of a given template
  * @param {V1Template} template - template
  */
-export const getTemplateNetworkInterfaces = (template: V1Template): V1Network[] => {
+export const getTemplateNetworks = (template: V1Template): V1Network[] => {
   return getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.networks ?? [];
+};
+
+/**
+ * A selector that returns the interfaces of a given template
+ * @param {V1Template} template - template
+ */
+export const getTemplateInterfaces = (template: V1Template): V1Network[] => {
+  return (
+    getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.devices?.interfaces ??
+    []
+  );
 };
 
 /**

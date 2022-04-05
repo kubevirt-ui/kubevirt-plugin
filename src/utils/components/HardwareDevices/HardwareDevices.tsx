@@ -2,21 +2,23 @@ import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import HardwareDevicesModal from './HardwareDevicesModal';
-import { useModal } from '../ModalProvider/ModalProvider';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
-import { HARDWARE_DEVICE_TYPE } from './utils/constants';
 import {
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
 } from '@patternfly/react-core';
+
+import { useModal } from '../ModalProvider/ModalProvider';
+
+import { HARDWARE_DEVICE_TYPE } from './utils/constants';
+import HardwareDevicesModal from './HardwareDevicesModal';
 import HardwareDevicesTable from './HardwareDevicesTable';
 import HardwareDeviceTitle from './HardwareDeviceTitle';
 
 type HardwareDevicesProps = {
   vm: V1VirtualMachine;
-  onSubmit: (vm: V1VirtualMachine) => Promise<void | V1VirtualMachine>;
+  onSubmit?: (vm: V1VirtualMachine) => Promise<void | V1VirtualMachine>;
   canEdit?: boolean;
 };
 

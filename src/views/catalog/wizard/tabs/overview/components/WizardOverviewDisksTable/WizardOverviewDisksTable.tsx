@@ -14,12 +14,13 @@ import {
 
 export const WizardOverviewDisksTable: React.FC<{
   vm: V1VirtualMachine;
-}> = React.memo(({ vm }) => {
+  isInlineGrid?: boolean;
+}> = React.memo(({ vm, isInlineGrid }) => {
   const [disks] = useWizardDisksTableData(vm);
 
   const { t } = useKubevirtTranslation();
   return (
-    <DescriptionList columnModifier={{ default: '3Col' }} isInlineGrid>
+    <DescriptionList columnModifier={{ default: '3Col' }} isInlineGrid={isInlineGrid}>
       <DescriptionListGroup>
         <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
         <DescriptionListDescription>

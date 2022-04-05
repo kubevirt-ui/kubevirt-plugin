@@ -10,6 +10,7 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+
 import './hardware-devices-table.scss';
 
 type HardwareDevicesTableProps = {

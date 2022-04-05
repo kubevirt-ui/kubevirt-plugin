@@ -22,12 +22,13 @@ export const interfacesTypes = {
 export const WizardOverviewNetworksTable: React.FC<{
   networks: V1Network[];
   interfaces: V1Interface[];
-}> = React.memo(({ networks = [], interfaces = [] }) => {
+  isInlineGrid?: boolean;
+}> = React.memo(({ networks = [], interfaces = [], isInlineGrid }) => {
   const { t } = useKubevirtTranslation();
   const networkData = getNetworkInterfaceRowData(networks, interfaces);
 
   return (
-    <DescriptionList columnModifier={{ default: '3Col' }} isInlineGrid>
+    <DescriptionList columnModifier={{ default: '3Col' }} isInlineGrid={isInlineGrid}>
       <DescriptionListGroup>
         <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
         <DescriptionListDescription>
