@@ -25,15 +25,6 @@ export const useAvailableSourceTemplates = ({
   const [templatesWithSourceLoaded, setTemplatesWithSourceLoaded] = React.useState(false);
   const [error, setError] = React.useState<any>();
 
-  const initialAvailableTemplates = React.useMemo(
-    () =>
-      templates.filter((t) => {
-        const bootSource = getTemplateBootSourceType(t);
-        return bootSource?.type === BOOT_SOURCE.REGISTRY || bootSource?.type === BOOT_SOURCE.URL;
-      }),
-    [templates],
-  );
-
   const promises = React.useMemo(
     () =>
       onlyAvailable &&
@@ -64,16 +55,24 @@ export const useAvailableSourceTemplates = ({
             }
           });
         }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onlyAvailable, templates],
   );
 
-  const templatesToRender = React.useMemo(
+  const initialAvailableTemplates = React.useMemo(
     () =>
-      onlyAvailable
-        ? [...initialAvailableTemplates, ...Object.values(templatesWithSource)]
-        : templates,
-    [onlyAvailable, initialAvailableTemplates, templatesWithSource, templates],
+      templates.filter((t) => {
+        const bootSource = getTemplateBootSourceType(t);
+        return bootSource?.type === BOOT_SOURCE.REGISTRY || bootSource?.type === BOOT_SOURCE.URL;
+      }),
+    [templates],
+  );
+
+  const availableTemplates = React.useMemo(
+    () =>
+      [...initialAvailableTemplates, ...Object.values(templatesWithSource)].filter((t) =>
+        namespace ? t.metadata.namespace === namespace : true,
+      ),
+    [initialAvailableTemplates, namespace, templatesWithSource],
   );
 
   React.useEffect(() => {
@@ -86,7 +85,7 @@ export const useAvailableSourceTemplates = ({
   }, [promises]);
 
   return {
-    templates: templatesToRender,
+    templates: onlyAvailable ? availableTemplates : templates,
     loaded,
     initialSourcesLoaded: templatesWithSourceLoaded || Object.keys(templatesWithSource).length > 0,
     error: error || loadError,
