@@ -36,6 +36,13 @@ type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   submitBtnText?: string;
   modalVariant?: ModalVariant;
   submitBtnVariant?: ButtonVariant;
+  titleIconVariant?:
+    | 'success'
+    | 'danger'
+    | 'warning'
+    | 'info'
+    | 'default'
+    | React.ComponentType<any>;
 };
 
 export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(
@@ -54,6 +61,7 @@ const TabModal: TabModalFC = React.memo(
     submitBtnText,
     modalVariant,
     submitBtnVariant,
+    titleIconVariant,
   }) => {
     const { t } = useKubevirtTranslation();
 
@@ -87,6 +95,7 @@ const TabModal: TabModalFC = React.memo(
         className="ocs-modal co-catalog-page__overlay"
         onClose={closeModal}
         title={headerText}
+        titleIconVariant={titleIconVariant}
         footer={
           <Stack hasGutter>
             {error && (
