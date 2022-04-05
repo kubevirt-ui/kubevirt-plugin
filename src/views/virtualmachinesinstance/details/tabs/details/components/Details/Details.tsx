@@ -14,15 +14,24 @@ import {
 import { LinkIcon } from '@patternfly/react-icons';
 
 import VirtualMachinesInstancesStatus from '../../../../../components/VirtualMachinesInstancesStatus';
+import useGuestOS from '../../../../hooks/useGuestOS';
 
 import Annotations from './Annotations/Annotations';
+import BootOrder from './BootOrder/BootOrder';
 import CreateAt from './CreateAt/CreateAt';
 import Description from './Description/Description';
+import HardwareDevices from './HadwareDevices/HardwareDevices';
+import Hostname from './Hostname/Hostname';
+import IP from './IP/IP';
 import Labels from './Labels/Labels';
 import Name from './Name/Name';
 import Namespace from './Namespace/Namespace';
+import Node from './Node/Node';
 import OperationSystem from './OperationSystem/OperationSystem';
 import Owner from './Owner/Owner';
+import Pods from './Pods/Pods';
+import Timezone from './Timezone/Timezone';
+import WorkloadProfile from './WorkloadProfile/WorkloadProfile';
 
 type DetailsProps = {
   vmi: V1VirtualMachineInstance;
@@ -30,8 +39,8 @@ type DetailsProps = {
 };
 
 const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
-  console.log('vmi: ', vmi);
   const { t } = useKubevirtTranslation();
+  const [guestAgentData] = useGuestOS(vmi);
 
   return (
     <div>
@@ -67,25 +76,50 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
                 <VirtualMachinesInstancesStatus status={vmi?.status?.phase} />
               </DescriptionListDescription>
               <DescriptionListTerm>{t('Pod')}</DescriptionListTerm>
-              <DescriptionListDescription>pod</DescriptionListDescription>
+              <DescriptionListDescription>
+                <Pods namespace={vmi?.metadata?.namespace} />
+              </DescriptionListDescription>
               <DescriptionListTerm>{t('Boot Order')}</DescriptionListTerm>
-              <DescriptionListDescription>boot order</DescriptionListDescription>
+              <DescriptionListDescription>
+                <BootOrder
+                  disks={vmi?.spec?.domain?.devices?.disks}
+                  interfaces={vmi?.spec?.domain?.devices?.interfaces}
+                />
+              </DescriptionListDescription>
               <DescriptionListTerm>{t('IP Address')}</DescriptionListTerm>
-              <DescriptionListDescription>ip address</DescriptionListDescription>
+              <DescriptionListDescription>
+                <IP vmi={vmi} />
+              </DescriptionListDescription>
               <DescriptionListTerm>{t('Hostname')}</DescriptionListTerm>
-              <DescriptionListDescription>hostname</DescriptionListDescription>
+              <DescriptionListDescription>
+                <Hostname guestAgentData={guestAgentData} />
+              </DescriptionListDescription>
               <DescriptionListTerm>{t('Time Zone')}</DescriptionListTerm>
-              <DescriptionListDescription>time zone</DescriptionListDescription>
+              <DescriptionListDescription>
+                <Timezone guestAgentData={guestAgentData} />
+              </DescriptionListDescription>
               <DescriptionListTerm>{t('Node')}</DescriptionListTerm>
-              <DescriptionListDescription>node</DescriptionListDescription>
+              <DescriptionListDescription>
+                <Node nodeName={vmi?.status?.nodeName} />
+              </DescriptionListDescription>
               <DescriptionListTerm>{t('Workload Profile')}</DescriptionListTerm>
-              <DescriptionListDescription>workload profile</DescriptionListDescription>
+              <DescriptionListDescription>
+                <WorkloadProfile annotations={vmi?.metadata?.annotations} />
+              </DescriptionListDescription>
               <DescriptionListTerm>{t('User Credentials')}</DescriptionListTerm>
-              <DescriptionListDescription>user creds</DescriptionListDescription>
+              <DescriptionListDescription>
+                {/* placeholder */}
+                <div className="text-muted">{t('SSH service is not available')} </div>
+              </DescriptionListDescription>
               <DescriptionListTerm>{t('SSH Access')}</DescriptionListTerm>
-              <DescriptionListDescription>ssh access</DescriptionListDescription>
+              <DescriptionListDescription>
+                {/* placeholder */}
+                <div className="text-muted">{t('SSH service is not available')} </div>
+              </DescriptionListDescription>
               <DescriptionListTerm>{t('Hardware devices')}</DescriptionListTerm>
-              <DescriptionListDescription>hardware devices</DescriptionListDescription>
+              <DescriptionListDescription>
+                <HardwareDevices devices={vmi?.spec?.domain?.devices} />
+              </DescriptionListDescription>
             </DescriptionListGroup>
           </DescriptionList>
         </GridItem>
