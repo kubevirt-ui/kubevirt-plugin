@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -13,6 +14,7 @@ import useVirtualMachineInstanceMigration from './useVirtualMachineInstanceMigra
 type UseVirtualMachineActionsProvider = (vm: V1VirtualMachine) => [Action[], boolean, any];
 
 const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) => {
+  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const vmim = useVirtualMachineInstanceMigration(vm);
 
@@ -22,30 +24,30 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
     const { Stopped, Paused, Migrating } = printableVMStatus;
 
     const startOrStop = [Stopped, Paused].includes(printableStatus)
-      ? VirtualMachineActionFactory.start(vm)
-      : VirtualMachineActionFactory.stop(vm);
+      ? VirtualMachineActionFactory.start(vm, t)
+      : VirtualMachineActionFactory.stop(vm, t);
 
     const migrateOrCancelMigration =
       printableStatus === Migrating || vmim
-        ? VirtualMachineActionFactory.cancelMigration(vm, vmim)
-        : VirtualMachineActionFactory.migrate(vm);
+        ? VirtualMachineActionFactory.cancelMigration(vm, vmim, t)
+        : VirtualMachineActionFactory.migrate(vm, t);
 
     const pauseOrUnpause =
       printableStatus === Paused
-        ? VirtualMachineActionFactory.unpause(vm)
-        : VirtualMachineActionFactory.pause(vm);
+        ? VirtualMachineActionFactory.unpause(vm, t)
+        : VirtualMachineActionFactory.pause(vm, t);
     return [
       startOrStop,
-      VirtualMachineActionFactory.restart(vm),
+      VirtualMachineActionFactory.restart(vm, t),
       pauseOrUnpause,
       // VirtualMachineActionFactory.clone(vm),
       migrateOrCancelMigration,
       // VirtualMachineActionFactory.openConsole(vm),
-      VirtualMachineActionFactory.editLabels(vm, createModal),
-      VirtualMachineActionFactory.editAnnotations(vm, createModal),
-      VirtualMachineActionFactory.delete(vm),
+      VirtualMachineActionFactory.editLabels(vm, createModal, t),
+      VirtualMachineActionFactory.editAnnotations(vm, createModal, t),
+      VirtualMachineActionFactory.delete(vm, t),
     ];
-  }, [vm, vmim, createModal]);
+  }, [vm, vmim, createModal, t]);
 
   return [actions, inFlight, undefined];
 };
