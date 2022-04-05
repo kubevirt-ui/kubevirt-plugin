@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { bytesFromQuantity } from '@catalog/utils/quantity';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
@@ -41,8 +42,7 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
 
       const size =
         dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage ||
-        dataVolumeTemplate?.spec?.pvc?.resources?.requests?.storage ||
-        '-';
+        dataVolumeTemplate?.spec?.pvc?.resources?.requests?.storage;
 
       const storageClass =
         dataVolumeTemplate?.spec?.storage?.storageClassName ||
@@ -52,7 +52,7 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
       return {
         name: device?.disk?.name,
         source: source(),
-        size,
+        size: size ? bytesFromQuantity(size, 2).join('') : '-',
         storageClass,
         interface: getPrintableDiskInterface(device?.disk),
         drive: getPrintableDiskDrive(device?.disk),

@@ -178,11 +178,11 @@ describe('Test CustomizeSource', () => {
     });
 
     act(() => {
-      userEvent.click(screen.getByText(PVC_SIZE_FORMATS.GiB));
+      userEvent.click(screen.getByText(PVC_SIZE_FORMATS.Gi));
     });
 
     act(() => {
-      userEvent.click(screen.getByText(PVC_SIZE_FORMATS.MiB));
+      userEvent.click(screen.getByText(PVC_SIZE_FORMATS.Mi));
     });
 
     expect(onChangeMock).lastCalledWith({
