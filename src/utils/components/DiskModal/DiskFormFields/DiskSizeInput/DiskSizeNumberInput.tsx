@@ -1,10 +1,7 @@
 import * as React from 'react';
 
 import { PVC_SIZE_FORMATS } from '@catalog/customize/components/CustomizeSource';
-import {
-  bytesFromQuantity,
-  ISUnitFromBytes,
-} from '@catalog/customize/components/CustomizeSource/quantity';
+import { bytesFromQuantity } from '@catalog/utils/quantity';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -32,23 +29,23 @@ const DiskSizeNumberInput: React.FC<DiskSizeNumberInputProps> = ({ diskSize, onC
 
   const onFormatChange = React.useCallback(
     (event, newUnit: PVC_SIZE_FORMATS) => {
-      onChange(ISUnitFromBytes(`${value}${newUnit}`));
+      onChange(`${value}${newUnit}`);
       toggleSelect(false);
     },
     [onChange, value],
   );
 
   const onMinus = React.useCallback(() => {
-    if (value > 0) onChange(ISUnitFromBytes(`${(value || 0) - 1}${quantityUnit}`));
+    if (value > 0) onChange(`${(value || 0) - 1}${quantityUnit}`);
   }, [onChange, quantityUnit, value]);
 
   const onPlus = React.useCallback(
-    () => onChange(ISUnitFromBytes(`${(value || 0) + 1}${quantityUnit}`)),
+    () => onChange(`${(value || 0) + 1}${quantityUnit}`),
     [onChange, quantityUnit, value],
   );
 
   const onChangeSize = React.useCallback(
-    (event) => onChange(ISUnitFromBytes(`${Number(event.currentTarget.value)}${quantityUnit}`)),
+    (event) => onChange(`${Number(event.currentTarget.value)}${quantityUnit}`),
     [onChange, quantityUnit],
   );
 

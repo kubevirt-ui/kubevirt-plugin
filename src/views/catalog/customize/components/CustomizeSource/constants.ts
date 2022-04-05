@@ -10,7 +10,7 @@ export type SOURCE_OPTIONS_IDS =
   | typeof REGISTRY_SOURCE_NAME;
 
 export enum PVC_SIZE_FORMATS {
-  MiB = 'MiB',
-  GiB = 'GiB',
-  TiB = 'TiB',
+  Mi = 'Mi',
+  Gi = 'Gi',
+  Ti = 'Ti',
 }

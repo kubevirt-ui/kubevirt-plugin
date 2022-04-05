@@ -13,8 +13,9 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
+import { bytesFromQuantity } from '../../../utils/quantity';
+
 import { PVC_SIZE_FORMATS } from './constants';
-import { bytesFromQuantity, ISUnitFromBytes } from './quantity';
 
 type VolumeSizeProps = {
   quantity: string;
@@ -30,23 +31,23 @@ export const VolumeSize: React.FC<VolumeSizeProps> = ({ quantity, onChange }) =>
 
   const onFormatChange = React.useCallback(
     (event, newUnit: PVC_SIZE_FORMATS) => {
-      onChange(ISUnitFromBytes(`${value}${newUnit}`));
+      onChange(`${value}${newUnit}`);
       toggleSelect(false);
     },
     [onChange, value],
   );
 
   const onMinus = React.useCallback(() => {
-    if (value > 0) onChange(ISUnitFromBytes(`${(value || 0) - 1}${quantityUnit}`));
+    if (value > 0) onChange(`${(value || 0) - 1}${quantityUnit}`);
   }, [onChange, quantityUnit, value]);
 
   const onPlus = React.useCallback(
-    () => onChange(ISUnitFromBytes(`${(value || 0) + 1}${quantityUnit}`)),
+    () => onChange(`${(value || 0) + 1}${quantityUnit}`),
     [onChange, quantityUnit, value],
   );
 
   const _onChangeSize = React.useCallback(
-    (event) => onChange(ISUnitFromBytes(`${Number(event.currentTarget.value)}${quantityUnit}`)),
+    (event) => onChange(`${Number(event.currentTarget.value)}${quantityUnit}`),
     [onChange, quantityUnit],
   );
 
