@@ -2,6 +2,8 @@ import * as React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesModal';
+import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,8 +19,6 @@ import { DescriptionList, GridItem } from '@patternfly/react-core';
 import VirtualMachineStatus from '../../../../../../list/components/VirtualMachineStatus/VirtualMachineStatus';
 import { VirtualMachineDetailsRightGridLayoutPresentation } from '../../../utils/gridHelper';
 import BootOrderSummary from '../../BootOrderSummary/BootOrderSummary';
-import HardwareDevicesModal from '../../modals/HardwareDevices/HardwareDevicesModal';
-import { HARDWARE_DEVICE_TYPE } from '../../modals/HardwareDevices/utils/constants';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 type VirtualMachineDetailsRightGridLayout = {
