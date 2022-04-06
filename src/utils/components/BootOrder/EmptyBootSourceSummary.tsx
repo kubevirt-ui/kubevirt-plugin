@@ -4,8 +4,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ExpandableSection, Text, TextVariants } from '@patternfly/react-core';
 
 import { BootableDeviceType } from '../../resources/vm/utils/boot-order/bootOrder';
-import BootableDevicesList from './BootableDevicesList';
 import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
+
+import BootableDevicesList from './BootableDevicesList';
 
 type BootOrderSummaryProps = {
   devices: BootableDeviceType[];

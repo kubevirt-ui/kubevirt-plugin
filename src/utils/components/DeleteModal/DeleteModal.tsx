@@ -2,9 +2,9 @@ import * as React from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant } from '@patternfly/react-core';
+
 import DeleteResourceMessage from '../DeleteResourceMessage/DeleteResourceMessage';
 
 type DeleteModalProps = {

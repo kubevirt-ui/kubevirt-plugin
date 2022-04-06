@@ -88,7 +88,7 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
           resultDisk,
         ];
         vmDraft.spec.template.spec.volumes = [...(getVolumes(vmDraft) || []), resultVolume];
-        if(sourceRequiresDataVolume) {
+        if (sourceRequiresDataVolume) {
           vmDraft.spec.dataVolumeTemplates = resultDataVolumeTemplate && [
             ...(getDataVolumeTemplates(vmDraft) || []),
             resultDataVolumeTemplate,
@@ -99,7 +99,7 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
     });
 
     return isVMRunning ? vm : updatedVM; // we will create DataVolume and make a API call to attach the hotplug disk
-  }, [vm, diskState, isVMRunning, diskSourceState]);
+  }, [vm, isVMRunning, diskState, diskSourceState, sourceRequiresDataVolume]);
 
   return (
     <TabModal

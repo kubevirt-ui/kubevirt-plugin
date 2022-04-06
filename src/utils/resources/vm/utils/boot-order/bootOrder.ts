@@ -28,8 +28,8 @@ export enum DeviceType {
  * Transform disk and nics into BootableDeviceType[]
  * @date 3/20/2022 - 11:34:56 AM
  *
- * @param {V1Disk[]} [disks=[]]
- * @param {V1Interface[]} [nics=[]]
+ * @param {V1Disk[]} [disks=[]] - disks
+ * @param {V1Interface[]} [nics=[]] - nics
  * @returns {BootableDeviceType[]}
  */
 export const transformDevices = (

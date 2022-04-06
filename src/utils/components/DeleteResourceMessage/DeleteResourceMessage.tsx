@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Trans } from 'react-i18next';
-import { useKubevirtTranslation } from "@kubevirt-utils/hooks/useKubevirtTranslation";
+
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 const DeleteResourceMessage: React.FC<{ obj: K8sResourceCommon }> = ({ obj }) => {
   const { t } = useKubevirtTranslation();

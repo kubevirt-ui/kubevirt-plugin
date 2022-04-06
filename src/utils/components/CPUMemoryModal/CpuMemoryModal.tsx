@@ -26,7 +26,7 @@ type CPUMemoryModalProps = {
   vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>
+  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
 };
 
 const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, onSubmit }) => {

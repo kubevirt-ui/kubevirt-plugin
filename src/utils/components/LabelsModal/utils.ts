@@ -14,4 +14,3 @@ export const labelsArrayToObject = (labels: string[]): { [key: string]: string }
 export const isLabelValid = (label: string) => {
   return /^[0-9A-Za-z/\-_.]+\s*=?\s*[0-9A-Za-z/\-_.]+$/.test(label) && !/\s/g.test(label);
 };
-
