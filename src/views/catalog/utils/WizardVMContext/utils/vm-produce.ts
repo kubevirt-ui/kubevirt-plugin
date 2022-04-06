@@ -51,3 +51,20 @@ export const produceVMDisks = (
     updateDisks(draftVM);
   });
 };
+
+export const produceVMDevices = (
+  vm: V1VirtualMachine,
+  updateDevices: (vmDraft: WritableDraft<V1VirtualMachine>) => void,
+) => {
+  return produce(vm, (draftVM) => {
+    ensurePath(draftVM, ['spec.template.spec.domain.devices']);
+
+    if (!draftVM.spec.template.spec.domain.devices.gpus)
+      draftVM.spec.template.spec.domain.devices.gpus = [];
+
+    if (!draftVM.spec.template.spec.domain.devices.hostDevices)
+      draftVM.spec.template.spec.domain.devices.hostDevices = [];
+
+    updateDevices(draftVM);
+  });
+};

@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import {
   V1KubeVirtConfiguration,
   V1PermittedHostDevices,
@@ -8,17 +6,12 @@ import { HyperConvergedModelGroupVersionKind } from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 const useHCPermittedHostDevices = (): V1PermittedHostDevices => {
-  const hcWatchResource = React.useMemo(() => {
-    return {
-      groupVersionKind: HyperConvergedModelGroupVersionKind,
-      isList: true,
-    };
-  }, []);
+  const [hcList] = useK8sWatchResource({
+    groupVersionKind: HyperConvergedModelGroupVersionKind,
+    isList: true,
+  });
 
-  const [hcList] = useK8sWatchResource(hcWatchResource);
-
-  const hc = React.useMemo(() => hcList?.[0], [hcList]);
-  const { permittedHostDevices }: V1KubeVirtConfiguration = hc?.spec || {};
+  const { permittedHostDevices }: V1KubeVirtConfiguration = hcList?.[0]?.spec || {};
 
   return permittedHostDevices;
 };

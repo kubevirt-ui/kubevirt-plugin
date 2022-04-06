@@ -17,17 +17,15 @@ const HardwareDevicesList: React.FC<HardwareDevicesListProps> = ({
 }) => {
   const columns = useHardwareDevicesColumns();
   return (
-    <>
-      <VirtualizedTable
-        data={devices || []}
-        unfilteredData={devices || []}
-        loaded
-        loadError={false}
-        columns={columns}
-        Row={HardwareDeviceRow}
-        rowData={{ handleRemoveDevice }}
-      />
-    </>
+    <VirtualizedTable
+      data={devices || []}
+      unfilteredData={devices || []}
+      loaded
+      loadError={false}
+      columns={columns}
+      Row={HardwareDeviceRow}
+      rowData={{ handleRemoveDevice }}
+    />
   );
 };
 

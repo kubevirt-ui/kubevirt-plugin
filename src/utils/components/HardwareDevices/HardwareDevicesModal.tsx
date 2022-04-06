@@ -1,5 +1,4 @@
 import * as React from 'react';
-import produce from 'immer';
 
 import { V1GPU, V1HostDevice, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -12,6 +11,7 @@ import PlainIconButton from './form/PlainIconButton';
 import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
 import HardwareDevicesList from './list/HardwareDevicesList';
 import { HARDWARE_DEVICE_TYPE } from './utils/constants';
+import { produceVMDevices } from '@catalog/utils/WizardVMContext';
 
 type HardwareDevicesModalProps = {
   vm: V1VirtualMachine;
@@ -67,8 +67,8 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
   };
 
   const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {
-    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      if (type === 'gpus') {
+    const updatedVM = produceVMDevices(vm, (vmDraft: V1VirtualMachine) => {
+      if (type === HARDWARE_DEVICE_TYPE.GPUS) {
         vmDraft.spec.template.spec.domain.devices.gpus = [...(devices || [])];
       } else {
         vmDraft.spec.template.spec.domain.devices.hostDevices = [...(devices || [])];
@@ -76,6 +76,7 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
     });
     return updatedVM;
   }, [devices, type, vm]);
+
   return (
     <TabModal
       obj={updatedVirtualMachine}
@@ -108,6 +109,7 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
             icon={<PlusCircleIcon />}
             onClick={onAddDevice}
             isDisabled={addButtonDisabled}
+            className="pf-m-link--align-left"
           >
             {btnText}
           </Button>
