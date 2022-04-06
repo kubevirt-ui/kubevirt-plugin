@@ -27,11 +27,12 @@ services:
     network_mode: service:console
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
-    # Cache local workspace and copy shell history.
+    # Cache local workspace and copy shell history, gh auth.
     volumes:
       - ..:/workspace:cached
       - ~/.bash_history:/root/.bash_history
       - ~/.zsh_history:/root/.zsh_history
+      - ~/.config/gh/hosts.yml:/root/.config/gh/hosts.yml
     volumes_from:
       - x11-bridge:rw
 
