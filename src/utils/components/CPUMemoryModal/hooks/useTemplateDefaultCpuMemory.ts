@@ -33,7 +33,7 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (vm) => {
       data: null,
       loaded: true,
       error: null,
-    }
+    };
   }
 
   const defaultMemory = getMemorySize(
