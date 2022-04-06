@@ -19,7 +19,7 @@ import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
 import useWizardDisksTableData from './hooks/useWizardDisksTableData';
 
-const WizardDisksTab: React.FC<WizardVMContextType> = ({ vm, loaded, updateVM, error }) => {
+const WizardDisksTab: React.FC<WizardVMContextType> = ({ vm, loaded, updateVM }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
@@ -59,7 +59,7 @@ const WizardDisksTab: React.FC<WizardVMContextType> = ({ vm, loaded, updateVM, e
           data={filteredData}
           unfilteredData={data}
           loaded={loaded}
-          loadError={error}
+          loadError={undefined}
           columns={columns}
           Row={DiskRow}
         />
