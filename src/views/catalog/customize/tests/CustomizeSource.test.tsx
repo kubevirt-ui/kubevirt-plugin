@@ -10,6 +10,8 @@ import {
   REGISTRY_SOURCE_NAME,
 } from '../components/CustomizeSource';
 
+import { getMockTemplate } from './mocks';
+
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { mockUseK8sWatchResource } = require('./mocks');
@@ -18,6 +20,7 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
   };
 });
 
+const template = getMockTemplate();
 const onChangeMock = jest.fn();
 const setDrivers = jest.fn();
 const setCDSource = jest.fn();
@@ -31,6 +34,7 @@ describe('Test CustomizeSource', () => {
   it('Switch to cd Source with checkbox', () => {
     const { rerender } = render(
       <CustomizeSource
+        template={template}
         setDiskSource={onChangeMock}
         setDrivers={setDrivers}
         withDrivers={false}
@@ -50,6 +54,7 @@ describe('Test CustomizeSource', () => {
     const newCdSource = (setCDSource as jest.Mock).mock.calls[0][0];
     rerender(
       <CustomizeSource
+        template={template}
         setDiskSource={onChangeMock}
         setDrivers={setDrivers}
         withDrivers={false}
@@ -65,6 +70,7 @@ describe('Test CustomizeSource', () => {
     const testImageUrl = 'imageUrl';
     render(
       <CustomizeSource
+        template={template}
         setDiskSource={onChangeMock}
         setDrivers={setDrivers}
         withDrivers={false}
@@ -85,7 +91,13 @@ describe('Test CustomizeSource', () => {
 
     expect(onChangeMock).lastCalledWith({
       storage: {
-        resources: { requests: { storage: '30Gi' } },
+        resources: {
+          requests: {
+            storage:
+              template.objects[0].spec.dataVolumeTemplates[0].spec.storage.resources.requests
+                .storage,
+          },
+        },
       },
       source: {
         http: {
@@ -99,6 +111,7 @@ describe('Test CustomizeSource', () => {
     const testContainer = 'containerurl';
     render(
       <CustomizeSource
+        template={template}
         setDiskSource={onChangeMock}
         setDrivers={setDrivers}
         withDrivers={false}
@@ -106,6 +119,8 @@ describe('Test CustomizeSource', () => {
         cdSource={undefined}
       />,
     );
+    const templateStorage =
+      template.objects[0].spec.dataVolumeTemplates[0].spec.storage.resources.requests.storage;
 
     act(() => {
       fireEvent.click(screen.getByTestId(DEFAULT_SOURCE));
@@ -119,7 +134,11 @@ describe('Test CustomizeSource', () => {
 
     expect(onChangeMock).lastCalledWith({
       storage: {
-        resources: { requests: { storage: '30Gi' } },
+        resources: {
+          requests: {
+            storage: templateStorage,
+          },
+        },
       },
       source: {
         registry: {
@@ -129,7 +148,10 @@ describe('Test CustomizeSource', () => {
     });
 
     const mockedVolumeValue = '23';
-    userEvent.type(screen.getByDisplayValue('30'), `{selectall}${mockedVolumeValue}`);
+    userEvent.type(
+      screen.getByDisplayValue(parseInt(templateStorage)),
+      `{selectall}${mockedVolumeValue}`,
+    );
 
     expect(onChangeMock).lastCalledWith({
       storage: {

@@ -17,7 +17,7 @@ import { CustomizeSource, CustomizeSourceProps } from './CustomizeSource';
 
 export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = ({
   setDiskSource,
-  initialVolumeQuantity,
+  template,
   withDrivers,
   setDrivers,
   cdSource,
@@ -62,7 +62,7 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
         >
           <CustomizeSource
             setDiskSource={setDiskSource}
-            initialVolumeQuantity={initialVolumeQuantity}
+            template={template}
             withDrivers={withDrivers}
             setDrivers={setDrivers}
             cdSource={cdSource}

@@ -7,11 +7,7 @@ import {
   TemplateParameter,
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
-import {
-  V1beta1DataVolumeSpec,
-  V1DataVolumeTemplateSpec,
-  V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   generateVMName,
   getTemplateVirtualMachineObject,
@@ -45,14 +41,6 @@ export const setTemplateParameters = (template: V1Template, formData: FormData):
     };
   });
   return template;
-};
-
-export const getVirtualMachineDataVolumeTemplate = (
-  template: V1Template,
-): V1DataVolumeTemplateSpec | undefined => {
-  const dataVolumeTemplates = getTemplateVirtualMachineObject(template)?.spec?.dataVolumeTemplates;
-
-  return dataVolumeTemplates?.[0];
 };
 
 export const replaceTemplateParameterValue = (
@@ -132,10 +120,6 @@ export const getVirtualMachineNameField = (
     description: t('Virtual Machine Name'),
     value: generateVMName(template),
   };
-};
-
-export const getTemplateStorageQuantity = (template: V1Template): string | undefined => {
-  return getVirtualMachineDataVolumeTemplate(template)?.spec?.storage?.resources?.requests?.storage;
 };
 
 export const buildFields = (template: V1Template): Array<TemplateParameter[]> => {

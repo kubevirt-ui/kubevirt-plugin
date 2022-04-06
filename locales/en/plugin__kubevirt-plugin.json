@@ -146,6 +146,8 @@
   "Edit the disk or contact your cluster admin for further details._plural": "Edit the disk or contact your cluster admin for further details.",
   "Elapsed time since login": "Elapsed time since login",
   "Enable preallocation": "Enable preallocation",
+  "Enter URL to download (for example: {{importUrl}})": "Enter URL to download (for example: {{importUrl}})",
+  "Enter a container image (for example: {{containerDisk}})": "Enter a container image (for example: {{containerDisk}})",
   "Environment": "Environment",
   "Error": "Error",
   "Error Loading Template: the server could not find the requested resource": "Error Loading Template: the server could not find the requested resource",

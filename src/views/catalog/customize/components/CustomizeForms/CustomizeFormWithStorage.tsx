@@ -13,7 +13,6 @@ import { Form } from '@patternfly/react-core';
 import { addCDToTemplate } from '../../cd';
 import {
   buildFields,
-  getTemplateStorageQuantity,
   getVirtualMachineNameField,
   overrideVirtualMachineDataVolumeSpec,
 } from '../../utils';
@@ -68,7 +67,7 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ tem
 
       <ExpandableCustomizeSourceSection
         setDiskSource={setDiskSource}
-        initialVolumeQuantity={getTemplateStorageQuantity(template)}
+        template={template}
         withDrivers={windowsDrivers}
         setDrivers={setWindowsDrivers}
         cdSource={cdSource}

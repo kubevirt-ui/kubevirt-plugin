@@ -3,9 +3,11 @@ import {
   PersistentVolumeClaimModel,
   ProjectModel,
   TemplateModel,
+  V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
 
-export const getMockTemplate = () => JSON.parse(JSON.stringify(require('./data/template.json')));
+export const getMockTemplate = (): V1Template =>
+  JSON.parse(JSON.stringify(require('./data/template.json')));
 
 export const getPVCs = () => JSON.parse(JSON.stringify(require('./data/pvcs.json')));
 

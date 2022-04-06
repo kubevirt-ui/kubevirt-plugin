@@ -20,26 +20,28 @@ import { getGenericSourceCustomization, getPVCSource } from './utils';
 import { VolumeSize } from './VolumeSize';
 
 export type SelectSourceProps = {
-  initialSourceType?: SOURCE_OPTIONS_IDS;
   onSourceChange: (customSource: V1beta1DataVolumeSpec) => void;
   sourceLabel: React.ReactNode;
   initialVolumeQuantity?: string;
   withSize?: boolean;
   sourceOptions: SOURCE_OPTIONS_IDS[];
+  httpSourceHelperText?: string;
+  registrySourceHelperText?: string;
 };
 
 export const SelectSource: React.FC<SelectSourceProps> = ({
-  initialSourceType = DEFAULT_SOURCE,
   onSourceChange,
   initialVolumeQuantity = '30Gi',
   withSize = false,
   sourceOptions,
   sourceLabel,
+  httpSourceHelperText,
+  registrySourceHelperText,
 }) => {
   const { t } = useKubevirtTranslation();
   const [volumeQuantity, setVolumeQuantity] = React.useState(initialVolumeQuantity);
 
-  const [selectedSourceType, setSourceType] = React.useState<SOURCE_OPTIONS_IDS>(initialSourceType);
+  const [selectedSourceType, setSourceType] = React.useState<SOURCE_OPTIONS_IDS>(sourceOptions[0]);
   const [pvcNameSelected, selectPVCName] = React.useState<string>();
   const [pvcNamespaceSelected, selectPVCNamespace] = React.useState<string>();
   const [httpURL, setHTTPURL] = React.useState('');
@@ -110,6 +112,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           fieldId={`disk-source-required-${selectedSourceType}`}
           isRequired
           className="disk-source-form-group"
+          helperText={httpSourceHelperText}
         >
           <TextInput
             value={httpURL}
@@ -127,6 +130,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           fieldId={`disk-source-required-${selectedSourceType}`}
           isRequired
           className="disk-source-form-group"
+          helperText={registrySourceHelperText}
         >
           <TextInput
             value={containerImage}

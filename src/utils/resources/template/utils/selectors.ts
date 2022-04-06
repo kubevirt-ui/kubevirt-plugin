@@ -53,6 +53,22 @@ export const getTemplateSupportLevel = (template: V1Template): string =>
   getAnnotation(template, ANNOTATIONS.supportLevel);
 
 /**
+ * A selector that returns the containerDisks of a given template
+ * @param {V1Template} template - template
+ * @returns {string[]} array of containerDisks
+ */
+export const getTemplateContainerDisks = (template: V1Template): string[] | undefined =>
+  getAnnotation(template, ANNOTATIONS.containerDisks)?.split('\n');
+
+/**
+ * A selector that returns the import URLs of a given template
+ * @param {V1Template} template - template
+ * @returns {string[]} array of import URLS
+ */
+export const getTemplateImportURLs = (template: V1Template): string[] | undefined =>
+  getAnnotation(template, ANNOTATIONS.importURLs)?.split('\n');
+
+/**
  * A selector that returns the flavor of a given template
  * @param {V1Template} template - template
  */
