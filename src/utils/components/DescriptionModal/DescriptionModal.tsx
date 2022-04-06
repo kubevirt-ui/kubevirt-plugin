@@ -1,7 +1,9 @@
+import * as React from 'react';
+
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 import { TextArea } from '@patternfly/react-core';
-import * as React from 'react';
+
 import TabModal from '../TabModal/TabModal';
 
 type DescriptionModalProps = {

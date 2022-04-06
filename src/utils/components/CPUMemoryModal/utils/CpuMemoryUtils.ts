@@ -15,6 +15,7 @@ const unitsConvertor = new Proxy(
     Ti: TI,
   },
   {
+    // eslint-disable-next-line require-jsdoc
     get(target, prop) {
       return target[prop] || target.Gi;
     },

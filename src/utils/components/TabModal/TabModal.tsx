@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionGroup,
   Alert,
@@ -12,7 +13,6 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   isOpen: boolean;

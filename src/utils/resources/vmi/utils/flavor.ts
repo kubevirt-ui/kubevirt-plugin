@@ -17,7 +17,7 @@ export const FLAVOR_LABEL = 'flavor.template.kubevirt.io';
  * Get machine flavor (small,arge, custom, etc..)
  * @date 3/14/2022 - 1:01:02 PM
  *
- * @param {{ [key: string]: string }} labels
+ * @param {{ [key: string]: string }} labels - labels
  * @returns {string}
  */
 export const getFlavor = (labels: { [key: string]: string }): string => {

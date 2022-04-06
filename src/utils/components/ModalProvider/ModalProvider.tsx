@@ -45,9 +45,9 @@ export const useModalValue = (): ModalContextType => {
   const [modal, setModal] = React.useState<ModalComponent>();
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const createModal = (modal: ModalComponent) => {
+  const createModal = (newModal: ModalComponent) => {
     setIsOpen(true);
-    setModal(() => modal);
+    setModal(() => newModal);
   };
 
   const onClose = () => {

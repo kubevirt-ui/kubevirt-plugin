@@ -42,7 +42,7 @@ const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
   );
 
   const pvcNames = React.useMemo(() => {
-    return pvcs?.map((pvc) => pvc?.metadata?.name); 
+    return pvcs?.map((pvc) => pvc?.metadata?.name);
   }, [pvcs]);
 
   return (

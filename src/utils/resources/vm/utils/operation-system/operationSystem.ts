@@ -13,8 +13,8 @@ type LabelsOrAnnotationsMap = {
 /**
  * @date 3/16/2022 - 10:08:55 AM
  * Get a key form object that start with {keyPrefix} prefix
- * @param {LabelsOrAnnotationsMap} obj
- * @param {string} keyPrefix
+ * @param {LabelsOrAnnotationsMap} obj - object to search
+ * @param {string} keyPrefix - prefix to search
  * @returns {*}
  */
 const getPrefixedKey = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
@@ -23,7 +23,7 @@ const getPrefixedKey = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
 /**
  * @date 3/16/2022 - 10:08:55 AM
  * Get a value after '/' from a {key}
- * @param {string} key
+ * @param {string} key - key to search
  * @returns {*}
  */
 const getSuffixValue = (key: string) => {
@@ -34,8 +34,8 @@ const getSuffixValue = (key: string) => {
 /**
  * @date 3/16/2022 - 10:08:55 AM
  * Find in a {LabelsOrAnnotationsMap} object a key that start with {keyPrefix} prefix after '/' in label
- * @param {LabelsOrAnnotationsMap} obj
- * @param {string} keyPrefix
+ * @param {LabelsOrAnnotationsMap} obj - object to search
+ * @param {string} keyPrefix - prefix to search
  * @returns {*}
  */
 export const findKeySuffixValue = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
@@ -44,8 +44,8 @@ export const findKeySuffixValue = (obj: LabelsOrAnnotationsMap, keyPrefix: strin
 /**
  * @date 3/16/2022 - 10:08:55 AM
  * Find in a {LabelsOrAnnotationsMap} object a label that start with {keyPrefix}
- * @param {LabelsOrAnnotationsMap} obj
- * @param {string} keyPrefix
+ * @param {LabelsOrAnnotationsMap} obj - object to search
+ * @param {string} keyPrefix - prefix to search
  * @returns {string}
  */
 export const getValueByPrefix = (obj: LabelsOrAnnotationsMap, keyPrefix: string): string => {
@@ -56,7 +56,7 @@ export const getValueByPrefix = (obj: LabelsOrAnnotationsMap, keyPrefix: string)
 /**
  * @date 3/16/2022 - 10:08:55 AM
  * Get os from {obj}
- * @param {K8sResourceCommon} obj
+ * @param {K8sResourceCommon} obj - object to search
  * @returns {string}
  */
 export const getOperatingSystem = (obj: K8sResourceCommon): string =>
@@ -65,7 +65,7 @@ export const getOperatingSystem = (obj: K8sResourceCommon): string =>
 /**
  * @date 3/16/2022 - 10:08:55 AM
  * Get os name from {obj}
- * @param {K8sResourceCommon} obj
+ * @param {K8sResourceCommon} obj - object to search
  * @returns {string}
  */
 export const getOperatingSystemName = (obj: K8sResourceCommon) =>

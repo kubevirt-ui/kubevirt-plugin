@@ -7,7 +7,6 @@
       {
         "require": {
           "FunctionExpression": true,
-          "ArrowFunctionExpression": true,
           "FunctionDeclaration": true
         }
       }
@@ -20,6 +19,5 @@
     "jsdoc/require-property-description": "warn",
     "jsdoc/require-property-name": "warn",
     "jsdoc/require-property-type": "warn"
-  },
-  "ignorePatterns": ["components/**", "tests/**"]
+  }
 }

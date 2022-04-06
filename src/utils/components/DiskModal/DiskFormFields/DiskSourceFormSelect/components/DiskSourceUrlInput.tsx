@@ -7,7 +7,7 @@ import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 
 import { getURLSourceHelpertText } from '../../utils/helpers';
-import { HTTPS_URL_PREFIX, HTTP_URL_PREFIX } from '../utils/constants';
+import { HTTP_URL_PREFIX, HTTPS_URL_PREFIX } from '../utils/constants';
 
 const URLSourceHelperText: React.FC<{ os: OS_NAME_TYPES }> = ({ os }) => {
   const { t } = useKubevirtTranslation();
@@ -40,7 +40,7 @@ const DiskSourceUrlInput: React.FC<DiskSourceUrlInputProps> = ({ url, onChange, 
     } else {
       return url?.startsWith(HTTP_URL_PREFIX) || url?.startsWith(HTTPS_URL_PREFIX);
     }
-  }, [url])
+  }, [url]);
 
   return (
     <FormGroup

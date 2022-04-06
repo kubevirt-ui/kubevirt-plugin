@@ -25,7 +25,7 @@ export enum AffinityCondition {
  * Get node affinity (requiredDuringSchedulingIgnoredDuringExecution, preferredDuringSchedulingIgnoredDuringExecution)
  * @date 3/14/2022 - 12:57:30 PM
  *
- * @param {K8sIoApiCoreV1NodeAffinity} nodeAffinity
+ * @param {K8sIoApiCoreV1NodeAffinity} nodeAffinity - node affinity
  * @returns {((K8sIoApiCoreV1PreferredSchedulingTerm | K8sIoApiCoreV1NodeSelectorTerm)[])}
  */
 const getNodeAffinity = (
@@ -41,7 +41,7 @@ const getNodeAffinity = (
  * Get pod affinity (requiredDuringSchedulingIgnoredDuringExecution, preferredDuringSchedulingIgnoredDuringExecution)
  * @date 3/14/2022 - 12:57:30 PM
  *
- * @param {(K8sIoApiCoreV1PodAffinity | K8sIoApiCoreV1PodAntiAffinity)} podAffinity
+ * @param {(K8sIoApiCoreV1PodAffinity | K8sIoApiCoreV1PodAntiAffinity)} podAffinity - pod affinity
  * @returns {((K8sIoApiCoreV1WeightedPodAffinityTerm | K8sIoApiCoreV1PodAffinityTerm)[])}
  */
 const getPodAffinity = (
@@ -57,7 +57,7 @@ const getPodAffinity = (
  * Get affinity rules 
  * @date 3/14/2022 - 12:57:30 PM
  *
- * @param {K8sIoApiCoreV1Affinity} affinity
+ * @param {K8sIoApiCoreV1Affinity} affinity - affinity
  * @returns {((
   | K8sIoApiCoreV1PreferredSchedulingTerm
   | K8sIoApiCoreV1NodeSelectorTerm

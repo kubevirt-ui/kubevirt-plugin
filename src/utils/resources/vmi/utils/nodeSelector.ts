@@ -2,7 +2,7 @@
  * Get node selectors presentation
  * @date 3/14/2022 - 1:02:01 PM
  *
- * @param {({ [key: string]: string } | null)} nodes
+ * @param {({ [key: string]: string } | null)} nodes - node selectors
  * @returns {string}
  */
 export const getNodeSelector = (nodes: { [key: string]: string } | null): string =>
