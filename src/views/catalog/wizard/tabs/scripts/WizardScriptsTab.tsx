@@ -9,6 +9,8 @@ import Cloudinit from './components/CloudInit';
 import Sysprep from './components/sysprep/Sysprep';
 import { CLOUD, SYSPREP } from './utils/consts';
 
+import './WizardScriptsTab.scss';
+
 const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
   const { t } = useKubevirtTranslation();
   const [expanded, setExpanded] = React.useState<string>(CLOUD);
@@ -21,6 +23,7 @@ const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
       <Stack hasGutter>
         <StackItem>
           <ExpandableSection
+            className="wizard-scripts-tab-expanable-section"
             toggleText={t('Cloud-init')}
             onToggle={() => onToggle(CLOUD)}
             isExpanded={expanded === CLOUD}
@@ -31,6 +34,7 @@ const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
         </StackItem>
         <StackItem>
           <ExpandableSection
+            className="wizard-scripts-tab-expanable-section"
             toggleText={t('Sysprep')}
             onToggle={() => onToggle(SYSPREP)}
             isExpanded={expanded === SYSPREP}
