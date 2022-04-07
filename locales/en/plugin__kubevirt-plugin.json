@@ -442,5 +442,16 @@
   "Virtual Machines Instances": "Virtual Machines Instances",
   "GPU devices": "GPU devices",
   "Host devices": "Host devices",
-  "Hardware device name": "Hardware device name"
+  "Hardware device name": "Hardware device name",
+  "Service name": "Service name",
+  "Provider": "Provider",
+  "OpenShift Virtualization version": "OpenShift Virtualization version",
+  "Update Channel": "Update Channel",
+  "Cannot update": "Cannot update",
+  "CatalogSource not found": "CatalogSource not found",
+  "Upgrade available": "Upgrade available",
+  "Upgrading": "Upgrading",
+  "Up to date": "Up to date",
+  "Unknown failure": "Unknown failure",
+  "Warning": "Warning"
 }
