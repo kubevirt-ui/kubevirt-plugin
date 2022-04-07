@@ -1,7 +1,9 @@
 import * as React from 'react';
 
+import { WizardOverviewDisksTable } from '@catalog/wizard/tabs/overview/components/WizardOverviewDisksTable/WizardOverviewDisksTable';
+import { WizardOverviewNetworksTable } from '@catalog/wizard/tabs/overview/components/WizardOverviewNetworksTable/WizardOverviewNetworksTable';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateFlavorData } from '@kubevirt-utils/resources/template/utils';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
@@ -9,11 +11,14 @@ import {
   getTemplateDescription,
   getTemplateDisks,
   getTemplateDocumentationURL,
+  getTemplateInterfaces,
   getTemplateName,
-  getTemplateNetworkInterfaces,
+  getTemplateNetworks,
+  getTemplateVirtualMachineObject,
   getTemplateWorkload,
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
+import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import {
   Button,
   DescriptionList,
@@ -21,6 +26,8 @@ import {
   DescriptionListGroup,
   DescriptionListTerm,
   ExpandableSection,
+  Grid,
+  GridItem,
   Stack,
   StackItem,
   Title,
@@ -29,19 +36,6 @@ import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/ex
 
 type TemplatesCatalogDrawerPanelProps = {
   template: V1Template;
-};
-
-const TemplateDisksTable: React.FC<{ disks: V1Disk[] }> = ({ disks }) => {
-  return (
-    <DescriptionList isCompact isHorizontal>
-      {disks.map((disk) => (
-        <DescriptionListGroup key={disk.name}>
-          <DescriptionListTerm>{disk.name}</DescriptionListTerm>
-          <DescriptionListDescription>{disk?.disk?.bus}</DescriptionListDescription>
-        </DescriptionListGroup>
-      ))}
-    </DescriptionList>
-  );
 };
 
 const TemplateExpandableDescription: React.FC<{ description: string }> = ({ description }) => {
@@ -70,14 +64,19 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
     const { t } = useKubevirtTranslation();
 
     const notAvailable = t('N/A');
+    const vmObject = getTemplateVirtualMachineObject(template);
     const displayName = getTemplateName(template);
     const description = getTemplateDescription(template) || notAvailable;
     const documentationUrl = getTemplateDocumentationURL(template) || notAvailable;
     const workload = getTemplateWorkload(template);
-    const networkInterfaces = getTemplateNetworkInterfaces(template);
+    const networks = getTemplateNetworks(template);
+    const interfaces = getTemplateInterfaces(template);
     const disks = getTemplateDisks(template);
     const isDefaultTemplate = isDefaultVariantTemplate(template);
     const { memory, cpuCount } = getTemplateFlavorData(template);
+    const hostDevicesCount = getHostDevices(vmObject)?.length || 0;
+    const gpusCount = getGPUDevices(vmObject)?.length || 0;
+    const hardwareDevicesCount = hostDevicesCount + gpusCount;
 
     return (
       <div className="modal-body modal-body-border">
@@ -91,69 +90,85 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                   </Title>
                 </StackItem>
                 <StackItem>
-                  <DescriptionList
-                    columnModifier={{
-                      default: '2Col',
-                    }}
-                  >
-                    <DescriptionListGroup>
-                      <DescriptionListTerm>{t('Operating System')}</DescriptionListTerm>
-                      <DescriptionListDescription>{displayName}</DescriptionListDescription>
-                    </DescriptionListGroup>
-                    <DescriptionListGroup>
-                      <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
-                      <DescriptionListDescription>
-                        {t('{{cpuCount}} CPU | {{memory}} Memory', { cpuCount, memory })}
-                      </DescriptionListDescription>
-                    </DescriptionListGroup>
-                    <DescriptionListGroup>
-                      <DescriptionListTerm>{t('Workload type')}</DescriptionListTerm>
-                      <DescriptionListDescription>
-                        {WORKLOADS_LABELS[workload] ?? t('Other')}{' '}
-                        {isDefaultTemplate && t('(default)')}
-                      </DescriptionListDescription>
-                    </DescriptionListGroup>
-                    <DescriptionListGroup>
-                      <DescriptionListTerm>
-                        {t('Network interfaces')}
-                        {` (${networkInterfaces.length})`}
-                      </DescriptionListTerm>
-                      <DescriptionListDescription>
-                        {networkInterfaces.map((n) => n.name).join(', ')}
-                      </DescriptionListDescription>
-                    </DescriptionListGroup>
-                    <DescriptionListGroup>
-                      <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
-                      <DescriptionListDescription>
-                        {<TemplateExpandableDescription description={description} />}
-                      </DescriptionListDescription>
-                    </DescriptionListGroup>
-                    <DescriptionListGroup className="template-catalog-drawer-disks">
-                      <DescriptionListTerm>
-                        {t('Disks')}
-                        {` (${disks.length})`}
-                      </DescriptionListTerm>
-                      <DescriptionListDescription>
-                        <TemplateDisksTable disks={disks} />
-                      </DescriptionListDescription>
-                    </DescriptionListGroup>
-                    <DescriptionListGroup>
-                      <DescriptionListTerm>{t('Documentation')}</DescriptionListTerm>
-                      <DescriptionListDescription>
-                        <Button
-                          isSmall
-                          isInline
-                          variant="link"
-                          icon={<ExternalLinkSquareAltIcon />}
-                          iconPosition="right"
-                        >
-                          <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
-                            {t('Refer to documentation')}
-                          </a>
-                        </Button>
-                      </DescriptionListDescription>
-                    </DescriptionListGroup>
-                  </DescriptionList>
+                  <Grid hasGutter>
+                    <GridItem span={6}>
+                      <DescriptionList>
+                        <DescriptionListGroup>
+                          <DescriptionListTerm>{t('Operating System')}</DescriptionListTerm>
+                          <DescriptionListDescription>{displayName}</DescriptionListDescription>
+                        </DescriptionListGroup>
+                        <DescriptionListGroup>
+                          <DescriptionListTerm>{t('Workload type')}</DescriptionListTerm>
+                          <DescriptionListDescription>
+                            {WORKLOADS_LABELS[workload] ?? t('Other')}{' '}
+                            {isDefaultTemplate && t('(default)')}
+                          </DescriptionListDescription>
+                        </DescriptionListGroup>
+                        <DescriptionListGroup>
+                          <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
+                          <DescriptionListDescription>
+                            {<TemplateExpandableDescription description={description} />}
+                          </DescriptionListDescription>
+                        </DescriptionListGroup>
+                        <DescriptionListGroup>
+                          <DescriptionListTerm>{t('Documentation')}</DescriptionListTerm>
+                          <DescriptionListDescription>
+                            <Button
+                              isSmall
+                              isInline
+                              variant="link"
+                              icon={<ExternalLinkSquareAltIcon />}
+                              iconPosition="right"
+                            >
+                              <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
+                                {t('Refer to documentation')}
+                              </a>
+                            </Button>
+                          </DescriptionListDescription>
+                        </DescriptionListGroup>
+                      </DescriptionList>
+                    </GridItem>
+                    <GridItem span={6}>
+                      <DescriptionList>
+                        <DescriptionListGroup>
+                          <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
+                          <DescriptionListDescription>
+                            {t('{{cpuCount}} CPU | {{memory}} Memory', { cpuCount, memory })}
+                          </DescriptionListDescription>
+                        </DescriptionListGroup>
+                        <DescriptionListGroup>
+                          <DescriptionListTerm>
+                            {t('Network interfaces')}
+                            {` (${networks.length})`}
+                          </DescriptionListTerm>
+                          <DescriptionListDescription>
+                            <WizardOverviewNetworksTable
+                              networks={networks}
+                              interfaces={interfaces}
+                            />
+                          </DescriptionListDescription>
+                        </DescriptionListGroup>
+                        <DescriptionListGroup>
+                          <DescriptionListTerm>
+                            {t('Disks')}
+                            {` (${disks.length})`}
+                          </DescriptionListTerm>
+                          <DescriptionListDescription>
+                            <WizardOverviewDisksTable vm={vmObject} />
+                          </DescriptionListDescription>
+                        </DescriptionListGroup>
+                        <DescriptionListGroup>
+                          <DescriptionListTerm>
+                            {t('Hardware Devices')}
+                            {` (${hardwareDevicesCount})`}
+                          </DescriptionListTerm>
+                          <DescriptionListDescription>
+                            <HardwareDevices canEdit={false} vm={vmObject} />
+                          </DescriptionListDescription>
+                        </DescriptionListGroup>
+                      </DescriptionList>
+                    </GridItem>
+                  </Grid>
                 </StackItem>
               </Stack>
             </div>

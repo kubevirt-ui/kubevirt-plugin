@@ -119,7 +119,11 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, tabsData, update
                 history.push(`/k8s/ns/${ns}/templatescatalog/review/network-interfaces`)
               }
               description={
-                <WizardOverviewNetworksTable networks={networks} interfaces={interfaces} />
+                <WizardOverviewNetworksTable
+                  isInlineGrid
+                  networks={networks}
+                  interfaces={interfaces}
+                />
               }
             />
 
@@ -127,7 +131,7 @@ const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, tabsData, update
               title={t('Disks')}
               count={disks?.length}
               onTitleClick={() => history.push(`/k8s/ns/${ns}/templatescatalog/review/disks`)}
-              description={<WizardOverviewDisksTable vm={vm} />}
+              description={<WizardOverviewDisksTable isInlineGrid vm={vm} />}
             />
 
             <WizardDescriptionItem

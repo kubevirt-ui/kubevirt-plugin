@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { produceVMDevices } from '@catalog/utils/WizardVMContext';
 import { V1GPU, V1HostDevice, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { Button, Form, FormGroup, Grid } from '@patternfly/react-core';
@@ -11,7 +12,6 @@ import PlainIconButton from './form/PlainIconButton';
 import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
 import HardwareDevicesList from './list/HardwareDevicesList';
 import { HARDWARE_DEVICE_TYPE } from './utils/constants';
-import { produceVMDevices } from '@catalog/utils/WizardVMContext';
 
 type HardwareDevicesModalProps = {
   vm: V1VirtualMachine;
