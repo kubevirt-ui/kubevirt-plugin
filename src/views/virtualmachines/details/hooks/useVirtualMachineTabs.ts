@@ -4,6 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 import VirtualMachineDetailsPage from '../tabs/details/VirtualMachineDetailsPage';
 import DiskListPage from '../tabs/disk/tables/disk/DiskListPage';
+import VirtualMachineEnvironmentPage from '../tabs/environment/VirtualMachineEnvironmentPage';
 import NetworkInterfaceListPage from '../tabs/network/NetworkInterfaceListPage';
 import VirtualMachinesOverviewTab from '../tabs/overview/VirtualMachinesOverviewTab';
 import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
@@ -31,7 +32,7 @@ export const useVirtualMachineTabs = () => {
       {
         href: 'environment',
         name: t('Environment'),
-        component: React.Fragment,
+        component: VirtualMachineEnvironmentPage,
       },
       {
         href: 'events',
