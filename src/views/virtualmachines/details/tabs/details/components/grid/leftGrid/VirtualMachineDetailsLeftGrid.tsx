@@ -90,6 +90,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
           breadcrumb="VirtualMachine.metadata.labels"
           isEdit
+          showEditOnTitle
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <LabelsModal

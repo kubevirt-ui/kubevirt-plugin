@@ -9,11 +9,16 @@ import {
   Button,
   DescriptionListDescription,
   DescriptionListGroup,
+  DescriptionListTerm,
   DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
+  Flex,
+  FlexItem,
   Popover,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
+
+import './VirtualMachineDescriptionItem.scss';
 
 type VirtualMachineDescriptionItemProps = {
   descriptionData: any;
@@ -25,6 +30,7 @@ type VirtualMachineDescriptionItemProps = {
   isEdit?: boolean;
   onEditClick?: () => void;
   isDisabled?: boolean;
+  showEditOnTitle?: boolean;
 };
 
 const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps> = ({
@@ -37,44 +43,74 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
   isEdit,
   onEditClick,
   isDisabled,
+  showEditOnTitle,
 }) => {
   const { t } = useKubevirtTranslation();
+  const NotAvailable = <MutedTextSpan text={t('Not available')} />;
 
-  const popover = (
-    <Popover
-      headerContent={descriptionHeader}
-      bodyContent={
-        <>
-          {bodyContent} {t('More info: ')}
-          {moreInfoURL && <Link to={moreInfoURL}>{moreInfoURL}</Link>}
-          {breadcrumb && (
-            <Breadcrumb>
-              {breadcrumb.split('.').map((item) => (
-                <BreadcrumbItem key={item}>{item}</BreadcrumbItem>
-              ))}
-            </Breadcrumb>
-          )}
-        </>
-      }
-    >
-      <DescriptionListTermHelpTextButton>{descriptionHeader}</DescriptionListTermHelpTextButton>
-    </Popover>
-  );
+  const getItemHeader = () => {
+    if (isPopover) {
+      return (
+        <Popover
+          headerContent={descriptionHeader}
+          bodyContent={
+            <>
+              {bodyContent} {t('More info: ')}
+              {moreInfoURL && <Link to={moreInfoURL}>{moreInfoURL}</Link>}
+              {breadcrumb && (
+                <Breadcrumb>
+                  {breadcrumb.split('.').map((item) => (
+                    <BreadcrumbItem key={item}>{item}</BreadcrumbItem>
+                  ))}
+                </Breadcrumb>
+              )}
+            </>
+          }
+        >
+          <DescriptionListTermHelpTextButton>
+            {' '}
+            {descriptionHeader}{' '}
+          </DescriptionListTermHelpTextButton>
+        </Popover>
+      );
+    }
+
+    return <DescriptionListTerm>{descriptionHeader}</DescriptionListTerm>;
+  };
 
   const description = (
     <Button type="button" isInline isDisabled={isDisabled} onClick={onEditClick} variant="link">
-      {descriptionData ?? <MutedTextSpan text={t('Not available')} />}
+      {descriptionData ?? NotAvailable}
       <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
     </Button>
   );
+
   return (
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
-        {isPopover ? popover : descriptionHeader}
+        <Flex className="vm-description-item__title">
+          <FlexItem>{getItemHeader()}</FlexItem>
+          {isEdit && showEditOnTitle && (
+            <FlexItem>
+              <Button
+                type="button"
+                isInline
+                isDisabled={isDisabled}
+                onClick={onEditClick}
+                variant="link"
+              >
+                {t('Edit')}
+                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+              </Button>
+            </FlexItem>
+          )}
+        </Flex>
       </DescriptionListTermHelpText>
-      <DescriptionListDescription>
-        {isEdit ? description : descriptionData}
-      </DescriptionListDescription>
+      {isEdit && !showEditOnTitle ? (
+        description
+      ) : (
+        <DescriptionListDescription>{descriptionData}</DescriptionListDescription>
+      )}
     </DescriptionListGroup>
   );
 };
