@@ -1,12 +1,14 @@
 import * as React from 'react';
-import produce from 'immer';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DeleteResourceMessage from '@kubevirt-utils/components/DeleteResourceMessage/DeleteResourceMessage';
-import { getRemoveHotplugPromise } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import {
+  getRemoveHotplugPromise,
+  produceVMDisks,
+} from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -34,13 +36,13 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
     useVolumeOwnedResource(vm, volume);
 
   const updatedVirtualMachine = React.useMemo(() => {
-    const updatedDisks = getDisks(vm)?.filter(({ name }) => name !== diskName);
-    const updatedVolumes = getVolumes(vm)?.filter(({ name }) => name !== diskName);
-    const updatedDataVolumeTemplates = getDataVolumeTemplates(vm)?.filter(
+    const updatedDisks = (getDisks(vm) || [])?.filter(({ name }) => name !== diskName);
+    const updatedVolumes = (getVolumes(vm) || [])?.filter(({ name }) => name !== diskName);
+    const updatedDataVolumeTemplates = (getDataVolumeTemplates(vm) || [])?.filter(
       (dvt) => dvt?.metadata?.name !== volumeResourceName,
     );
 
-    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
+    const updatedVM = produceVMDisks(vm, (vmDraft: V1VirtualMachine) => {
       vmDraft.spec.template.spec.domain.devices.disks = updatedDisks;
       vmDraft.spec.template.spec.volumes = updatedVolumes;
       vmDraft.spec.dataVolumeTemplates = updatedDataVolumeTemplates;
@@ -49,7 +51,7 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
   }, [vm, diskName, volumeResourceName]);
 
   const onSubmit = (updatedVM: K8sResourceCommon) => {
-    const promise =
+    const deletePromise =
       vm?.status?.printableStatus === printableVMStatus.Running
         ? getRemoveHotplugPromise(vm, diskName)
         : k8sUpdate({
@@ -58,7 +60,8 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
             ns: updatedVM?.metadata?.namespace,
             name: updatedVM?.metadata?.name,
           });
-    return promise.then(() => {
+
+    return deletePromise.then(() => {
       if (volumeResource) {
         if (deleteOwnedResource) {
           // we need to delete the owned resource
