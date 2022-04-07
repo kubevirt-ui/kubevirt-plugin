@@ -27,6 +27,7 @@
     "version": "0.0.0",
     "displayName": "Kubevirt Plugin",
     "exposedModules": {
+      "kubevirtFlags": "./utils/flags",
       "VirtualMachinesList": "./views/virtualmachines/list/VirtualMachinesList.tsx",
       "TemplatesCatalog": "./views/catalog/Catalog.tsx",
       "VirtualMachineNavPage": "./views/virtualmachines/details/VirtualMachineNavPage.tsx",

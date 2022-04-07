@@ -439,5 +439,8 @@
   "MAC Address": "MAC Address",
   "masquerade": "masquerade",
   "VMI": "VMI",
-  "Virtual Machines Instances": "Virtual Machines Instances"
+  "Virtual Machines Instances": "Virtual Machines Instances",
+  "GPU devices": "GPU devices",
+  "Host devices": "Host devices",
+  "Hardware device name": "Hardware device name"
 }

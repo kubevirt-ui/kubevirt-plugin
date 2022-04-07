@@ -1,5 +1,11 @@
 [
   {
+    "type": "console.flag",
+    "properties": {
+      "handler": { "$codeRef": "kubevirtFlags.enableKubevirtDynamicFlag" }
+    }
+  },
+  {
     "type": "console.navigation/section",
     "properties": {
       "id": "virtualization",
