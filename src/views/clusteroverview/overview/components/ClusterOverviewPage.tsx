@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Overview, OverviewGrid } from '@openshift-console/dynamic-plugin-sdk';
 
+import ActivityCard from './activity-card/ActivityCard';
 import DetailsCard from './details-card/DetailsCard';
 import GettingStartedCard from './getting-started-card/GettingStartedCard';
 import InventoryCard from './inventory-card/InventoryCard';
@@ -16,7 +17,7 @@ import RestoreGettingStartedButton from './utils/RestoreGettingStartedButton';
 
 const leftCards = [{ Card: DetailsCard }, { Card: RunningVMsPerTemplateCard }];
 const mainCards = [{ Card: InventoryCard }];
-const rightCards = [{ Card: PermissionsCard }];
+const rightCards = [{ Card: ActivityCard }, { Card: PermissionsCard }];
 
 const ClusterOverviewPage: React.FC = () => {
   const { t } = useKubevirtTranslation();
