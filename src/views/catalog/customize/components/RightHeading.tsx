@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { getTemplateOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -7,7 +8,7 @@ import {
   getTemplateDocumentationURL,
   getTemplateName,
 } from '@kubevirt-utils/resources/template/utils/selectors';
-import { Button } from '@patternfly/react-core';
+import { Button, Flex, FlexItem } from '@patternfly/react-core';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
 
 type RightHeadingProps = {
@@ -21,10 +22,19 @@ export const RightHeader: React.FC<RightHeadingProps> = ({ template }) => {
   const displayName = getTemplateName(template);
   const documentationLink = getTemplateDocumentationURL(template);
   const description = getTemplateDescription(template);
+  const icon = getTemplateOSIcon(template);
   return (
     <div className="co-catalog-item-info customize-vm__right-header">
       <div>
-        <h2 className="co-section-heading co-catalog-item-details__name">{displayName}</h2>
+        <Flex>
+          <FlexItem>
+            <img src={icon} alt="os-icon" />
+          </FlexItem>
+
+          <FlexItem>
+            <h2 className="co-section-heading co-catalog-item-details__name">{displayName}</h2>
+          </FlexItem>
+        </Flex>
         {documentationLink && (
           <div>
             <Button

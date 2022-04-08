@@ -45,7 +45,7 @@ const CustomizeVirtualMachine: React.FC = () => {
   if (error) return <CustomizeError />;
 
   return (
-    <div className="co-m-pane__body">
+    <div className="co-m-pane__body customize-vm">
       <h1 className="co-m-pane__heading">{t('Create VirtualMachine from template')}</h1>
       <div className="row">
         <div className="col-md-7 col-md-push-5 co-catalog-item-info">
