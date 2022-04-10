@@ -50,17 +50,31 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
       <Title headingLevel="h2" className="co-section-heading">
         {t('Virtual Machine Instance Details')}
       </Title>
-      <Grid>
+      <Grid hasGutter>
         <GridItem span={6}>
           <DescriptionList>
             <DescriptionListGroup>
               <Name name={vmi?.metadata?.name} />
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <Namespace namespace={vmi?.metadata?.namespace} />
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <Labels vmi={vmi} />
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <Annotations vmi={vmi} />
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <Description vmi={vmi} />
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <OperationSystem vmi={vmi} />
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <CreateAt timestamp={vmi?.metadata?.creationTimestamp} />
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <Owner
                 namespace={vmi?.metadata?.namespace}
                 ownerReferences={vmi?.metadata?.ownerReferences}
@@ -75,10 +89,14 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               <DescriptionListDescription>
                 <VirtualMachinesInstancesStatus status={vmi?.status?.phase} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Pod')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <Pods namespace={vmi?.metadata?.namespace} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Boot Order')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <BootOrder
@@ -86,36 +104,52 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
                   interfaces={vmi?.spec?.domain?.devices?.interfaces}
                 />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('IP Address')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <IP vmi={vmi} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Hostname')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <Hostname guestAgentData={guestAgentData} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Time Zone')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <Timezone guestAgentData={guestAgentData} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Node')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <Node nodeName={vmi?.status?.nodeName} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Workload Profile')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <WorkloadProfile annotations={vmi?.metadata?.annotations} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('User Credentials')}</DescriptionListTerm>
               <DescriptionListDescription>
                 {/* placeholder */}
                 <div className="text-muted">{t('SSH service is not available')} </div>
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('SSH Access')}</DescriptionListTerm>
               <DescriptionListDescription>
                 {/* placeholder */}
                 <div className="text-muted">{t('SSH service is not available')} </div>
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Hardware devices')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <HardwareDevices devices={vmi?.spec?.domain?.devices} />
