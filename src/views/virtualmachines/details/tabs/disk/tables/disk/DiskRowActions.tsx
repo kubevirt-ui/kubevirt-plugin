@@ -5,12 +5,15 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
 
 import { printableVMStatus } from '../../../../../utils';
+import DeleteDiskModal from '../../modal/DeleteDiskModal';
 
 import { useEditDiskStates } from './hooks/useEditDiskStates';
+import { isHotplugVolume } from './utils/helpers';
 
 type DiskRowActionsProps = {
   vm: V1VirtualMachine;
@@ -32,7 +35,13 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
   const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName, vmi);
 
   const isVMRunning = vm?.status?.printableStatus !== printableVMStatus.Stopped;
+  const isHotplug = isHotplugVolume(vm, diskName, vmi);
+
+  const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
+  const volume = volumes?.find(({ name }) => name === diskName);
+
   const editBtnText = t('Edit');
+  const deleteBtnText = t('Delete');
 
   const disabledEditText = React.useMemo(() => {
     if (isVMRunning) {
@@ -52,7 +61,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
       name: updatedVM?.metadata?.name,
     });
 
-  const onEditModalOpen = () => {
+  const createEditDiskModal = () =>
     createModal(({ isOpen, onClose }) => (
       <EditDiskModal
         vm={vm}
@@ -64,17 +73,35 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
         initialDiskSourceState={initialDiskSourceState}
       />
     ));
+
+  const createDeleteDiskModal = () =>
+    createModal(({ isOpen, onClose }) => (
+      <DeleteDiskModal isOpen={isOpen} onClose={onClose} vm={vm} volume={volume} />
+    ));
+
+  const onModalOpen = (createModalCallback: () => void) => {
+    createModalCallback();
     setIsDropdownOpen(false);
   };
 
   const items = [
     <DropdownItem
-      onClick={onEditModalOpen}
+      onClick={() => onModalOpen(createEditDiskModal)}
       key="disk-edit"
       isDisabled={isVMRunning || pvcResourceExists}
       description={disabledEditText}
     >
       {editBtnText}
+    </DropdownItem>,
+    <DropdownItem
+      onClick={() => onModalOpen(createDeleteDiskModal)}
+      key="disk-edit"
+      isDisabled={!isHotplug && isVMRunning}
+      description={
+        !isHotplug && isVMRunning ? t('Can delete only hotplug volumes while VM is Running') : null
+      }
+    >
+      {deleteBtnText}
     </DropdownItem>,
   ];
 

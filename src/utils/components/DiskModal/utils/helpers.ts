@@ -8,6 +8,7 @@ import {
   V1AddVolumeOptions,
   V1DataVolumeTemplateSpec,
   V1Disk,
+  V1RemoveVolumeOptions,
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -17,6 +18,7 @@ import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   addNonPersistentVolume,
   addPersistentVolume,
+  removeVolume,
 } from '../../../../views/virtualmachines/actions/actions';
 import { sourceTypes } from '../DiskFormFields/utils/constants';
 import { DiskFormState, DiskSourceState } from '../state/initialState';
@@ -198,4 +200,11 @@ export const getPersistentVolumeClaimHotplugPromise = (
     return addNonPersistentVolume(vm, bodyRequestAddVolume);
   }
   return addPersistentVolume(vm, bodyRequestAddVolume);
+};
+
+export const getRemoveHotplugPromise = (vm: V1VirtualMachine, diskName: string) => {
+  const bodyRequestRemoveVolume: V1RemoveVolumeOptions = {
+    name: diskName,
+  };
+  return removeVolume(vm, bodyRequestRemoveVolume);
 };
