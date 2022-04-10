@@ -37,7 +37,7 @@ const Scheduling: React.FC<SchedulingProps> = ({ vmi, pathname }) => {
       <Title headingLevel="h2" className="co-section-heading">
         {t('Scheduling and resources requirements')}
       </Title>
-      <Grid>
+      <Grid hasGutter>
         <GridItem span={6}>
           <DescriptionList>
             <DescriptionListGroup>
@@ -45,14 +45,20 @@ const Scheduling: React.FC<SchedulingProps> = ({ vmi, pathname }) => {
               <DescriptionListDescription>
                 <NodeSelector vmi={vmi} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Tolerations')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <Tolerations vmi={vmi} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Affinity Rules')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <Affinity vmi={vmi} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Descheduler')}</DescriptionListTerm>
               <DescriptionListDescription className="list-description">
                 <Descheduler vmi={vmi} />
@@ -67,10 +73,14 @@ const Scheduling: React.FC<SchedulingProps> = ({ vmi, pathname }) => {
               <DescriptionListDescription>
                 <Flavor vmi={vmi} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Dedicated Resources')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <DedicatedResources vmi={vmi} />
               </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
               <DescriptionListTerm>{t('Eviction Strategy')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <EvictionStrategy vmi={vmi} />
