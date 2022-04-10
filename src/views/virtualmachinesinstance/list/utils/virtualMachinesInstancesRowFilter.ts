@@ -1,8 +1,8 @@
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { osNames, vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VM_KUBEVIRT_OS_ANNOTATION } from './virtualMachinesInstancesConstants';
-import { osNames, vmiStatuses } from './virtualMachinesInstancesStatuses';
 
 const osTitles = {
   centos: 'CentOS',

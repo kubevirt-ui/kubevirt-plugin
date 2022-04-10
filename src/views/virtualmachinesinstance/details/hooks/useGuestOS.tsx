@@ -5,9 +5,8 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
-
-import { vmiStatuses } from '../../list/utils';
 
 type UseGuestOS = (
   vmi: V1VirtualMachineInstance,
