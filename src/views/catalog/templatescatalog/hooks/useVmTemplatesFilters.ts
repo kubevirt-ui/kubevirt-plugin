@@ -46,14 +46,11 @@ export const useTemplatesFilters = (): [
       case CATALOG_FILTERS.ONLY_AVAILABLE:
       case CATALOG_FILTERS.IS_LIST:
       case CATALOG_FILTERS.NAMESPACE:
+      case CATALOG_FILTERS.QUERY:
         {
           updateFilter(type, value);
           setParam(type, value.toString());
         }
-        break;
-
-      case CATALOG_FILTERS.QUERY:
-        updateFilter(CATALOG_FILTERS.QUERY, value);
         break;
 
       default: {
