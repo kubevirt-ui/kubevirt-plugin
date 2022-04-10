@@ -1,8 +1,7 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup } from '@openshift-console/dynamic-plugin-sdk-internal/node_modules/@patternfly/react-core';
-import { TextInput } from '@patternfly/react-core';
+import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import { diskReducerActions, DiskReducerActionType } from '../../state/actions';
 import { DiskFormState } from '../../state/initialState';
