@@ -13,7 +13,10 @@ type UseVMIAndPodsForVMValues = {
   error: any;
 };
 
-const useVMIAndPodsForVM = (vmName: string, vmNamespace: string): UseVMIAndPodsForVMValues => {
+export const useVMIAndPodsForVM = (
+  vmName: string,
+  vmNamespace: string,
+): UseVMIAndPodsForVMValues => {
   const [vmi, vmiLoaded, vmiLoadError] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     name: vmName,
@@ -37,5 +40,3 @@ const useVMIAndPodsForVM = (vmName: string, vmNamespace: string): UseVMIAndPodsF
     error,
   };
 };
-
-export default useVMIAndPodsForVM;

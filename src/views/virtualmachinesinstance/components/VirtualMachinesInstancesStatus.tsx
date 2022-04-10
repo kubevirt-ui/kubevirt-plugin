@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { icon } from '../list/utils';
+import { icon } from '@kubevirt-utils/resources/vmi';
 
 type VirtualMachinesInstancesStatusProps = {
   status: string;
