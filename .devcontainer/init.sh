@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# pull latest console image
+docker pull quay.io/openshift/origin-console:latest
+
 if [[ ! -f .devcontainer/dev.env ]]
 then
     cat << EOF
