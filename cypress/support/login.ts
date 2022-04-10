@@ -1,4 +1,4 @@
-import { KUBEADMIN_IDP, KUBEADMIN_USERNAME } from '../consts';
+import { KUBEADMIN_IDP, KUBEADMIN_USERNAME } from '../utils/const/index';
 
 import { masthead, submitButton } from './views';
 
