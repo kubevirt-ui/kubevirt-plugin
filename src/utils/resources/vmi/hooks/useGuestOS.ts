@@ -7,11 +7,11 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseFileSystemTableGuestOS = (
+type UseGuestOS = (
   vmi?: V1VirtualMachineInstance,
 ) => [V1VirtualMachineInstanceGuestAgentInfo, boolean, any];
 
-const useFilesystemTableGuestOS: UseFileSystemTableGuestOS = (vmi) => {
+export const useGuestOS: UseGuestOS = (vmi) => {
   const [loaded, setLoaded] = React.useState(false);
   const [data, setData] = React.useState<V1VirtualMachineInstanceGuestAgentInfo>({});
   const [error, setError] = React.useState(null);
@@ -38,5 +38,3 @@ const useFilesystemTableGuestOS: UseFileSystemTableGuestOS = (vmi) => {
 
   return [data, loaded, error];
 };
-
-export default useFilesystemTableGuestOS;

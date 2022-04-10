@@ -2,13 +2,14 @@ import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
+import { useGuestOS } from '@kubevirt-utils/resources/vmi/hooks';
 
-import useFilesystemTableGuestOS from '../../../../disk/hooks/useFilesystemListGuestOS';
 import useSSHService from '../../../hooks/useSSHService';
-import useVMIAndPodsForVM from '../../../hooks/useVMIAndPodsForVM';
 import { getRunningVMRightGridPresentation } from '../../../utils/gridHelper';
 
 import VirtualMachineDetailsRightGridLayout from './VirtualMachineDetailsRightGridLayout';
+
 type VirtualMachineDetailsRightGridProps = {
   vm?: V1VirtualMachine;
 };
@@ -18,7 +19,7 @@ const RunningVirtualMachineDetailsRightGrid: React.FC<VirtualMachineDetailsRight
 }) => {
   const { t } = useKubevirtTranslation();
   const { vmi, pods } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const [guestAgentData] = useFilesystemTableGuestOS(vmi);
+  const [guestAgentData] = useGuestOS(vmi);
   const { sshService } = useSSHService(vmi);
   return (
     <VirtualMachineDetailsRightGridLayout

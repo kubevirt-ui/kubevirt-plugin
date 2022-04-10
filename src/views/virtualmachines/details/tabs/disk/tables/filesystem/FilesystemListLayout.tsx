@@ -1,10 +1,10 @@
 import * as React from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useGuestOS } from '@kubevirt-utils/resources/vmi/hooks';
 import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 
 import useFilesystemListColumns from '../../hooks/useFilesystemListColumns';
-import useFilesystemListGuestOS from '../../hooks/useFilesystemListGuestOS';
 
 import FilesystemListTitle from './FilesystemListTitle';
 import FilesystemRow from './FilesystemRow';
@@ -15,7 +15,7 @@ type FileSystemListLayoutProps = {
 };
 
 const FileSystemListLayout: React.FC<FileSystemListLayoutProps> = ({ vmi, noDataEmptyMsg }) => {
-  const [data, loaded, loadingError] = useFilesystemListGuestOS(vmi);
+  const [data, loaded, loadingError] = useGuestOS(vmi);
   const columns = useFilesystemListColumns();
   const fileSystems = data?.fsInfo?.disks || [];
 
