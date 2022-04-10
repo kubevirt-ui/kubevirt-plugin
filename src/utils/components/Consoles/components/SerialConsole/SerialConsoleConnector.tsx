@@ -4,8 +4,8 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WSFactory } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/ws-factory';
 
-import { INSECURE, SECURE } from '../../utils/VirtualMachinesInstancePageConsoleTabConsts';
-import { isConnectionEncrypted } from '../../utils/VirtualMachinesInstancePageConsoleTabUtils';
+import { INSECURE, SECURE } from '../../utils/constants';
+import { isConnectionEncrypted } from '../../utils/utils';
 import { ConsoleState, WS, WSS } from '../utils/ConsoleConsts';
 
 import { WebSocket } from './utils/serialConsole';
