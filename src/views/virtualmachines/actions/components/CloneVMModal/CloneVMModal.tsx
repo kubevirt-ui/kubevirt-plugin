@@ -1,44 +1,33 @@
 import * as React from 'react';
 
-import { ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { FilterPVCSelect as FilterProjectsSelect } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/Filters';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
-import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAnnotation } from '@kubevirt-utils/resources/shared';
-import {
-  DESCRIPTION_ANNOTATION,
-  getInterfaces,
-  VM_WORKLOAD_ANNOTATION,
-} from '@kubevirt-utils/resources/vm';
+import { DESCRIPTION_ANNOTATION, NAME_OS_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import {
   getOperatingSystem,
   getOperatingSystemName,
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { k8sCreate, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Alert,
-  AlertVariant,
-  Checkbox,
-  Form,
-  FormGroup,
-  Select,
-  SelectOption,
-  SelectVariant,
-  TextArea,
-  TextInput,
-  TextListItem,
-  TextListItemVariants,
-} from '@patternfly/react-core';
+import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { Form } from '@patternfly/react-core';
 
-import Flavor from '../../../details/tabs/details/components/Flavor/Flavor';
 import { printableVMStatus } from '../../../utils';
+import { stopVM } from '../../actions';
 
+import CloneRunningVMAlert from './components/CloneRunningVMAlert';
+import ConfigurationSummary from './components/ConfigurationSummary';
+import DescriptionInput from './components/DescriptionInput';
+import NameInput from './components/NameInput';
+import ProjectSelectInput from './components/ProjectSelectInput';
+import StartClonedVMCheckbox from './components/StartClonedVMCheckbox';
 import useProjectsAndDVsAndPVCs from './hooks/useProjectsAndDVsAndPVCs';
-import { getDisksDescription, getName } from './utils/helpers';
+import { TEMPLATE_VM_NAME_LABEL } from './utils/constants';
+import {
+  produceCleanClonedVM,
+  updateClonedDataVolumes,
+  updateClonedPersistentVolumeClaims,
+} from './utils/helpers';
 
 type CloneVMModalProps = {
   vm: V1VirtualMachine;
@@ -48,7 +37,15 @@ type CloneVMModalProps = {
 
 const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
-  const isVMRunning = vm?.status?.printableStatus !== printableVMStatus.Stopped;
+
+  const [cloneName, setCloneName] = React.useState(`${vm?.metadata?.name}-clone`);
+  const [cloneDescription, setCloneDescription] = React.useState(
+    vm?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
+  );
+  const [cloneProject, setCloneProject] = React.useState(vm?.metadata?.namespace);
+  const [startCloneVM, setStartCloneVM] = React.useState(false);
+
+  const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
   const { projects, pvcs, dataVolumes, loaded } = useProjectsAndDVsAndPVCs(vm);
 
@@ -56,116 +53,60 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
     () => (projects || [])?.map((project) => project.metadata.name),
     [projects],
   );
-  const [cloneName, setCloneName] = React.useState(`${vm?.metadata?.name}-clone`);
-  const [cloneDescription, setCloneDescription] = React.useState(
-    vm?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
-  );
-  const [cloneNamespace, setCloneNamespace] = React.useState(vm?.metadata?.namespace);
-  const [isNamespaceOpen, setIsNamespaceOpen] = React.useState(false);
-  const [startCloneVM, setStartCloneVM] = React.useState(false);
 
-  const onSelect = React.useCallback((event, selection) => {
-    setCloneNamespace(selection);
-    setIsNamespaceOpen(false);
-  }, []);
+  const clonedVirtualMachine = React.useMemo(() => {
+    const clonedVM = produceCleanClonedVM(vm, (draftVM) => {
+      draftVM.metadata.name = cloneName;
+      draftVM.metadata.namespace = cloneProject;
+      draftVM.metadata.annotations[DESCRIPTION_ANNOTATION] = cloneDescription;
+      draftVM.spec.running = startCloneVM;
+
+      const osId = getOperatingSystem(vm);
+      const osName = getOperatingSystemName(vm);
+
+      if (osId && osName) {
+        draftVM.metadata.annotations[`${NAME_OS_TEMPLATE_ANNOTATION}/${osId}`] = osName;
+      }
+
+      draftVM.spec.template.metadata.labels[TEMPLATE_VM_NAME_LABEL] = cloneName;
+
+      // withClonedPVCs
+      draftVM = updateClonedPersistentVolumeClaims(draftVM, pvcs);
+
+      // withClonedDataVolumes
+      draftVM = updateClonedDataVolumes(draftVM, dataVolumes, pvcs);
+    });
+
+    return clonedVM;
+  }, [cloneDescription, cloneName, cloneProject, dataVolumes, pvcs, startCloneVM, vm]);
+
+  const onClone = (updatedVM: V1VirtualMachine) => {
+    if (isVMRunning) {
+      return stopVM(vm).then(() => k8sCreate({ model: VirtualMachineModel, data: updatedVM }));
+    }
+    return k8sCreate({ model: VirtualMachineModel, data: updatedVM });
+  };
 
   return (
     <TabModal
       headerText={t('Clone VirtualMachine')}
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={(updatedVM) => k8sCreate({ model: VirtualMachineModel, data: updatedVM })}
-      obj={vm}
+      onSubmit={onClone}
+      obj={clonedVirtualMachine}
     >
       <Form isHorizontal>
-        <FormGroup label={t('Name')} fieldId="name" isRequired>
-          <TextInput type="text" value={cloneName} onChange={setCloneName} id="name" />
-        </FormGroup>
-        <FormGroup label={t('Description')} fieldId="description" isRequired>
-          <TextArea
-            type="text"
-            value={cloneDescription}
-            onChange={setCloneDescription}
-            id="description"
-          />
-        </FormGroup>
-        <FormGroup label={t('Namespace')} fieldId="namespace" isRequired>
-          {loaded ? (
-            <Select
-              menuAppendTo="parent"
-              id="namespace"
-              isOpen={isNamespaceOpen}
-              onToggle={setIsNamespaceOpen}
-              onSelect={onSelect}
-              variant={SelectVariant.single}
-              onFilter={FilterProjectsSelect(projectNames)}
-              hasInlineFilter
-              selections={cloneNamespace}
-              maxHeight={400}
-            >
-              {projectNames.map((projectName) => (
-                <SelectOption key={projectName} value={projectName}>
-                  <ResourceLink kind={ProjectModel.kind} name={projectName} linkTo={false} />
-                </SelectOption>
-              ))}
-            </Select>
-          ) : (
-            <Loading />
-          )}
-        </FormGroup>
-        <FormGroup hasNoPaddingTop label={t('Start cloned VM')} fieldId="start-clone">
-          <Checkbox
-            id="start-clone"
-            label={t('Start VirtualMachine on clone')}
-            isChecked={startCloneVM}
-            onChange={setStartCloneVM}
-          />
-        </FormGroup>
-        <FormGroup hasNoPaddingTop label={t('Configuration')} fieldId="configuration">
-          <TextListItem className="text-muted" component={TextListItemVariants.dt}>
-            {t('Operating System')}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dd}>
-            {getOperatingSystemName(vm) || getOperatingSystem(vm)}
-          </TextListItem>
-          <TextListItem className="text-muted" component={TextListItemVariants.dt}>
-            {t('Flavor')}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dd}>
-            <Flavor vm={vm} />
-          </TextListItem>
-          <TextListItem className="text-muted" component={TextListItemVariants.dt}>
-            {t('Workload Profile')}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dd}>
-            {getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) || (
-              <MutedTextSpan text={t('Not available')} />
-            )}
-          </TextListItem>
-          <TextListItem className="text-muted" component={TextListItemVariants.dt}>
-            {t('NICs')}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dd}>
-            {(getInterfaces(vm) || []).map(({ name, model }) => (
-              <div key={name}>{model ? `${name} - ${model}` : name}</div>
-            ))}
-          </TextListItem>
-          <TextListItem className="text-muted" component={TextListItemVariants.dt}>
-            {t('Disks')}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dd}>
-            {getDisksDescription(vm, pvcs, dataVolumes)}
-          </TextListItem>
-        </FormGroup>
-        {isVMRunning && (
-          <Alert
-            title={t('The VM {{vmName}} is still running. It will be powered off while cloning.', {
-              vmName: getName(vm),
-            })}
-            variant={AlertVariant.warning}
-            isInline
-          />
-        )}
+        <NameInput name={cloneName} setName={setCloneName} />
+        <DescriptionInput description={cloneDescription} setDescription={setCloneDescription} />
+        <ProjectSelectInput
+          project={cloneProject}
+          setProject={setCloneProject}
+          projectNames={projectNames}
+          projectsLoaded={loaded}
+        />
+        <StartClonedVMCheckbox startCloneVM={startCloneVM} setStartCloneVM={setStartCloneVM} />
+        <ConfigurationSummary vm={vm} pvcs={pvcs} dataVolumes={dataVolumes} />
+        <CloneRunningVMAlert vmName={vm?.metadata?.name} isVMRunning={isVMRunning} />
       </Form>
     </TabModal>
   );
