@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Flavor from 'src/views/virtualmachines/details/tabs/details/components/Flavor/Flavor';
+import Flavor from '../../../../details/tabs/details/components/Flavor/Flavor';
 
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';

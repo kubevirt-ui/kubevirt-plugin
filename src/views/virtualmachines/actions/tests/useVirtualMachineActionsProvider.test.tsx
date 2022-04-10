@@ -68,9 +68,9 @@ describe('useVirtualMachineActionsProvider tests', () => {
     const [actions] = result.current;
     const pausedVMActions = actions.map((action) => action.id);
 
-    // Paused vm should have start, restart, unpause, migrate and delete actions
+    // Paused vm should have stop, restart, unpause, migrate and delete actions
     expect(pausedVMActions).toEqual([
-      'vm-action-start',
+      'vm-action-stop',
       'vm-action-restart',
       'vm-action-unpause',
       'vm-action-clone',
