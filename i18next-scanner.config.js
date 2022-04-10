@@ -7,6 +7,7 @@ module.exports = {
   input: ['src/**/*.{js,jsx,ts,tsx}'],
   output: './',
   options: {
+    sort: true,
     lngs: ['en'],
     ns: ['plugin__kubevirt-plugin'],
     defaultLng: 'en',
