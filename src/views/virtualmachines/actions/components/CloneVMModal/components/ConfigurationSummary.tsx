@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Flavor from '../../../../details/tabs/details/components/Flavor/Flavor';
 
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
@@ -14,7 +13,8 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { FormGroup, TextListItem, TextListItemVariants } from '@patternfly/react-core';
 
-import { getClonedDisksSummery } from '../utils/helpers';
+import Flavor from '../../../../details/tabs/details/components/Flavor/Flavor';
+import { getClonedDisksSummary } from '../utils/helpers';
 
 type ConfigurationSummaryProps = {
   vm: V1VirtualMachine;
@@ -58,7 +58,7 @@ const ConfigurationSummary: React.FC<ConfigurationSummaryProps> = ({ vm, pvcs, d
         {t('Disks')}
       </TextListItem>
       <TextListItem component={TextListItemVariants.dd}>
-        {getClonedDisksSummery(vm, pvcs, dataVolumes)}
+        {getClonedDisksSummary(vm, pvcs, dataVolumes)}
       </TextListItem>
     </FormGroup>
   );

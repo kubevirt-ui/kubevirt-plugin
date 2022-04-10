@@ -21,7 +21,7 @@ import DescriptionInput from './components/DescriptionInput';
 import NameInput from './components/NameInput';
 import ProjectSelectInput from './components/ProjectSelectInput';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox';
-import useProjectsAndDVsAndPVCs from './hooks/useProjectsAndDVsAndPVCs';
+import useCloneVMResources from './hooks/useCloneVMResources';
 import { TEMPLATE_VM_NAME_LABEL } from './utils/constants';
 import {
   produceCleanClonedVM,
@@ -47,7 +47,7 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
 
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
-  const { projects, pvcs, dataVolumes, loaded } = useProjectsAndDVsAndPVCs(vm);
+  const { projects, pvcs, dataVolumes, loaded } = useCloneVMResources(vm);
 
   const projectNames = React.useMemo(
     () => (projects || [])?.map((project) => project.metadata.name),
@@ -81,10 +81,11 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
   }, [cloneDescription, cloneName, cloneProject, dataVolumes, pvcs, startCloneVM, vm]);
 
   const onClone = (updatedVM: V1VirtualMachine) => {
+    const createPromise = () => k8sCreate({ model: VirtualMachineModel, data: updatedVM });
     if (isVMRunning) {
-      return stopVM(vm).then(() => k8sCreate({ model: VirtualMachineModel, data: updatedVM }));
+      return stopVM(vm).then(createPromise);
     }
-    return k8sCreate({ model: VirtualMachineModel, data: updatedVM });
+    return createPromise();
   };
 
   return (

@@ -7,12 +7,9 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-// import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getNamespace } from '../utils/helpers';
-
-type UseProjectsAndDVsAndPVCs = (vm: V1VirtualMachine) => {
+type UseCloneVMResources = (vm: V1VirtualMachine) => {
   projects: K8sResourceCommon[];
   dataVolumes: V1beta1DataVolume[];
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
@@ -20,12 +17,7 @@ type UseProjectsAndDVsAndPVCs = (vm: V1VirtualMachine) => {
   error: any;
 };
 
-const useProjectsAndDVsAndPVCs: UseProjectsAndDVsAndPVCs = (vm: V1VirtualMachine) => {
-  //   const requestsDataVolumes = !!(getVolumes(vm) || []).find((volume) => volume?.dataVolume?.name);
-  //   const requestsPVCs = !!(getVolumes(vm) || []).find(
-  //     (volume) => volume?.persistentVolumeClaim?.claimName,
-  //   );
-
+const useCloneVMResources: UseCloneVMResources = (vm: V1VirtualMachine) => {
   const [projects, projectsLoaded, projectsLoadError] = useK8sWatchResource<K8sResourceCommon[]>({
     isList: true,
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
@@ -37,7 +29,7 @@ const useProjectsAndDVsAndPVCs: UseProjectsAndDVsAndPVCs = (vm: V1VirtualMachine
     isList: true,
     groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
     namespaced: true,
-    namespace: getNamespace(vm),
+    namespace: vm?.metadata?.namespace,
   });
 
   const [pvcs, pvcsLoaded, pvcsLoadError] = useK8sWatchResource<
@@ -46,7 +38,7 @@ const useProjectsAndDVsAndPVCs: UseProjectsAndDVsAndPVCs = (vm: V1VirtualMachine
     isList: true,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     namespaced: true,
-    namespace: getNamespace(vm),
+    namespace: vm?.metadata?.namespace,
   });
 
   return {
@@ -58,4 +50,4 @@ const useProjectsAndDVsAndPVCs: UseProjectsAndDVsAndPVCs = (vm: V1VirtualMachine
   };
 };
 
-export default useProjectsAndDVsAndPVCs;
+export default useCloneVMResources;

@@ -13,11 +13,6 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-
-export const getName = (obj: K8sResourceCommon) => obj?.metadata?.name;
-
-export const getNamespace = (obj: K8sResourceCommon) => obj?.metadata?.namespace;
 
 export const getRandomChars = (len: number): string => {
   return Math.random()
@@ -26,7 +21,7 @@ export const getRandomChars = (len: number): string => {
     .substr(1, len);
 };
 
-export const getClonedDisksSummery = (
+export const getClonedDisksSummary = (
   vm: V1VirtualMachine,
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
   dataVolumes: V1beta1DataVolume[],
@@ -41,17 +36,22 @@ export const getClonedDisksSummery = (
     if (volume) {
       if (volume.dataVolume) {
         const dataVolume =
-          (dataVolumeTemplates || []).find((dv) => getName(dv) === volume?.dataVolume?.name) ||
+          (dataVolumeTemplates || []).find(
+            (dv) => dv?.metadata?.name === volume?.dataVolume?.name,
+          ) ||
           (dataVolumes || []).find(
             (dv) =>
-              getName(dv) === volume?.dataVolume?.name && getNamespace(dv) === getNamespace(vm),
+              dv?.metadata?.name === volume?.dataVolume?.name &&
+              dv?.metadata?.namespace === vm?.metadata?.namespace,
           );
         description.push(
           formatBytes(dataVolume?.spec?.storage?.resources?.requests?.storage),
           dataVolume?.spec?.storage?.storageClassName,
         );
       } else if (volume.persistentVolumeClaim) {
-        const pvc = pvcs.find((p) => getName(p) === volume?.persistentVolumeClaim?.claimName);
+        const pvc = pvcs.find(
+          (p) => p?.metadata?.name === volume?.persistentVolumeClaim?.claimName,
+        );
         description.push(
           formatBytes(pvc?.spec?.resources?.requests?.storage),
           pvc?.spec?.storageClassName,
