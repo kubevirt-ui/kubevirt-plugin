@@ -68,7 +68,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
       </ListPageHeader>
       <ListPageBody>
         <ListPageFilter
-          data={data}
+          data={unfilteredData}
           loaded={loaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
