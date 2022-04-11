@@ -1,8 +1,11 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  VirtualMachineInstanceModelGroupVersionKind,
+  VirtualMachineModelRef,
+} from '@kubevirt-ui/kubevirt-api/console';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
@@ -28,10 +31,16 @@ type VirtualMachinesListProps = {
 const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const ref = VirtualMachineModelGroupVersionKind;
 
   const [vms, loaded, loadError] = useK8sWatchResource<V1VirtualMachine[]>({
     kind,
+    isList: true,
+    namespaced: true,
+    namespace,
+  });
+
+  const [vmis] = useK8sWatchResource<V1VirtualMachineInstance[]>({
+    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: true,
     namespaced: true,
     namespace,
@@ -47,7 +56,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
   const onCreate = (type: string) =>
     type === 'catalog'
       ? history.push(`/k8s/ns/${namespace || 'default'}/templatescatalog`)
-      : history.push(`/k8s/cluster/${ref.group}~${ref.version}~${ref.kind}/~new`);
+      : history.push(`/k8s/cluster/${VirtualMachineModelRef}/~new`);
 
   const columns = useVirtualMachineColumns();
   return (
@@ -59,7 +68,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
       </ListPageHeader>
       <ListPageBody>
         <ListPageFilter
-          data={data}
+          data={unfilteredData}
           loaded={loaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
@@ -71,7 +80,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
           loadError={loadError}
           columns={columns}
           Row={VirtualMachineRow}
-          rowData={{ kind }}
+          rowData={{ kind, vmis }}
         />
       </ListPageBody>
     </>

@@ -3,29 +3,16 @@ import * as React from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
-import { ResourceLink, RowProps, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceLink, RowProps } from '@openshift-console/dynamic-plugin-sdk';
 
 import FirstItemListPopover from '../FirstItemListPopover/FirstItemListPopover';
 
 import VirtualMachineRowLayout from './VirtualMachineRowLayout';
 
-const VirtualMachineRunningRow: React.FC<RowProps<V1VirtualMachine, { kind: string }>> = ({
-  obj,
-  activeColumnIDs,
-  rowData: { kind },
-}) => {
+const VirtualMachineRunningRow: React.FC<
+  RowProps<V1VirtualMachine, { kind: string; vmi: V1VirtualMachineInstance }>
+> = ({ obj, activeColumnIDs, rowData: { kind, vmi } }) => {
   const { t } = useKubevirtTranslation();
-
-  const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
-    groupVersionKind: {
-      group: 'kubevirt.io',
-      version: 'v1',
-      kind: 'VirtualMachineInstance',
-    },
-    isList: false,
-    name: obj.metadata.name,
-    namespace: obj.metadata.namespace,
-  });
 
   const ipAddressess = vmi && getVMIIPAddresses(vmi);
   return (
