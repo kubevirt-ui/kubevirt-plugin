@@ -2,12 +2,14 @@ import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
+import VirtualMachineConsolePage from '../tabs/console/VirtualMachineConsolePage';
 import VirtualMachineDetailsPage from '../tabs/details/VirtualMachineDetailsPage';
 import DiskListPage from '../tabs/disk/tables/disk/DiskListPage';
 import VirtualMachineEnvironmentPage from '../tabs/environment/VirtualMachineEnvironmentPage';
 import NetworkInterfaceListPage from '../tabs/network/NetworkInterfaceListPage';
 import VirtualMachinesOverviewTab from '../tabs/overview/VirtualMachinesOverviewTab';
 import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
+import VirtualMachineYAMLPage from '../tabs/yaml/VirtualMachineYAMLPage';
 
 export const useVirtualMachineTabs = () => {
   const { t } = useKubevirtTranslation();
@@ -27,7 +29,7 @@ export const useVirtualMachineTabs = () => {
       {
         href: 'yaml',
         name: 'YAML',
-        component: React.Fragment,
+        component: VirtualMachineYAMLPage,
       },
       {
         href: 'environment',
@@ -42,7 +44,7 @@ export const useVirtualMachineTabs = () => {
       {
         href: 'console',
         name: t('Console'),
-        component: React.Fragment,
+        component: VirtualMachineConsolePage,
       },
       {
         href: 'network-interfaces',

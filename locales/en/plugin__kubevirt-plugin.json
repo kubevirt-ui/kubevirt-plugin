@@ -371,6 +371,7 @@
   "The following information is provided by the OpenShift Virtualization operator.": "The following information is provided by the OpenShift Virtualization operator.",
   "The following information regarding how the disks are partitioned is provided by the guest agent.": "The following information regarding how the disks are partitioned is provided by the guest agent.",
   "The guest OS needs to have the Cloudinit service running.": "The guest OS needs to have the Cloudinit service running.",
+  "This Virtual Machine is down. Please start it to access its console.": "This Virtual Machine is down. Please start it to access its console.",
   "This disk's source is not editable": "This disk's source is not editable",
   "This field is required": "This field is required",
   "This template requires some additional parameters. Click the Customize Virtual machine button to complete the creation flow.": "This template requires some additional parameters. Click the Customize Virtual machine button to complete the creation flow.",
