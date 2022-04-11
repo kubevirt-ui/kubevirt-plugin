@@ -14,12 +14,12 @@
     "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/doc/console-extensions.md .",
     "test": "jest",
     "test-cov": "jest --coverage",
-    "cypress-merge": "mochawesome-merge ./gui-test-screenshots/cypress_report*.json > ./gui-test-screenshots/cypress.json",
-    "cypress-generate": "marge -o ./gui-test-screenshots/ -f cypress-report -t 'Kubevirt Cypress Test Results' -p 'Kubevirt Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",
+    "cypress-merge": "cd cypress && mochawesome-merge ./gui-test-screenshots/cypress_report*.json > ./gui-test-screenshots/cypress.json",
+    "cypress-generate": "cd cypress && marge -o ./gui-test-screenshots/ -f cypress-report -t 'Kubevirt Cypress Test Results' -p 'Kubevirt Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",
     "cypress-postreport": "yarn cypress-merge && yarn cypress-generate",
-    "test-cypress": "node_modules/.bin/cypress open --config-file ./cypress/cypress.json --env openshift=true",
-    "test-cypress-docker": "echo 'visit http://localhost:10000' && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 $(npm bin)/cypress open --config-file ./cypress/cypress.json --env openshift=true",
-    "test-cypress-headless": "node --max-old-space-size=4096 $(npm bin)/cypress run --config-file ./cypress/cypress.json --env openshift=true --headless",
+    "test-cypress": "cd cypress && $(npm bin)/cypress open --config-file ./cypress.json --env openshift=true",
+    "test-cypress-docker": "echo 'visit http://localhost:10000' && cd cypress && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 $(npm bin)/cypress open --config-file ./cypress.json --env openshift=true",
+    "test-cypress-headless": "cd cypress && node --max-old-space-size=4096 $(npm bin)/cypress run --config-file ./cypress.json --env openshift=true --headless",
     "start-console": "./start-console.sh"
   },
   "consolePlugin": {
