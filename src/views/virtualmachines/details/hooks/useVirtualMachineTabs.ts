@@ -8,6 +8,7 @@ import VirtualMachineEnvironmentPage from '../tabs/environment/VirtualMachineEnv
 import NetworkInterfaceListPage from '../tabs/network/NetworkInterfaceListPage';
 import VirtualMachinesOverviewTab from '../tabs/overview/VirtualMachinesOverviewTab';
 import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
+import VirtualMachineYAMLPage from '../tabs/yaml/VirtualMachineYAMLPage';
 
 export const useVirtualMachineTabs = () => {
   const { t } = useKubevirtTranslation();
@@ -27,7 +28,7 @@ export const useVirtualMachineTabs = () => {
       {
         href: 'yaml',
         name: 'YAML',
-        component: React.Fragment,
+        component: VirtualMachineYAMLPage,
       },
       {
         href: 'environment',
