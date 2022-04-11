@@ -2,14 +2,14 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
-import { Gallery, Stack, StackItem, Title } from '@patternfly/react-core';
+import { Gallery, Stack, StackItem } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
 import { TemplatesCatalogEmptyState } from './components/TemplatesCatalogEmptyState';
 import { TemplatesCatalogFilters } from './components/TemplatesCatalogFilters/TemplatesCatalogFilters';
 import { TemplatesCatalogHeader } from './components/TemplatesCatalogHeader';
+import { TemplatesCatalogPageHeader } from './components/TemplatesCatalogPageHeader';
 import { TemplatesCatalogRow } from './components/TemplatesCatalogRow';
 import { skeletonCatalog } from './components/TemplatesCatalogSkeleton';
 import { TemplateTile } from './components/TemplatesCatalogTile';
@@ -25,7 +25,6 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
     params: { ns: namespace },
   },
 }) => {
-  const { t } = useKubevirtTranslation();
   const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
@@ -70,14 +69,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
 
   return (
     <Stack hasGutter>
-      <StackItem className="co-m-nav-title co-m-nav-title--row">
-        <Stack>
-          <StackItem className="co-m-pane__heading">
-            <Title headingLevel="h1">{t('Create new VirtualMachine from catalog')}</Title>
-          </StackItem>
-          <StackItem>{t('Select an option to create a VirtualMachine')}</StackItem>
-        </Stack>
-      </StackItem>
+      <TemplatesCatalogPageHeader namespace={namespace} />
       {loaded ? (
         <div className="co-catalog-page co-catalog-page--with-sidebar">
           <TemplatesCatalogFilters filters={filters} onFilterChange={onFilterChange} />

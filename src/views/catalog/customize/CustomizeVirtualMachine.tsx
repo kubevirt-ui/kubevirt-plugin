@@ -1,17 +1,18 @@
 import * as React from 'react';
+import { useParams } from 'react-router-dom';
 
 import {
   modelToGroupVersionKind,
   TemplateModel,
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CustomizeError } from './components/CustomizeError';
 import { CustomizeForm } from './components/CustomizeForms/CustomizeForm';
 import CustomizeFormWithStorage from './components/CustomizeForms/CustomizeFormWithStorage';
+import { CustomizeVirtualMachineHeader } from './components/CustomizeVirtualMachineHeader';
 import { CustomizeVirtualMachineSkeleton } from './components/CustomizeVirtualMachineSkeleton';
 import { RightHeader } from './components/RightHeading';
 import { hasCustomizableSource } from './utils';
@@ -19,7 +20,7 @@ import { hasCustomizableSource } from './utils';
 import './CustomizeVirtualMachine.scss';
 
 const CustomizeVirtualMachine: React.FC = () => {
-  const { t } = useKubevirtTranslation();
+  const { ns } = useParams<{ ns: string }>();
   const { params } = useURLParams();
   const name = params.get('name');
   const templateNamespace = params.get('namespace');
@@ -45,18 +46,21 @@ const CustomizeVirtualMachine: React.FC = () => {
   if (error) return <CustomizeError />;
 
   return (
-    <div className="co-m-pane__body customize-vm">
-      <h1 className="co-m-pane__heading">{t('Create VirtualMachine from template')}</h1>
-      <div className="row">
-        <div className="col-md-7 col-md-push-5 co-catalog-item-info">
-          <RightHeader template={template} />
-        </div>
-        <div className="col-md-5 col-md-pull-7">
-          {template && loaded && <Form template={template} />}
-          {!loaded && <CustomizeVirtualMachineSkeleton />}
+    <>
+      <CustomizeVirtualMachineHeader namespace={ns} />
+
+      <div className="co-m-pane__body co-m-pane__body--no-top-margin customize-vm">
+        <div className="row">
+          <div className="col-md-7 col-md-push-5 co-catalog-item-info">
+            <RightHeader template={template} />
+          </div>
+          <div className="col-md-5 col-md-pull-7">
+            {template && loaded && <Form template={template} />}
+            {!loaded && <CustomizeVirtualMachineSkeleton />}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

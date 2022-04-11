@@ -1,23 +1,83 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 
+import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
+import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Stack, StackItem, Title } from '@patternfly/react-core';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  Button,
+  Stack,
+  StackItem,
+  Title,
+} from '@patternfly/react-core';
 
-export const WizardHeader: React.FC = () => {
+export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ namespace }) => {
   const { t } = useKubevirtTranslation();
+  const { tabsData } = useWizardVMContext();
+  const history = useHistory();
+
+  const templateName = tabsData?.overview?.templateMetadata?.name;
+  const templateNamespace = tabsData?.overview?.templateMetadata?.namespace;
+
+  const onBreadcrumbClick = (url: string) =>
+    confirm(t('Are you sure you want to leave this page?')) && history.push(url);
 
   return (
-    <StackItem className="co-m-nav-title co-m-nav-title--row">
+    <div className="co-m-nav-title co-m-nav-title--breadcrumbs">
+      <Breadcrumb>
+        <BreadcrumbItem>
+          <Button
+            variant="link"
+            isInline
+            onClick={() =>
+              onBreadcrumbClick(`/k8s/ns/${namespace || 'default'}/${VirtualMachineModelRef}`)
+            }
+          >
+            {t('Virtualization')}
+          </Button>
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+          <Button
+            variant="link"
+            isInline
+            onClick={() => onBreadcrumbClick(`/k8s/ns/${namespace || 'default'}/templatescatalog`)}
+          >
+            {t('Catalog')}
+          </Button>
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+          <Button
+            variant="link"
+            isInline
+            onClick={() =>
+              onBreadcrumbClick(
+                `/k8s/ns/${
+                  namespace || 'default'
+                }/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
+              )
+            }
+          >
+            {t('Customize')}
+          </Button>
+        </BreadcrumbItem>
+        <BreadcrumbItem>{t('Review')}</BreadcrumbItem>
+      </Breadcrumb>
       <Stack>
-        <Title className="co-m-pane__heading" headingLevel="h1">
-          {t('Review and Create VirtualMachine')}
-        </Title>
-        <Trans t={t} ns="plugin__kubevirt-plugin">
-          You can click the Create VirtualMachine button to create your VirtualMachine or customize
-          it by editing each of the tabs below. When done, click the Create Virtual Machine button.
-        </Trans>
+        <StackItem className="co-m-pane__heading">
+          <Title headingLevel="h1">{t('Review and Create VirtualMachine')}</Title>
+        </StackItem>
+        <StackItem>
+          <Trans t={t} ns="plugin__kubevirt-plugin">
+            You can click the Create VirtualMachine button to create your VirtualMachine or
+            customize it by editing each of the tabs below. When done, click the Create Virtual
+            Machine button.
+          </Trans>
+        </StackItem>
       </Stack>
-    </StackItem>
+    </div>
   );
-};
+});
+WizardHeader.displayName = 'WizardHeader';
