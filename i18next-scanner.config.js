@@ -20,6 +20,7 @@ module.exports = {
     },
     nsSeparator: '~',
     keySeparator: false,
+    removeUnusedKeys: true,
     interpolation: {
       prefix: '{{',
       suffix: '}}',

@@ -21,6 +21,7 @@
   "Add new values by referencing an existing config map, secret or service account. Using these values requires mounting them manually to the VM.": "Add new values by referencing an existing config map, secret or service account. Using these values requires mounting them manually to the VM.",
   "Affinity Rules": "Affinity Rules",
   "All Items": "All Items",
+  "An error occured, The VirtualMachine was not updated. Click \"Reload\" to go back to the last valid state": "An error occured, The VirtualMachine was not updated. Click \"Reload\" to go back to the last valid state",
   "An error occurred": "An error occurred",
   "Annotations": "Annotations",
   "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects": "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects",
