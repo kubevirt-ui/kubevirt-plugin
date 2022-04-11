@@ -103,8 +103,8 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
           variant={ButtonVariant.secondary}
           isDisabled={
             !defaultsLoaded ||
-            !templateDefaultsData.defaultCpu ||
-            !templateDefaultsData.defaultMemory ||
+            !templateDefaultsData?.defaultCpu ||
+            !templateDefaultsData?.defaultMemory ||
             defaultLoadError
           }
           isLoading={!defaultsLoaded}

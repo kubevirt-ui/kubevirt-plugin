@@ -25,7 +25,16 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (vm) => {
     groupVersionKind: modelToGroupVersionKind(TemplateModel),
     name: templateName,
     namespace: templateNamespace,
+    isList: false,
   });
+
+  if (!templateName || !templateNamespace) {
+    return {
+      data: null,
+      loaded: true,
+      error: null,
+    };
+  }
 
   const defaultMemory = getMemorySize(
     template?.objects?.[0]?.spec?.template?.spec?.domain?.resources?.requests?.memory,
