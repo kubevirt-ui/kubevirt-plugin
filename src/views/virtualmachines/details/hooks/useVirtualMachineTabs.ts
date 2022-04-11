@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
+import VirtualMachineConsolePage from '../tabs/console/VirtualMachineConsolePage';
 import VirtualMachineDetailsPage from '../tabs/details/VirtualMachineDetailsPage';
 import DiskListPage from '../tabs/disk/tables/disk/DiskListPage';
 import VirtualMachineEnvironmentPage from '../tabs/environment/VirtualMachineEnvironmentPage';
@@ -43,7 +44,7 @@ export const useVirtualMachineTabs = () => {
       {
         href: 'console',
         name: t('Console'),
-        component: React.Fragment,
+        component: VirtualMachineConsolePage,
       },
       {
         href: 'network-interfaces',
