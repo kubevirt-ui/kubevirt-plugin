@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 const useNetworkColumns = () => {
-  const { t } = useTranslation();
+  const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<NetworkPresentation>[] = React.useMemo(
     () => [

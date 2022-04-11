@@ -98,7 +98,7 @@ const TabModal: TabModalFC = React.memo(
               <ActionGroup>
                 <Button
                   isSmall
-                  isDisabled={isDisabled}
+                  isDisabled={isDisabled || isSubmitting}
                   isLoading={isSubmitting}
                   onClick={handleSubmit}
                   variant={submitBtnVariant ?? 'primary'}

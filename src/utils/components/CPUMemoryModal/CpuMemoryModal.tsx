@@ -94,6 +94,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
           key="confirm"
           variant={ButtonVariant.primary}
           onClick={handleSubmit}
+          isDisabled={updateInProcess}
           isLoading={updateInProcess}
         >
           {t('Save')}
