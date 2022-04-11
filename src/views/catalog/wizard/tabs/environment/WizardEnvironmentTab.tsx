@@ -2,13 +2,13 @@ import * as React from 'react';
 import { useParams } from 'react-router-dom';
 
 import { WizardVMContextType } from '@catalog/utils/WizardVMContext';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Bullseye, Button } from '@patternfly/react-core';
+import { Button } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 import EnvironmentEditor from './components/EnvironmentEditor';
 import WizardEnvironmentTabFooter from './components/WizardEnvironmentTabFooter';
+import WizardEnvironmentTabSkeleton from './components/WizardEnvironmentTabSkeleton';
 import WizardEnvironmentTabTitle from './components/WizardEnvironmentTabTitle';
 import useEnvironments from './hook/useEnvironments';
 import useEnvironmentsResources from './hook/useEnvironmentsResources';
@@ -46,12 +46,7 @@ const WizardEnvironmentTab: React.FC<WizardVMContextType> = ({
     return () => setDisableVmCreate(false);
   }, [edited, setDisableVmCreate]);
 
-  if (!loaded)
-    return (
-      <Bullseye>
-        <Loading />
-      </Bullseye>
-    );
+  if (!loaded) return <WizardEnvironmentTabSkeleton />;
 
   const environmentNamesSelected = environments.map((env) => env.name);
 
