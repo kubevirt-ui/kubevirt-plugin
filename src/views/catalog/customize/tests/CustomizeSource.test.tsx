@@ -7,7 +7,6 @@ import {
   CustomizeSource,
   DEFAULT_SOURCE,
   HTTP_SOURCE_NAME,
-  PVC_SIZE_FORMATS,
   REGISTRY_SOURCE_NAME,
 } from '../components/CustomizeSource';
 
@@ -32,11 +31,11 @@ describe('Test CustomizeSource', () => {
   it('Switch to cd Source with checkbox', () => {
     const { rerender } = render(
       <CustomizeSource
-        onChange={onChangeMock}
+        setDiskSource={onChangeMock}
         setDrivers={setDrivers}
         withDrivers={false}
         setCDSource={setCDSource}
-        cdSource={false}
+        cdSource={undefined}
       />,
     );
 
@@ -46,15 +45,16 @@ describe('Test CustomizeSource', () => {
       fireEvent.click(screen.getByLabelText('Boot from CD', { exact: false }));
     });
 
-    expect(setCDSource).toBeCalledWith(true, expect.anything());
+    expect(setCDSource).toBeCalled();
 
+    const newCdSource = (setCDSource as jest.Mock).mock.calls[0][0];
     rerender(
       <CustomizeSource
-        onChange={onChangeMock}
+        setDiskSource={onChangeMock}
         setDrivers={setDrivers}
         withDrivers={false}
         setCDSource={setCDSource}
-        cdSource
+        cdSource={newCdSource}
       />,
     );
 
@@ -65,11 +65,11 @@ describe('Test CustomizeSource', () => {
     const testImageUrl = 'imageUrl';
     render(
       <CustomizeSource
-        onChange={onChangeMock}
+        setDiskSource={onChangeMock}
         setDrivers={setDrivers}
         withDrivers={false}
         setCDSource={setCDSource}
-        cdSource={false}
+        cdSource={undefined}
       />,
     );
 
@@ -84,8 +84,7 @@ describe('Test CustomizeSource', () => {
     userEvent.type(screen.getByLabelText('Image URL'), testImageUrl);
 
     expect(onChangeMock).lastCalledWith({
-      pvc: {
-        accessModes: ['ReadWriteOnce'],
+      storage: {
         resources: { requests: { storage: '30Gi' } },
       },
       source: {
@@ -100,11 +99,11 @@ describe('Test CustomizeSource', () => {
     const testContainer = 'containerurl';
     render(
       <CustomizeSource
-        onChange={onChangeMock}
+        setDiskSource={onChangeMock}
         setDrivers={setDrivers}
         withDrivers={false}
         setCDSource={setCDSource}
-        cdSource={false}
+        cdSource={undefined}
       />,
     );
 
@@ -119,40 +118,7 @@ describe('Test CustomizeSource', () => {
     userEvent.type(screen.getByLabelText('Container Image'), testContainer);
 
     expect(onChangeMock).lastCalledWith({
-      pvc: {
-        accessModes: ['ReadWriteOnce'],
-        resources: { requests: { storage: '30Gi' } },
-      },
-      source: {
-        registry: {
-          url: testContainer,
-        },
-      },
-    });
-
-    act(() => {
-      fireEvent.click(screen.getByLabelText('Decrement'));
-    });
-
-    expect(onChangeMock).lastCalledWith({
-      pvc: {
-        accessModes: ['ReadWriteOnce'],
-        resources: { requests: { storage: '29Gi' } },
-      },
-      source: {
-        registry: {
-          url: testContainer,
-        },
-      },
-    });
-
-    act(() => {
-      fireEvent.click(screen.getByLabelText('Increment'));
-    });
-
-    expect(onChangeMock).lastCalledWith({
-      pvc: {
-        accessModes: ['ReadWriteOnce'],
+      storage: {
         resources: { requests: { storage: '30Gi' } },
       },
       source: {
@@ -166,29 +132,8 @@ describe('Test CustomizeSource', () => {
     userEvent.type(screen.getByDisplayValue('30'), `{selectall}${mockedVolumeValue}`);
 
     expect(onChangeMock).lastCalledWith({
-      pvc: {
-        accessModes: ['ReadWriteOnce'],
+      storage: {
         resources: { requests: { storage: mockedVolumeValue + 'Gi' } },
-      },
-      source: {
-        registry: {
-          url: testContainer,
-        },
-      },
-    });
-
-    act(() => {
-      userEvent.click(screen.getByText(PVC_SIZE_FORMATS.Gi));
-    });
-
-    act(() => {
-      userEvent.click(screen.getByText(PVC_SIZE_FORMATS.Mi));
-    });
-
-    expect(onChangeMock).lastCalledWith({
-      pvc: {
-        accessModes: ['ReadWriteOnce'],
-        resources: { requests: { storage: mockedVolumeValue + 'Mi' } },
       },
       source: {
         registry: {

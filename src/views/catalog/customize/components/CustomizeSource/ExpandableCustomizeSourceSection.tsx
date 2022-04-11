@@ -16,7 +16,7 @@ import { HelpIcon } from '@patternfly/react-icons';
 import { CustomizeSource, CustomizeSourceProps } from './CustomizeSource';
 
 export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = ({
-  onChange,
+  setDiskSource,
   initialVolumeQuantity,
   withDrivers,
   setDrivers,
@@ -61,7 +61,7 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
           isDetached
         >
           <CustomizeSource
-            onChange={onChange}
+            setDiskSource={setDiskSource}
             initialVolumeQuantity={initialVolumeQuantity}
             withDrivers={withDrivers}
             setDrivers={setDrivers}

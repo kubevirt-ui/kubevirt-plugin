@@ -3,7 +3,11 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateOS,
+  getTemplateVirtualMachineObject,
+  OS_NAME_TYPES,
+} from '@kubevirt-utils/resources/template';
 import { Form } from '@patternfly/react-core';
 
 import { addCDToTemplate } from '../../cd';
@@ -27,29 +31,32 @@ type CustomizeFormWithStorageProps = {
 
 const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
-  const [customSource, setCustomSource] = React.useState<V1beta1DataVolumeSpec>();
-  const [cdSource, setCDSource] = React.useState(false);
+  const [diskSource, setDiskSource] = React.useState<V1beta1DataVolumeSpec>();
+  const [cdSource, setCDSource] = React.useState<V1beta1DataVolumeSpec>();
 
-  const templateWithCDVolume = React.useMemo(() => {
-    if (cdSource) return addCDToTemplate(template, customSource);
-    else {
+  const templateWithSources = React.useMemo(() => {
+    let newTemplate = template;
+
+    if (diskSource) {
       let virtualMachine = getTemplateVirtualMachineObject(template);
 
-      virtualMachine = overrideVirtualMachineDataVolumeSpec(virtualMachine, customSource);
-      return { ...template, objects: [virtualMachine] };
+      virtualMachine = overrideVirtualMachineDataVolumeSpec(virtualMachine, diskSource);
+      newTemplate = { ...template, objects: [virtualMachine] };
     }
-  }, [cdSource, template, customSource]);
 
-  const [windowsDrivers, setWindowsDrivers] = React.useState(false);
+    if (cdSource) newTemplate = addCDToTemplate(newTemplate, cdSource);
 
-  const [onSubmit, loaded, error] = useCustomizeFormSubmit(templateWithCDVolume, windowsDrivers);
+    return newTemplate;
+  }, [cdSource, template, diskSource]);
 
-  const [requiredFields, optionalFields] = buildFields(template);
-  const nameField = getVirtualMachineNameField(template, t);
+  const [windowsDrivers, setWindowsDrivers] = React.useState(
+    getTemplateOS(template) === OS_NAME_TYPES.windows,
+  );
 
-  const onDiskSourceChange = React.useCallback((newDiskSource) => {
-    setCustomSource(newDiskSource);
-  }, []);
+  const [onSubmit, loaded, error] = useCustomizeFormSubmit(templateWithSources, windowsDrivers);
+
+  const [requiredFields, optionalFields] = React.useMemo(() => buildFields(template), [template]);
+  const nameField = React.useMemo(() => getVirtualMachineNameField(template, t), [template, t]);
 
   return (
     <Form onSubmit={onSubmit}>
@@ -60,7 +67,7 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ tem
       ))}
 
       <ExpandableCustomizeSourceSection
-        onChange={onDiskSourceChange}
+        setDiskSource={setDiskSource}
         initialVolumeQuantity={getTemplateStorageQuantity(template)}
         withDrivers={windowsDrivers}
         setDrivers={setWindowsDrivers}

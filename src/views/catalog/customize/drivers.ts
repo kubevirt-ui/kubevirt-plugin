@@ -13,7 +13,7 @@ import {
   WINDOWS_DRIVERS_DISK,
 } from './constants';
 
-const getVmwareConfigMap = async (): Promise<any> => {
+const getVirtioWinConfigMap = async (): Promise<any> => {
   let lastException = undefined;
   for (const namespace of VIRTIO_WIN_CONFIG_MAP_NAMESPACES) {
     try {
@@ -43,7 +43,7 @@ export const mountWinDriversToTemplate = async (template: V1Template): Promise<V
     let driversImage = DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE;
 
     try {
-      const configMap = await getVmwareConfigMap();
+      const configMap = await getVirtioWinConfigMap();
       if (configMap?.data?.[VIRTIO_WIN_IMAGE]) driversImage = configMap.data[VIRTIO_WIN_IMAGE];
     } catch (error) {
       console.error(error);

@@ -1,7 +1,8 @@
+import produce from 'immer';
+
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
-  K8sIoApiCoreV1PersistentVolumeClaimSpec,
   V1beta1DataVolumeSource,
   V1beta1DataVolumeSpec,
   V1DataVolumeTemplateSpec,
@@ -11,14 +12,11 @@ import {
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 
 import {
-  BLANK_SOURCE_FOR_INSTALLATION,
   INSTALLATION_CDROM_DISK,
   INSTALLATION_CDROM_NAME,
-  INSTALLATION_CDROM_PVC,
   INSTALLATION_CDROM_VOLUME,
   INSTALLATION_CDROM_VOLUME_NAME,
 } from './constants';
-import { overrideVirtualMachineDataVolumeSpec } from './utils';
 
 export const addInstallationCDRom = (
   virtualMachine: V1VirtualMachine,
@@ -39,7 +37,7 @@ export const addInstallationCDRom = (
 
     cdDataVolumeTemplate = {
       metadata: { name: INSTALLATION_CDROM_VOLUME_NAME },
-      spec: { source: cdSource, pvc: INSTALLATION_CDROM_PVC },
+      spec: { source: cdSource },
     };
   }
 
@@ -56,28 +54,15 @@ export const addInstallationCDRom = (
   });
 };
 
-const getBlankSourceForInstallation = (
-  pvc: K8sIoApiCoreV1PersistentVolumeClaimSpec,
-): V1beta1DataVolumeSpec => ({
-  ...BLANK_SOURCE_FOR_INSTALLATION,
-  pvc,
-});
-
 export const addCDToTemplate = (
   template: V1Template,
-  customCDVolumeSpec: V1beta1DataVolumeSpec,
+  cdSource: V1beta1DataVolumeSpec,
 ): V1Template => {
-  if (!customCDVolumeSpec) return template;
+  return produce(template, (draftTemplate) => {
+    if (!cdSource) return draftTemplate;
+    let virtualMachine = getTemplateVirtualMachineObject(draftTemplate);
+    virtualMachine = addInstallationCDRom(virtualMachine, cdSource.source);
 
-  let virtualMachine = getTemplateVirtualMachineObject(template);
-
-  if (customCDVolumeSpec.pvc)
-    virtualMachine = overrideVirtualMachineDataVolumeSpec(
-      virtualMachine,
-      getBlankSourceForInstallation(customCDVolumeSpec.pvc),
-    );
-
-  virtualMachine = addInstallationCDRom(virtualMachine, customCDVolumeSpec.source);
-
-  return { ...template, objects: [virtualMachine] };
+    return { ...draftTemplate, objects: [virtualMachine] };
+  });
 };

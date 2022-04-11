@@ -2,44 +2,36 @@ import * as React from 'react';
 
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Checkbox,
-  FormGroup,
-  Select,
-  SelectOption,
-  SelectVariant,
-  TextInput,
-  ValidatedOptions,
-} from '@patternfly/react-core';
+import { Checkbox, Divider, FormGroup } from '@patternfly/react-core';
 
-import { PersistentVolumeClaimSelect } from '../PersistentVolumeClaimSelect';
-
-import BootCDCheckboxLabel from './BootCDCheckboxLabel';
+import BootCDCheckbox from './BootCDCheckboxLabel';
 import {
+  BLANK_SOURCE_NAME,
+  CONTAINER_DISK_SOURCE_NAME,
   DEFAULT_SOURCE,
   HTTP_SOURCE_NAME,
   PVC_SOURCE_NAME,
   REGISTRY_SOURCE_NAME,
+  UPLOAD_SOURCE_NAME,
 } from './constants';
 import { SelectCDSourceLabel } from './SelectCDSourceLabel';
 import { SelectDiskSourceLabel } from './SelectDiskSourceLabel';
-import { getGenericSourceCustomization, getPVCSource } from './utils';
-import { VolumeSize } from './VolumeSize';
-import { SOURCE_OPTIONS_IDS } from '.';
+import { SelectSource } from './SelectSource';
+import { getPVCSource } from './utils';
 
 import './CustomizeSource.scss';
 
 export type CustomizeSourceProps = {
-  onChange: (customSource: V1beta1DataVolumeSpec) => void;
+  setDiskSource: (customSource: V1beta1DataVolumeSpec | undefined) => void;
   initialVolumeQuantity?: string;
   withDrivers: boolean;
   setDrivers: (withDrivers: boolean) => void;
-  cdSource: boolean;
-  setCDSource: (cdSource: boolean) => void;
+  cdSource: V1beta1DataVolumeSpec | undefined;
+  setCDSource: (cdSource: V1beta1DataVolumeSpec | undefined) => void;
 };
 
 export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
-  onChange,
+  setDiskSource,
   initialVolumeQuantity,
   withDrivers,
   setDrivers,
@@ -48,168 +40,44 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [selectedSourceType, setSourceType] = React.useState<SOURCE_OPTIONS_IDS>(DEFAULT_SOURCE);
-  const [pvcNameSelected, selectPVCName] = React.useState<string>();
-  const [pvcNamespaceSelected, selectPVCNamespace] = React.useState<string>();
-  const [volumeQuantity, setVolumeQuantity] = React.useState(initialVolumeQuantity || '30Gi');
-  const [httpURL, setHTTPURL] = React.useState('');
-  const [containerImage, setContainerImage] = React.useState('');
-
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const onSelectDiskSource = React.useCallback((event, selection) => {
-    setSourceType(selection);
-    setIsOpen(false);
-  }, []);
-
-  React.useEffect(() => {
-    switch (selectedSourceType) {
-      case DEFAULT_SOURCE:
-        return onChange(undefined);
-      case PVC_SOURCE_NAME:
-        return onChange(getPVCSource(pvcNameSelected, pvcNamespaceSelected, volumeQuantity));
-      case HTTP_SOURCE_NAME:
-        return onChange(getGenericSourceCustomization(selectedSourceType, httpURL, volumeQuantity));
-      case REGISTRY_SOURCE_NAME:
-        return onChange(
-          getGenericSourceCustomization(selectedSourceType, containerImage, volumeQuantity),
-        );
-    }
-  }, [
-    onChange,
-    pvcNameSelected,
-    pvcNamespaceSelected,
-    httpURL,
-    containerImage,
-    volumeQuantity,
-    selectedSourceType,
-  ]);
+  const onCDCheckboxChange = React.useCallback(() => {
+    if (cdSource) setCDSource(undefined);
+    else setCDSource(getPVCSource(null, null));
+  }, [cdSource, setCDSource]);
 
   return (
     <div className="customize-source">
-      <FormGroup fieldId="customize-boot-from-cd" className="disk-source-form-group">
-        <Checkbox
-          isChecked={cdSource}
-          onChange={setCDSource}
-          label={<BootCDCheckboxLabel />}
-          id="boot-cd"
-        />
-      </FormGroup>
-
-      <h2 className="co-section-heading">
-        {cdSource ? t('CD information') : t('Disk information')}
-      </h2>
-      <FormGroup
-        label={cdSource ? <SelectCDSourceLabel /> : <SelectDiskSourceLabel />}
-        fieldId="disk-source-required-disk"
-        isRequired
-        className="disk-source-form-group"
-      >
-        <Select
-          isOpen={isOpen}
-          onToggle={setIsOpen}
-          onSelect={onSelectDiskSource}
-          variant={SelectVariant.single}
-          selections={selectedSourceType}
-          maxHeight={400}
-        >
-          <SelectOption
-            value={DEFAULT_SOURCE}
-            description={t('Use the default template disk source')}
-          >
-            <span data-test-id={DEFAULT_SOURCE}>{t('Default')}</span>
-          </SelectOption>
-          <SelectOption
-            value={PVC_SOURCE_NAME}
-            description={t(
-              'Select an existing persistent volume claim already available on the cluster and clone it.',
-            )}
-          >
-            <span data-test-id={PVC_SOURCE_NAME}>{t('PVC (creates PVC)')}</span>
-          </SelectOption>
-
-          <SelectOption
-            value={HTTP_SOURCE_NAME}
-            description={t('Import content via URL (HTTP or S3 endpoint).')}
-          >
-            <span data-test-id={HTTP_SOURCE_NAME}>{t('URL (creates PVC)')}</span>
-          </SelectOption>
-
-          <SelectOption
-            value={REGISTRY_SOURCE_NAME}
-            description={t('Import content via container registry.')}
-          >
-            <span data-test-id={REGISTRY_SOURCE_NAME}>{t('Registry (creates PVC)')}</span>
-          </SelectOption>
-        </Select>
-      </FormGroup>
-
-      {selectedSourceType === PVC_SOURCE_NAME && (
-        <PersistentVolumeClaimSelect
-          pvcNameSelected={pvcNameSelected}
-          projectSelected={pvcNamespaceSelected}
-          selectNamespace={selectPVCNamespace}
-          selectPVCName={selectPVCName}
-        />
-      )}
-
-      {selectedSourceType === HTTP_SOURCE_NAME && (
-        <FormGroup
-          label={t('Image URL')}
-          fieldId={`disk-source-required-${selectedSourceType}`}
-          isRequired
-          className="disk-source-form-group"
-        >
-          <TextInput
-            value={httpURL}
-            type="text"
-            onChange={setHTTPURL}
-            aria-label={t('Image URL')}
-            validated={!httpURL ? ValidatedOptions.error : ValidatedOptions.default}
-          />
-        </FormGroup>
-      )}
-
-      {selectedSourceType === REGISTRY_SOURCE_NAME && (
-        <FormGroup
-          label={t('Container Image')}
-          fieldId={`disk-source-required-${selectedSourceType}`}
-          isRequired
-          className="disk-source-form-group"
-        >
-          <TextInput
-            value={containerImage}
-            type="text"
-            onChange={setContainerImage}
-            aria-label={t('Container Image')}
-            validated={!containerImage ? ValidatedOptions.error : ValidatedOptions.default}
-          />
-        </FormGroup>
-      )}
+      <BootCDCheckbox onChange={onCDCheckboxChange} cdSource={cdSource} />
 
       {cdSource && (
-        <>
-          <h2 className="co-section-heading">{t('Disk information')}</h2>
-          <FormGroup
-            label={t('Disk source')}
-            fieldId={`disk-source-blank`}
-            isRequired
-            className="disk-source-form-group"
-          >
-            <TextInput
-              isDisabled
-              placeholder={t('Blank')}
-              type="text"
-              readOnly
-              aria-label={t('Disk source')}
-            />
-          </FormGroup>
-        </>
+        <SelectSource
+          initialSourceType={PVC_SOURCE_NAME}
+          onSourceChange={setCDSource}
+          sourceLabel={<SelectCDSourceLabel />}
+          sourceOptions={[
+            PVC_SOURCE_NAME,
+            CONTAINER_DISK_SOURCE_NAME,
+            HTTP_SOURCE_NAME,
+            UPLOAD_SOURCE_NAME,
+          ]}
+        />
       )}
 
-      {selectedSourceType !== DEFAULT_SOURCE && (
-        <VolumeSize quantity={volumeQuantity} onChange={setVolumeQuantity} />
-      )}
+      {cdSource && <Divider className="divider" />}
+      <SelectSource
+        initialVolumeQuantity={initialVolumeQuantity || '30Gi'}
+        onSourceChange={setDiskSource}
+        withSize
+        sourceOptions={[
+          DEFAULT_SOURCE,
+          PVC_SOURCE_NAME,
+          REGISTRY_SOURCE_NAME,
+          HTTP_SOURCE_NAME,
+          UPLOAD_SOURCE_NAME,
+          BLANK_SOURCE_NAME,
+        ]}
+        sourceLabel={<SelectDiskSourceLabel />}
+      />
 
       <FormGroup fieldId="customize-cdrom-drivers">
         <Checkbox
