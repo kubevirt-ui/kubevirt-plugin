@@ -1,12 +1,11 @@
 import * as React from 'react';
 
-import { useInputDebounce } from '@kubevirt-utils/hooks/useInputDebounce';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   pluralize,
+  SearchInput,
   Split,
   SplitItem,
-  TextInput,
   ToggleGroup,
   ToggleGroupItem,
 } from '@patternfly/react-core';
@@ -21,11 +20,22 @@ export const TemplatesCatalogHeader: React.FC<{
   itemCount: number;
 }> = React.memo(({ filters, onFilterChange, itemCount }) => {
   const { t } = useKubevirtTranslation();
-  const { inputRef } = useInputDebounce({
-    delay: 150,
-    updateURLParam: CATALOG_FILTERS.QUERY,
-    onChange: (value) => onFilterChange(CATALOG_FILTERS.QUERY, value),
-  });
+  const [query, setQuery] = React.useState<string>(filters?.query || '');
+
+  React.useEffect(
+    () => {
+      // Update debounced value after delay
+      const handler = setTimeout(() => {
+        onFilterChange(CATALOG_FILTERS.QUERY, query);
+      }, 150);
+      // Cancel the timeout if value changes (also on delay change or unmount)
+      return () => {
+        clearTimeout(handler);
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [query], // Only re-call effect if value or delay changes
+  );
 
   return (
     <div className="co-catalog-page__header">
@@ -33,14 +43,22 @@ export const TemplatesCatalogHeader: React.FC<{
         {filters?.onlyDefault ? t('Default Templates') : t('All Items')}
       </div>
       <div className="co-catalog-page__filter">
-        <TextInput
-          className="co-catalog-page__input"
-          ref={inputRef}
-          type="text"
-          id="filter-text-input"
-          placeholder={t('Filter by name')}
-          aria-label="filter text input"
-        />
+        <div>
+          <SearchInput
+            className="co-catalog-page__input"
+            data-test="search-catalog"
+            id="filter-text-input"
+            type="text"
+            placeholder={t('Filter by keyword...')}
+            value={filters?.query}
+            onChange={setQuery}
+            onClear={() => {
+              setQuery('');
+              onFilterChange(CATALOG_FILTERS.QUERY, '');
+            }}
+            aria-label={t('Filter by keyword...')}
+          />
+        </div>
 
         <Split hasGutter>
           <SplitItem>

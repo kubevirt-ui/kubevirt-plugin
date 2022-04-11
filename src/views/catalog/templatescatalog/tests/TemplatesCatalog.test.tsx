@@ -85,10 +85,11 @@ test('TemplatesCatalog', async () => {
   // searching unknown query, no templates should be in catalog.
   // fake timers are used because of debounced input
   jest.useFakeTimers('modern');
-  userEvent.type(screen.getByPlaceholderText('Filter by name'), 'unknown');
+  userEvent.type(screen.getByPlaceholderText('Filter by keyword...'), 'unknown');
 
   act(() => {
     jest.runOnlyPendingTimers();
+    jest.useRealTimers();
   });
 
   expect(queryByTestId('container-template')).toBeNull();
