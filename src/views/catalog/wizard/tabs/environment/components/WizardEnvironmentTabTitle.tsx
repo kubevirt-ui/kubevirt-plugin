@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Popover, Title } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
-const WizardEnvironmentTabTitle: React.FC = () => {
+const WizardEnvironmentTabTitle: React.FC = React.memo(() => {
   const { t } = useKubevirtTranslation();
   return (
     <Title headingLevel="h2" className="co-section-heading">
@@ -25,6 +25,7 @@ const WizardEnvironmentTabTitle: React.FC = () => {
       </span>
     </Title>
   );
-};
+});
+WizardEnvironmentTabTitle.displayName = 'WizardEnvironmentTabTitle';
 
 export default WizardEnvironmentTabTitle;
