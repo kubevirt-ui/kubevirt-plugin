@@ -5,7 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, AlertVariant, Bullseye } from '@patternfly/react-core';
+import { Alert, AlertActionCloseButton, AlertVariant, Bullseye } from '@patternfly/react-core';
 
 import { WizardVMContextType } from '../../../utils/WizardVMContext';
 
@@ -14,10 +14,16 @@ import './WizardYAMLTab.scss';
 const WizardYAMLTab: React.FC<WizardVMContextType> = ({ vm, updateVM, setDisableVmCreate }) => {
   const { t } = useKubevirtTranslation();
   const [error, setError] = React.useState<any>();
+  const [success, setSuccess] = React.useState(false);
 
   const onSave = (yaml: string) => {
     setError(undefined);
-    updateVM(load(yaml) as V1VirtualMachine).catch(setError);
+    updateVM(load(yaml) as V1VirtualMachine)
+      .then(() => setSuccess(true))
+      .catch((apiError) => {
+        setError(apiError);
+        setSuccess(false);
+      });
   };
 
   React.useEffect(() => {
@@ -35,7 +41,7 @@ const WizardYAMLTab: React.FC<WizardVMContextType> = ({ vm, updateVM, setDisable
     >
       <ResourceYAMLEditor initialResource={vm} onSave={onSave} />
       {error && (
-        <div className="wizard-yaml-error-alert">
+        <div className="wizard-yaml-alert">
           <Alert
             isInline
             variant={AlertVariant.danger}
@@ -44,6 +50,18 @@ const WizardYAMLTab: React.FC<WizardVMContextType> = ({ vm, updateVM, setDisable
             )}
           >
             {error.message}
+          </Alert>
+        </div>
+      )}
+      {success && (
+        <div className="wizard-yaml-alert">
+          <Alert
+            isInline
+            variant={AlertVariant.success}
+            title={t('Success')}
+            actionClose={<AlertActionCloseButton onClose={() => setSuccess(false)} />}
+          >
+            {t('VirtualMachine updated successfully')}
           </Alert>
         </div>
       )}
