@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
 
 import { WizardVMContextType } from '../../../utils/WizardVMContext';
@@ -11,9 +12,10 @@ import { CLOUD, SYSPREP } from './utils/consts';
 
 import './WizardScriptsTab.scss';
 
-const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
+const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM, tabsData }) => {
   const { t } = useKubevirtTranslation();
-  const [expanded, setExpanded] = React.useState<string>(CLOUD);
+  const isWindows = tabsData?.overview?.templateMetadata?.osType === OS_NAME_TYPES.windows;
+  const [expanded, setExpanded] = React.useState<string>(isWindows ? SYSPREP : CLOUD);
 
   const onToggle = (value: string) =>
     setExpanded((expandedValue) => (expandedValue === value ? '' : value));
@@ -28,6 +30,7 @@ const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
             onToggle={() => onToggle(CLOUD)}
             isExpanded={expanded === CLOUD}
             id={CLOUD}
+            isIndented
           >
             <Cloudinit vm={vm} updateVM={updateVM} />
           </ExpandableSection>
@@ -39,6 +42,7 @@ const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
             onToggle={() => onToggle(SYSPREP)}
             isExpanded={expanded === SYSPREP}
             id={SYSPREP}
+            isIndented
           >
             <Sysprep />
           </ExpandableSection>

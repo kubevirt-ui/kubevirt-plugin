@@ -80,7 +80,7 @@ export const getTemplateWorkload = (template: V1Template): string => {
  * A selector that returns the os label of a given template
  * @param {V1Template} template - template
  */
-export const getTemplateOS = (template: V1Template): string => {
+export const getTemplateOS = (template: V1Template): OS_NAME_TYPES => {
   return (
     Object.values(OS_NAME_TYPES).find((osName) =>
       getTemplateOSLabelName(template).includes(osName),
