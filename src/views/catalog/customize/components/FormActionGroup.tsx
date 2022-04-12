@@ -21,6 +21,7 @@ export const FormActionGroup: React.FC<FormActionGroupProps> = ({ loading }) => 
       <Button
         variant="primary"
         type="submit"
+        isDisabled={loading}
         isLoading={loading}
         data-test-id="customize-vm-submit-button"
       >
