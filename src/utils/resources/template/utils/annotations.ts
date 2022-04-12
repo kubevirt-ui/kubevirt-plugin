@@ -7,4 +7,6 @@ export const ANNOTATIONS = Object.freeze({
   os: 'vm.kubevirt.io/os',
   osTemplate: 'vm.kubevirt.io/template',
   supportLevel: 'template.kubevirt.io/provider-support-level',
+  importURLs: 'template.kubevirt.io/images',
+  containerDisks: 'template.kubevirt.io/containerdisks',
 });
