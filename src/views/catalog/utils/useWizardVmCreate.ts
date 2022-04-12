@@ -13,56 +13,53 @@ import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { useWizardVMContext } from './WizardVMContext';
 
 type CreateVMArguments = {
-  namespace: string;
   startVM: boolean;
   onFullfilled: (vm: V1VirtualMachine) => void;
 };
 
-export const useWizardVmCreate = (): {
-  createVM: (
-    vm: V1VirtualMachine,
-    { namespace, startVM, onFullfilled }: CreateVMArguments,
-  ) => Promise<void>;
+type UseWizardVmCreateValues = {
+  createVM: ({ startVM, onFullfilled }: CreateVMArguments) => Promise<void>;
   loaded: boolean;
   error: any;
-} => {
-  const { tabsData } = useWizardVMContext();
+};
+
+export const useWizardVmCreate = (): UseWizardVmCreateValues => {
+  const { vm, tabsData } = useWizardVMContext();
   const [loaded, setLoaded] = useState<boolean>(true);
   const [error, setError] = useState<any>();
 
-  const hasSysprep =
-    tabsData?.scripts?.sysprep?.autounattend || tabsData?.scripts?.sysprep?.unattended;
+  const createVM = async ({ startVM, onFullfilled }: CreateVMArguments) => {
+    try {
+      setLoaded(false);
+      setError(undefined);
 
-  const createVM = (
-    vm: V1VirtualMachine,
-    { namespace, startVM, onFullfilled }: CreateVMArguments,
-  ) => {
-    setLoaded(false);
-    setError(undefined);
+      const hasSysprep =
+        tabsData?.scripts?.sysprep?.autounattend || tabsData?.scripts?.sysprep?.unattended;
 
-    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      vmDraft.metadata.namespace = namespace;
-      vmDraft.spec.running = startVM;
+      const updatedVM = produce(vm, (vmDraft) => {
+        vmDraft.spec.running = startVM;
+
+        if (hasSysprep) {
+          vmDraft.spec.template.spec.domain.devices.disks.push(sysprepDisk());
+          vmDraft.spec.template.spec.volumes.push(sysprepVolume(vmDraft));
+        }
+      });
+
+      const newVM = await k8sCreate<V1VirtualMachine>({
+        model: VirtualMachineModel,
+        data: updatedVM,
+      });
 
       if (hasSysprep) {
-        vmDraft.spec.template.spec.domain.devices.disks.push(sysprepDisk());
-        vmDraft.spec.template.spec.volumes.push(sysprepVolume(vmDraft));
+        await createSysprepConfigMap(newVM, tabsData?.scripts?.sysprep);
       }
-    });
 
-    return k8sCreate<V1VirtualMachine>({
-      model: VirtualMachineModel,
-      data: updatedVM,
-    })
-      .then((newVM) => {
-        if (hasSysprep) {
-          return createSysprepConfigMap(newVM, tabsData?.scripts?.sysprep).then(() => newVM);
-        }
-        return newVM;
-      })
-      .then(onFullfilled)
-      .catch(setError)
-      .finally(() => setLoaded(true));
+      setLoaded(true);
+      onFullfilled(newVM);
+    } catch (e) {
+      setLoaded(true);
+      setError(e);
+    }
   };
 
   return {

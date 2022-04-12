@@ -1,10 +1,9 @@
 import * as React from 'react';
 
+import { WizardTab } from '@catalog/wizard/tabs';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
-
-import { WizardVMContextType } from '../../../utils/WizardVMContext';
 
 import Cloudinit from './components/CloudInit';
 import Sysprep from './components/sysprep/Sysprep';
@@ -12,7 +11,7 @@ import { CLOUD, SYSPREP } from './utils/consts';
 
 import './WizardScriptsTab.scss';
 
-const WizardScriptsTab: React.FC<WizardVMContextType> = ({ vm, updateVM, tabsData }) => {
+const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData }) => {
   const { t } = useKubevirtTranslation();
   const isWindows = tabsData?.overview?.templateMetadata?.osType === OS_NAME_TYPES.windows;
   const [expanded, setExpanded] = React.useState<string>(isWindows ? SYSPREP : CLOUD);

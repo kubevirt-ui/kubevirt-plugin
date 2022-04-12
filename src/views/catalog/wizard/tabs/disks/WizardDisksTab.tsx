@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { WizardVMContextType } from '@catalog/utils/WizardVMContext';
+import { WizardTab } from '@catalog/wizard/tabs';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
 import useWizardDisksTableData from './hooks/useWizardDisksTableData';
 
-const WizardDisksTab: React.FC<WizardVMContextType> = ({ vm, loaded, updateVM }) => {
+const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();

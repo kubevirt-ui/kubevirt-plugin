@@ -1,17 +1,16 @@
 import * as React from 'react';
 import { load } from 'js-yaml';
 
+import { WizardTab } from '@catalog/wizard/tabs';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Bullseye } from '@patternfly/react-core';
 
-import { WizardVMContextType } from '../../../utils/WizardVMContext';
-
 import './WizardYAMLTab.scss';
 
-const WizardYAMLTab: React.FC<WizardVMContextType> = ({ vm, updateVM, setDisableVmCreate }) => {
+const WizardYAMLTab: WizardTab = ({ vm, updateVM, setDisableVmCreate }) => {
   const { t } = useKubevirtTranslation();
   const [error, setError] = React.useState<any>();
 

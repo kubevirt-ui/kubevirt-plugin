@@ -20,16 +20,13 @@ import { clearSessionStorageVM, useWizardVMContext } from '../../utils/WizardVMC
 export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => {
   const history = useHistory();
   const { t } = useKubevirtTranslation();
+  const { tabsData, disableVmCreate, loaded: vmContextLoaded } = useWizardVMContext();
+  const { createVM, error, loaded: vmCreateLoaded } = useWizardVmCreate();
 
   const [startVM, setStartVM] = React.useState(true);
-  const { vm, loaded: vmContextLoaded, disableVmCreate, tabsData } = useWizardVMContext();
-  const { createVM, loaded: vmCreateLoaded, error: vmCreateError } = useWizardVmCreate();
-  const templateName = tabsData?.overview?.templateMetadata?.name;
-  const templateNamespace = tabsData?.overview?.templateMetadata?.namespace;
 
   const onCreate = () =>
-    createVM(vm, {
-      namespace,
+    createVM({
       startVM,
       onFullfilled: (createdVM) => {
         clearSessionStorageVM();
@@ -37,6 +34,8 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
       },
     });
 
+  const templateName = tabsData?.overview?.templateMetadata?.name;
+  const templateNamespace = tabsData?.overview?.templateMetadata?.namespace;
   const loaded = vmContextLoaded && vmCreateLoaded;
 
   return (
@@ -51,17 +50,17 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
           />
         </StackItem>
         <StackItem />
-        {vmCreateError && (
+        {error && (
           <StackItem>
             <Alert variant="danger" title={t('Create VirtualMachine error')} isInline>
-              {vmCreateError.message}
+              {error.message}
             </Alert>
           </StackItem>
         )}
         <Split hasGutter>
           <SplitItem>
             <Button
-              isDisabled={!vm || !loaded || disableVmCreate}
+              isDisabled={!loaded || disableVmCreate}
               isLoading={!vmCreateLoaded}
               variant="primary"
               onClick={onCreate}
@@ -69,21 +68,20 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
               {t('Create VirtualMachine')}
             </Button>
           </SplitItem>
-          {templateName && templateNamespace && (
-            <SplitItem>
-              <Button
-                variant="secondary"
-                onClick={() =>
-                  confirm(t('Are you sure you want to go back?')) &&
-                  history.push(
-                    `/k8s/ns/${namespace}/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
-                  )
-                }
-              >
-                {t('Back')}
-              </Button>
-            </SplitItem>
-          )}
+          <SplitItem>
+            <Button
+              variant="secondary"
+              onClick={() =>
+                confirm(t('Are you sure you want to go back?')) &&
+                history.push(
+                  `/k8s/ns/${namespace}/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
+                )
+              }
+            >
+              {t('Back')}
+            </Button>
+          </SplitItem>
+
           <SplitItem>
             <Button
               variant="link"

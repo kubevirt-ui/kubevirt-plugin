@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 
-import { WizardVMContextType } from '@catalog/utils/WizardVMContext';
+import { WizardTab } from '@catalog/wizard/tabs';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
@@ -13,11 +13,7 @@ import WizardEnvironmentTabTitle from './components/WizardEnvironmentTabTitle';
 import useEnvironments from './hook/useEnvironments';
 import useEnvironmentsResources from './hook/useEnvironmentsResources';
 
-const WizardEnvironmentTab: React.FC<WizardVMContextType> = ({
-  vm,
-  updateVM,
-  setDisableVmCreate,
-}) => {
+const WizardEnvironmentTab: WizardTab = ({ vm, updateVM, setDisableVmCreate }) => {
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
 

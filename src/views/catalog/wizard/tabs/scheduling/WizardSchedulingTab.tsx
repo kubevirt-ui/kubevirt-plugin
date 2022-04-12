@@ -1,12 +1,12 @@
 import * as React from 'react';
 
+import { WizardTab } from '@catalog/wizard/tabs';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
 
-import { WizardVMContextType } from '../../../utils/WizardVMContext';
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
 
 import Affinity from './components/Affinity';
@@ -15,7 +15,7 @@ import EvictionStrategy from './components/EvictionStrategy';
 import NodeSelector from './components/NodeSelector';
 import Tolerations from './components/Tolerations';
 
-const WizardSchedulingTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
+const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
