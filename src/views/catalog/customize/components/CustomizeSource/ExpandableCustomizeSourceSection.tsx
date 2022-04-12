@@ -59,6 +59,7 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
           data-test-id="expandable-storage-section"
           isExpanded={storageFieldsExpanded}
           isDetached
+          isIndented
         >
           <CustomizeSource
             setDiskSource={setDiskSource}

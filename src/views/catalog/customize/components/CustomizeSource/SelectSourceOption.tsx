@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { TFunction } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
@@ -105,16 +104,14 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
 
   const onSelect = React.useCallback(
     (event, selection) => {
       setIsOpen(false);
 
       if (selection !== UPLOAD_SOURCE_NAME) onSelectSource(selection);
-      else history.push('/k8s/ns/default/persistentvolumeclaims/~new/data');
     },
-    [history, onSelectSource],
+    [onSelectSource],
   );
 
   return (
