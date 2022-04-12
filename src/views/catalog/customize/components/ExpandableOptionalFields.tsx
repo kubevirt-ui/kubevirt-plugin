@@ -23,6 +23,7 @@ export const ExpandableOptionsFields: React.FC<ExpandableOptionsFieldsProps> = (
         data-test-id="expandable-optional-section"
         onToggle={() => setOptionalFieldsExpanded(!optionalFieldsExpanded)}
         isExpanded={optionalFieldsExpanded}
+        isIndented
       >
         {optionalFields?.map((field) => (
           <FieldGroup key={field.name} field={field} />
