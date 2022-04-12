@@ -4,6 +4,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
   getTemplateName,
+  getTemplateOS,
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 
@@ -44,6 +45,7 @@ export const useCustomizeFormSubmit = (
         tabsDataDraft.overview.templateMetadata.name = template.metadata.name;
         tabsDataDraft.overview.templateMetadata.namespace = template.metadata.namespace;
         tabsDataDraft.overview.templateMetadata.displayName = getTemplateName(template);
+        tabsDataDraft.overview.templateMetadata.osType = getTemplateOS(template);
       });
       await updateVM(vm);
       history.push(`/k8s/ns/${ns || 'default'}/templatescatalog/review`);
