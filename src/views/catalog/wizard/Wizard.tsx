@@ -15,9 +15,9 @@ import './Wizard.scss';
 
 const Wizard: React.FC = () => {
   const { ns } = useParams<{ ns: string }>();
-  const { vm, loaded } = useWizardVMContext();
+  const { vm } = useWizardVMContext();
 
-  if (loaded && !vm) return <WizardEmptyState namespace={ns} />;
+  if (!vm) return <WizardEmptyState namespace={ns} />;
 
   return (
     <Stack hasGutter>

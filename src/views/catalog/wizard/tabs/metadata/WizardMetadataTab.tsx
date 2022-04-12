@@ -1,17 +1,17 @@
 import * as React from 'react';
 
+import { WizardTab } from '@catalog/wizard/tabs';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DescriptionList, Grid, GridItem, pluralize } from '@patternfly/react-core';
 
-import { WizardVMContextType } from '../../../utils/WizardVMContext';
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
 
 import WizardMetadataLabels from './components/WizardMetadataLabels';
 
-const WizardMetadataTab: React.FC<WizardVMContextType> = ({ vm, updateVM, loaded }) => {
+const WizardMetadataTab: WizardTab = ({ vm, updateVM, loaded }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 

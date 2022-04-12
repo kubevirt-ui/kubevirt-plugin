@@ -1,8 +1,7 @@
 import * as React from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { NavPage } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye } from '@patternfly/react-core';
 
 import { useWizardVMContext, WizardVMContextType } from '../utils/WizardVMContext';
 
@@ -15,80 +14,54 @@ import WizardSchedulingTab from './tabs/scheduling/WizardSchedulingTab';
 import WizardScriptsTab from './tabs/scripts/WizardScriptsTab';
 import WizardYAMLTab from './tabs/yaml/WizardYAMLTab';
 
-const withVmContext = (Page: React.FC<WizardVMContextType>) => (props) => {
-  const {
-    vm,
-    updateVM,
-    loaded,
-    error,
-    disableVmCreate,
-    setDisableVmCreate,
-    tabsData,
-    updateTabsData,
-  } = useWizardVMContext();
+type TabRouteProps = RouteComponentProps<{ ns: string }>;
+export type WizardTab = React.VFC<TabRouteProps & WizardVMContextType>;
 
-  if (!vm && !loaded) {
-    return (
-      <Bullseye>
-        <Loading />
-      </Bullseye>
-    );
-  }
+const withWizardVMContext = (Tab: WizardTab) => (routeProps: TabRouteProps) => {
+  const vmContext = useWizardVMContext();
 
-  return (
-    <Page
-      vm={vm}
-      loaded={loaded}
-      updateVM={updateVM}
-      error={error}
-      disableVmCreate={disableVmCreate}
-      setDisableVmCreate={setDisableVmCreate}
-      tabsData={tabsData}
-      updateTabsData={updateTabsData}
-      {...props}
-    />
-  );
+  return <Tab {...vmContext} {...routeProps} />;
 };
 
 export const wizardNavPages: NavPage[] = [
   {
     href: '',
     name: 'Overview',
-    component: withVmContext(WizardOverviewTab),
+    component: withWizardVMContext(WizardOverviewTab),
   },
   {
     href: 'yaml',
     name: 'YAML',
-    component: withVmContext(WizardYAMLTab),
+    component: withWizardVMContext(WizardYAMLTab),
   },
   {
     href: 'scheduling',
     name: 'Scheduling',
-    component: withVmContext(WizardSchedulingTab),
+    component: withWizardVMContext(WizardSchedulingTab),
   },
   {
     href: 'environment',
     name: 'Environment',
-    component: withVmContext(WizardEnvironmentTab),
+    component: withWizardVMContext(WizardEnvironmentTab),
   },
   {
     href: 'network-interfaces',
     name: 'Network Interfaces',
-    component: withVmContext(WizardNetworkTab),
+    component: withWizardVMContext(WizardNetworkTab),
   },
   {
     href: 'disks',
     name: 'Disks',
-    component: withVmContext(WizardDisksTab),
+    component: withWizardVMContext(WizardDisksTab),
   },
   {
     href: 'scripts',
     name: 'Scripts',
-    component: withVmContext(WizardScriptsTab),
+    component: withWizardVMContext(WizardScriptsTab),
   },
   {
     href: 'metadata',
     name: 'Metadata',
-    component: withVmContext(WizardMetadataTab),
+    component: withWizardVMContext(WizardMetadataTab),
   },
 ];

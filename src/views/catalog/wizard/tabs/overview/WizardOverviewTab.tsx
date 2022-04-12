@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
+import { WizardTab } from '@catalog/wizard/tabs';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
@@ -11,7 +12,6 @@ import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/temp
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
-import { WizardVMContextType } from '../../../utils/WizardVMContext';
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
 
 import { WizardOverviewDisksTable } from './components/WizardOverviewDisksTable/WizardOverviewDisksTable';
@@ -19,7 +19,7 @@ import { WizardOverviewNetworksTable } from './components/WizardOverviewNetworks
 
 import './WizardOverviewTab.scss';
 
-const WizardOverviewTab: React.FC<WizardVMContextType> = ({ vm, tabsData, updateVM }) => {
+const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
   const history = useHistory();
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();

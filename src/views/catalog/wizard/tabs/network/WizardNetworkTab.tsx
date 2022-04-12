@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { WizardVMContextType } from 'src/views/catalog/utils/WizardVMContext';
 
+import { WizardTab } from '@catalog/wizard/tabs';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -12,7 +12,7 @@ import {
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
 
-const WizardNetworkTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
+const WizardNetworkTab: WizardTab = ({ vm, updateVM }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
