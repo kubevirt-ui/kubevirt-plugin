@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
+import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
 
@@ -12,8 +15,9 @@ import EvictionStrategy from './components/EvictionStrategy';
 import NodeSelector from './components/NodeSelector';
 import Tolerations from './components/Tolerations';
 
-const WizardSchedulingTab: React.FC<WizardVMContextType> = ({ vm }) => {
+const WizardSchedulingTab: React.FC<WizardVMContextType> = ({ vm, updateVM }) => {
   const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
 
   return (
     <div className="co-m-pane__body">
@@ -39,11 +43,35 @@ const WizardSchedulingTab: React.FC<WizardVMContextType> = ({ vm }) => {
             <WizardDescriptionItem
               title={t('Dedicated Resources')}
               description={<DedicatedResources vm={vm} />}
+              isEdit
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <DedicatedResourcesModal
+                    vm={vm}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onSubmit={updateVM}
+                    headerText={t('Dedicated Resources')}
+                  />
+                ))
+              }
             />
 
             <WizardDescriptionItem
               title={t('Eviction Strategy')}
               description={<EvictionStrategy vm={vm} />}
+              isEdit
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <EvictionStrategyModal
+                    vm={vm}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onSubmit={updateVM}
+                    headerText={t('Eviction Strategy')}
+                  />
+                ))
+              }
             />
           </DescriptionList>
         </GridItem>
