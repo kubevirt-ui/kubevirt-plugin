@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
@@ -17,11 +19,15 @@ import {
 import { useWizardVmCreate } from '../../utils/useWizardVmCreate';
 import { clearSessionStorageVM, useWizardVMContext } from '../../utils/WizardVMContext';
 
+import { WizardNoBootModal } from './WizardNoBootModal';
+
 export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => {
   const history = useHistory();
   const { t } = useKubevirtTranslation();
   const { tabsData, disableVmCreate, loaded: vmContextLoaded } = useWizardVMContext();
+  const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVmCreate();
+  const { createModal } = useModal();
 
   const [startVM, setStartVM] = React.useState(true);
 
@@ -34,9 +40,31 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
       },
     });
 
+  const onSubmit = () => {
+    if (isBootSourceAvailable) {
+      return onCreate();
+    }
+
+    createModal(({ isOpen, onClose }) => (
+      <WizardNoBootModal
+        namespace={namespace}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={onCreate}
+      />
+    ));
+  };
+
   const templateName = tabsData?.overview?.templateMetadata?.name;
   const templateNamespace = tabsData?.overview?.templateMetadata?.namespace;
-  const loaded = vmContextLoaded && vmCreateLoaded;
+  const loaded = vmContextLoaded && vmCreateLoaded && bootSourceLoaded;
+
+  React.useEffect(() => {
+    if (loaded && startVM !== isBootSourceAvailable) {
+      setStartVM(isBootSourceAvailable);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded, isBootSourceAvailable]);
 
   return (
     <footer className="vm-wizard-footer">
@@ -44,6 +72,7 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
         <StackItem>
           <Checkbox
             id="start-after-create-checkbox"
+            isDisabled={!loaded || disableVmCreate}
             isChecked={startVM}
             onChange={(v) => setStartVM(v)}
             label={t('Start this VirtualMachine after creation')}
@@ -63,7 +92,7 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
               isDisabled={!loaded || disableVmCreate}
               isLoading={!vmCreateLoaded}
               variant="primary"
-              onClick={onCreate}
+              onClick={onSubmit}
             >
               {t('Create VirtualMachine')}
             </Button>
