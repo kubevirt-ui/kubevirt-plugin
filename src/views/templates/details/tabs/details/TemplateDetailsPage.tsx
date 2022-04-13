@@ -6,16 +6,14 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ListPageBody, ListPageHeader, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid, GridItem } from '@patternfly/react-core';
 
-type VirtualMachineTemplatesDetailsPageProps = RouteComponentProps<{
+type TemplateDetailsPageProps = RouteComponentProps<{
   ns: string;
   name: string;
 }> & {
   obj?: V1Template;
 };
 
-const VirtualMachineTemplatesDetailsPage: React.FC<VirtualMachineTemplatesDetailsPageProps> = ({
-  obj: template,
-}) => {
+const TemplateDetailsPage: React.FC<TemplateDetailsPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -35,4 +33,4 @@ const VirtualMachineTemplatesDetailsPage: React.FC<VirtualMachineTemplatesDetail
   );
 };
 
-export default VirtualMachineTemplatesDetailsPage;
+export default TemplateDetailsPage;

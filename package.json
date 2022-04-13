@@ -38,7 +38,7 @@
       "ClusterOverviewPage": "./views/clusteroverview/overview/components/ClusterOverviewPage.tsx",
       "VirtualMachineTemplatesList": "./views/templates/list/VirtualMachineTemplatesList.tsx",
       "modalProvider": "./utils/components/ModalProvider/ModalProvider.tsx",
-      "VirtualMachineTemplatesDetailsPage": "./views/templates/details/VirtualMachineTemplatesDetailsPage.tsx"
+      "TemplateNavPage": "./views/templates/details/TemplateNavPage.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
