@@ -6,9 +6,10 @@ import { Overview, OverviewGrid } from '@openshift-console/dynamic-plugin-sdk';
 
 import DetailsCard from './details-card/DetailsCard';
 import GettingStartedCard from './getting-started-card/GettingStartedCard';
+import RunningVMsPerTemplateCard from './getting-started-card/running-vms-per-template-card/RunningVMsPerTemplateCard';
 import PageHeader from './PageHeader';
 
-const leftCards = [{ Card: DetailsCard }];
+const leftCards = [{ Card: DetailsCard }, { Card: RunningVMsPerTemplateCard }];
 const mainCards = [];
 const rightCards = [];
 
