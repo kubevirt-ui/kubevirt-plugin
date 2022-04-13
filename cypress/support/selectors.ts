@@ -22,6 +22,7 @@ declare global {
         selector: string,
         options?: Partial<Loggable & Timeoutable & Withinable & Shadow>,
       ): Chainable;
+      byButtonText(selector: string): Chainable;
     }
   }
 }
@@ -61,3 +62,7 @@ Cypress.Commands.add('clickNavLink', (path: [string, string?]) => {
     cy.get('#page-sidebar').contains(path[1]).click();
   }
 });
+
+Cypress.Commands.add('byButtonText', (selector: string) =>
+  cy.contains('button[type="button"]', `${selector}`),
+);
