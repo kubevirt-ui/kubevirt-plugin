@@ -28,6 +28,7 @@ export const XTerm: React.FunctionComponent<XTermProps> = ({
   const ref = React.useRef<HTMLDivElement>();
 
   React.useImperativeHandle(innerRef, () => ({
+    // eslint-disable-next-line require-jsdoc
     focusterminall() {
       if (terminal) {
         terminal?.focus();
