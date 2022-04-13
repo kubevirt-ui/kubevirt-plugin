@@ -89,6 +89,15 @@
     }
   },
   {
+    "type": "console.page/resource/details",
+    "properties": {
+      "path": ["/k8s/ns/:ns/templates/:name"],
+      "component": {
+        "$codeRef": "VirtualMachineTemplatesDetailsPage"
+      }
+    }
+  },
+  {
     "type": "console.page/resource/list",
     "properties": {
       "model": {
