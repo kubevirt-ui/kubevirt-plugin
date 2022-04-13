@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
-import { Gallery, Stack, StackItem } from '@patternfly/react-core';
+import { Gallery, Stack, StackItem, Toolbar, ToolbarContent } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
 import { TemplatesCatalogEmptyState } from './components/TemplatesCatalogEmptyState';
@@ -42,15 +42,17 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   const renderTemplates = React.useMemo(
     () =>
       filters?.isList ? (
-        <VirtualizedTable
-          data={filteredTemplates}
-          unfilteredData={filteredTemplates}
-          loaded={loaded}
-          loadError={error}
-          columns={columns}
-          Row={TemplatesCatalogRow}
-          rowData={{ onTemplateClick: setSelectedTemplate }}
-        />
+        <div className="vm-catalog-table-container">
+          <VirtualizedTable
+            data={filteredTemplates}
+            unfilteredData={filteredTemplates}
+            loaded={loaded}
+            loadError={error}
+            columns={columns}
+            Row={TemplatesCatalogRow}
+            rowData={{ onTemplateClick: setSelectedTemplate }}
+          />
+        </div>
       ) : (
         <StackItem className="co-catalog-page__grid vm-catalog-grid-container">
           <Gallery hasGutter className="vm-catalog-grid" id="vm-catalog-grid">
@@ -68,19 +70,21 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   );
 
   return (
-    <Stack hasGutter>
+    <Stack hasGutter className="vm-catalog">
       <TemplatesCatalogPageHeader namespace={namespace} />
       {loaded ? (
         <div className="co-catalog-page co-catalog-page--with-sidebar">
           <TemplatesCatalogFilters filters={filters} onFilterChange={onFilterChange} />
           <Stack className="co-catalog-page__content">
-            <StackItem>
-              <TemplatesCatalogHeader
-                itemCount={filteredTemplates.length}
-                filters={filters}
-                onFilterChange={onFilterChange}
-              />
-            </StackItem>
+            <Toolbar inset={{ default: 'insetNone' }} isSticky>
+              <ToolbarContent>
+                <TemplatesCatalogHeader
+                  itemCount={filteredTemplates.length}
+                  filters={filters}
+                  onFilterChange={onFilterChange}
+                />
+              </ToolbarContent>
+            </Toolbar>
             {filteredTemplates?.length > 0 ? (
               <>{renderTemplates}</>
             ) : (
