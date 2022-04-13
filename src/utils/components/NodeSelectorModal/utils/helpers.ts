@@ -1,16 +1,5 @@
 import { IDLabel } from './types';
 
-// export const has = (object, key) => {
-//   const keyParts = key.split('.');
-
-//   return (
-//     !!object &&
-//     (keyParts.length > 1
-//       ? has(object[key.split('.')[0]], keyParts.slice(1).join('.'))
-//       : object.hasOwnProperty(key))
-//   );
-// };
-
 export const nodeSelectorToIDLabels = (nodeSelector: { [key: string]: string }): IDLabel[] =>
   Object.entries(nodeSelector || {}).map(([key, value], id) => ({ id, key, value }));
 
