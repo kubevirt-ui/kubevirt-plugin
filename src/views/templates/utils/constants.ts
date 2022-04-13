@@ -8,4 +8,18 @@ export const LABELS = {
   labelNamespace: 'vm.kubevirt.io/template.namespace',
 };
 
+export const SOURCE_TYPES = {
+  defaultSource: 'default',
+  httpSource: 'http',
+  pvcSource: 'pvc-clone',
+  registrySource: 'registry',
+  uploadSource: 'upload',
+};
+
+export type SOURCE_OPTIONS_IDS =
+  | typeof SOURCE_TYPES.httpSource
+  | typeof SOURCE_TYPES.pvcSource
+  | typeof SOURCE_TYPES.registrySource
+  | typeof SOURCE_TYPES.uploadSource;
+
 export const SUPPORT_URL = 'https://access.redhat.com/articles/4234591';

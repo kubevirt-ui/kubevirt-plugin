@@ -10,6 +10,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Action, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
+import EditBootSourceModal from '../components/EditBootSourceModal';
 import { hasEditableBootSource } from '../editBootSource';
 
 type useVirtualMachineTemplatesActionsProps = (
@@ -56,13 +57,11 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
           {t('Edit boot source')} {editableBootSource === null && <Loading />}
         </>
       ),
-      disabled: !editableBootSource,
-      cta: () => console.log('Edit boot source'),
-      // TODO add the modal
-      // cta: () =>
-      //   createModal(({ isOpen, onClose }) => (
-      //     <EditBootSourceModal obj={template} isOpen={isOpen} onClose={onClose} />
-      //   )),
+      disabled: !!editableBootSource, // !editableBootSource,
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <EditBootSourceModal obj={template} isOpen={isOpen} onClose={onClose} />
+        )),
     },
     {
       id: 'delete-template',
