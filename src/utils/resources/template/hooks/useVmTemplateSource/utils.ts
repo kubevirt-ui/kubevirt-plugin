@@ -59,7 +59,7 @@ export const getTemplateBootSourceType = (template: V1Template): TemplateBootSou
     (v) => v.name === TEMPLATE_ROOTDISK_VOLUME_NAME,
   );
   const rootDataVolumeTemplate = vmObject?.spec?.dataVolumeTemplates?.find(
-    (dv) => dv.metadata?.name === rootVolume?.name,
+    (dv) => dv.metadata?.name === rootVolume?.dataVolume?.name,
   );
 
   if (rootDataVolumeTemplate?.spec?.sourceRef) {
