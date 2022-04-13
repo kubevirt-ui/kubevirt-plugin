@@ -52,7 +52,11 @@ const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
         )
       }
       dropdownItems={actions?.map((action) => (
-        <DropdownItem key={action?.id} onClick={() => handleClick(action)}>
+        <DropdownItem
+          key={action?.id}
+          onClick={() => handleClick(action)}
+          isDisabled={action?.disabled}
+        >
           {action?.label}
         </DropdownItem>
       ))}

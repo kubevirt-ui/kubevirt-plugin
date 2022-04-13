@@ -23,9 +23,10 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
     const printableStatus = vm?.status?.printableStatus;
     const { Stopped, Paused, Migrating } = printableVMStatus;
 
-    const startOrStop = [Stopped, Paused].includes(printableStatus)
-      ? VirtualMachineActionFactory.start(vm, t)
-      : VirtualMachineActionFactory.stop(vm, t);
+    const startOrStop =
+      printableStatus === Stopped
+        ? VirtualMachineActionFactory.start(vm, t)
+        : VirtualMachineActionFactory.stop(vm, t);
 
     const migrateOrCancelMigration =
       printableStatus === Migrating || vmim
@@ -40,7 +41,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
       startOrStop,
       VirtualMachineActionFactory.restart(vm, t),
       pauseOrUnpause,
-      // VirtualMachineActionFactory.clone(vm),
+      VirtualMachineActionFactory.clone(vm, createModal, t),
       migrateOrCancelMigration,
       // VirtualMachineActionFactory.openConsole(vm),
       VirtualMachineActionFactory.editLabels(vm, createModal, t),

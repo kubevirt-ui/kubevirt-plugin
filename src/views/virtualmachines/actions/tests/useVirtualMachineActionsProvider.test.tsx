@@ -27,6 +27,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-stop',
       'vm-action-restart',
       'vm-action-pause',
+      'vm-action-clone',
       'vm-action-migrate',
       'vm-action-edit-labels',
       'vm-action-edit-annotations',
@@ -49,6 +50,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-start',
       'vm-action-restart',
       'vm-action-pause',
+      'vm-action-clone',
       'vm-action-migrate',
       'vm-action-edit-labels',
       'vm-action-edit-annotations',
@@ -66,11 +68,12 @@ describe('useVirtualMachineActionsProvider tests', () => {
     const [actions] = result.current;
     const pausedVMActions = actions.map((action) => action.id);
 
-    // Paused vm should have start, restart, unpause, migrate and delete actions
+    // Paused vm should have stop, restart, unpause, migrate and delete actions
     expect(pausedVMActions).toEqual([
-      'vm-action-start',
+      'vm-action-stop',
       'vm-action-restart',
       'vm-action-unpause',
+      'vm-action-clone',
       'vm-action-migrate',
       'vm-action-edit-labels',
       'vm-action-edit-annotations',
@@ -93,6 +96,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-stop',
       'vm-action-restart',
       'vm-action-pause',
+      'vm-action-clone',
       'vm-action-cancel-migrate',
       'vm-action-edit-labels',
       'vm-action-edit-annotations',

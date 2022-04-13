@@ -31,7 +31,7 @@ export const VMStatusConditionLabelList: React.FC<{ conditions: V1VirtualMachine
   React.memo(({ conditions }) => {
     return (
       <LabelGroup>
-        {conditions.map(({ message, reason, status, type }) => (
+        {conditions?.map(({ message, reason, status, type }) => (
           <VMStatusConditionLabel
             key={type}
             message={message}

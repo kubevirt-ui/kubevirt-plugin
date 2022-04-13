@@ -13,6 +13,7 @@ import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../utils';
 
+import CloneVMModal from './components/CloneVMModal/CloneVMModal';
 import {
   cancelMigration,
   deleteVM,
@@ -126,7 +127,24 @@ export const VirtualMachineActionFactory = {
       //   accessReview: {},
     };
   },
-  //   clone: (vm: V1VirtualMachine): Action => {},
+  clone: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+    t: TFunction,
+  ): Action => {
+    return {
+      id: 'vm-action-clone',
+      disabled: [Starting, Stopping, Terminating, Provisioning, Migrating, Unknown].includes(
+        vm?.status?.printableStatus,
+      ),
+      label: t('Clone'),
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <CloneVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
+        )),
+      //   accessReview: {},
+    };
+  },
   // console component is needed to allow openConsole action
   // openConsole: (vm: V1VirtualMachine): Action => {
   //   return {
