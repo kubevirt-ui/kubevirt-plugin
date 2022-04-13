@@ -82,6 +82,15 @@
   {
     "type": "console.page/route",
     "properties": {
+      "path": ["/k8s/ns/:ns/templates/:name", "/k8s/all-namespaces/templates/:name"],
+      "component": {
+        "$codeRef": "TemplateNavPage"
+      }
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
       "path": ["/k8s/ns/:ns/templates", "/k8s/all-namespaces/templates"],
       "component": {
         "$codeRef": "VirtualMachineTemplatesList"
