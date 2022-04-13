@@ -83,3 +83,24 @@ export const getSecrets = (vm: V1VirtualMachine) =>
  */
 export const getServiceAccounts = (vm: V1VirtualMachine) =>
   getVolumes(vm).filter((volume) => volume.serviceAccount);
+
+/**
+ * A selector for the virtual machine's nodeSelector
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine nodeSelector
+ */
+export const getNodeSelector = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.nodeSelector;
+
+/**
+ * A selector for the virtual machine's tolerations
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine tolerations
+ */
+export const getTolerations = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.tolerations;
+
+/**
+ * A selector for the virtual machine's affinity
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine affinity
+ */
+export const getAffinity = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.affinity;
