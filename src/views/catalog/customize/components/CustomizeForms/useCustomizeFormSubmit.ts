@@ -2,8 +2,9 @@ import * as React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import {
-  getTemplateName,
   getTemplateOS,
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template/utils/selectors';
@@ -44,8 +45,11 @@ export const useCustomizeFormSubmit = (
         ensurePath(tabsDataDraft, 'overview.templateMetadata');
         tabsDataDraft.overview.templateMetadata.name = template.metadata.name;
         tabsDataDraft.overview.templateMetadata.namespace = template.metadata.namespace;
-        tabsDataDraft.overview.templateMetadata.displayName = getTemplateName(template);
         tabsDataDraft.overview.templateMetadata.osType = getTemplateOS(template);
+        tabsDataDraft.overview.templateMetadata.displayName = getAnnotation(
+          template,
+          ANNOTATIONS.displayName,
+        );
       });
       await updateVM(vm);
       history.push(`/k8s/ns/${ns || 'default'}/templatescatalog/review`);

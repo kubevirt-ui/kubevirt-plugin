@@ -106,7 +106,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
             <WizardDescriptionItem
               className="wizard-overview-description-left-column"
               title={t('Workload profile')}
-              description={WORKLOADS_LABELS?.[workloadAnnotation]}
+              description={WORKLOADS_LABELS?.[workloadAnnotation] ?? t('Other')}
             />
           </DescriptionList>
         </GridItem>

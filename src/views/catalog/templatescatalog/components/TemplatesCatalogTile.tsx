@@ -10,7 +10,6 @@ import {
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import {
   getTemplateName,
-  getTemplateProviderName,
   getTemplateWorkload,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { CatalogTile } from '@patternfly/react-catalog-view-extension';
@@ -27,7 +26,6 @@ export type TemplateTileProps = {
 export const TemplateTile: React.FC<TemplateTileProps> = React.memo(({ template, onClick }) => {
   const { t } = useKubevirtTranslation();
 
-  const provider = getTemplateProviderName(template);
   const workload = getTemplateWorkload(template);
   const displayName = getTemplateName(template);
   const bootSourceType = getTemplateBootSourceType(template)?.type;
@@ -43,7 +41,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(({ template,
           <StackItem>
             <b>{displayName}</b>
           </StackItem>
-          {provider && <StackItem className="text-secondary">{template.metadata.name}</StackItem>}
+          <StackItem className="text-secondary">{template.metadata.name}</StackItem>
         </Stack>
       }
       onClick={() => onClick(template)}
@@ -58,7 +56,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(({ template,
               <b>{t('Boot source')}</b> {BOOT_SOURCE_LABELS?.[bootSourceType] || 'N/A'}
             </StackItem>
             <StackItem>
-              <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload]}
+              <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload] ?? t('Other')}
             </StackItem>
             <StackItem>
               <b>{t('CPU')}</b> {cpuCount} | <b>{t('Memory')}</b> {memory}
