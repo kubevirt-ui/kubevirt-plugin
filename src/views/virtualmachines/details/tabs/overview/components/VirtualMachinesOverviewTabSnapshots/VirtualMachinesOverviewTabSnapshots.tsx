@@ -1,7 +1,81 @@
 import * as React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
-const VirtualMachinesOverviewTabSnapshots = () => {
-  return <div>VirtualMachinesOverviewTabSnapshots</div>;
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import {
+  Bullseye,
+  Button,
+  ButtonVariant,
+  Card,
+  CardBody,
+  CardFooter,
+  CardTitle,
+  Divider,
+  Label,
+} from '@patternfly/react-core';
+
+import SnapshotModal from '../../../snapshots/components/modal/SnapshotModal';
+import useSnapshotData from '../../../snapshots/hooks/useSnapshotData';
+
+import { createURL } from './utils/url';
+import VirtualMachinesOverviewTabSnapshotsRow from './VirtualMachinesOverviewTabSnapshotsRow';
+
+import './virtual-machines-overview-tab-snapshots.scss';
+
+type VirtualMachinesOverviewTabSnapshotsProps = {
+  vm: V1VirtualMachine;
+};
+
+const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSnapshotsProps> = ({
+  vm,
+}) => {
+  const { t } = useKubevirtTranslation();
+  const { snapshots } = useSnapshotData(vm?.metadata?.name, vm?.metadata?.namespace);
+  const location = useLocation();
+  const { createModal } = useModal();
+
+  return (
+    <div className="VirtualMachinesOverviewTabSnapshots--main">
+      <Card>
+        <CardTitle className="text-muted">
+          {t('Snapshots ({{count}})', { count: snapshots.length || 0 })}
+          <Button
+            isInline
+            variant={ButtonVariant.link}
+            onClick={() => createModal((props) => <SnapshotModal vm={vm} {...props} />)}
+          >
+            {t('Take Snapshot')}
+          </Button>
+        </CardTitle>
+        <Divider />
+        <CardBody isFilled>
+          {!isEmpty(snapshots) ? (
+            snapshots?.map((snapshot) => (
+              <VirtualMachinesOverviewTabSnapshotsRow
+                key={snapshot?.metadata?.uid}
+                snapshot={snapshot}
+                vm={vm}
+              />
+            ))
+          ) : (
+            <Bullseye>{t('No snapshots found')}</Bullseye>
+          )}
+        </CardBody>
+        {!isEmpty(snapshots) && (
+          <CardFooter>
+            <Link to={createURL('snapshots', location?.pathname)}>
+              <Label variant="outline" color="blue">
+                {t('View More')}
+              </Label>
+            </Link>
+          </CardFooter>
+        )}
+      </Card>
+    </div>
+  );
 };
 
 export default VirtualMachinesOverviewTabSnapshots;
