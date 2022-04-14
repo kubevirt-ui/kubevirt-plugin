@@ -477,6 +477,7 @@
   "installation iso of Microsoft Windows 10 ": "installation iso of Microsoft Windows 10 ",
   "masquerade": "masquerade",
   "project": "project",
+  "template parameter": "template parameter",
   "view {{qualifiedNodesCount}} matching nodes": "view {{qualifiedNodesCount}} matching nodes",
   "virtio": "virtio",
   "{{count}} Affinity rules": "{{count}} Affinity rules",

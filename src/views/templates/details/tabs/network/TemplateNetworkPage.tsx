@@ -2,6 +2,18 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  ListPageBody,
+  ListPageCreateButton,
+  ListPageHeader,
+} from '@openshift-console/dynamic-plugin-sdk';
+
+import NetworkInterfaceList from './components/list/NetworkInterfaceList';
+import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
+
+import './template-network-page.scss';
 
 type TemplateNetworkProps = RouteComponentProps<{
   ns: string;
@@ -10,8 +22,33 @@ type TemplateNetworkProps = RouteComponentProps<{
   obj: V1Template;
 };
 
-const TemplateNetwork: React.FC<TemplateNetworkProps> = () => {
-  return <div>TemplateNetworkTAB</div>;
+const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
+  const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
+  const actionText = t('Add Network Interface');
+  return (
+    <div className="template-network-tab">
+      <ListPageHeader title="">
+        <ListPageCreateButton
+          onClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <NetworkInterfaceModal
+                isOpen={isOpen}
+                onClose={onClose}
+                headerText={actionText}
+                template={template}
+              />
+            ))
+          }
+        >
+          {actionText}
+        </ListPageCreateButton>
+      </ListPageHeader>
+      <ListPageBody>
+        <NetworkInterfaceList template={template} />
+      </ListPageBody>
+    </div>
+  );
 };
 
 export default TemplateNetwork;
