@@ -7,12 +7,10 @@ import {
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
-import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
+import { getVMIIPAddresses, getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
 import FirstItemListPopover from '../../../../list/components/FirstItemListPopover/FirstItemListPopover';
-
-import { getVMIPod } from './vmiHelper';
 
 export type VirtualMachineDetailsRightGridLayoutPresentation = {
   pod: React.ReactNode;
