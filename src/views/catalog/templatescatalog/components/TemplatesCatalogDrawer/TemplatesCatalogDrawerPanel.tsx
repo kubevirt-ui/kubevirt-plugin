@@ -67,7 +67,7 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
     const vmObject = getTemplateVirtualMachineObject(template);
     const displayName = getTemplateName(template);
     const description = getTemplateDescription(template) || notAvailable;
-    const documentationUrl = getTemplateDocumentationURL(template) || notAvailable;
+    const documentationUrl = getTemplateDocumentationURL(template);
     const workload = getTemplateWorkload(template);
     const networks = getTemplateNetworks(template);
     const interfaces = getTemplateInterfaces(template);
@@ -113,17 +113,25 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                         <DescriptionListGroup>
                           <DescriptionListTerm>{t('Documentation')}</DescriptionListTerm>
                           <DescriptionListDescription>
-                            <Button
-                              isSmall
-                              isInline
-                              variant="link"
-                              icon={<ExternalLinkSquareAltIcon />}
-                              iconPosition="right"
-                            >
-                              <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
-                                {t('Refer to documentation')}
-                              </a>
-                            </Button>
+                            {documentationUrl ? (
+                              <Button
+                                isSmall
+                                isInline
+                                variant="link"
+                                icon={<ExternalLinkSquareAltIcon />}
+                                iconPosition="right"
+                              >
+                                <a
+                                  href={documentationUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {t('Refer to documentation')}
+                                </a>
+                              </Button>
+                            ) : (
+                              notAvailable
+                            )}
                           </DescriptionListDescription>
                         </DescriptionListGroup>
                       </DescriptionList>

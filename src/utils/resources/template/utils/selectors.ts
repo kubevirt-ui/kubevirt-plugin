@@ -36,14 +36,26 @@ export const isDefaultVariantTemplate = (template: V1Template): boolean =>
  * @param {V1Template} template - template
  */
 export const getTemplateOSLabelName = (template: V1Template): string =>
-  getLabel(template, ANNOTATIONS.osTemplate, template?.metadata?.name);
+  getLabel(getTemplateVirtualMachineObject(template), ANNOTATIONS.osTemplate);
+
+/**
+ * A selector that returns the os label of a given template
+ * @param {V1Template} template - template
+ */
+export const getTemplateOS = (template: V1Template): OS_NAME_TYPES => {
+  return (
+    Object.values(OS_NAME_TYPES).find((osName) =>
+      getTemplateOSLabelName(template)?.includes(osName),
+    ) ?? OS_NAME_TYPES.other
+  );
+};
 
 /**
  * A selector that returns the template provider name of a given template
  * @param {V1Template} template - template
  */
 export const getTemplateProviderName = (template: V1Template): string =>
-  getAnnotation(template, ANNOTATIONS.providerDisplayName, template?.metadata?.name);
+  getAnnotation(template, ANNOTATIONS.providerDisplayName);
 
 /**
  * A selector that returns the support level of a given template
@@ -90,18 +102,6 @@ export const getTemplateWorkload = (template: V1Template): string => {
     getLabel(template, `${TEMPLATE_WORKLOAD_LABEL}/${workload}`) === 'true';
 
   return Object.values(WORKLOADS).find((flavor) => isWorkloadExist(flavor)) ?? 'unknown';
-};
-
-/**
- * A selector that returns the os label of a given template
- * @param {V1Template} template - template
- */
-export const getTemplateOS = (template: V1Template): OS_NAME_TYPES => {
-  return (
-    Object.values(OS_NAME_TYPES).find((osName) =>
-      getTemplateOSLabelName(template).includes(osName),
-    ) ?? OS_NAME_TYPES.other
-  );
 };
 
 /**
