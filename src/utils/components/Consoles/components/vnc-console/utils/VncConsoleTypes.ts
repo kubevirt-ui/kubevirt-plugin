@@ -35,6 +35,8 @@ export type VncConsoleProps = React.HTMLProps<HTMLDivElement> & {
   credentials?: object;
   /** A DOMString specifying the ID to provide to any VNC repeater encountered */
   repeaterID?: string;
+  /** Is a boolean to indicate if to show the access controls */
+  showAccessControls?: boolean;
   /** log-level for noVNC */
   vncLogging?: 'error' | 'warn' | 'none' | 'debug' | 'info';
   consoleContainerId?: string;
