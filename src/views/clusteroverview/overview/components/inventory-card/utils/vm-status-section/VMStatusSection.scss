@@ -1,0 +1,9 @@
+.kv-inventory-card__statuses-grid {
+  height: 100%;
+  padding-top: var(--pf-c-card--first-child--PaddingTop);
+  padding-bottom: var(--pf-c-card--child--PaddingBottom);
+}
+
+.kv-inventory-card__statuses-grid--left-col {
+  border-right: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
+}
