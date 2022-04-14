@@ -93,7 +93,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
             <DescriptionListGroup>
               <DescriptionListTerm>{t('Pod')}</DescriptionListTerm>
               <DescriptionListDescription>
-                <Pods namespace={vmi?.metadata?.namespace} />
+                <Pods vmi={vmi} />
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>

@@ -1,9 +1,24 @@
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
+/**
+ * Get if the pod is in a ready status
+ * @date 4/10/2022 - 8:13:37 AM
+ *
+ * @param {*} pod
+ * @returns {boolean}
+ */
 export const isPodReady = (pod): boolean =>
   pod?.status?.phase === 'Running' && pod?.status?.containerStatuses?.every((s) => s?.ready);
 
+/**
+ * Get the vmi pod
+ * @date 4/10/2022 - 8:13:37 AM
+ *
+ * @param {V1VirtualMachineInstance} vmi
+ * @param {K8sResourceCommon[]} pods
+ * @returns {*}
+ */
 export const getVMIPod = (vmi: V1VirtualMachineInstance, pods: K8sResourceCommon[]) => {
   if (!pods || !vmi) {
     return null;
