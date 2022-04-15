@@ -14,6 +14,7 @@ export const AnnotationsModalRow: React.FC<{
     <>
       <GridItem span={5}>
         <TextInput
+          autoFocus
           maxLength={255}
           className="annotation-form-input"
           size={1}

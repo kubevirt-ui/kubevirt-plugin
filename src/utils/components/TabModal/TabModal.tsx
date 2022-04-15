@@ -3,7 +3,8 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  ActionGroup,
+  ActionList,
+  ActionListItem,
   Alert,
   AlertVariant,
   Button,
@@ -16,7 +17,7 @@ import {
 
 type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   isOpen: boolean;
-  obj: T;
+  obj?: T;
   onSubmit: (obj: T) => Promise<T | void>;
   onClose: () => void;
   headerText: string;
@@ -24,6 +25,7 @@ type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   isDisabled?: boolean;
   submitBtnText?: string;
   modalVariant?: ModalVariant;
+  positionTop?: boolean;
   submitBtnVariant?: ButtonVariant;
   titleIconVariant?:
     | 'success'
@@ -49,6 +51,7 @@ const TabModal: TabModalFC = React.memo(
     isDisabled,
     submitBtnText,
     modalVariant,
+    positionTop = true,
     submitBtnVariant,
     titleIconVariant,
   }) => {
@@ -57,17 +60,14 @@ const TabModal: TabModalFC = React.memo(
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [error, setError] = React.useState(undefined);
 
-    const handleSubmit = () => {
+    const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+      e.preventDefault();
       setIsSubmitting(true);
       setError(undefined);
 
       onSubmit(obj)
-        .then(() => {
-          onClose();
-        })
-        .catch((err) => {
-          setError(err);
-        })
+        .then(onClose)
+        .catch(setError)
         .finally(() => setIsSubmitting(false));
     };
 
@@ -80,8 +80,8 @@ const TabModal: TabModalFC = React.memo(
     return (
       <Modal
         variant={modalVariant ?? 'small'}
-        position="top"
-        className="ocs-modal co-catalog-page__overlay"
+        position={positionTop ? 'top' : undefined}
+        className="ocs-modal"
         onClose={closeModal}
         title={headerText}
         titleIconVariant={titleIconVariant}
@@ -95,20 +95,23 @@ const TabModal: TabModalFC = React.memo(
               </StackItem>
             )}
             <StackItem>
-              <ActionGroup>
-                <Button
-                  isSmall
-                  isDisabled={isDisabled || isSubmitting}
-                  isLoading={isSubmitting}
-                  onClick={handleSubmit}
-                  variant={submitBtnVariant ?? 'primary'}
-                >
-                  {submitBtnText || t('Submit')}
-                </Button>
-                <Button isSmall onClick={closeModal} variant="link">
-                  {t('Cancel')}
-                </Button>
-              </ActionGroup>
+              <ActionList>
+                <ActionListItem>
+                  <Button
+                    onClick={handleSubmit}
+                    isDisabled={isDisabled || isSubmitting}
+                    isLoading={isSubmitting}
+                    variant={submitBtnVariant ?? 'primary'}
+                  >
+                    {submitBtnText || t('Submit')}
+                  </Button>
+                </ActionListItem>
+                <ActionListItem>
+                  <Button onClick={closeModal} variant="link">
+                    {t('Cancel')}
+                  </Button>
+                </ActionListItem>
+              </ActionList>
             </StackItem>
           </Stack>
         }
