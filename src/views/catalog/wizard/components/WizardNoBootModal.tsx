@@ -24,6 +24,7 @@ export const WizardNoBootModal: React.VFC<{
     <TabModal
       obj={null}
       headerText={t('No available boot source')}
+      positionTop={false}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSubmit}
