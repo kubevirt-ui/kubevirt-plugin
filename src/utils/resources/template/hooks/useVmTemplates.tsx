@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   modelToGroupVersionKind,
   ProjectModel,
+  TemplateModel,
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
@@ -11,6 +12,7 @@ import {
   useK8sWatchResource,
   useK8sWatchResources,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { Operator } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 
 import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../utils/constants';
 
@@ -18,10 +20,12 @@ import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../ut
  * @param namespace - The namespace to filter the templates by
  */
 export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
-  const [templates, setTemplates] = React.useState<V1Template[]>([]);
-  const [loaded, setLoaded] = React.useState<boolean>(false);
-  const [loadError, setLoadError] = React.useState<string>('');
+  const [allowedTemplates, setAllowedTemplates] = React.useState<V1Template[]>([]);
+  const [allowedTemplatesloaded, setAllowedTemplatesLoaded] = React.useState<boolean>(false);
+  const [allowedTemplatesError, setAllowedTemplatesError] = React.useState<string>('');
+
   const [isAdmin] = useIsAdmin();
+  const TemplateModelGroupVersionKind = modelToGroupVersionKind(TemplateModel);
 
   const [projects] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
@@ -29,37 +33,32 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
     isList: true,
   });
 
-  const templatesResources = React.useMemo(() => {
-    // If the user is an admin, or we have a specific namespace - return one resource to watch
-    if (isAdmin || namespace) {
-      return {
-        templates: {
-          ...(namespace ? { namespace } : {}),
-          kind: 'Template',
-          selector: {
-            matchExpressions: [
-              {
-                operator: 'In',
-                key: TEMPLATE_TYPE_LABEL,
-                values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
-              },
-            ],
-          },
-          isList: true,
+  const [allTemplates, allTemplatesLoaded, allTemplatesError] = useK8sWatchResource<V1Template[]>({
+    groupVersionKind: TemplateModelGroupVersionKind,
+    selector: {
+      matchExpressions: [
+        {
+          operator: Operator.In,
+          key: TEMPLATE_TYPE_LABEL,
+          values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
         },
-      };
-    }
-    // if the user is not an admin, and we don't have a specific namespace - return all permitted resources to watch
-    return Object.fromEntries(
+      ],
+    },
+    isList: true,
+  });
+
+  // user has limited access, so we can only get templates from allowed namespaces
+  const allowedResources = useK8sWatchResources<{ [key: string]: V1Template[] }>(
+    Object.fromEntries(
       projects.map((p) => [
         p.metadata.name,
         {
-          kind: 'Template',
+          groupVersionKind: TemplateModelGroupVersionKind,
           namespace: p.metadata.name,
           selector: {
             matchExpressions: [
               {
-                operator: 'In',
+                operator: Operator.In,
                 key: TEMPLATE_TYPE_LABEL,
                 values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
               },
@@ -68,28 +67,37 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
           isList: true,
         },
       ]),
-    );
-  }, [isAdmin, namespace, projects]);
+    ),
+  );
 
-  const resources = useK8sWatchResources<{ [key: string]: V1Template[] }>(templatesResources);
+  const templates = React.useMemo(
+    () => (isAdmin ? allTemplates : allowedTemplates),
+    [allTemplates, allowedTemplates, isAdmin],
+  );
 
   React.useEffect(() => {
-    const errorKey = Object.keys(resources).find((key) => resources[key].loadError);
-    if (errorKey) {
-      setLoadError(resources[errorKey].loadError);
+    if (!isAdmin) {
+      const errorKey = Object.keys(allowedResources).find((key) => allowedResources[key].loadError);
+      if (errorKey) {
+        setAllowedTemplatesError(allowedResources[errorKey].loadError);
+      }
+      if (
+        Object.keys(allowedResources).length > 0 &&
+        Object.keys(allowedResources).every((key) => {
+          return allowedResources[key].loaded || allowedResources[key].loadError;
+        })
+      ) {
+        setAllowedTemplates(Object.values(allowedResources).flatMap((r) => r.data));
+        setAllowedTemplatesLoaded(true);
+      }
     }
-    if (
-      Object.keys(resources).length > 0 &&
-      Object.keys(resources).every((key) => {
-        return resources[key].loaded || resources[key].loadError;
-      })
-    ) {
-      setTemplates(Object.values(resources).flatMap((r) => r.data));
-      setLoaded(true);
-    }
-  }, [resources]);
+  }, [allowedResources, isAdmin]);
 
-  return { templates, loaded, loadError };
+  return {
+    templates: namespace ? templates.filter((t) => t.metadata.namespace === namespace) : templates,
+    loaded: isAdmin ? allTemplatesLoaded : allowedTemplatesloaded,
+    loadError: isAdmin ? allTemplatesError : allowedTemplatesError,
+  };
 };
 
 type useVmTemplatesValues = {
