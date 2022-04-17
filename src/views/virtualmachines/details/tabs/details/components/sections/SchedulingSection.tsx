@@ -1,7 +1,10 @@
 import * as React from 'react';
 
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid, GridItem, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
@@ -17,6 +20,10 @@ type SchedulingSectionProps = {
 
 const SchedulingSection: React.FC<SchedulingSectionProps> = ({ vm, pathname }) => {
   const { t } = useKubevirtTranslation();
+  const [nodes, loaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+    groupVersionKind: modelToGroupVersionKind(NodeModel),
+    isList: true,
+  });
   return (
     <div className="VirtualMachinesDetailsSection">
       <a href={`${pathname}#scheduling`} className="link-icon">
@@ -26,7 +33,7 @@ const SchedulingSection: React.FC<SchedulingSectionProps> = ({ vm, pathname }) =
         {t('Scheduling and resources requirements')}
       </Title>
       <Grid hasGutter>
-        <VirtualMachineSchedulingLeftGrid vm={vm} />
+        <VirtualMachineSchedulingLeftGrid vm={vm} nodes={nodes} nodesLoaded={loaded} />
         <GridItem span={1}>{/* Spacer */}</GridItem>
         <VirtualMachineSchedulingRightGrid vm={vm} />
       </Grid>
