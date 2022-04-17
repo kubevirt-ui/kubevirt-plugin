@@ -1,0 +1,31 @@
+.VirtualMachinesOverviewTabSnapshots--main {
+  .text-muted {
+    display: flex;
+    justify-content: space-between;
+  }
+  .pf-c-card__body {
+    padding-right: 0;
+  }
+
+  .VirtualMachinesOverviewTabSnapshotsRow--main {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    .name {
+      display: inline-flex;
+      align-items: center;
+      .timestamp {
+        margin-left: var(--pf-global--spacer--xs);
+      }
+      .icon-spacer__offset {
+        margin-left: var(--pf-global--spacer--sm);
+        text-underline-offset: 0.25rem;
+      }
+    }
+  }
+}
+.pf-c-description-list__text {
+  .icon-spacer {
+    margin-left: var(--pf-global--spacer--sm);
+  }
+}
