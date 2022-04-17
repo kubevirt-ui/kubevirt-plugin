@@ -4,6 +4,7 @@ import { WizardTab } from '@catalog/wizard/tabs';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
 
@@ -30,6 +31,17 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
             <WizardDescriptionItem
               title={t('Node Selector')}
               description={<NodeSelector vm={vm} />}
+              isEdit
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <NodeSelectorModal
+                    vm={vm}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onSubmit={updateVM}
+                  />
+                ))
+              }
             />
 
             <WizardDescriptionItem title={t('Tolerations')} description={<Tolerations vm={vm} />} />
