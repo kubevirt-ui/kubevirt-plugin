@@ -11,8 +11,8 @@ export const CustomizeVirtualMachineHeader: React.FC<{ namespace: string }> = Re
     const history = useHistory();
 
     return (
-      <div className="co-m-nav-title co-m-nav-title--breadcrumbs">
-        <Breadcrumb>
+      <div className="pf-c-page__main-breadcrumb">
+        <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
           <BreadcrumbItem>
             <Button
               variant="link"
