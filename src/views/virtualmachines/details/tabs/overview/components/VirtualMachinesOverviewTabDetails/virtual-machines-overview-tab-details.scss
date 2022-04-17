@@ -1,0 +1,29 @@
+.VirtualMachinesOverviewTabDetails--details {
+  .card-title {
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+  }
+  .pf-c-console__vnc {
+    height: 70%;
+    width: 100%;
+  }
+  .bullseye {
+    flex-direction: column;
+  }
+  .right-column {
+    display: flex;
+    .title {
+      font-size: var(--pf-global--FontSize--sm);
+      font-weight: var(--pf-global--FontWeight--bold);
+      margin-right: var(--pf-global--spacer--2xl);
+    }
+  }
+  .link {
+    margin-top: var(--pf-global--spacer--sm);
+    align-self: baseline;
+    .icon {
+      margin-left: var(--pf-global--spacer--xs);
+    }
+  }
+}

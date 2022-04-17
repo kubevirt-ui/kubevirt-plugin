@@ -1,4 +1,5 @@
 import * as React from 'react';
+import cn from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import RFBCreate from '@novnc/novnc/core/rfb';
@@ -19,6 +20,7 @@ import { VncConsoleProps } from './utils/VncConsoleTypes';
 import VncConsoleActions from './VncConsoleActions';
 
 import '@patternfly/react-styles/css/components/Consoles/VncConsole.css';
+import './vnc-console.scss';
 
 const { connected, connecting, disconnected } = ConsoleState;
 
@@ -36,8 +38,9 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
   repeaterID = '',
   vncLogging = 'warn',
   consoleContainerId,
+  showAccessControls = true,
   additionalButtons = [] as React.ReactNode[],
-  onDisconnected = () => null,
+  onDisconnected,
   onInitFailed,
   onSecurityFailure,
   textConnect,
@@ -52,8 +55,14 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
   const [status, setStatus] = React.useState<ConsoleState>(disconnected);
   const staticRenderLocaitonRef = React.useRef(null);
   const StaticRenderLocaiton = React.useMemo(
-    () => <div id={consoleContainerId} ref={staticRenderLocaitonRef} />,
-    [staticRenderLocaitonRef, consoleContainerId],
+    () => (
+      <div
+        className={cn('vnc-container', { hide: status !== connected })}
+        id={consoleContainerId}
+        ref={staticRenderLocaitonRef}
+      ></div>
+    ),
+    [staticRenderLocaitonRef, consoleContainerId, status],
   );
 
   const url = React.useMemo(
@@ -77,11 +86,11 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
       rfbInstnce?.addEventListener('connect', () => setStatus(connected));
       rfbInstnce?.addEventListener('disconnect', (e: any) => {
         setStatus(disconnected);
-        onDisconnected(e);
+        onDisconnected && onDisconnected(e);
       });
       rfbInstnce?.addEventListener('securityfailure', (e: any) => {
         setStatus(disconnected);
-        onSecurityFailure(e);
+        onSecurityFailure && onSecurityFailure(e);
       });
       rfbInstnce.viewOnly = viewOnly;
       rfbInstnce.scaleViewport = scaleViewport;
@@ -118,7 +127,7 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
 
   return (
     <>
-      {status === connected && (
+      {status === connected && showAccessControls && (
         <VncConsoleActions
           onCtrlAltDel={() => rfb?.sendCtrlAltDel()}
           textSendShortcut={textSendShortcut}
@@ -130,25 +139,23 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
       )}
       <div className={css(styles.consoleVnc)}>
         {children}
-        <div>
-          {status === disconnected && (
-            <EmptyState>
-              <EmptyStateBody>
-                {textDisconnected || t('Click Connect to open the VNC console.')}
-              </EmptyStateBody>
-              <Button variant="primary" onClick={connect}>
-                {textConnect || t('Connect')}
-              </Button>
-            </EmptyState>
-          )}
-          {status === connecting && (
-            <EmptyState>
-              <EmptyStateIcon variant="container" component={Spinner} />
-              <EmptyStateBody>{textConnecting || t('Connecting')}</EmptyStateBody>
-            </EmptyState>
-          )}
-          {StaticRenderLocaiton}
-        </div>
+        {status === disconnected && (
+          <EmptyState>
+            <EmptyStateBody>
+              {textDisconnected || t('Click Connect to open the VNC console.')}
+            </EmptyStateBody>
+            <Button variant="primary" onClick={connect}>
+              {textConnect || t('Connect')}
+            </Button>
+          </EmptyState>
+        )}
+        {status === connecting && (
+          <EmptyState>
+            <EmptyStateIcon variant="container" component={Spinner} />
+            <EmptyStateBody>{textConnecting || t('Connecting')}</EmptyStateBody>
+          </EmptyState>
+        )}
+        {StaticRenderLocaiton}
       </div>
     </>
   );
