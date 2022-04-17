@@ -26,8 +26,8 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
     confirm(t('Are you sure you want to leave this page?')) && history.push(url);
 
   return (
-    <div className="co-m-nav-title co-m-nav-title--breadcrumbs">
-      <Breadcrumb>
+    <div className="pf-c-page__main-breadcrumb">
+      <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
         <BreadcrumbItem>
           <Button
             variant="link"
