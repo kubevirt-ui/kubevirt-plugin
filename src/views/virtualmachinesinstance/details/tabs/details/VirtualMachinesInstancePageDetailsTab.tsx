@@ -6,6 +6,7 @@ import { Divider, PageSection } from '@patternfly/react-core';
 
 import Details from './components/Details/Details';
 import Scheduling from './components/Scheduling/Scheduling';
+import Services from './components/Services/Services';
 import ActiveUserList from './components/UserList/ActiveUserList';
 
 import './virtual-machines-instance-details-tab.scss';
@@ -24,6 +25,10 @@ const VirtualMachinesInstancePageDetailsTab: React.FC<
       <Divider />
       <PageSection>
         <Scheduling vmi={vmi} pathname={location?.pathname} />
+      </PageSection>
+      <Divider />
+      <PageSection>
+        <Services vmi={vmi} pathname={location?.pathname} />
       </PageSection>
       <Divider />
       <PageSection>
