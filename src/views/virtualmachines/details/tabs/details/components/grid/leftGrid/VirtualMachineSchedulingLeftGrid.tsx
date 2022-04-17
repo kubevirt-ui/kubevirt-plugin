@@ -3,6 +3,7 @@ import * as React from 'react';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -67,6 +68,19 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Affinity vm={vm} />}
           descriptionHeader={t('Affinity Rules')}
+          isEdit
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <AffinityModal
+                vm={vm}
+                nodes={nodes}
+                nodesLoaded={nodesLoaded}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={onSubmit}
+              />
+            ))
+          }
         />
         <VirtualMachineDescriptionItem
           descriptionData={<Descheduler vm={vm} />}
