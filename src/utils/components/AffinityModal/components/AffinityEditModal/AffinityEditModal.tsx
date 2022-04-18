@@ -12,9 +12,6 @@ import AffinityForm from './AffinityForm/AffinityForm';
 import { useNodeFieldQualifier } from './hooks/useNodeFieldQualifier';
 import { useNodeLabelQualifier } from './hooks/useNodeLabelQualifier';
 
-// import { useNodeFieldQualifier } from './hooks/useNodeFieldQualifier';
-// import { useNodeLabelQualifier } from './hooks/useNodeLabelQualifier';
-
 type AffinityEditModalProps = {
   nodes: IoK8sApiCoreV1Node[];
   nodesLoaded: boolean;
@@ -66,7 +63,7 @@ const AffinityEditModal: React.FC<AffinityEditModalProps> = ({
             }
             variant={ButtonVariant.primary}
           >
-            {t('Save Affinity rule')}
+            {t('Save affinity rule')}
           </Button>
           <Button isSmall onClick={onCancel} variant="link">
             {t('Cancel')}

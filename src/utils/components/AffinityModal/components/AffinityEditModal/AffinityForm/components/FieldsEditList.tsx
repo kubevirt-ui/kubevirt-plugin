@@ -15,7 +15,6 @@ type FieldsEditListProps = {
   label: string;
   helperText: React.ReactNode;
   errorHelperText: React.ReactNode;
-  setSubmitDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const FieldsEditList: React.FC<FieldsEditListProps> = ({
@@ -23,7 +22,6 @@ const FieldsEditList: React.FC<FieldsEditListProps> = ({
   label,
   helperText,
   errorHelperText,
-  setSubmitDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -44,12 +42,11 @@ const FieldsEditList: React.FC<FieldsEditListProps> = ({
       />
       <AffinityEditList
         expressions={affinityFields}
-        addRowText={t('Add Field')}
+        addRowText={t('Add field')}
         onAdd={() => onFieldAdd({ id: null, key: '', values: [], operator: Operator.In })}
         onChange={onFieldChange}
         onDelete={onFieldDelete}
         rowID="field"
-        setSubmitDisabled={setSubmitDisabled}
       />
       {isTermsInvalid(affinityFields) && affinityFieldsChanged && (
         <ErrorHelperText>{errorHelperText}</ErrorHelperText>

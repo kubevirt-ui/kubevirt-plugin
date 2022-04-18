@@ -89,14 +89,14 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
   );
 
   const onAffinityAdd = (affinity: AffinityRowData) => {
-    setAffinities([...affinities, affinity]);
+    setAffinities((prevAffinities) => [...(prevAffinities || []), affinity]);
     setIsEditing(false);
     setIsCreating(false);
   };
 
   const onAffinityChange = (updatedAffinity: AffinityRowData) => {
-    setAffinities(
-      affinities.map((affinity) => {
+    setAffinities((prevAffinities) =>
+      prevAffinities.map((affinity) => {
         if (affinity.id === updatedAffinity.id) return { ...affinity, ...updatedAffinity };
         return affinity;
       }),
@@ -116,7 +116,7 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
   };
 
   const onAffinityDelete = (affinity: AffinityRowData) =>
-    setAffinities(affinities.filter(({ id }) => id !== affinity.id));
+    setAffinities((prevAffinities) => prevAffinities.filter(({ id }) => id !== affinity.id));
 
   const onCancel = () => {
     setIsEditing(false);
@@ -163,7 +163,7 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
       onSubmit={onSaveAffinity}
       focusedAffinity={focusedAffinity}
       setFocusedAffinity={setFocusedAffinity}
-      title={isCreating ? t('Create Affinity Rule') : t('Edit Affinity Rule')}
+      title={isCreating ? t('Add affinity rule') : t('Edit affinity rule')}
     />
   ) : (
     <TabModal
@@ -171,7 +171,7 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
       onClose={onClose}
       obj={updatedVirtualMachine}
       onSubmit={onSubmit}
-      headerText={t('Affinity Rules')}
+      headerText={t('Affinity rules')}
       submitBtnText={t('Save')}
       modalVariant={ModalVariant.medium}
     >

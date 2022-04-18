@@ -4,7 +4,6 @@ import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { GridItem, Text, TextVariants } from '@patternfly/react-core';
 
-import { isTermsInvalid } from '../../../../utils/helpers';
 import { AffinityLabel } from '../../../../utils/types';
 
 import AffinityEditRow from './AffinityEditRow';
@@ -16,7 +15,6 @@ type AffinityExpressionListProps = {
   onChange: (aff: AffinityLabel) => void;
   onDelete: (id: any) => void;
   rowID: string;
-  setSubmitDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const AffinityEditList: React.FC<AffinityExpressionListProps> = ({
@@ -26,17 +24,9 @@ const AffinityEditList: React.FC<AffinityExpressionListProps> = ({
   onChange,
   onDelete,
   rowID,
-  setSubmitDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  React.useEffect(() => {
-    if (expressions.length === 0 || isTermsInvalid(expressions)) {
-      setSubmitDisabled(true);
-    } else {
-      setSubmitDisabled(false);
-    }
-  }, [expressions, setSubmitDisabled]);
   return (
     <LabelsList
       isEmpty={expressions?.length === 0}

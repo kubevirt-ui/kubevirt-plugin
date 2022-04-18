@@ -83,12 +83,12 @@ const AffinityExpressionRow: React.FC<AffinityExpressionRowProps> = ({
           variant={SelectVariant.typeaheadMulti}
           isOpen={isValuesExpanded}
           isCreatable
-          typeAheadAriaLabel={t('Enter Value')}
+          typeAheadAriaLabel={t('Enter value')}
           onToggle={setIsValuesExpanded}
           onClear={() => onChange({ ...expression, values: [] })}
           onSelect={onSelectValues}
           selections={enableValueField ? values : []}
-          placeholderText={enableValueField ? t('Enter Value') : ''}
+          placeholderText={enableValueField ? t('Enter value') : ''}
         >
           {values?.map((option) => (
             <SelectOption isDisabled={false} key={option} value={option} />

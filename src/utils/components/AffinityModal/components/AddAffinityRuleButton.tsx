@@ -21,7 +21,7 @@ const AddAffinityRuleButton: React.FC<AddAffinityRuleButtonProps> = ({
       variant={isLinkButton ? ButtonVariant.link : ButtonVariant.secondary}
       onClick={onAffinityClickAdd}
     >
-      {t('Add Affinity rule')}
+      {t('Add affinity rule')}
     </Button>
   );
 };

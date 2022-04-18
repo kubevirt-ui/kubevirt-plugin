@@ -14,7 +14,7 @@ const NodeFieldsDescriptionText: React.FC = () => {
       </Text>
       <Text className="text-muted" component={TextVariants.p}>
         {t(
-          'Note that for Node field expressions, entering a full path is required in the Key field (e.g. "metadata.name: value").',
+          'Note that for Node field expressions, entering a full path is required in the "Key" field (e.g. "metadata.name: value").',
         )}
       </Text>
       <Text className="text-muted" component={TextVariants.p}>

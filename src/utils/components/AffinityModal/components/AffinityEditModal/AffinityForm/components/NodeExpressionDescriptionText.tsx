@@ -8,13 +8,13 @@ const NodeExpressionDescriptionText: React.FC = () => {
   return (
     <>
       <Text className="text-muted" component={TextVariants.p}>
-        {t('Select nodes that must have all the following expressions.')}
+        {t('Select Nodes that must have all the following expressions.')}
       </Text>
       <Text className="text-muted" component={TextVariants.p}>
         {t('Label selectors let you select Nodes based on the value of one or more labels.')}
       </Text>
       <Text className="text-muted" component={TextVariants.p}>
-        {t('A list of matching nodes will be provided on label input below.')}
+        {t('A list of matching Nodes will be provided on label input below.')}
       </Text>
     </>
   );

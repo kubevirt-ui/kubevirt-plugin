@@ -9,7 +9,7 @@ const AffinityDescriptionText: React.FC = () => {
     <>
       <Text className="text-muted" component={TextVariants.p}>
         {t(
-          'Set scheduling requirements and affect the ranking of the nodes candidate for scheduling.',
+          'Set scheduling requirements and affect the ranking of the Node candidates for scheduling.',
         )}
       </Text>
       <Text className="text-muted" component={TextVariants.p}>

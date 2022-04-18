@@ -36,6 +36,11 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
 
   const prefferedQualifiedNodesNames = prefferedQualifiedNodes?.map((node) => node?.metadata?.name);
 
+  const matchingNodeText = pluralize(
+    qualifiedNodesSize ? qualifiedNodesSize : prefferedQualifiedNodesSize,
+    'Node',
+  );
+
   let nodes = [];
   if (qualifiedNodesSize) {
     nodes = qualifiedNodes;
@@ -48,24 +53,20 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
         <>
           {!!qualifiedNodesSize || !!prefferedQualifiedNodesSize ? (
             <>
-              {t(
-                `${pluralize(
-                  qualifiedNodesSize ? qualifiedNodesSize : prefferedQualifiedNodesSize,
-                  'node',
-                )} matching`,
-              )}
+              {t('{{matchingNodeText}} matching', {
+                matchingNodeText,
+              })}
               {!!qualifiedNodesSize &&
                 !!prefferedQualifiedNodesSize &&
-                t(
-                  `, ${
+                t(', {{prefferedQualifiedNodesSize}} matching preferred Nodes found', {
+                  prefferedQualifiedNodesSize:
                     qualifiedNodesSize < prefferedQualifiedNodesSize
                       ? qualifiedNodesSize
-                      : prefferedQualifiedNodesSize
-                  } matching preferred nodes found`,
-                )}
+                      : prefferedQualifiedNodesSize,
+                })}
             </>
           ) : (
-            t('No matching nodes found for the labels')
+            t('No matching Nodes found for the labels')
           )}
         </>
       }
@@ -80,7 +81,7 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
         <Popover
           headerContent={
             <>
-              {t('{{qualifiedNodesCount}} mathcing nodes found', {
+              {t('{{qualifiedNodesCount}} matching Nodes found', {
                 qualifiedNodesCount: qualifiedNodesSize || prefferedQualifiedNodesSize,
               })}
             </>
@@ -109,12 +110,9 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
           }
         >
           <Button variant="link" isInline>
-            {t(
-              `view matching ${pluralize(
-                qualifiedNodesSize || prefferedQualifiedNodesSize,
-                'node',
-              )}`,
-            )}
+            {t('View matching {{matchingNodeText}}', {
+              matchingNodeText,
+            })}
           </Button>
         </Popover>
       ) : (

@@ -102,9 +102,8 @@ const AffinityForm: React.FC<AffinityFormProps> = ({
           isNodeAffinity ? <NodeExpressionDescriptionText /> : <WorkloadExpressionDescriptionText />
         }
         errorHelperText={t('Missing fields in {{kind}} labels', {
-          kind: isNodeAffinity ? 'node' : 'workload',
+          kind: isNodeAffinity ? 'Node' : 'Workload',
         })}
-        setSubmitDisabled={setSubmitDisabled}
       />
       {isNodeAffinity && (
         <>
@@ -113,8 +112,7 @@ const AffinityForm: React.FC<AffinityFormProps> = ({
             fields={fields}
             label={t('Node fields')}
             helperText={<NodeFieldsDescriptionText />}
-            errorHelperText={t('Missing fields in node fields')}
-            setSubmitDisabled={setSubmitDisabled}
+            errorHelperText={t('Missing fields in Node fields')}
           />
         </>
       )}

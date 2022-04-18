@@ -21,7 +21,7 @@ const AffinityEmptyState: React.FC<AffinityEmptyStateProps> = ({ onAffinityClick
   return (
     <EmptyState variant={EmptyStateVariant.full}>
       <Title headingLevel="h5" size="lg">
-        {t('No Affinity rules found')}
+        {t('No affinity rules found')}
       </Title>
       <EmptyStateBody>
         <AffinityDescriptionText />

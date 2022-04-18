@@ -15,7 +15,6 @@ type ExpressionEditListProps = {
   label: string;
   helperText: React.ReactNode;
   errorHelperText: React.ReactNode;
-  setSubmitDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const ExpressionEditList: React.FC<ExpressionEditListProps> = ({
@@ -23,7 +22,6 @@ const ExpressionEditList: React.FC<ExpressionEditListProps> = ({
   label,
   helperText,
   errorHelperText,
-  setSubmitDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -44,12 +42,11 @@ const ExpressionEditList: React.FC<ExpressionEditListProps> = ({
       />
       <AffinityEditList
         expressions={affinityExpressions}
-        addRowText={t('Add Expression')}
+        addRowText={t('Add expression')}
         onAdd={() => onExpressionAdd({ id: null, key: '', values: [], operator: Operator.In })}
         onChange={onExpressionChange}
         onDelete={onExpressionDelete}
         rowID="expression"
-        setSubmitDisabled={setSubmitDisabled}
       />
       {isTermsInvalid(affinityExpressions) && affinityExpressionsChanged && (
         <ErrorHelperText>{errorHelperText}</ErrorHelperText>
