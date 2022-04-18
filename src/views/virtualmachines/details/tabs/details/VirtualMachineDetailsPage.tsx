@@ -6,6 +6,7 @@ import { Divider, PageSection } from '@patternfly/react-core';
 
 import DetailsSection from './components/sections/DetailsSection';
 import SchedulingSection from './components/sections/SchedulingSection';
+import ServicesSection from './components/sections/ServicesSection';
 
 type VirtualMachineDetailsPageProps = RouteComponentProps<{
   ns: string;
@@ -25,7 +26,9 @@ const VirtualMachineDetailsPage: React.FC<VirtualMachineDetailsPageProps> = ({ o
         <SchedulingSection vm={vm} pathname={location?.pathname} />{' '}
       </PageSection>
       <Divider />
-      <PageSection>Services</PageSection>
+      <PageSection>
+        <ServicesSection vm={vm} pathname={location?.pathname} />
+      </PageSection>
     </div>
   );
 };
