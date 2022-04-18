@@ -8,6 +8,7 @@ import {
   V1beta1DataVolumeSourceRef,
   V1beta1DataVolumeSourceRegistry,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getVMBootSourceType } from '@kubevirt-utils/resources/vm/utils/source';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
 import { BOOT_SOURCE } from '../../utils/constants';
@@ -28,8 +29,6 @@ export type TemplateBootSource = {
     registry?: V1beta1DataVolumeSourceRegistry;
   };
 };
-
-export const TEMPLATE_ROOTDISK_VOLUME_NAME = '${NAME}';
 
 // Only used for replacing parameters in the template, do not use for anything else
 // eslint-disable-next-line require-jsdoc
@@ -52,52 +51,8 @@ const poorManProcess = (template: V1Template): V1Template => {
  * @param {V1Template} template - the template to get the boot source from
  * @returns the template's boot source and its status
  */
-export const getTemplateBootSourceType = (template: V1Template): TemplateBootSource => {
-  const vmObject = getTemplateVirtualMachineObject(poorManProcess(template));
-
-  const rootVolume = vmObject?.spec?.template?.spec?.volumes?.find(
-    (v) => v.name === TEMPLATE_ROOTDISK_VOLUME_NAME,
-  );
-  const rootDataVolumeTemplate = vmObject?.spec?.dataVolumeTemplates?.find(
-    (dv) => dv.metadata?.name === rootVolume?.dataVolume?.name,
-  );
-
-  if (rootDataVolumeTemplate?.spec?.sourceRef) {
-    const sourceRef = rootDataVolumeTemplate?.spec?.sourceRef;
-
-    if (sourceRef?.kind === DataSourceModel.kind) {
-      return {
-        type: BOOT_SOURCE.PVC_AUTO_UPLOAD,
-        source: { sourceRef },
-      };
-    }
-  }
-
-  if (rootDataVolumeTemplate?.spec?.source) {
-    const source = rootDataVolumeTemplate?.spec?.source;
-
-    if (source?.http) {
-      return {
-        type: BOOT_SOURCE.URL,
-        source: { http: source?.http },
-      };
-    }
-    if (source?.registry) {
-      return {
-        type: BOOT_SOURCE.REGISTRY,
-        source: { registry: source?.registry },
-      };
-    }
-    if (source?.pvc) {
-      return {
-        type: BOOT_SOURCE.PVC,
-        source: { pvc: source?.pvc },
-      };
-    }
-  }
-
-  return null;
-};
+export const getTemplateBootSourceType = (template: V1Template): TemplateBootSource =>
+  getVMBootSourceType(getTemplateVirtualMachineObject(poorManProcess(template)));
 
 /**
  * a function to k8sGet a PVC

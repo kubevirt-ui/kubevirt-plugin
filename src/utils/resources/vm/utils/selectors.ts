@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Disk, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 /**
  * A selector for the virtual machine's networks
@@ -104,3 +104,17 @@ export const getTolerations = (vm: V1VirtualMachine) => vm?.spec?.template?.spec
  * @returns the virtual machine affinity
  */
 export const getAffinity = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.affinity;
+
+/**
+ * A selector for the virtual machine's boot disk.
+ * If disks with bootOrder are available, returns the disk with lowest bootOrder integer value.
+ * If not, returns the first disk
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine boot disk
+ */
+export const getBootDisk = (vm: V1VirtualMachine): V1Disk =>
+  (getDisks(vm) || [])
+    .filter((d) => d.bootOrder)
+    .reduce((acc, disk) => {
+      return acc.bootOrder < disk.bootOrder ? acc : disk;
+    }, getDisks(vm)?.[0]);
