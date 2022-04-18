@@ -7349,6 +7349,7 @@ __metadata:
     webpack: ^5.68.0
     webpack-cli: 4.9.x
     webpack-dev-server: ^4.7.4
+    xbytes: ^1.7.0
     xterm: ^4.18.0
     xterm-addon-fit: ^0.5.0
   languageName: unknown
@@ -11959,6 +11960,13 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 76f2f90e40344bf18fd544194e7067812fb1372b2a37865678d8f12afe4b478ff2ebc0c7c0aff82cd5e6b66fc43d889eec0f1865c2365d8f7a66d92da7744a77
+  languageName: node
+  linkType: hard
+
+"xbytes@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "xbytes@npm:1.7.0"
+  checksum: f7b542e2a638cba219292a60ffe5c736d3b17b3631aefa152d2527bc2c24ea8ff9d408c417b978e2b8500e23f30dc1a2a928ca735aaa82815aadb2100802b934
   languageName: node
   linkType: hard
 

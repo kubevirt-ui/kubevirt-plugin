@@ -1,0 +1,62 @@
+.VirtualMachinesOverviewTabUtilization--main {
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .pf-c-card__title.text-muted {
+      padding-top: var(--pf-global--spacer--md);
+    }
+  }
+  .util {
+    .util-upper {
+      padding-left: var(--pf-global--spacer--2xl);
+      .util-title {
+        font-weight: var(--pf-global--FontWeight--semi-bold);
+      }
+      .util-summary {
+        width: 100%;
+        display: flex;
+        .util-summary-value {
+          width: 50%;
+          font-weight: var(--pf-global--FontWeight--normal);
+          font-size: var(--pf-global--FontSize--xl);
+          align-self: center;
+        }
+        .util-summary-text {
+          width: 50%;
+          &.network-value {
+            align-self: center;
+          }
+        }
+      }
+    }
+    .util-chart {
+      .pf-c-chart {
+        height: auto;
+      }
+    }
+    &.network {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .network-metrics {
+      padding-left: var(--pf-global--spacer--2xl);
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: center;
+      .network-metrics--row {
+        display: flex;
+        &__sum,
+        &__title {
+          font-size: var(--pf-global--FontSize--lg);
+          width: 50%;
+        }
+        &__title {
+          margin-left: var(--pf-global--spacer--sm);
+        }
+      }
+    }
+  }
+}
