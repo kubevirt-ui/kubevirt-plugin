@@ -42,10 +42,7 @@
     },
     "dependencies": {
       "@console/pluginAPI": "*"
-    },
-    "disableStaticPlugins": [
-      "@console/kubevirt-plugin"
-    ]
+    }
   },
   "dependencies": {
     "@kubevirt-ui/components": "^0.0.10",
