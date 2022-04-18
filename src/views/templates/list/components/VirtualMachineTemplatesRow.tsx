@@ -3,6 +3,7 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
+import VirtualMachineTemplatesActions from '../../actions/VirtualMachineTemplatesActions';
 import { useVirtualMachineTemplatesCPUMemory } from '../hooks/useVirtualMachineTemplatesCPUMemory';
 import useWorkloadProfile from '../hooks/useWorkloadProfile';
 
@@ -35,7 +36,7 @@ const VirtualMachineTemplatesRow: React.FC<RowProps<V1Template, { kind: string }
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
-        {/* TODO Kebab */}
+        <VirtualMachineTemplatesActions template={obj} />
       </TableData>
     </>
   );
