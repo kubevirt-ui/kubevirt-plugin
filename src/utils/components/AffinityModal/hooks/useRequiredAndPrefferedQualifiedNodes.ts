@@ -5,7 +5,7 @@ import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { intersectionWith, unionWith } from '../utils/helpers';
 import { AffinityCondition, AffinityRowData, AffinityType } from '../utils/types';
 
-import { useAffinitiesQualifiedNodes } from './useAffinityQualifiedNodes';
+import { useAffinitiesQualifiedNodes } from './useAffinitiesQualifiedNodes';
 
 type UseRequiredAndPrefferedQualifiedNodes = (
   nodes: IoK8sApiCoreV1Node[],
