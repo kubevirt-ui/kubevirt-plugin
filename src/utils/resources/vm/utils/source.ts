@@ -3,7 +3,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BOOT_SOURCE } from '@kubevirt-utils/resources/template';
 import { TemplateBootSource } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 
-import { getDisks, getVolumes } from './selectors';
+import { getBootDisk, getVolumes } from './selectors';
 
 /**
  * a function to get the boot source from a vm and its status
@@ -11,9 +11,8 @@ import { getDisks, getVolumes } from './selectors';
  * @returns the vm's boot source and its status
  */
 export const getVMBootSourceType = (vm: V1VirtualMachine): TemplateBootSource => {
-  // TODO: we will need to ad support for boot order in the future
-  const disk = getDisks(vm)?.[0];
-  const volume = getVolumes(vm)?.find((vol) => vol.name === disk?.name);
+  const bootDisk = getBootDisk(vm);
+  const volume = getVolumes(vm)?.find((vol) => vol.name === bootDisk?.name);
   const dataVolumeTemplate = vm?.spec?.dataVolumeTemplates?.find(
     (dv) => dv.metadata?.name === volume?.dataVolume?.name,
   );
