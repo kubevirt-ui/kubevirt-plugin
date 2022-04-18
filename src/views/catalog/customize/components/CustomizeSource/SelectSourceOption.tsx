@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { TFunction } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
@@ -16,7 +17,7 @@ import {
   UPLOAD_SOURCE_NAME,
 } from './constants';
 
-const getSourceOption = (source: SOURCE_OPTIONS_IDS, t: TFunction) => {
+const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) => {
   switch (source) {
     case DEFAULT_SOURCE:
       return (
@@ -70,14 +71,13 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, t: TFunction) => {
         <SelectOption
           value={UPLOAD_SOURCE_NAME}
           description={t('Upload new file using the "Upload data to Persistent Volume Claim" page')}
+          onClick={() =>
+            window
+              .open(`/k8s/ns/${ns || 'default'}/persistentvolumeclaims/~new/data`, '_blank')
+              .focus()
+          }
         >
-          <a
-            data-test-id={UPLOAD_SOURCE_NAME}
-            href="/k8s/ns/default/persistentvolumeclaims/~new/data"
-            target="_blank"
-          >
-            {t('Upload (Upload a new file to a PVC)')} <ExternalLinkAltIcon />
-          </a>
+          {t('Upload (Upload a new file to a PVC)')} <ExternalLinkAltIcon />
         </SelectOption>
       );
     case BLANK_SOURCE_NAME:
@@ -103,6 +103,7 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
   options,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
 
   const onSelect = React.useCallback(
@@ -129,7 +130,7 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
         selections={selectedSource}
         maxHeight={400}
       >
-        {options.map((option) => getSourceOption(option, t))}
+        {options.map((option) => getSourceOption(option, ns, t))}
       </Select>
     </FormGroup>
   );

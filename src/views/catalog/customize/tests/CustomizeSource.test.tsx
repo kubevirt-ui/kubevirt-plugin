@@ -12,6 +12,10 @@ import {
 
 import { getMockTemplate } from './mocks';
 
+jest.mock('react-router-dom', () => ({
+  useParams: () => ({ ns: 'mock-namespace' }),
+}));
+
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { mockUseK8sWatchResource } = require('./mocks');

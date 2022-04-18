@@ -62,7 +62,7 @@ describe('Test CustomizeVirtualMachine', () => {
     (useK8sWatchResource as jest.Mock).mockReturnValue([undefined, false, undefined]);
     render(<CustomizeVirtualMachine />);
 
-    screen.getByTestId('scheleton');
+    screen.getByTestId('skeleton');
   });
 
   it('It render the error properly on loading error', () => {
