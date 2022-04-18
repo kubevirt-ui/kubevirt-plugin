@@ -76,7 +76,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
       return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC };
     }
 
-    const dataVolumeTemplate = dataVolumeTemplates.find(
+    const dataVolumeTemplate = dataVolumeTemplates?.find(
       (dataVolume) => dataVolume.metadata.name === volume.dataVolume?.name,
     );
 

@@ -28,7 +28,7 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
       return { disk, volume };
     });
 
-    return diskDevices.map((device) => {
+    return (diskDevices || []).map((device) => {
       const source = () => {
         if (device?.volume?.containerDisk) {
           return t('Container (Ephemeral)');
