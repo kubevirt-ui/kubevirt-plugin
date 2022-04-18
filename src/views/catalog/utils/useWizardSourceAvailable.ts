@@ -74,16 +74,15 @@ export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
         break;
 
       case BOOT_SOURCE.URL:
-        {
-          setIsBootSourceAvailable(true);
-        }
-        break;
-
       case BOOT_SOURCE.REGISTRY:
         {
           setIsBootSourceAvailable(true);
         }
         break;
+
+      case undefined: {
+        setIsBootSourceAvailable(false);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bootSource]);

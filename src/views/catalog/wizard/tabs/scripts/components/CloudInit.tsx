@@ -15,7 +15,7 @@ type CloudinitProps = {
 };
 
 const Cloudinit: React.FC<CloudinitProps> = ({ vm, updateVM }) => {
-  const cloudInitVolume = getVolumes(vm).find((vol) => !!vol.cloudInitNoCloud);
+  const cloudInitVolume = getVolumes(vm)?.find((vol) => !!vol.cloudInitNoCloud);
 
   return (
     <>
