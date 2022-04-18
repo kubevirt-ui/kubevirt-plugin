@@ -14,9 +14,9 @@ import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { printableVMStatus } from '../utils';
 
 import CloneVMModal from './components/CloneVMModal/CloneVMModal';
+import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
 import {
   cancelMigration,
-  deleteVM,
   migrateVM,
   pauseVM,
   restartVM,
@@ -223,12 +223,19 @@ export const VirtualMachineActionFactory = {
         )),
     };
   },
-  delete: (vm: V1VirtualMachine, t: TFunction): Action => {
+  delete: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+    t: TFunction,
+  ): Action => {
     return {
       id: 'vm-action-delete',
       disabled: false,
       label: t('Delete'),
-      cta: () => deleteVM(vm),
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <DeleteVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
+        )),
     };
   },
 };

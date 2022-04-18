@@ -46,7 +46,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
       // VirtualMachineActionFactory.openConsole(vm),
       VirtualMachineActionFactory.editLabels(vm, createModal, t),
       VirtualMachineActionFactory.editAnnotations(vm, createModal, t),
-      VirtualMachineActionFactory.delete(vm, t),
+      VirtualMachineActionFactory.delete(vm, createModal, t),
     ];
   }, [vm, vmim, createModal, t]);
 
