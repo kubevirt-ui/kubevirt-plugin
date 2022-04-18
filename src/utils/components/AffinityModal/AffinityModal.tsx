@@ -13,16 +13,14 @@ import { ModalVariant } from '@patternfly/react-core';
 import AffinityEditModal from './components/AffinityEditModal/AffinityEditModal';
 import AffinityEmptyState from './components/AffinityEmptyState';
 import AffinityList from './components/AffinityList/AffinityList';
-import { useAffinitiesQualifiedNodes } from './hooks/useAffinityQualifiedNodes';
+import { useRequiredAndPrefferedQualifiedNodes } from './hooks/useRequiredAndPrefferedQualifiedNodes';
 import { defaultNewAffinity } from './utils/constants';
 import {
   getAffinityFromRowsData,
   getAvailableAffinityID,
   getRowsDataFromAffinity,
-  intersectionWith,
-  unionWith,
 } from './utils/helpers';
-import { AffinityCondition, AffinityRowData, AffinityType } from './utils/types';
+import { AffinityRowData } from './utils/types';
 
 type AffinityModalProps = {
   vm: V1VirtualMachine;
@@ -42,50 +40,19 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
   onSubmit,
 }) => {
   const { t } = useKubevirtTranslation();
-  const currentAffinity = getAffinity(vm);
 
   const [affinities, setAffinities] = React.useState<AffinityRowData[]>(
-    getRowsDataFromAffinity(currentAffinity),
+    getRowsDataFromAffinity(getAffinity(vm)),
   );
+  const [focusedAffinity, setFocusedAffinity] = React.useState<AffinityRowData>(defaultNewAffinity);
 
   const [isEditing, setIsEditing] = React.useState(false);
   const [isCreating, setIsCreating] = React.useState(false);
 
-  const [focusedAffinity, setFocusedAffinity] = React.useState<AffinityRowData>(defaultNewAffinity);
-
-  const [requiredNodeAffinities, preferredNodeAffinities] = React.useMemo(
-    () => [
-      affinities?.filter(
-        (aff) => aff?.type === AffinityType.node && aff?.condition === AffinityCondition.required,
-      ),
-      affinities?.filter(
-        (aff) => aff?.type === AffinityType.node && aff?.condition === AffinityCondition.preferred,
-      ),
-    ],
-    [affinities],
-  );
-
-  // OR Relation between Required Affinities
-  const qualifiedRequiredNodes = useAffinitiesQualifiedNodes(
+  const [qualifiedRequiredNodes, qualifiedPreferredNodes] = useRequiredAndPrefferedQualifiedNodes(
     nodes,
     nodesLoaded,
-    requiredNodeAffinities,
-    React.useCallback(
-      (suitableNodes) => suitableNodes.reduce((acc, curr) => unionWith(acc, curr), []),
-      [],
-    ),
-  );
-
-  // AND Relation between Preferred Affinities
-  const qualifiedPreferredNodes = useAffinitiesQualifiedNodes(
-    nodes,
-    nodesLoaded,
-    preferredNodeAffinities,
-    React.useCallback(
-      (suitableNodes) =>
-        suitableNodes.reduce((acc, curr) => intersectionWith(acc, curr), suitableNodes[0]),
-      [],
-    ),
+    affinities,
   );
 
   const onAffinityAdd = (affinity: AffinityRowData) => {
