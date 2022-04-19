@@ -47,7 +47,7 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
         <Divider />
         <CardBody isFilled>
           <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
-            <Tab eventKey={0} title={<TabTitleText>{t('GPU Devices')}</TabTitleText>}>
+            <Tab eventKey={0} title={<TabTitleText>{t('GPU devices')}</TabTitleText>}>
               <VirtualizedTable<V1GPU>
                 data={gpus}
                 unfilteredData={gpus}
@@ -57,7 +57,7 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
                 Row={VirtualMachinesOverviewTabHardwareDevicesRow}
               />
             </Tab>
-            <Tab eventKey={1} title={<TabTitleText>{t('Host Devices')}</TabTitleText>}>
+            <Tab eventKey={1} title={<TabTitleText>{t('Host devices')}</TabTitleText>}>
               <VirtualizedTable<V1HostDevice>
                 data={hostDevices}
                 unfilteredData={hostDevices}
