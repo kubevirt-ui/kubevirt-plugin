@@ -20,6 +20,7 @@ import {
 
 import { filters } from '../utils';
 
+import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 
@@ -31,6 +32,8 @@ type VirtualMachinesListProps = {
 const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
+
+  const catalogURL = `/k8s/ns/${namespace || 'default'}/templatescatalog`;
 
   const [vms, loaded, loadError] = useK8sWatchResource<V1VirtualMachine[]>({
     kind,
@@ -55,7 +58,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
 
   const onCreate = (type: string) =>
     type === 'catalog'
-      ? history.push(`/k8s/ns/${namespace || 'default'}/templatescatalog`)
+      ? history.push(catalogURL)
       : history.push(`/k8s/cluster/${VirtualMachineModelRef}/~new`);
 
   const columns = useVirtualMachineColumns();
@@ -81,6 +84,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
           columns={columns}
           Row={VirtualMachineRow}
           rowData={{ kind, vmis }}
+          EmptyMsg={() => <VirtualMachineEmptyState catalogURL={catalogURL} />}
         />
       </ListPageBody>
     </>
