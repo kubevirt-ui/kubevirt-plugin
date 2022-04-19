@@ -1,11 +1,15 @@
 import * as React from 'react';
 
 import { WizardTab } from '@catalog/wizard/tabs';
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
 
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
@@ -19,6 +23,11 @@ import Tolerations from './components/Tolerations';
 const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
+  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+    groupVersionKind: modelToGroupVersionKind(NodeModel),
+    isList: true,
+  });
 
   return (
     <div className="co-m-pane__body">
@@ -46,7 +55,23 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
 
             <WizardDescriptionItem title={t('Tolerations')} description={<Tolerations vm={vm} />} />
 
-            <WizardDescriptionItem title={t('Affinity Rules')} description={<Affinity vm={vm} />} />
+            <WizardDescriptionItem
+              title={t('Affinity Rules')}
+              description={<Affinity vm={vm} />}
+              isEdit
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <AffinityModal
+                    vm={vm}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onSubmit={updateVM}
+                    nodes={nodes}
+                    nodesLoaded={nodesLoaded}
+                  />
+                ))
+              }
+            />
           </DescriptionList>
         </GridItem>
 
