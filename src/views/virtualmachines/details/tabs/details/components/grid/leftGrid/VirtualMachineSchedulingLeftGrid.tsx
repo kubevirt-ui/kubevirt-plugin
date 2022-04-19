@@ -6,6 +6,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
+import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
@@ -64,6 +65,19 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Tolerations vm={vm} />}
           descriptionHeader={t('Tolerations')}
+          isEdit
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <TolerationsModal
+                vm={vm}
+                nodes={nodes}
+                nodesLoaded={nodesLoaded}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={onSubmit}
+              />
+            ))
+          }
         />
         <VirtualMachineDescriptionItem
           descriptionData={<Affinity vm={vm} />}
