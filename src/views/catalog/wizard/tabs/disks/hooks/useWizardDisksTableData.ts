@@ -3,7 +3,7 @@ import * as React from 'react';
 import { bytesFromQuantity } from '@catalog/utils/quantity';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getBootDisk, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import {
   getPrintableDiskDrive,
@@ -58,9 +58,10 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
         drive: getPrintableDiskDrive(device?.disk),
         metadata: { name: device?.disk?.name },
         namespace: device?.pvc?.metadata?.namespace,
+        isBootDisk: device?.disk?.name === getBootDisk(vm)?.name,
       };
     });
-  }, [t, vm?.spec?.dataVolumeTemplates, vmDisks, vmVolumes]);
+  }, [t, vm, vmDisks, vmVolumes]);
 
   return [disks || []];
 };

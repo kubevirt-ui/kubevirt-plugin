@@ -16,6 +16,7 @@ export type DiskFormState = {
   volumeMode: string;
   storageClassProvisioner: string;
   enablePreallocation: boolean;
+  asBootSource: boolean;
 };
 
 export const initialStateDiskForm: DiskFormState = {
@@ -32,6 +33,7 @@ export const initialStateDiskForm: DiskFormState = {
   volumeMode: null,
   storageClassProvisioner: null,
   enablePreallocation: false,
+  asBootSource: false,
 };
 
 export type DiskSourceState = {

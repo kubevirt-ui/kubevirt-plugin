@@ -16,7 +16,12 @@ import {
   DiskSourceState,
   initialStateDiskSource,
 } from '@kubevirt-utils/components/DiskModal/state/initialState';
-import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import {
+  getBootDisk,
+  getDataVolumeTemplates,
+  getDisks,
+  getVolumes,
+} from '@kubevirt-utils/resources/vm';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getDiskDrive, getDiskInterface } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 
@@ -56,7 +61,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
   const disks = getDisks(vm);
   const disk = disks?.find(({ name }) => name === diskName);
 
-  const { diskSource, diskSize } = React.useMemo(() => {
+  const { diskSource, diskSize, isBootDisk } = React.useMemo(() => {
     const dataVolumeTemplates = getDataVolumeTemplates(vm);
 
     const volumes = getVolumes(vm);
@@ -83,6 +88,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
     if (dataVolumeTemplate && dataVolumeTemplate.spec?.source) {
       setInitialStateFromDataVolume(dataVolumeTemplate, initialDiskSourceState);
       return {
+        isBootDisk: getBootDisk(vm)?.name === diskName,
         diskSource: getSourceFromDataVolue(dataVolumeTemplate),
         diskSize:
           dataVolumeTemplate.spec?.storage?.resources?.requests?.storage ||
@@ -90,7 +96,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
       };
     }
 
-    return { diskSource: OTHER, diskSize: null };
+    return { diskSource: OTHER, diskSize: null, isBootDisk: getBootDisk(vm)?.name === diskName };
   }, [initialDiskSourceState, vm, diskName]);
 
   const initialDiskState: DiskFormState = {
@@ -107,6 +113,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
     applyStorageProfileSettings: false,
     storageClassProvisioner: null,
     storageProfileSettingsCheckboxDisabled: false,
+    asBootSource: isBootDisk,
   };
 
   return { initialDiskState, initialDiskSourceState };

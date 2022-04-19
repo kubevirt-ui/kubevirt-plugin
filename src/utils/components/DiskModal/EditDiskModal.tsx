@@ -2,11 +2,17 @@ import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import {
+  getBootDisk,
+  getDataVolumeTemplates,
+  getDisks,
+  getVolumes,
+} from '@kubevirt-utils/resources/vm';
 import { Form } from '@patternfly/react-core';
 
 import AccessMode from './DiskFormFields/AccessMode';
 import ApplyStorageProfileSettingsCheckbox from './DiskFormFields/ApplyStorageProfileSettingsCheckbox';
+import BootSourceCheckbox from './DiskFormFields/BootSourceCheckbox/BootSourceCheckbox';
 import DetachHotplugDiskCheckbox from './DiskFormFields/DetachHotplugDiskCheckbox';
 import DiskInterfaceSelect from './DiskFormFields/DiskInterfaceSelect';
 import DiskSourceSizeInput from './DiskFormFields/DiskSizeInput/DiskSizeInput';
@@ -77,7 +83,13 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     const resultDataVolumeTemplate =
       sourceRequiresDataVolume && getDataVolumeTemplate(resultDataVolume);
 
-    const updatedVMDisks = updateVMDisks(getDisks(vm), resultDisk, initialDiskState.diskName);
+    const updatedVMDisks = updateVMDisks(
+      getDisks(vm),
+      resultDisk,
+      initialDiskState.diskName,
+      // only update bootOrder if checkbox is checked and the disk is not a boot disk
+      diskState.asBootSource && getBootDisk(vm)?.name !== initialDiskState.diskName,
+    );
 
     const updatedVmVolumes = updateVMVolumes(
       currentVmVolumes,
@@ -111,6 +123,12 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
       headerText={headerText}
     >
       <Form>
+        <BootSourceCheckbox
+          isDisabled={initialDiskState.asBootSource}
+          isBootSource={diskState.asBootSource}
+          initialBootDiskName={getBootDisk(vm)?.name}
+          dispatchDiskState={dispatchDiskState}
+        />
         <NameFormField objName={diskState.diskName} dispatchDiskState={dispatchDiskState} />
         <DiskSourceFormSelect
           vm={vm}

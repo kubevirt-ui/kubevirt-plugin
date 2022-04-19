@@ -1,17 +1,29 @@
 import * as React from 'react';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { Label, Split, SplitItem } from '@patternfly/react-core';
 
 import DiskRowActions from './DiskRowActions';
 
 const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ obj, activeColumnIDs }) => {
+  const { t } = useKubevirtTranslation();
   const isPVCSource = !['Container (Ephemeral)', 'Other'].includes(obj?.source);
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        {obj?.name}
+        <Split hasGutter>
+          <SplitItem>{obj?.name}</SplitItem>
+          {obj?.isBootDisk && (
+            <SplitItem>
+              <Label variant="filled" color="blue">
+                {t('bootable')}
+              </Label>
+            </SplitItem>
+          )}
+        </Split>
       </TableData>
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
         {isPVCSource ? (

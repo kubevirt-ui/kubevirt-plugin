@@ -42,15 +42,20 @@ export const updateVMDisks = (
   disks: V1Disk[],
   updatedDisk: V1Disk,
   initialDiskName: string,
+  useAsBoot: boolean,
 ): V1Disk[] => {
-  return [
-    ...(disks?.map((disk) => {
-      if (disk?.name === initialDiskName) {
-        return updatedDisk;
-      }
-      return disk;
-    }) || [updatedDisk]),
-  ];
+  return useAsBoot
+    ? [
+        { ...updatedDisk, bootOrder: 1 },
+        ...(disks || [])
+          .filter((disk) => disk.name !== initialDiskName)
+          .map((disk, index) => ({
+            ...disk,
+            // other disks should have bootOrder set to 2+
+            bootOrder: 2 + index,
+          })),
+      ]
+    : [...(disks || []).filter((d) => d?.name !== initialDiskName), updatedDisk];
 };
 
 export const updateVMVolumes = (
