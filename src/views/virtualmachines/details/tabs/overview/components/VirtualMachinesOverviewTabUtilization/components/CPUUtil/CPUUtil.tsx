@@ -3,12 +3,16 @@ import React from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
 
 import { getUtilizationQueries, PrometheusEndpoint } from '../../utils/queries';
 import { adjustDurationForStart, getCreationTimestamp, sumOfValues } from '../../utils/utils';
+import ComponentReady from '../ComponentReady/ComponentReady';
+
+import CPUThresholdChart from './CPUThresholdChart';
 
 type CPUUtilProps = {
   duration: number;
@@ -44,7 +48,7 @@ const CPUUtil: React.FC<CPUUtilProps> = ({ duration, vmi, vm, pods }) => {
     timespan,
   });
 
-  const [dataCPUUsage, errorData, notLoaded] = usePrometheusPoll({
+  const [dataCPUUsage] = usePrometheusPoll({
     query: queries?.CPU_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vm?.metadata?.namespace,
@@ -52,8 +56,11 @@ const CPUUtil: React.FC<CPUUtilProps> = ({ duration, vmi, vm, pods }) => {
   });
 
   const sumCPURequested = sumOfValues(dataCPURequested);
+  const cpuUsage = dataCPUUsage?.data?.result?.[0]?.values;
+  const cpuRequested = dataCPURequested?.data?.result?.[0]?.values;
   const sumCPUUsage = sumOfValues(dataCPUUsage);
   const averageCPUUsage = Number(((sumCPUUsage / sumCPURequested) * 100).toFixed(2));
+  const isReady = !isEmpty(cpuUsage) && !isEmpty(cpuRequested) && !Number.isNaN(averageCPUUsage);
 
   return (
     <div className="util">
@@ -68,13 +75,13 @@ const CPUUtil: React.FC<CPUUtilProps> = ({ duration, vmi, vm, pods }) => {
         </div>
       </div>
       <div className="util-chart">
-        {!notLoaded && !errorData && !Number.isNaN(averageCPUUsage) && (
+        <ComponentReady isReady={isReady}>
           <ChartDonutUtilization
             constrainToVisibleArea
             animate
             data={{
               x: t('CPU used'),
-              y: averageCPUUsage || 0,
+              y: (averageCPUUsage > 100 ? 100 : averageCPUUsage) || 0,
             }}
             labels={({ datum }) =>
               datum.x ? `${datum.x}: ${(sumCPUUsage || 0)?.toFixed(2)}s` : null
@@ -83,7 +90,8 @@ const CPUUtil: React.FC<CPUUtilProps> = ({ duration, vmi, vm, pods }) => {
             subTitleComponent={<ChartLabel y={135} />}
             title={`${averageCPUUsage || 0}%`}
           />
-        )}
+          <CPUThresholdChart cpuUsage={cpuUsage} cpuRequested={cpuRequested} />
+        </ComponentReady>
       </div>
     </div>
   );

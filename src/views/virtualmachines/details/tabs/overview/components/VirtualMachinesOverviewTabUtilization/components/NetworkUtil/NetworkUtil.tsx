@@ -3,10 +3,14 @@ import xbytes from 'xbytes';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import { getMultilineUtilizationQueries, PrometheusEndpoint } from '../../utils/queries';
 import { adjustDurationForStart, getCreationTimestamp, sumOfValues } from '../../utils/utils';
+import ComponentReady from '../ComponentReady/ComponentReady';
+
+import NetworkThresholdChart from './NetworkThresholdChart';
 
 type NetworkUtilProps = {
   duration: number;
@@ -54,10 +58,18 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ duration, vmi, vm }) => {
     fixed: 0,
   });
 
+  const networkInData = networkIn?.data?.result?.[0]?.values;
+  const networkOutData = networkOut?.data?.result?.[0]?.values;
+  const isReady =
+    !isEmpty(networkInData) && !isEmpty(networkOutData) && !Number.isNaN(totalTransferred);
+
   return (
     <div className="util network">
       <div className="util-upper">
-        <div className="util-title">{t('Network Transfer')}</div>
+        <div className="util-title">
+          {t('Network Transfer')}
+          <div className="util-title__subtitle text-muted">{t('Primary Network')}</div>
+        </div>
         <div className="util-summary">
           <div className="util-summary-value">{`${totalTransferred}s`}</div>
           <div className="util-summary-text text-muted network-value">
@@ -65,24 +77,27 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ duration, vmi, vm }) => {
           </div>
         </div>
       </div>
-      <div className="network-metrics">
-        <div className="network-metrics--row text-muted">
-          <div className="network-metrics--row__sum">
-            {`${xbytes(networkInSum || 0, {
-              fixed: 0,
-            })}s`}
+      <ComponentReady isReady={isReady}>
+        <div className="network-metrics">
+          <div className="network-metrics--row text-muted">
+            <div className="network-metrics--row__sum">
+              {`${xbytes(networkInSum || 0, {
+                fixed: 0,
+              })}s`}
+            </div>
+            <div className="network-metrics--row__title">{t('In')}</div>
           </div>
-          <div className="network-metrics--row__title">{t('In')}</div>
-        </div>
-        <div className="network-metrics--row text-muted">
-          <div className="network-metrics--row__sum">
-            {`${xbytes(networkOutSum || 0, {
-              fixed: 0,
-            })}s`}
+          <div className="network-metrics--row text-muted">
+            <div className="network-metrics--row__sum">
+              {`${xbytes(networkOutSum || 0, {
+                fixed: 0,
+              })}s`}
+            </div>
+            <div className="network-metrics--row__title">{t('Out')}</div>
           </div>
-          <div className="network-metrics--row__title">{t('Out')}</div>
         </div>
-      </div>
+        <NetworkThresholdChart networkIn={networkInData} networkOut={networkOutData} />
+      </ComponentReady>
     </div>
   );
 };

@@ -12,15 +12,20 @@
       padding-left: var(--pf-global--spacer--2xl);
       .util-title {
         font-weight: var(--pf-global--FontWeight--semi-bold);
+        height: var(--pf-global--spacer--2xl);
+        &__subtitle {
+          font-size: var(--pf-global--FontSize--md);
+        }
       }
       .util-summary {
         width: 100%;
+        height: var(--pf-global--spacer--2xl);
         display: flex;
         .util-summary-value {
           width: 50%;
           font-weight: var(--pf-global--FontWeight--normal);
           font-size: var(--pf-global--FontSize--xl);
-          align-self: center;
+          align-self: self-end;
         }
         .util-summary-text {
           width: 50%;
@@ -56,7 +61,13 @@
         &__title {
           margin-left: var(--pf-global--spacer--sm);
         }
+        &__sum {
+          font-weight: var(--pf-global--FontWeight--semi-bold);
+        }
       }
     }
+  }
+  .ComponentReady {
+    margin: var(--pf-global--spacer--2xl);
   }
 }
