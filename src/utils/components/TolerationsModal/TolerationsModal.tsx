@@ -14,8 +14,8 @@ import { getTolerations } from '@kubevirt-utils/resources/vm';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, ModalVariant } from '@patternfly/react-core';
 
-import { useNodeTaintQualifier } from './hooks/useNodeTaintQualifier';
 import { TolerationLabel, TOLERATIONS_EFFECTS } from './utils/constants';
+import { getNodeTaintQualifier } from './utils/helpers';
 import TolerationEditRow from './TolerationEditRow';
 import TolerationListHeaders from './TolerationListHeaders';
 import TolerationModalDescriptionText from './TolerationModalDescriptionText';
@@ -49,7 +49,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
 
   const tolerationLabelsEmpty = tolerationsLabels?.length === 0;
 
-  const qualifiedNodes = useNodeTaintQualifier(nodes, nodesLoaded, tolerationsLabels);
+  const qualifiedNodes = getNodeTaintQualifier(nodes, nodesLoaded, tolerationsLabels);
 
   const onSelectorLabelAdd = () =>
     onTolerationAdd({ id: null, key: '', value: '', effect: TOLERATIONS_EFFECTS[0] });
