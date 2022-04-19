@@ -57,16 +57,15 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
   const updatedVirtualMachine = React.useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, ['spec.template.template.spec.tolerations']);
-      if (!vmDraft.spec.template.spec.tolerations) {
-        vmDraft.spec.template.spec.tolerations = [];
-      }
 
-      const updatedTolerations: K8sIoApiCoreV1Toleration[] = tolerationsLabels.map((toleration) => {
-        return {
-          ...toleration,
-          operator: toleration?.value ? Operator.Equals : Operator.Exists,
-        };
-      });
+      const updatedTolerations: K8sIoApiCoreV1Toleration[] = (tolerationsLabels || []).map(
+        (toleration) => {
+          return {
+            ...toleration,
+            operator: toleration?.value ? Operator.Equals : Operator.Exists,
+          };
+        },
+      );
 
       vmDraft.spec.template.spec.tolerations = updatedTolerations;
     });
