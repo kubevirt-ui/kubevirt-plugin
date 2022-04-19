@@ -14,8 +14,8 @@ const HardwareDevices: React.FC<HardwareDevices> = ({ devices }) => {
 
   return (
     <div>
-      <div className="text-muted">{t('{{gpuDevices}} GPU Devices', { gpuDevices })}</div>
-      <div className="text-muted">{t('{{hostDevices}} Host Devices', { hostDevices })}</div>
+      <div className="text-muted">{t('{{gpuDevices}} GPU devices', { gpuDevices })}</div>
+      <div className="text-muted">{t('{{hostDevices}} Host devices', { hostDevices })}</div>
     </div>
   );
 };

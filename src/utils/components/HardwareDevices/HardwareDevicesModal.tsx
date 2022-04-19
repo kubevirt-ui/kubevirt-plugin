@@ -83,7 +83,7 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
       onSubmit={onSubmit}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={headerText}
+      headerText={showForm ? btnText : headerText}
     >
       <Form>
         <HardwareDevicesList devices={devices} handleRemoveDevice={onRemoveDevice} />

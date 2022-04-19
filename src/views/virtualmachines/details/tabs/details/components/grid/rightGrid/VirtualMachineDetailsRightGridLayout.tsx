@@ -103,7 +103,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
                       vm={vm}
                       isOpen={isOpen}
                       onClose={onClose}
-                      headerText={t('GPU Devices')}
+                      headerText={t('GPU devices')}
                       onSubmit={onSubmit}
                       initialDevices={gpus}
                       btnText={t('Add GPU device')}
@@ -122,7 +122,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
                       vm={vm}
                       isOpen={isOpen}
                       onClose={onClose}
-                      headerText={t('Host Devices')}
+                      headerText={t('Host devices')}
                       onSubmit={onSubmit}
                       initialDevices={hostDevices}
                       btnText={t('Add Host device')}
