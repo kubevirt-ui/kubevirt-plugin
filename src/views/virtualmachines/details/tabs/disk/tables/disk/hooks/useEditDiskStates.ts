@@ -12,7 +12,7 @@ import {
   DiskSourceState,
   initialStateDiskSource,
 } from '@kubevirt-utils/components/DiskModal/state/initialState';
-import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getBootDisk, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getDiskDrive, getDiskInterface } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 
@@ -30,7 +30,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
   const disks = !vmi ? getDisks(vm) : vmi?.spec?.domain?.devices?.disks;
   const disk = disks?.find(({ name }) => name === diskName);
 
-  const { diskSource, diskSize } = React.useMemo(() => {
+  const { diskSource, diskSize, isBootDisk } = React.useMemo(() => {
     const volumes = !vmi ? getVolumes(vm) : vmi?.spec?.volumes;
     const volume = volumes?.find(({ name }) => name === diskName);
     // volume consists of 2 keys:
@@ -47,7 +47,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
       initialDiskSourceState.ephemeralSource = volume.containerDisk?.image;
       return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC };
     }
-    return { diskSource: OTHER, diskSize: null };
+    return { isBootDisk: diskName === getBootDisk(vm)?.name, diskSource: OTHER, diskSize: null };
   }, [initialDiskSourceState, vm, vmi, diskName]);
 
   const initialDiskState: DiskFormState = {
@@ -64,6 +64,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
     applyStorageProfileSettings: false,
     storageClassProvisioner: null,
     storageProfileSettingsCheckboxDisabled: false,
+    asBootSource: isBootDisk,
   };
 
   return { initialDiskState, initialDiskSourceState };

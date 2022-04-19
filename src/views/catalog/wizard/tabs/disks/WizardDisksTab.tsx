@@ -49,16 +49,11 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM }) => {
       </ListPageHeader>
       <ListPageBody>
         <DiskListTitle />
-        <ListPageFilter
-          data={data}
-          loaded={loaded}
-          rowFilters={filters}
-          onFilterChange={onFilterChange}
-        />
+        <ListPageFilter data={data} loaded rowFilters={filters} onFilterChange={onFilterChange} />
         <VirtualizedTable
           data={filteredData}
           unfilteredData={data}
-          loaded={loaded}
+          loaded
           loadError={undefined}
           columns={columns}
           Row={DiskRow}

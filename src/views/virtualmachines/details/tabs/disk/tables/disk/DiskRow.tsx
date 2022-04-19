@@ -5,9 +5,11 @@ import {
   CONTAINER_EPHERMAL,
   OTHER,
 } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { Label, Split, SplitItem } from '@patternfly/react-core';
 
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
@@ -15,13 +17,26 @@ import { HotplugLabel } from './HotplugLabel';
 const DiskRow: React.FC<
   RowProps<DiskRowDataLayout, { vm: V1VirtualMachine; vmi?: V1VirtualMachineInstance }>
 > = ({ obj, activeColumnIDs, rowData: { vm, vmi } }) => {
+  const { t } = useKubevirtTranslation();
   const isPVCSource = ![CONTAINER_EPHERMAL, OTHER].includes(obj?.source);
 
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        {obj?.name} <HotplugLabel vm={vm} diskName={obj?.name} vmi={vmi} />
+        <Split hasGutter>
+          <SplitItem>
+            {obj?.name} <HotplugLabel vm={vm} diskName={obj?.name} vmi={vmi} />
+          </SplitItem>
+          {obj?.isBootDisk && (
+            <SplitItem>
+              <Label variant="filled" color="blue">
+                {t('bootable')}
+              </Label>
+            </SplitItem>
+          )}
+        </Split>
       </TableData>
+
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
         {isPVCSource ? (
           <ResourceLink kind={PersistentVolumeClaimModel.kind} name={obj?.source} />

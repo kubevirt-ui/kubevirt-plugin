@@ -3,11 +3,17 @@ import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import {
+  getBootDisk,
+  getDataVolumeTemplates,
+  getDisks,
+  getVolumes,
+} from '@kubevirt-utils/resources/vm';
 import { Form } from '@patternfly/react-core';
 
 import AccessMode from './DiskFormFields/AccessMode';
 import ApplyStorageProfileSettingsCheckbox from './DiskFormFields/ApplyStorageProfileSettingsCheckbox';
+import BootSourceCheckbox from './DiskFormFields/BootSourceCheckbox/BootSourceCheckbox';
 import DetachHotplugDiskCheckbox from './DiskFormFields/DetachHotplugDiskCheckbox';
 import DiskInterfaceSelect from './DiskFormFields/DiskInterfaceSelect';
 import DiskSourceSizeInput from './DiskFormFields/DiskSizeInput/DiskSizeInput';
@@ -83,10 +89,13 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
       const resultDataVolumeTemplate = getDataVolumeTemplate(resultDataVolume);
 
       if (!isVMRunning) {
-        vmDraft.spec.template.spec.domain.devices.disks = [
-          ...(getDisks(vmDraft) || []),
-          resultDisk,
-        ];
+        vmDraft.spec.template.spec.domain.devices.disks = diskState.asBootSource
+          ? [resultDisk, ...(getDisks(vmDraft) || [])].map((disk, index) => ({
+              ...disk,
+              bootOrder: index + 1,
+            }))
+          : [...(getDisks(vmDraft) || []), resultDisk];
+
         vmDraft.spec.template.spec.volumes = [...(getVolumes(vmDraft) || []), resultVolume];
         if (sourceRequiresDataVolume) {
           vmDraft.spec.dataVolumeTemplates = resultDataVolumeTemplate && [
@@ -112,6 +121,12 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
       headerText={headerText}
     >
       <Form>
+        <BootSourceCheckbox
+          isDisabled={isVMRunning}
+          isBootSource={diskState.asBootSource}
+          initialBootDiskName={getBootDisk(vm)?.name}
+          dispatchDiskState={dispatchDiskState}
+        />
         <NameFormField objName={diskState.diskName} dispatchDiskState={dispatchDiskState} />
         <DiskSourceFormSelect
           vm={vm}

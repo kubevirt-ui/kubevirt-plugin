@@ -1,5 +1,6 @@
 import { TFunction } from 'i18next';
 
+import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   CONTAINER_EPHERMAL,
   DYNAMIC,
@@ -18,10 +19,15 @@ import { NO_DATA_DASH } from '../constants';
 /**
  *  A function for getting disks row data for a VM
  * @param {DiskRawData[]} disks - disks to get row data from
+ * @param {V1Disk} bootDisk - the current boot disk of the vm
  * @param {TFunction} t - T function for i18n
  * @returns returns DiskRowDataLayout[]
  */
-export const getDiskRowDataLayout = (disks: DiskRawData[], t: TFunction): DiskRowDataLayout[] => {
+export const getDiskRowDataLayout = (
+  disks: DiskRawData[],
+  bootDisk: V1Disk,
+  t: TFunction,
+): DiskRowDataLayout[] => {
   return disks?.map((device) => {
     // eslint-disable-next-line require-jsdoc
     const volumeSource = Object.keys(device?.volume).find((key) => key !== 'name');
@@ -35,6 +41,7 @@ export const getDiskRowDataLayout = (disks: DiskRawData[], t: TFunction): DiskRo
       source: t(OTHER),
       size: NO_DATA_DASH,
       storageClass: NO_DATA_DASH,
+      isBootDisk: device?.disk?.name === bootDisk?.name,
     };
 
     if (device?.pvc) {

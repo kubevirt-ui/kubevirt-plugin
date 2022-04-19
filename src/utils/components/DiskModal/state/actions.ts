@@ -12,6 +12,7 @@ export const diskReducerActions = Object.freeze({
   SET_VOLUME_MODE: 'setVolumeMode',
   SET_STORAGE_CLASS_PROVISIONER: 'setStorageClassProvisioner',
   SET_ENABLE_PREALLOCATION: 'setEnablePreallocation',
+  SET_BOOT_SOURCE: 'setBootSource',
   RESET: 'reset',
 });
 

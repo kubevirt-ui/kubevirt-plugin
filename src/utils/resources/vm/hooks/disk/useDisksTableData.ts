@@ -9,7 +9,7 @@ import {
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getDisks, getVolumes } from '../../utils';
+import { getBootDisk, getDisks, getVolumes } from '../../utils';
 import { getDiskRowDataLayout } from '../../utils/disk/rowData';
 
 type UseDisksTableDisks = (
@@ -53,8 +53,8 @@ const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
       return { disk, volume, pvc };
     });
 
-    return getDiskRowDataLayout(diskDevices, t);
-  }, [pvcs, vmDisks, vmVolumes, t]);
+    return getDiskRowDataLayout(diskDevices, getBootDisk(vm), t);
+  }, [vmVolumes, vm, t, vmDisks, pvcs]);
 
   return [disks || [], loaded, loadingError, vmi || null];
 };

@@ -39,6 +39,8 @@ export const diskReducer = (state: DiskFormState, action: DiskReducerActionType)
       return { ...state, storageClassProvisioner: action.payload };
     case diskReducerActions.SET_ENABLE_PREALLOCATION:
       return { ...state, enablePreallocation: action.payload };
+    case diskReducerActions.SET_BOOT_SOURCE:
+      return { ...state, asBootSource: action.payload };
     case diskReducerActions.RESET:
       return initialStateDiskForm;
     default:
