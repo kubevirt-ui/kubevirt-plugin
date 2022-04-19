@@ -5,7 +5,7 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
  * Get if the pod is in a ready status
  * @date 4/10/2022 - 8:13:37 AM
  *
- * @param {*} pod
+ * @param {*} pod - The pod to check
  * @returns {boolean}
  */
 export const isPodReady = (pod): boolean =>
@@ -15,8 +15,8 @@ export const isPodReady = (pod): boolean =>
  * Get the vmi pod
  * @date 4/10/2022 - 8:13:37 AM
  *
- * @param {V1VirtualMachineInstance} vmi
- * @param {K8sResourceCommon[]} pods
+ * @param {V1VirtualMachineInstance} vmi - The vmi to check
+ * @param {K8sResourceCommon[]} pods - The pods to check
  * @returns {*}
  */
 export const getVMIPod = (vmi: V1VirtualMachineInstance, pods: K8sResourceCommon[]) => {

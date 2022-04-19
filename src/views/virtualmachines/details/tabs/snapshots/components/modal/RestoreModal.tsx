@@ -1,8 +1,10 @@
 import * as React from 'react';
 
-import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/components/node_modules/@kubevirt-ui/kubevirt-api/kubevirt';
 import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
-import { V1alpha1VirtualMachineRestore } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1alpha1VirtualMachineRestore,
+  V1alpha1VirtualMachineSnapshot,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
