@@ -1,0 +1,20 @@
+@import '~@patternfly/patternfly/sass-utilities/colors';
+
+.kv-top-consumers-card {
+  padding-top: 1rem;
+}
+
+.kv-top-consumers-card__header {
+  border-bottom: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
+}
+
+.kv-top-consumers-card__dropdown {
+  display: inline-block;
+  margin-left: var(--pf-global--spacer--lg);
+}
+
+div.kv-top-consumers-card__body {
+  padding-right: 0;
+  padding-left: 0;
+  padding-bottom: 0;
+}

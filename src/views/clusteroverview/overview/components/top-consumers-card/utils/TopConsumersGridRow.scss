@@ -1,0 +1,11 @@
+@import '~@patternfly/patternfly/sass-utilities/colors';
+
+.kv-top-consumers-card__top-grid {
+  border-bottom: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
+}
+
+.kv-top-consumers-card__card-grid-item {
+  &:not(:last-child) {
+    border-right: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
+  }
+}

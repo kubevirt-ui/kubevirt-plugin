@@ -12,3 +12,5 @@ export const get = (obj, path, defaultValue = undefined) => {
 };
 
 export const isUpstream = (window as any).SERVER_FLAGS.branding === 'okd';
+
+export const isString = (val) => val !== null && typeof val === 'string';

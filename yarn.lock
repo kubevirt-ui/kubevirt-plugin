@@ -7321,6 +7321,7 @@ __metadata:
     immer: ^9.0.12
     jest: ^27.4.5
     js-yaml: ^4.1.0
+    lodash.clonedeepwith: ^4.5.0
     lodash.shuffle: ^4.2.0
     mocha: ^9.2.0
     mocha-junit-reporter: ^2.0.2
@@ -7487,6 +7488,13 @@ __metadata:
   dependencies:
     p-locate: ^5.0.0
   checksum: 72eb661788a0368c099a184c59d2fee760b3831c9c1c33955e8a19ae4a21b4116e53fa736dc086cdeb9fce9f7cc508f2f92d2d3aae516f133e16a2bb59a39f5a
+  languageName: node
+  linkType: hard
+
+"lodash.clonedeepwith@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.clonedeepwith@npm:4.5.0"
+  checksum: 9fbf4ebfa04b381df226a2298eba680327bea3d0d5d19c5118de7ae218fd219186e30e9fd0d33b13729f34ffbc83c1cf09cb27aff265ba94cb602b8a2b1e71c9
   languageName: node
   linkType: hard
 
