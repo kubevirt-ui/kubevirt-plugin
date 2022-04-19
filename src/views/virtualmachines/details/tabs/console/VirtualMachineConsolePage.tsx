@@ -7,7 +7,7 @@ import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye } from '@patternfly/react-core';
+import { Bullseye, PageSection } from '@patternfly/react-core';
 
 import { printableVMStatus } from '../../../utils';
 
@@ -26,9 +26,9 @@ const VirtualMachineConsolePage: React.FC<VirtualMachineConsolePageProps> = ({ o
 
   if (!vmi && vm?.status?.printableStatus === printableVMStatus.Stopped) {
     return (
-      <div className="co-m-pane__body">
+      <PageSection>
         {t('This Virtual Machine is down. Please start it to access its console.')}
-      </div>
+      </PageSection>
     );
   }
 
@@ -41,9 +41,9 @@ const VirtualMachineConsolePage: React.FC<VirtualMachineConsolePageProps> = ({ o
   }
 
   return (
-    <div className="co-m-pane__body">
+    <PageSection>
       <Consoles vmi={vmi} />
-    </div>
+    </PageSection>
   );
 };
 
