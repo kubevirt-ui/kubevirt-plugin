@@ -6,8 +6,7 @@ import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Action, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
-
-import CloneTemplateModal from '../components/CloneTemplateModal';
+import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
 
 type useVirtualMachineTemplatesActionsProps = (template: V1Template) => Action[];
 
