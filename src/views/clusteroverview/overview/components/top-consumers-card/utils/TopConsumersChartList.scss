@@ -1,0 +1,14 @@
+.kv-top-consumers-card__chart-list-container {
+  padding-top: var(--pf-global--spacer--md);
+  min-height: 235px;
+}
+
+.kv-top-consumers-card__chart-list-body {
+  align-content: center;
+  height: 100%;
+}
+
+.kv-top-consumers-card__metric-title {
+  font-weight: bold;
+  margin-bottom: var(--pf-global--spacer--md);
+}

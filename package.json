@@ -60,6 +60,7 @@
     "global": "^4.4.0",
     "immer": "^9.0.12",
     "js-yaml": "^4.1.0",
+    "lodash.clonedeepwith": "^4.5.0",
     "lodash.shuffle": "^4.2.0",
     "mochawesome-report-generator": "^6.0.1",
     "react": "17.0.2",

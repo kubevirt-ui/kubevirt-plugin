@@ -1,0 +1,13 @@
+.kv-top-consumers-card__chart-list-no-data-msg {
+  padding: var(--pf-global--spacer--md);
+}
+
+.kv-top-consumers-card__chart-list-no-data-msg--link {
+  margin-top: var(--pf-global--spacer--sm);
+}
+
+.kv-top-consumers-card__chart-list-no-data-msg--icon {
+  margin-left: var(--pf-global--spacer--xs);
+  opacity: 0.5;
+  cursor: pointer;
+}
