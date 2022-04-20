@@ -35,6 +35,9 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
     cy.get('#inputPassword').type(password || Cypress.env('BRIDGE_KUBEADMIN_PASSWORD'));
     cy.get(submitButton).click();
     masthead.username.shouldBeVisible();
+
+    // wait for virtualization page
+    cy.contains('.pf-c-nav__link', 'Virtualization').should('be.visible');
   });
 });
 
