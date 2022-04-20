@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import TemplateDetailsPage from '../tabs/details/TemplateDetailsPage';
-import TemplateDisksPage from '../tabs/disk/TemplateDisksPage';
+import TemplateDisksPage from '../tabs/disks/TemplateDisksPage';
 import TemplateNetworkPage from '../tabs/network/TemplateNetworkPage';
 import TemplateYAMLPage from '../tabs/yaml/TemplateYAMLPage';
 

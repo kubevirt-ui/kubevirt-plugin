@@ -8,6 +8,7 @@ import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/u
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import NetworkInterfaceActions from './NetworkInterfaceActions';
+import TemplateNameTableData from '@kubevirt-utils/components/TemplateNameTableData/TemplateNameTableData';
 
 export type NetworkInterfaceRowProps = {
   obj: NetworkPresentation;
@@ -22,10 +23,7 @@ const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation, { template: V1
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        {network.name}
-        {!!/^\$\{[A-Z_]+\}$/.test(network.name) && (
-          <div className="template-parameter">{t('template parameter')}</div>
-        )}
+        <TemplateNameTableData name={network.name} />
       </TableData>
       <TableData id="model" activeColumnIDs={activeColumnIDs}>
         {iface.model || NO_DATA_DASH}

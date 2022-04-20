@@ -13,8 +13,6 @@ import {
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
 
-import './template-network-page.scss';
-
 type TemplateNetworkProps = RouteComponentProps<{
   ns: string;
   name: string;
