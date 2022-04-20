@@ -4,11 +4,15 @@ import xbytes from 'xbytes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
 
 import { getUtilizationQueries, PrometheusEndpoint } from '../../utils/queries';
 import { adjustDurationForStart, getCreationTimestamp, sumOfValues } from '../../utils/utils';
+import ComponentReady from '../ComponentReady/ComponentReady';
+
+import MemoryThresholdChart from './MemoryThresholdChart';
 
 type MemoryUtilProps = {
   duration: number;
@@ -31,7 +35,7 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ duration, vmi, vm }) => {
   };
   const memory = getMemorySize(requests?.memory);
 
-  const [data, errorData, notLoaded] = usePrometheusPoll({
+  const [data] = usePrometheusPoll({
     query: queries?.MEMORY_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vm?.metadata?.namespace,
@@ -43,8 +47,9 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ duration, vmi, vm }) => {
   const averageUsedMemory = sumOfValues(data);
 
   const memoryUsed = averageUsedMemory / prometheusMemoryData?.length;
-
-  const value = (memoryUsed / xbytes.parseSize(`${memory?.size} ${memory?.unit}B`)) * 100;
+  const memoryAvilableBytes = xbytes.parseSize(`${memory?.size} ${memory?.unit}B`);
+  const value = (memoryUsed / memoryAvilableBytes) * 100;
+  const isReady = !isEmpty(prometheusMemoryData) && !isEmpty(memory) && !Number.isNaN(value);
 
   return (
     <div className="util">
@@ -61,7 +66,7 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ duration, vmi, vm }) => {
         </div>
       </div>
       <div className="util-chart">
-        {!notLoaded && !errorData && !Number.isNaN(value) && (
+        <ComponentReady isReady={isReady}>
           <ChartDonutUtilization
             constrainToVisibleArea
             animate
@@ -76,7 +81,8 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ duration, vmi, vm }) => {
             subTitleComponent={<ChartLabel y={135} />}
             title={`${Number(value?.toFixed(2))}%`}
           />
-        )}
+          <MemoryThresholdChart threshold={memoryAvilableBytes} data={prometheusMemoryData} />
+        </ComponentReady>
       </div>
     </div>
   );
