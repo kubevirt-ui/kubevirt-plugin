@@ -4,6 +4,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
+import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
@@ -99,6 +100,12 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Descheduler vm={vm} />}
           descriptionHeader={t('Descheduler')}
+          isEdit
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <DeschedulerModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
+            ))
+          }
         />
       </DescriptionList>
     </GridItem>
