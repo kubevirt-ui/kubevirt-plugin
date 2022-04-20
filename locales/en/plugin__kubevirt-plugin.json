@@ -131,7 +131,6 @@
   "Created At": "Created At",
   "Created at": "Created at",
   "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC. Populated by the system. Read-only. Null for lists.<1><1></1></1><2><0>VirtualMachineInstance</0><1>metadata</1><2>creationTimestamp</2></2>": "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC. Populated by the system. Read-only. Null for lists.<1><1></1></1><2><0>VirtualMachineInstance</0><1>metadata</1><2>creationTimestamp</2></2>",
-  "Ctrl+Alt+Del": "Ctrl+Alt+Del",
   "Customize": "Customize",
   "Customize VirtualMachine": "Customize VirtualMachine",
   "Deadline": "Deadline",

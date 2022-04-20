@@ -1,13 +1,11 @@
 export type VncConsoleActionsProps = {
   onDisconnect: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  onCtrlAltDel: () => void;
-
-  textCtrlAltDel?: string;
   textSendShortcut?: string;
   textDisconnect?: string;
-
   /** VNC console additional action elements */
   additionalButtons?: React.ReactNode[];
+  /** VNC console additional send keys elements */
+  customButtons?: { text: string; onClick: () => void }[];
 };
 
 export type VncConsoleProps = React.HTMLProps<HTMLDivElement> & {

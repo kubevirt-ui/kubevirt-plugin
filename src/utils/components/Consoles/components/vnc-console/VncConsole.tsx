@@ -2,6 +2,7 @@ import * as React from 'react';
 import cn from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import KeyTable from '@novnc/novnc/core/input/keysym';
 import RFBCreate from '@novnc/novnc/core/rfb';
 import { initLogging } from '@novnc/novnc/core/util/logging';
 import {
@@ -92,6 +93,28 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
         setStatus(disconnected);
         onSecurityFailure && onSecurityFailure(e);
       });
+      rfbInstnce.sendCtrlAlt1 = function sendCtrlAlt1() {
+        if (this._rfbConnectionState !== connected || this._viewOnly) {
+          return;
+        }
+        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', true);
+        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', true);
+        this.sendKey(KeyTable.XK_1, 'One', true);
+        this.sendKey(KeyTable.XK_1, 'One', false);
+        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
+        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
+      };
+      rfbInstnce.sendCtrlAlt2 = function sendCtrlAlt1() {
+        if (this._rfbConnectionState !== connected || this._viewOnly) {
+          return;
+        }
+        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', true);
+        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', true);
+        this.sendKey(KeyTable.XK_2, 'Two', true);
+        this.sendKey(KeyTable.XK_2, 'Two', false);
+        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
+        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
+      };
       rfbInstnce.viewOnly = viewOnly;
       rfbInstnce.scaleViewport = scaleViewport;
       rfbInstnce.resizeSession = resizeSession;
@@ -129,9 +152,21 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
     <>
       {status === connected && showAccessControls && (
         <VncConsoleActions
-          onCtrlAltDel={() => rfb?.sendCtrlAltDel()}
+          customButtons={[
+            {
+              text: textCtrlAltDel || 'Ctrl + Alt + Delete',
+              onClick: () => rfb?.sendCtrlAltDel(),
+            },
+            {
+              text: 'Ctrl + Alt + 1',
+              onClick: () => rfb?.sendCtrlAlt1(),
+            },
+            {
+              text: 'Ctrl + Alt + 2',
+              onClick: () => rfb?.sendCtrlAlt2(),
+            },
+          ]}
           textSendShortcut={textSendShortcut}
-          textCtrlAltDel={textCtrlAltDel}
           textDisconnect={textDisconnect}
           onDisconnect={() => rfb?.disconnect()}
           additionalButtons={additionalButtons}
