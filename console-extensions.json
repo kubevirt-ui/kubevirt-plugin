@@ -218,5 +218,19 @@
       "provider": { "$codeRef": "modalProvider.ModalProvider" },
       "useValueHook": { "$codeRef": "modalProvider.useModalValue" }
     }
+  },
+  {
+    "type": "console.page/route/standalone",
+    "properties": {
+      "exact": false,
+      "path": [
+        "/k8s/ns/:ns/kubevirt.io~v1~VirtualMachine/:name/console/standalone",
+        "/k8s/ns/:ns/kubevirt.io~v1~VirtualMachineInstance/:name/console/standalone"
+      ],
+      "component": { "$codeRef": "ConsoleStandAlone" }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
   }
 ]

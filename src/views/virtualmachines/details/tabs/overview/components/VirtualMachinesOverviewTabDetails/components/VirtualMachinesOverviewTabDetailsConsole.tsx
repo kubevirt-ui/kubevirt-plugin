@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VNC_CONSOLE_TYPE } from '@kubevirt-utils/components/Consoles/components/utils/ConsoleConsts';
@@ -9,7 +8,7 @@ import { isConnectionEncrypted } from '@kubevirt-utils/components/Consoles/utils
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
-import { Bullseye } from '@patternfly/react-core';
+import { Bullseye, Button } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 type VirtualMachinesOverviewTabDetailsConsoleProps = {
@@ -37,10 +36,17 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
             showAccessControls={false}
           />
           <div className="link">
-            <Link to="/">
+            <Button
+              onClick={() =>
+                window.open(
+                  `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
+                )
+              }
+              variant="link"
+            >
               {t('Open web console')}
               <ExternalLinkAltIcon className="icon" />
-            </Link>
+            </Button>
           </div>
         </>
       ) : (

@@ -30,14 +30,7 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
         disabled: inFlight,
         cta: () =>
           window.open(
-            // *** Should create path and component in a sperate PR and connect it to the plugin ***
-
-            // `/k8s/ns/${getNamespace(vmi)}/virtualmachineinstances/${getName(
-            //   vmi,
-            // )}/standaloneconsole`,
-            // `${getName(vmi)}-console}`,
-            // 'modal=yes,alwaysRaised=yes,location=yes,width=1024,height=768',
-            `/${vmi?.metadata?.name}`,
+            `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachineInstance/${vmi?.metadata?.name}/console/standalone`,
           ),
       },
       {
