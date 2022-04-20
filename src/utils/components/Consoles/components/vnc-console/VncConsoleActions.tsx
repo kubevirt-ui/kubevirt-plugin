@@ -15,11 +15,10 @@ import { VncConsoleActionsProps } from './utils/VncConsoleTypes';
 
 export const VncConsoleActions: React.FC<VncConsoleActionsProps> = ({
   textSendShortcut,
-  textCtrlAltDel,
   textDisconnect,
-  onCtrlAltDel = undefined,
   onDisconnect,
   additionalButtons = [],
+  customButtons,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -38,11 +37,11 @@ export const VncConsoleActions: React.FC<VncConsoleActionsProps> = ({
           </DropdownToggle>
         }
         isOpen={isOpen}
-        dropdownItems={[
-          <DropdownItem onClick={onCtrlAltDel} key="ctrl-alt-delete">
-            {textCtrlAltDel || t('Ctrl+Alt+Del')}
-          </DropdownItem>,
-        ]}
+        dropdownItems={customButtons?.map(({ onClick, text }) => (
+          <DropdownItem onClick={onClick} key={text}>
+            {text}
+          </DropdownItem>
+        ))}
       />
       <Button variant={ButtonVariant.secondary} onClick={onDisconnect}>
         {textDisconnect || t('Disconnect')}
