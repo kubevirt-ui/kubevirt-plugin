@@ -6,9 +6,9 @@ import { Overview, OverviewGrid } from '@openshift-console/dynamic-plugin-sdk';
 
 import DetailsCard from './details-card/DetailsCard';
 import GettingStartedCard from './getting-started-card/GettingStartedCard';
-import RunningVMsPerTemplateCard from './getting-started-card/running-vms-per-template-card/RunningVMsPerTemplateCard';
 import InventoryCard from './inventory-card/InventoryCard';
 import PermissionsCard from './permissions-card/PermissionsCard';
+import RunningVMsPerTemplateCard from './running-vms-per-template-card/RunningVMsPerTemplateCard';
 import TopConsumersCard from './top-consumers-card/TopConsumersCard';
 import PageHeader from './PageHeader';
 
