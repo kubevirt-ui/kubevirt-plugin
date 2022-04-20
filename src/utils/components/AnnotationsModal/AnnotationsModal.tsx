@@ -21,8 +21,9 @@ export const AnnotationsModal: React.FC<{
 }> = ({ obj, isOpen, onSubmit, onClose }) => {
   const { t } = useKubevirtTranslation();
 
-  const [annotations, setAnnotations] =
-    React.useState<{ [id: number]: { [key: string]: string } }>();
+  const [annotations, setAnnotations] = React.useState<{
+    [id: number]: { [key: string]: string };
+  }>();
 
   const onAnnotationAdd = () => {
     const keys = new Set([...Object.keys(annotations)]);

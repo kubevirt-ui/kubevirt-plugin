@@ -52,6 +52,7 @@
     "@patternfly/react-catalog-view-extension": "^4.43.15",
     "@patternfly/react-charts": "^6.55.16",
     "@patternfly/react-core": "4.198.19",
+    "@patternfly/react-icons": "^4.53.16",
     "@patternfly/react-table": "^4.67.19",
     "@types/byte-size": "^8.1.0",
     "byte-size": "^8.1.0",
@@ -90,9 +91,8 @@
     "@types/jest": "^27.0.3",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^16.11.12",
-    "@types/react": "^17.0.37",
+    "@types/react": "^17.0.40",
     "@types/react-router-dom": "5.x",
-    "@types/webpack-dev-server": "^4.5.0",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
     "copy-webpack-plugin": "^6.4.1",
@@ -133,7 +133,7 @@
     "webpack-dev-server": "^4.7.4"
   },
   "resolutions": {
-    "webpack": "^5.68.0"
-  },
-  "packageManager": "yarn@3.2.0"
+    "webpack": "^5.68.0",
+    "@types/react": "17.0.40"
+  }
 }

@@ -3,10 +3,10 @@
 set -eExuo pipefail
 
 # Install dependencies.
-yarn install
+yarn install --ignore-engines
 
 # Add mochawesome-report-generator
-yarn add global mochawesome-report-generator
+yarn add global mochawesome-report-generator --ignore-engines
 
 while getopts g:s: flag
 do
