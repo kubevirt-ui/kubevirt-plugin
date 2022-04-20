@@ -22,6 +22,7 @@ type DiskRowActionsProps = {
   diskName: string;
   vm: V1VirtualMachine;
   onUpdate: (updatedVM: V1VirtualMachine) => Promise<void>;
+  isDisabled?: boolean;
 };
 
 const getDiskDataVolume = (
@@ -41,7 +42,7 @@ const getDiskDataVolume = (
   );
 };
 
-const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate }) => {
+const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate, isDisabled }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
@@ -109,7 +110,9 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate 
   return (
     <Dropdown
       onSelect={() => setIsDropdownOpen(false)}
-      toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-disk" />}
+      toggle={
+        <KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-disk" isDisabled={isDisabled} />
+      }
       isOpen={isDropdownOpen}
       isPlain
       dropdownItems={[

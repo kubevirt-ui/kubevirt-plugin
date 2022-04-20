@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import TemplateNameTableData from '@kubevirt-utils/components/TemplateNameTableData/TemplateNameTableData';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -8,7 +9,6 @@ import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/u
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import NetworkInterfaceActions from './NetworkInterfaceActions';
-import TemplateNameTableData from '@kubevirt-utils/components/TemplateNameTableData/TemplateNameTableData';
 
 export type NetworkInterfaceRowProps = {
   obj: NetworkPresentation;

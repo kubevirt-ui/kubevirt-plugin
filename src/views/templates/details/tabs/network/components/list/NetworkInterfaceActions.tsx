@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
 import produce from 'immer';
+import { isCommonTemplate } from 'src/views/clusteroverview/overview/components/inventory-card/utils/flattenTemplates';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -100,16 +101,20 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   ];
 
   return (
-    <>
-      <Dropdown
-        onSelect={() => setIsDropdownOpen(false)}
-        toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-6" />}
-        isOpen={isDropdownOpen}
-        isPlain
-        dropdownItems={items}
-        position={DropdownPosition.right}
-      />
-    </>
+    <Dropdown
+      onSelect={() => setIsDropdownOpen(false)}
+      toggle={
+        <KebabToggle
+          onToggle={setIsDropdownOpen}
+          id="toggle-id-6"
+          isDisabled={isCommonTemplate(template)}
+        />
+      }
+      isOpen={isDropdownOpen}
+      isPlain
+      dropdownItems={items}
+      position={DropdownPosition.right}
+    />
   );
 };
 
