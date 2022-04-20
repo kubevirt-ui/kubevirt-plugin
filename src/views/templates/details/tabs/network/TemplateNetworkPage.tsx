@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { isCommonTemplate } from 'src/views/clusteroverview/overview/components/inventory-card/utils/flattenTemplates';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -24,10 +25,12 @@ const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const actionText = t('Add Network Interface');
+
   return (
     <div className="template-network-tab">
       <ListPageHeader title="">
         <ListPageCreateButton
+          isDisabled={isCommonTemplate(template)}
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <NetworkInterfaceModal

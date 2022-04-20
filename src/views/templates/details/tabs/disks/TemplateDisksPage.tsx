@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import produce from 'immer';
+import { isCommonTemplate } from 'src/views/clusteroverview/overview/components/inventory-card/utils/flattenTemplates';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -40,6 +41,8 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
   const vm = getTemplateVirtualMachineObject(template);
 
+  const isEditDisabled = isCommonTemplate(template);
+
   const onUpdate = async (updatedVM: V1VirtualMachine) => {
     const updatedTemplate = produce(template, (draftTemplate) => {
       draftTemplate.objects = [updatedVM];
@@ -57,6 +60,7 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
     <div className="template-disk-page">
       <ListPageHeader title="">
         <ListPageCreateButton
+          isDisabled={isEditDisabled}
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DiskModal
@@ -82,7 +86,7 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
           loadError={undefined}
           columns={columns}
           Row={DiskRow}
-          rowData={{ vm, onUpdate }}
+          rowData={{ vm, onUpdate, actionsDisabled: isEditDisabled }}
         />
       </ListPageBody>
     </div>

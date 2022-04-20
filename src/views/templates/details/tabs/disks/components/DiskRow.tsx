@@ -1,20 +1,26 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import TemplateNameTableData from '@kubevirt-utils/components/TemplateNameTableData/TemplateNameTableData';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Split, SplitItem } from '@patternfly/react-core';
-import TemplateNameTableData from '@kubevirt-utils/components/TemplateNameTableData/TemplateNameTableData';
+
 import DiskRowActions from './DiskRowActions';
 
-const DiskRow: React.FC<
-  RowProps<
-    DiskRowDataLayout,
-    { vm: V1VirtualMachine; onUpdate: (vm: V1VirtualMachine) => Promise<void> }
-  >
-> = ({ obj, activeColumnIDs, rowData: { vm, onUpdate } }) => {
+type AdditionalRowData = {
+  vm: V1VirtualMachine;
+  onUpdate: (vm: V1VirtualMachine) => Promise<void>;
+  actionsDisabled: boolean;
+};
+
+const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
+  obj,
+  activeColumnIDs,
+  rowData: { vm, onUpdate, actionsDisabled },
+}) => {
   const { t } = useKubevirtTranslation();
   const isPVCSource = !['Container (Ephemeral)', 'Other'].includes(obj?.source);
   return (
@@ -57,7 +63,12 @@ const DiskRow: React.FC<
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
-        <DiskRowActions diskName={obj?.name} onUpdate={onUpdate} vm={vm} />
+        <DiskRowActions
+          diskName={obj?.name}
+          onUpdate={onUpdate}
+          vm={vm}
+          isDisabled={actionsDisabled}
+        />
       </TableData>
     </>
   );
