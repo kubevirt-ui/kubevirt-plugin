@@ -9,7 +9,6 @@ export const updateVolume = (
   oldVolume: V1Volume,
   diskState: DiskFormState,
   diskSourceState: DiskSourceState,
-  dvName: string,
 ): V1Volume => {
   const updatedVolume = { ...oldVolume };
   if (updatedVolume.name !== diskState.diskName) {
@@ -22,11 +21,7 @@ export const updateVolume = (
     delete updatedVolume[oldVolumeSource];
   }
 
-  if (requiresDataVolume(diskState.diskSource)) {
-    updatedVolume.dataVolume = {
-      name: dvName,
-    };
-  } else if (diskState.diskSource === sourceTypes.EPHEMERAL) {
+  if (diskState.diskSource === sourceTypes.EPHEMERAL) {
     updatedVolume.containerDisk = {
       image: diskSourceState.ephemeralSource,
     };
@@ -82,17 +77,13 @@ export const updateVMDataVolumeTemplates = (
   if (sourceRequiresDataVolume) {
     if (requiresDataVolume(initialDiskSource)) {
       return [
-        ...dataVolumeTemplates?.map((dataVolumeTemplate) => {
-          if (dataVolumeTemplate?.metadata?.name === updatedDataVolumeTemplate?.metadata?.name) {
-            return updatedDataVolumeTemplate;
-          }
-          return dataVolumeTemplate;
-        }),
+        ...(dataVolumeTemplates || []).filter(
+          (dvt) => dvt?.metadata?.name !== updatedDataVolumeTemplate?.metadata?.name,
+        ),
+        updatedDataVolumeTemplate,
       ];
     } else {
-      return dataVolumeTemplates?.length > 0
-        ? [...dataVolumeTemplates, updatedDataVolumeTemplate]
-        : [updatedDataVolumeTemplate];
+      return [...(dataVolumeTemplates || []), updatedDataVolumeTemplate];
     }
   }
   return dataVolumeTemplates;
