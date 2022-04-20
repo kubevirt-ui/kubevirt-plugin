@@ -68,8 +68,6 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
   );
 
   const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {
-    const dvName = `${vm?.metadata?.name}-${diskState.diskName}`;
-
     const currentVmVolumes = getVolumes(vm);
 
     const volumeToUpdate = currentVmVolumes.find(
@@ -77,9 +75,10 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     );
 
     const resultDisk = getDiskFromState(diskState);
-    const resultVolume = updateVolume(volumeToUpdate, diskState, diskSourceState, dvName);
+    const resultVolume = updateVolume(volumeToUpdate, diskState, diskSourceState);
     const resultDataVolume =
-      sourceRequiresDataVolume && getDataVolumeFromState(vm, diskState, diskSourceState);
+      sourceRequiresDataVolume &&
+      getDataVolumeFromState(vm, diskState, diskSourceState, resultVolume);
     const resultDataVolumeTemplate =
       sourceRequiresDataVolume && getDataVolumeTemplate(resultDataVolume);
 

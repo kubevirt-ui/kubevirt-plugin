@@ -110,9 +110,10 @@ export const getDataVolumeFromState = (
   vm: V1VirtualMachine,
   diskState: DiskFormState,
   diskSourceState: DiskSourceState,
+  resultVolume?: V1Volume,
 ): V1beta1DataVolume => {
   const dataVolume = getEmptyVMDataVolumeResource(vm);
-  const dvName = `${vm?.metadata?.name}-${diskState.diskName}`;
+  const dvName = resultVolume?.dataVolume?.name || `${vm?.metadata?.name}-${diskState.diskName}`;
 
   dataVolume.metadata.name = dvName;
   dataVolume.spec.storage.resources.requests.storage = diskState.diskSize;
