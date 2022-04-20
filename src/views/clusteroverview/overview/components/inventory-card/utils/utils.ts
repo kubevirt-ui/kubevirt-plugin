@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isUpstream } from '@kubevirt-utils/utils/utils';
@@ -6,13 +8,12 @@ import {
   WatchK8sResultsObject,
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { InProgressIcon, OffIcon, PausedIcon, SyncAltIcon } from '@patternfly/react-icons';
 
 import { getVMStatus } from '../../../utils/utils';
 
 import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from './constants';
 import { flattenTemplates } from './flattenTemplates';
-import { InProgressIcon, OffIcon, PausedIcon, SyncAltIcon } from '@patternfly/react-icons';
-import * as React from 'react';
 
 export const getOSImagesNS = (): string =>
   isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS;

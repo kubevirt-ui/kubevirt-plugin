@@ -6,6 +6,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { K8sResourceCommon, WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
 import { ResourceInventoryItem } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Stack, StackItem } from '@patternfly/react-core';
+
 import { InventoryCardResources } from './types';
 import { getOSImagesNS, getTemplates } from './utils';
 
