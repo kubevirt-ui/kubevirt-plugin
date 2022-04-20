@@ -3,19 +3,21 @@ import * as React from 'react';
 import {
   modelToGroupVersionKind,
   TemplateModel,
+  V1Template,
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
 import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { useDeepCompareMemoize } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/hooks/useDeepCompareMemoize';
 
-import { useDebounceCallback } from '../../../details-card/hooks/useDebounceCallback';
+import { useDebounceCallback } from '../../details-card/hooks/useDebounceCallback';
 
 export type UseRunningVMsPerTemplateResources = {
   loaded: boolean;
   loadError: string;
-  vms: any[]; // TODO Fix type back to VMKind[]
-  templates: any[]; // TODO Fix type back to TemplateKind[]
+  vms: V1VirtualMachine[];
+  templates: V1Template[];
 };
 
 export const useRunningVMsPerTemplateResources = (): UseRunningVMsPerTemplateResources => {

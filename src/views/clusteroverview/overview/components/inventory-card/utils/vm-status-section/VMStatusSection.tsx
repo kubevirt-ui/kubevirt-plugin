@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { Flex, FlexItem, Grid, GridItem, TitleSizes } from '@patternfly/react-core';
 
 import { K8sResourceKind } from '../../../details-card/utils/types';
-import EmptyStateNoVMs from '../../../getting-started-card/running-vms-per-template-card/utils/EmptyStateNoVMs';
+import EmptyStateNoVMs from '../../../running-vms-per-template-card/utils/EmptyStateNoVMs';
 import { getVMStatusCounts } from '../utils';
 
 import VMStatusInventoryItem from './VMStatusInventoryItem';
