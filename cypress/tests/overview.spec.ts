@@ -7,11 +7,11 @@ adminOnlyDescribe('Test Getting started card of the Virtualization Overview page
     cy.visit('/overview');
   });
 
-  it('ID(CNV-7924) Feature highlights card is displayed', () => {
+  xit('ID(CNV-7924) Feature highlights card is displayed', () => {
     cy.get(overview.featureHighlightsCard).should('exist');
   });
 
-  it('ID(CNV-7925) Recommended operators card is displayed', () => {
+  xit('ID(CNV-7925) Recommended operators card is displayed', () => {
     cy.get(overview.recommendedOperatorsCard).should('exist');
   });
 });
