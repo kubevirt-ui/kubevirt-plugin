@@ -6,6 +6,8 @@ import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryM
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
+import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
@@ -107,6 +109,17 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
               className="wizard-overview-description-left-column"
               title={t('Workload profile')}
               description={WORKLOADS_LABELS?.[workloadAnnotation] ?? t('Other')}
+            />
+
+            <WizardDescriptionItem
+              description={<Tolerations vm={vm} />}
+              title={t('Tolerations')}
+              isEdit
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <TolerationsModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
+                ))
+              }
             />
           </DescriptionList>
         </GridItem>
