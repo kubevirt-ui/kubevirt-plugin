@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
+import { isCommonVMTemplate } from 'src/views/templates/utils';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
@@ -14,7 +15,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   template: V1Template,
 ) => {
   const { t } = useKubevirtTranslation();
-  const isCommonTemplate = template.metadata.labels['template.kubevirt.io/type'] === 'base';
+  const isCommonTemplate = isCommonVMTemplate(template);
   const { createModal } = useModal();
   const history = useHistory();
 

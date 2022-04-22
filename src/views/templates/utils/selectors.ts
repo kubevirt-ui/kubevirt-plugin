@@ -5,7 +5,8 @@ import { VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm/utils';
 import { ANNOTATIONS } from './constants';
 
 export const getTemplateProviderName = (template: V1Template): string =>
-  getAnnotation(template, ANNOTATIONS.providerName, template?.metadata?.name);
+  getAnnotation(template, ANNOTATIONS.providerName, null) ||
+  getAnnotation(template, ANNOTATIONS.providerDisplayName, template?.metadata?.name);
 
 export const getTemplateWorkload = (template: V1Template): string =>
   template?.objects[0]?.spec?.template?.metadata?.annotations?.[VM_WORKLOAD_ANNOTATION];
