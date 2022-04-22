@@ -20,7 +20,8 @@ const RunningVirtualMachineDetailsRightGrid: React.FC<VirtualMachineDetailsRight
   const { t } = useKubevirtTranslation();
   const { vmi, pods } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const [guestAgentData] = useGuestOS(vmi);
-  const { sshService } = useSSHService(vmi);
+  const watchSSHService = useSSHService(vmi);
+
   return (
     <VirtualMachineDetailsRightGridLayout
       vm={vm}
@@ -29,8 +30,9 @@ const RunningVirtualMachineDetailsRightGrid: React.FC<VirtualMachineDetailsRight
         vmi,
         pods,
         guestAgentData,
-        sshService,
+        watchSSHService,
       )}
+      sshService={watchSSHService[0]}
     />
   );
 };

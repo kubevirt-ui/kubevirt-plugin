@@ -1,11 +1,13 @@
 import * as React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import SSHAccessModal from '@kubevirt-utils/components/SSHAccess/SSHAccessModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import {
@@ -24,11 +26,13 @@ import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/V
 type VirtualMachineDetailsRightGridLayout = {
   vm: V1VirtualMachine;
   vmDetailsRightGridObj: VirtualMachineDetailsRightGridLayoutPresentation;
+  sshService?: IoK8sApiCoreV1Service;
 };
 
 const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightGridLayout> = ({
   vmDetailsRightGridObj,
   vm,
+  sshService,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -91,6 +95,20 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.sshAccess}
+          isEdit
+          showEditOnTitle
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <SSHAccessModal
+                name={vm?.metadata?.name}
+                namespace={vm?.metadata?.namespace}
+                resouceLabels={vm?.metadata?.labels}
+                isOpen={isOpen}
+                onClose={onClose}
+                sshService={sshService}
+              />
+            ))
+          }
           descriptionHeader={t('SSH Access')}
         />
         <VirtualMachineDescriptionItem
