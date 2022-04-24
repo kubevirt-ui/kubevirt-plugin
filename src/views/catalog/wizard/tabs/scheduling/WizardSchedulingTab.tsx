@@ -8,6 +8,7 @@ import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourc
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
+import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
@@ -53,7 +54,16 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
               }
             />
 
-            <WizardDescriptionItem title={t('Tolerations')} description={<Tolerations vm={vm} />} />
+            <WizardDescriptionItem
+              description={<Tolerations vm={vm} />}
+              title={t('Tolerations')}
+              isEdit
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <TolerationsModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
+                ))
+              }
+            />
 
             <WizardDescriptionItem
               title={t('Affinity Rules')}
