@@ -7,6 +7,7 @@ import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModa
 import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
+import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
@@ -15,7 +16,6 @@ import { DescriptionList, GridItem } from '@patternfly/react-core';
 import Affinity from '../../Affinity/Affinity';
 import Descheduler from '../../Descheduler/Descheduler';
 import NodeSelector from '../../NodeSelector/NodeSelector';
-import Tolerations from '../../Tolerations/Tolerations';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 type VirtualMachineSchedulingLeftGridProps = {
