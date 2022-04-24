@@ -698,13 +698,13 @@
     semver "6.x"
     webpack "^5.68.0"
 
-"@openshift-console/dynamic-plugin-sdk@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-0.0.7.tgz#c0ef6b5a68c74ce513827e6900d94cb3ddc2555a"
-  integrity sha512-7IR84mIQ6vz73WxLZ7QazWdajGXyMvsrT94tuiHqG1QyVGRCZUw8vVHBHlTEa8yDDIEE9JdVwaF2IRtWpHe3Uw==
+"@openshift-console/dynamic-plugin-sdk@0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-0.0.8.tgz#234eaeb4aeca3de28461cb5d06e638821080a8e1"
+  integrity sha512-CU6S28ToIoZDJlUg9pcUJkUJsrctxm1hwlveqWmNH9mZ2pkFBy3NP4qscDKDsECdy8/eV6jt7LdUAgHt7Tgyfg==
   dependencies:
-    "@patternfly/react-core" "4.198.19"
-    "@patternfly/react-table" "4.67.19"
+    "@patternfly/react-core" "4.202.16"
+    "@patternfly/react-table" "4.71.16"
     react "^17.0.1"
     react-helmet "^6.1.0"
     react-i18next "^11.7.3"
@@ -792,7 +792,7 @@
     tippy.js "5.1.2"
     tslib "^2.0.0"
 
-"@patternfly/react-core@^4.135.15", "@patternfly/react-core@^4.192.15", "@patternfly/react-core@^4.198.19", "@patternfly/react-core@^4.202.16":
+"@patternfly/react-core@4.202.16", "@patternfly/react-core@^4.135.15", "@patternfly/react-core@^4.192.15", "@patternfly/react-core@^4.198.19", "@patternfly/react-core@^4.202.16":
   version "4.202.16"
   resolved "https://registry.yarnpkg.com/@patternfly/react-core/-/react-core-4.202.16.tgz#dc45712315beb84b29f34d5cc29ec4f443b37857"
   integrity sha512-yWDf0x+YFFVxm72RC/BUaSOn2UsIirT77qif6DfAWdSODhdxTfaLCeBZ08uWgxJ1YZNCrankj60va+G5L+LVrg==
@@ -827,7 +827,7 @@
     lodash "^4.17.19"
     tslib "^2.0.0"
 
-"@patternfly/react-table@^4.67.19":
+"@patternfly/react-table@4.71.16", "@patternfly/react-table@^4.67.19":
   version "4.71.16"
   resolved "https://registry.yarnpkg.com/@patternfly/react-table/-/react-table-4.71.16.tgz#c8669a495371cf6a310a7c6aa5d2d0f7d4cfcd8d"
   integrity sha512-HF//Sk1nnF7phAOjglC8zndRfJ3/3oe8Bkxbufhp3lSFdAyzjed6WBdV2dNIrsNj1UeO8MRSlYCbbDEZZlrO2A==
