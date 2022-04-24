@@ -13,24 +13,29 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
+import { printableVMStatus } from '../../../../../../utils';
 import Affinity from '../../Affinity/Affinity';
 import Descheduler from '../../Descheduler/Descheduler';
 import NodeSelector from '../../NodeSelector/NodeSelector';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 type VirtualMachineSchedulingLeftGridProps = {
-  vm?: V1VirtualMachine;
-  nodes?: IoK8sApiCoreV1Node[];
-  nodesLoaded?: boolean;
+  vm: V1VirtualMachine;
+  nodes: IoK8sApiCoreV1Node[];
+  nodesLoaded: boolean;
+  canUpdateVM: boolean;
 };
 
 const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGridProps> = ({
   vm,
   nodes,
   nodesLoaded,
+  canUpdateVM,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const canUpdateStoppedVM =
+    canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -49,7 +54,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<NodeSelector vm={vm} />}
           descriptionHeader={t('Node Selector')}
-          isEdit
+          isEdit={canUpdateStoppedVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <NodeSelectorModal
@@ -66,7 +71,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Tolerations vm={vm} />}
           descriptionHeader={t('Tolerations')}
-          isEdit
+          isEdit={canUpdateStoppedVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <TolerationsModal
@@ -83,7 +88,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Affinity vm={vm} />}
           descriptionHeader={t('Affinity Rules')}
-          isEdit
+          isEdit={canUpdateStoppedVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <AffinityModal
@@ -100,7 +105,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Descheduler vm={vm} />}
           descriptionHeader={t('Descheduler')}
-          isEdit
+          isEdit={canUpdateStoppedVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DeschedulerModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
