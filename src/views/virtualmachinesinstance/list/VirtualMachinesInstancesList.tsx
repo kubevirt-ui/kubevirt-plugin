@@ -12,10 +12,10 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import VirtualMachineInstanceEmptyState from './components/VirtualMachineInstanceEmptyState/VirtualMachineInstanceEmptyState';
 import useVirtualMachinesInstancesColumns from './hooks/useVirtualMachinesInstancesColumns';
 import { filters } from './utils';
 import VirtualMachinesInstancesRow from './VirtualMachinesInstancesRow';
-
 type VirtualMachinesInstancesListProps = {
   kind: string;
   namespace: string;
@@ -53,6 +53,7 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
           columns={columns}
           Row={VirtualMachinesInstancesRow}
           rowData={{ kind }}
+          EmptyMsg={() => <VirtualMachineInstanceEmptyState />}
         />
       </ListPageBody>
     </>
