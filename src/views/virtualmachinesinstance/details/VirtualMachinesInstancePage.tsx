@@ -27,7 +27,7 @@ const VirtualMachinesInstanceDetails: React.FC<VirtualMachinesInstanceDetailsPro
 
   return (
     <>
-      <VirtualMachinesInstancePageHeader name={name} status={vmi?.status?.phase} />
+      <VirtualMachinesInstancePageHeader vmi={vmi} />
       <HorizontalNav pages={tabs} resource={vmi} />
     </>
   );
