@@ -7,6 +7,7 @@ import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourc
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
@@ -27,6 +28,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const canUpdateStoppedVM =
     canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
 
@@ -50,7 +52,13 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
           isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
-              <CPUMemoryModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
+              <CPUMemoryModal
+                vm={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={onSubmit}
+                vmi={vmi}
+              />
             ))
           }
         />

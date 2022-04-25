@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
@@ -28,12 +28,14 @@ type VirtualMachineDetailsRightGridLayout = {
   vm: V1VirtualMachine;
   vmDetailsRightGridObj: VirtualMachineDetailsRightGridLayoutPresentation;
   sshService?: IoK8sApiCoreV1Service;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightGridLayout> = ({
-  vmDetailsRightGridObj,
   vm,
   sshService,
+  vmDetailsRightGridObj,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -132,6 +134,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
                       initialDevices={gpus}
                       btnText={t('Add GPU device')}
                       type={HARDWARE_DEVICE_TYPE.GPUS}
+                      vmi={vmi}
                     />
                   ))
                 }
@@ -151,6 +154,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
                       initialDevices={hostDevices}
                       btnText={t('Add Host device')}
                       type={HARDWARE_DEVICE_TYPE.HOST_DEVICES}
+                      vmi={vmi}
                     />
                   ))
                 }

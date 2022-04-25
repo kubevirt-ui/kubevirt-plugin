@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import {
   ListPageBody,
   ListPageCreateButton,
@@ -23,6 +24,7 @@ type NetworkInterfaceListPageProps = RouteComponentProps<{
 const NetworkInterfaceListPage: React.FC<NetworkInterfaceListPageProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const actionText = t('Add Network Interface');
   return (
     <>
@@ -35,6 +37,7 @@ const NetworkInterfaceListPage: React.FC<NetworkInterfaceListPageProps> = ({ obj
                 isOpen={isOpen}
                 onClose={onClose}
                 headerText={actionText}
+                vmi={vmi}
               />
             ))
           }

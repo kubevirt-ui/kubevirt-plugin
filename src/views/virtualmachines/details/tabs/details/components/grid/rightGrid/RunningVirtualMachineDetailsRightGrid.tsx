@@ -33,6 +33,7 @@ const RunningVirtualMachineDetailsRightGrid: React.FC<VirtualMachineDetailsRight
         watchSSHService,
       )}
       sshService={watchSSHService[0]}
+      vmi={vmi}
     />
   );
 };

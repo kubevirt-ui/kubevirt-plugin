@@ -1,7 +1,14 @@
 import * as React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1Interface,
+  V1Network,
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ModalPendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { getChangedNics } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
@@ -26,6 +33,7 @@ type NetworkInterfaceModalProps = {
   isOpen: boolean;
   onClose: () => void;
   headerText: string;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
@@ -33,6 +41,7 @@ const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
   isOpen,
   onClose,
   headerText,
+  vmi,
 }) => {
   const [nicName, setNicName] = React.useState(generateNicName());
   const [interfaceModel, setInterfaceModel] = React.useState(interfaceModelType.VIRTIO);
@@ -44,7 +53,7 @@ const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
 
   const [submitDisabled, setSubmitDisabled] = React.useState(true);
 
-  const resultVirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine = React.useMemo(() => {
     const resultNetwork: V1Network = {
       name: nicName,
     };
@@ -77,7 +86,7 @@ const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
 
   return (
     <TabModal
-      obj={resultVirtualMachine}
+      obj={updatedVirtualMachine}
       onSubmit={(obj) =>
         k8sUpdate({
           model: VirtualMachineModel,
@@ -92,6 +101,7 @@ const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
       isDisabled={submitDisabled}
     >
       <Form>
+        {vmi && <ModalPendingChangesAlert isChanged={getChangedNics(vm, vmi)?.length > 0} />}
         <NameFormField objName={nicName} setObjName={setNicName} />
         <NetworkInterfaceModelSelect
           interfaceModel={interfaceModel}
