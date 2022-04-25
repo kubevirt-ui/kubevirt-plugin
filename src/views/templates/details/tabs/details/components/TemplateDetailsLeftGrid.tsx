@@ -1,9 +1,12 @@
 import React from 'react';
-import Annotations from 'src/views/templates/details/tabs/details/components//Annotations';
-import DescriptionItem from 'src/views/templates/details/tabs/details/components//DescriptionItem';
-import Labels from 'src/views/templates/details/tabs/details/components//Labels';
-import Name from 'src/views/templates/details/tabs/details/components//Name';
-import Namespace from 'src/views/templates/details/tabs/details/components//Namespace';
+import Annotations from 'src/views/templates/details/tabs/details/components/Annotations';
+import BaseTemplate from 'src/views/templates/details/tabs/details/components/BaseTemplate';
+import CreatedAt from 'src/views/templates/details/tabs/details/components/CreatedAt';
+import DescriptionItem from 'src/views/templates/details/tabs/details/components/DescriptionItem';
+import Labels from 'src/views/templates/details/tabs/details/components/Labels';
+import Name from 'src/views/templates/details/tabs/details/components/Name';
+import Namespace from 'src/views/templates/details/tabs/details/components/Namespace';
+import Owner from 'src/views/templates/details/tabs/details/components/Owner';
 import { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
 import useWorkloadProfile from 'src/views/templates/list/hooks/useWorkloadProfile';
 
@@ -26,6 +29,9 @@ const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template 
       />
       <DescriptionItem title={t('Operating system')} content={getOperatingSystemName(template)} />
       <DescriptionItem title={t('Workload profile')} content={useWorkloadProfile(template)} />
+      <BaseTemplate template={template} />
+      <CreatedAt template={template} />
+      <Owner template={template} />
     </DescriptionList>
   );
 };
