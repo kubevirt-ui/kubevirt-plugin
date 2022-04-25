@@ -4,11 +4,13 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceGuestOSUser,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
+import { isGuestAgentConnected } from '@kubevirt-utils/resources/vmi';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi/hooks';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
-import { Title } from '@patternfly/react-core';
+import { Bullseye, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
 import useActiveUsersColumnsVm from './hooks/useActiveUsersColumnsVm';
@@ -34,19 +36,25 @@ const ActiveUserListSection: React.FC<ActiveUserListProps> = ({ vm, pathname }) 
         {t('Active Users')}
       </Title>
 
-      <VirtualizedTable<V1VirtualMachineInstanceGuestOSUser>
-        data={userList}
-        unfilteredData={userList}
-        loaded={loaded}
-        loadError={loadError}
-        columns={columns}
-        Row={ActiveUserListRowVm}
-        NoDataEmptyMsg={() => (
-          <div id="no-active-users-msg" className="pf-u-text-align-center">
-            {t('No Active Users')}
-          </div>
-        )}
-      />
+      {isGuestAgentConnected(vmi) ? (
+        <VirtualizedTable<V1VirtualMachineInstanceGuestOSUser>
+          data={userList}
+          unfilteredData={userList}
+          loaded={loaded}
+          loadError={loadError}
+          columns={columns}
+          Row={ActiveUserListRowVm}
+          NoDataEmptyMsg={() => (
+            <div id="no-active-users-msg" className="pf-u-text-align-center">
+              {t('No Active Users')}
+            </div>
+          )}
+        />
+      ) : (
+        <Bullseye>
+          <MutedTextSpan text={t('Guest Agent is required')} />
+        </Bullseye>
+      )}
     </div>
   );
 };
