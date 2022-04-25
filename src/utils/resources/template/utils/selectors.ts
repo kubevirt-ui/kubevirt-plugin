@@ -177,7 +177,7 @@ export const getTemplateDescription = (template: V1Template): string =>
  * @returns a unique vm name
  */
 export const generateVMName = (template: V1Template): string => {
-  return `${getTemplatePVCName(template) ?? template?.metadata?.name}-${uniqueNamesGenerator({
+  return `${getTemplatePVCName(template) || template?.metadata?.name}-${uniqueNamesGenerator({
     dictionaries: [adjectives, animals],
     separator: '-',
   })}`;
