@@ -86,8 +86,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
       getDisks(vm),
       resultDisk,
       initialDiskState.diskName,
-      // only update bootOrder if checkbox is checked and the disk is not a boot disk
-      diskState.asBootSource && getBootDisk(vm)?.name !== initialDiskState.diskName,
+      diskState.asBootSource,
     );
 
     const updatedVmVolumes = updateVMVolumes(

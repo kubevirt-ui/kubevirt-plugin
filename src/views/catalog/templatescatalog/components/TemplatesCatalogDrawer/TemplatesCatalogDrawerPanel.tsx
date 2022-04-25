@@ -80,106 +80,100 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
 
     return (
       <div className="modal-body modal-body-border">
-        <div className="modal-body-content">
-          <div className="modal-body-inner-shadow-covers">
-            <div className="co-catalog-page__overlay-body">
-              <Stack hasGutter className="template-catalog-drawer-info">
-                <StackItem>
-                  <Title headingLevel="h1" size="lg">
-                    {t('Template info')}
-                  </Title>
-                </StackItem>
-                <StackItem>
-                  <Grid hasGutter>
-                    <GridItem span={6}>
-                      <DescriptionList>
-                        <DescriptionListGroup>
-                          <DescriptionListTerm>{t('Operating System')}</DescriptionListTerm>
-                          <DescriptionListDescription>{displayName}</DescriptionListDescription>
-                        </DescriptionListGroup>
-                        <DescriptionListGroup>
-                          <DescriptionListTerm>{t('Workload type')}</DescriptionListTerm>
-                          <DescriptionListDescription>
-                            {WORKLOADS_LABELS[workload] ?? t('Other')}{' '}
-                            {isDefaultTemplate && t('(default)')}
-                          </DescriptionListDescription>
-                        </DescriptionListGroup>
-                        <DescriptionListGroup>
-                          <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
-                          <DescriptionListDescription>
-                            {<TemplateExpandableDescription description={description} />}
-                          </DescriptionListDescription>
-                        </DescriptionListGroup>
-                        <DescriptionListGroup>
-                          <DescriptionListTerm>{t('Documentation')}</DescriptionListTerm>
-                          <DescriptionListDescription>
-                            {documentationUrl ? (
-                              <Button
-                                isSmall
-                                isInline
-                                variant="link"
-                                icon={<ExternalLinkSquareAltIcon />}
-                                iconPosition="right"
-                              >
-                                <a
-                                  href={documentationUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {t('Refer to documentation')}
-                                </a>
-                              </Button>
-                            ) : (
-                              notAvailable
-                            )}
-                          </DescriptionListDescription>
-                        </DescriptionListGroup>
-                      </DescriptionList>
-                    </GridItem>
-                    <GridItem span={6}>
-                      <DescriptionList>
-                        <DescriptionListGroup>
-                          <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
-                          <DescriptionListDescription>
-                            {t('{{cpuCount}} CPU | {{memory}} Memory', { cpuCount, memory })}
-                          </DescriptionListDescription>
-                        </DescriptionListGroup>
-                        <DescriptionListGroup>
-                          <DescriptionListTerm>
-                            {t('Network interfaces')}
-                            {` (${networks.length})`}
-                          </DescriptionListTerm>
-                          <DescriptionListDescription>
-                            <WizardOverviewNetworksTable
-                              networks={networks}
-                              interfaces={interfaces}
-                            />
-                          </DescriptionListDescription>
-                        </DescriptionListGroup>
-                        <DescriptionListGroup>
-                          <DescriptionListTerm>
-                            {t('Disks')}
-                            {` (${disks.length})`}
-                          </DescriptionListTerm>
-                          <DescriptionListDescription>
-                            <WizardOverviewDisksTable vm={vmObject} />
-                          </DescriptionListDescription>
-                        </DescriptionListGroup>
-                        <DescriptionListGroup>
-                          <DescriptionListTerm>
-                            {t('Hardware Devices')}
-                            {` (${hardwareDevicesCount})`}
-                          </DescriptionListTerm>
-                          <DescriptionListDescription>
-                            <HardwareDevices canEdit={false} vm={vmObject} />
-                          </DescriptionListDescription>
-                        </DescriptionListGroup>
-                      </DescriptionList>
-                    </GridItem>
-                  </Grid>
-                </StackItem>
-              </Stack>
-            </div>
+        <div className="modal-body-inner-shadow-covers">
+          <div className="co-catalog-page__overlay-body">
+            <Stack hasGutter className="template-catalog-drawer-info">
+              <StackItem>
+                <Title headingLevel="h1" size="lg">
+                  {t('Template info')}
+                </Title>
+              </StackItem>
+              <StackItem>
+                <Grid hasGutter>
+                  <GridItem span={6}>
+                    <DescriptionList>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>{t('Operating System')}</DescriptionListTerm>
+                        <DescriptionListDescription>{displayName}</DescriptionListDescription>
+                      </DescriptionListGroup>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>{t('Workload type')}</DescriptionListTerm>
+                        <DescriptionListDescription>
+                          {WORKLOADS_LABELS[workload] ?? t('Other')}{' '}
+                          {isDefaultTemplate && t('(default)')}
+                        </DescriptionListDescription>
+                      </DescriptionListGroup>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
+                        <DescriptionListDescription>
+                          {<TemplateExpandableDescription description={description} />}
+                        </DescriptionListDescription>
+                      </DescriptionListGroup>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>{t('Documentation')}</DescriptionListTerm>
+                        <DescriptionListDescription>
+                          {documentationUrl ? (
+                            <Button
+                              isSmall
+                              isInline
+                              variant="link"
+                              icon={<ExternalLinkSquareAltIcon />}
+                              iconPosition="right"
+                            >
+                              <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
+                                {t('Refer to documentation')}
+                              </a>
+                            </Button>
+                          ) : (
+                            notAvailable
+                          )}
+                        </DescriptionListDescription>
+                      </DescriptionListGroup>
+                    </DescriptionList>
+                  </GridItem>
+                  <GridItem span={6}>
+                    <DescriptionList>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
+                        <DescriptionListDescription>
+                          {t('{{cpuCount}} CPU | {{memory}} Memory', { cpuCount, memory })}
+                        </DescriptionListDescription>
+                      </DescriptionListGroup>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>
+                          {t('Network interfaces')}
+                          {` (${networks.length})`}
+                        </DescriptionListTerm>
+                        <DescriptionListDescription>
+                          <WizardOverviewNetworksTable
+                            networks={networks}
+                            interfaces={interfaces}
+                          />
+                        </DescriptionListDescription>
+                      </DescriptionListGroup>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>
+                          {t('Disks')}
+                          {` (${disks.length})`}
+                        </DescriptionListTerm>
+                        <DescriptionListDescription>
+                          <WizardOverviewDisksTable vm={vmObject} />
+                        </DescriptionListDescription>
+                      </DescriptionListGroup>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>
+                          {t('Hardware Devices')}
+                          {` (${hardwareDevicesCount})`}
+                        </DescriptionListTerm>
+                        <DescriptionListDescription>
+                          <HardwareDevices canEdit={false} vm={vmObject} />
+                        </DescriptionListDescription>
+                      </DescriptionListGroup>
+                    </DescriptionList>
+                  </GridItem>
+                </Grid>
+              </StackItem>
+            </Stack>
           </div>
         </div>
       </div>
