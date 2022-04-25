@@ -10,20 +10,25 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
+import { printableVMStatus } from '../../../../../../utils';
 import DedicatedResources from '../../DedicatedResources/DedicatedResources';
 import EvictionStrategy from '../../EvictionStrategy/EvictionStrategy';
 import Flavor from '../../Flavor/Flavor';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 type VirtualMachineSchedulingLeftGridProps = {
-  vm?: V1VirtualMachine;
+  vm: V1VirtualMachine;
+  canUpdateVM: boolean;
 };
 
 const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGridProps> = ({
   vm,
+  canUpdateVM,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const canUpdateStoppedVM =
+    canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -42,7 +47,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Flavor vm={vm} />}
           descriptionHeader={t('CPU | Memory')}
-          isEdit
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <CPUMemoryModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
@@ -52,7 +57,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<DedicatedResources vm={vm} />}
           descriptionHeader={t('Dedicated Resources')}
-          isEdit
+          isEdit={canUpdateStoppedVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DedicatedResourcesModal
@@ -68,7 +73,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<EvictionStrategy vm={vm} />}
           descriptionHeader={t('Eviction Strategy')}
-          isEdit
+          isEdit={canUpdateStoppedVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <EvictionStrategyModal
