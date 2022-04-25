@@ -6,6 +6,7 @@ import { icon } from '@kubevirt-utils/resources/vmi';
 import { Label } from '@patternfly/react-core';
 
 import VirtualMachineInstanceActions from '../list/components/VirtualMachineInstanceActions/VirtualMachineInstanceAction';
+import VirtualMachineInstanceBreadcrumb from '../list/components/VirtualMachineInstanceBreadcrumb/VirtualMachineInstanceBreadcrumb';
 
 type VirtualMachinesInstancePageHeaderProps = {
   vmi: V1VirtualMachineInstance;
@@ -19,15 +20,14 @@ const VirtualMachinesInstancePageHeader: React.FC<VirtualMachinesInstancePageHea
   const IconComponent = icon?.[status];
   return (
     <div className="co-m-nav-title co-m-nav-title--detail">
+      <VirtualMachineInstanceBreadcrumb namespace={vmi?.metadata?.namespace} />
       <span className={'co-m-pane__heading'}>
-        <h1 className="co-m-pane__name co-resource-item">
+        <h1 className="co-resource-item__resource-name">
           <span className={`co-m-resource-icon co-m-resource-icon--lg`}>{t('VMI')}</span>
-          <span data-test-id="resource-title" className="co-resource-item__resource-name">
-            {vmi?.metadata?.name}
-            <Label isCompact icon={<IconComponent />}>
-              {status}
-            </Label>
-          </span>
+          {vmi?.metadata?.name}{' '}
+          <Label isCompact icon={<IconComponent />}>
+            {status}
+          </Label>
         </h1>
         <VirtualMachineInstanceActions vmi={vmi} />
       </span>
