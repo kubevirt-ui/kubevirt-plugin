@@ -1,15 +1,12 @@
+import { V1VirtualMachineInstanceGuestOSUser } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  K8sResourceCommon,
-  TableColumn,
-  useActiveColumns,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 const useActiveUsersColumnsVm = (): { title: string; id: string }[] => {
   const { t } = useKubevirtTranslation();
 
-  const columns: TableColumn<K8sResourceCommon>[] = [
+  const columns: TableColumn<V1VirtualMachineInstanceGuestOSUser>[] = [
     {
       title: t('User Name'),
       id: 'userName',
@@ -34,13 +31,7 @@ const useActiveUsersColumnsVm = (): { title: string; id: string }[] => {
     },
   ];
 
-  const [activeColumns] = useActiveColumns<K8sResourceCommon>({
-    columns,
-    showNamespaceOverride: false,
-    columnManagementID: '',
-  });
-
-  return activeColumns;
+  return columns;
 };
 
 export default useActiveUsersColumnsVm;
