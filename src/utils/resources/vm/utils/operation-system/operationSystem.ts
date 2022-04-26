@@ -73,3 +73,21 @@ export const getOperatingSystemName = (obj: K8sResourceCommon) =>
     obj?.metadata?.annotations,
     `${NAME_OS_TEMPLATE_ANNOTATION}/${getOperatingSystem(obj)}`,
   );
+
+/**
+ * Windows os prefix
+ * @date 4/20/2022 - 1:58:24 PM
+ *
+ * @type {"win"}
+ */
+export const OS_WINDOWS_PREFIX = 'win';
+
+/**
+ * Check if a vm/vmi is running windows
+ * @date 4/20/2022 - 1:58:24 PM
+ *
+ * @param {K8sResourceCommon} obj
+ * @returns {boolean}
+ */
+export const isWindows = (obj: K8sResourceCommon): boolean =>
+  (getOperatingSystem(obj) || '')?.startsWith(OS_WINDOWS_PREFIX);
