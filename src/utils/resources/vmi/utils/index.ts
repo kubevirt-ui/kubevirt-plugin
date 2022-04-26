@@ -1,6 +1,7 @@
 export * from './affinity';
 export * from './cpu';
 export * from './flavor';
+export * from './guest-agent';
 export * from './ips';
 export * from './nodeSelector';
 export * from './pod';
