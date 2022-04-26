@@ -20,14 +20,16 @@ import { RocketIcon, VirtualMachineIcon } from '@patternfly/react-icons';
 const VirtualMachineInstanceEmptyState: React.FC = ({}) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const namespace = useActiveNamespace();
-  const catalogURL = `/k8s/ns/${namespace || 'default'}/templatescatalog`;
+  const [namespace] = useActiveNamespace();
+  const isAllNamespaces = namespace === '#ALL_NS#';
+  const namespaceURL = isAllNamespaces ? `all-namespaces` : `ns/${namespace}`;
+  const catalogURL = `/k8s/${namespaceURL}/templatescatalog`;
 
   return (
     <EmptyState variant={EmptyStateVariant.large}>
       <EmptyStateIcon icon={VirtualMachineIcon} />
       <Title headingLevel="h4" size="lg">
-        {t('No VirtualMachinesInstaces found')}
+        {t('No VirtualMachinesInstances found')}
       </Title>
       <EmptyStateBody>
         <Trans t={t} ns="plugin__kubevirt-plugin">
