@@ -3,6 +3,7 @@ import { Trans } from 'react-i18next';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import {
   Accordion,
   AccordionContent,
@@ -12,7 +13,6 @@ import {
 } from '@patternfly/react-core';
 
 import { CLOUD_INIT_MISSING_USERNAME } from '../../utils/constants';
-import { getCloudInitCredentials } from '../../utils/utils';
 
 type CloudInitCredentialsProps = {
   vmi: V1VirtualMachineInstance;

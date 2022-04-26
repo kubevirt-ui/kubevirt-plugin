@@ -1,39 +1,15 @@
-import * as React from 'react';
-
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseSSHServiceValues = {
-  sshService: any;
-};
-
-const useSSHService = (vmi: V1VirtualMachineInstance): UseSSHServiceValues => {
-  const [sshService, setSSHService] = React.useState<any>(undefined);
-  const sshServiceModal = React.useMemo(
-    () => ({
-      kind: ServiceModel.kind,
-      isList: true,
-      namespace: vmi?.metadata?.namespace,
-    }),
-    [vmi],
-  );
-
-  const [services, isServicesLoaded] = useK8sWatchResource<K8sResourceCommon[]>(sshServiceModal);
-
-  React.useEffect(() => {
-    if (vmi?.metadata?.name && isServicesLoaded) {
-      const service = services?.find(
-        ({ metadata: serviceMetadata }) =>
-          serviceMetadata?.name === `${vmi?.metadata?.name}-ssh-service`,
-      );
-      if (service) {
-        setSSHService(service);
-      }
-    }
-  }, [vmi, services, isServicesLoaded]);
-
-  return { sshService };
+const useSSHService = (vmi: V1VirtualMachineInstance) => {
+  return useK8sWatchResource<IoK8sApiCoreV1Service>({
+    kind: ServiceModel.kind,
+    isList: false,
+    namespace: vmi?.metadata?.namespace,
+    name: `${vmi?.metadata?.name}-ssh-service`,
+  });
 };
 
 export default useSSHService;

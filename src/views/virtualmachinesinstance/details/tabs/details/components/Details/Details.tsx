@@ -1,7 +1,12 @@
 import * as React from 'react';
 
+import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
+import UserCredentials from '@kubevirt-utils/components/UserCredentials/UserCredentials';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   DescriptionList,
   DescriptionListDescription,
@@ -30,6 +35,7 @@ import Node from './Node/Node';
 import OperationSystem from './OperationSystem/OperationSystem';
 import Owner from './Owner/Owner';
 import Pods from './Pods/Pods';
+import SSHDetails from './SSHAccess/SSHAccess';
 import Timezone from './Timezone/Timezone';
 import WorkloadProfile from './WorkloadProfile/WorkloadProfile';
 
@@ -41,6 +47,14 @@ type DetailsProps = {
 const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
   const { t } = useKubevirtTranslation();
   const [guestAgentData] = useGuestOS(vmi);
+
+  const [sshService, sshServiceLoaded, sshServiceError] =
+    useK8sWatchResource<IoK8sApiCoreV1Service>({
+      kind: ServiceModel.kind,
+      isList: false,
+      namespace: vmi?.metadata?.namespace,
+      name: `${vmi?.metadata?.name}-ssh-service`,
+    });
 
   return (
     <div>
@@ -138,16 +152,19 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
             <DescriptionListGroup>
               <DescriptionListTerm>{t('User Credentials')}</DescriptionListTerm>
               <DescriptionListDescription>
-                {/* placeholder */}
-                <div className="text-muted">{t('SSH service is not available')} </div>
+                {sshServiceLoaded || sshServiceError ? (
+                  <UserCredentials sshService={sshService} vmi={vmi} />
+                ) : (
+                  <Loading />
+                )}
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('SSH Access')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {/* placeholder */}
-                <div className="text-muted">{t('SSH service is not available')} </div>
-              </DescriptionListDescription>
+              <SSHDetails
+                vmi={vmi}
+                sshService={sshService}
+                sshServiceLoaded={sshServiceLoaded || sshServiceError}
+              />
             </DescriptionListGroup>
             <DescriptionListGroup>
               <DescriptionListTerm>{t('Hardware devices')}</DescriptionListTerm>

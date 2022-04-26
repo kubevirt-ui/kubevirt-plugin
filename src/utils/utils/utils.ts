@@ -1,3 +1,5 @@
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
+
 export const isEmpty = (obj) =>
   [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
 
@@ -14,3 +16,6 @@ export const get = (obj, path, defaultValue = undefined) => {
 export const isUpstream = (window as any).SERVER_FLAGS.branding === 'okd';
 
 export const isString = (val) => val !== null && typeof val === 'string';
+
+export const getSSHNodePort = (sshService: IoK8sApiCoreV1Service) =>
+  sshService?.spec?.ports?.find((port) => parseInt(port.targetPort, 10) === 22)?.nodePort;
