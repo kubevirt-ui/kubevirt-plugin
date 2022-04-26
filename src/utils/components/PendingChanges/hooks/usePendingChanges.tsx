@@ -53,7 +53,7 @@ export const usePendingChanges = (
       hasPendingChange: cpuMemoryChanged,
       tabLabel: VirtualMachineDetailsTabLabel.Details,
       label: t('CPU | Memory'),
-      action: () => {
+      handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <CPUMemoryModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vmi={vmi} />
@@ -64,7 +64,7 @@ export const usePendingChanges = (
       hasPendingChange: bootOrderChanged,
       tabLabel: VirtualMachineDetailsTabLabel.Details,
       label: t('Boot order'),
-      action: () => {
+      handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         // TODO: createModal(({ isOpen, onClose }) => (<BootOrderModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />))
       },
@@ -76,7 +76,7 @@ export const usePendingChanges = (
         !isEmpty(modifiedEnvDisks) && modifiedEnvDisks?.length > 1
           ? modifiedEnvDisks.join(', ')
           : modifiedEnvDisks[0],
-      action: () => {
+      handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Environment));
       },
     },
@@ -87,7 +87,7 @@ export const usePendingChanges = (
         !isEmpty(modifiedNics) && modifiedNics?.length > 1
           ? modifiedNics.join(', ')
           : modifiedNics[0],
-      action: () => {
+      handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.NetworkInterfaces));
       },
     },
@@ -98,7 +98,7 @@ export const usePendingChanges = (
         !isEmpty(modifiedGPUDevices) && modifiedGPUDevices?.length > 1
           ? modifiedGPUDevices.join(', ')
           : modifiedGPUDevices[0],
-      action: () => {
+      handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesModal
@@ -122,7 +122,7 @@ export const usePendingChanges = (
         !isEmpty(modifiedHostDevices) && modifiedHostDevices?.length > 1
           ? modifiedHostDevices.join(', ')
           : modifiedHostDevices[0],
-      action: () => {
+      handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesModal
