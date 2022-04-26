@@ -5,6 +5,7 @@ import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/co
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
+import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
@@ -17,6 +18,7 @@ import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
 
 import Affinity from './components/Affinity';
 import DedicatedResources from './components/DedicatedResources';
+import Descheduler from './components/Descheduler';
 import EvictionStrategy from './components/EvictionStrategy';
 import NodeSelector from './components/NodeSelector';
 import Tolerations from './components/Tolerations';
@@ -79,6 +81,17 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
                     nodes={nodes}
                     nodesLoaded={nodesLoaded}
                   />
+                ))
+              }
+            />
+
+            <WizardDescriptionItem
+              title={t('Descheduler')}
+              description={<Descheduler vm={vm} />}
+              isEdit
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <DeschedulerModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
                 ))
               }
             />
