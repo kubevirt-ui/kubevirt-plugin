@@ -12,3 +12,5 @@ export const NONE_TYPE = '_none_';
 export const SERIAL_CONSOLE_TYPE = 'Serial console';
 export const VNC_CONSOLE_TYPE = 'VNC console';
 export const DESKTOP_VIEWER_CONSOLE_TYPE = 'Desktop viewer';
+export const SPICE_CONSOLE_TYPE = 'SpiceConsole';
+export const RDP_CONSOLE_TYPE = 'RdpConsole';
