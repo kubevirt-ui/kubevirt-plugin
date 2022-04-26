@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -60,6 +61,11 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         <VirtualMachineDescriptionItem
           descriptionData={<BootOrderSummary vm={vm} />}
           descriptionHeader={t('Boot Order')}
+          isEdit
+          showEditOnTitle
+          onEditClick={() =>
+            createModal((props) => <BootOrderModal {...props} vm={vm} onSubmit={onSubmit} />)
+          }
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.ipAddress}

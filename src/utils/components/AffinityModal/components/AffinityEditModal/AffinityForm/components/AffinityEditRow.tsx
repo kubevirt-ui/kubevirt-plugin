@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 import {
   Button,
@@ -28,7 +28,7 @@ const AffinityExpressionRow: React.FC<AffinityExpressionRowProps> = ({
   onDelete,
   rowID = 'affinity',
 }) => {
-  const { t } = useTranslation();
+  const { t } = useKubevirtTranslation();
   const { id, key, values = [], operator } = expression;
   const enableValueField = operator !== Operator.Exists && operator !== Operator.DoesNotExist;
   const [isOperatorExpended, setIsOperatorExpended] = React.useState(false);
