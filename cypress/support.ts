@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import './support/selectors';
 import './support/login';
+import './support/nav';
+import './support/project';
+import './support/resource';
 
 declare global {
   namespace Cypress {
