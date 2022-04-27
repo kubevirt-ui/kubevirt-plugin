@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
@@ -66,7 +67,9 @@ export const usePendingChanges = (
       label: t('Boot order'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
-        // TODO: createModal(({ isOpen, onClose }) => (<BootOrderModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />))
+        createModal(({ isOpen, onClose }) => (
+          <BootOrderModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vmi={vmi} />
+        ));
       },
     },
     {

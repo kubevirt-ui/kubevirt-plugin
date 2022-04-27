@@ -70,7 +70,9 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           isEdit
           showEditOnTitle
           onEditClick={() =>
-            createModal((props) => <BootOrderModal {...props} vm={vm} onSubmit={onSubmit} />)
+            createModal((props) => (
+              <BootOrderModal {...props} vm={vm} onSubmit={onSubmit} vmi={vmi} />
+            ))
           }
         />
         <VirtualMachineDescriptionItem
