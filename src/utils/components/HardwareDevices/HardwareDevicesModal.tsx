@@ -1,10 +1,18 @@
 import * as React from 'react';
 
 import { produceVMDevices } from '@catalog/utils/WizardVMContext';
-import { V1GPU, V1HostDevice, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1GPU,
+  V1HostDevice,
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { Button, Form, FormGroup, Grid } from '@patternfly/react-core';
 import { CheckCircleIcon, PlusCircleIcon, TrashIcon } from '@patternfly/react-icons';
+
+import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { getChangedGPUDevices, getChangedHostDevices } from '../PendingChanges/utils/helpers';
 
 import DeviceNameSelect from './form/DeviceNameSelect';
 import NameFormField from './form/NameFormField';
@@ -22,6 +30,7 @@ type HardwareDevicesModalProps = {
   initialDevices: V1GPU[] | V1HostDevice[];
   btnText: string;
   type: HARDWARE_DEVICE_TYPE.GPUS | HARDWARE_DEVICE_TYPE.HOST_DEVICES;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
@@ -33,6 +42,7 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
   initialDevices,
   btnText,
   type,
+  vmi,
 }) => {
   const [devices, setDevices] = React.useState<V1GPU[] | V1HostDevice[]>(initialDevices);
   const [name, setName] = React.useState<string>();
@@ -41,6 +51,9 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
   const [addButtonDisabled, setAddButtonDisabled] = React.useState<boolean>(false);
 
   const permittedHostDevices = useHCPermittedHostDevices();
+
+  const getChangedDevices =
+    type === HARDWARE_DEVICE_TYPE.GPUS ? getChangedGPUDevices : getChangedHostDevices;
 
   const onAddDevice = () => {
     setShowForm(true);
@@ -86,6 +99,11 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
       headerText={showForm ? btnText : headerText}
     >
       <Form>
+        {vmi && (
+          <ModalPendingChangesAlert
+            isChanged={getChangedDevices(updatedVirtualMachine, vmi)?.length > 0}
+          />
+        )}
         <HardwareDevicesList devices={devices} handleRemoveDevice={onRemoveDevice} />
         {showForm && (
           <Grid hasGutter>

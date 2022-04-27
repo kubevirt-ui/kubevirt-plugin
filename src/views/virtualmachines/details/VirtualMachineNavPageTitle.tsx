@@ -1,11 +1,15 @@
 import * as React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 
 import VirtualMachineActions from '../list/components/VirtualMachineActions/VirtualMachineActions';
 import { getVMStatusIcon } from '../utils';
+
+import VirtualMachinePendingChangesAlert from './VirtualMachinePendingChangesAlert';
 
 type VirtualMachineNavPageTitleProps = {
   vm: V1VirtualMachine;
@@ -13,6 +17,13 @@ type VirtualMachineNavPageTitleProps = {
 
 const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
+
+  const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
+    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+    name: vm?.metadata?.name,
+    namespace: vm?.metadata?.namespace,
+    isList: false,
+  });
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
   return (
     <div className="co-m-nav-title co-m-nav-title--detail">
@@ -26,6 +37,7 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
         </h1>
         <VirtualMachineActions vm={vm} />
       </span>
+      <VirtualMachinePendingChangesAlert vm={vm} vmi={vmi} />
     </div>
   );
 };

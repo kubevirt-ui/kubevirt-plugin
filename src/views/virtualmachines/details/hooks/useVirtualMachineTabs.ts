@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+import {
+  VirtualMachineDetailsTab,
+  VirtualMachineDetailsTabLabel,
+} from '@kubevirt-utils/components/PendingChanges/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import VirtualMachineConsolePage from '../tabs/console/VirtualMachineConsolePage';
@@ -17,48 +21,48 @@ export const useVirtualMachineTabs = () => {
   const tabs = React.useMemo(
     () => [
       {
-        href: '',
-        name: t('Overview'),
+        href: VirtualMachineDetailsTab.Overview,
+        name: t(VirtualMachineDetailsTabLabel.Overview),
         component: VirtualMachinesOverviewTab,
       },
       {
-        href: 'details',
-        name: t('Details'),
+        href: VirtualMachineDetailsTab.Details,
+        name: t(VirtualMachineDetailsTabLabel.Details),
         component: VirtualMachineDetailsPage,
       },
       {
-        href: 'yaml',
-        name: 'YAML',
+        href: VirtualMachineDetailsTab.YAML,
+        name: t(VirtualMachineDetailsTabLabel.YAML),
         component: VirtualMachineYAMLPage,
       },
       {
-        href: 'environment',
-        name: t('Environment'),
+        href: VirtualMachineDetailsTab.Environment,
+        name: t(VirtualMachineDetailsTabLabel.Environment),
         component: VirtualMachineEnvironmentPage,
       },
       {
-        href: 'events',
-        name: t('Events'),
+        href: VirtualMachineDetailsTab.Events,
+        name: t(VirtualMachineDetailsTabLabel.Events),
         component: React.Fragment,
       },
       {
-        href: 'console',
-        name: t('Console'),
+        href: VirtualMachineDetailsTab.Console,
+        name: t(VirtualMachineDetailsTabLabel.Console),
         component: VirtualMachineConsolePage,
       },
       {
-        href: 'network-interfaces',
-        name: t('Network Interfaces'),
+        href: VirtualMachineDetailsTab.NetworkInterfaces,
+        name: t(VirtualMachineDetailsTabLabel.NetworkInterfaces),
         component: NetworkInterfaceListPage,
       },
       {
-        href: 'disks',
-        name: t('Disks'),
+        href: VirtualMachineDetailsTab.Disks,
+        name: t(VirtualMachineDetailsTabLabel.Disks),
         component: DiskListPage,
       },
       {
-        href: 'snapshots',
-        name: t('Snapshots'),
+        href: VirtualMachineDetailsTab.Snapshots,
+        name: t(VirtualMachineDetailsTabLabel.Snapshots),
         component: SnapshotListPage,
       },
     ],

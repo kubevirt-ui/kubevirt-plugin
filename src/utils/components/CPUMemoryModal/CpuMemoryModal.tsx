@@ -1,7 +1,7 @@
 import * as React from 'react';
 import produce from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Alert,
@@ -17,6 +17,9 @@ import {
   TitleSizes,
 } from '@patternfly/react-core';
 
+import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { checkCPUMemoryChanged } from '../PendingChanges/utils/helpers';
+
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
 import { getCPUCount, getMemorySize, memorySizesTypes } from './utils/CpuMemoryUtils';
 
@@ -27,9 +30,10 @@ type CPUMemoryModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vmi?: V1VirtualMachineInstance;
 };
 
-const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, onSubmit }) => {
+const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, onSubmit, vmi }) => {
   const { t } = useKubevirtTranslation();
   const {
     data: templateDefaultsData,
@@ -122,12 +126,8 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
         </Button>,
       ]}
     >
-      {vm?.status?.printableStatus === 'Running' && (
-        <Alert variant="info" isInline title={t('Restart required to apply changes')}>
-          {t(
-            'If you make changes to the following settings you will need to restart the virtual machine in order for them to be applied',
-          )}
-        </Alert>
+      {vmi && (
+        <ModalPendingChangesAlert isChanged={checkCPUMemoryChanged(updatedVirtualMachine, vmi)} />
       )}
       <div className="inputs">
         <div className="input-cpu">
