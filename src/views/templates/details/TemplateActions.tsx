@@ -5,7 +5,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, DropdownToggle } from '@patternfly/react-core';
 
-import useVirtualMachineTemplatesActions from '../actions/hooks/useVirtualMachineTemplatesActions';
+import useVirtualMachineTemplatesActions, {
+  EDIT_TEMPLATE_ID,
+} from '../actions/hooks/useVirtualMachineTemplatesActions';
 
 type TemplateActionsProps = {
   template: V1Template;
@@ -15,9 +17,9 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const [isDropDownOpen, setDropdownOpen] = React.useState(false);
 
-  const actions = useVirtualMachineTemplatesActions(template).filter(
-    (action) => action.id !== 'edit-template',
-  );
+  const [actions] = useVirtualMachineTemplatesActions(template);
+
+  const filteredActions = actions.filter((action) => action.id !== EDIT_TEMPLATE_ID);
 
   const handleClick = (action: Action) => {
     if (typeof action?.cta === 'function') {
@@ -31,7 +33,7 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({ template }) => {
       isOpen={isDropDownOpen}
       position={DropdownPosition.right}
       toggle={<DropdownToggle onToggle={setDropdownOpen}>{t('Actions')}</DropdownToggle>}
-      dropdownItems={actions?.map((action) => (
+      dropdownItems={filteredActions?.map((action) => (
         <DropdownItem
           key={action?.id}
           onClick={() => handleClick(action)}

@@ -11,6 +11,7 @@ import {
 import { getVMBootSourceType } from '@kubevirt-utils/resources/vm/utils/source';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
+import { poorManProcess } from '../../utils';
 import { BOOT_SOURCE } from '../../utils/constants';
 import { getTemplateVirtualMachineObject } from '../../utils/selectors';
 
@@ -28,22 +29,6 @@ export type TemplateBootSource = {
     http?: V1beta1DataVolumeSourceHTTP;
     registry?: V1beta1DataVolumeSourceRegistry;
   };
-};
-
-// Only used for replacing parameters in the template, do not use for anything else
-// eslint-disable-next-line require-jsdoc
-const poorManProcess = (template: V1Template): V1Template => {
-  if (!template) return null;
-
-  let templateString = JSON.stringify(template);
-
-  template.parameters
-    .filter((p) => p.value)
-    .forEach((p) => {
-      templateString = templateString.replaceAll(`\${${p.name}}`, p.value);
-    });
-
-  return JSON.parse(templateString);
 };
 
 /**
