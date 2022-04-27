@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import TemplateNameTableData from '@kubevirt-utils/components/TemplateNameTableData/TemplateNameTableData';
+import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -23,19 +23,23 @@ const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation, { template: V1
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        <TemplateNameTableData name={network.name} />
+        <TemplateValue value={network.name} />
       </TableData>
       <TableData id="model" activeColumnIDs={activeColumnIDs}>
         {iface.model || NO_DATA_DASH}
       </TableData>
       <TableData id="network" activeColumnIDs={activeColumnIDs}>
-        {network.pod ? t('Pod networking') : network.multus?.networkName || NO_DATA_DASH}
+        {network.pod ? (
+          t('Pod networking')
+        ) : (
+          <TemplateValue value={network.multus?.networkName || NO_DATA_DASH} />
+        )}
       </TableData>
       <TableData id="type" activeColumnIDs={activeColumnIDs}>
         {getPrintableNetworkInterfaceType(iface)}
       </TableData>
       <TableData id="macAddress" activeColumnIDs={activeColumnIDs}>
-        {iface.macAddress || NO_DATA_DASH}
+        <TemplateValue value={iface.macAddress || NO_DATA_DASH} />
       </TableData>
       <TableData
         id="actions"
