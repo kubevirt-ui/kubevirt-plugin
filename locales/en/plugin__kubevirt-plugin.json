@@ -1,4 +1,5 @@
 {
+  " 0 Toleration rules": " 0 Toleration rules",
   " Password: ": " Password: ",
   "(default)": "(default)",
   "(default) | ": "(default) | ",
@@ -157,6 +158,7 @@
   "Deadline must be greater than 0": "Deadline must be greater than 0",
   "Decrement": "Decrement",
   "Dedicated Resources": "Dedicated Resources",
+  "Dedicated resources": "Dedicated resources",
   "Default": "Default",
   "Default Templates": "Default Templates",
   "Define an affinity rule. This rule will be added to the list of affinity rules applied to this workload.": "Define an affinity rule. This rule will be added to the list of affinity rules applied to this workload.",
@@ -220,6 +222,7 @@
   "Error Loading Template: the server could not find the requested resource": "Error Loading Template: the server could not find the requested resource",
   "Events": "Events",
   "Eviction Strategy": "Eviction Strategy",
+  "Eviction strategy": "Eviction strategy",
   "EvictionStrategy can be set to \"LiveMigrate\" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.": "EvictionStrategy can be set to \"LiveMigrate\" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.",
   "Example: ": "Example: ",
   "Example: For CentOS, visit the ": "Example: For CentOS, visit the ",
@@ -367,6 +370,7 @@
   "Node fields": "Node fields",
   "Node labels": "Node labels",
   "Node port": "Node port",
+  "Node selector": "Node selector",
   "None": "None",
   "Not available": "Not available",
   "Note that for Node field expressions, entering a full path is required in the \"Key\" field (e.g. \"metadata.name: value\").": "Note that for Node field expressions, entering a full path is required in the \"Key\" field (e.g. \"metadata.name: value\").",
@@ -469,6 +473,7 @@
   "Save": "Save",
   "Save affinity rule": "Save affinity rule",
   "Schedule this workload with dedicated resources (guaranteed policy)": "Schedule this workload with dedicated resources (guaranteed policy)",
+  "Scheduling": "Scheduling",
   "Scheduling and resources requirements": "Scheduling and resources requirements",
   "Scheduling will not be possible at this state": "Scheduling will not be possible at this state",
   "Search": "Search",
@@ -696,5 +701,6 @@
   "{{matchingNodeText}} matching": "{{matchingNodeText}} matching",
   "{{qualifiedNodesCount}} matching Nodes found": "{{qualifiedNodesCount}} matching Nodes found",
   "{{qualifiedNodesCount}} matching nodes found": "{{qualifiedNodesCount}} matching nodes found",
-  "{{qualifiedNodesCount}} nodes found": "{{qualifiedNodesCount}} nodes found"
+  "{{qualifiedNodesCount}} nodes found": "{{qualifiedNodesCount}} nodes found",
+  "{{rulesCount}} Affinity rules": "{{rulesCount}} Affinity rules"
 }
