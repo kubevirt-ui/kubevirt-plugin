@@ -27,6 +27,29 @@ const ActiveUserListSection: React.FC<ActiveUserListProps> = ({ vm, pathname }) 
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const [{ userList = [] }, loaded, loadError] = useGuestOS(vmi);
 
+  const bodyTable =
+    vmi && isGuestAgentConnected(vmi) ? (
+      <VirtualizedTable<V1VirtualMachineInstanceGuestOSUser>
+        data={userList}
+        unfilteredData={userList}
+        loaded={loaded}
+        loadError={loadError}
+        columns={columns}
+        Row={ActiveUserListRowVm}
+        NoDataEmptyMsg={() => (
+          <div id="no-active-users-msg" className="pf-u-text-align-center">
+            {t('No Active Users')}
+          </div>
+        )}
+      />
+    ) : (
+      <Bullseye>
+        <MutedTextSpan
+          text={vmi ? t('Guest Agent is required') : t('VirtualMachine is not running')}
+        />
+      </Bullseye>
+    );
+
   return (
     <div className="VirtualMachinesDetailsSection">
       <a href={`${pathname}#logged-in-users`} className="link-icon">
@@ -35,26 +58,7 @@ const ActiveUserListSection: React.FC<ActiveUserListProps> = ({ vm, pathname }) 
       <Title headingLevel="h2" className="co-section-heading">
         {t('Active Users')}
       </Title>
-
-      {isGuestAgentConnected(vmi) ? (
-        <VirtualizedTable<V1VirtualMachineInstanceGuestOSUser>
-          data={userList}
-          unfilteredData={userList}
-          loaded={loaded}
-          loadError={loadError}
-          columns={columns}
-          Row={ActiveUserListRowVm}
-          NoDataEmptyMsg={() => (
-            <div id="no-active-users-msg" className="pf-u-text-align-center">
-              {t('No Active Users')}
-            </div>
-          )}
-        />
-      ) : (
-        <Bullseye>
-          <MutedTextSpan text={t('Guest Agent is required')} />
-        </Bullseye>
-      )}
+      {bodyTable}
     </div>
   );
 };
