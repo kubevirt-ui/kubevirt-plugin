@@ -33,8 +33,8 @@ const TemplateDetailsPage: React.FC<TemplateDetailsPageProps> = ({ obj: template
 
   return (
     <>
-      <ListPageBody>
-        {isCommonTemplate && (
+      {isCommonTemplate && (
+        <ListPageBody>
           <Alert
             className="alert-margin-top-bottom"
             isInline
@@ -57,8 +57,8 @@ const TemplateDetailsPage: React.FC<TemplateDetailsPageProps> = ({ obj: template
               </div>
             </Trans>
           </Alert>
-        )}
-      </ListPageBody>
+        </ListPageBody>
+      )}
       <ListPageHeader title={t('VM Template Details')}></ListPageHeader>
       <ListPageBody>
         <Grid>
