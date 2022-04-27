@@ -3,18 +3,15 @@ import { ACTION_TIMEOUT, VM_STATUS } from '../utils/const/index';
 import { NoBootSource } from '../utils/const/string';
 
 import * as catalogView from './catalog';
-import { vmStatusOnDetails, vmStatusOnList } from './selector';
-import { tab } from './tab';
+import { detailsOnOverview, vmStatusOnList } from './selector';
 
 export const getRow = (name: string, within: VoidFunction) =>
   cy.byTestRows('resource-row').contains(name).parents('tr').within(within);
 
-// monitor vm status on details tab
-// navigate to vm details tab before call it
 export const waitForStatus = (status: string) => {
   switch (status) {
     case VM_STATUS.Running: {
-      cy.contains(vmStatusOnDetails, VM_STATUS.Running, {
+      cy.contains(detailsOnOverview, VM_STATUS.Running, {
         timeout: ACTION_TIMEOUT.BOOTUP,
       }).should('exist');
       // wait for vmi appear
@@ -23,25 +20,25 @@ export const waitForStatus = (status: string) => {
       break;
     }
     case VM_STATUS.Provisioning: {
-      cy.contains(vmStatusOnDetails, VM_STATUS.Provisioning, {
+      cy.contains(detailsOnOverview, VM_STATUS.Provisioning, {
         timeout: ACTION_TIMEOUT.IMPORT,
       }).should('exist');
       break;
     }
     case VM_STATUS.Stopped: {
-      cy.contains(vmStatusOnDetails, VM_STATUS.Stopped, {
+      cy.contains(detailsOnOverview, VM_STATUS.Stopped, {
         timeout: ACTION_TIMEOUT.IMPORT,
       }).should('exist');
       break;
     }
     case VM_STATUS.Starting: {
-      cy.contains(vmStatusOnDetails, VM_STATUS.Starting, {
+      cy.contains(detailsOnOverview, VM_STATUS.Starting, {
         timeout: ACTION_TIMEOUT.IMPORT,
       }).should('exist');
       break;
     }
     default: {
-      cy.contains(vmStatusOnDetails, status).should('exist');
+      cy.contains(detailsOnOverview, status).should('exist');
       break;
     }
   }
@@ -51,7 +48,7 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
   cy.get(catalogView.vmName).clear().type(vmData.name);
   switch (vmData.diskSource.name) {
     case 'URL': {
-      cy.get(catalogView.diskSourceSelect).click();
+      cy.byButtonText('Default').click();
       cy.byLegacyTestID(vmData.diskSource.selectorID).click();
       cy.get(catalogView.diskSourceURL).type(vmData.diskSource.value);
       break;
@@ -75,8 +72,6 @@ export const vm = {
         cy.byButtonText(catalogView.createWithNoBS).click();
       }
     });
-
-    tab.navigateToDetails();
     if (vmData.startOnCreation) {
       waitForStatus(VM_STATUS.Provisioning);
       waitForStatus(VM_STATUS.Starting);
