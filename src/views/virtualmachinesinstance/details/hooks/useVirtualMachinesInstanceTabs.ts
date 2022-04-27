@@ -30,9 +30,9 @@ const useVirtualMachinesInstanceTabs = () => {
         component: VirtualMachinesInstancePageConsoleTab,
       },
       {
-        href: 'disks',
-        name: t('Disks'),
-        component: VirtualMachinesInstancePageDisksTab,
+        href: 'events',
+        name: t('Events'),
+        component: VirtualMachinesInstancePageEventsTab,
       },
       {
         href: 'network',
@@ -40,9 +40,9 @@ const useVirtualMachinesInstanceTabs = () => {
         component: VirtualMachinesInstancePageNetworkTab,
       },
       {
-        href: 'events',
-        name: t('Events'),
-        component: VirtualMachinesInstancePageEventsTab,
+        href: 'disks',
+        name: t('Disks'),
+        component: VirtualMachinesInstancePageDisksTab,
       },
     ],
     [t],
