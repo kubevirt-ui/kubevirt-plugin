@@ -306,7 +306,7 @@
   "Memory swap": "Memory swap",
   "Memory used": "Memory used",
   "Metrics are collected by the OpenShift Monitoring Operator.": "Metrics are collected by the OpenShift Monitoring Operator.",
-  "Migrate node to node": "Migrate node to node",
+  "Migrate VirtualMachine to Node": "Migrate VirtualMachine to Node",
   "Migration Toolkit for Virtualization": "Migration Toolkit for Virtualization",
   "Missing Guest Agent": "Missing Guest Agent",
   "Missing fields in Node fields": "Missing fields in Node fields",
