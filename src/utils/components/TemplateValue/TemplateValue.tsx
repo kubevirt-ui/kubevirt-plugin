@@ -1,18 +1,20 @@
 import * as React from 'react';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import './template-name-table-data.scss';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isTemplateParameter } from '@kubevirt-utils/utils/utils';
+
+import './template-value.scss';
 
 type TemplateNameTableDataProps = {
-  name: string;
+  value: string;
 };
 
-const TemplateNameTableData: React.FC<TemplateNameTableDataProps> = ({ name, children }) => {
+const TemplateNameTableData: React.FC<TemplateNameTableDataProps> = ({ value, children }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <div className="template-name-table-data">
-      {children || name}
-      {!!/^\$\{[A-Z_]+\}$/.test(name) && (
+    <div className="template-value">
+      {children || value}
+      {isTemplateParameter(value) && (
         <div className="template-parameter">{t('template parameter')}</div>
       )}
     </div>

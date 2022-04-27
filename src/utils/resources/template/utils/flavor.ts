@@ -1,7 +1,11 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1CPU, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { getTemplateFlavor, getTemplateVirtualMachineObject } from './selectors';
+import {
+  getTemplateFlavor,
+  getTemplateVirtualMachineCPU,
+  getTemplateVirtualMachineObject,
+} from './selectors';
 
 /**
  * parses CPU and returns its sockets, cores and threads
@@ -35,7 +39,7 @@ export const getFlavorData = (
   cpuCount: number;
   memory: string;
 } => {
-  const cpu = getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.cpu;
+  const cpu = getTemplateVirtualMachineCPU(template);
   const memory = (
     getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.resources
       ?.requests as { memory: string }
@@ -44,7 +48,11 @@ export const getFlavorData = (
   const cpuCount = vCPUCount(cpu);
   const flavor = getTemplateFlavor(template);
 
-  return { flavor, cpuCount, memory };
+  return {
+    flavor,
+    cpuCount,
+    memory,
+  };
 };
 
 /**
@@ -63,7 +71,10 @@ export const getVmCPUMemory = (
 
   const cpuCount = vCPUCount(cpu);
 
-  return { cpuCount, memory };
+  return {
+    cpuCount,
+    memory,
+  };
 };
 
 /**

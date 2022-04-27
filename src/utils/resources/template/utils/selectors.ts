@@ -182,3 +182,10 @@ export const generateVMName = (template: V1Template): string => {
     separator: '-',
   })}`;
 };
+
+/**
+ * A selector that returns the CPU of a given template
+ * @param {V1Template} template - template
+ */
+export const getTemplateVirtualMachineCPU = (template: V1Template) =>
+  getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.cpu;

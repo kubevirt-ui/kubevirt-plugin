@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import TemplateNameTableData from '@kubevirt-utils/components/TemplateNameTableData/TemplateNameTableData';
+import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
@@ -26,7 +26,7 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        <TemplateNameTableData name={obj?.name}>
+        <TemplateValue value={obj?.name}>
           <Split hasGutter>
             <SplitItem>{obj?.name}</SplitItem>
             {obj?.isBootDisk && (
@@ -37,26 +37,26 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
               </SplitItem>
             )}
           </Split>
-        </TemplateNameTableData>
+        </TemplateValue>
       </TableData>
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
         {isPVCSource ? (
           <ResourceLink kind={PersistentVolumeClaimModel.kind} name={obj?.source} />
         ) : (
-          obj?.source
+          <TemplateValue value={obj?.source} />
         )}
       </TableData>
       <TableData id="size" activeColumnIDs={activeColumnIDs}>
-        {obj?.size}
+        <TemplateValue value={obj?.size} />
       </TableData>
       <TableData id="drive" activeColumnIDs={activeColumnIDs}>
-        {obj?.drive}
+        <TemplateValue value={obj?.drive} />
       </TableData>
       <TableData id="interface" activeColumnIDs={activeColumnIDs}>
-        {obj?.interface}
+        <TemplateValue value={obj?.interface} />
       </TableData>
       <TableData id="storage-class" activeColumnIDs={activeColumnIDs}>
-        {obj?.storageClass}
+        <TemplateValue value={obj?.storageClass} />
       </TableData>
       <TableData
         id="actions"
