@@ -12,7 +12,7 @@ const VirtualMachineTemplatesActions: React.FC<VirtualMachineTemplatesActionsPro
   template,
 }) => {
   // const { t } = useKubevirtTranslation();
-  const actions = useVirtualMachineTemplatesActions(template);
+  const [actions, onLazsyActions] = useVirtualMachineTemplatesActions(template);
   const [isOpen, setIsOpen] = React.useState(false);
 
   const handleClick = (action: Action) => {
@@ -22,13 +22,18 @@ const VirtualMachineTemplatesActions: React.FC<VirtualMachineTemplatesActionsPro
     }
   };
 
+  const onDropDownToggle = (value: boolean) => {
+    setIsOpen(value);
+    if (value) onLazsyActions();
+  };
+
   return (
     // TODO: use LazyActionMenu when fixed
     <Dropdown
       isPlain
       isOpen={isOpen}
       position={DropdownPosition.right}
-      toggle={<KebabToggle onToggle={setIsOpen} />}
+      toggle={<KebabToggle onToggle={onDropDownToggle} />}
       dropdownItems={actions?.map((action) => (
         <DropdownItem
           key={action?.id}

@@ -5,12 +5,18 @@ import { isCommonVMTemplate } from 'src/views/templates/utils';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Action, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
-type useVirtualMachineTemplatesActionsProps = (template: V1Template) => Action[];
+import { hasEditableBootSource } from '../editBootSource';
 
+type useVirtualMachineTemplatesActionsProps = (
+  template: V1Template,
+) => [actions: Action[], onLazsyActions: () => void];
+
+export const EDIT_TEMPLATE_ID = 'edit-template';
 const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps = (
   template: V1Template,
 ) => {
@@ -18,10 +24,18 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const isCommonTemplate = isCommonVMTemplate(template);
   const { createModal } = useModal();
   const history = useHistory();
+  const [editableBootSource, setEditableBootSource] = React.useState<boolean>(null);
+
+  const onLazsyActions = React.useCallback(async () => {
+    if (editableBootSource === null) {
+      const editable = await hasEditableBootSource(template);
+      setEditableBootSource(editable);
+    }
+  }, [editableBootSource, template]);
 
   const actions = [
     {
-      id: 'edit-template',
+      id: EDIT_TEMPLATE_ID,
       label: t('Edit Template'),
       cta: () =>
         // lead to the template details page
@@ -37,9 +51,12 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     },
     {
       id: 'edit-boot-source',
-      label: t('Edit boot source'),
-      description: t('This action is currently not avaliable'),
-      disabled: true, // TODO check if datasource is available and does not have a matching cron import job
+      label: (
+        <>
+          {t('Edit boot source')} {editableBootSource === null && <Loading />}
+        </>
+      ),
+      disabled: !editableBootSource,
       cta: () => console.log('Edit boot source'),
       // TODO add the modal
       // cta: () =>
@@ -70,7 +87,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     },
   ];
 
-  return actions;
+  return [actions, onLazsyActions];
 };
 
 export default useVirtualMachineTemplatesActions;
