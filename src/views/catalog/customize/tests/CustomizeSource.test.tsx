@@ -146,7 +146,7 @@ describe('Test CustomizeSource', () => {
       },
       source: {
         registry: {
-          url: testContainer,
+          url: 'docker://'.concat(testContainer),
         },
       },
     });
@@ -163,7 +163,7 @@ describe('Test CustomizeSource', () => {
       },
       source: {
         registry: {
-          url: testContainer,
+          url: 'docker://'.concat(testContainer),
         },
       },
     });

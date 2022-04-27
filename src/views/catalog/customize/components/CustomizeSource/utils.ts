@@ -84,3 +84,5 @@ export const getRegistryHelperText = (template: V1Template, t: TFunction) => {
       containerDisk: containerDisks[0],
     });
 };
+
+export const appendDockerPrefix = (image: string) => 'docker://'.concat(image);
