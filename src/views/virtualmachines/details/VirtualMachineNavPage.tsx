@@ -24,7 +24,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   const pages = useVirtualMachineTabs();
   return (
     <>
-      <VirtualMachineNavPageTitle vm={vm} namespace={namespace} />
+      <VirtualMachineNavPageTitle vm={vm} />
       <HorizontalNav pages={pages} resource={vm} />
     </>
   );
