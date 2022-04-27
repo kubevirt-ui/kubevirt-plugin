@@ -38,7 +38,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources }) => {
           isLoading={resources?.vmCommonTemplates?.loaded === false}
           error={!!resources?.vmCommonTemplates?.loadError}
           dataTest="kv-inventory-card--vm-templates"
-          basePath={`/k8s/ns/${dataSourceNS}/virtualmachinetemplates`}
+          basePath={`/k8s/ns/${dataSourceNS}/templates`}
         />
       </StackItem>
       <StackItem key={NodeModel.kind}>
