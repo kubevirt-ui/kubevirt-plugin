@@ -59,4 +59,6 @@ export type VncConsoleProps = React.HTMLProps<HTMLDivElement> & {
   textSendShortcut?: string;
   /** Text content rendered inside the Ctrl-Alt-Delete dropdown entry */
   textCtrlAltDel?: string;
+  /** Should console try to connect once rendering */
+  autoConnect?: boolean;
 };

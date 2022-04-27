@@ -50,6 +50,7 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
   textDisconnect,
   textSendShortcut,
   textCtrlAltDel,
+  autoConnect = true,
 }) => {
   const { t } = useKubevirtTranslation();
   const [rfb, setRfb] = React.useState<any>();
@@ -135,7 +136,7 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
     if (!rfb && status === disconnected) {
       try {
         initLogging(vncLogging);
-        connect();
+        autoConnect && connect();
       } catch (e) {
         onInitFailed && onInitFailed(e);
       }
@@ -146,7 +147,7 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
         rfb?.disconnect();
       }
     };
-  }, [connect, onInitFailed, vncLogging, rfb, status]);
+  }, [connect, onInitFailed, vncLogging, rfb, status, autoConnect]);
 
   return (
     <>
