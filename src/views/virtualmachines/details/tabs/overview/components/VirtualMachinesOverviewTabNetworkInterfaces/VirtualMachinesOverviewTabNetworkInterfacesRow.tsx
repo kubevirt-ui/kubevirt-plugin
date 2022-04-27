@@ -39,7 +39,11 @@ const VirtualMachinesOverviewTabInterfacesRow: React.FC<
         </Popover>
       </TableData>
       <TableData id="ip" activeColumnIDs={activeColumnIDs}>
-        <FirstItemListPopover items={obj?.ipAddresses} headerContent={'IP Addresses'} />
+        <FirstItemListPopover
+          items={obj?.ipAddresses}
+          headerContent={'IP Addresses'}
+          includeCopyFirstItem
+        />
       </TableData>
     </>
   );
