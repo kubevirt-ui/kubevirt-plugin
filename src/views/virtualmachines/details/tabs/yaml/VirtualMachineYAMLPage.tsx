@@ -14,14 +14,15 @@ type VirtualMachineYAMLPageProps = RouteComponentProps<{
 };
 
 const VirtualMachineYAMLPage: React.FC<VirtualMachineYAMLPageProps> = ({ obj: vm }) => {
-  return (
-    <React.Suspense
-      fallback={
-        <Bullseye>
-          <Loading />
-        </Bullseye>
-      }
-    >
+  const loading = (
+    <Bullseye>
+      <Loading />
+    </Bullseye>
+  );
+  return !vm ? (
+    loading
+  ) : (
+    <React.Suspense fallback={loading}>
       <ResourceYAMLEditor initialResource={vm} />
     </React.Suspense>
   );
