@@ -5,7 +5,6 @@ import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-p
 
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
 import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
-
 export type VirtualMachineDetailsPageProps = {
   name: string;
   namespace: string;
