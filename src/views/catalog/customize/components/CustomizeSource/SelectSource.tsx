@@ -16,7 +16,7 @@ import {
   SOURCE_OPTIONS_IDS,
 } from './constants';
 import SelectSourceOption from './SelectSourceOption';
-import { getGenericSourceCustomization, getPVCSource } from './utils';
+import { appendDockerPrefix, getGenericSourceCustomization, getPVCSource } from './utils';
 import { VolumeSize } from './VolumeSize';
 
 export type SelectSourceProps = {
@@ -72,7 +72,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
         return onSourceChange(
           getGenericSourceCustomization(
             selectedSourceType,
-            containerImage,
+            appendDockerPrefix(containerImage),
             withSize ? volumeQuantity : null,
           ),
         );
