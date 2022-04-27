@@ -3,7 +3,6 @@ import { Trans } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
   Button,
   ButtonVariant,
@@ -17,13 +16,14 @@ import {
 } from '@patternfly/react-core';
 import { RocketIcon, VirtualMachineIcon } from '@patternfly/react-icons';
 
-const VirtualMachineInstanceEmptyState: React.FC = ({}) => {
+type VirtualMachineInstanceEmptyStateProps = {
+  catalogURL: string;
+};
+const VirtualMachineInstanceEmptyState: React.FC<VirtualMachineInstanceEmptyStateProps> = ({
+  catalogURL,
+}) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const [namespace] = useActiveNamespace();
-  const isAllNamespaces = namespace === '#ALL_NS#';
-  const namespaceURL = isAllNamespaces ? `all-namespaces` : `ns/${namespace}`;
-  const catalogURL = `/k8s/${namespaceURL}/templatescatalog`;
 
   return (
     <EmptyState variant={EmptyStateVariant.large}>

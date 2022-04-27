@@ -26,6 +26,7 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
   namespace,
 }) => {
   const { t } = useKubevirtTranslation();
+  const catalogURL = `/k8s/ns/${namespace || 'default'}/templatescatalog`;
 
   const [vmis, loaded, loadError] = useK8sWatchResource<V1VirtualMachineInstance[]>({
     kind,
@@ -53,7 +54,7 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
           columns={columns}
           Row={VirtualMachinesInstancesRow}
           rowData={{ kind }}
-          EmptyMsg={() => <VirtualMachineInstanceEmptyState />}
+          EmptyMsg={() => <VirtualMachineInstanceEmptyState catalogURL={catalogURL} />}
         />
       </ListPageBody>
     </>
