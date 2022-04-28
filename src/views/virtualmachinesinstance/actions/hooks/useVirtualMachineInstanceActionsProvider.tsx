@@ -8,6 +8,7 @@ import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, k8sDelete, k8sPatch, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
@@ -103,12 +104,13 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
               }
             />
           )),
+        accessReview: asAccessReview(VirtualMachineInstanceModel, vmi, 'delete'),
       },
     ],
     [vmi, inFlight, createModal, t],
   );
 
-  return [actions, !inFlight, undefined];
+  return React.useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };
 
 export default useVirtualMachineInstanceActionsProvider;

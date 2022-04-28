@@ -1,5 +1,11 @@
 import { V1alpha1Condition } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { K8sModel, K8sResourceCommon, OwnerReference } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  AccessReviewResourceAttributes,
+  K8sModel,
+  K8sResourceCommon,
+  K8sVerb,
+  OwnerReference,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 /**
  * function for getting an entity's annotation
@@ -114,4 +120,32 @@ export const compareOwnerReferences = (obj: OwnerReference, otherObj: OwnerRefer
     obj?.apiVersion === otherObj?.apiVersion ||
     obj?.kind === otherObj?.kind
   );
+};
+
+/**
+ * function to build AccessReviewResourceAttributes from a resource
+ * @param model - k8s model
+ * @param obj - resource
+ * @param verb - verb
+ * @param subresource - subresource
+ * @returns AccessReviewResourceAttributes
+ */
+export const asAccessReview = (
+  model: K8sModel,
+  obj: K8sResourceCommon,
+  verb: K8sVerb,
+  subresource?: string,
+): AccessReviewResourceAttributes => {
+  if (!obj) {
+    console.warn('review obj should not be null');
+    return null;
+  }
+  return {
+    group: model.apiGroup,
+    resource: model.plural,
+    name: obj?.metadata?.name,
+    namespace: obj?.metadata?.namespace,
+    verb,
+    subresource,
+  };
 };

@@ -50,7 +50,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
     ];
   }, [vm, vmim, createModal, t]);
 
-  return [actions, inFlight, undefined];
+  return React.useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };
 
 export default useVirtualMachineActionsProvider;
