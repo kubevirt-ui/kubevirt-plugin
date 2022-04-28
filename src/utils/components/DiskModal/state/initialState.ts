@@ -43,6 +43,8 @@ export type DiskSourceState = {
   pvcCloneSourceNamespace: string;
   registrySource: string;
   ephemeralSource: string;
+  dataSourceName: string;
+  dataSourceNamespace: string;
 };
 
 export const initialStateDiskSource: DiskSourceState = {
@@ -52,4 +54,6 @@ export const initialStateDiskSource: DiskSourceState = {
   pvcCloneSourceNamespace: null,
   registrySource: null,
   ephemeralSource: null,
+  dataSourceName: null,
+  dataSourceNamespace: null,
 };

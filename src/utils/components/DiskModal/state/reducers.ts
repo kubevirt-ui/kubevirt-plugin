@@ -65,6 +65,10 @@ export const diskSourceReducer = (
       return { ...state, registrySource: action.payload };
     case diskSourceReducerActions.SET_EPHEMERAL_SOURCE:
       return { ...state, ephemeralSource: action.payload };
+    case diskSourceReducerActions.SET_DATA_SOURCE_NAME:
+      return { ...state, dataSourceName: action.payload };
+    case diskSourceReducerActions.SET_DATA_SOURCE_NAMESPACE:
+      return { ...state, dataSourceNamespace: action.payload };
     case diskSourceReducerActions.RESET:
       return initialStateDiskSource;
     default:

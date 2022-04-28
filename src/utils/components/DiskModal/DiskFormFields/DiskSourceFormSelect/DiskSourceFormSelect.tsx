@@ -20,6 +20,7 @@ import { OTHER, sourceTypes } from '../utils/constants';
 import { getSourceOptions } from '../utils/helpers';
 
 import DiskSourceContainer from './components/DiskSourceContainer';
+import DiskSourceDataSourceSelect from './components/DiskSourceDataSourceSelect';
 import DiskSourcePVCSelect from './components/DiskSourcePVCSelect';
 import DiskSourceUrlInput from './components/DiskSourceUrlInput';
 
@@ -51,6 +52,8 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
     pvcCloneSourceNamespace,
     registrySource,
     ephemeralSource,
+    dataSourceName,
+    dataSourceNamespace,
   } = diskSourceState || {};
 
   const os = getAnnotation(vm?.spec?.template, ANNOTATIONS.os) || getOperatingSystem(vm);
@@ -161,6 +164,24 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
           }
           setDiskSize={(value) =>
             dispatchDiskState({ type: diskReducerActions.SET_DISK_SIZE, payload: value })
+          }
+        />
+      )}
+      {diskSource === sourceTypes.DATA_SOURCE && (
+        <DiskSourceDataSourceSelect
+          dataSourceNameSelected={dataSourceName}
+          dataSourceNamespaceSelected={dataSourceNamespace}
+          selectDataSourceName={(value) =>
+            dispatchDiskSourceState({
+              type: diskSourceReducerActions.SET_DATA_SOURCE_NAME,
+              payload: value,
+            })
+          }
+          selectDataSourceNamespace={(value) =>
+            dispatchDiskSourceState({
+              type: diskSourceReducerActions.SET_DATA_SOURCE_NAMESPACE,
+              payload: value,
+            })
           }
         />
       )}

@@ -18,6 +18,7 @@ export const sourceTypes = {
   REGISTRY: 'registry',
   PVC: 'persistentVolumeClaim', // Existing PVC
   EPHEMERAL: 'containerDisk',
+  DATA_SOURCE: 'dataSource',
 };
 
 export const volumeTypes = {
