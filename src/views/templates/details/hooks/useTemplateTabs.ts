@@ -5,6 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import TemplateDetailsPage from '../tabs/details/TemplateDetailsPage';
 import TemplateDisksPage from '../tabs/disks/TemplateDisksPage';
 import TemplateNetworkPage from '../tabs/network/TemplateNetworkPage';
+import TemplateSchedulingTab from '../tabs/scheduling/TemplateSchedulingTab';
 import TemplateYAMLPage from '../tabs/yaml/TemplateYAMLPage';
 
 export const useVirtualMachineTabs = () => {
@@ -16,6 +17,11 @@ export const useVirtualMachineTabs = () => {
         href: '',
         name: t('Details'),
         component: TemplateDetailsPage,
+      },
+      {
+        href: 'scheduling',
+        name: t('Scheduling'),
+        component: TemplateSchedulingTab,
       },
       {
         href: 'yaml',
