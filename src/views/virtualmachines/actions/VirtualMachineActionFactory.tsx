@@ -9,6 +9,7 @@ import {
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../utils';
@@ -52,7 +53,7 @@ export const VirtualMachineActionFactory = {
       ].includes(vm?.status?.printableStatus),
       label: t('Start'),
       cta: () => startVM(vm),
-      //   accessReview: {},
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
   stop: (vm: V1VirtualMachine, t: TFunction): Action => {
@@ -63,7 +64,7 @@ export const VirtualMachineActionFactory = {
       ),
       label: t('Stop'),
       cta: () => stopVM(vm),
-      //   accessReview: {},
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
   restart: (vm: V1VirtualMachine, t: TFunction): Action => {
@@ -80,7 +81,7 @@ export const VirtualMachineActionFactory = {
       ].includes(vm?.status?.printableStatus),
       label: t('Restart'),
       cta: () => restartVM(vm),
-      //   accessReview: {},
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
   pause: (vm: V1VirtualMachine, t: TFunction): Action => {
@@ -89,7 +90,7 @@ export const VirtualMachineActionFactory = {
       disabled: vm?.status?.printableStatus !== Running,
       label: t('Pause'),
       cta: () => pauseVM(vm),
-      //   accessReview: {},
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
   unpause: (vm: V1VirtualMachine, t: TFunction): Action => {
@@ -98,7 +99,7 @@ export const VirtualMachineActionFactory = {
       disabled: vm?.status?.printableStatus !== Paused,
       label: t('Unpause'),
       cta: () => unpauseVM(vm),
-      //   accessReview: {},
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
   migrate: (vm: V1VirtualMachine, t: TFunction): Action => {
@@ -111,7 +112,7 @@ export const VirtualMachineActionFactory = {
         ),
       label: t('Migrate VirtualMachine to Node'),
       cta: () => migrateVM(vm),
-      //   accessReview: {},
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
   cancelMigration: (
@@ -124,7 +125,7 @@ export const VirtualMachineActionFactory = {
       disabled: vm?.status?.printableStatus !== Migrating,
       label: t('Cancel virtual machine migration'),
       cta: () => cancelMigration(vmim),
-      //   accessReview: {},
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
   clone: (
@@ -142,7 +143,7 @@ export const VirtualMachineActionFactory = {
         createModal(({ isOpen, onClose }) => (
           <CloneVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
         )),
-      //   accessReview: {},
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
   // console component is needed to allow openConsole action
@@ -236,6 +237,7 @@ export const VirtualMachineActionFactory = {
         createModal(({ isOpen, onClose }) => (
           <DeleteVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
         )),
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'delete'),
     };
   },
 };
