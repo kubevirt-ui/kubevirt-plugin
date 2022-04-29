@@ -1,13 +1,15 @@
 import * as React from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { getTemplateStorageQuantity } from '@catalog/customize/components/CustomizeSource/utils';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sCreate, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import { SOURCE_TYPES } from '../../utils/constants';
+import { editBootSource } from '../editBootSource';
 
 import { SelectSource } from './SelectSource';
 
@@ -25,10 +27,7 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({ isOpen, obj, 
   const [sourceProvider, setSourceProvider] = React.useState('');
 
   const onSubmit = async () => {
-    await k8sCreate({
-      model: TemplateModel,
-      data: { bootSource, ...obj }, // TODO
-    });
+    await editBootSource(obj, bootSource);
   };
 
   return (
@@ -60,6 +59,8 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({ isOpen, obj, 
                 SOURCE_TYPES.httpSource,
                 SOURCE_TYPES.uploadSource,
               ]}
+              withSize
+              initialVolumeQuantity={getTemplateStorageQuantity(obj)}
             />
           </FormGroup>
           <FormGroup

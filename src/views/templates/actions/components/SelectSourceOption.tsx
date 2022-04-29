@@ -112,6 +112,7 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
         selections={selectedSource}
         maxHeight={400}
         placeholderText={t(`Select boot source`)}
+        menuAppendTo="parent"
       >
         {<SelectOption key={0} value="Select a title" isPlaceholder /> &&
           options.map((option) => getSourceOption(option, ns, t))}

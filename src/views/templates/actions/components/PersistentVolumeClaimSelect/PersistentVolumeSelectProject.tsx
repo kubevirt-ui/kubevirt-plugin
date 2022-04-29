@@ -57,6 +57,7 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
         validated={!selectedProject ? ValidatedOptions.error : ValidatedOptions.default}
         aria-invalid={!selectedProject ? true : false}
         maxHeight={400}
+        menuAppendTo="parent"
       >
         {projectsName.map((projectName) => (
           <SelectOption key={projectName} value={projectName}>

@@ -1,6 +1,10 @@
 import { PersistentVolumeClaimModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import {
+  V1beta1DataSource,
+  V1beta1DataVolume,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   V1alpha1PersistentVolumeClaim,
   V1beta1DataVolumeSourceHTTP,
@@ -48,6 +52,19 @@ export const getTemplateBootSourceType = (template: V1Template): TemplateBootSou
 export const getPVC = (name: string, ns: string) =>
   k8sGet<V1alpha1PersistentVolumeClaim>({
     model: PersistentVolumeClaimModel,
+    name,
+    ns,
+  });
+
+/**
+ * a function to k8sGet a DataVolume
+ * @param name the name of the DataVolume
+ * @param ns  the namespace of the DataVolume
+ * @returns a promise that resolves into the DataVolume
+ */
+export const getDataVolume = (name: string, ns: string) =>
+  k8sGet<V1beta1DataVolume>({
+    model: DataVolumeModel,
     name,
     ns,
   });

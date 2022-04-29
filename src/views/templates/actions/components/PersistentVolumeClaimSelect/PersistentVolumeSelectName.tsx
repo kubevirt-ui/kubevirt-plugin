@@ -59,6 +59,7 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
         validated={!pvcNameSelected ? ValidatedOptions.error : ValidatedOptions.default}
         aria-invalid={!pvcNameSelected ? true : false}
         maxHeight={400}
+        menuAppendTo="parent"
       >
         {pvcNames.map((name) => (
           <SelectOption key={name} value={name} />
