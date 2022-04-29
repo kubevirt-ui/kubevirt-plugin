@@ -19,14 +19,14 @@ export const useVirtualMachineTabs = () => {
         component: TemplateDetailsPage,
       },
       {
-        href: 'scheduling',
-        name: t('Scheduling'),
-        component: TemplateSchedulingTab,
-      },
-      {
         href: 'yaml',
         name: 'YAML',
         component: TemplateYAMLPage,
+      },
+      {
+        href: 'scheduling',
+        name: t('Scheduling'),
+        component: TemplateSchedulingTab,
       },
       {
         href: 'network-interfaces',
