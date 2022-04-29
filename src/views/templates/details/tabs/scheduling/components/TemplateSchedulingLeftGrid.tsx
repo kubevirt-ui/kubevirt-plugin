@@ -1,6 +1,7 @@
 import React from 'react';
 import { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
 import AffinityRules from 'src/views/templates/details/tabs/scheduling/components/AffinityRules';
+import Descheduler from 'src/views/templates/details/tabs/scheduling/components/Descheduler';
 import NodeSelector from 'src/views/templates/details/tabs/scheduling/components/NodeSelector';
 import Tolerations from 'src/views/templates/details/tabs/scheduling/components/Tolerations';
 import { isCommonVMTemplate } from 'src/views/templates/utils';
@@ -10,7 +11,7 @@ import { DescriptionList } from '@patternfly/react-core';
 
 export type TemplateSchedulingGridProps = {
   template: V1Template;
-  editable: boolean;
+  editable?: boolean;
 };
 
 const TemplateSchedulingLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template }) => {
@@ -21,7 +22,7 @@ const TemplateSchedulingLeftGrid: React.FC<TemplateDetailsGridProps> = ({ templa
       <NodeSelector template={template} editable={isTemplateEditable} />
       <Tolerations template={template} editable={isTemplateEditable} />
       <AffinityRules template={template} editable={isTemplateEditable} />
-      {/* TODO Descheduler */}
+      <Descheduler template={template} />
     </DescriptionList>
   );
 };
