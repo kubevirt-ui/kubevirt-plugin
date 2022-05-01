@@ -2,12 +2,11 @@ import * as React from 'react';
 import { Trans } from 'react-i18next';
 
 import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
-import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import {
   ButtonVariant,
   Dropdown,
@@ -22,23 +21,6 @@ type DiskRowActionsProps = {
   diskName: string;
 };
 
-const getDiskDataVolume = (
-  vm: V1VirtualMachine,
-  diskName: string,
-): V1DataVolumeTemplateSpec | undefined => {
-  const disk = getDisks(vm)?.find((d) => d.name === diskName);
-
-  if (!disk) return;
-
-  const volume = getVolumes(vm)?.find((v) => v.name === diskName);
-
-  if (!volume || !volume.dataVolume) return;
-
-  return getDataVolumeTemplates(vm)?.find(
-    (dataVolume) => dataVolume.metadata?.name === volume.dataVolume.name,
-  );
-};
-
 const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const { t } = useKubevirtTranslation();
   const { vm, updateVM } = useWizardVMContext();
@@ -47,9 +29,6 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const deleteBtnText = t('Delete');
 
   const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName);
-  const diskDataVolume = getDiskDataVolume(vm, diskName);
-  /** TODO: add editing support for sourceRef in 4.12 */
-  const hasSourceRef = !!diskDataVolume?.spec?.sourceRef;
 
   const onDelete = React.useCallback(() => {
     const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
@@ -112,12 +91,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
       isOpen={isDropdownOpen}
       isPlain
       dropdownItems={[
-        <DropdownItem
-          onClick={onEditModalToggle}
-          key="disk-edit"
-          isDisabled={hasSourceRef}
-          description={hasSourceRef ? t("This disk's source is not editable") : null}
-        >
+        <DropdownItem onClick={onEditModalToggle} key="disk-edit">
           {t('Edit')}
         </DropdownItem>,
         <DropdownItem onClick={onDeleteModalToggle} key="disk-delete">

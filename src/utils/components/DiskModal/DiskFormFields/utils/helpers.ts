@@ -13,6 +13,11 @@ export const getSourceOptions = (t: TFunction) => ({
     name: t('Blank (creates PVC)'),
     description: t('Create an empty disk.'),
   },
+  dataSource: {
+    id: sourceTypes.DATA_SOURCE,
+    name: t('PVC auto upload (use DataSource)'),
+    description: t('Select DataSource to use for automatic image upload.'),
+  },
   http: {
     id: sourceTypes.HTTP,
     name: t('URL (creates PVC)'),

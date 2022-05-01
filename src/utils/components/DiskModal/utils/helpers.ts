@@ -2,6 +2,7 @@ import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
+import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
@@ -33,7 +34,6 @@ export const getEmptyVMDataVolumeResource = (vm: V1VirtualMachine): V1beta1DataV
       ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
     },
     spec: {
-      source: {},
       storage: {
         resources: {
           requests: {
@@ -71,6 +71,7 @@ export const requiresDataVolume = (diskSource: string): boolean => {
     sourceTypes.HTTP,
     sourceTypes.CLONE_PVC,
     sourceTypes.REGISTRY,
+    sourceTypes.DATA_SOURCE,
   ].includes(diskSource);
 };
 
@@ -138,11 +139,17 @@ export const getDataVolumeFromState = (
         url: `docker://${diskSourceState.registrySource}`,
       },
     };
-  } else {
+  } else if (diskState.diskSource === sourceTypes.HTTP) {
     dataVolume.spec.source = {
       [diskState.diskSource]: {
         url: diskSourceState.urlSource,
       },
+    };
+  } else if (diskState.diskSource === sourceTypes.DATA_SOURCE) {
+    dataVolume.spec.sourceRef = {
+      kind: DataSourceModel.kind,
+      name: diskSourceState.dataSourceName,
+      namespace: diskSourceState.dataSourceNamespace,
     };
   }
   return dataVolume;
