@@ -18,7 +18,7 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { filters } from '../utils';
+import { getStatusFilter, getTemplatesFilter } from '../utils';
 
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
@@ -49,6 +49,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
     namespace,
   });
 
+  const filters = [...getStatusFilter(t), ...getTemplatesFilter(vms, t)];
   const [unfilteredData, data, onFilterChange] = useListPageFilter(vms, filters);
 
   const createItems = {
