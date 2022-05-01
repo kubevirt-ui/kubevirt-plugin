@@ -19,7 +19,7 @@ export const VMStatusConditionLabel: React.FC<V1VirtualMachineCondition> = React
             e.preventDefault();
           }}
         >
-          {condition?.reason}={condition?.type}
+          {condition?.type}={condition?.status}
         </Label>
       </Popover>
     );
