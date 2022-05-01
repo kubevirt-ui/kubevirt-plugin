@@ -29,11 +29,6 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const deleteBtnText = t('Delete');
 
   const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName);
-  console.log(
-    '🚀 ~ file: DiskRowActions.tsx ~ line 32 ~ initialDiskState, initialDiskSourceState',
-    initialDiskState,
-    initialDiskSourceState,
-  );
 
   const onDelete = React.useCallback(() => {
     const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {

@@ -11,7 +11,7 @@ type useProjectsAndDataSourcesReturnType = {
   error: Error;
 };
 
-export const useProjectsAndDataSources = (
+export const useDataSourcesTypeResources = (
   projectSelected: string,
 ): useProjectsAndDataSourcesReturnType => {
   const [projects, projectsLoaded, projectsErrors] = useK8sWatchResource<K8sResourceCommon[]>({

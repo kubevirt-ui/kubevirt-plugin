@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useProjectsAndDataSources } from '../../hooks/useProjectsAndDataSources';
+import { useDataSourcesTypeResources } from '../../hooks/useProjectsAndDataSources';
 
 import DiskSourceDataSourceSelectName from './DiskSourceDataSourceSelectName';
 import DiskSourceDataSourceSelectNamespace from './DiskSourceDataSourceSelectNamespace';
@@ -19,7 +19,7 @@ const DiskSourceDataSourceSelect: React.FC<DiskSourceDataSourceSelectProps> = ({
   selectDataSourceNamespace,
 }) => {
   const { projectsNames, dataSources, projectsLoaded, dataSourcesLoaded } =
-    useProjectsAndDataSources(dataSourceNamespaceSelected);
+    useDataSourcesTypeResources(dataSourceNamespaceSelected);
 
   const onSelectProject = React.useCallback(
     (newProject) => {
@@ -36,7 +36,7 @@ const DiskSourceDataSourceSelect: React.FC<DiskSourceDataSourceSelectProps> = ({
   return (
     <>
       <DiskSourceDataSourceSelectNamespace
-        projectsName={projectsNames}
+        projectsNames={projectsNames}
         selectedProject={dataSourceNamespaceSelected}
         onChange={onSelectProject}
         isDisabled={!selectDataSourceNamespace}

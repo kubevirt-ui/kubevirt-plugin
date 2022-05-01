@@ -10,7 +10,7 @@ import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/reac
 import { FilterPVCSelect as FilterProjectSelect } from '../../utils/Filters';
 
 type DiskSourceDataSourceSelectNamespaceProps = {
-  projectsName: string[];
+  projectsNames: string[];
   selectedProject: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   projectsLoaded: boolean;
@@ -19,7 +19,7 @@ type DiskSourceDataSourceSelectNamespaceProps = {
 
 const DiskSourceDataSourceSelectNamespace: React.FC<DiskSourceDataSourceSelectNamespaceProps> = ({
   selectedProject,
-  projectsName,
+  projectsNames,
   onChange,
   projectsLoaded,
   isDisabled,
@@ -54,14 +54,14 @@ const DiskSourceDataSourceSelectNamespace: React.FC<DiskSourceDataSourceSelectNa
           onToggle={setIsOpen}
           onSelect={onSelect}
           variant={SelectVariant.single}
-          onFilter={FilterProjectSelect(projectsName)}
+          onFilter={FilterProjectSelect(projectsNames)}
           hasInlineFilter
           selections={selectedProject}
           placeholderText={t('--- Select {{dsLabel}} project ---', { dsLabel })}
           isDisabled={isDisabled}
           maxHeight={400}
         >
-          {projectsName.map((projectName) => (
+          {projectsNames.map((projectName) => (
             <SelectOption key={projectName} value={projectName}>
               <ResourceLink kind={ProjectModel.kind} name={projectName} linkTo={false} />
             </SelectOption>

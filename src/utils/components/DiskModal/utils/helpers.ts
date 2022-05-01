@@ -34,7 +34,6 @@ export const getEmptyVMDataVolumeResource = (vm: V1VirtualMachine): V1beta1DataV
       ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
     },
     spec: {
-      source: {},
       storage: {
         resources: {
           requests: {
@@ -152,7 +151,6 @@ export const getDataVolumeFromState = (
       name: diskSourceState.dataSourceName,
       namespace: diskSourceState.dataSourceNamespace,
     };
-    delete dataVolume?.spec?.source;
   }
   return dataVolume;
 };
