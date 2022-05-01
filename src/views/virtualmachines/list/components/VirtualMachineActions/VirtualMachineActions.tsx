@@ -41,6 +41,7 @@ const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
 
   return (
     <Dropdown
+      id="VirtualMachineActions"
       isPlain={isKebabToggle}
       isOpen={isOpen}
       position={DropdownPosition.right}
