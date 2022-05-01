@@ -1,7 +1,6 @@
 import { TFunction } from 'i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { OTHER } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
 import { LABEL_USED_TEMPLATE_NAME } from '@kubevirt-utils/resources/template';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -27,12 +26,13 @@ export const getStatusFilter = (t: TFunction): RowFilter[] => [
   },
 ];
 export const getTemplatesFilter = (vms: V1VirtualMachine[], t: TFunction): RowFilter[] => {
+  const other = t('Other');
   const templates = vms.reduce((acc, vm) => {
     const templateName = vm.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME];
     if (templateName) {
       acc.add(templateName);
     } else {
-      acc.add(OTHER);
+      acc.add(other);
     }
     return acc;
   }, new Set<string>());
@@ -41,9 +41,9 @@ export const getTemplatesFilter = (vms: V1VirtualMachine[], t: TFunction): RowFi
     {
       filterGroupName: t('Template'),
       type: 'template',
-      reducer: (obj) => obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? OTHER,
+      reducer: (obj) => obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? other,
       filter: (selectedTemplates, obj) => {
-        const templateName = obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? OTHER;
+        const templateName = obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? other;
         return (
           selectedTemplates.selected?.length === 0 ||
           selectedTemplates.selected?.includes(templateName)
