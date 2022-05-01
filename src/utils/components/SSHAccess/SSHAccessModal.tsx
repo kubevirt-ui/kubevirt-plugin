@@ -73,7 +73,7 @@ const SSHAccessModal: React.FC<SSHAccessModalProps> = ({
             id="ssh-service-checkbox"
             className="kv-ssh-service-checkbox--main"
             label={
-              <Trans ns="kubevirt-plugin" t={t}>
+              <Trans ns="plugin__kubevirt-plugin" t={t}>
                 Expose SSH access for{' '}
                 <ResourceLink
                   inline
