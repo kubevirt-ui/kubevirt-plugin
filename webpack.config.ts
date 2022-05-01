@@ -12,6 +12,7 @@ interface Configuration extends WebpackConfiguration {
   devServer?: WebpackDevServerConfiguration;
 }
 
+const svgToMiniDataURI = require('mini-svg-data-uri');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
@@ -103,11 +104,25 @@ const config: Configuration = {
         use: ['style-loader', 'css-loader'],
       },
       {
-        test: /\.(png|jpg|jpeg|gif|svg|woff2?|ttf|eot|otf)(\?.*$|$)/,
-        type: 'asset/resource',
-        generator: {
-          filename: 'assets/[name].[ext]',
-        },
+        oneOf: [
+          {
+            test: /\.svg$/,
+            type: 'asset/inline',
+            generator: {
+              dataUrl: (content) => {
+                content = content.toString();
+                return svgToMiniDataURI(content);
+              },
+            },
+          },
+          {
+            test: /\.(png|jpg|jpeg|gif|svg|woff2?|ttf|eot|otf)(\?.*$|$)/,
+            type: 'asset/resource',
+            generator: {
+              filename: 'assets/[name].[ext]',
+            },
+          },
+        ],
       },
     ],
   },
