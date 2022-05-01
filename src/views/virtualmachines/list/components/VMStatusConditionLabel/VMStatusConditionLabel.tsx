@@ -9,7 +9,7 @@ export const VMStatusConditionLabel: React.FC<V1VirtualMachineCondition> = React
       <Popover
         position={PopoverPosition.top}
         aria-label="Condition Popover"
-        bodyContent={() => <div>{condition?.message}</div>}
+        bodyContent={() => <div>{condition?.message ?? condition?.reason}</div>}
       >
         <Label
           color="grey"
@@ -19,7 +19,7 @@ export const VMStatusConditionLabel: React.FC<V1VirtualMachineCondition> = React
             e.preventDefault();
           }}
         >
-          {condition?.reason}={condition?.status}
+          {condition?.reason}={condition?.type}
         </Label>
       </Popover>
     );
