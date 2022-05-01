@@ -10,6 +10,7 @@ import VirtualMachineConsolePage from '../tabs/console/VirtualMachineConsolePage
 import VirtualMachineDetailsPage from '../tabs/details/VirtualMachineDetailsPage';
 import DiskListPage from '../tabs/disk/tables/disk/DiskListPage';
 import VirtualMachineEnvironmentPage from '../tabs/environment/VirtualMachineEnvironmentPage';
+import VirtualMachinePageEventsTab from '../tabs/events/VirtualMachinePageEvents';
 import NetworkInterfaceListPage from '../tabs/network/NetworkInterfaceListPage';
 import VirtualMachinesOverviewTab from '../tabs/overview/VirtualMachinesOverviewTab';
 import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
@@ -43,7 +44,7 @@ export const useVirtualMachineTabs = () => {
       {
         href: VirtualMachineDetailsTab.Events,
         name: t(VirtualMachineDetailsTabLabel.Events),
-        component: React.Fragment,
+        component: VirtualMachinePageEventsTab,
       },
       {
         href: VirtualMachineDetailsTab.Console,
