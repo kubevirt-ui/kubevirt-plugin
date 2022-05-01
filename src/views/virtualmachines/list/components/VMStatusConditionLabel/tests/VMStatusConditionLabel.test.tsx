@@ -18,7 +18,7 @@ test('VMStatusConditionLabel', async () => {
   expect(firstRender).toMatchSnapshot();
 
   // click on condition to open popover
-  fireEvent.click(getByText(`${reason}=${status}`));
+  fireEvent.click(getByText(`${type}=${status}`));
   const popoverMessage = await screen.findByText(message);
 
   expect(popoverMessage).toHaveTextContent(message);

@@ -12,7 +12,7 @@ exports[`VMStatusConditionLabel 1`] = `
       <span
         class="pf-c-label__text"
       >
-        no_vmi=true
+        Failure=true
       </span>
     </a>
   </span>
