@@ -23,7 +23,11 @@ import { MAXIMUM_TIMES_PVC_NOT_DELETED, TIMEOUT_PVC_GETS_DELETED_INTERVAL } from
 const DATA_VOLUME: V1beta1DataVolume = {
   apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
   kind: DataVolumeModel.kind,
-  metadata: {},
+  metadata: {
+    annotations: {
+      'cdi.kubevirt.io/storage.bind.immediate.requested': 'true',
+    },
+  },
   spec: {},
 };
 
@@ -34,6 +38,7 @@ const createDataVolume = (
 ): V1beta1DataVolume => {
   return produce(DATA_VOLUME, (draftDataVolume) => {
     draftDataVolume.metadata = {
+      ...draftDataVolume.metadata,
       name,
       namespace,
     };
@@ -103,13 +108,13 @@ export const editBootSource = async (template: V1Template, bootSource: V1beta1Da
     dataVolumeTemplate?.spec?.sourceRef.namespace,
   );
 
-  const dataSourceName = dataSource.metadata.name;
-  const dataSourceNamespace = dataSource.metadata.namespace;
+  const dataSourcePVCName = dataSource?.spec?.source?.pvc?.name;
+  const dataSourcePVCNamespace = dataSource?.spec?.source?.pvc?.namespace;
 
   let dataVolume = null;
 
   try {
-    dataVolume = await getDataVolume(dataSourceName, dataSourceNamespace);
+    dataVolume = await getDataVolume(dataSourcePVCName, dataSourcePVCNamespace);
   } catch (error) {}
 
   if (dataVolume) {
@@ -118,11 +123,11 @@ export const editBootSource = async (template: V1Template, bootSource: V1beta1Da
       resource: dataVolume,
     });
 
-    await waitPVCGetDeleted(dataSourceName, dataSourceNamespace);
+    await waitPVCGetDeleted(dataSourcePVCName, dataSourcePVCNamespace);
   }
 
   await k8sCreate<V1beta1DataVolume>({
     model: DataVolumeModel,
-    data: createDataVolume(dataSourceName, dataSourceNamespace, bootSource),
+    data: createDataVolume(dataSourcePVCName, dataSourcePVCNamespace, bootSource),
   });
 };
