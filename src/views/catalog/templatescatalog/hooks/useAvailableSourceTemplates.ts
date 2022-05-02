@@ -1,7 +1,11 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { BOOT_SOURCE, useVmTemplates } from '@kubevirt-utils/resources/template';
+import {
+  BOOT_SOURCE,
+  isDefaultVariantTemplate,
+  useVmTemplates,
+} from '@kubevirt-utils/resources/template';
 import {
   getDataSource,
   getPVC,
@@ -10,11 +14,13 @@ import {
 
 type useAvailableSourceTemplatesProps = {
   onlyAvailable: boolean;
+  onlyDefault: boolean;
   namespace: string;
 };
 
 export const useAvailableSourceTemplates = ({
   onlyAvailable,
+  onlyDefault,
   namespace,
 }: useAvailableSourceTemplatesProps): useAvailableSourceTemplatesValues => {
   const { templates, loaded, loadError } = useVmTemplates(namespace);
@@ -27,8 +33,9 @@ export const useAvailableSourceTemplates = ({
 
   const promises = React.useMemo(
     () =>
-      onlyAvailable &&
+      loaded &&
       templates
+        .filter((template) => (onlyDefault ? isDefaultVariantTemplate(template) : true))
         .filter((template) => {
           const bootSource = getTemplateBootSourceType(template);
           return (
@@ -55,33 +62,30 @@ export const useAvailableSourceTemplates = ({
             }
           });
         }),
-    [onlyAvailable, templates],
+    [loaded, templates, onlyDefault],
   );
 
   const initialAvailableTemplates = React.useMemo(
     () =>
+      loaded &&
       templates.filter((t) => {
         const bootSource = getTemplateBootSourceType(t);
         return bootSource?.type === BOOT_SOURCE.REGISTRY || bootSource?.type === BOOT_SOURCE.URL;
       }),
-    [templates],
+    [templates, loaded],
   );
 
   const availableTemplates = React.useMemo(
-    () =>
-      [...initialAvailableTemplates, ...Object.values(templatesWithSource)].filter((t) =>
-        namespace ? t.metadata.namespace === namespace : true,
-      ),
-    [initialAvailableTemplates, namespace, templatesWithSource],
+    () => [...(initialAvailableTemplates || []), ...Object.values(templatesWithSource)],
+    [initialAvailableTemplates, templatesWithSource],
   );
 
   React.useEffect(() => {
-    if (onlyAvailable) {
+    if (Array.isArray(promises)) {
       Promise.allSettled(promises)
         .then(() => setTemplatesWithSourceLoaded(true))
         .catch(setError);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [promises]);
 
   return {
