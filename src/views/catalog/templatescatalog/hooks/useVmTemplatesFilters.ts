@@ -20,7 +20,7 @@ export const useTemplatesFilters = (): [
   (type: CATALOG_FILTERS, value: string | boolean) => void,
   () => void,
 ] => {
-  const [isAdmin] = useIsAdmin();
+  const isAdmin = useIsAdmin();
   const { params, appendParam, setParam, deleteParam } = useURLParams();
   const onlyDefaultParam = params.get(CATALOG_FILTERS.ONLY_DEFAULT);
 

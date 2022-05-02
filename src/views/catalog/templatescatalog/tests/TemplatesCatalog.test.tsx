@@ -9,7 +9,7 @@ import TemplatesCatalog from '../TemplatesCatalog';
 import { containerTemplateMock, urlTemplateMock } from './mocks';
 
 jest.mock('@kubevirt-utils/hooks/useIsAdmin', () => ({
-  useIsAdmin: () => [false, true],
+  useIsAdmin: () => false,
 }));
 
 jest.mock('../hooks/useAvailableSourceTemplates', () => ({

@@ -24,7 +24,7 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
   const [allowedTemplatesloaded, setAllowedTemplatesLoaded] = React.useState<boolean>(false);
   const [allowedTemplatesError, setAllowedTemplatesError] = React.useState<string>('');
 
-  const [isAdmin] = useIsAdmin();
+  const isAdmin = useIsAdmin();
   const TemplateModelGroupVersionKind = modelToGroupVersionKind(TemplateModel);
 
   const [projects, loaded] = useK8sWatchResource<K8sResourceCommon[]>({
