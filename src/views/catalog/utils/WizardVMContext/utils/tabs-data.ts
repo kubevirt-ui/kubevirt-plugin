@@ -10,6 +10,9 @@ export type TabsData = {
     };
   };
   scripts?: {
+    cloudInit: {
+      sshKey?: string;
+    };
     sysprep?: {
       autounattend?: string;
       unattended?: string;

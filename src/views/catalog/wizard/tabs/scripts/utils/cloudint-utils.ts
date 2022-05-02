@@ -1,6 +1,11 @@
 import { TFunction } from 'react-i18next';
 import validator from 'validator';
 
+import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import { k8sCreate, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+
 export enum ValidationOption {
   success = 'success',
   error = 'error',
@@ -189,3 +194,18 @@ export class ErrorCatcher {
 
   getErrors = () => this.errors;
 }
+
+export const createVmSSHSecret = (vm: V1VirtualMachine, sshKey: string, secretName?: string) =>
+  k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
+    model: SecretModel,
+    data: {
+      kind: SecretModel.kind,
+      apiVersion: SecretModel.apiVersion,
+      metadata: {
+        name: secretName || `${vm.metadata.name}-ssh-key`,
+        namespace: vm.metadata.namespace,
+        ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
+      },
+      data: { key: btoa(sshKey) },
+    },
+  });

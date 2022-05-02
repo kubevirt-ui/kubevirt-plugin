@@ -1,24 +1,24 @@
 import * as React from 'react';
 import { dump, load } from 'js-yaml';
 
-import { produceVMDisks, UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
+import { ensurePath, produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import { CloudInitDataFormKeys, CloudInitDataHelper } from '../utils/cloud-init-data-helper';
-import { cloudinitIDGenerator } from '../utils/cloudint-utils';
+import { cloudinitIDGenerator, isValidSSHKey } from '../utils/cloudint-utils';
 import useCloudinitValidations from '../utils/use-cloudinit-validations';
 
-import CloutinitSSHKeyForm from './CloudinitSSHKeyForm/CloudInitSSHKeyForm';
+import CloudinitSSHKeyForm from './CloudinitSSHKeyForm/CloudInitSSHKeyForm';
 
 type CloudinitFormProps = {
   cloudInitVolume: V1Volume;
-  updateVM: UpdateValidatedVM;
 };
-const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume, updateVM }) => {
+const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume }) => {
   const { t } = useKubevirtTranslation();
+  const { updateVM, tabsData, updateTabsData } = useWizardVMContext();
 
   const [cloudinitConfigUserData, isBase64] = React.useMemo(
     () => CloudInitDataHelper.getUserData(cloudInitVolume?.cloudInitNoCloud || {}),
@@ -56,6 +56,16 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume, updateVM
       }
       return data;
     });
+  };
+
+  const onSSHKeyChange = (sshKey: string) => {
+    const isSSHValid = isValidSSHKey(sshKey);
+    if (isSSHValid) {
+      updateTabsData((tabDataDraft) => {
+        ensurePath(tabDataDraft, 'scripts.cloudInit');
+        tabDataDraft.scripts.cloudInit.sshKey = sshKey;
+      });
+    }
   };
 
   const onUpdateVM = React.useCallback(
@@ -167,19 +177,10 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume, updateVM
         fieldId={cloudinitIDGenerator(CloudInitDataFormKeys.SSH_AUTHORIZED_KEYS)}
         className="kv-cloudint-advanced-tab--validation-text"
       >
-        <CloutinitSSHKeyForm
+        <CloudinitSSHKeyForm
           id={cloudinitIDGenerator(CloudInitDataFormKeys.SSH_AUTHORIZED_KEYS)}
-          value={
-            Array.isArray(yamlAsJS?.ssh_authorized_keys)
-              ? yamlAsJS?.ssh_authorized_keys?.[0]
-              : yamlAsJS?.ssh_authorized_keys || ''
-          }
-          onChange={(updatedKey) => {
-            const otherKeys = Array.isArray(yamlAsJS?.ssh_authorized_keys)
-              ? yamlAsJS?.ssh_authorized_keys?.slice(1)
-              : [];
-            onFieldChange(CloudInitDataFormKeys.SSH_AUTHORIZED_KEYS, [updatedKey, ...otherKeys]);
-          }}
+          value={tabsData?.scripts?.cloudInit?.sshKey || ''}
+          onChange={onSSHKeyChange}
         />
       </FormGroup>
     </Form>
