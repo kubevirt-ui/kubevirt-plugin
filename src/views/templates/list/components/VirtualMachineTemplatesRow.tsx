@@ -9,11 +9,9 @@ import useWorkloadProfile from '../hooks/useWorkloadProfile';
 
 import VirtualMachineTemplatesSource from './VirtualMachineTemplatesSource';
 
-const VirtualMachineTemplatesRow: React.FC<RowProps<V1Template, { kind: string }>> = ({
-  obj,
-  activeColumnIDs,
-  rowData: { kind },
-}) => {
+const VirtualMachineTemplatesRow: React.FC<
+  RowProps<V1Template, { kind: string; availableTemplatesUID: Set<string> }>
+> = ({ obj, activeColumnIDs, rowData: { kind, availableTemplatesUID } }) => {
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
@@ -26,7 +24,9 @@ const VirtualMachineTemplatesRow: React.FC<RowProps<V1Template, { kind: string }
         {useWorkloadProfile(obj)}
       </TableData>
       <TableData id="availability" activeColumnIDs={activeColumnIDs}>
-        <VirtualMachineTemplatesSource template={obj} />
+        <VirtualMachineTemplatesSource
+          isBootSourceAvailable={availableTemplatesUID.has(obj.metadata.uid)}
+        />
       </TableData>
       <TableData id="cpu" activeColumnIDs={activeColumnIDs}>
         {useVirtualMachineTemplatesCPUMemory(obj)}
