@@ -14,13 +14,13 @@ import UpgradeApprovalLink from './UpgradeApprovalLink';
 
 const upgradeRequiresApproval = (subscription: SubscriptionKind): boolean =>
   subscription?.status?.state === SubscriptionState.SubscriptionStateUpgradePending &&
-  (subscription.status?.conditions ?? []).filter(
+  (subscription?.status?.conditions ?? []).filter(
     ({ status, reason }) => status === 'True' && reason === 'RequiresApproval',
   ).length > 0;
 
 const SubscriptionStatus: React.FC<{ subscription: SubscriptionKind }> = ({ subscription }) => {
   const { t } = useKubevirtTranslation();
-  switch (subscription.status.state) {
+  switch (subscription?.status?.state) {
     case SubscriptionState.SubscriptionStateUpgradeAvailable:
       return (
         <span>
@@ -28,7 +28,7 @@ const SubscriptionStatus: React.FC<{ subscription: SubscriptionKind }> = ({ subs
         </span>
       );
     case SubscriptionState.SubscriptionStateUpgradePending:
-      return upgradeRequiresApproval(subscription) && subscription.status.installPlanRef ? (
+      return upgradeRequiresApproval(subscription) && subscription?.status?.installPlanRef ? (
         <UpgradeApprovalLink subscription={subscription} />
       ) : (
         <span>
@@ -43,8 +43,8 @@ const SubscriptionStatus: React.FC<{ subscription: SubscriptionKind }> = ({ subs
       );
     default:
       return (
-        <span className={isEmpty(subscription.status.state) ? 'text-muted' : ''}>
-          {subscription.status.state || t('Unknown failure')}
+        <span className={isEmpty(subscription?.status?.state) ? 'text-muted' : ''}>
+          {subscription?.status?.state || t('Unknown failure')}
         </span>
       );
   }
