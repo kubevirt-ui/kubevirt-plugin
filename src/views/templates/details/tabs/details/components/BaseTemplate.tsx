@@ -11,8 +11,6 @@ import {
   Text,
 } from '@patternfly/react-core';
 
-import 'src/views/templates/details/tabs/details/TemplateDetailsPage.scss';
-
 type BaseTemplateProps = {
   template: V1Template;
 };

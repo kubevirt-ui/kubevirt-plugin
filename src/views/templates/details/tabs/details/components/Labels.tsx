@@ -38,7 +38,7 @@ const Labels: React.FC<LabelsProps> = ({ labels }) => {
               <a href="http://kubernetes.io/docs/user-guide/labels">
                 http://kubernetes.io/docs/user-guide/labels
               </a>
-              <Breadcrumb>
+              <Breadcrumb className="margin-top">
                 <BreadcrumbItem>Template</BreadcrumbItem>
                 <BreadcrumbItem>metadata</BreadcrumbItem>
                 <BreadcrumbItem>labels</BreadcrumbItem>

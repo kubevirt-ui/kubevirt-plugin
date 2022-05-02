@@ -14,8 +14,6 @@ import {
   Popover,
 } from '@patternfly/react-core';
 
-import 'src/views/templates/details/tabs/details/TemplateDetailsPage.scss';
-
 type CreatedAtProps = {
   template: V1Template;
 };
@@ -41,7 +39,7 @@ const CreatedAt: React.FC<CreatedAtProps> = ({ template }) => {
                   {` https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata`}
                 </a>
               </div>
-              <Breadcrumb>
+              <Breadcrumb className="margin-top">
                 <BreadcrumbItem>Template</BreadcrumbItem>
                 <BreadcrumbItem>metadata</BreadcrumbItem>
                 <BreadcrumbItem>creationTimestamp</BreadcrumbItem>

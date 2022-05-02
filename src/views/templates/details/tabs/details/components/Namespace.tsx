@@ -13,8 +13,6 @@ import {
   Popover,
 } from '@patternfly/react-core';
 
-import 'src/views/templates/details/tabs/details/TemplateDetailsPage.scss';
-
 type NamespaceProps = {
   namespace: string;
 };
@@ -41,7 +39,7 @@ const Namespace: React.FC<NamespaceProps> = ({ namespace }) => {
                   http://kubernetes.io/docs/user-guide/namespaces
                 </a>
               </div>
-              <Breadcrumb>
+              <Breadcrumb className="margin-top">
                 <BreadcrumbItem>Template</BreadcrumbItem>
                 <BreadcrumbItem>metadata</BreadcrumbItem>
                 <BreadcrumbItem>namespace</BreadcrumbItem>
