@@ -15,7 +15,7 @@ import {
 type useAvailableSourceTemplatesProps = {
   onlyAvailable: boolean;
   onlyDefault: boolean;
-  namespace: string;
+  namespace?: string;
 };
 
 export const useAvailableSourceTemplates = ({
@@ -90,14 +90,16 @@ export const useAvailableSourceTemplates = ({
 
   return {
     templates: onlyAvailable ? availableTemplates : templates,
-    loaded,
+    availableTemplatesUID: new Set(availableTemplates.map((t) => t.metadata.uid)),
     initialSourcesLoaded: templatesWithSourceLoaded || Object.keys(templatesWithSource).length > 0,
+    loaded,
     error: error || loadError,
   };
 };
 
 type useAvailableSourceTemplatesValues = {
   templates: V1Template[];
+  availableTemplatesUID: Set<string>;
   loaded: boolean;
   initialSourcesLoaded: boolean;
   error: any;

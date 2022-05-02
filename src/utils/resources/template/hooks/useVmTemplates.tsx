@@ -33,6 +33,12 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
     isList: true,
   });
 
+  // Bug fix: TODO open BZ for SSP oc get projects don't show on projects when non-priv users
+  const projectNames = projects?.map((proj) => proj?.metadata?.name);
+  if (projectNames && !projectNames.includes('openshift')) {
+    projectNames.push('openshift');
+  }
+
   const [allTemplates, allTemplatesLoaded, allTemplatesError] = useK8sWatchResource<V1Template[]>({
     groupVersionKind: TemplateModelGroupVersionKind,
     selector: {
@@ -51,11 +57,11 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
   const allowedResources = useK8sWatchResources<{ [key: string]: V1Template[] }>(
     Object.fromEntries(
       loaded && !isAdmin
-        ? projects.map((p) => [
-            p.metadata.name,
+        ? projectNames.map((name) => [
+            name,
             {
               groupVersionKind: TemplateModelGroupVersionKind,
-              namespace: p.metadata.name,
+              namespace: name,
               selector: {
                 matchExpressions: [
                   {

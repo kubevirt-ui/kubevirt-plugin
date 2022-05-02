@@ -1,8 +1,8 @@
 import * as React from 'react';
 
+import { useAvailableSourceTemplates } from '@catalog/templatescatalog/hooks/useAvailableSourceTemplates';
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useVmTemplates } from '@kubevirt-utils/resources/template';
 import {
   K8sResourceCommon,
   ListPageBody,
@@ -19,7 +19,10 @@ import useVirtualMachineTemplatesFilters from './hooks/useVirtualMachineTemplate
 
 const VirtualMachineTemplatesList: React.FC = () => {
   const { t } = useKubevirtTranslation();
-  const { templates, loaded, loadError } = useVmTemplates();
+  const { templates, loaded, error, availableTemplatesUID } = useAvailableSourceTemplates({
+    onlyAvailable: false,
+    onlyDefault: false,
+  });
   const [data, filteredData, onFilterChange] = useListPageFilter(
     templates,
     useVirtualMachineTemplatesFilters(),
@@ -36,14 +39,14 @@ const VirtualMachineTemplatesList: React.FC = () => {
           onFilterChange={onFilterChange}
         />
         <VirtualMachineTemplateSupport />
-        <VirtualizedTable<K8sResourceCommon>
+        <VirtualizedTable<K8sResourceCommon, { kind: string; availableTemplatesUID: Set<string> }>
           data={filteredData}
           unfilteredData={data}
           loaded={loaded}
-          loadError={loadError}
+          loadError={error}
           columns={useVirtualMachineTemplatesColumns()}
           Row={VirtualMachineTemplatesRow}
-          rowData={{ kind: TemplateModel.kind }}
+          rowData={{ kind: TemplateModel.kind, availableTemplatesUID }}
         />
       </ListPageBody>
     </>
