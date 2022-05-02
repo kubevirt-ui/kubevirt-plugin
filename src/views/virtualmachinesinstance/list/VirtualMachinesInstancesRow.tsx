@@ -7,7 +7,7 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { GlobeAmericasIcon } from '@patternfly/react-icons';
 
-import VirtualMachinesInsanceActions from '../actions/VirtualMachinesInstanceActions';
+import VirtualMachinesInstanceActions from '../actions/VirtualMachinesInstanceActions';
 import VirtualMachinesInstancesIP from '../components/VirtualMachinesInstanceIP';
 import VirtualMachinesInstancesStatus from '../components/VirtualMachinesInstancesStatus';
 
@@ -43,7 +43,7 @@ const VirtualMachinesInstancesRow: React.FC<VirtualMachinesInstancesRowProps> = 
         <VirtualMachinesInstancesIP vmi={obj} />
       </TableData>
       <TableData id="actions" activeColumnIDs={activeColumnIDs} className="pf-c-table__action">
-        <VirtualMachinesInsanceActions vmi={obj} />
+        <VirtualMachinesInstanceActions vmi={obj} isKebab />
       </TableData>
     </>
   );

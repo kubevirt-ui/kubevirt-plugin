@@ -5,8 +5,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { icon } from '@kubevirt-utils/resources/vmi';
 import { Label } from '@patternfly/react-core';
 
-import VirtualMachineInstanceActions from '../list/components/VirtualMachineInstanceActions/VirtualMachineInstanceAction';
 import VirtualMachineInstanceBreadcrumb from '../list/components/VirtualMachineInstanceBreadcrumb/VirtualMachineInstanceBreadcrumb';
+import VirtualMachinesInstanceActions from '../actions/VirtualMachinesInstanceActions';
 
 type VirtualMachinesInstancePageHeaderProps = {
   vmi: V1VirtualMachineInstance;
@@ -29,7 +29,7 @@ const VirtualMachinesInstancePageHeader: React.FC<VirtualMachinesInstancePageHea
             {status}
           </Label>
         </h1>
-        <VirtualMachineInstanceActions vmi={vmi} />
+        <VirtualMachinesInstanceActions vmi={vmi} />
       </span>
     </div>
   );

@@ -17,10 +17,11 @@ export enum VM_STATUS {
   Running = 'Running',
   Stopped = 'Stopped',
   Provisioning = 'Provisioning',
+  Paused = 'Paused',
 }
 
 export enum ACTION_TIMEOUT {
-  BOOTUP = 60000,
+  BOOTUP = 120000,
   IMPORT = 300000,
 }
 

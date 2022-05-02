@@ -11,9 +11,9 @@ const VirtualMachinesInstancesStatus: React.FC<VirtualMachinesInstancesStatusPro
 }) => {
   const IconComponent = icon?.[status];
   return (
-    <>
+    <div className="pf-c-helper-text__item-text">
       <IconComponent /> {status}
-    </>
+    </div>
   );
 };
 

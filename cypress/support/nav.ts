@@ -6,6 +6,7 @@ declare global {
     interface Chainable {
       visitCatalog(): void;
       visitVMs(): void;
+      visitVMIs(): void;
     }
   }
 }
@@ -16,4 +17,8 @@ Cypress.Commands.add('visitCatalog', () => {
 
 Cypress.Commands.add('visitVMs', () => {
   cy.clickNavLink(['Virtualization', 'VirtualMachines']);
+});
+
+Cypress.Commands.add('visitVMIs', () => {
+  cy.clickNavLink(['Virtualization', 'VirtualMachineInstances']);
 });

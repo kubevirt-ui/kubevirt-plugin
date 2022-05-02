@@ -83,6 +83,10 @@ export const vm = {
       waitForStatus(VM_STATUS.Running);
     }
   },
+  visitVMI: (vmData: VirtualMachineData) => {
+    cy.visitVMIs();
+    getRow(vmData?.name, () => cy.byLegacyTestID(vmData?.name).click());
+  },
   testStatus: (vmName: string, status: string, waitTime = 60000) =>
     getRow(vmName, () =>
       cy.contains(vmStatusOnList, status, { timeout: waitTime }).should('be.exist'),

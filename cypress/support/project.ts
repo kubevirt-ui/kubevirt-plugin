@@ -7,6 +7,7 @@ declare global {
       selectProject(name: string): void;
       newProject(name: string): void;
       selectTestProject(): void;
+      deleteProject(name: string): void;
     }
   }
 }
@@ -26,4 +27,10 @@ Cypress.Commands.add('newProject', (project: string) => {
 
 Cypress.Commands.add('selectTestProject', () => {
   cy.selectProject(TEST_NS);
+});
+
+Cypress.Commands.add('deleteProject', (project: string) => {
+  cy.exec(`oc delete ns ${project} > /dev/null 2>&1 || oc delete project ${project}`, {
+    timeout: 180000,
+  });
 });
