@@ -14,14 +14,14 @@ type CloudinitProps = {
   updateVM: UpdateValidatedVM;
 };
 
-const Cloudinit: React.FC<CloudinitProps> = ({ vm, updateVM }) => {
+const Cloudinit: React.FC<CloudinitProps> = ({ vm }) => {
   const cloudInitVolume = getVolumes(vm)?.find((vol) => !!vol.cloudInitNoCloud);
 
   return (
     <>
       <CloudInitInfoHelper />
       <div className="kv-cloudinit-advanced-tab--main">
-        <CloudinitForm cloudInitVolume={cloudInitVolume} updateVM={updateVM} />
+        <CloudinitForm cloudInitVolume={cloudInitVolume} />
       </div>
     </>
   );
