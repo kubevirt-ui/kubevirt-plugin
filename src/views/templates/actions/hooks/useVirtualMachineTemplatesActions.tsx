@@ -57,7 +57,8 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
           {t('Edit boot source')} {editableBootSource === null && <Loading />}
         </>
       ),
-      disabled: !!editableBootSource, // !editableBootSource,
+      description: t('For not automatically managed boot sources'),
+      disabled: !editableBootSource,
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <EditBootSourceModal obj={template} isOpen={isOpen} onClose={onClose} />
@@ -66,8 +67,8 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     {
       id: 'delete-template',
       label: t('Delete Template'),
-      description: t('Common templates cannot be deleted'),
-      disabled: isCommonTemplate, // common templates cannot be deleted
+      description: t('Custom templates can be deleted'),
+      disabled: isCommonTemplate,
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <DeleteModal
