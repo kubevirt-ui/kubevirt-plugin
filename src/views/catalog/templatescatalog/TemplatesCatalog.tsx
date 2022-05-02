@@ -28,6 +28,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   const { templates, loaded, initialSourcesLoaded, error } = useAvailableSourceTemplates({
     namespace: filters.namespace,
     onlyAvailable: filters.onlyAvailable,
+    onlyDefault: filters.onlyDefault,
   });
 
   const filteredTemplates = React.useMemo(

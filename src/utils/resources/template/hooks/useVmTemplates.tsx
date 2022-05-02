@@ -27,7 +27,7 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
   const [isAdmin] = useIsAdmin();
   const TemplateModelGroupVersionKind = modelToGroupVersionKind(TemplateModel);
 
-  const [projects] = useK8sWatchResource<K8sResourceCommon[]>({
+  const [projects, loaded] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
     namespaced: false,
     isList: true,
@@ -50,23 +50,25 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
   // user has limited access, so we can only get templates from allowed namespaces
   const allowedResources = useK8sWatchResources<{ [key: string]: V1Template[] }>(
     Object.fromEntries(
-      projects.map((p) => [
-        p.metadata.name,
-        {
-          groupVersionKind: TemplateModelGroupVersionKind,
-          namespace: p.metadata.name,
-          selector: {
-            matchExpressions: [
-              {
-                operator: Operator.In,
-                key: TEMPLATE_TYPE_LABEL,
-                values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
+      loaded && !isAdmin
+        ? projects.map((p) => [
+            p.metadata.name,
+            {
+              groupVersionKind: TemplateModelGroupVersionKind,
+              namespace: p.metadata.name,
+              selector: {
+                matchExpressions: [
+                  {
+                    operator: Operator.In,
+                    key: TEMPLATE_TYPE_LABEL,
+                    values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
+                  },
+                ],
               },
-            ],
-          },
-          isList: true,
-        },
-      ]),
+              isList: true,
+            },
+          ])
+        : [],
     ),
   );
 
