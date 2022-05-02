@@ -1,6 +1,6 @@
 import * as React from 'react';
 import produce from 'immer';
-import { useDeschedulerOn } from 'src/views/templates/utils';
+import { isDeschedulerOn } from 'src/views/templates/utils';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -32,7 +32,7 @@ type DeschedulerModalProps = {
 
 const DeschedulerModal: React.FC<DeschedulerModalProps> = ({ template, isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
-  const [isOn, setOn] = React.useState<boolean>(useDeschedulerOn(template)); // the default is OFF, the admin has to opt-in this feature
+  const [isOn, setOn] = React.useState<boolean>(isDeschedulerOn(template)); // the default is OFF, the admin has to opt-in this feature
 
   const onSubmit = React.useCallback(
     (updatedTemplate: V1Template) =>

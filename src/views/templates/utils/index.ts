@@ -20,7 +20,6 @@ export const useDeschedulerInstalled = (): boolean => {
 };
 
 // check if the descheduler is ON
-export const useDeschedulerOn = (template: V1Template): boolean =>
-  // check for the descheduler.alpha.kubernetes.io/evict: 'true' annotation, also the descheduler has to be installed
-  useDeschedulerInstalled &&
+export const isDeschedulerOn = (template: V1Template): boolean =>
+  // check for the descheduler.alpha.kubernetes.io/evict: 'true' annotation
   template?.objects[0]?.spec?.template?.metadata?.annotations[DESCHEDULER_EVICT_LABEL] === 'true';
