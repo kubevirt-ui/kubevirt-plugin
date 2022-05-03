@@ -1,5 +1,11 @@
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateOS, OS_NAME_TYPES, OS_NAMES } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateOS,
+  isDefaultVariantTemplate,
+  OS_NAME_TYPES,
+  OS_NAMES,
+} from '@kubevirt-utils/resources/template';
 import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getTemplateProviderName } from '../../utils/selectors';
@@ -40,7 +46,9 @@ const includeFilter = (
   return compareData.selected?.length === 0 || compareData.selected?.includes(compareString);
 };
 
-const useVirtualMachineTemplatesFilters = (): RowFilter[] => {
+const useVirtualMachineTemplatesFilters = (
+  availableTemplatesUID: Set<string>,
+): RowFilter<V1Template>[] => {
   const { t } = useKubevirtTranslation();
   const providers = useTemplateProviders();
   const osNames = [
@@ -52,6 +60,31 @@ const useVirtualMachineTemplatesFilters = (): RowFilter[] => {
   ];
 
   return [
+    {
+      filterGroupName: t('Type'),
+      type: 'is-default-template',
+      reducer: (obj) => (isDefaultVariantTemplate(obj) ? 'is-default' : ''),
+      filter: ({ selected }, obj) => selected?.length === 0 || isDefaultVariantTemplate(obj),
+      items: [
+        {
+          id: 'is-default',
+          title: t('Default Templates'),
+        },
+      ],
+    },
+    {
+      filterGroupName: t('Boot source'),
+      type: 'boot-source-available',
+      reducer: (obj) => (availableTemplatesUID.has(obj.metadata.uid) ? 'available' : ''),
+      filter: ({ selected }, obj) =>
+        selected?.length === 0 || availableTemplatesUID.has(obj.metadata.uid),
+      items: [
+        {
+          id: 'available',
+          title: t('Boot source available'),
+        },
+      ],
+    },
     {
       filterGroupName: t('Template provider'),
       type: 'template-provider',
