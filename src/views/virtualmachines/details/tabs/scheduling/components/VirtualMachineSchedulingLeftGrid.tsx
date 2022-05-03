@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
@@ -13,11 +14,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
-import { printableVMStatus } from '../../../../../../utils';
-import Affinity from '../../Affinity/Affinity';
-import Descheduler from '../../Descheduler/Descheduler';
-import NodeSelector from '../../NodeSelector/NodeSelector';
-import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import VirtualMachineDescriptionItem from '../../details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+
+import Affinity from './Affinity';
+import Descheduler from './Descheduler';
+import NodeSelector from './NodeSelector';
 
 type VirtualMachineSchedulingLeftGridProps = {
   vm: V1VirtualMachine;

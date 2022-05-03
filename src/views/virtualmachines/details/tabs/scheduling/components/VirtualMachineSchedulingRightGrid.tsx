@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -11,11 +12,11 @@ import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
-import { printableVMStatus } from '../../../../../../utils';
-import CPUMemory from '../../CPUMemory/CPUMemory';
-import DedicatedResources from '../../DedicatedResources/DedicatedResources';
-import EvictionStrategy from '../../EvictionStrategy/EvictionStrategy';
-import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import CPUMemory from '../../details/components/CPUMemory/CPUMemory';
+import VirtualMachineDescriptionItem from '../../details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+
+import DedicatedResources from './DedicatedResources';
+import EvictionStrategy from './EvictionStrategy';
 
 type VirtualMachineSchedulingLeftGridProps = {
   vm: V1VirtualMachine;
