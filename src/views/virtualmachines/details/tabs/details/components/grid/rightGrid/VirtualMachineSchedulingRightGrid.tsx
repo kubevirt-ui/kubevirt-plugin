@@ -12,9 +12,9 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
 import { printableVMStatus } from '../../../../../../utils';
+import CPUMemory from '../../CPUMemory/CPUMemory';
 import DedicatedResources from '../../DedicatedResources/DedicatedResources';
 import EvictionStrategy from '../../EvictionStrategy/EvictionStrategy';
-import Flavor from '../../Flavor/Flavor';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 type VirtualMachineSchedulingLeftGridProps = {
@@ -47,7 +47,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
     <GridItem span={5}>
       <DescriptionList>
         <VirtualMachineDescriptionItem
-          descriptionData={<Flavor vm={vm} />}
+          descriptionData={<CPUMemory vm={vm} />}
           descriptionHeader={t('CPU | Memory')}
           isEdit={canUpdateVM}
           onEditClick={() =>

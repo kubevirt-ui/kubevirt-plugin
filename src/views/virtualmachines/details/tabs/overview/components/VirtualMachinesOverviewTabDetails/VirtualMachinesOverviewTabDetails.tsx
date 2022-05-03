@@ -25,7 +25,7 @@ import {
 } from '@patternfly/react-core';
 
 import { getVMStatusIcon } from '../../../../../utils';
-import Flavor from '../../../details/components/Flavor/Flavor';
+import CPUMemory from '../../../details/components/CPUMemory/CPUMemory';
 
 import VirtualMachinesOverviewTabDetailsConsole from './components/VirtualMachinesOverviewTabDetailsConsole';
 import VirtualMachinesOverviewTabDetailsTitle from './components/VirtualMachinesOverviewTabDetailsTitle';
@@ -110,7 +110,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
             <GridItem span={6}>
               <div className="right-column">
                 <div className="title">{t('CPU | Memory')}</div>
-                <Flavor vm={vm} />
+                <CPUMemory vm={vm} />
               </div>
               <VirtualMachinesOverviewTabDetailsConsole vmi={vmi} />
             </GridItem>
