@@ -8,5 +8,5 @@ export const defaultSourceVM: VirtualMachineData = {
   name: 'vm-from-default-source',
   namespace: TEST_NS,
   template: TEMPLATE.FEDORA,
-  diskSource: DiskSource.DEFAULT,
+  diskSource: DiskSource.REGISTRY,
 };

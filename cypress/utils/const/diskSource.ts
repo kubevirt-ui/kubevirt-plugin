@@ -15,8 +15,8 @@ export const DiskSource = {
     pvcNS: '',
   },
   REGISTRY: {
-    name: 'Registry',
+    name: 'REGISTRY',
     selectorID: 'registry',
-    value: 'quay.io/kubevirt/fedora-with-test-tooling-container-disk:latest',
+    value: 'quay.io/containerdisks/fedora:35',
   },
 };

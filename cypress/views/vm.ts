@@ -56,6 +56,12 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
       cy.get(catalogView.diskSourceURL).type(vmData.diskSource.value);
       break;
     }
+    case 'REGISTRY': {
+      cy.get(catalogView.diskSourceSelect).click();
+      cy.get(catalogView.diskSourceRegistry).click();
+      cy.get(catalogView.diskSourceRegistryInput).type(vmData.diskSource.value);
+      break;
+    }
     default: {
       break;
     }

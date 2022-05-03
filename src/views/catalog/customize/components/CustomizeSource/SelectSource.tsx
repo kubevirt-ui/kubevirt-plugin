@@ -89,7 +89,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   ]);
 
   return (
-    <>
+    <div id="SelectSource">
       <SelectSourceOption
         onSelectSource={setSourceType}
         selectedSource={selectedSourceType}
@@ -133,6 +133,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           helperText={registrySourceHelperText}
         >
           <TextInput
+            id="container-image-registry"
             value={containerImage}
             type="text"
             onChange={setContainerImage}
@@ -145,6 +146,6 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
       {withSize && selectedSourceType !== DEFAULT_SOURCE && (
         <VolumeSize quantity={volumeQuantity} onChange={setVolumeQuantity} />
       )}
-    </>
+    </div>
   );
 };
