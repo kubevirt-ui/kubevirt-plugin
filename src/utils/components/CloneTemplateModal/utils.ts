@@ -6,13 +6,22 @@ import {
   V1beta1DataVolumeSpec,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
+import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
-export const getTemplateVMPVC = (template: V1Template): V1beta1DataVolumeSourcePVC => {
+const getBootSourceDataVolumeTemplate = (template: V1Template) => {
   const vm = getTemplateVirtualMachineObject(template);
-  const dataVolumeTemplates = getDataVolumeTemplates(vm);
-  return dataVolumeTemplates?.[0]?.spec?.source?.pvc;
+  const rootVolume = getVolumes(vm)?.find((volume) => volume.name === 'rootdisk');
+
+  if (rootVolume?.dataVolume?.name)
+    return getDataVolumeTemplates(vm)?.find(
+      (dataVolumeTemplate) => dataVolumeTemplate.metadata.name === rootVolume.dataVolume.name,
+    );
+};
+
+export const getTemplateBootSourcePVC = (template: V1Template): V1beta1DataVolumeSourcePVC => {
+  const rootDiskDataVolumeTemplate = getBootSourceDataVolumeTemplate(template);
+  return rootDiskDataVolumeTemplate?.spec?.source?.pvc;
 };
 
 const produceDataVolume = (
@@ -30,9 +39,8 @@ const produceDataVolume = (
 });
 
 export const cloneStorage = async (template: V1Template, pvcName: string, namespace: string) => {
-  const vm = getTemplateVirtualMachineObject(template);
-  const dataVolumeTemplates = getDataVolumeTemplates(vm);
-  const dataVolume = produceDataVolume(pvcName, namespace, dataVolumeTemplates?.[0]?.spec);
+  const rootDiskDataVolumeTemplate = getBootSourceDataVolumeTemplate(template);
+  const dataVolume = produceDataVolume(pvcName, namespace, rootDiskDataVolumeTemplate?.spec);
   await k8sCreate({
     model: DataVolumeModel,
     data: dataVolume,
