@@ -30,11 +30,13 @@ const Owner: React.FC<OwnerProps> = ({ template }) => {
           headerContent={t('Owner')}
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
-              List of objects depended by this object. If ALL objects in the list have been deleted,
-              this object will be garbage collected. If this object is managed by a controller, then
-              an entry in this list will point to this controller, with the controller field set to
-              true. There cannot be more than one managing controller.
-              <Breadcrumb>
+              <div>
+                List of objects depended by this object. If ALL objects in the list have been
+                deleted, this object will be garbage collected. If this object is managed by a
+                controller, then an entry in this list will point to this controller, with the
+                controller field set to true. There cannot be more than one managing controller.
+              </div>
+              <Breadcrumb className="margin-top">
                 <BreadcrumbItem>Template</BreadcrumbItem>
                 <BreadcrumbItem>metadata</BreadcrumbItem>
                 <BreadcrumbItem>ownerReferences</BreadcrumbItem>

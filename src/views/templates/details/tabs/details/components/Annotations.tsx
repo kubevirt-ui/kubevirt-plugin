@@ -34,7 +34,7 @@ const Annotations: React.FC<AnnotationsProps> = ({ count }) => {
               <a href="http://kubernetes.io/docs/user-guide/annotations">
                 http://kubernetes.io/docs/user-guide/annotations
               </a>
-              <Breadcrumb>
+              <Breadcrumb className="margin-top">
                 <BreadcrumbItem>Template</BreadcrumbItem>
                 <BreadcrumbItem>metadata</BreadcrumbItem>
                 <BreadcrumbItem>annotations</BreadcrumbItem>

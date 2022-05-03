@@ -35,7 +35,7 @@ const Name: React.FC<NameProps> = ({ name }) => {
               <a href="http://kubernetes.io/docs/user-guide/identifiers#names">
                 http://kubernetes.io/docs/user-guide/identifiers#names
               </a>
-              <Breadcrumb>
+              <Breadcrumb className="margin-top">
                 <BreadcrumbItem>Template</BreadcrumbItem>
                 <BreadcrumbItem>metadata</BreadcrumbItem>
                 <BreadcrumbItem>name</BreadcrumbItem>
