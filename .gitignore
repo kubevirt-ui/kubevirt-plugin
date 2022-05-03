@@ -18,3 +18,4 @@ console-extensions.md
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.idea/
