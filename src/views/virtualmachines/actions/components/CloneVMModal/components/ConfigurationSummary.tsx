@@ -13,7 +13,7 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { FormGroup, TextListItem, TextListItemVariants } from '@patternfly/react-core';
 
-import Flavor from '../../../../details/tabs/details/components/Flavor/Flavor';
+import CPUMemory from '../../../../details/tabs/details/components/CPUMemory/CPUMemory';
 import { getClonedDisksSummary } from '../utils/helpers';
 
 type ConfigurationSummaryProps = {
@@ -36,7 +36,7 @@ const ConfigurationSummary: React.FC<ConfigurationSummaryProps> = ({ vm, pvcs, d
         {t('Flavor')}
       </TextListItem>
       <TextListItem component={TextListItemVariants.dd}>
-        <Flavor vm={vm} />
+        <CPUMemory vm={vm} />
       </TextListItem>
       <TextListItem className="text-muted" component={TextListItemVariants.dt}>
         {t('Workload Profile')}

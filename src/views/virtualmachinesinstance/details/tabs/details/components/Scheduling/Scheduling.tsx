@@ -14,10 +14,10 @@ import {
 import { LinkIcon } from '@patternfly/react-icons';
 
 import Affinity from './Affinity/Affinity';
+import CPUMemory from './CPUMemory/CPUMemory';
 import Descheduler from './Descheduler/Descheduler';
 import DedicatedResources from './DeticatedResources/DedicatedResources';
 import EvictionStrategy from './EvictionStrategy/EvictionStrategy';
-import Flavor from './Flavor/Flavor';
 import NodeSelector from './NodeSelector/NodeSelector';
 import Tolerations from './Tolerations/Tolerations';
 
@@ -69,9 +69,9 @@ const Scheduling: React.FC<SchedulingProps> = ({ vmi, pathname }) => {
         <GridItem span={6}>
           <DescriptionList>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('Flavor')}</DescriptionListTerm>
+              <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
               <DescriptionListDescription>
-                <Flavor vmi={vmi} />
+                <CPUMemory vmi={vmi} />
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
