@@ -1,0 +1,21 @@
+.template-parameters-page {
+  .pf-c-expandable-section__toggle-text {
+    color: black;
+  }
+
+  .pf-c-form__group {
+    margin-bottom: var(--pf-global--spacer--md);
+  }
+
+  .form-group-indented {
+    margin-left: var(--pf-global--spacer--md);
+  }
+
+  .pf-c-form__group:last-child {
+    margin-bottom: var(--pf-global--spacer--lg);
+  }
+
+  .pf-c-divider {
+    margin-bottom: var(--pf-global--spacer--lg);
+  }
+}
