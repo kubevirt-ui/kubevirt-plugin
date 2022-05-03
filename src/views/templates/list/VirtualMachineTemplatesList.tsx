@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 
 import { useAvailableSourceTemplates } from '@catalog/templatescatalog/hooks/useAvailableSourceTemplates';
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
@@ -17,16 +18,19 @@ import VirtualMachineTemplateSupport from './components/VirtualMachineTemplateSu
 import useVirtualMachineTemplatesColumns from './hooks/useVirtualMachineTemplatesColumns';
 import useVirtualMachineTemplatesFilters from './hooks/useVirtualMachineTemplatesFilters';
 
-const VirtualMachineTemplatesList: React.FC = () => {
+const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>> = ({
+  match: {
+    params: { ns: namespace },
+  },
+}) => {
   const { t } = useKubevirtTranslation();
   const { templates, loaded, error, availableTemplatesUID } = useAvailableSourceTemplates({
     onlyAvailable: false,
     onlyDefault: false,
+    namespace,
   });
-  const [data, filteredData, onFilterChange] = useListPageFilter(
-    templates,
-    useVirtualMachineTemplatesFilters(),
-  );
+  const filters = useVirtualMachineTemplatesFilters(availableTemplatesUID);
+  const [data, filteredData, onFilterChange] = useListPageFilter(templates, filters);
 
   return (
     <>
@@ -35,7 +39,7 @@ const VirtualMachineTemplatesList: React.FC = () => {
         <ListPageFilter
           data={data}
           loaded={loaded}
-          rowFilters={useVirtualMachineTemplatesFilters()}
+          rowFilters={filters}
           onFilterChange={onFilterChange}
         />
         <VirtualMachineTemplateSupport />
