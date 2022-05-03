@@ -232,5 +232,24 @@
     "flags": {
       "required": ["KUBEVIRT"]
     }
+  },
+  {
+    "type": "console.navigation/href",
+    "properties": {
+      "prefixNamespaced": true,
+      "id": "virtualization-migration-tool",
+      "section": "virtualization",
+      "name": "%plugin__kubevirt-plugin~MigrationTool%",
+      "href": "migration-tool"
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
+      "path": ["/k8s/ns/:ns/migration-tool", "/k8s/all-namespaces/migration-tool"],
+      "component": {
+        "$codeRef": "MigrationToolPage"
+      }
+    }
   }
 ]
