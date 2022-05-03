@@ -67,13 +67,13 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
       </Breadcrumb>
       <Stack>
         <StackItem className="co-m-pane__heading">
-          <Title headingLevel="h1">{t('Review and Create VirtualMachine')}</Title>
+          <Title headingLevel="h1">{t('Review and create VirtualMachine')}</Title>
         </StackItem>
         <StackItem>
           <Trans t={t} ns="plugin__kubevirt-plugin">
             You can click the Create VirtualMachine button to create your VirtualMachine or
-            customize it by editing each of the tabs below. When done, click the Create Virtual
-            Machine button.
+            customize it by editing each of the tabs below. When done, click the Create
+            VirtualMachine button.
           </Trans>
         </StackItem>
       </Stack>
