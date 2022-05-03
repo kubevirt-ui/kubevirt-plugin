@@ -21,7 +21,7 @@ export enum VM_STATUS {
 }
 
 export enum ACTION_TIMEOUT {
-  BOOTUP = 120000,
+  BOOTUP = 1200000,
   IMPORT = 300000,
 }
 
