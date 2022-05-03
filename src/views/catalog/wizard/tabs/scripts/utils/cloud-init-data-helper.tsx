@@ -39,6 +39,11 @@ export enum CloudInitDataFormKeys {
   SSH_AUTHORIZED_KEYS = 'ssh_authorized_keys',
   PASSWORD = 'password',
 }
+export enum CloudInitNetworkFormKeys {
+  NAME = 'name',
+  ADDRESS = 'address',
+  GATEWAY = 'gateway',
+}
 export const CLOUD_CONFIG_HEADER = '#cloud-config';
 
 export const formAllowedKeys = new Set([
@@ -77,28 +82,47 @@ export class CloudInitDataHelper {
       : cloudInitNoCloud && cloudInitNoCloud.userData;
     return [userData, isBase64] as [string, boolean];
   };
+  static getNetworkData = (cloudInitNoCloud?: V1CloudInitNoCloudSource) => {
+    const isBase64 = !!cloudInitNoCloud?.networkDataBase64;
+    const networkData = isBase64
+      ? safeAtob(cloudInitNoCloud && cloudInitNoCloud.networkDataBase64)
+      : cloudInitNoCloud && cloudInitNoCloud.networkData;
+    return [networkData, isBase64] as [string, boolean];
+  };
 
-  static toCloudInitNoCloudSource = (
+  static toCloudInitNoCloudUserSource = (
     userData: string,
     isBase64: boolean,
   ): V1CloudInitNoCloudSource => {
-    if (isBase64) {
-      return { userDataBase64: btoa(userData) };
-    }
-    return { userData };
+    return {
+      ...(isBase64 ? { userDataBase64: btoa(userData) } : { userData }),
+    };
+  };
+
+  static toCloudInitNoCloudNetworkSource = (
+    networkData: string,
+    isNetworkDataBase64: boolean,
+  ): V1CloudInitNoCloudSource => {
+    return {
+      ...(isNetworkDataBase64 ? { networkDataBase64: btoa(networkData) } : { networkData }),
+    };
   };
 
   private header: string;
 
   private base64: boolean;
+  private networkBase64: boolean;
 
   private cloudConfigData: any = null;
+  private cloudNetworkData: any = null;
 
   private otherFormatData: any = null;
 
   constructor(cloudInitNoCloud?: V1CloudInitNoCloudSource) {
     const [userData, isBase64] = CloudInitDataHelper.getUserData(cloudInitNoCloud);
+    const [networkData, isNetworkDataBase64] = CloudInitDataHelper.getNetworkData(cloudInitNoCloud);
     this.base64 = isBase64;
+    this.networkBase64 = isNetworkDataBase64;
 
     const firstLineSepIndex = userData ? userData.indexOf('\n') : -1;
     const header = firstLineSepIndex === -1 ? undefined : userData.substring(0, firstLineSepIndex);
@@ -114,21 +138,11 @@ export class CloudInitDataHelper {
     } else {
       this.otherFormatData = userData;
     }
+    this.cloudNetworkData = load(networkData);
   }
 
-  isEmpty = () => !this.otherFormatData && isEmpty(this.cloudConfigData);
-
-  includesOnlyFormValues = () =>
-    this.cloudConfigData
-      ? Object.keys(this.cloudConfigData).every((key) => formAllowedKeys.has(key as any))
-      : !this.otherFormatData;
-
-  areAllFormValuesEmpty = () =>
-    this.isEmpty() ||
-    (this.includesOnlyFormValues() &&
-      !Object.keys(this.cloudConfigData).find(
-        (key) => this.has(key) && key !== CloudInitDataFormKeys.NAME,
-      ));
+  isEmpty = () =>
+    !this.otherFormatData && isEmpty(this.cloudConfigData) && isEmpty(this.cloudNetworkData);
 
   getUserData = () => {
     if (this.cloudConfigData) {
@@ -138,11 +152,20 @@ export class CloudInitDataHelper {
     return this.otherFormatData;
   };
 
+  getNetworkData = () => {
+    if (this.cloudNetworkData) {
+      return dump(this.cloudNetworkData);
+    }
+    return this.otherFormatData;
+  };
+
   get = (key: string) => this.cloudConfigData && this.cloudConfigData[key];
+  getNetworkKey = (key: string) => this.cloudNetworkData && this.cloudNetworkData[key];
 
   has = (key: string) => !!this.get(key);
 
   hasKey = (key: string) => this.cloudConfigData && !!this.cloudConfigData[key];
+  networkHasKey = (key: string) => this.cloudNetworkData && !!this.cloudNetworkData[key];
 
   set = (key: string, value: string | string[]) => {
     if (key && !this.otherFormatData) {
@@ -157,22 +180,22 @@ export class CloudInitDataHelper {
     }
   };
 
-  makeFormCompliant = () => {
-    this.header = CLOUD_CONFIG_HEADER;
-    this.otherFormatData = undefined;
-    if (!this.cloudConfigData) {
-      this.cloudConfigData = {};
-    }
-    Object.keys(this.cloudConfigData).forEach((key) => {
-      if (!formAllowedKeys.has(key as any)) {
-        delete this.cloudConfigData[key];
+  setNetworkKey = (key: string, value: string | string[]) => {
+    if (key && !this.otherFormatData) {
+      if (!this.cloudNetworkData) {
+        this.cloudNetworkData = {};
       }
-    });
-    if (!this.cloudConfigData[CloudInitDataFormKeys.NAME]) {
-      this.cloudConfigData[CloudInitDataFormKeys.NAME] = 'default'; // root account might not be enabled
+      if (value === undefined) {
+        delete this.cloudNetworkData[key];
+      } else {
+        this.cloudNetworkData[key] = value;
+      }
     }
   };
 
-  asCloudInitNoCloudSource = () =>
-    CloudInitDataHelper.toCloudInitNoCloudSource(this.getUserData(), this.base64);
+  asCloudInitNoCloudUserSource = () =>
+    CloudInitDataHelper.toCloudInitNoCloudUserSource(this.getUserData(), this.base64);
+
+  asCloudInitNoCloudNetworkSource = () =>
+    CloudInitDataHelper.toCloudInitNoCloudNetworkSource(this.getNetworkData(), this.networkBase64);
 }

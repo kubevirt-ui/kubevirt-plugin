@@ -13,6 +13,7 @@ import { cloudinitIDGenerator } from '../utils/cloudint-utils';
 import useCloudinitValidations from '../utils/use-cloudinit-validations';
 
 import CloudinitSSHKeyForm from './CloudinitSSHKeyForm/CloudInitSSHKeyForm';
+import { CloudinitNetworkForm } from './CloudInitNetworkForm';
 
 type CloudinitFormProps = {
   cloudInitVolume: V1Volume;
@@ -20,10 +21,11 @@ type CloudinitFormProps = {
 const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume }) => {
   const { t } = useKubevirtTranslation();
   const { updateVM, tabsData, updateTabsData } = useWizardVMContext();
+  const cloudInitData = cloudInitVolume?.cloudInitNoCloud || cloudInitVolume?.cloudInitConfigDrive;
 
   const [cloudinitConfigUserData, isBase64] = React.useMemo(
-    () => CloudInitDataHelper.getUserData(cloudInitVolume?.cloudInitNoCloud || {}),
-    [cloudInitVolume],
+    () => CloudInitDataHelper.getUserData(cloudInitData || {}),
+    [cloudInitData],
   );
 
   const cloudinitConfigDataHelper = React.useMemo(
@@ -86,15 +88,18 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume }) => {
           }
 
           const updatedCloudinitVolume = {
-            ...(cloudInitVolume || { name: cloudInitDiskName }),
-            cloudInitNoCloud: CloudInitDataHelper.toCloudInitNoCloudSource(yaml, isBase64),
+            name: cloudInitDiskName,
+            cloudInitNoCloud: {
+              ...(cloudInitData || {}),
+              ...CloudInitDataHelper.toCloudInitNoCloudUserSource(yaml, isBase64),
+            },
           };
 
           const otherVolumes = getVolumes(vmDraft).filter((vol) => !vol.cloudInitNoCloud);
           vmDraft.spec.template.spec.volumes = [...otherVolumes, updatedCloudinitVolume];
         }),
       ),
-    [cloudInitVolume, isBase64, updateVM, yaml],
+    [cloudInitData, cloudInitVolume?.name, isBase64, updateVM, yaml],
   );
 
   React.useEffect(() => {
@@ -168,6 +173,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume }) => {
           onChange={(v) => onFieldChange(CloudInitDataFormKeys.HOSTNAME, v)}
         />
       </FormGroup>
+      <CloudinitNetworkForm cloudInitVolume={cloudInitVolume} updateVM={updateVM} />
       <FormGroup
         label={t('Authorized SSH Key')}
         fieldId={cloudinitIDGenerator(CloudInitDataFormKeys.SSH_AUTHORIZED_KEYS)}
