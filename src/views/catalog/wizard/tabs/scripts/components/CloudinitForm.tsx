@@ -3,12 +3,13 @@ import { dump, load } from 'js-yaml';
 
 import { ensurePath, produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DebouncedTextInput } from '@kubevirt-utils/components/DebouncedTextInput/DebouncedTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { Form, FormGroup } from '@patternfly/react-core';
 
 import { CloudInitDataFormKeys, CloudInitDataHelper } from '../utils/cloud-init-data-helper';
-import { cloudinitIDGenerator, isValidSSHKey } from '../utils/cloudint-utils';
+import { cloudinitIDGenerator } from '../utils/cloudint-utils';
 import useCloudinitValidations from '../utils/use-cloudinit-validations';
 
 import CloudinitSSHKeyForm from './CloudinitSSHKeyForm/CloudInitSSHKeyForm';
@@ -59,13 +60,10 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume }) => {
   };
 
   const onSSHKeyChange = (sshKey: string) => {
-    const isSSHValid = isValidSSHKey(sshKey);
-    if (isSSHValid) {
-      updateTabsData((tabDataDraft) => {
-        ensurePath(tabDataDraft, 'scripts.cloudInit');
-        tabDataDraft.scripts.cloudInit.sshKey = sshKey;
-      });
-    }
+    updateTabsData((tabDataDraft) => {
+      ensurePath(tabDataDraft, 'scripts.cloudInit');
+      tabDataDraft.scripts.cloudInit.sshKey = sshKey;
+    });
   };
 
   const onUpdateVM = React.useCallback(
@@ -115,9 +113,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume }) => {
 
   React.useEffect(() => {
     if (yaml && isValid) {
-      const timerId = setTimeout(() => onUpdateVM(), 100);
-
-      return () => clearTimeout(timerId);
+      onUpdateVM();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yaml, isValid]);
@@ -135,10 +131,10 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume }) => {
         validated={validationStatus?.user?.type}
         isRequired
       >
-        <TextInput
+        <DebouncedTextInput
           type="text"
           id={cloudinitIDGenerator(CloudInitDataFormKeys.USER)}
-          value={(yamlAsJS?.user as string) || ''}
+          initialValue={(yamlAsJS?.user as string) || ''}
           onChange={(v) => onFieldChange(CloudInitDataFormKeys.USER, v)}
         />
       </FormGroup>
@@ -150,10 +146,10 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume }) => {
         helperText={t('Please provide password for username.')}
         validated={validationStatus?.password?.type}
       >
-        <TextInput
+        <DebouncedTextInput
           type="text"
           id={cloudinitIDGenerator(CloudInitDataFormKeys.PASSWORD)}
-          value={(yamlAsJS?.password as string) || ''}
+          initialValue={(yamlAsJS?.password as string) || ''}
           onChange={(v) => onFieldChange(CloudInitDataFormKeys.PASSWORD, v)}
         />
       </FormGroup>
@@ -165,8 +161,8 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume }) => {
         helperText={t('Please provide hostname.')}
         validated={validationStatus?.hostname?.type}
       >
-        <TextInput
-          value={(yamlAsJS?.hostname as string) || ''}
+        <DebouncedTextInput
+          initialValue={(yamlAsJS?.hostname as string) || ''}
           type="text"
           id={cloudinitIDGenerator(CloudInitDataFormKeys.HOSTNAME)}
           onChange={(v) => onFieldChange(CloudInitDataFormKeys.HOSTNAME, v)}
