@@ -7,10 +7,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { TEMPLATE_TYPE_VM } from '@kubevirt-utils/resources/template';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { ButtonVariant, Checkbox, Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { ButtonVariant, Form, FormGroup, TextInput } from '@patternfly/react-core';
 
+import CloneStorageCheckbox from './CloneStorageCheckbox';
 import SelectProject from './SelectProject';
-import { cloneStorage, getTemplateVMPVC } from './utils';
+import { cloneStorage, getTemplateBootSourcePVC } from './utils';
 
 type CloneTemplateModalProps = {
   isOpen: boolean;
@@ -23,12 +24,11 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({ isOpen, obj, on
   const [templateName, setTemplateName] = React.useState(
     `${obj?.metadata?.name}-${getRandomChars(9)}`,
   );
-  const templateVMPVC = getTemplateVMPVC(obj);
+  const templateVMPVC = getTemplateBootSourcePVC(obj);
   const clonableStorage = !!templateVMPVC;
   const [pvcName, setPVCName] = React.useState(`${templateVMPVC?.name}-clone`);
   const [templateProvider, setTemplateProvider] = React.useState('');
   const [selectedProject, setSelectedProject] = React.useState(obj?.metadata?.namespace);
-  const [selectedPVCProject, setSelectedPVCProject] = React.useState(obj?.metadata?.namespace);
   const [isCloneStorageEnabled, setCloneStorage] = React.useState(false);
 
   const onSubmit = async () => {
@@ -46,12 +46,12 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({ isOpen, obj, on
     };
 
     if (isCloneStorageEnabled) {
-      await cloneStorage(obj, pvcName, selectedPVCProject);
+      await cloneStorage(obj, pvcName, selectedProject);
 
       templateToCreate = produce(templateToCreate, (draftTemplate) => {
         draftTemplate.objects[0].spec.dataVolumeTemplates[0].spec.source.pvc.name = pvcName;
         draftTemplate.objects[0].spec.dataVolumeTemplates[0].spec.source.pvc.namespace =
-          selectedPVCProject;
+          selectedProject;
       });
     }
 
@@ -69,7 +69,7 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({ isOpen, obj, on
         onSubmit={onSubmit}
         isOpen={isOpen}
         onClose={onClose}
-        submitBtnText={t('Save')}
+        submitBtnText={t('Clone')}
         submitBtnVariant={ButtonVariant.primary}
       >
         <Form>
@@ -98,27 +98,11 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({ isOpen, obj, on
             />
           </FormGroup>
           {clonableStorage && (
-            <FormGroup fieldId="clone-storage">
-              <Checkbox
-                id="clone-storage"
-                isChecked={isCloneStorageEnabled}
-                onChange={setCloneStorage}
-                label={t('Clone storage')}
-              />
-            </FormGroup>
+            <CloneStorageCheckbox isChecked={isCloneStorageEnabled} onChange={setCloneStorage} />
           )}
           {isCloneStorageEnabled && (
-            <FormGroup label={t('PVC name')} fieldId="pvc-name" isRequired>
+            <FormGroup label={t('Name of the template new disk')} fieldId="pvc-name" isRequired>
               <TextInput id="pvc-name" type="text" value={pvcName} onChange={setPVCName} />
-            </FormGroup>
-          )}
-          {isCloneStorageEnabled && (
-            <FormGroup label={t('PVC namespace')} fieldId="pvc-namespace" isRequired>
-              <SelectProject
-                selectedProject={selectedPVCProject}
-                setSelectedProject={setSelectedPVCProject}
-                id="pvc-namespace"
-              />
             </FormGroup>
           )}
         </Form>
