@@ -503,7 +503,7 @@
   "Resume Virtual machine": "Resume Virtual machine",
   "Review": "Review",
   "Review and create Virtual Machine": "Review and create Virtual Machine",
-  "Review and Create VirtualMachine": "Review and Create VirtualMachine",
+  "Review and create VirtualMachine": "Review and create VirtualMachine",
   "RHEL download page ": "RHEL download page ",
   "Rules with \"Preferred\" condition will stack with an \"AND\" relation between them.": "Rules with \"Preferred\" condition will stack with an \"AND\" relation between them.",
   "Rules with \"Required\" condition will stack with an \"OR\" relation between them.": "Rules with \"Required\" condition will stack with an \"OR\" relation between them.",
@@ -718,7 +718,7 @@
   "Workload type": "Workload type",
   "XML structure is not valid": "XML structure is not valid",
   "YAML": "YAML",
-  "You can click the Create VirtualMachine button to create your VirtualMachine or customize it by editing each of the tabs below. When done, click the Create Virtual Machine button.": "You can click the Create VirtualMachine button to create your VirtualMachine or customize it by editing each of the tabs below. When done, click the Create Virtual Machine button.",
+  "You can click the Create VirtualMachine button to create your VirtualMachine or customize it by editing each of the tabs below. When done, click the Create VirtualMachine button.": "You can click the Create VirtualMachine button to create your VirtualMachine or customize it by editing each of the tabs below. When done, click the Create VirtualMachine button.",
   "You can customize the templates storage by overriding the original parameters": "You can customize the templates storage by overriding the original parameters",
   "You can select the boot source in the <2>Disks</2> tab.": "You can select the boot source in the <2>Disks</2> tab.",
   "You can use Cloudinit for post installation configuration of the guest operating system.": "You can use Cloudinit for post installation configuration of the guest operating system."
