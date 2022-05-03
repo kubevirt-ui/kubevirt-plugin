@@ -73,14 +73,21 @@ export const extractParameterNameFromMetadataName = (template: V1Template): stri
   return virtualMachineObject?.metadata.name?.replace(/[${}\"]+/g, '');
 };
 
-export const processTemplate = async (
-  template: V1Template,
-  formData: FormData,
-  withWindowsDrivers?: boolean,
-): Promise<V1Template> => {
+export const processTemplate = async ({
+  template,
+  namespace,
+  formData,
+  withWindowsDrivers,
+}: {
+  template: V1Template;
+  namespace: string;
+  formData: FormData;
+  withWindowsDrivers?: boolean;
+}): Promise<V1Template> => {
   const virtualMachineName = formData.get(NAME_INPUT_FIELD) as string;
 
   const templateToProcess = await produce(template, async (draftTemplate) => {
+    draftTemplate.metadata.namespace = namespace;
     const parameterForName = extractParameterNameFromMetadataName(template);
 
     draftTemplate = setTemplateParameters(draftTemplate, formData);
