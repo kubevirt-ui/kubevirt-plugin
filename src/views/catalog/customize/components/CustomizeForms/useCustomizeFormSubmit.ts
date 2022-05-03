@@ -21,7 +21,7 @@ type useCustomizeFormSubmitType = [
 
 export const useCustomizeFormSubmit = (
   template: V1Template,
-  withWinDrivers?: boolean,
+  withWindowsDrivers?: boolean,
 ): useCustomizeFormSubmitType => {
   const { ns } = useParams<{ ns: string }>();
   const history = useHistory();
@@ -35,7 +35,12 @@ export const useCustomizeFormSubmit = (
     setTemplateLoaded(false);
     try {
       const formData = new FormData(event.currentTarget as HTMLFormElement);
-      const processedTemplate = await processTemplate(template, formData, withWinDrivers);
+      const processedTemplate = await processTemplate({
+        template,
+        namespace: ns || DEFAULT_NAMESPACE,
+        formData,
+        withWindowsDrivers,
+      });
 
       const vm = getTemplateVirtualMachineObject(processedTemplate);
       vm.metadata.namespace = ns || DEFAULT_NAMESPACE;
