@@ -5,6 +5,7 @@ import { ensurePath } from '@catalog/utils/WizardVMContext';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
+import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -13,14 +14,25 @@ import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerRef
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
-import { DESCRIPTION_ANNOTATION, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import {
+  DESCRIPTION_ANNOTATION,
+  useVMIAndPodsForVM,
+  VM_TEMPLATE_ANNOTATION,
+} from '@kubevirt-utils/resources/vm';
 import {
   getOperatingSystem,
   getOperatingSystemName,
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { k8sPatch, k8sUpdate, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  k8sPatch,
+  k8sUpdate,
+  K8sVerb,
+  ResourceLink,
+  useAccessReview,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
+import CPUMemory from '../../CPUMemory/CPUMemory';
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import VirtualMachineLabels from '../../VirtualMachineLabels/VirtualMachineLabels';
@@ -33,6 +45,23 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const None = <MutedTextSpan text={t('None')} />;
+  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const [canUpdateVM] = useAccessReview({
+    namespace: vm?.metadata?.namespace,
+    resource: vm?.kind,
+    verb: 'patch' as K8sVerb,
+  });
+
+  const onSubmitCPU = React.useCallback(
+    (updatedVM: V1VirtualMachine) =>
+      k8sUpdate({
+        model: VirtualMachineModel,
+        data: updatedVM,
+        ns: updatedVM?.metadata?.namespace,
+        name: updatedVM?.metadata?.name,
+      }),
+    [],
+  );
 
   const updateDescription = (updatedDescription) => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
@@ -166,6 +195,22 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
         <VirtualMachineDescriptionItem
           descriptionData={getOperatingSystemName(vm) || getOperatingSystem(vm)}
           descriptionHeader={t('Operating System')}
+        />
+        <VirtualMachineDescriptionItem
+          descriptionData={<CPUMemory vm={vm} />}
+          descriptionHeader={t('CPU | Memory')}
+          isEdit={canUpdateVM}
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <CPUMemoryModal
+                vm={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={onSubmitCPU}
+                vmi={vmi}
+              />
+            ))
+          }
         />
         <VirtualMachineDescriptionItem
           descriptionData={getLabel(vm, VM_TEMPLATE_ANNOTATION) || None}
