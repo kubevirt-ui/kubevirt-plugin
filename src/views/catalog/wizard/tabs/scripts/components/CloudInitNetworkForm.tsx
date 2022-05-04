@@ -123,7 +123,9 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
 
   React.useEffect(() => {
     if (networkData) {
-      const ipAddreses = networkToEdit.subnets[0].address.join(', ');
+      const ipAddreses = Array.isArray(networkToEdit?.subnets?.[0]?.address)
+        ? networkToEdit?.subnets?.[0]?.address.join(', ')
+        : networkToEdit?.subnets?.[0]?.address;
       const hasChanged =
         ipAddreses !== '' || networkToEdit.subnets[0].gateway !== '' || networkToEdit.name !== '';
 
@@ -184,7 +186,11 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
             helperText={t('Use commas to separate between IP addresses')}
           >
             <TextInput
-              value={networkToEdit?.subnets?.[0]?.address.join(', ') || ''}
+              value={
+                Array.isArray(networkToEdit?.subnets?.[0]?.address)
+                  ? networkToEdit?.subnets?.[0]?.address.join(', ')
+                  : networkToEdit?.subnets?.[0]?.address
+              }
               type="text"
               id={'address'}
               onChange={(v) => onFieldChange(CloudInitNetworkFormKeys.ADDRESS, v.split(', '))}
