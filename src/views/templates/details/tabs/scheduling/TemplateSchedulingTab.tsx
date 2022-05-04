@@ -8,6 +8,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid, GridItem } from '@patternfly/react-core';
 
+import { isCommonVMTemplate } from '../../../utils';
+import NoEditableTemplateAlert from '../NoEditableTemplateAlert';
+
 type TemplateSchedulingTabProps = RouteComponentProps<{
   ns: string;
   name: string;
@@ -17,9 +20,11 @@ type TemplateSchedulingTabProps = RouteComponentProps<{
 
 const TemplateSchedulingTab: React.FC<TemplateSchedulingTabProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
+  const isEditDisabled = isCommonVMTemplate(template);
 
   return (
     <>
+      {isEditDisabled && <NoEditableTemplateAlert template={template} />}
       <ListPageHeader title={t('Scheduling and resources requirements')}></ListPageHeader>
       <ListPageBody>
         <Grid>
