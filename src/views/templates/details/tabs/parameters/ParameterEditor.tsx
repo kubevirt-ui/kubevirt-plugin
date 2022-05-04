@@ -9,9 +9,14 @@ import ParameterValueEditor from './ParameterValueEditor';
 type ParameterEditorProps = {
   parameter: TemplateParameter;
   onChange: (parameter: TemplateParameter) => void;
+  isEditDisabled?: boolean;
 };
 
-const ParameterEditor: React.FC<ParameterEditorProps> = ({ parameter, onChange }) => {
+const ParameterEditor: React.FC<ParameterEditorProps> = ({
+  parameter,
+  onChange,
+  isEditDisabled,
+}) => {
   const { t } = useKubevirtTranslation();
   const [isExpanded, setExpanded] = React.useState(true);
 
@@ -32,6 +37,7 @@ const ParameterEditor: React.FC<ParameterEditorProps> = ({ parameter, onChange }
           isChecked={parameter.required}
           onChange={(required) => onChange({ ...parameter, required })}
           id={`${parameter.name}-required`}
+          isDisabled={isEditDisabled}
         />
       </FormGroup>
       <FormGroup fieldId={`${parameter.name}-description`} label={t('Description')}>
@@ -39,9 +45,14 @@ const ParameterEditor: React.FC<ParameterEditorProps> = ({ parameter, onChange }
           id={`${parameter.name}-description`}
           value={parameter.description}
           onChange={(description) => onChange({ ...parameter, description })}
+          isDisabled={isEditDisabled}
         />
       </FormGroup>
-      <ParameterValueEditor parameter={parameter} onChange={onChange} />
+      <ParameterValueEditor
+        parameter={parameter}
+        onChange={onChange}
+        isEditDisabled={isEditDisabled}
+      />
     </ExpandableSection>
   );
 };

@@ -10,9 +10,14 @@ import { getValueTypeFromParameter } from './utils';
 type ParameterValueEditorProps = {
   parameter: TemplateParameter;
   onChange: (parameter: TemplateParameter) => void;
+  isEditDisabled?: boolean;
 };
 
-const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({ parameter, onChange }) => {
+const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
+  parameter,
+  onChange,
+  isEditDisabled,
+}) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { t } = useKubevirtTranslation();
 
@@ -49,6 +54,7 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({ paramet
           onSelect={handleChange}
           variant={SelectVariant.single}
           selections={valueType}
+          isDisabled={isEditDisabled}
         >
           <SelectOption
             value={PARAMETER_VALUE_TYPES.GENERATED}
@@ -82,6 +88,7 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({ paramet
             id={`${parameter.name}-value`}
             value={parameter.value}
             onChange={(value) => onChange({ ...parameter, value })}
+            isDisabled={isEditDisabled}
           />
         </FormGroup>
       )}
@@ -96,6 +103,7 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({ paramet
             id={`${parameter.name}-generated`}
             value={parameter.from}
             onChange={(expression) => onChange({ ...parameter, from: expression })}
+            isDisabled={isEditDisabled}
           />
         </FormGroup>
       )}
