@@ -3,33 +3,29 @@ import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
-import CPUMemory from '../../details/components/CPUMemory/CPUMemory';
 import VirtualMachineDescriptionItem from '../../details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 import DedicatedResources from './DedicatedResources';
 import EvictionStrategy from './EvictionStrategy';
 
-type VirtualMachineSchedulingLeftGridProps = {
+type VirtualMachineSchedulingRightGridProps = {
   vm: V1VirtualMachine;
   canUpdateVM: boolean;
 };
 
-const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGridProps> = ({
+const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightGridProps> = ({
   vm,
   canUpdateVM,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const canUpdateStoppedVM =
     canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
 
@@ -47,22 +43,6 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
   return (
     <GridItem span={5}>
       <DescriptionList>
-        <VirtualMachineDescriptionItem
-          descriptionData={<CPUMemory vm={vm} />}
-          descriptionHeader={t('CPU | Memory')}
-          isEdit={canUpdateVM}
-          onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <CPUMemoryModal
-                vm={vm}
-                isOpen={isOpen}
-                onClose={onClose}
-                onSubmit={onSubmit}
-                vmi={vmi}
-              />
-            ))
-          }
-        />
         <VirtualMachineDescriptionItem
           descriptionData={<DedicatedResources vm={vm} />}
           descriptionHeader={t('Dedicated Resources')}
@@ -100,4 +80,4 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
   );
 };
 
-export default VirtualMachineSchedulingLeftGrid;
+export default VirtualMachineSchedulingRightGrid;
