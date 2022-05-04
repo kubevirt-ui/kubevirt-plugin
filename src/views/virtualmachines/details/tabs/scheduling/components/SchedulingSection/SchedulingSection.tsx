@@ -12,10 +12,10 @@ import {
 import { Grid, GridItem, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
-import VirtualMachineSchedulingLeftGrid from '../grid/leftGrid/VirtualMachineSchedulingLeftGrid';
-import VirtualMachineSchedulingRightGrid from '../grid/rightGrid/VirtualMachineSchedulingRightGrid';
+import VirtualMachineSchedulingLeftGrid from '../VirtualMachineSchedulingLeftGrid';
+import VirtualMachineSchedulingRightGrid from '../VirtualMachineSchedulingRightGrid';
 
-import './VirtualMachinesDetailsSection.scss';
+import './SchedulingSection.scss';
 
 type SchedulingSectionProps = {
   vm: V1VirtualMachine;
@@ -34,7 +34,7 @@ const SchedulingSection: React.FC<SchedulingSectionProps> = ({ vm, pathname }) =
     verb: 'patch' as K8sVerb,
   });
   return (
-    <div className="VirtualMachinesDetailsSection">
+    <div className="vm-scheduling-section">
       <a href={`${pathname}#scheduling`} className="link-icon">
         <LinkIcon size="sm" />
       </a>

@@ -5,7 +5,6 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Divider, PageSection } from '@patternfly/react-core';
 
 import DetailsSection from './components/sections/DetailsSection';
-import SchedulingSection from './components/sections/SchedulingSection';
 import ServicesSection from './components/sections/ServicesSection';
 import ActiveUserListSection from './components/sections/UserList/ActiveUserListSection';
 
@@ -21,10 +20,6 @@ const VirtualMachineDetailsPage: React.FC<VirtualMachineDetailsPageProps> = ({ o
     <div>
       <PageSection>
         <DetailsSection vm={vm} pathname={location?.pathname} />
-      </PageSection>
-      <Divider />
-      <PageSection>
-        <SchedulingSection vm={vm} pathname={location?.pathname} />{' '}
       </PageSection>
       <Divider />
       <PageSection>

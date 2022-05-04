@@ -13,6 +13,7 @@ import VirtualMachineEnvironmentPage from '../tabs/environment/VirtualMachineEnv
 import VirtualMachinePageEventsTab from '../tabs/events/VirtualMachinePageEvents';
 import NetworkInterfaceListPage from '../tabs/network/NetworkInterfaceListPage';
 import VirtualMachinesOverviewTab from '../tabs/overview/VirtualMachinesOverviewTab';
+import VirtualMachineSchedulingPage from '../tabs/scheduling/VirtualMachineSchedulingPage';
 import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
 import VirtualMachineYAMLPage from '../tabs/yaml/VirtualMachineYAMLPage';
 
@@ -35,6 +36,11 @@ export const useVirtualMachineTabs = () => {
         href: VirtualMachineDetailsTab.YAML,
         name: t(VirtualMachineDetailsTabLabel.YAML),
         component: VirtualMachineYAMLPage,
+      },
+      {
+        href: VirtualMachineDetailsTab.Scheduling,
+        name: t(VirtualMachineDetailsTabLabel.Scheduling),
+        component: VirtualMachineSchedulingPage,
       },
       {
         href: VirtualMachineDetailsTab.Environment,
