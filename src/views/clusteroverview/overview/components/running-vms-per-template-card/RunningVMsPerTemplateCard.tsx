@@ -15,7 +15,7 @@ import {
   TitleSizes,
 } from '@patternfly/react-core';
 
-import { useRunningVMsPerTemplateResources } from './hooks/useRunningVMsPerTemplateResources';
+import { useRunningVMsPerTemplateResourcesHook } from './hooks/useRunningVMsPerTemplateResources';
 import EmptyStateNoVMs from './utils/EmptyStateNoVMs';
 import RunningVMsChartLegend from './utils/RunningVMsChartLegend';
 import { getChartData, getLegendItems, getTemplateToVMCountMap } from './utils/utils';
@@ -24,7 +24,7 @@ import './RunningVMsPerTemplateCard.scss';
 
 const RunningVMsPerTemplateCard = () => {
   const { t } = useKubevirtTranslation();
-  const { loaded, vms, templates } = useRunningVMsPerTemplateResources();
+  const { loaded, vms, templates } = useRunningVMsPerTemplateResourcesHook();
   const templateToVMCountMap = React.useMemo(
     () => getTemplateToVMCountMap(loaded, vms, templates),
     [loaded, vms, templates],
