@@ -17,9 +17,15 @@ type CloneTemplateModalProps = {
   isOpen: boolean;
   obj: V1Template;
   onClose: () => void;
+  onTemplateCloned?: (clonedTemplate: V1Template) => void;
 };
 
-const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({ isOpen, obj, onClose }) => {
+const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
+  isOpen,
+  obj,
+  onClose,
+  onTemplateCloned,
+}) => {
   const { t } = useKubevirtTranslation();
   const [templateName, setTemplateName] = React.useState(
     `${obj?.metadata?.name}-${getRandomChars(9)}`,
@@ -55,10 +61,12 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({ isOpen, obj, on
       });
     }
 
-    await k8sCreate<V1Template>({
+    const clonedTemplate = await k8sCreate<V1Template>({
       model: TemplateModel,
       data: templateToCreate,
     });
+
+    if (onTemplateCloned) onTemplateCloned(clonedTemplate);
   };
 
   return (
