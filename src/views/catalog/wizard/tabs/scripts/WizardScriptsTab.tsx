@@ -11,7 +11,7 @@ import { CLOUD, SYSPREP } from './utils/consts';
 
 import './WizardScriptsTab.scss';
 
-const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData }) => {
+const WizardScriptsTab: WizardTab = ({ vm, loaded, updateVM, tabsData }) => {
   const { t } = useKubevirtTranslation();
   const isWindows = tabsData?.overview?.templateMetadata?.osType === OS_NAME_TYPES.windows;
   const [expanded, setExpanded] = React.useState<string>(isWindows ? SYSPREP : CLOUD);
@@ -31,7 +31,7 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData }) => {
             id={CLOUD}
             isIndented
           >
-            <Cloudinit vm={vm} updateVM={updateVM} />
+            <Cloudinit vm={vm} updateVM={updateVM} loaded={loaded} />
           </ExpandableSection>
         </StackItem>
         <StackItem>

@@ -117,7 +117,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume }) => {
   }, [validationSchema, yamlAsJS]);
 
   React.useEffect(() => {
-    if (yaml && isValid) {
+    if (yaml && isValid && yaml !== cloudinitConfigDataHelper.getUserData()) {
       onUpdateVM();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
