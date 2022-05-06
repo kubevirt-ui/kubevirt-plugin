@@ -1,8 +1,7 @@
-import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-export const getCPUCount = (sourceCPU: V1CPU): number => {
-  return sourceCPU?.cores || 1;
-};
+export const getCPUcores = (vm: V1VirtualMachine): number =>
+  vm?.spec?.template?.spec?.domain?.cpu?.cores || 1;
 
 const GI = 'Gi';
 const MI = 'Mi';
