@@ -35,7 +35,6 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources }) => {
   );
   const dataSourceNS = React.useMemo(() => getOSImagesNS(), []);
 
-  console.log('🚀 ~ file: ResourcesSection.tsx ~ line 46 ~ vms?.loadError', vms?.loadError);
   return (
     <Stack hasGutter className="kv-inventory-card__resources--container">
       <StackItem key={VirtualMachineModel.kind}>
