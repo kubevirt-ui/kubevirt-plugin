@@ -25,14 +25,14 @@ const useVirtualMachinesInstanceTabs = () => {
         component: VirtualMachinesInstancePageYAMLTab,
       },
       {
-        href: 'console',
-        name: t('Console'),
-        component: VirtualMachinesInstancePageConsoleTab,
-      },
-      {
         href: 'events',
         name: t('Events'),
         component: VirtualMachinesInstancePageEventsTab,
+      },
+      {
+        href: 'console',
+        name: t('Console'),
+        component: VirtualMachinesInstancePageConsoleTab,
       },
       {
         href: 'network',
