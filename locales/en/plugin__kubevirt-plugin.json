@@ -28,7 +28,7 @@
   "{{gpuDevices}} GPU devices": "{{gpuDevices}} GPU devices",
   "{{hostDevices}} Host devices": "{{hostDevices}} Host devices",
   "{{matchingNodeText}} matching": "{{matchingNodeText}} matching",
-  "{{osName}} VM can not be edited because it is provided by the Red Hat OpenShift Virtualization Operator.<2></2>We suggest you to create a custom Template from this {{providerName}} template.<6><0>{t('Create a new custom template')}</0></6>": "{{osName}} VM can not be edited because it is provided by the Red Hat OpenShift Virtualization Operator.<2></2>We suggest you to create a custom Template from this {{providerName}} template.<6><0>{t('Create a new custom template')}</0></6>",
+  "{{osName}} VM can not be edited because it is provided by {{providerName}}Virtualization Operator.<4></4>We suggest you to create a custom Template from this {{providerName}} template.<8><0>{t('Create a new custom template')}</0></8>": "{{osName}} VM can not be edited because it is provided by {{providerName}}Virtualization Operator.<4></4>We suggest you to create a custom Template from this {{providerName}} template.<8><0>{t('Create a new custom template')}</0></8>",
   "{{qualifiedNodesCount}} matching nodes found": "{{qualifiedNodesCount}} matching nodes found",
   "{{qualifiedNodesCount}} matching Nodes found": "{{qualifiedNodesCount}} matching Nodes found",
   "{{qualifiedNodesCount}} nodes found": "{{qualifiedNodesCount}} nodes found",
