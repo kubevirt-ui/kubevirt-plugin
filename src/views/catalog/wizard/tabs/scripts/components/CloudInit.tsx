@@ -2,12 +2,10 @@ import * as React from 'react';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { Bullseye, Radio, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
+import { Radio, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
 
-import CloudInitEditor from './CloudInitEditor';
 import CloudinitForm from './CloudinitForm';
 import CloudInitInfoHelper from './CloudinitInfoHelper';
 
@@ -59,19 +57,7 @@ const Cloudinit: React.FC<CloudinitProps> = ({ vm, loaded }) => {
         </Split>
       </StackItem>
       <div className="kv-cloudinit-advanced-tab--main">
-        {showEditor ? (
-          <React.Suspense
-            fallback={
-              <Bullseye>
-                <Loading />
-              </Bullseye>
-            }
-          >
-            <CloudInitEditor cloudInitVolume={cloudInitVolume} />
-          </React.Suspense>
-        ) : (
-          <CloudinitForm cloudInitVolume={cloudInitVolume} />
-        )}
+        <CloudinitForm showEditor={showEditor} cloudInitVolume={cloudInitVolume} />
       </div>
     </Stack>
   );
