@@ -46,7 +46,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate,
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const deleteBtnText = t('Delete');
+  const deleteBtnText = t('Detach');
 
   const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName);
   const diskDataVolume = getDiskDataVolume(vm, diskName);
@@ -82,12 +82,12 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate,
         isOpen={isOpen}
         obj={vm}
         onSubmit={onDelete}
-        headerText={t('Delete {{diskName}} disk', { diskName })}
+        headerText={t('Detach {{diskName}} disk', { diskName })}
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
         <Trans t={t}>
-          Are you sure you want to delete <strong>{diskName} </strong>
+          Are you sure you want to detach <strong>{diskName} </strong>
         </Trans>
       </TabModal>
     ));

@@ -87,8 +87,6 @@ export const unpauseVM = async (vm: V1VirtualMachine) =>
   VMActionRequest(vm, VMActionType.Unpause, VirtualMachineInstanceModel);
 export const addPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolumeOptions) =>
   VMActionRequest(vm, VMActionType.AddVolume, VirtualMachineModel, body);
-export const addNonPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolumeOptions) =>
-  VMActionRequest(vm, VMActionType.AddVolume, VirtualMachineInstanceModel, body);
 export const removeVolume = async (vm: V1VirtualMachine, body: V1RemoveVolumeOptions) =>
   VMActionRequest(vm, VMActionType.RemoveVolume, VirtualMachineModel, body);
 export const migrateVM = async (vm: V1VirtualMachine) => {

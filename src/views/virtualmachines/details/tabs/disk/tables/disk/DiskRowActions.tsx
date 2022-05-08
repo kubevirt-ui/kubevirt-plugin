@@ -41,7 +41,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
   const volume = volumes?.find(({ name }) => name === diskName);
 
   const editBtnText = t('Edit');
-  const deleteBtnText = t('Delete');
+  const deleteBtnText = t('Detach');
 
   const disabledEditText = React.useMemo(() => {
     if (isVMRunning) {
@@ -98,7 +98,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
       key="disk-edit"
       isDisabled={!isHotplug && isVMRunning}
       description={
-        !isHotplug && isVMRunning ? t('Can delete only hotplug volumes while VM is Running') : null
+        !isHotplug && isVMRunning ? t('Can detach only hotplug volumes while VM is Running') : null
       }
     >
       {deleteBtnText}

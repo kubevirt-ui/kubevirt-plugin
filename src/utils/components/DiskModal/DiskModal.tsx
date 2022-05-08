@@ -14,7 +14,6 @@ import { Form } from '@patternfly/react-core';
 import AccessMode from './DiskFormFields/AccessMode';
 import ApplyStorageProfileSettingsCheckbox from './DiskFormFields/ApplyStorageProfileSettingsCheckbox';
 import BootSourceCheckbox from './DiskFormFields/BootSourceCheckbox/BootSourceCheckbox';
-import DetachHotplugDiskCheckbox from './DiskFormFields/DetachHotplugDiskCheckbox';
 import DiskInterfaceSelect from './DiskFormFields/DiskInterfaceSelect';
 import DiskSourceSizeInput from './DiskFormFields/DiskSizeInput/DiskSizeInput';
 import DiskSourceFormSelect from './DiskFormFields/DiskSourceFormSelect/DiskSourceFormSelect';
@@ -65,16 +64,10 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
           vmObj,
           diskSourceState.pvcSourceName,
           resultDisk,
-          diskState.detachHotplug,
         );
       }
       const resultDataVolume = getDataVolumeFromState(vmObj, diskState, diskSourceState);
-      return getDataVolumeHotplugPromise(
-        vmObj,
-        resultDataVolume,
-        resultDisk,
-        diskState.detachHotplug,
-      );
+      return getDataVolumeHotplugPromise(vmObj, resultDataVolume, resultDisk);
     },
     [diskState, diskSourceState],
   );
@@ -140,11 +133,6 @@ const DiskModal: React.FC<DiskModalProps> = ({ vm, isOpen, onClose, headerText, 
         <DiskTypeSelect
           isVMRunning={isVMRunning}
           diskType={diskState.diskType}
-          dispatchDiskState={dispatchDiskState}
-        />
-        <DetachHotplugDiskCheckbox
-          isVMRunning={isVMRunning}
-          detachHotplug={diskState.detachHotplug}
           dispatchDiskState={dispatchDiskState}
         />
         <DiskInterfaceSelect

@@ -21,8 +21,6 @@ export const diskReducer = (state: DiskFormState, action: DiskReducerActionType)
       return { ...state, diskSize: action.payload };
     case diskReducerActions.SET_DISK_TYPE:
       return { ...state, diskType: action.payload };
-    case diskReducerActions.SET_DETACH_HOTPLUG:
-      return { ...state, detachHotplug: action.payload };
     case diskReducerActions.SET_DISK_INTERFACE:
       return { ...state, diskInterface: action.payload };
     case diskReducerActions.SET_STORAGE_CLASS:

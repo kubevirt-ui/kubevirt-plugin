@@ -17,7 +17,6 @@ import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
-  addNonPersistentVolume,
   addPersistentVolume,
   removeVolume,
 } from '../../../../views/virtualmachines/actions/actions';
@@ -166,7 +165,6 @@ export const getDataVolumeHotplugPromise = (
   vm: V1VirtualMachine,
   resultDataVolume: V1beta1DataVolume,
   resultDisk: V1Disk,
-  detachHotplug: boolean,
 ) => {
   const bodyRequestAddVolume: V1AddVolumeOptions = {
     disk: resultDisk,
@@ -178,11 +176,6 @@ export const getDataVolumeHotplugPromise = (
     },
   };
 
-  if (detachHotplug) {
-    return k8sCreate({ model: DataVolumeModel, data: resultDataVolume }).then(() =>
-      addNonPersistentVolume(vm, bodyRequestAddVolume),
-    ) as Promise<void>;
-  }
   return k8sCreate({ model: DataVolumeModel, data: resultDataVolume }).then(() =>
     addPersistentVolume(vm, bodyRequestAddVolume),
   ) as Promise<void>;
@@ -192,7 +185,6 @@ export const getPersistentVolumeClaimHotplugPromise = (
   vm: V1VirtualMachine,
   pvcName: string,
   resultDisk: V1Disk,
-  detachHotplug: boolean,
 ) => {
   const bodyRequestAddVolume: V1AddVolumeOptions = {
     disk: resultDisk,
@@ -204,9 +196,6 @@ export const getPersistentVolumeClaimHotplugPromise = (
     },
   };
 
-  if (detachHotplug) {
-    return addNonPersistentVolume(vm, bodyRequestAddVolume);
-  }
   return addPersistentVolume(vm, bodyRequestAddVolume);
 };
 
