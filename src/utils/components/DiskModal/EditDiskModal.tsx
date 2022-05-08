@@ -13,7 +13,6 @@ import { Form } from '@patternfly/react-core';
 import AccessMode from './DiskFormFields/AccessMode';
 import ApplyStorageProfileSettingsCheckbox from './DiskFormFields/ApplyStorageProfileSettingsCheckbox';
 import BootSourceCheckbox from './DiskFormFields/BootSourceCheckbox/BootSourceCheckbox';
-import DetachHotplugDiskCheckbox from './DiskFormFields/DetachHotplugDiskCheckbox';
 import DiskInterfaceSelect from './DiskFormFields/DiskInterfaceSelect';
 import DiskSourceSizeInput from './DiskFormFields/DiskSizeInput/DiskSizeInput';
 import DiskSourceFormSelect from './DiskFormFields/DiskSourceFormSelect/DiskSourceFormSelect';
@@ -140,11 +139,6 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
         <DiskTypeSelect
           isVMRunning={false}
           diskType={diskState.diskType}
-          dispatchDiskState={dispatchDiskState}
-        />
-        <DetachHotplugDiskCheckbox
-          isVMRunning={false}
-          detachHotplug={diskState.detachHotplug}
           dispatchDiskState={dispatchDiskState}
         />
         <DiskInterfaceSelect

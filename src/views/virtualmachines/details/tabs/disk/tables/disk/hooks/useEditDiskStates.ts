@@ -55,7 +55,6 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
     diskSize,
     diskType: diskTypes[getDiskDrive(disk)],
     diskSource,
-    detachHotplug: false,
     enablePreallocation: false,
     storageClass: null,
     volumeMode: null,

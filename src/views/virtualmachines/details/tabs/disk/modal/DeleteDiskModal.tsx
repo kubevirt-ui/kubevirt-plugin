@@ -1,10 +1,10 @@
 import * as React from 'react';
+import { Trans } from 'react-i18next';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import DeleteResourceMessage from '@kubevirt-utils/components/DeleteResourceMessage/DeleteResourceMessage';
 import {
   getRemoveHotplugPromise,
   produceVMDisks,
@@ -28,7 +28,7 @@ type DeleteDiskModalProps = {
 
 const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
-  const [deleteOwnedResource, setDeleteOwnedResource] = React.useState(true);
+  const [deleteOwnedResource, setDeleteOwnedResource] = React.useState(false);
 
   const diskName = volume?.name;
 
@@ -98,17 +98,16 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onSubmit={onSubmit}
-      headerText={t('Delete {{diskName}} disk', { diskName })}
-      submitBtnText={t('Delete')}
+      headerText={t('Detach {{diskName}} disk', { diskName })}
+      submitBtnText={t('Detach')}
       submitBtnVariant={ButtonVariant.danger}
     >
       <Stack hasGutter>
         <StackItem>
-          <DeleteResourceMessage
-            obj={{
-              metadata: { name: diskName, namespace: updatedVirtualMachine?.metadata?.namespace },
-            }}
-          />
+          <Trans t={t}>
+            Are you sure you want to detach <strong>{diskName} </strong>in namespace{' '}
+            <strong>{updatedVirtualMachine?.metadata?.namespace}?</strong>
+          </Trans>
         </StackItem>
         {loaded ? (
           <StackItem>

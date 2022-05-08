@@ -3,7 +3,6 @@ export const diskReducerActions = Object.freeze({
   SET_DISK_SOURCE: 'setDiskSource',
   SET_DISK_SIZE: 'setDiskSize',
   SET_DISK_TYPE: 'setDiskType',
-  SET_DETACH_HOTPLUG: 'setDetachHotplug',
   SET_DISK_INTERFACE: 'setDiskInterface',
   SET_STORAGE_CLASS: 'setStorageClass',
   SET_APPLY_STORAGE_PROFILE_SETTINGS: 'setApplyStorageProfileSettings',

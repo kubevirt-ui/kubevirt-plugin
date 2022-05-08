@@ -7,7 +7,6 @@ export type DiskFormState = {
   diskSource: string;
   diskSize: string;
   diskType: string;
-  detachHotplug: boolean;
   diskInterface: string;
   storageClass: string;
   applyStorageProfileSettings: boolean;
@@ -24,7 +23,6 @@ export const initialStateDiskForm: DiskFormState = {
   diskSource: sourceTypes.BLANK,
   diskSize: '30Gi',
   diskType: diskTypes.disk,
-  detachHotplug: false,
   diskInterface: interfaceTypes.VIRTIO,
   storageClass: null,
   applyStorageProfileSettings: true,
