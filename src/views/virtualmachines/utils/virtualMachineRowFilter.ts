@@ -36,15 +36,13 @@ export const getStatusFilter = (t: TFunction): RowFilter[] => [
 ];
 export const getTemplatesFilter = (vms: V1VirtualMachine[], t: TFunction): RowFilter[] => {
   const other = t('Other');
-  const templates = vms.reduce((acc, vm) => {
-    const templateName = vm.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME];
-    if (templateName) {
-      acc.add(templateName);
-    } else {
-      acc.add(other);
-    }
-    return acc;
-  }, new Set<string>());
+
+  const templates = new Set(
+    (vms || []).map((vm) => {
+      const templateName = vm.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME];
+      return templateName ?? other;
+    }),
+  );
 
   return [
     {
@@ -71,13 +69,7 @@ export const getNodesFilter = (vmis: V1VirtualMachineInstance[], t: TFunction): 
     return [] as RowFilter[];
   }
 
-  const nodes = vmis.reduce((acc, vmi) => {
-    const nodeName = vmi?.status?.nodeName;
-    if (nodeName) {
-      acc.add(nodeName);
-    }
-    return acc;
-  }, new Set<string>());
+  const nodes = new Set((vmis || []).map((vmi) => vmi.status?.nodeName)?.filter(Boolean));
 
   return [
     {
