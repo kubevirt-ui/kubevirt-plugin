@@ -51,6 +51,8 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
                     isOpen={isOpen}
                     onClose={onClose}
                     onSubmit={updateVM}
+                    nodes={nodes}
+                    nodesLoaded={nodesLoaded}
                   />
                 ))
               }
