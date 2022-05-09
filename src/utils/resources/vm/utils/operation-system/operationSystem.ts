@@ -86,7 +86,7 @@ export const OS_WINDOWS_PREFIX = 'win';
  * Check if a vm/vmi is running windows
  * @date 4/20/2022 - 1:58:24 PM
  *
- * @param {K8sResourceCommon} obj
+ * @param {K8sResourceCommon} obj - object to search
  * @returns {boolean}
  */
 export const isWindows = (obj: K8sResourceCommon): boolean =>
