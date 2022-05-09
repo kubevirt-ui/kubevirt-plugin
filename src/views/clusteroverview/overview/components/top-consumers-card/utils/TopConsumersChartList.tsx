@@ -1,8 +1,7 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
-import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { CardBody } from '@patternfly/react-core';
 
 import NoDataAvailableMessage from './NoDataAvailableMessage';

@@ -1,7 +1,8 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DetailItem, DetailsBody } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { DetailsBody } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { OverviewDetailItem } from '@openshift-console/plugin-shared';
 import { Card, CardBody, CardHeader, CardTitle } from '@patternfly/react-core';
 
 import { useKubevirtCSVDetails } from './hooks/useKubevirtCSVDetails';
@@ -30,13 +31,13 @@ const DetailsCard: React.FC = () => {
       </CardHeader>
       <CardBody>
         <DetailsBody>
-          <DetailItem isLoading={isLoading} title={t('Service name')}>
+          <OverviewDetailItem isLoading={isLoading} title={t('Service name')}>
             {name}
-          </DetailItem>
-          <DetailItem isLoading={isLoading} title={t('Provider')}>
+          </OverviewDetailItem>
+          <OverviewDetailItem isLoading={isLoading} title={t('Provider')}>
             {provider}
-          </DetailItem>
-          <DetailItem isLoading={isLoading} title={t('OpenShift Virtualization version')}>
+          </OverviewDetailItem>
+          <OverviewDetailItem isLoading={isLoading} title={t('OpenShift Virtualization version')}>
             {version}
             <div>
               {catalogSourceMissing ? (
@@ -45,10 +46,10 @@ const DetailsCard: React.FC = () => {
                 <SubscriptionStatus subscription={kubevirtSub} />
               )}
             </div>
-          </DetailItem>
-          <DetailItem isLoading={isLoading} title={t('Update Channel')}>
+          </OverviewDetailItem>
+          <OverviewDetailItem isLoading={isLoading} title={t('Update Channel')}>
             {updateChannel}
-          </DetailItem>
+          </OverviewDetailItem>
         </DetailsBody>
       </CardBody>
     </Card>

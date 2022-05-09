@@ -4,8 +4,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { K8sResourceCommon, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
 
 import { getUtilizationQueries, PrometheusEndpoint } from '../../utils/queries';

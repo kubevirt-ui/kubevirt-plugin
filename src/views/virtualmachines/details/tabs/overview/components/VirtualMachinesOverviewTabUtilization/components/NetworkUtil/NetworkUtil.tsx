@@ -4,7 +4,7 @@ import xbytes from 'xbytes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getMultilineUtilizationQueries, PrometheusEndpoint } from '../../utils/queries';
 import { adjustDurationForStart, getCreationTimestamp, sumOfValues } from '../../utils/utils';
