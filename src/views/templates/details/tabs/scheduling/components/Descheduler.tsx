@@ -1,10 +1,10 @@
 import React from 'react';
-import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
-import { useDeschedulerInstalled, useDeschedulerOn } from 'src/views/templates/utils';
+import { isDeschedulerOn, useDeschedulerInstalled } from 'src/views/templates/utils';
 import { DESCHEDULER_URL } from 'src/views/templates/utils/constants';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { V1Template } from '@kubevirt-utils/models';
 import {
   Button,
   DescriptionListDescription,
@@ -12,6 +12,7 @@ import {
   DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
   Popover,
+  Tooltip,
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, PencilAltIcon } from '@patternfly/react-icons';
 
@@ -19,10 +20,13 @@ import DeschedulerModal from './DeschedulerModal';
 
 import 'src/views/templates/details/tabs/scheduling/TemplateSchedulingTab.scss';
 
-const Descheduler: React.FC<TemplateSchedulingGridProps> = ({ template }) => {
+type DeschedulerProps = {
+  template: V1Template;
+};
+
+const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const isDeschedulerOn = useDeschedulerOn(template);
   const isDeschedulerInstalled = useDeschedulerInstalled();
 
   return (
@@ -58,22 +62,34 @@ const Descheduler: React.FC<TemplateSchedulingGridProps> = ({ template }) => {
       </DescriptionListTermHelpText>
 
       <DescriptionListDescription>
-        {useDeschedulerInstalled && (
-          <Button
-            isInline
-            isDisabled={!isDeschedulerInstalled}
-            onClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <DeschedulerModal template={template} isOpen={isOpen} onClose={onClose} />
-              ))
-            }
-            variant="link"
-            iconPosition={'right'}
-          >
-            {isDeschedulerOn ? t('ON') : t('OFF')}
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        )}
+        <Tooltip
+          content={
+            !isDeschedulerInstalled &&
+            t(
+              'To enable the descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more descheduler profiles.',
+            )
+          }
+          position="right"
+        >
+          <span>
+            <Button
+              isInline
+              isDisabled={!isDeschedulerInstalled}
+              onClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <DeschedulerModal template={template} isOpen={isOpen} onClose={onClose} />
+                ))
+              }
+              variant="link"
+              iconPosition={'right'}
+            >
+              {isDeschedulerInstalled && isDeschedulerOn(template) ? t('ON') : t('OFF')}
+              {isDeschedulerInstalled && (
+                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+              )}
+            </Button>
+          </span>
+        </Tooltip>
       </DescriptionListDescription>
     </DescriptionListGroup>
   );
