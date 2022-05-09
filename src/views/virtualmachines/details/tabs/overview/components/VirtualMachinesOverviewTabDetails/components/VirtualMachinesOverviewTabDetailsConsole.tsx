@@ -51,7 +51,7 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
           </div>
         </>
       ) : (
-        <MutedTextSpan text={t('Virtual machine is not running')} />
+        <MutedTextSpan text={t('VirtualMachine is not running')} />
       )}
     </Bullseye>
   );

@@ -30,7 +30,7 @@ export const getStoppedVMRightGridPresentation = (
   t: TFunction,
 ): VirtualMachineDetailsRightGridLayoutPresentation => {
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
-  const VirtualMachineIsNotRunning = <MutedTextSpan text={t('Virtual machine is not running')} />;
+  const VirtualMachineIsNotRunning = <MutedTextSpan text={t('VirtualMachine is not running')} />;
 
   return {
     pod: NotAvailable,

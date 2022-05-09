@@ -30,7 +30,7 @@ export const TemplatesCatalogDrawer: React.FC<TemplatesCatalogDrawerProps> = ({
 
   return (
     <Modal
-      aria-label="template drawer"
+      aria-label="Template drawer"
       className="ocs-modal co-catalog-page__overlay co-catalog-page__overlay--right template-catalog-drawer"
       isOpen={isOpen}
       onClose={onClose}

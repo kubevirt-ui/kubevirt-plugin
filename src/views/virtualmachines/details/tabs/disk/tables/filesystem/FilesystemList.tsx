@@ -25,7 +25,7 @@ const FilesystemList: React.FC<FilesystemListProps> = ({ vm }) => {
   const guestOS = vmi?.status?.guestOSInfo?.id;
   let noDataEmptyMsg = undefined;
   if (vm?.status?.printableStatus !== printableVMStatus.Running) {
-    noDataEmptyMsg = () => <>{t('Virtual machine is not running')}</>;
+    noDataEmptyMsg = () => <>{t('VirtualMachine is not running')}</>;
   } else if (!guestOS && vmi?.metadata) {
     noDataEmptyMsg = () => <>{t('Guest agent is required')}</>;
   }

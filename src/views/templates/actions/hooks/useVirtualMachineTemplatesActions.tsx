@@ -75,7 +75,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
             obj={template}
             isOpen={isOpen}
             onClose={onClose}
-            headerText={t('Delete Virtual Machine Template?')}
+            headerText={t('Delete VirtualMachine Template?')}
             onDeleteSubmit={() =>
               k8sDelete({
                 model: TemplateModel,

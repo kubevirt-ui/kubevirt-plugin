@@ -52,7 +52,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
         <LinkIcon size="sm" />
       </a>
       <Title headingLevel="h2" className="co-section-heading">
-        {t('Virtual Machine Instance Details')}
+        {t('VirtualMachineInstance Details')}
       </Title>
       <Grid hasGutter>
         <GridItem span={6}>

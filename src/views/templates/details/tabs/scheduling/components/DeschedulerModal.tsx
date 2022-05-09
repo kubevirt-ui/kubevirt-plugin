@@ -72,13 +72,15 @@ const DeschedulerModal: React.FC<DeschedulerModalProps> = ({ template, isOpen, o
             id="descheduler"
             isChecked={isOn}
             onChange={setOn}
-            label={t('Allow the Descheduler to evict the VM via live migration')}
+            label={t('Allow the Descheduler to evict the VitrualMachine via live migration')}
           />
         </FormGroup>
         {isOn && (
-          <Alert isInline variant={AlertVariant.info} title={t('Active descheduler')}>
+          <Alert isInline variant={AlertVariant.info} title={t('Active Descheduler')}>
             {/* TODO fix the message */}
-            {t('This VM is subject to the descheduler profiles configured for eviction.')}
+            {t(
+              'This VirtualMachine is subject to the Descheduler profiles configured for eviction.',
+            )}
           </Alert>
         )}
       </Form>

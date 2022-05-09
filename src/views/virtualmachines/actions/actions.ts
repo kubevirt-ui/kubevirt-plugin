@@ -15,8 +15,8 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 export const VirtualMachineInstanceMigrationModel: K8sKind = {
-  label: 'Virtual Machine Instance Migration',
-  labelPlural: 'Virtual Machine Instance Migrations',
+  label: 'VirtualMachineInstanceMigration',
+  labelPlural: 'VirtualMachineInstanceMigrations',
   apiVersion: 'v1',
   apiGroup: 'kubevirt.io',
   plural: 'virtualmachineinstancemigrations',

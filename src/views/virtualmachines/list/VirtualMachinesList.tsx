@@ -70,7 +70,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
   const columns = useVirtualMachineColumns();
   return (
     <>
-      <ListPageHeader title={t('Virtual Machines')}>
+      <ListPageHeader title={t('VirtualMachines')}>
         <ListPageCreateDropdown items={createItems} onClick={onCreate}>
           {t('Create')}
         </ListPageCreateDropdown>

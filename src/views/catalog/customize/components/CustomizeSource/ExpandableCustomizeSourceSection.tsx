@@ -45,7 +45,7 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
               bodyContent={() => (
                 <div>
                   {t(
-                    'You can customize the templates storage by overriding the original parameters',
+                    'You can customize the Templates storage by overriding the original parameters',
                   )}
                 </div>
               )}

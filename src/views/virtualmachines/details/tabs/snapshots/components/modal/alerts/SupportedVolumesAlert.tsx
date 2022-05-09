@@ -18,7 +18,7 @@ const SupportedVolumesAlert: React.FC<SupportedVolumesAlertProps> = ({ isVMRunni
               {t('Snapshot only includes disks backed by a snapshot-supported storage class')}
             </StackItem>
             {isVMRunning && (
-              <StackItem>{t('Taking snapshot of running virtual machine.')}</StackItem>
+              <StackItem>{t('Taking snapshot of running VirtualMachine.')}</StackItem>
             )}
           </Stack>
         }

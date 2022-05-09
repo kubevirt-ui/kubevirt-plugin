@@ -55,7 +55,7 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
                 <SplitItem className="template-catalog-drawer-footer-tooltip">
                   <Tooltip
                     position={TooltipPosition.right}
-                    content={<div>{t('This template supports quick create VirtualMachine')}</div>}
+                    content={<div>{t('This Template supports quick create VirtualMachine')}</div>}
                   >
                     <OutlinedQuestionCircleIcon />
                   </Tooltip>

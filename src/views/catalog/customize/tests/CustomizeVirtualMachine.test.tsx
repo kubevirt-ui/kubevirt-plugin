@@ -41,7 +41,7 @@ describe('Test CustomizeVirtualMachine', () => {
     cleanup();
   });
 
-  it('It render the form on template loaded', () => {
+  it('It render the form on Template loaded', () => {
     (useK8sWatchResource as jest.Mock).mockReturnValueOnce([
       mockVirtualMachineTemplate,
       true,

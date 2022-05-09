@@ -118,7 +118,7 @@ export const VirtualMachineActionFactory = {
     return {
       id: 'vm-action-cancel-migrate',
       disabled: vm?.status?.printableStatus !== Migrating,
-      label: t('Cancel virtual machine migration'),
+      label: t('Cancel VirtualMachine migration'),
       cta: () => cancelMigration(vmim),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };

@@ -35,7 +35,7 @@ const VirtualMachineEmptyState: React.FC<VirtualMachineEmptyStateProps> = ({ cat
           <Button variant={ButtonVariant.link} onClick={() => history.push(catalogURL)} isInline>
             catalog tab
           </Button>{' '}
-          to quickly create a virtual machine from the available templates.
+          to quickly create a VirtualMachine from the available Templates.
         </Trans>
       </EmptyStateBody>
       <EmptyStatePrimary>

@@ -18,7 +18,7 @@ const getSourceOption = (
       return (
         <SelectOption
           value={SOURCE_TYPES.defaultSource}
-          description={t('Use the default template disk source')}
+          description={t('Use the default Template disk source')}
         >
           <span data-test-id={SOURCE_TYPES.defaultSource}>{t('Default')}</span>
         </SelectOption>
