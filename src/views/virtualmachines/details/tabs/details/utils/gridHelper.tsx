@@ -2,7 +2,6 @@ import * as React from 'react';
 import { TFunction } from 'i18next';
 
 import { NodeModel, PodModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
@@ -10,13 +9,10 @@ import {
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
+import { UseSSHServiceReturnType } from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import UserCredentials from '@kubevirt-utils/components/UserCredentials/UserCredentials';
 import { getVMIIPAddresses, getVMIPod } from '@kubevirt-utils/resources/vmi';
-import {
-  K8sResourceCommon,
-  ResourceLink,
-  WatchK8sResult,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
 import FirstItemListPopover from '../../../../list/components/FirstItemListPopover/FirstItemListPopover';
 
@@ -52,7 +48,7 @@ export const getRunningVMRightGridPresentation = (
   vmi: V1VirtualMachineInstance,
   pods: K8sResourceCommon[],
   guestAgentData?: V1VirtualMachineInstanceGuestAgentInfo,
-  watchSSHService?: WatchK8sResult<IoK8sApiCoreV1Service>,
+  watchSSHService?: UseSSHServiceReturnType,
 ): VirtualMachineDetailsRightGridLayoutPresentation => {
   const vmiPod = getVMIPod(vmi, pods);
   const ipAddresses = getVMIIPAddresses(vmi);
@@ -61,7 +57,7 @@ export const getRunningVMRightGridPresentation = (
 
   const GuestAgentIsRequiredText = <MutedTextSpan text={t('Guest agent is required')} />;
 
-  const [sshService, sshServiceLoaded, sshServiceError] = watchSSHService;
+  const [sshService, sshServiceLoaded] = watchSSHService;
 
   return {
     pod: (
@@ -77,13 +73,11 @@ export const getRunningVMRightGridPresentation = (
       ? GuestAgentIsRequiredText
       : guestAgentData?.timezone?.split(',')[0],
     node: <ResourceLink kind={NodeModel.kind} name={nodeName} />,
-    userCredentials:
-      sshServiceLoaded || sshServiceError ? (
-        <UserCredentials vmi={vmi} sshService={sshService} />
-      ) : (
-        <Loading />
-      ),
-    sshAccess:
-      sshServiceLoaded || sshServiceError ? <SSHAccess sshService={sshService} /> : <Loading />,
+    userCredentials: sshServiceLoaded ? (
+      <UserCredentials vmi={vmi} sshService={sshService} />
+    ) : (
+      <Loading />
+    ),
+    sshAccess: sshServiceLoaded ? <SSHAccess sshService={sshService} /> : <Loading />,
   };
 };

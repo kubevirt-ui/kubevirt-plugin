@@ -4,6 +4,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import useSSHCommand from '@kubevirt-utils/components/UserCredentials/useSSHCommand';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
@@ -13,7 +14,6 @@ import { CopyIcon } from '@patternfly/react-icons';
 
 import { pauseVM, startVM, stopVM, unpauseVM } from '../../../../../../actions/actions';
 import { printableVMStatus } from '../../../../../../utils';
-import useSSHService from '../../../../details/hooks/useSSHService';
 
 type VirtualMachinesOverviewTabDetailsTitleProps = {
   vm: V1VirtualMachine;

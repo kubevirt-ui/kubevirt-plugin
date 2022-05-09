@@ -19,13 +19,16 @@ const UserCredentials: React.FC<UserCredentialsProps> = ({ vmi, sshService }) =>
 
   return (
     <>
-      <span data-test="details-item-user-credentials-user-name">
-        {t('user: {{user}}', { user })}
-      </span>
-      <ClipboardCopy isReadOnly data-test="SSHDetailsPage-command">
-        {sshServiceRunning ? command : `ssh ${user}@`}
-      </ClipboardCopy>
-      {!sshServiceRunning && <MutedTextSpan text={t('Requires SSH service')} />}
+      <div data-test="details-item-user-credentials-user-name">
+        {user && t('user: {{user}}', { user })}
+      </div>
+      {sshServiceRunning ? (
+        <ClipboardCopy isReadOnly data-test="SSHDetailsPage-command">
+          {command}
+        </ClipboardCopy>
+      ) : (
+        <MutedTextSpan text={t('Requires SSH service')} />
+      )}
     </>
   );
 };

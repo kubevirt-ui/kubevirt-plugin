@@ -1,11 +1,11 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi/hooks';
 
-import useSSHService from '../../../hooks/useSSHService';
 import { getRunningVMRightGridPresentation } from '../../../utils/gridHelper';
 
 import VirtualMachineDetailsRightGridLayout from './VirtualMachineDetailsRightGridLayout';

@@ -1,7 +1,7 @@
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ServiceSpecTypeEnum } from '@kubevirt-ui/kubevirt-api/kubernetes';
 
-import { PORT, TARGET_PORT } from './constants';
+import { PORT, SSH_PORT } from './constants';
 
 export const getSSHServiceFromVM = (
   name: string,
@@ -18,7 +18,7 @@ export const getSSHServiceFromVM = (
     ports: [
       {
         port: PORT,
-        targetPort: TARGET_PORT,
+        targetPort: SSH_PORT,
       },
     ],
     type: IoK8sApiCoreV1ServiceSpecTypeEnum.NodePort,

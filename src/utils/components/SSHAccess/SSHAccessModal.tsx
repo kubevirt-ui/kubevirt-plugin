@@ -53,8 +53,6 @@ const SSHAccessModal: React.FC<SSHAccessModalProps> = ({
         name: sshService?.metadata?.name,
         ns: namespace,
       });
-
-      window.location.reload();
     }
   };
 
