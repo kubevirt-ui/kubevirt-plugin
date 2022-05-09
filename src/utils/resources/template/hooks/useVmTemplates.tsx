@@ -16,6 +16,10 @@ import { Operator } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api
 
 import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../utils/constants';
 
+const OPENSHIFT_NS = 'openshift';
+const KUBEVIRT_OS_IMAGES_NS = 'kubevirt-os-images';
+const OPENSHIFT_OS_IMAGES_NS = 'openshift-virtualization-os-images';
+
 /** A Hook that returns VM Templates from allowed namespaces
  * @param namespace - The namespace to filter the templates by
  */
@@ -35,9 +39,15 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
 
   // Bug fix: TODO open BZ for SSP oc get projects don't show on projects when non-priv users
   const projectNames = projects?.map((proj) => proj?.metadata?.name);
-  if (projectNames && !projectNames.includes('openshift')) {
-    projectNames.push('openshift');
+  if (projectNames && !projectNames.includes(OPENSHIFT_NS)) {
+    projectNames.push(OPENSHIFT_NS);
   }
+
+  // Bug fix: the project with the images can't access templates which cause
+  // the template list view to show error instead of existing templates
+  const filteredProjNames = projectNames?.filter(
+    (proj) => proj !== OPENSHIFT_OS_IMAGES_NS && proj !== KUBEVIRT_OS_IMAGES_NS,
+  );
 
   const [allTemplates, allTemplatesLoaded, allTemplatesError] = useK8sWatchResource<V1Template[]>({
     groupVersionKind: TemplateModelGroupVersionKind,
@@ -57,7 +67,7 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
   const allowedResources = useK8sWatchResources<{ [key: string]: V1Template[] }>(
     Object.fromEntries(
       loaded && !isAdmin
-        ? projectNames.map((name) => [
+        ? (filteredProjNames || []).map((name) => [
             name,
             {
               groupVersionKind: TemplateModelGroupVersionKind,
