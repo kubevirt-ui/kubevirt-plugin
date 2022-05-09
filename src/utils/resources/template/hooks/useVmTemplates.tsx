@@ -16,6 +16,8 @@ import { Operator } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api
 
 import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../utils/constants';
 
+const OPENSHIFT_NS = 'openshift';
+
 /** A Hook that returns VM Templates from allowed namespaces
  * @param namespace - The namespace to filter the templates by
  */
@@ -33,10 +35,10 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
     isList: true,
   });
 
-  // Bug fix: TODO open BZ for SSP oc get projects don't show on projects when non-priv users
+  // Bug fix: BZ: https://bugzilla.redhat.com/show_bug.cgi?id=2081295
   const projectNames = projects?.map((proj) => proj?.metadata?.name);
-  if (projectNames && !projectNames.includes('openshift')) {
-    projectNames.push('openshift');
+  if (projectNames && !projectNames.includes(OPENSHIFT_NS)) {
+    projectNames.push(OPENSHIFT_NS);
   }
 
   const [allTemplates, allTemplatesLoaded, allTemplatesError] = useK8sWatchResource<V1Template[]>({
@@ -57,7 +59,7 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
   const allowedResources = useK8sWatchResources<{ [key: string]: V1Template[] }>(
     Object.fromEntries(
       loaded && !isAdmin
-        ? projectNames.map((name) => [
+        ? (projectNames || []).map((name) => [
             name,
             {
               groupVersionKind: TemplateModelGroupVersionKind,
