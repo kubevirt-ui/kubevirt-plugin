@@ -8,7 +8,25 @@ import {
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template';
 
-import { SOURCE_OPTIONS_IDS } from './constants';
+import {
+  BLANK_SOURCE_NAME,
+  DEFAULT_SOURCE,
+  HTTP_SOURCE_NAME,
+  PVC_SOURCE_NAME,
+  REGISTRY_SOURCE_NAME,
+  SOURCE_OPTIONS_IDS,
+} from './constants';
+
+export const getSourceTypeFromDiskSource = (
+  diskSource: V1beta1DataVolumeSpec,
+): SOURCE_OPTIONS_IDS => {
+  if (diskSource.source.blank) return BLANK_SOURCE_NAME;
+  if (diskSource.source.http) return HTTP_SOURCE_NAME;
+  if (diskSource.source.registry) return REGISTRY_SOURCE_NAME;
+  if (diskSource.source.pvc) return PVC_SOURCE_NAME;
+
+  return DEFAULT_SOURCE;
+};
 
 export const getGenericSourceCustomization = (
   diskSourceId: SOURCE_OPTIONS_IDS,

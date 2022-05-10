@@ -48,6 +48,12 @@ describe('Test CustomizeForm', () => {
   it('It render all the parameters', () => {
     render(<CustomizeForm template={mockVirtualMachineTemplate} />);
 
+    act(() => {
+      fireEvent.click(
+        within(screen.getByTestId('expandable-optional-section')).getByRole('button'),
+      );
+    });
+
     expect(screen.getAllByRole('textbox')).toHaveLength(
       mockVirtualMachineTemplate.parameters.length,
     );
@@ -106,7 +112,7 @@ describe('Test CustomizeForm', () => {
       (parameter) => !parameter.required,
     );
 
-    expect(screen.getByText(oneOptionalField.description)).toBeVisible();
+    expect(screen.getByText(oneOptionalField.description)).not.toBeVisible();
 
     act(() => {
       fireEvent.click(
@@ -114,6 +120,6 @@ describe('Test CustomizeForm', () => {
       );
     });
 
-    expect(screen.getByText(oneOptionalField.description)).not.toBeVisible();
+    expect(screen.getByText(oneOptionalField.description)).toBeVisible();
   });
 });

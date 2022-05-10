@@ -19,6 +19,7 @@ import { SelectCDSourceLabel } from './SelectCDSourceLabel';
 import { SelectDiskSourceLabel } from './SelectDiskSourceLabel';
 import { SelectSource } from './SelectSource';
 import {
+  getGenericSourceCustomization,
   getHTTPHelperText,
   getPVCSource,
   getRegistryHelperText,
@@ -28,6 +29,7 @@ import {
 import './CustomizeSource.scss';
 
 export type CustomizeSourceProps = {
+  diskSource: V1beta1DataVolumeSpec;
   setDiskSource: (customSource: V1beta1DataVolumeSpec | undefined) => void;
   withDrivers: boolean;
   setDrivers: (withDrivers: boolean) => void;
@@ -37,6 +39,7 @@ export type CustomizeSourceProps = {
 };
 
 export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
+  diskSource,
   setDiskSource,
   withDrivers,
   setDrivers,
@@ -48,8 +51,11 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
 
   const onCDCheckboxChange = React.useCallback(() => {
     if (cdSource) setCDSource(undefined);
-    else setCDSource(getPVCSource(null, null));
-  }, [cdSource, setCDSource]);
+    else {
+      setDiskSource(getGenericSourceCustomization(BLANK_SOURCE_NAME));
+      setCDSource(getPVCSource(null, null));
+    }
+  }, [cdSource, setCDSource, setDiskSource]);
 
   const httpSourceHelperText = getHTTPHelperText(template, t);
   const registrySourceHelperText = getRegistryHelperText(template, t);
@@ -77,6 +83,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
       <SelectSource
         initialVolumeQuantity={getTemplateStorageQuantity(template) || '30Gi'}
         onSourceChange={setDiskSource}
+        selectedSource={diskSource}
         withSize
         sourceOptions={[
           DEFAULT_SOURCE,

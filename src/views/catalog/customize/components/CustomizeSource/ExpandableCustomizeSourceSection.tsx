@@ -16,6 +16,7 @@ import { HelpIcon } from '@patternfly/react-icons';
 import { CustomizeSource, CustomizeSourceProps } from './CustomizeSource';
 
 export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = ({
+  diskSource,
   setDiskSource,
   template,
   withDrivers,
@@ -62,6 +63,7 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
           isIndented
         >
           <CustomizeSource
+            diskSource={diskSource}
             setDiskSource={setDiskSource}
             template={template}
             withDrivers={withDrivers}
