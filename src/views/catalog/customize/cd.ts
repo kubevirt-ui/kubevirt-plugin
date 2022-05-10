@@ -49,6 +49,11 @@ export const addInstallationCDRom = (
 
   return produceVMDisks(virtualMachine, (draftVM) => {
     draftVM.spec.dataVolumeTemplates = dataVolumeTemplates;
+    draftVM.spec.template.spec.domain.devices.disks =
+      draftVM.spec.template.spec.domain.devices.disks.map((disk, index) => ({
+        ...disk,
+        bootOrder: 2 + index,
+      }));
     draftVM.spec.template.spec.domain.devices.disks.push(INSTALLATION_CDROM_DISK);
     draftVM.spec.template.spec.volumes.push(cdVolume);
   });
