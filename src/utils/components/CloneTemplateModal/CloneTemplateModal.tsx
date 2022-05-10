@@ -13,6 +13,8 @@ import CloneStorageCheckbox from './CloneStorageCheckbox';
 import SelectProject from './SelectProject';
 import { cloneStorage, getTemplateBootSourcePVC } from './utils';
 
+import './clone-template-modal.scss';
+
 type CloneTemplateModalProps = {
   isOpen: boolean;
   obj: V1Template;
@@ -80,9 +82,21 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
         submitBtnText={t('Clone')}
         submitBtnVariant={ButtonVariant.primary}
       >
-        <Form>
+        <Form className="clone-template-modal">
           <FormGroup label={t('Template name')} fieldId="name" isRequired>
             <TextInput id="name" type="text" value={templateName} onChange={setTemplateName} />
+          </FormGroup>
+
+          <FormGroup
+            label={t('Template project')}
+            fieldId="namespace"
+            helperText={t('Project name to clone the template to')}
+          >
+            <SelectProject
+              selectedProject={selectedProject}
+              setSelectedProject={setSelectedProject}
+              id="namespace"
+            />
           </FormGroup>
 
           <FormGroup
@@ -98,18 +112,16 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
               onChange={setTemplateProvider}
             />
           </FormGroup>
-          <FormGroup label={t('Template namespace')} fieldId="namespace" isRequired>
-            <SelectProject
-              selectedProject={selectedProject}
-              setSelectedProject={setSelectedProject}
-              id="namespace"
-            />
-          </FormGroup>
           {clonableStorage && (
             <CloneStorageCheckbox isChecked={isCloneStorageEnabled} onChange={setCloneStorage} />
           )}
           {isCloneStorageEnabled && (
-            <FormGroup label={t('Name of the template new disk')} fieldId="pvc-name" isRequired>
+            <FormGroup
+              label={t('Name of the template new disk')}
+              fieldId="pvc-name"
+              className="pvc-name-form-group"
+              isRequired
+            >
               <TextInput id="pvc-name" type="text" value={pvcName} onChange={setPVCName} />
             </FormGroup>
           )}

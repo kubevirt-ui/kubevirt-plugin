@@ -14,7 +14,7 @@ const CloneStorageCheckbox: React.FC<CloneStorageCheckboxProps> = ({ isChecked, 
 
   return (
     <FormGroup fieldId="clone-storage">
-      <Flex>
+      <Flex alignItems={{ default: 'alignItemsCenter' }}>
         <FlexItem>
           <Checkbox
             isChecked={isChecked}
@@ -29,7 +29,7 @@ const CloneStorageCheckbox: React.FC<CloneStorageCheckboxProps> = ({ isChecked, 
             bodyContent={() => (
               <div>
                 {t(
-                  'Checking this option will copy the template boot source disk, the new template will use the copy as its boot source',
+                  'Checking this option will create a new PVC of the bootsource for the new template',
                 )}
               </div>
             )}
