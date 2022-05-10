@@ -69,7 +69,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
   React.useEffect(() => {
     // if the selected disk source is black or ephemeral and the user changed
     // the disk type to CDROM, we need to reset the disk source to the default (url)
-    if (isCDROMType && [sourceTypes.BLANK, sourceTypes.EPHEMERAL].includes(diskSource)) {
+    if (isCDROMType && sourceTypes.BLANK === diskSource) {
       dispatchDiskState({ type: diskReducerActions.SET_DISK_SOURCE, payload: sourceTypes.HTTP });
     }
   }, [dispatchDiskState, isCDROMType, diskSource]);
@@ -87,7 +87,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
         >
           {sourceOptions.map(({ id, description, name }) => {
             const isDisabled =
-              ((isVMRunning || isCDROMType) && id === sourceTypes.EPHEMERAL) ||
+              (isVMRunning && id === sourceTypes.EPHEMERAL) ||
               (isCDROMType && id === sourceTypes.BLANK);
             return (
               <SelectOption isDisabled={isDisabled} key={id} value={id} description={description}>

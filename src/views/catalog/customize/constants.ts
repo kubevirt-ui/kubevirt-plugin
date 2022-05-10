@@ -11,6 +11,7 @@ export const INSTALLATION_CDROM_DISK: V1Disk = {
   cdrom: {
     bus: 'sata',
   },
+  bootOrder: 1,
 };
 
 export const INSTALLATION_CDROM_VOLUME: V1Volume = {
