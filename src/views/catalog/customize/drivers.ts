@@ -1,5 +1,3 @@
-import produce from 'immer';
-
 import { produceVMDisks } from '@catalog/utils/WizardVMContext/utils/vm-produce';
 import { ConfigMapModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
@@ -39,32 +37,32 @@ const getVirtioWinConfigMap = async (): Promise<any> => {
 };
 
 export const mountWinDriversToTemplate = async (template: V1Template): Promise<V1Template> => {
-  return await produce(template, async (draftTemplate) => {
-    let driversImage = DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE;
+  let driversImage = DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE;
 
-    try {
-      const configMap = await getVirtioWinConfigMap();
-      if (configMap?.data?.[VIRTIO_WIN_IMAGE]) driversImage = configMap.data[VIRTIO_WIN_IMAGE];
-    } catch (error) {
-      console.error(error);
-    }
+  try {
+    const configMap = await getVirtioWinConfigMap();
+    if (configMap?.data?.[VIRTIO_WIN_IMAGE]) driversImage = configMap.data[VIRTIO_WIN_IMAGE];
+  } catch (error) {
+    console.error(error);
+  }
 
-    const virtualMachine = getTemplateVirtualMachineObject(draftTemplate);
+  const virtualMachine = getTemplateVirtualMachineObject(template);
 
-    draftTemplate.objects[0] = produceVMDisks(virtualMachine, (draftVM) => {
-      draftVM.spec.template.spec.domain.devices.disks.push({
-        name: WINDOWS_DRIVERS_DISK,
-        cdrom: {
-          bus: 'sata',
-        },
-      });
+  template.objects[0] = produceVMDisks(virtualMachine, (draftVM) => {
+    draftVM.spec.template.spec.domain.devices.disks.push({
+      name: WINDOWS_DRIVERS_DISK,
+      cdrom: {
+        bus: 'sata',
+      },
+    });
 
-      draftVM.spec.template.spec.volumes.push({
-        name: WINDOWS_DRIVERS_DISK,
-        containerDisk: {
-          image: driversImage,
-        },
-      });
+    draftVM.spec.template.spec.volumes.push({
+      name: WINDOWS_DRIVERS_DISK,
+      containerDisk: {
+        image: driversImage,
+      },
     });
   });
+
+  return template;
 };

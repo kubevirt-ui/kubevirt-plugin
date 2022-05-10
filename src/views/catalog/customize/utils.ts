@@ -99,7 +99,6 @@ export const processTemplate = async ({
     );
 
     if (withWindowsDrivers) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       draftTemplate = await mountWinDriversToTemplate(draftTemplate);
     }
   });
