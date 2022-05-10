@@ -3,7 +3,7 @@ import './support/selectors';
 import './support/login';
 import './support/nav';
 import './support/project';
-import './support/resource';
+import './support/cli';
 
 declare global {
   namespace Cypress {

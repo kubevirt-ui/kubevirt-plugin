@@ -4,6 +4,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
+      createResource(resource: any): void;
       deleteResource(kind: string, name: string, namespace?: string): void;
     }
   }
@@ -29,4 +30,8 @@ Cypress.Commands.add('deleteResource', (kind: string, name: string, namespace?: 
       { timeout: 240000 },
     );
   }
+});
+
+Cypress.Commands.add('createResource', (resource) => {
+  cy.exec(`echo '${JSON.stringify(resource)}' | kubectl create -f -`);
 });
