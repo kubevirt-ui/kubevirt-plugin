@@ -371,6 +371,7 @@
   "Migrate VirtualMachine to Node": "Migrate VirtualMachine to Node",
   "Migration Tool": "Migration Tool",
   "Migration Toolkit for Virtualization": "Migration Toolkit for Virtualization",
+  "MigrationTool": "MigrationTool",
   "Missing fields in {{kind}} labels": "Missing fields in {{kind}} labels",
   "Missing fields in Node fields": "Missing fields in Node fields",
   "Missing Guest Agent": "Missing Guest Agent",

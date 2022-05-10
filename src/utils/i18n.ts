@@ -11,3 +11,4 @@
 // t('plugin__kubevirt-plugin~VirtualMachineInstances')
 // t('plugin__kubevirt-plugin~Templates')
 // t('plugin__kubevirt-plugin~Overview')
+// t('plugin__kubevirt-plugin~MigrationTool')

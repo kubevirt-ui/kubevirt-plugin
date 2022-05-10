@@ -11,7 +11,7 @@ import { TemplatesCatalogHeader } from './components/TemplatesCatalogHeader';
 import { TemplatesCatalogItems } from './components/TemplatesCatalogItems';
 import { TemplatesCatalogPageHeader } from './components/TemplatesCatalogPageHeader';
 import { skeletonCatalog } from './components/TemplatesCatalogSkeleton';
-import { useAvailableSourceTemplates } from './hooks/useAvailableSourceTemplates';
+import { useTemplatesWithAvailableSource } from './hooks/useTemplatesWithAvailableSource';
 import { useTemplatesFilters } from './hooks/useVmTemplatesFilters';
 import { filterTemplates } from './utils/helpers';
 
@@ -25,7 +25,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
-  const { templates, loaded, initialSourcesLoaded, error } = useAvailableSourceTemplates({
+  const { templates, loaded, error } = useTemplatesWithAvailableSource({
     namespace: filters.namespace,
     onlyAvailable: filters.onlyAvailable,
     onlyDefault: filters.onlyDefault,
@@ -61,10 +61,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
                 error={error}
               />
             ) : (
-              <TemplatesCatalogEmptyState
-                loadingSources={filters?.onlyAvailable && !initialSourcesLoaded}
-                onClearFilters={clearAll}
-              />
+              <TemplatesCatalogEmptyState onClearFilters={clearAll} />
             )}
           </Stack>
         </div>
