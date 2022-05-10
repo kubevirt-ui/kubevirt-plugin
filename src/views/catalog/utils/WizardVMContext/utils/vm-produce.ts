@@ -1,6 +1,7 @@
 import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
+import { sysprepDisk, sysprepVolume } from '@catalog/wizard/tabs/scripts/utils/sysprep-utils';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export const ensurePath = <T extends object>(data: T, paths: string | string[]) => {
@@ -66,5 +67,44 @@ export const produceVMDevices = (
       draftVM.spec.template.spec.domain.devices.hostDevices = [];
 
     updateDevices(draftVM);
+  });
+};
+
+export const produceVMSysprep = (vm: V1VirtualMachine) => {
+  return produce(vm, (vmDraft) => {
+    vmDraft.spec.template.spec.domain.devices.disks.push(sysprepDisk());
+    vmDraft.spec.template.spec.volumes.push(sysprepVolume(vmDraft));
+  });
+};
+
+export const produceVMSSHKey = (vm: V1VirtualMachine) => {
+  return produce(vm, (vmDraft) => {
+    const cloudInitNoCloudVolume = vmDraft.spec.template.spec.volumes.find(
+      (v) => v.cloudInitNoCloud,
+    );
+    if (cloudInitNoCloudVolume) {
+      vmDraft.spec.template.spec.volumes = [
+        {
+          name: cloudInitNoCloudVolume.name,
+          cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
+        },
+        ...vmDraft.spec.template.spec.volumes.filter((v) => !v.cloudInitNoCloud),
+      ];
+    }
+
+    vmDraft.spec.template.spec.accessCredentials = [
+      {
+        sshPublicKey: {
+          source: {
+            secret: {
+              secretName: `${vmDraft.metadata.name}-ssh-key`,
+            },
+          },
+          propagationMethod: {
+            configDrive: {},
+          },
+        },
+      },
+    ];
   });
 };

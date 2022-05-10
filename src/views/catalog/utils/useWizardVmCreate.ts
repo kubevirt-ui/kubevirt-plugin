@@ -2,16 +2,12 @@ import { useState } from 'react';
 import produce from 'immer';
 
 import { createVmSSHSecret } from '@catalog/wizard/tabs/scripts/utils/cloudint-utils';
-import {
-  createSysprepConfigMap,
-  sysprepDisk,
-  sysprepVolume,
-} from '@catalog/wizard/tabs/scripts/utils/sysprep-utils';
+import { createSysprepConfigMap } from '@catalog/wizard/tabs/scripts/utils/sysprep-utils';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
-import { useWizardVMContext } from './WizardVMContext';
+import { produceVMSSHKey, produceVMSysprep, useWizardVMContext } from './WizardVMContext';
 
 type CreateVMArguments = {
   startVM: boolean;
@@ -42,38 +38,11 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
         vmDraft.spec.running = startVM;
 
         if (hasSysprep) {
-          vmDraft.spec.template.spec.domain.devices.disks.push(sysprepDisk());
-          vmDraft.spec.template.spec.volumes.push(sysprepVolume(vmDraft));
+          produceVMSysprep(vmDraft);
         }
 
         if (sshKey) {
-          const cloudInitNoCloudVolume = vmDraft.spec.template.spec.volumes.find(
-            (v) => v.cloudInitNoCloud,
-          );
-          if (cloudInitNoCloudVolume) {
-            vmDraft.spec.template.spec.volumes = [
-              {
-                name: cloudInitNoCloudVolume.name,
-                cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
-              },
-              ...vmDraft.spec.template.spec.volumes.filter((v) => !v.cloudInitNoCloud),
-            ];
-          }
-
-          vmDraft.spec.template.spec.accessCredentials = [
-            {
-              sshPublicKey: {
-                source: {
-                  secret: {
-                    secretName: `${vmDraft.metadata.name}-ssh-key`,
-                  },
-                },
-                propagationMethod: {
-                  configDrive: {},
-                },
-              },
-            },
-          ];
+          produceVMSSHKey(vmDraft);
         }
       });
 
