@@ -6,7 +6,7 @@ import {
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getCPUCount, getMemorySize } from '../utils/CpuMemoryUtils';
+import { getCPUcores, getMemorySize } from '../utils/CpuMemoryUtils';
 
 type UseTemplateDefaultCpuMemory = (vm: V1VirtualMachine) => {
   data: {
@@ -39,7 +39,7 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (vm) => {
   const defaultMemory = getMemorySize(
     template?.objects?.[0]?.spec?.template?.spec?.domain?.resources?.requests?.memory,
   );
-  const defaultCpu = getCPUCount(template?.objects?.[0]?.spec?.template?.spec?.domain?.cpu);
+  const defaultCpu = getCPUcores(template?.objects?.[0]);
 
   return {
     data: {

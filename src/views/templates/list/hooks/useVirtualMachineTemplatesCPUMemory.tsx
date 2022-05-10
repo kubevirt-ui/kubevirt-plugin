@@ -42,11 +42,10 @@ export const useVirtualMachineTemplatesCPUMemory = (
   template: V1Template,
 ): string | React.ReactNode => {
   const { t } = useKubevirtTranslation();
-  const { cpuCount, memory } = getFlavorData(template);
+  const cpu = getTemplateVirtualMachineCPU(template);
+  const { memory } = getFlavorData(template);
 
-  if (!cpuCount || isTemplateParameter(memory)) {
-    const cpu = getTemplateVirtualMachineCPU(template);
-
+  if (isTemplateParameter(memory)) {
     return (
       <>
         {t('CPU | Memory depend on parameters')}{' '}
@@ -75,6 +74,6 @@ export const useVirtualMachineTemplatesCPUMemory = (
     );
   } else {
     const [value, readableUnit] = stringValueUnitSplit(memory);
-    return `CPU ${cpuCount} | ${t('Memory')} ${value} ${readableUnit}`;
+    return `CPU ${cpu.cores} | ${t('Memory')} ${value} ${readableUnit}`;
   }
 };

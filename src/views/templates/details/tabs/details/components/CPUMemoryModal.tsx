@@ -1,8 +1,16 @@
 import * as React from 'react';
 import produce from 'immer';
+import { isCommonVMTemplate } from 'src/views/templates/utils';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import useTemplateDefaultCpuMemory from '@kubevirt-utils/components/CPUMemoryModal/hooks/useTemplateDefaultCpuMemory';
+import {
+  getCPUcores,
+  getMemorySize,
+  memorySizesTypes,
+} from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import {
   Alert,
   Button,
@@ -17,29 +25,24 @@ import {
   TitleSizes,
 } from '@patternfly/react-core';
 
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { checkCPUMemoryChanged } from '../PendingChanges/utils/helpers';
-
-import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
-import { getCPUcores, getMemorySize, memorySizesTypes } from './utils/CpuMemoryUtils';
-
 import './cpu-memory-modal.scss';
 
 type CPUMemoryModalProps = {
-  vm: V1VirtualMachine;
+  template: V1Template;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  vmi?: V1VirtualMachineInstance;
+  onSubmit: (updatedVMTemplate: V1Template) => Promise<V1Template | void>;
 };
 
-const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, onSubmit, vmi }) => {
+const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
+  const vm = getTemplateVirtualMachineObject(template);
   const {
     data: templateDefaultsData,
     loaded: defaultsLoaded,
     error: defaultLoadError,
   } = useTemplateDefaultCpuMemory(vm);
+  const isCommonTemplate = isCommonVMTemplate(template);
   const [updateInProcess, setUpdateInProcess] = React.useState<boolean>(false);
   const [updateError, setUpdateError] = React.useState<string>();
 
@@ -48,16 +51,16 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
   const [memoryUnit, setMemoryUnit] = React.useState<string>();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
 
-  const updatedVirtualMachine = React.useMemo(() => {
-    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      vmDraft.spec.template.spec.domain.resources.requests = {
+  const updatedTemplate = React.useMemo(() => {
+    const updatedVMTemplate = produce<V1Template>(template, (templateDraft: V1Template) => {
+      templateDraft.objects[0].spec.template.spec.domain.resources.requests = {
         ...vm?.spec?.template?.spec?.domain?.resources?.requests,
         memory: `${memory}${memoryUnit}`,
       };
-      vmDraft.spec.template.spec.domain.cpu.cores = cpuCores;
+      templateDraft.objects[0].spec.template.spec.domain.cpu.cores = cpuCores;
     });
-    return updatedVM;
-  }, [vm, memory, cpuCores, memoryUnit]);
+    return updatedVMTemplate;
+  }, [vm, memory, cpuCores, memoryUnit, template]);
 
   React.useEffect(() => {
     if (vm?.metadata) {
@@ -69,13 +72,13 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
       setMemory(size);
       setCpuCores(getCPUcores(vm));
     }
-  }, [vm]);
+  }, [vm, template]);
 
   const handleSubmit = () => {
     setUpdateInProcess(true);
     setUpdateError(null);
 
-    onSubmit(updatedVirtualMachine)
+    onSubmit(updatedTemplate)
       .then(() => {
         setUpdateInProcess(false);
         onClose();
@@ -126,15 +129,13 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
         </Button>,
       ]}
     >
-      {vmi && (
-        <ModalPendingChangesAlert isChanged={checkCPUMemoryChanged(updatedVirtualMachine, vmi)} />
-      )}
       <div className="inputs">
         <div className="input-cpu">
           <Title headingLevel="h6" size={TitleSizes.md}>
             {t('CPUs')}
           </Title>
           <NumberInput
+            isDisabled={isCommonTemplate}
             value={cpuCores}
             onMinus={() => setCpuCores((cpus) => +cpus - 1)}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,6 +152,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
             {t('Memory')}
           </Title>
           <NumberInput
+            isDisabled={isCommonTemplate}
             value={memory}
             onMinus={() => setMemory((mem) => +mem - 1)}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
