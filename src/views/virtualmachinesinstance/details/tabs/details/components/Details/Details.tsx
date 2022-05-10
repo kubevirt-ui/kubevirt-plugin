@@ -1,12 +1,10 @@
 import * as React from 'react';
 
-import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import UserCredentials from '@kubevirt-utils/components/UserCredentials/UserCredentials';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   DescriptionList,
   DescriptionListDescription,
@@ -47,15 +45,7 @@ type DetailsProps = {
 const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
   const { t } = useKubevirtTranslation();
   const [guestAgentData] = useGuestOS(vmi);
-
-  const [sshService, sshServiceLoaded, sshServiceError] =
-    useK8sWatchResource<IoK8sApiCoreV1Service>({
-      kind: ServiceModel.kind,
-      isList: false,
-      namespace: vmi?.metadata?.namespace,
-      name: `${vmi?.metadata?.name}-ssh-service`,
-    });
-
+  const [sshService, sshServiceLoading] = useSSHService(vmi);
   return (
     <div>
       <a href={`${pathname}#details`} className="link-icon">
@@ -152,7 +142,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
             <DescriptionListGroup>
               <DescriptionListTerm>{t('User Credentials')}</DescriptionListTerm>
               <DescriptionListDescription>
-                {sshServiceLoaded || sshServiceError ? (
+                {sshServiceLoading ? (
                   <UserCredentials sshService={sshService} vmi={vmi} />
                 ) : (
                   <Loading />
@@ -160,11 +150,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <SSHDetails
-                vmi={vmi}
-                sshService={sshService}
-                sshServiceLoaded={sshServiceLoaded || sshServiceError}
-              />
+              <SSHDetails vmi={vmi} sshService={sshService} sshServiceLoaded={sshServiceLoading} />
             </DescriptionListGroup>
             <DescriptionListGroup>
               <DescriptionListTerm>{t('Hardware devices')}</DescriptionListTerm>
