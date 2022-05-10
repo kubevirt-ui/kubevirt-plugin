@@ -66,6 +66,7 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ tem
       ))}
 
       <ExpandableCustomizeSourceSection
+        diskSource={diskSource}
         setDiskSource={setDiskSource}
         template={template}
         withDrivers={windowsDrivers}

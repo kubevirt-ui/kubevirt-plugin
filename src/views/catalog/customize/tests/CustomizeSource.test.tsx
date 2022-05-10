@@ -38,6 +38,7 @@ describe('Test CustomizeSource', () => {
   it('Switch to cd Source with checkbox', () => {
     const { rerender } = render(
       <CustomizeSource
+        diskSource={undefined}
         template={template}
         setDiskSource={onChangeMock}
         setDrivers={setDrivers}
@@ -58,6 +59,7 @@ describe('Test CustomizeSource', () => {
     const newCdSource = (setCDSource as jest.Mock).mock.calls[0][0];
     rerender(
       <CustomizeSource
+        diskSource={undefined}
         template={template}
         setDiskSource={onChangeMock}
         setDrivers={setDrivers}
@@ -74,6 +76,7 @@ describe('Test CustomizeSource', () => {
     const testImageUrl = 'imageUrl';
     render(
       <CustomizeSource
+        diskSource={undefined}
         template={template}
         setDiskSource={onChangeMock}
         setDrivers={setDrivers}
@@ -116,6 +119,7 @@ describe('Test CustomizeSource', () => {
     render(
       <CustomizeSource
         template={template}
+        diskSource={undefined}
         setDiskSource={onChangeMock}
         setDrivers={setDrivers}
         withDrivers={false}

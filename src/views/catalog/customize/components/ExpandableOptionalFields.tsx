@@ -14,7 +14,7 @@ export const ExpandableOptionsFields: React.FC<ExpandableOptionsFieldsProps> = (
   optionalFields,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [optionalFieldsExpanded, setOptionalFieldsExpanded] = React.useState(true);
+  const [optionalFieldsExpanded, setOptionalFieldsExpanded] = React.useState(false);
 
   if (optionalFields && optionalFields.length > 0)
     return (

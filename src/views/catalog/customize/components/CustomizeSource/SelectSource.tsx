@@ -16,11 +16,17 @@ import {
   SOURCE_OPTIONS_IDS,
 } from './constants';
 import SelectSourceOption from './SelectSourceOption';
-import { appendDockerPrefix, getGenericSourceCustomization, getPVCSource } from './utils';
+import {
+  appendDockerPrefix,
+  getGenericSourceCustomization,
+  getPVCSource,
+  getSourceTypeFromDiskSource,
+} from './utils';
 import { VolumeSize } from './VolumeSize';
 
 export type SelectSourceProps = {
   onSourceChange: (customSource: V1beta1DataVolumeSpec) => void;
+  selectedSource?: V1beta1DataVolumeSpec;
   sourceLabel: React.ReactNode;
   initialVolumeQuantity?: string;
   withSize?: boolean;
@@ -31,6 +37,7 @@ export type SelectSourceProps = {
 
 export const SelectSource: React.FC<SelectSourceProps> = ({
   onSourceChange,
+  selectedSource,
   initialVolumeQuantity = '30Gi',
   withSize = false,
   sourceOptions,
@@ -46,6 +53,10 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   const [pvcNamespaceSelected, selectPVCNamespace] = React.useState<string>();
   const [httpURL, setHTTPURL] = React.useState('');
   const [containerImage, setContainerImage] = React.useState('');
+
+  React.useEffect(() => {
+    if (selectedSource) setSourceType(getSourceTypeFromDiskSource(selectedSource));
+  }, [selectedSource]);
 
   React.useEffect(() => {
     switch (selectedSourceType) {
