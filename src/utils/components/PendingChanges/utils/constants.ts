@@ -9,6 +9,7 @@ export enum VirtualMachineDetailsTab {
   NetworkInterfaces = 'network-interfaces',
   Disks = 'disks',
   Snapshots = 'snapshots',
+  Scripts = 'scripts',
 }
 
 export enum VirtualMachineDetailsTabLabel {
@@ -22,4 +23,5 @@ export enum VirtualMachineDetailsTabLabel {
   NetworkInterfaces = 'Network Interfaces',
   Disks = 'Disks',
   Snapshots = 'Snapshots',
+  Scripts = 'Scripts',
 }

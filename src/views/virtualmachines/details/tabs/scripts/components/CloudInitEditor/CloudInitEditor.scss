@@ -1,0 +1,15 @@
+.cloud-init-editor {
+  height: 400px;
+  width: 500px;
+
+  .yaml-editor {
+    height: 400px;
+    padding-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+.yaml-controls {
+  margin-top: var(--pf-global--spacer--md);
+}

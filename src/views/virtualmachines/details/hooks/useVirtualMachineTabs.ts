@@ -14,6 +14,7 @@ import VirtualMachinePageEventsTab from '../tabs/events/VirtualMachinePageEvents
 import NetworkInterfaceListPage from '../tabs/network/NetworkInterfaceListPage';
 import VirtualMachinesOverviewTab from '../tabs/overview/VirtualMachinesOverviewTab';
 import VirtualMachineSchedulingPage from '../tabs/scheduling/VirtualMachineSchedulingPage';
+import ScriptsTab from '../tabs/scripts/ScriptsTab';
 import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
 import VirtualMachineYAMLPage from '../tabs/yaml/VirtualMachineYAMLPage';
 
@@ -66,6 +67,11 @@ export const useVirtualMachineTabs = () => {
         href: VirtualMachineDetailsTab.Disks,
         name: t(VirtualMachineDetailsTabLabel.Disks),
         component: DiskListPage,
+      },
+      {
+        href: VirtualMachineDetailsTab.Scripts,
+        name: t(VirtualMachineDetailsTabLabel.Scripts),
+        component: ScriptsTab,
       },
       {
         href: VirtualMachineDetailsTab.Snapshots,
