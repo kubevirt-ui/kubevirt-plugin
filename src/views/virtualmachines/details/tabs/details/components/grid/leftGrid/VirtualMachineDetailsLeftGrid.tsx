@@ -13,7 +13,7 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
+import { asAccessReview, getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import {
   DESCRIPTION_ANNOTATION,
   useVMIAndPodsForVM,
@@ -46,11 +46,9 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   const { createModal } = useModal();
   const None = <MutedTextSpan text={t('None')} />;
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const [canUpdateVM] = useAccessReview({
-    namespace: vm?.metadata?.namespace,
-    resource: vm?.kind,
-    verb: 'patch' as K8sVerb,
-  });
+
+  const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
+  const [canUpdateVM] = useAccessReview(accessReview || {});
 
   const onSubmitCPU = React.useCallback(
     (updatedVM: V1VirtualMachine) =>

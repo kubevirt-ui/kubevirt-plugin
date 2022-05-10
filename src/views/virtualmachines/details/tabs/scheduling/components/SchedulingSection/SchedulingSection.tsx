@@ -1,9 +1,11 @@
 import * as React from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import {
   K8sVerb,
   useAccessReview,
@@ -28,11 +30,8 @@ const SchedulingSection: React.FC<SchedulingSectionProps> = ({ vm, pathname }) =
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
-  const [canUpdateVM] = useAccessReview({
-    namespace: vm?.metadata?.namespace,
-    resource: vm?.kind,
-    verb: 'patch' as K8sVerb,
-  });
+  const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
+  const [canUpdateVM] = useAccessReview(accessReview || {});
   return (
     <div className="vm-scheduling-section">
       <a href={`${pathname}#scheduling`} className="link-icon">
