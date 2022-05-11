@@ -10,8 +10,8 @@ export const isCommonVMTemplate = (template: V1Template): boolean =>
 export const isDedicatedCPUPlacement = (template: V1Template): boolean =>
   template?.objects[0]?.spec?.template?.spec?.domain?.cpu?.dedicatedCpuPlacement;
 
+// check if the Descheduler is installed
 export const useDeschedulerInstalled = (): boolean => {
-  // check if the Descheduler is installed
   const [resourceList] = useK8sWatchResource<any>({
     kind: KubeDeschedulerModel.kind,
     isList: true,

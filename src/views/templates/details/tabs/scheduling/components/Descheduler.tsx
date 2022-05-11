@@ -2,7 +2,8 @@ import React from 'react';
 import { isDeschedulerOn, useDeschedulerInstalled } from 'src/views/templates/utils';
 import { DESCHEDULER_URL } from 'src/views/templates/utils/constants';
 
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
 import {
@@ -14,9 +15,9 @@ import {
   Popover,
   Tooltip,
 } from '@patternfly/react-core';
-import { ExternalLinkAltIcon, PencilAltIcon } from '@patternfly/react-icons';
+import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
-import DeschedulerModal from './DeschedulerModal';
+import DeschedulerModalButton from './DeschedulerModalButton';
 
 import 'src/views/templates/details/tabs/scheduling/TemplateSchedulingTab.scss';
 
@@ -26,8 +27,9 @@ type DeschedulerProps = {
 
 const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
-  const { createModal } = useModal();
   const isDeschedulerInstalled = useDeschedulerInstalled();
+  const isAdmin = useIsAdmin();
+  const isEditable = isAdmin && isDeschedulerInstalled;
 
   return (
     <DescriptionListGroup>
@@ -62,34 +64,18 @@ const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
       </DescriptionListTermHelpText>
 
       <DescriptionListDescription>
-        <Tooltip
-          content={
-            !isDeschedulerInstalled &&
-            t(
+        {isAdmin && !isDeschedulerInstalled ? (
+          <Tooltip
+            content={t(
               'To enable the descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more descheduler profiles.',
-            )
-          }
-          position="right"
-        >
-          <span>
-            <Button
-              isInline
-              isDisabled={!isDeschedulerInstalled}
-              onClick={() =>
-                createModal(({ isOpen, onClose }) => (
-                  <DeschedulerModal template={template} isOpen={isOpen} onClose={onClose} />
-                ))
-              }
-              variant="link"
-              iconPosition={'right'}
-            >
-              {isDeschedulerInstalled && isDeschedulerOn(template) ? t('ON') : t('OFF')}
-              {isDeschedulerInstalled && (
-                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-              )}
-            </Button>
-          </span>
-        </Tooltip>
+            )}
+            position="right"
+          >
+            <MutedTextSpan text={isDeschedulerOn(template) ? t('ON') : t('OFF')} />
+          </Tooltip>
+        ) : (
+          <DeschedulerModalButton template={template} editable={isEditable} />
+        )}
       </DescriptionListDescription>
     </DescriptionListGroup>
   );
