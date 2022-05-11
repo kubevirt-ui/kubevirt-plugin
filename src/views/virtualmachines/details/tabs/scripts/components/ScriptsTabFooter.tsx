@@ -45,7 +45,7 @@ const ScriptsTabFooter: React.FC<ScriptsTabFooterProps> = ({
   };
 
   return (
-    <Stack className="vm-environment-tab__buttons">
+    <Stack className="vm-scripts-tab__buttons">
       <StackItem>
         {apiError && (
           <Alert

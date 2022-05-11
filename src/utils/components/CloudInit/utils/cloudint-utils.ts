@@ -1,4 +1,5 @@
 import { TFunction } from 'react-i18next';
+import produce from 'immer';
 import validator from 'validator';
 
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
@@ -209,3 +210,35 @@ export const createVmSSHSecret = (vm: V1VirtualMachine, sshKey: string, secretNa
       data: { key: btoa(sshKey) },
     },
   });
+
+export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string): V1VirtualMachine => {
+  return produce(vm, (draftVM) => {
+    const cloudInitNoCloudVolume = draftVM.spec.template.spec.volumes.find(
+      (v) => v.cloudInitNoCloud,
+    );
+    if (cloudInitNoCloudVolume) {
+      draftVM.spec.template.spec.volumes = draftVM.spec.template.spec.volumes.filter(
+        (v) => !v.cloudInitNoCloud,
+      );
+      draftVM.spec.template.spec.volumes.push({
+        name: cloudInitNoCloudVolume.name,
+        cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
+      });
+    }
+
+    draftVM.spec.template.spec.accessCredentials = [
+      {
+        sshPublicKey: {
+          source: {
+            secret: {
+              secretName: secretName || `${draftVM.metadata.name}-ssh-key`,
+            },
+          },
+          propagationMethod: {
+            configDrive: {},
+          },
+        },
+      },
+    ];
+  });
+};

@@ -35,6 +35,13 @@ const CloudInitSSHKeyForm: React.FC<CloudInitSSHKeyFormProps> = ({ id, value, on
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
+  const onInputFileChange = React.useCallback(
+    (newValue: string) => {
+      onChange(newValue.replace('\n', ''));
+    },
+    [onChange],
+  );
+
   return (
     <>
       <FileUpload
@@ -42,7 +49,7 @@ const CloudInitSSHKeyForm: React.FC<CloudInitSSHKeyFormProps> = ({ id, value, on
         className="CloudInitSSHKeyForm-input-field"
         type="text"
         value={value}
-        onChange={onChange}
+        onChange={onInputFileChange}
         onReadStarted={() => setIsLoading(true)}
         onReadFinished={() => setIsLoading(false)}
         isLoading={isLoading}
