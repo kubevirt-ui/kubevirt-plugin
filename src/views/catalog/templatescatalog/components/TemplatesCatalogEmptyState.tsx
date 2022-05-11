@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
@@ -11,9 +12,23 @@ import {
 } from '@patternfly/react-core';
 
 export const TemplatesCatalogEmptyState: React.FC<{
+  bootSourcesLoaded: boolean;
   onClearFilters: () => void;
-}> = React.memo(({ onClearFilters }) => {
+}> = React.memo(({ onClearFilters, bootSourcesLoaded }) => {
   const { t } = useKubevirtTranslation();
+
+  if (!bootSourcesLoaded) {
+    return (
+      <EmptyState variant={EmptyStateVariant.large}>
+        <Title headingLevel="h4" size="lg">
+          {t('Loading Templates with available boot source')}
+        </Title>
+        <EmptyStateBody>
+          <Loading />
+        </EmptyStateBody>
+      </EmptyState>
+    );
+  }
 
   return (
     <EmptyState variant={EmptyStateVariant.small}>
