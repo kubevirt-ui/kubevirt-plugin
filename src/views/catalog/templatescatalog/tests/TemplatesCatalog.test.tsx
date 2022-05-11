@@ -12,8 +12,8 @@ jest.mock('@kubevirt-utils/hooks/useIsAdmin', () => ({
   useIsAdmin: () => false,
 }));
 
-jest.mock('../hooks/useAvailableSourceTemplates', () => ({
-  useAvailableSourceTemplates: () => ({
+jest.mock('../hooks/useTemplatesWithAvailableSource', () => ({
+  useTemplatesWithAvailableSource: () => ({
     templates: [urlTemplateMock, containerTemplateMock],
     loaded: true,
     initialSourcesLoaded: true,

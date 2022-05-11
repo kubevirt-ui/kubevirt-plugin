@@ -103,8 +103,13 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
     }
   }, [allowedResources, isAdmin]);
 
+  const memoizedTemplates = React.useMemo(
+    () => (namespace ? templates.filter((t) => t.metadata.namespace === namespace) : templates),
+    [namespace, templates],
+  );
+
   return {
-    templates: namespace ? templates.filter((t) => t.metadata.namespace === namespace) : templates,
+    templates: memoizedTemplates,
     loaded: isAdmin ? allTemplatesLoaded : allowedTemplatesloaded,
     loadError: isAdmin ? allTemplatesError : allowedTemplatesError,
   };

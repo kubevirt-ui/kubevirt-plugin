@@ -92,3 +92,11 @@ export const getDataSourcePVC = (name: string, ns: string) =>
   getDataSource(name, ns)
     .then((data) => data?.spec?.source?.pvc)
     .then((pvc) => getPVC(pvc.name, pvc.namespace));
+
+/**
+ * a function that returns true if the data source is ready
+ * @param dataSource the data source to check if ready
+ * @returns true if the data source is ready, false otherwise
+ */
+export const isDataSourceReady = (dataSource: V1beta1DataSource): boolean =>
+  dataSource?.status?.conditions?.some((c) => c.type === 'Ready' && c.status === 'True');

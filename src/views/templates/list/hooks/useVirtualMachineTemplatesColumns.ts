@@ -37,7 +37,7 @@ const useVirtualMachineTemplatesColumns = (): TableColumn<K8sResourceCommon>[] =
       id: 'cpu',
     },
     {
-      title: t(''),
+      title: '',
       id: 'actions',
       props: { className: 'dropdown-kebab-pf pf-c-table__action' },
     },
