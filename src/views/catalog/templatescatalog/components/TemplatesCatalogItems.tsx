@@ -12,6 +12,8 @@ import { TemplateTile } from './TemplatesCatalogTile';
 
 type TemplatesCatalogItemsProps = {
   templates: V1Template[];
+  availableTemplatesUID: Set<string>;
+  bootSourcesLoaded: boolean;
   filters: TemplateFilters;
   onTemplateClick: (template: V1Template) => void;
   loaded: boolean;
@@ -20,6 +22,8 @@ type TemplatesCatalogItemsProps = {
 
 export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
   templates,
+  availableTemplatesUID,
+  bootSourcesLoaded,
   filters,
   onTemplateClick,
   loaded,
@@ -47,6 +51,8 @@ export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
             key={template?.metadata?.uid}
             template={template}
             onClick={onTemplateClick}
+            isBootSourceAvailable={availableTemplatesUID.has(template.metadata.uid)}
+            bootSourcesLoaded={bootSourcesLoaded}
           />
         ))}
       </Gallery>

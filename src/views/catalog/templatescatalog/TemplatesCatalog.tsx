@@ -25,11 +25,12 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
-  const { templates, loaded, error } = useTemplatesWithAvailableSource({
-    namespace: filters.namespace,
-    onlyAvailable: filters.onlyAvailable,
-    onlyDefault: filters.onlyDefault,
-  });
+  const { templates, availableTemplatesUID, loaded, bootSourcesLoaded, error } =
+    useTemplatesWithAvailableSource({
+      namespace: filters.namespace,
+      onlyAvailable: filters.onlyAvailable,
+      onlyDefault: filters.onlyDefault,
+    });
 
   const filteredTemplates = React.useMemo(
     () => filterTemplates(templates, filters),
@@ -55,13 +56,18 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
             {filteredTemplates?.length > 0 ? (
               <TemplatesCatalogItems
                 templates={filteredTemplates}
+                availableTemplatesUID={availableTemplatesUID}
+                bootSourcesLoaded={bootSourcesLoaded}
                 filters={filters}
                 onTemplateClick={setSelectedTemplate}
                 loaded={loaded}
                 error={error}
               />
             ) : (
-              <TemplatesCatalogEmptyState onClearFilters={clearAll} />
+              <TemplatesCatalogEmptyState
+                onClearFilters={clearAll}
+                bootSourcesLoaded={bootSourcesLoaded}
+              />
             )}
           </Stack>
         </div>
