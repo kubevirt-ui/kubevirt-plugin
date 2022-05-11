@@ -84,7 +84,7 @@ export const _CloudInitEditor: React.FC<CloudInitEditorProps> = ({ cloudInitVolu
     <div className="yaml-container">
       <div className="cloud-init-editor" ref={yamlEditorRef}>
         {editorHeight && (
-          <ResourceYAMLEditor initialResource={dump(cloudInitData)} onSave={onSaveClick} />
+          <ResourceYAMLEditor initialResource={dump(cloudInitData || '')} onSave={onSaveClick} />
         )}
       </div>
       <Stack hasGutter>

@@ -37,7 +37,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume, showEdit
   );
 
   const { validationSchema, validationStatus, isValid } = useCloudinitValidations();
-  const [yaml, setYAML] = React.useState<string>(cloudinitConfigDataHelper.getUserData());
+  const [yaml, setYAML] = React.useState<string>(cloudinitConfigDataHelper.getUserData() || '');
 
   const yamlAsJS = React.useMemo(() => {
     try {
