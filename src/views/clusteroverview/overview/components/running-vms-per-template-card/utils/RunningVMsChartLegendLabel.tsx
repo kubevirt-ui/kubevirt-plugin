@@ -16,7 +16,7 @@ type RunningVMsChartLegendLabelProps = {
 
 const RunningVMsChartLegendLabel: React.FC<RunningVMsChartLegendLabelProps> = ({ item }) => {
   const iconStyle = { color: item.color };
-  const linkPath = `/k8s/ns/${item.namespace}/virtualmachinetemplates/${item.name}`;
+  const linkPath = `/k8s/ns/${item.namespace}/templates/${item.name}`;
 
   return (
     <>

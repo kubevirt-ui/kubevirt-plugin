@@ -31,7 +31,7 @@ export const getAllowedResourceData = (
   }>,
   model: K8sModel,
 ) => {
-  const bla = Object.entries(resources)
+  const resourcesArray = Object.entries(resources)
     .map(([key, { data, loaded, loadError }]) => {
       if (
         loaded &&
@@ -43,9 +43,11 @@ export const getAllowedResourceData = (
     })
     .filter(Boolean);
 
-  const resourceData = (bla || []).map(({ data }) => data).flat();
-  const resourceLoaded = (bla || []).map(({ loaded }) => loaded)?.every((vmLoaded) => vmLoaded);
-  const resourceLoadError = (bla || [])
+  const resourceData = (resourcesArray || []).map(({ data }) => data).flat();
+  const resourceLoaded = (resourcesArray || [])
+    .map(({ loaded }) => loaded)
+    ?.every((vmLoaded) => vmLoaded);
+  const resourceLoadError = (resourcesArray || [])
     .map(({ loadError }) => loadError)
     ?.filter(Boolean)
     ?.join('');
