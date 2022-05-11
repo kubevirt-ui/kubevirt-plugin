@@ -4,6 +4,11 @@ import { useHistory, useParams } from 'react-router-dom';
 import { WizardTab } from '@catalog/wizard/tabs';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
+import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
+import {
+  getBootloaderLabelFromVM,
+  getBootloaderLabels,
+} from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -101,6 +106,22 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
                   {t('CPU')} {flavor?.cpuCount} | {t('Memory')} {flavor?.memory}
                 </>
               }
+            />
+
+            <WizardDescriptionItem
+              title={t('Boot method')}
+              isEdit
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <FirmwareBootloaderModal
+                    vm={vm}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onSubmit={updateVM}
+                  />
+                ))
+              }
+              description={getBootloaderLabelFromVM(vm, getBootloaderLabels(t))}
             />
 
             <WizardDescriptionItem

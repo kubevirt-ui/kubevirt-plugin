@@ -7,6 +7,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
+import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -32,6 +33,11 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
+import {
+  getBootloaderLabelFromVM,
+  getBootloaderLabels,
+} from '../../../../../../../../utils/components/FirmwareBootloaderModal/utils/utils';
+import { printableVMStatus } from '../../../../../../utils';
 import CPUMemory from '../../CPUMemory/CPUMemory';
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
@@ -44,13 +50,15 @@ type VirtualMachineDetailsLeftGridProps = {
 const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const None = <MutedTextSpan text={t('None')} />;
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
 
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
+  const canUpdateStoppedVM =
+    canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
+  const firmwareBootloader = getBootloaderLabelFromVM(vm, getBootloaderLabels(t));
 
-  const onSubmitCPU = React.useCallback(
+  const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
         model: VirtualMachineModel,
@@ -81,6 +89,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
     });
   };
 
+  const None = <MutedTextSpan text={t('None')} />;
   return (
     <GridItem span={5}>
       <DescriptionList>
@@ -204,8 +213,25 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
                 vm={vm}
                 isOpen={isOpen}
                 onClose={onClose}
-                onSubmit={onSubmitCPU}
+                onSubmit={onSubmit}
                 vmi={vmi}
+              />
+            ))
+          }
+        />
+        <VirtualMachineDescriptionItem
+          descriptionData={
+            !canUpdateStoppedVM ? <MutedTextSpan text={firmwareBootloader} /> : firmwareBootloader
+          }
+          descriptionHeader={t('Boot method')}
+          isEdit={canUpdateStoppedVM}
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <FirmwareBootloaderModal
+                vm={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={onSubmit}
               />
             ))
           }
