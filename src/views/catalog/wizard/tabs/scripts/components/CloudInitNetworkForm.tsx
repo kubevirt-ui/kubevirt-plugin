@@ -188,12 +188,14 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
             <TextInput
               value={
                 Array.isArray(networkToEdit?.subnets?.[0]?.address)
-                  ? networkToEdit?.subnets?.[0]?.address.join(', ')
+                  ? networkToEdit?.subnets?.[0]?.address.join(',')
                   : networkToEdit?.subnets?.[0]?.address
               }
               type="text"
               id={'address'}
-              onChange={(v) => onFieldChange(CloudInitNetworkFormKeys.ADDRESS, v.split(', '))}
+              onChange={(v) =>
+                onFieldChange(CloudInitNetworkFormKeys.ADDRESS, v.replace(/\s/g, '').split(','))
+              }
             />
           </FormGroup>
           <FormGroup
