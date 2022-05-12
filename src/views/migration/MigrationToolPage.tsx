@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
-import { Link, RouteComponentProps, useHistory } from 'react-router-dom';
+import { RouteComponentProps, useHistory } from 'react-router-dom';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -44,7 +44,7 @@ const MigrationToolPage: React.FC<MigrationToolPageProps> = ({
       <Stack hasGutter>
         <StackItem>
           <Title headingLevel="h2" className="co-section-heading">
-            {t('Migration Tool')}
+            {t('Migration Toolkit for Virtualization')}
           </Title>
         </StackItem>
         <StackItem>
@@ -56,26 +56,19 @@ const MigrationToolPage: React.FC<MigrationToolPageProps> = ({
         </StackItem>
         <StackItem className="migration-phrase">
           <Trans t={t} ns="plugin__kubevirt-plugin">
-            The Migration Tool for Virtualization Operator facilitates the migration of multiplce
-            Virtual Machine workloads to Openshift Virtualization.
+            The Migration Toolkit for Virtualization Operator facilitates the migration of multiple
+            virtual machine workloads to OpenShift Virtualization.
           </Trans>{' '}
-          {!mtvLink && (
-            <Trans t={t} ns="plugin__kubevirt-plugin">
-              Clicking the install migration tool button will take you to the{' '}
-              <Link to={'/operatorhub'}>
-                OperatorHub. <ExternalLinkAltIcon />
-              </Link>
-            </Trans>
-          )}
+          {!mtvLink && t('The Operator is installed from the OperatorHub.')}
         </StackItem>
         <StackItem>
           {mtvLink ? (
             <Button isInline variant="primary" href={mtvLink} target="_blank" component="a">
-              {t('Open Migration Tool')}
+              {t('Open MTV')}
             </Button>
           ) : (
             <Button isInline variant="primary" onClick={goToOperatorPage}>
-              {t('Install Migration Tool')}
+              {t('Install MTV')}
             </Button>
           )}
         </StackItem>
