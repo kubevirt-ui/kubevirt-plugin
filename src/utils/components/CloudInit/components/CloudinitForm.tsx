@@ -1,4 +1,5 @@
 import * as React from 'react';
+import produce from 'immer';
 import { dump, load } from 'js-yaml';
 
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
@@ -65,10 +66,13 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
       try {
         const loadedYaml: any = load(data);
 
-        return dump({
-          ...loadedYaml,
-          [field]: value,
-        });
+        if (value) {
+          loadedYaml[field] = value;
+        } else {
+          delete loadedYaml[field];
+        }
+
+        return dump(loadedYaml);
       } catch (e) {
         // eslint-disable-next-line no-console
         console.log(e?.message);
@@ -76,6 +80,30 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
       return data;
     });
   };
+
+  const _updateVM = React.useCallback(
+    (newVM: V1VirtualMachine) => {
+      if (!sshKey) updateVM(newVM);
+
+      const vmChangedCloudType = produce(newVM, (draftVM) => {
+        const cloudInitNoCloudVolume = draftVM.spec.template.spec.volumes?.find(
+          (v) => v.cloudInitNoCloud,
+        );
+        if (cloudInitNoCloudVolume) {
+          draftVM.spec.template.spec.volumes = draftVM.spec.template.spec.volumes.filter(
+            (v) => v.name !== cloudInitNoCloudVolume.name,
+          );
+          draftVM.spec.template.spec.volumes.push({
+            cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
+            name: cloudInitNoCloudVolume.name,
+          });
+        }
+      });
+
+      updateVM(vmChangedCloudType);
+    },
+    [sshKey, updateVM],
+  );
 
   const onUpdateVM = React.useCallback(() => {
     const newVM = produceVMDisks(vm, (vmDraft) => {
@@ -95,18 +123,18 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
       }
 
       const updatedCloudinitVolume = {
-        name: cloudInitDiskName,
         cloudInitNoCloud: {
           ...(cloudInitData || {}),
           ...CloudInitDataHelper.toCloudInitNoCloudUserSource(yaml, isBase64),
         },
+        name: cloudInitDiskName,
       };
 
       const otherVolumes = getVolumes(vmDraft).filter((vol) => !vol.cloudInitNoCloud);
       vmDraft.spec.template.spec.volumes = [...otherVolumes, updatedCloudinitVolume];
     });
-    updateVM(newVM);
-  }, [cloudInitData, cloudInitVolume?.name, isBase64, updateVM, vm, yaml]);
+    _updateVM(newVM);
+  }, [cloudInitData, cloudInitVolume?.name, isBase64, _updateVM, vm, yaml]);
 
   React.useEffect(() => {
     try {
@@ -139,7 +167,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
             </Bullseye>
           }
         >
-          <CloudInitEditor cloudInitVolume={cloudInitVolume} vm={vm} updateVM={updateVM} />
+          <CloudInitEditor cloudInitVolume={cloudInitVolume} vm={vm} updateVM={_updateVM} />
         </React.Suspense>
       ) : (
         <Form>
@@ -191,7 +219,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
               onChange={(v) => onFieldChange(CloudInitDataFormKeys.HOSTNAME, v)}
             />
           </FormGroup>
-          <CloudinitNetworkForm cloudInitVolume={cloudInitVolume} updateVM={updateVM} vm={vm} />{' '}
+          <CloudinitNetworkForm cloudInitVolume={cloudInitVolume} updateVM={_updateVM} vm={vm} />{' '}
         </Form>
       )}
       <Form className="kv-cloudinit--ssh-form">

@@ -52,10 +52,12 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({ cloudInitVolume, showEdit
       try {
         const loadedYaml: any = load(data);
 
-        return dump({
-          ...loadedYaml,
-          [field]: value,
-        });
+        if (value) {
+          loadedYaml[field] = value;
+        } else {
+          delete loadedYaml[field];
+        }
+        return dump(loadedYaml);
       } catch (e) {
         // eslint-disable-next-line no-console
         console.log(e?.message);
