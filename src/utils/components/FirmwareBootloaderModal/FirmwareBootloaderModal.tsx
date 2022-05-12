@@ -63,22 +63,16 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, 'spec.template.spec.domain.firmware.bootloader');
 
-      const ensureSMMPath = () => {
-        ensurePath(vmDraft, 'spec.template.spec.domain.features.smm');
-        vmDraft.spec.template.spec.domain.features.smm = { enabled: true };
-      };
+      ensurePath(vmDraft, 'spec.template.spec.domain.features.smm');
+      vmDraft.spec.template.spec.domain.features.smm = { enabled: true };
 
       switch (selectedFirmwareBootloader) {
         case 'uefi':
-          ensureSMMPath();
-
           vmDraft.spec.template.spec.domain.firmware.bootloader = {
             efi: {},
           };
           break;
         case 'uefiSecure':
-          ensureSMMPath();
-
           vmDraft.spec.template.spec.domain.firmware.bootloader = {
             efi: { secureBoot: true },
           };

@@ -5,10 +5,10 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BootloaderOptionValue } from './constants';
 
 export const getBootloaderFromVM = (vm: V1VirtualMachine): BootloaderOptionValue => {
-  if (!!vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.efi?.secureBoot) {
+  if (vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.efi?.secureBoot) {
     return 'uefiSecure';
   }
-  if (!!vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.efi) {
+  if (vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.efi) {
     return `uefi`;
   }
   return 'bios';
