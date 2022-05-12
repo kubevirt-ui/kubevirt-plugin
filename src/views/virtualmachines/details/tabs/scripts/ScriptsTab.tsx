@@ -1,18 +1,18 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { useImmer } from 'use-immer';
+import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
-import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import Cloudinit from '@kubevirt-utils/components/CloudInit/CloudInit';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { k8sGet, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye } from '@patternfly/react-core';
+import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
+import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { k8sUpdate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { DescriptionList, Grid, GridItem, PageSection } from '@patternfly/react-core';
 
-import ScriptsTabFooter from './components/ScriptsTabFooter';
-import { changeVMSecret } from './utils';
+import VirtualMachineDescriptionItem from '../details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 import './scripts-tab.scss';
 
@@ -24,70 +24,44 @@ type VirtualMachineScriptPageProps = RouteComponentProps<{
 };
 
 const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
-  const [sshKey, setSSHKey] = React.useState('');
-  const initialSSHKey = React.useRef('');
-  const vmSecret = React.useRef<IoK8sApiCoreV1Secret>();
-  const [vmCopy, setVMCopy] = useImmer(vm);
+  const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
+  const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
+  const [canUpdateVM] = useAccessReview(accessReview || {});
+  const canUpdateStoppedVM =
+    canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
 
-  const sshKeyChanged = sshKey !== initialSSHKey.current;
-
-  React.useEffect(() => {
-    if (vm) {
-      setVMCopy(vm);
-
-      const sshKeyCredential =
-        vm.spec?.template?.spec?.accessCredentials?.[0]?.sshPublicKey?.source?.secret?.secretName;
-
-      if (sshKeyCredential)
-        k8sGet<IoK8sApiCoreV1Secret>({
-          model: SecretModel,
-          name: sshKeyCredential,
-          ns: vm.metadata.namespace,
-        }).then((secret) => {
-          const data = atob(secret?.data?.key);
-          initialSSHKey.current = data;
-          setSSHKey(data || '');
-          vmSecret.current = secret;
-        });
-    }
-  }, [setVMCopy, vm]);
-
-  const onSave = async () => {
-    const vmToProcess = vmCopy;
-    if (sshKeyChanged) {
-      const newSecret = await changeVMSecret(vm, vmSecret.current, sshKey);
-
-      vmSecret.current = newSecret;
-      initialSSHKey.current = sshKey;
-    }
-
-    await k8sUpdate({
-      model: VirtualMachineModel,
-      data: vmToProcess,
-    });
-  };
-
-  const onReload = () => {
-    setVMCopy(vm);
-  };
-
-  if (!vm || Object.keys(vmCopy).length === 0)
-    return (
-      <Bullseye>
-        <Loading />
-      </Bullseye>
-    );
-
-  const isSaveDisabled =
-    JSON.stringify(vm?.spec?.template?.spec) === JSON.stringify(vmCopy?.spec?.template?.spec) &&
-    !sshKeyChanged;
+  const onSubmit = React.useCallback(
+    (updatedVM: V1VirtualMachine) =>
+      k8sUpdate({
+        model: VirtualMachineModel,
+        data: updatedVM,
+        ns: updatedVM?.metadata?.namespace,
+        name: updatedVM?.metadata?.name,
+      }),
+    [],
+  );
 
   return (
-    <div className="co-m-pane__body vm-scripts-tab">
-      <Cloudinit vm={vmCopy} updateVM={setVMCopy} loaded sshKey={sshKey} setSSHKey={setSSHKey} />
-
-      <ScriptsTabFooter isSaveDisabled={isSaveDisabled} onSave={onSave} onReload={onReload} />
-    </div>
+    <PageSection>
+      <Grid hasGutter>
+        <GridItem span={5}>
+          <DescriptionList>
+            <VirtualMachineDescriptionItem
+              descriptionData={<CloudInitDescription vm={vm} />}
+              descriptionHeader={t('Cloud-init')}
+              isEdit={canUpdateStoppedVM}
+              showEditOnTitle
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <CloudinitModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
+                ))
+              }
+            />
+          </DescriptionList>
+        </GridItem>
+      </Grid>
+    </PageSection>
   );
 };
 
