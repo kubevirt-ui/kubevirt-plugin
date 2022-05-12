@@ -239,7 +239,7 @@
       "prefixNamespaced": true,
       "id": "virtualization-migration-tool",
       "section": "virtualization",
-      "name": "%plugin__kubevirt-plugin~MigrationTool%",
+      "name": "%plugin__kubevirt-plugin~MTV%",
       "href": "migration-tool"
     }
   },
