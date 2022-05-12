@@ -33,7 +33,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
-import { getBootloaderLabelFromVM } from '../../../../../../../../utils/components/FirmwareBootloaderModal/utils/utils';
+import { getBootloaderTitleFromVM } from '../../../../../../../../utils/components/FirmwareBootloaderModal/utils/utils';
 import { printableVMStatus } from '../../../../../../utils';
 import CPUMemory from '../../CPUMemory/CPUMemory';
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
@@ -53,7 +53,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   const [canUpdateVM] = useAccessReview(accessReview || {});
   const canUpdateStoppedVM =
     canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
-  const firmwareBootloader = getBootloaderLabelFromVM(vm, t);
+  const firmwareBootloader = getBootloaderTitleFromVM(vm, t);
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>

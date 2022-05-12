@@ -5,7 +5,7 @@ import { WizardTab } from '@catalog/wizard/tabs';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
-import { getBootloaderLabelFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
+import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -118,7 +118,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
                   />
                 ))
               }
-              description={getBootloaderLabelFromVM(vm, t)}
+              description={getBootloaderTitleFromVM(vm, t)}
             />
 
             <WizardDescriptionItem

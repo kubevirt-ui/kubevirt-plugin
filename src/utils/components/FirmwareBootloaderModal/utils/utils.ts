@@ -2,30 +2,25 @@ import { TFunction } from 'i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { BootloaderOptionValue, bootloaderOptionValues } from './constants';
-
-export const isUEFI = (vm: V1VirtualMachine): boolean =>
-  !!vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.efi;
-
-export const isUEFISecure = (vm: V1VirtualMachine): boolean =>
-  !!vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.efi?.secureBoot;
+import { BootloaderOptionValue } from './constants';
 
 export const getBootloaderFromVM = (vm: V1VirtualMachine): BootloaderOptionValue => {
-  if (isUEFISecure(vm)) {
-    return bootloaderOptionValues.uefiSecure;
+  if (!!vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.efi?.secureBoot) {
+    return 'uefiSecure';
   }
-  if (isUEFI(vm)) {
-    return bootloaderOptionValues.uefi;
+  if (!!vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.efi) {
+    return `uefi`;
   }
-  return bootloaderOptionValues.bios;
+  return 'bios';
 };
 
-export const getBootloaderLabelFromVM = (vm: V1VirtualMachine, t: TFunction): string => {
-  if (isUEFISecure(vm)) {
-    return t('UEFI (secure)');
-  }
-  if (isUEFI(vm)) {
-    return t('UEFI');
-  }
-  return t('BIOS');
+export const getBootloaderTitleFromVM = (vm: V1VirtualMachine, t: TFunction): string => {
+  const bootloader = getBootloaderFromVM(vm);
+  const titles = {
+    uefiSecure: t('UEFI (secure)'),
+    uefi: t('UEFI '),
+    bios: t('BIOS'),
+  };
+
+  return titles[bootloader];
 };

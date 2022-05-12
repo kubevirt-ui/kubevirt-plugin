@@ -7,7 +7,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Form, FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import { BootloaderLabel, BootloaderOptionValue, bootloaderOptionValues } from './utils/constants';
+import { BootloaderLabel, BootloaderOptionValue } from './utils/constants';
 import { getBootloaderFromVM } from './utils/utils';
 
 type FirmwareBootloaderModalProps = {
@@ -30,19 +30,19 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
 
   const bootloaderOptions: BootloaderLabel[] = [
     {
-      value: bootloaderOptionValues.bios,
+      value: 'bios',
       title: t('BIOS'),
       description: t('Use BIOS when bootloading the guest OS (Default)'),
     },
     {
-      value: bootloaderOptionValues.uefi,
+      value: 'uefi',
       title: t('UEFI'),
       description: t(
         'Use UEFI when bootloading the guest OS. Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true',
       ),
     },
     {
-      value: bootloaderOptionValues.uefiSecure,
+      value: 'uefiSecure',
       title: t('UEFI (secure)'),
       description: t(
         'Use UEFI when bootloading the guest OS. Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true',
@@ -63,28 +63,28 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, 'spec.template.spec.domain.firmware.bootloader');
 
-      const ensureSMM = () => {
+      const ensureSMMPath = () => {
         ensurePath(vmDraft, 'spec.template.spec.domain.features.smm');
         vmDraft.spec.template.spec.domain.features.smm = { enabled: true };
       };
 
-      if (selectedFirmwareBootloader === bootloaderOptionValues.uefiSecure) {
-        // uefi requires SSM
-        ensureSMM();
-        vmDraft.spec.template.spec.domain.firmware.bootloader = {
-          efi: { secureBoot: true },
-        };
-      }
+      switch (selectedFirmwareBootloader) {
+        case 'uefi':
+          ensureSMMPath();
 
-      if (selectedFirmwareBootloader === bootloaderOptionValues.uefi) {
-        // uefi requires SSM
-        ensureSMM();
-        vmDraft.spec.template.spec.domain.firmware.bootloader = {
-          efi: {},
-        };
-      }
-      if (selectedFirmwareBootloader === bootloaderOptionValues.bios) {
-        vmDraft.spec.template.spec.domain.firmware.bootloader = { bios: {} };
+          vmDraft.spec.template.spec.domain.firmware.bootloader = {
+            efi: {},
+          };
+          break;
+        case 'uefiSecure':
+          ensureSMMPath();
+
+          vmDraft.spec.template.spec.domain.firmware.bootloader = {
+            efi: { secureBoot: true },
+          };
+          break;
+        default: // 'bios'
+          vmDraft.spec.template.spec.domain.firmware.bootloader = { bios: {} };
       }
     });
     return updatedVM;
