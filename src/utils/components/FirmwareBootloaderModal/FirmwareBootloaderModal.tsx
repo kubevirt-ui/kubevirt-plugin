@@ -63,20 +63,26 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, 'spec.template.spec.domain.firmware.bootloader');
 
-      const isUEFISecure = selectedFirmwareBootloader === bootloaderOptionValues.uefiSecure;
-      const isUEFI = selectedFirmwareBootloader === bootloaderOptionValues.uefi;
-      const isBIOS = selectedFirmwareBootloader === bootloaderOptionValues.bios;
-
-      if (isUEFISecure || isUEFI) {
-        // uefi requires SSM
+      const ensureSMM = () => {
         ensurePath(vmDraft, 'spec.template.spec.domain.features.smm');
         vmDraft.spec.template.spec.domain.features.smm = { enabled: true };
+      };
 
+      if (selectedFirmwareBootloader === bootloaderOptionValues.uefiSecure) {
+        // uefi requires SSM
+        ensureSMM();
         vmDraft.spec.template.spec.domain.firmware.bootloader = {
-          efi: isUEFISecure ? { secureBoot: true } : {},
+          efi: { secureBoot: true },
         };
       }
-      if (isBIOS) {
+
+      if (selectedFirmwareBootloader === bootloaderOptionValues.uefi) {
+        ensureSMM();
+        vmDraft.spec.template.spec.domain.firmware.bootloader = {
+          efi: {},
+        };
+      }
+      if (selectedFirmwareBootloader === bootloaderOptionValues.bios) {
         vmDraft.spec.template.spec.domain.firmware.bootloader = { bios: {} };
       }
     });
