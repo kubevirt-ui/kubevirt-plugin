@@ -34,42 +34,40 @@ const NoEditableTemplateAlert: React.FC<NoEditableTemplateAlertProps> = ({ templ
   );
 
   return (
-    <>
-      <ListPageBody>
-        <Alert
-          className="alert-margin-top-bottom no-editable-template-alert"
-          isInline
-          variant={AlertVariant.info}
-          title={t('Templates provided by {{providerName}} are not editable.', {
-            providerName,
-          })}
-        >
-          <Trans ns="plugin__kubevirt-plugin">
-            {{ osName }} VM can not be edited because it is provided by {{ providerName }}
-            Virtualization Operator.
-            <br />
-            We suggest you to create a custom Template from this {{ providerName }} template.
-            <div className="margin-top">
-              <Button
-                onClick={() =>
-                  createModal(({ isOpen, onClose }) => (
-                    <CloneTemplateModal
-                      obj={template}
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      onTemplateCloned={goToTemplatePage}
-                    />
-                  ))
-                }
-                variant={ButtonVariant.link}
-              >
-                {t('Create a new custom template')}
-              </Button>
-            </div>
-          </Trans>
-        </Alert>
-      </ListPageBody>
-    </>
+    <ListPageBody>
+      <Alert
+        className="alert-margin-top-bottom no-editable-template-alert"
+        isInline
+        variant={AlertVariant.info}
+        title={t('Templates provided by {{providerName}} are not editable.', {
+          providerName,
+        })}
+      >
+        <Trans ns="plugin__kubevirt-plugin">
+          {{ osName }} VM can not be edited because it is provided by {{ providerName }}
+          Virtualization Operator.
+          <br />
+          We suggest you to create a custom Template from this {{ providerName }} template.
+          <div className="margin-top">
+            <Button
+              onClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <CloneTemplateModal
+                    obj={template}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onTemplateCloned={goToTemplatePage}
+                  />
+                ))
+              }
+              variant={ButtonVariant.link}
+            >
+              {t('Create a new custom template')}
+            </Button>
+          </div>
+        </Trans>
+      </Alert>
+    </ListPageBody>
   );
 };
 

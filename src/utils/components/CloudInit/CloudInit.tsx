@@ -5,8 +5,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { Radio, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
 
-import CloudinitForm from './CloudinitForm';
-import CloudInitInfoHelper from './CloudinitInfoHelper';
+import CloudinitForm from './components/CloudinitForm';
+import CloudInitInfoHelper from './components/CloudinitInfoHelper';
 
 import './cloud-init.scss';
 
@@ -14,13 +14,16 @@ type CloudinitProps = {
   vm: V1VirtualMachine;
   updateVM: (updateVM: V1VirtualMachine) => void;
   loaded: boolean;
+  setSSHKey: (sshKey: string) => void;
+  sshKey: string;
 };
 
-const Cloudinit: React.FC<CloudinitProps> = ({ vm, loaded, updateVM }) => {
+const Cloudinit: React.FC<CloudinitProps> = ({ vm, loaded, updateVM, setSSHKey, sshKey }) => {
   const { t } = useKubevirtTranslation();
   const [showEditor, setShowEditor] = React.useState(false);
-  const cloudInitVolume = getVolumes(vm)?.find(
-    (vol) => !!vol.cloudInitNoCloud || !!vol.cloudInitConfigDrive,
+  const cloudInitVolume = React.useMemo(
+    () => getVolumes(vm)?.find((vol) => !!vol.cloudInitNoCloud || !!vol.cloudInitConfigDrive),
+    [vm],
   );
 
   return (
@@ -61,6 +64,8 @@ const Cloudinit: React.FC<CloudinitProps> = ({ vm, loaded, updateVM }) => {
           cloudInitVolume={cloudInitVolume}
           vm={vm}
           updateVM={updateVM}
+          setSSHKey={setSSHKey}
+          sshKey={sshKey}
         />
       </div>
     </Stack>

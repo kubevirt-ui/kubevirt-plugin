@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { dump, load } from 'js-yaml';
 
-import { ensurePath, produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
+import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
@@ -21,6 +21,8 @@ type CloudinitFormProps = {
   showEditor: boolean;
   updateVM: (newVM: V1VirtualMachine) => void;
   vm: V1VirtualMachine;
+  setSSHKey: (sshKey: string) => void;
+  sshKey: string;
 };
 
 const CloudinitForm: React.FC<CloudinitFormProps> = ({
@@ -28,10 +30,14 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
   showEditor,
   vm,
   updateVM,
+  setSSHKey,
+  sshKey,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { tabsData, updateTabsData } = useWizardVMContext();
-  const cloudInitData = cloudInitVolume?.cloudInitNoCloud || cloudInitVolume?.cloudInitConfigDrive;
+  const cloudInitData = React.useMemo(
+    () => cloudInitVolume?.cloudInitNoCloud || cloudInitVolume?.cloudInitConfigDrive,
+    [cloudInitVolume],
+  );
 
   const [cloudinitConfigUserData, isBase64] = React.useMemo(
     () => CloudInitDataHelper.getUserData(cloudInitData || {}),
@@ -68,13 +74,6 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
         console.log(e?.message);
       }
       return data;
-    });
-  };
-
-  const onSSHKeyChange = (sshKey: string) => {
-    updateTabsData((tabDataDraft) => {
-      ensurePath(tabDataDraft, 'scripts.cloudInit');
-      tabDataDraft.scripts.cloudInit.sshKey = sshKey;
     });
   };
 
@@ -203,8 +202,8 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
         >
           <CloudinitSSHKeyForm
             id={cloudinitIDGenerator(CloudInitDataFormKeys.SSH_AUTHORIZED_KEYS)}
-            value={tabsData?.scripts?.cloudInit?.sshKey || ''}
-            onChange={onSSHKeyChange}
+            value={sshKey}
+            onChange={setSSHKey}
           />
         </FormGroup>
       </Form>
