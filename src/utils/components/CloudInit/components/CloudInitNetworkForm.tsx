@@ -107,11 +107,11 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
       }
 
       const updatedCloudinitVolume = {
-        name: cloudInitDiskName,
         cloudInitNoCloud: {
           ...(cloudInitData || {}),
           ...CloudInitDataHelper.toCloudInitNoCloudNetworkSource(dump(networkData), isBase64),
         },
+        name: cloudInitDiskName,
       };
 
       const otherVolumes = getVolumes(vmDraft).filter((vol) => !vol.cloudInitNoCloud);
@@ -188,7 +188,7 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
           </FormGroup>
           <FormGroup
             label={t('IP Addresses')}
-            fieldId={'address'}
+            fieldId={'ip-address'}
             className="kv-cloudint-advanced-tab--validation-text"
             helperText={t('Use commas to separate between IP addresses')}
           >
@@ -199,7 +199,7 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
                   : networkToEdit?.subnets?.[0]?.address
               }
               type="text"
-              id={'address'}
+              id={'ip-address'}
               onChange={(v) => onFieldChange(CloudInitNetworkFormKeys.ADDRESS, v.split(', '))}
             />
           </FormGroup>
