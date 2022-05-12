@@ -38,14 +38,14 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
       value: bootloaderOptionValues.uefi,
       title: t('UEFI'),
       description: t(
-        'Use UEFI when bootloading the guest OS (unsecure). Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true',
+        'Use UEFI when bootloading the guest OS. Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true',
       ),
     },
     {
       value: bootloaderOptionValues.uefiSecure,
       title: t('UEFI (secure)'),
       description: t(
-        'Use secure UEFI boot requires SMM feature, if the SMM feature is not set, choosing this method will set it to true',
+        'Use UEFI when bootloading the guest OS. Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true',
       ),
     },
   ];
@@ -77,6 +77,7 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
       }
 
       if (selectedFirmwareBootloader === bootloaderOptionValues.uefi) {
+        // uefi requires SSM
         ensureSMM();
         vmDraft.spec.template.spec.domain.firmware.bootloader = {
           efi: {},
