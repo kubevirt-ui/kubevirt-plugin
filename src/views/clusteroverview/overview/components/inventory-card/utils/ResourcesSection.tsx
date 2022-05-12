@@ -9,9 +9,6 @@ import { Stack, StackItem } from '@patternfly/react-core';
 
 import { getAllowedResourceData } from '../../../utils/utils';
 
-// import { InventoryCardResources } from './types';
-import { getOSImagesNS } from './utils';
-
 import './ResourcesSection.scss';
 
 export type ResourcesSectionProps = {
@@ -33,7 +30,6 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources }) => {
     () => getAllowedResourceData(resources, NetworkAttachmentDefinitionModel),
     [resources],
   );
-  const dataSourceNS = React.useMemo(() => getOSImagesNS(), []);
 
   return (
     <Stack hasGutter className="kv-inventory-card__resources--container">
@@ -53,7 +49,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources }) => {
           isLoading={templates?.loaded === false}
           error={!!templates?.loadError}
           dataTest="kv-inventory-card--vm-templates"
-          basePath={`/k8s/ns/${dataSourceNS}/templates`}
+          basePath={`/k8s/all-namespaces/templates`}
         />
       </StackItem>
       <StackItem key={NodeModel.kind}>
