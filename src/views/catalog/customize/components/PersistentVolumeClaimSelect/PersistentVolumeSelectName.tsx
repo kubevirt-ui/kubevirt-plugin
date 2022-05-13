@@ -17,6 +17,7 @@ type PersistentVolumeSelectNameProps = {
   pvcNameSelected: string;
   pvcNames: string[];
   onChange: (newPVCName: string) => void;
+  'data-test-id': string;
 };
 
 export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProps> = ({
@@ -24,6 +25,7 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
   pvcNameSelected,
   pvcNames,
   onChange,
+  'data-test-id': testId,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setSelectOpen] = React.useState(false);
@@ -36,18 +38,16 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
     [onChange],
   );
 
-  const fieldId = 'pvc-name-select';
-
   return (
     <FormGroup
       label={t('Persistent Volume Claim name')}
-      fieldId={fieldId}
-      id={fieldId}
+      fieldId={testId}
+      id={testId}
       isRequired
       className="pvc-selection-formgroup"
     >
       <Select
-        aria-labelledby={fieldId}
+        aria-labelledby={testId}
         isOpen={isOpen}
         onToggle={() => setSelectOpen(!isOpen)}
         onSelect={onSelect}
@@ -59,6 +59,8 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
         validated={!pvcNameSelected ? ValidatedOptions.error : ValidatedOptions.default}
         aria-invalid={!pvcNameSelected ? true : false}
         maxHeight={400}
+        data-test-id={`${testId}-dropdown`}
+        toggleId={`${testId}-toggle`}
       >
         {pvcNames.map((name) => (
           <SelectOption key={name} value={name} />

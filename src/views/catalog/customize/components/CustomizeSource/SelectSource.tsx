@@ -33,6 +33,7 @@ export type SelectSourceProps = {
   sourceOptions: SOURCE_OPTIONS_IDS[];
   httpSourceHelperText?: string;
   registrySourceHelperText?: string;
+  'data-test-id': string;
 };
 
 export const SelectSource: React.FC<SelectSourceProps> = ({
@@ -44,6 +45,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   sourceLabel,
   httpSourceHelperText,
   registrySourceHelperText,
+  'data-test-id': testId,
 }) => {
   const { t } = useKubevirtTranslation();
   const [volumeQuantity, setVolumeQuantity] = React.useState(initialVolumeQuantity);
@@ -106,6 +108,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
         selectedSource={selectedSourceType}
         label={sourceLabel}
         options={sourceOptions}
+        data-test-id={testId}
       />
 
       {selectedSourceType === PVC_SOURCE_NAME && (
@@ -114,18 +117,20 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           projectSelected={pvcNamespaceSelected}
           selectNamespace={selectPVCNamespace}
           selectPVCName={selectPVCName}
+          data-test-id={`${testId}-pvc-select`}
         />
       )}
 
       {selectedSourceType === HTTP_SOURCE_NAME && (
         <FormGroup
           label={t('Image URL')}
-          fieldId={`disk-source-required-${selectedSourceType}`}
+          fieldId={`${testId}-${selectedSourceType}`}
           isRequired
           className="disk-source-form-group"
           helperText={httpSourceHelperText}
         >
           <TextInput
+            id={`${testId}-${selectedSourceType}`}
             value={httpURL}
             type="text"
             onChange={setHTTPURL}
@@ -138,12 +143,13 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
       {[REGISTRY_SOURCE_NAME, CONTAINER_DISK_SOURCE_NAME].includes(selectedSourceType) && (
         <FormGroup
           label={t('Container Image')}
-          fieldId={`disk-source-required-${selectedSourceType}`}
+          fieldId={`${testId}-${selectedSourceType}`}
           isRequired
           className="disk-source-form-group"
           helperText={registrySourceHelperText}
         >
           <TextInput
+            id={`${testId}-${selectedSourceType}`}
             value={containerImage}
             type="text"
             onChange={setContainerImage}
