@@ -66,9 +66,14 @@ export const useTemplatesWithAvailableSource = ({
     );
   }, [availableTemplates, onlyAvailable, onlyDefault, templates]);
 
+  const availableTemplatesUID = React.useMemo(
+    () => new Set(availableTemplates.map((template) => template.metadata.uid)),
+    [availableTemplates],
+  );
+
   return {
     templates: filteredTemplates,
-    availableTemplatesUID: new Set(availableTemplates.map((t) => t.metadata.uid)),
+    availableTemplatesUID,
     loaded,
     bootSourcesLoaded,
     error: loadError,

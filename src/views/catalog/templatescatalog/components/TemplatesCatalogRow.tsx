@@ -15,9 +15,14 @@ import { Button } from '@patternfly/react-core';
 
 import { getTemplateOSIcon } from '../utils/os-icons';
 
+import TemplateRowAvailableSource from './TemplateRowAvailableSource';
+
 export const TemplatesCatalogRow: React.FC<
-  RowProps<V1Template, { onTemplateClick: (template: V1Template) => void }>
-> = React.memo(({ obj, activeColumnIDs, rowData: { onTemplateClick } }) => {
+  RowProps<
+    V1Template,
+    { onTemplateClick: (template: V1Template) => void; availableTemplatesUID: Set<string> }
+  >
+> = React.memo(({ obj, activeColumnIDs, rowData: { onTemplateClick, availableTemplatesUID } }) => {
   const { t } = useKubevirtTranslation();
   const bootSourceType = getTemplateBootSourceType(obj)?.type;
   const { memory, cpuCount } = getTemplateFlavorData(obj);
@@ -36,6 +41,11 @@ export const TemplatesCatalogRow: React.FC<
       </TableData>
       <TableData id="workload" activeColumnIDs={activeColumnIDs}>
         {WORKLOADS_LABELS?.[workload]}
+      </TableData>
+      <TableData id="availability" activeColumnIDs={activeColumnIDs}>
+        <TemplateRowAvailableSource
+          isBootSourceAvailable={availableTemplatesUID.has(obj.metadata.uid)}
+        />
       </TableData>
       <TableData id="cpu" activeColumnIDs={activeColumnIDs}>
         {t('CPU')} {cpuCount} | {t('Memory')} {memory}
