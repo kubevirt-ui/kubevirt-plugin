@@ -104,9 +104,10 @@ export const VirtualMachineActionFactory = {
         !!vm?.status?.conditions?.find(
           ({ type, status }) => type === 'LiveMigratable' && status === 'False',
         ),
-      label: t('Migrate VirtualMachine to Node'),
+      label: t('Migrate'),
       cta: () => migrateVM(vm),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      description: t('Migrate to a different Node'),
     };
   },
   cancelMigration: (
