@@ -10,6 +10,7 @@ import {
   K8sIoApiCoreV1WeightedPodAffinityTerm,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 
 import { AffinityCondition, AffinityLabel, AffinityRowData, AffinityType } from './types';
@@ -135,51 +136,87 @@ export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
     return null;
   }
 
+  debugger;
   const pickRows = (rowType, rowCondition, mapper) =>
     affinityRows
       .filter(({ type, condition }) => type === rowType && condition === rowCondition)
       .map((rowData) => mapper(rowData));
 
-  const affinity = {
-    nodeAffinity: {
-      [AffinityCondition.required]: {
-        nodeSelectorTerms: pickRows(
-          AffinityType.node,
-          AffinityCondition.required,
-          getRequiredNodeTermFromRowData,
-        ),
+  const affinity = {} as K8sIoApiCoreV1Affinity;
+
+  const nodeSelectorTermsRequired = pickRows(
+    AffinityType.node,
+    AffinityCondition.required,
+    getRequiredNodeTermFromRowData,
+  );
+
+  const nodeSelectorTermsPreffered = pickRows(
+    AffinityType.node,
+    AffinityCondition.preferred,
+    getPreferredNodeTermFromRowData,
+  );
+
+  const podAffinityTermsRequired = pickRows(
+    AffinityType.pod,
+    AffinityCondition.required,
+    getRequiredPodTermFromRowData,
+  );
+
+  const podAffinityTermsPreffered = pickRows(
+    AffinityType.pod,
+    AffinityCondition.preferred,
+    getPreferredPodTermFromRowData,
+  );
+
+  const antiPodAffinityTermsRequired = pickRows(
+    AffinityType.podAnti,
+    AffinityCondition.required,
+    getRequiredPodTermFromRowData,
+  );
+
+  const antiPodAffinityTermsPreffered = pickRows(
+    AffinityType.podAnti,
+    AffinityCondition.preferred,
+    getPreferredPodTermFromRowData,
+  );
+
+  if (!isEmpty(nodeSelectorTermsRequired)) {
+    affinity.nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution: {
+        nodeSelectorTerms: nodeSelectorTermsRequired,
       },
-      [AffinityCondition.preferred]: pickRows(
-        AffinityType.node,
-        AffinityCondition.preferred,
-        getPreferredNodeTermFromRowData,
-      ),
-    },
-    podAffinity: {
-      [AffinityCondition.required]: pickRows(
-        AffinityType.pod,
-        AffinityCondition.required,
-        getRequiredPodTermFromRowData,
-      ),
-      [AffinityCondition.preferred]: pickRows(
-        AffinityType.pod,
-        AffinityCondition.preferred,
-        getPreferredPodTermFromRowData,
-      ),
-    },
-    podAntiAffinity: {
-      [AffinityCondition.required]: pickRows(
-        AffinityType.podAnti,
-        AffinityCondition.required,
-        getRequiredPodTermFromRowData,
-      ),
-      [AffinityCondition.preferred]: pickRows(
-        AffinityType.podAnti,
-        AffinityCondition.preferred,
-        getPreferredPodTermFromRowData,
-      ),
-    },
-  };
+    };
+  }
+
+  if (!isEmpty(nodeSelectorTermsPreffered)) {
+    affinity.nodeAffinity = {
+      preferredDuringSchedulingIgnoredDuringExecution: nodeSelectorTermsPreffered,
+    };
+  }
+
+  if (!isEmpty(podAffinityTermsRequired)) {
+    affinity.podAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution: podAffinityTermsRequired,
+    };
+  }
+
+  if (!isEmpty(podAffinityTermsPreffered)) {
+    affinity.podAffinity = {
+      preferredDuringSchedulingIgnoredDuringExecution: podAffinityTermsPreffered,
+    };
+  }
+
+  if (!isEmpty(antiPodAffinityTermsRequired)) {
+    affinity.podAntiAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution: antiPodAffinityTermsRequired,
+    };
+  }
+
+  if (!isEmpty(antiPodAffinityTermsPreffered)) {
+    affinity.podAntiAffinity = {
+      preferredDuringSchedulingIgnoredDuringExecution: antiPodAffinityTermsPreffered,
+    };
+  }
 
   return affinity;
 };
