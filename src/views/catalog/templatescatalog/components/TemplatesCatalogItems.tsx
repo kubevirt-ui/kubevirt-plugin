@@ -40,7 +40,7 @@ export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
         loadError={error}
         columns={columns}
         Row={TemplatesCatalogRow}
-        rowData={{ onTemplateClick }}
+        rowData={{ onTemplateClick, availableTemplatesUID }}
       />
     </div>
   ) : (

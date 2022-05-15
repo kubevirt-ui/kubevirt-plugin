@@ -21,6 +21,10 @@ const useTemplatesCatalogColumns = (): TableColumn<K8sResourceCommon>[] => {
       id: 'workload',
     },
     {
+      title: t('Boot source'),
+      id: 'availability',
+    },
+    {
       title: t('CPU | Memory'),
       id: 'cpu',
     },
