@@ -113,6 +113,7 @@ export const VirtualMachineActionFactory = {
       label: t('Migrate'),
       cta: () => migrateVM(vm),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      description: t('Migrate to a different Node'),
     };
   },
   cancelMigration: (

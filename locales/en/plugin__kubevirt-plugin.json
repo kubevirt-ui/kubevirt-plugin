@@ -371,6 +371,7 @@
   "Memory used": "Memory used",
   "Metrics are collected by the OpenShift Monitoring Operator.": "Metrics are collected by the OpenShift Monitoring Operator.",
   "Migrate": "Migrate",
+  "Migrate to a different Node": "Migrate to a different Node",
   "Migration Toolkit for Virtualization": "Migration Toolkit for Virtualization",
   "Missing fields in {{kind}} labels": "Missing fields in {{kind}} labels",
   "Missing fields in Node fields": "Missing fields in Node fields",
