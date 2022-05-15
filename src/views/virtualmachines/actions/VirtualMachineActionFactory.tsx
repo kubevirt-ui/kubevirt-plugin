@@ -59,7 +59,7 @@ export const VirtualMachineActionFactory = {
   stop: (vm: V1VirtualMachine, t: TFunction): Action => {
     return {
       id: 'vm-action-stop',
-      disabled: [Starting, Stopping, Terminating, Stopped, Paused, Unknown].includes(
+      disabled: [Stopping, Terminating, Stopped, Paused, Unknown].includes(
         vm?.status?.printableStatus,
       ),
       label: t('Stop'),
@@ -70,15 +70,9 @@ export const VirtualMachineActionFactory = {
   restart: (vm: V1VirtualMachine, t: TFunction): Action => {
     return {
       id: 'vm-action-restart',
-      disabled: [
-        Starting,
-        Stopping,
-        Terminating,
-        Provisioning,
-        Migrating,
-        Stopped,
-        Unknown,
-      ].includes(vm?.status?.printableStatus),
+      disabled: [Stopping, Terminating, Provisioning, Migrating, Stopped, Unknown].includes(
+        vm?.status?.printableStatus,
+      ),
       label: t('Restart'),
       cta: () => restartVM(vm),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
