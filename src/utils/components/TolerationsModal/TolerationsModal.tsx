@@ -62,7 +62,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
         (toleration) => {
           return {
             ...toleration,
-            operator: toleration?.value ? Operator.Equals : Operator.Exists,
+            operator: toleration?.value ? 'Equal' : Operator.Exists,
           };
         },
       );
