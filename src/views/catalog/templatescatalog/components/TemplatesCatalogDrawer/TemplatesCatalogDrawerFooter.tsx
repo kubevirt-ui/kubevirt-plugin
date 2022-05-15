@@ -33,7 +33,7 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
 }) => {
   const { t } = useKubevirtTranslation();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVmTemplateSource(template);
-  const [processedTemplate, processedTemplateLoaded] = useProcessedTemplate(template);
+  const [processedTemplate, processedTemplateLoaded] = useProcessedTemplate(template, namespace);
 
   const canQuickCreate = !!processedTemplate && isBootSourceAvailable;
   const loaded = bootSourceLoaded && processedTemplateLoaded;

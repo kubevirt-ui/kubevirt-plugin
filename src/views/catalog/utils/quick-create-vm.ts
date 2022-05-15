@@ -11,6 +11,7 @@ export const quickCreateVM = (
   k8sCreate<V1Template>({
     model: ProcessedTemplatesModel,
     data: template,
+    ns: namespace,
     queryParams: {
       dryRun: 'All',
     },

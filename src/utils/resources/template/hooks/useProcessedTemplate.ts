@@ -6,9 +6,13 @@ import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 /**
  * A Hook that processes a given template and returns the processed template.
  * @param {V1Template} template V1Template to process
+ * @param {string} namespace Namespace to process the template in
  * @returns the processed template.
  */
-export const useProcessedTemplate = (template: V1Template): [V1Template, boolean, any] => {
+export const useProcessedTemplate = (
+  template: V1Template,
+  namespace: string,
+): [V1Template, boolean, any] => {
   const [processedTemplate, setProcessedTemplate] = React.useState<V1Template | undefined>(
     undefined,
   );
@@ -22,6 +26,7 @@ export const useProcessedTemplate = (template: V1Template): [V1Template, boolean
       k8sCreate<V1Template>({
         model: ProcessedTemplatesModel,
         data: template,
+        ns: namespace,
         queryParams: {
           dryRun: 'All',
         },
@@ -36,7 +41,7 @@ export const useProcessedTemplate = (template: V1Template): [V1Template, boolean
           setError(err);
         });
     }
-  }, [template]);
+  }, [template, namespace]);
 
   return [processedTemplate, loaded, error];
 };
