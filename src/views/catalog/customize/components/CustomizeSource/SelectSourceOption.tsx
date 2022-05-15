@@ -94,6 +94,7 @@ type SelectSourceOptionProps = {
   onSelectSource: (selection: SOURCE_OPTIONS_IDS) => void;
   selectedSource: SOURCE_OPTIONS_IDS;
   options: SOURCE_OPTIONS_IDS[];
+  'data-test-id': string;
 };
 
 const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
@@ -101,6 +102,7 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
   onSelectSource,
   selectedSource,
   options,
+  'data-test-id': testId,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { ns } = useParams<{ ns: string }>();
@@ -118,11 +120,13 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
   return (
     <FormGroup
       label={label}
-      fieldId="disk-source-required-disk"
+      fieldId={testId}
       isRequired
       className="disk-source-form-group select-source-option"
     >
       <Select
+        toggleId={`${testId}-toggle`}
+        id={testId}
         isOpen={isOpen}
         onToggle={setIsOpen}
         onSelect={onSelect}

@@ -33,6 +33,7 @@ describe('PersistentVolumeClaimSelect tests', () => {
         projectSelected={undefined}
         selectPVCName={onNameSelected}
         selectNamespace={onNamespaceSelected}
+        data-test-id="pvc-select"
       />,
     );
 
@@ -54,6 +55,7 @@ describe('PersistentVolumeClaimSelect tests', () => {
         projectSelected={namespace}
         selectPVCName={onNameSelected}
         selectNamespace={onNamespaceSelected}
+        data-test-id="pvc-select"
       />,
     );
 

@@ -12,6 +12,7 @@ type PersistentVolumeClaimSelectProps = {
   projectSelected: string;
   selectNamespace: (namespace: string) => void;
   selectPVCName: (pvcName: string) => void;
+  'data-test-id': string;
 };
 
 export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectProps> = ({
@@ -19,6 +20,7 @@ export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectPr
   projectSelected,
   selectPVCName,
   selectNamespace,
+  'data-test-id': testId,
 }) => {
   const { projectsNames, filteredPVCNames, loaded } = useProjectsAndPVCs(projectSelected);
 
@@ -45,12 +47,14 @@ export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectPr
         projectsName={projectsNames}
         selectedProject={projectSelected}
         onChange={onSelectProject}
+        data-test-id={`${testId}-project-select`}
       />
       <PersistentVolumeSelectName
         onChange={onPVCSelected}
         pvcNameSelected={pvcNameSelected}
         pvcNames={filteredPVCNames}
         isDisabled={!projectSelected}
+        data-test-id={`${testId}-pvc-name-select`}
       />
     </div>
   );

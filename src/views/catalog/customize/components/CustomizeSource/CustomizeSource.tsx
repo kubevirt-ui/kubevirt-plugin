@@ -3,6 +3,7 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateOS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { Checkbox, Divider, FormGroup } from '@patternfly/react-core';
 
 import BootCDCheckbox from './BootCDCheckboxLabel';
@@ -48,6 +49,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
   template,
 }) => {
   const { t } = useKubevirtTranslation();
+  const isWindowTemplate = getTemplateOS(template) === OS_NAME_TYPES.windows;
 
   const onCDCheckboxChange = React.useCallback(() => {
     if (cdSource) setCDSource(undefined);
@@ -69,13 +71,14 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
           onSourceChange={setCDSource}
           sourceLabel={<SelectCDSourceLabel />}
           sourceOptions={[
+            HTTP_SOURCE_NAME,
             PVC_SOURCE_NAME,
             CONTAINER_DISK_SOURCE_NAME,
-            HTTP_SOURCE_NAME,
             UPLOAD_SOURCE_NAME,
           ]}
           httpSourceHelperText={httpSourceHelperText}
           registrySourceHelperText={registrySourceHelperText}
+          data-test-id="cd-boot-source"
         />
       )}
 
@@ -96,16 +99,19 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         sourceLabel={<SelectDiskSourceLabel />}
         httpSourceHelperText={httpSourceHelperText}
         registrySourceHelperText={registrySourceHelperText}
+        data-test-id="disk-boot-source"
       />
 
-      <FormGroup fieldId="customize-cdrom-drivers">
-        <Checkbox
-          isChecked={withDrivers}
-          onChange={setDrivers}
-          label={t('Mount Windows drivers disk')}
-          id="cdrom-drivers"
-        />
-      </FormGroup>
+      {isWindowTemplate && (
+        <FormGroup fieldId="customize-cdrom-drivers">
+          <Checkbox
+            isChecked={withDrivers}
+            onChange={setDrivers}
+            label={t('Mount Windows drivers disk')}
+            id="cdrom-drivers"
+          />
+        </FormGroup>
+      )}
     </div>
   );
 };

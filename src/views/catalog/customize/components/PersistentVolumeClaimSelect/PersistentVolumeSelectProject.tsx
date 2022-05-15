@@ -16,12 +16,14 @@ type PersistentVolumeSelectProjectProps = {
   projectsName: string[];
   selectedProject: string;
   onChange: (newProject: string) => void;
+  'data-test-id': string;
 };
 
 export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProjectProps> = ({
   selectedProject,
   projectsName,
   onChange,
+  'data-test-id': testId,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isNamespacePVCOpen, setNamespaceOpen] = React.useState(false);
@@ -34,18 +36,16 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
     [onChange],
   );
 
-  const fieldId = 'pvc-project-select';
-
   return (
     <FormGroup
       label={t('Persistent Volume Claim project')}
-      fieldId={fieldId}
-      id={fieldId}
+      fieldId={testId}
+      id={testId}
       isRequired
       className="pvc-selection-formgroup"
     >
       <Select
-        aria-labelledby={fieldId}
+        aria-labelledby={testId}
         isOpen={isNamespacePVCOpen}
         onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
         onSelect={onSelect}
@@ -57,6 +57,8 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
         validated={!selectedProject ? ValidatedOptions.error : ValidatedOptions.default}
         aria-invalid={!selectedProject ? true : false}
         maxHeight={400}
+        data-test-id={`${testId}-dropdown`}
+        toggleId={`${testId}-toggle`}
       >
         {projectsName.map((projectName) => (
           <SelectOption key={projectName} value={projectName}>

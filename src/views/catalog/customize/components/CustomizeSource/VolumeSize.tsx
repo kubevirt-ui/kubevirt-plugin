@@ -23,7 +23,7 @@ export const VolumeSize: React.FC<VolumeSizeProps> = ({ quantity, onChange }) =>
   return (
     <FormGroup
       label={t('Disk size')}
-      fieldId={`disk-size-required`}
+      fieldId="disk-size-required"
       isRequired
       className="disk-source-form-group"
       validated={!value ? ValidatedOptions.error : ValidatedOptions.default}
@@ -32,7 +32,13 @@ export const VolumeSize: React.FC<VolumeSizeProps> = ({ quantity, onChange }) =>
     >
       <Flex spaceItems={{ default: 'spaceItemsSm' }}>
         <FlexItem>
-          <TextInput min={1} value={value} type="number" onChange={_onChangeSize} />
+          <TextInput
+            min={1}
+            value={value}
+            type="number"
+            onChange={_onChangeSize}
+            id="disk-size-required"
+          />
         </FlexItem>
         <FlexItem>{quantityUnit}</FlexItem>
       </Flex>
