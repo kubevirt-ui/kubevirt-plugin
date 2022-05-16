@@ -3,7 +3,6 @@ import produce from 'immer';
 import { isCommonVMTemplate } from 'src/views/templates/utils';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import useTemplateDefaultCpuMemory from '@kubevirt-utils/components/CPUMemoryModal/hooks/useTemplateDefaultCpuMemory';
 import {
   getCPUcores,
   getMemorySize,
@@ -37,11 +36,11 @@ type CPUMemoryModalProps = {
 const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
-  const {
-    data: templateDefaultsData,
-    loaded: defaultsLoaded,
-    error: defaultLoadError,
-  } = useTemplateDefaultCpuMemory(vm);
+
+  const defaultMemory = getMemorySize(
+    template?.objects?.[0]?.spec?.template?.spec?.domain?.resources?.requests?.memory,
+  );
+  const defaultCpu = getCPUcores(template?.objects?.[0]);
   const isCommonTemplate = isCommonVMTemplate(template);
   const [updateInProcess, setUpdateInProcess] = React.useState<boolean>(false);
   const [updateError, setUpdateError] = React.useState<string>();
@@ -109,17 +108,11 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
         <Button
           key="default"
           variant={ButtonVariant.secondary}
-          isDisabled={
-            !defaultsLoaded ||
-            !templateDefaultsData?.defaultCpu ||
-            !templateDefaultsData?.defaultMemory ||
-            defaultLoadError
-          }
-          isLoading={!defaultsLoaded}
+          isDisabled={!defaultCpu || !defaultMemory}
           onClick={() => {
-            setCpuCores(templateDefaultsData?.defaultCpu);
-            setMemory(templateDefaultsData?.defaultMemory?.size);
-            setMemoryUnit(templateDefaultsData?.defaultMemory?.unit);
+            setCpuCores(defaultCpu);
+            setMemory(defaultMemory?.size);
+            setMemoryUnit(defaultMemory?.unit);
           }}
         >
           {t('Restore default settings')}

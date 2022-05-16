@@ -22,6 +22,7 @@ import { checkCPUMemoryChanged } from '../PendingChanges/utils/helpers';
 
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
 import { getCPUcores, getMemorySize, memorySizesTypes } from './utils/CpuMemoryUtils';
+import { COMMON_TEMPLATE_DEFAULT_NAMESPACE } from './constants';
 
 import './cpu-memory-modal.scss';
 
@@ -39,7 +40,11 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
     data: templateDefaultsData,
     loaded: defaultsLoaded,
     error: defaultLoadError,
-  } = useTemplateDefaultCpuMemory(vm);
+  } = useTemplateDefaultCpuMemory(
+    vm?.metadata?.labels?.['vm.kubevirt.io/template'],
+    vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'] ||
+      COMMON_TEMPLATE_DEFAULT_NAMESPACE,
+  );
   const [updateInProcess, setUpdateInProcess] = React.useState<boolean>(false);
   const [updateError, setUpdateError] = React.useState<string>();
 
