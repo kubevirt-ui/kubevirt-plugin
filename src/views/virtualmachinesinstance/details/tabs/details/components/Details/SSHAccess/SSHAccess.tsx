@@ -35,14 +35,7 @@ const SSHDetails: React.FC<SSHAccessProps> = ({ vmi, sshService, sshServiceLoade
           iconPosition={'right'}
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
-              <SSHAccessModal
-                name={vmi?.metadata?.name}
-                namespace={vmi?.metadata?.namespace}
-                resouceLabels={vmi?.metadata?.labels}
-                isOpen={isOpen}
-                onClose={onClose}
-                sshService={sshService}
-              />
+              <SSHAccessModal vmi={vmi} isOpen={isOpen} onClose={onClose} sshService={sshService} />
             ))
           }
         ></Button>

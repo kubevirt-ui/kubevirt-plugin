@@ -4,54 +4,42 @@ import { Trans } from 'react-i18next';
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sCreate, k8sDelete, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sDelete, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Checkbox, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
 
 import ExternalLink from '../ExternalLink/ExternalLink';
 import TabModal from '../TabModal/TabModal';
 
 import { NODE_PORTS_LINK } from './constants';
-import { getSSHServiceFromVM } from './utils';
+import { createSSHService } from './utils';
 
 type SSHAccessModalProps = {
-  name: string;
-  namespace: string;
-  resouceLabels: { [key: string]: string };
+  vmi: V1VirtualMachineInstance;
   isOpen: boolean;
   onClose: () => void;
   sshService: IoK8sApiCoreV1Service;
 };
 
-const SSHAccessModal: React.FC<SSHAccessModalProps> = ({
-  name,
-  namespace,
-  resouceLabels,
-  isOpen,
-  onClose,
-  sshService,
-}) => {
+const SSHAccessModal: React.FC<SSHAccessModalProps> = ({ vmi, isOpen, onClose, sshService }) => {
+  const { namespace, name } = vmi?.metadata;
+
   const { t } = useKubevirtTranslation();
   const initiallyEnabled = !!sshService;
   const [isEnabled, setEnabled] = React.useState<boolean>(initiallyEnabled);
 
   const onSubmit = async () => {
-    const serviceResource = getSSHServiceFromVM(name, namespace, resouceLabels);
-
     if (initiallyEnabled === isEnabled) return;
 
     if (isEnabled) {
-      await k8sCreate({
-        model: ServiceModel,
-        data: serviceResource,
-        ns: namespace,
-      });
+      await createSSHService(vmi);
     } else {
       await k8sDelete({
         model: ServiceModel,
-        resource: serviceResource,
+        resource: sshService,
         name: sshService?.metadata?.name,
-        ns: namespace,
+        ns: sshService?.metadata?.namespace,
       });
     }
   };
