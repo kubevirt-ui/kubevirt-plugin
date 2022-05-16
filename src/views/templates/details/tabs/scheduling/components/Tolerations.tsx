@@ -2,33 +2,42 @@ import React from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getTolerations } from 'src/views/templates/utils/selectors';
 
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  Button,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
-  Label,
-  LabelGroup,
   Text,
 } from '@patternfly/react-core';
+import { PencilAltIcon } from '@patternfly/react-icons';
 
-const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ template, editable }) => {
+import TolerationsModal from './TolerationsModal';
+
+const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ template, editable, onSubmit }) => {
+  const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
-  const tolerations = getTolerations(template);
+  const tolerationsCount = t('{{count}} Toleration rules', {
+    count: getTolerations(template)?.length ?? 0,
+  });
+
+  const onEditClick = () =>
+    createModal(({ isOpen, onClose }) => (
+      <TolerationsModal template={template} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
+    ));
 
   return (
     <DescriptionListGroup>
       <DescriptionListTerm>{t('Tolerations')}</DescriptionListTerm>
       <DescriptionListDescription>
-        {/* TODO edit labels */}
-        {tolerations ? (
-          <LabelGroup defaultIsOpen>
-            {Object.entries(tolerations)?.map(([key, value]) => (
-              <Label key={key}>{`${key}=${value}`}</Label>
-            ))}
-          </LabelGroup>
+        {editable ? (
+          <Button type="button" isInline onClick={onEditClick} variant="link">
+            {tolerationsCount}
+            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+          </Button>
         ) : (
-          <Text className={editable ? '' : 'text-muted'}>{t(' 0 Toleration rules')}</Text>
+          <Text className="text-muted">{tolerationsCount}</Text>
         )}
       </DescriptionListDescription>
     </DescriptionListGroup>

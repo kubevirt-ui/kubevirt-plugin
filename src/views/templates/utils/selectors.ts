@@ -6,7 +6,7 @@ import { VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm/utils';
 import { ANNOTATIONS, LABELS } from './constants';
 
 export const getAffinity = (template: V1Template) =>
-  template?.objects[0]?.spec?.template?.spec?.affinity || [];
+  template?.objects[0]?.spec?.template?.spec?.affinity || {};
 
 export const getEvictionStrategy = (template: V1Template): string =>
   template?.objects[0]?.spec?.template?.spec?.evictionStrategy;
