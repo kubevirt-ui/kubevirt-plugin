@@ -15,6 +15,7 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { DescriptionList } from '@patternfly/react-core';
 
+import BootMethod from './BootMethod/BootMethod';
 import CPUMemory from './CPUMemory';
 
 const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template }) => {
@@ -33,6 +34,7 @@ const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template 
       <DescriptionItem title={t('Operating system')} content={getOperatingSystemName(template)} />
       <DescriptionItem title={t('Workload profile')} content={useWorkloadProfile(template)} />
       <CPUMemory template={template} />
+      <BootMethod template={template} />
       <BaseTemplate template={template} />
       <CreatedAt template={template} />
       <Owner template={template} />

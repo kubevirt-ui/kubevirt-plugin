@@ -53,7 +53,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   const [canUpdateVM] = useAccessReview(accessReview || {});
   const canUpdateStoppedVM =
     canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
-  const firmwareBootloader = getBootloaderTitleFromVM(vm, t);
+  const firmwareBootloaderTitle = getBootloaderTitleFromVM(vm, t);
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -218,7 +218,11 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
         />
         <VirtualMachineDescriptionItem
           descriptionData={
-            !canUpdateStoppedVM ? <MutedTextSpan text={firmwareBootloader} /> : firmwareBootloader
+            !canUpdateStoppedVM ? (
+              <MutedTextSpan text={firmwareBootloaderTitle} />
+            ) : (
+              firmwareBootloaderTitle
+            )
           }
           descriptionHeader={t('Boot method')}
           isEdit={canUpdateStoppedVM}
