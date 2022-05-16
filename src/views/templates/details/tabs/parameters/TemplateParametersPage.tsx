@@ -5,7 +5,7 @@ import { useImmer } from 'use-immer';
 import { TemplateModel, TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-import { ActionGroup, Alert, AlertVariant, Button, Divider, Title } from '@patternfly/react-core';
+import { ActionGroup, Alert, AlertVariant, Button, Divider } from '@patternfly/react-core';
 
 import { isCommonVMTemplate } from '../../../utils';
 import NoEditableTemplateAlert from '../NoEditableTemplateAlert';
@@ -70,25 +70,19 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
     <>
       {isEditDisabled && <NoEditableTemplateAlert template={template} />}
       <div className="co-m-pane__body template-parameters-page">
-        <Title headingLevel="h2" className="co-section-heading">
-          {t('Template parameters')}
-        </Title>
-
-        <div>
-          <div className="row">
-            <div className="col-md-7">
-              {parameters.map((parameter, index) => (
-                <>
-                  <ParameterEditor
-                    key={parameter.name}
-                    parameter={parameter}
-                    onChange={onParameterChange}
-                    isEditDisabled={isEditDisabled}
-                  />
-                  {index !== parameters.length - 1 && <Divider />}
-                </>
-              ))}
-            </div>
+        <div className="row">
+          <div className="col-md-7">
+            {parameters.map((parameter, index) => (
+              <>
+                <ParameterEditor
+                  key={parameter.name}
+                  parameter={parameter}
+                  onChange={onParameterChange}
+                  isEditDisabled={isEditDisabled}
+                />
+                {index !== parameters.length - 1 && <Divider />}
+              </>
+            ))}
           </div>
         </div>
         {error && (

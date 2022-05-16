@@ -4,12 +4,13 @@ import TemplateSchedulingLeftGrid from 'src/views/templates/details/tabs/schedul
 import TemplateSchedulingRightGrid from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingRightGrid';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid, GridItem } from '@patternfly/react-core';
 
 import { isCommonVMTemplate } from '../../../utils';
 import NoEditableTemplateAlert from '../NoEditableTemplateAlert';
+
+import './TemplateSchedulingTab.scss';
 
 type TemplateSchedulingTabProps = RouteComponentProps<{
   ns: string;
@@ -19,24 +20,24 @@ type TemplateSchedulingTabProps = RouteComponentProps<{
 };
 
 const TemplateSchedulingTab: React.FC<TemplateSchedulingTabProps> = ({ obj: template }) => {
-  const { t } = useKubevirtTranslation();
   const isEditDisabled = isCommonVMTemplate(template);
 
   return (
     <>
       {isEditDisabled && <NoEditableTemplateAlert template={template} />}
-      <ListPageHeader title={t('Scheduling and resources requirements')}></ListPageHeader>
-      <ListPageBody>
-        <Grid>
-          <GridItem span={5}>
-            <TemplateSchedulingLeftGrid template={template} />
-          </GridItem>
-          <GridItem span={1}></GridItem>
-          <GridItem span={5}>
-            <TemplateSchedulingRightGrid template={template} />
-          </GridItem>
-        </Grid>
-      </ListPageBody>
+      <p className="list-page-body-no-border-top">
+        <ListPageBody>
+          <Grid>
+            <GridItem span={5} className="margin-top-grid-item">
+              <TemplateSchedulingLeftGrid template={template} />
+            </GridItem>
+            <GridItem span={1}></GridItem>
+            <GridItem span={5} className="margin-top-grid-item">
+              <TemplateSchedulingRightGrid template={template} />
+            </GridItem>
+          </Grid>
+        </ListPageBody>
+      </p>
     </>
   );
 };
