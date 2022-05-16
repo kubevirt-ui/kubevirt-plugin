@@ -8,51 +8,42 @@
     margin-left: 0;
     margin-right: 0;
   }
-}
 
-.yaml-controls {
-  margin-top: var(--pf-global--spacer--md);
-}
+  .yaml-editor__buttons {
+    #save-changes {
+      width: 90px;
+      --pf-c-button--after--BorderColor: var(
+        --pf-c-button--m-secondary--after--BorderColor
+      ) !important;
+      color: var(--pf-c-button--m-secondary--Color) !important;
+      background-color: var(--pf-c-button--m-secondary--BackgroundColor) !important;
+    }
 
-element {
-  --pf-c-button--m-secondary--after--BorderColor: transparent;
-  --pf-c-button--after--BorderColor: transparent;
-}
+    #reload-object {
+      --pf-c-button--after--BorderColor: var(
+        --pf-c-button--m-link--disabled--BackgroundColor
+      ) !important;
+      --pf-c-button--disabled--BackgroundColor: var(
+        --pf-c-button--m-link--disabled--BackgroundColor
+      ) !important;
+      color: var(--pf-c-button--m-link--Color) !important;
+      background-color: var(--pf-c-button--m-link--BackgroundColor) !important;
+    }
 
-.yaml-editor__buttons {
-  #save-changes {
-    width: 90px;
-    --pf-c-button--after--BorderColor: var(
-      --pf-c-button--m-secondary--after--BorderColor
-    ) !important;
-    color: var(--pf-c-button--m-secondary--Color) !important;
-    background-color: var(--pf-c-button--m-secondary--BackgroundColor) !important;
-  }
+    #cancel {
+      display: none;
+    }
 
-  #reload-object {
-    --pf-c-button--after--BorderColor: var(
-      --pf-c-button--m-link--disabled--BackgroundColor
-    ) !important;
-    --pf-c-button--disabled--BackgroundColor: var(
-      --pf-c-button--m-link--disabled--BackgroundColor
-    ) !important;
-    color: var(--pf-c-button--m-link--Color) !important;
-    background-color: var(--pf-c-button--m-link--BackgroundColor) !important;
-  }
-
-  #cancel {
-    display: none;
-  }
-
-  // download button
-  .pf-c-button--align-right {
-    --pf-c-button--after--BorderColor: var(
-      --pf-c-button--m-link--disabled--BackgroundColor
-    ) !important;
-    --pf-c-button--disabled--BackgroundColor: var(
-      --pf-c-button--m-link--disabled--BackgroundColor
-    ) !important;
-    color: var(--pf-c-button--m-link--Color) !important;
-    background-color: var(--pf-c-button--m-link--BackgroundColor) !important;
+    // download button
+    .pf-c-button--align-right {
+      --pf-c-button--after--BorderColor: var(
+        --pf-c-button--m-link--disabled--BackgroundColor
+      ) !important;
+      --pf-c-button--disabled--BackgroundColor: var(
+        --pf-c-button--m-link--disabled--BackgroundColor
+      ) !important;
+      color: var(--pf-c-button--m-link--Color) !important;
+      background-color: var(--pf-c-button--m-link--BackgroundColor) !important;
+    }
   }
 }
