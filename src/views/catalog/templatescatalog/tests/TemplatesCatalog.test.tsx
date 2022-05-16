@@ -72,9 +72,9 @@ test('TemplatesCatalog', async () => {
   fireEvent.click(getByText('All Items'));
   expect(getByTestId('url-template')).toBeInTheDocument();
 
-  // switching to default templates, url template should not be in catalog
+  // switching to default templates, url template should still be in catalog as custom template
   fireEvent.click(getByText('Default Templates'));
-  expect(queryByTestId('url-template')).toBeNull();
+  expect(queryByTestId('url-template')).toBeInTheDocument();
 
   // picking RHEL filter, container-template should not be in catalog
   fireEvent.click(getByText('RHEL'));

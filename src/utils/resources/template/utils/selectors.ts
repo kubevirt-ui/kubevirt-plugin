@@ -13,6 +13,8 @@ import {
   TEMPLATE_DATA_SOURCE_NAME_PARAMETER,
   TEMPLATE_DEFAULT_VARIANT_LABEL,
   TEMPLATE_FLAVOR_LABEL,
+  TEMPLATE_TYPE_LABEL,
+  TEMPLATE_TYPE_VM,
   TEMPLATE_WORKLOAD_LABEL,
   WORKLOADS,
 } from './constants';
@@ -30,6 +32,13 @@ export const getTemplateVirtualMachineObject = (template: V1Template): V1Virtual
  */
 export const isDefaultVariantTemplate = (template: V1Template): boolean =>
   template?.metadata?.labels?.[TEMPLATE_DEFAULT_VARIANT_LABEL] === 'true';
+
+/**
+ * returns true if the given template is a custom template
+ * @param {V1Template} template - template
+ */
+export const isCustomTemplate = (template: V1Template): boolean =>
+  template?.metadata?.labels?.[TEMPLATE_TYPE_LABEL] === TEMPLATE_TYPE_VM;
 
 /**
  * A selector that returns the os label name of a given template
