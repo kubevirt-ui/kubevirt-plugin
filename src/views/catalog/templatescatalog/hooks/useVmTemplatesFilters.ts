@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 
 import { CATALOG_FILTERS } from '../utils/consts';
@@ -20,12 +19,11 @@ export const useTemplatesFilters = (): [
   (type: CATALOG_FILTERS, value: string | boolean) => void,
   () => void,
 ] => {
-  const isAdmin = useIsAdmin();
   const { params, appendParam, setParam, deleteParam } = useURLParams();
   const onlyDefaultParam = params.get(CATALOG_FILTERS.ONLY_DEFAULT);
 
   const [filters, setFilters] = React.useState<TemplateFilters>({
-    [CATALOG_FILTERS.ONLY_DEFAULT]: isAdmin,
+    [CATALOG_FILTERS.ONLY_DEFAULT]: true,
     [CATALOG_FILTERS.ONLY_AVAILABLE]: params.get(CATALOG_FILTERS.ONLY_AVAILABLE) === 'true',
     [CATALOG_FILTERS.IS_LIST]: params.get(CATALOG_FILTERS.IS_LIST) === 'true',
     [CATALOG_FILTERS.QUERY]: params.get(CATALOG_FILTERS.QUERY) || '',
@@ -73,7 +71,7 @@ export const useTemplatesFilters = (): [
 
   const clearAll = () => {
     setFilters({
-      [CATALOG_FILTERS.ONLY_DEFAULT]: isAdmin,
+      [CATALOG_FILTERS.ONLY_DEFAULT]: true,
       [CATALOG_FILTERS.ONLY_AVAILABLE]: false,
       [CATALOG_FILTERS.IS_LIST]: filters.isList,
       [CATALOG_FILTERS.QUERY]: '',
@@ -90,10 +88,10 @@ export const useTemplatesFilters = (): [
     if (onlyDefaultParam) {
       updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, onlyDefaultParam === 'true');
     } else {
-      updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, isAdmin);
+      updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin, onlyDefaultParam]);
+  }, [onlyDefaultParam]);
 
   return [filters, onFilterChange, clearAll];
 };

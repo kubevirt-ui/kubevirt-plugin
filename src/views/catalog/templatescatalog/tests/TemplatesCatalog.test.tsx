@@ -64,11 +64,12 @@ test('TemplatesCatalog', async () => {
     />,
   );
 
-  // non admin user, should see all templates by default
+  // non admin user, should see default templates by default
   // default variant template, should be in catalog
   expect(getByTestId('container-template')).toBeInTheDocument();
 
   // not default variant template, should be in catalog
+  fireEvent.click(getByText('All Items'));
   expect(getByTestId('url-template')).toBeInTheDocument();
 
   // switching to default templates, url template should not be in catalog
