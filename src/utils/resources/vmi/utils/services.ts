@@ -6,6 +6,9 @@ export const getServicesForVmi = (
   vmi: V1VirtualMachineInstance,
 ): IoK8sApiCoreV1Service[] => {
   const vmLabels = vmi?.metadata?.labels;
+
+  if (!vmLabels) return [];
+
   return services?.filter((service) => {
     const selectors = service?.spec?.selector || {};
     return Object?.keys(selectors)?.every((key) => vmLabels?.[key] === selectors?.[key]);

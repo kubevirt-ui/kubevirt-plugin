@@ -109,14 +109,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           showEditOnTitle
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
-              <SSHAccessModal
-                name={vm?.metadata?.name}
-                namespace={vm?.metadata?.namespace}
-                resouceLabels={vm?.metadata?.labels}
-                isOpen={isOpen}
-                onClose={onClose}
-                sshService={sshService}
-              />
+              <SSHAccessModal vmi={vmi} isOpen={isOpen} onClose={onClose} sshService={sshService} />
             ))
           }
           descriptionHeader={t('SSH Access')}
