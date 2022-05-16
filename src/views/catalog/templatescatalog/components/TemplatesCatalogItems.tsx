@@ -17,7 +17,6 @@ type TemplatesCatalogItemsProps = {
   filters: TemplateFilters;
   onTemplateClick: (template: V1Template) => void;
   loaded: boolean;
-  error: any;
 };
 
 export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
@@ -27,7 +26,6 @@ export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
   filters,
   onTemplateClick,
   loaded,
-  error,
 }) => {
   const columns = useTemplatesCatalogColumns();
 
@@ -37,7 +35,7 @@ export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
         data={templates}
         unfilteredData={templates}
         loaded={loaded}
-        loadError={error}
+        loadError={null}
         columns={columns}
         Row={TemplatesCatalogRow}
         rowData={{ onTemplateClick, availableTemplatesUID }}

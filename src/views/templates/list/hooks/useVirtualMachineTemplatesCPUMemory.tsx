@@ -24,15 +24,15 @@ const toIECUnit = (unit: BinaryUnit | string): string => {
 };
 
 const stringValueUnitSplit = (combinedVal: string): [value: string, unit: string] => {
-  const index = combinedVal.search(/([a-zA-Z]+)/g);
+  const index = combinedVal?.search(/([a-zA-Z]+)/g);
   let value = '';
   let unit = '';
 
   if (index === -1) {
     value = combinedVal;
   } else {
-    value = combinedVal.slice(0, index);
-    unit = combinedVal.slice(index);
+    value = combinedVal?.slice(0, index);
+    unit = combinedVal?.slice(index);
   }
 
   return [value, toIECUnit(unit)];
@@ -53,13 +53,13 @@ export const useVirtualMachineTemplatesCPUMemory = (
           bodyContent={
             <ul>
               <li>
-                {t('Sockets')}: {cpu.sockets}
+                {t('Sockets')}: {cpu?.sockets}
               </li>
               <li>
-                {t('Cores')}: {cpu.cores}
+                {t('Cores')}: {cpu?.cores}
               </li>
               <li>
-                {t('Threads')}: {cpu.threads}
+                {t('Threads')}: {cpu?.threads}
               </li>
               <li>
                 {t('Memory')}: {memory}
@@ -74,6 +74,6 @@ export const useVirtualMachineTemplatesCPUMemory = (
     );
   } else {
     const [value, readableUnit] = stringValueUnitSplit(memory);
-    return `CPU ${cpu.cores} | ${t('Memory')} ${value} ${readableUnit}`;
+    return `CPU ${cpu?.cores} | ${t('Memory')} ${value} ${readableUnit}`;
   }
 };

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
-import { useTemplatesWithAvailableSource } from '@catalog/templatescatalog/hooks/useTemplatesWithAvailableSource';
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -16,6 +15,7 @@ import { Stack, StackItem } from '@patternfly/react-core';
 
 import VirtualMachineTemplatesRow from './components/VirtualMachineTemplatesRow';
 import VirtualMachineTemplateSupport from './components/VirtualMachineTemplateSupport';
+import { useTemplatesWithAvailableSource } from './hooks/useTemplatesWithAvailableSource';
 import useVirtualMachineTemplatesColumns from './hooks/useVirtualMachineTemplatesColumns';
 import useVirtualMachineTemplatesFilters from './hooks/useVirtualMachineTemplatesFilters';
 
@@ -25,7 +25,7 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
   },
 }) => {
   const { t } = useKubevirtTranslation();
-  const { templates, availableTemplatesUID, loaded, bootSourcesLoaded, error } =
+  const { templates, loaded, error, availableTemplatesUID, bootSourcesLoaded } =
     useTemplatesWithAvailableSource({
       namespace,
       onlyAvailable: false,
