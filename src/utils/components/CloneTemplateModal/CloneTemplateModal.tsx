@@ -4,7 +4,13 @@ import produce from 'immer';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { TEMPLATE_TYPE_VM } from '@kubevirt-utils/resources/template';
+import {
+  ANNOTATIONS,
+  LABEL_USED_TEMPLATE_NAME,
+  LABEL_USED_TEMPLATE_NAMESPACE,
+  TEMPLATE_TYPE_VM,
+  TEMPLATE_VERSION_LABEL,
+} from '@kubevirt-utils/resources/template';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Form, FormGroup, TextInput } from '@patternfly/react-core';
@@ -38,31 +44,41 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
   const [templateProvider, setTemplateProvider] = React.useState('');
   const [selectedProject, setSelectedProject] = React.useState(obj?.metadata?.namespace);
   const [isCloneStorageEnabled, setCloneStorage] = React.useState(false);
+  const [templateDisplayName, setTemplateDisplayName] = React.useState(
+    obj?.metadata?.annotations?.[ANNOTATIONS.displayName] || '',
+  );
 
   const onSubmit = async () => {
-    let templateToCreate: V1Template = {
-      ...obj,
-      metadata: {
+    let templateToCreate: V1Template = produce(obj, (draftTemplate) => {
+      draftTemplate.metadata = {
         annotations: {
-          ...obj?.metadata?.annotations,
+          ...draftTemplate?.metadata?.annotations,
           'template.kubevirt.io/provider': templateProvider,
+          [ANNOTATIONS.displayName]: templateDisplayName,
         },
-        labels: { ...obj?.metadata?.labels, 'template.kubevirt.io/type': TEMPLATE_TYPE_VM },
+        labels: {
+          ...draftTemplate?.metadata?.labels,
+          'template.kubevirt.io/type': TEMPLATE_TYPE_VM,
+        },
         name: templateName,
         namespace: selectedProject,
-      },
-    };
+      };
+
+      draftTemplate.objects[0].metadata.labels[LABEL_USED_TEMPLATE_NAME] = templateName;
+      draftTemplate.objects[0].metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedProject;
+      delete draftTemplate.objects[0].metadata.labels[TEMPLATE_VERSION_LABEL];
+    });
 
     if (isCloneStorageEnabled) {
       await cloneStorage(obj, pvcName, selectedProject);
 
       templateToCreate = produce(templateToCreate, (draftTemplate) => {
+        delete draftTemplate.objects[0].spec.dataVolumeTemplates[0].spec.sourceRef;
         draftTemplate.objects[0].spec.dataVolumeTemplates[0].spec.source.pvc.name = pvcName;
         draftTemplate.objects[0].spec.dataVolumeTemplates[0].spec.source.pvc.namespace =
           selectedProject;
       });
     }
-
     const clonedTemplate = await k8sCreate<V1Template>({
       model: TemplateModel,
       data: templateToCreate,
@@ -96,6 +112,14 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
               selectedProject={selectedProject}
               setSelectedProject={setSelectedProject}
               id="namespace"
+            />
+          </FormGroup>
+          <FormGroup label={t('Template display name')} fieldId="display-name" isRequired>
+            <TextInput
+              id="display-name"
+              type="text"
+              value={templateDisplayName}
+              onChange={setTemplateDisplayName}
             />
           </FormGroup>
 

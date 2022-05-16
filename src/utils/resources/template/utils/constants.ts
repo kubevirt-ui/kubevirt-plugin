@@ -10,6 +10,7 @@ export const TEMPLATE_DATA_SOURCE_NAME_PARAMETER = 'DATA_SOURCE_NAME';
 export const TEMPLATE_DATA_SOURCE_NAMESPACE_PARAMETER = 'DATA_SOURCE_NAMESPACE';
 export const LABEL_USED_TEMPLATE_NAME = 'vm.kubevirt.io/template';
 export const LABEL_USED_TEMPLATE_NAMESPACE = 'vm.kubevirt.io/template.namespace';
+export const TEMPLATE_VERSION_LABEL = 'vm.kubevirt.io/template.version';
 
 export enum OS_NAME_TYPES {
   rhel = 'rhel',
