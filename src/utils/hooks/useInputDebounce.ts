@@ -14,15 +14,17 @@ export const useInputDebounce = ({
   delay,
   onChange,
   updateURLParam,
+  initialValue,
 }: {
   delay: number;
   onChange?: (value: string) => void;
   updateURLParam?: string;
+  initialValue?: string;
 }) => {
   let typingTimer: null | ReturnType<typeof setTimeout> = null;
 
   const { params, setParam } = useURLParams();
-  const [value, setValue] = React.useState<string>('');
+  const [value, setValue] = React.useState<string>();
   const param = params.get(updateURLParam);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -57,6 +59,13 @@ export const useInputDebounce = ({
       inputRef.current.value = param;
     }
   }, [param, updateURLParam]);
+
+  React.useEffect(() => {
+    if (initialValue && !value) {
+      setValue(initialValue);
+      inputRef.current.value = initialValue;
+    }
+  }, [initialValue, value]);
 
   return {
     inputRef,

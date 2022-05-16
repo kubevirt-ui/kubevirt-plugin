@@ -5,7 +5,7 @@ import {
   addSecretToVM,
   createVmSSHSecret,
   removeSecretToVM,
-} from '@kubevirt-utils/components/CloudInit/utils/cloudint-utils';
+} from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 

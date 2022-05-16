@@ -1,8 +1,8 @@
 import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
-import { sysprepDisk, sysprepVolume } from '@catalog/wizard/tabs/scripts/utils/sysprep-utils';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 
 export const ensurePath = <T extends object>(data: T, paths: string | string[]) => {
   let current = data;

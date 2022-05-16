@@ -1,52 +1,134 @@
 import * as React from 'react';
+import { Trans } from 'react-i18next';
 
+import { ensurePath } from '@catalog/utils/WizardVMContext';
+import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import { WizardTab } from '@catalog/wizard/tabs';
+import { AuthorizedSSHKeyModal } from '@kubevirt-utils/components/AuthorizedSSHKeyModal/AuthorizedSSHKeyModal';
+import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
+import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
-import { ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
+import {
+  DescriptionList,
+  Divider,
+  Grid,
+  GridItem,
+  Stack,
+  Text,
+  TextVariants,
+} from '@patternfly/react-core';
 
-import Cloudinit from './components/CloudInit';
-import Sysprep from './components/sysprep/Sysprep';
-import { CLOUD, SYSPREP } from './utils/consts';
+import { SysprepDescription } from './components/SysprepDescription';
 
 import './WizardScriptsTab.scss';
 
-const WizardScriptsTab: WizardTab = ({ vm, loaded, updateVM, tabsData }) => {
+const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData }) => {
   const { t } = useKubevirtTranslation();
-  const isWindows = tabsData?.overview?.templateMetadata?.osType === OS_NAME_TYPES.windows;
-  const [expanded, setExpanded] = React.useState<string>(isWindows ? SYSPREP : CLOUD);
+  const { createModal } = useModal();
 
-  const onToggle = (value: string) =>
-    setExpanded((expandedValue) => (expandedValue === value ? '' : value));
+  const sshKey = tabsData?.scripts?.cloudInit?.sshKey;
+  const unattend = tabsData?.scripts?.sysprep?.unattended;
+  const autoUnattend = tabsData?.scripts?.sysprep?.autounattend;
+
+  const onUnattendChange = (value: string) =>
+    updateTabsData((tabsDraft) => {
+      ensurePath(tabsDraft, 'scripts.sysprep');
+      if (value) {
+        tabsDraft.scripts.sysprep.unattended = value;
+      } else {
+        delete tabsDraft.scripts.sysprep.unattended;
+      }
+    });
+
+  const onAutoUnattendChange = (value: string) =>
+    updateTabsData((tabsDraft) => {
+      ensurePath(tabsDraft, 'scripts.sysprep');
+      if (value) {
+        tabsDraft.scripts.sysprep.autounattend = value;
+      } else {
+        delete tabsDraft.scripts.sysprep.autounattend;
+      }
+    });
+
+  const onSSHChange = (value: string) =>
+    updateTabsData((tabsDraft) => {
+      ensurePath(tabsDraft, 'scripts.cloudInit');
+
+      if (value) {
+        tabsDraft.scripts.cloudInit.sshKey = value;
+      } else {
+        delete tabsDraft.scripts.cloudInit.sshKey;
+      }
+    });
 
   return (
     <div className="co-m-pane__body">
-      <Stack hasGutter>
-        <StackItem>
-          <ExpandableSection
-            className="wizard-scripts-tab-expanable-section"
-            toggleText={t('Cloud-init')}
-            onToggle={() => onToggle(CLOUD)}
-            isExpanded={expanded === CLOUD}
-            id={CLOUD}
-            isIndented
-          >
-            <Cloudinit vm={vm} updateVM={updateVM} loaded={loaded} />
-          </ExpandableSection>
-        </StackItem>
-        <StackItem>
-          <ExpandableSection
-            className="wizard-scripts-tab-expanable-section"
-            toggleText={t('Sysprep')}
-            onToggle={() => onToggle(SYSPREP)}
-            isExpanded={expanded === SYSPREP}
-            id={SYSPREP}
-            isIndented
-          >
-            <Sysprep />
-          </ExpandableSection>
-        </StackItem>
-      </Stack>
+      <Grid hasGutter>
+        <GridItem span={5} rowSpan={4}>
+          <DescriptionList>
+            <WizardDescriptionItem
+              testId="wizard-cloudinit"
+              title={t('Cloud-init')}
+              description={<CloudInitDescription vm={vm} />}
+              isEdit
+              showEditOnTitle
+              onEditClick={() =>
+                createModal((modalProps) => (
+                  <CloudinitModal {...modalProps} vm={vm} onSubmit={updateVM} />
+                ))
+              }
+            />
+            <Divider />
+            <WizardDescriptionItem
+              testId="wizard-sshkey"
+              title={t('Authorized SSH Key')}
+              isEdit
+              showEditOnTitle
+              description={
+                <Stack hasGutter>
+                  <div data-test="ssh-popover">
+                    <Trans t={t} ns="plugin__kubevirt-plugin">
+                      <Text component={TextVariants.p}>Store the key in a project secret.</Text>
+                      <Text component={TextVariants.p}>
+                        The key will be stored after the machine is created
+                      </Text>
+                    </Trans>
+                  </div>
+                  <span>{sshKey ? t('Available') : t('Not available')}</span>
+                </Stack>
+              }
+              onEditClick={() =>
+                createModal((modalProps) => (
+                  <AuthorizedSSHKeyModal {...modalProps} sshKey={sshKey} onChange={onSSHChange} />
+                ))
+              }
+            />
+            <Divider />
+            <WizardDescriptionItem
+              testId="wizard-sysprep"
+              title={t('Sysprep')}
+              description={
+                <SysprepDescription hasAutoUnattend={!!autoUnattend} hasUnattend={!!unattend} />
+              }
+              isEdit
+              showEditOnTitle
+              onEditClick={() =>
+                createModal((modalProps) => (
+                  <SysprepModal
+                    {...modalProps}
+                    unattend={unattend}
+                    autoUnattend={autoUnattend}
+                    onAutoUnattendChange={onAutoUnattendChange}
+                    onUnattendChange={onUnattendChange}
+                  />
+                ))
+              }
+            />
+          </DescriptionList>
+        </GridItem>
+      </Grid>
     </div>
   );
 };

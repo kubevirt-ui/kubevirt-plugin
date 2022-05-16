@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import produce from 'immer';
 
-import { createVmSSHSecret } from '@catalog/wizard/tabs/scripts/utils/cloudint-utils';
-import { createSysprepConfigMap } from '@catalog/wizard/tabs/scripts/utils/sysprep-utils';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { createVmSSHSecret } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { createSysprepConfigMap } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { produceVMSSHKey, produceVMSysprep, useWizardVMContext } from './WizardVMContext';
