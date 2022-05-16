@@ -3,6 +3,7 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
   BOOT_SOURCE,
+  isCustomTemplate,
   isDefaultVariantTemplate,
   useVmTemplates,
 } from '@kubevirt-utils/resources/template';
@@ -62,7 +63,7 @@ export const useTemplatesWithAvailableSource = ({
 
   const filteredTemplates = React.useMemo(() => {
     return (onlyAvailable ? availableTemplates : templates).filter((template) =>
-      onlyDefault ? isDefaultVariantTemplate(template) : true,
+      onlyDefault ? isDefaultVariantTemplate(template) || isCustomTemplate(template) : true,
     );
   }, [availableTemplates, onlyAvailable, onlyDefault, templates]);
 
