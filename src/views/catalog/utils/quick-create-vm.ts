@@ -1,6 +1,10 @@
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  LABEL_USED_TEMPLATE_NAME,
+  LABEL_USED_TEMPLATE_NAMESPACE,
+} from '@kubevirt-utils/resources/template';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -20,6 +24,9 @@ export const quickCreateVM = (
     vm.metadata.namespace = namespace;
     vm.metadata.name = name;
     vm.spec.template.spec.hostname = name;
+
+    vm.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
+    vm.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = processedTemplate.metadata.namespace;
 
     if (startVM) {
       vm.spec.running = true;

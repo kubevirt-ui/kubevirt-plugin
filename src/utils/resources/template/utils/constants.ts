@@ -9,6 +9,7 @@ export const TEMPLATE_BASE_IMAGE_NAMESPACE_PARAMETER = 'SRC_PVC_NAMESPACE';
 export const TEMPLATE_DATA_SOURCE_NAME_PARAMETER = 'DATA_SOURCE_NAME';
 export const TEMPLATE_DATA_SOURCE_NAMESPACE_PARAMETER = 'DATA_SOURCE_NAMESPACE';
 export const LABEL_USED_TEMPLATE_NAME = 'vm.kubevirt.io/template';
+export const LABEL_USED_TEMPLATE_NAMESPACE = 'vm.kubevirt.io/template.namespace';
 
 export enum OS_NAME_TYPES {
   rhel = 'rhel',

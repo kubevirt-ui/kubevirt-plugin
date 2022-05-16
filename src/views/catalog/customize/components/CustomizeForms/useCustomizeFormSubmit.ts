@@ -3,7 +3,11 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
-import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
+import {
+  ANNOTATIONS,
+  LABEL_USED_TEMPLATE_NAME,
+  LABEL_USED_TEMPLATE_NAMESPACE,
+} from '@kubevirt-utils/resources/template';
 import {
   getTemplateOS,
   getTemplateVirtualMachineObject,
@@ -44,6 +48,8 @@ export const useCustomizeFormSubmit = (
 
       const vm = getTemplateVirtualMachineObject(processedTemplate);
       vm.metadata.namespace = ns || DEFAULT_NAMESPACE;
+      vm.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
+      vm.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = processedTemplate.metadata.namespace;
 
       // keep template's name and namespace for navigation
       updateTabsData((tabsDataDraft) => {
