@@ -19,8 +19,6 @@ import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import DeschedulerModalButton from './DeschedulerModalButton';
 
-import 'src/views/templates/details/tabs/scheduling/TemplateSchedulingTab.scss';
-
 type DeschedulerProps = {
   template: V1Template;
 };

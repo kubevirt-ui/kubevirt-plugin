@@ -5,8 +5,7 @@ import TemplateDetailsRightGrid from 'src/views/templates/details/tabs/details/c
 import { isCommonVMTemplate } from 'src/views/templates/utils';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid, GridItem } from '@patternfly/react-core';
 
 import NoEditableTemplateAlert from '../NoEditableTemplateAlert';
@@ -25,24 +24,24 @@ type TemplateDetailsPageProps = RouteComponentProps<{
 };
 
 const TemplateDetailsPage: React.FC<TemplateDetailsPageProps> = ({ obj: template }) => {
-  const { t } = useKubevirtTranslation();
   const isCommonTemplate = isCommonVMTemplate(template);
 
   return (
     <>
       {isCommonTemplate && <NoEditableTemplateAlert template={template} />}
-      <ListPageHeader title={t('VM Template Details')}></ListPageHeader>
-      <ListPageBody>
-        <Grid>
-          <GridItem span={5}>
-            <TemplateDetailsLeftGrid template={template} />
-          </GridItem>
-          <GridItem span={1}></GridItem>
-          <GridItem span={5}>
-            <TemplateDetailsRightGrid template={template} />
-          </GridItem>
-        </Grid>
-      </ListPageBody>
+      <p className="list-page-body-no-border-top">
+        <ListPageBody>
+          <Grid>
+            <GridItem span={5} className="margin-top-grid-item">
+              <TemplateDetailsLeftGrid template={template} />
+            </GridItem>
+            <GridItem span={1}></GridItem>
+            <GridItem span={5} className="margin-top-grid-item">
+              <TemplateDetailsRightGrid template={template} />
+            </GridItem>
+          </Grid>
+        </ListPageBody>
+      </p>
     </>
   );
 };
