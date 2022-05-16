@@ -1,27 +1,26 @@
 import React from 'react';
-import { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
 import AffinityRules from 'src/views/templates/details/tabs/scheduling/components/AffinityRules';
 import Descheduler from 'src/views/templates/details/tabs/scheduling/components/Descheduler';
 import NodeSelector from 'src/views/templates/details/tabs/scheduling/components/NodeSelector';
 import Tolerations from 'src/views/templates/details/tabs/scheduling/components/Tolerations';
-import { isCommonVMTemplate } from 'src/views/templates/utils';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { DescriptionList } from '@patternfly/react-core';
 
 export type TemplateSchedulingGridProps = {
   template: V1Template;
-  editable?: boolean;
+  editable: boolean;
 };
 
-const TemplateSchedulingLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template }) => {
-  const isTemplateEditable = !isCommonVMTemplate(template);
-
+const TemplateSchedulingLeftGrid: React.FC<TemplateSchedulingGridProps> = ({
+  template,
+  editable,
+}) => {
   return (
     <DescriptionList>
-      <NodeSelector template={template} editable={isTemplateEditable} />
-      <Tolerations template={template} editable={isTemplateEditable} />
-      <AffinityRules template={template} editable={isTemplateEditable} />
+      <NodeSelector template={template} editable={editable} />
+      <Tolerations template={template} editable={editable} />
+      <AffinityRules template={template} editable={editable} />
       <Descheduler template={template} />
     </DescriptionList>
   );

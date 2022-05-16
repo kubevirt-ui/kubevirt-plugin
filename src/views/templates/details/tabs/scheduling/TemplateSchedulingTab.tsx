@@ -29,11 +29,11 @@ const TemplateSchedulingTab: React.FC<TemplateSchedulingTabProps> = ({ obj: temp
         <ListPageBody>
           <Grid>
             <GridItem span={5} className="margin-top-grid-item">
-              <TemplateSchedulingLeftGrid template={template} />
+              <TemplateSchedulingLeftGrid template={template} editable={!isEditDisabled} />
             </GridItem>
             <GridItem span={1}></GridItem>
             <GridItem span={5} className="margin-top-grid-item">
-              <TemplateSchedulingRightGrid template={template} />
+              <TemplateSchedulingRightGrid template={template} editable={!isEditDisabled} />
             </GridItem>
           </Grid>
         </ListPageBody>
