@@ -19,8 +19,7 @@ export const CloudinitModal: React.FC<{
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
 }> = ({ vm, onSubmit, isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
-  const { updatedVM, updateFromYAML, updatedCloudinitVolume, ...cloudInitHookValues } =
-    useCloudInit(vm);
+  const { updatedVM, updateFromYAML, ...cloudInitHookValues } = useCloudInit(vm);
 
   const [showEditor, setShowEditor] = React.useState(false);
   const [isSubmitDisabled, setSubmitDisabled] = React.useState(false);
@@ -80,7 +79,6 @@ export const CloudinitModal: React.FC<{
         <CloudinitForm
           showEditor={showEditor}
           onEditorSave={onEditorSave}
-          cloudInitVolume={updatedCloudinitVolume}
           {...cloudInitHookValues}
         />
       </Stack>
