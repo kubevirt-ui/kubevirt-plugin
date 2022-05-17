@@ -139,7 +139,6 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
       obj={updatedVirtualMachine}
       onSubmit={onSubmit}
       headerText={t('Affinity rules')}
-      submitBtnText={t('Save')}
       modalVariant={ModalVariant.medium}
     >
       {list}

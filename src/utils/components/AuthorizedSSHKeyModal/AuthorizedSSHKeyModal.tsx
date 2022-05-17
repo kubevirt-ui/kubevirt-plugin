@@ -25,7 +25,6 @@ export const AuthorizedSSHKeyModal: React.FC<{
       onClose={onClose}
       onSubmit={submitHandler}
       headerText={t('Authorized SSH Key')}
-      submitBtnText={t('Save')}
     >
       <FileUpload
         id={'ssh-key-modal'}

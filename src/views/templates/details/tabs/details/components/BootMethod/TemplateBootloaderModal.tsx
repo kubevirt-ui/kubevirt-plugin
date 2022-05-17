@@ -96,7 +96,6 @@ const TemplateBootloaderModal: React.FC<TemplateBootloaderModalProps> = ({
       onClose={onClose}
       headerText={t('VirtualMachine Template boot method')}
       obj={updatedTemplate}
-      submitBtnText={t('Save')}
     >
       <Form>
         <FormGroup fieldId="template-firmware-bootloader" label={t('Bootloader method')}>

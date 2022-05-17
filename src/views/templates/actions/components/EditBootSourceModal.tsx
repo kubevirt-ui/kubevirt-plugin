@@ -6,7 +6,7 @@ import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { ButtonVariant, Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import { SOURCE_TYPES } from '../../utils/constants';
 import { editBootSource } from '../editBootSource';
@@ -38,8 +38,6 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({ isOpen, obj, 
         onSubmit={onSubmit}
         isOpen={isOpen}
         onClose={onClose}
-        submitBtnText={t('Save')}
-        submitBtnVariant={ButtonVariant.primary}
       >
         <p className="margin-bottom-md">
           This data can be found in{' '}

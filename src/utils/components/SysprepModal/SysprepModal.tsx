@@ -38,7 +38,6 @@ export const SysprepModal: React.FC<{
       onClose={onClose}
       headerText={t('Sysprep')}
       modalVariant={ModalVariant.medium}
-      submitBtnText={t('Save')}
     >
       <Sysprep
         autoUnattend={autoUnattend}

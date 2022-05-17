@@ -80,7 +80,6 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
       onSubmit={onSubmit}
       headerText={t('Tolerations')}
       modalVariant={ModalVariant.medium}
-      submitBtnText={t('Save')}
     >
       <TolerationModalDescriptionText />
       <Form>
