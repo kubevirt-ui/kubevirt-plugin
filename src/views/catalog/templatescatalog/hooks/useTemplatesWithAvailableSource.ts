@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   BOOT_SOURCE,
   isCustomTemplate,
@@ -37,9 +38,9 @@ export const useTemplatesWithAvailableSource = ({
         const bootSource = getTemplateBootSourceType(template);
 
         // data sources
-        if (bootSource.type === BOOT_SOURCE.PVC_AUTO_UPLOAD) {
+        if (bootSource.type === BOOT_SOURCE.DATA_SOURCE) {
           const ds = bootSource?.source?.sourceRef;
-          if (availableDatasources.has(`${ds.namespace}-${ds.name}`)) {
+          if (availableDatasources[`${ds.namespace}-${ds.name}`]) {
             acc.push(template);
           }
           return acc;
@@ -75,6 +76,7 @@ export const useTemplatesWithAvailableSource = ({
   return {
     templates: filteredTemplates,
     availableTemplatesUID,
+    availableDatasources,
     loaded,
     bootSourcesLoaded,
     error: loadError,
@@ -84,6 +86,7 @@ export const useTemplatesWithAvailableSource = ({
 type useTemplatesWithAvailableSourceValues = {
   templates: V1Template[];
   availableTemplatesUID: Set<string>;
+  availableDatasources: Record<string, V1beta1DataSource>;
   loaded: boolean;
   bootSourcesLoaded: boolean;
   error: any;

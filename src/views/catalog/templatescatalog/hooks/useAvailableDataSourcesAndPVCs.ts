@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { BOOT_SOURCE } from '@kubevirt-utils/resources/template';
 import {
   getDataSource,
@@ -25,7 +26,9 @@ export const useAvailableDataSourcesAndPVCs = (
   templates: V1Template[],
   templatesLoaded: boolean,
 ) => {
-  const [availableDatasources, setAvailableDatasources] = React.useState<Set<string>>();
+  const [availableDatasources, setAvailableDatasources] = React.useState<
+    Record<string, V1beta1DataSource>
+  >({});
   const [availablePVCs, setAvailablePVCs] = React.useState<Set<string>>();
   const [loaded, setLoaded] = React.useState(false);
 
@@ -37,7 +40,7 @@ export const useAvailableDataSourcesAndPVCs = (
       templates.forEach((t) => {
         const bootSource = getTemplateBootSourceType(t);
 
-        if (bootSource.type === BOOT_SOURCE.PVC_AUTO_UPLOAD) {
+        if (bootSource.type === BOOT_SOURCE.DATA_SOURCE) {
           const ds = bootSource?.source?.sourceRef;
           dataSources[ds?.namespace] = new Set([...(dataSources?.[ds?.namespace] || []), ds?.name]);
         }
@@ -64,10 +67,11 @@ export const useAvailableDataSourcesAndPVCs = (
           const [dataSources, pvcs] = sources.filter(assertFulfilled);
           const dataSourcesSet = dataSources.value.filter(assertFulfilled).reduce((acc, curr) => {
             if (isDataSourceReady(curr.value)) {
-              acc.add(`${curr?.value?.metadata?.namespace}-${curr?.value?.metadata?.name}`);
+              acc[`${curr?.value?.metadata?.namespace}-${curr?.value?.metadata?.name}`] =
+                curr?.value;
             }
             return acc;
-          }, new Set<string>());
+          }, {});
 
           const pvcSet = new Set(
             pvcs.value
@@ -75,7 +79,7 @@ export const useAvailableDataSourcesAndPVCs = (
               .map((pvc) => `${pvc?.value.metadata?.namespace}-${pvc?.value.metadata?.name}`),
           );
 
-          setAvailableDatasources(dataSourcesSet || new Set());
+          setAvailableDatasources(dataSourcesSet || {});
           setAvailablePVCs(pvcSet || new Set());
         })
         .catch(console.error)

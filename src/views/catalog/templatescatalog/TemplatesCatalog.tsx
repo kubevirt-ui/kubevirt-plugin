@@ -28,7 +28,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   const isAdmin = useIsAdmin();
   const disableDrawer = !namespace && !isAdmin;
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
-  const { templates, availableTemplatesUID, loaded, bootSourcesLoaded } =
+  const { templates, availableTemplatesUID, loaded, bootSourcesLoaded, availableDatasources } =
     useTemplatesWithAvailableSource({
       namespace: filters.namespace,
       onlyAvailable: filters.onlyAvailable,
@@ -60,6 +60,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
               <TemplatesCatalogItems
                 templates={filteredTemplates}
                 availableTemplatesUID={availableTemplatesUID}
+                availableDatasources={availableDatasources}
                 bootSourcesLoaded={bootSourcesLoaded}
                 filters={filters}
                 onTemplateClick={!disableDrawer && setSelectedTemplate}

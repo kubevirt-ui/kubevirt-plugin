@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Gallery, StackItem } from '@patternfly/react-core';
 
@@ -13,6 +14,7 @@ import { TemplateTile } from './TemplatesCatalogTile';
 type TemplatesCatalogItemsProps = {
   templates: V1Template[];
   availableTemplatesUID: Set<string>;
+  availableDatasources: Record<string, V1beta1DataSource>;
   bootSourcesLoaded: boolean;
   filters: TemplateFilters;
   onTemplateClick: (template: V1Template) => void;
@@ -22,6 +24,7 @@ type TemplatesCatalogItemsProps = {
 export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
   templates,
   availableTemplatesUID,
+  availableDatasources,
   bootSourcesLoaded,
   filters,
   onTemplateClick,
@@ -49,7 +52,7 @@ export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
             key={template?.metadata?.uid}
             template={template}
             onClick={onTemplateClick}
-            isBootSourceAvailable={availableTemplatesUID.has(template.metadata.uid)}
+            availableDatasources={availableDatasources}
             bootSourcesLoaded={bootSourcesLoaded}
           />
         ))}

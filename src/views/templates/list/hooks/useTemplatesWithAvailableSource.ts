@@ -56,9 +56,9 @@ export const useTemplatesWithAvailableSource = ({
         const bootSource = getTemplateBootSourceType(template);
 
         // data sources
-        if (bootSource.type === BOOT_SOURCE.PVC_AUTO_UPLOAD) {
+        if (bootSource.type === BOOT_SOURCE.DATA_SOURCE) {
           const ds = bootSource?.source?.sourceRef;
-          if (availableDatasources.has(`${ds.namespace}-${ds.name}`)) {
+          if (availableDatasources[`${ds.namespace}-${ds.name}`]) {
             acc.push(template);
           }
           return acc;

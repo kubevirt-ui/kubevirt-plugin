@@ -1,6 +1,11 @@
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { BOOT_SOURCE } from '@kubevirt-utils/resources/template';
+import {
+  BOOT_SOURCE,
+  BOOT_SOURCE_LABELS,
+  DATA_SOURCE_CRONJOB_LABEL,
+} from '@kubevirt-utils/resources/template';
 import { TemplateBootSource } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 
 import { getBootDisk, getVolumes } from './selectors';
@@ -22,7 +27,7 @@ export const getVMBootSourceType = (vm: V1VirtualMachine): TemplateBootSource =>
 
     if (sourceRef?.kind === DataSourceModel.kind) {
       return {
-        type: BOOT_SOURCE.PVC_AUTO_UPLOAD,
+        type: BOOT_SOURCE.DATA_SOURCE,
         source: { sourceRef },
       };
     }
@@ -52,4 +57,20 @@ export const getVMBootSourceType = (vm: V1VirtualMachine): TemplateBootSource =>
   }
 
   return null;
+};
+
+/**
+ * Function to get a human comprehensive label to describe the vm boot source
+ * @param {BOOT_SOURCE} bootSourceType - vm boot source type
+ * @param {V1beta1DataSource} dataSource - if any, the vm boot data source
+ * @returns label representing the boot source type
+ */
+export const getVMBootSourceLabel = (
+  bootSourceType: BOOT_SOURCE,
+  dataSource?: V1beta1DataSource,
+): string => {
+  if (BOOT_SOURCE.DATA_SOURCE && dataSource?.metadata?.labels?.[DATA_SOURCE_CRONJOB_LABEL])
+    return BOOT_SOURCE_LABELS[BOOT_SOURCE.DATA_SOURCE_AUTO_UPLOAD] || 'N/A';
+
+  return BOOT_SOURCE_LABELS[bootSourceType] || 'N/A';
 };
