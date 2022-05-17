@@ -251,5 +251,22 @@
         "$codeRef": "MigrationToolPage"
       }
     }
+  },
+  {
+    "type": "console.yaml-template",
+    "properties": {
+      "name": "default",
+      "model": {
+        "group": "kubevirt.io",
+        "kind": "VirtualMachine",
+        "version": "v1"
+      },
+      "template": {
+        "$codeRef": "yamlTemplates.defaultVMYamlTemplate"
+      }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
   }
 ]

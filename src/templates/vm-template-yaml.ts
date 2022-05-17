@@ -1,0 +1,74 @@
+import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+
+export const defaultVMTemplateYamlTemplate = `
+apiVersion: ${TemplateModel.apiGroup}/${TemplateModel.apiVersion}
+kind: ${TemplateModel.kind}
+metadata:
+  name: vm-template-example
+  labels:
+    template.kubevirt.io/type: vm
+    os.template.kubevirt.io/fedora31: 'true'
+    workload.template.kubevirt.io/server: 'true'
+  annotations:
+    name.os.template.kubevirt.io/fedora31: Fedora 31
+    description: VM template example
+objects:
+  - apiVersion: kubevirt.io/v1
+    kind: VirtualMachine
+    metadata:
+      labels:
+        app: '\${NAME}'
+      name: '\${NAME}'
+    spec:
+      running: false
+      template:
+        metadata:
+          labels:
+            kubevirt.io/domain: '\${NAME}'
+        spec:
+          domain:
+            cpu:
+              cores: 1
+              sockets: 1
+              threads: 1
+            devices:
+              disks:
+                - name: containerdisk
+                  bootOrder: 1
+                  disk:
+                    bus: virtio
+                - disk:
+                    bus: virtio
+                  name: cloudinitdisk
+              interfaces:
+                - masquerade: {}
+                  name: default
+              networkInterfaceMultiqueue: true
+              rng: {}
+            resources:
+              requests:
+                memory: 1G
+          networks:
+            - name: default
+              pod: {}
+          terminationGracePeriodSeconds: 0
+          volumes:
+            - name: containerdisk
+              containerDisk:
+                image: 'quay.io/kubevirt/fedora-cloud-container-disk-demo:latest'
+            - cloudInitNoCloud:
+                userData: |-
+                  #cloud-config
+                  password: '\${CLOUD_USER_PASSWORD}'
+                  chpasswd: { expire: False }
+              name: cloudinitdisk
+          hostname: '\${NAME}'
+parameters:
+  - name: NAME
+    description: Name for the new VM
+    required: true
+  - password: CLOUD_USER_PASSWORD
+    description: Randomized password for the cloud-init user
+    generate: expression
+    from: '[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}'
+`;
