@@ -1,5 +1,4 @@
 {
-  " 0 Toleration rules": " 0 Toleration rules",
   " Password: ": " Password: ",
   "--- Select {{ dsLabel }} name ---": "--- Select {{ dsLabel }} name ---",
   "--- Select {{dsLabel}} project ---": "--- Select {{dsLabel}} project ---",
@@ -19,6 +18,8 @@
   "{{count}} GPU devices_other": "{{count}} GPU devices",
   "{{count}} Host devices_one": "{{count}} Host devices",
   "{{count}} Host devices_other": "{{count}} Host devices",
+  "{{count}} Toleration rules_one": "{{count}} Toleration rules",
+  "{{count}} Toleration rules_other": "{{count}} Toleration rules",
   "{{count}} Tolerations rules_one": "{{count}} Tolerations rules",
   "{{count}} Tolerations rules_other": "{{count}} Tolerations rules",
   "{{cpu}} CPU | {{memory}} Memory": "{{cpu}} CPU | {{memory}} Memory",
@@ -32,7 +33,6 @@
   "{{qualifiedNodesCount}} matching nodes found": "{{qualifiedNodesCount}} matching nodes found",
   "{{qualifiedNodesCount}} matching Nodes found": "{{qualifiedNodesCount}} matching Nodes found",
   "{{qualifiedNodesCount}} nodes found": "{{qualifiedNodesCount}} nodes found",
-  "{{rulesCount}} Affinity rules": "{{rulesCount}} Affinity rules",
   "<0>Autounattend.xml</0><1>Autounattend will be picked up automatically during windows installation. it can be used with destructive actions such as disk formatting. Autounattend will only be used once during installation.</1><2><0>{t('Learn more')}</0></2>": "<0>Autounattend.xml</0><1>Autounattend will be picked up automatically during windows installation. it can be used with destructive actions such as disk formatting. Autounattend will only be used once during installation.</1><2><0>{t('Learn more')}</0></2>",
   "<0>Clicking &quot;Launch Remote Desktop&quot; will download an .rdp file and launch <2>Remote Desktop Viewer</2>.</0><1>Since the RDP is native Windows protocol, the best experience is achieved when used on Windows-based desktop.</1><2>For other operating systems, the <1>Remote Viewer</1> is recommended. If RDP needs to be accessed anyway, the <3>Remmina</3> client is available.</2>": "<0>Clicking &quot;Launch Remote Desktop&quot; will download an .rdp file and launch <2>Remote Desktop Viewer</2>.</0><1>Since the RDP is native Windows protocol, the best experience is achieved when used on Windows-based desktop.</1><2>For other operating systems, the <1>Remote Viewer</1> is recommended. If RDP needs to be accessed anyway, the <3>Remmina</3> client is available.</2>",
   "<0>Clicking &quot;Launch Remote Viewer&quot; will download a .vv file and launch <2>Remote Viewer</2></0><1><0>Remote Viewer</0> is available for most operating systems. To install it, search for it in GNOME Software or run the following:</1>": "<0>Clicking &quot;Launch Remote Viewer&quot; will download a .vv file and launch <2>Remote Viewer</2></0><1><0>Remote Viewer</0> is available for most operating systems. To install it, search for it in GNOME Software or run the following:</1>",

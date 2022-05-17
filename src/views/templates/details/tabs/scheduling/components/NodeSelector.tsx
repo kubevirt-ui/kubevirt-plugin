@@ -2,11 +2,9 @@ import React from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   DescriptionListDescription,
@@ -20,7 +18,7 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import NodeSelectorModal from './NodeSelectorModal';
 
-const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ template, editable }) => {
+const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ template, editable, onSubmit }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const nodeSelector = getNodeSelector(template);
@@ -32,17 +30,6 @@ const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ template, editabl
     </LabelGroup>
   ) : (
     t('No selector')
-  );
-
-  const onSubmit = React.useCallback(
-    (updatedTemplate: V1Template) =>
-      k8sUpdate({
-        model: TemplateModel,
-        data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
-        name: updatedTemplate?.metadata?.name,
-      }),
-    [],
   );
 
   const onEditClick = () =>
