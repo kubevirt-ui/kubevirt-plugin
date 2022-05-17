@@ -14,6 +14,7 @@ import './TemplateDetailsPage.scss';
 
 export type TemplateDetailsGridProps = {
   template: V1Template;
+  editable?: boolean;
 };
 
 type TemplateDetailsPageProps = RouteComponentProps<{
@@ -33,7 +34,7 @@ const TemplateDetailsPage: React.FC<TemplateDetailsPageProps> = ({ obj: template
         <ListPageBody>
           <Grid>
             <GridItem span={5} className="margin-top-grid-item">
-              <TemplateDetailsLeftGrid template={template} />
+              <TemplateDetailsLeftGrid template={template} editable={!isCommonTemplate} />
             </GridItem>
             <GridItem span={1}></GridItem>
             <GridItem span={5} className="margin-top-grid-item">
