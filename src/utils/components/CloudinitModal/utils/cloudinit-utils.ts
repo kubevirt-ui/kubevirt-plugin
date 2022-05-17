@@ -37,7 +37,7 @@ export const convertUserDataObjectToYAML = (
 ): string => {
   try {
     const filteredUser = deleteObjBlankValues(userData);
-    const result = dump({ ...filteredUser, chpasswd: { expire: false } });
+    const result = dump(filteredUser);
     return addHeader ? `${CLOUD_CONFIG_HEADER}\n${result}` : result;
   } catch (e) {
     console.error(e);
@@ -143,6 +143,7 @@ export type CloudInitUserData = {
   user: string;
   password: string;
   hostname: string;
+  chpasswd?: { expire?: boolean };
 };
 
 export type CloudInitNetworkData = {

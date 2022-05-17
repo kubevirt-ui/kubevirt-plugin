@@ -23,8 +23,8 @@ import {
 import { CLOUD_CONFIG_HEADER } from './consts';
 
 export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
-  const cloudInitVolume = getCloudInitVolume(vm);
-  const cloudInit = getCloudInitData(cloudInitVolume);
+  const cloudInitVol = getCloudInitVolume(vm);
+  const cloudInit = React.useMemo(() => getCloudInitData(cloudInitVol), [cloudInitVol]);
 
   const [userData, setUserData] = React.useState<CloudInitUserData>(
     convertYAMLUserDataObject(cloudInit?.userData),
@@ -61,54 +61,22 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
     return header?.trimEnd() === CLOUD_CONFIG_HEADER;
   }, [cloudInit?.userData]);
 
-  const shouldUpdateUser = React.useMemo(() => {
-    const initData = convertYAMLUserDataObject(cloudInit?.userData);
-    return (
-      userData?.user !== initData?.user ||
-      userData?.password !== initData?.password ||
-      userData?.hostname !== initData?.hostname
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData]);
+  const cloudInitVolume: V1Volume = React.useMemo(() => {
+    const cloudInitNoCloud: V1CloudInitNoCloudSource = deleteObjBlankValues({
+      userData: convertUserDataObjectToYAML(userData, shouldAddHeader),
+      networkData: convertNetworkDataObjectToYAML(networkData),
+    });
 
-  const shouldUpdateNetwork = React.useMemo(() => {
-    const initData = convertYAMLToNetworkDataObject(cloudInit?.networkData);
-    return (
-      enableNetworkData &&
-      (networkData?.name !== initData?.name ||
-        !!networkData?.address ||
-        networkData?.gateway !== initData?.gateway)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [networkData, enableNetworkData]);
-
-  const updatedCloudinitVolume: V1Volume = React.useMemo(
-    () => {
-      // if network form checkbox is unchecked, we should remove network data from cloudinit
-      const resetNetworkData = enableNetworkData ? cloudInit?.networkData : undefined;
-
-      const cloudInitNoCloud: V1CloudInitNoCloudSource = {
-        userData: shouldUpdateUser
-          ? convertUserDataObjectToYAML(userData, shouldAddHeader)
-          : cloudInit?.userData,
-        networkData: shouldUpdateNetwork
-          ? convertNetworkDataObjectToYAML(networkData)
-          : resetNetworkData,
-      };
-
-      return {
-        name: 'cloudinitdisk',
-        cloudInitNoCloud: deleteObjBlankValues(cloudInitNoCloud),
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [networkData, userData, enableNetworkData],
-  );
+    return {
+      name: 'cloudinitdisk',
+      cloudInitNoCloud,
+    };
+  }, [userData, shouldAddHeader, networkData]);
 
   const updatedVM = React.useMemo(
     () =>
       produceVMDisks(vm, (vmDraft) => {
-        const cloudInitDiskName = 'cloudinitdisk';
+        const cloudInitDiskName = cloudInitVol?.name || 'cloudinitdisk';
 
         const cloudInitDisk = vmDraft.spec.template.spec.domain.devices.disks.find(
           (disk) => disk.name === cloudInitDiskName,
@@ -127,17 +95,16 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
         const otherVolumes = getVolumes(vmDraft).filter(
           (vol) => !vol.cloudInitNoCloud && !vol.cloudInitConfigDrive,
         );
-        vmDraft.spec.template.spec.volumes = [...otherVolumes, updatedCloudinitVolume];
+        vmDraft.spec.template.spec.volumes = [...otherVolumes, cloudInitVolume];
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [networkData, userData, updatedCloudinitVolume],
+    [vm, cloudInitVol?.name, cloudInitVolume],
   );
 
   return {
     userData,
     enableNetworkData,
     networkData,
-    updatedCloudinitVolume,
+    cloudInitVolume,
     updatedVM,
 
     // methods
@@ -152,7 +119,7 @@ type UseCloudInitValues = {
   userData: CloudInitUserData;
   enableNetworkData: boolean;
   networkData: CloudInitNetworkData;
-  updatedCloudinitVolume: V1Volume;
+  cloudInitVolume: V1Volume;
   updatedVM: V1VirtualMachine;
   updateUserField: (key: keyof CloudInitUserData, value: string) => void;
   updateNetworkField: (key: keyof CloudInitNetworkData, value: string) => void;
