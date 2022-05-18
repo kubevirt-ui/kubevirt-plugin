@@ -12,6 +12,8 @@ export const LABEL_USED_TEMPLATE_NAME = 'vm.kubevirt.io/template';
 export const LABEL_USED_TEMPLATE_NAMESPACE = 'vm.kubevirt.io/template.namespace';
 export const TEMPLATE_VERSION_LABEL = 'vm.kubevirt.io/template.version';
 
+export const DATA_SOURCE_CRONJOB_LABEL = 'cdi.kubevirt.io/dataImportCron';
+
 export enum OS_NAME_TYPES {
   rhel = 'rhel',
   fedora = 'fedora',
@@ -73,14 +75,16 @@ export const OS_NAMES = [
 
 export enum BOOT_SOURCE {
   PVC = 'PVC',
-  PVC_AUTO_UPLOAD = 'PVC_AUTO_UPLOAD',
+  DATA_SOURCE = 'DATA_SOURCE',
+  DATA_SOURCE_AUTO_UPLOAD = 'DATA_SOURCE_AUTO_UPLOAD',
   URL = 'URL',
   REGISTRY = 'REGISTRY',
 }
 
 export const BOOT_SOURCE_LABELS = {
   [BOOT_SOURCE.PVC]: 'PVC',
-  [BOOT_SOURCE.PVC_AUTO_UPLOAD]: 'PVC (auto upload)',
+  [BOOT_SOURCE.DATA_SOURCE]: 'PVC',
+  [BOOT_SOURCE.DATA_SOURCE_AUTO_UPLOAD]: 'PVC (auto upload)',
   [BOOT_SOURCE.URL]: 'URL',
   [BOOT_SOURCE.REGISTRY]: 'Registry',
 };

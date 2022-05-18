@@ -1,17 +1,15 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  BOOT_SOURCE_LABELS,
-  getTemplateFlavorData,
-  WORKLOADS_LABELS,
-} from '@kubevirt-utils/resources/template';
+import { getTemplateFlavorData, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import {
   getTemplateName,
   getTemplateWorkload,
 } from '@kubevirt-utils/resources/template/utils/selectors';
+import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { CatalogTile } from '@patternfly/react-catalog-view-extension';
 import { Badge, Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
@@ -19,19 +17,24 @@ import { getTemplateOSIcon } from '../utils/os-icons';
 
 export type TemplateTileProps = {
   template: V1Template;
-  isBootSourceAvailable: boolean;
+  availableDatasources: Record<string, V1beta1DataSource>;
   bootSourcesLoaded: boolean;
   onClick: (template: V1Template) => void;
   isSelected?: boolean;
 };
 
 export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
-  ({ template, isBootSourceAvailable, bootSourcesLoaded, onClick }) => {
+  ({ template, availableDatasources, bootSourcesLoaded, onClick }) => {
     const { t } = useKubevirtTranslation();
 
     const workload = getTemplateWorkload(template);
     const displayName = getTemplateName(template);
-    const bootSourceType = getTemplateBootSourceType(template)?.type;
+    const bootSource = getTemplateBootSourceType(template);
+
+    const dataSource =
+      availableDatasources[
+        `${bootSource?.source?.sourceRef.namespace}-${bootSource?.source?.sourceRef.name}`
+      ];
     const { memory, cpuCount } = getTemplateFlavorData(template);
 
     const icon = React.useMemo(() => {
@@ -59,7 +62,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
         onClick={() => onClick(template)}
         badges={
           bootSourcesLoaded
-            ? isBootSourceAvailable && [<Badge key="available-boot">{t('Source available')}</Badge>]
+            ? dataSource && [<Badge key="available-boot">{t('Source available')}</Badge>]
             : [<Skeleton key="loading-sources" height="18px" width="105px" className="badgeload" />]
         }
       >
@@ -70,7 +73,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
                 <b>{t('Project')}</b> {template.metadata.namespace}
               </StackItem>
               <StackItem>
-                <b>{t('Boot source')}</b> {BOOT_SOURCE_LABELS?.[bootSourceType] || 'N/A'}
+                <b>{t('Boot source')}</b> {getVMBootSourceLabel(bootSource?.type, dataSource)}
               </StackItem>
               <StackItem>
                 <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload] ?? t('Other')}

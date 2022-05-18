@@ -69,7 +69,7 @@ export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
         getPVCSource(bootSource?.source?.pvc);
         break;
 
-      case BOOT_SOURCE.PVC_AUTO_UPLOAD:
+      case BOOT_SOURCE.DATA_SOURCE:
         getDataSourceCondition(bootSource?.source?.sourceRef);
         break;
 

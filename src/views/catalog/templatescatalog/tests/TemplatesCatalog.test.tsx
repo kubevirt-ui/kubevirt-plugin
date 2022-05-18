@@ -16,6 +16,7 @@ jest.mock('../hooks/useTemplatesWithAvailableSource', () => ({
   useTemplatesWithAvailableSource: () => ({
     templates: [urlTemplateMock, containerTemplateMock],
     availableTemplatesUID: new Set(['url-template-uid', 'container-template-uid']),
+    availableDatasources: {},
     loaded: true,
     bootSourcesLoaded: true,
   }),

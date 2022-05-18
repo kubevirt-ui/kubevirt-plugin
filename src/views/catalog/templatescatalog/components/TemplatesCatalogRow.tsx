@@ -3,13 +3,13 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  BOOT_SOURCE_LABELS,
   getTemplateFlavorData,
   getTemplateName,
   getTemplateWorkload,
   WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Button } from '@patternfly/react-core';
 
@@ -37,7 +37,7 @@ export const TemplatesCatalogRow: React.FC<
         </Button>
       </TableData>
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
-        {BOOT_SOURCE_LABELS?.[bootSourceType] || 'N/A'}
+        {getVMBootSourceLabel(bootSourceType)}
       </TableData>
       <TableData id="workload" activeColumnIDs={activeColumnIDs}>
         {WORKLOADS_LABELS?.[workload]}
