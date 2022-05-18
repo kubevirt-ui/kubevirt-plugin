@@ -114,7 +114,7 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
               id="namespace"
             />
           </FormGroup>
-          <FormGroup label={t('Template display name')} fieldId="display-name" isRequired>
+          <FormGroup label={t('Template display name')} fieldId="display-name">
             <TextInput
               id="display-name"
               type="text"
@@ -126,7 +126,6 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
           <FormGroup
             label={t('Template provider')}
             fieldId="provider"
-            isRequired
             helperText={t('Example: your company name')}
           >
             <TextInput
