@@ -4,6 +4,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { Bullseye } from '@patternfly/react-core';
 
 import { printableVMStatus } from '../../../../../utils';
 
@@ -21,15 +22,23 @@ const FilesystemList: React.FC<FilesystemListProps> = ({ vm }) => {
     name: vm?.metadata?.name,
     namespace: vm?.metadata?.namespace,
   });
+  const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
   const guestOS = vmi?.status?.guestOSInfo?.id;
-  let noDataEmptyMsg = undefined;
-  if (vm?.status?.printableStatus !== printableVMStatus.Running) {
-    noDataEmptyMsg = () => <>{t('VirtualMachine is not running')}</>;
-  } else if (!guestOS && vmi?.metadata) {
-    noDataEmptyMsg = () => <>{t('Guest agent is required')}</>;
-  }
-  return <FileSystemListLayout vmi={vmi} noDataEmptyMsg={noDataEmptyMsg} />;
+  const noDataEmptyMsg = React.useMemo(() => {
+    if (!isVMRunning) {
+      return t('VirtualMachine is not running');
+    } else if (!guestOS && isVMRunning) {
+      return t('Guest agent is required');
+    }
+  }, [guestOS, isVMRunning, t]);
+
+  return (
+    <FileSystemListLayout
+      vmi={isVMRunning ? vmi : null}
+      noDataEmptyMsg={() => <Bullseye>{noDataEmptyMsg}</Bullseye>}
+    />
+  );
 };
 
 export default FilesystemList;
