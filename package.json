@@ -40,7 +40,6 @@
       "modalProvider": "./utils/components/ModalProvider/ModalProvider.tsx",
       "TemplateNavPage": "./views/templates/details/TemplateNavPage.tsx",
       "ConsoleStandAlone": "./utils/components/Consoles/ConsoleStandAlone.tsx",
-      "MigrationToolPage": "./views/migration/MigrationToolPage.tsx",
       "yamlTemplates": "src/templates/index.ts"
     },
     "dependencies": {
