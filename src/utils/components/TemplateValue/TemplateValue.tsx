@@ -15,7 +15,7 @@ const TemplateNameTableData: React.FC<TemplateNameTableDataProps> = ({ value, ch
     <div className="template-value">
       {children || value}
       {isTemplateParameter(value) && (
-        <div className="template-parameter">{t('template parameter')}</div>
+        <div className="template-parameter">{t('Template parameter')}</div>
       )}
     </div>
   );

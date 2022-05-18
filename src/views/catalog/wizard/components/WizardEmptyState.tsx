@@ -19,7 +19,7 @@ export const WizardEmptyState: React.FC<{ namespace: string }> = ({ namespace })
         {t('No Template found')}
       </Title>
       <EmptyStateBody>
-        {t('No template was selected for review, please go to the catalog and select one.')}
+        {t('No Template was selected for review, please go to the catalog and select one.')}
       </EmptyStateBody>
       <EmptyStateSecondaryActions>
         <Button onClick={() => history.push(`/k8s/ns/${namespace}/templatescatalog`)}>

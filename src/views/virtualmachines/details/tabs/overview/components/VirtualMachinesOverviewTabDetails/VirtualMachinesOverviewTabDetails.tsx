@@ -70,7 +70,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                       headerContent={<div>{vm?.status?.printableStatus}</div>}
                       bodyContent={
                         <div>
-                          {t('Virtual Machine is currently ')} {vm?.status?.printableStatus}
+                          {t('VirtualMachine is currently ')} {vm?.status?.printableStatus}
                         </div>
                       }
                       position={PopoverPosition.right}

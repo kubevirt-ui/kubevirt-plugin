@@ -123,7 +123,7 @@ export const getVirtualMachineNameField = (
     required: true,
     name: NAME_INPUT_FIELD,
     displayName: t('Name'),
-    description: t('Virtual Machine Name'),
+    description: t('VirtualMachine Name'),
     value: generateVMName(template),
   };
 };

@@ -39,7 +39,7 @@ const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
           bodyContent={
             <>
               {t(
-                'The descheduler can be used to evict a running VM so that the VM can be rescheduled onto a more suitable node via a live migration.',
+                'The Descheduler can be used to evict a running VirtualMachine so that the VirtualMachine can be rescheduled onto a more suitable Node via a live migration.',
               )}
               <div className="margin-top">
                 <Button
@@ -65,7 +65,7 @@ const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
         {isAdmin && !isDeschedulerInstalled ? (
           <Tooltip
             content={t(
-              'To enable the descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more descheduler profiles.',
+              'To enable the Descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more Descheduler profiles.',
             )}
             position="right"
           >

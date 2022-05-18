@@ -27,7 +27,7 @@ const VirtualMachineConsolePage: React.FC<VirtualMachineConsolePageProps> = ({ o
   if (!vmi && vm?.status?.printableStatus === printableVMStatus.Stopped) {
     return (
       <PageSection>
-        {t('This Virtual Machine is down. Please start it to access its console.')}
+        {t('This VirtualMachine is down. Please start it to access its console.')}
       </PageSection>
     );
   }

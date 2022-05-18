@@ -38,7 +38,7 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
 
   return (
     <>
-      <ListPageHeader title={t('Virtual Machine Templates')}></ListPageHeader>
+      <ListPageHeader title={t('VirtualMachine Templates')}></ListPageHeader>
       <ListPageBody>
         <Stack hasGutter>
           <StackItem>

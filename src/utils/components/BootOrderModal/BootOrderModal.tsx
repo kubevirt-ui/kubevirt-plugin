@@ -53,7 +53,7 @@ export const BootOrderModal: React.FC<{
       onSubmit={() => onSubmit(updatedVirtualMachine)}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('Virtual machine boot order')}
+      headerText={t('VirtualMachine boot order')}
     >
       {vmi && (
         <ModalPendingChangesAlert isChanged={checkBootOrderChanged(updatedVirtualMachine, vmi)} />

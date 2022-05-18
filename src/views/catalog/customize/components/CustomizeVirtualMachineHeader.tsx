@@ -35,7 +35,7 @@ export const CustomizeVirtualMachineHeader: React.FC<{ namespace: string }> = Re
           </BreadcrumbItem>
           <BreadcrumbItem>{t('Customize')}</BreadcrumbItem>
         </Breadcrumb>
-        <h1 className="co-m-pane__heading">{t('Create VirtualMachine from template')}</h1>
+        <h1 className="co-m-pane__heading">{t('Create VirtualMachine from Template')}</h1>
       </div>
     );
   },

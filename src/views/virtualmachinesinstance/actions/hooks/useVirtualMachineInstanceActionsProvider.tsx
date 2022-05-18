@@ -86,14 +86,14 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
       },
       {
         id: 'delete-virtual-machine-instance',
-        label: t('Delete Virtual Machine Instance'),
+        label: t('Delete VirtualMachineInstance'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <DeleteModal
               obj={vmi}
               isOpen={isOpen}
               onClose={onClose}
-              headerText={t('Delete Virtual Machine Instance?')}
+              headerText={t('Delete VirtualMachineInstance?')}
               onDeleteSubmit={() =>
                 k8sDelete({
                   model: VirtualMachineInstanceModel,

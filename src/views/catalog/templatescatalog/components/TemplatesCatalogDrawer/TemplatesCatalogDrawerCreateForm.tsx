@@ -104,7 +104,7 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
           ) : (
             <StackItem>
               {t(
-                'This template requires some additional parameters. Click the Customize Virtual machine button to complete the creation flow.',
+                'This Template requires some additional parameters. Click the Customize VirtualMachine button to complete the creation flow.',
               )}
             </StackItem>
           )}

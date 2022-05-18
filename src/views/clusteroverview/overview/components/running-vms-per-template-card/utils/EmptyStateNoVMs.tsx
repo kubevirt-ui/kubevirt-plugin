@@ -16,7 +16,7 @@ const EmptyStateNoVMs: React.FC<EmptyStateNoVMsProps> = ({ titleSize, className 
     <EmptyState className={className}>
       <EmptyStateIcon icon={VirtualMachineIcon} />
       <Title headingLevel="h4" size={titleSize}>
-        {t('No virtual machines found')}
+        {t('No VirtualMachines found')}
       </Title>
     </EmptyState>
   );

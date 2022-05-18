@@ -34,7 +34,7 @@ const VirtualMachinePendingChangesAlert: React.FC<VirtualMachinePendingChangesAl
   return (
     <PendingChangesAlert isWarning>
       {t(
-        'The following areas have pending changes that will be applied when this virtual machine is restarted.',
+        'The following areas have pending changes that will be applied when this VirtualMachine is restarted.',
       )}
       <List>
         <PendingChangesBreadcrumb pendingChanges={pendingChangesDetailsTab} />

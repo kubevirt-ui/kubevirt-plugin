@@ -38,7 +38,7 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
 
   return (
     <>
-      <ListPageHeader title={t('Virtual Machines Instances')} />
+      <ListPageHeader title={t('VirtualMachineInstances')} />
       <ListPageBody>
         <ListPageFilter
           data={data}

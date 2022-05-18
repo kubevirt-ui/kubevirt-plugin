@@ -50,7 +50,7 @@ const SnapshotRow: React.FC<
         <IndicationLabelList snapshot={snapshot} />
       </TableData>
       <TableData id="restore-snapshot" activeColumnIDs={activeColumnIDs}>
-        <Tooltip content={t('Restore is enabled only for offline virtual machine.')}>
+        <Tooltip content={t('Restore is enabled only for offline VirtualMachine.')}>
           <Button
             isAriaDisabled={isRestoreDisabled}
             variant="secondary"

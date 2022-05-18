@@ -53,10 +53,10 @@ const VirtualMachinesOverviewTabDetailsTitle: React.FC<
             </span>
           </DropdownItem>,
           <DropdownItem onClick={() => (isMachineStopped ? startVM(vm) : stopVM(vm))} key="stop">
-            {isMachineStopped ? t('Resume Virtual machine') : t('Stop Virtual machine')}
+            {isMachineStopped ? t('Resume VirtualMachine') : t('Stop VirtualMachine')}
           </DropdownItem>,
           <DropdownItem onClick={() => (isMachinePaused ? unpauseVM(vm) : pauseVM(vm))} key="pause">
-            {isMachinePaused ? t('Unpause Virtual machine') : t('Pause Virtual machine')}
+            {isMachinePaused ? t('Unpause VirtualMachine') : t('Pause VirtualMachine')}
           </DropdownItem>,
           <DropdownItem
             onClick={() =>

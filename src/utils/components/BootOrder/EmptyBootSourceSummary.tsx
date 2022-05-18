@@ -22,7 +22,7 @@ const EmptyBootOrderSummary: React.FC<BootOrderSummaryProps> = ({ devices }) => 
       <Text component={TextVariants.p}>{t('No resource selected')}</Text>
       <MutedTextSpan
         text={t(
-          'Virtual Machine will attempt to boot from disks by order of appearance in YAML file',
+          'VirtualMachine will attempt to boot from disks by order of appearance in YAML file',
         )}
       />
       {options?.length > 0 && (

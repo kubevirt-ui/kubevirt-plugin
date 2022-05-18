@@ -23,7 +23,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ vm, pathname }) => {
         <LinkIcon size="sm" />
       </a>
       <Title headingLevel="h2" className="co-section-heading">
-        {t('Virtual Machine Details')}
+        {t('VirtualMachine Details')}
       </Title>
       <Grid hasGutter>
         <VirtualMachineDetailsLeftGrid vm={vm} />

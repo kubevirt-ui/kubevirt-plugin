@@ -13,8 +13,8 @@ const RdpServiceNotConfigured: React.FC<RdpServiceNotConfiguredProps> = ({ vm })
   return (
     <Trans t={t} ns="plugin__kubevirt-plugin">
       <span>
-        This is a Windows virtual machine but no Service for the RDP (Remote Desktop Protocol) can
-        be found.
+        This is a Windows VirtualMachine but no Service for the RDP (Remote Desktop Protocol) can be
+        found.
       </span>
       <br />
       <span>
@@ -27,7 +27,7 @@ const RdpServiceNotConfigured: React.FC<RdpServiceNotConfiguredProps> = ({ vm })
               {DEFAULT_RDP_PORT}
               /tcp
             </b>{' '}
-            port of the virtual machine
+            port of the VirtualMachine
           </li>
           <li>
             using selector:{' '}
@@ -36,7 +36,7 @@ const RdpServiceNotConfigured: React.FC<RdpServiceNotConfiguredProps> = ({ vm })
             </b>
           </li>
           <li>
-            Example: virtctl expose virtualmachine {name} --name {name}
+            Example: virtctl expose VirtualMachine {name} --name {name}
             -rdp --port [UNIQUE_PORT] --target-port {DEFAULT_RDP_PORT} --type NodePort
           </li>
         </ul>
