@@ -1,3 +1,4 @@
+import produce from 'immer';
 import { dump, load } from 'js-yaml';
 
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
@@ -108,36 +109,38 @@ export const createVmSSHSecret = (vm: V1VirtualMachine, sshKey: string, secretNa
     },
   });
 
-export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string) => {
-  const cloudInitNoCloudVolume = vm.spec.template.spec.volumes?.find((v) => v.cloudInitNoCloud);
-  if (cloudInitNoCloudVolume) {
-    vm.spec.template.spec.volumes = vm.spec.template.spec.volumes.filter(
-      (v) => !v.cloudInitNoCloud,
-    );
-    vm.spec.template.spec.volumes.push({
-      name: cloudInitNoCloudVolume.name,
-      cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
-    });
-  }
-  vm.spec.template.spec.accessCredentials = [
-    {
-      sshPublicKey: {
-        source: {
-          secret: {
-            secretName: secretName || `${vm.metadata.name}-ssh-key`,
+export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string) =>
+  produce(vm, (vmDraft) => {
+    const cloudInitNoCloudVolume = vm.spec.template.spec.volumes?.find((v) => v.cloudInitNoCloud);
+    if (cloudInitNoCloudVolume) {
+      vmDraft.spec.template.spec.volumes = vm.spec.template.spec.volumes.filter(
+        (v) => !v.cloudInitNoCloud,
+      );
+      vmDraft.spec.template.spec.volumes.push({
+        name: cloudInitNoCloudVolume.name,
+        cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
+      });
+    }
+    vmDraft.spec.template.spec.accessCredentials = [
+      {
+        sshPublicKey: {
+          source: {
+            secret: {
+              secretName: secretName || `${vm.metadata.name}-ssh-key`,
+            },
+          },
+          propagationMethod: {
+            configDrive: {},
           },
         },
-        propagationMethod: {
-          configDrive: {},
-        },
       },
-    },
-  ];
-};
+    ];
+  });
 
-export const removeSecretToVM = (vm: V1VirtualMachine) => {
-  vm.spec.template.spec.accessCredentials = null;
-};
+export const removeSecretToVM = (vm: V1VirtualMachine) =>
+  produce(vm, (vmDraft) => {
+    vmDraft.spec.template.spec.accessCredentials = null;
+  });
 
 export type CloudInitUserData = {
   user: string;
