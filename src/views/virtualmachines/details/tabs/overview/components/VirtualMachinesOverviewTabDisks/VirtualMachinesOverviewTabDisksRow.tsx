@@ -7,13 +7,16 @@ const VirtualMachinesOverviewTabDisksRow = ({ obj, activeColumnIDs }) => {
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        {obj?.name}
+        <div data-test-id={`disk-${obj?.name}`}>{obj?.name}</div>
       </TableData>
       <TableData id="drive" activeColumnIDs={activeColumnIDs}>
-        {obj?.drive || NO_DATA_DASH}
+        <div data-test-id={`disk-${obj?.drive}`}>
+          {obj?.drive}
+          {obj?.drive || NO_DATA_DASH}
+        </div>
       </TableData>
       <TableData id="size" activeColumnIDs={activeColumnIDs}>
-        {obj?.size || NO_DATA_DASH}
+        <div data-test-id={`disk-${obj?.size}`}>{obj?.size || NO_DATA_DASH}</div>
       </TableData>
     </>
   );

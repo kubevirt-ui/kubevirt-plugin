@@ -56,22 +56,29 @@ const NetworkInterfaceTypeSelect: React.FC<NetworkInterfaceTypeSelectProps> = ({
 
   return (
     <FormGroup label={t('Type')} fieldId="type">
-      <Select
-        menuAppendTo="parent"
-        isOpen={isOpen}
-        onToggle={setIsOpen}
-        onSelect={handleChange}
-        variant={SelectVariant.single}
-        selections={interfaceType}
-      >
-        {Object.values(interfaceTypeOptions)
-          .filter(({ allowOption }) => allowOption)
-          .map(({ id, name, description }) => (
-            <SelectOption key={id} value={id} description={description}>
-              {name}
-            </SelectOption>
-          ))}
-      </Select>
+      <div data-test-id="network-interface-type-select">
+        <Select
+          menuAppendTo="parent"
+          isOpen={isOpen}
+          onToggle={setIsOpen}
+          onSelect={handleChange}
+          variant={SelectVariant.single}
+          selections={interfaceType}
+        >
+          {Object.values(interfaceTypeOptions)
+            .filter(({ allowOption }) => allowOption)
+            .map(({ id, name, description }) => (
+              <SelectOption
+                key={id}
+                value={id}
+                description={description}
+                data-test-id={`network-interface-type-select-${id}`}
+              >
+                {name}
+              </SelectOption>
+            ))}
+        </Select>
+      </div>
     </FormGroup>
   );
 };

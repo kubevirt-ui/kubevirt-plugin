@@ -61,11 +61,14 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
               <DescriptionList isHorizontal>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
-                  <DescriptionListDescription> {vm?.metadata?.name}</DescriptionListDescription>
+                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-name">
+                    {' '}
+                    {vm?.metadata?.name}
+                  </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
-                  <DescriptionListDescription>
+                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-status">
                     <Popover
                       headerContent={<div>{vm?.status?.printableStatus}</div>}
                       bodyContent={
@@ -83,17 +86,19 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                 </DescriptionListGroup>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Created')}</DescriptionListTerm>
-                  <DescriptionListDescription>{timestamp}</DescriptionListDescription>
+                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-created">
+                    {timestamp}
+                  </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('OS')}</DescriptionListTerm>
-                  <DescriptionListDescription>
+                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-os">
                     {getOperatingSystemName(vm) || getOperatingSystem(vm) || '-'}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Host')}</DescriptionListTerm>
-                  <DescriptionListDescription>
+                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-host">
                     {guestAgentData?.hostname ?? (
                       <MutedTextSpan text={t('Guest agent is required')} />
                     )}
@@ -101,7 +106,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                 </DescriptionListGroup>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Template')}</DescriptionListTerm>
-                  <DescriptionListDescription>
+                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-template">
                     {vm?.metadata?.labels?.['vm.kubevirt.io/template'] || '-'}
                   </DescriptionListDescription>
                 </DescriptionListGroup>

@@ -38,7 +38,10 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
   const { createModal } = useModal();
 
   return (
-    <div className="VirtualMachinesOverviewTabSnapshots--main">
+    <div
+      className="VirtualMachinesOverviewTabSnapshots--main"
+      data-test-id="virtual-machine-overview-snapshots"
+    >
       <Card>
         <CardTitle className="text-muted">
           {t('Snapshots ({{count}})', { count: snapshots.length || 0 })}

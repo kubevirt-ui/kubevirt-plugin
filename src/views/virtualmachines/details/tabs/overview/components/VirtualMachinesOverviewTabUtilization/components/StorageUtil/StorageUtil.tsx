@@ -64,7 +64,7 @@ const StorageUtil: React.FC<StorageUtilProps> = ({ vmi, vm, duration }) => {
     <div className="util">
       <div className="util-upper">
         <div className="util-title">{t('Storage')}</div>
-        <div className="util-summary">
+        <div className="util-summary" data-test-id="util-summary-storage">
           <div className="util-summary-value">
             {xbytes(usedBytes || 0, { iec: true, fixed: 0 })}
           </div>

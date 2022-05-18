@@ -65,7 +65,7 @@ const CPUUtil: React.FC<CPUUtilProps> = ({ duration, vmi, vm, pods }) => {
     <div className="util">
       <div className="util-upper">
         <div className="util-title">{t('CPU')}</div>
-        <div className="util-summary">
+        <div className="util-summary" data-test-id="util-summary-cpu">
           <div className="util-summary-value">{`${sumCPUUsage?.toFixed(2) || 0}s`}</div>
           <div className="util-summary-text text-muted">
             <div>{t('Requested of ')}</div>

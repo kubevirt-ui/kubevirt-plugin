@@ -86,43 +86,45 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
             </Alert>
           </StackItem>
         )}
-        <Split hasGutter>
-          <SplitItem>
-            <Button
-              isDisabled={!loaded || disableVmCreate}
-              isLoading={!vmCreateLoaded}
-              variant="primary"
-              onClick={onSubmit}
-            >
-              {t('Create VirtualMachine')}
-            </Button>
-          </SplitItem>
-          <SplitItem>
-            <Button
-              variant="secondary"
-              onClick={() =>
-                confirm(t('Are you sure you want to go back?')) &&
-                history.push(
-                  `/k8s/ns/${namespace}/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
-                )
-              }
-            >
-              {t('Back')}
-            </Button>
-          </SplitItem>
+        <div data-test-id="create-virtual-machine">
+          <Split hasGutter>
+            <SplitItem>
+              <Button
+                isDisabled={!loaded || disableVmCreate}
+                isLoading={!vmCreateLoaded}
+                variant="primary"
+                onClick={onSubmit}
+              >
+                {t('Create VirtualMachine')}
+              </Button>
+            </SplitItem>
+            <SplitItem>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  confirm(t('Are you sure you want to go back?')) &&
+                  history.push(
+                    `/k8s/ns/${namespace}/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
+                  )
+                }
+              >
+                {t('Back')}
+              </Button>
+            </SplitItem>
 
-          <SplitItem>
-            <Button
-              variant="link"
-              onClick={() =>
-                confirm(t('Are you sure you want to cancel?')) &&
-                history.push(`/k8s/ns/${namespace}/templatescatalog`)
-              }
-            >
-              {t('Cancel')}
-            </Button>
-          </SplitItem>
-        </Split>
+            <SplitItem>
+              <Button
+                variant="link"
+                onClick={() =>
+                  confirm(t('Are you sure you want to cancel?')) &&
+                  history.push(`/k8s/ns/${namespace}/templatescatalog`)
+                }
+              >
+                {t('Cancel')}
+              </Button>
+            </SplitItem>
+          </Split>
+        </div>
       </Stack>
     </footer>
   );

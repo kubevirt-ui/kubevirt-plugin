@@ -70,7 +70,7 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ duration, vmi, vm }) => {
           {t('Network Transfer')}
           <div className="util-title__subtitle text-muted">{t('Primary Network')}</div>
         </div>
-        <div className="util-summary">
+        <div className="util-summary" data-test-id="util-summary-network-transfer">
           <div className="util-summary-value">{`${totalTransferred}s`}</div>
           <div className="util-summary-text text-muted network-value">
             <div>{t('Total')}</div>

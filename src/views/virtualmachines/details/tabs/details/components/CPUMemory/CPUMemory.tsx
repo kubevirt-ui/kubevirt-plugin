@@ -17,7 +17,11 @@ const CPUMemory: React.FC<CPUMemoryProps> = ({ vm }) => {
     vm?.spec?.template?.spec?.domain?.resources?.requests as { [key: string]: string }
   )?.memory;
 
-  return <>{t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}</>;
+  return (
+    <div data-test-id="virtual-machine-overview-details-cpu-memory">
+      {t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}
+    </div>
+  );
 };
 
 export default CPUMemory;
