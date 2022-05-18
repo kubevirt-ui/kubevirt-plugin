@@ -44,29 +44,35 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
       isRequired
       className="pvc-selection-formgroup"
     >
-      <Select
-        aria-labelledby={testId}
-        isOpen={isNamespacePVCOpen}
-        onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
-        onSelect={onSelect}
-        variant={SelectVariant.single}
-        onFilter={filter(projectsName)}
-        hasInlineFilter
-        selections={selectedProject}
-        placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} project ---`)}
-        validated={!selectedProject ? ValidatedOptions.error : ValidatedOptions.default}
-        aria-invalid={!selectedProject ? true : false}
-        maxHeight={400}
-        data-test-id={`${testId}-dropdown`}
-        toggleId={`${testId}-toggle`}
-      >
-        {projectsName.map((projectName) => (
-          <SelectOption key={projectName} value={projectName}>
-            <span className="sr-only">{t('project')}</span>
-            <span className="co-m-resource-icon co-m-resource-project">PR</span> {projectName}
-          </SelectOption>
-        ))}
-      </Select>
+      <div data-test-id={`${testId}-dropdown`}>
+        <Select
+          aria-labelledby={testId}
+          isOpen={isNamespacePVCOpen}
+          onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
+          onSelect={onSelect}
+          variant={SelectVariant.single}
+          onFilter={filter(projectsName)}
+          hasInlineFilter
+          selections={selectedProject}
+          placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} project ---`)}
+          validated={!selectedProject ? ValidatedOptions.error : ValidatedOptions.default}
+          aria-invalid={!selectedProject ? true : false}
+          maxHeight={400}
+          data-test-id={`${testId}-dropdown`}
+          toggleId={`${testId}-toggle`}
+        >
+          {projectsName.map((projectName) => (
+            <SelectOption
+              key={projectName}
+              value={projectName}
+              data-test-id={`${testId}-dropdown-option-${projectName}`}
+            >
+              <span className="sr-only">{t('project')}</span>
+              <span className="co-m-resource-icon co-m-resource-project">PR</span> {projectName}
+            </SelectOption>
+          ))}
+        </Select>
+      </div>
     </FormGroup>
   );
 };

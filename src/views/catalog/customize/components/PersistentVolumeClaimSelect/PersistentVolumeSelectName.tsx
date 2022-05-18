@@ -46,26 +46,32 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
       isRequired
       className="pvc-selection-formgroup"
     >
-      <Select
-        aria-labelledby={testId}
-        isOpen={isOpen}
-        onToggle={() => setSelectOpen(!isOpen)}
-        onSelect={onSelect}
-        variant={SelectVariant.typeahead}
-        selections={pvcNameSelected}
-        onFilter={filter(pvcNames)}
-        placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} name ---`)}
-        isDisabled={isDisabled}
-        validated={!pvcNameSelected ? ValidatedOptions.error : ValidatedOptions.default}
-        aria-invalid={!pvcNameSelected ? true : false}
-        maxHeight={400}
-        data-test-id={`${testId}-dropdown`}
-        toggleId={`${testId}-toggle`}
-      >
-        {pvcNames.map((name) => (
-          <SelectOption key={name} value={name} />
-        ))}
-      </Select>
+      <div data-test-id={`${testId}-dropdown`}>
+        <Select
+          aria-labelledby={testId}
+          isOpen={isOpen}
+          onToggle={() => setSelectOpen(!isOpen)}
+          onSelect={onSelect}
+          variant={SelectVariant.typeahead}
+          selections={pvcNameSelected}
+          onFilter={filter(pvcNames)}
+          placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} name ---`)}
+          isDisabled={isDisabled}
+          validated={!pvcNameSelected ? ValidatedOptions.error : ValidatedOptions.default}
+          aria-invalid={!pvcNameSelected ? true : false}
+          maxHeight={400}
+          data-test-id={`${testId}-dropdown`}
+          toggleId={`${testId}-toggle`}
+        >
+          {pvcNames.map((name) => (
+            <SelectOption
+              key={name}
+              value={name}
+              data-test-id={`${testId}-dropdown-option-${pvcNames}`}
+            />
+          ))}
+        </Select>
+      </div>
     </FormGroup>
   );
 };

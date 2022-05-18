@@ -52,7 +52,13 @@ const DiskSourceUrlInput: React.FC<DiskSourceUrlInputProps> = ({ url, onChange, 
       helperTextInvalidIcon={<ExclamationCircleIcon />}
       validated={isValidURL ? ValidatedOptions.default : ValidatedOptions.error}
     >
-      <TextInput id="disk-source-url" type="text" value={url} onChange={onChange} />
+      <TextInput
+        data-test-id="disk-source-url"
+        id="disk-source-url"
+        type="text"
+        value={url}
+        onChange={onChange}
+      />
     </FormGroup>
   );
 };

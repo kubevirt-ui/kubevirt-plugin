@@ -66,24 +66,26 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
   }, [loaded, storageClass, storageClasses]);
   return (
     <FormGroup fieldId="storage-class" label={t('StorageClass')}>
-      {loaded ? (
-        <Select
-          menuAppendTo="parent"
-          isOpen={isOpen}
-          onToggle={setIsOpen}
-          onSelect={onSelect}
-          variant={SelectVariant.single}
-          selections={storageClass}
-          onFilter={FilterSCSelect(storageClasses, t)}
-          hasInlineFilter
-          maxHeight={200}
-          direction="up"
-        >
-          {getSCSelectOptions(storageClasses, t)}
-        </Select>
-      ) : (
-        <Loading />
-      )}
+      <div data-test-id="storage-class-select">
+        {loaded ? (
+          <Select
+            menuAppendTo="parent"
+            isOpen={isOpen}
+            onToggle={setIsOpen}
+            onSelect={onSelect}
+            variant={SelectVariant.single}
+            selections={storageClass}
+            onFilter={FilterSCSelect(storageClasses, t)}
+            hasInlineFilter
+            maxHeight={200}
+            direction="up"
+          >
+            {getSCSelectOptions(storageClasses, t)}
+          </Select>
+        ) : (
+          <Loading />
+        )}
+      </div>
     </FormGroup>
   );
 };

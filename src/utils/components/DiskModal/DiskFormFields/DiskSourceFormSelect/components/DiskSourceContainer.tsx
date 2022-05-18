@@ -34,7 +34,13 @@ const DiskSourceContainer: React.FC<DiskSourceUrlInputProps> = ({ url, onChange,
       fieldId="disk-source-container"
       isRequired
     >
-      <TextInput id="disk-source-container" type="text" value={url} onChange={onChange} />
+      <TextInput
+        id="disk-source-container"
+        type="text"
+        value={url}
+        onChange={onChange}
+        data-test-id="disk-source-container"
+      />
     </FormGroup>
   );
 };

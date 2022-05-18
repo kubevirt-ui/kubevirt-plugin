@@ -76,26 +76,35 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
   return (
     <>
       <FormGroup label={t('Source')} fieldId="disk-source" isRequired>
-        <Select
-          menuAppendTo="parent"
-          isOpen={isOpen}
-          onToggle={setIsOpen}
-          onSelect={onSelect}
-          variant={SelectVariant.single}
-          selections={diskSource}
-          isDisabled={diskSource === OTHER}
-        >
-          {sourceOptions.map(({ id, description, name }) => {
-            const isDisabled =
-              (isVMRunning && id === sourceTypes.EPHEMERAL) ||
-              (isCDROMType && id === sourceTypes.BLANK);
-            return (
-              <SelectOption isDisabled={isDisabled} key={id} value={id} description={description}>
-                {name}
-              </SelectOption>
-            );
-          })}
-        </Select>
+        <div data-test-id="disk-source-select">
+          <Select
+            data-test-id="disk-source-select"
+            menuAppendTo="parent"
+            isOpen={isOpen}
+            onToggle={setIsOpen}
+            onSelect={onSelect}
+            variant={SelectVariant.single}
+            selections={diskSource}
+            isDisabled={diskSource === OTHER}
+          >
+            {sourceOptions.map(({ id, description, name }) => {
+              const isDisabled =
+                (isVMRunning && id === sourceTypes.EPHEMERAL) ||
+                (isCDROMType && id === sourceTypes.BLANK);
+              return (
+                <SelectOption
+                  isDisabled={isDisabled}
+                  key={id}
+                  value={id}
+                  description={description}
+                  data-test-id={`disk-source-select-${id}`}
+                >
+                  {name}
+                </SelectOption>
+              );
+            })}
+          </Select>
+        </div>
       </FormGroup>
       {diskSource === sourceTypes.HTTP && (
         <DiskSourceUrlInput
@@ -106,6 +115,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
               payload: value,
             })
           }
+          data-test-id="disk-source-url-input"
           os={OS_NAME_TYPES[getOSNameWithoutVersionNumber(os)]}
         />
       )}
