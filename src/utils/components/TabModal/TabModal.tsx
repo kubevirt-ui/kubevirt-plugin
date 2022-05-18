@@ -103,7 +103,7 @@ const TabModal: TabModalFC = React.memo(
                     isLoading={isSubmitting}
                     variant={submitBtnVariant ?? 'primary'}
                   >
-                    {submitBtnText || t('Submit')}
+                    {submitBtnText || t('Save')}
                   </Button>
                 </ActionListItem>
                 <ActionListItem>

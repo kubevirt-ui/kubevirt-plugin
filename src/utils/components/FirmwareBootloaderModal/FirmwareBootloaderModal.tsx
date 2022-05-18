@@ -91,7 +91,6 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
       onClose={onClose}
       headerText={t('VirtualMachine boot method')}
       obj={updatedVirtualMachine}
-      submitBtnText={t('Save')}
     >
       <Form>
         <FormGroup fieldId="firmware-bootloader" label={t('Bootloader method')}>

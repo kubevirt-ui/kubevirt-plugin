@@ -50,7 +50,6 @@ const SSHAccessModal: React.FC<SSHAccessModalProps> = ({ vmi, isOpen, onClose, s
       onClose={onClose}
       onSubmit={onSubmit}
       headerText={t('SSH Access')}
-      submitBtnText={t('Save')}
       modalVariant={ModalVariant.medium}
     >
       <Stack hasGutter>
