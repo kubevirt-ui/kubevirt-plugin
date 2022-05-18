@@ -3,7 +3,8 @@ import * as React from 'react';
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Loading } from '@patternfly/quickstarts';
-import { Bullseye, Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { Bullseye, Button, Form, FormGroup, InputGroup, TextInput } from '@patternfly/react-core';
+import { EyeIcon, EyeSlashIcon } from '@patternfly/react-icons';
 
 import { CloudInitNetworkData, CloudInitUserData } from './utils/cloudinit-utils';
 import CloudInitEditor from './CloudInitEditor';
@@ -32,6 +33,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
   setEnableNetworkData,
 }) => {
   const { t } = useKubevirtTranslation();
+  const [passwordHidden, setPasswordHidden] = React.useState<boolean>(true);
 
   return (
     <React.Fragment key="cloudinit-editor">
@@ -64,14 +66,19 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
             label={t('Password')}
             fieldId={'cloudinit-password'}
             className="kv-cloudint-advanced-tab--validation-text"
-            helperText={t('Please provide password for username.')}
+            helperText={t('Password for this username')}
           >
-            <TextInput
-              type="text"
-              id="cloudinit-password"
-              value={userData?.password || ''}
-              onChange={(v) => updateUserField('password', v)}
-            />
+            <InputGroup>
+              <TextInput
+                type={passwordHidden ? 'password' : 'text'}
+                id="cloudinit-password"
+                value={userData?.password || ''}
+                onChange={(v) => updateUserField('password', v)}
+              />
+              <Button variant="control" onClick={() => setPasswordHidden(!passwordHidden)}>
+                {passwordHidden ? <EyeIcon /> : <EyeSlashIcon />}
+              </Button>
+            </InputGroup>
           </FormGroup>
           <FormGroup
             label={t('Hostname')}
