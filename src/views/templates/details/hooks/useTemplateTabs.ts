@@ -7,6 +7,7 @@ import TemplateDisksPage from '../tabs/disks/TemplateDisksPage';
 import TemplateNetworkPage from '../tabs/network/TemplateNetworkPage';
 import TemplateParametersPage from '../tabs/parameters/TemplateParametersPage';
 import TemplateSchedulingTab from '../tabs/scheduling/TemplateSchedulingTab';
+import TemplateScriptsPage from '../tabs/scripts/TemplateYAMLPage';
 import TemplateYAMLPage from '../tabs/yaml/TemplateYAMLPage';
 
 export const useVirtualMachineTabs = () => {
@@ -38,6 +39,11 @@ export const useVirtualMachineTabs = () => {
         href: 'disks',
         name: t('Disks'),
         component: TemplateDisksPage,
+      },
+      {
+        href: 'scripts',
+        name: t('Scripts'),
+        component: TemplateScriptsPage,
       },
       {
         href: 'parameters',
