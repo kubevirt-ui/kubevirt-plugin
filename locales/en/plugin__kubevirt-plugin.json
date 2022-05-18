@@ -712,6 +712,7 @@
   "VirtualMachine Templates": "VirtualMachine Templates",
   "VirtualMachine updated successfully": "VirtualMachine updated successfully",
   "VirtualMachine will attempt to boot from disks by order of appearance in YAML file": "VirtualMachine will attempt to boot from disks by order of appearance in YAML file",
+  "VirtualMachineInstance": "VirtualMachineInstance",
   "VirtualMachineInstance details": "VirtualMachineInstance details",
   "VirtualMachineInstance Details": "VirtualMachineInstance Details",
   "VirtualMachineInstances": "VirtualMachineInstances",

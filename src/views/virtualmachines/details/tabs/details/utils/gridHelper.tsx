@@ -2,6 +2,7 @@ import * as React from 'react';
 import { TFunction } from 'i18next';
 
 import { NodeModel, PodModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineInstanceModelRef } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
@@ -18,6 +19,7 @@ import FirstItemListPopover from '../../../../list/components/FirstItemListPopov
 
 export type VirtualMachineDetailsRightGridLayoutPresentation = {
   pod: React.ReactNode;
+  vmi: React.ReactNode;
   ipAddress: React.ReactNode;
   hostname: React.ReactNode;
   timezone: React.ReactNode;
@@ -34,6 +36,7 @@ export const getStoppedVMRightGridPresentation = (
 
   return {
     pod: NotAvailable,
+    vmi: NotAvailable,
     ipAddress: VirtualMachineIsNotRunning,
     hostname: NotAvailable,
     timezone: VirtualMachineIsNotRunning,
@@ -65,6 +68,13 @@ export const getRunningVMRightGridPresentation = (
         kind={PodModel.kind}
         name={vmiPod?.metadata?.name}
         namespace={vmiPod?.metadata?.namespace}
+      />
+    ),
+    vmi: (
+      <ResourceLink
+        kind={VirtualMachineInstanceModelRef}
+        name={vmi?.metadata?.name}
+        namespace={vmi?.metadata?.namespace}
       />
     ),
     ipAddress: <FirstItemListPopover items={ipAddresses} headerContent={'IP Addresses'} />,
