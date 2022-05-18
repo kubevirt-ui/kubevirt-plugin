@@ -39,7 +39,7 @@ export class TopConsumerMetric extends TopConsumerMetricObjectEnum<string> {
   static readonly MEMORY_SWAP_TRAFFIC = new TopConsumerMetric('memory-swap-traffic', {
     // t('By memory swap traffic')
     dropdownLabel: 'By memory swap traffic',
-    // t('Memory swap')
+    // t('Memory swap traffic')
     chartLabel: 'Memory swap traffic',
   });
 

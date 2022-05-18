@@ -35,11 +35,11 @@ const FeatureHighlightsSection: React.FC = () => {
       id: 'item2',
       title: (
         <FeatureHighlightsTitle
-          title={t('OpenShift Virtualization 4.7 Highlights')}
+          title={t('OpenShift Virtualization 4.10 Highlights')}
           readTime={t('5 min')}
         />
       ),
-      href: 'https://www.openshift.com/blog/openshift-virtualization-4.7-highlights',
+      href: 'https://www.openshift.com/blog/whats-new-in-openshift-virtualization-4.10',
       external: true,
     },
   ];
