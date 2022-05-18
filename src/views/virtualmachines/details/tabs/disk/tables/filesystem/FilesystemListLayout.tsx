@@ -15,7 +15,7 @@ type FileSystemListLayoutProps = {
 };
 
 const FileSystemListLayout: React.FC<FileSystemListLayoutProps> = ({ vmi, noDataEmptyMsg }) => {
-  const [data, loaded, loadingError] = useGuestOS(vmi);
+  const [data, loaded] = useGuestOS(vmi);
   const columns = useFilesystemListColumns();
   const fileSystems = data?.fsInfo?.disks || [];
 
@@ -26,7 +26,7 @@ const FileSystemListLayout: React.FC<FileSystemListLayoutProps> = ({ vmi, noData
         data={fileSystems}
         unfilteredData={fileSystems}
         loaded={loaded}
-        loadError={loadingError}
+        loadError={null}
         columns={columns}
         Row={FilesystemRow}
         NoDataEmptyMsg={noDataEmptyMsg}

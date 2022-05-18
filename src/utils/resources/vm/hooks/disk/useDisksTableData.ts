@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -29,11 +30,15 @@ const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
     name: vm?.metadata?.name,
     namespace: vm?.metadata?.namespace,
   });
+  const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
   const vmDisks = React.useMemo(
-    () => (!vmi ? getDisks(vm) : vmi?.spec?.domain?.devices?.disks),
-    [vm, vmi],
+    () => (!isVMRunning ? getDisks(vm) : vmi?.spec?.domain?.devices?.disks),
+    [vm, vmi, isVMRunning],
   );
-  const vmVolumes = React.useMemo(() => (!vmi ? getVolumes(vm) : vmi?.spec?.volumes), [vm, vmi]);
+  const vmVolumes = React.useMemo(
+    () => (!isVMRunning ? getVolumes(vm) : vmi?.spec?.volumes),
+    [vm, vmi, isVMRunning],
+  );
 
   const [pvcs, loaded, loadingError] = useK8sWatchResource<K8sResourceCommon[]>({
     kind: PersistentVolumeClaimModel.kind,
@@ -56,7 +61,7 @@ const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
     return getDiskRowDataLayout(diskDevices, getBootDisk(vm), t);
   }, [vmVolumes, vm, t, vmDisks, pvcs]);
 
-  return [disks || [], loaded, loadingError, vmi || null];
+  return [disks || [], loaded, loadingError, isVMRunning ? vmi : null];
 };
 
 export default useDisksTableData;
