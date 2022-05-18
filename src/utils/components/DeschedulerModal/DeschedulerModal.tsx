@@ -54,7 +54,7 @@ const DeschedulerModal: React.FC<DeschedulerModalProps> = ({ vm, isOpen, onClose
           />
         </FormGroup>
         {checked && (
-          <Alert isInline variant={AlertVariant.info} title={t('Active descheduler')}>
+          <Alert isInline variant={AlertVariant.info} title={t('Active Descheduler')}>
             {t(
               'This VirtualMachine is subject to the Descheduler profiles configured for eviction.',
             )}

@@ -65,7 +65,7 @@ const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
         {isAdmin && !isDeschedulerInstalled ? (
           <Tooltip
             content={t(
-              'To enable the descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more descheduler profiles.',
+              'To enable the Descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more Descheduler profiles.',
             )}
             position="right"
           >
