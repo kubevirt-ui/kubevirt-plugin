@@ -55,7 +55,7 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ duration, vmi, vm }) => {
     <div className="util">
       <div className="util-upper">
         <div className="util-title">{t('Memory')}</div>
-        <div className="util-summary">
+        <div className="util-summary" data-test-id="util-summary-memory">
           <div className="util-summary-value">
             {xbytes(memoryUsed || 0, { iec: true, fixed: 0 })}
           </div>

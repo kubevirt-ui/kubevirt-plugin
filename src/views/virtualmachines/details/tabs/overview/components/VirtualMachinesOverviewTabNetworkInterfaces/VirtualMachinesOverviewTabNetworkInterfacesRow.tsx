@@ -21,29 +21,35 @@ const VirtualMachinesOverviewTabInterfacesRow: React.FC<
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        <Popover
-          hasAutoWidth
-          position={PopoverPosition.left}
-          bodyContent={
-            <>
-              <div className="interface-row--title">{t('Network')}</div>
-              <div className="interface-row--value">{obj?.network?.name}</div>
-              <div className="interface-row--title">{t('Type')}</div>
-              <div className="interface-row--value">
-                {getPrintableNetworkInterfaceType(obj?.iface)}
-              </div>
-            </>
-          }
-        >
-          <div className="pf-c-description-list__text pf-m-help-text help">{obj?.iface?.name}</div>
-        </Popover>
+        <div data-test-id={`network-interface-${obj?.network?.name}`}>
+          <Popover
+            hasAutoWidth
+            position={PopoverPosition.left}
+            bodyContent={
+              <>
+                <div className="interface-row--title">{t('Network')}</div>
+                <div className="interface-row--value">{obj?.network?.name}</div>
+                <div className="interface-row--title">{t('Type')}</div>
+                <div className="interface-row--value">
+                  {getPrintableNetworkInterfaceType(obj?.iface)}
+                </div>
+              </>
+            }
+          >
+            <div className="pf-c-description-list__text pf-m-help-text help">
+              {obj?.iface?.name}
+            </div>
+          </Popover>
+        </div>
       </TableData>
       <TableData id="ip" activeColumnIDs={activeColumnIDs}>
-        <FirstItemListPopover
-          items={obj?.ipAddresses}
-          headerContent={'IP Addresses'}
-          includeCopyFirstItem
-        />
+        <div data-test-id={`network-interface-${obj?.ipAddresses}`}>
+          <FirstItemListPopover
+            items={obj?.ipAddresses}
+            headerContent={'IP Addresses'}
+            includeCopyFirstItem
+          />
+        </div>
       </TableData>
     </>
   );

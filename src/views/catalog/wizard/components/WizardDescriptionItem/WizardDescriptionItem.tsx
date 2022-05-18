@@ -60,7 +60,6 @@ export const WizardDescriptionItem: React.FC<WizardDescriptionItemProps> = React
   }) => {
     const { t } = useKubevirtTranslation();
     const titleWithCount = title.concat(count ? ` (${count})` : '');
-
     const getItemHeader = () => {
       if (onTitleClick)
         return (
@@ -115,9 +114,11 @@ export const WizardDescriptionItem: React.FC<WizardDescriptionItemProps> = React
             <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
           </Button>
         ) : (
-          <DescriptionListDescription data-test-id={testId}>
-            {description ?? <span className="text-muted">{t('Not available')}</span>}
-          </DescriptionListDescription>
+          <div data-test-id={testId}>
+            <DescriptionListDescription>
+              {description ?? <span className="text-muted">{t('Not available')}</span>}
+            </DescriptionListDescription>
+          </div>
         )}
       </DescriptionListGroup>
     );

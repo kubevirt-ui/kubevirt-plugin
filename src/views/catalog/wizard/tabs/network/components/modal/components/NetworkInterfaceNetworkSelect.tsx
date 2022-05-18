@@ -118,23 +118,29 @@ const NetworkInterfaceNetworkSelect: React.FC<NetworkInterfaceNetworkSelectProps
       }
       isRequired
     >
-      {hasPodNetwork && !loaded ? (
-        <Loading />
-      ) : (
-        <Select
-          menuAppendTo="parent"
-          isDisabled={!canCreateNetworkInterface}
-          onToggle={setIsOpen}
-          isOpen={isOpen}
-          onSelect={handleChange}
-          variant={SelectVariant.single}
-          selections={networkName}
-        >
-          {networkOptions?.map(({ key, value }) => (
-            <SelectOption key={key} value={value} />
-          ))}
-        </Select>
-      )}
+      <div data-test-id="network-attachment-definition-select">
+        {hasPodNetwork && !loaded ? (
+          <Loading />
+        ) : (
+          <Select
+            menuAppendTo="parent"
+            isDisabled={!canCreateNetworkInterface}
+            onToggle={setIsOpen}
+            isOpen={isOpen}
+            onSelect={handleChange}
+            variant={SelectVariant.single}
+            selections={networkName}
+          >
+            {networkOptions?.map(({ key, value }) => (
+              <SelectOption
+                key={key}
+                value={value}
+                data-test-id={`network-attachment-definition-select-${key}`}
+              />
+            ))}
+          </Select>
+        )}
+      </div>
     </FormGroup>
   );
 };

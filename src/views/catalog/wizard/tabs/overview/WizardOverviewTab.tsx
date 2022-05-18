@@ -47,11 +47,13 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
             <WizardDescriptionItem
               title={t('Name')}
               description={vm.metadata.name}
+              testId="wizard-overview-name"
               helperPopover={{ header: t('Name'), content: t('Name of the VirtualMachine') }}
             />
 
             <WizardDescriptionItem
               title={t('Namespace')}
+              testId="wizard-overview-namespace"
               description={vm.metadata.namespace}
               helperPopover={{
                 header: t('Namespace'),
@@ -63,6 +65,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
               title={t('Description')}
               description={description}
               isEdit
+              testId="wizard-overview-description"
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <DescriptionModal
@@ -87,12 +90,17 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
               }}
             />
 
-            <WizardDescriptionItem title={t('Operating system')} description={displayName} />
+            <WizardDescriptionItem
+              title={t('Operating system')}
+              description={displayName}
+              testId="wizard-overview-operating-system"
+            />
 
             <WizardDescriptionItem
               className="wizard-overview-description-left-column"
               title={t('CPU | Memory')}
               isEdit
+              testId="wizard-overview-cpu-memory"
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <CPUMemoryModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
@@ -108,6 +116,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
             <WizardDescriptionItem
               title={t('Boot method')}
               isEdit
+              testId="wizard-overview-boot-method"
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <FirmwareBootloaderModal
@@ -125,6 +134,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
               className="wizard-overview-description-left-column"
               title={t('Workload profile')}
               description={WORKLOADS_LABELS?.[workloadAnnotation] ?? t('Other')}
+              testId="wizard-overview-workload-profile"
             />
           </DescriptionList>
         </GridItem>
@@ -143,11 +153,13 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
                   interfaces={interfaces}
                 />
               }
+              testId="wizard-overview-network-interfaces"
             />
 
             <WizardDescriptionItem
               title={t('Disks')}
               count={disks?.length}
+              testId="wizard-overview-disks"
               onTitleClick={() => history.push(`/k8s/ns/${ns}/templatescatalog/review/disks`)}
               description={<WizardOverviewDisksTable isInlineGrid vm={vm} />}
             />
@@ -156,6 +168,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
               count={nDevices}
               description={<HardwareDevices vm={vm} onSubmit={updateVM} />}
               title={t('Hardware devices')}
+              testId="wizard-overview-hardware-devices"
             />
           </DescriptionList>
         </GridItem>

@@ -42,20 +42,27 @@ const NetworkInterfaceModelSelect: React.FC<NetworkInterfaceModelSelectProps> = 
 
   return (
     <FormGroup label={t('Model')} fieldId="model">
-      <Select
-        menuAppendTo="parent"
-        isOpen={isOpen}
-        onToggle={setIsOpen}
-        onSelect={handleChange}
-        variant={SelectVariant.single}
-        selections={interfaceModel}
-      >
-        {Object.values(interfaceModelOptions).map(({ id, name, description }) => (
-          <SelectOption key={id} value={id} description={description}>
-            {name}
-          </SelectOption>
-        ))}
-      </Select>
+      <div data-test-id="model-select">
+        <Select
+          menuAppendTo="parent"
+          isOpen={isOpen}
+          onToggle={setIsOpen}
+          onSelect={handleChange}
+          variant={SelectVariant.single}
+          selections={interfaceModel}
+        >
+          {Object.values(interfaceModelOptions).map(({ id, name, description }) => (
+            <SelectOption
+              key={id}
+              value={id}
+              description={description}
+              data-test-id={`model-select-${id}`}
+            >
+              {name}
+            </SelectOption>
+          ))}
+        </Select>
+      </div>
     </FormGroup>
   );
 };
