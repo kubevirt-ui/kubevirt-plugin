@@ -135,7 +135,7 @@ export const getVolumeResourceName = (volume: V1Volume): string => {
 };
 
 export const isDefaultStorageClass = (storageClass: IoK8sApiStorageV1StorageClass): boolean =>
-  Boolean(storageClass?.metadata?.annotations?.['storageclass.kubernetes.io/is-default-class']);
+  storageClass?.metadata?.annotations?.['storageclass.kubernetes.io/is-default-class'] === 'true';
 
 export const getDefaultStorageClass = (
   storageClasses: IoK8sApiStorageV1StorageClass[],
