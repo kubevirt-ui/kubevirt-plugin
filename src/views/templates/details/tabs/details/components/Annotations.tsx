@@ -1,23 +1,55 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
 
+import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Breadcrumb,
   BreadcrumbItem,
+  Button,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
   Popover,
 } from '@patternfly/react-core';
+import { PencilAltIcon } from '@patternfly/react-icons';
 
-type AnnotationsProps = {
-  count: number;
-};
+import { LabelsAnnotationsType, TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-const Annotations: React.FC<AnnotationsProps> = ({ count }) => {
+const Annotations: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
+  const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
+  const annotationsCount = Object.keys(template?.metadata?.annotations || {}).length;
+  const annotationsText = t('{{annotationsCount}} Annotations', {
+    annotationsCount,
+  });
+
+  const onAnnotationsSubmit = (updatedAnnotations: LabelsAnnotationsType) =>
+    k8sPatch({
+      model: TemplateModel,
+      resource: template,
+      data: [
+        {
+          op: 'replace',
+          path: '/metadata/annotations',
+          value: updatedAnnotations,
+        },
+      ],
+    });
+
+  const onEditClick = () =>
+    createModal(({ isOpen, onClose }) => (
+      <AnnotationsModal
+        obj={template}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={onAnnotationsSubmit}
+      />
+    ));
 
   return (
     <DescriptionListGroup>
@@ -47,9 +79,14 @@ const Annotations: React.FC<AnnotationsProps> = ({ count }) => {
       </DescriptionListTermHelpText>
 
       <DescriptionListDescription>
-        {t('{{count}} annotations', {
-          count,
-        })}
+        {editable ? (
+          <Button type="button" isInline onClick={onEditClick} variant="link">
+            {annotationsText}
+            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+          </Button>
+        ) : (
+          annotationsText
+        )}
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

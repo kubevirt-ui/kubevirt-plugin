@@ -25,8 +25,8 @@ const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template,
     <DescriptionList>
       <Name name={template?.metadata?.name} />
       <Namespace namespace={template?.metadata?.namespace} />
-      <Labels labels={template?.metadata?.labels} />
-      <Annotations count={Object.keys(template?.metadata?.annotations || {}).length} />
+      <Labels template={template} editable={editable} />
+      <Annotations template={template} editable={editable} />
       <Description template={template} editable={editable} />
       <DescriptionItem title={t('Operating system')} content={getOperatingSystemName(template)} />
       <DescriptionItem title={t('Workload profile')} content={useWorkloadProfile(template)} />
