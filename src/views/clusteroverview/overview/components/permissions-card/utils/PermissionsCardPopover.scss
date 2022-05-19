@@ -8,6 +8,10 @@
   padding-right: var(--pf-c-card--child--PaddingRight);
 }
 
+.kv-permissions-card__popover-item:last-child {
+  padding-bottom: 0;
+}
+
 .kv-permissions-card__popover-table-header {
   font-size: var(--pf-global--FontSize--md);
   font-weight: bold;

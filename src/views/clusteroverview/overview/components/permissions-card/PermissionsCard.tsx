@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   GreenCheckCircleIcon,
   YellowExclamationTriangleIcon,
@@ -10,11 +9,11 @@ import { Card, CardBody, CardHeader, CardTitle, Flex, FlexItem } from '@patternf
 import { usePermissionsCardPermissions } from './hooks/useOverviewPermissions';
 import { PermissionsCardPopover } from './utils/PermissionsCardPopover';
 import { PermissionsCountItem } from './utils/PermissionsCountItem';
+import PermissionsCardTitle from './PermissionsCardTitle';
 
 import './PermissionsCard.scss';
 
 const PermissionsCard: React.FC = () => {
-  const { t } = useKubevirtTranslation();
   const permissionsData = usePermissionsCardPermissions();
   const {
     capabilitiesData,
@@ -26,7 +25,9 @@ const PermissionsCard: React.FC = () => {
   return (
     <Card data-test-id="kv-overview-permissions-card">
       <CardHeader>
-        <CardTitle>{t('Permissions')}</CardTitle>
+        <CardTitle>
+          <PermissionsCardTitle />
+        </CardTitle>
       </CardHeader>
       <CardBody>
         <div className="kv-permissions-card__status">

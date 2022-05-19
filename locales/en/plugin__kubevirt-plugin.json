@@ -467,6 +467,7 @@
   "PCI host devices": "PCI host devices",
   "Pending Changes": "Pending Changes",
   "Permissions": "Permissions",
+  "Permissions inform you of the user capabilities assigned to the user role for each listed task. There will be an orange alert icon next to any task that you are not permitted to perform.": "Permissions inform you of the user capabilities assigned to the user role for each listed task. There will be an orange alert icon next to any task that you are not permitted to perform.",
   "Persistent Hotplug": "Persistent Hotplug",
   "Persistent Volume Claim name": "Persistent Volume Claim name",
   "Persistent Volume Claim project": "Persistent Volume Claim project",
