@@ -53,7 +53,7 @@ const BootMethod: React.FC<BootMethodProps> = ({ template }) => {
 
   return (
     <DescriptionListGroup>
-      <DescriptionListTerm>{t('Boot method')}</DescriptionListTerm>
+      <DescriptionListTerm>{t('Boot mode')}</DescriptionListTerm>
       <DescriptionListDescription>
         {!isCommonTemplate ? (
           <Button type="button" isInline onClick={onEditClick} variant="link">

@@ -114,7 +114,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
             />
 
             <WizardDescriptionItem
-              title={t('Boot method')}
+              title={t('Boot mode')}
               isEdit
               testId="wizard-overview-boot-method"
               onEditClick={() =>

@@ -224,7 +224,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
               firmwareBootloaderTitle
             )
           }
-          descriptionHeader={t('Boot method')}
+          descriptionHeader={t('Boot mode')}
           isEdit={canUpdateStoppedVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
