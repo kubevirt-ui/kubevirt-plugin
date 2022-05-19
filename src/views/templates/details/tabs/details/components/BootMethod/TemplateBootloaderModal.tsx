@@ -94,11 +94,11 @@ const TemplateBootloaderModal: React.FC<TemplateBootloaderModalProps> = ({
       onSubmit={onSubmit}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('VirtualMachine Template boot method')}
+      headerText={t('Boot mode')}
       obj={updatedTemplate}
     >
       <Form>
-        <FormGroup fieldId="template-firmware-bootloader" label={t('Bootloader method')}>
+        <FormGroup fieldId="template-firmware-bootloader" label={t('Boot mode')}>
           <Select
             menuAppendTo="parent"
             isOpen={isDropdownOpen}

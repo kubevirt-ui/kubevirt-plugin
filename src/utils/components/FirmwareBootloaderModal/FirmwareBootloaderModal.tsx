@@ -89,11 +89,11 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
       onSubmit={onSubmit}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('VirtualMachine boot method')}
+      headerText={t('Boot mode')}
       obj={updatedVirtualMachine}
     >
       <Form>
-        <FormGroup fieldId="firmware-bootloader" label={t('Bootloader method')}>
+        <FormGroup fieldId="firmware-bootloader" label={t('Boot mode')}>
           <Select
             menuAppendTo="parent"
             isOpen={isDropdownOpen}
