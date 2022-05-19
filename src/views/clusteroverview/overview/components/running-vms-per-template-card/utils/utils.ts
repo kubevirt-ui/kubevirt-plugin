@@ -60,7 +60,7 @@ export const getTemplateToVMCountMap = (loaded, vms, templates) => {
 
   if (loaded) {
     vms.forEach((vm) => {
-      const template = vm?.metadata?.labels[LABEL_USED_TEMPLATE_NAME];
+      const template = vm?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME];
       if (template) {
         const value = templateToVMCountMap.has(template)
           ? templateToVMCountMap.get(template).vmCount + 1
