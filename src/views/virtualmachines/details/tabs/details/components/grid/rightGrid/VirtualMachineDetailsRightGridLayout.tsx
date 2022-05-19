@@ -65,6 +65,10 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           descriptionHeader={t('Pod')}
         />
         <VirtualMachineDescriptionItem
+          descriptionData={vmDetailsRightGridObj?.vmi}
+          descriptionHeader={t('VirtualMachineInstance')}
+        />
+        <VirtualMachineDescriptionItem
           descriptionData={<BootOrderSummary vm={vm} />}
           descriptionHeader={t('Boot Order')}
           isEdit
