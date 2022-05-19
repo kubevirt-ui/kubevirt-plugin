@@ -14,6 +14,7 @@ import {
 
 import { GettingStartedLink } from '../types';
 
+import GettingStartedLinkExtraContent from './GettingStartedLinkExtraContent';
 import { getLinkComponent, getMoreLinkContent } from './utils';
 
 import './GettingStartedContent.scss';
@@ -67,28 +68,44 @@ const GettingStartedContent: React.FC<GettingStartedContentProps> = ({
                   <Skeleton fontSize="sm" />
                 </li>
               ) : (
-                <SimpleListItem
-                  key={link.id}
-                  component={getLinkComponent(link)}
-                  componentClassName={link.external ? 'co-external-link' : 'co-goto-arrow'}
-                  componentProps={
-                    link.external
-                      ? {
-                          href: link.href,
-                          target: '_blank',
-                          rel: 'noopener noreferrer',
-                          'data-test': `item ${link.id}`,
-                        }
-                      : {
-                          to: link.href,
-                          'data-test': `item ${link.id}`,
-                        }
-                  }
-                  href={link.href}
-                  onClick={handleClick}
-                >
-                  {link.title}
-                </SimpleListItem>
+                <span key={link.id}>
+                  <SimpleListItem
+                    component={getLinkComponent(link)}
+                    componentClassName={link.external ? 'co-external-link' : 'co-goto-arrow'}
+                    componentProps={
+                      link.external
+                        ? {
+                            href: link.href,
+                            target: '_blank',
+                            rel: 'noopener noreferrer',
+                            'data-test': `item ${link.id}`,
+                          }
+                        : {
+                            to: link.href,
+                            'data-test': `item ${link.id}`,
+                          }
+                    }
+                    href={link.href}
+                    onClick={handleClick}
+                  >
+                    {link.title}
+                  </SimpleListItem>
+                  <GettingStartedLinkExtraContent link={link} />
+                  {/*{link.showMoreLink && (*/}
+                  {/*  <div className="kv-getting-started-content--more-block">*/}
+                  {/*    {link?.description}*/}
+                  {/*    {link?.moreLinkExternal ? (*/}
+                  {/*      <ExternalLink*/}
+                  {/*        href={link.moreLinkHref}*/}
+                  {/*        text={link.moreLinkText}*/}
+                  {/*        additionalClassName="kv-getting-started-content__more-block--link"*/}
+                  {/*      />*/}
+                  {/*    ) : (*/}
+                  {/*      <Link to={link.moreLinkHref}>{link.moreLinkText}</Link>*/}
+                  {/*    )}*/}
+                  {/*  </div>*/}
+                  {/*)}*/}
+                </span>
               );
             })}
           </SimpleList>
