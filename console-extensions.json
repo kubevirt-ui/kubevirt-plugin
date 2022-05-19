@@ -57,37 +57,15 @@
     }
   },
   {
-    "type": "console.navigation/href",
+    "type": "console.navigation/resource-ns",
     "properties": {
       "id": "templates",
       "section": "virtualization",
       "name": "%plugin__kubevirt-plugin~Templates%",
-      "href": "/templates",
-      "prefixNamespaced": true,
+      "resource": "templates",
       "dataAttributes": {
         "data-quickstart-id": "qs-nav-templates",
         "data-test-id": "templates-nav-item"
-      }
-    },
-    "flags": {
-      "required": ["OPENSHIFT"]
-    }
-  },
-  {
-    "type": "console.page/route",
-    "properties": {
-      "path": ["/k8s/ns/:ns/templates/:name", "/k8s/all-namespaces/templates/:name"],
-      "component": {
-        "$codeRef": "TemplateNavPage"
-      }
-    }
-  },
-  {
-    "type": "console.page/route",
-    "properties": {
-      "path": ["/k8s/ns/:ns/templates", "/k8s/all-namespaces/templates"],
-      "component": {
-        "$codeRef": "VirtualMachineTemplatesList"
       }
     }
   },
@@ -113,6 +91,17 @@
         "version": "v1"
       },
       "component": { "$codeRef": "VirtualMachinesInstancesList" }
+    }
+  },
+  {
+    "type": "console.page/resource/list",
+    "properties": {
+      "model": {
+        "group": "template.openshift.io",
+        "version": "v1",
+        "kind": "Template"
+      },
+      "component": { "$codeRef": "VirtualMachineTemplatesList" }
     }
   },
   {
@@ -144,6 +133,17 @@
         "version": "v1"
       },
       "component": { "$codeRef": "VirtualMachinesInstancePage" }
+    }
+  },
+  {
+    "type": "console.page/resource/details",
+    "properties": {
+      "model": {
+        "group": "template.openshift.io",
+        "version": "v1",
+        "kind": "Template"
+      },
+      "component": { "$codeRef": "TemplateNavPage" }
     }
   },
   {

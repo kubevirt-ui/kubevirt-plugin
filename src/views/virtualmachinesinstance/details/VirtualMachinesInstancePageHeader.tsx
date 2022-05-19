@@ -20,7 +20,7 @@ const VirtualMachinesInstancePageHeader: React.FC<VirtualMachinesInstancePageHea
   const IconComponent = icon?.[status];
   return (
     <div className="co-m-nav-title co-m-nav-title--detail">
-      <VirtualMachineInstanceBreadcrumb namespace={vmi?.metadata?.namespace} />
+      <VirtualMachineInstanceBreadcrumb />
       <span className={'co-m-pane__heading'}>
         <h1 className="co-resource-item__resource-name">
           <span className={`co-m-resource-icon co-m-resource-icon--lg`}>{t('VMI')}</span>

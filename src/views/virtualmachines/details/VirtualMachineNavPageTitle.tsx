@@ -28,7 +28,7 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
   return (
     <div className="co-m-nav-title co-m-nav-title--detail">
-      <VirtualMachineBreadcrumb namespace={vm?.metadata?.namespace} />
+      <VirtualMachineBreadcrumb />
       <span className="co-m-pane__heading">
         <h1 className="co-resource-item__resource-name">
           <span className="co-m-resource-icon co-m-resource-icon--lg">{t('VM')}</span>

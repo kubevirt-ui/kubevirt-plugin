@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { V1Template, VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useLastNamespace } from '@kubevirt-utils/hooks/useLastNamespace';
 import { Breadcrumb, BreadcrumbItem, Button, Title } from '@patternfly/react-core';
 
 import TemplateActions from './TemplateActions';
@@ -14,7 +16,9 @@ type TemplatePageTitleTitleProps = {
 const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const namespace = template?.metadata?.namespace;
+  const [lastNamespace] = useLastNamespace();
+
+  const namespacePath = lastNamespace === ALL_NAMESPACES ? lastNamespace : `ns/${lastNamespace}`;
 
   const onBreadcrumbClick = (url: string) =>
     confirm(t('Are you sure you want to leave this page?')) && history.push(url);
@@ -26,16 +30,7 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
           <Button
             variant="link"
             isInline
-            onClick={() => onBreadcrumbClick(`/k8s/ns/${namespace}/${VirtualMachineModelRef}`)}
-          >
-            {t('Virtualization')}
-          </Button>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <Button
-            variant="link"
-            isInline
-            onClick={() => onBreadcrumbClick(`/k8s/ns/${namespace}/templates`)}
+            onClick={() => onBreadcrumbClick(`/k8s/${namespacePath}/templates`)}
           >
             {t('Templates')}
           </Button>
