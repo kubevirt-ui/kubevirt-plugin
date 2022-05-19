@@ -17,6 +17,8 @@ export type TemplateDetailsGridProps = {
   editable?: boolean;
 };
 
+export type LabelsAnnotationsType = { [key: string]: string };
+
 type TemplateDetailsPageProps = RouteComponentProps<{
   ns: string;
   name: string;
