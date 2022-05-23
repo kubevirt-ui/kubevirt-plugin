@@ -33,7 +33,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
 
     const dataSource =
       availableDatasources[
-        `${bootSource?.source?.sourceRef.namespace}-${bootSource?.source?.sourceRef.name}`
+        `${bootSource?.source?.sourceRef?.namespace}-${bootSource?.source?.sourceRef?.name}`
       ];
     const { memory, cpuCount } = getTemplateFlavorData(template);
 
