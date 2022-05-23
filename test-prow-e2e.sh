@@ -109,7 +109,7 @@ export KUBEVIRT_PLUGIN_NAME="kubevirt-plugin"
 KUBEVIRT_PLUGIN_IMAGE="$1"
 
 echo "Deploy Kubevirt Plugin"
-oc process -n ${NS} -f openshift-ci/template.yaml \
+oc process -n ${NS} -f oc-manifest.yaml \
   -p PLUGIN_NAME=${KUBEVIRT_PLUGIN_NAME} \
   -p NAMESPACE=${NS} \
   -p IMAGE=${KUBEVIRT_PLUGIN_IMAGE} \

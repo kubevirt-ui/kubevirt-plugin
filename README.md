@@ -104,7 +104,7 @@ After pushing an image with your changes to an image registry, you can deploy
 the plugin to a cluster by instantiating the template:
 
 ```sh
-oc process -f template.yaml \
+oc process -f oc-manifest.yaml \
   -p PLUGIN_NAME=kubevirt-plugin \
   -p NAMESPACE=kubevirt-ui \
   -p IMAGE=quay.io/kubevirt-ui/kubevirt-plugin:latest \
