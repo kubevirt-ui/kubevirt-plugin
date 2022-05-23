@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -30,6 +31,8 @@ type CustomizeFormWithStorageProps = {
 
 const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
+  const methods = useForm();
+
   const [diskSource, setDiskSource] = React.useState<V1beta1DataVolumeSpec>();
   const [cdSource, setCDSource] = React.useState<V1beta1DataVolumeSpec>();
 
@@ -58,28 +61,30 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ tem
   const nameField = React.useMemo(() => getVirtualMachineNameField(template, t), [template, t]);
 
   return (
-    <Form onSubmit={onSubmit}>
-      <FieldGroup field={nameField} showError={error} />
+    <FormProvider {...methods}>
+      <Form onSubmit={methods.handleSubmit(onSubmit)}>
+        <FieldGroup field={nameField} showError={error} />
 
-      {requiredFields?.map((field) => (
-        <FieldGroup key={field.name} field={field} showError={error} />
-      ))}
+        {requiredFields?.map((field) => (
+          <FieldGroup key={field.name} field={field} showError={error} />
+        ))}
 
-      <ExpandableCustomizeSourceSection
-        diskSource={diskSource}
-        setDiskSource={setDiskSource}
-        template={template}
-        withDrivers={windowsDrivers}
-        setDrivers={setWindowsDrivers}
-        cdSource={cdSource}
-        setCDSource={setCDSource}
-      />
+        <ExpandableCustomizeSourceSection
+          diskSource={diskSource}
+          setDiskSource={setDiskSource}
+          template={template}
+          withDrivers={windowsDrivers}
+          setDrivers={setWindowsDrivers}
+          cdSource={cdSource}
+          setCDSource={setCDSource}
+        />
 
-      <ExpandableOptionsFields optionalFields={optionalFields} />
+        <ExpandableOptionsFields optionalFields={optionalFields} />
 
-      <FormError error={error} />
-      <FormActionGroup loading={!loaded} />
-    </Form>
+        <FormError error={error} />
+        <FormActionGroup loading={!loaded} />
+      </Form>
+    </FormProvider>
   );
 };
 

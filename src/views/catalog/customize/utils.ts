@@ -27,9 +27,6 @@ export const overrideVirtualMachineDataVolumeSpec = (
   });
 };
 
-export const isFieldInvalid = (field: TemplateParameter, formData: FormData): boolean =>
-  (formData.get(field.name) as string).length === 0;
-
 export const setTemplateParameters = (template: V1Template, formData: FormData): V1Template => {
   template.parameters = template.parameters.map((parameter) => {
     const formParameter = formData.get(parameter.name) as string;

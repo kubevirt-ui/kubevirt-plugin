@@ -18,7 +18,7 @@ import { DEFAULT_NAMESPACE } from '../../constants';
 import { processTemplate } from '../../utils';
 
 type useCustomizeFormSubmitType = [
-  onSubmit: (event: any) => Promise<void>,
+  onSubmit: (_data: any, event: { target: HTMLFormElement }) => Promise<void>,
   loaded: boolean,
   error: any,
 ];
@@ -34,11 +34,10 @@ export const useCustomizeFormSubmit = (
 
   const { updateVM, updateTabsData, loaded: vmLoaded, error: vmError } = useWizardVMContext();
 
-  const onSubmit = async (event) => {
-    event.preventDefault();
+  const onSubmit = async (_data, event: { target: HTMLFormElement }) => {
     setTemplateLoaded(false);
     try {
-      const formData = new FormData(event.currentTarget as HTMLFormElement);
+      const formData = new FormData(event.target);
       const processedTemplate = await processTemplate({
         template,
         namespace: ns || DEFAULT_NAMESPACE,

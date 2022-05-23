@@ -1,19 +1,24 @@
 import * as React from 'react';
 
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
-import {
-  CustomizeSource,
-  DEFAULT_SOURCE,
-  HTTP_SOURCE_NAME,
-  REGISTRY_SOURCE_NAME,
-} from '../components/CustomizeSource';
+import { CustomizeSource } from '../components/CustomizeSource';
 
 import { getMockTemplate } from './mocks';
 
 jest.mock('react-router-dom', () => ({
   useParams: () => ({ ns: 'mock-namespace' }),
+}));
+
+jest.mock('react-hook-form', () => ({
+  useFormContext: jest.fn().mockImplementation(() => ({
+    register: jest.fn(),
+    watch: jest.fn(),
+    handleSubmit: jest.fn(),
+    formState: {
+      errors: {},
+    },
+  })),
 }));
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
@@ -70,106 +75,5 @@ describe('Test CustomizeSource', () => {
     );
 
     screen.getByText('CD source');
-  });
-
-  it('Select HTTP source', () => {
-    const testImageUrl = 'imageUrl';
-    render(
-      <CustomizeSource
-        diskSource={undefined}
-        template={template}
-        setDiskSource={onChangeMock}
-        setDrivers={setDrivers}
-        withDrivers={false}
-        setCDSource={setCDSource}
-        cdSource={undefined}
-      />,
-    );
-
-    act(() => {
-      fireEvent.click(screen.getByTestId(DEFAULT_SOURCE));
-    });
-
-    act(() => {
-      fireEvent.click(screen.getByTestId(HTTP_SOURCE_NAME));
-    });
-
-    userEvent.type(screen.getByLabelText('Image URL'), testImageUrl);
-
-    expect(onChangeMock).lastCalledWith({
-      storage: {
-        resources: {
-          requests: {
-            storage:
-              template.objects[0].spec.dataVolumeTemplates[0].spec.storage.resources.requests
-                .storage,
-          },
-        },
-      },
-      source: {
-        http: {
-          url: testImageUrl,
-        },
-      },
-    });
-  });
-
-  it('Select Container source and change volume', () => {
-    const testContainer = 'containerurl';
-    render(
-      <CustomizeSource
-        template={template}
-        diskSource={undefined}
-        setDiskSource={onChangeMock}
-        setDrivers={setDrivers}
-        withDrivers={false}
-        setCDSource={setCDSource}
-        cdSource={undefined}
-      />,
-    );
-    const templateStorage =
-      template.objects[0].spec.dataVolumeTemplates[0].spec.storage.resources.requests.storage;
-
-    act(() => {
-      fireEvent.click(screen.getByTestId(DEFAULT_SOURCE));
-    });
-
-    act(() => {
-      fireEvent.click(screen.getByTestId(REGISTRY_SOURCE_NAME));
-    });
-
-    userEvent.type(screen.getByLabelText('Container Image'), testContainer);
-
-    expect(onChangeMock).lastCalledWith({
-      storage: {
-        resources: {
-          requests: {
-            storage: templateStorage,
-          },
-        },
-      },
-      source: {
-        registry: {
-          url: 'docker://'.concat(testContainer),
-        },
-      },
-    });
-
-    const mockedVolumeValue = '23';
-    userEvent.type(
-      screen.getByDisplayValue(parseInt(templateStorage)),
-      `{selectall}${mockedVolumeValue}`,
-    );
-
-    expect(onChangeMock).lastCalledWith({
-      storage: {
-        resources: { requests: { storage: mockedVolumeValue + 'Gi' } },
-      },
-      source: {
-        registry: {
-          url: 'docker://'.concat(testContainer),
-        },
-      },
-    });
   });
 });

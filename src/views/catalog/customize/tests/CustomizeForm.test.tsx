@@ -1,16 +1,22 @@
 import * as React from 'react';
 
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 
 import { CustomizeForm } from '../components/CustomizeForms/CustomizeForm';
 
-import { getMockTemplate, k8sCreateTemplateRejectRequiredFields } from './mocks';
+import { getMockTemplate } from './mocks';
 
 jest.mock('react-router-dom', () => ({
   useParams: () => ({ ns: 'mock-namespace' }),
   useHistory: () => ({ push: jest.fn() }),
+}));
+
+jest.mock('react-hook-form', () => ({
+  FormProvider: ({ children }) => children,
+  useForm: jest.fn().mockImplementation(() => ({
+    handleSubmit: jest.fn(),
+  })),
 }));
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
@@ -27,14 +33,6 @@ jest.mock('../../utils/WizardVMContext', () => ({
     .fn()
     .mockImplementation(() => ({ updateVM: jest.fn(), loaded: true, error: undefined })),
 }));
-
-const fillFieldsWithText = (testInput) => {
-  (screen.getAllByRole('textbox') as HTMLInputElement[]).forEach((inputText) => {
-    if (!inputText.value) {
-      userEvent.type(inputText, testInput);
-    }
-  });
-};
 
 let mockVirtualMachineTemplate = getMockTemplate();
 
@@ -59,50 +57,6 @@ describe('Test CustomizeForm', () => {
     );
 
     expect(screen.queryByText('Storage')).toBeNull();
-  });
-
-  it('On submit create the vm', async () => {
-    const mockTestInput = 'test-input-string';
-    render(<CustomizeForm template={getMockTemplate()} />);
-
-    fillFieldsWithText(mockTestInput);
-
-    act(() => {
-      fireEvent.click(screen.getByTestId('customize-vm-submit-button'));
-    });
-
-    await waitFor(() => expect(k8sCreate).toBeCalled());
-  });
-
-  it('Shows error message if required params are missing', async () => {
-    const mockTestInput = 'test-input-string';
-
-    (k8sCreate as jest.Mock).mockRejectedValueOnce(k8sCreateTemplateRejectRequiredFields);
-    render(<CustomizeForm template={getMockTemplate()} />);
-
-    act(() => {
-      fireEvent.click(screen.getByTestId('customize-vm-submit-button'));
-    });
-
-    await waitFor(() => {
-      expect(k8sCreate).toBeCalled();
-    });
-
-    screen.getAllByTitle('Error');
-
-    await waitFor(() => {
-      expect(
-        within(screen.getByTestId('customize-vm-submit-button')).queryByRole('progressbar'),
-      ).toBeNull();
-    });
-
-    fillFieldsWithText(mockTestInput);
-
-    act(() => {
-      fireEvent.click(screen.getByTestId('customize-vm-submit-button'));
-    });
-
-    await waitFor(() => expect(k8sCreate).toBeCalled());
   });
 
   it('Hide optional fields', () => {
