@@ -244,6 +244,7 @@
   "Disks": "Disks",
   "Disks included in this snapshot ({{count}})_one": "Disks included in this snapshot ({{count}})",
   "Disks included in this snapshot ({{count}})_other": "Disks included in this snapshot ({{count}})",
+  "Disks tab": "Disks tab",
   "Documentation": "Documentation",
   "Domain": "Domain",
   "Download the MSI from ": "Download the MSI from ",
@@ -748,6 +749,7 @@
   "YAML": "YAML",
   "You can click the Create VirtualMachine button to create your VirtualMachine or customize it by editing each of the tabs below. When done, click the Create VirtualMachine button.": "You can click the Create VirtualMachine button to create your VirtualMachine or customize it by editing each of the tabs below. When done, click the Create VirtualMachine button.",
   "You can customize the Templates storage by overriding the original parameters": "You can customize the Templates storage by overriding the original parameters",
+  "You can edit the boot order in the <1>{t('Disks tab')}</1>": "You can edit the boot order in the <1>{t('Disks tab')}</1>",
   "You can select the boot source in the <2>Disks</2> tab.": "You can select the boot source in the <2>Disks</2> tab.",
   "You can use Cloudinit for post installation configuration of the guest operating system.": "You can use Cloudinit for post installation configuration of the guest operating system."
 }
