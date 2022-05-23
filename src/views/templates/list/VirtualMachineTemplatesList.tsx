@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps, useHistory } from 'react-router-dom';
 
-import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
   ListPageBody,
+  ListPageCreateButton,
   ListPageFilter,
   ListPageHeader,
   useListPageFilter,
@@ -25,6 +26,7 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
   },
 }) => {
   const { t } = useKubevirtTranslation();
+  const history = useHistory();
   const { templates, loaded, error, availableTemplatesUID, bootSourcesLoaded } =
     useTemplatesWithAvailableSource({
       namespace,
@@ -36,9 +38,13 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
 
   const templatesLoaded = loaded && bootSourcesLoaded;
 
+  const onCreate = () => history.push(`/k8s/cluster/${modelToRef(TemplateModel)}/~new`);
+
   return (
     <>
-      <ListPageHeader title={t('VirtualMachine Templates')}></ListPageHeader>
+      <ListPageHeader title={t('VirtualMachine Templates')}>
+        <ListPageCreateButton onClick={onCreate}>{t('Create Template')}</ListPageCreateButton>
+      </ListPageHeader>
       <ListPageBody>
         <Stack hasGutter>
           <StackItem>
