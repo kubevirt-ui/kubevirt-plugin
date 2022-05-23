@@ -136,6 +136,7 @@
   "Can edit only when VM is stopped": "Can edit only when VM is stopped",
   "Cancel": "Cancel",
   "Cancel VirtualMachine migration": "Cancel VirtualMachine migration",
+  "Canceling ongoing migration": "Canceling ongoing migration",
   "Cannot edit resources that already created": "Cannot edit resources that already created",
   "Cannot update": "Cannot update",
   "Capability": "Capability",
