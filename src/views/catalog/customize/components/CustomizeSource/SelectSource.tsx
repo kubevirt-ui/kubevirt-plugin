@@ -135,6 +135,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
             type="text"
             onChange={setHTTPURL}
             aria-label={t('Image URL')}
+            data-test-id={`${testId}-http-source-input`}
             validated={!httpURL ? ValidatedOptions.error : ValidatedOptions.default}
           />
         </FormGroup>
@@ -154,6 +155,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
             type="text"
             onChange={setContainerImage}
             aria-label={t('Container Image')}
+            data-test-id={`${testId}-container-source-input`}
             validated={!containerImage ? ValidatedOptions.error : ValidatedOptions.default}
           />
         </FormGroup>

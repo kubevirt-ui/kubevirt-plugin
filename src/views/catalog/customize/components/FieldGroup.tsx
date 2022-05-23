@@ -30,6 +30,7 @@ export const FieldGroup: React.FC<FieldGroupProps> = ({ field, showError }) => {
       validated={validated}
     >
       <TextInput
+        data-test-id={fieldId}
         isRequired={required}
         type="text"
         id={fieldId}

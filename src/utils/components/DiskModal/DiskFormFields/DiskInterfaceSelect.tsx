@@ -60,26 +60,34 @@ const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
         helperText={t('Hot plug is enabled only for "SCSI" interface')}
         isRequired
       >
-        <Select
-          menuAppendTo="parent"
-          isOpen={isOpen}
-          onToggle={setIsOpen}
-          onSelect={onSelect}
-          variant={SelectVariant.single}
-          selections={diskInterface}
-          direction="up"
-        >
-          {interfaceOptions.map(({ id, description, name }) => {
-            const isDisabled =
-              (isVMRunning && id !== interfaceTypes.SCSI) ||
-              (isCDROMType && id === interfaceTypes.VIRTIO);
-            return (
-              <SelectOption key={id} value={id} description={description} isDisabled={isDisabled}>
-                {name}
-              </SelectOption>
-            );
-          })}
-        </Select>
+        <div data-test-id="disk-interface-select">
+          <Select
+            menuAppendTo="parent"
+            isOpen={isOpen}
+            onToggle={setIsOpen}
+            onSelect={onSelect}
+            variant={SelectVariant.single}
+            selections={diskInterface}
+            direction="up"
+          >
+            {interfaceOptions.map(({ id, description, name }) => {
+              const isDisabled =
+                (isVMRunning && id !== interfaceTypes.SCSI) ||
+                (isCDROMType && id === interfaceTypes.VIRTIO);
+              return (
+                <SelectOption
+                  key={id}
+                  value={id}
+                  description={description}
+                  isDisabled={isDisabled}
+                  data-test-id={`disk-interface-select-${id}`}
+                >
+                  {name}
+                </SelectOption>
+              );
+            })}
+          </Select>
+        </div>
       </FormGroup>
     </>
   );

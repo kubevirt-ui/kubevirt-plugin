@@ -124,18 +124,21 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
       isRequired
       className="disk-source-form-group select-source-option"
     >
-      <Select
-        toggleId={`${testId}-toggle`}
-        id={testId}
-        isOpen={isOpen}
-        onToggle={setIsOpen}
-        onSelect={onSelect}
-        variant={SelectVariant.single}
-        selections={selectedSource}
-        maxHeight={400}
-      >
-        {options.map((option) => getSourceOption(option, ns, t))}
-      </Select>
+      <div data-test-id={testId}>
+        <Select
+          toggleId={`${testId}-toggle`}
+          id={testId}
+          isOpen={isOpen}
+          onToggle={setIsOpen}
+          onSelect={onSelect}
+          variant={SelectVariant.single}
+          selections={selectedSource}
+          maxHeight={400}
+          data-test-id={testId}
+        >
+          {options.map((option) => getSourceOption(option, ns, t))}
+        </Select>
+      </div>
     </FormGroup>
   );
 };

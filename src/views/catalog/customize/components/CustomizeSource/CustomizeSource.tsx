@@ -109,6 +109,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
             onChange={setDrivers}
             label={t('Mount Windows drivers disk')}
             id="cdrom-drivers"
+            data-test-id="cdrom-drivers"
           />
         </FormGroup>
       )}

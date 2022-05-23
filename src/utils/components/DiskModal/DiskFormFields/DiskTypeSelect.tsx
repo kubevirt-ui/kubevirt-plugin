@@ -35,20 +35,27 @@ const DiskTypeSelect: React.FC<DiskTypeSelectProps> = ({
       label={t('Type')}
       helperText={t('Hot plug is enabled only for "Disk" type')}
     >
-      <Select
-        menuAppendTo="parent"
-        isOpen={isOpen}
-        onToggle={setIsOpen}
-        onSelect={onSelectDiskSource}
-        variant={SelectVariant.single}
-        selections={diskType}
-      >
-        {typeOptions.map((type) => (
-          <SelectOption key={type} value={type} isDisabled={isVMRunning && type !== diskTypes.disk}>
-            {diskTypesLabels[type]}
-          </SelectOption>
-        ))}
-      </Select>
+      <div data-test-id="disk-type-select">
+        <Select
+          menuAppendTo="parent"
+          isOpen={isOpen}
+          onToggle={setIsOpen}
+          onSelect={onSelectDiskSource}
+          variant={SelectVariant.single}
+          selections={diskType}
+        >
+          {typeOptions.map((type) => (
+            <SelectOption
+              key={type}
+              value={type}
+              isDisabled={isVMRunning && type !== diskTypes.disk}
+              data-test-id={`disk-type-select-${type}`}
+            >
+              {diskTypesLabels[type]}
+            </SelectOption>
+          ))}
+        </Select>
+      </div>
     </FormGroup>
   );
 };

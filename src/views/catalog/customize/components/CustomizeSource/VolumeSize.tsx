@@ -38,6 +38,7 @@ export const VolumeSize: React.FC<VolumeSizeProps> = ({ quantity, onChange }) =>
             type="number"
             onChange={_onChangeSize}
             id="disk-size-required"
+            data-test-id="disk-size-required"
           />
         </FlexItem>
         <FlexItem>{quantityUnit}</FlexItem>
