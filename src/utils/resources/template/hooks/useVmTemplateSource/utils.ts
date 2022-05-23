@@ -11,6 +11,7 @@ import {
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSourceRef,
   V1beta1DataVolumeSourceRegistry,
+  V1ContainerDiskSource,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVMBootSourceType } from '@kubevirt-utils/resources/vm/utils/source';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
@@ -26,12 +27,14 @@ export type TemplateBootSource = {
     pvc?: V1beta1DataVolumeSourcePVC;
     http?: V1beta1DataVolumeSourceHTTP;
     registry?: V1beta1DataVolumeSourceRegistry;
+    containerDisk?: V1ContainerDiskSource;
   };
   sourceValue?: {
     sourceRef?: V1alpha1PersistentVolumeClaim;
     pvc?: V1alpha1PersistentVolumeClaim;
     http?: V1beta1DataVolumeSourceHTTP;
     registry?: V1beta1DataVolumeSourceRegistry;
+    containerDisk?: V1ContainerDiskSource;
   };
 };
 
