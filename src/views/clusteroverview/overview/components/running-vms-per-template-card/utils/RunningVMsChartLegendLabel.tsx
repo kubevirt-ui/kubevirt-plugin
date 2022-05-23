@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 
+import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
+
 import './RunningVMsChartLegendLabel.scss';
 
 export type RunningVMsChartLegendLabelItem = {
@@ -16,7 +18,7 @@ type RunningVMsChartLegendLabelProps = {
 
 const RunningVMsChartLegendLabel: React.FC<RunningVMsChartLegendLabelProps> = ({ item }) => {
   const iconStyle = { color: item.color };
-  const linkPath = `/k8s/ns/${item.namespace}/templates/${item.name}`;
+  const linkPath = `/k8s/all-namespaces/${VirtualMachineModelRef}?rowFilter-template=${item.name}`;
 
   return (
     <>
