@@ -5,11 +5,12 @@ import { VNC_CONSOLE_TYPE } from '@kubevirt-utils/components/Consoles/components
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
 import { INSECURE, SECURE } from '@kubevirt-utils/components/Consoles/utils/constants';
 import { isConnectionEncrypted } from '@kubevirt-utils/components/Consoles/utils/utils';
-import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { Bullseye, Button } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
+
+import VirtualMachinesOverviewTabDetailsConsoleConnect from './VirtualMachinesOverviewTabDetailsConsoleConnect';
 
 type VirtualMachinesOverviewTabDetailsConsoleProps = {
   vmi: V1VirtualMachineInstance;
@@ -21,10 +22,11 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
   const { t } = useKubevirtTranslation();
 
   const isEncrypted = isConnectionEncrypted();
+  const isVMRunning = vmi?.status?.phase === vmiStatuses.Running;
 
   return (
     <Bullseye className="bullseye">
-      {vmi?.status?.phase === vmiStatuses.Running ? (
+      {isVMRunning ? (
         <>
           <VncConsole
             type={VNC_CONSOLE_TYPE}
@@ -35,24 +37,28 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
             scaleViewport
             showAccessControls={false}
             autoConnect={false}
+            CustomConnectComponent={VirtualMachinesOverviewTabDetailsConsoleConnect}
           />
-          <div className="link">
-            <Button
-              onClick={() =>
-                window.open(
-                  `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
-                )
-              }
-              variant="link"
-            >
-              {t('Open web console')}
-              <ExternalLinkAltIcon className="icon" />
-            </Button>
-          </div>
         </>
       ) : (
-        <MutedTextSpan text={t('VirtualMachine is not running')} />
+        <div className="pf-c-console__vnc">
+          <VirtualMachinesOverviewTabDetailsConsoleConnect isDisabled />
+        </div>
       )}
+      <div className="link">
+        <Button
+          isDisabled={!isVMRunning}
+          onClick={() =>
+            window.open(
+              `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
+            )
+          }
+          variant="link"
+        >
+          {t('Open web console')}
+          <ExternalLinkAltIcon className="icon" />
+        </Button>
+      </div>
     </Bullseye>
   );
 };

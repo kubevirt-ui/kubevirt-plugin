@@ -61,4 +61,6 @@ export type VncConsoleProps = React.HTMLProps<HTMLDivElement> & {
   textCtrlAltDel?: string;
   /** Should console try to connect once rendering */
   autoConnect?: boolean;
+  /** A custom component to replace th default connect button screen */
+  CustomConnectComponent?: React.FC<{ connect: () => void }>;
 };

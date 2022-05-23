@@ -51,6 +51,7 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
   textSendShortcut,
   textCtrlAltDel,
   autoConnect = true,
+  CustomConnectComponent,
 }) => {
   const { t } = useKubevirtTranslation();
   const [rfb, setRfb] = React.useState<any>();
@@ -175,16 +176,19 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
       )}
       <div className={css(styles.consoleVnc)}>
         {children}
-        {status === disconnected && (
-          <EmptyState>
-            <EmptyStateBody>
-              {textDisconnected || t('Click Connect to open the VNC console.')}
-            </EmptyStateBody>
-            <Button variant="primary" onClick={connect}>
-              {textConnect || t('Connect')}
-            </Button>
-          </EmptyState>
-        )}
+        {status === disconnected &&
+          (CustomConnectComponent ? (
+            <CustomConnectComponent connect={connect} />
+          ) : (
+            <EmptyState>
+              <EmptyStateBody>
+                {textDisconnected || t('Click Connect to open the VNC console.')}
+              </EmptyStateBody>
+              <Button variant="primary" onClick={connect}>
+                {textConnect || t('Connect')}
+              </Button>
+            </EmptyState>
+          ))}
         {status === connecting && (
           <EmptyState>
             <EmptyStateIcon variant="container" component={Spinner} />
