@@ -23,3 +23,18 @@ export const useDeschedulerInstalled = (): boolean => {
 export const isDeschedulerOn = (template: V1Template): boolean =>
   // check for the descheduler.alpha.kubernetes.io/evict: 'true' annotation
   template?.objects[0]?.spec?.template?.metadata?.annotations[DESCHEDULER_EVICT_LABEL] === 'true';
+
+export const ensurePath = <T extends object>(data: T, paths: string | string[]) => {
+  let current = data;
+
+  if (Array.isArray(paths)) {
+    paths.forEach((path) => ensurePath(data, path));
+  } else {
+    const keys = paths.split('.');
+
+    for (const key of keys) {
+      if (!current[key]) current[key] = {};
+      current = current[key];
+    }
+  }
+};

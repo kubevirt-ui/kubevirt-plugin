@@ -17,6 +17,7 @@ import { DescriptionList } from '@patternfly/react-core';
 import BootMethod from './BootMethod/BootMethod';
 import CPUMemory from './CPUMemory';
 import Description from './Description';
+import DisplayName from './DisplayName';
 
 const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
   const { t } = useKubevirtTranslation();
@@ -27,6 +28,7 @@ const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template,
       <Namespace namespace={template?.metadata?.namespace} />
       <Labels template={template} editable={editable} />
       <Annotations template={template} editable={editable} />
+      <DisplayName template={template} editable={editable} />
       <Description template={template} editable={editable} />
       <DescriptionItem title={t('Operating system')} content={getOperatingSystemName(template)} />
       <DescriptionItem title={t('Workload profile')} content={useWorkloadProfile(template)} />
