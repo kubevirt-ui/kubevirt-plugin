@@ -10,9 +10,10 @@
   }
   .bullseye {
     flex-direction: column;
+    justify-content: space-around;
   }
   .right-column {
-    display: flex;
+    height: 100%;
     .title {
       font-size: var(--pf-global--FontSize--sm);
       font-weight: var(--pf-global--FontWeight--bold);
@@ -22,8 +23,29 @@
   .link {
     margin-top: var(--pf-global--spacer--sm);
     align-self: baseline;
+    button {
+      padding-left: 0;
+    }
     .icon {
       margin-left: var(--pf-global--spacer--xs);
+    }
+  }
+  .vnc-grey-background {
+    background: var(--pf-global--palette--black-300);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    svg {
+      cursor: pointer;
+      color: var(--pf-global--primary-color--100);
+    }
+    &.disabled {
+      svg {
+        cursor: auto;
+        color: var(--pf-global--disabled-color--100);
+      }
     }
   }
 }

@@ -57,7 +57,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
         <Divider />
         <CardBody isFilled>
           <Grid>
-            <GridItem span={6}>
+            <GridItem span={5}>
               <DescriptionList isHorizontal>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
@@ -97,6 +97,12 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
+                  <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
+                  <DescriptionListDescription>
+                    <CPUMemory vm={vm} />
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
                   <DescriptionListTerm>{t('Host')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-host">
                     {guestAgentData?.hostname ?? (
@@ -112,12 +118,12 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                 </DescriptionListGroup>
               </DescriptionList>
             </GridItem>
-            <GridItem span={6}>
+            <GridItem span={1} />
+            <GridItem span={5}>
               <div className="right-column">
-                <div className="title">{t('CPU | Memory')}</div>
-                <CPUMemory vm={vm} />
+                <div className="title">{t('VNC console')}</div>
+                <VirtualMachinesOverviewTabDetailsConsole vmi={vmi} />
               </div>
-              <VirtualMachinesOverviewTabDetailsConsole vmi={vmi} />
             </GridItem>
           </Grid>
         </CardBody>
