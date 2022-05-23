@@ -57,17 +57,14 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
               rowFilters={filters}
               onFilterChange={onFilterChange}
             />
-            <VirtualizedTable<
-              K8sResourceCommon,
-              { kind: string; availableTemplatesUID: Set<string> }
-            >
+            <VirtualizedTable<K8sResourceCommon, { availableTemplatesUID: Set<string> }>
               data={filteredData}
               unfilteredData={data}
               loaded={templatesLoaded}
               loadError={error}
               columns={useVirtualMachineTemplatesColumns()}
               Row={VirtualMachineTemplatesRow}
-              rowData={{ kind: TemplateModel.kind, availableTemplatesUID }}
+              rowData={{ availableTemplatesUID }}
             />
           </StackItem>
         </Stack>
