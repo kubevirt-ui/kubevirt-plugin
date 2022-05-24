@@ -37,8 +37,8 @@ const RunningVMsPerTemplateCard = () => {
   const RunningVMsChart = (
     <div>
       <ChartDonut
-        ariaDesc={t('VMs per template')}
-        ariaTitle={t('VMs per template donut chart')}
+        ariaDesc={t('VirtualMachines per template')}
+        ariaTitle={t('VirtualMachines per template donut chart')}
         data={chartData}
         height={150}
         labels={({ datum }) => `${datum.x}: ${datum.y}%`}
@@ -49,7 +49,7 @@ const RunningVMsPerTemplateCard = () => {
           right: 20,
           top: 20,
         }}
-        subTitle={t('VMs')}
+        subTitle={t('VirtualMachines')}
         title={numVMs?.toString()}
         width={300}
         style={{
@@ -85,7 +85,7 @@ const RunningVMsPerTemplateCard = () => {
   return (
     <Card className="kv-running-vms-card__gradient" data-test-id="kv-running-vms-per-template-card">
       <CardHeader>
-        <CardTitle>{t('VMs per template')}</CardTitle>
+        <CardTitle>{t('VirtualMachines per template')}</CardTitle>
       </CardHeader>
       <CardBody>{body}</CardBody>
     </Card>

@@ -15,9 +15,12 @@ const CloneRunningVMAlert: React.FC<CloneRunningVMAlertProps> = ({ vmName, isVMR
   }
   return (
     <Alert
-      title={t('The VM {{vmName}} is still running. It will be powered off while cloning.', {
-        vmName,
-      })}
+      title={t(
+        'The VirtualMachine {{virtualmachineName}} is still running. It will be powered off while cloning.',
+        {
+          vmName,
+        },
+      )}
       variant={AlertVariant.warning}
       isInline
     />

@@ -23,7 +23,9 @@ const VirtualMachinesInstancePageHeader: React.FC<VirtualMachinesInstancePageHea
       <VirtualMachineInstanceBreadcrumb />
       <span className={'co-m-pane__heading'}>
         <h1 className="co-resource-item__resource-name">
-          <span className={`co-m-resource-icon co-m-resource-icon--lg`}>{t('VMI')}</span>
+          <span className={`co-m-resource-icon co-m-resource-icon--lg`}>
+            {t('VirtualMachineInstance')}
+          </span>
           {vmi?.metadata?.name}{' '}
           <Label isCompact icon={<IconComponent />}>
             {status}

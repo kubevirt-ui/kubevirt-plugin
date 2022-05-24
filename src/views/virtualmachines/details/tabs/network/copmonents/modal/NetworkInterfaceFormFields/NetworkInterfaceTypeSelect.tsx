@@ -27,7 +27,7 @@ const NetworkInterfaceTypeSelect: React.FC<NetworkInterfaceTypeSelectProps> = ({
       id: interfaceTypeTypes.MASQUERADE,
       name: t('Masquerade'),
       description: t(
-        'Put the VM behind a NAT Proxy for high compability with different network providers. The VMs IP will differ from the IP seen on the pod network',
+        'Put the VirtualMachine behind a NAT Proxy for high compability with different network providers. The VirtualMachines IP will differ from the IP seen on the pod network',
       ),
       // in case of pod network, networkName is undefined
       allowOption: isPodNetworkName,
@@ -35,14 +35,18 @@ const NetworkInterfaceTypeSelect: React.FC<NetworkInterfaceTypeSelectProps> = ({
     bridge: {
       id: interfaceTypeTypes.BRIDGE,
       name: t('Bridge'),
-      description: t('The VM will be bridged to the selected network, ideal for L2 devices'),
+      description: t(
+        'The VirtualMachine will be bridged to the selected network, ideal for L2 devices',
+      ),
       // in case of NAD network, networkName should be a string
       allowOption: !isPodNetworkName,
     },
     sriov: {
       id: interfaceTypeTypes.SRIOV,
       name: t('SR-IOV'),
-      description: t('Attach a virtual function network device to the VM for high performance'),
+      description: t(
+        'Attach a virtual function network device to the VirtualMachine for high performance',
+      ),
       // in case of NAD network, networkName should be a string
       allowOption: !isPodNetworkName,
     },

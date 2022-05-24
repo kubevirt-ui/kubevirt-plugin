@@ -92,7 +92,9 @@ export const BootOrderModalBody: React.FC<{
       {showEmpty ? (
         <BootOrderEmptyState
           title={t('No resource selected')}
-          message={t('VM will attempt to boot from disks by order of apearance in YAML file')}
+          message={t(
+            'VirtualMachine will attempt to boot from disks by order of apearance in YAML file',
+          )}
           addItemMessage={t('Add source')}
           addItemDisabledMessage={t('All sources selected')}
           addItemIsDisabled={devices.length === 0}

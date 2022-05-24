@@ -40,7 +40,7 @@ const RdpServiceNotConfigured: React.FC<RdpServiceNotConfiguredProps> = ({ vm })
             -rdp --port [UNIQUE_PORT] --target-port {DEFAULT_RDP_PORT} --type NodePort
           </li>
         </ul>
-        Make sure, the VM object has <b>spec.template.metadata.labels</b> set to{' '}
+        Make sure, the VirtualMachine object has <b>spec.template.metadata.labels</b> set to{' '}
         <b>
           {TEMPLATE_VM_NAME_LABEL}: {name}
         </b>

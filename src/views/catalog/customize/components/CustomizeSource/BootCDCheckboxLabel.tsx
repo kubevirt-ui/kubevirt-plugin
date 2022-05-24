@@ -31,7 +31,7 @@ const BootCDCheckbox: React.FC<BootCDCheckboxProps> = ({ cdSource, onChange }) =
             bodyContent={() => (
               <div>
                 {t(
-                  'Boot from CD requires an image file i.e. ISO, qcow, etc. that will be mounted to the VM as a CD',
+                  'Boot from CD requires an image file i.e. ISO, qcow, etc. that will be mounted to the VirtualMachine as a CD',
                 )}
               </div>
             )}

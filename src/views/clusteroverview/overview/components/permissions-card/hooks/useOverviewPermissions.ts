@@ -84,12 +84,12 @@ export const usePermissionsCardPermissions = (): UseOverviewPermissions => {
       allowed: basePermissionsAllowed,
     },
     {
-      taskName: t('Clone a VM'),
+      taskName: t('Clone a VirtualMachine'),
       isLoading: basePermissionsLoading,
       allowed: basePermissionsAllowed && cdiInstalled,
     },
     {
-      taskName: t('Attach VM to multiple networks'),
+      taskName: t('Attach VirtualMachine to multiple networks'),
       isLoading: basePermissionsLoading && canReadNadsLoading,
       allowed: basePermissionsAllowed && canReadNads,
     },
