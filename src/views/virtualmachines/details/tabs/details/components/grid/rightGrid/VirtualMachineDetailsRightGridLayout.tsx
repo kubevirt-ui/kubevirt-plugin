@@ -109,7 +109,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.sshAccess}
-          isEdit
+          isEdit={!!vmi}
           showEditOnTitle
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
