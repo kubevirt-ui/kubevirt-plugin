@@ -21,7 +21,6 @@ export type NetworkAttachmentDefinitionKind = {
 export type InventoryCardResources = {
   vms: V1VirtualMachine[];
   vmTemplates: V1Template[];
-  vmCommonTemplates: V1Template[];
   nodes: IoK8sApiCoreV1Node[];
   nads: NetworkAttachmentDefinitionKind[];
 };

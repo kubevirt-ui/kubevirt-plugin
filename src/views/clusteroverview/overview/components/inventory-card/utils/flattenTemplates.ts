@@ -96,11 +96,10 @@ export const filterTemplates = (templates: V1Template[]): TemplateItem[] => {
 };
 
 export const flattenTemplates: Flatten<
-  { vmTemplates: V1Template[]; vmCommonTemplates: V1Template[]; vms: V1VirtualMachine[] },
+  { vmTemplates: V1Template[]; vms: V1VirtualMachine[] },
   VirtualMachineTemplateBundle[]
-> = ({ vmTemplates, vmCommonTemplates, vms }) => {
-  const user = getLoadedData<V1Template[]>(vmTemplates, []);
-  const common = getLoadedData<V1Template[]>(vmCommonTemplates, []);
+> = ({ vmTemplates, vms }) => {
+  const templates = getLoadedData<V1Template[]>(vmTemplates, []);
   return [
     ...getLoadedData<V1VirtualMachine[]>(vms, []).map((vm) => {
       let template: V1Template;
@@ -117,7 +116,7 @@ export const flattenTemplates: Flatten<
         metadata: vm.metadata,
       };
     }),
-    ...filterTemplates([...user, ...common]).map((template) => ({
+    ...filterTemplates([...templates]).map((template) => ({
       template,
       metadata: template.variants[0].metadata,
     })),

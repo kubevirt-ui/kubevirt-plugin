@@ -2,19 +2,15 @@ import * as React from 'react';
 
 import {
   modelToGroupVersionKind,
-  ProjectModel,
   TemplateModel,
   V1Template,
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
-import {
-  K8sResourceCommon,
-  useK8sWatchResource,
-  useK8sWatchResources,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
+import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { useDeepCompareMemoize } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/hooks/useDeepCompareMemoize';
 
 import {
@@ -23,10 +19,7 @@ import {
   getAllowedTemplateResources,
 } from '../../../utils/utils';
 import { useDebounceCallback } from '../../details-card/hooks/useDebounceCallback';
-import {
-  KUBEVIRT_OS_IMAGES_NS,
-  OPENSHIFT_OS_IMAGES_NS,
-} from '../../inventory-card/utils/constants';
+import { useProjectNames } from '../../inventory-card/hooks/useProjectNames';
 
 export type UseRunningVMsPerTemplateResources = {
   loaded: boolean;
@@ -35,7 +28,7 @@ export type UseRunningVMsPerTemplateResources = {
   templates: V1Template[];
 };
 
-export const useRunningVMsPerTemplateResources = (): UseRunningVMsPerTemplateResources => {
+export const useAdminRunningVMsPerTemplateResources = (): UseRunningVMsPerTemplateResources => {
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [loadError, setLoadError] = React.useState<string>('');
   const [vms, setVMs] = React.useState([]);
@@ -59,14 +52,6 @@ export const useRunningVMsPerTemplateResources = (): UseRunningVMsPerTemplateRes
         ],
       },
     },
-    vmCommonTemplates: {
-      groupVersionKind: modelToGroupVersionKind(TemplateModel),
-      isList: true,
-      namespace: 'openshift',
-      selector: {
-        matchLabels: { [TEMPLATE_TYPE_LABEL]: TEMPLATE_TYPE_BASE },
-      },
-    },
   };
 
   const resources = useK8sWatchResources<{ [key: string]: K8sResourceCommon[] }>(watchedResources);
@@ -84,10 +69,7 @@ export const useRunningVMsPerTemplateResources = (): UseRunningVMsPerTemplateRes
       setLoaded(true);
       setLoadError(null);
       setVMs(updatedResources?.vms?.data);
-      setTemplates([
-        ...updatedResources?.vmTemplates?.data,
-        ...updatedResources?.vmCommonTemplates?.data,
-      ]);
+      setTemplates([...updatedResources?.vmTemplates?.data]);
     }
   }, []);
 
@@ -100,22 +82,7 @@ export const useRunningVMsPerTemplateResources = (): UseRunningVMsPerTemplateRes
   return useDeepCompareMemoize({ loaded, loadError, vms, templates });
 };
 
-export const useProjectNames = (): string[] => {
-  const [projects] = useK8sWatchResource<K8sResourceCommon[]>({
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    namespaced: false,
-    isList: true,
-  });
-  // a user can see VMs if they are project-admin we should remove either
-  // 'kubevirt-os-images' or 'openshift-virtualization-os-images';
-  const projectNames = (projects || [])
-    .map((project) => project.metadata.name)
-    .filter((project) => project !== KUBEVIRT_OS_IMAGES_NS && project !== OPENSHIFT_OS_IMAGES_NS);
-
-  return projectNames;
-};
-
-export const useRunningVMsPerTemplateResourcesHook = () => {
+export const useNonAdminRunningVMsPerTemplateResources = () => {
   const projectNames = useProjectNames();
   const allowedVMResources = getAllowedResources(projectNames, VirtualMachineModel);
   const allowedVMTemplateResources = getAllowedTemplateResources(projectNames);
@@ -128,7 +95,7 @@ export const useRunningVMsPerTemplateResourcesHook = () => {
   const resources = useK8sWatchResources<{ [key: string]: K8sResourceCommon[] }>(watchedResources);
 
   const resourcesLoadError = Object.keys(resources).find((key) => resources[key].loadError);
-  const resourcesLoaded = Object.keys(resources).every((key) => resources[key].loaded);
+  const resourcesLoaded = Object.keys(resources).some((key) => resources[key].loaded);
 
   const { data: vms } = getAllowedResourceData(resources, VirtualMachineModel);
 
@@ -140,4 +107,13 @@ export const useRunningVMsPerTemplateResourcesHook = () => {
     loaded: resourcesLoaded,
     loadError: resourcesLoadError,
   };
+};
+
+// as cluster admin we should see all resources
+// otherwise we should only see resources that are in the project list
+export const useRunningVMsPerTemplatesHook = () => {
+  const isAdmin = useIsAdmin();
+  return isAdmin
+    ? useAdminRunningVMsPerTemplateResources
+    : useNonAdminRunningVMsPerTemplateResources;
 };

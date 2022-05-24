@@ -15,20 +15,24 @@ export type ResourcesSectionProps = {
   resources?: WatchK8sResults<{
     [key: string]: K8sResourceCommon[];
   }>;
+  isAdmin?: boolean;
 };
 
-const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources }) => {
+const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources, isAdmin }) => {
   const templates = React.useMemo(
-    () => getAllowedResourceData(resources, TemplateModel),
-    [resources],
+    () => (isAdmin ? resources?.vmTemplates : getAllowedResourceData(resources, TemplateModel)),
+    [resources, isAdmin],
   );
   const vms = React.useMemo(
-    () => getAllowedResourceData(resources, VirtualMachineModel),
-    [resources],
+    () => (isAdmin ? resources?.vms : getAllowedResourceData(resources, VirtualMachineModel)),
+    [resources, isAdmin],
   );
   const nads = React.useMemo(
-    () => getAllowedResourceData(resources, NetworkAttachmentDefinitionModel),
-    [resources],
+    () =>
+      isAdmin
+        ? resources?.nads
+        : getAllowedResourceData(resources, NetworkAttachmentDefinitionModel),
+    [resources, isAdmin],
   );
 
   return (
