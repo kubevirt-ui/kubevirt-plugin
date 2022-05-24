@@ -1,6 +1,6 @@
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
+import { TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sModel,
@@ -33,11 +33,7 @@ export const getAllowedResourceData = (
 ) => {
   const resourcesArray = Object.entries(resources)
     .map(([key, { data, loaded, loadError }]) => {
-      if (
-        loaded &&
-        (key?.includes(model.plural) || (model === TemplateModel && key === 'vmCommonTemplates')) &&
-        !isEmpty(data)
-      ) {
+      if (loaded && key?.includes(model.plural) && !isEmpty(data)) {
         return { data, loaded, loadError };
       }
     })
@@ -56,7 +52,7 @@ export const getAllowedResourceData = (
 
 export const getAllowedTemplateResources = (projectNames: string[]) => {
   const TemplateModelGroupVersionKind = modelToGroupVersionKind(TemplateModel);
-  const allowedTemplateResources = Object.fromEntries(
+  return Object.fromEntries(
     (projectNames || []).map((projName) => [
       `${projName}/${TemplateModel.plural}`,
       {
@@ -74,15 +70,4 @@ export const getAllowedTemplateResources = (projectNames: string[]) => {
       },
     ]),
   );
-  return {
-    ...allowedTemplateResources,
-    vmCommonTemplates: {
-      groupVersionKind: TemplateModelGroupVersionKind,
-      isList: true,
-      namespace: 'openshift',
-      selector: {
-        matchLabels: { [TEMPLATE_TYPE_LABEL]: TEMPLATE_TYPE_BASE },
-      },
-    },
-  };
 };

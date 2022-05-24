@@ -20,9 +20,8 @@ export const getOSImagesNS = (): string =>
 
 export const getTemplates = (resources) => {
   const vmTemplates = resources?.vmTemplates as WatchK8sResultsObject<V1Template[]>;
-  const vmCommonTemplates = resources?.vmCommonTemplates as WatchK8sResultsObject<V1Template[]>;
   const vms = resources?.vms as WatchK8sResultsObject<V1VirtualMachine[]>;
-  return flattenTemplates({ vmTemplates, vmCommonTemplates, vms }) || [];
+  return flattenTemplates({ vmTemplates, vms }) || [];
 };
 
 export const getVMStatusCounts = (vms) => {
