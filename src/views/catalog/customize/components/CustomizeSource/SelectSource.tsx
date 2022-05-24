@@ -1,8 +1,10 @@
 import * as React from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
+import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
 import { PersistentVolumeClaimSelect } from '../PersistentVolumeClaimSelect';
 
@@ -48,13 +50,19 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   'data-test-id': testId,
 }) => {
   const { t } = useKubevirtTranslation();
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useFormContext();
+  const httpURL = watch('httpURL');
+  const containerImage = watch('containerImage');
+
   const [volumeQuantity, setVolumeQuantity] = React.useState(initialVolumeQuantity);
 
   const [selectedSourceType, setSourceType] = React.useState<SOURCE_OPTIONS_IDS>(sourceOptions[0]);
   const [pvcNameSelected, selectPVCName] = React.useState<string>();
   const [pvcNamespaceSelected, selectPVCNamespace] = React.useState<string>();
-  const [httpURL, setHTTPURL] = React.useState('');
-  const [containerImage, setContainerImage] = React.useState('');
 
   React.useEffect(() => {
     if (selectedSource) setSourceType(getSourceTypeFromDiskSource(selectedSource));
@@ -129,14 +137,13 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           className="disk-source-form-group"
           helperText={httpSourceHelperText}
         >
-          <TextInput
+          <FormTextInput
+            {...register('httpURL', { required: true })}
             id={`${testId}-${selectedSourceType}`}
-            value={httpURL}
             type="text"
-            onChange={setHTTPURL}
             aria-label={t('Image URL')}
             data-test-id={`${testId}-http-source-input`}
-            validated={!httpURL ? ValidatedOptions.error : ValidatedOptions.default}
+            validated={errors?.httpURL ? ValidatedOptions.error : ValidatedOptions.default}
           />
         </FormGroup>
       )}
@@ -149,14 +156,13 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           className="disk-source-form-group"
           helperText={registrySourceHelperText}
         >
-          <TextInput
+          <FormTextInput
+            {...register('containerImage', { required: true })}
             id={`${testId}-${selectedSourceType}`}
-            value={containerImage}
             type="text"
-            onChange={setContainerImage}
             aria-label={t('Container Image')}
             data-test-id={`${testId}-container-source-input`}
-            validated={!containerImage ? ValidatedOptions.error : ValidatedOptions.default}
+            validated={errors?.containerImage ? ValidatedOptions.error : ValidatedOptions.default}
           />
         </FormGroup>
       )}

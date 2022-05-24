@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,21 +19,25 @@ type CustomizeFormProps = {
 
 export const CustomizeForm: React.FC<CustomizeFormProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
+  const methods = useForm();
+
   const [onSubmit, loaded, error] = useCustomizeFormSubmit(template);
   const [requiredFields, optionalFields] = buildFields(template);
   const nameField = getVirtualMachineNameField(template, t);
 
   return (
-    <Form onSubmit={onSubmit}>
-      <FieldGroup field={nameField} showError={error} />
-      {requiredFields?.map((field) => (
-        <FieldGroup key={field.name} field={field} showError={error} />
-      ))}
+    <FormProvider {...methods}>
+      <Form onSubmit={methods.handleSubmit(onSubmit)}>
+        <FieldGroup field={nameField} showError={error} />
+        {requiredFields?.map((field) => (
+          <FieldGroup key={field.name} field={field} showError={error} />
+        ))}
 
-      <ExpandableOptionsFields optionalFields={optionalFields} />
+        <ExpandableOptionsFields optionalFields={optionalFields} />
 
-      <FormError error={error} />
-      <FormActionGroup loading={!loaded} />
-    </Form>
+        <FormError error={error} />
+        <FormActionGroup loading={!loaded} />
+      </Form>
+    </FormProvider>
   );
 };

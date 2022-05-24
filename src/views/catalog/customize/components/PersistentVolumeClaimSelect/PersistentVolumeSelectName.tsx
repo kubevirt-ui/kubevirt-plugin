@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,18 +25,19 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
   isDisabled,
   pvcNameSelected,
   pvcNames,
-  onChange,
+  onChange: onPvcNameChange,
   'data-test-id': testId,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { control } = useFormContext();
   const [isOpen, setSelectOpen] = React.useState(false);
 
   const onSelect = React.useCallback(
     (event, selection) => {
-      onChange(selection);
+      onPvcNameChange(selection);
       setSelectOpen(false);
     },
-    [onChange],
+    [onPvcNameChange],
   );
 
   return (
@@ -46,32 +48,42 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
       isRequired
       className="pvc-selection-formgroup"
     >
-      <div data-test-id={`${testId}-dropdown`}>
-        <Select
-          aria-labelledby={testId}
-          isOpen={isOpen}
-          onToggle={() => setSelectOpen(!isOpen)}
-          onSelect={onSelect}
-          variant={SelectVariant.typeahead}
-          selections={pvcNameSelected}
-          onFilter={filter(pvcNames)}
-          placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} name ---`)}
-          isDisabled={isDisabled}
-          validated={!pvcNameSelected ? ValidatedOptions.error : ValidatedOptions.default}
-          aria-invalid={!pvcNameSelected ? true : false}
-          maxHeight={400}
-          data-test-id={`${testId}-dropdown`}
-          toggleId={`${testId}-toggle`}
-        >
-          {pvcNames.map((name) => (
-            <SelectOption
-              key={name}
-              value={name}
-              data-test-id={`${testId}-dropdown-option-${pvcNames}`}
-            />
-          ))}
-        </Select>
-      </div>
+      <Controller
+        name="pvcNamespace"
+        control={control}
+        rules={{ required: true }}
+        render={({ field: { onChange }, fieldState: { error } }) => (
+          <div data-test-id={`${testId}-dropdown`}>
+            <Select
+              aria-labelledby={testId}
+              isOpen={isOpen}
+              onToggle={() => setSelectOpen(!isOpen)}
+              onSelect={(e, v) => {
+                onSelect(e, v);
+                onChange(v);
+              }}
+              variant={SelectVariant.typeahead}
+              selections={pvcNameSelected}
+              onFilter={filter(pvcNames)}
+              placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} name ---`)}
+              isDisabled={isDisabled}
+              validated={error ? ValidatedOptions.error : ValidatedOptions.default}
+              aria-invalid={error ? true : false}
+              maxHeight={400}
+              data-test-id={`${testId}-dropdown`}
+              toggleId={`${testId}-toggle`}
+            >
+              {pvcNames.map((name) => (
+                <SelectOption
+                  key={name}
+                  value={name}
+                  data-test-id={`${testId}-dropdown-option-${pvcNames}`}
+                />
+              ))}
+            </Select>
+          </div>
+        )}
+      />
     </FormGroup>
   );
 };
