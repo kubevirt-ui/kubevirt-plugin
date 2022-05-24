@@ -54,7 +54,7 @@ const RelatedOperatorsSection: React.FC = () => {
         />
       }
       title={t('Related operators')}
-      titleColor={'var(--pf-global--palette--blue-600)'}
+      titleColor={'var(--co-global--palette--orange-400)'}
       description={t('Ease operational complexity with virtualization by using Operators.')}
       links={links}
       moreLink={moreLink}

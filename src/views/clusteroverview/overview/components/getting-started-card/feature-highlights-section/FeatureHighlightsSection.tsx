@@ -55,7 +55,7 @@ const FeatureHighlightsSection: React.FC = () => {
         />
       }
       title={t('Feature highlights')}
-      titleColor={'var(--pf-global--palette--blue-600)'}
+      titleColor={'var(--co-global--palette--blue-400)'}
       description={t(
         'Read about the latest information and key virtualization features on the Virtualization highlights.',
       )}
