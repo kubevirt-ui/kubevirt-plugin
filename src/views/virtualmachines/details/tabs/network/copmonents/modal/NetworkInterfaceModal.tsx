@@ -63,7 +63,7 @@ const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
       resultNetwork.pod = {};
     }
 
-    const updatedNetworks: V1Network[] = [...getNetworks(vm), resultNetwork];
+    const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
 
     const resultInterface: V1Interface = {
       name: nicName,
@@ -79,7 +79,7 @@ const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
       resultInterface.sriov = {};
     }
 
-    const updatedInterfaces: V1Interface[] = [...getInterfaces(vm), resultInterface];
+    const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
 
     return updateVMNetworkInterface(vm, updatedNetworks, updatedInterfaces);
   }, [interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName, vm]);
