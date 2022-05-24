@@ -11,8 +11,8 @@ import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-pl
 import { Label } from '@patternfly/react-core';
 
 import VirtualMachineTemplatesActions from '../../actions/VirtualMachineTemplatesActions';
+import { getWorkloadProfile } from '../../utils/selectors';
 import { useVirtualMachineTemplatesCPUMemory } from '../hooks/useVirtualMachineTemplatesCPUMemory';
-import useWorkloadProfile from '../hooks/useWorkloadProfile';
 
 import VirtualMachineTemplatesSource from './VirtualMachineTemplatesSource';
 
@@ -48,7 +48,7 @@ const VirtualMachineTemplatesRow: React.FC<
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
       </TableData>
       <TableData id="workload" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
-        {useWorkloadProfile(obj)}
+        {t(getWorkloadProfile(obj))}
       </TableData>
       <TableData id="availability" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
         <VirtualMachineTemplatesSource
