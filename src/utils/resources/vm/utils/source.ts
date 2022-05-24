@@ -56,11 +56,11 @@ export const getVMBootSourceType = (vm: V1VirtualMachine): TemplateBootSource =>
     }
   }
 
-  if (volume.containerDisk) {
+  if (volume?.containerDisk) {
     return {
       type: BOOT_SOURCE.CONTAINER_DISK,
       source: {
-        containerDisk: volume.containerDisk,
+        containerDisk: volume?.containerDisk,
       },
     };
   }
