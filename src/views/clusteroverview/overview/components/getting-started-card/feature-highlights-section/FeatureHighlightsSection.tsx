@@ -24,7 +24,7 @@ const FeatureHighlightsSection: React.FC = () => {
       id: 'item1',
       title: (
         <FeatureHighlightsTitle
-          title={t('Automatic Windows VM installation')}
+          title={t('Automatic Windows VirtualMachine installation')}
           readTime={t('8 min')}
         />
       ),

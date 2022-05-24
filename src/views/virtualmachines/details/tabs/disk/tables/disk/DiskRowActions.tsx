@@ -45,7 +45,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
 
   const disabledEditText = React.useMemo(() => {
     if (isVMRunning) {
-      return t('Can edit only when VM is stopped');
+      return t('Can edit only when VirtualMachine is stopped');
     }
     if (pvcResourceExists) {
       return t('Cannot edit resources that already created');
@@ -98,7 +98,9 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
       key="disk-edit"
       isDisabled={!isHotplug && isVMRunning}
       description={
-        !isHotplug && isVMRunning ? t('Can detach only hotplug volumes while VM is Running') : null
+        !isHotplug && isVMRunning
+          ? t('Can detach only hotplug volumes while VirtualMachine is Running')
+          : null
       }
     >
       {deleteBtnText}

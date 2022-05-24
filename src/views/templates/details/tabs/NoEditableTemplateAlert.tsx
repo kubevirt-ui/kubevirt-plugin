@@ -44,7 +44,7 @@ const NoEditableTemplateAlert: React.FC<NoEditableTemplateAlertProps> = ({ templ
         })}
       >
         <Trans ns="plugin__kubevirt-plugin">
-          {{ osName }} VM can not be edited because it is provided by {{ providerName }}
+          {{ osName }} VirtualMachine can not be edited because it is provided by {{ providerName }}
           Virtualization Operator.
           <br />
           We suggest you to create a custom Template from this {{ providerName }} template.
@@ -62,7 +62,7 @@ const NoEditableTemplateAlert: React.FC<NoEditableTemplateAlertProps> = ({ templ
               }
               variant={ButtonVariant.link}
             >
-              {t('Create a new custom template')}
+              {t('Create a new custom Template')}
             </Button>
           </div>
         </Trans>

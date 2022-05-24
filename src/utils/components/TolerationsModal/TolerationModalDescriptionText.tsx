@@ -10,11 +10,13 @@ const TolerationModalDescriptionText: React.FC = () => {
     <>
       <Text className="text-muted" component={TextVariants.p}>
         {t(
-          'Tolerations are applied to VMs, and allow (but do not require) the VMs to schedule onto Nodes with matching taints.',
+          'Tolerations are applied to VirtualMachines, and allow (but do not require) the VirtualMachines to schedule onto Nodes with matching taints.',
         )}
       </Text>
       <Text className="text-muted" component={TextVariants.p}>
-        {t('Add tolerations to allow a VM to schedule onto Nodes with matching taints.')}
+        {t(
+          'Add tolerations to allow a VirtualMachine to schedule onto Nodes with matching taints.',
+        )}
       </Text>
       <Text
         component={TextVariants.a}
