@@ -3,7 +3,6 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateOS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { Checkbox, Divider, FormGroup } from '@patternfly/react-core';
 
 import BootCDCheckbox from './BootCDCheckboxLabel';
@@ -49,8 +48,6 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
   template,
 }) => {
   const { t } = useKubevirtTranslation();
-  const isWindowTemplate = getTemplateOS(template) === OS_NAME_TYPES.windows;
-
   const onCDCheckboxChange = React.useCallback(() => {
     if (cdSource) setCDSource(undefined);
     else {
@@ -102,17 +99,15 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         data-test-id="disk-boot-source"
       />
 
-      {isWindowTemplate && (
-        <FormGroup fieldId="customize-cdrom-drivers">
-          <Checkbox
-            isChecked={withDrivers}
-            onChange={setDrivers}
-            label={t('Mount Windows drivers disk')}
-            id="cdrom-drivers"
-            data-test-id="cdrom-drivers"
-          />
-        </FormGroup>
-      )}
+      <FormGroup fieldId="customize-cdrom-drivers">
+        <Checkbox
+          isChecked={withDrivers}
+          onChange={setDrivers}
+          label={t('Mount Windows drivers disk')}
+          id="cdrom-drivers"
+          data-test-id="cdrom-drivers"
+        />
+      </FormGroup>
     </div>
   );
 };
