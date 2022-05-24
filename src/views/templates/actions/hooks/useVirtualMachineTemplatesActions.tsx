@@ -57,7 +57,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
           {t('Edit boot source')} {editableBootSource === null && <Loading />}
         </>
       ),
-      description: t('For not automatically managed boot sources'),
+      description: !editableBootSource && t('Boot source cannot be edited for Red Hat templates'),
       disabled: !editableBootSource,
       cta: () =>
         createModal(({ isOpen, onClose }) => (
@@ -67,7 +67,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     {
       id: 'delete-template',
       label: t('Delete Template'),
-      description: t('Custom templates can be deleted'),
+      description: isCommonTemplate && t('Red Hat template cannot be deleted'),
       disabled: isCommonTemplate,
       cta: () =>
         createModal(({ isOpen, onClose }) => (
