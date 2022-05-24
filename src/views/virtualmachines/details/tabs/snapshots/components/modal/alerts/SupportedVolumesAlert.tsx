@@ -9,17 +9,16 @@ type SupportedVolumesAlertProps = {
 
 const SupportedVolumesAlert: React.FC<SupportedVolumesAlertProps> = ({ isVMRunning }) => {
   const { t } = useKubevirtTranslation();
+
+  if (!isVMRunning) {
+    return null;
+  }
   return (
     <FormGroup fieldId="snapshot-info-alerts">
       <Alert
         title={
           <Stack hasGutter>
-            <StackItem>
-              {t('Snapshot only includes disks backed by a snapshot-supported storage class')}
-            </StackItem>
-            {isVMRunning && (
-              <StackItem>{t('Taking snapshot of running VirtualMachine.')}</StackItem>
-            )}
+            <StackItem>{t('Taking snapshot of running VirtualMachine.')}</StackItem>
           </Stack>
         }
         isInline

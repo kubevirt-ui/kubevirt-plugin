@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1VolumeSnapshotStatus } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, FormGroup, Stack, StackItem } from '@patternfly/react-core';
 
 import SnapshotSupportLink from '../SnapshotSupportLink/SnapshotSupportLink';
@@ -14,7 +15,7 @@ const UnsupportedVolumesAlert: React.FC<UnsupportedVolumesAlertProps> = ({
   unsupportedVolumes,
 }) => {
   const { t } = useKubevirtTranslation();
-  if (unsupportedVolumes?.length === 0) {
+  if (isEmpty(unsupportedVolumes)) {
     return null;
   }
   return (

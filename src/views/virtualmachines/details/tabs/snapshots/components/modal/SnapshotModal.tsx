@@ -3,7 +3,6 @@ import * as React from 'react';
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1alpha1VirtualMachineSnapshot,
-  // V1alpha1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -21,7 +20,6 @@ import {
   getVolumeSnapshotStatusesPartition,
 } from '../../utils/helpers';
 
-import NoSupportedVolumesAlert from './alerts/NoSupportedVolumesAlert';
 import SupportedVolumesAlert from './alerts/SupportedVolumesAlert';
 import UnsupportedVolumesAlert from './alerts/UnsupportedVolumesAlert';
 import SnapshotDeadlineFormField from './SnapshotFormFields/SnapshotDeadlineFormField';
@@ -35,7 +33,6 @@ type SnapshotModalProps = {
 
 const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
-  // fields input values
   const [snapshotName, setSnapshotName] = React.useState<string>(createSnapshotName());
   const [description, setDescription] = React.useState<string>(undefined);
   const [deadline, setDeadline] = React.useState<string>(undefined);
@@ -76,9 +73,7 @@ const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, isOpen, onClose }) =>
       headerText={t('Add Snapshot')}
       isDisabled={isSubmitDisabled}
     >
-      {supportedVolumes?.length === 0 ? (
-        <NoSupportedVolumesAlert />
-      ) : (
+      {
         <Form>
           <SupportedVolumesAlert
             isVMRunning={vm?.status?.printableStatus === printableVMStatus.Running}
@@ -99,7 +94,7 @@ const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, isOpen, onClose }) =>
           <SnapshotSupportedVolumeList supportedVolumes={supportedVolumes} />
           <UnsupportedVolumesAlert unsupportedVolumes={unsupportedVolumes} />
         </Form>
-      )}
+      }
     </TabModal>
   );
 };
