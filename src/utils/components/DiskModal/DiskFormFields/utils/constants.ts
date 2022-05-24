@@ -19,6 +19,7 @@ export const sourceTypes = {
   PVC: 'persistentVolumeClaim', // Existing PVC
   EPHEMERAL: 'containerDisk',
   DATA_SOURCE: 'dataSource',
+  UPLOAD: 'upload',
 };
 
 export const volumeTypes = {
@@ -47,6 +48,8 @@ export const mapSourceTypeToVolumeType = {
   [sourceTypes.REGISTRY]: volumeTypes.DATA_VOLUME,
   [sourceTypes.PVC]: volumeTypes.PERSISTENT_VOLUME_CLAIM,
   [sourceTypes.EPHEMERAL]: volumeTypes.CONTAINER_DISK,
+  [sourceTypes.DATA_SOURCE]: volumeTypes.DATA_VOLUME,
+  [sourceTypes.UPLOAD]: volumeTypes.PERSISTENT_VOLUME_CLAIM,
   [volumeTypes.CLOUD_INIT_NO_CLOUD]: OTHER,
   [volumeTypes.CONFIG_MAP]: OTHER,
   [volumeTypes.SECRET]: OTHER,

@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
@@ -22,6 +23,7 @@ import { getSourceOptions } from '../utils/helpers';
 import DiskSourceContainer from './components/DiskSourceContainer';
 import DiskSourceDataSourceSelect from './components/DiskSourceDataSourceSelect';
 import DiskSourcePVCSelect from './components/DiskSourcePVCSelect';
+import DiskSourceUploadPVC from './components/DiskSourceUploadPVC';
 import DiskSourceUrlInput from './components/DiskSourceUrlInput';
 
 type DiskSourceFormSelectProps = {
@@ -31,6 +33,7 @@ type DiskSourceFormSelectProps = {
   isVMRunning: boolean;
   diskSourceState: DiskSourceState;
   dispatchDiskSourceState: React.Dispatch<DiskSourceReducerActionType>;
+  relevantUpload?: DataUpload;
 };
 
 const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
@@ -40,6 +43,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
   isVMRunning,
   diskSourceState,
   dispatchDiskSourceState,
+  relevantUpload,
 }) => {
   const { t } = useKubevirtTranslation();
   const { diskSource, diskType } = diskState || {};
@@ -54,6 +58,8 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
     ephemeralSource,
     dataSourceName,
     dataSourceNamespace,
+    uploadFile,
+    uploadFilename,
   } = diskSourceState || {};
 
   const os = getAnnotation(vm?.spec?.template, ANNOTATIONS.os) || getOperatingSystem(vm);
@@ -190,6 +196,25 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
           selectDataSourceNamespace={(value) =>
             dispatchDiskSourceState({
               type: diskSourceReducerActions.SET_DATA_SOURCE_NAMESPACE,
+              payload: value,
+            })
+          }
+        />
+      )}
+      {diskSource === sourceTypes.UPLOAD && (
+        <DiskSourceUploadPVC
+          relevantUpload={relevantUpload}
+          uploadFile={uploadFile}
+          uploadFileName={uploadFilename}
+          setUploadFile={(file) =>
+            dispatchDiskSourceState({
+              type: diskSourceReducerActions.SET_UPLOAD_PVC_FILE,
+              file,
+            })
+          }
+          setUploadFileName={(value) =>
+            dispatchDiskSourceState({
+              type: diskSourceReducerActions.SET_UPLOAD_PVC_FILENAME,
               payload: value,
             })
           }

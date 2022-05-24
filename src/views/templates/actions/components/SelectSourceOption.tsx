@@ -95,8 +95,6 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
     [onSelectSource],
   );
 
-  console.log('==== options', options);
-
   return (
     <FormGroup
       label={label}

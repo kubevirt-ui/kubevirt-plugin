@@ -28,6 +28,11 @@ export const getSourceOptions = (t: TFunction) => ({
     name: t('Use an existing PVC'),
     description: t('Use a persistent volume claim (PVC) already available on the cluster.'),
   },
+  upload: {
+    id: sourceTypes.UPLOAD,
+    name: t('Upload (Upload a new file to PVC)'),
+    description: t('Upload a new file to PVC. a new PVC will be created.'),
+  },
   clonePvc: {
     id: sourceTypes.CLONE_PVC,
     name: t('PVC (creates PVC)'),
