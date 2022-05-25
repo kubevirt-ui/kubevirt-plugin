@@ -31,6 +31,7 @@ type VirtualMachineDescriptionItemProps = {
   onEditClick?: () => void;
   isDisabled?: boolean;
   showEditOnTitle?: boolean;
+  'data-test-id'?: string;
 };
 
 const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps> = ({
@@ -44,6 +45,7 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
   onEditClick,
   isDisabled,
   showEditOnTitle,
+  'data-test-id': testId,
 }) => {
   const { t } = useKubevirtTranslation();
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
@@ -79,7 +81,14 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
   };
 
   const description = (
-    <Button type="button" isInline isDisabled={isDisabled} onClick={onEditClick} variant="link">
+    <Button
+      type="button"
+      isInline
+      isDisabled={isDisabled}
+      onClick={onEditClick}
+      variant="link"
+      data-test-id={testId}
+    >
       {descriptionData ?? NotAvailable}
       <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
     </Button>
@@ -98,6 +107,7 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
                 isDisabled={isDisabled}
                 onClick={onEditClick}
                 variant="link"
+                data-test-id={`${testId}-edit`}
               >
                 {t('Edit')}
                 <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
@@ -109,7 +119,9 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
       {isEdit && !showEditOnTitle ? (
         description
       ) : (
-        <DescriptionListDescription>{descriptionData}</DescriptionListDescription>
+        <DescriptionListDescription data-test-id={testId}>
+          {descriptionData}
+        </DescriptionListDescription>
       )}
     </DescriptionListGroup>
   );

@@ -100,6 +100,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           )}
           moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
           breadcrumb="VirtualMachine.metadata.name"
+          data-test-id={`${vm?.metadata?.name}-name`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={<ResourceLink kind="Namespace" name={vm?.metadata?.namespace} />}
@@ -146,6 +147,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
               />
             ))
           }
+          data-test-id={`${vm?.metadata?.name}-labels`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={<VirtualMachineAnnotations annotations={vm?.metadata?.annotations} />}
@@ -195,10 +197,12 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
               />
             ))
           }
+          data-test-id={`${vm?.metadata?.name}-description`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={getOperatingSystemName(vm) || getOperatingSystem(vm)}
           descriptionHeader={t('Operating System')}
+          data-test-id={`${vm?.metadata?.name}-os`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={<CPUMemory vm={vm} />}
@@ -215,6 +219,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
               />
             ))
           }
+          data-test-id={`${vm?.metadata?.name}-cpu-memory`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={
@@ -236,10 +241,12 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
               />
             ))
           }
+          data-test-id={`${vm?.metadata?.name}-boot-method`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={getLabel(vm, VM_TEMPLATE_ANNOTATION) || None}
           descriptionHeader={t('Template')}
+          data-test-id={`${vm?.metadata?.name}-template`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={<Timestamp timestamp={vm?.metadata?.creationTimestamp} />}

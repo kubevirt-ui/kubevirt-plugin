@@ -41,6 +41,7 @@ const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
 
   return (
     <Dropdown
+      data-test-id="virtual-machine-actions"
       isPlain={isKebabToggle}
       isOpen={isOpen}
       position={DropdownPosition.right}
@@ -53,6 +54,7 @@ const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
       }
       dropdownItems={actions?.map((action) => (
         <DropdownItem
+          data-test-id={`${action.id}`}
           key={action?.id}
           onClick={() => handleClick(action)}
           isDisabled={action?.disabled}

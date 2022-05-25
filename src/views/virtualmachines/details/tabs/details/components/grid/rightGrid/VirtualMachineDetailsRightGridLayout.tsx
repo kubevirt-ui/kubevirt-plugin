@@ -59,10 +59,12 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         <VirtualMachineDescriptionItem
           descriptionData={<VirtualMachineStatus printableStatus={vm?.status?.printableStatus} />}
           descriptionHeader={t('Status')}
+          data-test-id={`${vm?.metadata?.name}-status`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.pod}
           descriptionHeader={t('Pod')}
+          data-test-id={`${vm?.metadata?.name}-pod`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.vmi}
@@ -78,18 +80,22 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
               <BootOrderModal {...props} vm={vm} onSubmit={onSubmit} vmi={vmi} />
             ))
           }
+          data-test-id={`${vm?.metadata?.name}-boot-order`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.ipAddress}
           descriptionHeader={t('IP Address')}
+          data-test-id={`${vm?.metadata?.name}-ip-address`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.hostname}
           descriptionHeader={t('Hostname')}
+          data-test-id={`${vm?.metadata?.name}-hostname`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.timezone}
           descriptionHeader={t('Time Zone')}
+          data-test-id={`${vm?.metadata?.name}-timezone`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.node}
@@ -102,10 +108,12 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
             )
           }
           descriptionHeader={t('Workload Profile')}
+          data-test-id={`${vm?.metadata?.name}-workload-profile`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.userCredentials}
           descriptionHeader={t('User credentials')}
+          data-test-id={`${vm?.metadata?.name}-user-credentials`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.sshAccess}
@@ -117,6 +125,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
             ))
           }
           descriptionHeader={t('SSH Access')}
+          data-test-id={`${vm?.metadata?.name}-ssh-access`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={
