@@ -23,7 +23,6 @@ export const quickCreateVM = (
     const vm = getTemplateVirtualMachineObject(processedTemplate);
     vm.metadata.namespace = namespace;
     vm.metadata.name = name;
-    vm.spec.template.spec.hostname = name;
 
     vm.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
     vm.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = processedTemplate.metadata.namespace;

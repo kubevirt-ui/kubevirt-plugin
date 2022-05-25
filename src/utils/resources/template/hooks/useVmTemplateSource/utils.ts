@@ -1,3 +1,5 @@
+import produce from 'immer';
+
 import { PersistentVolumeClaimModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
@@ -13,6 +15,7 @@ import {
   V1beta1DataVolumeSourceRegistry,
   V1ContainerDiskSource,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getBootDisk, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getVMBootSourceType } from '@kubevirt-utils/resources/vm/utils/source';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -36,6 +39,7 @@ export type TemplateBootSource = {
     registry?: V1beta1DataVolumeSourceRegistry;
     containerDisk?: V1ContainerDiskSource;
   };
+  storageClassName?: string;
 };
 
 /**
@@ -103,3 +107,30 @@ export const getDataSourcePVC = (name: string, ns: string) =>
  */
 export const isDataSourceReady = (dataSource: V1beta1DataSource): boolean =>
   dataSource?.status?.conditions?.some((c) => c.type === 'Ready' && c.status === 'True');
+
+/**
+ * update template's boot source storage class
+ * @param template the template to get the boot source from
+ * @param storageClassName the storage class name to use
+ * @returns - an updated template with storage class name set
+ */
+export const produceTemplateBootSourceStorageClass = (
+  template: V1Template,
+  storageClassName: string,
+) =>
+  produce(template, (templateDraft) => {
+    if (storageClassName) {
+      const vm = getTemplateVirtualMachineObject(templateDraft);
+      const bootDisk = getBootDisk(vm);
+      const volume = getVolumes(vm)?.find((vol) => vol.name === bootDisk?.name);
+
+      const otherDataVolumeTemplates = vm?.spec?.dataVolumeTemplates?.filter(
+        (dv) => dv.metadata?.name !== volume?.dataVolume?.name,
+      );
+      const dataVolumeTemplate = vm?.spec?.dataVolumeTemplates?.find(
+        (dv) => dv.metadata?.name === volume?.dataVolume?.name,
+      );
+      dataVolumeTemplate.spec.storage.storageClassName = storageClassName;
+      vm.spec.dataVolumeTemplates = [...otherDataVolumeTemplates, dataVolumeTemplate];
+    }
+  });
