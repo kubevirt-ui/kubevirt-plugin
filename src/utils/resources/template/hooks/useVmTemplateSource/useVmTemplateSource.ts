@@ -23,7 +23,6 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
 
   const bootSource = React.useMemo(() => getTemplateBootSourceType(template), [template]);
 
-  // eslint-disable-next-line require-jsdoc
   const getPVCSource = ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
     setLoaded(false);
     return getPVC(name, namespace)
@@ -38,6 +37,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
             },
           },
           sourceValue: { pvc },
+          storageClassName: pvc.spec.storageClassName,
         });
       })
       .catch((e) => {
@@ -46,7 +46,6 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
       .finally(() => setLoaded(true));
   };
 
-  // eslint-disable-next-line require-jsdoc
   const getDataSourceCondition = ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
     setLoaded(false);
     return getDataSource(name, namespace)
@@ -61,6 +60,19 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
               pvc: dataSource?.spec?.source?.pvc,
             },
           });
+          return dataSource;
+        }
+      })
+      .then((dataSource) => {
+        if (dataSource) {
+          getPVC(dataSource.spec.source.pvc.name, dataSource.spec.source.pvc.namespace).then(
+            (pvc) => {
+              setTemplateBootSource((prev) => ({
+                ...prev,
+                storageClassName: pvc?.spec?.storageClassName,
+              }));
+            },
+          );
         }
       })
       .catch((e) => {
