@@ -1,11 +1,11 @@
 import * as React from 'react';
 
-type PageHeadingProps = {
+type PageHeaderProps = {
   badge?: React.ReactNode;
   title?: string | JSX.Element;
 };
 
-const PageHeader: React.FC<PageHeadingProps> = ({ badge, title }) => (
+const PageHeader: React.FC<PageHeaderProps> = ({ badge, title }) => (
   <div className="co-m-nav-title co-m-nav-title--detail">
     <h1 className="co-m-pane__heading">
       <div className="co-m-pane__name co-resource-item">

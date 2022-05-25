@@ -10,8 +10,8 @@ export interface GettingStartedLink {
   /** OnClick callback for the SimpleList item */
   onClick?: (event: React.MouseEvent | React.ChangeEvent) => void;
   description?: string;
-  moreLinkHref?: string;
-  moreLinkText?: string;
-  moreLinkExternal?: boolean;
-  showMoreLink?: boolean;
+  secondaryLinkHref?: string;
+  secondaryLinkText?: string;
+  secondaryLinkExternal?: boolean;
+  showSecondaryLink?: boolean;
 }

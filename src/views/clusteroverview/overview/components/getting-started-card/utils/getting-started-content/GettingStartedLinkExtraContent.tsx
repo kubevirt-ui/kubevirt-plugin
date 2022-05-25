@@ -5,6 +5,8 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 
 import { GettingStartedLink } from '../types';
 
+import './GettingStartedLinkExtraContent.scss';
+
 export type GettingStartedLinkExtraContentProps = {
   link: GettingStartedLink;
 };
@@ -14,22 +16,22 @@ const GettingStartedLinkExtraContent: React.FC<GettingStartedLinkExtraContentPro
 }) => {
   let ExtraLink = null;
 
-  if (link?.moreLinkHref) {
-    ExtraLink = link?.moreLinkExternal ? (
+  if (link?.secondaryLinkHref) {
+    ExtraLink = link?.secondaryLinkExternal ? (
       <ExternalLink
-        href={link?.moreLinkHref}
-        text={link?.moreLinkText}
-        additionalClassName="kv-getting-started-content__more-block--link"
+        href={link?.secondaryLinkHref}
+        text={link?.secondaryLinkText}
+        additionalClassName="getting-started-link-extra-content__more-block--link"
       />
     ) : (
-      <Link to={link?.moreLinkHref}>{link?.moreLinkText}</Link>
+      <Link to={link?.secondaryLinkHref}>{link?.secondaryLinkText}</Link>
     );
   }
 
   return (
-    <div className="kv-getting-started-content--more-block">
+    <div className="getting-started-link-extra-content--more-block">
       {link?.description}
-      {link?.showMoreLink && ExtraLink}
+      {link?.showSecondaryLink && ExtraLink}
     </div>
   );
 };
