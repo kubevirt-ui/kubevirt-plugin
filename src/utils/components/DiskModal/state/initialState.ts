@@ -39,6 +39,8 @@ export type DiskSourceState = {
   pvcSourceName: string;
   pvcCloneSourceName: string;
   pvcCloneSourceNamespace: string;
+  uploadFile: File | string;
+  uploadFilename: string;
   registrySource: string;
   ephemeralSource: string;
   dataSourceName: string;
@@ -50,6 +52,8 @@ export const initialStateDiskSource: DiskSourceState = {
   pvcSourceName: null,
   pvcCloneSourceName: null,
   pvcCloneSourceNamespace: null,
+  uploadFile: null,
+  uploadFilename: null,
   registrySource: null,
   ephemeralSource: null,
   dataSourceName: null,

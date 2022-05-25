@@ -25,6 +25,8 @@ export const diskSourceReducerActions = Object.freeze({
   SET_PVC_SOURCE_NAME: 'setPvcSourceName',
   SET_PVC_CLONE_SOURCE_NAME: 'setPvcCloneSourceName',
   SET_PVC_CLONE_SOURCE_NAMESPACE: 'setPvcCloneSourceNamespace',
+  SET_UPLOAD_PVC_FILE: 'setUploadPvcFile',
+  SET_UPLOAD_PVC_FILENAME: 'setUploadPvcFilename',
   SET_REGISTRY_SOURCE: 'setRegistrySource',
   SET_EPHEMERAL_SOURCE: 'setEphemeralSource',
   SET_DATA_SOURCE_NAME: 'setDataSourceName',
@@ -35,4 +37,5 @@ export const diskSourceReducerActions = Object.freeze({
 export type DiskSourceReducerActionType = {
   type: string;
   payload?: string;
+  file?: File | string;
 };

@@ -59,6 +59,10 @@ export const diskSourceReducer = (
       return { ...state, pvcCloneSourceName: action.payload };
     case diskSourceReducerActions.SET_PVC_CLONE_SOURCE_NAMESPACE:
       return { ...state, pvcCloneSourceNamespace: action.payload };
+    case diskSourceReducerActions.SET_UPLOAD_PVC_FILE:
+      return { ...state, uploadFile: action.file };
+    case diskSourceReducerActions.SET_UPLOAD_PVC_FILENAME:
+      return { ...state, uploadFilename: action.payload };
     case diskSourceReducerActions.SET_REGISTRY_SOURCE:
       return { ...state, registrySource: action.payload };
     case diskSourceReducerActions.SET_EPHEMERAL_SOURCE:

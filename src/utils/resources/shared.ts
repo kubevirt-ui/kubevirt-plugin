@@ -149,3 +149,11 @@ export const asAccessReview = (
     subresource,
   };
 };
+
+/**
+ * Provides apiVersion for a k8s model.
+ * @param model k8s model
+ * @returns The apiVersion for the model i.e `group/version`.
+ * */
+export const getAPIVersionForModel = (model: K8sModel): string =>
+  !model?.apiGroup ? model.apiVersion : `${model.apiGroup}/${model.apiVersion}`;

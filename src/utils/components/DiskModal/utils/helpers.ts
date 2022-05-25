@@ -23,14 +23,19 @@ import {
 import { sourceTypes } from '../DiskFormFields/utils/constants';
 import { DiskFormState, DiskSourceState } from '../state/initialState';
 
-export const getEmptyVMDataVolumeResource = (vm: V1VirtualMachine): V1beta1DataVolume => {
+export const getEmptyVMDataVolumeResource = (
+  vm: V1VirtualMachine,
+  createOwnerReference: boolean,
+): V1beta1DataVolume => {
   const dataVolumeResource: V1beta1DataVolume = {
     apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
     kind: DataVolumeModel.kind,
     metadata: {
       namespace: vm?.metadata?.namespace,
       name: '',
-      ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
+      ...(createOwnerReference
+        ? { ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })] }
+        : {}),
     },
     spec: {
       storage: {
@@ -71,6 +76,7 @@ export const requiresDataVolume = (diskSource: string): boolean => {
     sourceTypes.CLONE_PVC,
     sourceTypes.REGISTRY,
     sourceTypes.DATA_SOURCE,
+    sourceTypes.UPLOAD,
   ].includes(diskSource);
 };
 
@@ -106,13 +112,20 @@ export const getVolumeFromState = (
   return volume;
 };
 
-export const getDataVolumeFromState = (
-  vm: V1VirtualMachine,
-  diskState: DiskFormState,
-  diskSourceState: DiskSourceState,
-  resultVolume?: V1Volume,
-): V1beta1DataVolume => {
-  const dataVolume = getEmptyVMDataVolumeResource(vm);
+export const getDataVolumeFromState = ({
+  vm,
+  diskState,
+  diskSourceState,
+  resultVolume,
+  createOwnerReference = true,
+}: {
+  vm: V1VirtualMachine;
+  diskState: DiskFormState;
+  diskSourceState: DiskSourceState;
+  resultVolume?: V1Volume;
+  createOwnerReference?: boolean;
+}): V1beta1DataVolume => {
+  const dataVolume = getEmptyVMDataVolumeResource(vm, createOwnerReference);
   const dvName = resultVolume?.dataVolume?.name || `${vm?.metadata?.name}-${diskState.diskName}`;
 
   dataVolume.metadata.name = dvName;
@@ -149,6 +162,10 @@ export const getDataVolumeFromState = (
       kind: DataSourceModel.kind,
       name: diskSourceState.dataSourceName,
       namespace: diskSourceState.dataSourceNamespace,
+    };
+  } else if (diskState.diskSource === sourceTypes.UPLOAD) {
+    dataVolume.spec.source = {
+      upload: {},
     };
   }
   return dataVolume;

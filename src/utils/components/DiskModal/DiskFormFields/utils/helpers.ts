@@ -47,6 +47,11 @@ export const getSourceOptions = (t: TFunction) => ({
       'Upload content from a container located in a registry accessible from the cluster. The container disk is meant to be used only for read-only filesystems such as CD-ROMs or for small short-lived throw-away VMs.',
     ),
   },
+  upload: {
+    id: sourceTypes.UPLOAD,
+    name: t('Upload (Upload a new file to PVC)'),
+    description: t('Upload a new file to PVC. a new PVC will be created.'),
+  },
 });
 
 export const getURLSourceHelpertText = (t: TFunction, os: OS_NAME_TYPES) => {

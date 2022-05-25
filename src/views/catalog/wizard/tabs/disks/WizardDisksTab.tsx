@@ -40,6 +40,7 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM }) => {
                 onClose={onClose}
                 onSubmit={updateVM}
                 headerText={t('Add disk')}
+                createOwnerReference={false}
               />
             ))
           }
