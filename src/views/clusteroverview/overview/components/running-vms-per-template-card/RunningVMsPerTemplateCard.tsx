@@ -50,7 +50,7 @@ const RunningVMsPerTemplateCard = () => {
           right: 20,
           top: 20,
         }}
-        subTitle={t('VirtualMachines')}
+        subTitle={t('VMs')}
         title={numVMs?.toString()}
         width={300}
         style={{
