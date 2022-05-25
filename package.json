@@ -9,7 +9,6 @@
     "lint": "eslint src cypress --color",
     "lint:fix": "yarn lint --fix",
     "check-types": "tsc",
-    "i18n": "i18next",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
     "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/doc/console-extensions.md .",
     "test": "jest",
@@ -20,7 +19,13 @@
     "test-cypress": "cd cypress && $(npm bin)/cypress open --config-file ./cypress.json --env openshift=true",
     "test-cypress-docker": "echo 'visit http://localhost:10000' && cd cypress && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 $(npm bin)/cypress open --config-file ./cypress.json --env openshift=true",
     "test-cypress-headless": "cd cypress && node --max-old-space-size=4096 $(npm bin)/cypress run --config-file ./cypress.json --env openshift=true --headless",
-    "start-console": "./start-console.sh"
+    "start-console": "./start-console.sh",
+    "i18n-to-po": "node ./i18n-scripts/i18n-to-po.js",
+    "po-to-i18n": "node ./i18n-scripts/po-to-i18n.js",
+    "i18n": "./i18n-scripts/build-i18n.sh && node ./i18n-scripts/set-english-defaults.js",
+    "export-pos": "./i18n-scripts/export-pos.sh",
+    "memsource-upload": "./i18n-scripts/memsource-upload.sh",
+    "memsource-download": "./i18n-scripts/memsource-download.sh"
   },
   "consolePlugin": {
     "name": "kubevirt-plugin",
@@ -117,6 +122,7 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "fork-ts-checker-webpack-plugin": "^6.5.0",
     "i18next": "^21.6.0",
+    "i18next-conv": "^12.1.1",
     "i18next-parser": "^6.4.0",
     "jest": "^27.4.5",
     "mini-svg-data-uri": "^1.4.4",
@@ -124,6 +130,7 @@
     "mocha-junit-reporter": "^2.0.2",
     "mochawesome": "^7.0.1",
     "mochawesome-merge": "^4.2.1",
+    "pluralize": "^8.0.0",
     "prettier": "^2.5.1",
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.49.7",
