@@ -1,8 +1,9 @@
 import * as React from 'react';
 import produce from 'immer';
+import { ensurePath } from 'src/views/templates/utils';
+import { ANNOTATIONS } from 'src/views/templates/utils/constants';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,22 +18,22 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-const Description: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
+import DisplayNameModal from './DisplayNameModal';
+
+const DisplayName: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
-  const templateDescription = template?.metadata?.annotations?.description || (
-    <MutedTextSpan text={t('None')} />
-  );
+  const displayName = template?.metadata?.annotations?.[ANNOTATIONS.displayName];
 
-  const updateDescription = (updatedDescription: string) => {
+  const updateDisplayName = (updatedDisplayName: string) => {
     const updatedTemplate = produce<V1Template>(template, (templateDraft: V1Template) => {
-      if (!templateDraft.metadata.annotations) templateDraft.metadata.annotations = {};
+      if (!templateDraft.metadata.annotations) ensurePath(templateDraft, 'metadata.annotations');
 
-      if (updatedDescription) {
-        templateDraft.metadata.annotations.description = updatedDescription;
-      } else {
-        delete templateDraft.metadata.annotations.description;
-      }
+      delete templateDraft.metadata.annotations[ANNOTATIONS.displayName];
+
+      if (updatedDisplayName)
+        templateDraft.metadata.annotations[ANNOTATIONS.displayName] = updatedDisplayName;
+
       return templateDraft;
     });
 
@@ -46,19 +47,19 @@ const Description: React.FC<TemplateDetailsGridProps> = ({ template, editable })
 
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
-      <DescriptionModal
+      <DisplayNameModal
         obj={template}
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={updateDescription}
+        onSubmit={updateDisplayName}
       />
     ));
 
   return (
     <DescriptionListGroup>
-      <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
+      <DescriptionListTerm>{t('Display name')}</DescriptionListTerm>
       <DescriptionListDescription>
-        {templateDescription}
+        {displayName || <MutedTextSpan text={t('No display name')} />}
         {editable && (
           <Button type="button" isInline onClick={onEditClick} variant="link">
             <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
@@ -69,4 +70,4 @@ const Description: React.FC<TemplateDetailsGridProps> = ({ template, editable })
   );
 };
 
-export default Description;
+export default DisplayName;

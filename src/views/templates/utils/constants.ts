@@ -1,4 +1,5 @@
 export const ANNOTATIONS = {
+  displayName: 'openshift.io/display-name',
   providerName: 'template.kubevirt.io/provider',
   providerDisplayName: 'openshift.io/provider-display-name',
 };
