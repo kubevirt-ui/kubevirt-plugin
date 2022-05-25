@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Trans } from 'react-i18next';
 
 import { getTemplateStorageQuantity } from '@catalog/customize/components/CustomizeSource/utils';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -6,7 +7,7 @@ import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { Alert, Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import { SOURCE_TYPES } from '../../utils/constants';
 import { editBootSource } from '../editBootSource';
@@ -39,13 +40,13 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({ isOpen, obj, 
         isOpen={isOpen}
         onClose={onClose}
       >
-        <p className="margin-bottom-md">
-          This data can be found in{' '}
-          <b>
-            Storage {'>'} Persistent volume claims {'>'} ...
-          </b>{' '}
-          under the <b>kubevirt-os-images</b> project
-        </p>
+        <Alert isInline className="margin-bottom-md" variant="warning" title={t('Warning')}>
+          <Trans ns="plugin__kubevirt-plugin">
+            Editing the DataSource will affect all templates that are currently using this
+            DataSource.
+          </Trans>
+        </Alert>
+
         <Form>
           <FormGroup fieldId="boot-source-type" isRequired>
             <SelectSource
