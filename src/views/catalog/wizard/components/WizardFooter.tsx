@@ -101,12 +101,14 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
             <SplitItem>
               <Button
                 variant="secondary"
-                onClick={() =>
-                  confirm(t('Are you sure you want to go back?')) &&
-                  history.push(
-                    `/k8s/ns/${namespace}/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
-                  )
-                }
+                onClick={() => {
+                  if (confirm(t('Are you sure you want to go back?'))) {
+                    clearSessionStorageVM();
+                    history.push(
+                      `/k8s/ns/${namespace}/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
+                    );
+                  }
+                }}
               >
                 {t('Back')}
               </Button>
@@ -115,10 +117,12 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
             <SplitItem>
               <Button
                 variant="link"
-                onClick={() =>
-                  confirm(t('Are you sure you want to cancel?')) &&
-                  history.push(`/k8s/ns/${namespace}/templatescatalog`)
-                }
+                onClick={() => {
+                  if (confirm(t('Are you sure you want to cancel?'))) {
+                    clearSessionStorageVM();
+                    history.push(`/k8s/ns/${namespace}/templatescatalog`);
+                  }
+                }}
               >
                 {t('Cancel')}
               </Button>

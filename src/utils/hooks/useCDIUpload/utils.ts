@@ -2,10 +2,17 @@ import { TFunction } from 'react-i18next';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadTokenRequestModel } from '@kubevirt-utils/models';
-import { getAPIVersionForModel } from '@kubevirt-utils/resources/shared';
+import { buildOwnerReference, getAPIVersionForModel } from '@kubevirt-utils/resources/shared';
 import { getDataVolume } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
-import { k8sCreate, k8sDelete, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
+import {
+  k8sCreate,
+  k8sDelete,
+  k8sPatch,
+  K8sResourceCommon,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { ProgressVariant } from '@patternfly/react-core';
 
 import { CDI_BIND_REQUESTED_ANNOTATION } from './consts';
@@ -31,7 +38,7 @@ export enum UPLOAD_STATUS {
 }
 
 export const uploadStatusLabels = (t: TFunction) => ({
-  [UPLOAD_STATUS.ALLOCATING]: t('Allocating resources, Please wait.'),
+  [UPLOAD_STATUS.ALLOCATING]: t('Allocating resources, please wait for upload to start.'),
   [UPLOAD_STATUS.UPLOADING]: t('Uploading'),
   [UPLOAD_STATUS.SUCCESS]: t('Success'),
   [UPLOAD_STATUS.ERROR]: t('Error'),
@@ -41,7 +48,7 @@ export const uploadStatusLabels = (t: TFunction) => ({
 export const uploadStatusToProgressVariant = {
   [UPLOAD_STATUS.SUCCESS]: ProgressVariant.success,
   [UPLOAD_STATUS.ERROR]: ProgressVariant.danger,
-  [UPLOAD_STATUS.CANCELED]: ProgressVariant.danger,
+  [UPLOAD_STATUS.CANCELED]: ProgressVariant.warning,
 };
 
 const PVC_STATUS_DELAY = 2 * 1000;
@@ -49,6 +56,13 @@ const DV_UPLOAD_STATES = {
   SCHEDULED: 'UploadScheduled',
   READY: 'UploadReady',
 };
+
+export class PVCInitError extends Error {
+  constructor() {
+    // t('Data Volume failed to initiate upload.')
+    super('Data Volume failed to initiate upload.');
+  }
+}
 
 export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -58,7 +72,7 @@ export const getUploadURL = (uploadProxyURL: string) =>
   `https://${uploadProxyURL}/v1beta1/upload-form-async`;
 
 export const killUploadPVC = async (name: string, namespace: string) => {
-  await k8sDelete({ model: DataVolumeModel, resource: { metadata: { name, namespace } } });
+  return k8sDelete({ model: DataVolumeModel, resource: { metadata: { name, namespace } } });
 };
 
 const waitForUploadReady = async (dataVolume: V1beta1DataVolume, counter = 30) => {
@@ -123,9 +137,31 @@ export const createUploadPVC = async (dataVolume: V1beta1DataVolume) => {
   }
 };
 
-export class PVCInitError extends Error {
-  constructor() {
-    // t('Data Volume failed to initiate upload.')
-    super('Data Volume failed to initiate upload.');
-  }
-}
+/**
+ * while in wizard, the vm is not yet created so we wait for it to be created before adding ownerReference
+ * @param vm - VirtualMachine
+ * @param dataVolume - DataVolume
+ * @returns - Promise
+ */
+export const addUploadDataVolumeOwnerReference = (
+  vm: V1VirtualMachine,
+  dataVolume: V1beta1DataVolume,
+) => {
+  // make sure the disk was not deleted manually
+  const dvExists = getVolumes(vm)?.find(
+    (vol) => vol?.dataVolume?.name === dataVolume?.metadata?.name,
+  );
+  if (!dvExists) return Promise.resolve();
+
+  return k8sPatch({
+    model: DataVolumeModel,
+    resource: dataVolume,
+    data: [
+      {
+        op: 'replace',
+        path: '/metadata/ownerReferences',
+        value: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
+      },
+    ],
+  });
+};

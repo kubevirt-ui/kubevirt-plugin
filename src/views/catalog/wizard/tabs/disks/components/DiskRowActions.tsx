@@ -2,11 +2,14 @@ import * as React from 'react';
 import { Trans } from 'react-i18next';
 
 import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
+import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ButtonVariant,
   Dropdown,
@@ -48,6 +51,20 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
       draftVM.spec.template.spec.domain.devices.disks =
         draftVM.spec.template.spec.domain.devices.disks.filter((disk) => disk.name !== diskName);
     });
+
+    // check if disk has data volume created and tries to delete it (mainly for upload data volumes)
+    const volume = getVolumes(vm)?.find((vol) => vol.name === diskName && !!vol?.dataVolume);
+
+    if (volume) {
+      return k8sDelete({
+        model: DataVolumeModel,
+        resource: {
+          metadata: { name: volume?.dataVolume?.name, namespace: vm?.metadata?.namespace },
+        },
+      })
+        .catch(console.error)
+        .finally(() => updateVM(vmWithDeletedDisk)) as Promise<V1VirtualMachine>;
+    }
 
     return updateVM(vmWithDeletedDisk);
   }, [diskName, updateVM, vm]);

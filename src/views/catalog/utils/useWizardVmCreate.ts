@@ -5,7 +5,8 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { createVmSSHSecret } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { createSysprepConfigMap } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
 import { produceVMSSHKey, produceVMSysprep, useWizardVMContext } from './WizardVMContext';
 
@@ -24,6 +25,7 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
   const { vm, tabsData } = useWizardVMContext();
   const [loaded, setLoaded] = useState<boolean>(true);
   const [error, setError] = useState<any>();
+  const [isVmCreated, setIsVmCreated] = useState<boolean>(false);
 
   const createVM = async ({ startVM, onFullfilled }: CreateVMArguments) => {
     try {
@@ -52,6 +54,7 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
         model: VirtualMachineModel,
         data: updatedVM,
       });
+      setIsVmCreated(true);
 
       if (hasSysprep) {
         await createSysprepConfigMap(newVM, tabsData?.scripts?.sysprep);
@@ -61,9 +64,26 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
         await createVmSSHSecret(newVM, sshKey);
       }
 
+      // add missing ownerReferences to upload data volumes
+      if (tabsData?.disks?.dataVolumesToAddOwnerRef?.length > 0) {
+        await Promise.all(
+          tabsData?.disks?.dataVolumesToAddOwnerRef.map((dv) =>
+            addUploadDataVolumeOwnerReference(newVM, dv),
+          ),
+        );
+      }
+
       setLoaded(true);
       onFullfilled(newVM);
     } catch (e) {
+      // vm has been created but other promises failed, we need to delete the vm
+      if (isVmCreated) {
+        await k8sDelete({
+          model: VirtualMachineModel,
+          resource: vm,
+        });
+      }
+
       setLoaded(true);
       setError(e);
     }

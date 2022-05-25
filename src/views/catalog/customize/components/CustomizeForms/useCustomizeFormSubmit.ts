@@ -60,6 +60,10 @@ export const useCustomizeFormSubmit = (
           template,
           ANNOTATIONS.displayName,
         );
+
+        if (tabsDataDraft?.disks?.dataVolumesToAddOwnerRef) {
+          tabsDataDraft.disks.dataVolumesToAddOwnerRef = [];
+        }
       });
       await updateVM(vm);
       history.push(`/k8s/ns/${ns || 'default'}/templatescatalog/review`);

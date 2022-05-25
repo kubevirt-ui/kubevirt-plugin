@@ -28,11 +28,6 @@ export const getSourceOptions = (t: TFunction) => ({
     name: t('Use an existing PVC'),
     description: t('Use a persistent volume claim (PVC) already available on the cluster.'),
   },
-  upload: {
-    id: sourceTypes.UPLOAD,
-    name: t('Upload (Upload a new file to PVC)'),
-    description: t('Upload a new file to PVC. a new PVC will be created.'),
-  },
   clonePvc: {
     id: sourceTypes.CLONE_PVC,
     name: t('PVC (creates PVC)'),
@@ -51,6 +46,11 @@ export const getSourceOptions = (t: TFunction) => ({
     description: t(
       'Upload content from a container located in a registry accessible from the cluster. The container disk is meant to be used only for read-only filesystems such as CD-ROMs or for small short-lived throw-away VMs.',
     ),
+  },
+  upload: {
+    id: sourceTypes.UPLOAD,
+    name: t('Upload (Upload a new file to PVC)'),
+    description: t('Upload a new file to PVC. a new PVC will be created.'),
   },
 });
 

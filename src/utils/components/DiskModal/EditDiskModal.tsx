@@ -72,26 +72,40 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     [diskState.diskSource],
   );
 
-  const relevantUpload = uploadCDIHook.getUpload(
-    `${vm.metadata.name}-${diskState.diskName}`,
-    vm.metadata.namespace,
-  );
-  const isUploading = relevantUpload?.uploadStatus === UPLOAD_STATUS.UPLOADING;
-
   const uploadPromise = React.useCallback(() => {
+    const currentVmVolumes = getVolumes(vm);
+
+    const volumeToUpdate = currentVmVolumes.find(
+      (volume) => volume?.name === initialDiskState.diskName,
+    );
+
+    const resultVolume = updateVolume(volumeToUpdate, diskState, diskSourceState);
+
+    const resultDataVolume =
+      sourceRequiresDataVolume &&
+      getDataVolumeFromState({
+        vm,
+        diskState,
+        diskSourceState,
+        resultVolume,
+        createOwnerReference,
+      });
     if (diskState.diskSource === sourceTypes.UPLOAD) {
       return uploadCDIHook.uploadData({
         file: diskSourceState?.uploadFile as File,
-        dataVolume: getDataVolumeFromState({
-          vm,
-          diskState,
-          diskSourceState,
-          createOwnerReference,
-        }),
+        dataVolume: resultDataVolume,
       });
     }
     return Promise.resolve();
-  }, [createOwnerReference, diskSourceState, diskState, uploadCDIHook, vm]);
+  }, [
+    createOwnerReference,
+    diskSourceState,
+    diskState,
+    initialDiskState.diskName,
+    sourceRequiresDataVolume,
+    uploadCDIHook,
+    vm,
+  ]);
 
   const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {
     const currentVmVolumes = getVolumes(vm);
@@ -102,6 +116,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
 
     const resultDisk = getDiskFromState(diskState);
     const resultVolume = updateVolume(volumeToUpdate, diskState, diskSourceState);
+
     const resultDataVolume =
       sourceRequiresDataVolume &&
       getDataVolumeFromState({
@@ -162,14 +177,24 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     [diskState.diskSource, onSubmit, uploadPromise],
   );
 
+  const relevantUpload = React.useMemo(() => {
+    const currentVmVolumes = getVolumes(vm);
+    const volumeToUpdate = currentVmVolumes.find(
+      (volume) => volume?.name === initialDiskState.diskName,
+    );
+    const resultVolume = updateVolume(volumeToUpdate, diskState, diskSourceState);
+
+    return uploadCDIHook.getUpload(resultVolume?.dataVolume?.name, vm?.metadata?.namespace);
+  }, [diskSourceState, diskState, initialDiskState.diskName, uploadCDIHook, vm]);
+
   return (
     <TabModal
       obj={updatedVirtualMachine}
       onSubmit={handleSubmit}
       isOpen={isOpen}
       onClose={() => {
-        if (isUploading) {
-          relevantUpload.cancelUpload();
+        if (relevantUpload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
+          relevantUpload?.cancelUpload();
         }
         onClose();
       }}

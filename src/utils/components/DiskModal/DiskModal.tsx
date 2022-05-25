@@ -67,27 +67,6 @@ const DiskModal: React.FC<DiskModalProps> = ({
     [diskState.diskSource],
   );
 
-  const relevantUpload = uploadCDIHook.getUpload(
-    `${vm.metadata.name}-${diskState.diskName}`,
-    vm.metadata.namespace,
-  );
-  const isUploading = relevantUpload?.uploadStatus === UPLOAD_STATUS.UPLOADING;
-
-  const uploadPromise = React.useCallback(() => {
-    if (diskState.diskSource === sourceTypes.UPLOAD) {
-      return uploadCDIHook.uploadData({
-        file: diskSourceState?.uploadFile as File,
-        dataVolume: getDataVolumeFromState({
-          vm,
-          diskState,
-          diskSourceState,
-          createOwnerReference,
-        }),
-      });
-    }
-    return Promise.resolve();
-  }, [createOwnerReference, diskSourceState, diskState, uploadCDIHook, vm]);
-
   const hotplugPromise = React.useCallback(
     (vmObj: V1VirtualMachine) => {
       const resultDisk = getDiskFromState(diskState);
@@ -148,11 +127,34 @@ const DiskModal: React.FC<DiskModalProps> = ({
   const handleSubmit = React.useCallback(
     async (updatedVM: V1VirtualMachine) => {
       if (diskState.diskSource === sourceTypes.UPLOAD) {
-        await uploadPromise();
+        await uploadCDIHook.uploadData({
+          file: diskSourceState?.uploadFile as File,
+          dataVolume: getDataVolumeFromState({
+            vm,
+            diskState,
+            diskSourceState,
+            createOwnerReference,
+          }),
+        });
       }
       return !isVMRunning ? onSubmit(updatedVM) : (hotplugPromise(updatedVM) as Promise<any>);
     },
-    [diskState.diskSource, hotplugPromise, isVMRunning, onSubmit, uploadPromise],
+    [
+      createOwnerReference,
+      diskSourceState,
+      diskState,
+      hotplugPromise,
+      isVMRunning,
+      onSubmit,
+      uploadCDIHook,
+      vm,
+    ],
+  );
+
+  const relevantUpload = React.useMemo(
+    () =>
+      uploadCDIHook.getUpload(`${vm.metadata.name}-${diskState.diskName}`, vm.metadata.namespace),
+    [diskState.diskName, uploadCDIHook, vm.metadata.name, vm.metadata.namespace],
   );
 
   return (
@@ -161,7 +163,7 @@ const DiskModal: React.FC<DiskModalProps> = ({
       onSubmit={handleSubmit}
       isOpen={isOpen}
       onClose={() => {
-        if (isUploading) {
+        if (relevantUpload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
           relevantUpload.cancelUpload();
         }
         onClose();

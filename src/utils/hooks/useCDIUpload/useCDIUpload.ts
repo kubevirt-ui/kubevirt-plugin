@@ -1,5 +1,5 @@
 import * as React from 'react';
-import axios, { Canceler } from 'axios';
+import axios from 'axios';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import CDIConfigModel from '@kubevirt-ui/kubevirt-api/console/models/CDIConfigModel';
@@ -48,8 +48,9 @@ export const useCDIUpload = (): UseCDIUploadValues => {
       progress: 0,
       fileName: file?.name,
       cancelUpload: () => {
-        killUploadPVC(dataVolume.metadata.name, dataVolume.metadata.namespace);
         cancelSource.cancel();
+        updateUpload({ ...newUpload, uploadStatus: UPLOAD_STATUS.CANCELED });
+        return killUploadPVC(dataVolume.metadata.name, dataVolume.metadata.namespace);
       },
       uploadError: noRouteFound && {
         message: t(`No Upload URL found {{configError}}`, { configError }),
@@ -119,13 +120,15 @@ export const useCDIUpload = (): UseCDIUploadValues => {
         uploadStatus: UPLOAD_STATUS.SUCCESS,
       });
     } catch (e) {
-      const isCanceled = axios.isCancel(e);
+      // if cancelled, 'not found' is a case where the user clicked cancel while allocating
+      const isCanceled = axios.isCancel(e) || e?.message.includes('not found');
+
       updateUpload({
         ...newUpload,
         uploadStatus: isCanceled ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR,
         uploadError: !isCanceled && { message: `${e?.message}: ${e?.response?.data}` },
       });
-      return Promise.reject(isCanceled ? { message: t('Upload canceled') } : e);
+      return Promise.reject(isCanceled ? { message: t('Upload cancelled') } : e);
     }
   };
 
@@ -146,7 +149,12 @@ export type DataUpload = {
   progress?: number;
   uploadStatus?: UPLOAD_STATUS;
   uploadError?: any;
-  cancelUpload?: Canceler;
+  cancelUpload?: () => Promise<{
+    metadata: {
+      name: string;
+      namespace: string;
+    };
+  }>;
 };
 
 type Uploads = {
