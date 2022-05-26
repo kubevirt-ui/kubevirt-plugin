@@ -3,6 +3,7 @@ import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
+import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -29,7 +30,7 @@ export const getClonedDisksSummary = (
   const disks = getDisks(vm);
   const volumes = getVolumes(vm);
   const dataVolumeTemplates = getDataVolumeTemplates(vm);
-  return disks.map((disk) => {
+  return disks?.map((disk) => {
     const description = [disk.name];
 
     const volume = (volumes || []).find((v) => v.name === disk.name);
@@ -130,6 +131,13 @@ export const updateClonedPersistentVolumeClaims = (
           },
         },
       };
+
+      vm.spec.dataVolumeTemplates = vm.spec.dataVolumeTemplates.filter(
+        (dataVolume) =>
+          dataVolume.metadata.name === clonedDVTemplate.metadata.name &&
+          dataVolume.metadata.namespace === clonedDVTemplate.metadata.namespace,
+      );
+
       vm.spec.dataVolumeTemplates.push(clonedDVTemplate);
       vol.dataVolume = {
         name: clonedDVTemplate?.metadata?.name,
@@ -157,8 +165,11 @@ export const updateClonedDataVolumes = (
 
     if (dvToClone) {
       const clonedDVTemplate: V1DataVolumeTemplateSpec = {
+        apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
+        kind: DataVolumeModel.kind,
         metadata: {
           name: `${vm?.metadata?.name}-${vol.name}-${getRandomChars(5)}`,
+          namespace: vm?.metadata?.namespace,
         },
         spec: {
           storage: {
@@ -183,6 +194,12 @@ export const updateClonedDataVolumes = (
           },
         },
       };
+
+      vm.spec.dataVolumeTemplates = vm.spec.dataVolumeTemplates.filter(
+        (dataVolume) =>
+          dataVolume.metadata.name === clonedDVTemplate.metadata.name &&
+          dataVolume.metadata.namespace === clonedDVTemplate.metadata.namespace,
+      );
       vm.spec.dataVolumeTemplates.push(clonedDVTemplate);
       vol.dataVolume = {
         name: clonedDVTemplate?.metadata?.name,
