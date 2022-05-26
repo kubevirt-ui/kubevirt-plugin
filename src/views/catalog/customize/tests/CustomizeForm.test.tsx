@@ -36,12 +36,8 @@ jest.mock('../../utils/WizardVMContext', () => ({
 
 jest.mock('@kubevirt-utils/hooks/useCDIUpload/useCDIUpload', () => ({
   useCDIUpload: () => ({
-    uploads: {},
+    upload: {},
     uploadData: jest.fn().mockResolvedValue({}),
-    getUpload: (name: string, namespace: string) => ({
-      name,
-      namespace,
-    }),
   }),
 }));
 

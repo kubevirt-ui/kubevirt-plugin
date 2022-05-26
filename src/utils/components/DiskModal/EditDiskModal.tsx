@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
@@ -46,6 +47,7 @@ type DiskModalProps = {
   onClose: () => void;
   headerText: string;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
   initialDiskState: DiskFormState;
   initialDiskSourceState: DiskSourceState;
   createOwnerReference?: boolean;
@@ -57,11 +59,12 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
   onClose,
   headerText,
   onSubmit,
+  onUploadedDataVolume,
   initialDiskState,
   initialDiskSourceState,
   createOwnerReference = true,
 }) => {
-  const uploadCDIHook = useCDIUpload();
+  const { upload, uploadData } = useCDIUpload();
   const [diskState, dispatchDiskState] = React.useReducer(diskReducer, initialDiskState);
   const [diskSourceState, dispatchDiskSourceState] = React.useReducer(
     diskSourceReducer,
@@ -91,20 +94,22 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
         createOwnerReference,
       });
     if (diskState.diskSource === sourceTypes.UPLOAD) {
-      return uploadCDIHook.uploadData({
+      onUploadedDataVolume(resultDataVolume);
+      return uploadData({
         file: diskSourceState?.uploadFile as File,
         dataVolume: resultDataVolume,
       });
     }
     return Promise.resolve();
   }, [
-    createOwnerReference,
-    diskSourceState,
-    diskState,
-    initialDiskState.diskName,
-    sourceRequiresDataVolume,
-    uploadCDIHook,
     vm,
+    diskState,
+    diskSourceState,
+    sourceRequiresDataVolume,
+    createOwnerReference,
+    initialDiskState.diskName,
+    onUploadedDataVolume,
+    uploadData,
   ]);
 
   const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {
@@ -177,24 +182,14 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     [diskState.diskSource, onSubmit, uploadPromise],
   );
 
-  const relevantUpload = React.useMemo(() => {
-    const currentVmVolumes = getVolumes(vm);
-    const volumeToUpdate = currentVmVolumes.find(
-      (volume) => volume?.name === initialDiskState.diskName,
-    );
-    const resultVolume = updateVolume(vm, volumeToUpdate, diskState, diskSourceState);
-
-    return uploadCDIHook.getUpload(resultVolume?.dataVolume?.name, vm?.metadata?.namespace);
-  }, [diskSourceState, diskState, initialDiskState.diskName, uploadCDIHook, vm]);
-
   return (
     <TabModal
       obj={updatedVirtualMachine}
       onSubmit={handleSubmit}
       isOpen={isOpen}
       onClose={() => {
-        if (relevantUpload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
-          relevantUpload?.cancelUpload();
+        if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
+          upload?.cancelUpload();
         }
         onClose();
       }}
@@ -215,7 +210,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
           diskSourceState={diskSourceState}
           dispatchDiskSourceState={dispatchDiskSourceState}
           isVMRunning={false}
-          relevantUpload={relevantUpload}
+          relevantUpload={upload}
         />
         <DiskSourceSizeInput diskState={diskState} dispatchDiskState={dispatchDiskState} />
         <DiskTypeSelect

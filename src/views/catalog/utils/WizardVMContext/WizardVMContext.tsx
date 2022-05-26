@@ -35,7 +35,7 @@ export const useWizardVM = (): WizardVMContextType => {
   const [tabsData, updateTabsData] = useImmer<TabsData>(getSessionStorageTabsData());
   const [disableVmCreate, setDisableVmCreate] = React.useState(false);
 
-  useWizardVMEffects(vm, tabsData, updateTabsData);
+  useWizardVMEffects(vm, tabsData);
 
   return {
     vm,

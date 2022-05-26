@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { WizardTab } from '@catalog/wizard/tabs';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -19,7 +20,7 @@ import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
 import useWizardDisksTableData from './hooks/useWizardDisksTableData';
 
-const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM }) => {
+const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsData }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
@@ -41,6 +42,17 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM }) => {
                 onSubmit={updateVM}
                 headerText={t('Add disk')}
                 createOwnerReference={false}
+                onUploadedDataVolume={(dataVolume) =>
+                  updateTabsData((draft) => {
+                    ensurePath(draft, 'disks.dataVolumesToAddOwnerRef');
+                    if (draft.disks) {
+                      draft.disks.dataVolumesToAddOwnerRef = [
+                        ...(tabsData?.disks?.dataVolumesToAddOwnerRef || []),
+                        dataVolume,
+                      ];
+                    }
+                  })
+                }
               />
             ))
           }
