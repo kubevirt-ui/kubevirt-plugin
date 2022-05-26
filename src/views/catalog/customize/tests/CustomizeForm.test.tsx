@@ -34,6 +34,17 @@ jest.mock('../../utils/WizardVMContext', () => ({
     .mockImplementation(() => ({ updateVM: jest.fn(), loaded: true, error: undefined })),
 }));
 
+jest.mock('@kubevirt-utils/hooks/useCDIUpload/useCDIUpload', () => ({
+  useCDIUpload: () => ({
+    uploads: {},
+    uploadData: jest.fn().mockResolvedValue({}),
+    getUpload: (name: string, namespace: string) => ({
+      name,
+      namespace,
+    }),
+  }),
+}));
+
 let mockVirtualMachineTemplate = getMockTemplate();
 
 describe('Test CustomizeForm', () => {

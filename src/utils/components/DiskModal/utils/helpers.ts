@@ -76,7 +76,6 @@ export const requiresDataVolume = (diskSource: string): boolean => {
     sourceTypes.CLONE_PVC,
     sourceTypes.REGISTRY,
     sourceTypes.DATA_SOURCE,
-    sourceTypes.UPLOAD,
   ].includes(diskSource);
 };
 
@@ -88,6 +87,7 @@ export const getDiskFromState = (diskState: DiskFormState): V1Disk => ({
 });
 
 export const getVolumeFromState = (
+  vm: V1VirtualMachine,
   diskState: DiskFormState,
   diskSourceState: DiskSourceState,
   dvName: string,
@@ -106,6 +106,10 @@ export const getVolumeFromState = (
   } else if (diskState.diskSource === sourceTypes.PVC) {
     volume.persistentVolumeClaim = {
       claimName: diskSourceState.pvcSourceName,
+    };
+  } else if (diskState.diskSource === sourceTypes.UPLOAD) {
+    volume.persistentVolumeClaim = {
+      claimName: `${vm?.metadata?.name}-${diskState.diskName}`,
     };
   }
 

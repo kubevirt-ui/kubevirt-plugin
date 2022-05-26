@@ -21,7 +21,7 @@ export const CustomizeForm: React.FC<CustomizeFormProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const methods = useForm();
 
-  const [onSubmit, loaded, error] = useCustomizeFormSubmit(template);
+  const { onSubmit, loaded, error } = useCustomizeFormSubmit({ template });
   const [requiredFields, optionalFields] = buildFields(template);
   const nameField = getVirtualMachineNameField(template, t);
 

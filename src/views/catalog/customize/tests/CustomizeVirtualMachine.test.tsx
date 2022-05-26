@@ -13,6 +13,17 @@ jest.mock('react-router-dom', () => ({
   useHistory: () => ({ push: jest.fn() }),
 }));
 
+jest.mock('@kubevirt-utils/hooks/useCDIUpload/useCDIUpload', () => ({
+  useCDIUpload: () => ({
+    uploads: {},
+    uploadData: jest.fn().mockResolvedValue({}),
+    getUpload: (name: string, namespace: string) => ({
+      name,
+      namespace,
+    }),
+  }),
+}));
+
 jest.mock('@kubevirt-utils/hooks/useURLParams', () => ({
   useURLParams: () => ({
     params: {

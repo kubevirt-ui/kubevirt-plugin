@@ -55,7 +55,11 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ tem
     getTemplateOS(template) === OS_NAME_TYPES.windows,
   );
 
-  const [onSubmit, loaded, error] = useCustomizeFormSubmit(templateWithSources, windowsDrivers);
+  const { onSubmit, relevantUpload, loaded, error } = useCustomizeFormSubmit({
+    template: templateWithSources,
+    diskSource,
+    withWindowsDrivers: windowsDrivers,
+  });
 
   const [requiredFields, optionalFields] = React.useMemo(() => buildFields(template), [template]);
   const nameField = React.useMemo(() => getVirtualMachineNameField(template, t), [template, t]);
@@ -77,6 +81,7 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ tem
           setDrivers={setWindowsDrivers}
           cdSource={cdSource}
           setCDSource={setCDSource}
+          relevantUpload={relevantUpload}
         />
 
         <ExpandableOptionsFields optionalFields={optionalFields} />

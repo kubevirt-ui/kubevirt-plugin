@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
+import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
+import { FileUpload, FormGroup, Stack, StackItem, ValidatedOptions } from '@patternfly/react-core';
 
 import { PersistentVolumeClaimSelect } from '../PersistentVolumeClaimSelect';
 
@@ -16,14 +17,11 @@ import {
   PVC_SOURCE_NAME,
   REGISTRY_SOURCE_NAME,
   SOURCE_OPTIONS_IDS,
+  UPLOAD_SOURCE_NAME,
 } from './constants';
 import SelectSourceOption from './SelectSourceOption';
-import {
-  appendDockerPrefix,
-  getGenericSourceCustomization,
-  getPVCSource,
-  getSourceTypeFromDiskSource,
-} from './utils';
+import { SelectSourceUploadPVCProgress } from './SelectSourceUploadPVCProgress';
+import { appendDockerPrefix, getGenericSourceCustomization, getPVCSource } from './utils';
 import { VolumeSize } from './VolumeSize';
 
 export type SelectSourceProps = {
@@ -36,11 +34,11 @@ export type SelectSourceProps = {
   httpSourceHelperText?: string;
   registrySourceHelperText?: string;
   'data-test-id': string;
+  relevantUpload?: DataUpload;
 };
 
 export const SelectSource: React.FC<SelectSourceProps> = ({
   onSourceChange,
-  selectedSource,
   initialVolumeQuantity = '30Gi',
   withSize = false,
   sourceOptions,
@@ -48,15 +46,17 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   httpSourceHelperText,
   registrySourceHelperText,
   'data-test-id': testId,
+  relevantUpload,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
     register,
     watch,
+    control,
     formState: { errors },
   } = useFormContext();
-  const httpURL = watch('httpURL');
-  const containerImage = watch('containerImage');
+  const httpURL = watch(`${testId}-httpURL`);
+  const containerImage = watch(`${testId}-containerImage`);
 
   const [volumeQuantity, setVolumeQuantity] = React.useState(initialVolumeQuantity);
 
@@ -65,14 +65,11 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   const [pvcNamespaceSelected, selectPVCNamespace] = React.useState<string>();
 
   React.useEffect(() => {
-    if (selectedSource) setSourceType(getSourceTypeFromDiskSource(selectedSource));
-  }, [selectedSource]);
-
-  React.useEffect(() => {
     switch (selectedSourceType) {
       case DEFAULT_SOURCE:
         return onSourceChange(undefined);
       case BLANK_SOURCE_NAME:
+      case UPLOAD_SOURCE_NAME:
         return onSourceChange(
           getGenericSourceCustomization(selectedSourceType, null, volumeQuantity),
         );
@@ -138,7 +135,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           helperText={httpSourceHelperText}
         >
           <FormTextInput
-            {...register('httpURL', { required: true })}
+            {...register(`${testId}-httpURL`, { required: true })}
             id={`${testId}-${selectedSourceType}`}
             type="text"
             aria-label={t('Image URL')}
@@ -146,6 +143,45 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
             validated={errors?.httpURL ? ValidatedOptions.error : ValidatedOptions.default}
           />
         </FormGroup>
+      )}
+
+      {selectedSourceType === UPLOAD_SOURCE_NAME && (
+        <>
+          <FormGroup
+            label={t('Upload data')}
+            fieldId={`${testId}-${selectedSourceType}`}
+            isRequired
+            className="disk-source-form-group"
+          >
+            <Stack hasGutter>
+              <StackItem>
+                <Controller
+                  name={`${testId}-uploadFile`}
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value: fileValue, onChange }, fieldState: { error } }) => (
+                    <FileUpload
+                      name={`${testId}-uploadFile`}
+                      id="simple-file"
+                      value={fileValue?.value}
+                      filename={fileValue?.filename}
+                      data-test-id="disk-source-upload-pvc-file"
+                      filenamePlaceholder={t('Drag and drop an image or upload one')}
+                      onChange={(value, filename) => {
+                        onChange({ value, filename });
+                      }}
+                      onClearClick={() => onChange(undefined)}
+                      validated={error ? ValidatedOptions.error : ValidatedOptions.default}
+                    />
+                  )}
+                />
+              </StackItem>
+              <StackItem>
+                {relevantUpload && <SelectSourceUploadPVCProgress upload={relevantUpload} />}
+              </StackItem>
+            </Stack>
+          </FormGroup>
+        </>
       )}
 
       {[REGISTRY_SOURCE_NAME, CONTAINER_DISK_SOURCE_NAME].includes(selectedSourceType) && (
@@ -157,7 +193,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           helperText={registrySourceHelperText}
         >
           <FormTextInput
-            {...register('containerImage', { required: true })}
+            {...register(`${testId}-containerImage`, { required: true })}
             id={`${testId}-${selectedSourceType}`}
             type="text"
             aria-label={t('Container Image')}
