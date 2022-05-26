@@ -79,7 +79,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
       (volume) => volume?.name === initialDiskState.diskName,
     );
 
-    const resultVolume = updateVolume(volumeToUpdate, diskState, diskSourceState);
+    const resultVolume = updateVolume(vm, volumeToUpdate, diskState, diskSourceState);
 
     const resultDataVolume =
       sourceRequiresDataVolume &&
@@ -115,7 +115,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     );
 
     const resultDisk = getDiskFromState(diskState);
-    const resultVolume = updateVolume(volumeToUpdate, diskState, diskSourceState);
+    const resultVolume = updateVolume(vm, volumeToUpdate, diskState, diskSourceState);
 
     const resultDataVolume =
       sourceRequiresDataVolume &&
@@ -182,7 +182,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     const volumeToUpdate = currentVmVolumes.find(
       (volume) => volume?.name === initialDiskState.diskName,
     );
-    const resultVolume = updateVolume(volumeToUpdate, diskState, diskSourceState);
+    const resultVolume = updateVolume(vm, volumeToUpdate, diskState, diskSourceState);
 
     return uploadCDIHook.getUpload(resultVolume?.dataVolume?.name, vm?.metadata?.namespace);
   }, [diskSourceState, diskState, initialDiskState.diskName, uploadCDIHook, vm]);

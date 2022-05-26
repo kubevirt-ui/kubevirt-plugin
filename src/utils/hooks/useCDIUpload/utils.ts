@@ -1,4 +1,5 @@
 import { TFunction } from 'react-i18next';
+import produce from 'immer';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -117,14 +118,15 @@ export const createUploadPVC = async (dataVolume: V1beta1DataVolume) => {
   const dvName = dataVolume?.metadata?.name;
   const namespace = dataVolume?.metadata?.namespace;
 
-  dataVolume.metadata = dataVolume?.metadata || {};
-  dataVolume.metadata.annotations = {
-    ...(dataVolume?.metadata?.annotations || {}),
-    [CDI_BIND_REQUESTED_ANNOTATION]: 'true',
-  };
+  const updatedDataVolume = produce(dataVolume, (dvDraft) => {
+    dvDraft.metadata.annotations = {
+      ...(dvDraft.metadata.annotations || {}),
+      [CDI_BIND_REQUESTED_ANNOTATION]: 'true',
+    };
+  });
 
   try {
-    const dv = await k8sCreate({ model: DataVolumeModel, data: dataVolume });
+    const dv = await k8sCreate({ model: DataVolumeModel, data: updatedDataVolume });
     await waitForUploadReady(dv);
     const token = await createUploadToken(dvName, namespace);
 

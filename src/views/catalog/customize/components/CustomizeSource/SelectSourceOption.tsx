@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
-import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
 
 import {
   BLANK_SOURCE_NAME,
@@ -70,14 +69,9 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
       return (
         <SelectOption
           value={UPLOAD_SOURCE_NAME}
-          description={t('Upload new file using the "Upload data to Persistent Volume Claim" page')}
-          onClick={() =>
-            window
-              .open(`/k8s/ns/${ns || 'default'}/persistentvolumeclaims/~new/data`, '_blank')
-              .focus()
-          }
+          description={t('Upload a new file to a PVC. A new PVC will be created.')}
         >
-          {t('Upload (Upload a new file to a PVC)')} <ExternalLinkAltIcon />
+          {t('Upload (Upload a new file to a PVC)')}
         </SelectOption>
       );
     case BLANK_SOURCE_NAME:
@@ -111,8 +105,7 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
   const onSelect = React.useCallback(
     (event, selection) => {
       setIsOpen(false);
-
-      if (selection !== UPLOAD_SOURCE_NAME) onSelectSource(selection);
+      onSelectSource(selection);
     },
     [onSelectSource],
   );

@@ -1,4 +1,9 @@
-import { V1DataVolumeTemplateSpec, V1Disk, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1DataVolumeTemplateSpec,
+  V1Disk,
+  V1VirtualMachine,
+  V1Volume,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 import { mapSourceTypeToVolumeType, sourceTypes } from '../DiskFormFields/utils/constants';
 import { DiskFormState, DiskSourceState } from '../state/initialState';
@@ -6,6 +11,7 @@ import { DiskFormState, DiskSourceState } from '../state/initialState';
 import { requiresDataVolume } from './helpers';
 
 export const updateVolume = (
+  vm: V1VirtualMachine,
   oldVolume: V1Volume,
   diskState: DiskFormState,
   diskSourceState: DiskSourceState,
@@ -28,6 +34,10 @@ export const updateVolume = (
   } else if (diskState.diskSource === sourceTypes.PVC) {
     updatedVolume.persistentVolumeClaim = {
       claimName: diskSourceState.pvcSourceName,
+    };
+  } else if (diskState.diskSource === sourceTypes.UPLOAD) {
+    updatedVolume.persistentVolumeClaim = {
+      claimName: `${vm?.metadata?.name}-${diskState.diskName}`,
     };
   }
   return updatedVolume;

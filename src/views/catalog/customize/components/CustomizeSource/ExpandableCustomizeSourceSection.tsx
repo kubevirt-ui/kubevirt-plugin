@@ -23,6 +23,7 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
   setDrivers,
   cdSource,
   setCDSource,
+  relevantUpload,
 }) => {
   const { t } = useKubevirtTranslation();
   const [storageFieldsExpanded, setStorageFieldsExpanded] = React.useState(true);
@@ -70,6 +71,7 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
             setDrivers={setDrivers}
             cdSource={cdSource}
             setCDSource={setCDSource}
+            relevantUpload={relevantUpload}
           />
         </ExpandableSection>
       </StackItem>

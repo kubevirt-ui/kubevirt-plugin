@@ -93,7 +93,7 @@ const DiskModal: React.FC<DiskModalProps> = ({
       const dvName = `${vmDraft?.metadata?.name}-${diskState.diskName}`;
 
       const resultDisk = getDiskFromState(diskState);
-      const resultVolume = getVolumeFromState(diskState, diskSourceState, dvName);
+      const resultVolume = getVolumeFromState(vm, diskState, diskSourceState, dvName);
       const resultDataVolume = getDataVolumeFromState({
         vm: vmDraft,
         diskState,
@@ -198,25 +198,26 @@ const DiskModal: React.FC<DiskModalProps> = ({
           diskState={diskState}
           dispatchDiskState={dispatchDiskState}
         />
-        {sourceRequiresDataVolume && (
-          <>
-            <StorageClassSelect
-              storageClass={diskState.storageClass}
-              dispatchDiskState={dispatchDiskState}
-            />
-            <ApplyStorageProfileSettingsCheckbox
-              diskState={diskState}
-              dispatchDiskState={dispatchDiskState}
-            />
-            <AccessMode diskState={diskState} dispatchDiskState={dispatchDiskState} />
-            <VolumeMode diskState={diskState} dispatchDiskState={dispatchDiskState} />
-            <EnablePreallocationCheckbox
-              isDisabled={!sourceRequiresDataVolume}
-              enablePreallocation={diskState.enablePreallocation}
-              dispatchDiskState={dispatchDiskState}
-            />
-          </>
-        )}
+        {sourceRequiresDataVolume ||
+          (diskState.diskSource === sourceTypes.UPLOAD && (
+            <>
+              <StorageClassSelect
+                storageClass={diskState.storageClass}
+                dispatchDiskState={dispatchDiskState}
+              />
+              <ApplyStorageProfileSettingsCheckbox
+                diskState={diskState}
+                dispatchDiskState={dispatchDiskState}
+              />
+              <AccessMode diskState={diskState} dispatchDiskState={dispatchDiskState} />
+              <VolumeMode diskState={diskState} dispatchDiskState={dispatchDiskState} />
+              <EnablePreallocationCheckbox
+                isDisabled={!sourceRequiresDataVolume}
+                enablePreallocation={diskState.enablePreallocation}
+                dispatchDiskState={dispatchDiskState}
+              />
+            </>
+          ))}
       </Form>
     </TabModal>
   );
