@@ -5,10 +5,6 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
-import {
-  getOperatingSystem,
-  getOperatingSystemName,
-} from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import {
   Card,
@@ -22,6 +18,7 @@ import {
   GridItem,
   Popover,
   PopoverPosition,
+  Skeleton,
 } from '@patternfly/react-core';
 
 import { getVMStatusIcon } from '../../../../../utils';
@@ -41,7 +38,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
 }) => {
   const { t } = useKubevirtTranslation();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const [guestAgentData] = useGuestOS(vmi);
+  const [guestAgentData, loaded] = useGuestOS(vmi);
   const Icon = getVMStatusIcon(vm?.status?.printableStatus);
 
   const timestamp = timestampFor(
@@ -49,6 +46,13 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
     new Date(Date.now()),
     true,
   );
+
+  const guestAgentIsRequired = <MutedTextSpan text={t('Guest agent is required')} />;
+
+  const osName =
+    (guestAgentData?.os?.prettyName || guestAgentData?.os?.name) ?? guestAgentIsRequired;
+
+  const hostname = guestAgentData?.hostname ?? guestAgentIsRequired;
 
   return (
     <div className="VirtualMachinesOverviewTabDetails--details">
@@ -93,7 +97,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('OS')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-os">
-                    {getOperatingSystemName(vm) || getOperatingSystem(vm) || '-'}
+                    {loaded ? osName : <Skeleton />}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
@@ -105,9 +109,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Host')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-host">
-                    {guestAgentData?.hostname ?? (
-                      <MutedTextSpan text={t('Guest agent is required')} />
-                    )}
+                    {loaded ? hostname : <Skeleton />}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
