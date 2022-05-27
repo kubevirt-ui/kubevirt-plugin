@@ -4,18 +4,13 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
-import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesModal';
-import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
+import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SSHAccessModal from '@kubevirt-utils/components/SSHAccess/SSHAccessModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
-import {
-  getGPUDevices,
-  getHostDevices,
-  VM_WORKLOAD_ANNOTATION,
-} from '@kubevirt-utils/resources/vm';
+import { VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
@@ -39,9 +34,6 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-
-  const hostDevices = getHostDevices(vm);
-  const gpus = getGPUDevices(vm);
 
   const onSubmit = React.useCallback(
     (obj: V1VirtualMachine) =>
@@ -128,49 +120,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           data-test-id={`${vm?.metadata?.name}-ssh-access`}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={
-            <>
-              <a
-                onClick={() =>
-                  createModal(({ isOpen, onClose }) => (
-                    <HardwareDevicesModal
-                      vm={vm}
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      headerText={t('GPU devices')}
-                      onSubmit={onSubmit}
-                      initialDevices={gpus}
-                      btnText={t('Add GPU device')}
-                      type={HARDWARE_DEVICE_TYPE.GPUS}
-                      vmi={vmi}
-                    />
-                  ))
-                }
-              >
-                {t(`${(gpus || []).length} GPU devices`)}
-              </a>
-              <br />
-              <a
-                onClick={() =>
-                  createModal(({ isOpen, onClose }) => (
-                    <HardwareDevicesModal
-                      vm={vm}
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      headerText={t('Host devices')}
-                      onSubmit={onSubmit}
-                      initialDevices={hostDevices}
-                      btnText={t('Add Host device')}
-                      type={HARDWARE_DEVICE_TYPE.HOST_DEVICES}
-                      vmi={vmi}
-                    />
-                  ))
-                }
-              >
-                {t(`${(hostDevices || []).length} Host devices`)}
-              </a>
-            </>
-          }
+          descriptionData={<HardwareDevices vm={vm} canEdit onSubmit={onSubmit} />}
           descriptionHeader={t('Hardware devices')}
         />
       </DescriptionList>

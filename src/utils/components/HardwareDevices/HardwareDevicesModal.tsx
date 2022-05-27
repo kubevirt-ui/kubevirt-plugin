@@ -8,7 +8,8 @@ import {
   V1VirtualMachineInstance,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { Button, Form, FormGroup, Grid } from '@patternfly/react-core';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Alert, AlertVariant, Button, Form, FormGroup, Grid } from '@patternfly/react-core';
 import { CheckCircleIcon, PlusCircleIcon, TrashIcon } from '@patternfly/react-icons';
 
 import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
@@ -44,6 +45,7 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
   type,
   vmi,
 }) => {
+  const { t } = useKubevirtTranslation();
   const [devices, setDevices] = React.useState<V1GPU[] | V1HostDevice[]>(initialDevices);
   const [name, setName] = React.useState<string>();
   const [deviceName, setDeviceName] = React.useState<string>();
@@ -103,6 +105,17 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
           <ModalPendingChangesAlert
             isChanged={getChangedDevices(updatedVirtualMachine, vmi)?.length > 0}
           />
+        )}
+        {vm?.status?.created && vm?.spec?.running && (
+          <Alert
+            variant={AlertVariant.info}
+            isInline
+            title={t('Restart required to apply changes')}
+          >
+            {t(
+              'If you make changes to the following settings you will need to restart the virtual machine in order for them to be applied',
+            )}
+          </Alert>
         )}
         <HardwareDevicesList devices={devices} handleRemoveDevice={onRemoveDevice} />
         {showForm && (

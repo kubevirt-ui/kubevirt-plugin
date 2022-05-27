@@ -1,7 +1,14 @@
 import * as React from 'react';
 
 import { V1Devices } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import HardwareDevicesTable from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesTable';
+import HardwareDeviceTitle from '@kubevirt-utils/components/HardwareDevices/HardwareDeviceTitle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  DescriptionList,
+  DescriptionListDescription,
+  DescriptionListGroup,
+} from '@patternfly/react-core';
 
 type HardwareDevices = {
   devices: V1Devices;
@@ -9,14 +16,23 @@ type HardwareDevices = {
 
 const HardwareDevices: React.FC<HardwareDevices> = ({ devices }) => {
   const { t } = useKubevirtTranslation();
-  const gpuDevices = devices?.gpus?.length || 0;
-  const hostDevices = devices?.hostDevices?.length || 0;
 
   return (
-    <div>
-      <div className="text-muted">{t('{{gpuDevices}} GPU devices', { gpuDevices })}</div>
-      <div className="text-muted">{t('{{hostDevices}} Host devices', { hostDevices })}</div>
-    </div>
+    <DescriptionList>
+      <DescriptionListGroup>
+        <HardwareDeviceTitle title={t('GPU devices')} canEdit={false} />
+        <DescriptionListDescription>
+          <HardwareDevicesTable devices={devices?.gpus} />
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+
+      <DescriptionListGroup>
+        <HardwareDeviceTitle title={t('Host devices')} canEdit={false} />
+        <DescriptionListDescription>
+          <HardwareDevicesTable devices={devices?.hostDevices} />
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+    </DescriptionList>
   );
 };
 
