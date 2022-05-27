@@ -6,15 +6,26 @@ import { ActionGroup, Button } from '@patternfly/react-core';
 
 type FormActionGroupProps = {
   loading: boolean;
+  onCancel?: () => Promise<{
+    metadata: {
+      name: string;
+      namespace: string;
+    };
+  }>;
 };
 
-export const FormActionGroup: React.FC<FormActionGroupProps> = ({ loading }) => {
+export const FormActionGroup: React.FC<FormActionGroupProps> = ({ loading, onCancel }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
 
   const goBack = React.useCallback(() => {
     history.goBack();
   }, [history]);
+
+  const handleCancel = React.useCallback(() => {
+    onCancel?.().catch(console.error);
+    goBack();
+  }, [goBack, onCancel]);
 
   return (
     <ActionGroup>
@@ -27,7 +38,7 @@ export const FormActionGroup: React.FC<FormActionGroupProps> = ({ loading }) => 
       >
         {t('Review and create VirtualMachine')}
       </Button>
-      <Button variant="link" onClick={goBack}>
+      <Button variant="link" onClick={handleCancel}>
         {t('Cancel')}
       </Button>
     </ActionGroup>

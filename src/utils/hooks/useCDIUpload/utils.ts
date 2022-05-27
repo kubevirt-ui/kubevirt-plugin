@@ -151,7 +151,7 @@ export const addUploadDataVolumeOwnerReference = (
 ) => {
   // make sure the disk was not deleted manually
   const dvExists = getVolumes(vm)?.find(
-    (vol) => vol?.dataVolume?.name === dataVolume?.metadata?.name,
+    (vol) => vol?.persistentVolumeClaim?.claimName === dataVolume?.metadata?.name,
   );
   if (!dvExists) return Promise.resolve();
 

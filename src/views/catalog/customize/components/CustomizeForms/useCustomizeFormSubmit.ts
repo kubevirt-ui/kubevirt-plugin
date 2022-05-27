@@ -25,7 +25,13 @@ import { processTemplate } from '../../utils';
 
 type useCustomizeFormSubmitType = {
   onSubmit: (_data: any, event: { target: HTMLFormElement }) => Promise<void>;
-  relevantUpload?: DataUpload;
+  onCancel: () => Promise<{
+    metadata: {
+      name: string;
+      namespace: string;
+    };
+  }>;
+  upload?: DataUpload;
   loaded: boolean;
   error: any;
 };
@@ -44,11 +50,17 @@ export const useCustomizeFormSubmit = ({
   const [templateLoaded, setTemplateLoaded] = React.useState(true);
   const [templateError, setTemplateError] = React.useState<any>();
 
-  const { updateVM, updateTabsData, loaded: vmLoaded, error: vmError } = useWizardVMContext();
-  const uploadHook = useCDIUpload();
-  const relevantUpload = Object.values(uploadHook.uploads)[0];
+  const {
+    updateVM,
+    tabsData,
+    updateTabsData,
+    loaded: vmLoaded,
+    error: vmError,
+  } = useWizardVMContext();
+  const { upload, uploadData } = useCDIUpload();
 
   const onSubmit = async (data, event: { target: HTMLFormElement }) => {
+    // upload only supported for diskSource
     const uploadFile = data?.['disk-boot-source-uploadFile'];
 
     setTemplateError(undefined);
@@ -114,11 +126,6 @@ export const useCustomizeFormSubmit = ({
       });
 
       if (uploadFile) {
-        const upload: {
-          value: File;
-          filename: string;
-        } = uploadFile;
-
         const dataVolume: V1beta1DataVolume = {
           apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
           kind: DataVolumeModel.kind,
@@ -140,7 +147,18 @@ export const useCustomizeFormSubmit = ({
           },
         };
 
-        await uploadHook.uploadData({ file: upload.value, dataVolume });
+        // add ownerReference after vm creation
+        updateTabsData((draft) => {
+          ensurePath(draft, 'disks.dataVolumesToAddOwnerRef');
+          if (draft.disks) {
+            draft.disks.dataVolumesToAddOwnerRef = [
+              ...(tabsData?.disks?.dataVolumesToAddOwnerRef || []),
+              dataVolume,
+            ];
+          }
+        });
+
+        await uploadData({ file: uploadFile?.value, dataVolume });
       }
 
       // update context vm
@@ -158,8 +176,9 @@ export const useCustomizeFormSubmit = ({
 
   return {
     onSubmit,
+    onCancel: upload?.cancelUpload,
     loaded: templateLoaded && vmLoaded,
     error: templateError || vmError,
-    relevantUpload,
+    upload,
   };
 };

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
 
-import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
+import { ensurePath, produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
@@ -26,7 +26,7 @@ type DiskRowActionsProps = {
 
 const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const { t } = useKubevirtTranslation();
-  const { vm, updateVM } = useWizardVMContext();
+  const { vm, updateVM, tabsData, updateTabsData } = useWizardVMContext();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const deleteBtnText = t('Detach');
@@ -98,6 +98,17 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
         initialDiskState={initialDiskState}
         initialDiskSourceState={initialDiskSourceState}
         createOwnerReference={false}
+        onUploadedDataVolume={(dataVolume) =>
+          updateTabsData((draft) => {
+            ensurePath(draft, 'disks.dataVolumesToAddOwnerRef');
+            if (draft.disks) {
+              draft.disks.dataVolumesToAddOwnerRef = [
+                ...(tabsData?.disks?.dataVolumesToAddOwnerRef || []),
+                dataVolume,
+              ];
+            }
+          })
+        }
       />
     ));
   };

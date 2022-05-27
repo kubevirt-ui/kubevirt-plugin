@@ -27,15 +27,8 @@ const resource: WatchK8sResource = {
 export const useCDIUpload = (): UseCDIUploadValues => {
   const { t } = useKubevirtTranslation();
   const [cdiConfig, configLoaded, configError] = useK8sWatchResource<CDIConfig>(resource);
-  const [uploads, setUploads] = React.useState<Uploads>({});
+  const [upload, setUpload] = React.useState<DataUpload>();
   const uploadProxyURL = getUploadProxyURL(cdiConfig);
-
-  const updateUpload = (upload: DataUpload) => {
-    setUploads((prevUploads) => ({
-      ...prevUploads,
-      [`${upload.namespace}-${upload.pvcName}`]: upload,
-    }));
-  };
 
   const uploadData = async ({ file, dataVolume }: UploadDataProps) => {
     const { CancelToken } = axios;
@@ -49,7 +42,7 @@ export const useCDIUpload = (): UseCDIUploadValues => {
       fileName: file?.name,
       cancelUpload: () => {
         cancelSource.cancel();
-        updateUpload({ ...newUpload, uploadStatus: UPLOAD_STATUS.CANCELED });
+        setUpload({ ...newUpload, uploadStatus: UPLOAD_STATUS.CANCELED });
         return killUploadPVC(dataVolume.metadata.name, dataVolume.metadata.namespace);
       },
       uploadError: noRouteFound && {
@@ -80,12 +73,12 @@ export const useCDIUpload = (): UseCDIUploadValues => {
 
     try {
       if (noRouteFound) {
-        updateUpload(newUpload);
+        setUpload(newUpload);
         throw new Error(t(`No Upload URL found {{configError}}`, { configError }));
       }
 
       // allocating
-      updateUpload({
+      setUpload({
         ...newUpload,
         uploadStatus: UPLOAD_STATUS.ALLOCATING,
       });
@@ -105,7 +98,7 @@ export const useCDIUpload = (): UseCDIUploadValues => {
           'Content-Type': 'multipart/form-data',
         },
         onUploadProgress: (e) => {
-          updateUpload({
+          setUpload({
             ...newUpload,
             uploadStatus: UPLOAD_STATUS.UPLOADING,
             progress: Math.floor((e.loaded / file.size) * 100),
@@ -114,7 +107,7 @@ export const useCDIUpload = (): UseCDIUploadValues => {
       });
 
       // finished uploading
-      updateUpload({
+      setUpload({
         ...newUpload,
         progress: 100,
         uploadStatus: UPLOAD_STATUS.SUCCESS,
@@ -123,7 +116,7 @@ export const useCDIUpload = (): UseCDIUploadValues => {
       // if cancelled, 'not found' is a case where the user clicked cancel while allocating
       const isCanceled = axios.isCancel(e) || e?.message.includes('not found');
 
-      updateUpload({
+      setUpload({
         ...newUpload,
         uploadStatus: isCanceled ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR,
         uploadError: !isCanceled && { message: `${e?.message}: ${e?.response?.data}` },
@@ -132,13 +125,9 @@ export const useCDIUpload = (): UseCDIUploadValues => {
     }
   };
 
-  const getUpload = (pvcName: string, namespace: string): DataUpload =>
-    uploads?.[`${namespace}-${pvcName}`];
-
   return {
-    uploads,
+    upload,
     uploadData,
-    getUpload,
   };
 };
 
@@ -157,14 +146,9 @@ export type DataUpload = {
   }>;
 };
 
-type Uploads = {
-  [key: string]: DataUpload;
-};
-
 export type UseCDIUploadValues = {
-  uploads: Uploads;
+  upload: DataUpload;
   uploadData: ({ file, dataVolume }: UploadDataProps) => Promise<void>;
-  getUpload: (pvcName: string, namespace: string) => DataUpload;
 };
 
 type UploadDataProps = {
