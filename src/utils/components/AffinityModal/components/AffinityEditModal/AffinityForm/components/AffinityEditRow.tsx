@@ -15,6 +15,8 @@ import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { AffinityLabel } from '../../../../utils/types';
 
+import './affinity-edit-row.scss';
+
 type AffinityExpressionRowProps = {
   expression: AffinityLabel;
   onChange: (label: AffinityLabel) => void;
@@ -78,6 +80,7 @@ const AffinityExpressionRow: React.FC<AffinityExpressionRowProps> = ({
       </GridItem>
       <GridItem span={5}>
         <Select
+          className="affinity-edit-row__values-chips"
           menuAppendTo="parent"
           isDisabled={!enableValueField}
           variant={SelectVariant.typeaheadMulti}
