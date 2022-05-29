@@ -84,15 +84,13 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
 
     const resultVolume = updateVolume(vm, volumeToUpdate, diskState, diskSourceState);
 
-    const resultDataVolume =
-      sourceRequiresDataVolume &&
-      getDataVolumeFromState({
-        vm,
-        diskState,
-        diskSourceState,
-        resultVolume,
-        createOwnerReference,
-      });
+    const resultDataVolume = getDataVolumeFromState({
+      vm,
+      diskState,
+      diskSourceState,
+      resultVolume,
+      createOwnerReference,
+    });
     if (diskState.diskSource === sourceTypes.UPLOAD) {
       onUploadedDataVolume(resultDataVolume);
       return uploadData({
@@ -105,7 +103,6 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     vm,
     diskState,
     diskSourceState,
-    sourceRequiresDataVolume,
     createOwnerReference,
     initialDiskState.diskName,
     onUploadedDataVolume,
@@ -152,6 +149,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
       resultDataVolumeTemplate,
       initialDiskState.diskSource,
       sourceRequiresDataVolume,
+      updatedVmVolumes,
     );
 
     const updatedVM = produceVMDisks(vm, (vmDraft) => {

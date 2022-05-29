@@ -80,6 +80,13 @@ const DiskModal: React.FC<DiskModalProps> = ({
           resultDisk,
         );
       }
+      if (diskState.diskSource === sourceTypes.UPLOAD) {
+        return getPersistentVolumeClaimHotplugPromise(
+          vmObj,
+          `${vm?.metadata?.name}-${diskState.diskName}`,
+          resultDisk,
+        );
+      }
       const resultDataVolume = getDataVolumeFromState({
         vm: vmObj,
         diskState,
@@ -88,7 +95,7 @@ const DiskModal: React.FC<DiskModalProps> = ({
       });
       return getDataVolumeHotplugPromise(vmObj, resultDataVolume, resultDisk);
     },
-    [diskState, diskSourceState, createOwnerReference],
+    [diskState, diskSourceState, createOwnerReference, vm?.metadata?.name],
   );
 
   const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {

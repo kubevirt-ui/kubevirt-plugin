@@ -8,7 +8,6 @@ import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ButtonVariant,
@@ -34,11 +33,9 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName);
 
   const onDelete = React.useCallback(() => {
-    const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
-      const volumeToDelete = draftVM.spec.template.spec.volumes.find(
-        (volume) => volume.name === diskName,
-      );
+    const volumeToDelete = vm.spec.template.spec.volumes.find((volume) => volume.name === diskName);
 
+    const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
       if (volumeToDelete?.dataVolume?.name) {
         draftVM.spec.dataVolumeTemplates = draftVM.spec.dataVolumeTemplates.filter(
           (dataVolume) => dataVolume.metadata.name !== volumeToDelete.dataVolume.name,
@@ -52,22 +49,22 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
         draftVM.spec.template.spec.domain.devices.disks.filter((disk) => disk.name !== diskName);
     });
 
-    // check if disk has data volume created and tries to delete it (mainly for upload data volumes)
-    const volume = getVolumes(vm)?.find((vol) => vol.name === diskName && !!vol?.dataVolume);
+    // check if disk has a created dataVolume that needs to be deleted (mainly for uploads)
+    const dataVolumeToDelete = tabsData?.disks?.dataVolumesToAddOwnerRef?.find(
+      (dv) => dv.metadata.name === volumeToDelete.persistentVolumeClaim.claimName,
+    );
 
-    if (volume) {
+    if (dataVolumeToDelete) {
       return k8sDelete({
         model: DataVolumeModel,
-        resource: {
-          metadata: { name: volume?.dataVolume?.name, namespace: vm?.metadata?.namespace },
-        },
+        resource: dataVolumeToDelete,
       })
         .catch(console.error)
         .finally(() => updateVM(vmWithDeletedDisk)) as Promise<V1VirtualMachine>;
     }
 
     return updateVM(vmWithDeletedDisk);
-  }, [diskName, updateVM, vm]);
+  }, [diskName, tabsData?.disks?.dataVolumesToAddOwnerRef, updateVM, vm]);
 
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
