@@ -42,7 +42,9 @@ const InventoryCard: React.FC = () => {
           <GridItem span={8}>
             <div className="kv-inventory-card__item kv-inventory-card__section-header">
               <div className="kv-inventory-card__item-section">
-                <span className="kv-inventory-card__item-text">{t('VM statuses')}</span>
+                <span className="kv-inventory-card__item-text">
+                  {t('VirtualMachines statuses')}
+                </span>
               </div>
             </div>
           </GridItem>
