@@ -66,7 +66,7 @@ export const getDataVolumeTemplates = (vm: V1VirtualMachine) => vm?.spec?.dataVo
  * @returns the virtual machine config maps
  */
 export const getConfigMaps = (vm: V1VirtualMachine) =>
-  getVolumes(vm).filter((volume) => volume.configMap);
+  (getVolumes(vm) || []).filter((volume) => volume.configMap);
 
 /**
  * A selector for the virtual machine's secrets
@@ -74,7 +74,7 @@ export const getConfigMaps = (vm: V1VirtualMachine) =>
  * @returns the virtual machine secrets
  */
 export const getSecrets = (vm: V1VirtualMachine) =>
-  getVolumes(vm).filter((volume) => volume.secret);
+  (getVolumes(vm) || []).filter((volume) => volume.secret);
 
 /**
  * A selector for the virtual machine's service accounts
@@ -82,7 +82,7 @@ export const getSecrets = (vm: V1VirtualMachine) =>
  * @returns the virtual machine service accounts
  */
 export const getServiceAccounts = (vm: V1VirtualMachine) =>
-  getVolumes(vm).filter((volume) => volume.serviceAccount);
+  (getVolumes(vm) || []).filter((volume) => volume.serviceAccount);
 
 /**
  * A selector for the virtual machine's nodeSelector
