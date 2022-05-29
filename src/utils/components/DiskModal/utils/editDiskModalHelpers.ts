@@ -36,8 +36,11 @@ export const updateVolume = (
       claimName: diskSourceState.pvcSourceName,
     };
   } else if (diskState.diskSource === sourceTypes.UPLOAD) {
-    updatedVolume.persistentVolumeClaim = {
-      claimName: `${vm?.metadata?.name}-${diskState.diskName}`,
+    return {
+      name: diskState.diskName,
+      persistentVolumeClaim: {
+        claimName: `${vm?.metadata?.name}-${diskState.diskName}`,
+      },
     };
   }
   return updatedVolume;
@@ -83,18 +86,25 @@ export const updateVMDataVolumeTemplates = (
   updatedDataVolumeTemplate: V1DataVolumeTemplateSpec,
   initialDiskSource: string,
   sourceRequiresDataVolume: boolean,
+  updatedVmVolumes: V1Volume[],
 ): V1DataVolumeTemplateSpec[] => {
-  if (sourceRequiresDataVolume) {
-    if (requiresDataVolume(initialDiskSource)) {
-      return [
-        ...(dataVolumeTemplates || []).filter(
-          (dvt) => dvt?.metadata?.name !== updatedDataVolumeTemplate?.metadata?.name,
-        ),
-        updatedDataVolumeTemplate,
-      ];
-    } else {
-      return [...(dataVolumeTemplates || []), updatedDataVolumeTemplate];
+  const updatedDataVolumeTemplates = () => {
+    if (sourceRequiresDataVolume) {
+      if (requiresDataVolume(initialDiskSource)) {
+        return [
+          ...(dataVolumeTemplates || []).filter(
+            (dvt) => dvt?.metadata?.name !== updatedDataVolumeTemplate?.metadata?.name,
+          ),
+          updatedDataVolumeTemplate,
+        ];
+      } else {
+        return [...(dataVolumeTemplates || []), updatedDataVolumeTemplate];
+      }
     }
-  }
-  return dataVolumeTemplates;
+    return dataVolumeTemplates;
+  };
+
+  return updatedDataVolumeTemplates().filter((dvt) =>
+    updatedVmVolumes.some((volume) => volume?.dataVolume?.name === dvt.metadata.name),
+  );
 };
