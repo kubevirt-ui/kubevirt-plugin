@@ -80,8 +80,7 @@ export const useCustomizeFormSubmit = ({
       const updatedVM = produce(vmObj, (vmDraft) => {
         vmDraft.metadata.namespace = ns || DEFAULT_NAMESPACE;
         vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
-        vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] =
-          processedTemplate.metadata.namespace;
+        vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
 
         // upload is required, we need to patch the volume and delete the data volume template (keep only cd dv template if available)
         if (uploadFile) {
