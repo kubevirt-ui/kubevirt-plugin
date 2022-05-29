@@ -5,12 +5,15 @@ export const getServicesForVmi = (
   services: IoK8sApiCoreV1Service[],
   vmi: V1VirtualMachineInstance,
 ): IoK8sApiCoreV1Service[] => {
-  const vmLabels = vmi?.metadata?.labels;
+  const vmiLabels = vmi?.metadata?.labels;
 
-  if (!vmLabels) return [];
+  if (!vmiLabels) return [];
 
-  return services?.filter((service) => {
+  return (services || []).filter((service) => {
     const selectors = service?.spec?.selector || {};
-    return Object?.keys(selectors)?.every((key) => vmLabels?.[key] === selectors?.[key]);
+    return (
+      Object.keys(selectors).length > 0 &&
+      Object.keys(selectors).every((key) => vmiLabels?.[key] === selectors?.[key])
+    );
   });
 };
