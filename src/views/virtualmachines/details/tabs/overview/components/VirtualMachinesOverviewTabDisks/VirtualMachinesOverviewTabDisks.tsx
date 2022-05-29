@@ -20,7 +20,7 @@ const VirtualMachinesOverviewTabDisks = ({ vm }) => {
     <div className="VirtualMachinesOverviewTabDisks--main">
       <Card>
         <CardTitle className="text-muted">
-          {t('Disk ({{count}})', { count: disks.length || 0 })}
+          {t('Disks ({{count}})', { count: disks.length || 0 })}
         </CardTitle>
         <Divider />
         <CardBody isFilled>
