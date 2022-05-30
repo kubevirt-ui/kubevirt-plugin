@@ -84,6 +84,13 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
       return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC };
     }
 
+    if (volumeSource === volumeTypes.PERSISTENT_VOLUME_CLAIM) {
+      initialDiskSourceState.pvcSourceName = volume.persistentVolumeClaim?.claimName;
+      return {
+        diskSource: sourceTypes.PVC,
+      };
+    }
+
     const dataVolumeTemplate = dataVolumeTemplates?.find(
       (dataVolume) => dataVolume.metadata.name === volume.dataVolume?.name,
     );
