@@ -11,16 +11,14 @@ const DiskListTitle = () => {
 
   return (
     <span>
-      <h3 className="HeaderWithIcon">{t('Disks')} </h3>
+      <h3 className="HeaderWithIcon">{t('Disks')}</h3>
       <Popover
-        bodyContent={
-          <div>
-            {t('The following information is provided by the OpenShift Virtualization operator.')}
-          </div>
-        }
+        bodyContent={t(
+          'The following information is provided by the OpenShift Virtualization operator.',
+        )}
         position={PopoverPosition.right}
       >
-        <HelpIcon />
+        <HelpIcon className="icon-size-small" />
       </Popover>
     </span>
   );
