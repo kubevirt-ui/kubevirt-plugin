@@ -53,13 +53,16 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
 
     return (diskDevices || []).map((device) => {
       const source = () => {
+        if (device?.dataVolumeTemplate?.spec?.sourceRef) {
+          return t('PVC (auto upload)');
+        }
+        if (device?.dataVolumeTemplate?.spec?.source?.http?.url) {
+          return t('URL');
+        }
         if (device?.volume?.containerDisk) {
           return t('Container (Ephemeral)');
         }
 
-        if (device?.dataVolumeTemplate?.spec?.sourceRef) {
-          return t('PVC (auto upload)');
-        }
         const sourceName = device?.pvc?.metadata?.name || t('Other');
         return sourceName;
       };
