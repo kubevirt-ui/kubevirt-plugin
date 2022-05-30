@@ -10,6 +10,7 @@ import { containerTemplateMock } from './mocks';
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   k8sCreate: jest.fn().mockResolvedValue({}),
+  useK8sWatchResource: jest.fn(() => [[], true]),
 }));
 
 jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => ({

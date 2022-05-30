@@ -34,7 +34,7 @@ type UseEditDiskStates = (
   initialDiskSourceState: DiskSourceState;
 };
 
-const getSourceFromDataVolue = (dataVolume: V1DataVolumeTemplateSpec): string => {
+const getSourceFromDataVolume = (dataVolume: V1DataVolumeTemplateSpec): string => {
   if (dataVolume.spec?.source?.blank) return sourceTypes.BLANK;
   else if (dataVolume.spec?.source?.http) return sourceTypes.HTTP;
   else if (dataVolume.spec?.source?.pvc) return sourceTypes.CLONE_PVC;
@@ -89,7 +89,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
       setInitialStateFromDataVolume(dataVolumeTemplate, initialDiskSourceState);
       return {
         isBootDisk: getBootDisk(vm)?.name === diskName,
-        diskSource: getSourceFromDataVolue(dataVolumeTemplate),
+        diskSource: getSourceFromDataVolume(dataVolumeTemplate),
         diskSize:
           dataVolumeTemplate.spec?.storage?.resources?.requests?.storage ||
           dataVolumeTemplate.spec?.pvc?.resources?.requests?.storage,
