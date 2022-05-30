@@ -1,7 +1,9 @@
 import * as React from 'react';
+import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
+import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
@@ -16,6 +18,7 @@ import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerRef
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview, getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
+import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
 import {
   DESCRIPTION_ANNOTATION,
   useVMIAndPodsForVM,
@@ -48,12 +51,15 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const history = useHistory();
 
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
   const canUpdateStoppedVM =
     canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(vm, t);
+  const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
+  const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -244,7 +250,20 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           data-test-id={`${vm?.metadata?.name}-boot-method`}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={getLabel(vm, VM_TEMPLATE_ANNOTATION) || None}
+          descriptionData={
+            templateName ? (
+              <ResourceLink
+                groupVersionKind={modelToGroupVersionKind(TemplateModel)}
+                name={templateName}
+                namespace={templateNamespace}
+                onClick={() =>
+                  history.push(`/k8s/ns/${templateNamespace}/templates/${templateName}`)
+                }
+              />
+            ) : (
+              None
+            )
+          }
           descriptionHeader={t('Template')}
           data-test-id={`${vm?.metadata?.name}-template`}
         />
