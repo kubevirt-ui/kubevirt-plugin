@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import produce from 'immer';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
@@ -16,6 +17,7 @@ import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerRef
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview, getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
+import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
 import {
   DESCRIPTION_ANNOTATION,
   useVMIAndPodsForVM,
@@ -54,6 +56,8 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   const canUpdateStoppedVM =
     canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(vm, t);
+  const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
+  const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -244,7 +248,15 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           data-test-id={`${vm?.metadata?.name}-boot-method`}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={getLabel(vm, VM_TEMPLATE_ANNOTATION) || None}
+          descriptionData={
+            templateName ? (
+              <Link to={`/k8s/ns/${templateNamespace}/templates/${templateName}`}>
+                {templateName}
+              </Link>
+            ) : (
+              None
+            )
+          }
           descriptionHeader={t('Template')}
           data-test-id={`${vm?.metadata?.name}-template`}
         />
