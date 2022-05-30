@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { Trans } from 'react-i18next';
 
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sDelete, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Checkbox, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
 
 import ExternalLink from '../ExternalLink/ExternalLink';
@@ -23,8 +21,6 @@ type SSHAccessModalProps = {
 };
 
 const SSHAccessModal: React.FC<SSHAccessModalProps> = ({ vmi, isOpen, onClose, sshService }) => {
-  const { namespace, name } = vmi?.metadata;
-
   const { t } = useKubevirtTranslation();
   const initiallyEnabled = !!sshService;
   const [isEnabled, setEnabled] = React.useState<boolean>(initiallyEnabled);
@@ -57,18 +53,7 @@ const SSHAccessModal: React.FC<SSHAccessModalProps> = ({ vmi, isOpen, onClose, s
           <Checkbox
             id="ssh-service-checkbox"
             className="kv-ssh-service-checkbox--main"
-            label={
-              <Trans ns="plugin__kubevirt-plugin" t={t}>
-                Expose SSH access for{' '}
-                <ResourceLink
-                  inline
-                  linkTo={false}
-                  kind={VirtualMachineModel.kind}
-                  name={name}
-                  namespace={namespace}
-                />
-              </Trans>
-            }
+            label={t('Expose SSH access')}
             isChecked={isEnabled}
             data-checked-state={isEnabled}
             onChange={setEnabled}

@@ -288,7 +288,7 @@
   "Example: For Windows, get a link to the ": "Example: For Windows, get a link to the ",
   "Example: your company name": "Example: your company name",
   "Explore {{kind}} list": "Explore {{kind}} list",
-  "Expose SSH access for <2></2>": "Expose SSH access for <2></2>",
+  "Expose SSH access": "Expose SSH access",
   "Feature highlights": "Feature highlights",
   "Fedora cloud image list ": "Fedora cloud image list ",
   "Field selectors let you select Nodes based on the value of one or more resource fields.": "Field selectors let you select Nodes based on the value of one or more resource fields.",
