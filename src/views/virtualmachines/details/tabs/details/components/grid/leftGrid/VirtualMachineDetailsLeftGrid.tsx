@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
+import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
@@ -50,6 +51,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const history = useHistory();
 
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
@@ -250,9 +252,14 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
         <VirtualMachineDescriptionItem
           descriptionData={
             templateName ? (
-              <Link to={`/k8s/ns/${templateNamespace}/templates/${templateName}`}>
-                {templateName}
-              </Link>
+              <ResourceLink
+                groupVersionKind={modelToGroupVersionKind(TemplateModel)}
+                name={templateName}
+                namespace={templateNamespace}
+                onClick={() =>
+                  history.push(`/k8s/ns/${templateNamespace}/templates/${templateName}`)
+                }
+              />
             ) : (
               None
             )
