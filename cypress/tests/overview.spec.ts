@@ -9,6 +9,7 @@ adminOnlyDescribe('Test Getting started card of the Virtualization Overview page
 
   xit('ID(CNV-7924) Feature highlights card is displayed', () => {
     cy.get(overview.featureHighlightsCard).should('exist');
+    expect('test').toEqual('test');
   });
 
   xit('ID(CNV-7925) Recommended operators card is displayed', () => {
