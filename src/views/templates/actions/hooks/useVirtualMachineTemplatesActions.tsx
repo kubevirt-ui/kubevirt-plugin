@@ -29,6 +29,15 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const history = useHistory();
   const [editableBootSource, setEditableBootSource] = React.useState<boolean>(null);
 
+  const goToTemplatePage = React.useCallback(
+    (clonedTemplate: V1Template) => {
+      history.push(
+        `/k8s/ns/${clonedTemplate.metadata.namespace}/templates/${clonedTemplate.metadata.name}`,
+      );
+    },
+    [history],
+  );
+
   const onLazyActions = React.useCallback(async () => {
     if (editableBootSource === null) {
       const editable = await hasEditableBootSource(template);
@@ -49,7 +58,12 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       label: t('Clone Template'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
-          <CloneTemplateModal obj={template} isOpen={isOpen} onClose={onClose} />
+          <CloneTemplateModal
+            obj={template}
+            isOpen={isOpen}
+            onClose={onClose}
+            onTemplateCloned={goToTemplatePage}
+          />
         )),
     },
     {
