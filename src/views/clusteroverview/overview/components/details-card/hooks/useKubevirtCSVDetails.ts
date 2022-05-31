@@ -96,7 +96,7 @@ export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
       );
 
       const catalogSrcMissing =
-        !isEmpty(updatedResources.catalogSources.data) &&
+        isEmpty(updatedResources.catalogSources.data) &&
         !catalogSourceForSubscription(kubevirtSub, updatedResources.catalogSources.data) &&
         !isPackageServer(kubevirtCSV);
 
