@@ -54,6 +54,7 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
         annotations: {
           ...draftTemplate?.metadata?.annotations,
           'template.kubevirt.io/provider': templateProvider,
+          [ANNOTATIONS.providerDisplayName]: templateProvider,
           [ANNOTATIONS.displayName]: templateDisplayName,
         },
         labels: {

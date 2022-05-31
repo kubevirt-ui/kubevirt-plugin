@@ -17,11 +17,15 @@ import { DescriptionList } from '@patternfly/react-core';
 const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
 
+  const providerContent = getTemplateProviderName(template)?.trim()
+    ? getTemplateProviderName(template)
+    : t('Not available');
+
   return (
     <DescriptionList>
       <BootOrderItem template={template} />
       <BootSource template={template} />
-      <DescriptionItem title={t('Provider')} content={getTemplateProviderName(template)} />
+      <DescriptionItem title={t('Provider')} content={providerContent} />
       <DescriptionItem
         title={t('Support')}
         content={getTemplateSupportLevel(template) || NO_DATA_DASH}

@@ -16,7 +16,7 @@ export const getNodeSelector = (template: V1Template) =>
 
 export const getTemplateProviderName = (template: V1Template): string =>
   getAnnotation(template, ANNOTATIONS.providerName, null) ||
-  getAnnotation(template, ANNOTATIONS.providerDisplayName, template?.metadata?.name);
+  getAnnotation(template, ANNOTATIONS.providerDisplayName, null);
 
 export const getTemplateWorkload = (template: V1Template): string =>
   template?.objects[0]?.spec?.template?.metadata?.annotations?.[VM_WORKLOAD_ANNOTATION];
