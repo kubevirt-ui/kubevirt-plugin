@@ -12,8 +12,6 @@ import {
   DescriptionListTerm,
   DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
-  Flex,
-  FlexItem,
   Popover,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
@@ -96,25 +94,20 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
 
   return (
     <DescriptionListGroup>
-      <DescriptionListTermHelpText>
-        <Flex className="vm-description-item__title">
-          <FlexItem>{getItemHeader()}</FlexItem>
-          {isEdit && showEditOnTitle && (
-            <FlexItem>
-              <Button
-                type="button"
-                isInline
-                isDisabled={isDisabled}
-                onClick={onEditClick}
-                variant="link"
-                data-test-id={`${testId}-edit`}
-              >
-                {t('Edit')}
-                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-              </Button>
-            </FlexItem>
-          )}
-        </Flex>
+      <DescriptionListTermHelpText className="vm-description-item__title">
+        {getItemHeader()}
+        {isEdit && showEditOnTitle && (
+          <Button
+            type="button"
+            isInline
+            isDisabled={isDisabled}
+            onClick={onEditClick}
+            variant="link"
+            data-test-id={`${testId}-edit`}
+          >
+            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+          </Button>
+        )}
       </DescriptionListTermHelpText>
       {isEdit && !showEditOnTitle ? (
         description
