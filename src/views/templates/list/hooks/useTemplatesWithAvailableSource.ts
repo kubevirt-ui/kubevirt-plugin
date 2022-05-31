@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { useAvailableDataSourcesAndPVCs } from '@catalog/templatescatalog/hooks/useAvailableDataSourcesAndPVCs';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   BOOT_SOURCE,
   isDefaultVariantTemplate,
@@ -94,6 +95,7 @@ export const useTemplatesWithAvailableSource = ({
   return {
     templates: filteredTemplates,
     availableTemplatesUID,
+    availableDatasources,
     loaded,
     bootSourcesLoaded,
     error: loadError,
@@ -103,6 +105,7 @@ export const useTemplatesWithAvailableSource = ({
 type useTemplatesWithAvailableSourceValues = {
   templates: V1Template[];
   availableTemplatesUID: Set<string>;
+  availableDatasources: Record<string, V1beta1DataSource>;
   loaded: boolean;
   bootSourcesLoaded: boolean;
   error: any;
