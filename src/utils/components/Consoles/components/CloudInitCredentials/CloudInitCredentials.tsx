@@ -43,7 +43,12 @@ const CloudInitCredentials: React.FC<CloudInitCredentialsProps> = ({ vmi }) => {
             <strong>{t('User name: ')}</strong>
             {user || CLOUD_INIT_MISSING_USERNAME}
             <strong>{t(' Password: ')} </strong>
-            <ClipboardCopy variant="inline-compact" isCode>
+            <ClipboardCopy
+              variant="inline-compact"
+              isCode
+              clickTip={t('Copied')}
+              hoverTip={t('Copy to clipboard')}
+            >
               {password}
             </ClipboardCopy>
           </div>
