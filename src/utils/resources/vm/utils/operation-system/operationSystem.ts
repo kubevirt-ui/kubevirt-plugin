@@ -1,4 +1,8 @@
-import { NAME_OS_TEMPLATE_ANNOTATION, OS_TEMPLATE_LABEL } from '@kubevirt-utils/resources/vm';
+import {
+  NAME_OS_TEMPLATE_ANNOTATION,
+  OS_TEMPLATE_LABEL,
+  VM_OS_ANNOTATION,
+} from '@kubevirt-utils/resources/vm';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 /**
@@ -60,7 +64,8 @@ export const getValueByPrefix = (obj: LabelsOrAnnotationsMap, keyPrefix: string)
  * @returns {string}
  */
 export const getOperatingSystem = (obj: K8sResourceCommon): string =>
-  findKeySuffixValue(obj?.metadata?.labels, OS_TEMPLATE_LABEL);
+  findKeySuffixValue(obj?.metadata?.labels, OS_TEMPLATE_LABEL) ||
+  obj?.metadata?.annotations?.[VM_OS_ANNOTATION];
 
 /**
  * @date 3/16/2022 - 10:08:55 AM
@@ -89,5 +94,6 @@ export const OS_WINDOWS_PREFIX = 'win';
  * @param {K8sResourceCommon} obj - object to search
  * @returns {boolean}
  */
+
 export const isWindows = (obj: K8sResourceCommon): boolean =>
   (getOperatingSystem(obj) || '')?.startsWith(OS_WINDOWS_PREFIX);
