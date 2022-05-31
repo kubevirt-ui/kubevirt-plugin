@@ -26,7 +26,6 @@ import {
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { isCommonVMTemplate } from '../../../utils';
-import NoEditableTemplateAlert from '../NoEditableTemplateAlert';
 
 type TemplateScriptsPageProps = RouteComponentProps<{
   ns: string;
@@ -58,51 +57,48 @@ const TemplateScriptsPage: React.FC<TemplateScriptsPageProps> = ({ obj: template
   );
 
   return (
-    <>
-      {isEditDisabled && <NoEditableTemplateAlert template={template} />}
-      <PageSection>
-        <Grid hasGutter>
-          <GridItem span={5}>
-            <DescriptionList>
-              <DescriptionListGroup>
-                <DescriptionListTerm>
-                  <DescriptionListTermHelpText>
-                    <Flex className="vm-description-item__title">
-                      <FlexItem>{t('Cloud-init')}</FlexItem>
-                      {!isEditDisabled && (
-                        <FlexItem>
-                          <Button
-                            type="button"
-                            isInline
-                            onClick={() =>
-                              createModal(({ isOpen, onClose }) => (
-                                <CloudinitModal
-                                  vm={vm}
-                                  isOpen={isOpen}
-                                  onClose={onClose}
-                                  onSubmit={onSubmit}
-                                />
-                              ))
-                            }
-                            variant="link"
-                          >
-                            {t('Edit')}
-                            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-                          </Button>
-                        </FlexItem>
-                      )}
-                    </Flex>
-                  </DescriptionListTermHelpText>
-                </DescriptionListTerm>
-                <DescriptionListDescription>
-                  <CloudInitDescription vm={vm} />
-                </DescriptionListDescription>
-              </DescriptionListGroup>
-            </DescriptionList>
-          </GridItem>
-        </Grid>
-      </PageSection>
-    </>
+    <PageSection>
+      <Grid hasGutter>
+        <GridItem span={5}>
+          <DescriptionList>
+            <DescriptionListGroup>
+              <DescriptionListTerm>
+                <DescriptionListTermHelpText>
+                  <Flex className="vm-description-item__title">
+                    <FlexItem>{t('Cloud-init')}</FlexItem>
+                    {!isEditDisabled && (
+                      <FlexItem>
+                        <Button
+                          type="button"
+                          isInline
+                          onClick={() =>
+                            createModal(({ isOpen, onClose }) => (
+                              <CloudinitModal
+                                vm={vm}
+                                isOpen={isOpen}
+                                onClose={onClose}
+                                onSubmit={onSubmit}
+                              />
+                            ))
+                          }
+                          variant="link"
+                        >
+                          {t('Edit')}
+                          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+                        </Button>
+                      </FlexItem>
+                    )}
+                  </Flex>
+                </DescriptionListTermHelpText>
+              </DescriptionListTerm>
+              <DescriptionListDescription>
+                <CloudInitDescription vm={vm} />
+              </DescriptionListDescription>
+            </DescriptionListGroup>
+          </DescriptionList>
+        </GridItem>
+      </Grid>
+    </PageSection>
   );
 };
 

@@ -11,9 +11,6 @@ import {
   ListPageHeader,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { isCommonVMTemplate } from '../../../utils';
-import NoEditableTemplateAlert from '../NoEditableTemplateAlert';
-
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
 
@@ -28,11 +25,9 @@ const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const actionText = t('Add Network Interface');
-  const isEditDisabled = isCommonVMTemplate(template);
 
   return (
     <div className="template-network-tab">
-      {isEditDisabled && <NoEditableTemplateAlert template={template} />}
       <ListPageHeader title="">
         <ListPageCreateButton
           isDisabled={isCommonTemplate(template)}

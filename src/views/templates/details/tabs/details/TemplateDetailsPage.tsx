@@ -8,8 +8,6 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid, GridItem } from '@patternfly/react-core';
 
-import NoEditableTemplateAlert from '../NoEditableTemplateAlert';
-
 import './TemplateDetailsPage.scss';
 
 export type TemplateDetailsGridProps = {
@@ -30,22 +28,19 @@ const TemplateDetailsPage: React.FC<TemplateDetailsPageProps> = ({ obj: template
   const isCommonTemplate = isCommonVMTemplate(template);
 
   return (
-    <>
-      {isCommonTemplate && <NoEditableTemplateAlert template={template} />}
-      <p className="list-page-body-no-border-top">
-        <ListPageBody>
-          <Grid>
-            <GridItem span={5} className="margin-top-grid-item">
-              <TemplateDetailsLeftGrid template={template} editable={!isCommonTemplate} />
-            </GridItem>
-            <GridItem span={1}></GridItem>
-            <GridItem span={5} className="margin-top-grid-item">
-              <TemplateDetailsRightGrid template={template} />
-            </GridItem>
-          </Grid>
-        </ListPageBody>
-      </p>
-    </>
+    <p className="list-page-body-no-border-top">
+      <ListPageBody>
+        <Grid>
+          <GridItem span={5} className="margin-top-grid-item">
+            <TemplateDetailsLeftGrid template={template} editable={!isCommonTemplate} />
+          </GridItem>
+          <GridItem span={1}></GridItem>
+          <GridItem span={5} className="margin-top-grid-item">
+            <TemplateDetailsRightGrid template={template} />
+          </GridItem>
+        </Grid>
+      </ListPageBody>
+    </p>
   );
 };
 

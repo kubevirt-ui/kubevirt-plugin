@@ -19,7 +19,6 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { isCommonVMTemplate } from '../../../utils';
-import NoEditableTemplateAlert from '../NoEditableTemplateAlert';
 
 import DiskListTitle from './components/DiskListTitle';
 import DiskRow from './components/DiskRow';
@@ -59,7 +58,6 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
 
   return (
     <div className="template-disk-page">
-      {isEditDisabled && <NoEditableTemplateAlert template={template} />}
       <ListPageHeader title="">
         <ListPageCreateButton
           isDisabled={isEditDisabled}
