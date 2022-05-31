@@ -11,22 +11,21 @@ const useTemplatesCatalogColumns = (): TableColumn<K8sResourceCommon>[] => {
       id: 'name',
       transforms: [sortable],
       sort: 'metadata.name',
+      props: { className: 'pf-m-width-20' },
+    },
+    {
+      title: t('Workload'),
+      id: 'workload',
+      props: { className: 'pf-m-width-10' },
     },
     {
       title: t('Boot source'),
       id: 'source',
     },
     {
-      title: t('Workload'),
-      id: 'workload',
-    },
-    {
-      title: t('Boot source'),
-      id: 'availability',
-    },
-    {
       title: t('CPU | Memory'),
       id: 'cpu',
+      props: { className: 'pf-m-width-30' },
     },
   ];
 };

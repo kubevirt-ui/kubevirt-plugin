@@ -37,11 +37,11 @@ export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
       <VirtualizedTable
         data={templates}
         unfilteredData={templates}
-        loaded={loaded}
+        loaded={loaded && bootSourcesLoaded}
         loadError={null}
         columns={columns}
         Row={TemplatesCatalogRow}
-        rowData={{ onTemplateClick, availableTemplatesUID }}
+        rowData={{ onTemplateClick, availableTemplatesUID, availableDatasources }}
       />
     </div>
   ) : (
@@ -52,6 +52,7 @@ export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
             key={template?.metadata?.uid}
             template={template}
             onClick={onTemplateClick}
+            availableTemplatesUID={availableTemplatesUID}
             availableDatasources={availableDatasources}
             bootSourcesLoaded={bootSourcesLoaded}
           />
