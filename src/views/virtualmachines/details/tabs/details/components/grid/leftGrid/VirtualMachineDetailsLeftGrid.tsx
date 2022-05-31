@@ -37,7 +37,6 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
-import { printableVMStatus } from '../../../../../../utils';
 import CPUMemory from '../../CPUMemory/CPUMemory';
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
@@ -55,8 +54,6 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
 
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
-  const canUpdateStoppedVM =
-    canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(vm, t);
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
@@ -229,14 +226,14 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
         />
         <VirtualMachineDescriptionItem
           descriptionData={
-            !canUpdateStoppedVM ? (
+            !canUpdateVM ? (
               <MutedTextSpan text={firmwareBootloaderTitle} />
             ) : (
               firmwareBootloaderTitle
             )
           }
           descriptionHeader={t('Boot mode')}
-          isEdit={canUpdateStoppedVM}
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <FirmwareBootloaderModal
@@ -244,6 +241,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vmi={vmi}
               />
             ))
           }

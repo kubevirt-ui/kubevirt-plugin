@@ -5,6 +5,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
+import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -15,6 +16,7 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VirtualMachineDetailsTab, VirtualMachineDetailsTabLabel } from '../utils/constants';
 import {
+  checkBootModeChanged,
   checkBootOrderChanged,
   checkCPUMemoryChanged,
   getChangedEnvDisks,
@@ -35,6 +37,7 @@ export const usePendingChanges = (
 
   const cpuMemoryChanged = checkCPUMemoryChanged(vm, vmi);
   const bootOrderChanged = checkBootOrderChanged(vm, vmi);
+  const bootModeChanged = checkBootModeChanged(vm, vmi);
 
   const modifiedEnvDisks = getChangedEnvDisks(vm, vmi);
   const modifiedNics = getChangedNics(vm, vmi);
@@ -69,6 +72,23 @@ export const usePendingChanges = (
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <BootOrderModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vmi={vmi} />
+        ));
+      },
+    },
+    {
+      hasPendingChange: bootModeChanged,
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
+      label: t('Boot method'),
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        createModal(({ isOpen, onClose }) => (
+          <FirmwareBootloaderModal
+            vm={vm}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+            vmi={vmi}
+          />
         ));
       },
     },

@@ -63,6 +63,19 @@ export const checkBootOrderChanged = (
       device.value.name === vmiBootOrder[index].value.name,
   );
 };
+
+export const checkBootModeChanged = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  const vmiBootloader = vmi?.spec?.domain?.firmware?.bootloader;
+  const vmBootloader = vm?.spec?.template?.spec?.domain?.firmware?.bootloader;
+  return !isEqualObject(vmiBootloader, vmBootloader);
+};
+
 export const getChangedEnvDisks = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
