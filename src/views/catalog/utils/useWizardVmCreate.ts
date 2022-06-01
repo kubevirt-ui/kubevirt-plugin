@@ -40,12 +40,12 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
         vmDraft.spec.running = startVM;
 
         if (hasSysprep) {
-          const produced = produceVMSysprep(vm);
+          const produced = produceVMSysprep(vmDraft);
           vmDraft.spec = produced.spec;
         }
 
         if (sshKey) {
-          const produced = produceVMSSHKey(vm);
+          const produced = produceVMSSHKey(vmDraft);
           vmDraft.spec = produced.spec;
         }
       });
