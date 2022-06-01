@@ -2,6 +2,10 @@
   height: 100%;
   width: 100%;
   display: block;
+  div:first-child {
+    // vnc console use element as ref and inline styling on element to control auto resizing, we need to use important in this case.
+    background-color: transparent !important;
+  }
 }
 .hide {
   display: none;
