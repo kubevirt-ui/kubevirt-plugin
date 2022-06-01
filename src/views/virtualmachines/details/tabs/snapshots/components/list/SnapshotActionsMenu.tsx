@@ -15,33 +15,42 @@ import {
   KebabToggle,
 } from '@patternfly/react-core';
 
+import RestoreModal from '../modal/RestoreModal';
+
 type SnapshotActionsMenuProps = {
   snapshot: V1alpha1VirtualMachineSnapshot;
+  isRestoreDisabled: boolean;
 };
 
-const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({ snapshot }) => {
+const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
+  snapshot,
+  isRestoreDisabled,
+}) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const label = t('Delete VirtualMachineSnapshot');
+  const deleteLabel = t('Delete VirtualMachineSnapshot');
 
-  const snapshotResult = React.useMemo(() => snapshot, [snapshot]);
+  const onRestoreModalToggle = React.useCallback(() => {
+    createModal(({ isOpen, onClose }) => (
+      <RestoreModal snapshot={snapshot} isOpen={isOpen} onClose={onClose} />
+    ));
+    setIsDropdownOpen(false);
+  }, [createModal, snapshot]);
 
-  const onDeleteModalToggle = () => {
+  const onDeleteModalToggle = React.useCallback(() => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1alpha1VirtualMachineSnapshot>
         isOpen={isOpen}
         onClose={onClose}
-        obj={snapshotResult}
+        obj={snapshot}
         onSubmit={(obj) =>
           k8sDelete({
             model: VirtualMachineSnapshotModel,
             resource: obj,
-            json: undefined,
-            requestInit: undefined,
           })
         }
-        headerText={label}
+        headerText={deleteLabel}
         submitBtnText={t('Delete')}
         submitBtnVariant={ButtonVariant.danger}
       >
@@ -49,11 +58,19 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({ snapshot }) =
       </TabModal>
     ));
     setIsDropdownOpen(false);
-  };
+  }, [createModal, deleteLabel, snapshot, t]);
 
   const items = [
+    <DropdownItem
+      description={t('Restore is enabled only for offline VirtualMachine.')}
+      onClick={onRestoreModalToggle}
+      key="snapshot-resotre"
+      isDisabled={isRestoreDisabled}
+    >
+      {t('Restore')}
+    </DropdownItem>,
     <DropdownItem onClick={onDeleteModalToggle} key="snapshot-delete">
-      {label}
+      {deleteLabel}
     </DropdownItem>,
   ];
 
