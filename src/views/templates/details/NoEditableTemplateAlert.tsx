@@ -8,7 +8,6 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateProviderName } from '@kubevirt-utils/resources/template';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
 import './no-editable-template-alert.scss';
@@ -34,40 +33,38 @@ const NoEditableTemplateAlert: React.FC<NoEditableTemplateAlertProps> = ({ templ
   );
 
   return (
-    <ListPageBody>
-      <Alert
-        className="alert-margin-top-bottom no-editable-template-alert"
-        isInline
-        variant={AlertVariant.info}
-        title={t('Templates provided by {{providerName}} are not editable.', {
-          providerName,
-        })}
-      >
-        <Trans ns="plugin__kubevirt-plugin">
-          {{ osName }} VirtualMachine can not be edited because it is provided by {{ providerName }}
-          Virtualization Operator.
-          <br />
-          We suggest you to create a custom Template from this {{ providerName }} template.
-          <div className="margin-top">
-            <Button
-              onClick={() =>
-                createModal(({ isOpen, onClose }) => (
-                  <CloneTemplateModal
-                    obj={template}
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    onTemplateCloned={goToTemplatePage}
-                  />
-                ))
-              }
-              variant={ButtonVariant.link}
-            >
-              {t('Create a new custom Template')}
-            </Button>
-          </div>
-        </Trans>
-      </Alert>
-    </ListPageBody>
+    <Alert
+      className="alert-margin-top-bottom no-editable-template-alert"
+      isInline
+      variant={AlertVariant.info}
+      title={t('Templates provided by {{providerName}} are not editable.', {
+        providerName,
+      })}
+    >
+      <Trans ns="plugin__kubevirt-plugin">
+        {{ osName }} VirtualMachine can not be edited because it is provided by {{ providerName }}
+        Virtualization Operator.
+        <br />
+        We suggest you to create a custom Template from this {{ providerName }} template.
+        <div className="margin-top">
+          <Button
+            onClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <CloneTemplateModal
+                  obj={template}
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  onTemplateCloned={goToTemplatePage}
+                />
+              ))
+            }
+            variant={ButtonVariant.link}
+          >
+            {t('Create a new custom Template')}
+          </Button>
+        </div>
+      </Trans>
+    </Alert>
   );
 };
 

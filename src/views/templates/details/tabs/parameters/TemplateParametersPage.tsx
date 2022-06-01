@@ -8,7 +8,6 @@ import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ActionGroup, Alert, AlertVariant, Button, Divider } from '@patternfly/react-core';
 
 import { isCommonVMTemplate } from '../../../utils';
-import NoEditableTemplateAlert from '../NoEditableTemplateAlert';
 
 import ParameterEditor from './ParameterEditor';
 
@@ -67,51 +66,48 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
   };
 
   return (
-    <>
-      {isEditDisabled && <NoEditableTemplateAlert template={template} />}
-      <div className="co-m-pane__body template-parameters-page">
-        <div className="row">
-          <div className="col-md-7">
-            {parameters.map((parameter, index) => (
-              <>
-                <ParameterEditor
-                  key={parameter.name}
-                  parameter={parameter}
-                  onChange={onParameterChange}
-                  isEditDisabled={isEditDisabled}
-                />
-                {index !== parameters.length - 1 && <Divider />}
-              </>
-            ))}
-          </div>
+    <div className="co-m-pane__body template-parameters-page">
+      <div className="row">
+        <div className="col-md-7">
+          {parameters.map((parameter, index) => (
+            <>
+              <ParameterEditor
+                key={parameter.name}
+                parameter={parameter}
+                onChange={onParameterChange}
+                isEditDisabled={isEditDisabled}
+              />
+              {index !== parameters.length - 1 && <Divider />}
+            </>
+          ))}
         </div>
-        {error && (
-          <Alert variant={AlertVariant.danger} isInline title={t('Error')}>
-            {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert variant={AlertVariant.info} isInline title={t('Success')}>
-            {t('Parameters successfully edited')}
-          </Alert>
-        )}
-        <ActionGroup className="pf-c-form">
-          <Button
-            isDisabled={isSaveDisabled}
-            type="submit"
-            variant="primary"
-            onClick={onSave}
-            isLoading={loading}
-          >
-            {t('Save')}
-          </Button>
-          <Button type="button" variant="secondary" onClick={goBack}>
-            {t('Cancel')}
-          </Button>
-        </ActionGroup>
       </div>
-    </>
+      {error && (
+        <Alert variant={AlertVariant.danger} isInline title={t('Error')}>
+          {error}
+        </Alert>
+      )}
+
+      {success && (
+        <Alert variant={AlertVariant.info} isInline title={t('Success')}>
+          {t('Parameters successfully edited')}
+        </Alert>
+      )}
+      <ActionGroup className="pf-c-form">
+        <Button
+          isDisabled={isSaveDisabled}
+          type="submit"
+          variant="primary"
+          onClick={onSave}
+          isLoading={loading}
+        >
+          {t('Save')}
+        </Button>
+        <Button type="button" variant="secondary" onClick={goBack}>
+          {t('Cancel')}
+        </Button>
+      </ActionGroup>
+    </div>
   );
 };
 

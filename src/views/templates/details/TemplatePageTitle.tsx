@@ -7,6 +7,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useLastNamespace } from '@kubevirt-utils/hooks/useLastNamespace';
 import { Breadcrumb, BreadcrumbItem, Button, Title } from '@patternfly/react-core';
 
+import { isCommonVMTemplate } from '../utils';
+
+import NoEditableTemplateAlert from './NoEditableTemplateAlert';
 import TemplateActions from './TemplateActions';
 
 type TemplatePageTitleTitleProps = {
@@ -17,6 +20,7 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const [lastNamespace] = useLastNamespace();
+  const isEditDisabled = isCommonVMTemplate(template);
 
   const namespacePath = lastNamespace === ALL_NAMESPACES ? lastNamespace : `ns/${lastNamespace}`;
 
@@ -45,6 +49,7 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
         </span>
         <TemplateActions template={template} />
       </Title>
+      {isEditDisabled && <NoEditableTemplateAlert template={template} />}
     </div>
   );
 };
