@@ -94,7 +94,7 @@ const useVirtualMachineTemplatesFilters = (
       items: providers,
     },
     {
-      filterGroupName: t('OS'),
+      filterGroupName: t('Operating system'),
       type: 'osName',
       reducer: (obj) => getItemNameWithOther(getTemplateOS(obj), osNames),
       filter: (availableOsNames, obj) =>
