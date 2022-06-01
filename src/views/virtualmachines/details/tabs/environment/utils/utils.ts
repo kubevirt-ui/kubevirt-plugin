@@ -95,7 +95,8 @@ export const addEnvironmentsToVM = (
     let newSourcesDisks: V1Disk[] = [];
     let newSourcesVolumes: V1Volume[] = [];
     environments.forEach((environment) => {
-      const diskName = environment.name + '-disk';
+      const dotRegex = /\./g;
+      const diskName = environment.name.replaceAll(dotRegex, '-') + '-disk';
 
       const newDisk: V1Disk = {
         serial: environment.serial,
