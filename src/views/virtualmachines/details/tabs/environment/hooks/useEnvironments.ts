@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { EnvironmentKind, EnvironmentVariable } from '../utils/constants';
 import { addEnvironmentsToVM, getRandomSerial, getVMEnvironmentsVariables } from '../utils/utils';
@@ -26,6 +27,7 @@ const useEnvironments = (
   vm: V1VirtualMachine,
   updateVM: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>,
 ): UseEnvironmentsType => {
+  const { t } = useKubevirtTranslation();
   const initialEnvironments = React.useMemo(() => getVMEnvironmentsVariables(vm), [vm]);
   const [environments, setEnvironments] = React.useState(initialEnvironments);
   const [environmentsEdited, setEnvironmentsEdited] = React.useState(false);
@@ -40,7 +42,7 @@ const useEnvironments = (
   const onEnvironmentChange = React.useCallback(
     (environmentIndex: number, name: string, serial: string, kind: EnvironmentKind) => {
       if (environments.find((env, index) => env.name === name && index !== environmentIndex)) {
-        return setError(new Error('Resource already selected'));
+        return setError(new Error(t('Resource already selected')));
       }
 
       setEnvironments((envs) => {
@@ -48,20 +50,30 @@ const useEnvironments = (
         newEnvironments.splice(environmentIndex, 1, { name, serial: serial || '', kind });
         return newEnvironments;
       });
+
+      setError(undefined);
     },
-    [environments],
+    [environments, t],
   );
 
   const onEnvironmentRemove = React.useCallback((environmentIndex: number) => {
     setEnvironments((envs) => envs?.filter((_, index) => index !== environmentIndex));
+    setError(undefined);
   }, []);
 
   const onReload = React.useCallback(() => {
     setEnvironments(initialEnvironments);
+    setError(undefined);
   }, [initialEnvironments]);
 
   const onSave = React.useCallback(async () => {
-    await updateVM(addEnvironmentsToVM(vm, environments));
+    try {
+      await updateVM(addEnvironmentsToVM(vm, environments));
+      setError(undefined);
+    } catch (apiError) {
+      setError(apiError);
+      throw apiError;
+    }
   }, [environments, updateVM, vm]);
 
   React.useEffect(() => {

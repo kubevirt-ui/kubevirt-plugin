@@ -520,6 +520,7 @@
   "Requires SSH service": "Requires SSH service",
   "Reset": "Reset",
   "Resource": "Resource",
+  "Resource already selected": "Resource already selected",
   "Resource Name": "Resource Name",
   "Resources": "Resources",
   "Restart": "Restart",

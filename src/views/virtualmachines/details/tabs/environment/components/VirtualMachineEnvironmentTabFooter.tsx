@@ -29,38 +29,24 @@ const VirtualMachineEnvironmentTabFooter: React.FC<VirtualMachineEnvironmentTabF
 }) => {
   const { t } = useKubevirtTranslation();
   const [success, setSuccess] = React.useState(false);
-  const [apiError, setApiError] = React.useState<any>();
 
   const _onSave = async () => {
-    try {
-      await onSave();
-      setSuccess(true);
-      setApiError(undefined);
-    } catch (onSaveError) {
-      setApiError(onSaveError);
-    }
-  };
-
-  const _closeError = () => {
-    if (apiError) {
-      setApiError(undefined);
-    } else {
-      closeError();
-    }
+    await onSave();
+    setSuccess(true);
   };
 
   return (
     <Stack className="vm-environment-tab__buttons">
       <StackItem>
-        {(error || apiError) && (
+        {error && (
           <Alert
             isInline
             className="co-alert co-alert--scrollable"
             variant="danger"
             title={t('An error occurred')}
-            actionClose={<AlertActionCloseButton onClose={_closeError} />}
+            actionClose={<AlertActionCloseButton onClose={closeError} />}
           >
-            <div className="co-pre-line">{error?.message || apiError?.message}</div>
+            <div className="co-pre-line">{error?.message}</div>
           </Alert>
         )}
         {success && (
