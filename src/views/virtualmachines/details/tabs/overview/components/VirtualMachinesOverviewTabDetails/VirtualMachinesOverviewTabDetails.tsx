@@ -95,7 +95,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
-                  <DescriptionListTerm>{t('OS')}</DescriptionListTerm>
+                  <DescriptionListTerm>{t('Operating system')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-os">
                     {loaded ? osName : <Skeleton />}
                   </DescriptionListDescription>
@@ -107,7 +107,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Host')}</DescriptionListTerm>
+                  <DescriptionListTerm>{t('Hostname')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-host">
                     {loaded ? hostname : <Skeleton />}
                   </DescriptionListDescription>
