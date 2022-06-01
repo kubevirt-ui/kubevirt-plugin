@@ -56,7 +56,7 @@ export const TemplatesCatalogFilters: React.FC<{
         />
         <TemplatesCatalogFiltersGroup
           groupKey="osName"
-          groupLabel={t('OS')}
+          groupLabel={t('Operating system')}
           pickedFilters={filters.osName}
           onFilterClick={onFilterChange}
           filters={Object.values(OS_NAME_TYPES).map((v) => ({

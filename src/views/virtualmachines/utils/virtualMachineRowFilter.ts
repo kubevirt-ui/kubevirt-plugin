@@ -94,7 +94,7 @@ export const getNodesFilter = (vmis: V1VirtualMachineInstance[], t: TFunction): 
 export const getOSFilter = (vms: V1VirtualMachine[], t: TFunction): RowFilter[] => {
   return [
     {
-      filterGroupName: t('OS'),
+      filterGroupName: t('Operating system'),
       type: 'os',
       reducer: (obj) => {
         const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
