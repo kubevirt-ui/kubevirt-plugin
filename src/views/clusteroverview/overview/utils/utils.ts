@@ -71,3 +71,5 @@ export const getAllowedTemplateResources = (projectNames: string[]) => {
     ]),
   );
 };
+
+export const KUBEVIRT_HIDE_GETTING_STARTED = 'kubevirt-hide-getting-started';

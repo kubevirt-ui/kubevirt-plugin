@@ -44,4 +44,15 @@
       padding-right: var(--pf-c-card--child--PaddingRight);
     }
   }
+  &__title {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    .pf-c-dropdown__menu {
+      width: 280px;
+    }
+  }
+  &__dropdown-item {
+    white-space: normal;
+  }
 }
