@@ -37,7 +37,7 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
-  const disks = useTemplateDisksTableData(template);
+  const [disks, disksLoaded] = useTemplateDisksTableData(template);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
   const vm = getTemplateVirtualMachineObject(template);
@@ -78,11 +78,16 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
       </ListPageHeader>
       <ListPageBody>
         <DiskListTitle />
-        <ListPageFilter data={data} loaded rowFilters={filters} onFilterChange={onFilterChange} />
+        <ListPageFilter
+          data={data}
+          loaded={disksLoaded}
+          rowFilters={filters}
+          onFilterChange={onFilterChange}
+        />
         <VirtualizedTable
           data={filteredData}
           unfilteredData={data}
-          loaded
+          loaded={disksLoaded}
           loadError={undefined}
           columns={columns}
           Row={DiskRow}

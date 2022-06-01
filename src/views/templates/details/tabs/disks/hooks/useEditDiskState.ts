@@ -35,10 +35,11 @@ type UseEditDiskStates = (
 };
 
 const getSourceFromDataVolume = (dataVolume: V1DataVolumeTemplateSpec): string => {
-  if (dataVolume.spec?.source?.blank) return sourceTypes.BLANK;
+  if (dataVolume.spec?.sourceRef) return sourceTypes.DATA_SOURCE;
   else if (dataVolume.spec?.source?.http) return sourceTypes.HTTP;
   else if (dataVolume.spec?.source?.pvc) return sourceTypes.CLONE_PVC;
   else if (dataVolume.spec?.source?.registry) return sourceTypes.REGISTRY;
+  else if (dataVolume.spec?.source?.blank) return sourceTypes.BLANK;
   else return OTHER;
 };
 
@@ -53,13 +54,15 @@ const setInitialStateFromDataVolume = (
     initialDiskSourceState.pvcCloneSourceNamespace = dataVolume.spec.source.pvc.namespace;
   } else if (dataVolume.spec?.source?.registry) {
     initialDiskSourceState.registrySource = dataVolume.spec.source.registry.url;
+  } else if (dataVolume.spec?.sourceRef) {
+    initialDiskSourceState.dataSourceName = dataVolume.spec?.sourceRef?.name;
+    initialDiskSourceState.dataSourceNamespace = dataVolume.spec?.sourceRef?.namespace;
   }
 };
 
 export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
   const initialDiskSourceState = React.useMemo(() => ({ ...initialStateDiskSource }), []);
-  const disks = getDisks(vm);
-  const disk = disks?.find(({ name }) => name === diskName);
+  const disk = getDisks(vm)?.find(({ name }) => name === diskName);
 
   const { diskSource, diskSize, isBootDisk } = React.useMemo(() => {
     const dataVolumeTemplates = getDataVolumeTemplates(vm);
@@ -81,11 +84,21 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
       return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC };
     }
 
+    if (volumeSource === volumeTypes.PERSISTENT_VOLUME_CLAIM) {
+      initialDiskSourceState.pvcSourceName = volume.persistentVolumeClaim?.claimName;
+      return {
+        diskSource: sourceTypes.PVC,
+      };
+    }
+
     const dataVolumeTemplate = dataVolumeTemplates?.find(
       (dataVolume) => dataVolume.metadata.name === volume.dataVolume?.name,
     );
 
-    if (dataVolumeTemplate && dataVolumeTemplate.spec?.source) {
+    if (
+      dataVolumeTemplate &&
+      (dataVolumeTemplate.spec?.source || dataVolumeTemplate.spec?.sourceRef)
+    ) {
       setInitialStateFromDataVolume(dataVolumeTemplate, initialDiskSourceState);
       return {
         isBootDisk: getBootDisk(vm)?.name === diskName,

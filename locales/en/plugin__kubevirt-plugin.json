@@ -648,7 +648,6 @@
   "The VirtualMachine {{vmName}} is still running. It will be powered off while cloning.": "The VirtualMachine {{vmName}} is still running. It will be powered off while cloning.",
   "The VirtualMachine will be bridged to the selected network, ideal for L2 devices": "The VirtualMachine will be bridged to the selected network, ideal for L2 devices",
   "The VirtualMachine you are creating does not have an available boot source. We recommended that you select a boot source to create the VirtualMachine.": "The VirtualMachine you are creating does not have an available boot source. We recommended that you select a boot source to create the VirtualMachine.",
-  "This disk's source is not editable": "This disk's source is not editable",
   "This field is required": "This field is required",
   "This Template requires some additional parameters. Click the Customize VirtualMachine button to complete the creation flow.": "This Template requires some additional parameters. Click the Customize VirtualMachine button to complete the creation flow.",
   "This Template supports quick create VirtualMachine": "This Template supports quick create VirtualMachine",

@@ -22,7 +22,9 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
   rowData: { vm, onUpdate, actionsDisabled },
 }) => {
   const { t } = useKubevirtTranslation();
-  const isPVCSource = !['Container (Ephemeral)', 'Other'].includes(obj?.source);
+  const isPVCSource = !['URL', 'PVC (auto upload)', 'Container (Ephemeral)', 'Other'].includes(
+    obj?.source,
+  );
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
