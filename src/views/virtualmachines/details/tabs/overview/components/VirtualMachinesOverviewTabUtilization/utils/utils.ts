@@ -2,6 +2,7 @@ import { K8sResourceCommon, PrometheusResponse } from '@openshift-console/dynami
 
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
+export const FIVE_MINUTES = 5 * ONE_MINUTE;
 export const ONE_HOUR = 60 * ONE_MINUTE;
 export const ONE_DAY = 24 * ONE_HOUR;
 export const ONE_WEEK = 7 * ONE_DAY;
@@ -21,12 +22,14 @@ export const getCreationTimestamp = <A extends K8sResourceCommon = K8sResourceCo
   value?.metadata?.creationTimestamp || '';
 
 export enum DurationKeys {
+  FiveMinutes = 'FiveMinutes',
   OneHour = 'OneHour',
   SixHours = 'SixHours',
   TwentyFourHours = 'TwentyFourHours',
 }
 
 export const DURATION_VALUES = {
+  [DurationKeys.FiveMinutes]: FIVE_MINUTES,
   [DurationKeys.OneHour]: ONE_HOUR,
   [DurationKeys.SixHours]: 6 * ONE_HOUR,
   [DurationKeys.TwentyFourHours]: ONE_DAY,

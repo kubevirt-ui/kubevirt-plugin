@@ -15,6 +15,7 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({ setDuration }) => {
   const { t } = useKubevirtTranslation();
 
   const items = {
+    [DurationKeys.FiveMinutes]: t('5 minutes'),
     [DurationKeys.OneHour]: t('1 hour'),
     [DurationKeys.SixHours]: t('6 hours'),
     [DurationKeys.TwentyFourHours]: t('24 hours'),
