@@ -18,9 +18,9 @@ const CPUMemory: React.FC<CPUMemoryProps> = ({ vm }) => {
   )?.memory;
 
   return (
-    <div data-test-id="virtual-machine-overview-details-cpu-memory">
+    <span data-test-id="virtual-machine-overview-details-cpu-memory">
       {t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}
-    </div>
+    </span>
   );
 };
 
