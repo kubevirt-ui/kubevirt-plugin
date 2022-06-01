@@ -2,10 +2,13 @@ import * as React from 'react';
 import produce from 'immer';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Form, FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+
+import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { checkBootModeChanged } from '../PendingChanges/utils/helpers';
 
 import { BootloaderLabel, BootloaderOptionValue } from './utils/constants';
 import { getBootloaderFromVM } from './utils/utils';
@@ -15,6 +18,7 @@ type FirmwareBootloaderModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
@@ -22,6 +26,7 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
@@ -93,6 +98,9 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
       obj={updatedVirtualMachine}
     >
       <Form>
+        {vmi && (
+          <ModalPendingChangesAlert isChanged={checkBootModeChanged(updatedVirtualMachine, vmi)} />
+        )}
         <FormGroup fieldId="firmware-bootloader" label={t('Boot mode')}>
           <Select
             menuAppendTo="parent"

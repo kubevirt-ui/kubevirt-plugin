@@ -114,6 +114,7 @@
   "Block": "Block",
   "Boot from CD": "Boot from CD",
   "Boot from CD requires an image file i.e. ISO, qcow, etc. that will be mounted to the VirtualMachine as a CD": "Boot from CD requires an image file i.e. ISO, qcow, etc. that will be mounted to the VirtualMachine as a CD",
+  "Boot method": "Boot method",
   "Boot mode": "Boot mode",
   "Boot order": "Boot order",
   "Boot Order": "Boot Order",
