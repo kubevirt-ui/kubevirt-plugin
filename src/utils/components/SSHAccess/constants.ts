@@ -4,4 +4,4 @@ export const NODE_PORTS_LINK =
 export const PORT = 22000;
 export const SSH_PORT = 22;
 
-export const TEMPLATE_VM_NAME_LABEL = 'vm.kubevirt.io/name';
+export const VM_LABEL_AS_SSH_SERVICE_SELECTOR = 'kubevirt.io/domain';
