@@ -2,6 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 
 import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
@@ -27,12 +28,18 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
 }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const { templates, loaded, error, availableTemplatesUID, bootSourcesLoaded } =
-    useTemplatesWithAvailableSource({
-      namespace,
-      onlyAvailable: false,
-      onlyDefault: false,
-    });
+  const {
+    templates,
+    loaded,
+    error,
+    availableTemplatesUID,
+    availableDatasources,
+    bootSourcesLoaded,
+  } = useTemplatesWithAvailableSource({
+    namespace,
+    onlyAvailable: false,
+    onlyDefault: false,
+  });
   const filters = useVirtualMachineTemplatesFilters(availableTemplatesUID);
   const [data, filteredData, onFilterChange] = useListPageFilter(templates, filters);
 
@@ -57,14 +64,20 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
               rowFilters={filters}
               onFilterChange={onFilterChange}
             />
-            <VirtualizedTable<K8sResourceCommon, { availableTemplatesUID: Set<string> }>
+            <VirtualizedTable<
+              K8sResourceCommon,
+              {
+                availableTemplatesUID: Set<string>;
+                availableDatasources: Record<string, V1beta1DataSource>;
+              }
+            >
               data={filteredData}
               unfilteredData={data}
               loaded={templatesLoaded}
               loadError={error}
               columns={useVirtualMachineTemplatesColumns()}
               Row={VirtualMachineTemplatesRow}
-              rowData={{ availableTemplatesUID }}
+              rowData={{ availableTemplatesUID, availableDatasources }}
             />
           </StackItem>
         </Stack>
