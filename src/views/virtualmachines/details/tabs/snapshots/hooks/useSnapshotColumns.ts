@@ -33,10 +33,6 @@ const useSnapshotColumns = () => {
     },
     {
       title: '',
-      id: 'restore-snapshot',
-    },
-    {
-      title: '',
       id: 'actions',
       props: { className: 'dropdown-kebab-pf pf-c-table__action' },
     },
