@@ -24,10 +24,7 @@ import {
   useVMIAndPodsForVM,
   VM_TEMPLATE_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
-import {
-  getOperatingSystem,
-  getOperatingSystemName,
-} from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import {
   k8sPatch,
   k8sUpdate,
@@ -48,12 +45,13 @@ type VirtualMachineDetailsLeftGridProps = {
 
 const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
+  const history = useHistory();
   const { createModal } = useModal();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const history = useHistory();
 
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
+  const [guestAgentData] = useGuestOS(vmi);
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(vm, t);
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
@@ -90,6 +88,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   };
 
   const None = <MutedTextSpan text={t('None')} />;
+  const GuestAgentIsRequired = <MutedTextSpan text={t('Guest agend is required')} />;
   return (
     <GridItem span={5}>
       <DescriptionList>
@@ -203,7 +202,11 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           data-test-id={`${vm?.metadata?.name}-description`}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={getOperatingSystemName(vm) || getOperatingSystem(vm)}
+          descriptionData={
+            guestAgentData?.os?.prettyName || guestAgentData?.os?.name || GuestAgentIsRequired
+          }
+          isPopover
+          // body-content text copied from:
           descriptionHeader={t('Operating System')}
           data-test-id={`${vm?.metadata?.name}-os`}
         />
