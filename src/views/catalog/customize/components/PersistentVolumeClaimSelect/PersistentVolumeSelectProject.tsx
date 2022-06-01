@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   FormGroup,
@@ -64,7 +63,7 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
               onFilter={filter(projectsName)}
               hasInlineFilter
               selections={selectedProject}
-              placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} project ---`)}
+              placeholderText={t('--- Select PersistentVolumeClaim project ---')}
               validated={error ? ValidatedOptions.error : ValidatedOptions.default}
               aria-invalid={error ? true : false}
               maxHeight={400}

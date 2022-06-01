@@ -7,8 +7,11 @@ import {
 } from '@kubevirt-utils/models';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
+// t('Other')
 export const OTHER = 'Other';
+// t('Container (Ephemeral)')
 export const CONTAINER_EPHERMAL = 'Container (Ephemeral)';
+// t('Dynamic')
 export const DYNAMIC = 'Dynamic';
 
 export const sourceTypes = {

@@ -58,7 +58,7 @@ const SelectProject: React.FC<SelectProjectProps> = ({
       onFilter={filterNamespaces}
       hasInlineFilter
       selections={selectedProject}
-      placeholderText={t(`--- Select project ---`)}
+      placeholderText={t('--- Select project ---')}
       maxHeight={400}
       id={id}
     >

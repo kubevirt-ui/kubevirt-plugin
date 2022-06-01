@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
@@ -48,7 +47,7 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
           hasInlineFilter
           selections={pvcNameSelected}
           onFilter={FilterPVCSelect(pvcNames)}
-          placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} name ---`)}
+          placeholderText={t('--- Select PersistentVolumeClaim name ---')}
           isDisabled={isDisabled}
           maxHeight={400}
         >

@@ -35,9 +35,9 @@ const CloudInitCredentials: React.FC<CloudInitCredentialsProps> = ({ vmi }) => {
         </AccordionToggle>
         <AccordionContent isHidden={!showCredentials}>
           <Trans ns="plugin__kubevirt-plugin">
-            The following credentials for this operating system were created via{' '}
-            <strong>cloud-init</strong>. If unsuccessful, cloud-init could be improperly configured.
-            Please contact the image provider for more information.
+            The following credentials for this operating system were created via cloud-init. If
+            unsuccessful, cloud-init could be improperly configured. Please contact the image
+            provider for more information.
           </Trans>
           <div>
             <strong>{t('User name: ')}</strong>
