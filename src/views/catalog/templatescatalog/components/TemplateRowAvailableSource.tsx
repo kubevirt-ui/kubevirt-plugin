@@ -1,17 +1,29 @@
 import * as React from 'react';
 
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { CheckIcon } from '@patternfly/react-icons';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Badge, Split, SplitItem } from '@patternfly/react-core';
 
 type TemplateRowAvailableSourceProps = {
   isBootSourceAvailable: boolean;
+  source: string;
 };
 
 // Component for VM Template's Boot source availability column
 const TemplateRowAvailableSource: React.FC<TemplateRowAvailableSourceProps> = ({
   isBootSourceAvailable,
+  source,
 }) => {
-  return isBootSourceAvailable ? <CheckIcon /> : <>{NO_DATA_DASH}</>;
+  const { t } = useKubevirtTranslation();
+  return (
+    <Split hasGutter>
+      <SplitItem>{source}</SplitItem>
+      {isBootSourceAvailable && (
+        <SplitItem>
+          <Badge key="available-boot">{t('Source available')}</Badge>
+        </SplitItem>
+      )}
+    </Split>
+  );
 };
 
 export default TemplateRowAvailableSource;

@@ -17,6 +17,7 @@ import { getTemplateOSIcon } from '../utils/os-icons';
 
 export type TemplateTileProps = {
   template: V1Template;
+  availableTemplatesUID: Set<string>;
   availableDatasources: Record<string, V1beta1DataSource>;
   bootSourcesLoaded: boolean;
   onClick: (template: V1Template) => void;
@@ -24,13 +25,13 @@ export type TemplateTileProps = {
 };
 
 export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
-  ({ template, availableDatasources, bootSourcesLoaded, onClick }) => {
+  ({ template, availableTemplatesUID, availableDatasources, bootSourcesLoaded, onClick }) => {
     const { t } = useKubevirtTranslation();
 
     const workload = getTemplateWorkload(template);
     const displayName = getTemplateName(template);
     const bootSource = getTemplateBootSourceType(template);
-
+    const isBootSourceAvailable = availableTemplatesUID.has(template.metadata.uid);
     const dataSource =
       availableDatasources[
         `${bootSource?.source?.sourceRef?.namespace}-${bootSource?.source?.sourceRef?.name}`
@@ -62,7 +63,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
         onClick={() => onClick(template)}
         badges={
           bootSourcesLoaded
-            ? dataSource && [<Badge key="available-boot">{t('Source available')}</Badge>]
+            ? isBootSourceAvailable && [<Badge key="available-boot">{t('Source available')}</Badge>]
             : [<Skeleton key="loading-sources" height="18px" width="105px" className="badgeload" />]
         }
       >
