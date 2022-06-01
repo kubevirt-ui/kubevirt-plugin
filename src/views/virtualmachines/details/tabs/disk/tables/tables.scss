@@ -1,4 +1,8 @@
 .HeaderWithIcon {
-    display: inline-block;
-    margin-right: var(--pf-global--spacer--sm);
+  display: inline-block;
+  margin-right: var(--pf-global--spacer--sm);
+}
+
+.icon-size-small {
+  font-size: var(--pf-global--FontSize--sm);
 }
