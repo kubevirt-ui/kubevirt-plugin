@@ -2,6 +2,7 @@ import * as React from 'react';
 import FirstItemListPopover from 'src/views/virtualmachines/list/components/FirstItemListPopover/FirstItemListPopover';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Popover, PopoverPosition } from '@patternfly/react-core';
@@ -17,7 +18,12 @@ const VirtualMachinesOverviewTabInterfacesRow: React.FC<
   VirtualMachinesOverviewTabNetworkInterfacesProps
 > = ({ obj, activeColumnIDs }) => {
   const { t } = useKubevirtTranslation();
-
+  const popoverFields = {
+    [t('Name')]: obj?.network?.name,
+    [t('Model')]: obj?.iface?.model,
+    [t('Network')]: obj?.network?.multus?.networkName || t('Pod networking'),
+    [t('Type')]: getPrintableNetworkInterfaceType(obj?.iface),
+  };
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
@@ -25,16 +31,12 @@ const VirtualMachinesOverviewTabInterfacesRow: React.FC<
           <Popover
             hasAutoWidth
             position={PopoverPosition.left}
-            bodyContent={
+            bodyContent={Object.entries(popoverFields).map(([key, value]) => (
               <>
-                <div className="interface-row--title">{t('Network')}</div>
-                <div className="interface-row--value">{obj?.network?.name}</div>
-                <div className="interface-row--title">{t('Type')}</div>
-                <div className="interface-row--value">
-                  {getPrintableNetworkInterfaceType(obj?.iface)}
-                </div>
+                <div className="interface-row--title">{key}</div>
+                <div className="interface-row--value">{value || NO_DATA_DASH}</div>
               </>
-            }
+            ))}
           >
             <div className="pf-c-description-list__text pf-m-help-text help">
               {obj?.iface?.name}
