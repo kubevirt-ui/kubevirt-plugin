@@ -23,9 +23,9 @@ const initialMetrics = [
   TopConsumerMetric.CPU,
   TopConsumerMetric.MEMORY,
   TopConsumerMetric.MEMORY_SWAP_TRAFFIC,
+  TopConsumerMetric.VCPU_WAIT,
   TopConsumerMetric.STORAGE_THROUGHPUT,
   TopConsumerMetric.STORAGE_IOPS,
-  TopConsumerMetric.CPU,
 ];
 
 const topAmountSelectOptions = (t: TFunction) => [
