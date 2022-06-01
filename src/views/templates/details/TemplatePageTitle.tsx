@@ -24,9 +24,6 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
 
   const namespacePath = lastNamespace === ALL_NAMESPACES ? lastNamespace : `ns/${lastNamespace}`;
 
-  const onBreadcrumbClick = (url: string) =>
-    confirm(t('Are you sure you want to leave this page?')) && history.push(url);
-
   return (
     <div className="pf-c-page__main-breadcrumb">
       <Breadcrumb>
@@ -34,7 +31,7 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
           <Button
             variant="link"
             isInline
-            onClick={() => onBreadcrumbClick(`/k8s/${namespacePath}/templates`)}
+            onClick={() => history.push(`/k8s/${namespacePath}/templates`)}
           >
             {t('Templates')}
           </Button>
