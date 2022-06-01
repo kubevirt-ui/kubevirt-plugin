@@ -13,15 +13,26 @@ export enum VirtualMachineDetailsTab {
 }
 
 export enum VirtualMachineDetailsTabLabel {
+  // t('Overview')
   Overview = 'Overview',
+  // t('Details')
   Details = 'Details',
+  // t('YAML')
   YAML = 'YAML',
+  // t('Scheduling')
   Scheduling = 'Scheduling',
+  // t('Environment')
   Environment = 'Environment',
+  // t('Events')
   Events = 'Events',
+  // t('Console')
   Console = 'Console',
+  // t('Network Interfaces')
   NetworkInterfaces = 'Network Interfaces',
+  // t('Disks')
   Disks = 'Disks',
+  // t('Snapshots')
   Snapshots = 'Snapshots',
+  // t('Scripts')
   Scripts = 'Scripts',
 }

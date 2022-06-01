@@ -46,7 +46,7 @@ export const useCDIUpload = (): UseCDIUploadValues => {
         return killUploadPVC(dataVolume.metadata.name, dataVolume.metadata.namespace);
       },
       uploadError: noRouteFound && {
-        message: t(`No Upload URL found {{configError}}`, { configError }),
+        message: t('No Upload URL found {{configError}}', { configError }),
       },
       uploadStatus: noRouteFound ? UPLOAD_STATUS.ERROR : UPLOAD_STATUS.ALLOCATING,
     };
@@ -74,7 +74,7 @@ export const useCDIUpload = (): UseCDIUploadValues => {
     try {
       if (noRouteFound) {
         setUpload(newUpload);
-        throw new Error(t(`No Upload URL found {{configError}}`, { configError }));
+        throw new Error(t('No Upload URL found {{configError}}', { configError }));
       }
 
       // allocating

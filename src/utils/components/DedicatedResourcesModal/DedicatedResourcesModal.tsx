@@ -104,7 +104,9 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
                   ? t('{{qualifiedNodesCount}} matching nodes found', {
                       qualifiedNodesCount: qualifiedNodes?.length,
                     })
-                  : t(`No matching nodes found for the ${cpuManagerLabel} label`)
+                  : t('No matching nodes found for the {{cpuManagerLabel}} label', {
+                      cpuManagerLabel,
+                    })
               }
               variant={hasNodes ? AlertVariant.success : AlertVariant.warning}
               isInline

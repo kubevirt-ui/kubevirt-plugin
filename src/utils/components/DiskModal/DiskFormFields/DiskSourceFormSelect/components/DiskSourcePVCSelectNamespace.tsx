@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { PersistentVolumeClaimModel, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
+import { ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
@@ -55,7 +55,7 @@ const DiskSourcePVCSelectNamespace: React.FC<DiskSourcePVCSelectNamespaceProps> 
           onFilter={FilterPVCSelect(projectsName)}
           hasInlineFilter
           selections={selectedProject}
-          placeholderText={t(`--- Select ${PersistentVolumeClaimModel.label} project ---`)}
+          placeholderText={t('--- Select PersistentVolumeClaim project ---')}
           isDisabled={isDisabled}
           maxHeight={400}
         >
