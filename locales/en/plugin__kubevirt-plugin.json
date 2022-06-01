@@ -364,6 +364,7 @@
   "Loading Templates with available boot source": "Loading Templates with available boot source",
   "MAC address": "MAC address",
   "MAC Address": "MAC Address",
+  "Make sure to have clone permissions in the destination namespace. <2>Learn more <1></1></2>": "Make sure to have clone permissions in the destination namespace. <2>Learn more <1></1></2>",
   "Manual Connection": "Manual Connection",
   "Map of string keys and values that can be used to organize and categorize (scope and select) objects": "Map of string keys and values that can be used to organize and categorize (scope and select) objects",
   "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ",

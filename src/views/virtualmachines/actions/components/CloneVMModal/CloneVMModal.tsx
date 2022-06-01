@@ -80,12 +80,11 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
     return clonedVM;
   }, [cloneDescription, cloneName, cloneProject, dataVolumes, pvcs, startCloneVM, vm]);
 
-  const onClone = (updatedVM: V1VirtualMachine) => {
-    const createPromise = () => k8sCreate({ model: VirtualMachineModel, data: updatedVM });
+  const onClone = async (updatedVM: V1VirtualMachine) => {
     if (isVMRunning) {
-      return stopVM(vm).then(createPromise);
+      await stopVM(vm);
     }
-    return createPromise();
+    return await k8sCreate({ model: VirtualMachineModel, data: updatedVM });
   };
 
   return (
@@ -104,6 +103,7 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
           setProject={setCloneProject}
           projectNames={projectNames}
           projectsLoaded={loaded}
+          vmNamespace={vm?.metadata?.namespace}
         />
         <StartClonedVMCheckbox startCloneVM={startCloneVM} setStartCloneVM={setStartCloneVM} />
         <ConfigurationSummary vm={vm} pvcs={pvcs} dataVolumes={dataVolumes} />
