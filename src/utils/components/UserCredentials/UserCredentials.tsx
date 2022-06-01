@@ -23,7 +23,12 @@ const UserCredentials: React.FC<UserCredentialsProps> = ({ vmi, sshService }) =>
         {user && t('user: {{user}}', { user })}
       </div>
       {sshServiceRunning ? (
-        <ClipboardCopy isReadOnly data-test="SSHDetailsPage-command">
+        <ClipboardCopy
+          isReadOnly
+          data-test="SSHDetailsPage-command"
+          clickTip={t('Copied')}
+          hoverTip={t('Copy to clipboard')}
+        >
           {command}
         </ClipboardCopy>
       ) : (
