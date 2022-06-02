@@ -19,10 +19,10 @@ import {
   SOURCE_OPTIONS_IDS,
   UPLOAD_SOURCE_NAME,
 } from './constants';
+import DiskSizeNumberInput from './DiskSizeNumberInput';
 import SelectSourceOption from './SelectSourceOption';
 import { SelectSourceUploadPVCProgress } from './SelectSourceUploadPVCProgress';
 import { appendDockerPrefix, getGenericSourceCustomization, getPVCSource } from './utils';
-import { VolumeSize } from './VolumeSize';
 
 export type SelectSourceProps = {
   onSourceChange: (customSource: V1beta1DataVolumeSpec) => void;
@@ -35,6 +35,7 @@ export type SelectSourceProps = {
   registrySourceHelperText?: string;
   'data-test-id': string;
   relevantUpload?: DataUpload;
+  defaultsAsBlank?: boolean;
 };
 
 export const SelectSource: React.FC<SelectSourceProps> = ({
@@ -47,6 +48,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   registrySourceHelperText,
   'data-test-id': testId,
   relevantUpload,
+  defaultsAsBlank,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -63,6 +65,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   const [selectedSourceType, setSourceType] = React.useState<SOURCE_OPTIONS_IDS>(sourceOptions[0]);
   const [pvcNameSelected, selectPVCName] = React.useState<string>();
   const [pvcNamespaceSelected, selectPVCNamespace] = React.useState<string>();
+  const showSizeInput = withSize || selectedSourceType === HTTP_SOURCE_NAME;
 
   React.useEffect(() => {
     switch (selectedSourceType) {
@@ -75,14 +78,18 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
         );
       case PVC_SOURCE_NAME:
         return onSourceChange(
-          getPVCSource(pvcNameSelected, pvcNamespaceSelected, withSize ? volumeQuantity : null),
+          getPVCSource(
+            pvcNameSelected,
+            pvcNamespaceSelected,
+            showSizeInput ? volumeQuantity : null,
+          ),
         );
       case HTTP_SOURCE_NAME:
         return onSourceChange(
           getGenericSourceCustomization(
             selectedSourceType,
             httpURL,
-            withSize ? volumeQuantity : null,
+            showSizeInput ? volumeQuantity : null,
           ),
         );
       case CONTAINER_DISK_SOURCE_NAME:
@@ -91,7 +98,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           getGenericSourceCustomization(
             selectedSourceType,
             appendDockerPrefix(containerImage),
-            withSize ? volumeQuantity : null,
+            showSizeInput ? volumeQuantity : null,
           ),
         );
     }
@@ -103,8 +110,14 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
     containerImage,
     volumeQuantity,
     selectedSourceType,
-    withSize,
+    showSizeInput,
   ]);
+
+  React.useEffect(() => {
+    if (defaultsAsBlank) {
+      setSourceType(BLANK_SOURCE_NAME);
+    }
+  }, [defaultsAsBlank]);
 
   return (
     <>
@@ -203,8 +216,8 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
         </FormGroup>
       )}
 
-      {withSize && selectedSourceType !== DEFAULT_SOURCE && (
-        <VolumeSize quantity={volumeQuantity} onChange={setVolumeQuantity} />
+      {showSizeInput && selectedSourceType !== DEFAULT_SOURCE && (
+        <DiskSizeNumberInput diskSize={volumeQuantity} onChange={setVolumeQuantity} />
       )}
     </>
   );

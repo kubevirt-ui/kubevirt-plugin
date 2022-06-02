@@ -105,7 +105,8 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
         diskSource: getSourceFromDataVolume(dataVolumeTemplate),
         diskSize:
           dataVolumeTemplate.spec?.storage?.resources?.requests?.storage ||
-          dataVolumeTemplate.spec?.pvc?.resources?.requests?.storage,
+          dataVolumeTemplate.spec?.pvc?.resources?.requests?.storage ||
+          '',
       };
     }
 

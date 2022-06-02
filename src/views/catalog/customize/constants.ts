@@ -1,10 +1,9 @@
-import { V1Disk, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export const DEFAULT_NAMESPACE = 'default';
 export const NAME_INPUT_FIELD = 'NAME';
 
 export const INSTALLATION_CDROM_NAME = 'installation-cdrom';
-export const INSTALLATION_CDROM_VOLUME_NAME = 'installation-cdrom-volume';
 
 export const INSTALLATION_CDROM_DISK: V1Disk = {
   name: INSTALLATION_CDROM_NAME,
@@ -12,13 +11,6 @@ export const INSTALLATION_CDROM_DISK: V1Disk = {
     bus: 'sata',
   },
   bootOrder: 1,
-};
-
-export const INSTALLATION_CDROM_VOLUME: V1Volume = {
-  name: INSTALLATION_CDROM_NAME,
-  dataVolume: {
-    name: INSTALLATION_CDROM_VOLUME_NAME,
-  },
 };
 
 export const WINDOWS_DRIVERS_DISK = 'windows-drivers-disk';
