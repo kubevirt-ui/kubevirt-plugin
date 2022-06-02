@@ -18,7 +18,11 @@ const useSSHCommand = (
   const { user } = getCloudInitCredentials(vmi);
   const sshServicePort = getSSHNodePort(sshService);
 
-  const command = `ssh ${user && `${user}@`}${consoleHostname} -p ${sshServicePort}`;
+  let command = 'ssh ';
+
+  if (user) command += `${user}@`;
+
+  command += `${consoleHostname} -p ${sshServicePort}`;
 
   return {
     command,
