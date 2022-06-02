@@ -37,18 +37,16 @@ export const getGenericSourceCustomization = (
     source: {
       [diskSourceId]: {},
     },
+    storage: {
+      resources: {
+        requests: {
+          storage: storage ?? '30Gi',
+        },
+      },
+    },
   };
 
   if (url) dataVolumeSpec.source[diskSourceId].url = url;
-
-  if (storage)
-    dataVolumeSpec.storage = {
-      resources: {
-        requests: {
-          storage,
-        },
-      },
-    };
 
   return dataVolumeSpec;
 };

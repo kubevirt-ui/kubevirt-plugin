@@ -8,6 +8,7 @@ import {
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import {
   generateVMName,
   getTemplateVirtualMachineObject,
@@ -22,8 +23,19 @@ export const overrideVirtualMachineDataVolumeSpec = (
   customSource?: V1beta1DataVolumeSpec,
 ): V1VirtualMachine => {
   return produceVMDisks(virtualMachine, (draftVM) => {
-    if (draftVM.spec.dataVolumeTemplates[0] && !!customSource)
+    const dataVolumeTemplate = draftVM.spec.dataVolumeTemplates[0];
+    if (dataVolumeTemplate && !!customSource) {
       draftVM.spec.dataVolumeTemplates[0].spec = customSource;
+
+      const shouldAddImmediateBind = customSource?.source?.blank || customSource?.source?.upload;
+
+      if (shouldAddImmediateBind) {
+        dataVolumeTemplate.metadata.annotations = {
+          ...(dataVolumeTemplate?.metadata?.annotations || {}),
+          [CDI_BIND_REQUESTED_ANNOTATION]: 'true',
+        };
+      }
+    }
   });
 };
 

@@ -10,12 +10,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 
-import {
-  INSTALLATION_CDROM_DISK,
-  INSTALLATION_CDROM_NAME,
-  INSTALLATION_CDROM_VOLUME,
-  INSTALLATION_CDROM_VOLUME_NAME,
-} from './constants';
+import { INSTALLATION_CDROM_DISK, INSTALLATION_CDROM_NAME } from './constants';
 
 export const addInstallationCDRom = (
   virtualMachine: V1VirtualMachine,
@@ -23,6 +18,7 @@ export const addInstallationCDRom = (
 ): V1VirtualMachine => {
   let cdVolume: V1Volume = undefined;
   let cdDataVolumeTemplate: V1DataVolumeTemplateSpec = undefined;
+  const dataVolumeName = `${virtualMachine?.metadata?.name}-${INSTALLATION_CDROM_NAME}`;
 
   if (cdSource?.source?.registry) {
     cdVolume = {
@@ -32,10 +28,15 @@ export const addInstallationCDRom = (
       },
     };
   } else if (cdSource.source?.http || cdSource?.source?.pvc) {
-    cdVolume = INSTALLATION_CDROM_VOLUME;
+    cdVolume = {
+      name: INSTALLATION_CDROM_NAME,
+      dataVolume: {
+        name: dataVolumeName,
+      },
+    };
 
     cdDataVolumeTemplate = {
-      metadata: { name: INSTALLATION_CDROM_VOLUME_NAME },
+      metadata: { name: dataVolumeName },
       spec: { source: cdSource?.source, storage: cdSource?.storage },
     };
   }

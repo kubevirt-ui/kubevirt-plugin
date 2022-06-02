@@ -52,8 +52,9 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const onCDCheckboxChange = React.useCallback(() => {
-    if (cdSource) setCDSource(undefined);
-    else {
+    if (cdSource) {
+      setCDSource(undefined);
+    } else {
       setDiskSource(getGenericSourceCustomization(BLANK_SOURCE_NAME));
       setCDSource(getPVCSource(null, null));
     }
@@ -68,6 +69,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
 
       {cdSource && (
         <SelectSource
+          selectedSource={cdSource}
           onSourceChange={setCDSource}
           sourceLabel={<SelectCDSourceLabel />}
           sourceOptions={[HTTP_SOURCE_NAME, PVC_SOURCE_NAME, CONTAINER_DISK_SOURCE_NAME]}
@@ -96,9 +98,10 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         registrySourceHelperText={registrySourceHelperText}
         relevantUpload={relevantUpload}
         data-test-id="disk-boot-source"
+        defaultsAsBlank={!!cdSource}
       />
-
-      <FormGroup fieldId="customize-cdrom-drivers">
+      <Divider className="divider" />
+      <FormGroup label={t('Drivers')} fieldId="customize-cdrom-drivers">
         <Checkbox
           isChecked={withDrivers}
           onChange={setDrivers}
