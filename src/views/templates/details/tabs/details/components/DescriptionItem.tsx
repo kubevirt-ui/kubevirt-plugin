@@ -8,7 +8,7 @@ import {
 
 type DescriptionProps = {
   title: string;
-  content: string;
+  content: string | JSX.Element;
 };
 
 // a simple DescriptionList item component
