@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -18,16 +17,16 @@ import EvictionStrategy from './EvictionStrategy';
 type VirtualMachineSchedulingRightGridProps = {
   vm: V1VirtualMachine;
   canUpdateVM: boolean;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightGridProps> = ({
   vm,
   canUpdateVM,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const canUpdateStoppedVM =
-    canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -46,7 +45,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
         <VirtualMachineDescriptionItem
           descriptionData={<DedicatedResources vm={vm} />}
           descriptionHeader={t('Dedicated Resources')}
-          isEdit={canUpdateStoppedVM}
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DedicatedResourcesModal
@@ -55,6 +54,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
                 onClose={onClose}
                 onSubmit={onSubmit}
                 headerText={t('Dedicated Resources')}
+                vmi={vmi}
               />
             ))
           }
@@ -62,7 +62,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
         <VirtualMachineDescriptionItem
           descriptionData={<EvictionStrategy vm={vm} />}
           descriptionHeader={t('Eviction Strategy')}
-          isEdit={canUpdateStoppedVM}
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <EvictionStrategyModal
@@ -71,6 +71,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
                 onClose={onClose}
                 onSubmit={onSubmit}
                 headerText={t('Eviction Strategy')}
+                vmi={vmi}
               />
             ))
           }

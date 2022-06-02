@@ -4,7 +4,7 @@ import produce from 'immer';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,6 +21,9 @@ import {
   Popover,
 } from '@patternfly/react-core';
 
+import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { getChangedDedicatedResources } from '../PendingChanges/utils/helpers';
+
 import { cpuManagerLabel, cpuManagerLabelKey, cpuManagerLabelValue } from './utils/constants';
 
 type DedicatedResourcesModalProps = {
@@ -29,6 +32,7 @@ type DedicatedResourcesModalProps = {
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   headerText: string;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
@@ -37,6 +41,7 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
   onClose,
   onSubmit,
   headerText,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const [checked, setChecked] = React.useState<boolean>(
@@ -75,6 +80,11 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
       isDisabled={!loaded}
     >
       <Form>
+        {vmi && (
+          <ModalPendingChangesAlert
+            isChanged={getChangedDedicatedResources(updatedVirtualMachine, vmi, checked)}
+          />
+        )}
         <FormGroup fieldId="dedicated-resources" isInline>
           <Checkbox
             id="dedicated-resources"
