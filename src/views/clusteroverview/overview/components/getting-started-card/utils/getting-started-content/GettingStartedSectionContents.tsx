@@ -15,11 +15,12 @@ import {
 import { GettingStartedLink } from '../types';
 
 import GettingStartedLinkExtraContent from './GettingStartedLinkExtraContent';
-import { getLinkComponent, getMoreLinkContent } from './utils';
+import GettingStartedMoreLinkContent from './GettingStartedMoreLinkContent';
+import { getLinkComponent } from './utils';
 
-import './GettingStartedContent.scss';
+import './GettingStartedSectionContents.scss';
 
-type GettingStartedContentProps = {
+type GettingStartedSectionContentsProps = {
   id: string;
   icon?: React.ReactElement;
   title: string;
@@ -29,7 +30,7 @@ type GettingStartedContentProps = {
   moreLink?: GettingStartedLink;
 };
 
-const GettingStartedContent: React.FC<GettingStartedContentProps> = ({
+const GettingStartedSectionContents: React.FC<GettingStartedSectionContentsProps> = ({
   id,
   icon,
   title,
@@ -38,17 +39,15 @@ const GettingStartedContent: React.FC<GettingStartedContentProps> = ({
   links,
   moreLink,
 }) => {
-  const MoreLinkContent = getMoreLinkContent(moreLink);
-
   return (
     <Flex
       direction={{ default: 'column' }}
       grow={{ default: 'grow' }}
-      className="ocs-getting-started-card"
+      className="getting-started-section-contents"
       data-test={`card ${id}`}
     >
       <Title headingLevel="h3" size={TitleSizes.md} style={{ color: titleColor }} data-test="title">
-        {icon ? <span className="ocs-getting-started-card__title-icon">{icon}</span> : null}
+        {icon ? <span className="getting-started-section-contents__title-icon">{icon}</span> : null}
         {title}
       </Title>
 
@@ -60,7 +59,7 @@ const GettingStartedContent: React.FC<GettingStartedContentProps> = ({
 
       <Flex direction={{ default: 'column' }} grow={{ default: 'grow' }}>
         {links?.length > 0 ? (
-          <SimpleList isControlled={false} className="ocs-getting-started-card__list">
+          <SimpleList isControlled={false} className="getting-started-section-contents__list">
             {links.map((link) => {
               const handleClick = link.onClick;
               return link.loading ? (
@@ -91,29 +90,17 @@ const GettingStartedContent: React.FC<GettingStartedContentProps> = ({
                     {link.title}
                   </SimpleListItem>
                   <GettingStartedLinkExtraContent link={link} />
-                  {/*{link.showMoreLink && (*/}
-                  {/*  <div className="kv-getting-started-content--more-block">*/}
-                  {/*    {link?.description}*/}
-                  {/*    {link?.moreLinkExternal ? (*/}
-                  {/*      <ExternalLink*/}
-                  {/*        href={link.moreLinkHref}*/}
-                  {/*        text={link.moreLinkText}*/}
-                  {/*        additionalClassName="kv-getting-started-content__more-block--link"*/}
-                  {/*      />*/}
-                  {/*    ) : (*/}
-                  {/*      <Link to={link.moreLinkHref}>{link.moreLinkText}</Link>*/}
-                  {/*    )}*/}
-                  {/*  </div>*/}
-                  {/*)}*/}
                 </span>
               );
             })}
           </SimpleList>
         ) : null}
       </Flex>
-      {<FlexItem>{MoreLinkContent}</FlexItem>}
+      <FlexItem>
+        <GettingStartedMoreLinkContent moreLink={moreLink} />
+      </FlexItem>
     </Flex>
   );
 };
 
-export default GettingStartedContent;
+export default GettingStartedSectionContents;

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { recommendedOperatorIcon } from '../../../utils/svg/icons';
-import GettingStartedContent from '../utils/getting-started-content/GettingStartedContent';
+import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
 import useMTVResources from '../utils/hooks/useMTVResources';
 import { GettingStartedLink } from '../utils/types';
 
@@ -36,15 +36,15 @@ const RelatedOperatorsSection: React.FC = () => {
       title: t('Migration Toolkit for Virtualization'),
       description: t('Migrate multiple virtual machine workloads to OpenShift Virtualization. '),
       href: '/operatorhub/all-namespaces?keyword=MTV',
-      moreLinkText: t('Launch Migration Toolkit for Virtualization web console'),
-      moreLinkHref: mtvLink,
-      showMoreLink: mtvLoaded && !!mtvLink,
-      moreLinkExternal: true,
+      secondaryLinkText: t('Launch Migration Toolkit for Virtualization web console'),
+      secondaryLinkHref: mtvLink,
+      showSecondaryLink: mtvLoaded && !!mtvLink,
+      secondaryLinkExternal: true,
     },
   ];
 
   return (
-    <GettingStartedContent
+    <GettingStartedSectionContents
       id="related-operators"
       icon={
         <img

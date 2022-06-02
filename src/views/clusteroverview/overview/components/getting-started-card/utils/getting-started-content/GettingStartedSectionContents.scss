@@ -1,4 +1,4 @@
-.ocs-getting-started-card {
+.getting-started-section-contents {
 
   &__title-icon {
     margin-right: var(--pf-global--spacer--sm);
@@ -31,18 +31,5 @@
   a > svg,
   button > svg {
     margin-left: var(--pf-global--spacer--sm);
-  }
-
-  .kv-getting-started-content {
-
-    &--more-block {
-      max-width: 325px;
-      padding-left: 16px;
-      color: var(--pf-global--Color--200);
-    }
-
-    &__more-block--link {
-      display: inline;
-    }
   }
 }

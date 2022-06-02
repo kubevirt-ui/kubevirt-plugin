@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import GettingStartedContent from '../utils/getting-started-content/GettingStartedContent';
+import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
 import { GettingStartedLink } from '../utils/types';
 
 import FeatureHighlightsTitle from './FeatureHighlightsTitle';
@@ -45,7 +45,7 @@ const FeatureHighlightsSection: React.FC = () => {
   ];
 
   return (
-    <GettingStartedContent
+    <GettingStartedSectionContents
       id="feature-highlights"
       icon={
         <i
