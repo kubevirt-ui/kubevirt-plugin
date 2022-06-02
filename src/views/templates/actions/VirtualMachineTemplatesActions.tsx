@@ -11,8 +11,7 @@ type VirtualMachineTemplatesActionsProps = { template: V1Template };
 const VirtualMachineTemplatesActions: React.FC<VirtualMachineTemplatesActionsProps> = ({
   template,
 }) => {
-  // const { t } = useKubevirtTranslation();
-  const [actions, onLazsyActions] = useVirtualMachineTemplatesActions(template);
+  const [actions, onLazyActions] = useVirtualMachineTemplatesActions(template);
   const [isOpen, setIsOpen] = React.useState(false);
 
   const handleClick = (action: Action) => {
@@ -24,7 +23,7 @@ const VirtualMachineTemplatesActions: React.FC<VirtualMachineTemplatesActionsPro
 
   const onDropDownToggle = (value: boolean) => {
     setIsOpen(value);
-    if (value) onLazsyActions();
+    if (value) onLazyActions();
   };
 
   return (

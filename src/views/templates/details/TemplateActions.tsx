@@ -17,7 +17,7 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const [isDropDownOpen, setDropdownOpen] = React.useState(false);
 
-  const [actions] = useVirtualMachineTemplatesActions(template);
+  const [actions, onLazyActions] = useVirtualMachineTemplatesActions(template);
 
   const filteredActions = actions.filter((action) => action.id !== EDIT_TEMPLATE_ID);
 
@@ -28,11 +28,16 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({ template }) => {
     }
   };
 
+  const onDropDownToggle = (value: boolean) => {
+    setDropdownOpen(value);
+    if (value) onLazyActions();
+  };
+
   return (
     <Dropdown
       isOpen={isDropDownOpen}
       position={DropdownPosition.right}
-      toggle={<DropdownToggle onToggle={setDropdownOpen}>{t('Actions')}</DropdownToggle>}
+      toggle={<DropdownToggle onToggle={onDropDownToggle}>{t('Actions')}</DropdownToggle>}
       dropdownItems={filteredActions?.map((action) => (
         <DropdownItem
           key={action?.id}

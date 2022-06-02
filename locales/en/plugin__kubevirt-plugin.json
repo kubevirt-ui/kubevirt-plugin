@@ -123,7 +123,7 @@
   "Boot Order": "Boot Order",
   "Boot source": "Boot source",
   "Boot source available": "Boot source available",
-  "Boot source cannot be edited for Red Hat templates": "Boot source cannot be edited for Red Hat templates",
+  "Boot source cannot be edited": "Boot source cannot be edited",
   "Boot source provider": "Boot source provider",
   "Boot source type": "Boot source type",
   "bootable": "bootable",
