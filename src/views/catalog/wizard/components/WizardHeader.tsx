@@ -3,7 +3,6 @@ import { Trans } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
-import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Breadcrumb,
@@ -28,17 +27,6 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
   return (
     <div className="pf-c-page__main-breadcrumb">
       <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
-        <BreadcrumbItem>
-          <Button
-            variant="link"
-            isInline
-            onClick={() =>
-              onBreadcrumbClick(`/k8s/ns/${namespace || 'default'}/${VirtualMachineModelRef}`)
-            }
-          >
-            {t('Virtualization')}
-          </Button>
-        </BreadcrumbItem>
         <BreadcrumbItem>
           <Button
             variant="link"
