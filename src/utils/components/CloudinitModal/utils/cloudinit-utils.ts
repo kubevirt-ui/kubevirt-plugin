@@ -94,6 +94,16 @@ export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData
   }
 };
 
+export const createDefaultCloudInitYAML = () =>
+  convertUserDataObjectToYAML(
+    {
+      user: '',
+      password: '',
+      hostname: '',
+    },
+    true,
+  );
+
 export const createVmSSHSecret = (vm: V1VirtualMachine, sshKey: string, secretName?: string) =>
   k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
     model: SecretModel,

@@ -38,6 +38,7 @@ export const CloudinitModal: React.FC<{
       isOpen={isOpen}
       onClose={onClose}
       headerText={t('Cloud-init')}
+      submitBtnText={t('Apply')}
       isDisabled={isSubmitDisabled}
     >
       <Stack hasGutter>

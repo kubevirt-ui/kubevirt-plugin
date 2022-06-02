@@ -16,6 +16,7 @@ import {
   convertUserDataObjectToYAML,
   convertYAMLToNetworkDataObject,
   convertYAMLUserDataObject,
+  createDefaultCloudInitYAML,
   deleteObjBlankValues,
   getCloudInitData,
   getCloudInitVolume,
@@ -23,15 +24,15 @@ import {
 import { CLOUD_CONFIG_HEADER } from './consts';
 
 export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
-  const cloudInitVol = getCloudInitVolume(vm);
+  const cloudInitVol = React.useMemo(() => getCloudInitVolume(vm), [vm]);
   const cloudInit = React.useMemo(() => getCloudInitData(cloudInitVol), [cloudInitVol]);
 
   const [userData, setUserData] = React.useState<CloudInitUserData>(
-    convertYAMLUserDataObject(cloudInit?.userData),
+    convertYAMLUserDataObject(cloudInit?.userData ?? createDefaultCloudInitYAML()),
   );
 
   const [networkData, setNetworkData] = React.useState<CloudInitNetworkData>(
-    convertYAMLToNetworkDataObject(cloudInit?.networkData),
+    convertYAMLToNetworkDataObject(cloudInit?.networkData ?? ''),
   );
   const [enableNetworkData, setEnableNetworkData] = React.useState<boolean>(
     !!networkData?.name || !!networkData?.address || !!networkData?.gateway,
