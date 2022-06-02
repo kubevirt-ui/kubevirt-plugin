@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -14,6 +15,7 @@ import { CopyIcon } from '@patternfly/react-icons';
 
 import { pauseVM, startVM, stopVM, unpauseVM } from '../../../../../../actions/actions';
 import { printableVMStatus } from '../../../../../../utils';
+import { createURL } from '../../../utils/url';
 
 type VirtualMachinesOverviewTabDetailsTitleProps = {
   vm: V1VirtualMachine;
@@ -35,7 +37,7 @@ const VirtualMachinesOverviewTabDetailsTitle: React.FC<
 
   return (
     <CardTitle className="text-muted card-title">
-      {t('Details')}
+      <Link to={createURL('details', location?.pathname)}>{t('Details')}</Link>
       <Dropdown
         onSelect={() => setIsDropdownOpen(false)}
         toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-disk" />}

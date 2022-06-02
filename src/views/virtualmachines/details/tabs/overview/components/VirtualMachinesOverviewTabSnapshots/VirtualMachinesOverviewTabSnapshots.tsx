@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -19,8 +19,8 @@ import {
 
 import SnapshotModal from '../../../snapshots/components/modal/SnapshotModal';
 import useSnapshotData from '../../../snapshots/hooks/useSnapshotData';
+import { createURL } from '../../utils/url';
 
-import { createURL } from './utils/url';
 import VirtualMachinesOverviewTabSnapshotsRow from './VirtualMachinesOverviewTabSnapshotsRow';
 
 import './virtual-machines-overview-tab-snapshots.scss';
@@ -34,8 +34,8 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
 }) => {
   const { t } = useKubevirtTranslation();
   const { snapshots } = useSnapshotData(vm?.metadata?.name, vm?.metadata?.namespace);
-  const location = useLocation();
   const { createModal } = useModal();
+  const snapshotsTabLink = createURL('snapshots', location?.pathname);
 
   return (
     <div
@@ -44,7 +44,10 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
     >
       <Card>
         <CardTitle className="text-muted">
-          {t('Snapshots ({{count}})', { count: snapshots.length || 0 })}
+          <Link to={snapshotsTabLink}>
+            {t('Snapshots ({{count}})', { count: snapshots.length || 0 })}
+          </Link>
+
           <Button
             isInline
             variant={ButtonVariant.link}
@@ -69,7 +72,7 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
         </CardBody>
         {!isEmpty(snapshots) && (
           <CardFooter>
-            <Link to={createURL('snapshots', location?.pathname)}>
+            <Link to={snapshotsTabLink}>
               <Label variant="outline" color="blue">
                 {t('View More')}
               </Label>

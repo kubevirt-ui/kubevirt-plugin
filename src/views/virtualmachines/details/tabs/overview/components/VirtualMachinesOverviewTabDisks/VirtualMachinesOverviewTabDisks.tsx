@@ -1,10 +1,13 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
+
+import { createURL } from '../../utils/url';
 
 import useVirtualMachinesOverviewTabDisksColumns from './hooks/useVirtualMachinesOverviewTabDisksColumns';
 import VirtualMachinesOverviewTabDisksRow from './VirtualMachinesOverviewTabDisksRow';
@@ -20,7 +23,9 @@ const VirtualMachinesOverviewTabDisks = ({ vm }) => {
     <div className="VirtualMachinesOverviewTabDisks--main">
       <Card>
         <CardTitle className="text-muted">
-          {t('Disks ({{count}})', { count: disks.length || 0 })}
+          <Link to={createURL('disks', location?.pathname)}>
+            {t('Disks ({{count}})', { count: disks.length || 0 })}
+          </Link>
         </CardTitle>
         <Divider />
         <CardBody isFilled>
