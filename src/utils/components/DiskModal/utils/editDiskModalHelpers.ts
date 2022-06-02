@@ -101,7 +101,7 @@ export const updateVMDataVolumeTemplates = (
         return [...(dataVolumeTemplates || []), updatedDataVolumeTemplate];
       }
     }
-    return dataVolumeTemplates;
+    return dataVolumeTemplates || [];
   };
 
   return updatedDataVolumeTemplates().filter((dvt) =>
