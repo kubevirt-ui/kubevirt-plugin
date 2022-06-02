@@ -2,10 +2,13 @@ import * as React from 'react';
 import produce from 'immer';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
+
+import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { getChangedEvictionStrategy } from '../PendingChanges/utils/helpers';
 
 type EvictionStrategyModalProps = {
   vm: V1VirtualMachine;
@@ -13,6 +16,7 @@ type EvictionStrategyModalProps = {
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   headerText: string;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
@@ -21,6 +25,7 @@ const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
   onClose,
   onSubmit,
   headerText,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const [checked, setChecked] = React.useState<boolean>(
@@ -47,6 +52,11 @@ const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
       headerText={headerText}
     >
       <Form>
+        {vmi && (
+          <ModalPendingChangesAlert
+            isChanged={getChangedEvictionStrategy(updatedVirtualMachine, vmi, checked)}
+          />
+        )}
         <FormGroup
           fieldId="eviction-strategy"
           helperText={t(

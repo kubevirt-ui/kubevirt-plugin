@@ -1,9 +1,13 @@
 import * as React from 'react';
 
-import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  modelToGroupVersionKind,
+  NodeModel,
+  VirtualMachineInstanceModelGroupVersionKind,
+} from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import {
@@ -26,6 +30,12 @@ type SchedulingSectionProps = {
 
 const SchedulingSection: React.FC<SchedulingSectionProps> = ({ vm, pathname }) => {
   const { t } = useKubevirtTranslation();
+  const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
+    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+    name: vm?.metadata?.name,
+    namespace: vm?.metadata?.namespace,
+    isList: false,
+  });
   const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
@@ -48,7 +58,7 @@ const SchedulingSection: React.FC<SchedulingSectionProps> = ({ vm, pathname }) =
           canUpdateVM={canUpdateVM}
         />
         <GridItem span={1}>{/* Spacer */}</GridItem>
-        <VirtualMachineSchedulingRightGrid vm={vm} canUpdateVM={canUpdateVM} />
+        <VirtualMachineSchedulingRightGrid vm={vm} canUpdateVM={canUpdateVM} vmi={vmi} />
       </Grid>
     </div>
   );

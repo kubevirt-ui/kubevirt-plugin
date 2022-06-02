@@ -22,8 +22,12 @@ const VirtualMachinePendingChangesAlert: React.FC<VirtualMachinePendingChangesAl
   const { t } = useKubevirtTranslation();
   const pendingChanges = usePendingChanges(vm, vmi);
 
-  const { pendingChangesDetailsTab, pendingChangesEnvTab, pendingChangesNICsTab } =
-    getPendingChangesByTab(pendingChanges);
+  const {
+    pendingChangesDetailsTab,
+    pendingChangesSchedulingTab,
+    pendingChangesEnvTab,
+    pendingChangesNICsTab,
+  } = getPendingChangesByTab(pendingChanges);
 
   const hasPendingChanges = pendingChanges?.some((change) => change?.hasPendingChange);
 
@@ -38,6 +42,7 @@ const VirtualMachinePendingChangesAlert: React.FC<VirtualMachinePendingChangesAl
       )}
       <List>
         <PendingChangesBreadcrumb pendingChanges={pendingChangesDetailsTab} />
+        <PendingChangesBreadcrumb pendingChanges={pendingChangesSchedulingTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesEnvTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesNICsTab} />
       </List>

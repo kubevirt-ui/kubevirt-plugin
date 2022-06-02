@@ -165,6 +165,36 @@ export const getChangedHostDevices = (
   return changedHostDevices;
 };
 
+export const getChangedDedicatedResources = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+  currentSelection: boolean,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  const vmDedicatedResources =
+    vm?.spec?.template?.spec?.domain?.cpu?.dedicatedCpuPlacement || false;
+  const vmiDedicatedResources = vmi?.spec?.domain?.cpu?.dedicatedCpuPlacement || false;
+
+  return (
+    vmDedicatedResources !== vmiDedicatedResources || currentSelection !== vmiDedicatedResources
+  );
+};
+
+export const getChangedEvictionStrategy = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+  currentSelection: boolean,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  const vmEvictionStrategy = !!vm?.spec?.template?.spec?.evictionStrategy;
+  const vmiEvictionStrategy = !!vmi?.spec?.evictionStrategy;
+  return vmEvictionStrategy !== vmiEvictionStrategy || currentSelection !== vmiEvictionStrategy;
+};
+
 export const getTabURL = (vm: V1VirtualMachine, tab: string) =>
   `/k8s/ns/${vm?.metadata?.namespace}/${VirtualMachineModelRef}/${vm?.metadata?.name}/${tab}`;
 
@@ -172,6 +202,10 @@ export const getPendingChangesByTab = (pendingChanges: PendingChange[]) => {
   const pendingChangesDetailsTab = pendingChanges?.filter(
     (change) =>
       change?.tabLabel === VirtualMachineDetailsTabLabel.Details && change?.hasPendingChange,
+  );
+  const pendingChangesSchedulingTab = pendingChanges?.filter(
+    (change) =>
+      change?.tabLabel === VirtualMachineDetailsTabLabel.Scheduling && change?.hasPendingChange,
   );
   const pendingChangesEnvTab = pendingChanges?.filter(
     (change) =>
@@ -185,6 +219,7 @@ export const getPendingChangesByTab = (pendingChanges: PendingChange[]) => {
 
   return {
     pendingChangesDetailsTab,
+    pendingChangesSchedulingTab,
     pendingChangesEnvTab,
     pendingChangesNICsTab,
   };

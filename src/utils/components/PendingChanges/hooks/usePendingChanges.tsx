@@ -5,6 +5,8 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
+import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
+import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
@@ -19,7 +21,9 @@ import {
   checkBootModeChanged,
   checkBootOrderChanged,
   checkCPUMemoryChanged,
+  getChangedDedicatedResources,
   getChangedEnvDisks,
+  getChangedEvictionStrategy,
   getChangedGPUDevices,
   getChangedHostDevices,
   getChangedNics,
@@ -38,6 +42,16 @@ export const usePendingChanges = (
   const cpuMemoryChanged = checkCPUMemoryChanged(vm, vmi);
   const bootOrderChanged = checkBootOrderChanged(vm, vmi);
   const bootModeChanged = checkBootModeChanged(vm, vmi);
+  const dedicatedResourcesChanged = getChangedDedicatedResources(
+    vm,
+    vmi,
+    vm?.spec?.template?.spec?.domain?.cpu?.dedicatedCpuPlacement || false,
+  );
+  const evictionStrategyChanged = getChangedEvictionStrategy(
+    vm,
+    vmi,
+    !!vm?.spec?.template?.spec?.evictionStrategy,
+  );
 
   const modifiedEnvDisks = getChangedEnvDisks(vm, vmi);
   const modifiedNics = getChangedNics(vm, vmi);
@@ -157,6 +171,42 @@ export const usePendingChanges = (
             initialDevices={getHostDevices(vm)}
             btnText={t('Add Host device')}
             type={HARDWARE_DEVICE_TYPE.HOST_DEVICES}
+            vmi={vmi}
+          />
+        ));
+      },
+    },
+    {
+      hasPendingChange: dedicatedResourcesChanged,
+      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
+      label: t('Dedicated resources'),
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+        createModal(({ isOpen, onClose }) => (
+          <DedicatedResourcesModal
+            vm={vm}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+            headerText={t('Dedicated Resources')}
+            vmi={vmi}
+          />
+        ));
+      },
+    },
+    {
+      hasPendingChange: evictionStrategyChanged,
+      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
+      label: t('Eviction strategy'),
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+        createModal(({ isOpen, onClose }) => (
+          <EvictionStrategyModal
+            vm={vm}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+            headerText={t('Eviction Strategy')}
             vmi={vmi}
           />
         ));
