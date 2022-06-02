@@ -2,16 +2,21 @@ import * as React from 'react';
 import { Trans } from 'react-i18next';
 
 import { getTemplateStorageQuantity } from '@catalog/customize/components/CustomizeSource/utils';
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  modelToGroupVersionKind,
+  TemplateModel,
+  V1Template,
+} from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { Alert, Button, Form, FormGroup, Popover, TextInput } from '@patternfly/react-core';
 
 import { SOURCE_TYPES } from '../../utils/constants';
 import { editBootSource } from '../editBootSource';
 
+import useBootSourceEditAffectedTemplates from './hooks/useBootSourceEditAffectedTemplates';
 import { SelectSource } from './SelectSource';
 
 import './EditBootSourceModal.scss';
@@ -26,6 +31,8 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({ isOpen, obj, 
   const { t } = useKubevirtTranslation();
   const [bootSource, setBootSource] = React.useState<V1beta1DataVolumeSpec>();
   const [sourceProvider, setSourceProvider] = React.useState('');
+
+  const affectedTemplates = useBootSourceEditAffectedTemplates(obj);
 
   const onSubmit = async () => {
     await editBootSource(obj, bootSource);
@@ -42,8 +49,25 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({ isOpen, obj, 
       >
         <Alert isInline className="margin-bottom-md" variant="warning" title={t('Warning')}>
           <Trans ns="plugin__kubevirt-plugin">
-            Editing the DataSource will affect all templates that are currently using this
-            DataSource.
+            Editing the DataSource will affect{' '}
+            <Popover
+              headerContent={t('Affected Templates')}
+              bodyContent={(affectedTemplates || []).map((template) => (
+                <ResourceLink
+                  key={template.metadata.uid}
+                  groupVersionKind={modelToGroupVersionKind(TemplateModel)}
+                  name={template.metadata.name}
+                  namespace={template.metadata.namespace}
+                  linkTo={false}
+                />
+              ))}
+            >
+              <Button variant="link" isInline>
+                {' '}
+                all templates
+              </Button>
+            </Popover>{' '}
+            that are currently using this DataSource.
           </Trans>
         </Alert>
 
