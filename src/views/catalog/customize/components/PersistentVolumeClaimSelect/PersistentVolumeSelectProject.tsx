@@ -71,11 +71,7 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
               toggleId={`${testId}-toggle`}
             >
               {projectsName.map((projectName) => (
-                <SelectOption
-                  key={projectName}
-                  value={projectName}
-                  data-test-id={`${testId}-dropdown-option-${projectName}`}
-                >
+                <SelectOption key={projectName} value={projectName} data-test-id={projectName}>
                   <span className="sr-only">{t('project')}</span>
                   <span className="co-m-resource-icon co-m-resource-project">PR</span> {projectName}
                 </SelectOption>
