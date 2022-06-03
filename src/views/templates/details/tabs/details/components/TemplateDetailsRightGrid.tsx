@@ -50,10 +50,15 @@ const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template
         title={t('Support')}
         content={getTemplateSupportLevel(template) || NO_DATA_DASH}
       />
-      <HardwareDevices
-        vm={getTemplateVirtualMachineObject(template)}
-        canEdit={!isCommonTemplate(template)}
-        onSubmit={onSubmit}
+      <DescriptionItem
+        title={t('Hardware devices')}
+        content={
+          <HardwareDevices
+            vm={getTemplateVirtualMachineObject(template)}
+            canEdit={!isCommonTemplate(template)}
+            onSubmit={onSubmit}
+          />
+        }
       />
     </DescriptionList>
   );
