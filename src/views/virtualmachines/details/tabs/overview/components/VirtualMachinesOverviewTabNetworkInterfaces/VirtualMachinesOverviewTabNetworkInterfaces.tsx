@@ -1,8 +1,11 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
+
+import { createURL } from '../../utils/url';
 
 import useVirtualMachinesOverviewTabInterfacesColumns from './hooks/useVirtualMachinesOverviewTabInterfacesColumns';
 import useVirtualMachinesOverviewTabInterfacesData from './hooks/useVirtualMachinesOverviewTabInterfacesData';
@@ -20,7 +23,9 @@ const VirtualMachinesOverviewTabInterfaces = ({ vm }) => {
     <div className="VirtualMachinesOverviewTabInterfaces--main">
       <Card>
         <CardTitle className="text-muted">
-          {t('Network interfaces ({{count}})', { count: data?.length || 0 })}
+          <Link to={createURL('network-interfaces', location?.pathname)}>
+            {t('Network interfaces ({{count}})', { count: data?.length || 0 })}
+          </Link>
         </CardTitle>
         <Divider />
         <CardBody isFilled>
