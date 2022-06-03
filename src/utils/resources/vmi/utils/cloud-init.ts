@@ -3,9 +3,14 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 export const getCloudInitCredentials = (
   vmi: V1VirtualMachineInstance,
 ): { user: string; password: string } => {
-  const cloudInitValuesStrings = vmi?.spec?.volumes
-    ?.find((volume) => volume?.cloudInitNoCloud)
-    ?.cloudInitNoCloud?.userData?.split('\n')
+  const cloudInitVolume = vmi?.spec?.volumes?.find(
+    (volume) => volume?.cloudInitNoCloud || volume?.cloudInitConfigDrive,
+  );
+
+  const cloudInit = cloudInitVolume?.cloudInitNoCloud || cloudInitVolume?.cloudInitConfigDrive;
+
+  const cloudInitValuesStrings = cloudInit?.userData
+    ?.split('\n')
     ?.filter((row) => !row?.includes('#cloud-config'));
 
   const password = cloudInitValuesStrings
