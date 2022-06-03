@@ -230,6 +230,7 @@
   "Delete VirtualMachineInstance": "Delete VirtualMachineInstance",
   "Delete VirtualMachineInstance?": "Delete VirtualMachineInstance?",
   "Delete VirtualMachineSnapshot": "Delete VirtualMachineSnapshot",
+  "Deprecated": "Deprecated",
   "Descheduler": "Descheduler",
   "Descheduler settings": "Descheduler settings",
   "Description": "Description",

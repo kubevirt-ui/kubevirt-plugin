@@ -15,6 +15,7 @@ const useVirtualMachineTemplatesColumns = (): TableColumn<K8sResourceCommon>[] =
       id: 'name',
       transforms: [sortable],
       sort: 'metadata.name',
+      props: { className: 'pf-m-width-30' },
     },
     {
       title: t('Namespace'),

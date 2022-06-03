@@ -5,7 +5,8 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useLastNamespace } from '@kubevirt-utils/hooks/useLastNamespace';
-import { Breadcrumb, BreadcrumbItem, Button, Title } from '@patternfly/react-core';
+import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
+import { Breadcrumb, BreadcrumbItem, Button, Label, Title } from '@patternfly/react-core';
 
 import { isCommonVMTemplate } from '../utils';
 
@@ -42,7 +43,10 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
       <Title className="co-m-pane__heading" headingLevel="h1">
         <span className="co-resource-item__resource-name">
           <span className="co-m-resource-icon co-m-resource-icon--lg">T</span>
-          <span className="co-resource-item__resource-name">{template?.metadata?.name}</span>
+          <span className="co-resource-item__resource-name">
+            {template?.metadata?.name}{' '}
+            {isDeprecatedTemplate(template) && <Label isCompact>{t('Deprecated')}</Label>}
+          </span>
         </span>
         <TemplateActions template={template} />
       </Title>

@@ -13,6 +13,7 @@ export const LABEL_USED_TEMPLATE_NAMESPACE = 'vm.kubevirt.io/template.namespace'
 export const TEMPLATE_VERSION_LABEL = 'vm.kubevirt.io/template.version';
 
 export const DATA_SOURCE_CRONJOB_LABEL = 'cdi.kubevirt.io/dataImportCron';
+export const TEMPLATE_DEPRECATED_ANNOTATION = 'template.kubevirt.io/deprecated';
 
 export enum OS_NAME_TYPES {
   rhel = 'rhel',
