@@ -4,6 +4,8 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCPUCount } from '@kubevirt-utils/resources/vmi';
 
+import './CPUMemory.scss';
+
 type CPUMemoryProps = {
   vm: V1VirtualMachine;
 };
@@ -19,7 +21,9 @@ const CPUMemory: React.FC<CPUMemoryProps> = ({ vm }) => {
 
   return (
     <span data-test-id="virtual-machine-overview-details-cpu-memory">
-      {t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}
+      {t('CPU')} {cpu}
+      <span className="cpu-memory-divider"> | </span>
+      {t('Memory')} {memory}
     </span>
   );
 };

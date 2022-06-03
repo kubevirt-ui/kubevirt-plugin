@@ -18,6 +18,8 @@ import { getTemplateOSIcon } from '../utils/os-icons';
 
 import TemplateRowAvailableSource from './TemplateRowAvailableSource';
 
+import './TemplatesCatalog.scss';
+
 export const TemplatesCatalogRow: React.FC<
   RowProps<
     V1Template,
@@ -60,7 +62,9 @@ export const TemplatesCatalogRow: React.FC<
           />
         </TableData>
         <TableData id="cpu" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
-          {t('CPU')} {cpuCount} | {t('Memory')} {memory}
+          {t('CPU')} {cpuCount}
+          <span className="cpu-memory-divider"> | </span>
+          {t('Memory')} {memory}
         </TableData>
       </>
     );

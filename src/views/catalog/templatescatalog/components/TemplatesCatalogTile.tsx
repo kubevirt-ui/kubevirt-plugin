@@ -15,6 +15,8 @@ import { Badge, Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
 import { getTemplateOSIcon } from '../utils/os-icons';
 
+import './TemplatesCatalog.scss';
+
 export type TemplateTileProps = {
   template: V1Template;
   availableTemplatesUID: Set<string>;
@@ -80,7 +82,9 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
                 <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload] ?? t('Other')}
               </StackItem>
               <StackItem>
-                <b>{t('CPU')}</b> {cpuCount} | <b>{t('Memory')}</b> {memory}
+                <b>{t('CPU')}</b> {cpuCount}
+                <span className="cpu-memory-divider"> | </span>
+                <b>{t('Memory')}</b> {memory}
               </StackItem>
             </Stack>
           </StackItem>

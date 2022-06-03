@@ -7,6 +7,8 @@ import { isTemplateParameter } from '@kubevirt-utils/utils/utils';
 import { Popover, PopoverPosition } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
+import './useVirtualMachineTemplatesCPUMemory.scss';
+
 enum BinaryUnit {
   B = 'B',
   Ki = 'Ki',
@@ -74,6 +76,12 @@ export const useVirtualMachineTemplatesCPUMemory = (
     );
   } else {
     const [value, readableUnit] = stringValueUnitSplit(memory);
-    return `CPU ${cpu?.cores} | ${t('Memory')} ${value} ${readableUnit}`;
+    return (
+      <>
+        CPU {cpu?.cores}
+        <span className="cpu-memory-divider"> | </span>
+        {t('Memory')} {value} {readableUnit}
+      </>
+    );
   }
 };

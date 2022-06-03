@@ -34,6 +34,8 @@ import {
 } from '@patternfly/react-core';
 import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
 
+import './TemplateCatalogDrawer.scss';
+
 type TemplatesCatalogDrawerPanelProps = {
   template: V1Template;
 };
@@ -136,7 +138,9 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                       <DescriptionListGroup>
                         <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
                         <DescriptionListDescription>
-                          {t('{{cpuCount}} CPU | {{memory}} Memory', { cpuCount, memory })}
+                          {t('CPU')} {cpuCount}
+                          <span className="cpu-memory-divider"> | </span>
+                          {t('Memory')} {memory}
                         </DescriptionListDescription>
                       </DescriptionListGroup>
                       <DescriptionListGroup>

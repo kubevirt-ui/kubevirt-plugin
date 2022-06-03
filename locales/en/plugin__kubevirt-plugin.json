@@ -20,7 +20,6 @@
   "{{count}} Tolerations rules": "{{count}} Tolerations rules",
   "{{count}} Tolerations rules_plural": "{{count}} Tolerations rules",
   "{{cpu}} CPU | {{memory}} Memory": "{{cpu}} CPU | {{memory}} Memory",
-  "{{cpuCount}} CPU | {{memory}} Memory": "{{cpuCount}} CPU | {{memory}} Memory",
   "{{dsLabel}} name": "{{dsLabel}} name",
   "{{dsLabel}} project": "{{dsLabel}} project",
   "{{matchingNodeText}} matching": "{{matchingNodeText}} matching",
