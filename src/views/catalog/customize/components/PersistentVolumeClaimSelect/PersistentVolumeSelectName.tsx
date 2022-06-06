@@ -73,11 +73,7 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
               toggleId={`${testId}-toggle`}
             >
               {pvcNames.map((name) => (
-                <SelectOption
-                  key={name}
-                  value={name}
-                  data-test-id={`${testId}-dropdown-option-${pvcNames}`}
-                />
+                <SelectOption key={name} value={name} data-test-id={pvcNames} />
               ))}
             </Select>
           </div>
