@@ -24,13 +24,13 @@ const DiskRow: React.FC<
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        <Split hasGutter>
+        <Split className="disk-row-split">
           <SplitItem>
             {obj?.name} <HotplugLabel vm={vm} diskName={obj?.name} vmi={vmi} />
           </SplitItem>
           {obj?.isBootDisk && (
             <SplitItem>
-              <Label variant="filled" color="blue">
+              <Label variant="filled" color="blue" className="icon-size-small">
                 {t('bootable')}
               </Label>
             </SplitItem>
