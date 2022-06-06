@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -25,6 +24,7 @@ type VirtualMachineSchedulingLeftGridProps = {
   nodes: IoK8sApiCoreV1Node[];
   nodesLoaded: boolean;
   canUpdateVM: boolean;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGridProps> = ({
@@ -32,11 +32,10 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
   nodes,
   nodesLoaded,
   canUpdateVM,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const canUpdateStoppedVM =
-    canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -55,7 +54,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<NodeSelector vm={vm} />}
           descriptionHeader={t('Node Selector')}
-          isEdit={canUpdateStoppedVM}
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <NodeSelectorModal
@@ -65,6 +64,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vmi={vmi}
               />
             ))
           }
@@ -72,7 +72,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Tolerations vm={vm} />}
           descriptionHeader={t('Tolerations')}
-          isEdit={canUpdateStoppedVM}
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <TolerationsModal
@@ -82,6 +82,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vmi={vmi}
               />
             ))
           }
@@ -89,7 +90,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Affinity vm={vm} />}
           descriptionHeader={t('Affinity Rules')}
-          isEdit={canUpdateStoppedVM}
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <AffinityModal
@@ -99,6 +100,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vmi={vmi}
               />
             ))
           }
@@ -106,10 +108,16 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Descheduler vm={vm} />}
           descriptionHeader={t('Descheduler')}
-          isEdit={canUpdateStoppedVM}
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
-              <DeschedulerModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
+              <DeschedulerModal
+                vm={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={onSubmit}
+                vmi={vmi}
+              />
             ))
           }
         />

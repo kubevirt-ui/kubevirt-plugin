@@ -2,13 +2,17 @@ import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import {
+  getAffinity,
   getDisks,
   getGPUDevices,
   getHostDevices,
   getInterfaces,
+  getNodeSelector,
+  getTolerations,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { transformDevices } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
+import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { VirtualMachineDetailsTabLabel } from './constants';
@@ -193,6 +197,60 @@ export const getChangedEvictionStrategy = (
   const vmEvictionStrategy = !!vm?.spec?.template?.spec?.evictionStrategy;
   const vmiEvictionStrategy = !!vmi?.spec?.evictionStrategy;
   return vmEvictionStrategy !== vmiEvictionStrategy || currentSelection !== vmiEvictionStrategy;
+};
+
+export const getChangedNodeSelector = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  const vmNodeSelector = getNodeSelector(vm) || {};
+  const vmiNodeSelector = vmi?.spec?.nodeSelector || {};
+
+  return !isEqualObject(vmNodeSelector, vmiNodeSelector);
+};
+
+export const getChangedTolerations = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  const vmTolerations = getTolerations(vm) || [];
+  const vmiTolerations = vmi?.spec?.tolerations || [];
+
+  return !isEqualObject(vmTolerations, vmiTolerations);
+};
+
+export const getChangedAffinity = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  const vmAffinity = getAffinity(vm) || {};
+  const vmiAffinity = vmi?.spec?.affinity || {};
+
+  return !isEqualObject(vmAffinity, vmiAffinity);
+};
+
+export const getChangedDescheduler = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+  currentSelection: boolean,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+
+  const vmDescheduler = !!vm?.spec?.template?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL];
+  const vmiDescheduler = !!vmi?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL];
+
+  return vmDescheduler !== vmiDescheduler || currentSelection !== vmiDescheduler;
 };
 
 export const getTabURL = (vm: V1VirtualMachine, tab: string) =>
