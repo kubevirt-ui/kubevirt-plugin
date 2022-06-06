@@ -18,7 +18,7 @@ export type SOURCE_OPTIONS_IDS =
   | typeof PVC_EPHEMERAL_SOURCE_NAME;
 
 export enum PVC_SIZE_FORMATS {
-  Mi = 'Mi',
-  Gi = 'Gi',
-  Ti = 'Ti',
+  MiB = 'MiB',
+  GiB = 'GiB',
+  TiB = 'TiB',
 }

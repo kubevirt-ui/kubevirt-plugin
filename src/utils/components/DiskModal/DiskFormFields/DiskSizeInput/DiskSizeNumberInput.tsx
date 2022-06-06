@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { PVC_SIZE_FORMATS } from '@catalog/customize/components/CustomizeSource';
-import { bytesFromQuantity } from '@catalog/utils/quantity';
+import { bytesFromQuantity, remoteByteUnit } from '@catalog/utils/quantity';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -18,9 +18,10 @@ import {
 type DiskSizeNumberInputProps = {
   diskSize: string;
   onChange: (quantity: string) => void;
+  label?: string;
 };
 
-const DiskSizeNumberInput: React.FC<DiskSizeNumberInputProps> = ({ diskSize, onChange }) => {
+const DiskSizeNumberInput: React.FC<DiskSizeNumberInputProps> = ({ diskSize, onChange, label }) => {
   const { t } = useKubevirtTranslation();
 
   const [value, quantityUnit] = bytesFromQuantity(diskSize);
@@ -29,23 +30,23 @@ const DiskSizeNumberInput: React.FC<DiskSizeNumberInputProps> = ({ diskSize, onC
 
   const onFormatChange = React.useCallback(
     (event, newUnit: PVC_SIZE_FORMATS) => {
-      onChange(`${value}${newUnit}`);
+      onChange(`${value}${remoteByteUnit(newUnit)}`);
       toggleSelect(false);
     },
     [onChange, value],
   );
 
   const onMinus = React.useCallback(() => {
-    if (value > 0) onChange(`${(value || 0) - 1}${quantityUnit}`);
+    if (value > 0) onChange(`${(value || 0) - 1}${remoteByteUnit(quantityUnit)}`);
   }, [onChange, quantityUnit, value]);
 
   const onPlus = React.useCallback(
-    () => onChange(`${(value || 0) + 1}${quantityUnit}`),
+    () => onChange(`${(value || 0) + 1}${remoteByteUnit(quantityUnit)}`),
     [onChange, quantityUnit, value],
   );
 
   const onChangeSize = React.useCallback(
-    (event) => onChange(`${Number(event.currentTarget.value)}${quantityUnit}`),
+    (event) => onChange(`${Number(event.currentTarget.value)}${remoteByteUnit(quantityUnit)}`),
     [onChange, quantityUnit],
   );
 
@@ -57,7 +58,7 @@ const DiskSizeNumberInput: React.FC<DiskSizeNumberInputProps> = ({ diskSize, onC
 
   return (
     <FormGroup
-      label={t('Persistent Volume Claim size')}
+      label={label || t('Persistent Volume Claim size')}
       fieldId={`pvc-size-required`}
       isRequired
       validated={!value || value <= 0 ? ValidatedOptions.error : ValidatedOptions.default}

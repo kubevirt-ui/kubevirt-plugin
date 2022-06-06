@@ -23,11 +23,11 @@ multipliers.E = multipliers.P * 1000;
 multipliers.Z = multipliers.E * 1000;
 const customUnits = {
   IS: [
-    { from: 0, to: multipliers.Ki, unit: '' },
-    { from: multipliers.Ki, to: multipliers.Mi, unit: 'Ki', long: 'thousand' },
-    { from: multipliers.Mi, to: multipliers.Gi, unit: 'Mi', long: 'million' },
-    { from: multipliers.Gi, to: multipliers.Ti, unit: 'Gi', long: 'billion' },
-    { from: multipliers.Ti, unit: 'Ti', long: 'billion' },
+    { from: 0, to: multipliers.Ki, unit: 'B' },
+    { from: multipliers.Ki, to: multipliers.Mi, unit: 'KiB', long: 'thousand' },
+    { from: multipliers.Mi, to: multipliers.Gi, unit: 'MiB', long: 'million' },
+    { from: multipliers.Gi, to: multipliers.Ti, unit: 'GiB', long: 'billion' },
+    { from: multipliers.Ti, unit: 'TiB', long: 'billion' },
   ],
 };
 
