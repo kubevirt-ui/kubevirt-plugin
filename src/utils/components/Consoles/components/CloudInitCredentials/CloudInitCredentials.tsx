@@ -1,18 +1,17 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionToggle,
-  ClipboardCopy,
 } from '@patternfly/react-core';
 
-import { CLOUD_INIT_MISSING_USERNAME } from '../../utils/constants';
+import CloudInitCredentialsContent from './CloudInitCredentialsContent';
+
+import './cloud-init-credentials.scss';
 
 type CloudInitCredentialsProps = {
   vmi: V1VirtualMachineInstance;
@@ -20,11 +19,10 @@ type CloudInitCredentialsProps = {
 
 const CloudInitCredentials: React.FC<CloudInitCredentialsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const { user, password } = getCloudInitCredentials(vmi);
   const [showCredentials, setShowCredentials] = React.useState<boolean>(false);
 
   return (
-    <Accordion>
+    <Accordion className="cloud-init-credentials">
       <AccordionItem>
         <AccordionToggle
           id="consoles-accordion-toggle"
@@ -34,24 +32,7 @@ const CloudInitCredentials: React.FC<CloudInitCredentialsProps> = ({ vmi }) => {
           {t('Guest login credentials')}
         </AccordionToggle>
         <AccordionContent isHidden={!showCredentials}>
-          <Trans ns="plugin__kubevirt-plugin">
-            The following credentials for this operating system were created via cloud-init. If
-            unsuccessful, cloud-init could be improperly configured. Please contact the image
-            provider for more information.
-          </Trans>
-          <div>
-            <strong>{t('User name: ')}</strong>
-            {user || CLOUD_INIT_MISSING_USERNAME}
-            <strong>{t(' Password: ')} </strong>
-            <ClipboardCopy
-              variant="inline-compact"
-              isCode
-              clickTip={t('Copied')}
-              hoverTip={t('Copy to clipboard')}
-            >
-              {password}
-            </ClipboardCopy>
-          </div>
+          <CloudInitCredentialsContent vmi={vmi} />
         </AccordionContent>
       </AccordionItem>
     </Accordion>
