@@ -124,7 +124,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
             setMemoryUnit(templateDefaultsData?.defaultMemory?.unit);
           }}
         >
-          {t('Restore default settings')}
+          {t('Restore template settings')}
         </Button>,
         <Button key="cancel" variant="link" onClick={onClose}>
           {t('Cancel')}
