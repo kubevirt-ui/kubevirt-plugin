@@ -40,3 +40,11 @@ export const sumOfValues = (obj: PrometheusResponse) =>
 
 export const DEFAULT_DURATION_KEY = DurationKeys.OneHour;
 export const DEFAULT_DURATION = DURATION_VALUES[DEFAULT_DURATION_KEY];
+
+export const queriesToLink = (queries: string[] | string) => {
+  const queriesArray = Array.isArray(queries) ? queries : [queries];
+  return queriesArray?.reduce(
+    (acc, query, index) => acc.concat(`&query${index}=${encodeURIComponent(query)}`),
+    '/monitoring/query-browser?',
+  );
+};

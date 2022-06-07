@@ -35,16 +35,17 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ duration, vmi, vm }) => {
     [vm],
   );
   const timespan = React.useMemo(() => adjustDuration(duration), [adjustDuration, duration]);
+  const [networkInQuery, networkOutQuery] = queries?.NETWORK_USAGE;
 
   const [networkIn] = usePrometheusPoll({
-    query: queries?.NETWORK_USAGE?.[0]?.query,
+    query: networkInQuery?.query,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vm?.metadata?.namespace,
     timespan,
   });
 
   const [networkOut] = usePrometheusPoll({
-    query: queries?.NETWORK_USAGE?.[1]?.query,
+    query: networkOutQuery?.query,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vm?.metadata?.namespace,
     timespan,
@@ -96,7 +97,11 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ duration, vmi, vm }) => {
             <div className="network-metrics--row__title">{t('Out')}</div>
           </div>
         </div>
-        <NetworkThresholdChart networkIn={networkInData} networkOut={networkOutData} />
+        <NetworkThresholdChart
+          query={[networkInQuery?.query, networkOutQuery?.query]}
+          networkIn={networkInData}
+          networkOut={networkOutData}
+        />
       </ComponentReady>
     </div>
   );
