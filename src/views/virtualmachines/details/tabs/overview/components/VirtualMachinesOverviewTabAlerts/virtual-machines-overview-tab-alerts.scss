@@ -1,0 +1,67 @@
+.VirtualMachinesOverviewTabAlerts__drawer {
+  .pf-c-accordion__toggle-text {
+    display: flex;
+  }
+  .pf-c-accordion__toggle,
+  .pf-c-accordion__expanded-content-body {
+    &:after,
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: transparent;
+    }
+    .subtitle {
+      min-width: 100px;
+      text-align: left;
+    }
+    .subtitle-label {
+      margin-left: var(--pf-global--spacer--sm);
+    }
+  }
+  .pf-c-accordion__expanded-content-body {
+    padding: 0;
+    .content {
+      box-shadow: var(--pf-global--BoxShadow--md);
+      padding: var(--pf-c-accordion__toggle--PaddingTop) var(--pf-c-accordion__toggle--PaddingRight)
+        var(--pf-c-accordion__toggle--PaddingBottom) var(--pf-c-accordion__toggle--PaddingLeft);
+    }
+    .alert-title {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--pf-global--spacer--sm);
+      .alert-name {
+        font-size: var(--pf-global--FontSize--md);
+        font-weight: var(--pf-global--FontWeight--semi-bold);
+      }
+    }
+    .alert-description {
+      margin-bottom: var(--pf-global--spacer--sm);
+    }
+  }
+  .pf-c-label {
+    .pf-c-label__content:before {
+      border: none;
+    }
+    &.critical {
+      color: var(--pf-global--palette--red-50);
+      background-color: var(--pf-global--palette--red-50);
+      .pf-c-label__icon {
+        color: var(--pf-global--palette--red-100);
+      }
+    }
+    &.warning {
+      color: var(--pf-global--palette--gold-50);
+      background-color: var(--pf-global--palette--gold-50);
+      .pf-c-label__icon {
+        color: var(--pf-global--palette--gold-400);
+      }
+    }
+    &.info {
+      color: var(--pf-global--palette--blue-50);
+      background-color: var(--pf-global--palette--blue-50);
+      .pf-c-label__icon {
+        color: var(--pf-global--palette--blue-300);
+      }
+    }
+  }
+}
