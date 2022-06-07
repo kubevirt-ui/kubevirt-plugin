@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Checkbox, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
@@ -15,12 +15,19 @@ import { createSSHService } from './utils';
 
 type SSHAccessModalProps = {
   vmi: V1VirtualMachineInstance;
+  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   sshService: IoK8sApiCoreV1Service;
 };
 
-const SSHAccessModal: React.FC<SSHAccessModalProps> = ({ vmi, isOpen, onClose, sshService }) => {
+const SSHAccessModal: React.FC<SSHAccessModalProps> = ({
+  vmi,
+  vm,
+  isOpen,
+  onClose,
+  sshService,
+}) => {
   const { t } = useKubevirtTranslation();
   const initiallyEnabled = !!sshService;
   const [isEnabled, setEnabled] = React.useState<boolean>(initiallyEnabled);
@@ -29,7 +36,7 @@ const SSHAccessModal: React.FC<SSHAccessModalProps> = ({ vmi, isOpen, onClose, s
     if (initiallyEnabled === isEnabled) return;
 
     if (isEnabled) {
-      await createSSHService(vmi);
+      await createSSHService(vmi, vm);
     } else {
       await k8sDelete({
         model: ServiceModel,

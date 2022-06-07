@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
@@ -12,11 +12,12 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 type SSHAccessProps = {
   vmi: V1VirtualMachineInstance;
+  vm: V1VirtualMachine;
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded: boolean;
 };
 
-const SSHDetails: React.FC<SSHAccessProps> = ({ vmi, sshService, sshServiceLoaded }) => {
+const SSHDetails: React.FC<SSHAccessProps> = ({ vmi, vm, sshService, sshServiceLoaded }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   return (
@@ -35,7 +36,13 @@ const SSHDetails: React.FC<SSHAccessProps> = ({ vmi, sshService, sshServiceLoade
           iconPosition={'right'}
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
-              <SSHAccessModal vmi={vmi} isOpen={isOpen} onClose={onClose} sshService={sshService} />
+              <SSHAccessModal
+                vmi={vmi}
+                vm={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                sshService={sshService}
+              />
             ))
           }
         ></Button>
