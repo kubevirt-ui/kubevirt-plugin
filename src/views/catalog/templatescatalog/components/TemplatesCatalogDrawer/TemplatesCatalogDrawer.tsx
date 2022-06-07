@@ -34,6 +34,7 @@ export const TemplatesCatalogDrawer: React.FC<TemplatesCatalogDrawerProps> = ({
       className="ocs-modal co-catalog-page__overlay co-catalog-page__overlay--right template-catalog-drawer"
       isOpen={isOpen}
       onClose={onClose}
+      disableFocusTrap
       header={
         <CatalogItemHeader
           className="co-catalog-page__overlay-header"
