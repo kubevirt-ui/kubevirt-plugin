@@ -115,6 +115,7 @@
   "Blank": "Blank",
   "Blank (creates PVC)": "Blank (creates PVC)",
   "Block": "Block",
+  "Boot disk": "Boot disk",
   "Boot from CD": "Boot from CD",
   "Boot from CD requires an image file i.e. ISO, qcow, etc. that will be mounted to the VirtualMachine as a CD": "Boot from CD requires an image file i.e. ISO, qcow, etc. that will be mounted to the VirtualMachine as a CD",
   "Boot method": "Boot method",

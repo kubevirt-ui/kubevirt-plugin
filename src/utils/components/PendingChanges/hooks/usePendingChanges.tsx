@@ -104,7 +104,7 @@ export const usePendingChanges = (
     {
       hasPendingChange: bootOrderChanged,
       tabLabel: VirtualMachineDetailsTabLabel.Details,
-      label: t('Boot order'),
+      label: t('Boot disk'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (

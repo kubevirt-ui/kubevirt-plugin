@@ -3,7 +3,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import {
   getAffinity,
-  getDisks,
+  getBootDisk,
   getGPUDevices,
   getHostDevices,
   getInterfaces,
@@ -11,7 +11,6 @@ import {
   getTolerations,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
-import { transformDevices } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -42,30 +41,14 @@ export const checkBootOrderChanged = (
     return false;
   }
 
-  const vmDevices = transformDevices(getDisks(vm), getInterfaces(vm));
-  const vmiDevices = transformDevices(
-    vmi?.spec?.domain?.devices?.disks,
-    vmi?.spec?.domain?.devices?.interfaces,
-  );
+  const vmBootDisk = getBootDisk(vm);
+  const vmiBootDisk = (vmi?.spec?.domain?.devices?.disks || [])
+    .filter((d) => d.bootOrder)
+    .reduce((acc, disk) => {
+      return acc.bootOrder < disk.bootOrder ? acc : disk;
+    }, vmi?.spec?.domain?.devices?.disks?.[0]);
 
-  if (vmDevices?.length !== vmiDevices?.length) {
-    return true;
-  }
-  const vmBootOrder = vmDevices?.sort((a, b) => a?.value?.bootOrder - b?.value?.bootOrder);
-  // if boot order is not configured, we check if the disks order in the YAML has changed
-  if (vmBootOrder?.length === 0) {
-    return vmDevices?.some((device, index) => !isEqualObject(device, vmiDevices?.[index]));
-  }
-
-  const vmiBootOrder = vmiDevices?.sort((a, b) => a?.value?.bootOrder - b?.value?.bootOrder);
-
-  return !vmBootOrder.every(
-    (device, index) =>
-      device.type === vmiBootOrder[index].type &&
-      device.typeLabel === vmiBootOrder[index].typeLabel &&
-      device.value.bootOrder === vmiBootOrder[index].value.bootOrder &&
-      device.value.name === vmiBootOrder[index].value.name,
-  );
+  return !isEqualObject(vmBootDisk, vmiBootDisk);
 };
 
 export const checkBootModeChanged = (
