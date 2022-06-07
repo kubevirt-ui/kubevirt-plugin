@@ -79,7 +79,7 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
     const hardwareDevicesCount = hostDevicesCount + gpusCount;
 
     return (
-      <div className="modal-body modal-body-border">
+      <div className="modal-body modal-body-border modal-body-content">
         <div className="modal-body-inner-shadow-covers">
           <div className="co-catalog-page__overlay-body">
             <Stack hasGutter className="template-catalog-drawer-info">
