@@ -12,7 +12,7 @@ export const isEqualObject = (object, otherObject) => {
     return false;
   }
 
-  if (object.constructor !== otherObject.constructor) {
+  if (object?.constructor !== otherObject?.constructor) {
     return false;
   }
 

@@ -7,6 +7,7 @@ import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
+import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
@@ -17,6 +18,7 @@ import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
+import { VMAuthorizedSSHKeyModal } from '@kubevirt-utils/components/VMAuthorizedSSHKeyModal/VMAuthorizedSSHKeyModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
@@ -29,6 +31,8 @@ import {
   checkBootOrderChanged,
   checkCPUMemoryChanged,
   getChangedAffinity,
+  getChangedAuthorizedSSHKey,
+  getChangedCloudInit,
   getChangedDedicatedResources,
   getChangedDescheduler,
   getChangedEnvDisks,
@@ -75,6 +79,8 @@ export const usePendingChanges = (
     vmi,
     !!vm?.spec?.template?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL] || false,
   );
+  const cloudInitChanged = getChangedCloudInit(vm, vmi);
+  const sshServiceChanged = getChangedAuthorizedSSHKey(vm, vmi);
 
   const modifiedEnvDisks = getChangedEnvDisks(vm, vmi);
   const modifiedNics = getChangedNics(vm, vmi);
@@ -255,6 +261,17 @@ export const usePendingChanges = (
       },
     },
     {
+      hasPendingChange: cloudInitChanged,
+      tabLabel: VirtualMachineDetailsTabLabel.Scripts,
+      label: t('Cloud-init'),
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
+        createModal(({ isOpen, onClose }) => (
+          <CloudinitModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vmi={vmi} />
+        ));
+      },
+    },
+    {
       hasPendingChange: tolerationsChanged,
       tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
       label: t('Tolerations'),
@@ -306,6 +323,17 @@ export const usePendingChanges = (
             onSubmit={onSubmit}
             vmi={vmi}
           />
+        ));
+      },
+    },
+    {
+      hasPendingChange: sshServiceChanged,
+      tabLabel: VirtualMachineDetailsTabLabel.Scripts,
+      label: t('Authorized SSH Key'),
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
+        createModal(({ isOpen, onClose }) => (
+          <VMAuthorizedSSHKeyModal vm={vm} isOpen={isOpen} onClose={onClose} vmi={vmi} />
         ));
       },
     },
