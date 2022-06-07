@@ -30,7 +30,7 @@ export const formatBytes = (rawSize: string, unit?: string): string => {
   }
   const size = hasNumber(rawSize);
   const sizeUnit = hasSizeUnit(rawSize) || unit;
-  const sizeUnits = ['B', 'Ki', 'Mi', 'Gi', 'Ti'];
+  const sizeUnits = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
   let unitIndex = (sizeUnit && sizeUnits.findIndex((sUnit) => sUnit === sizeUnit)) || 0;
   let convertedSize = size;
   while (convertedSize >= 1024) {

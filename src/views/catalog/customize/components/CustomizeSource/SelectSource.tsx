@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DiskSizeNumberInput from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSizeInput/DiskSizeNumberInput';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +20,6 @@ import {
   SOURCE_OPTIONS_IDS,
   UPLOAD_SOURCE_NAME,
 } from './constants';
-import DiskSizeNumberInput from './DiskSizeNumberInput';
 import SelectSourceOption from './SelectSourceOption';
 import { SelectSourceUploadPVCProgress } from './SelectSourceUploadPVCProgress';
 import { appendDockerPrefix, getGenericSourceCustomization, getPVCSource } from './utils';
@@ -217,7 +217,11 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
       )}
 
       {showSizeInput && selectedSourceType !== DEFAULT_SOURCE && (
-        <DiskSizeNumberInput diskSize={volumeQuantity} onChange={setVolumeQuantity} />
+        <DiskSizeNumberInput
+          diskSize={volumeQuantity}
+          onChange={setVolumeQuantity}
+          label={t('Disk size')}
+        />
       )}
     </>
   );
