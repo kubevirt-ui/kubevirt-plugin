@@ -2,20 +2,30 @@ import * as React from 'react';
 import produce from 'immer';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { Alert, AlertVariant, Checkbox, Form, FormGroup } from '@patternfly/react-core';
+
+import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { getChangedDescheduler } from '../PendingChanges/utils/helpers';
 
 type DeschedulerModalProps = {
   vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vmi?: V1VirtualMachineInstance;
 };
 
-const DeschedulerModal: React.FC<DeschedulerModalProps> = ({ vm, isOpen, onClose, onSubmit }) => {
+const DeschedulerModal: React.FC<DeschedulerModalProps> = ({
+  vm,
+  isOpen,
+  onClose,
+  onSubmit,
+  vmi,
+}) => {
   const { t } = useKubevirtTranslation();
   const [checked, setChecked] = React.useState<boolean>(
     vm?.spec?.template?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL] === 'true',
@@ -44,6 +54,11 @@ const DeschedulerModal: React.FC<DeschedulerModalProps> = ({ vm, isOpen, onClose
       headerText={t('Descheduler settings')}
     >
       <Form>
+        {vmi && (
+          <ModalPendingChangesAlert
+            isChanged={getChangedDescheduler(updatedVirtualMachine, vmi, checked)}
+          />
+        )}
         <FormGroup fieldId="descheduler">
           <Checkbox
             id="descheduler"

@@ -56,6 +56,7 @@ const SchedulingSection: React.FC<SchedulingSectionProps> = ({ vm, pathname }) =
           nodes={nodes}
           nodesLoaded={nodesLoaded}
           canUpdateVM={canUpdateVM}
+          vmi={vmi}
         />
         <GridItem span={1}>{/* Spacer */}</GridItem>
         <VirtualMachineSchedulingRightGrid vm={vm} canUpdateVM={canUpdateVM} vmi={vmi} />

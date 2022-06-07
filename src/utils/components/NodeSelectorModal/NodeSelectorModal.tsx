@@ -4,11 +4,14 @@ import produce from 'immer';
 import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNodeSelector } from '@kubevirt-utils/resources/vm';
 import { Form } from '@patternfly/react-core';
+
+import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { getChangedNodeSelector } from '../PendingChanges/utils/helpers';
 
 import LabelsList from './components/LabelList';
 import LabelRow from './components/LabelRow';
@@ -19,12 +22,13 @@ import { isEqualObject, nodeSelectorToIDLabels } from './utils/helpers';
 import { IDLabel } from './utils/types';
 
 type NodeSelectorModalProps = {
-  vm?: V1VirtualMachine;
+  vm: V1VirtualMachine;
   nodes?: IoK8sApiCoreV1Node[];
   nodesLoaded?: boolean;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
@@ -34,6 +38,7 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -78,6 +83,11 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
       headerText={t('Node Selector')}
     >
       <Form>
+        {vmi && (
+          <ModalPendingChangesAlert
+            isChanged={getChangedNodeSelector(updatedVirtualMachine, vmi)}
+          />
+        )}
         <LabelsList
           isEmpty={selectorLabels?.length === 0}
           model={NodeModel}

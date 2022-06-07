@@ -4,7 +4,11 @@ import produce from 'immer';
 import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import { K8sIoApiCoreV1Toleration, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  K8sIoApiCoreV1Toleration,
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
@@ -12,7 +16,10 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTolerations } from '@kubevirt-utils/resources/vm';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, ModalVariant } from '@patternfly/react-core';
+import { Form, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
+
+import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { getChangedTolerations } from '../PendingChanges/utils/helpers';
 
 import { TolerationLabel, TOLERATIONS_EFFECTS } from './utils/constants';
 import { getNodeTaintQualifier } from './utils/helpers';
@@ -27,6 +34,7 @@ type TolerationsModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const TolerationsModal: React.FC<TolerationsModalProps> = ({
@@ -36,6 +44,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -81,36 +90,49 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
       headerText={t('Tolerations')}
       modalVariant={ModalVariant.medium}
     >
-      <TolerationModalDescriptionText />
-      <Form>
-        <LabelsList
-          isEmpty={tolerationLabelsEmpty}
-          model={NodeModel}
-          onLabelAdd={onSelectorLabelAdd}
-          addRowText={t('Add toleration')}
-          emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
-        >
-          {!tolerationLabelsEmpty && (
-            <>
-              <TolerationListHeaders />
-              {tolerationsLabels.map((label) => (
-                <TolerationEditRow
-                  key={label.id}
-                  label={label}
-                  onChange={onTolerationChange}
-                  onDelete={onTolerationDelete}
-                />
-              ))}
-            </>
+      <Stack hasGutter>
+        <StackItem>
+          {vmi && (
+            <ModalPendingChangesAlert
+              isChanged={getChangedTolerations(updatedVirtualMachine, vmi)}
+            />
           )}
-        </LabelsList>
-        {!tolerationLabelsEmpty && nodesLoaded && (
-          <NodeCheckerAlert
-            qualifiedNodes={tolerationsLabels?.length === 0 ? nodes : qualifiedNodes}
-            nodesLoaded={nodesLoaded}
-          />
-        )}
-      </Form>
+        </StackItem>
+        <StackItem>
+          <TolerationModalDescriptionText />
+        </StackItem>
+        <StackItem>
+          <Form>
+            <LabelsList
+              isEmpty={tolerationLabelsEmpty}
+              model={NodeModel}
+              onLabelAdd={onSelectorLabelAdd}
+              addRowText={t('Add toleration')}
+              emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
+            >
+              {!tolerationLabelsEmpty && (
+                <>
+                  <TolerationListHeaders />
+                  {tolerationsLabels.map((label) => (
+                    <TolerationEditRow
+                      key={label.id}
+                      label={label}
+                      onChange={onTolerationChange}
+                      onDelete={onTolerationDelete}
+                    />
+                  ))}
+                </>
+              )}
+            </LabelsList>
+            {!tolerationLabelsEmpty && nodesLoaded && (
+              <NodeCheckerAlert
+                qualifiedNodes={tolerationsLabels?.length === 0 ? nodes : qualifiedNodes}
+                nodesLoaded={nodesLoaded}
+              />
+            )}
+          </Form>
+        </StackItem>
+      </Stack>
     </TabModal>
   );
 };

@@ -2,13 +2,16 @@ import * as React from 'react';
 import produce from 'immer';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAffinity } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ModalVariant } from '@patternfly/react-core';
+
+import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { getChangedAffinity } from '../PendingChanges/utils/helpers';
 
 import AffinityEditModal from './components/AffinityEditModal/AffinityEditModal';
 import AffinityEmptyState from './components/AffinityEmptyState';
@@ -29,6 +32,7 @@ type AffinityModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const AffinityModal: React.FC<AffinityModalProps> = ({
@@ -38,6 +42,7 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -141,6 +146,9 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
       headerText={t('Affinity rules')}
       modalVariant={ModalVariant.medium}
     >
+      {vmi && (
+        <ModalPendingChangesAlert isChanged={getChangedAffinity(updatedVirtualMachine, vmi)} />
+      )}
       {list}
     </TabModal>
   );
