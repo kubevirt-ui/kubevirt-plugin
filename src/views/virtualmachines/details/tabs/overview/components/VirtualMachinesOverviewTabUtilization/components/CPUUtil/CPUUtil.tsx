@@ -89,7 +89,11 @@ const CPUUtil: React.FC<CPUUtilProps> = ({ duration, vmi, vm, pods }) => {
             subTitleComponent={<ChartLabel y={135} />}
             title={`${averageCPUUsage || 0}%`}
           />
-          <CPUThresholdChart cpuUsage={cpuUsage} cpuRequested={cpuRequested} />
+          <CPUThresholdChart
+            query={queries.CPU_REQUESTED}
+            cpuUsage={cpuUsage}
+            cpuRequested={cpuRequested}
+          />
         </ComponentReady>
       </div>
     </div>

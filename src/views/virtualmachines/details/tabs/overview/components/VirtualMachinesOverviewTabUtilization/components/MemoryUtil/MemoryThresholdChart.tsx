@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import xbytes from 'xbytes';
 
 import { PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
@@ -14,12 +15,15 @@ import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
+import { queriesToLink } from '../../utils/utils';
+
 type MemoryThresholdChartProps = {
   threshold: number;
   data: PrometheusValue[];
+  query: string;
 };
 
-const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ threshold, data }) => {
+const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ threshold, data, query }) => {
   const chartData = data?.map(([, item], index) => {
     return { x: index, y: +item, name: 'Memory used' };
   });
@@ -29,7 +33,7 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ threshold, 
     .map((_, index) => ({ x: index, y: threshold, name: 'Memory available' }));
 
   return (
-    <div>
+    <Link to={queriesToLink(query)}>
       <Chart
         height={200}
         showAxis={false}
@@ -64,7 +68,7 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ threshold, 
           }}
         />
       </Chart>
-    </div>
+    </Link>
   );
 };
 

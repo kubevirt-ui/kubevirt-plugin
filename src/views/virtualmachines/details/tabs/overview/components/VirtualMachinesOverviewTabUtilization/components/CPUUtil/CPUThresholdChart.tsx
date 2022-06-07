@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -13,12 +14,15 @@ import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
+import { queriesToLink } from '../../utils/utils';
+
 type CPUThresholdChartProps = {
   cpuUsage: PrometheusValue[];
   cpuRequested: PrometheusValue[];
+  query: string;
 };
 
-const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ cpuRequested, cpuUsage }) => {
+const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ cpuRequested, cpuUsage, query }) => {
   const chartData = cpuUsage?.map(([, item], index) => {
     return { x: index, y: +item, name: 'CPU usage' };
   });
@@ -28,7 +32,7 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ cpuRequested, cpu
   });
 
   return (
-    <div>
+    <Link to={queriesToLink(query)}>
       <Chart
         height={200}
         showAxis={false}
@@ -63,7 +67,7 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ cpuRequested, cpu
           }}
         />
       </Chart>
-    </div>
+    </Link>
   );
 };
 

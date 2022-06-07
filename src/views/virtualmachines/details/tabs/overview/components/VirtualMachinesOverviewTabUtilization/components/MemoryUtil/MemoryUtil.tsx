@@ -81,7 +81,11 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ duration, vmi, vm }) => {
             subTitleComponent={<ChartLabel y={135} />}
             title={`${Number(value?.toFixed(2))}%`}
           />
-          <MemoryThresholdChart threshold={memoryAvilableBytes} data={prometheusMemoryData} />
+          <MemoryThresholdChart
+            threshold={memoryAvilableBytes}
+            data={prometheusMemoryData}
+            query={queries?.MEMORY_USAGE}
+          />
         </ComponentReady>
       </div>
     </div>

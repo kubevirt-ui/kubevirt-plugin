@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import xbytes from 'xbytes';
 
 import { PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
@@ -13,12 +14,19 @@ import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_
 import chart_color_blue_400 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
+import { queriesToLink } from '../../utils/utils';
+
 type NetworkThresholdChartProps = {
   networkIn: PrometheusValue[];
   networkOut: PrometheusValue[];
+  query: string[];
 };
 
-const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ networkIn, networkOut }) => {
+const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({
+  networkIn,
+  networkOut,
+  query,
+}) => {
   const chartDataIn = networkIn?.map(([, item], index) => {
     return { x: index, y: +item, name: 'Network In' };
   });
@@ -28,7 +36,7 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ networkIn
   });
 
   return (
-    <div>
+    <Link to={queriesToLink(query)}>
       <Chart
         height={200}
         showAxis={false}
@@ -61,7 +69,7 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ networkIn
           />
         </ChartGroup>
       </Chart>
-    </div>
+    </Link>
   );
 };
 
