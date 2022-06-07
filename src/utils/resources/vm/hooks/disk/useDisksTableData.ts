@@ -2,6 +2,10 @@ import * as React from 'react';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  getRunningVMMissingDisksFromVMI,
+  getRunningVMMissingVolumesFromVMI,
+} from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   PersistentVolumeClaimModel,
@@ -32,11 +36,20 @@ const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
   });
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
   const vmDisks = React.useMemo(
-    () => (!isVMRunning ? getDisks(vm) : vmi?.spec?.domain?.devices?.disks),
+    () =>
+      !isVMRunning
+        ? getDisks(vm)
+        : [...(getDisks(vm) || []), ...getRunningVMMissingDisksFromVMI(getDisks(vm) || [], vmi)],
     [vm, vmi, isVMRunning],
   );
   const vmVolumes = React.useMemo(
-    () => (!isVMRunning ? getVolumes(vm) : vmi?.spec?.volumes),
+    () =>
+      !isVMRunning
+        ? getVolumes(vm)
+        : [
+            ...(getVolumes(vm) || []),
+            ...getRunningVMMissingVolumesFromVMI(getVolumes(vm) || [], vmi),
+          ],
     [vm, vmi, isVMRunning],
   );
 

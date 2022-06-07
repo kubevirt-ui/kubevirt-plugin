@@ -11,6 +11,7 @@ import {
   V1Disk,
   V1RemoveVolumeOptions,
   V1VirtualMachine,
+  V1VirtualMachineInstance,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
@@ -225,4 +226,26 @@ export const getRemoveHotplugPromise = (vm: V1VirtualMachine, diskName: string) 
     name: diskName,
   };
   return removeVolume(vm, bodyRequestRemoveVolume);
+};
+
+export const getRunningVMMissingDisksFromVMI = (
+  vmDisks: V1Disk[],
+  vmi: V1VirtualMachineInstance,
+): V1Disk[] => {
+  const vmDiskNames = vmDisks?.map((disk) => disk?.name);
+  const missingDisksFromVMI = (vmi?.spec?.domain?.devices?.disks || [])?.filter(
+    (disk) => !vmDiskNames?.includes(disk?.name),
+  );
+  return missingDisksFromVMI || [];
+};
+
+export const getRunningVMMissingVolumesFromVMI = (
+  vmVolumes: V1Volume[],
+  vmi: V1VirtualMachineInstance,
+): V1Volume[] => {
+  const vmVolumeNames = vmVolumes?.map((vol) => vol?.name);
+  const missingVolumesFromVMI = (vmi?.spec?.volumes || [])?.filter(
+    (vol) => !vmVolumeNames?.includes(vol?.name),
+  );
+  return missingVolumesFromVMI || [];
 };
