@@ -3,9 +3,12 @@ import { useHistory } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { Label } from '@patternfly/react-core';
 
 import VirtualMachineTemplatesActions from '../../actions/VirtualMachineTemplatesActions';
 import { useVirtualMachineTemplatesCPUMemory } from '../hooks/useVirtualMachineTemplatesCPUMemory';
@@ -19,6 +22,7 @@ const VirtualMachineTemplatesRow: React.FC<
     { availableTemplatesUID: Set<string>; availableDatasources: Record<string, V1beta1DataSource> }
   >
 > = ({ obj, activeColumnIDs, rowData: { availableTemplatesUID, availableDatasources } }) => {
+  const { t } = useKubevirtTranslation();
   const history = useHistory();
   const bootSource = getTemplateBootSourceType(obj);
   const dataSource =
@@ -28,7 +32,7 @@ const VirtualMachineTemplatesRow: React.FC<
 
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
+      <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
         <ResourceLink
           kind={TemplateModel.kind}
           name={obj.metadata.name}
@@ -37,6 +41,8 @@ const VirtualMachineTemplatesRow: React.FC<
             history.push(`/k8s/ns/${obj.metadata.namespace}/templates/${obj.metadata.name}`)
           }
         />
+
+        {isDeprecatedTemplate(obj) && <Label isCompact>{t('Deprecated')}</Label>}
       </TableData>
       <TableData id="namespace" activeColumnIDs={activeColumnIDs}>
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
