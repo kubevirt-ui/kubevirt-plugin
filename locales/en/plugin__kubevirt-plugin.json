@@ -93,6 +93,7 @@
   "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.<1>{`\nMore info:`}<1>{` http://kubernetes.io/docs/user-guide/annotations`}</1></1><2><0>VirtualMachineInstance</0><1>metadata</1><2>annotations</2></2>": "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.<1>{`\nMore info:`}<1>{` http://kubernetes.io/docs/user-guide/annotations`}</1></1><2><0>VirtualMachineInstance</0><1>metadata</1><2>annotations</2></2>",
   "Apply": "Apply",
   "Apply optimized StorageProfile settings": "Apply optimized StorageProfile settings",
+  "Apply rules": "Apply rules",
   "Are you sure you want to cancel?": "Are you sure you want to cancel?",
   "Are you sure you want to delete <1>{nicName} </1>": "Are you sure you want to delete <1>{nicName} </1>",
   "Are you sure you want to delete <1>{obj.metadata.name} </1>in namespace <4>{obj.metadata.namespace}?</4>": "Are you sure you want to delete <1>{obj.metadata.name} </1>in namespace <4>{obj.metadata.namespace}?</4>",

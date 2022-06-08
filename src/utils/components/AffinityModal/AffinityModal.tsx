@@ -145,6 +145,7 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
       onSubmit={onSubmit}
       headerText={t('Affinity rules')}
       modalVariant={ModalVariant.medium}
+      submitBtnText={t('Apply rules')}
     >
       {vmi && (
         <ModalPendingChangesAlert isChanged={getChangedAffinity(updatedVirtualMachine, vmi)} />
