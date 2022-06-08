@@ -81,9 +81,19 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     },
     {
       id: 'edit-boot-source',
+      label: t('Edit boot source'),
+      description: isCommonTemplate && t('Red Hat template cannot be edited'),
+      disabled: isCommonTemplate,
+      cta: () =>
+        history.push(
+          `/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}/disks`,
+        ),
+    },
+    {
+      id: 'edit-boot-source-ref',
       label: (
         <>
-          {t('Edit boot source')} {editableBootSource === null && <Loading />}
+          {t('Edit boot source reference')} {editableBootSource === null && <Loading />}
         </>
       ),
       description: !editableBootSource && t('Boot source cannot be edited'),
