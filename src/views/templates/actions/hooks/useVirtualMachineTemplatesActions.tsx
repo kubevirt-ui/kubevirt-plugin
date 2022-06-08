@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { isCommonVMTemplate } from 'src/views/templates/utils';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
@@ -15,7 +16,11 @@ import { useLastNamespace } from '@kubevirt-utils/hooks/useLastNamespace';
 import { Action, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import EditBootSourceModal from '../components/EditBootSourceModal';
-import { hasEditableBootSource } from '../editBootSource';
+import {
+  getBootDataSource,
+  getEditBootSourceRefDescription,
+  hasEditableBootSource,
+} from '../editBootSource';
 
 type useVirtualMachineTemplatesActionsProps = (
   template: V1Template,
@@ -29,7 +34,9 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const isCommonTemplate = isCommonVMTemplate(template);
   const { createModal } = useModal();
   const history = useHistory();
-  const [editableBootSource, setEditableBootSource] = React.useState<boolean>(null);
+  const [bootDataSource, setBootDataSource] = React.useState<V1beta1DataSource>();
+  const [loadingBootSource, setLoadingBootSource] = React.useState(true);
+  const editableBootSource = hasEditableBootSource(bootDataSource);
   const [lastNamespace] = useLastNamespace();
 
   const goToTemplatePage = React.useCallback(
@@ -42,11 +49,12 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   );
 
   const onLazyActions = React.useCallback(async () => {
-    if (editableBootSource === null) {
-      const editable = await hasEditableBootSource(template);
-      setEditableBootSource(editable);
+    if (!bootDataSource) {
+      const dataSource = await getBootDataSource(template);
+      setBootDataSource(dataSource);
     }
-  }, [editableBootSource, template]);
+    setLoadingBootSource(false);
+  }, [bootDataSource, template]);
 
   const onDelete = async () => {
     await k8sDelete({
@@ -93,14 +101,19 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       id: 'edit-boot-source-ref',
       label: (
         <>
-          {t('Edit boot source reference')} {editableBootSource === null && <Loading />}
+          {t('Edit boot source reference')} {loadingBootSource && <Loading />}
         </>
       ),
-      description: !editableBootSource && t('Boot source cannot be edited'),
+      description: !loadingBootSource && getEditBootSourceRefDescription(t, bootDataSource),
       disabled: !editableBootSource,
       cta: () =>
         createModal(({ isOpen, onClose }) => (
-          <EditBootSourceModal obj={template} isOpen={isOpen} onClose={onClose} />
+          <EditBootSourceModal
+            obj={template}
+            isOpen={isOpen}
+            onClose={onClose}
+            dataSource={bootDataSource}
+          />
         )),
     },
     {
