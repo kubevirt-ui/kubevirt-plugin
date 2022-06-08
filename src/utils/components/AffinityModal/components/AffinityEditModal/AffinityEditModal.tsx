@@ -52,7 +52,6 @@ const AffinityEditModal: React.FC<AffinityEditModalProps> = ({
       footer={
         <ActionGroup>
           <Button
-            isSmall
             isDisabled={isDisabled}
             onClick={() =>
               onSubmit({
