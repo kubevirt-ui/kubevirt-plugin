@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1PermittedHostDevices } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   FormGroup,
   GridItem,
@@ -42,20 +43,36 @@ const DeviceNameSelect: React.FC<DeviceNameSelectProps> = ({
           variant={SelectVariant.single}
           selections={deviceName}
         >
-          <SelectGroup label={t('Mediated devices')} key="mediated">
+          <SelectGroup
+            hidden={isEmpty(permittedHostDevices?.mediatedDevices)}
+            label={t('Mediated devices')}
+            key="mediated"
+          >
             {permittedHostDevices?.mediatedDevices?.map(({ resourceName }) => (
               <SelectOption key={resourceName} value={resourceName}>
                 {resourceName}
               </SelectOption>
             ))}
           </SelectGroup>
-          <SelectGroup label={t('PCI host devices')} key="pciHost">
+          <SelectGroup
+            hidden={isEmpty(permittedHostDevices?.pciHostDevices)}
+            label={t('PCI host devices')}
+            key="pciHost"
+          >
             {permittedHostDevices?.pciHostDevices?.map(({ resourceName }) => (
               <SelectOption key={resourceName} value={resourceName}>
                 {resourceName}
               </SelectOption>
             ))}
           </SelectGroup>
+          <SelectGroup
+            hidden={
+              !isEmpty(permittedHostDevices?.mediatedDevices) ||
+              !isEmpty(permittedHostDevices?.pciHostDevices)
+            }
+            label={t('No host devices exists')}
+            key="noDevices"
+          />
         </Select>
       </FormGroup>
     </GridItem>

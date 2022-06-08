@@ -444,6 +444,7 @@
   "No default value": "No default value",
   "No display name": "No display name",
   "No eviction strategy": "No eviction strategy",
+  "No host devices exists": "No host devices exists",
   "No IP address is reported for network interface": "No IP address is reported for network interface",
   "No matching nodes found for the {{cpuManagerLabel}} label": "No matching nodes found for the {{cpuManagerLabel}} label",
   "No matching Nodes found for the labels": "No matching Nodes found for the labels",
