@@ -46,6 +46,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
           descriptionData={<DedicatedResources vm={vm} />}
           descriptionHeader={t('Dedicated Resources')}
           isEdit={canUpdateVM}
+          data-test-id="dedicated-resources"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DedicatedResourcesModal
@@ -63,6 +64,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
           descriptionData={<EvictionStrategy vm={vm} />}
           descriptionHeader={t('Eviction Strategy')}
           isEdit={canUpdateVM}
+          data-test-id="eviction-strategy"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <EvictionStrategyModal
