@@ -64,7 +64,7 @@ const DeschedulerModal: React.FC<DeschedulerModalProps> = ({
             id="descheduler"
             isChecked={checked}
             onChange={setChecked}
-            label={t('Allow the Descheduler to evict the VitrualMachine via live migration')}
+            label={t('Enable Descheduler')}
             description={t('Allow the Descheduler to evict the VirtualMachine via live migration')}
           />
         </FormGroup>
