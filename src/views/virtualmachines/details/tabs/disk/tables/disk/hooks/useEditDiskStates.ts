@@ -12,6 +12,10 @@ import {
   DiskSourceState,
   initialStateDiskSource,
 } from '@kubevirt-utils/components/DiskModal/state/initialState';
+import {
+  getRunningVMMissingDisksFromVMI,
+  getRunningVMMissingVolumesFromVMI,
+} from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { getBootDisk, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getDiskDrive, getDiskInterface } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
@@ -27,11 +31,18 @@ type UseEditDiskStates = (
 
 export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
   const initialDiskSourceState = React.useMemo(() => ({ ...initialStateDiskSource }), []);
-  const disks = !vmi ? getDisks(vm) : vmi?.spec?.domain?.devices?.disks;
+  const disks = !vmi
+    ? getDisks(vm)
+    : [...(getDisks(vm) || []), ...getRunningVMMissingDisksFromVMI(getDisks(vm) || [], vmi)];
   const disk = disks?.find(({ name }) => name === diskName);
 
   const { diskSource, diskSize, isBootDisk } = React.useMemo(() => {
-    const volumes = !vmi ? getVolumes(vm) : vmi?.spec?.volumes;
+    const volumes = !vmi
+      ? getVolumes(vm)
+      : [
+          ...(getVolumes(vm) || []),
+          ...getRunningVMMissingVolumesFromVMI(getVolumes(vm) || [], vmi),
+        ];
     const volume = volumes?.find(({ name }) => name === diskName);
     // volume consists of 2 keys:
     // name and one of: containerDisk/cloudInitNoCloud
