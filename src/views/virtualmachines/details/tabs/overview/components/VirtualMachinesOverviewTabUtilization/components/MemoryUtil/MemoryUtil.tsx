@@ -30,7 +30,7 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ duration, vmi, vm }) => {
   const queries = React.useMemo(() => getUtilizationQueries({ vmName: vm?.metadata?.name }), [vm]);
   const timespan = React.useMemo(() => adjustDuration(duration), [adjustDuration, duration]);
 
-  const requests = vm?.spec?.template?.spec?.domain?.resources?.requests as {
+  const requests = vmi?.spec?.domain?.resources?.requests as {
     [key: string]: string;
   };
   const memory = getMemorySize(requests?.memory);
