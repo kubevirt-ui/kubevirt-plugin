@@ -59,7 +59,7 @@ export const useCustomizeFormSubmit = ({
   } = useWizardVMContext();
   const { upload, uploadData } = useCDIUpload();
 
-  const onSubmit = async (data, event: { target: HTMLFormElement }) => {
+  const onSubmit = async (data: { [x: string]: any }, event: { target: HTMLFormElement }) => {
     // upload only supported for diskSource
     const uploadFile = data?.['disk-boot-source-uploadFile'];
 
@@ -76,7 +76,7 @@ export const useCustomizeFormSubmit = ({
 
       const vmObj = getTemplateVirtualMachineObject(processedTemplate);
 
-      const dataVolumeTemplate = vmObj.spec.dataVolumeTemplates[0];
+      const dataVolumeTemplate = vmObj?.spec?.dataVolumeTemplates?.[0];
       const updatedVM = produce(vmObj, (vmDraft) => {
         vmDraft.metadata.namespace = ns || DEFAULT_NAMESPACE;
         vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
