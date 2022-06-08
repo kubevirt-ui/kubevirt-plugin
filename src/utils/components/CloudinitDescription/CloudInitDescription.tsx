@@ -36,7 +36,9 @@ export const CloudInitDescription: React.FC<{ vm: V1VirtualMachine }> = ({ vm })
           </DescriptionListGroup>
           <DescriptionListGroup>
             <DescriptionListTerm>{t('Password')}</DescriptionListTerm>
-            <DescriptionListDescription>{userData?.password || '-'}</DescriptionListDescription>
+            <DescriptionListDescription>
+              {userData?.password.replace(/./g, '*') || '-'}
+            </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup>
             <DescriptionListTerm>{t('Network data')}</DescriptionListTerm>
