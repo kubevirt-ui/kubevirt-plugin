@@ -1,9 +1,19 @@
 import * as React from 'react';
+import { Trans } from 'react-i18next';
+import RandExp from 'randexp';
 
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Loading } from '@patternfly/quickstarts';
-import { Bullseye, Button, Form, FormGroup, InputGroup, TextInput } from '@patternfly/react-core';
+import {
+  Bullseye,
+  Button,
+  ButtonVariant,
+  Form,
+  FormGroup,
+  InputGroup,
+  TextInput,
+} from '@patternfly/react-core';
 import { EyeIcon, EyeSlashIcon } from '@patternfly/react-icons';
 
 import { CloudInitNetworkData, CloudInitUserData } from './utils/cloudinit-utils';
@@ -66,7 +76,23 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
             label={t('Password')}
             fieldId={'cloudinit-password'}
             className="kv-cloudint-advanced-tab--validation-text"
-            helperText={t('Password for this username')}
+            helperText={
+              <Trans t={t} ns="plugin__kubevirt-plugin">
+                Password for this username -{' '}
+                <Button
+                  variant={ButtonVariant.link}
+                  isInline
+                  onClick={() =>
+                    updateUserField(
+                      'password',
+                      new RandExp(/[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}/).gen(),
+                    )
+                  }
+                >
+                  generate password
+                </Button>
+              </Trans>
+            }
           >
             <InputGroup>
               <TextInput
@@ -75,7 +101,10 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
                 value={userData?.password || ''}
                 onChange={(v) => updateUserField('password', v)}
               />
-              <Button variant="control" onClick={() => setPasswordHidden(!passwordHidden)}>
+              <Button
+                variant={ButtonVariant.link}
+                onClick={() => setPasswordHidden(!passwordHidden)}
+              >
                 {passwordHidden ? <EyeIcon /> : <EyeSlashIcon />}
               </Button>
             </InputGroup>

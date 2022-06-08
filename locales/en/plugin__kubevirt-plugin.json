@@ -496,7 +496,7 @@
   "Parameters successfully edited": "Parameters successfully edited",
   "Paravirtualized iSCSI HDD driver offers similar functionality to the virtio-block device, with some additional enhancements. In particular, this driver supports adding hundreds of devices, and names devices using the standard SCSI device naming scheme.": "Paravirtualized iSCSI HDD driver offers similar functionality to the virtio-block device, with some additional enhancements. In particular, this driver supports adding hundreds of devices, and names devices using the standard SCSI device naming scheme.",
   "Password": "Password",
-  "Password for this username": "Password for this username",
+  "Password for this username - <2>generate password</2>": "Password for this username - <2>generate password</2>",
   "Pause": "Pause",
   "Pause VirtualMachine": "Pause VirtualMachine",
   "PCI host devices": "PCI host devices",
