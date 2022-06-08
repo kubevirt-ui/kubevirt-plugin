@@ -15,7 +15,7 @@ export const SelectDiskSourceLabel: React.FC = () => {
         bodyContent={() => (
           <div>
             {t(
-              'Disk Source represents the source for our Disk, this can be HTTP, Registry or an excisting PVC',
+              'Disk Source represents the source for our Disk, this can be HTTP, Registry or an existing PVC',
             )}
           </div>
         )}
