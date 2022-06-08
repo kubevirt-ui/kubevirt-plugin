@@ -55,6 +55,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
           descriptionData={<NodeSelector vm={vm} />}
           descriptionHeader={t('Node Selector')}
           isEdit={canUpdateVM}
+          data-test-id="node-selector"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <NodeSelectorModal
@@ -73,6 +74,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
           descriptionData={<Tolerations vm={vm} />}
           descriptionHeader={t('Tolerations')}
           isEdit={canUpdateVM}
+          data-test-id="tolerations"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <TolerationsModal
@@ -91,6 +93,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
           descriptionData={<Affinity vm={vm} />}
           descriptionHeader={t('Affinity Rules')}
           isEdit={canUpdateVM}
+          data-test-id="affinity-rules"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <AffinityModal
@@ -109,6 +112,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
           descriptionData={<Descheduler vm={vm} />}
           descriptionHeader={t('Descheduler')}
           isEdit={canUpdateVM}
+          data-test-id="descheduler"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DeschedulerModal

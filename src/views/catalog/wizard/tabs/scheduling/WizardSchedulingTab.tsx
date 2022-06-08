@@ -44,6 +44,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
               title={t('Node Selector')}
               description={<NodeSelector vm={vm} />}
               isEdit
+              testId="node-selector"
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <NodeSelectorModal
@@ -62,6 +63,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
               description={<Tolerations vm={vm} />}
               title={t('Tolerations')}
               isEdit
+              testId="tolerations"
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <TolerationsModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
@@ -72,6 +74,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
             <WizardDescriptionItem
               title={t('Affinity Rules')}
               description={<Affinity vm={vm} />}
+              testId="affinity-rules"
               isEdit
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
@@ -91,6 +94,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
               title={t('Descheduler')}
               description={<Descheduler vm={vm} />}
               isEdit
+              testId="descheduler"
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <DeschedulerModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
@@ -106,6 +110,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
               title={t('Dedicated Resources')}
               description={<DedicatedResources vm={vm} />}
               isEdit
+              testId="dedicated-resources"
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <DedicatedResourcesModal
@@ -123,6 +128,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
               title={t('Eviction Strategy')}
               description={<EvictionStrategy vm={vm} />}
               isEdit
+              testId="eviction-strategy"
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <EvictionStrategyModal
