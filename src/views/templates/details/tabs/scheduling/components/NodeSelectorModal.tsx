@@ -16,6 +16,7 @@ import {
 import { IDLabel } from '@kubevirt-utils/components/NodeSelectorModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form } from '@patternfly/react-core';
 
@@ -76,12 +77,12 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Node Selector')}
+      headerText={t('Node selector')}
     >
       <Form>
         <LabelsList
           isEmpty={selectorLabels?.length === 0}
-          model={NodeModel}
+          model={!isEmpty(nodes) && NodeModel}
           onLabelAdd={onSelectorLabelAdd}
         >
           {selectorLabels.length > 0 && (
@@ -97,10 +98,12 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
             </>
           )}
         </LabelsList>
-        <NodeCheckerAlert
-          qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
-          nodesLoaded={nodesLoaded}
-        />
+        {!isEmpty(nodes) && (
+          <NodeCheckerAlert
+            qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
+            nodesLoaded={nodesLoaded}
+          />
+        )}
       </Form>
     </TabModal>
   );
