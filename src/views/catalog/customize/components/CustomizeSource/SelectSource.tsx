@@ -27,7 +27,8 @@ import { appendDockerPrefix, getGenericSourceCustomization, getPVCSource } from 
 export type SelectSourceProps = {
   onSourceChange: (customSource: V1beta1DataVolumeSpec) => void;
   selectedSource?: V1beta1DataVolumeSpec;
-  sourceLabel: React.ReactNode;
+  sourceLabel: React.ReactNode | string;
+  sourcePopOver?: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
   initialVolumeQuantity?: string;
   withSize?: boolean;
   sourceOptions: SOURCE_OPTIONS_IDS[];
@@ -44,6 +45,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   withSize = false,
   sourceOptions,
   sourceLabel,
+  sourcePopOver,
   httpSourceHelperText,
   registrySourceHelperText,
   'data-test-id': testId,
@@ -125,6 +127,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
         onSelectSource={setSourceType}
         selectedSource={selectedSourceType}
         label={sourceLabel}
+        popOver={sourcePopOver}
         options={sourceOptions}
         data-test-id={testId}
       />
