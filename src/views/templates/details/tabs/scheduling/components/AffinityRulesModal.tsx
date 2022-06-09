@@ -136,6 +136,7 @@ const AffinityRulesModal: React.FC<AffinityModalProps> = ({
       onSubmit={onSubmit}
       headerText={t('Affinity rules')}
       modalVariant={ModalVariant.medium}
+      submitBtnText={t('Apply rules')}
     >
       {list}
     </TabModal>
