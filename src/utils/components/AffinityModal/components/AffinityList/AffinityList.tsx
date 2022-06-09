@@ -52,7 +52,7 @@ const AffinityList: React.FC<AffinityListProps> = ({
         <AddAffinityRuleButton isLinkButton onAffinityClickAdd={onAffinityClickAdd} />
       </StackItem>
       <StackItem>
-        {affinities?.some((affinity) => affinity?.type === AffinityType.node) && (
+        {affinities?.some((affinity) => affinity?.type === AffinityType.node) && nodesLoaded && (
           <NodeCheckerAlert
             qualifiedNodes={qualifiedNodes}
             prefferedQualifiedNodes={prefferedQualifiedNodes}
