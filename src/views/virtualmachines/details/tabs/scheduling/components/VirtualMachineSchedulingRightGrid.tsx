@@ -54,7 +54,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                headerText={t('Dedicated Resources')}
+                headerText={t('Dedicated resources')}
                 vmi={vmi}
               />
             ))
