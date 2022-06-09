@@ -6,6 +6,8 @@ import { ExpandableSection } from '@patternfly/react-core';
 
 import { FieldGroup } from './FieldGroup';
 
+import './ExpandableOptionsFields.scss';
+
 type ExpandableOptionsFieldsProps = {
   optionalFields: TemplateParameter[];
 };
@@ -26,7 +28,11 @@ export const ExpandableOptionsFields: React.FC<ExpandableOptionsFieldsProps> = (
         isIndented
       >
         {optionalFields?.map((field) => (
-          <FieldGroup key={field.name} field={field} />
+          <FieldGroup
+            key={field.name}
+            field={field}
+            className="expandable-section-content-margin-top"
+          />
         ))}
       </ExpandableSection>
     );
