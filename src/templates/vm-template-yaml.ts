@@ -7,10 +7,10 @@ metadata:
   name: vm-template-example
   labels:
     template.kubevirt.io/type: vm
-    os.template.kubevirt.io/fedora31: 'true'
+    os.template.kubevirt.io/fedora36: 'true'
     workload.template.kubevirt.io/server: 'true'
   annotations:
-    name.os.template.kubevirt.io/fedora31: Fedora 31
+    name.os.template.kubevirt.io/fedora36: Fedora 36
     description: VM template example
 objects:
   - apiVersion: kubevirt.io/v1
