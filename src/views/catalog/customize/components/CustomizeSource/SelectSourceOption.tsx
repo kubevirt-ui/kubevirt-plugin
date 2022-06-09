@@ -84,7 +84,8 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
 };
 
 type SelectSourceOptionProps = {
-  label: React.ReactNode;
+  label: React.ReactNode | string;
+  popOver?: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
   onSelectSource: (selection: SOURCE_OPTIONS_IDS) => void;
   selectedSource: SOURCE_OPTIONS_IDS;
   options: SOURCE_OPTIONS_IDS[];
@@ -93,6 +94,7 @@ type SelectSourceOptionProps = {
 
 const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
   label,
+  popOver,
   onSelectSource,
   selectedSource,
   options,
@@ -113,6 +115,7 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
   return (
     <FormGroup
       label={label}
+      labelIcon={popOver}
       fieldId={testId}
       isRequired
       className="disk-source-form-group select-source-option"

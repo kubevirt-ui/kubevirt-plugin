@@ -16,8 +16,8 @@ import {
   REGISTRY_SOURCE_NAME,
   UPLOAD_SOURCE_NAME,
 } from './constants';
-import { SelectCDSourceLabel } from './SelectCDSourceLabel';
-import { SelectDiskSourceLabel } from './SelectDiskSourceLabel';
+import SelectCDSourcePopOver from './SelectCDSourcePopOver';
+import SelectDiskSourcePopOver from './SelectDiskSourcePopOver';
 import { SelectSource } from './SelectSource';
 import {
   getGenericSourceCustomization,
@@ -71,7 +71,8 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         <SelectSource
           selectedSource={cdSource}
           onSourceChange={setCDSource}
-          sourceLabel={<SelectCDSourceLabel />}
+          sourceLabel={t('CD source')}
+          sourcePopOver={<SelectCDSourcePopOver />}
           sourceOptions={[HTTP_SOURCE_NAME, PVC_SOURCE_NAME, CONTAINER_DISK_SOURCE_NAME]}
           httpSourceHelperText={httpSourceHelperText}
           registrySourceHelperText={registrySourceHelperText}
@@ -93,7 +94,8 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
           UPLOAD_SOURCE_NAME,
           BLANK_SOURCE_NAME,
         ]}
-        sourceLabel={<SelectDiskSourceLabel />}
+        sourceLabel={t('Disk source')}
+        sourcePopOver={<SelectDiskSourcePopOver />}
         httpSourceHelperText={httpSourceHelperText}
         registrySourceHelperText={registrySourceHelperText}
         relevantUpload={relevantUpload}
