@@ -27,33 +27,41 @@ export const filter = (options: string[]) => {
 type useProjectsAndPVCsReturnType = {
   projectsNames: string[];
   filteredPVCNames: string[];
-  loaded: boolean;
+  projectsLoaded: boolean;
+  pvcsLoaded: boolean;
   error: Error;
 };
 
 export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsReturnType => {
   const [projects, projectsLoaded, projectsErrors] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    namespaced: false,
+    namespaced: true,
     isList: true,
   });
 
   const projectsNames = projects.map((project) => project.metadata.name);
 
-  const [pvcs, pvcsLoaded, pvcsErrors] = useK8sWatchResource<V1alpha1PersistentVolumeClaim[]>({
-    groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-    namespaced: false,
-    isList: true,
-  });
+  const pvcWatchResource = projectSelected
+    ? {
+        groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
+        namespaced: true,
+        isList: true,
+        namespace: projectSelected,
+      }
+    : null;
 
-  const pvcNamesFilteredByProjects = pvcs
+  const [pvcs, pvcsLoaded, pvcsErrors] =
+    useK8sWatchResource<V1alpha1PersistentVolumeClaim[]>(pvcWatchResource);
+
+  const pvcNamesFilteredByProjects = (pvcs || [])
     .filter((pvc) => pvc.metadata.namespace === projectSelected)
     .map((pvc) => pvc.metadata.name);
 
   return {
     projectsNames,
     filteredPVCNames: pvcNamesFilteredByProjects,
-    loaded: projectsLoaded && pvcsLoaded,
+    projectsLoaded,
+    pvcsLoaded,
     error: projectsErrors || pvcsErrors,
   };
 };

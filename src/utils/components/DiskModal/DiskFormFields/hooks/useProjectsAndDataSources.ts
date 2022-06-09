@@ -22,18 +22,21 @@ export const useDataSourcesTypeResources = (
 
   const projectsNames = projects.map((project) => project.metadata.name);
 
-  const [dataSources, dataSourcesLoaded, dataSourcesError] = useK8sWatchResource<
-    V1beta1DataSource[]
-  >({
-    groupVersionKind: modelToGroupVersionKind(DataSourceModel),
-    namespaced: true,
-    isList: true,
-    namespace: projectSelected,
-  });
+  const dataSourceWathcResource = projectSelected
+    ? {
+        groupVersionKind: modelToGroupVersionKind(DataSourceModel),
+        namespaced: true,
+        isList: true,
+        namespace: projectSelected,
+      }
+    : null;
+
+  const [dataSources, dataSourcesLoaded, dataSourcesError] =
+    useK8sWatchResource<V1beta1DataSource[]>(dataSourceWathcResource);
 
   return {
     projectsNames,
-    dataSources,
+    dataSources: dataSources || [],
     projectsLoaded,
     dataSourcesLoaded,
     error: projectsErrors || dataSourcesError,
