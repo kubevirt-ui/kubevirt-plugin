@@ -73,7 +73,7 @@ export const getOperatingSystem = (obj: K8sResourceCommon): string =>
  * @param {K8sResourceCommon} obj - object to search
  * @returns {string}
  */
-export const getOperatingSystemName = (obj: K8sResourceCommon) =>
+export const getOperatingSystemName = (obj: K8sResourceCommon): string =>
   getValueByPrefix(
     obj?.metadata?.annotations,
     `${NAME_OS_TEMPLATE_ANNOTATION}/${getOperatingSystem(obj)}`,
