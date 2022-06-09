@@ -118,7 +118,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
                     isOpen={isOpen}
                     onClose={onClose}
                     onSubmit={updateVM}
-                    headerText={t('Dedicated Resources')}
+                    headerText={t('Dedicated resources')}
                   />
                 ))
               }

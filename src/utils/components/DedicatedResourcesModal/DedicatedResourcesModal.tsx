@@ -9,6 +9,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -48,7 +49,7 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
     !!vm?.spec?.template?.spec?.domain?.cpu?.dedicatedCpuPlacement,
   );
 
-  const [nodes, loaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+  const [nodes, loaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
@@ -77,7 +78,6 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
       onClose={onClose}
       onSubmit={onSubmit}
       headerText={headerText}
-      isDisabled={!loaded}
     >
       <Form>
         {vmi && (
@@ -95,19 +95,23 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
               <>
                 {t('Available only on Nodes with labels')}{' '}
                 <Label variant="filled" color="purple">
-                  <Link
-                    to={`/search?kind=${NodeModel.kind}&q=${encodeURIComponent(cpuManagerLabel)}`}
-                    target="_blank"
-                  >
-                    {cpuManagerLabel}
-                  </Link>
+                  {!isEmpty(nodes) ? (
+                    <Link
+                      to={`/search?kind=${NodeModel.kind}&q=${encodeURIComponent(cpuManagerLabel)}`}
+                      target="_blank"
+                    >
+                      {cpuManagerLabel}
+                    </Link>
+                  ) : (
+                    cpuManagerLabel
+                  )}
                 </Label>
               </>
             }
           />
         </FormGroup>
         <FormGroup fieldId="dedicated-resources-node">
-          {loaded ? (
+          {!isEmpty(nodes) ? (
             <Alert
               title={
                 hasNodes
@@ -149,7 +153,7 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
               )}
             </Alert>
           ) : (
-            <Loading />
+            !loaded && !loadError && <Loading />
           )}
         </FormGroup>
       </Form>
