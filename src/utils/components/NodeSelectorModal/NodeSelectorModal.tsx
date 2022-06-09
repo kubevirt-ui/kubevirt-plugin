@@ -8,6 +8,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNodeSelector } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Form } from '@patternfly/react-core';
 
 import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
@@ -80,7 +81,7 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Node Selector')}
+      headerText={t('Node selector')}
     >
       <Form>
         {vmi && (
@@ -90,7 +91,7 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
         )}
         <LabelsList
           isEmpty={selectorLabels?.length === 0}
-          model={NodeModel}
+          model={!isEmpty(nodes) && NodeModel}
           onLabelAdd={onSelectorLabelAdd}
         >
           {selectorLabels.length > 0 && (
@@ -106,10 +107,12 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
             </>
           )}
         </LabelsList>
-        <NodeCheckerAlert
-          qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
-          nodesLoaded={nodesLoaded}
-        />
+        {!isEmpty(nodes) && (
+          <NodeCheckerAlert
+            qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
+            nodesLoaded={nodesLoaded}
+          />
+        )}
       </Form>
     </TabModal>
   );
