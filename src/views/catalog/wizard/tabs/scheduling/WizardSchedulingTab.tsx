@@ -66,7 +66,14 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
               testId="tolerations"
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
-                  <TolerationsModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
+                  <TolerationsModal
+                    vm={vm}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onSubmit={updateVM}
+                    nodes={nodes}
+                    nodesLoaded={nodesLoaded}
+                  />
                 ))
               }
             />

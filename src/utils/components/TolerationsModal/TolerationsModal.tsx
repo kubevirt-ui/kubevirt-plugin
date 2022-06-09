@@ -15,6 +15,7 @@ import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hook
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTolerations } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
 
@@ -105,7 +106,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
           <Form>
             <LabelsList
               isEmpty={tolerationLabelsEmpty}
-              model={NodeModel}
+              model={!isEmpty(nodes) && NodeModel}
               onLabelAdd={onSelectorLabelAdd}
               addRowText={t('Add toleration')}
               emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}

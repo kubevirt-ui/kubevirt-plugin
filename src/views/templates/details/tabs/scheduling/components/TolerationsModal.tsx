@@ -18,6 +18,7 @@ import {
 } from '@kubevirt-utils/components/TolerationsModal/utils/constants';
 import { getNodeTaintQualifier } from '@kubevirt-utils/components/TolerationsModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, ModalVariant } from '@patternfly/react-core';
 
@@ -81,7 +82,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
       <Form>
         <LabelsList
           isEmpty={tolerationLabelsEmpty}
-          model={NodeModel}
+          model={!isEmpty(nodes) && NodeModel}
           onLabelAdd={onSelectorLabelAdd}
           addRowText={t('Add toleration')}
           emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
