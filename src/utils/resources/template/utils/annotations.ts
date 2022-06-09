@@ -9,4 +9,5 @@ export const ANNOTATIONS = Object.freeze({
   supportLevel: 'template.kubevirt.io/provider-support-level',
   importURLs: 'template.kubevirt.io/images',
   containerDisks: 'template.kubevirt.io/containerdisks',
+  deprecated: 'template.kubevirt.io/deprecated',
 });
