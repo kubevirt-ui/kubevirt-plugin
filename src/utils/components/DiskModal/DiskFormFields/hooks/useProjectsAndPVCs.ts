@@ -23,18 +23,21 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
 
   const projectsNames = projects.map((project) => project.metadata.name);
 
-  const [pvcs, pvcsLoaded, pvcsErrors] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>(
-    {
-      groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-      namespaced: true,
-      isList: true,
-      namespace: projectSelected,
-    },
-  );
+  const pvcWathcResource = projectSelected
+    ? {
+        groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
+        namespaced: true,
+        isList: true,
+        namespace: projectSelected,
+      }
+    : null;
+
+  const [pvcs, pvcsLoaded, pvcsErrors] =
+    useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>(pvcWathcResource);
 
   return {
     projectsNames,
-    pvcs,
+    pvcs: pvcs || [],
     projectsLoaded,
     pvcsLoaded,
     error: projectsErrors || pvcsErrors,
