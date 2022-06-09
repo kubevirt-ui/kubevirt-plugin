@@ -7,6 +7,7 @@ import {
   TemplateModel,
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,10 +25,16 @@ import './EditBootSourceModal.scss';
 type EditBootSourceModalProps = {
   isOpen: boolean;
   obj: V1Template;
+  dataSource: V1beta1DataSource;
   onClose: () => void;
 };
 
-const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({ isOpen, obj, onClose }) => {
+const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({
+  isOpen,
+  obj,
+  dataSource,
+  onClose,
+}) => {
   const { t } = useKubevirtTranslation();
   const [bootSource, setBootSource] = React.useState<V1beta1DataVolumeSpec>();
   const [sourceProvider, setSourceProvider] = React.useState('');
@@ -35,7 +42,7 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({ isOpen, obj, 
   const affectedTemplates = useBootSourceEditAffectedTemplates(obj);
 
   const onSubmit = async () => {
-    await editBootSource(obj, bootSource);
+    await editBootSource(dataSource, bootSource);
   };
 
   return (

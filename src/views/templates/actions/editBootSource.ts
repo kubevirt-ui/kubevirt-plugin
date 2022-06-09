@@ -1,9 +1,13 @@
+import { TFunction } from 'react-i18next';
 import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  V1beta1DataSource,
+  V1beta1DataVolume,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   V1beta1DataVolumeSpec,
   V1DataVolumeTemplateSpec,
@@ -59,24 +63,24 @@ const getRootDiskDataVolumeTemplate = (
   );
 };
 
-export const hasEditableBootSource = async (template: V1Template): Promise<boolean> => {
+export const getBootDataSource = async (
+  template: V1Template,
+): Promise<V1beta1DataSource | undefined> => {
   const templateWithDefaultParameters = poorManProcess(template);
   const dataVolume = getRootDiskDataVolumeTemplate(templateWithDefaultParameters);
 
-  if (!dataVolume?.spec?.sourceRef || dataVolume?.spec?.sourceRef?.kind !== DataSourceModel.kind) {
-    return false;
-  }
-
-  try {
-    const dataSource = await getDataSource(
-      dataVolume?.spec?.sourceRef.name,
-      dataVolume?.spec?.sourceRef.namespace,
+  if (
+    dataVolume?.spec?.sourceRef?.kind === DataSourceModel.kind &&
+    dataVolume?.spec?.sourceRef?.name
+  )
+    return await getDataSource(
+      dataVolume?.spec?.sourceRef?.name,
+      dataVolume?.spec?.sourceRef?.namespace || dataVolume.metadata.namespace || 'default',
     );
+};
 
-    return !dataSource.metadata.labels['cdi.kubevirt.io/dataImportCron'];
-  } catch (error) {
-    return false;
-  }
+export const hasEditableBootSource = (dataSource: V1beta1DataSource): boolean => {
+  return dataSource && !dataSource.metadata.labels['cdi.kubevirt.io/dataImportCron'];
 };
 
 const waitPVCGetDeleted = (name: string, namespace: string): Promise<void> => {
@@ -99,15 +103,10 @@ const waitPVCGetDeleted = (name: string, namespace: string): Promise<void> => {
   });
 };
 
-export const editBootSource = async (template: V1Template, bootSource: V1beta1DataVolumeSpec) => {
-  const templateWithDefaultParameters = poorManProcess(template);
-  const dataVolumeTemplate = getRootDiskDataVolumeTemplate(templateWithDefaultParameters);
-
-  const dataSource = await getDataSource(
-    dataVolumeTemplate?.spec?.sourceRef.name,
-    dataVolumeTemplate?.spec?.sourceRef.namespace,
-  );
-
+export const editBootSource = async (
+  dataSource: V1beta1DataSource,
+  bootSource: V1beta1DataVolumeSpec,
+) => {
   const dataSourcePVCName = dataSource?.spec?.source?.pvc?.name;
   const dataSourcePVCNamespace = dataSource?.spec?.source?.pvc?.namespace;
 
@@ -130,4 +129,9 @@ export const editBootSource = async (template: V1Template, bootSource: V1beta1Da
     model: DataVolumeModel,
     data: createDataVolume(dataSourcePVCName, dataSourcePVCNamespace, bootSource),
   });
+};
+
+export const getEditBootSourceRefDescription = (t: TFunction, dataSource: V1beta1DataSource) => {
+  if (!dataSource) return t('Template does not use boot source reference');
+  if (!hasEditableBootSource(dataSource)) return t('Boot source reference cannot be edited');
 };
