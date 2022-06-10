@@ -16,25 +16,25 @@ const VirtualMachineRowLayout: React.FC<
 > = ({ obj, activeColumnIDs, rowData: { kind, node, ips } }) => {
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
+      <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
         <ResourceLink kind={kind} name={obj.metadata.name} namespace={obj.metadata.namespace} />
       </TableData>
-      <TableData id="namespace" activeColumnIDs={activeColumnIDs}>
+      <TableData id="namespace" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
       </TableData>
-      <TableData id="status" activeColumnIDs={activeColumnIDs}>
+      <TableData id="status" activeColumnIDs={activeColumnIDs} className="pf-m-width-5">
         <VirtualMachineStatus printableStatus={obj?.status?.printableStatus} />
       </TableData>
-      <TableData id="conditions" activeColumnIDs={activeColumnIDs}>
+      <TableData id="conditions" activeColumnIDs={activeColumnIDs} className="pf-m-width-20">
         <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
       </TableData>
       <TableData id="node" activeColumnIDs={activeColumnIDs}>
         {node}
       </TableData>
-      <TableData id="created" activeColumnIDs={activeColumnIDs}>
+      <TableData id="created" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
         <Timestamp timestamp={obj?.metadata?.creationTimestamp} />
       </TableData>
-      <TableData id="ip-address" activeColumnIDs={activeColumnIDs}>
+      <TableData id="ip-address" activeColumnIDs={activeColumnIDs} className="pf-m-width-5">
         {ips}
       </TableData>
       <TableData
