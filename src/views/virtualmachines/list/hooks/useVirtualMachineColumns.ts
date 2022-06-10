@@ -1,15 +1,24 @@
 import * as React from 'react';
 
+import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
+  K8sVerb,
   TableColumn,
+  useAccessReview,
   useActiveColumns,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
-const useVirtualMachineColumns = () => {
+const useVirtualMachineColumns = (namespace: string) => {
   const { t } = useKubevirtTranslation();
+
+  const [canGetNode] = useAccessReview({
+    namespace: namespace,
+    verb: 'get' as K8sVerb,
+    resource: NodeModel.plural,
+  });
 
   const columns: TableColumn<K8sResourceCommon>[] = React.useMemo(
     () => [
@@ -59,7 +68,7 @@ const useVirtualMachineColumns = () => {
   );
 
   const [activeColumns] = useActiveColumns<K8sResourceCommon>({
-    columns,
+    columns: canGetNode ? columns : columns.filter((column) => column.id !== 'node'),
     showNamespaceOverride: false,
     columnManagementID: '',
   });

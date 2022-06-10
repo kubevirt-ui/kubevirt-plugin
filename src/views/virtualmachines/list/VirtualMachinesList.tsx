@@ -67,7 +67,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
       ? history.push(catalogURL)
       : history.push(`/k8s/cluster/${VirtualMachineModelRef}/~new`);
 
-  const columns = useVirtualMachineColumns();
+  const columns = useVirtualMachineColumns(namespace);
   return (
     <>
       <ListPageHeader title={t('VirtualMachines')}>
