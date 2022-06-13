@@ -27,22 +27,26 @@ const useVirtualMachineColumns = (namespace: string) => {
         id: 'name',
         transforms: [sortable],
         sort: 'metadata.name',
+        props: { className: 'pf-m-width-15' },
       },
       {
         title: t('Namespace'),
         id: 'namespace',
         transforms: [sortable],
         sort: 'metadata.namespace',
+        props: { className: 'pf-m-width-10' },
       },
       {
         title: t('Status'),
         id: 'status',
         transforms: [sortable],
         sort: 'status.printableStatus',
+        props: { className: 'pf-m-width-5' },
       },
       {
         title: t('Conditions'),
         id: 'conditions',
+        props: { className: 'pf-m-width-20' },
       },
       {
         title: t('Node'),
@@ -53,10 +57,12 @@ const useVirtualMachineColumns = (namespace: string) => {
         id: 'created',
         transforms: [sortable],
         sort: 'metadata.creationTimestamp',
+        props: { className: 'pf-m-width-15' },
       },
       {
         title: t('IP address'),
         id: 'ip-address',
+        props: { className: 'pf-m-width-5' },
       },
       {
         title: '',
