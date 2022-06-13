@@ -92,7 +92,7 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
     <>
       <TabModal<K8sResourceCommon>
         obj={obj}
-        headerText={t('Clone Template')}
+        headerText={t('Clone template')}
         onSubmit={onSubmit}
         isOpen={isOpen}
         onClose={onClose}
