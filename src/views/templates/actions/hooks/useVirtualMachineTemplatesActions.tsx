@@ -69,14 +69,14 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const actions = [
     {
       id: EDIT_TEMPLATE_ID,
-      label: t('Edit Template'),
+      label: t('Edit template'),
       cta: () =>
         // lead to the template details page
         history.push(`/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}`),
     },
     {
       id: 'clone-template',
-      label: t('Clone Template'),
+      label: t('Clone template'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <CloneTemplateModal
@@ -172,7 +172,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     },
     {
       id: 'delete-template',
-      label: t('Delete Template'),
+      label: t('Delete template'),
       description: isCommonTemplate && t('Red Hat template cannot be deleted'),
       disabled: isCommonTemplate,
       cta: () =>

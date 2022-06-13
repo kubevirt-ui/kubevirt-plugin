@@ -49,7 +49,7 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({
     <>
       <TabModal<K8sResourceCommon>
         obj={obj}
-        headerText={t('Edit Boot source to template')}
+        headerText={t('Edit boot source to template')}
         onSubmit={onSubmit}
         isOpen={isOpen}
         onClose={onClose}
