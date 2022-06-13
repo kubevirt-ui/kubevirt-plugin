@@ -1,11 +1,17 @@
 import * as React from 'react';
+import { useHistory } from 'react-router-dom';
 
+import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getLabel } from '@kubevirt-utils/resources/shared';
+import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
+import { VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
+import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
   CardBody,
@@ -40,6 +46,10 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const [guestAgentData, loaded] = useGuestOS(vmi);
   const Icon = getVMStatusIcon(vm?.status?.printableStatus);
+  const history = useHistory();
+  const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
+  const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
+  const None = <MutedTextSpan text={t('None')} />;
 
   const timestamp = timestampFor(
     new Date(vm?.metadata?.creationTimestamp),
@@ -115,7 +125,18 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Template')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-template">
-                    {vm?.metadata?.labels?.['vm.kubevirt.io/template'] || '-'}
+                    {templateName && templateNamespace ? (
+                      <ResourceLink
+                        groupVersionKind={modelToGroupVersionKind(TemplateModel)}
+                        name={templateName}
+                        namespace={templateNamespace}
+                        onClick={() =>
+                          history.push(`/k8s/ns/${templateNamespace}/templates/${templateName}`)
+                        }
+                      />
+                    ) : (
+                      None
+                    )}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
               </DescriptionList>
