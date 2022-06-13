@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -11,7 +12,7 @@ import SSHAccessModal from '@kubevirt-utils/components/SSHAccess/SSHAccessModal'
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sUpdate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
 import VirtualMachineStatus from '../../../../../../list/components/VirtualMachineStatus/VirtualMachineStatus';
@@ -34,6 +35,12 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
+  const [canGetNode] = useAccessReview({
+    namespace: vmi?.metadata?.namespace,
+    verb: 'get' as K8sVerb,
+    resource: NodeModel.plural,
+  });
 
   const onSubmit = React.useCallback(
     (obj: V1VirtualMachine) =>
@@ -89,10 +96,12 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           descriptionHeader={t('Time Zone')}
           data-test-id={`${vm?.metadata?.name}-timezone`}
         />
-        <VirtualMachineDescriptionItem
-          descriptionData={vmDetailsRightGridObj?.node}
-          descriptionHeader={t('Node')}
-        />
+        {canGetNode && (
+          <VirtualMachineDescriptionItem
+            descriptionData={vmDetailsRightGridObj?.node}
+            descriptionHeader={t('Node')}
+          />
+        )}
         <VirtualMachineDescriptionItem
           descriptionData={
             getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) || (
