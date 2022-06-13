@@ -21,8 +21,7 @@ objects:
         description: VM example
       labels:
         app: '\${NAME}'
-        vm.kubevirt.io/template: fedora-server-small
-        vm.kubevirt.io/template.namespace: openshift
+        vm.kubevirt.io/template: vm-template-example
         os.template.kubevirt.io/fedora36: 'true'
     spec:
       running: false

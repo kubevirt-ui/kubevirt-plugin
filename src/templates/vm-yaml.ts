@@ -9,8 +9,6 @@ metadata:
     description: VM example
   labels:
     app: vm-example
-    vm.kubevirt.io/template: fedora-server-small
-    vm.kubevirt.io/template.namespace: openshift
     os.template.kubevirt.io/fedora36: 'true'
 spec:
   running: false
