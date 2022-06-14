@@ -11,6 +11,9 @@ import {
   EmptyStateBody,
   EmptyStateIcon,
   Spinner,
+  Tab,
+  Tabs,
+  TabTitleText,
 } from '@patternfly/react-core';
 import { css } from '@patternfly/react-styles';
 import styles from '@patternfly/react-styles/css/components/Consoles/VncConsole';
@@ -52,10 +55,12 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
   textCtrlAltDel,
   autoConnect = true,
   CustomConnectComponent,
+  hasGPU,
 }) => {
   const { t } = useKubevirtTranslation();
   const [rfb, setRfb] = React.useState<any>();
   const [status, setStatus] = React.useState<ConsoleState>(disconnected);
+  const [activeTabKey, setActiveTabKey] = React.useState<number | string>(0);
   const staticRenderLocaitonRef = React.useRef(null);
   const StaticRenderLocaiton = React.useMemo(
     () => (
@@ -194,6 +199,34 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
             <EmptyStateIcon variant="container" component={Spinner} />
             <EmptyStateBody>{textConnecting || t('Connecting')}</EmptyStateBody>
           </EmptyState>
+        )}
+
+        {hasGPU && status === connected && (
+          <div className="vnc-screen-tabs">
+            <Tabs
+              activeKey={activeTabKey}
+              style={{
+                width: staticRenderLocaitonRef?.current?.lastElementChild?.lastElementChild?.width,
+              }}
+            >
+              <Tab
+                eventKey={0}
+                title={<TabTitleText>{t('Screen 1')}</TabTitleText>}
+                onClick={() => {
+                  rfb?.sendCtrlAlt1();
+                  setActiveTabKey(0);
+                }}
+              />
+              <Tab
+                eventKey={1}
+                title={<TabTitleText>{t('Screen 2')}</TabTitleText>}
+                onClick={() => {
+                  rfb?.sendCtrlAlt2();
+                  setActiveTabKey(1);
+                }}
+              />
+            </Tabs>
+          </div>
         )}
         {StaticRenderLocaiton}
       </div>
