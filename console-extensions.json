@@ -36,7 +36,11 @@
       "section": "virtualization",
       "insertBefore": "virtualmachines",
       "name": "%plugin__kubevirt-plugin~Catalog%",
-      "href": "templatescatalog"
+      "href": "templatescatalog",
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualization-catalog",
+        "data-test-id": "virtualization-catalog-nav-item"
+      }
     }
   },
   {
@@ -180,7 +184,11 @@
       "insertBefore": "virtualization-catalog",
       "name": "%plugin__kubevirt-plugin~Overview%",
       "href": "/overview",
-      "prefixNamespaced": false
+      "prefixNamespaced": false,
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualization-overview",
+        "data-test-id": "virtualization-overview-nav-item"
+      }
     },
     "flags": {
       "required": ["OPENSHIFT"]
