@@ -184,7 +184,11 @@
       "insertBefore": "virtualization-catalog",
       "name": "%plugin__kubevirt-plugin~Overview%",
       "href": "/overview",
-      "prefixNamespaced": false
+      "prefixNamespaced": false,
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualization-overview",
+        "data-test-id": "virtualization-overview-nav-item"
+      }
     },
     "flags": {
       "required": ["OPENSHIFT"]
