@@ -36,7 +36,11 @@
       "section": "virtualization",
       "insertBefore": "virtualmachines",
       "name": "%plugin__kubevirt-plugin~Catalog%",
-      "href": "templatescatalog"
+      "href": "templatescatalog",
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualization-catalog",
+        "data-test-id": "virtualization-catalog-nav-item"
+      }
     }
   },
   {
