@@ -4,7 +4,9 @@ import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/c
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getGPUDevices } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Stack, StackItem } from '@patternfly/react-core';
 
@@ -30,6 +32,7 @@ const Consoles: React.FC<ConsolesProps> = ({ vmi }) => {
     name: vmi?.metadata?.name,
     namespace: vmi?.metadata?.namespace,
   });
+  const gpus = getGPUDevices(vm);
 
   return !vmi?.metadata ? (
     <Bullseye>
@@ -52,6 +55,7 @@ const Consoles: React.FC<ConsolesProps> = ({ vmi }) => {
             host={window.location.hostname}
             port={window.location.port || (isEncrypted ? SECURE : INSECURE)}
             path={`api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`}
+            hasGPU={!isEmpty(gpus)}
           />
           <SerialConsoleConnector vmi={vmi} type={SERIAL_CONSOLE_TYPE} />
           {isWindowsMachine && loaded && (
