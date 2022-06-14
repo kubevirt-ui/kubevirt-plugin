@@ -36,7 +36,6 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
             path={`api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`}
             scaleViewport
             showAccessControls={false}
-            autoConnect={false}
             CustomConnectComponent={VirtualMachinesOverviewTabDetailsConsoleConnect}
           />
         </>
