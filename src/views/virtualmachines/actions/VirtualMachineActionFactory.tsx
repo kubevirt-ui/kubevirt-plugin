@@ -118,7 +118,7 @@ export const VirtualMachineActionFactory = {
     return {
       id: 'vm-action-cancel-migrate',
       disabled: !vmim || !!vmim?.metadata?.deletionTimestamp,
-      label: t('Cancel VirtualMachine migration'),
+      label: t('Cancel migration'),
       cta: () => cancelMigration(vmim),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       description: !!vmim?.metadata?.deletionTimestamp && t('Canceling ongoing migration'),
