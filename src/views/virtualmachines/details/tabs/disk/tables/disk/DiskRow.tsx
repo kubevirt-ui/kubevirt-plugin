@@ -10,7 +10,7 @@ import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Label, Split, SplitItem } from '@patternfly/react-core';
+import { Label, SplitItem, Stack } from '@patternfly/react-core';
 
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
@@ -24,7 +24,7 @@ const DiskRow: React.FC<
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        <Split className="disk-row-split">
+        <Stack>
           <SplitItem>
             {obj?.name} <HotplugLabel vm={vm} diskName={obj?.name} vmi={vmi} />
           </SplitItem>
@@ -42,7 +42,7 @@ const DiskRow: React.FC<
               </Label>
             </SplitItem>
           )}
-        </Split>
+        </Stack>
       </TableData>
 
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
