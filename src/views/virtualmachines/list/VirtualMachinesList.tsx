@@ -65,7 +65,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
   const onCreate = (type: string) =>
     type === 'catalog'
       ? history.push(catalogURL)
-      : history.push(`/k8s/cluster/${VirtualMachineModelRef}/~new`);
+      : history.push(`/k8s/ns/${namespace || 'default'}/${VirtualMachineModelRef}/~new`);
 
   const columns = useVirtualMachineColumns(namespace);
   return (
