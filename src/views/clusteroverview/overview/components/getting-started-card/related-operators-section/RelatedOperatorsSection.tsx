@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { recommendedOperatorIcon } from '../../../utils/svg/icons';
 import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
 import useMTVResources from '../utils/hooks/useMTVResources';
 import { GettingStartedLink } from '../utils/types';
@@ -47,10 +46,11 @@ const RelatedOperatorsSection: React.FC = () => {
     <GettingStartedSectionContents
       id="related-operators"
       icon={
-        <img
+        <i
+          className="fas fa-cubes"
+          color="var(--pf-global--primary-color--100)"
+          aria-hidden="true"
           id="kv-getting-started--related-operators-icon"
-          src={recommendedOperatorIcon}
-          alt={t('Related operators')}
         />
       }
       title={t('Related operators')}
