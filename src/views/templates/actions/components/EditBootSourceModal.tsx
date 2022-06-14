@@ -49,7 +49,7 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({
     <>
       <TabModal<K8sResourceCommon>
         obj={obj}
-        headerText={t('Edit boot source to template')}
+        headerText={t('Edit boot source reference')}
         onSubmit={onSubmit}
         isOpen={isOpen}
         onClose={onClose}
@@ -87,7 +87,6 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({
                 SOURCE_TYPES.pvcSource,
                 SOURCE_TYPES.registrySource,
                 SOURCE_TYPES.httpSource,
-                SOURCE_TYPES.uploadSource,
               ]}
               withSize
               initialVolumeQuantity={getTemplateStorageQuantity(obj)}
