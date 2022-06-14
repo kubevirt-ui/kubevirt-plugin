@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router-dom';
 
 import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   K8sResourceCommon,
   ListPageBody,
-  ListPageCreateButton,
+  ListPageCreate,
   ListPageFilter,
   ListPageHeader,
   useListPageFilter,
@@ -27,7 +27,6 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
   },
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
   const {
     templates,
     loaded,
@@ -45,12 +44,12 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
 
   const templatesLoaded = loaded && bootSourcesLoaded;
 
-  const onCreate = () => history.push(`/k8s/cluster/${modelToRef(TemplateModel)}/~new`);
-
   return (
     <>
       <ListPageHeader title={t('VirtualMachine Templates')}>
-        <ListPageCreateButton onClick={onCreate}>{t('Create Template')}</ListPageCreateButton>
+        <ListPageCreate groupVersionKind={modelToRef(TemplateModel)}>
+          {t('Create Template')}
+        </ListPageCreate>
       </ListPageHeader>
       <ListPageBody>
         <Stack hasGutter>

@@ -14,9 +14,10 @@ import VirtualMachinePendingChangesAlert from './VirtualMachinePendingChangesAle
 
 type VirtualMachineNavPageTitleProps = {
   vm: V1VirtualMachine;
+  name: string;
 };
 
-const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({ vm }) => {
+const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({ vm, name }) => {
   const { t } = useKubevirtTranslation();
 
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
@@ -32,7 +33,7 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
       <span className="co-m-pane__heading">
         <h1 className="co-resource-item__resource-name">
           <span className="co-m-resource-icon co-m-resource-icon--lg">{t('VM')}</span>
-          {vm?.metadata?.name}{' '}
+          {name}{' '}
           <Label isCompact icon={<StatusIcon />}>
             {vm?.status?.printableStatus}
           </Label>
