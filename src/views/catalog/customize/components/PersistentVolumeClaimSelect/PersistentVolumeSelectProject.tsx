@@ -3,6 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   FormGroup,
   Select,
@@ -29,7 +30,10 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
   'data-test-id': testId,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { control } = useFormContext();
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
   const [isNamespacePVCOpen, setNamespaceOpen] = React.useState(false);
 
   const onSelect = React.useCallback(
@@ -47,6 +51,9 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
       id={testId}
       isRequired
       className="pvc-selection-formgroup"
+      validated={errors?.['pvcNamespace'] ? ValidatedOptions.error : ValidatedOptions.default}
+      helperTextInvalid={t('This field is required')}
+      helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
     >
       {loaded ? (
         <Controller

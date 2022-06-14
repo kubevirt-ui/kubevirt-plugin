@@ -6,6 +6,7 @@ import DiskSizeNumberInput from '@kubevirt-utils/components/DiskModal/DiskFormFi
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { FileUpload, FormGroup, Stack, StackItem, ValidatedOptions } from '@patternfly/react-core';
 
 import { PersistentVolumeClaimSelect } from '../PersistentVolumeClaimSelect';
@@ -149,6 +150,11 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           isRequired
           className="disk-source-form-group"
           helperText={httpSourceHelperText}
+          validated={
+            errors?.[`${testId}-httpURL`] ? ValidatedOptions.error : ValidatedOptions.default
+          }
+          helperTextInvalid={t('This field is required')}
+          helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
         >
           <FormTextInput
             {...register(`${testId}-httpURL`, { required: true })}
@@ -156,7 +162,9 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
             type="text"
             aria-label={t('Image URL')}
             data-test-id={`${testId}-http-source-input`}
-            validated={errors?.httpURL ? ValidatedOptions.error : ValidatedOptions.default}
+            validated={
+              errors?.[`${testId}-httpURL`] ? ValidatedOptions.error : ValidatedOptions.default
+            }
           />
         </FormGroup>
       )}
@@ -168,6 +176,11 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
             fieldId={`${testId}-${selectedSourceType}`}
             isRequired
             className="disk-source-form-group"
+            validated={
+              errors?.[`${testId}-uploadFile`] ? ValidatedOptions.error : ValidatedOptions.default
+            }
+            helperTextInvalid={t('This field is required')}
+            helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
           >
             <Stack hasGutter>
               <StackItem>
@@ -207,6 +220,11 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           isRequired
           className="disk-source-form-group"
           helperText={registrySourceHelperText}
+          validated={
+            errors?.[`${testId}-containerImage`] ? ValidatedOptions.error : ValidatedOptions.default
+          }
+          helperTextInvalid={t('This field is required')}
+          helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
         >
           <FormTextInput
             {...register(`${testId}-containerImage`, { required: true })}
@@ -214,7 +232,11 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
             type="text"
             aria-label={t('Container Image')}
             data-test-id={`${testId}-container-source-input`}
-            validated={errors?.containerImage ? ValidatedOptions.error : ValidatedOptions.default}
+            validated={
+              errors?.[`${testId}-containerImage`]
+                ? ValidatedOptions.error
+                : ValidatedOptions.default
+            }
           />
         </FormGroup>
       )}
