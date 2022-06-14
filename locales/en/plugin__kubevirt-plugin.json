@@ -283,6 +283,7 @@
   "Edit template": "Edit template",
   "Edit the disk or contact your cluster admin for further details.": "Edit the disk or contact your cluster admin for further details.",
   "Edit the disk or contact your cluster admin for further details._plural": "Edit the disk or contact your cluster admin for further details.",
+  "Edit Workload profile": "Edit Workload profile",
   "Editing the DataSource will affect <2><0> all templates</0></2> that are currently using this DataSource.": "Editing the DataSource will affect <2><0> all templates</0></2> that are currently using this DataSource.",
   "Effect": "Effect",
   "Elapsed time since login": "Elapsed time since login",

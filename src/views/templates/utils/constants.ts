@@ -27,3 +27,15 @@ export type SOURCE_OPTIONS_IDS =
   | typeof SOURCE_TYPES.uploadSource;
 
 export const SUPPORT_URL = 'https://access.redhat.com/articles/4234591';
+
+// t('Desktop')
+// t('Server')
+// t('High performance')
+
+export const workloadProfiles = {
+  desktop: 'Desktop',
+  server: 'Server',
+  highperformance: 'High performance',
+};
+
+export type WorkloadProfileKeys = 'desktop' | 'server' | 'highperformance';

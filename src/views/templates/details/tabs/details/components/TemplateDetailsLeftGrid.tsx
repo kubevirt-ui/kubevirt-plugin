@@ -8,7 +8,6 @@ import Name from 'src/views/templates/details/tabs/details/components/Name';
 import Namespace from 'src/views/templates/details/tabs/details/components/Namespace';
 import Owner from 'src/views/templates/details/tabs/details/components/Owner';
 import { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
-import useWorkloadProfile from 'src/views/templates/list/hooks/useWorkloadProfile';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
@@ -18,6 +17,7 @@ import BootMethod from './BootMethod/BootMethod';
 import CPUMemory from './CPUMemory';
 import Description from './Description';
 import DisplayName from './DisplayName';
+import WorkloadProfile from './WorkloadProfile';
 
 const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
   const { t } = useKubevirtTranslation();
@@ -31,7 +31,7 @@ const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template,
       <DisplayName template={template} editable={editable} />
       <Description template={template} editable={editable} />
       <DescriptionItem title={t('Operating system')} content={getOperatingSystemName(template)} />
-      <DescriptionItem title={t('Workload profile')} content={useWorkloadProfile(template)} />
+      <WorkloadProfile template={template} editable={editable} />
       <CPUMemory template={template} />
       <BootMethod template={template} />
       <BaseTemplate template={template} />
