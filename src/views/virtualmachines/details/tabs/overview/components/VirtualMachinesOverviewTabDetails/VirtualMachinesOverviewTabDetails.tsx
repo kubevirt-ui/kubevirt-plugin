@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
 
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -46,7 +45,6 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const [guestAgentData, loaded] = useGuestOS(vmi);
   const Icon = getVMStatusIcon(vm?.status?.printableStatus);
-  const history = useHistory();
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
   const None = <MutedTextSpan text={t('None')} />;
@@ -130,9 +128,6 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                         groupVersionKind={modelToGroupVersionKind(TemplateModel)}
                         name={templateName}
                         namespace={templateNamespace}
-                        onClick={() =>
-                          history.push(`/k8s/ns/${templateNamespace}/templates/${templateName}`)
-                        }
                       />
                     ) : (
                       None
