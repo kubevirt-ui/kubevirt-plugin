@@ -82,6 +82,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate,
         onSubmit={onUpdate}
         initialDiskState={initialDiskState}
         initialDiskSourceState={initialDiskSourceState}
+        createOwnerReference={false}
       />
     ));
   };

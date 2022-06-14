@@ -69,6 +69,7 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
                 onClose={onClose}
                 onSubmit={onUpdate}
                 headerText={t('Add disk')}
+                createOwnerReference={false}
               />
             ))
           }
