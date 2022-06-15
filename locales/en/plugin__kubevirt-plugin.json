@@ -219,6 +219,7 @@
   "Dedicated resources": "Dedicated resources",
   "Dedicated Resources": "Dedicated Resources",
   "Default": "Default",
+  "Default cloudinit username is 'cloud-user'": "Default cloudinit username is 'cloud-user'",
   "Default Templates": "Default Templates",
   "Default value for this parameter": "Default value for this parameter",
   "Default value type": "Default value type",
