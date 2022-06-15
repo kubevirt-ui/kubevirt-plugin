@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Trans } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
@@ -8,8 +7,8 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   Button,
-  Stack,
-  StackItem,
+  Text,
+  TextVariants,
   Title,
 } from '@patternfly/react-core';
 
@@ -19,6 +18,7 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
   const history = useHistory();
 
   const templateName = tabsData?.overview?.templateMetadata?.name;
+  const templateDisplayName = tabsData?.overview?.templateMetadata?.displayName || templateName;
   const templateNamespace = tabsData?.overview?.templateMetadata?.namespace;
 
   const onBreadcrumbClick = (url: string) =>
@@ -53,18 +53,10 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
         </BreadcrumbItem>
         <BreadcrumbItem>{t('Review')}</BreadcrumbItem>
       </Breadcrumb>
-      <Stack>
-        <StackItem className="co-m-pane__heading">
-          <Title headingLevel="h1">{t('Review and create VirtualMachine')}</Title>
-        </StackItem>
-        <StackItem>
-          <Trans t={t} ns="plugin__kubevirt-plugin">
-            You can click the Create VirtualMachine button to create your VirtualMachine or
-            customize it by editing each of the tabs below. When done, click the Create
-            VirtualMachine button.
-          </Trans>
-        </StackItem>
-      </Stack>
+      <Title headingLevel="h1">{t('Review and create VirtualMachine')}</Title>
+      <Text component={TextVariants.small} data-test="wizard title help">
+        {t('Template: {{templateDisplayName}}', { templateDisplayName })}
+      </Text>
     </div>
   );
 });
