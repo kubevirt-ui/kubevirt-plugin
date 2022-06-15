@@ -37,7 +37,8 @@ export type CustomizeSourceProps = {
   cdSource: V1beta1DataVolumeSpec | undefined;
   setCDSource: (cdSource: V1beta1DataVolumeSpec | undefined) => void;
   template: V1Template;
-  relevantUpload?: DataUpload;
+  diskUpload?: DataUpload;
+  cdUpload?: DataUpload;
 };
 
 export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
@@ -48,7 +49,8 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
   cdSource,
   setCDSource,
   template,
-  relevantUpload,
+  diskUpload,
+  cdUpload,
 }) => {
   const { t } = useKubevirtTranslation();
   const onCDCheckboxChange = React.useCallback(() => {
@@ -73,10 +75,16 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
           onSourceChange={setCDSource}
           sourceLabel={t('CD source')}
           sourcePopOver={<SelectCDSourcePopOver />}
-          sourceOptions={[HTTP_SOURCE_NAME, PVC_SOURCE_NAME, CONTAINER_DISK_SOURCE_NAME]}
+          sourceOptions={[
+            HTTP_SOURCE_NAME,
+            PVC_SOURCE_NAME,
+            CONTAINER_DISK_SOURCE_NAME,
+            UPLOAD_SOURCE_NAME,
+          ]}
           httpSourceHelperURL={httpSourceHelperURL}
           registrySourceHelperText={registrySourceHelperText}
           data-test-id="cd-boot-source"
+          relevantUpload={cdUpload}
         />
       )}
 
@@ -98,7 +106,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         sourcePopOver={<SelectDiskSourcePopOver />}
         httpSourceHelperURL={httpSourceHelperURL}
         registrySourceHelperText={registrySourceHelperText}
-        relevantUpload={relevantUpload}
+        relevantUpload={diskUpload}
         data-test-id="disk-boot-source"
         defaultsAsBlank={!!cdSource}
       />

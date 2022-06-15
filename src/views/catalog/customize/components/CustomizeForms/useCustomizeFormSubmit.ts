@@ -3,8 +3,6 @@ import { useHistory, useParams } from 'react-router-dom';
 import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DataUpload, useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -20,8 +18,8 @@ import {
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 
 import { ensurePath, useWizardVMContext } from '../../../utils/WizardVMContext';
-import { DEFAULT_NAMESPACE } from '../../constants';
-import { processTemplate } from '../../utils';
+import { DEFAULT_NAMESPACE, INSTALLATION_CDROM_NAME } from '../../constants';
+import { getUploadDataVolume, processTemplate } from '../../utils';
 
 type useCustomizeFormSubmitType = {
   onSubmit: (_data: any, event: { target: HTMLFormElement }) => Promise<void>;
@@ -31,7 +29,8 @@ type useCustomizeFormSubmitType = {
       namespace: string;
     };
   }>;
-  upload?: DataUpload;
+  diskUpload?: DataUpload;
+  cdUpload?: DataUpload;
   loaded: boolean;
   error: any;
 };
@@ -40,9 +39,11 @@ export const useCustomizeFormSubmit = ({
   template,
   withWindowsDrivers,
   diskSource,
+  cdSource,
 }: {
   template: V1Template;
   diskSource?: V1beta1DataVolumeSpec;
+  cdSource?: V1beta1DataVolumeSpec;
   withWindowsDrivers?: boolean;
 }): useCustomizeFormSubmitType => {
   const { ns } = useParams<{ ns: string }>();
@@ -57,11 +58,12 @@ export const useCustomizeFormSubmit = ({
     loaded: vmLoaded,
     error: vmError,
   } = useWizardVMContext();
-  const { upload, uploadData } = useCDIUpload();
+  const { upload: diskUpload, uploadData: uploadDiskData } = useCDIUpload();
+  const { upload: cdUpload, uploadData: uploadCDData } = useCDIUpload();
 
   const onSubmit = async (data: { [x: string]: any }, event: { target: HTMLFormElement }) => {
-    // upload only supported for diskSource
-    const uploadFile = data?.['disk-boot-source-uploadFile'];
+    const diskUploadFile = data?.['disk-boot-source-uploadFile'];
+    const cdUploadFile = data?.['cd-boot-source-uploadFile'];
 
     setTemplateError(undefined);
     setTemplateLoaded(false);
@@ -83,7 +85,7 @@ export const useCustomizeFormSubmit = ({
         vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
 
         // upload is required, we need to patch the volume and delete the data volume template (keep only cd dv template if available)
-        if (uploadFile) {
+        if (diskUploadFile) {
           const filteredDVTs = vmObj.spec.dataVolumeTemplates.filter(
             (dvt) => dvt.metadata.name !== dataVolumeTemplate.metadata.name,
           );
@@ -123,42 +125,45 @@ export const useCustomizeFormSubmit = ({
           tabsDataDraft.disks.dataVolumesToAddOwnerRef = [];
         }
       });
+      const diskUploadDV = getUploadDataVolume(
+        dataVolumeTemplate.metadata.name,
+        updatedVM.metadata.namespace,
+        diskSource?.storage?.resources?.requests?.storage || '30Gi',
+      );
+      const cdUploadDV = getUploadDataVolume(
+        `${updatedVM?.metadata?.name}-${INSTALLATION_CDROM_NAME}`,
+        updatedVM.metadata.namespace,
+        cdSource?.storage?.resources?.requests?.storage || '30Gi',
+      );
 
-      if (uploadFile) {
-        const dataVolume: V1beta1DataVolume = {
-          apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
-          kind: DataVolumeModel.kind,
-          metadata: {
-            name: dataVolumeTemplate.metadata.name,
-            namespace: updatedVM.metadata.namespace,
+      await Promise.all(
+        [
+          {
+            file: diskUploadFile,
+            upload: () => uploadDiskData({ file: diskUploadFile?.value, dataVolume: diskUploadDV }),
+            dataVolume: diskUploadDV,
           },
-          spec: {
-            source: {
-              upload: {},
-            },
-            storage: {
-              resources: {
-                requests: {
-                  storage: diskSource?.storage?.resources?.requests?.storage || '30Gi',
-                },
-              },
-            },
+          {
+            file: cdUploadFile,
+            upload: () => uploadCDData({ file: cdUploadFile?.value, dataVolume: cdUploadDV }),
+            dataVolume: cdUploadDV,
           },
-        };
-
-        // add ownerReference after vm creation
-        updateTabsData((draft) => {
-          ensurePath(draft, 'disks.dataVolumesToAddOwnerRef');
-          if (draft.disks) {
-            draft.disks.dataVolumesToAddOwnerRef = [
-              ...(tabsData?.disks?.dataVolumesToAddOwnerRef || []),
-              dataVolume,
-            ];
-          }
-        });
-
-        await uploadData({ file: uploadFile?.value, dataVolume });
-      }
+        ]
+          .filter((u) => u.file)
+          .map((uploadPromise) => {
+            // add ownerReference after vm creation
+            updateTabsData((draft) => {
+              ensurePath(draft, 'disks.dataVolumesToAddOwnerRef');
+              if (draft.disks) {
+                draft.disks.dataVolumesToAddOwnerRef = [
+                  ...(tabsData?.disks?.dataVolumesToAddOwnerRef || []),
+                  uploadPromise.dataVolume,
+                ];
+              }
+            });
+            return uploadPromise.upload();
+          }),
+      );
 
       // update context vm
       await updateVM(updatedVM);
@@ -175,9 +180,13 @@ export const useCustomizeFormSubmit = ({
 
   return {
     onSubmit,
-    onCancel: upload?.cancelUpload,
+    onCancel: async () => {
+      await diskUpload?.cancelUpload();
+      return cdUpload?.cancelUpload();
+    },
     loaded: templateLoaded && vmLoaded,
     error: templateError || vmError,
-    upload,
+    diskUpload,
+    cdUpload,
   };
 };

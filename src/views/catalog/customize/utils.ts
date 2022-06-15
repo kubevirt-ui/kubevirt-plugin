@@ -7,6 +7,8 @@ import {
   TemplateParameter,
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
+import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import {
@@ -149,3 +151,28 @@ export const buildFields = (template: V1Template): Array<TemplateParameter[]> =>
 
   return [requiredFields, optionalFields];
 };
+
+export const getUploadDataVolume = (
+  name: string,
+  namespace: string,
+  storage?: string,
+): V1beta1DataVolume => ({
+  apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
+  kind: DataVolumeModel.kind,
+  metadata: {
+    name,
+    namespace,
+  },
+  spec: {
+    source: {
+      upload: {},
+    },
+    storage: {
+      resources: {
+        requests: {
+          storage,
+        },
+      },
+    },
+  },
+});

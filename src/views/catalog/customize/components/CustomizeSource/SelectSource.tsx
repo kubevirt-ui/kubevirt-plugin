@@ -68,7 +68,10 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   const [selectedSourceType, setSourceType] = React.useState<SOURCE_OPTIONS_IDS>(sourceOptions[0]);
   const [pvcNameSelected, selectPVCName] = React.useState<string>();
   const [pvcNamespaceSelected, selectPVCNamespace] = React.useState<string>();
-  const showSizeInput = withSize || selectedSourceType === HTTP_SOURCE_NAME;
+  const showSizeInput =
+    withSize ||
+    selectedSourceType === HTTP_SOURCE_NAME ||
+    selectedSourceType === UPLOAD_SOURCE_NAME;
 
   React.useEffect(() => {
     switch (selectedSourceType) {
