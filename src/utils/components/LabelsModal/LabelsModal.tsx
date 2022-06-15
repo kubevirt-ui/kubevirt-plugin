@@ -4,19 +4,20 @@ import TagsInput from 'react-tagsinput';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Stack, StackItem } from '@patternfly/react-core';
+import { Label as PFLabel, Stack, StackItem } from '@patternfly/react-core';
 
 import { isLabelValid, labelsArrayToObject, labelsToArray } from './utils';
 
 type LabelsModalProps = {
   isOpen: boolean;
   obj: K8sResourceCommon;
+  labelClassName?: string;
   onLabelsSubmit: (labels: { [key: string]: string }) => Promise<void | K8sResourceCommon>;
   onClose: () => void;
 };
 
 export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
-  ({ isOpen, obj, onLabelsSubmit, onClose }) => {
+  ({ isOpen, obj, labelClassName, onLabelsSubmit, onClose }) => {
     const { t } = useKubevirtTranslation();
     const [inputValue, setInputValue] = React.useState('');
     const [isInputValid, setIsInputValid] = React.useState(true);
@@ -63,13 +64,14 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
 
     const renderTag = ({ tag, key, onRemove, getTagDisplayValue }) => {
       return (
-        <span className="tag-item" key={key}>
-          <span className="tag-item__content">{getTagDisplayValue(tag)}</span>
-          &nbsp;
-          <a className="remove-button" onClick={() => onRemove(key)}>
-            ×
-          </a>
-        </span>
+        <PFLabel
+          className={'co-label tag-item-content'.concat(labelClassName || '')}
+          key={key}
+          onClose={() => onRemove(key)}
+          isTruncated
+        >
+          {getTagDisplayValue(tag)}
+        </PFLabel>
       );
     };
 

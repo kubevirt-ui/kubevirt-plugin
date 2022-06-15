@@ -22,6 +22,12 @@
     &-tile {
       color: var(--pf-global--Color--100);
     }
+
+    :where(.pf-theme-dark) & {
+      .vm-catalog-grid-tile:hover {
+        outline: 1px solid var(--pf-global--BorderColor--300);
+      }
+    }
   }
 
   .vm-catalog-grid-container,
