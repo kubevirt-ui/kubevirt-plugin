@@ -22,7 +22,7 @@ export const FieldGroup: React.FC<FieldGroupProps> = ({ field, showError, classN
 
   return (
     <FormGroup
-      label={displayName}
+      label={displayName || name}
       fieldId={fieldId}
       isRequired={required}
       helperText={description}
