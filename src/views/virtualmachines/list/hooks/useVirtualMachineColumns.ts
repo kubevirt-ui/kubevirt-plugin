@@ -41,7 +41,7 @@ const useVirtualMachineColumns = (namespace: string) => {
         id: 'status',
         transforms: [sortable],
         sort: 'status.printableStatus',
-        props: { className: 'pf-m-width-5' },
+        props: { className: 'pf-m-width-10' },
       },
       {
         title: t('Conditions'),
@@ -51,6 +51,7 @@ const useVirtualMachineColumns = (namespace: string) => {
       {
         title: t('Node'),
         id: 'node',
+        props: { className: 'pf-m-width-15' },
       },
       {
         title: t('Created'),
@@ -62,7 +63,7 @@ const useVirtualMachineColumns = (namespace: string) => {
       {
         title: t('IP address'),
         id: 'ip-address',
-        props: { className: 'pf-m-width-5' },
+        props: { className: 'pf-m-width-10' },
       },
       {
         title: '',
