@@ -8,6 +8,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Split, SplitItem } from '@patternfly/react-core';
 
@@ -45,7 +46,7 @@ const DiskRow: React.FC<
         )}
       </TableData>
       <TableData id="size" activeColumnIDs={activeColumnIDs}>
-        {obj?.size}
+        {readableSizeUnit(obj?.size)}
       </TableData>
       <TableData id="drive" activeColumnIDs={activeColumnIDs}>
         {obj?.drive}

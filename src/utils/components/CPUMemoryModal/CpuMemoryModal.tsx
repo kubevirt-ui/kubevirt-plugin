@@ -3,6 +3,7 @@ import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { toIECUnit } from '@kubevirt-utils/utils/units';
 import {
   Alert,
   Button,
@@ -170,19 +171,19 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
           <Dropdown
             className="input-memory--dropdown"
             onSelect={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setMemoryUnit(e?.target?.innerText);
+              setMemoryUnit(e?.target?.value);
               setIsDropdownOpen(false);
             }}
             toggle={
               <DropdownToggle onToggle={(toggeld) => setIsDropdownOpen(toggeld)}>
-                {memoryUnit}
+                {toIECUnit(memoryUnit)}
               </DropdownToggle>
             }
             isOpen={isDropdownOpen}
             dropdownItems={memorySizesTypes.map((value) => {
               return (
-                <DropdownItem key={value} component="button">
-                  {value}
+                <DropdownItem key={value} value={value} component="button">
+                  {toIECUnit(value)}
                 </DropdownItem>
               );
             })}

@@ -10,6 +10,7 @@ import {
   getTemplateWorkload,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { CatalogTile } from '@patternfly/react-catalog-view-extension';
 import { Badge, Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
@@ -80,7 +81,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
                 <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload] ?? t('Other')}
               </StackItem>
               <StackItem>
-                <b>{t('CPU')}</b> {cpuCount} | <b>{t('Memory')}</b> {memory}
+                <b>{t('CPU')}</b> {cpuCount} | <b>{t('Memory')}</b> {readableSizeUnit(memory)}
               </StackItem>
             </Stack>
           </StackItem>

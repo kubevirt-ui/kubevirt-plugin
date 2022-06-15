@@ -10,6 +10,7 @@ import {
 } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { toIECUnit } from '@kubevirt-utils/utils/units';
 import {
   Alert,
   Button,
@@ -142,21 +143,22 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
           />
 
           <Dropdown
+            selected
             className="input-memory--dropdown"
             onSelect={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setMemoryUnit(e?.target?.innerText);
+              setMemoryUnit(e?.target?.value);
               setIsDropdownOpen(false);
             }}
             toggle={
               <DropdownToggle onToggle={(toggeld) => setIsDropdownOpen(toggeld)}>
-                {memoryUnit}
+                {toIECUnit(memoryUnit)}
               </DropdownToggle>
             }
             isOpen={isDropdownOpen}
             dropdownItems={memorySizesTypes.map((value) => {
               return (
-                <DropdownItem key={value} component="button">
-                  {value}
+                <DropdownItem key={value} value={value} component="button">
+                  {toIECUnit(value)}
                 </DropdownItem>
               );
             })}

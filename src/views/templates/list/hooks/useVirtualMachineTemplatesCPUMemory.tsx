@@ -3,40 +3,10 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
 import { getFlavorData, getTemplateVirtualMachineCPU } from '@kubevirt-utils/resources/template';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { isTemplateParameter } from '@kubevirt-utils/utils/utils';
 import { Popover, PopoverPosition } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
-
-enum BinaryUnit {
-  B = 'B',
-  Ki = 'Ki',
-  Mi = 'Mi',
-  Gi = 'Gi',
-  Ti = 'Ti',
-}
-
-const toIECUnit = (unit: BinaryUnit | string): string => {
-  if (!unit || unit.endsWith('B')) {
-    return unit;
-  }
-
-  return `${unit}B`;
-};
-
-const stringValueUnitSplit = (combinedVal: string): [value: string, unit: string] => {
-  const index = combinedVal?.search(/([a-zA-Z]+)/g);
-  let value = '';
-  let unit = '';
-
-  if (index === -1) {
-    value = combinedVal;
-  } else {
-    value = combinedVal?.slice(0, index);
-    unit = combinedVal?.slice(index);
-  }
-
-  return [value, toIECUnit(unit)];
-};
 
 export const useVirtualMachineTemplatesCPUMemory = (
   template: V1Template,
@@ -73,7 +43,6 @@ export const useVirtualMachineTemplatesCPUMemory = (
       </>
     );
   } else {
-    const [value, readableUnit] = stringValueUnitSplit(memory);
-    return `CPU ${cpu?.cores} | ${t('Memory')} ${value} ${readableUnit}`;
+    return `CPU ${cpu?.cores} | ${t('Memory')} ${readableSizeUnit(memory)}`;
   }
 };

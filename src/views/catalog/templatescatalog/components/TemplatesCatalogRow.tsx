@@ -11,6 +11,7 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Button } from '@patternfly/react-core';
 
@@ -60,7 +61,7 @@ export const TemplatesCatalogRow: React.FC<
           />
         </TableData>
         <TableData id="cpu" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
-          {t('CPU')} {cpuCount} | {t('Memory')} {memory}
+          {t('CPU')} {cpuCount} | {t('Memory')} {readableSizeUnit(memory)}
         </TableData>
       </>
     );

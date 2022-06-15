@@ -12,6 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
@@ -27,7 +28,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const flavor = getVmCPUMemory(vm);
+  const { cpuCount, memory } = getVmCPUMemory(vm);
   const description = getAnnotation(vm, 'description');
   const workloadAnnotation = vm?.spec?.template?.metadata?.annotations?.['vm.kubevirt.io/workload'];
   const networks = vm?.spec?.template?.spec?.networks;
@@ -108,7 +109,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
               }
               description={
                 <>
-                  {t('CPU')} {flavor?.cpuCount} | {t('Memory')} {flavor?.memory}
+                  {t('CPU')} {cpuCount} | {t('Memory')} {readableSizeUnit(memory)}
                 </>
               }
             />
