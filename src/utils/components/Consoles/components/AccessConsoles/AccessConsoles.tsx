@@ -14,6 +14,7 @@ import {
 import { AccessConsolesProps, getChildTypeName, getConsoleForType } from './utils/accessConsoles';
 
 import '@patternfly/react-styles/css/components/Consoles/AccessConsoles.css';
+import './access-consoles.scss';
 
 export const AccessConsoles: React.FC<AccessConsolesProps> = ({
   children,
@@ -54,7 +55,7 @@ export const AccessConsoles: React.FC<AccessConsolesProps> = ({
   return (
     <div className={css(styles.console)}>
       {React.Children.toArray(children).length > 1 && (
-        <div className={css(styles.consoleActions)}>
+        <div className={css(styles.consoleActions, 'pf-u-w-0', 'access-consoles')}>
           <Select
             aria-label={textSelectConsoleType}
             placeholderText={textSelectConsoleType}
