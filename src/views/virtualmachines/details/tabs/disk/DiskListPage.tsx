@@ -3,9 +3,8 @@ import { RouteComponentProps } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import FilesystemList from '../filesystem/FilesystemList';
-
-import DiskList from './DiskList';
+import DiskList from './tables/disk/DiskList';
+import FilesystemList from './tables/filesystem/FilesystemList';
 
 type DiskListPageProps = RouteComponentProps<{
   ns: string;

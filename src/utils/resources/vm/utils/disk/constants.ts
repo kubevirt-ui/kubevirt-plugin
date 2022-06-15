@@ -22,6 +22,7 @@ export type DiskRowDataLayout = {
   metadata: { name: string };
   namespace?: string;
   isBootDisk: boolean;
+  isEnvDisk: boolean;
 };
 
 export const diskTypes = {

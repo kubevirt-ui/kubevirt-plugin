@@ -42,6 +42,8 @@ export const getDiskRowDataLayout = (
       size: NO_DATA_DASH,
       storageClass: NO_DATA_DASH,
       isBootDisk: device?.disk?.name === bootDisk?.name,
+      isEnvDisk:
+        !!device?.volume?.configMap || !!device?.volume?.secret || !!device?.volume?.serviceAccount,
     };
 
     if (device?.pvc) {
