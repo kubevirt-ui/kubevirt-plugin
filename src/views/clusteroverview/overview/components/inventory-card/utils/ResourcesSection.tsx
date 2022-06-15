@@ -44,6 +44,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources, isAdmin 
           isLoading={vms?.loaded === false}
           error={!!vms?.loadError}
           dataTest="kv-inventory-card--vms"
+          showLink={isAdmin}
         />
       </StackItem>
       <StackItem key={TemplateModel.kind}>
@@ -54,6 +55,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources, isAdmin 
           error={!!templates?.loadError}
           dataTest="kv-inventory-card--vm-templates"
           basePath={`/k8s/all-namespaces/templates`}
+          showLink={isAdmin}
         />
       </StackItem>
       <StackItem key={NodeModel.kind}>
@@ -63,6 +65,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources, isAdmin 
           isLoading={resources?.nodes?.loaded === false}
           error={!!resources?.nodes?.loadError}
           dataTest="kv-inventory-card--nodes"
+          showLink={isAdmin}
         />
       </StackItem>
       <StackItem key={NetworkAttachmentDefinitionModel.kind}>
@@ -74,6 +77,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources, isAdmin 
           isLoading={nads?.loaded === false}
           error={!!nads?.loadError}
           dataTest="kv-inventory-card--nads"
+          showLink={isAdmin}
         />
       </StackItem>
     </Stack>
