@@ -356,7 +356,7 @@
   "installation iso of Microsoft Windows 10 ": "installation iso of Microsoft Windows 10 ",
   "Interface": "Interface",
   "Interface Type": "Interface Type",
-  "Invalid certificate, please visit the following URL and approve it.\n {{getUploadURL}}": "Invalid certificate, please visit the following URL and approve it.\n {{getUploadURL}}",
+  "Invalid certificate, please visit the following URL and approve it": "Invalid certificate, please visit the following URL and approve it",
   "Invalid MAC address format": "Invalid MAC address format",
   "Invalid URL": "Invalid URL",
   "Inventory": "Inventory",

@@ -63,10 +63,8 @@ export const useCDIUpload = (): UseCDIUploadValues => {
     } catch (catchError) {
       if (catchError?.response?.data === undefined) {
         return Promise.reject({
-          message: t(
-            `Invalid certificate, please visit the following URL and approve it.\n {{getUploadURL}}`,
-            { getUploadURL: getUploadURL(uploadProxyURL) },
-          ),
+          message: t('Invalid certificate, please visit the following URL and approve it'),
+          href: getUploadURL(uploadProxyURL),
         });
       }
     }

@@ -90,7 +90,14 @@ const TabModal: TabModalFC = React.memo(
             {error && (
               <StackItem>
                 <Alert isInline variant={AlertVariant.danger} title={t('An error occurred')}>
-                  {error?.message}
+                  <Stack hasGutter>
+                    <StackItem>{error.message}</StackItem>
+                    {error?.href && (
+                      <StackItem>
+                        <a href={error.href}>{error.href}</a>
+                      </StackItem>
+                    )}
+                  </Stack>
                 </Alert>
               </StackItem>
             )}
