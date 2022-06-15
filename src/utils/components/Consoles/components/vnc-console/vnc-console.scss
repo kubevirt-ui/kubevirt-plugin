@@ -15,3 +15,11 @@
   justify-content: center;
   margin-bottom: -5px;
 }
+.pf-c-console__actions-vnc {
+  grid-area: actions-main;
+  margin-left: 250px;
+  justify-content: unset;
+}
+.vnc-actions-disconnect-button {
+  justify-self: flex-end;
+}
