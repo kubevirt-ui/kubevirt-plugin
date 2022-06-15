@@ -8,9 +8,10 @@ import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 type FieldGroupProps = {
   field: TemplateParameter;
   showError?: boolean;
+  className?: string;
 };
 
-export const FieldGroup: React.FC<FieldGroupProps> = ({ field, showError }) => {
+export const FieldGroup: React.FC<FieldGroupProps> = ({ field, showError, className }) => {
   const { t } = useKubevirtTranslation();
   const { name, description, displayName, required, value: initialValue } = field;
   const [value, setValue] = React.useState(initialValue || '');
@@ -28,6 +29,7 @@ export const FieldGroup: React.FC<FieldGroupProps> = ({ field, showError }) => {
       helperTextInvalid={t('This field is required')}
       helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
       validated={validated}
+      className={className}
     >
       <TextInput
         data-test-id={fieldId}
