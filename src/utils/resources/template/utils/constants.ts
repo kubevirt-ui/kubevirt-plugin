@@ -83,6 +83,13 @@ export enum BOOT_SOURCE {
   NONE = 'NONE',
 }
 
+// t('PVC')
+// t('PVC (auto upload)')
+// t('URL')
+// t('Registry')
+// t('Container Disk')
+// t('No boot source')
+
 export const BOOT_SOURCE_LABELS = {
   [BOOT_SOURCE.PVC]: 'PVC',
   [BOOT_SOURCE.DATA_SOURCE]: 'PVC',
@@ -90,7 +97,7 @@ export const BOOT_SOURCE_LABELS = {
   [BOOT_SOURCE.URL]: 'URL',
   [BOOT_SOURCE.REGISTRY]: 'Registry',
   [BOOT_SOURCE.CONTAINER_DISK]: 'Container Disk',
-  [BOOT_SOURCE.NONE]: 'No Boot Source',
+  [BOOT_SOURCE.NONE]: 'No boot source',
 };
 
 export const OS_IMAGE_LINKS = {
