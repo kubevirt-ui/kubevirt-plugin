@@ -5,8 +5,6 @@ import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
-import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
-import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 
@@ -21,14 +19,9 @@ const VirtualMachineTemplatesRow: React.FC<
     V1Template,
     { availableTemplatesUID: Set<string>; availableDatasources: Record<string, V1beta1DataSource> }
   >
-> = ({ obj, activeColumnIDs, rowData: { availableTemplatesUID, availableDatasources } }) => {
+> = ({ obj, activeColumnIDs, rowData: { availableDatasources } }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const bootSource = getTemplateBootSourceType(obj);
-  const dataSource =
-    availableDatasources?.[
-      `${bootSource?.source?.sourceRef?.namespace}-${bootSource?.source?.sourceRef?.name}`
-    ];
 
   return (
     <>
@@ -51,10 +44,7 @@ const VirtualMachineTemplatesRow: React.FC<
         {t(getWorkloadProfile(obj))}
       </TableData>
       <TableData id="availability" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
-        <VirtualMachineTemplatesSource
-          source={getVMBootSourceLabel(bootSource?.type, dataSource)}
-          isBootSourceAvailable={availableTemplatesUID.has(obj.metadata.uid)}
-        />
+        <VirtualMachineTemplatesSource template={obj} availableDatasources={availableDatasources} />
       </TableData>
       <TableData id="cpu" activeColumnIDs={activeColumnIDs}>
         {useVirtualMachineTemplatesCPUMemory(obj)}
