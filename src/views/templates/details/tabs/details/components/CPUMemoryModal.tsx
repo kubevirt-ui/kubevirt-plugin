@@ -37,10 +37,6 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
 
-  const defaultMemory = getMemorySize(
-    template?.objects?.[0]?.spec?.template?.spec?.domain?.resources?.requests?.memory,
-  );
-  const defaultCpu = getCPUcores(template?.objects?.[0]);
   const isCommonTemplate = isCommonVMTemplate(template);
   const [updateInProcess, setUpdateInProcess] = React.useState<boolean>(false);
   const [updateError, setUpdateError] = React.useState<string>();
@@ -104,18 +100,6 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
           isLoading={updateInProcess}
         >
           {t('Save')}
-        </Button>,
-        <Button
-          key="default"
-          variant={ButtonVariant.secondary}
-          isDisabled={!defaultCpu || !defaultMemory}
-          onClick={() => {
-            setCpuCores(defaultCpu);
-            setMemory(defaultMemory?.size);
-            setMemoryUnit(defaultMemory?.unit);
-          }}
-        >
-          {t('Restore template settings')}
         </Button>,
         <Button key="cancel" variant="link" onClick={onClose}>
           {t('Cancel')}
