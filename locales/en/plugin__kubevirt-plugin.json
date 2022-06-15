@@ -291,7 +291,7 @@
   "Enable Descheduler": "Enable Descheduler",
   "Enable preallocation": "Enable preallocation",
   "Enter a container image (for example: {{containerDisk}})": "Enter a container image (for example: {{containerDisk}})",
-  "Enter URL to download (for example: {{importUrl}})": "Enter URL to download (for example: {{importUrl}})",
+  "Enter URL to download. for example: ": "Enter URL to download. for example: ",
   "Enter value": "Enter value",
   "Environment": "Environment",
   "Error": "Error",

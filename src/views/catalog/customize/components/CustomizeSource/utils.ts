@@ -4,7 +4,6 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   getTemplateContainerDisks,
-  getTemplateImportURLs,
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template';
 
@@ -81,15 +80,6 @@ export const getTemplateStorageQuantity = (template: V1Template): string | undef
   const dataVolumeTemplates = getTemplateVirtualMachineObject(template)?.spec?.dataVolumeTemplates;
 
   return dataVolumeTemplates?.[0]?.spec?.storage?.resources?.requests?.storage;
-};
-
-export const getHTTPHelperText = (template: V1Template, t: TFunction) => {
-  const importUrls = getTemplateImportURLs(template);
-
-  if (importUrls && importUrls.length > 0)
-    return t('Enter URL to download (for example: {{importUrl}})', {
-      importUrl: importUrls[0],
-    });
 };
 
 export const getRegistryHelperText = (template: V1Template, t: TFunction) => {

@@ -4,6 +4,7 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateImportURLs } from '@kubevirt-utils/resources/template';
 import { Checkbox, Divider, FormGroup } from '@patternfly/react-core';
 
 import BootCDCheckbox from './BootCDCheckboxLabel';
@@ -21,7 +22,6 @@ import SelectDiskSourcePopOver from './SelectDiskSourcePopOver';
 import { SelectSource } from './SelectSource';
 import {
   getGenericSourceCustomization,
-  getHTTPHelperText,
   getPVCSource,
   getRegistryHelperText,
   getTemplateStorageQuantity,
@@ -60,7 +60,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
     }
   }, [cdSource, setCDSource, setDiskSource]);
 
-  const httpSourceHelperText = getHTTPHelperText(template, t);
+  const httpSourceHelperURL = getTemplateImportURLs(template)?.[0];
   const registrySourceHelperText = getRegistryHelperText(template, t);
 
   return (
@@ -74,7 +74,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
           sourceLabel={t('CD source')}
           sourcePopOver={<SelectCDSourcePopOver />}
           sourceOptions={[HTTP_SOURCE_NAME, PVC_SOURCE_NAME, CONTAINER_DISK_SOURCE_NAME]}
-          httpSourceHelperText={httpSourceHelperText}
+          httpSourceHelperURL={httpSourceHelperURL}
           registrySourceHelperText={registrySourceHelperText}
           data-test-id="cd-boot-source"
         />
@@ -96,7 +96,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         ]}
         sourceLabel={t('Disk source')}
         sourcePopOver={<SelectDiskSourcePopOver />}
-        httpSourceHelperText={httpSourceHelperText}
+        httpSourceHelperURL={httpSourceHelperURL}
         registrySourceHelperText={registrySourceHelperText}
         relevantUpload={relevantUpload}
         data-test-id="disk-boot-source"

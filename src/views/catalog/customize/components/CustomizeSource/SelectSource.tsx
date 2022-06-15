@@ -33,7 +33,7 @@ export type SelectSourceProps = {
   initialVolumeQuantity?: string;
   withSize?: boolean;
   sourceOptions: SOURCE_OPTIONS_IDS[];
-  httpSourceHelperText?: string;
+  httpSourceHelperURL?: string;
   registrySourceHelperText?: string;
   'data-test-id': string;
   relevantUpload?: DataUpload;
@@ -47,7 +47,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   sourceOptions,
   sourceLabel,
   sourcePopOver,
-  httpSourceHelperText,
+  httpSourceHelperURL,
   registrySourceHelperText,
   'data-test-id': testId,
   relevantUpload,
@@ -149,7 +149,16 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           fieldId={`${testId}-${selectedSourceType}`}
           isRequired
           className="disk-source-form-group"
-          helperText={httpSourceHelperText}
+          helperText={
+            httpSourceHelperURL && (
+              <>
+                {t('Enter URL to download. for example: ')}
+                <a href={httpSourceHelperURL} target="_blank" rel="noreferrer">
+                  {httpSourceHelperURL}
+                </a>
+              </>
+            )
+          }
           validated={
             errors?.[`${testId}-httpURL`] ? ValidatedOptions.error : ValidatedOptions.default
           }
