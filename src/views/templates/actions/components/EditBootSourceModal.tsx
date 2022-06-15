@@ -12,7 +12,7 @@ import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, Button, Form, FormGroup, Popover, TextInput } from '@patternfly/react-core';
+import { Alert, Button, Form, FormGroup, Popover } from '@patternfly/react-core';
 
 import { SOURCE_TYPES } from '../../utils/constants';
 import { editBootSource } from '../editBootSource';
@@ -37,7 +37,6 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [bootSource, setBootSource] = React.useState<V1beta1DataVolumeSpec>();
-  const [sourceProvider, setSourceProvider] = React.useState('');
 
   const affectedTemplates = useBootSourceEditAffectedTemplates(obj);
 
@@ -90,19 +89,6 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({
               ]}
               withSize
               initialVolumeQuantity={getTemplateStorageQuantity(obj)}
-            />
-          </FormGroup>
-          <FormGroup
-            label={t('Boot source provider')}
-            fieldId="boot-source-provider"
-            isRequired
-            helperText={t('Example: your company name')}
-          >
-            <TextInput
-              id="boot-source-provider"
-              type="text"
-              value={sourceProvider}
-              onChange={setSourceProvider}
             />
           </FormGroup>
         </Form>
