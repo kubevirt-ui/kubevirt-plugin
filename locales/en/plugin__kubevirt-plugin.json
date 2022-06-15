@@ -411,7 +411,7 @@
   "Missing required fields": "Missing required fields",
   "Model": "Model",
   "More info": "More info",
-  "More info: ": "More info: ",
+  "More info: <1>{moreInfoURL}</1>": "More info: <1>{moreInfoURL}</1>",
   "Mount Point": "Mount Point",
   "Mount Windows drivers disk": "Mount Windows drivers disk",
   "MTV": "MTV",

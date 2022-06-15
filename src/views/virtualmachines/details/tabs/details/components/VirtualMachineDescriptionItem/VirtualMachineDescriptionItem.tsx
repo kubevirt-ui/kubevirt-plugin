@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -51,14 +52,18 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
 
   const getItemHeader = () => {
-    if (isPopover) {
+    if (isPopover && bodyContent) {
       return (
         <Popover
           headerContent={descriptionHeader}
           bodyContent={
             <>
-              {bodyContent} {t('More info: ')}
-              {moreInfoURL && <Link to={moreInfoURL}>{moreInfoURL}</Link>}
+              {bodyContent}
+              {moreInfoURL && (
+                <Trans t={t} ns="plugin__kubevirt-plugin">
+                  More info: <Link to={moreInfoURL}>{moreInfoURL}</Link>
+                </Trans>
+              )}
               {breadcrumb && (
                 <Breadcrumb>
                   {breadcrumb.split('.').map((item) => (
