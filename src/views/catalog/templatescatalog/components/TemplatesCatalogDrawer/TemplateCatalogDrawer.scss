@@ -7,7 +7,7 @@
       padding-right: var(--pf-c-modal-box__footer--PaddingRight);
       padding-bottom: var(--pf-c-modal-box__footer--PaddingBottom);
       padding-left: var(--pf-c-modal-box__footer--PaddingLeft);
-      border-top: 1px solid var(--pf-chart-color-black-200);
+      border-top: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--300);
     }
   }
 }
