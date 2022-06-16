@@ -64,7 +64,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
   const initialDiskSourceState = React.useMemo(() => ({ ...initialStateDiskSource }), []);
   const disk = getDisks(vm)?.find(({ name }) => name === diskName);
 
-  const { diskSource, diskSize, isBootDisk } = React.useMemo(() => {
+  const { diskSource, diskSize, isBootDisk, accessMode, volumeMode } = React.useMemo(() => {
     const dataVolumeTemplates = getDataVolumeTemplates(vm);
 
     const volumes = getVolumes(vm);
@@ -107,6 +107,8 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
           dataVolumeTemplate.spec?.storage?.resources?.requests?.storage ||
           dataVolumeTemplate.spec?.pvc?.resources?.requests?.storage ||
           '',
+        accessMode: dataVolumeTemplate?.spec?.storage?.accessModes?.[0],
+        volumeMode: dataVolumeTemplate?.spec?.storage?.volumeMode,
       };
     }
 
@@ -120,8 +122,8 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
     diskSource,
     enablePreallocation: false,
     storageClass: null,
-    volumeMode: null,
-    accessMode: null,
+    volumeMode,
+    accessMode,
     diskInterface: getDiskInterface(disk),
     applyStorageProfileSettings: false,
     storageClassProvisioner: null,
