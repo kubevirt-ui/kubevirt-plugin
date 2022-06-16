@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
 
-import { ensurePath } from '@catalog/utils/WizardVMContext';
+import { ensurePath, produceVMSSHKey } from '@catalog/utils/WizardVMContext';
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import { WizardTab } from '@catalog/wizard/tabs';
 import { AuthorizedSSHKeyModal } from '@kubevirt-utils/components/AuthorizedSSHKeyModal/AuthorizedSSHKeyModal';
@@ -52,7 +52,7 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
       }
     });
 
-  const onSSHChange = (value: string) =>
+  const onSSHChange = (value: string) => {
     updateTabsData((tabsDraft) => {
       ensurePath(tabsDraft, 'scripts.cloudInit');
 
@@ -62,6 +62,12 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
         delete tabsDraft.scripts.cloudInit.sshKey;
       }
     });
+
+    return updateVM((vmDraft) => {
+      const produced = produceVMSSHKey(vmDraft);
+      vmDraft.spec = produced.spec;
+    });
+  };
 
   return (
     <div className="co-m-pane__body">
@@ -101,7 +107,7 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
               }
               onEditClick={() =>
                 createModal((modalProps) => (
-                  <AuthorizedSSHKeyModal {...modalProps} sshKey={sshKey} onChange={onSSHChange} />
+                  <AuthorizedSSHKeyModal {...modalProps} sshKey={sshKey} onSubmit={onSSHChange} />
                 ))
               }
             />
