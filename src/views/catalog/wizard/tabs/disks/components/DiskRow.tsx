@@ -25,6 +25,13 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ obj, activeColumnIDs }
               </Label>
             </SplitItem>
           )}
+          {obj?.isEnvDisk && (
+            <SplitItem>
+              <Label variant="filled" color="blue">
+                {t('environment disk')}
+              </Label>
+            </SplitItem>
+          )}
         </Split>
       </TableData>
       <TableData id="source" activeColumnIDs={activeColumnIDs}>

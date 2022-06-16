@@ -35,7 +35,7 @@ const useTemplateDisksTableData: UseDisksTableDisks = (template: V1Template) => 
     kind: PersistentVolumeClaimModel.kind,
     isList: true,
     namespaced: true,
-    namespace: vm?.metadata?.namespace,
+    namespace: template?.metadata?.namespace,
   });
 
   const disks = React.useMemo(() => {
@@ -87,6 +87,10 @@ const useTemplateDisksTableData: UseDisksTableDisks = (template: V1Template) => 
         metadata: { name: device?.disk?.name },
         namespace: device?.pvc?.metadata?.namespace,
         isBootDisk: device?.disk?.name === getBootDisk(vm)?.name,
+        isEnvDisk:
+          !!device?.volume?.configMap ||
+          !!device?.volume?.secret ||
+          !!device?.volume?.serviceAccount,
       };
     });
   }, [pvcs, t, vm, vmDataVolumeTemplates, vmDisks, vmVolumes]);

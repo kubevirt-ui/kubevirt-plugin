@@ -295,6 +295,7 @@
   "Enter URL to download. for example: ": "Enter URL to download. for example: ",
   "Enter value": "Enter value",
   "Environment": "Environment",
+  "environment disk": "environment disk",
   "Error": "Error",
   "Error Loading Template: the server could not find the requested resource": "Error Loading Template: the server could not find the requested resource",
   "Ethernet name": "Ethernet name",

@@ -8,7 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 import VirtualMachineConsolePage from '../tabs/console/VirtualMachineConsolePage';
 import VirtualMachineDetailsPage from '../tabs/details/VirtualMachineDetailsPage';
-import DiskListPage from '../tabs/disk/tables/disk/DiskListPage';
+import DiskListPage from '../tabs/disk/DiskListPage';
 import VirtualMachineEnvironmentPage from '../tabs/environment/VirtualMachineEnvironmentPage';
 import VirtualMachinePageEventsTab from '../tabs/events/VirtualMachinePageEvents';
 import NetworkInterfaceListPage from '../tabs/network/NetworkInterfaceListPage';

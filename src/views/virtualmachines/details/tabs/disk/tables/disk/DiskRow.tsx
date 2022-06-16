@@ -34,6 +34,13 @@ const DiskRow: React.FC<
               </Label>
             </SplitItem>
           )}
+          {obj?.isEnvDisk && (
+            <SplitItem>
+              <Label variant="filled" color="blue">
+                {t('environment disk')}
+              </Label>
+            </SplitItem>
+          )}
         </Split>
       </TableData>
 
