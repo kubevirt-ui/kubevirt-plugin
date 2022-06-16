@@ -79,7 +79,7 @@ export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
           setIsBootSourceAvailable(true);
         }
         break;
-
+      case BOOT_SOURCE.NONE:
       case undefined: {
         setIsBootSourceAvailable(false);
       }
