@@ -2,9 +2,8 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
+import { useActiveNamespacePath } from '@kubevirt-utils/hooks/useActiveNamespacePath';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useLastNamespace } from '@kubevirt-utils/hooks/useLastNamespace';
 import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
 import { Breadcrumb, BreadcrumbItem, Button, Label, Title } from '@patternfly/react-core';
 
@@ -20,10 +19,8 @@ type TemplatePageTitleTitleProps = {
 const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const [lastNamespace] = useLastNamespace();
+  const [activeNamespacePath] = useActiveNamespacePath();
   const isEditDisabled = isCommonVMTemplate(template);
-
-  const namespacePath = lastNamespace === ALL_NAMESPACES ? lastNamespace : `ns/${lastNamespace}`;
 
   return (
     <div className="pf-c-page__main-breadcrumb">
@@ -32,7 +29,7 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
           <Button
             variant="link"
             isInline
-            onClick={() => history.push(`/k8s/${namespacePath}/templates`)}
+            onClick={() => history.push(`/k8s/${activeNamespacePath}/templates`)}
           >
             {t('Templates')}
           </Button>

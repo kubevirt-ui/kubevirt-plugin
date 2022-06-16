@@ -9,9 +9,8 @@ import VirtualMachineModel, {
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DeleteResourceMessage from '@kubevirt-utils/components/DeleteResourceMessage/DeleteResourceMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
+import { useActiveNamespacePath } from '@kubevirt-utils/hooks/useActiveNamespacePath';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useLastNamespace } from '@kubevirt-utils/hooks/useLastNamespace';
 import { buildOwnerReference, compareOwnerReferences } from '@kubevirt-utils/resources/shared';
 import { k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
@@ -30,7 +29,7 @@ const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) =>
   const history = useHistory();
   const [deleteOwnedResource, setDeleteOwnedResource] = React.useState(true);
   const { dataVolumes, pvcs, snapshots, loaded } = useDeleteVMResources(vm);
-  const [lastNamespace] = useLastNamespace();
+  const [activeNamespacePath] = useActiveNamespacePath();
 
   const onDelete = (updatedVM: V1VirtualMachine) => {
     const deletePromise = async () => {
@@ -40,9 +39,7 @@ const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) =>
         requestInit: null,
         json: null,
       });
-      const lastNamespacePath =
-        lastNamespace === ALL_NAMESPACES ? lastNamespace : `ns/${lastNamespace}`;
-      history.push(`/k8s/${lastNamespacePath}/${VirtualMachineModelRef}`);
+      history.push(`/k8s/${activeNamespacePath}/${VirtualMachineModelRef}`);
     };
 
     if (!deleteOwnedResource) {
