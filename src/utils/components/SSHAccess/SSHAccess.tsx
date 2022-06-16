@@ -15,11 +15,13 @@ const SSHAccess: React.FC<SSHAccessProps> = ({ sshService }) => {
 
   return (
     <span data-test="details-item-ssh-access-port">
-      {sshService
-        ? t('port: {{port}}', {
-            port: sshServiceNodePort,
-          })
-        : t('SSH service disabled')}
+      {sshService ? (
+        t('port: {{port}}', {
+          port: sshServiceNodePort,
+        })
+      ) : (
+        <span className="text-muted">{t('SSH service disabled')} </span>
+      )}
     </span>
   );
 };
