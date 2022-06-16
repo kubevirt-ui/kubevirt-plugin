@@ -10,9 +10,8 @@ import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
+import { useActiveNamespacePath } from '@kubevirt-utils/hooks/useActiveNamespacePath';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useLastNamespace } from '@kubevirt-utils/hooks/useLastNamespace';
 import { Action, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import EditBootSourceModal from '../components/EditBootSourceModal';
@@ -37,7 +36,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const [bootDataSource, setBootDataSource] = React.useState<V1beta1DataSource>();
   const [loadingBootSource, setLoadingBootSource] = React.useState(true);
   const editableBootSource = hasEditableBootSource(bootDataSource);
-  const [lastNamespace] = useLastNamespace();
+  const [activeNamespacePath] = useActiveNamespacePath();
 
   const goToTemplatePage = React.useCallback(
     (clonedTemplate: V1Template) => {
@@ -61,9 +60,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       model: TemplateModel,
       resource: template,
     });
-    const lastNamespacePath =
-      lastNamespace === ALL_NAMESPACES ? lastNamespace : `ns/${lastNamespace}`;
-    history.push(`/k8s/${lastNamespacePath}/templates`);
+    history.push(`/k8s/${activeNamespacePath}/templates`);
   };
 
   const actions = [
