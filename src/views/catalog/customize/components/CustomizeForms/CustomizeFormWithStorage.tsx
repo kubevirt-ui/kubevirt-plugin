@@ -55,9 +55,10 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ tem
     getTemplateOS(template) === OS_NAME_TYPES.windows,
   );
 
-  const { onSubmit, onCancel, upload, loaded, error } = useCustomizeFormSubmit({
+  const { onSubmit, onCancel, diskUpload, cdUpload, loaded, error } = useCustomizeFormSubmit({
     template: templateWithSources,
     diskSource,
+    cdSource,
     withWindowsDrivers: windowsDrivers,
   });
 
@@ -81,7 +82,8 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ tem
           setDrivers={setWindowsDrivers}
           cdSource={cdSource}
           setCDSource={setCDSource}
-          relevantUpload={upload}
+          diskUpload={diskUpload}
+          cdUpload={cdUpload}
         />
 
         <ExpandableOptionsFields optionalFields={optionalFields} />

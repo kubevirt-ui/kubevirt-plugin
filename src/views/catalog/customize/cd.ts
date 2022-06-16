@@ -39,6 +39,13 @@ export const addInstallationCDRom = (
       metadata: { name: dataVolumeName },
       spec: { source: cdSource?.source, storage: cdSource?.storage },
     };
+  } else if (cdSource?.source?.upload) {
+    cdVolume = {
+      name: INSTALLATION_CDROM_NAME,
+      persistentVolumeClaim: {
+        claimName: dataVolumeName,
+      },
+    };
   }
 
   if (!cdVolume) return virtualMachine;
