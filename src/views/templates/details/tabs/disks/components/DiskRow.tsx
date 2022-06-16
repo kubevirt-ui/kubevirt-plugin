@@ -5,6 +5,7 @@ import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValu
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Split, SplitItem } from '@patternfly/react-core';
 
@@ -25,6 +26,7 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
   const isPVCSource = !['URL', 'PVC (auto upload)', 'Container (Ephemeral)', 'Other'].includes(
     obj?.source,
   );
+
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
@@ -56,7 +58,7 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
         )}
       </TableData>
       <TableData id="size" activeColumnIDs={activeColumnIDs}>
-        <TemplateValue value={obj?.size} />
+        <TemplateValue value={readableSizeUnit(obj?.size)} />
       </TableData>
       <TableData id="drive" activeColumnIDs={activeColumnIDs}>
         <TemplateValue value={obj?.drive} />

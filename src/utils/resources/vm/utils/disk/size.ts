@@ -1,3 +1,5 @@
+import { toIECUnit } from '@kubevirt-utils/utils/units';
+
 /**
  * function that checks if rawSize has number
  * @param {string} rawSize raw size
@@ -38,6 +40,6 @@ export const formatBytes = (rawSize: string, unit?: string): string => {
     ++unitIndex;
   }
 
-  const formattedSize = convertedSize.toFixed(2).concat(' ', sizeUnits[unitIndex]);
+  const formattedSize = convertedSize.toFixed(2).concat(' ', toIECUnit(sizeUnits[unitIndex]));
   return formattedSize;
 };

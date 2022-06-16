@@ -3,6 +3,7 @@ import * as React from 'react';
 import useWizardDisksTableData from '@catalog/wizard/tabs/disks/hooks/useWizardDisksTableData';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   DescriptionList,
   DescriptionListDescription,
@@ -46,7 +47,7 @@ export const WizardOverviewDisksTable: React.FC<{
         <DescriptionListDescription>
           <Stack>
             {disks.map((disk) => (
-              <StackItem key={disk.name}>{disk.size}</StackItem>
+              <StackItem key={disk.name}>{readableSizeUnit(disk.size)}</StackItem>
             ))}
           </Stack>
         </DescriptionListDescription>

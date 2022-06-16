@@ -19,6 +19,7 @@ import {
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   Button,
   DescriptionList,
@@ -136,7 +137,10 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                       <DescriptionListGroup>
                         <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
                         <DescriptionListDescription>
-                          {t('{{cpuCount}} CPU | {{memory}} Memory', { cpuCount, memory })}
+                          {t('{{cpuCount}} CPU | {{memory}} Memory', {
+                            cpuCount,
+                            memory: readableSizeUnit(memory),
+                          })}
                         </DescriptionListDescription>
                       </DescriptionListGroup>
                       <DescriptionListGroup>
