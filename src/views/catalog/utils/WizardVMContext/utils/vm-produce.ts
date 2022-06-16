@@ -71,9 +71,15 @@ export const produceVMDevices = (
 };
 
 export const produceVMSysprep = (vm: V1VirtualMachine) => {
-  return produce(vm, (vmDraft) => {
-    vmDraft.spec.template.spec.domain.devices.disks.push(sysprepDisk());
-    vmDraft.spec.template.spec.volumes.push(sysprepVolume(vmDraft));
+  return produceVMDisks(vm, (vmDraft) => {
+    if (
+      !vmDraft.spec.template.spec.domain.devices.disks?.find(
+        (disk) => disk.name === sysprepDisk.name,
+      )
+    ) {
+      vmDraft.spec.template.spec.domain.devices.disks.push(sysprepDisk());
+      vmDraft.spec.template.spec.volumes.push(sysprepVolume(vmDraft));
+    }
   });
 };
 

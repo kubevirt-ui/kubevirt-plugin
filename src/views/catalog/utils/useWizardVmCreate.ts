@@ -8,7 +8,7 @@ import { createSysprepConfigMap } from '@kubevirt-utils/components/SysprepModal/
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
-import { produceVMSSHKey, produceVMSysprep, useWizardVMContext } from './WizardVMContext';
+import { produceVMSysprep, useWizardVMContext } from './WizardVMContext';
 
 type CreateVMArguments = {
   startVM: boolean;
@@ -32,36 +32,28 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
       setLoaded(false);
       setError(undefined);
 
-      const sshKey = tabsData?.scripts?.cloudInit?.sshKey;
-      const hasSysprep =
-        tabsData?.scripts?.sysprep?.autounattend || tabsData?.scripts?.sysprep?.unattended;
-
-      const updatedVM = produce(vm, (vmDraft) => {
-        vmDraft.spec.running = startVM;
-
-        if (hasSysprep) {
-          const produced = produceVMSysprep(vmDraft);
-          vmDraft.spec = produced.spec;
-        }
-
-        if (sshKey) {
-          const produced = produceVMSSHKey(vmDraft);
-          vmDraft.spec = produced.spec;
-        }
-      });
-
       const newVM = await k8sCreate<V1VirtualMachine>({
         model: VirtualMachineModel,
-        data: updatedVM,
+        data: produce(vm, (vmDraft) => {
+          vmDraft.spec.running = startVM;
+
+          // sysprep disk addition
+          if (tabsData?.scripts?.sysprep) {
+            const produced = produceVMSysprep(vmDraft);
+            vmDraft.spec = produced.spec;
+          }
+        }),
       });
       setIsVmCreated(true);
 
-      if (hasSysprep) {
+      // sysprep configmap
+      if (tabsData?.scripts?.sysprep) {
         await createSysprepConfigMap(newVM, tabsData?.scripts?.sysprep);
       }
 
-      if (sshKey) {
-        await createVmSSHSecret(newVM, sshKey);
+      // ssh key
+      if (tabsData?.scripts?.cloudInit?.sshKey) {
+        await createVmSSHSecret(newVM, tabsData?.scripts?.cloudInit?.sshKey);
       }
 
       // add missing ownerReferences to upload data volumes

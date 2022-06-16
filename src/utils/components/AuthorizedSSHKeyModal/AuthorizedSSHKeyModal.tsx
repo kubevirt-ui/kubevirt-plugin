@@ -9,15 +9,15 @@ export const AuthorizedSSHKeyModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   sshKey: string;
-  onChange: (sshKey: string) => void | Promise<void>;
-}> = ({ sshKey, onChange, onClose, isOpen }) => {
+  onSubmit: (sshKey: string) => Promise<void>;
+}> = ({ sshKey, onSubmit, onClose, isOpen }) => {
   const { t } = useKubevirtTranslation();
   const [value, setValue] = React.useState(sshKey);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const submitHandler = React.useCallback(async () => {
-    onChange(value);
-  }, [onChange, value]);
+    await onSubmit(value);
+  }, [onSubmit, value]);
 
   return (
     <TabModal
