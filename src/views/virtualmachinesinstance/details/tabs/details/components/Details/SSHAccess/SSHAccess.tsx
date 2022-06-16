@@ -22,10 +22,10 @@ const SSHDetails: React.FC<SSHAccessProps> = ({ vmi, vm, sshService, sshServiceL
   const { createModal } = useModal();
   return (
     <>
-      <DescriptionListTerm>{t('SSH Access')}</DescriptionListTerm>
+      <DescriptionListTerm>{t('SSH access')}</DescriptionListTerm>
 
       <DescriptionListDescription className="SSHAccess--container">
-        {sshServiceLoaded ? <SSHAccess sshService={sshService} /> : <Loading />}
+        {!sshServiceLoaded && <Loading />}
 
         <Button
           variant="link"
@@ -45,7 +45,9 @@ const SSHDetails: React.FC<SSHAccessProps> = ({ vmi, vm, sshService, sshServiceL
               />
             ))
           }
-        ></Button>
+        >
+          <SSHAccess sshService={sshService} />
+        </Button>
       </DescriptionListDescription>
     </>
   );

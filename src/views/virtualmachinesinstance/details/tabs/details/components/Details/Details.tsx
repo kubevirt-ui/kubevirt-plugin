@@ -147,7 +147,15 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('User Credentials')}</DescriptionListTerm>
+              <SSHDetails
+                vmi={vmi}
+                vm={vm}
+                sshService={sshService}
+                sshServiceLoaded={sshServiceLoading}
+              />
+            </DescriptionListGroup>
+            <DescriptionListGroup>
+              <DescriptionListTerm>{t('SSH command')}</DescriptionListTerm>
               <DescriptionListDescription>
                 {sshServiceLoading ? (
                   <UserCredentials sshService={sshService} vmi={vmi} />
@@ -155,14 +163,6 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
                   <Loading />
                 )}
               </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <SSHDetails
-                vmi={vmi}
-                vm={vm}
-                sshService={sshService}
-                sshServiceLoaded={sshServiceLoading}
-              />
             </DescriptionListGroup>
             <DescriptionListGroup>
               <DescriptionListTerm>{t('Hardware devices')}</DescriptionListTerm>

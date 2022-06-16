@@ -112,14 +112,8 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           data-test-id={`${vm?.metadata?.name}-workload-profile`}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={vmDetailsRightGridObj?.userCredentials}
-          descriptionHeader={t('User credentials')}
-          data-test-id={`${vm?.metadata?.name}-user-credentials`}
-        />
-        <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.sshAccess}
           isEdit={!!vmi}
-          showEditOnTitle
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <SSHAccessModal
@@ -131,8 +125,13 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
               />
             ))
           }
-          descriptionHeader={t('SSH Access')}
+          descriptionHeader={t('SSH access')}
           data-test-id={`${vm?.metadata?.name}-ssh-access`}
+        />
+        <VirtualMachineDescriptionItem
+          descriptionData={vmDetailsRightGridObj?.userCredentials}
+          descriptionHeader={t('SSH command')}
+          data-test-id={`${vm?.metadata?.name}-user-credentials`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={<HardwareDevices vm={vm} canEdit onSubmit={onSubmit} />}
