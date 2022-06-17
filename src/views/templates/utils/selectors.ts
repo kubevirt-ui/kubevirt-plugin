@@ -1,9 +1,10 @@
 import { V1Template } from '@kubevirt-utils/models';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { getLabel } from '@kubevirt-utils/resources/shared';
+import { WORKLOADS, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import { VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm/utils';
 
-import { ANNOTATIONS, LABELS, WorkloadProfileKeys, workloadProfiles } from './constants';
+import { ANNOTATIONS, LABELS } from './constants';
 
 export const getAffinity = (template: V1Template) =>
   template?.objects[0]?.spec?.template?.spec?.affinity || {};
@@ -18,16 +19,15 @@ export const getTemplateProviderName = (template: V1Template): string =>
   getAnnotation(template, ANNOTATIONS.providerName, null) ||
   getAnnotation(template, ANNOTATIONS.providerDisplayName, null);
 
-export const getTemplateWorkload = (template: V1Template): WorkloadProfileKeys =>
+export const getTemplateWorkload = (template: V1Template): WORKLOADS =>
   template?.objects[0]?.spec?.template?.metadata?.annotations?.[VM_WORKLOAD_ANNOTATION];
 
 export const getTolerations = (template: V1Template) =>
   template?.objects[0]?.spec?.template?.spec?.tolerations;
 
 // t('Other')
-
 export const getWorkloadProfile = (template: V1Template): string =>
-  workloadProfiles[getTemplateWorkload(template)] || 'Other';
+  WORKLOADS_LABELS[getTemplateWorkload(template)] || 'Other';
 
 export const getVMTemplateBaseName = (
   template: V1Template,

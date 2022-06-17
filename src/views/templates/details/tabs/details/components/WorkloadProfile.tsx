@@ -1,11 +1,15 @@
 import * as React from 'react';
-import { WorkloadProfileKeys } from 'src/views/templates/utils/constants';
 import { getWorkloadProfile } from 'src/views/templates/utils/selectors';
 
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  getTemplateWorkload,
+  TEMPLATE_WORKLOAD_LABEL,
+  WORKLOADS,
+} from '@kubevirt-utils/resources/template';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
@@ -24,7 +28,7 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ template, editabl
   const { t } = useKubevirtTranslation();
   const workload = getWorkloadProfile(template);
 
-  const updateWorkload = (updatedWorkload: WorkloadProfileKeys) => {
+  const updateWorkload = (updatedWorkload: WORKLOADS) => {
     const vmObjectIndex = template?.objects.findIndex(
       (obj) => obj.kind === VirtualMachineModel.kind,
     );
@@ -42,6 +46,15 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ template, editabl
           op: hasWorkload ? 'replace' : 'add',
           path: workloadPath,
           value: updatedWorkload,
+        },
+        {
+          op: 'remove',
+          path: `/metadata/labels/${TEMPLATE_WORKLOAD_LABEL}~1${getTemplateWorkload(template)}`,
+        },
+        {
+          op: 'add',
+          path: `/metadata/labels/${TEMPLATE_WORKLOAD_LABEL}~1${updatedWorkload}`,
+          value: 'true',
         },
       ],
     });
