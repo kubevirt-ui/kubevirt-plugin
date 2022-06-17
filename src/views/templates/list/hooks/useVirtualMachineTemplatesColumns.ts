@@ -28,7 +28,7 @@ const useVirtualMachineTemplatesColumns = (): TableColumn<K8sResourceCommon>[] =
       id: 'workload',
       transforms: [sortable],
       sort: 'objects[0].spec.template.metadata.annotations.["vm.kubevirt.io/workload"]',
-      props: { className: 'pf-m-width-10' },
+      props: { className: 'pf-m-width-15' },
     },
     {
       title: t('Boot source'),

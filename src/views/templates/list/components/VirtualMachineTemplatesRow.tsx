@@ -40,7 +40,7 @@ const VirtualMachineTemplatesRow: React.FC<
       <TableData id="namespace" activeColumnIDs={activeColumnIDs}>
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
       </TableData>
-      <TableData id="workload" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
+      <TableData id="workload" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
         {t(getWorkloadProfile(obj))}
       </TableData>
       <TableData id="availability" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
