@@ -16,9 +16,9 @@ abstract class TopConsumerMetricObjectEnum<T> extends ObjectEnum<T> {
     this.chartLabel = chartLabel;
   }
 
-  getDropdownLabel = () => this.dropdownLabel;
+  getDropdownLabel = (): string => this.dropdownLabel;
 
-  getChartLabel = () => this.chartLabel;
+  getChartLabel = (): string => this.chartLabel;
 }
 
 export class TopConsumerMetric extends TopConsumerMetricObjectEnum<string> {
@@ -68,6 +68,8 @@ export class TopConsumerMetric extends TopConsumerMetricObjectEnum<string> {
     ObjectEnum.getAllClassEnumProperties<TopConsumerMetric>(TopConsumerMetric),
   );
 
+  static getAll = () => TopConsumerMetric.ALL;
+
   private static readonly stringMapper = TopConsumerMetric.ALL.reduce(
     (accumulator, metric: TopConsumerMetric) => ({
       ...accumulator,
@@ -79,12 +81,10 @@ export class TopConsumerMetric extends TopConsumerMetricObjectEnum<string> {
   private static readonly dropdownLabelMapper = TopConsumerMetric.ALL.reduce(
     (accumulator, metric: TopConsumerMetric) => ({
       ...accumulator,
-      [metric.dropdownLabel.replace('', '')]: metric,
+      [metric.dropdownLabel]: metric,
     }),
     {},
   );
-
-  static getAll = () => TopConsumerMetric.ALL;
 
   static fromString = (source: string): TopConsumerMetric => TopConsumerMetric.stringMapper[source];
 
