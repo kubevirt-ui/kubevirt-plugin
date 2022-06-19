@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { Trans } from 'react-i18next';
+import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
@@ -36,6 +38,12 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const canUpdateStoppedVM =
+    canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
+
+  const isMachineNotLiveMirgation = !!vm?.status?.conditions?.find(
+    ({ type, status }) => type === 'LiveMigratable' && status === 'False',
+  );
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -111,8 +119,19 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Descheduler vm={vm} />}
           descriptionHeader={t('Descheduler')}
-          isEdit={canUpdateVM}
+          isEdit={canUpdateStoppedVM && !isMachineNotLiveMirgation}
           data-test-id="descheduler"
+          isPopover
+          bodyContent={
+            <Trans t={t} ns="plugin__kubevirt-plugin">
+              <p>
+                The descheduler can be used to evict a running pod to allow the pod to be
+                rescheduled onto a more suitable node.
+              </p>
+              <br />
+              <p>Note: if VirtualMachine have LiveMigration=False condition, edit is disabled.</p>
+            </Trans>
+          }
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DeschedulerModal
