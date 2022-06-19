@@ -28,3 +28,11 @@ export const getRandomChars = (len = 6): string => {
     .replace(/[^a-z0-9]+/g, '')
     .substr(1, len);
 };
+
+export const SSH_PUBLIC_KEY_VALIDATION_REGEX =
+  /^(sk-)?(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+\/]+[=]{0,3}( .*)?$/;
+
+export const validateSSHPublicKey = (value: string): boolean => {
+  const trimmedValue = value?.trim();
+  return isEmpty(trimmedValue) || Boolean(SSH_PUBLIC_KEY_VALIDATION_REGEX?.test(trimmedValue));
+};

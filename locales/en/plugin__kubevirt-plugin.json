@@ -627,6 +627,7 @@
   "SSH Access": "SSH Access",
   "SSH access is using a node port. Node port requires additional port resources.": "SSH access is using a node port. Node port requires additional port resources.",
   "SSH command": "SSH command",
+  "SSH Key is invalid": "SSH Key is invalid",
   "SSH service disabled": "SSH service disabled",
   "Start": "Start",
   "Start cloned VM": "Start cloned VM",
