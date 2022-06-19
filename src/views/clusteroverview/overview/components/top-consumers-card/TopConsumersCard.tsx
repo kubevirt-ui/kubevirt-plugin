@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { TFunction } from 'i18next';
 
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import {
   Card,
   CardActions,
@@ -14,39 +14,19 @@ import {
   SelectVariant,
 } from '@patternfly/react-core';
 
+import { SHOW_TOP_5_ITEMS, TOP_CONSUMER_NUM_ITEMS_KEY } from './utils/constants';
 import FormPFSelect from './utils/FormPFSelect';
-import { TopConsumerMetric } from './utils/topConsumerMetric';
 import TopConsumersGridRow from './utils/TopConsumersGridRow';
+import { topAmountSelectOptions } from './utils/utils';
 
 import './TopConsumersCard.scss';
-
-const initialMetrics = [
-  TopConsumerMetric.CPU,
-  TopConsumerMetric.MEMORY,
-  TopConsumerMetric.MEMORY_SWAP_TRAFFIC,
-  TopConsumerMetric.VCPU_WAIT,
-  TopConsumerMetric.STORAGE_THROUGHPUT,
-  TopConsumerMetric.STORAGE_IOPS,
-];
-
-const topAmountSelectOptions = (t: TFunction) => [
-  {
-    key: 'top-5',
-    value: t('Show top 5'),
-  },
-  {
-    key: 'top-10',
-    value: t('Show top 10'),
-  },
-];
 
 const TopConsumersCard: React.FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
-  const [numItemsToShow, setNumItemsToShow] = React.useState<string>('Show top 5');
-  const numItemsOptionSelected = React.useMemo(
-    () => (numItemsToShow === 'Show top 5' ? 5 : 10),
-    [numItemsToShow],
+  const [numItemsToShow, setNumItemsToShow] = useLocalStorage(
+    TOP_CONSUMER_NUM_ITEMS_KEY,
+    SHOW_TOP_5_ITEMS,
   );
 
   const onTopAmountSelect = (value) => setNumItemsToShow(value);
@@ -76,15 +56,8 @@ const TopConsumersCard: React.FC = () => {
             </CardActions>
           </CardHeader>
           <CardBody className="kv-top-consumers-card__body">
-            <TopConsumersGridRow
-              topGrid
-              numItemsToShow={numItemsOptionSelected}
-              initialMetrics={initialMetrics.slice(0, 3)}
-            />
-            <TopConsumersGridRow
-              numItemsToShow={numItemsOptionSelected}
-              initialMetrics={initialMetrics.slice(3)}
-            />
+            <TopConsumersGridRow rowNumber={1} topGrid />
+            <TopConsumersGridRow rowNumber={2} />
           </CardBody>
         </Card>
       </div>

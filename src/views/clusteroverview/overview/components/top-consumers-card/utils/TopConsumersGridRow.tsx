@@ -4,20 +4,18 @@ import classNames from 'classnames';
 import { Grid, GridItem } from '@patternfly/react-core';
 
 import TopConsumerCard from './TopConsumerCard';
-import { TopConsumerMetric } from './topConsumerMetric';
+import { getTopConsumerCardID } from './utils';
 
 import './TopConsumersGridRow.scss';
 
 type TopConsumersGridRowProps = {
+  rowNumber: number;
   topGrid?: boolean;
-  numItemsToShow: number;
-  initialMetrics: TopConsumerMetric[];
 };
 
 const TopConsumersGridRow: React.FC<TopConsumersGridRowProps> = ({
+  rowNumber,
   topGrid = false,
-  numItemsToShow,
-  initialMetrics,
 }) => {
   const classes = classNames('kv-top-consumers-card__grid', {
     'kv-top-consumers-card__top-grid': topGrid,
@@ -26,13 +24,13 @@ const TopConsumersGridRow: React.FC<TopConsumersGridRowProps> = ({
   return (
     <Grid className={classes}>
       <GridItem span={4} className="kv-top-consumers-card__card-grid-item">
-        <TopConsumerCard numItemsToShow={numItemsToShow} initialMetric={initialMetrics[0]} />
+        <TopConsumerCard cardID={getTopConsumerCardID(rowNumber, 1)} />
       </GridItem>
       <GridItem span={4} className="kv-top-consumers-card__card-grid-item">
-        <TopConsumerCard numItemsToShow={numItemsToShow} initialMetric={initialMetrics[1]} />
+        <TopConsumerCard cardID={getTopConsumerCardID(rowNumber, 2)} />
       </GridItem>
       <GridItem span={4} className="kv-top-consumers-card__card-grid-item">
-        <TopConsumerCard numItemsToShow={numItemsToShow} initialMetric={initialMetrics[2]} />
+        <TopConsumerCard cardID={getTopConsumerCardID(rowNumber, 3)} />
       </GridItem>
     </Grid>
   );

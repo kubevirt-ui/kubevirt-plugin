@@ -4,7 +4,18 @@ type TopConsumerScopeData = {
   dropdownLabel: string;
 };
 
-export class TopConsumerScope extends ObjectEnum<string> {
+abstract class TopConsumerScopeObjectEnum<T> extends ObjectEnum<T> {
+  protected readonly dropdownLabel: string;
+
+  protected constructor(value: T, { dropdownLabel }: TopConsumerScopeData) {
+    super(value);
+    this.dropdownLabel = dropdownLabel;
+  }
+
+  getDropdownLabel = (): string => this.dropdownLabel;
+}
+
+export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
   static readonly PROJECT = new TopConsumerScope('PROJECT', {
     // t('Project')
     dropdownLabel: 'Project',
@@ -20,30 +31,29 @@ export class TopConsumerScope extends ObjectEnum<string> {
     dropdownLabel: 'Node',
   });
 
-  private readonly dropdownLabel: string;
-
-  protected constructor(value: string, { dropdownLabel }: TopConsumerScopeData) {
-    super(value);
-    this.dropdownLabel = dropdownLabel;
-  }
-
   private static readonly ALL = Object.freeze(
     ObjectEnum.getAllClassEnumProperties<TopConsumerScope>(TopConsumerScope),
   );
 
   static getAll = () => TopConsumerScope.ALL;
 
-  private static readonly dropdownLabelMapper = TopConsumerScope.ALL.reduce(
-    (accumulator, metric: TopConsumerScope) => ({
+  private static readonly stringMapper = TopConsumerScope.ALL.reduce(
+    (accumulator, scope: TopConsumerScope) => ({
       ...accumulator,
-      [metric.dropdownLabel.replace('', '')]: metric,
+      [scope.value]: scope,
     }),
     {},
   );
 
-  getDropdownLabel = (): string => this.dropdownLabel;
+  private static readonly dropdownLabelMapper = TopConsumerScope.ALL.reduce(
+    (accumulator, scope: TopConsumerScope) => ({
+      ...accumulator,
+      [scope.dropdownLabel]: scope,
+    }),
+    {},
+  );
 
-  toString = (): string => this.dropdownLabel || super.toString();
+  static fromString = (source: string): TopConsumerScope => TopConsumerScope.stringMapper[source];
 
   static fromDropdownLabel = (dropdownLabel: string): TopConsumerScope =>
     TopConsumerScope.dropdownLabelMapper[dropdownLabel];

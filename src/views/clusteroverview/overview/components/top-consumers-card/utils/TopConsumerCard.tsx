@@ -1,29 +1,44 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { Card, SelectOption, SelectVariant } from '@patternfly/react-core';
 
+import { SHOW_TOP_5_ITEMS, TOP_CONSUMER_NUM_ITEMS_KEY } from './constants';
 import FormPFSelect from './FormPFSelect';
 import { TopConsumerMetric } from './topConsumerMetric';
 import { TopConsumersChartList } from './TopConsumersChartList';
 import { TopConsumerScope } from './topConsumerScope';
+import { initialTopConsumerCardSettings } from './utils';
 
 import './TopConsumerCard.scss';
 
 type TopConsumersMetricCard = {
-  numItemsToShow: number;
-  initialMetric?: TopConsumerMetric;
+  cardID: string;
 };
 
-const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ numItemsToShow, initialMetric }) => {
+const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ cardID }) => {
   const { t } = useKubevirtTranslation();
-  const [metricValue, setMetricValue] = React.useState<TopConsumerMetric>(
-    initialMetric || TopConsumerMetric.CPU,
+  const [numItemsLabel] = useLocalStorage(TOP_CONSUMER_NUM_ITEMS_KEY);
+  const numItemsToShow = React.useMemo(
+    () => (numItemsLabel === SHOW_TOP_5_ITEMS ? 5 : 10),
+    [numItemsLabel],
   );
-  const [scopeValue, setScopeValue] = React.useState<TopConsumerScope>(TopConsumerScope.VM);
+  const [metricKey, setMetricKey] = useLocalStorage(
+    `${cardID}-metric-value`,
+    initialTopConsumerCardSettings[cardID]?.metric.toString(),
+  );
+  const [scopeKey, setScopeKey] = useLocalStorage(
+    `${cardID}-scope-value`,
+    initialTopConsumerCardSettings[cardID]?.scope.toString(),
+  );
 
-  const onMetricSelect = (value) => setMetricValue(TopConsumerMetric.fromDropdownLabel(value));
-  const onScopeSelect = (value) => setScopeValue(TopConsumerScope.fromDropdownLabel(value));
+  const onMetricSelect = (value) => {
+    setMetricKey(TopConsumerMetric.fromDropdownLabel(value).toString());
+  };
+  const onScopeSelect = (value) => {
+    setScopeKey(TopConsumerScope.fromDropdownLabel(value).toString());
+  };
 
   return (
     <Card className="co-overview-card--gradient kv-top-consumer-card__metric-card">
@@ -32,7 +47,7 @@ const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ numItemsToShow, ini
           <FormPFSelect
             toggleId="kv-top-consumers-card-metric-select"
             variant={SelectVariant.single}
-            selections={t(metricValue.getDropdownLabel())}
+            selections={t(TopConsumerMetric.fromString(metricKey).getDropdownLabel())}
             onSelect={(e, value) => onMetricSelect(value)}
             isCheckboxSelectionBadgeHidden
           >
@@ -45,7 +60,7 @@ const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ numItemsToShow, ini
           <FormPFSelect
             toggleId="kv-top-consumers-card-scope-select"
             variant={SelectVariant.single}
-            selections={t(scopeValue.getDropdownLabel())}
+            selections={t(TopConsumerScope.fromString(scopeKey).getDropdownLabel())}
             onSelect={(e, value) => onScopeSelect(value)}
             isCheckboxSelectionBadgeHidden
           >
@@ -59,7 +74,11 @@ const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ numItemsToShow, ini
         <div>{t('Resource')}</div>
         <div>{t('Usage')}</div>
       </div>
-      <TopConsumersChartList numItems={numItemsToShow} metric={metricValue} scope={scopeValue} />
+      <TopConsumersChartList
+        numItems={numItemsToShow}
+        metric={TopConsumerMetric.fromString(metricKey)}
+        scope={TopConsumerScope.fromString(scopeKey)}
+      />
     </Card>
   );
 };

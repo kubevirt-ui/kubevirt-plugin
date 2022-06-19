@@ -1,3 +1,5 @@
+import { TFunction } from 'i18next';
+
 import {
   humanizeBinaryBytes,
   humanizeDecimalBytes,
@@ -7,6 +9,7 @@ import {
 
 import { STORAGE_IOPS_UNIT } from './constants';
 import { TopConsumerMetric } from './topConsumerMetric';
+import { TopConsumerScope } from './topConsumerScope';
 
 export const getValue = (value) => parseFloat(value);
 
@@ -41,4 +44,47 @@ export const humanizeTopConsumerMetric = (value: number, metric: TopConsumerMetr
 export const getHumanizedValue = (value, metric) => {
   const rawValue = getValue(value);
   return humanizeTopConsumerMetric(rawValue, metric);
+};
+
+export const getTopConsumerCardID = (rowNumber, cardNumber) =>
+  `topConsumerCard-${rowNumber}-${cardNumber}`;
+
+export const topAmountSelectOptions = (t: TFunction) => [
+  {
+    key: 'top-5',
+    value: t('Show top 5'),
+  },
+  {
+    key: 'top-10',
+    value: t('Show top 10'),
+  },
+];
+
+export const initialTopConsumerCardSettings: {
+  [key: string]: { scope: TopConsumerScope; metric: TopConsumerMetric };
+} = {
+  'topConsumerCard-1-1': {
+    scope: TopConsumerScope.VM,
+    metric: TopConsumerMetric.CPU,
+  },
+  'topConsumerCard-1-2': {
+    scope: TopConsumerScope.VM,
+    metric: TopConsumerMetric.MEMORY,
+  },
+  'topConsumerCard-1-3': {
+    scope: TopConsumerScope.VM,
+    metric: TopConsumerMetric.MEMORY_SWAP_TRAFFIC,
+  },
+  'topConsumerCard-2-1': {
+    scope: TopConsumerScope.VM,
+    metric: TopConsumerMetric.VCPU_WAIT,
+  },
+  'topConsumerCard-2-2': {
+    scope: TopConsumerScope.VM,
+    metric: TopConsumerMetric.STORAGE_THROUGHPUT,
+  },
+  'topConsumerCard-2-3': {
+    scope: TopConsumerScope.VM,
+    metric: TopConsumerMetric.STORAGE_IOPS,
+  },
 };
