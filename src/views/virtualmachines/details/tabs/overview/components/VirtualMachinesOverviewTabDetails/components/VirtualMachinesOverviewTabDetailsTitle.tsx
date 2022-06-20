@@ -1,15 +1,11 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import useSSHCommand from '@kubevirt-utils/components/UserCredentials/useSSHCommand';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { CardTitle, Dropdown, DropdownItem, KebabToggle } from '@patternfly/react-core';
 import { CopyIcon } from '@patternfly/react-icons';
 
@@ -25,7 +21,6 @@ const VirtualMachinesOverviewTabDetailsTitle: React.FC<
   VirtualMachinesOverviewTabDetailsTitleProps
 > = ({ vm }) => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const [sshService] = useSSHService(vmi);
@@ -59,27 +54,6 @@ const VirtualMachinesOverviewTabDetailsTitle: React.FC<
           </DropdownItem>,
           <DropdownItem onClick={() => (isMachinePaused ? unpauseVM(vm) : pauseVM(vm))} key="pause">
             {isMachinePaused ? t('Unpause VirtualMachine') : t('Pause VirtualMachine')}
-          </DropdownItem>,
-          <DropdownItem
-            onClick={() =>
-              createModal((props) => (
-                <CPUMemoryModal
-                  vm={vm}
-                  {...props}
-                  onSubmit={(updatedVM) =>
-                    k8sUpdate({
-                      model: VirtualMachineModel,
-                      data: updatedVM,
-                      ns: updatedVM?.metadata?.namespace,
-                      name: updatedVM?.metadata?.name,
-                    })
-                  }
-                />
-              ))
-            }
-            key="disk-edit"
-          >
-            {t('Edit CPU | Memory')}
           </DropdownItem>,
         ]}
       />
