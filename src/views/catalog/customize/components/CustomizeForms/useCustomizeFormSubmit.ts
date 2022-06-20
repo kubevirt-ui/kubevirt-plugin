@@ -126,7 +126,7 @@ export const useCustomizeFormSubmit = ({
         }
       });
       const diskUploadDV = getUploadDataVolume(
-        dataVolumeTemplate.metadata.name,
+        dataVolumeTemplate?.metadata?.name,
         updatedVM.metadata.namespace,
         diskSource?.storage?.resources?.requests?.storage || '30Gi',
       );
