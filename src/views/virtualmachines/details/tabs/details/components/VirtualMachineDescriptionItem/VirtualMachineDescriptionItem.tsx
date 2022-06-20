@@ -94,8 +94,12 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
       variant="link"
       data-test-id={testId}
     >
-      {descriptionData ?? NotAvailable}
-      <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+      <Flex spaceItems={{ default: 'spaceItemsNone' }}>
+        <FlexItem>{descriptionData ?? NotAvailable}</FlexItem>
+        <FlexItem>
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </FlexItem>
+      </Flex>
     </Button>
   );
 

@@ -73,7 +73,6 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           descriptionData={<BootOrderSummary vm={vm} />}
           descriptionHeader={t('Boot Order')}
           isEdit
-          showEditOnTitle
           onEditClick={() =>
             createModal((props) => (
               <BootOrderModal {...props} vm={vm} onSubmit={onSubmit} vmi={vmi} />
