@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -60,9 +59,10 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
             <>
               {bodyContent}
               {moreInfoURL && (
-                <Trans t={t} ns="plugin__kubevirt-plugin">
-                  More info: <Link to={moreInfoURL}>{moreInfoURL}</Link>
-                </Trans>
+                <>
+                  {t('More info: ')}
+                  <Link to={moreInfoURL}>{moreInfoURL}</Link>
+                </>
               )}
               {breadcrumb && (
                 <Breadcrumb>
