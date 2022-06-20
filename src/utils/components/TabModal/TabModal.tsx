@@ -19,7 +19,7 @@ type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   isOpen: boolean;
   obj?: T;
   onSubmit: (obj: T) => Promise<T | void>;
-  onClose: () => void;
+  onClose: () => Promise<void> | void;
   headerText: string;
   children: React.ReactNode;
   isDisabled?: boolean;
@@ -74,7 +74,10 @@ const TabModal: TabModalFC = React.memo(
     const closeModal = () => {
       setError(undefined);
       setIsSubmitting(false);
-      onClose();
+
+      const promise = onClose();
+
+      if (promise) promise?.catch(setError);
     };
 
     return (
