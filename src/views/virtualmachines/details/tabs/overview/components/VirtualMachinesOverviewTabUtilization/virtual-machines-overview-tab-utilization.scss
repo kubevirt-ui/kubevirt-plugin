@@ -8,6 +8,9 @@
     }
   }
   .util {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     .util-upper {
       padding-left: var(--pf-global--spacer--2xl);
       .util-title {
@@ -36,6 +39,7 @@
       }
     }
     .util-chart {
+      flex-grow: 1;
       .pf-c-chart {
         height: auto;
       }
@@ -67,7 +71,13 @@
       }
     }
   }
-  .ComponentReady {
-    margin: var(--pf-global--spacer--2xl);
+  .duration-select {
+    display: flex;
+    .pf-c-select {
+      flex-basis: content;
+    }
+  }
+  .pf-c-description-list__text.pf-m-help-text {
+    text-underline-offset: 0.25rem;
   }
 }

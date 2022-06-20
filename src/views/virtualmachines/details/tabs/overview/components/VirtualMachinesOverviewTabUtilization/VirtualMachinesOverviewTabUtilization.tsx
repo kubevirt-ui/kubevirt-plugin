@@ -1,9 +1,21 @@
 import * as React from 'react';
+import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
-import { Card, CardBody, CardTitle, Divider, Grid, GridItem } from '@patternfly/react-core';
+import {
+  Card,
+  CardBody,
+  CardTitle,
+  DescriptionListTermHelpText,
+  DescriptionListTermHelpTextButton,
+  Divider,
+  Grid,
+  GridItem,
+  Popover,
+  PopoverPosition,
+} from '@patternfly/react-core';
 
 import { printableVMStatus } from '../../../../../utils';
 
@@ -12,8 +24,7 @@ import CPUUtil from './components/CPUUtil/CPUUtil';
 import MemoryUtil from './components/MemoryUtil/MemoryUtil';
 import NetworkUtil from './components/NetworkUtil/NetworkUtil';
 import StorageUtil from './components/StorageUtil/StorageUtil';
-import TimeDropdown from './components/TimeDropdown';
-import { ONE_HOUR } from './utils/utils';
+import UtilizationThresholdCharts from './components/UtilizationThresholdCharts';
 
 import './virtual-machines-overview-tab-utilization.scss';
 
@@ -26,33 +37,46 @@ const VirtualMachinesOverviewTabUtilization: React.FC<
 > = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const { vmi, pods } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const [duration, setDuration] = React.useState(ONE_HOUR);
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
   return (
     <Card className="VirtualMachinesOverviewTabUtilization--main">
       <div className="title">
-        <CardTitle className="text-muted">{t('Utilization')}</CardTitle>
-        <ComponentReady isReady={isVMRunning}>
-          <TimeDropdown setDuration={setDuration} />
-        </ComponentReady>
+        <CardTitle className="text-muted">
+          <DescriptionListTermHelpText>
+            <Popover
+              position={PopoverPosition?.right}
+              bodyContent={
+                <Trans t={t} ns="plugin__kubevirt-plugin">
+                  <div>Donuts chart represent current values.</div>
+                  <div>Sparkline charts represent data over time</div>
+                </Trans>
+              }
+            >
+              <DescriptionListTermHelpTextButton>
+                {t('Utilization')}
+              </DescriptionListTermHelpTextButton>
+            </Popover>
+          </DescriptionListTermHelpText>
+        </CardTitle>
       </div>
       <Divider />
       <CardBody isFilled>
         <ComponentReady isReady={isVMRunning} text={t('VirtualMachine is not running')}>
           <Grid>
             <GridItem span={3}>
-              <CPUUtil duration={duration} vmi={vmi} vm={vm} pods={pods} />
+              <CPUUtil vmi={vmi} pods={pods} />
             </GridItem>
             <GridItem span={3}>
-              <MemoryUtil duration={duration} vmi={vmi} vm={vm} />
+              <MemoryUtil vmi={vmi} />
             </GridItem>
             <GridItem span={3}>
-              <StorageUtil duration={duration} vmi={vmi} vm={vm} />
+              <StorageUtil vmi={vmi} />
             </GridItem>
             <GridItem span={3}>
-              <NetworkUtil duration={duration} vmi={vmi} vm={vm} />
+              <NetworkUtil vmi={vmi} />
             </GridItem>
+            <UtilizationThresholdCharts vmi={vmi} pods={pods} />
           </Grid>
         </ComponentReady>
       </CardBody>

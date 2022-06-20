@@ -1,7 +1,9 @@
 import React from 'react';
 import xbytes from 'xbytes';
 
-import { PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
+import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
   ChartArea,
@@ -11,17 +13,34 @@ import {
 } from '@patternfly/react-charts';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
+
+import { getMultilineUtilizationQueries } from '../../utils/queries';
+import ComponentReady from '../ComponentReady/ComponentReady';
 // import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 
 type StorageThresholdChartProps = {
-  threshold?: number;
-  data: PrometheusValue[];
+  timespan: number;
+  vmi: V1VirtualMachineInstance;
 };
 
 const GIB_IN_BYTES = 1024;
 
-const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ data }) => {
-  const chartData = data?.map(([, item], index) => {
+const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan, vmi }) => {
+  const queries = React.useMemo(
+    () => getMultilineUtilizationQueries({ vmName: vmi?.metadata?.name }),
+    [vmi],
+  );
+
+  const [data] = usePrometheusPoll({
+    query: queries?.FILESYSTEM_USAGE?.[1]?.query,
+    endpoint: PrometheusEndpoint?.QUERY_RANGE,
+    namespace: vmi?.metadata?.namespace,
+    timespan,
+  });
+
+  const storageWriteData = data?.data?.result?.[0]?.values;
+
+  const chartData = storageWriteData?.map(([, item], index) => {
     return { x: index, y: Number(+item / GIB_IN_BYTES) };
   });
 
@@ -31,7 +50,7 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ data }) =
   //   .map((_, index) => ({ x: index, y: threshold / GIB_IN_BYTES }));
 
   return (
-    <div>
+    <ComponentReady isReady={!isEmpty(chartData)}>
       <Chart
         height={200}
         showAxis={false}
@@ -67,7 +86,7 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ data }) =
           }}
         /> */}
       </Chart>
-    </div>
+    </ComponentReady>
   );
 };
 
