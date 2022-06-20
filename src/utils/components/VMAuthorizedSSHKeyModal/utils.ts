@@ -1,3 +1,4 @@
+import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
@@ -9,8 +10,9 @@ import {
   createVmSSHSecret,
   removeSecretToVM,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { k8sDelete, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sDelete, k8sPatch, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 const produceAndUpdate = (
   vm: V1VirtualMachine,
@@ -25,12 +27,13 @@ const produceAndUpdate = (
   });
 };
 
-export const decodeSecret = (secret: IoK8sApiCoreV1Secret): string => atob(secret?.data?.key || '');
+export const decodeSecret = (secret: IoK8sApiCoreV1Secret): string =>
+  secret?.data ? atob(secret?.data?.key || Object.values(secret?.data)?.[0] || '') : '';
 
 export const changeVMSecret = async (
   vm: V1VirtualMachine,
   vmOldSecret: IoK8sApiCoreV1Secret,
-  newSSHKey: string,
+  newSSHKey?: string,
 ): Promise<IoK8sApiCoreV1Secret> => {
   const sshSecretName = `${vm.metadata.name}-ssh-key-${getRandomChars()}`;
   if (
@@ -61,4 +64,72 @@ export const changeVMSecret = async (
       return vmDraft;
     });
   }
+};
+
+export const attachVMSecret = async (
+  vm: V1VirtualMachine,
+  vmOldSecret: IoK8sApiCoreV1Secret,
+  newSSHSecret: IoK8sApiCoreV1Secret,
+) => {
+  if (vmOldSecret?.metadata?.name === newSSHSecret?.metadata?.name) return;
+
+  await produceAndUpdate(vm, (vmDraft) => {
+    const produced = addSecretToVM(vm, newSSHSecret?.metadata?.name);
+    vmDraft.spec = produced.spec;
+
+    return vmDraft;
+  });
+
+  const updatedSecret = produce(newSSHSecret, (draftSecret) => {
+    const ownerReference = buildOwnerReference(vm, { blockOwnerDeletion: false });
+    if (draftSecret.metadata.ownerReferences)
+      draftSecret.metadata.ownerReferences.push(ownerReference);
+    else {
+      draftSecret.metadata.ownerReferences = [ownerReference];
+    }
+  });
+
+  await k8sUpdate({
+    model: SecretModel,
+    data: updatedSecret,
+  });
+
+  if (vmOldSecret) {
+    const updatedOldSecret = produce(vmOldSecret, (draftSecret) => {
+      if (draftSecret.metadata.ownerReferences)
+        draftSecret.metadata.ownerReferences = draftSecret.metadata.ownerReferences.filter(
+          (ref) => ref?.uid !== vm?.metadata?.uid,
+        );
+    });
+
+    await k8sUpdate({
+      model: SecretModel,
+      data: updatedOldSecret,
+    });
+  }
+};
+
+export const detachVMSecret = async (vm: V1VirtualMachine, vmSecret: IoK8sApiCoreV1Secret) => {
+  await k8sPatch({
+    model: VirtualMachineModel,
+    resource: vm,
+    data: [
+      {
+        op: 'remove',
+        path: '/spec/template/spec/accessCredentials',
+      },
+    ],
+  });
+
+  const updatedSecret = produce(vmSecret, (draftSecret) => {
+    if (draftSecret.metadata.ownerReferences)
+      draftSecret.metadata.ownerReferences = draftSecret.metadata.ownerReferences.filter(
+        (ref) => ref?.uid !== vm?.metadata?.uid,
+      );
+  });
+
+  await k8sUpdate({
+    model: SecretModel,
+    data: updatedSecret,
+  });
 };
