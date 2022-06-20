@@ -10,7 +10,7 @@ import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Label, Split, SplitItem } from '@patternfly/react-core';
+import { Label, Stack, StackItem } from '@patternfly/react-core';
 
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
@@ -24,25 +24,25 @@ const DiskRow: React.FC<
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        <Split hasGutter>
-          <SplitItem>
+        <Stack>
+          <StackItem>
             {obj?.name} <HotplugLabel vm={vm} diskName={obj?.name} vmi={vmi} />
-          </SplitItem>
+          </StackItem>
           {obj?.isBootDisk && (
-            <SplitItem>
-              <Label variant="filled" color="blue">
+            <StackItem>
+              <Label variant="filled" color="blue" className="icon-size-small">
                 {t('bootable')}
               </Label>
-            </SplitItem>
+            </StackItem>
           )}
           {obj?.isEnvDisk && (
-            <SplitItem>
+            <StackItem>
               <Label variant="filled" color="blue">
                 {t('environment disk')}
               </Label>
-            </SplitItem>
+            </StackItem>
           )}
-        </Split>
+        </Stack>
       </TableData>
 
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
