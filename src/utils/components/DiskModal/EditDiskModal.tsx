@@ -92,7 +92,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
       createOwnerReference,
     });
     if (diskState.diskSource === sourceTypes.UPLOAD) {
-      onUploadedDataVolume(resultDataVolume);
+      if (onUploadedDataVolume) onUploadedDataVolume(resultDataVolume);
       return uploadData({
         file: diskSourceState?.uploadFile as File,
         dataVolume: resultDataVolume,
@@ -185,9 +185,9 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
       obj={updatedVirtualMachine}
       onSubmit={handleSubmit}
       isOpen={isOpen}
-      onClose={() => {
+      onClose={async () => {
         if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
-          upload?.cancelUpload();
+          await upload?.cancelUpload();
         }
         onClose();
       }}
