@@ -31,7 +31,7 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({ setDuration }) => {
   );
 
   return (
-    <div data-test-id="duration-select">
+    <div className="duration-select" data-test-id="duration-select">
       <Select
         variant={SelectVariant.single}
         onToggle={setOpen}

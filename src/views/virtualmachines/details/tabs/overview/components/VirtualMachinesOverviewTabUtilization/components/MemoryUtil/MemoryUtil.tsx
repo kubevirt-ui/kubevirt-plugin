@@ -1,7 +1,7 @@
 import React from 'react';
 import xbytes from 'xbytes';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -9,26 +9,19 @@ import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
 
 import { getUtilizationQueries, PrometheusEndpoint } from '../../utils/queries';
-import { adjustDurationForStart, getCreationTimestamp, sumOfValues } from '../../utils/utils';
 import ComponentReady from '../ComponentReady/ComponentReady';
 
-import MemoryThresholdChart from './MemoryThresholdChart';
-
 type MemoryUtilProps = {
-  duration: number;
   vmi: V1VirtualMachineInstance;
-  vm: V1VirtualMachine;
 };
 
-const MemoryUtil: React.FC<MemoryUtilProps> = ({ duration, vmi, vm }) => {
+const MemoryUtil: React.FC<MemoryUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const createdAt = React.useMemo(() => getCreationTimestamp(vmi), [vmi]);
-  const adjustDuration = React.useCallback(
-    (start) => adjustDurationForStart(start, createdAt),
-    [createdAt],
+
+  const queries = React.useMemo(
+    () => getUtilizationQueries({ vmName: vmi?.metadata?.name }),
+    [vmi],
   );
-  const queries = React.useMemo(() => getUtilizationQueries({ vmName: vm?.metadata?.name }), [vm]);
-  const timespan = React.useMemo(() => adjustDuration(duration), [adjustDuration, duration]);
 
   const requests = vmi?.spec?.domain?.resources?.requests as {
     [key: string]: string;
@@ -37,19 +30,14 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ duration, vmi, vm }) => {
 
   const [data] = usePrometheusPoll({
     query: queries?.MEMORY_USAGE,
-    endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vm?.metadata?.namespace,
-    timespan,
+    endpoint: PrometheusEndpoint?.QUERY,
+    namespace: vmi?.metadata?.namespace,
   });
 
-  const prometheusMemoryData = data?.data?.result?.[0]?.values;
-
-  const averageUsedMemory = sumOfValues(data);
-
-  const memoryUsed = averageUsedMemory / prometheusMemoryData?.length;
-  const memoryAvilableBytes = xbytes.parseSize(`${memory?.size} ${memory?.unit}B`);
-  const value = (memoryUsed / memoryAvilableBytes) * 100;
-  const isReady = !isEmpty(prometheusMemoryData) && !isEmpty(memory) && !Number.isNaN(value);
+  const memoryUsed = +data?.data?.result?.[0]?.value?.[1];
+  const memoryAvailableBytes = xbytes.parseSize(`${memory?.size} ${memory?.unit}B`);
+  const percentageMemoryUsed = (memoryUsed / memoryAvailableBytes) * 100;
+  const isReady = !isEmpty(memory) && !Number.isNaN(percentageMemoryUsed);
 
   return (
     <div className="util">
@@ -72,19 +60,14 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ duration, vmi, vm }) => {
             animate
             data={{
               x: t('Memory used'),
-              y: Number(value?.toFixed(2)),
+              y: Number(percentageMemoryUsed?.toFixed(2)),
             }}
             labels={({ datum }) =>
               datum.x ? `${datum.x}: ${xbytes(memoryUsed || 0, { iec: true })}` : null
             }
             subTitle={t('Used')}
             subTitleComponent={<ChartLabel y={135} />}
-            title={`${Number(value?.toFixed(2))}%`}
-          />
-          <MemoryThresholdChart
-            threshold={memoryAvilableBytes}
-            data={prometheusMemoryData}
-            query={queries?.MEMORY_USAGE}
+            title={`${Number(percentageMemoryUsed?.toFixed(2))}%`}
           />
         </ComponentReady>
       </div>
