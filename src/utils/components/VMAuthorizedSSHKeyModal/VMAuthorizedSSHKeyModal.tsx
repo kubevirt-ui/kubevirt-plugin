@@ -6,8 +6,9 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import { ModalPendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 import { k8sGet, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { FileUpload } from '@patternfly/react-core';
+import { FileUpload, HelperText, HelperTextItem } from '@patternfly/react-core';
 
 import { changeVMSecret, decodeSecret } from './utils';
 
@@ -30,6 +31,7 @@ export const VMAuthorizedSSHKeyModal: React.FC<{
   const [secret, setSecret] = React.useState<IoK8sApiCoreV1Secret>();
   const [value, setValue] = React.useState('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isValidatedKey, setIsValidatedKey] = React.useState<boolean>(true);
 
   const onSubmit = () => {
     if (value !== decodeSecret(secret)) {
@@ -47,8 +49,10 @@ export const VMAuthorizedSSHKeyModal: React.FC<{
         ns: namespace,
       })
         .then((s) => {
+          const key = decodeSecret(s)?.trim();
           setSecret(s);
-          setValue(decodeSecret(s));
+          setValue(key);
+          setIsValidatedKey(validateSSHPublicKey(key));
         })
         .finally(() => setIsLoading(false));
     }
@@ -60,19 +64,30 @@ export const VMAuthorizedSSHKeyModal: React.FC<{
       onClose={onClose}
       onSubmit={onSubmit}
       headerText={t('Authorized SSH Key')}
+      isDisabled={!isValidatedKey}
     >
       {vmi && <ModalPendingChangesAlert isChanged={decodeSecret(vmiSSHSecret) !== value} />}
       <FileUpload
         id={'ssh-key-modal'}
         type="text"
         value={value}
-        onChange={(v) => setValue(v as string)}
+        onChange={(v: string) => {
+          setIsValidatedKey(validateSSHPublicKey(v));
+          setValue(v?.trim());
+        }}
         onReadStarted={() => setIsLoading(true)}
         onReadFinished={() => setIsLoading(false)}
         isLoading={isLoading}
         allowEditingUploadedText
         isReadOnly={false}
-      />
+        validated={isValidatedKey ? 'default' : 'error'}
+      >
+        {!isValidatedKey && (
+          <HelperText>
+            <HelperTextItem variant="error">{t('SSH Key is invalid')}</HelperTextItem>
+          </HelperText>
+        )}
+      </FileUpload>
     </TabModal>
   );
 };

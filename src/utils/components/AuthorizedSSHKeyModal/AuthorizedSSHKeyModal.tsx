@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FileUpload } from '@patternfly/react-core';
+import { validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
+import { FileUpload, HelperText, HelperTextItem } from '@patternfly/react-core';
 
 import TabModal from '../TabModal/TabModal';
 
@@ -14,6 +15,7 @@ export const AuthorizedSSHKeyModal: React.FC<{
   const { t } = useKubevirtTranslation();
   const [value, setValue] = React.useState(sshKey);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isValidatedKey, setIsValidatedKey] = React.useState<boolean>(true);
 
   const submitHandler = React.useCallback(async () => {
     await onSubmit(value);
@@ -25,18 +27,29 @@ export const AuthorizedSSHKeyModal: React.FC<{
       onClose={onClose}
       onSubmit={submitHandler}
       headerText={t('Authorized SSH Key')}
+      isDisabled={!isValidatedKey}
     >
       <FileUpload
         id={'ssh-key-modal'}
         type="text"
         value={value}
-        onChange={(v) => setValue(v as string)}
+        onChange={(v: string) => {
+          setIsValidatedKey(validateSSHPublicKey(v));
+          setValue(v?.trim());
+        }}
         onReadStarted={() => setIsLoading(true)}
         onReadFinished={() => setIsLoading(false)}
         isLoading={isLoading}
         allowEditingUploadedText
         isReadOnly={false}
-      />
+        validated={isValidatedKey ? 'default' : 'error'}
+      >
+        {!isValidatedKey && (
+          <HelperText>
+            <HelperTextItem variant="error">{t('SSH Key is invalid')}</HelperTextItem>
+          </HelperText>
+        )}
+      </FileUpload>
     </TabModal>
   );
 };
