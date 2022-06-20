@@ -1,6 +1,5 @@
 export * from './affinity';
 export * from './cloud-init';
-export * from './cpu';
 export * from './flavor';
 export * from './guest-agent';
 export * from './ips';

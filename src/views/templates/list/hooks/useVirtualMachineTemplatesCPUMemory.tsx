@@ -2,7 +2,11 @@ import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
-import { getFlavorData, getTemplateVirtualMachineCPU } from '@kubevirt-utils/resources/template';
+import {
+  getFlavorData,
+  getTemplateVirtualMachineCPU,
+  vCPUCount,
+} from '@kubevirt-utils/resources/template';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { isTemplateParameter } from '@kubevirt-utils/utils/utils';
 import { Popover, PopoverPosition } from '@patternfly/react-core';
@@ -43,6 +47,6 @@ export const useVirtualMachineTemplatesCPUMemory = (
       </>
     );
   } else {
-    return `CPU ${cpu?.cores} | ${t('Memory')} ${readableSizeUnit(memory)}`;
+    return `CPU ${vCPUCount(cpu)} | ${t('Memory')} ${readableSizeUnit(memory)}`;
   }
 };
