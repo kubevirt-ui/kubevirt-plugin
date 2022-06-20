@@ -7,7 +7,7 @@ import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, PageSection } from '@patternfly/react-core';
+import { Bullseye, EmptyState, EmptyStateBody, PageSection } from '@patternfly/react-core';
 
 import { printableVMStatus } from '../../../utils';
 
@@ -24,11 +24,13 @@ const VirtualMachineConsolePage: React.FC<VirtualMachineConsolePageProps> = ({ o
     isList: false,
   });
 
-  if (!vmi && vm?.status?.printableStatus === printableVMStatus.Stopped) {
+  if (!vmi || vm?.status?.printableStatus === printableVMStatus.Stopped) {
     return (
-      <PageSection>
-        {t('This VirtualMachine is down. Please start it to access its console.')}
-      </PageSection>
+      <EmptyState>
+        <EmptyStateBody>
+          {t('This VirtualMachine is down. Please start it to access its console.')}
+        </EmptyStateBody>
+      </EmptyState>
     );
   }
 
