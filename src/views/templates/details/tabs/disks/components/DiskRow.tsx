@@ -23,7 +23,7 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
   rowData: { vm, onUpdate, actionsDisabled },
 }) => {
   const { t } = useKubevirtTranslation();
-  const isPVCSource = !['URL', 'PVC (auto upload)', 'Container (Ephemeral)', 'Other'].includes(
+  const isPVCSource = !['URL', 'PVC (auto import)', 'Container (Ephemeral)', 'Other'].includes(
     obj?.source,
   );
 

@@ -79,7 +79,7 @@ export const getVMBootSourceLabel = (
   dataSource?: V1beta1DataSource,
 ): string => {
   if (BOOT_SOURCE.DATA_SOURCE && dataSource?.metadata?.labels?.[DATA_SOURCE_CRONJOB_LABEL])
-    return BOOT_SOURCE_LABELS[BOOT_SOURCE.DATA_SOURCE_AUTO_UPLOAD] || 'N/A';
+    return BOOT_SOURCE_LABELS[BOOT_SOURCE.DATA_SOURCE_AUTO_IMPORT] || 'N/A';
 
   return BOOT_SOURCE_LABELS[bootSourceType] || 'N/A';
 };

@@ -79,7 +79,7 @@ export const OS_NAMES = [
 export enum BOOT_SOURCE {
   PVC = 'PVC',
   DATA_SOURCE = 'DATA_SOURCE',
-  DATA_SOURCE_AUTO_UPLOAD = 'DATA_SOURCE_AUTO_UPLOAD',
+  DATA_SOURCE_AUTO_IMPORT = 'DATA_SOURCE_AUTO_IMPORT',
   URL = 'URL',
   REGISTRY = 'REGISTRY',
   CONTAINER_DISK = 'CONTAINER_DISK',
@@ -87,7 +87,7 @@ export enum BOOT_SOURCE {
 }
 
 // t('PVC')
-// t('PVC (auto upload)')
+// t('PVC (auto import)')
 // t('URL')
 // t('Registry')
 // t('Container Disk')
@@ -96,7 +96,7 @@ export enum BOOT_SOURCE {
 export const BOOT_SOURCE_LABELS = {
   [BOOT_SOURCE.PVC]: 'PVC',
   [BOOT_SOURCE.DATA_SOURCE]: 'PVC',
-  [BOOT_SOURCE.DATA_SOURCE_AUTO_UPLOAD]: 'PVC (auto upload)',
+  [BOOT_SOURCE.DATA_SOURCE_AUTO_IMPORT]: 'PVC (auto import)',
   [BOOT_SOURCE.URL]: 'URL',
   [BOOT_SOURCE.REGISTRY]: 'Registry',
   [BOOT_SOURCE.CONTAINER_DISK]: 'Container Disk',
