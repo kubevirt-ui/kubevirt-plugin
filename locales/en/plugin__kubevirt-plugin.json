@@ -751,6 +751,7 @@
   "view {{qualifiedNodesCount}} matching nodes": "view {{qualifiedNodesCount}} matching nodes",
   "View Alert": "View Alert",
   "View all quick starts": "View all quick starts",
+  "View details": "View details",
   "View documentation": "View documentation",
   "View events": "View events",
   "View matching {{matchingNodeText}}": "View matching {{matchingNodeText}}",
