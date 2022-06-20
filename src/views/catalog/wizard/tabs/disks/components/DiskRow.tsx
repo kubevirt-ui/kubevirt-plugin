@@ -11,7 +11,7 @@ import DiskRowActions from './DiskRowActions';
 
 const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ obj, activeColumnIDs }) => {
   const { t } = useKubevirtTranslation();
-  const isPVCSource = !['URL', 'PVC (auto upload)', 'Container (Ephemeral)', 'Other'].includes(
+  const isPVCSource = !['URL', 'PVC (auto import)', 'Container (Ephemeral)', 'Other'].includes(
     obj?.source,
   );
   return (

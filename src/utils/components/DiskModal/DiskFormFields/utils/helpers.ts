@@ -15,7 +15,7 @@ export const getSourceOptions = (t: TFunction) => ({
   },
   dataSource: {
     id: sourceTypes.DATA_SOURCE,
-    name: t('PVC auto upload (use DataSource)'),
+    name: t('PVC auto import (use DataSource)'),
     description: t('Select DataSource to use for automatic image upload.'),
   },
   http: {

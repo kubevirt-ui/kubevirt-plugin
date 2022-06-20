@@ -55,7 +55,7 @@ const useTemplateDisksTableData: UseDisksTableDisks = (template: V1Template) => 
     return (diskDevices || []).map((device) => {
       const source = () => {
         if (device?.dataVolumeTemplate?.spec?.sourceRef) {
-          return t('PVC (auto upload)');
+          return t('PVC (auto import)');
         }
         if (device?.dataVolumeTemplate?.spec?.source?.http?.url) {
           return t('URL');
