@@ -25,7 +25,7 @@
   "{{dsLabel}} name": "{{dsLabel}} name",
   "{{dsLabel}} project": "{{dsLabel}} project",
   "{{matchingNodeText}} matching": "{{matchingNodeText}} matching",
-  "{{osName}} VirtualMachine can not be edited because it is provided by {{providerName}}Virtualization Operator.<4></4>We suggest you to create a custom Template from this {{providerName}} template.<8><0>{t('Create a new custom Template')}</0></8>": "{{osName}} VirtualMachine can not be edited because it is provided by {{providerName}}Virtualization Operator.<4></4>We suggest you to create a custom Template from this {{providerName}} template.<8><0>{t('Create a new custom Template')}</0></8>",
+  "{{osName}} VirtualMachine can not be edited because it is provided by OpenShift Virtualization Operator.<2></2>We suggest you to create a custom Template from this {{providerName}} Template.<6><0>{t('Create a new custom Template')}</0></6>": "{{osName}} VirtualMachine can not be edited because it is provided by OpenShift Virtualization Operator.<2></2>We suggest you to create a custom Template from this {{providerName}} Template.<6><0>{t('Create a new custom Template')}</0></6>",
   "{{qualifiedNodesCount}} matching nodes found": "{{qualifiedNodesCount}} matching nodes found",
   "{{qualifiedNodesCount}} matching Nodes found": "{{qualifiedNodesCount}} matching Nodes found",
   "{{qualifiedNodesCount}} nodes found": "{{qualifiedNodesCount}} nodes found",

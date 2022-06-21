@@ -42,10 +42,10 @@ const NoEditableTemplateAlert: React.FC<NoEditableTemplateAlertProps> = ({ templ
       })}
     >
       <Trans ns="plugin__kubevirt-plugin">
-        {{ osName }} VirtualMachine can not be edited because it is provided by {{ providerName }}
+        {{ osName }} VirtualMachine can not be edited because it is provided by OpenShift
         Virtualization Operator.
         <br />
-        We suggest you to create a custom Template from this {{ providerName }} template.
+        We suggest you to create a custom Template from this {{ providerName }} Template.
         <div className="margin-top">
           <Button
             onClick={() =>
