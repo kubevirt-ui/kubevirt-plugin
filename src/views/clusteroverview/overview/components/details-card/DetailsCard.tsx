@@ -10,17 +10,17 @@ import { Card, CardActions, CardBody, CardHeader, CardTitle } from '@patternfly/
 import { useKubevirtCSVDetails } from './hooks/useKubevirtCSVDetails';
 import SourceMissingStatus from './SourceMissingStatus/SourceMissingStatus';
 import SubscriptionStatus from './SourceMissingStatus/SubscriptionStatus';
-import { OPENSHIFT_VIRT_PATH } from './utils/constants';
 
 const DetailsCard: React.FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const kvCsvDetails = useKubevirtCSVDetails();
   const {
-    name,
+    displayName,
     provider,
     version,
     updateChannel,
+    operatorLink,
     kubevirtSub,
     catalogSourceMissing,
     loaded,
@@ -34,13 +34,13 @@ const DetailsCard: React.FC = () => {
         <CardHeader>
           <CardTitle>{t('Details')}</CardTitle>
           <CardActions className="co-overview-card__actions">
-            <Link to={OPENSHIFT_VIRT_PATH}>{t('View details')}</Link>
+            {operatorLink && <Link to={operatorLink}>{t('View details')}</Link>}
           </CardActions>
         </CardHeader>
         <CardBody>
           <DetailsBody>
             <OverviewDetailItem isLoading={isLoading} title={t('Service name')}>
-              {name}
+              {displayName}
             </OverviewDetailItem>
             <OverviewDetailItem isLoading={isLoading} title={t('Provider')}>
               {provider}

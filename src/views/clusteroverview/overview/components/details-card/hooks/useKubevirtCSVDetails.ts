@@ -33,11 +33,15 @@ const catalogSourceForSubscription = (
       source?.metadata?.namespace === subscription?.spec?.sourceNamespace,
   );
 
+const getOperatorLink = (name, namespace) =>
+  `/k8s/ns/${namespace}/operators.coreos.com~v1alpha1~ClusterServiceVersion/${name}`;
+
 type UseKubevirtCSVDetails = {
-  name: string;
+  displayName: string;
   provider: string;
   version: string;
   updateChannel: string;
+  operatorLink: string;
   kubevirtSub: SubscriptionKind;
   catalogSourceMissing: boolean;
   loaded: boolean;
@@ -45,10 +49,11 @@ type UseKubevirtCSVDetails = {
 };
 
 export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
-  const [name, setName] = React.useState<string>();
+  const [displayName, setDisplayName] = React.useState<string>();
   const [provider, setProvider] = React.useState<string>();
   const [version, setVersion] = React.useState<string>();
   const [updateChannel, setUpdateChannel] = React.useState<string>();
+  const [operatorLink, setOperatorLink] = React.useState<string>();
   const [kubevirtSub, setKubevirtSub] = React.useState<SubscriptionKind>();
   const [catalogSourceMissing, setCatalogSourceMissing] = React.useState<boolean>(false);
   const [loaded, setLoaded] = React.useState<boolean>(false);
@@ -100,12 +105,18 @@ export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
         !catalogSourceForSubscription(kubevirtSub, updatedResources.catalogSources.data) &&
         !isPackageServer(kubevirtCSV);
 
-      setName(kubevirtCSV?.spec?.displayName);
+      const name = kubevirtCSV?.metadata?.name;
+      const namespace = kubevirtCSV?.metadata?.namespace;
+      const operatorVersion = kubevirtCSV?.spec?.version;
+      const link = getOperatorLink(name, namespace);
+
+      setDisplayName(kubevirtCSV?.spec?.displayName);
       setProvider(kubevirtCSV?.spec?.provider?.name);
-      setVersion(kubevirtCSV?.spec?.version);
+      setVersion(operatorVersion);
       setUpdateChannel(kubevirtSubscription?.spec?.channel);
       setKubevirtSub(kubevirtSubscription);
       setCatalogSourceMissing(catalogSrcMissing);
+      setOperatorLink(link);
 
       setLoaded(true);
       setLoadError(null);
@@ -118,10 +129,11 @@ export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
   }, [debouncedUpdateResources, resources]);
 
   return useDeepCompareMemoize({
-    name,
+    displayName,
     provider,
     version,
     updateChannel,
+    operatorLink,
     kubevirtSub,
     catalogSourceMissing,
     loaded,
