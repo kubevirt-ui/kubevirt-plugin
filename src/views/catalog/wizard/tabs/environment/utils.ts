@@ -86,7 +86,7 @@ export const addEnvironmentsToVM = (
   environments: EnvironmentVariable[],
 ): V1VirtualMachine => {
   return produceVMDisks(vm, (draftVM) => {
-    const currentOtherDisks: V1Disk[] = (getDisks(draftVM) || []).filter((disk) => !disk.serial);
+    const currentOtherDisks: V1Disk[] = (getDisks(draftVM) || []).filter((disk) => !disk?.serial);
 
     const currentOtherVolumes: V1Volume[] = (getVolumes(draftVM) || []).filter(
       (volume) => !volume.secret && !volume.configMap && !volume.serviceAccount,

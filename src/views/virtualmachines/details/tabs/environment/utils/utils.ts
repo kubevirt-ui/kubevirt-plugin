@@ -12,7 +12,7 @@ import { SelectOptionObject } from '@patternfly/react-core';
 import { EnvironmentKind, EnvironmentVariable } from './constants';
 
 export const getVMEnvironmentsVariables = (vm: V1VirtualMachine): EnvironmentVariable[] => {
-  const disksWithSerial = (getDisks(vm) || [])?.filter((disk) => disk.serial);
+  const disksWithSerial = (getDisks(vm) || [])?.filter((disk) => disk?.serial);
 
   return []
     .concat(
@@ -20,7 +20,7 @@ export const getVMEnvironmentsVariables = (vm: V1VirtualMachine): EnvironmentVar
         const diskEnvironment = disksWithSerial.find((disk) => disk.name === volume.name);
         return {
           name: volume.configMap.name,
-          serial: diskEnvironment.serial,
+          serial: diskEnvironment?.serial,
           kind: EnvironmentKind.configMap,
         };
       }),
@@ -30,7 +30,7 @@ export const getVMEnvironmentsVariables = (vm: V1VirtualMachine): EnvironmentVar
         const diskEnvironment = disksWithSerial.find((disk) => disk.name === volume.name);
         return {
           name: volume.secret.secretName,
-          serial: diskEnvironment.serial,
+          serial: diskEnvironment?.serial,
           kind: EnvironmentKind.secret,
         };
       }),
@@ -40,7 +40,7 @@ export const getVMEnvironmentsVariables = (vm: V1VirtualMachine): EnvironmentVar
         const diskEnvironment = disksWithSerial.find((disk) => disk.name === volume.name);
         return {
           name: volume.serviceAccount.serviceAccountName,
-          serial: diskEnvironment.serial,
+          serial: diskEnvironment?.serial,
           kind: EnvironmentKind.serviceAccount,
         };
       }),
@@ -86,7 +86,7 @@ export const addEnvironmentsToVM = (
   environments: EnvironmentVariable[],
 ): V1VirtualMachine => {
   return produceVMDisks(vm, (draftVM) => {
-    const currentOtherDisks: V1Disk[] = (getDisks(draftVM) || [])?.filter((disk) => !disk.serial);
+    const currentOtherDisks: V1Disk[] = (getDisks(draftVM) || [])?.filter((disk) => !disk?.serial);
 
     const currentOtherVolumes: V1Volume[] = (getVolumes(draftVM) || [])?.filter(
       (volume) => !volume.secret && !volume.configMap && !volume.serviceAccount,
@@ -99,7 +99,7 @@ export const addEnvironmentsToVM = (
       const diskName = environment.name.replaceAll(dotRegex, '-') + '-disk';
 
       const newDisk: V1Disk = {
-        serial: environment.serial,
+        serial: environment?.serial,
         name: diskName,
         disk: {},
       };

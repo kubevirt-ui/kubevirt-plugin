@@ -89,7 +89,7 @@ const VirtualMachineEnvironmentPage: React.FC<VirtualMachineEnvironmentPageProps
         <EnvironmentEditor
           key={environment.name}
           environmentName={environment.name}
-          serial={environment.serial}
+          serial={environment?.serial}
           kind={environment.kind}
           secrets={secrets}
           configMaps={configMaps}
