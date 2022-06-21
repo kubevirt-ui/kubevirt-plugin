@@ -12,13 +12,13 @@ const CloudInitInfoHelper = () => {
     <Stack className="kv-cloudinit-info-helper--main">
       <StackItem>
         {t(
-          'You can use Cloudinit for post installation configuration of the guest operating system.',
+          'You can use Cloud-init for post installation configuration of the guest operating system.',
         )}
       </StackItem>
-      <StackItem>{t('The guest OS needs to have the Cloudinit service running.')}</StackItem>
+      <StackItem>{t('The guest OS needs to have the Cloud-init service running.')}</StackItem>
       <StackItem>
         <div className="text-muted">
-          {t('Cloudinit is already configured in cloud images of Fedora and RHEL')}{' '}
+          {t('Cloud-init is already configured in cloud images of Fedora and RHEL')}{' '}
           <Button
             isSmall
             isInline
