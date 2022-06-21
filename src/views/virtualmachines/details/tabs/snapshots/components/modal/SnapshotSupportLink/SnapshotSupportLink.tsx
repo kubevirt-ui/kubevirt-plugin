@@ -7,7 +7,7 @@ const SnapshotSupportLink: React.FC = () => {
   return (
     <a
       href={
-        'https://access.redhat.com/documentation/en-us/openshift_container_platform/4.9/html/storage/using-container-storage-interface-csi#persistent-storage-csi-snapshots'
+        'https://access.redhat.com/documentation/en-us/openshift_container_platform/4.10/html/storage/using-container-storage-interface-csi#persistent-storage-csi-snapshots'
       }
       target="_blank"
       rel="noreferrer"
