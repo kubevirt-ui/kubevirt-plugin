@@ -120,6 +120,18 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
           setIsBootSourceAvailable(true);
         }
         break;
+      case BOOT_SOURCE.CONTAINER_DISK:
+        {
+          setTemplateBootSource({
+            type: bootSource.type,
+            source: bootSource.source,
+            sourceValue: {
+              containerDisk: bootSource?.source?.containerDisk,
+            },
+          });
+          setIsBootSourceAvailable(true);
+        }
+        break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bootSource]);
