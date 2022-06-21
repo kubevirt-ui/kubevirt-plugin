@@ -24,17 +24,15 @@
         width: 100%;
         height: var(--pf-global--spacer--2xl);
         display: flex;
+        align-items: flex-end;
         .util-summary-value {
           width: 50%;
           font-weight: var(--pf-global--FontWeight--normal);
           font-size: var(--pf-global--FontSize--xl);
-          align-self: self-end;
+          line-height: normal;
         }
         .util-summary-text {
           width: 50%;
-          &.network-value {
-            align-self: center;
-          }
         }
       }
     }
