@@ -15,24 +15,19 @@ type UserCredentialsProps = {
 
 const UserCredentials: React.FC<UserCredentialsProps> = ({ vmi, sshService }) => {
   const { t } = useKubevirtTranslation();
-  const { user, command, sshServiceRunning } = useSSHCommand(vmi, sshService);
+  const { command, sshServiceRunning } = useSSHCommand(vmi, sshService);
 
   if (!sshServiceRunning) return <MutedTextSpan text={t('Requires SSH service')} />;
 
   return (
-    <>
-      <div data-test="details-item-user-credentials-user-name">
-        {user && t('user: {{user}}', { user })}
-      </div>
-      <ClipboardCopy
-        isReadOnly
-        data-test="SSHDetailsPage-command"
-        clickTip={t('Copied')}
-        hoverTip={t('Copy to clipboard')}
-      >
-        {command}
-      </ClipboardCopy>
-    </>
+    <ClipboardCopy
+      isReadOnly
+      data-test="SSHDetailsPage-command"
+      clickTip={t('Copied')}
+      hoverTip={t('Copy to clipboard')}
+    >
+      {command}
+    </ClipboardCopy>
   );
 };
 
