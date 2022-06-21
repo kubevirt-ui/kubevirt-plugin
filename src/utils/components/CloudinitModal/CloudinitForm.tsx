@@ -64,7 +64,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
             fieldId={'cloudinit-user'}
             className="kv-cloudint-advanced-tab--validation-text"
             isRequired
-            helperText={t("Default cloudinit username is 'cloud-user'")}
+            helperText={t("Default cloud-init username is 'cloud-user'")}
           >
             <TextInput
               type="text"
