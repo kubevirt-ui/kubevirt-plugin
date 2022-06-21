@@ -25,7 +25,7 @@ const VMStatusSection: React.FC<VMStatusSectionProps> = ({ vms, vmsLoaded }) => 
     const status = key;
     const count = value as number;
     statusItems.push(
-      <FlexItem>
+      <FlexItem key={key}>
         <VMStatusInventoryItem status={status} count={count} />
       </FlexItem>,
     );
