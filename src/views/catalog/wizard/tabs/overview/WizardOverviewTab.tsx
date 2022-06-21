@@ -109,7 +109,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
               }
               description={
                 <>
-                  {t('CPU')} {cpuCount} | {t('Memory')} {readableSizeUnit(memory)}
+                  {cpuCount} {t('CPU')} | {readableSizeUnit(memory)} {t('Memory')}
                 </>
               }
             />

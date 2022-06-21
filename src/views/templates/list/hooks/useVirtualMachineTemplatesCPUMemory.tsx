@@ -47,6 +47,6 @@ export const useVirtualMachineTemplatesCPUMemory = (
       </>
     );
   } else {
-    return `CPU ${vCPUCount(cpu)} | ${t('Memory')} ${readableSizeUnit(memory)}`;
+    return `${vCPUCount(cpu)} CPU | ${readableSizeUnit(memory)} ${t('Memory')}`;
   }
 };

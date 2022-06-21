@@ -81,7 +81,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
                 <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload] ?? t('Other')}
               </StackItem>
               <StackItem>
-                <b>{t('CPU')}</b> {cpuCount} | <b>{t('Memory')}</b> {readableSizeUnit(memory)}
+                {cpuCount} <b>{t('CPU')}</b> | {readableSizeUnit(memory)} <b>{t('Memory')}</b>
               </StackItem>
             </Stack>
           </StackItem>
