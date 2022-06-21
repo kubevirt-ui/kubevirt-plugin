@@ -27,7 +27,7 @@ const EnablePreallocationCheckbox: React.FC<EnablePreallocationCheckboxProps> = 
         <>
           <Trans ns="plugin__kubevirt-plugin">
             Refer to the
-            <Link to="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.9/html/virtualization/virtual-machines#virt-using-preallocation-for-datavolumes">
+            <Link to="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.10/html/virtualization/virtual-machines#virt-using-preallocation-for-datavolumes">
               {' '}
               Documentation{' '}
             </Link>
