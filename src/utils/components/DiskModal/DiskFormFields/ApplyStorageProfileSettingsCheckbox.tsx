@@ -3,6 +3,7 @@ import * as React from 'react';
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import StorageProfileModel from '@kubevirt-ui/kubevirt-api/console/models/StorageProfileModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
@@ -38,24 +39,9 @@ const ApplyStorageProfileSettingsCheckbox: React.FC<ApplyStorageProfileSettingsC
   React.useEffect(() => {
     dispatchDiskState({
       type: diskReducerActions.SET_STORAGE_PROFILE_SETTINGS_CHECKBOX_DISABLED,
-      payload: !loaded || !claimPropertySets,
+      payload: !loaded || !claimPropertySets || isEmpty(claimPropertySets),
     });
-
-    // only if claimPropertySets is not empty and the user checked for the optimized settings checkbox
-    // we set the values from claimPropertySets
-    if (applyStorageProfileSettings && claimPropertySets?.length > 0) {
-      const firstCliamPropertySet = claimPropertySets?.[0];
-      dispatchDiskState({
-        type: diskReducerActions.SET_ACCESS_MODE,
-        payload: firstCliamPropertySet?.accessModes?.[0],
-      });
-      dispatchDiskState({
-        type: diskReducerActions.SET_VOLUME_MODE,
-        payload: firstCliamPropertySet?.volumeMode,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applyStorageProfileSettings, claimPropertySets, loaded]);
+  }, [claimPropertySets, dispatchDiskState, loaded]);
 
   return (
     <FormGroup
