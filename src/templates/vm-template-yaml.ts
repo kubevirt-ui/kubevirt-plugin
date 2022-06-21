@@ -84,7 +84,8 @@ objects:
 parameters:
   - name: NAME
     description: Name for the new VM
-    required: true
+    generate: expression
+    from: 'vm-template-example-[a-z0-9]{16}'
   - name: CLOUD_USER_PASSWORD
     description: Randomized password for the cloud-init user
     generate: expression
