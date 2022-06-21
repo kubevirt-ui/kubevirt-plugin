@@ -221,7 +221,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
           diskState={diskState}
           dispatchDiskState={dispatchDiskState}
         />
-        {sourceRequiresDataVolume && (
+        {(sourceRequiresDataVolume || diskState.diskSource === sourceTypes.UPLOAD) && (
           <>
             <StorageClassSelect
               storageClass={diskState.storageClass}
