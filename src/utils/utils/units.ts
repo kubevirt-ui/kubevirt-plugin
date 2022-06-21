@@ -27,5 +27,6 @@ export const readableSizeUnit = (combinedStr: string): string => {
       ? [combinedString, '']
       : [combinedString?.slice(0, index), combinedString?.slice(index)];
 
-  return `${value} ${toIECUnit(unit)}`;
+  // if there isn't any specific value/size present, return the original string, for example for the dynamic disk size
+  return !value ? combinedStr : `${value} ${toIECUnit(unit)}`;
 };
