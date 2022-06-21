@@ -12,6 +12,7 @@ import {
 import {
   Chart,
   ChartArea,
+  ChartAxis,
   ChartGroup,
   ChartThreshold,
   ChartTooltip,
@@ -22,7 +23,7 @@ import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_colo
 import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
 import { getUtilizationQueries } from '../../utils/queries';
-import { queriesToLink } from '../../utils/utils';
+import { queriesToLink, tickFormat } from '../../utils/utils';
 import ComponentReady from '../ComponentReady/ComponentReady';
 
 type CPUThresholdChartProps = {
@@ -75,7 +76,7 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ timespan, vmi, po
       <Link to={queriesToLink(queries.CPU_REQUESTED)}>
         <Chart
           height={200}
-          showAxis={false}
+          scale={{ x: 'time', y: 'linear' }}
           containerComponent={
             <ChartVoronoiContainer
               labels={({ datum }) => {
@@ -88,6 +89,22 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ timespan, vmi, po
             />
           }
         >
+          <ChartAxis
+            dependentAxis
+            tickCount={2}
+            tickValues={[thresholdData?.[0]?.y]}
+            style={{
+              ticks: { stroke: 'transparent' },
+            }}
+            axisComponent={<></>}
+          />
+          <ChartAxis
+            tickFormat={tickFormat(timespan)}
+            style={{
+              ticks: { stroke: 'transparent' },
+            }}
+            axisComponent={<></>}
+          />
           <ChartGroup>
             <ChartArea
               data={chartData}

@@ -7,6 +7,7 @@ import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynami
 import {
   Chart,
   ChartArea,
+  ChartAxis,
   ChartGroup,
   ChartTooltip,
   ChartVoronoiContainer,
@@ -15,6 +16,7 @@ import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_
 import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
 import { getMultilineUtilizationQueries } from '../../utils/queries';
+import { tickFormat } from '../../utils/utils';
 import ComponentReady from '../ComponentReady/ComponentReady';
 // import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 
@@ -53,7 +55,7 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan,
     <ComponentReady isReady={!isEmpty(chartData)}>
       <Chart
         height={200}
-        showAxis={false}
+        scale={{ x: 'time', y: 'linear' }}
         containerComponent={
           <ChartVoronoiContainer
             labels={({ datum }) => {
@@ -64,6 +66,13 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan,
           />
         }
       >
+        <ChartAxis
+          tickFormat={tickFormat(timespan)}
+          style={{
+            ticks: { stroke: 'transparent' },
+          }}
+          axisComponent={<></>}
+        />
         <ChartGroup>
           <ChartArea
             data={chartData}
