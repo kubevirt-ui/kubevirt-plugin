@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
-import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
@@ -38,8 +37,6 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const canUpdateStoppedVM =
-    canUpdateVM && vm?.status?.printableStatus === printableVMStatus.Stopped;
 
   const isMachineNotLiveMirgation = !!vm?.status?.conditions?.find(
     ({ type, status }) => type === 'LiveMigratable' && status === 'False',
@@ -119,7 +116,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Descheduler vm={vm} />}
           descriptionHeader={t('Descheduler')}
-          isEdit={canUpdateStoppedVM && !isMachineNotLiveMirgation}
+          isEdit={!isMachineNotLiveMirgation}
           data-test-id="descheduler"
           isPopover
           bodyContent={
