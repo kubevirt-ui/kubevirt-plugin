@@ -21,7 +21,9 @@ export const FormError: React.FC<FormErrorProps> = ({ error }) => {
           <StackItem>{error.message}</StackItem>
           {error?.href && (
             <StackItem>
-              <a href={error.href}>{error.href}</a>
+              <a href={error.href} target="blank">
+                {error.href}
+              </a>
             </StackItem>
           )}
         </Stack>
