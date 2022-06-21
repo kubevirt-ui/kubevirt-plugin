@@ -70,7 +70,7 @@ const WizardEnvironmentTab: WizardTab = ({ vm, updateVM, setDisableVmCreate }) =
         <EnvironmentEditor
           key={environment.name}
           environmentName={environment.name}
-          serial={environment.serial}
+          serial={environment?.serial}
           kind={environment.kind}
           secrets={secrets}
           configMaps={configMaps}
