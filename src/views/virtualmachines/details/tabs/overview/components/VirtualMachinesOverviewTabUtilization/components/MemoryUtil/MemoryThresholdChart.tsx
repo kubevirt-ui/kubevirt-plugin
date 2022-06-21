@@ -9,6 +9,7 @@ import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynami
 import {
   Chart,
   ChartArea,
+  ChartAxis,
   ChartGroup,
   ChartThreshold,
   ChartTooltip,
@@ -19,7 +20,7 @@ import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_colo
 import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
 import { getUtilizationQueries } from '../../utils/queries';
-import { queriesToLink } from '../../utils/utils';
+import { queriesToLink, tickFormat } from '../../utils/utils';
 import ComponentReady from '../ComponentReady/ComponentReady';
 
 type MemoryThresholdChartProps = {
@@ -63,7 +64,7 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ timespan, v
       <Link to={queriesToLink(queries?.MEMORY_USAGE)}>
         <Chart
           height={200}
-          showAxis={false}
+          scale={{ x: 'time', y: 'linear' }}
           containerComponent={
             <ChartVoronoiContainer
               labels={({ datum }) => {
@@ -76,6 +77,23 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ timespan, v
             />
           }
         >
+          <ChartAxis
+            dependentAxis
+            tickCount={2}
+            tickValues={[thresholdLine?.[0]?.y]}
+            tickFormat={(tick: number) => xbytes(tick, { iec: true, fixed: 0 })}
+            style={{
+              ticks: { stroke: 'transparent' },
+            }}
+            axisComponent={<></>}
+          />
+          <ChartAxis
+            tickFormat={tickFormat(timespan)}
+            style={{
+              ticks: { stroke: 'transparent' },
+            }}
+            axisComponent={<></>}
+          />
           <ChartGroup>
             <ChartArea
               data={chartData}

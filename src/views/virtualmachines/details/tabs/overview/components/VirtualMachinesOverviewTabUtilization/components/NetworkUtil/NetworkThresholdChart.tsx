@@ -9,6 +9,7 @@ import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynami
 import {
   Chart,
   ChartArea,
+  ChartAxis,
   ChartGroup,
   ChartTooltip,
   ChartVoronoiContainer,
@@ -18,7 +19,7 @@ import chart_color_blue_400 from '@patternfly/react-tokens/dist/esm/chart_color_
 import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
 import { getMultilineUtilizationQueries } from '../../utils/queries';
-import { queriesToLink } from '../../utils/utils';
+import { queriesToLink, tickFormat } from '../../utils/utils';
 import ComponentReady from '../ComponentReady/ComponentReady';
 
 type NetworkThresholdChartProps = {
@@ -68,7 +69,7 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ timespan,
       <Link to={queriesToLink([networkInQuery?.query, networkOutQuery?.query])}>
         <Chart
           height={200}
-          showAxis={false}
+          scale={{ x: 'time', y: 'linear' }}
           containerComponent={
             <ChartVoronoiContainer
               labels={({ datum }) => {
@@ -81,6 +82,13 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ timespan,
             />
           }
         >
+          <ChartAxis
+            tickFormat={tickFormat(timespan)}
+            style={{
+              ticks: { stroke: 'transparent' },
+            }}
+            axisComponent={<></>}
+          />
           <ChartGroup>
             <ChartArea
               data={chartDataOut}
