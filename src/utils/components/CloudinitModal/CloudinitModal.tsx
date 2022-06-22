@@ -85,6 +85,7 @@ export const CloudinitModal: React.FC<{
         <CloudinitForm
           showEditor={showEditor}
           onEditorSave={onEditorSave}
+          setSubmitDisabled={setSubmitDisabled}
           {...cloudInitHookValues}
         />
       </Stack>
