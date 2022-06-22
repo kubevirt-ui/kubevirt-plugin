@@ -136,7 +136,6 @@ export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
     return null;
   }
 
-  debugger;
   const pickRows = (rowType, rowCondition, mapper) =>
     affinityRows
       .filter(({ type, condition }) => type === rowType && condition === rowCondition)
