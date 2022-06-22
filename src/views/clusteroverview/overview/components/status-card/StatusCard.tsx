@@ -2,13 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  DashboardsOverviewHealthSubsystem as DynamicDashboardsOverviewHealthSubsystem,
-  isDashboardsOverviewHealthSubsystem as isDynamicDashboardsOverviewHealthSubsystem,
-  isResolvedDashboardsOverviewHealthURLSubsystem,
-  K8sResourceCommon,
-  useK8sWatchResource,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { HealthBody } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
   Card,
@@ -19,20 +13,14 @@ import {
   GalleryItem,
 } from '@patternfly/react-core';
 
-import { VIRTUALIZATION } from './utils/constants';
-import useDashboardSubsystems from './utils/hooks/useDashboardSubsystems';
 import NetworkingHealthItem from './utils/NetworkingHealthItem';
 import StorageHealthItem from './utils/storage-health-item/StorageHealthItem';
 import { VirtStatusItems } from './utils/types';
-import URLHealthItem from './utils/URLHealthItem';
 import { getClusterNAC, NetworkAddonsConfigResource } from './utils/utils';
 import VirtualizationAlerts from './utils/VirtualizationAlerts';
 
 const StatusCard = () => {
   const { t } = useKubevirtTranslation();
-  const subsystems = useDashboardSubsystems<DynamicDashboardsOverviewHealthSubsystem>(
-    isDynamicDashboardsOverviewHealthSubsystem,
-  );
 
   const [networkAddonsConfigList] = useK8sWatchResource<K8sResourceCommon[]>(
     NetworkAddonsConfigResource,
@@ -40,17 +28,6 @@ const StatusCard = () => {
   const clusterNAC = getClusterNAC(networkAddonsConfigList);
 
   const virtStatusItems: VirtStatusItems = [];
-  subsystems?.forEach((subsystem) => {
-    if (
-      isResolvedDashboardsOverviewHealthURLSubsystem(subsystem) &&
-      subsystem?.properties?.title === VIRTUALIZATION
-    ) {
-      virtStatusItems.push({
-        title: t('Virtualization'),
-        Component: <URLHealthItem subsystem={subsystem.properties} />,
-      });
-    }
-  });
 
   virtStatusItems.push({
     title: t('Networking'),
