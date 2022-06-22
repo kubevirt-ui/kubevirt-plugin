@@ -4,6 +4,7 @@ import RandExp from 'randexp';
 
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Loading } from '@patternfly/quickstarts';
 import {
   Bullseye,
@@ -30,6 +31,7 @@ type CloudinitFormProps = {
   updateNetworkField: (key: keyof CloudInitNetworkData, value: string) => void;
   onEditorSave: (yaml: string) => void;
   setEnableNetworkData: (value: boolean) => void;
+  setSubmitDisabled: (value: boolean) => void;
 };
 const CloudinitForm: React.FC<CloudinitFormProps> = ({
   cloudInitVolume,
@@ -41,6 +43,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
   showEditor,
   enableNetworkData,
   setEnableNetworkData,
+  setSubmitDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
   const [passwordHidden, setPasswordHidden] = React.useState<boolean>(true);
@@ -64,13 +67,16 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
             fieldId={'cloudinit-user'}
             className="kv-cloudint-advanced-tab--validation-text"
             isRequired
-            helperText={t("Default cloud-init username is 'cloud-user'")}
+            required
           >
             <TextInput
               type="text"
               id={'cloudinit-user'}
               value={userData?.user || ''}
-              onChange={(v) => updateUserField('user', v)}
+              onChange={(v) => {
+                setSubmitDisabled(isEmpty(v));
+                updateUserField('user', v);
+              }}
             />
           </FormGroup>
           <FormGroup
