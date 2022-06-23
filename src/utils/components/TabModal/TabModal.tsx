@@ -97,7 +97,9 @@ const TabModal: TabModalFC = React.memo(
                     <StackItem>{error.message}</StackItem>
                     {error?.href && (
                       <StackItem>
-                        <a href={error.href}>{error.href}</a>
+                        <a href={error.href} target="_blank" rel="noreferrer">
+                          {error.href}
+                        </a>
                       </StackItem>
                     )}
                   </Stack>
