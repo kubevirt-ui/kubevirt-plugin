@@ -136,10 +136,8 @@ export const getDataVolumeFromState = ({
   dataVolume.metadata.name = dvName;
   dataVolume.spec.storage.resources.requests.storage = diskState.diskSize;
   dataVolume.spec.storage.storageClassName = diskState.storageClass;
-  if (!diskState.applyStorageProfileSettings) {
-    dataVolume.spec.storage.accessModes = [diskState.accessMode];
-    dataVolume.spec.storage.volumeMode = diskState.volumeMode;
-  }
+  dataVolume.spec.storage.accessModes = [diskState.accessMode];
+  dataVolume.spec.storage.volumeMode = diskState.volumeMode;
   dataVolume.spec.preallocation = diskState.enablePreallocation;
   if (diskState.diskSource === sourceTypes.BLANK) {
     dataVolume.spec.source = {
