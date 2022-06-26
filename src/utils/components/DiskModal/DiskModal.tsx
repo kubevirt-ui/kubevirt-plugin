@@ -22,6 +22,7 @@ import DiskSourceSizeInput from './DiskFormFields/DiskSizeInput/DiskSizeInput';
 import DiskSourceFormSelect from './DiskFormFields/DiskSourceFormSelect/DiskSourceFormSelect';
 import DiskTypeSelect from './DiskFormFields/DiskTypeSelect';
 import EnablePreallocationCheckbox from './DiskFormFields/EnablePreallocationCheckbox';
+import useStorageProfileClaimPropertySets from './DiskFormFields/hooks/useStorageProfileClaimPropertySets';
 import NameFormField from './DiskFormFields/NameFormField';
 import StorageClassSelect from './DiskFormFields/StorageClassSelect';
 import { sourceTypes } from './DiskFormFields/utils/constants';
@@ -68,6 +69,10 @@ const DiskModal: React.FC<DiskModalProps> = ({
   const sourceRequiresDataVolume = React.useMemo(
     () => requiresDataVolume(diskState.diskSource),
     [diskState.diskSource],
+  );
+
+  const { claimPropertySets, loaded: storageProfileLoaded } = useStorageProfileClaimPropertySets(
+    diskState?.storageClass,
   );
 
   const hotplugPromise = React.useCallback(
@@ -216,9 +221,19 @@ const DiskModal: React.FC<DiskModalProps> = ({
             <ApplyStorageProfileSettingsCheckbox
               diskState={diskState}
               dispatchDiskState={dispatchDiskState}
+              claimPropertySets={claimPropertySets}
+              loaded={storageProfileLoaded}
             />
-            <AccessMode diskState={diskState} dispatchDiskState={dispatchDiskState} />
-            <VolumeMode diskState={diskState} dispatchDiskState={dispatchDiskState} />
+            <AccessMode
+              diskState={diskState}
+              dispatchDiskState={dispatchDiskState}
+              spAccessMode={claimPropertySets?.[0]?.accessModes?.[0]}
+            />
+            <VolumeMode
+              diskState={diskState}
+              dispatchDiskState={dispatchDiskState}
+              spVolumeMode={claimPropertySets?.[0]?.volumeMode}
+            />
             <EnablePreallocationCheckbox
               isDisabled={!sourceRequiresDataVolume}
               enablePreallocation={diskState.enablePreallocation}
