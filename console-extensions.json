@@ -121,6 +121,17 @@
     "type": "console.page/resource/details",
     "properties": {
       "model": {
+        "group": "cdi.kubevirt.io",
+        "kind": "DataSource",
+        "version": "v1beta1"
+      },
+      "component": { "$codeRef": "DataSourcePage" }
+    }
+  },
+  {
+    "type": "console.page/resource/details",
+    "properties": {
+      "model": {
         "group": "kubevirt.io",
         "kind": "VirtualMachine",
         "version": "v1"

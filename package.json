@@ -36,6 +36,7 @@
       "VirtualMachinesList": "./views/virtualmachines/list/VirtualMachinesList.tsx",
       "TemplatesCatalog": "./views/catalog/Catalog.tsx",
       "VirtualMachineNavPage": "./views/virtualmachines/details/VirtualMachineNavPage.tsx",
+      "DataSourcePage": "./views/datasources/details/DataSourcePage.tsx",
       "VirtualMachinesInstancePage": "./views/virtualmachinesinstance/details/VirtualMachinesInstancePage.tsx",
       "useVirtualMachineActionsProvider": "./views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts",
       "VirtualMachinesInstancesList": "./views/virtualmachinesinstance/list/VirtualMachinesInstancesList.tsx",
