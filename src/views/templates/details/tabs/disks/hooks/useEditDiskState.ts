@@ -101,17 +101,18 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
         (dataVolumeTemplate.spec?.source || dataVolumeTemplate.spec?.sourceRef)
       ) {
         setInitialStateFromDataVolume(dataVolumeTemplate, initialDiskSourceState);
+        const applySPSettings =
+          !dataVolumeTemplate?.spec?.storage?.accessModes &&
+          !dataVolumeTemplate?.spec?.storage?.volumeMode;
         return {
           isBootDisk: getBootDisk(vm)?.name === diskName,
           diskSource: getSourceFromDataVolume(dataVolumeTemplate),
           diskSize:
             dataVolumeTemplate.spec?.storage?.resources?.requests?.storage ||
             dataVolumeTemplate.spec?.pvc?.resources?.requests?.storage,
-          accessMode: dataVolumeTemplate?.spec?.storage?.accessModes?.[0],
-          volumeMode: dataVolumeTemplate?.spec?.storage?.volumeMode,
-          applyStorageProfileSettings:
-            !dataVolumeTemplate?.spec?.storage?.accessModes &&
-            !dataVolumeTemplate?.spec?.storage?.volumeMode,
+          accessMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.accessModes?.[0] : null,
+          volumeMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.volumeMode : null,
+          applyStorageProfileSettings: applySPSettings,
         };
       }
 
@@ -128,7 +129,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
     volumeMode,
     accessMode,
     diskInterface: getDiskInterface(disk),
-    applyStorageProfileSettings,
+    applyStorageProfileSettings: applyStorageProfileSettings ?? true,
     storageClassProvisioner: null,
     storageProfileSettingsCheckboxDisabled: false,
     asBootSource: isBootDisk,
