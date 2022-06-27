@@ -14,14 +14,14 @@ type WorkloadProfileModalProps = {
   obj: V1Template;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (workload: WORKLOADS) => Promise<void | K8sResourceCommon>;
+  onSubmit: (workload: string) => Promise<void | K8sResourceCommon>;
 };
 
 const WorkloadProfileModal: React.FC<WorkloadProfileModalProps> = React.memo(
   ({ obj, isOpen, onClose, onSubmit }) => {
     const { t } = useKubevirtTranslation();
     const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
-    const [workload, setWorkload] = React.useState<WORKLOADS>(
+    const [workload, setWorkload] = React.useState<string>(
       getTemplateWorkload(obj) || WORKLOADS.desktop,
     );
 
