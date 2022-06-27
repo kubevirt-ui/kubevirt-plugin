@@ -1,8 +1,13 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
+import { K8sResourceCondition } from 'src/views/clusteroverview/overview/components/details-card/utils/types';
 
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { PageSection } from '@patternfly/react-core';
+import { ConditionsTable } from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Divider, PageSection, Title } from '@patternfly/react-core';
+
+import { DataSourceDetailsGrid } from './components/DataSourceDetailsGrid.tsx/DataSourceDetailsGrid';
 
 type DataSourceDetailsPageProps = RouteComponentProps<{
   ns: string;
@@ -12,9 +17,23 @@ type DataSourceDetailsPageProps = RouteComponentProps<{
 };
 
 const DataSourceDetailsPage: React.FC<DataSourceDetailsPageProps> = ({ obj: dataSource }) => {
+  const { t } = useKubevirtTranslation();
+
   return (
     <div>
-      <PageSection>Details {dataSource?.metadata?.name}</PageSection>
+      <PageSection>
+        <Title headingLevel="h2" className="co-section-heading">
+          {t('DataSource details')}
+        </Title>
+        <DataSourceDetailsGrid dataSource={dataSource} />
+      </PageSection>
+      <Divider />
+      <PageSection>
+        <Title headingLevel="h2" className="co-section-heading">
+          {t('Conditions')}
+        </Title>
+        <ConditionsTable conditions={dataSource?.status?.conditions as K8sResourceCondition[]} />
+      </PageSection>
     </div>
   );
 };

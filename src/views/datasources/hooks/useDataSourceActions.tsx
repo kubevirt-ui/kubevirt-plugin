@@ -1,6 +1,9 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import DataSourceModel, {
+  DataSourceModelRef,
+} from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
@@ -13,6 +16,7 @@ type UseDataSourceActionsProvider = (dataSource: V1beta1DataSource) => Action[];
 export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataSource) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const history = useHistory();
 
   return React.useMemo(
     () => [
@@ -68,7 +72,18 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
             />
           )),
       },
+      {
+        id: 'datasource-action-edit-datasource',
+        disabled: false,
+        label: t('Edit DataSource'),
+        cta: () =>
+          history.push(
+            `/k8s/ns/${dataSource.metadata.namespace || 'default'}/${DataSourceModelRef}/${
+              dataSource.metadata.name
+            }/yaml`,
+          ),
+      },
     ],
-    [dataSource, t, createModal],
+    [t, createModal, dataSource, history],
   );
 };

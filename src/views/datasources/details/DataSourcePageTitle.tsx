@@ -51,9 +51,7 @@ const DataSourcePageTitle: React.FC<DataSourcePageTitleProps> = ({
             </span>
             {isDataSourceReady(dataSource) && (
               <span className="dps-resource-item__resource-status hidden-xs">
-                <Label color="green" variant="filled" isCompact>
-                  {t('Ready')}
-                </Label>
+                <Label isCompact>{t('Ready')}</Label>
               </span>
             )}
           </h1>
