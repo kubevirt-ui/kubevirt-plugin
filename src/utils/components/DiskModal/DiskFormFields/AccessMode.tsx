@@ -15,9 +15,10 @@ import {
 type AccessModeProps = {
   diskState: DiskFormState;
   dispatchDiskState: React.Dispatch<DiskReducerActionType>;
+  spAccessMode?: string;
 };
 
-const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatchDiskState }) => {
+const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatchDiskState, spAccessMode }) => {
   const { t } = useKubevirtTranslation();
 
   const {
@@ -27,35 +28,58 @@ const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatchDiskState })
     applyStorageProfileSettings,
     storageClassProvisioner,
   } = diskState || {};
+
   const allowedAccessModes = React.useMemo(() => {
     return getAccessModeForProvisioner(storageClassProvisioner, volumeMode as VolumeMode);
   }, [storageClassProvisioner, volumeMode]);
-  const radios = getAccessModeRadioOptions(t)?.map(({ value, label }) => (
-    <Radio
-      name="accessMode"
-      id={value}
-      isChecked={value === accessMode}
-      key={value}
-      label={label}
-      onChange={() =>
-        dispatchDiskState({ type: diskReducerActions.SET_ACCESS_MODE, payload: value })
-      }
-      isDisabled={!allowedAccessModes?.includes(value)}
-    />
-  ));
 
   React.useEffect(() => {
-    if (storageProfileSettingsCheckboxDisabled && !allowedAccessModes?.includes(accessMode)) {
+    if (!storageProfileSettingsCheckboxDisabled) {
+      if (applyStorageProfileSettings) {
+        dispatchDiskState({
+          type: diskReducerActions.SET_ACCESS_MODE,
+          payload: null,
+        });
+      } else if (spAccessMode && !accessMode) {
+        dispatchDiskState({
+          type: diskReducerActions.SET_ACCESS_MODE,
+          payload: spAccessMode,
+        });
+      }
+    } else if (!allowedAccessModes?.includes(accessMode)) {
       dispatchDiskState({
         type: diskReducerActions.SET_ACCESS_MODE,
         payload: allowedAccessModes[0],
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessMode, allowedAccessModes, storageProfileSettingsCheckboxDisabled]);
+  }, [
+    accessMode,
+    allowedAccessModes,
+    applyStorageProfileSettings,
+    dispatchDiskState,
+    spAccessMode,
+    storageProfileSettingsCheckboxDisabled,
+  ]);
+
+  if (!storageProfileSettingsCheckboxDisabled && applyStorageProfileSettings) {
+    return null;
+  }
+
   return (
     <FormGroup fieldId="access-mode" label={t('Access Mode')}>
-      {!storageProfileSettingsCheckboxDisabled && applyStorageProfileSettings ? accessMode : radios}
+      {getAccessModeRadioOptions(t)?.map(({ value, label }) => (
+        <Radio
+          name="accessMode"
+          id={value}
+          isChecked={value === accessMode}
+          key={value}
+          label={label}
+          onChange={() =>
+            dispatchDiskState({ type: diskReducerActions.SET_ACCESS_MODE, payload: value })
+          }
+          isDisabled={!allowedAccessModes?.includes(value)}
+        />
+      ))}
     </FormGroup>
   );
 };

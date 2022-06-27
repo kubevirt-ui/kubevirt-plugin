@@ -71,7 +71,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
     volumeMode: null,
     accessMode: null,
     diskInterface: getDiskInterface(disk),
-    applyStorageProfileSettings: false,
+    applyStorageProfileSettings: true,
     storageClassProvisioner: null,
     storageProfileSettingsCheckboxDisabled: false,
     asBootSource: isBootDisk,

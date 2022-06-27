@@ -1,40 +1,30 @@
 import * as React from 'react';
 
-import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import StorageProfileModel from '@kubevirt-ui/kubevirt-api/console/models/StorageProfileModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
 import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 import { DiskFormState } from '../state/initialState';
 
-import { StorageProfile } from './utils/constants';
-
 type ApplyStorageProfileSettingsCheckboxProps = {
   diskState: DiskFormState;
   dispatchDiskState: React.Dispatch<DiskReducerActionType>;
+  claimPropertySets: {
+    accessModes: string[];
+    volumeMode?: string;
+  }[];
+  loaded: boolean;
 };
 
 const ApplyStorageProfileSettingsCheckbox: React.FC<ApplyStorageProfileSettingsCheckboxProps> = ({
   diskState,
   dispatchDiskState,
+  claimPropertySets,
+  loaded,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { storageClass, applyStorageProfileSettings } = diskState || {};
-
-  const watchStorageProfileResource = React.useMemo(() => {
-    return {
-      groupVersionKind: modelToGroupVersionKind(StorageProfileModel),
-      isList: false,
-      name: storageClass,
-    };
-  }, [storageClass]);
-
-  const [storageProfile, loaded] = useK8sWatchResource<StorageProfile>(watchStorageProfileResource);
-
-  const { claimPropertySets } = storageProfile?.status || {};
+  const { applyStorageProfileSettings } = diskState || {};
 
   React.useEffect(() => {
     dispatchDiskState({
@@ -46,9 +36,14 @@ const ApplyStorageProfileSettingsCheckbox: React.FC<ApplyStorageProfileSettingsC
   return (
     <FormGroup
       fieldId="apply-storage-profile-settings"
-      helperText={t(
-        'Use optimized access mode & volume mode settings from StorageProfile resource.',
-      )}
+      helperText={
+        isEmpty(claimPropertySets)
+          ? t('No optimized StorageProfile settings for this StorageClass.')
+          : t('Optimized values Access mode: {{accessMode}}, Volume mode: {{volumeMode}}.', {
+              accessMode: claimPropertySets?.[0]?.accessModes[0],
+              volumeMode: claimPropertySets?.[0]?.volumeMode,
+            })
+      }
       isInline
     >
       <Checkbox
