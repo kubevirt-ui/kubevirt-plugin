@@ -47,7 +47,7 @@ const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ cardID }) => {
           <FormPFSelect
             toggleId="kv-top-consumers-card-metric-select"
             variant={SelectVariant.single}
-            selections={t(TopConsumerMetric.fromString(metricKey).getDropdownLabel())}
+            selections={t(TopConsumerMetric.fromString(metricKey)?.getDropdownLabel())}
             onSelect={(e, value) => onMetricSelect(value)}
             isCheckboxSelectionBadgeHidden
           >
