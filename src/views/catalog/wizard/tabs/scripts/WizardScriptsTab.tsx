@@ -7,6 +7,7 @@ import { WizardTab } from '@catalog/wizard/tabs';
 import { AuthorizedSSHKeyModal } from '@kubevirt-utils/components/AuthorizedSSHKeyModal/AuthorizedSSHKeyModal';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
+import { addSecretToVM } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -29,6 +30,10 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
   const { createModal } = useModal();
 
   const sshKey = tabsData?.scripts?.cloudInit?.sshKey;
+  const vmAttachedSecretName = vm?.spec?.template?.spec?.accessCredentials?.find(
+    (ac) => ac?.sshPublicKey?.source?.secret?.secretName,
+  )?.sshPublicKey?.source?.secret?.secretName;
+
   const unattend = tabsData?.scripts?.sysprep?.unattended;
   const autoUnattend = tabsData?.scripts?.sysprep?.autounattend;
 
@@ -52,7 +57,7 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
       }
     });
 
-  const onSSHChange = (value: string) => {
+  const onSSHChange = (secretName: string, value?: string) => {
     updateTabsData((tabsDraft) => {
       ensurePath(tabsDraft, 'scripts.cloudInit');
 
@@ -63,10 +68,20 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
       }
     });
 
-    return updateVM((vmDraft) => {
-      const produced = produceVMSSHKey(vmDraft);
-      vmDraft.spec = produced.spec;
-    });
+    if (value) {
+      return updateVM((vmDraft) => {
+        const produced = produceVMSSHKey(vmDraft);
+        vmDraft.spec = produced.spec;
+      });
+    } else if (secretName) {
+      return updateVM((vmDraft) => {
+        return addSecretToVM(vmDraft, secretName);
+      });
+    } else {
+      return updateVM((vmDraft) => {
+        vmDraft.spec.template.spec.accessCredentials = null;
+      });
+    }
   };
 
   return (
@@ -102,12 +117,19 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
                       </Text>
                     </Trans>
                   </div>
-                  <span>{sshKey ? t('Available') : t('Not available')}</span>
+                  <span>
+                    {sshKey || vmAttachedSecretName ? t('Available') : t('Not available')}
+                  </span>
                 </Stack>
               }
               onEditClick={() =>
                 createModal((modalProps) => (
-                  <AuthorizedSSHKeyModal {...modalProps} sshKey={sshKey} onSubmit={onSSHChange} />
+                  <AuthorizedSSHKeyModal
+                    {...modalProps}
+                    sshKey={sshKey}
+                    vmSecretName={vmAttachedSecretName}
+                    onSubmit={onSSHChange}
+                  />
                 ))
               }
             />
