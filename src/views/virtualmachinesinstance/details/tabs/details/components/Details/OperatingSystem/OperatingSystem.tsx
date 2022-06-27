@@ -8,15 +8,15 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { DescriptionListDescription, DescriptionListTerm } from '@patternfly/react-core';
 
-type OperationSystemProps = {
+type OperatingSystemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const OperationSystem: React.FC<OperationSystemProps> = ({ vmi }) => {
+const OperatingSystem: React.FC<OperatingSystemProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>
-      <DescriptionListTerm>{t('Operation System')}</DescriptionListTerm>
+      <DescriptionListTerm>{t('Operating system')}</DescriptionListTerm>
       <DescriptionListDescription>
         {getOperatingSystemName(vmi) || getOperatingSystem(vmi)}
       </DescriptionListDescription>
@@ -24,4 +24,4 @@ const OperationSystem: React.FC<OperationSystemProps> = ({ vmi }) => {
   );
 };
 
-export default OperationSystem;
+export default OperatingSystem;
