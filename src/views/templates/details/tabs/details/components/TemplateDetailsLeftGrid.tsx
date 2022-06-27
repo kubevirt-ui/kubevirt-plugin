@@ -10,6 +10,9 @@ import Owner from 'src/views/templates/details/tabs/details/components/Owner';
 import { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getMachineType } from '@kubevirt-utils/resources/vm';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { DescriptionList } from '@patternfly/react-core';
 
@@ -21,6 +24,7 @@ import WorkloadProfile from './WorkloadProfile';
 
 const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
   const { t } = useKubevirtTranslation();
+  const machineType = getMachineType(getTemplateVirtualMachineObject(template)) || NO_DATA_DASH;
 
   return (
     <DescriptionList>
@@ -33,6 +37,7 @@ const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template,
       <DescriptionItem title={t('Operating system')} content={getOperatingSystemName(template)} />
       <WorkloadProfile template={template} editable={editable} />
       <CPUMemory template={template} />
+      <DescriptionItem title={t('Machine type')} content={machineType} />
       <BootMethod template={template} />
       <BaseTemplate template={template} />
       <CreatedAt template={template} />

@@ -118,3 +118,11 @@ export const getBootDisk = (vm: V1VirtualMachine): V1Disk =>
     .reduce((acc, disk) => {
       return acc.bootOrder < disk.bootOrder ? acc : disk;
     }, getDisks(vm)?.[0]);
+
+/**
+ * A selector for the QEMU machine's type
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns {string} the machine type
+ */
+export const getMachineType = (vm: V1VirtualMachine): string =>
+  vm?.spec?.template?.spec?.domain?.machine?.type;
