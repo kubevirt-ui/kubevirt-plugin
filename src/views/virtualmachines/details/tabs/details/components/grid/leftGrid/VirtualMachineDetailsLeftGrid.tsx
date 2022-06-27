@@ -21,9 +21,11 @@ import { asAccessReview, getAnnotation, getLabel } from '@kubevirt-utils/resourc
 import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
 import {
   DESCRIPTION_ANNOTATION,
+  getMachineType,
   useVMIAndPodsForVM,
   VM_TEMPLATE_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import {
   k8sPatch,
@@ -226,6 +228,10 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
             ))
           }
           data-test-id={`${vm?.metadata?.name}-cpu-memory`}
+        />
+        <VirtualMachineDescriptionItem
+          descriptionData={getMachineType(vm) || NO_DATA_DASH}
+          descriptionHeader={t('Machine type')}
         />
         <VirtualMachineDescriptionItem
           descriptionData={
