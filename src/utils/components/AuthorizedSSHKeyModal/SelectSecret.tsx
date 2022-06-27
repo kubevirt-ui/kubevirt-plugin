@@ -15,12 +15,14 @@ type SelectSecretProps = {
   selectedSecretName: string;
   onSelectSecret: (secretName: string) => void;
   namespace: string;
+  id?: string;
 };
 
 const SelectSecret: React.FC<SelectSecretProps> = ({
   selectedSecretName,
   onSelectSecret,
   namespace,
+  id,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isSecretSelectOpen, setSecretSelectOpen] = React.useState(false);
@@ -75,7 +77,7 @@ const SelectSecret: React.FC<SelectSecretProps> = ({
       selections={selectedSecretName}
       placeholderText={t('--- Select secret ---')}
       maxHeight={400}
-      id="select-secret"
+      id={id || 'select-secret'}
     >
       {sshKeySecrets?.map((secret) => (
         <SelectOption key={secret?.metadata?.name} value={secret?.metadata?.name}>

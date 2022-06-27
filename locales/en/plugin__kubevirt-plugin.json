@@ -601,6 +601,7 @@
   "Secrets": "Secrets",
   "See the <2>catalog tab</2> to quickly create a VirtualMachine from the available Templates.": "See the <2>catalog tab</2> to quickly create a VirtualMachine from the available Templates.",
   "Select a resource": "Select a resource",
+  "Select an available secret": "Select an available secret",
   "Select an existing persistent volume claim already available on the cluster and clone it.": "Select an existing persistent volume claim already available on the cluster and clone it.",
   "Select an option to create a VirtualMachine": "Select an option to create a VirtualMachine",
   "Select boot source": "Select boot source",
