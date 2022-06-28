@@ -23,6 +23,7 @@ import useGuestOS from '../../../../hooks/useGuestOS';
 
 import Annotations from './Annotations/Annotations';
 import BootOrder from './BootOrder/BootOrder';
+import CPUMemory from './CPUMemory/CPUMemory';
 import CreateAt from './CreateAt/CreateAt';
 import Description from './Description/Description';
 import HardwareDevices from './HadwareDevices/HardwareDevices';
@@ -32,7 +33,7 @@ import Labels from './Labels/Labels';
 import Name from './Name/Name';
 import Namespace from './Namespace/Namespace';
 import Node from './Node/Node';
-import OperationSystem from './OperationSystem/OperationSystem';
+import OperatingSystem from './OperatingSystem/OperatingSystem';
 import Owner from './Owner/Owner';
 import Pods from './Pods/Pods';
 import SSHDetails from './SSHAccess/SSHAccess';
@@ -80,7 +81,13 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               <Description vmi={vmi} />
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <OperationSystem vmi={vmi} />
+              <OperatingSystem vmi={vmi} />
+            </DescriptionListGroup>
+            <DescriptionListGroup>
+              <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
+              <DescriptionListDescription>
+                <CPUMemory vmi={vmi} />
+              </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
               <CreateAt timestamp={vmi?.metadata?.creationTimestamp} />
@@ -108,7 +115,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('Boot Order')}</DescriptionListTerm>
+              <DescriptionListTerm>{t('Boot order')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <BootOrder
                   disks={vmi?.spec?.domain?.devices?.disks}
@@ -117,7 +124,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('IP Address')}</DescriptionListTerm>
+              <DescriptionListTerm>{t('IP address')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <IP vmi={vmi} />
               </DescriptionListDescription>
@@ -129,7 +136,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('Time Zone')}</DescriptionListTerm>
+              <DescriptionListTerm>{t('Time zone')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <Timezone guestAgentData={guestAgentData} />
               </DescriptionListDescription>
@@ -141,7 +148,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('Workload Profile')}</DescriptionListTerm>
+              <DescriptionListTerm>{t('Workload profile')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <WorkloadProfile annotations={vmi?.metadata?.annotations} />
               </DescriptionListDescription>
