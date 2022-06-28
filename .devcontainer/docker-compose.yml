@@ -32,7 +32,7 @@ services:
       - ..:/workspace:cached
       - ~/.bash_history:/root/.bash_history
       - ~/.zsh_history:/root/.zsh_history
-      - ~/.config/gh/hosts.yml:/root/.config/gh/hosts.yml
+      - ~/.config/gh:/root/.config/gh
     volumes_from:
       - x11-bridge:rw
 
