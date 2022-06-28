@@ -8,6 +8,7 @@ import {
   ButtonVariant,
   ExpandableSection,
   FileUpload,
+  FormGroup,
   HelperText,
   HelperTextItem,
 } from '@patternfly/react-core';
@@ -21,10 +22,11 @@ import './auth-ssh-key-modal.scss';
 export const AuthorizedSSHKeyModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-  sshKey: string;
+  sshKey?: string;
   vmSecretName: string;
+  enableCreation?: boolean;
   onSubmit: (secretName: string, sshKey?: string) => Promise<void>;
-}> = ({ sshKey, vmSecretName, onSubmit, onClose, isOpen }) => {
+}> = ({ sshKey, vmSecretName, onSubmit, onClose, isOpen, enableCreation = true }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
   const [value, setValue] = React.useState(sshKey);
@@ -37,6 +39,38 @@ export const AuthorizedSSHKeyModal: React.FC<{
     if (selectedSecretName) await onSubmit(selectedSecretName);
     else await onSubmit(undefined, value);
   }, [onSubmit, selectedSecretName, value]);
+
+  if (!enableCreation) {
+    return (
+      <TabModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={submitHandler}
+        headerText={t('Authorized SSH Key')}
+        isDisabled={!isValidatedKey}
+      >
+        <div className="auth-ssh-key-modal">
+          <FormGroup fieldId="auth-ssh-service-select" label={t('Attach an existing secret')}>
+            <SelectSecret
+              selectedSecretName={selectedSecretName}
+              onSelectSecret={setSelectedSecretName}
+              namespace={namespace}
+              id="auth-ssh-service-select"
+            />
+          </FormGroup>
+          {selectedSecretName && (
+            <Button
+              variant={ButtonVariant.link}
+              isDanger
+              onClick={() => setSelectedSecretName(undefined)}
+            >
+              {t('Detach secret')}
+            </Button>
+          )}
+        </div>
+      </TabModal>
+    );
+  }
 
   return (
     <TabModal
