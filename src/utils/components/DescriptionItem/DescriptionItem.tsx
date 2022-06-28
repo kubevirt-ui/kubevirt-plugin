@@ -1,22 +1,18 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Button,
   DescriptionListDescription,
   DescriptionListGroup,
-  DescriptionListTerm,
   DescriptionListTermHelpText,
-  DescriptionListTermHelpTextButton,
   Flex,
   FlexItem,
-  Popover,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
+
+import { DescriptionItemHeader } from './DescriptionItemHeader';
 
 import './DescriptionItem.scss';
 
@@ -50,64 +46,21 @@ const DescriptionItem: React.FC<DescriptionItemProps> = ({
   const { t } = useKubevirtTranslation();
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
 
-  const getItemHeader = () => {
-    if (isPopover && bodyContent) {
-      return (
-        <Popover
-          headerContent={descriptionHeader}
-          bodyContent={
-            <>
-              {bodyContent}
-              {moreInfoURL && (
-                <>
-                  {t('More info: ')}
-                  <Link to={moreInfoURL}>{moreInfoURL}</Link>
-                </>
-              )}
-              {breadcrumb && (
-                <Breadcrumb>
-                  {breadcrumb.split('.').map((item) => (
-                    <BreadcrumbItem key={item}>{item}</BreadcrumbItem>
-                  ))}
-                </Breadcrumb>
-              )}
-            </>
-          }
-        >
-          <DescriptionListTermHelpTextButton>
-            {' '}
-            {descriptionHeader}{' '}
-          </DescriptionListTermHelpTextButton>
-        </Popover>
-      );
-    }
-
-    return <DescriptionListTerm>{descriptionHeader}</DescriptionListTerm>;
-  };
-
-  const description = (
-    <Button
-      type="button"
-      isInline
-      isDisabled={isDisabled}
-      onClick={onEditClick}
-      variant="link"
-      data-test-id={testId}
-    >
-      <Flex spaceItems={{ default: 'spaceItemsNone' }}>
-        <FlexItem>{descriptionData ?? NotAvailable}</FlexItem>
-        <FlexItem>
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </FlexItem>
-      </Flex>
-    </Button>
-  );
-
   return (
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
         <Flex className="description-item__title">
-          <FlexItem>{getItemHeader()}</FlexItem>
+          <FlexItem>
+            {
+              <DescriptionItemHeader
+                isPopover={isPopover}
+                bodyContent={bodyContent}
+                moreInfoURL={moreInfoURL}
+                breadcrumb={breadcrumb}
+                descriptionHeader={descriptionHeader}
+              />
+            }
+          </FlexItem>
           {isEdit && showEditOnTitle && (
             <FlexItem>
               <Button
@@ -126,7 +79,21 @@ const DescriptionItem: React.FC<DescriptionItemProps> = ({
         </Flex>
       </DescriptionListTermHelpText>
       {isEdit && !showEditOnTitle ? (
-        description
+        <Button
+          type="button"
+          isInline
+          isDisabled={isDisabled}
+          onClick={onEditClick}
+          variant="link"
+          data-test-id={testId}
+        >
+          <Flex spaceItems={{ default: 'spaceItemsNone' }}>
+            <FlexItem>{descriptionData ?? NotAvailable}</FlexItem>
+            <FlexItem>
+              <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+            </FlexItem>
+          </Flex>
+        </Button>
       ) : (
         <DescriptionListDescription data-test-id={testId}>
           {descriptionData}

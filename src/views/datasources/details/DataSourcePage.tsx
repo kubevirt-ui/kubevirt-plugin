@@ -9,7 +9,8 @@ import { Bullseye } from '@patternfly/react-core';
 import DataSourceDetailsPage from './DataSourceDetailsPage';
 import DataSourcePageTitle from './DataSourcePageTitle';
 import DataSourceYAMLPage from './DataSourceYamlPage';
-export type DataSourcePageProps = {
+
+type DataSourcePageProps = {
   name: string;
   namespace: string;
   kind: string;

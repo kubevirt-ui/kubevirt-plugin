@@ -268,5 +268,44 @@
     "flags": {
       "required": ["KUBEVIRT"]
     }
+  },
+  {
+    "type": "console.navigation/separator",
+    "properties": {
+      "perspective": "admin",
+      "section": "virtualization",
+      "id": "VirtualizationSeparator",
+      "insertAfter": "templates",
+      "insertBefore": "datasources",
+      "testID": "VirtualizationSeparator"
+    }
+  },
+  {
+    "type": "console.navigation/resource-ns",
+    "properties": {
+      "id": "datasources",
+      "section": "virtualization",
+      "name": "%plugin__kubevirt-plugin~DataSources%",
+      "model": {
+        "group": "cdi.kubevirt.io",
+        "kind": "DataSource",
+        "version": "v1beta1"
+      },
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-datasources",
+        "data-test-id": "datasources-nav-item"
+      }
+    }
+  },
+  {
+    "type": "console.page/resource/list",
+    "properties": {
+      "model": {
+        "group": "cdi.kubevirt.io",
+        "kind": "DataSource",
+        "version": "v1beta1"
+      },
+      "component": { "$codeRef": "DataSourcesList" }
+    }
   }
 ]

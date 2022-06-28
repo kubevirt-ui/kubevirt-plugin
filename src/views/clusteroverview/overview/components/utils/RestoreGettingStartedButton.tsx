@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Label } from '@patternfly/react-core';
 
 import useGettingStartedShowState from '../getting-started-card/utils/hooks/useGettingStartedShowState';
@@ -14,7 +14,7 @@ interface RestoreGettingStartedButtonProps {
 const RestoreGettingStartedButton: React.FC<RestoreGettingStartedButtonProps> = ({
   userSettingsKey,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useKubevirtTranslation();
   const [showState, setShowState, showStateLoaded] = useGettingStartedShowState(userSettingsKey);
 
   if (!showStateLoaded || showState !== GETTING_STARTED_SHOW_STATE.HIDE) {

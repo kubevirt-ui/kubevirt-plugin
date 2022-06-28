@@ -1,4 +1,5 @@
 import React from 'react';
+import { getDataSourceCronJob } from 'src/views/datasources/utils';
 
 import WizardMetadataLabels from '@catalog/wizard/tabs/metadata/components/WizardMetadataLabels';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
@@ -14,6 +15,7 @@ import { k8sPatch, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import DataSourceAnnotations from '../DataSourceAnnotations/DataSourceAnnotations';
+import DataSourceManagedByDescription from '../DataSourceManagedByDescription/DataSourceManagedByDescription';
 
 type DataSourceDetailsGridProps = {
   dataSource: V1beta1DataSource;
@@ -22,6 +24,7 @@ type DataSourceDetailsGridProps = {
 export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ dataSource }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const dataImportCron = getDataSourceCronJob(dataSource);
 
   return (
     <Grid hasGutter>
@@ -52,6 +55,13 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             moreInfoURL="http://kubernetes.io/docs/user-guide/namespaces"
             breadcrumb="DataSource.metadata.namespace"
           />
+          {dataImportCron && (
+            <DataSourceManagedByDescription
+              dataImportCronName={dataImportCron}
+              namespace={dataSource?.metadata?.namespace}
+            />
+          )}
+
           <DescriptionItem
             descriptionData={<WizardMetadataLabels labels={dataSource?.metadata?.labels} />}
             descriptionHeader={t('Labels')}

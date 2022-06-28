@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Breadcrumb, BreadcrumbItem, Button, Label } from '@patternfly/react-core';
+import { Breadcrumb, BreadcrumbItem, Label } from '@patternfly/react-core';
 
 import DataSourceActions from '../actions/DataSourceActions';
 import { isDataSourceReady } from '../utils';
@@ -21,23 +21,15 @@ const DataSourcePageTitle: React.FC<DataSourcePageTitleProps> = ({
   namespace,
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
 
   return (
     <>
       <div className="pf-c-page__main-breadcrumb">
         <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
           <BreadcrumbItem>
-            <Button
-              variant="link"
-              isInline
-              isSmall
-              onClick={() =>
-                history.push(`/k8s/ns/${namespace || 'default'}/${DataSourceModelRef}`)
-              }
-            >
+            <Link to={`/k8s/ns/${namespace || 'default'}/${DataSourceModelRef}`}>
               {t('DataSources')}
-            </Button>
+            </Link>
           </BreadcrumbItem>
           <BreadcrumbItem>{t('DataSource Details')}</BreadcrumbItem>
         </Breadcrumb>

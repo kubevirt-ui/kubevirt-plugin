@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { QuickStartsLoader } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
   AllQuickStartStates,
@@ -30,7 +30,7 @@ const QuickStartsSection: React.FC<QuickStartsSectionProps> = ({
   description,
   filter,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useKubevirtTranslation();
   const { allQuickStartStates, setActiveQuickStart } =
     React.useContext<QuickStartContextValues>(QuickStartContext);
 

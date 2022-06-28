@@ -36,6 +36,7 @@
       "VirtualMachinesList": "./views/virtualmachines/list/VirtualMachinesList.tsx",
       "TemplatesCatalog": "./views/catalog/Catalog.tsx",
       "VirtualMachineNavPage": "./views/virtualmachines/details/VirtualMachineNavPage.tsx",
+      "DataSourcesList": "./views/datasources/list/DataSourcesList.tsx",
       "DataSourcePage": "./views/datasources/details/DataSourcePage.tsx",
       "VirtualMachinesInstancePage": "./views/virtualmachinesinstance/details/VirtualMachinesInstancePage.tsx",
       "useVirtualMachineActionsProvider": "./views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts",
@@ -92,7 +93,7 @@
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.11.0",
-    "@kubevirt-ui/kubevirt-api": "^0.0.43",
+    "@kubevirt-ui/kubevirt-api": "^0.0.44",
     "@openshift-console/dynamic-plugin-sdk": "0.0.11",
     "@openshift-console/dynamic-plugin-sdk-internal": "0.0.10",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.7",
