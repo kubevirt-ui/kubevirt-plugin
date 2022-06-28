@@ -5,6 +5,7 @@ import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HorizontalNav, NavPage } from '@openshift-console/dynamic-plugin-sdk';
 
+import SettingsTab from './SettingsTab/SettingsTab';
 import { KUBEVIRT_QUICK_START_USER_SETTINGS_KEY } from './utils/constants';
 import PageHeader from './utils/PageHeader';
 import RestoreGettingStartedButton from './utils/RestoreGettingStartedButton';
@@ -21,6 +22,11 @@ const overviewTabs: NavPage[] = [
     href: 'performance',
     name: 'Performance',
     component: TopConsumersTab,
+  },
+  {
+    href: 'settings',
+    name: 'Settings',
+    component: SettingsTab,
   },
 ];
 

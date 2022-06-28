@@ -1,0 +1,14 @@
+.settings-tab__card {
+  height: 100%;
+  flex-direction: row;
+}
+
+.settings-tab__menu {
+  flex-basis: fit-content;
+}
+
+.settings-tab__content {
+  width: 100%;
+  padding: var(--pf-global--spacer--2xl);
+  padding-left: calc(var(--pf-global--spacer--3xl) * 2);
+}
