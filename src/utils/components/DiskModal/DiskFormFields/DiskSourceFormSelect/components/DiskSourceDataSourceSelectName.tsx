@@ -38,7 +38,7 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
 
   return (
     <FormGroup label={t('{{dsLabel}} name', { dsLabel })} fieldId={fieldId} id={fieldId} isRequired>
-      {dataSourcesLoaded ? (
+      {dataSourcesLoaded || isDisabled ? (
         <Select
           menuAppendTo="parent"
           aria-labelledby={fieldId}
