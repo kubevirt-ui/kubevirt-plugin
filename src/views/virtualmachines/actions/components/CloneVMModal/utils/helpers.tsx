@@ -7,12 +7,7 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  getDataVolumeTemplates,
-  getDisks,
-  getInterfaces,
-  getVolumes,
-} from '@kubevirt-utils/resources/vm';
+import { getDisks, getInterfaces, getVolumes } from '@kubevirt-utils/resources/vm';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 
 export const getRandomChars = (len: number): string => {
@@ -25,33 +20,19 @@ export const getRandomChars = (len: number): string => {
 export const getClonedDisksSummary = (
   vm: V1VirtualMachine,
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
-  dataVolumes: V1beta1DataVolume[],
 ) => {
   const disks = getDisks(vm);
   const volumes = getVolumes(vm);
-  const dataVolumeTemplates = getDataVolumeTemplates(vm);
   return disks?.map((disk) => {
     const description = [disk.name];
 
     const volume = (volumes || []).find((v) => v.name === disk.name);
     if (volume) {
-      if (volume.dataVolume) {
-        const dataVolume =
-          (dataVolumeTemplates || []).find(
-            (dv) => dv?.metadata?.name === volume?.dataVolume?.name,
-          ) ||
-          (dataVolumes || []).find(
-            (dv) =>
-              dv?.metadata?.name === volume?.dataVolume?.name &&
-              dv?.metadata?.namespace === vm?.metadata?.namespace,
-          );
-        description.push(
-          formatBytes(dataVolume?.spec?.storage?.resources?.requests?.storage),
-          dataVolume?.spec?.storage?.storageClassName,
-        );
-      } else if (volume.persistentVolumeClaim) {
+      if (volume?.dataVolume || volume?.persistentVolumeClaim) {
         const pvc = pvcs.find(
-          (p) => p?.metadata?.name === volume?.persistentVolumeClaim?.claimName,
+          (p) =>
+            p?.metadata?.name === volume?.persistentVolumeClaim?.claimName ||
+            p?.metadata?.name === volume?.dataVolume?.name,
         );
         description.push(
           formatBytes(pvc?.spec?.resources?.requests?.storage),

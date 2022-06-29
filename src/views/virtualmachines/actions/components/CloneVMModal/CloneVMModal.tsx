@@ -106,7 +106,7 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
           vmNamespace={vm?.metadata?.namespace}
         />
         <StartClonedVMCheckbox startCloneVM={startCloneVM} setStartCloneVM={setStartCloneVM} />
-        <ConfigurationSummary vm={vm} pvcs={pvcs} dataVolumes={dataVolumes} />
+        <ConfigurationSummary vm={vm} pvcs={pvcs} />
         <CloneRunningVMAlert vmName={vm?.metadata?.name} isVMRunning={isVMRunning} />
       </Form>
     </TabModal>
