@@ -7,6 +7,7 @@ import VirtualMachinesInstancePageDetailsTab from '../tabs/details/VirtualMachin
 import VirtualMachinesInstancePageDisksTab from '../tabs/disks/VirtualMachinesInstancePageDisksTab';
 import VirtualMachinesInstancePageEventsTab from '../tabs/events/VirtualMachinesInstancePageEventsTab';
 import VirtualMachinesInstancePageNetworkTab from '../tabs/network/VirtualMachinesInstancePageNetworkTab';
+import VirtualMachinesInstancePageSchedulingTab from '../tabs/scheduling/VirtualMachinesInstancePageSchedulingTab';
 import VirtualMachinesInstancePageYAMLTab from '../tabs/yaml/VirtualMachinesInstancePageYAMLTab';
 
 const useVirtualMachinesInstanceTabs = () => {
@@ -23,6 +24,11 @@ const useVirtualMachinesInstanceTabs = () => {
         href: 'yaml',
         name: t('YAML'),
         component: VirtualMachinesInstancePageYAMLTab,
+      },
+      {
+        href: 'scheduling',
+        name: t('Scheduling'),
+        component: VirtualMachinesInstancePageSchedulingTab,
       },
       {
         href: 'events',
