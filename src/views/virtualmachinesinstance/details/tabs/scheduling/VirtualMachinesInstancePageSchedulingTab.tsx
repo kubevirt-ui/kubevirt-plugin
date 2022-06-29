@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,9 +10,8 @@ import {
   DescriptionListTerm,
   Grid,
   GridItem,
-  Title,
+  PageSection,
 } from '@patternfly/react-core';
-import { LinkIcon } from '@patternfly/react-icons';
 
 import Affinity from './Affinity/Affinity';
 import Descheduler from './Descheduler/Descheduler';
@@ -20,22 +20,17 @@ import EvictionStrategy from './EvictionStrategy/EvictionStrategy';
 import NodeSelector from './NodeSelector/NodeSelector';
 import Tolerations from './Tolerations/Tolerations';
 
-type SchedulingProps = {
-  vmi: V1VirtualMachineInstance;
-  pathname: string;
+type VirtualMachinesInstancePageSchedulingTabProps = RouteComponentProps & {
+  obj: V1VirtualMachineInstance;
 };
 
-const Scheduling: React.FC<SchedulingProps> = ({ vmi, pathname }) => {
+const VirtualMachinesInstancePageSchedulingTab: React.FC<
+  VirtualMachinesInstancePageSchedulingTabProps
+> = ({ obj: vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <div>
-      <a href={`${pathname}#scheduling`} className="link-icon">
-        <LinkIcon size="sm" />
-      </a>
-      <Title headingLevel="h2" className="co-section-heading">
-        {t('Scheduling and resources requirements')}
-      </Title>
+    <PageSection>
       <Grid hasGutter>
         <GridItem span={6}>
           <DescriptionList>
@@ -82,8 +77,8 @@ const Scheduling: React.FC<SchedulingProps> = ({ vmi, pathname }) => {
           </DescriptionList>
         </GridItem>
       </Grid>
-    </div>
+    </PageSection>
   );
 };
 
-export default Scheduling;
+export default VirtualMachinesInstancePageSchedulingTab;
