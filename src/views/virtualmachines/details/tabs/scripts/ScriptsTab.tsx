@@ -103,6 +103,7 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               }
               descriptionHeader={t('Authorized SSH Key')}
               isEdit={canUpdateVM}
+              data-test-id="authorized-ssh-key-button"
               showEditOnTitle
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
