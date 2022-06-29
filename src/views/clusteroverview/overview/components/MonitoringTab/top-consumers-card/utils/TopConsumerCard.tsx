@@ -4,7 +4,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { Card, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import { SHOW_TOP_5_ITEMS, TOP_CONSUMER_NUM_ITEMS_KEY } from './constants';
 import FormPFSelect from './FormPFSelect';
 import { TopConsumerMetric } from './topConsumerMetric';
 import { TopConsumersChartList } from './TopConsumersChartList';
@@ -19,11 +18,7 @@ type TopConsumersMetricCard = {
 
 const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ cardID }) => {
   const { t } = useKubevirtTranslation();
-  const [numItemsLabel] = useLocalStorage(TOP_CONSUMER_NUM_ITEMS_KEY);
-  const numItemsToShow = React.useMemo(
-    () => (numItemsLabel === SHOW_TOP_5_ITEMS ? 5 : 10),
-    [numItemsLabel],
-  );
+
   const [metricKey, setMetricKey] = useLocalStorage(
     `${cardID}-metric-value`,
     initialTopConsumerCardSettings[cardID]?.metric.toString(),
@@ -75,7 +70,6 @@ const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ cardID }) => {
         <div>{t('Usage')}</div>
       </div>
       <TopConsumersChartList
-        numItems={numItemsToShow}
         metric={TopConsumerMetric.fromString(metricKey)}
         scope={TopConsumerScope.fromString(scopeKey)}
       />
