@@ -18,22 +18,23 @@ export const ExpandableOptionsFields: React.FC<ExpandableOptionsFieldsProps> = (
   const { t } = useKubevirtTranslation();
   const [optionalFieldsExpanded, setOptionalFieldsExpanded] = React.useState(false);
 
-  if (optionalFields && optionalFields.length > 0)
-    return (
-      <ExpandableSection
-        toggleText={t('Optional parameters')}
-        data-test-id="expandable-optional-section"
-        onToggle={() => setOptionalFieldsExpanded(!optionalFieldsExpanded)}
-        isExpanded={optionalFieldsExpanded}
-        isIndented
-      >
-        {optionalFields?.map((field) => (
-          <FieldGroup
-            key={field.name}
-            field={field}
-            className="expandable-section-content-margin-top"
-          />
-        ))}
-      </ExpandableSection>
-    );
+  if (!optionalFields || optionalFields.length === 0) return null;
+
+  return (
+    <ExpandableSection
+      toggleText={t('Optional parameters')}
+      data-test-id="expandable-optional-section"
+      onToggle={() => setOptionalFieldsExpanded(!optionalFieldsExpanded)}
+      isExpanded={optionalFieldsExpanded}
+      isIndented
+    >
+      {optionalFields?.map((field) => (
+        <FieldGroup
+          key={field.name}
+          field={field}
+          className="expandable-section-content-margin-top"
+        />
+      ))}
+    </ExpandableSection>
+  );
 };
