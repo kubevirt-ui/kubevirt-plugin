@@ -36,14 +36,28 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
 
   const unattend = tabsData?.scripts?.sysprep?.unattended;
   const autoUnattend = tabsData?.scripts?.sysprep?.autounattend;
+  const selectedSysprep = tabsData?.scripts?.sysprep?.selectedSysprep;
 
   const onUnattendChange = (value: string) =>
     updateTabsData((tabsDraft) => {
       ensurePath(tabsDraft, 'scripts.sysprep');
       if (value) {
         tabsDraft.scripts.sysprep.unattended = value;
+        delete tabsDraft.scripts.sysprep.selectedSysprep;
       } else {
         delete tabsDraft.scripts.sysprep.unattended;
+      }
+    });
+
+  const onSysprepSelected = (newSysprep: string) =>
+    updateTabsData((tabsDraft) => {
+      ensurePath(tabsDraft, 'scripts.sysprep');
+      if (newSysprep) {
+        tabsDraft.scripts.sysprep.selectedSysprep = newSysprep;
+        delete tabsDraft.scripts.sysprep.unattended;
+        delete tabsDraft.scripts.sysprep.autounattend;
+      } else {
+        delete tabsDraft.scripts.sysprep.selectedSysprep;
       }
     });
 
@@ -52,6 +66,7 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
       ensurePath(tabsDraft, 'scripts.sysprep');
       if (value) {
         tabsDraft.scripts.sysprep.autounattend = value;
+        delete tabsDraft.scripts.sysprep.selectedSysprep;
       } else {
         delete tabsDraft.scripts.sysprep.autounattend;
       }
@@ -138,7 +153,11 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
               testId="wizard-sysprep"
               title={t('Sysprep')}
               description={
-                <SysprepDescription hasAutoUnattend={!!autoUnattend} hasUnattend={!!unattend} />
+                <SysprepDescription
+                  hasAutoUnattend={!!autoUnattend}
+                  hasUnattend={!!unattend}
+                  selectedSysprepName={selectedSysprep}
+                />
               }
               isEdit
               showEditOnTitle
@@ -150,6 +169,8 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
                     autoUnattend={autoUnattend}
                     onAutoUnattendChange={onAutoUnattendChange}
                     onUnattendChange={onUnattendChange}
+                    onSysprepSelected={onSysprepSelected}
+                    sysprepSelected={selectedSysprep}
                   />
                 ))
               }

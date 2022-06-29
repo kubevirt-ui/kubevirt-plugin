@@ -39,7 +39,7 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
 
           // sysprep disk addition
           if (tabsData?.scripts?.sysprep) {
-            const produced = produceVMSysprep(vmDraft);
+            const produced = produceVMSysprep(vmDraft, tabsData?.scripts?.sysprep?.selectedSysprep);
             vmDraft.spec = produced.spec;
           }
         }),
@@ -47,7 +47,7 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
       setIsVmCreated(true);
 
       // sysprep configmap
-      if (tabsData?.scripts?.sysprep) {
+      if (tabsData?.scripts?.sysprep?.autounattend || tabsData?.scripts?.sysprep?.unattended) {
         await createSysprepConfigMap(newVM, tabsData?.scripts?.sysprep);
       }
 

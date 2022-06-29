@@ -20,6 +20,7 @@ export type TabsData = {
     sysprep?: {
       autounattend?: string;
       unattended?: string;
+      selectedSysprep?: string;
     };
   };
 };

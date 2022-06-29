@@ -15,3 +15,9 @@ form.kv-sysprep--main.pf-c-form {
 .kv-sysprep-info {
   margin: 0;
 }
+
+.kv-sysprep-modal button.pf-m-danger {
+  padding-left: 0;
+  margin-bottom: var(--pf-global-spacer-md);
+  margin-top: var(--pf-global-spacer-sm);
+}

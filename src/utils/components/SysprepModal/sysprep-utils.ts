@@ -11,9 +11,9 @@ export type SysprepData = { autounattend?: string; unattended?: string };
 
 export const sysprepDisk = () => ({ cdrom: { bus: 'sata' }, name: SYSPREP });
 
-export const sysprepVolume = (vm: V1VirtualMachine) => ({
+export const sysprepVolume = (sysprepName: string) => ({
   sysprep: {
-    configMap: { name: `sysprep-config-${vm?.metadata?.name}` },
+    configMap: { name: sysprepName },
   },
   name: SYSPREP,
 });
