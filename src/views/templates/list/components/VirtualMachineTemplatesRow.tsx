@@ -19,7 +19,7 @@ const VirtualMachineTemplatesRow: React.FC<
     V1Template,
     { availableTemplatesUID: Set<string>; availableDatasources: Record<string, V1beta1DataSource> }
   >
-> = ({ obj, activeColumnIDs, rowData: { availableDatasources } }) => {
+> = ({ obj, activeColumnIDs, rowData: { availableDatasources, availableTemplatesUID } }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
 
@@ -44,7 +44,11 @@ const VirtualMachineTemplatesRow: React.FC<
         {t(getWorkloadProfile(obj))}
       </TableData>
       <TableData id="availability" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
-        <VirtualMachineTemplatesSource template={obj} availableDatasources={availableDatasources} />
+        <VirtualMachineTemplatesSource
+          template={obj}
+          availableDatasources={availableDatasources}
+          availableTemplatesUID={availableTemplatesUID}
+        />
       </TableData>
       <TableData id="cpu" activeColumnIDs={activeColumnIDs}>
         {useVirtualMachineTemplatesCPUMemory(obj)}

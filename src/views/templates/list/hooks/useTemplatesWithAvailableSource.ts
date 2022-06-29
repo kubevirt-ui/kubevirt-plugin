@@ -74,7 +74,9 @@ export const useTemplatesWithAvailableSource = ({
           return acc;
         }
 
-        acc.push(template);
+        if (bootSource.type !== BOOT_SOURCE.NONE) {
+          acc.push(template);
+        }
         return acc;
       }, [] as V1Template[]);
 
