@@ -1,3 +1,3 @@
 export const SYSPREP = 'sysprep';
 export const SYSPREP_DOC_URL =
-  'https://kubevirt.io/user-guide/virtual_machines/startup_scripts/#sysprep';
+  'https://docs.openshift.com/container-platform/4.10/virt/virtual_machines/virt-automating-windows-sysprep.html';
