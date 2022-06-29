@@ -38,7 +38,13 @@ const AffinityRules: React.FC<TemplateSchedulingGridProps> = ({ template, editab
       <DescriptionListTerm>{t('Affinity rules')}</DescriptionListTerm>
       <DescriptionListDescription>
         {editable ? (
-          <Button type="button" isInline onClick={onEditClick} variant="link">
+          <Button
+            type="button"
+            isInline
+            onClick={onEditClick}
+            variant="link"
+            data-test-id="affinity-rules"
+          >
             {rulesCount}
             <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
           </Button>
