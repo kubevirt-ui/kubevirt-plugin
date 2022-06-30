@@ -42,7 +42,7 @@ const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) =>
       history.push(`/k8s/${activeNamespacePath}/${VirtualMachineModelRef}`);
     };
 
-    if (!deleteOwnedResource) {
+    if (deleteOwnedResource) {
       const vmOwnerRef = buildOwnerReference(updatedVM);
 
       const pvcPromises = (pvcs || [])?.map((pvc) => {
