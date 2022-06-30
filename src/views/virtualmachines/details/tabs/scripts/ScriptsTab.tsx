@@ -73,6 +73,7 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               descriptionData={<CloudInitDescription vm={vm} />}
               descriptionHeader={t('Cloud-init')}
               isEdit={canUpdateVM}
+              data-test-id="cloud-init"
               showEditOnTitle
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
@@ -103,6 +104,7 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               }
               descriptionHeader={t('Authorized SSH Key')}
               isEdit={canUpdateVM}
+              data-test-id="authorized-ssh-key-button"
               showEditOnTitle
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
