@@ -39,7 +39,13 @@ const EvictionStrategy: React.FC<TemplateSchedulingGridProps> = ({
       <DescriptionListTerm>{t('Eviction strategy')}</DescriptionListTerm>
       <DescriptionListDescription>
         {editable ? (
-          <Button type="button" isInline onClick={onEditClick} variant="link">
+          <Button
+            type="button"
+            isInline
+            onClick={onEditClick}
+            variant="link"
+            data-test-id="eviction-strategy"
+          >
             {strategy}
             <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
           </Button>
