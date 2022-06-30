@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -24,10 +23,9 @@ import { getClonedDisksSummary } from '../utils/helpers';
 type ConfigurationSummaryProps = {
   vm: V1VirtualMachine;
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  dataVolumes: V1beta1DataVolume[];
 };
 
-const ConfigurationSummary: React.FC<ConfigurationSummaryProps> = ({ vm, pvcs, dataVolumes }) => {
+const ConfigurationSummary: React.FC<ConfigurationSummaryProps> = ({ vm, pvcs }) => {
   const { t } = useKubevirtTranslation();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const [guestAgentData] = useGuestOS(vmi);
@@ -69,7 +67,7 @@ const ConfigurationSummary: React.FC<ConfigurationSummaryProps> = ({ vm, pvcs, d
         {t('Disks')}
       </TextListItem>
       <TextListItem component={TextListItemVariants.dd}>
-        {getClonedDisksSummary(vm, pvcs, dataVolumes)}
+        {getClonedDisksSummary(vm, pvcs)}
       </TextListItem>
     </FormGroup>
   );
