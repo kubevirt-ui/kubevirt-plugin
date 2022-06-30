@@ -6,6 +6,8 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import UserCredentials from '@kubevirt-utils/components/UserCredentials/UserCredentials';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getMachineType } from '@kubevirt-utils/resources/vm';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   DescriptionList,
@@ -54,6 +56,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
     namespace: vmi?.metadata?.namespace,
   });
   const [sshService, sshServiceLoading] = useSSHService(vmi);
+
   return (
     <div>
       <a href={`${pathname}#details`} className="link-icon">
@@ -87,6 +90,12 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <CPUMemory vmi={vmi} />
+              </DescriptionListDescription>
+            </DescriptionListGroup>
+            <DescriptionListGroup>
+              <DescriptionListTerm>{t('Machine type')}</DescriptionListTerm>
+              <DescriptionListDescription>
+                {getMachineType(vm) || NO_DATA_DASH}
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
