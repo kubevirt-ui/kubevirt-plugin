@@ -43,7 +43,7 @@ const NetworkInterfaceNetworkSelect: React.FC<NetworkInterfaceNetworkSelectProps
   const [nads, loaded, error] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
     isList: true,
-    namespace: vm?.metadata?.namespace,
+    namespace: template?.metadata?.namespace,
   });
 
   const hasPodNetwork = React.useMemo(() => podNetworkExists(vm), [vm]);
