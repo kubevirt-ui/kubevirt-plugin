@@ -47,7 +47,13 @@ const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ template, editabl
       <DescriptionListTerm>{t('Node selector')}</DescriptionListTerm>
       <DescriptionListDescription>
         {editable ? (
-          <Button type="button" isInline onClick={onEditClick} variant="link">
+          <Button
+            type="button"
+            isInline
+            onClick={onEditClick}
+            variant="link"
+            data-test-id="node-selector"
+          >
             {nodeSelectorLabels}
             <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
           </Button>

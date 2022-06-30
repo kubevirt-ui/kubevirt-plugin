@@ -32,7 +32,13 @@ const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ template, editable
       <DescriptionListTerm>{t('Tolerations')}</DescriptionListTerm>
       <DescriptionListDescription>
         {editable ? (
-          <Button type="button" isInline onClick={onEditClick} variant="link">
+          <Button
+            type="button"
+            isInline
+            onClick={onEditClick}
+            variant="link"
+            data-test-id="tolerations"
+          >
             {tolerationsCount}
             <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
           </Button>
