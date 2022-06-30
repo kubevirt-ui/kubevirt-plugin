@@ -42,26 +42,5 @@
     .pf-c-label__content:before {
       border: none;
     }
-    &.critical {
-      color: var(--pf-global--palette--red-50);
-      background-color: var(--pf-global--palette--red-50);
-      .pf-c-label__icon {
-        color: var(--pf-global--palette--red-100);
-      }
-    }
-    &.warning {
-      color: var(--pf-global--palette--gold-50);
-      background-color: var(--pf-global--palette--gold-50);
-      .pf-c-label__icon {
-        color: var(--pf-global--palette--gold-400);
-      }
-    }
-    &.info {
-      color: var(--pf-global--palette--blue-50);
-      background-color: var(--pf-global--palette--blue-50);
-      .pf-c-label__icon {
-        color: var(--pf-global--palette--blue-300);
-      }
-    }
   }
 }

@@ -55,3 +55,9 @@ export const icon = {
   [AlertType.warning]: <ExclamationTriangleIcon />,
   [AlertType.info]: <ExclamationCircleIcon />,
 };
+
+export const color = {
+  [AlertType.critical]: 'red',
+  [AlertType.warning]: 'orange',
+  [AlertType.info]: 'blue',
+};
