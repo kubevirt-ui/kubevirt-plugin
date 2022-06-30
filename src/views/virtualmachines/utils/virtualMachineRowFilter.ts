@@ -116,8 +116,8 @@ export const getOSFilter = (vms: V1VirtualMachine[], t: TFunction): RowFilter[] 
         );
         return selectedOS.selected?.length === 0 || selectedOS.selected?.includes(osName);
       },
-      items: Object.values(OS_NAME_LABELS).map((osName) => ({
-        id: osName,
+      items: Object.entries(OS_NAME_LABELS).map(([key, osName]) => ({
+        id: key,
         title: osName,
       })),
     },
