@@ -21,6 +21,8 @@ const DiskSourceDataSourceSelect: React.FC<DiskSourceDataSourceSelectProps> = ({
   const { projectsNames, dataSources, projectsLoaded, dataSourcesLoaded } =
     useDataSourcesTypeResources(dataSourceNamespaceSelected);
 
+  const isTemplateParameter = /\$\{(.*?)\}/.test(dataSourceNamespaceSelected);
+
   const onSelectProject = React.useCallback(
     (newProject) => {
       selectDataSourceNamespace(newProject);
@@ -46,7 +48,7 @@ const DiskSourceDataSourceSelect: React.FC<DiskSourceDataSourceSelectProps> = ({
         onChange={selectDataSourceName}
         dataSourceNameSelected={dataSourceNameSelected}
         dataSourceNames={dataSourceNames}
-        isDisabled={!dataSourceNamespaceSelected}
+        isDisabled={!dataSourceNamespaceSelected || isTemplateParameter}
         dataSourcesLoaded={dataSourcesLoaded}
       />
     </>
