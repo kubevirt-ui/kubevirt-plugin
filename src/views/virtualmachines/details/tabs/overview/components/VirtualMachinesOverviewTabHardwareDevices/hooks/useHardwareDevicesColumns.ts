@@ -7,11 +7,11 @@ const useHardwareDevicesColumns = () => {
 
   const columns: TableColumn<V1GPU | V1HostDevice>[] = [
     {
-      title: t('Resource Name'),
+      title: t('Resource name'),
       id: 'resourceName',
     },
     {
-      title: t('Hardware Device Name'),
+      title: t('Hardware device name'),
       id: 'hardwareName',
     },
   ];
