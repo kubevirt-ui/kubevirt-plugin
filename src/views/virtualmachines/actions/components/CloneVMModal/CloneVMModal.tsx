@@ -1,6 +1,9 @@
 import * as React from 'react';
+import { useHistory } from 'react-router-dom';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import VirtualMachineModel, {
+  VirtualMachineModelRef,
+} from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -37,6 +40,8 @@ type CloneVMModalProps = {
 
 const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
+
+  const history = useHistory();
 
   const [cloneName, setCloneName] = React.useState(`${vm?.metadata?.name}-clone`);
   const [cloneDescription, setCloneDescription] = React.useState(
@@ -84,7 +89,11 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
     if (isVMRunning) {
       await stopVM(vm);
     }
-    return await k8sCreate({ model: VirtualMachineModel, data: updatedVM });
+    await k8sCreate({ model: VirtualMachineModel, data: updatedVM });
+
+    history.push(
+      `/k8s/ns/${updatedVM.metadata.namespace}/${VirtualMachineModelRef}/${updatedVM.metadata.name}`,
+    );
   };
 
   return (
