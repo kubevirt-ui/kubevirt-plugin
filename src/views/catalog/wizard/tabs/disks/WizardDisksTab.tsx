@@ -9,7 +9,6 @@ import {
   ListPageBody,
   ListPageCreateButton,
   ListPageFilter,
-  ListPageHeader,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -30,8 +29,9 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsD
 
   return (
     <>
-      <ListPageHeader title="">
+      <ListPageBody>
         <ListPageCreateButton
+          className="list-page-create-button-margin"
           isDisabled={!loaded}
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
@@ -59,8 +59,6 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsD
         >
           {t('Add disk')}
         </ListPageCreateButton>
-      </ListPageHeader>
-      <ListPageBody>
         <DiskListTitle />
         <ListPageFilter
           data={data}

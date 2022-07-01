@@ -5,14 +5,12 @@ import { isCommonTemplate } from 'src/views/clusteroverview/overview/components/
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ListPageBody,
-  ListPageCreateButton,
-  ListPageHeader,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
 
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
+
+import 'src/utils/styles/ListPageCreateButton.scss';
 
 type TemplateNetworkProps = RouteComponentProps<{
   ns: string;
@@ -27,9 +25,10 @@ const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
   const actionText = t('Add Network Interface');
 
   return (
-    <div className="template-network-tab">
-      <ListPageHeader title="">
+    <div>
+      <ListPageBody>
         <ListPageCreateButton
+          className="list-page-create-button-margin"
           isDisabled={isCommonTemplate(template)}
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
@@ -44,8 +43,6 @@ const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
         >
           {actionText}
         </ListPageCreateButton>
-      </ListPageHeader>
-      <ListPageBody>
         <NetworkInterfaceList template={template} />
       </ListPageBody>
     </div>

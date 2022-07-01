@@ -13,7 +13,6 @@ import {
   ListPageBody,
   ListPageCreateButton,
   ListPageFilter,
-  ListPageHeader,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -57,9 +56,10 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
   };
 
   return (
-    <div className="template-disk-page">
-      <ListPageHeader title="">
+    <div>
+      <ListPageBody>
         <ListPageCreateButton
+          className="list-page-create-button-margin"
           isDisabled={isEditDisabled}
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
@@ -76,8 +76,6 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
         >
           {t('Add disk')}
         </ListPageCreateButton>
-      </ListPageHeader>
-      <ListPageBody>
         <DiskListTitle />
         <ListPageFilter
           data={data}
