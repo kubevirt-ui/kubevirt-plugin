@@ -41,7 +41,13 @@ const DedicatedResources: React.FC<TemplateSchedulingGridProps> = ({
       <DescriptionListTerm>{t('Dedicated resources')}</DescriptionListTerm>
       <DescriptionListDescription>
         {editable ? (
-          <Button type="button" isInline onClick={onEditClick} variant="link">
+          <Button
+            type="button"
+            isInline
+            onClick={onEditClick}
+            variant="link"
+            data-test-id="dedicated-resources"
+          >
             {dedicatedResourcesText}
             <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
           </Button>
