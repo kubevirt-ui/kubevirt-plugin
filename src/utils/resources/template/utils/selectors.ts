@@ -45,17 +45,17 @@ export const isCustomTemplate = (template: V1Template): boolean =>
  * @param {V1Template} template - template
  */
 export const getTemplateOSLabelName = (template: V1Template): string =>
-  getLabel(getTemplateVirtualMachineObject(template), ANNOTATIONS.osTemplate);
+  getAnnotation(getTemplateVirtualMachineObject(template)?.spec?.template, ANNOTATIONS.os);
 
 /**
  * A selector that returns the os label of a given template
  * @param {V1Template} template - template
  */
 export const getTemplateOS = (template: V1Template): OS_NAME_TYPES => {
+  const templateOS = getTemplateOSLabelName(template);
   return (
-    Object.values(OS_NAME_TYPES).find((osName) =>
-      getTemplateOSLabelName(template)?.includes(osName),
-    ) ?? OS_NAME_TYPES.other
+    Object.values(OS_NAME_TYPES).find((osName) => templateOS?.includes(osName)) ??
+    OS_NAME_TYPES.other
   );
 };
 

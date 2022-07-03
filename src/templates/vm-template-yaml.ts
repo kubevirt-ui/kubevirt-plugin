@@ -12,6 +12,8 @@ metadata:
   annotations:
     name.os.template.kubevirt.io/fedora36: Fedora 36
     description: VM template example
+    openshift.io/display-name: "Fedora VM"
+    iconClass: icon-fedora
 objects:
   - apiVersion: kubevirt.io/v1
     kind: VirtualMachine
