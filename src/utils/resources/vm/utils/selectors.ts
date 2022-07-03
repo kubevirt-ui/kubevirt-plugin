@@ -35,7 +35,7 @@ export const getVolumes = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.vo
  * @returns the virtual machine GPUs
  */
 export const getGPUDevices = (vm: V1VirtualMachine) =>
-  vm?.spec?.template?.spec?.domain?.devices?.gpus;
+  vm?.spec?.template?.spec?.domain?.devices?.gpus || [];
 
 /**
  * A selector for the virtual machine's host devices
@@ -43,7 +43,7 @@ export const getGPUDevices = (vm: V1VirtualMachine) =>
  * @returns the virtual machine host devices
  */
 export const getHostDevices = (vm: V1VirtualMachine) =>
-  vm?.spec?.template?.spec?.domain?.devices?.hostDevices;
+  vm?.spec?.template?.spec?.domain?.devices?.hostDevices || [];
 
 /**
  * A selector for the virtual machine's volumes snapshot statuses

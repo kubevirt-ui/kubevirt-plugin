@@ -166,7 +166,7 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                       </DescriptionListGroup>
                       <DescriptionListGroup>
                         <DescriptionListTerm>
-                          {t('Hardware Devices')}
+                          {t('Hardware devices')}
                           {` (${hardwareDevicesCount})`}
                         </DescriptionListTerm>
                         <DescriptionListDescription>
