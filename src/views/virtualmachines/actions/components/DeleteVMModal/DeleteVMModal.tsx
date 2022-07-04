@@ -31,19 +31,20 @@ const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) =>
   const { dataVolumes, pvcs, snapshots, loaded } = useDeleteVMResources(vm);
   const [activeNamespacePath] = useActiveNamespacePath();
 
-  const onDelete = (updatedVM: V1VirtualMachine) => {
-    const deletePromise = async () => {
-      await k8sDelete({
-        model: VirtualMachineModel,
-        resource: updatedVM,
-        requestInit: null,
-        json: null,
-      });
-      history.push(`/k8s/${activeNamespacePath}/${VirtualMachineModelRef}`);
-    };
-
+  const onDelete = async (updatedVM: V1VirtualMachine) => {
     if (!deleteOwnedResource) {
       const vmOwnerRef = buildOwnerReference(updatedVM);
+
+      await k8sPatch({
+        model: VirtualMachineModel,
+        resource: updatedVM,
+        data: [
+          {
+            op: 'remove',
+            path: '/spec/dataVolumeTemplates',
+          },
+        ],
+      });
 
       const pvcPromises = (pvcs || [])?.map((pvc) => {
         const pvcFilteredOwnerReference = pvc?.metadata?.ownerReferences?.filter(
@@ -79,22 +80,14 @@ const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) =>
         });
       });
 
-      return k8sPatch({
-        model: VirtualMachineModel,
-        resource: updatedVM,
-        data: [
-          {
-            op: 'replace',
-            path: '/spec/dataVolumeTemplates',
-            value: null,
-          },
-        ],
-      })
-        .then(() => Promise.all([...pvcPromises, ...dvPromises]))
-        .then(deletePromise);
+      await Promise.allSettled([...pvcPromises, ...dvPromises]);
     }
 
-    return deletePromise();
+    await k8sDelete({
+      model: VirtualMachineModel,
+      resource: updatedVM,
+    });
+    history.push(`/k8s/${activeNamespacePath}/${VirtualMachineModelRef}`);
   };
 
   return (
