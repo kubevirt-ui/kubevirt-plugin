@@ -10,7 +10,7 @@ const DiskListTitle = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <span>
+    <div>
       <h3 className="HeaderWithIcon">{t('Disks')}</h3>
       <Popover
         bodyContent={t(
@@ -20,7 +20,7 @@ const DiskListTitle = () => {
       >
         <HelpIcon className="icon-size-small" />
       </Popover>
-    </span>
+    </div>
   );
 };
 
