@@ -4,10 +4,10 @@ import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 
 import TopConsumersCard from './top-consumers-card/TopConsumersCard';
 
-const TopConsumersTab: React.FC = () => (
+const MonitoringTab: React.FC = () => (
   <Overview>
     <TopConsumersCard />
   </Overview>
 );
 
-export default TopConsumersTab;
+export default MonitoringTab;
