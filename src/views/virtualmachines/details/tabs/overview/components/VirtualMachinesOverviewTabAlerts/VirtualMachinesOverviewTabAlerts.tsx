@@ -17,7 +17,7 @@ import {
 } from '@patternfly/react-core';
 
 import useVMAlerts from './hook/useVMAlerts';
-import { AlertType, icon } from './utils/utils';
+import { AlertType, color, icon } from './utils/utils';
 import VirtualMachinesOverviewTabAlertsAccordionItem from './VirtualMachinesOverviewTabAlertsAccordionItem';
 
 import './virtual-machines-overview-tab-alerts.scss';
@@ -71,7 +71,7 @@ const VirtualMachinesOverviewTabAlerts: React.FC<VirtualMachinesOverviewTabAlert
             >
               <Flex>
                 {Object.keys(vmAlerts)?.map((alertType) => (
-                  <Label key={alertType} className={alertType} icon={icon[alertType]}>
+                  <Label key={alertType} color={color[alertType]} icon={icon[alertType]}>
                     {vmAlerts?.[alertType]?.length || 0}
                   </Label>
                 ))}
