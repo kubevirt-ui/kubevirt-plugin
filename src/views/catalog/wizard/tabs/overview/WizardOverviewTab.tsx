@@ -11,7 +11,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
-import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import { getGPUDevices, getHostDevices, getMachineType } from '@kubevirt-utils/resources/vm';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
@@ -112,6 +112,13 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
                   {t('CPU')} {cpuCount} | {t('Memory')} {readableSizeUnit(memory)}
                 </>
               }
+            />
+
+            <WizardDescriptionItem
+              className="wizard-overview-description-left-column"
+              title={t('Machine type')}
+              testId="wizard-overview-machine-type"
+              description={getMachineType(vm)}
             />
 
             <WizardDescriptionItem
