@@ -4,11 +4,7 @@ import { RouteComponentProps } from 'react-router';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ListPageBody,
-  ListPageCreateButton,
-  ListPageHeader,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../../../utils';
 
@@ -33,8 +29,9 @@ const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
 
   return (
     <>
-      <ListPageHeader title="">
+      <ListPageBody>
         <ListPageCreateButton
+          className="list-page-create-button-margin"
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <SnapshotModal vm={vm} isOpen={isOpen} onClose={onClose} />
@@ -43,8 +40,6 @@ const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
         >
           {t('Add Snapshot')}
         </ListPageCreateButton>
-      </ListPageHeader>
-      <ListPageBody>
         <SnapshotList
           snapshots={snapshots}
           restoresMap={restoresMap}
