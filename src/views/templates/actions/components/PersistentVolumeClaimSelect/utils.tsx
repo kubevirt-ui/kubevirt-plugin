@@ -1,12 +1,19 @@
 import * as React from 'react';
+import {
+  getAllowedResourceData,
+  getAllowedResources,
+} from 'src/views/clusteroverview/overview/utils/utils';
 
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
   ProjectModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  K8sResourceCommon,
+  useK8sWatchResource,
+  useK8sWatchResources,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { SelectOption } from '@patternfly/react-core';
 
 export const filter = (options: string[]) => {
@@ -40,11 +47,13 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
 
   const projectsNames = projects.map((project) => project.metadata.name);
 
-  const [pvcs, pvcsLoaded, pvcsErrors] = useK8sWatchResource<V1alpha1PersistentVolumeClaim[]>({
-    groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-    namespaced: false,
-    isList: true,
-  });
+  const watchedResources = getAllowedResources(projectsNames, PersistentVolumeClaimModel);
+  const resources = useK8sWatchResources<{ [key: string]: K8sResourceCommon[] }>(watchedResources);
+  const {
+    data: pvcs,
+    loaded: pvcsLoaded,
+    loadError: pvcsErrors,
+  } = getAllowedResourceData(resources, PersistentVolumeClaimModel);
 
   const pvcNamesFilteredByProjects = pvcs
     .filter((pvc) => pvc.metadata.namespace === projectSelected)

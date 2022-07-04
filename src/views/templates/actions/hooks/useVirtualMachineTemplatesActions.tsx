@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { isCommonVMTemplate } from 'src/views/templates/utils';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
@@ -12,10 +13,17 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useActiveNamespacePath } from '@kubevirt-utils/hooks/useActiveNamespacePath';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Action, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import {
+  Action,
+  k8sDelete,
+  k8sPatch,
+  useAccessReview,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 import EditBootSourceModal from '../components/EditBootSourceModal';
 import {
+  createDataVolume,
   getBootDataSource,
   getEditBootSourceRefDescription,
   hasEditableBootSource,
@@ -37,6 +45,18 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const [loadingBootSource, setLoadingBootSource] = React.useState(true);
   const editableBootSource = hasEditableBootSource(bootDataSource);
   const [activeNamespacePath] = useActiveNamespacePath();
+
+  const [canWriteToDataSourceNs] = useAccessReview(
+    asAccessReview(
+      DataVolumeModel,
+      createDataVolume(
+        bootDataSource?.spec?.source?.pvc?.name,
+        bootDataSource?.spec?.source?.pvc?.namespace,
+        {},
+      ),
+      'create',
+    ),
+  );
 
   const goToTemplatePage = React.useCallback(
     (clonedTemplate: V1Template) => {
@@ -101,8 +121,10 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
           {t('Edit boot source reference')} {loadingBootSource && <Loading />}
         </>
       ),
-      description: !loadingBootSource && getEditBootSourceRefDescription(t, bootDataSource),
-      disabled: !editableBootSource,
+      description:
+        (!loadingBootSource || !canWriteToDataSourceNs) &&
+        getEditBootSourceRefDescription(t, bootDataSource, canWriteToDataSourceNs),
+      disabled: !editableBootSource || !canWriteToDataSourceNs,
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <EditBootSourceModal

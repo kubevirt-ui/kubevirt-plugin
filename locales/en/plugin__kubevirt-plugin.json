@@ -707,6 +707,7 @@
   "This field is required": "This field is required",
   "This Template requires some additional parameters. Click the Customize VirtualMachine button to complete the creation flow.": "This Template requires some additional parameters. Click the Customize VirtualMachine button to complete the creation flow.",
   "This Template supports quick create VirtualMachine": "This Template supports quick create VirtualMachine",
+  "This user is not allowed to edit this boot source": "This user is not allowed to edit this boot source",
   "This VirtualMachine is down. Please start it to access its console.": "This VirtualMachine is down. Please start it to access its console.",
   "This VirtualMachine is subject to the Descheduler profiles configured for eviction.": "This VirtualMachine is subject to the Descheduler profiles configured for eviction.",
   "Threads": "Threads",
