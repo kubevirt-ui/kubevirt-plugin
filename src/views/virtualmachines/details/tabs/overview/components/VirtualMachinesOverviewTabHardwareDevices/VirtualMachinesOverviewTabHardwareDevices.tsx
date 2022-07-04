@@ -29,7 +29,9 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
   const columns = useHardwareDevicesColumns();
   const [activeTabKey, setActiveTabKey] = React.useState<string | number>(0);
   const hostDevices = getHostDevices(vm);
+  const hostDevicesCount = hostDevices?.length;
   const gpus = getGPUDevices(vm);
+  const gpusCount = gpus?.length;
 
   const handleTabClick = (
     _: React.MouseEvent<HTMLElement, MouseEvent>,
@@ -42,12 +44,15 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
     <div className="VirtualMachinesOverviewTabHardware--main">
       <Card>
         <CardTitle className="text-muted">
-          {t('Hardware Devices ({{count}})', { count: hostDevices?.length + gpus?.length || 0 })}
+          {t('Hardware devices ({{count}})', { count: hostDevicesCount + gpusCount })}
         </CardTitle>
         <Divider />
         <CardBody isFilled>
           <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
-            <Tab eventKey={0} title={<TabTitleText>{t('GPU devices')}</TabTitleText>}>
+            <Tab
+              eventKey={0}
+              title={<TabTitleText>{t('GPU devices ({{gpusCount}})', { gpusCount })}</TabTitleText>}
+            >
               <VirtualizedTable<V1GPU>
                 data={gpus}
                 unfilteredData={gpus}
@@ -57,7 +62,14 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
                 Row={VirtualMachinesOverviewTabHardwareDevicesRow}
               />
             </Tab>
-            <Tab eventKey={1} title={<TabTitleText>{t('Host devices')}</TabTitleText>}>
+            <Tab
+              eventKey={1}
+              title={
+                <TabTitleText>
+                  {t('Host devices ({{hostDevicesCount}})', { hostDevicesCount })}
+                </TabTitleText>
+              }
+            >
               <VirtualizedTable<V1HostDevice>
                 data={hostDevices}
                 unfilteredData={hostDevices}
