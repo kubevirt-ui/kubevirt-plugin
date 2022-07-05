@@ -6,12 +6,12 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-type DataSourceManagedByDescriptionProps = {
+type DataSourceImportCronDescriptionProps = {
   dataImportCronName: string;
   namespace: string;
 };
 
-const DataSourceManagedByDescription: React.FC<DataSourceManagedByDescriptionProps> = ({
+const DataSourceImportCronDescription: React.FC<DataSourceImportCronDescriptionProps> = ({
   dataImportCronName,
   namespace,
 }) => {
@@ -24,7 +24,7 @@ const DataSourceManagedByDescription: React.FC<DataSourceManagedByDescriptionPro
 
   return (
     <DescriptionItem
-      descriptionHeader={t('Managed by')}
+      descriptionHeader={t('DataImportCron')}
       descriptionData={
         dataImportCron && (
           <ResourceLink
@@ -38,4 +38,4 @@ const DataSourceManagedByDescription: React.FC<DataSourceManagedByDescriptionPro
   );
 };
 
-export default DataSourceManagedByDescription;
+export default DataSourceImportCronDescription;

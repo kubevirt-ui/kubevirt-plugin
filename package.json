@@ -38,6 +38,7 @@
       "VirtualMachineNavPage": "./views/virtualmachines/details/VirtualMachineNavPage.tsx",
       "DataSourcesList": "./views/datasources/list/DataSourcesList.tsx",
       "DataSourcePage": "./views/datasources/details/DataSourcePage.tsx",
+      "DataImportCronPage": "./views/datasources/dataimportcron/details/DataImportCronPage.tsx",
       "VirtualMachinesInstancePage": "./views/virtualmachinesinstance/details/VirtualMachinesInstancePage.tsx",
       "useVirtualMachineActionsProvider": "./views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts",
       "VirtualMachinesInstancesList": "./views/virtualmachinesinstance/list/VirtualMachinesInstancesList.tsx",
