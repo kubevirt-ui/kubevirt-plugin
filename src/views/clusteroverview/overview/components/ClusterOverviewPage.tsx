@@ -9,8 +9,8 @@ import SettingsTab from './SettingsTab/SettingsTab';
 import { KUBEVIRT_QUICK_START_USER_SETTINGS_KEY } from './utils/constants';
 import PageHeader from './utils/PageHeader';
 import RestoreGettingStartedButton from './utils/RestoreGettingStartedButton';
+import MonitoringTab from './MonitoringTab';
 import OverviewTab from './OverviewTab';
-import TopConsumersTab from './TopConsumersTab';
 
 const overviewTabs: NavPage[] = [
   {
@@ -19,9 +19,9 @@ const overviewTabs: NavPage[] = [
     component: OverviewTab,
   },
   {
-    href: 'performance',
-    name: 'Performance',
-    component: TopConsumersTab,
+    href: 'monitoring',
+    name: 'Monitoring',
+    component: MonitoringTab,
   },
   {
     href: 'settings',
