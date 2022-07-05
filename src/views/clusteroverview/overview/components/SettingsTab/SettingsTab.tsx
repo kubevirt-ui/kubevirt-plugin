@@ -4,6 +4,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
+import GeneralTab from './General Tab/GeneralTab';
+
 import './settings-tab.scss';
 
 const SettingsTab: React.FC = () => {
@@ -19,7 +21,9 @@ const SettingsTab: React.FC = () => {
           className="settings-tab__menu"
         >
           <Tab eventKey={0} title={<TabTitleText>{t('General')}</TabTitleText>}>
-            <div className="settings-tab__content">General placeholder</div>
+            <div className="settings-tab__content">
+              <GeneralTab />
+            </div>
           </Tab>
           <Tab eventKey={1} title={<TabTitleText>{t('Live migration')}</TabTitleText>}>
             <div className="settings-tab__content">Live migration placeholder</div>
