@@ -53,38 +53,44 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan,
 
   return (
     <ComponentReady isReady={!isEmpty(chartData)}>
-      <Chart
-        height={200}
-        scale={{ x: 'time', y: 'linear' }}
-        containerComponent={
-          <ChartVoronoiContainer
-            labels={({ datum }) => {
-              return `Data written: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
-            }}
-            labelComponent={<ChartTooltip style={{ fontSize: chart_global_FontSize_2xl.value }} />}
-            constrainToVisibleArea
-          />
-        }
-      >
-        <ChartAxis
-          tickFormat={tickFormat(timespan)}
-          style={{
-            ticks: { stroke: 'transparent' },
-          }}
-          axisComponent={<></>}
-        />
-        <ChartGroup>
-          <ChartArea
-            data={chartData}
+      <div className="util-threshold-chart">
+        <Chart
+          height={200}
+          scale={{ x: 'time', y: 'linear' }}
+          containerComponent={
+            <ChartVoronoiContainer
+              labels={({ datum }) => {
+                return `Data written: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
+              }}
+              labelComponent={
+                <ChartTooltip style={{ fontSize: chart_global_FontSize_2xl.value }} />
+              }
+              constrainToVisibleArea
+            />
+          }
+        >
+          <ChartAxis
+            tickFormat={tickFormat(timespan)}
             style={{
-              data: {
-                stroke: chart_color_blue_300.value,
+              ticks: { stroke: 'transparent' },
+              tickLabels: {
+                fontSize: 24,
               },
             }}
+            axisComponent={<></>}
           />
-        </ChartGroup>
-        {/* ! should be fixed once promethesus request adjust */}
-        {/* <ChartThreshold
+          <ChartGroup>
+            <ChartArea
+              data={chartData}
+              style={{
+                data: {
+                  stroke: chart_color_blue_300.value,
+                },
+              }}
+            />
+          </ChartGroup>
+          {/* ! should be fixed once promethesus request adjust */}
+          {/* <ChartThreshold
           data={thresholdLine}
           style={{
             data: {
@@ -94,7 +100,8 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan,
             },
           }}
         /> */}
-      </Chart>
+        </Chart>
+      </div>
     </ComponentReady>
   );
 };

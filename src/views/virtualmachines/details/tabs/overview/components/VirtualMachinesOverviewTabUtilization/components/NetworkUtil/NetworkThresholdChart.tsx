@@ -66,49 +66,54 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ timespan,
 
   return (
     <ComponentReady isReady={isReady}>
-      <Link to={queriesToLink([networkInQuery?.query, networkOutQuery?.query])}>
-        <Chart
-          height={200}
-          scale={{ x: 'time', y: 'linear' }}
-          containerComponent={
-            <ChartVoronoiContainer
-              labels={({ datum }) => {
-                return `${datum?.name}: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
-              }}
-              labelComponent={
-                <ChartTooltip style={{ fontSize: chart_global_FontSize_2xl.value }} />
-              }
-              constrainToVisibleArea
-            />
-          }
-        >
-          <ChartAxis
-            tickFormat={tickFormat(timespan)}
-            style={{
-              ticks: { stroke: 'transparent' },
-            }}
-            axisComponent={<></>}
-          />
-          <ChartGroup>
-            <ChartArea
-              data={chartDataOut}
+      <div className="util-threshold-chart">
+        <Link to={queriesToLink([networkInQuery?.query, networkOutQuery?.query])}>
+          <Chart
+            height={200}
+            scale={{ x: 'time', y: 'linear' }}
+            containerComponent={
+              <ChartVoronoiContainer
+                labels={({ datum }) => {
+                  return `${datum?.name}: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
+                }}
+                labelComponent={
+                  <ChartTooltip style={{ fontSize: chart_global_FontSize_2xl.value }} />
+                }
+                constrainToVisibleArea
+              />
+            }
+          >
+            <ChartAxis
+              tickFormat={tickFormat(timespan)}
               style={{
-                data: {
-                  stroke: chart_color_blue_300.value,
+                ticks: { stroke: 'transparent' },
+                tickLabels: {
+                  fontSize: 24,
                 },
               }}
+              axisComponent={<></>}
             />
-            <ChartArea
-              data={chartDataIn}
-              style={{
-                data: {
-                  stroke: chart_color_blue_400.value,
-                },
-              }}
-            />
-          </ChartGroup>
-        </Chart>
-      </Link>
+            <ChartGroup>
+              <ChartArea
+                data={chartDataOut}
+                style={{
+                  data: {
+                    stroke: chart_color_blue_300.value,
+                  },
+                }}
+              />
+              <ChartArea
+                data={chartDataIn}
+                style={{
+                  data: {
+                    stroke: chart_color_blue_400.value,
+                  },
+                }}
+              />
+            </ChartGroup>
+          </Chart>
+        </Link>
+      </div>
     </ComponentReady>
   );
 };
