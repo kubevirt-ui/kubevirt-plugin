@@ -63,7 +63,7 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
   };
 
   const onRemoveDevice = (device: V1GPU | V1HostDevice) => {
-    setDevices((prevDevices) => prevDevices?.filter((d) => d.name !== device.name));
+    setDevices((prevDevices) => prevDevices?.filter((d) => d !== device));
   };
 
   const onCancel = () => {
