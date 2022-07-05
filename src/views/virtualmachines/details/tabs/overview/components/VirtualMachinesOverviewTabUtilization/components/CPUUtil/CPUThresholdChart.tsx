@@ -73,60 +73,70 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ timespan, vmi, po
 
   return (
     <ComponentReady isReady={isReady}>
-      <Link to={queriesToLink(queries.CPU_REQUESTED)}>
-        <Chart
-          height={200}
-          scale={{ x: 'time', y: 'linear' }}
-          containerComponent={
-            <ChartVoronoiContainer
-              labels={({ datum }) => {
-                return `${datum?.name}: ${datum?.y?.toFixed(2)}'s`;
+      <div className="util-threshold-chart">
+        <Link to={queriesToLink(queries.CPU_REQUESTED)}>
+          <Chart
+            height={200}
+            scale={{ x: 'time', y: 'linear' }}
+            containerComponent={
+              <ChartVoronoiContainer
+                labels={({ datum }) => {
+                  return `${datum?.name}: ${datum?.y?.toFixed(2)}'s`;
+                }}
+                labelComponent={
+                  <ChartTooltip style={{ fontSize: chart_global_FontSize_2xl.value }} />
+                }
+                constrainToVisibleArea
+              />
+            }
+          >
+            <ChartAxis
+              dependentAxis
+              tickCount={2}
+              tickValues={[thresholdData?.[0]?.y]}
+              style={{
+                ticks: {
+                  stroke: 'transparent',
+                },
+                tickLabels: {
+                  fontSize: 24,
+                },
               }}
-              labelComponent={
-                <ChartTooltip style={{ fontSize: chart_global_FontSize_2xl.value }} />
-              }
-              constrainToVisibleArea
+              axisComponent={<></>}
             />
-          }
-        >
-          <ChartAxis
-            dependentAxis
-            tickCount={2}
-            tickValues={[thresholdData?.[0]?.y]}
-            style={{
-              ticks: { stroke: 'transparent' },
-            }}
-            axisComponent={<></>}
-          />
-          <ChartAxis
-            tickFormat={tickFormat(timespan)}
-            style={{
-              ticks: { stroke: 'transparent' },
-            }}
-            axisComponent={<></>}
-          />
-          <ChartGroup>
-            <ChartArea
-              data={chartData}
+            <ChartAxis
+              tickFormat={tickFormat(timespan)}
+              style={{
+                ticks: { stroke: 'transparent' },
+                tickLabels: {
+                  fontSize: 24,
+                },
+              }}
+              axisComponent={<></>}
+            />
+            <ChartGroup>
+              <ChartArea
+                data={chartData}
+                style={{
+                  data: {
+                    stroke: chart_color_blue_300.value,
+                  },
+                }}
+              />
+            </ChartGroup>
+            <ChartThreshold
+              data={thresholdData}
               style={{
                 data: {
-                  stroke: chart_color_blue_300.value,
+                  stroke: chart_color_orange_300.value,
+                  strokeDasharray: 10,
+                  strokeWidth: 7,
                 },
               }}
             />
-          </ChartGroup>
-          <ChartThreshold
-            data={thresholdData}
-            style={{
-              data: {
-                stroke: chart_color_orange_300.value,
-                strokeDasharray: 10,
-                strokeWidth: 7,
-              },
-            }}
-          />
-        </Chart>
-      </Link>
+          </Chart>
+        </Link>
+      </div>
     </ComponentReady>
   );
 };
