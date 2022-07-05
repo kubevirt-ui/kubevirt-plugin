@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Label } from '@patternfly/react-core';
 
-import useGettingStartedShowState from '../getting-started-card/utils/hooks/useGettingStartedShowState';
+import useGettingStartedShowState from '../OverviewTab/getting-started-card/utils/hooks/useGettingStartedShowState';
 
 import { GETTING_STARTED_SHOW_STATE } from './constants';
 

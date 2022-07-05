@@ -8,7 +8,7 @@ import {
   CSVConditionReason,
   InstallModeType,
   RequirementStatus,
-} from '../../utils/types';
+} from '../../../utils/types';
 
 export type K8sResourceKind = K8sResourceCommon & {
   spec?: {

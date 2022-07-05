@@ -10,7 +10,7 @@ import {
   CSVConditionReason,
   InstallModeType,
   RequirementStatus,
-} from '../../utils/types';
+} from '../../../utils/types';
 
 export type ClusterServiceVersionKind = {
   apiVersion: 'operators.coreos.com/v1alpha1';

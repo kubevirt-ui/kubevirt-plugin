@@ -5,7 +5,7 @@ import {
   humanizeDecimalBytes,
   humanizeDecimalBytesPerSec,
   humanizeSeconds,
-} from '../../../../../../utils/utils/humanize';
+} from '../../../../../../../utils/utils/humanize';
 
 import { STORAGE_IOPS_UNIT } from './constants';
 import { TopConsumerMetric } from './topConsumerMetric';

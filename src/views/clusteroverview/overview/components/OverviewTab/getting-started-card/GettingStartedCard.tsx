@@ -5,7 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   GETTING_STARTED_SHOW_STATE,
   KUBEVIRT_QUICK_START_USER_SETTINGS_KEY,
-} from '../utils/constants';
+} from '../../utils/constants';
 
 import FeatureHighlightsSection from './feature-highlights-section/FeatureHighlightsSection';
 import QuickStartsSection from './quick-starts-section/QuickStartsSection';

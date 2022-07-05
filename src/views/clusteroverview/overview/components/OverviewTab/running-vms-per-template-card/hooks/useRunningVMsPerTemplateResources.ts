@@ -17,7 +17,7 @@ import {
   getAllowedResourceData,
   getAllowedResources,
   getAllowedTemplateResources,
-} from '../../../utils/utils';
+} from '../../../../utils/utils';
 import { useDebounceCallback } from '../../details-card/hooks/useDebounceCallback';
 import { useProjectNames } from '../../inventory-card/hooks/useProjectNames';
 
