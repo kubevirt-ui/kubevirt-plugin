@@ -19,8 +19,12 @@ export const printableVMStatus = {
   Paused: 'Paused',
   Stopping: 'Stopping',
   Terminating: 'Terminating',
+  Failed: 'Failed',
   Unknown: 'Unknown',
 };
+
+export const isFailedPrintableStatus = (printableStatus: string) =>
+  printableStatus?.toLowerCase()?.includes('error');
 
 export const getVMStatusIcon = (
   status: string,

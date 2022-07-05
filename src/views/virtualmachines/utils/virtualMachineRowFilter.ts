@@ -13,19 +13,26 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import { printableVMStatus } from './virtualMachineStatuses';
+import { isFailedPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
 
 export const getStatusFilter = (t: TFunction): RowFilter[] => [
   {
     filterGroupName: t('Status'),
     type: 'status',
-    reducer: (obj) => obj?.status?.printableStatus,
+    isMatch: (obj, filterStatus) => {
+      return (
+        filterStatus === obj?.status?.printableStatus ||
+        (filterStatus === printableVMStatus.Failed &&
+          isFailedPrintableStatus(obj?.status?.printableStatus))
+      );
+    },
     filter: (statuses, obj) => {
       const status = obj?.status?.printableStatus;
+      const filterFailedStatus =
+        statuses.selected?.includes(printableVMStatus.Failed) && isFailedPrintableStatus(status);
+
       return (
-        statuses.selected?.length === 0 ||
-        statuses.selected?.includes(status) ||
-        !statuses?.all?.find((s) => s === status)
+        statuses.selected?.length === 0 || statuses.selected?.includes(status) || filterFailedStatus
       );
     },
     items: Object.keys(printableVMStatus).map((status) => ({
