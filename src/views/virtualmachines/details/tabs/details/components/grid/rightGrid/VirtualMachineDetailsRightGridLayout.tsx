@@ -1,4 +1,5 @@
 import * as React from 'react';
+import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -9,9 +10,10 @@ import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/Hardware
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SSHAccessModal from '@kubevirt-utils/components/SSHAccess/SSHAccessModal';
+import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAnnotation } from '@kubevirt-utils/resources/shared';
-import { VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { WORKLOADS, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
+import { getWorkload, VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
@@ -52,6 +54,27 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
       }),
     [],
   );
+
+  const vmWorkload = getWorkload(vm);
+
+  const updateWorkload = (newWorkload: WORKLOADS) => {
+    if (vmWorkload === newWorkload) return Promise.resolve();
+
+    const updateVM = produce(vm, (draftVM) => {
+      if (!draftVM.spec.template.metadata?.annotations)
+        draftVM.spec.template.metadata.annotations = {};
+
+      draftVM.spec.template.metadata.annotations[VM_WORKLOAD_ANNOTATION] = newWorkload;
+    });
+
+    return k8sUpdate({
+      model: VirtualMachineModel,
+      data: updateVM,
+      ns: updateVM?.metadata?.namespace,
+      name: updateVM?.metadata?.name,
+    });
+  };
+
   return (
     <GridItem span={5}>
       <DescriptionList>
@@ -103,9 +126,22 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         )}
         <VirtualMachineDescriptionItem
           descriptionData={
-            getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) || (
+            vmWorkload ? (
+              WORKLOADS_LABELS[vmWorkload] || vmWorkload
+            ) : (
               <MutedTextSpan text={t('Not available')} />
             )
+          }
+          isEdit
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <WorkloadProfileModal
+                initialWorkload={vmWorkload}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={updateWorkload}
+              />
+            ))
           }
           descriptionHeader={t('Workload Profile')}
           data-test-id={`${vm?.metadata?.name}-workload-profile`}

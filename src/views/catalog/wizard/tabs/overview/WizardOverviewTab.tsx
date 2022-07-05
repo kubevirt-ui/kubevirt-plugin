@@ -8,10 +8,17 @@ import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootload
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
-import { getGPUDevices, getHostDevices, getMachineType } from '@kubevirt-utils/resources/vm';
+import {
+  getGPUDevices,
+  getHostDevices,
+  getMachineType,
+  getWorkload,
+  VM_WORKLOAD_ANNOTATION,
+} from '@kubevirt-utils/resources/vm';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
@@ -30,7 +37,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
 
   const { cpuCount, memory } = getVmCPUMemory(vm);
   const description = getAnnotation(vm, 'description');
-  const workloadAnnotation = vm?.spec?.template?.metadata?.annotations?.['vm.kubevirt.io/workload'];
+  const workloadAnnotation = getWorkload(vm);
   const networks = vm?.spec?.template?.spec?.networks;
   const interfaces = vm?.spec?.template?.spec?.domain?.devices?.interfaces;
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
@@ -39,6 +46,15 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
   const hostDevicesCount = getHostDevices(vm)?.length || 0;
   const gpusCount = getGPUDevices(vm)?.length || 0;
   const nDevices = hostDevicesCount + gpusCount;
+
+  const updateWorkload = async (newWorkload: string) => {
+    return updateVM((draftVM) => {
+      if (!draftVM.spec.template.metadata?.annotations)
+        draftVM.spec.template.metadata.annotations = {};
+
+      draftVM.spec.template.metadata.annotations[VM_WORKLOAD_ANNOTATION] = newWorkload;
+    });
+  };
 
   return (
     <div className="co-m-pane__body">
@@ -141,6 +157,17 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
             <WizardDescriptionItem
               className="wizard-overview-description-left-column"
               title={t('Workload profile')}
+              isEdit
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <WorkloadProfileModal
+                    initialWorkload={workloadAnnotation}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onSubmit={updateWorkload}
+                  />
+                ))
+              }
               description={WORKLOADS_LABELS?.[workloadAnnotation] ?? t('Other')}
               testId="wizard-overview-workload-profile"
             />
