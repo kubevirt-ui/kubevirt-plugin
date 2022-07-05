@@ -13,7 +13,7 @@ interface Configuration extends WebpackConfiguration {
 }
 
 const svgToMiniDataURI = require('mini-svg-data-uri');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
@@ -127,6 +127,9 @@ const config: Configuration = {
     ],
   },
   plugins: [
+    new CopyPlugin({
+      patterns: [{ from: '../locales', to: '../dist/locales' }],
+    }),
     new ConsoleRemotePlugin(),
     new ForkTsCheckerWebpackPlugin({
       typescript: {
@@ -138,9 +141,6 @@ const config: Configuration = {
         },
       },
     }),
-    new CopyWebpackPlugin({
-      patterns: [{ from: path.resolve(__dirname, 'locales'), to: 'locales' }],
-    }),
   ],
   devtool: 'source-map',
   optimization: {
@@ -151,10 +151,14 @@ const config: Configuration = {
 
 if (process.env.NODE_ENV === 'production') {
   config.mode = 'production';
-  config.output.filename = '[name]-bundle-[hash].min.js';
-  config.output.chunkFilename = '[name]-chunk-[chunkhash].min.js';
-  config.optimization.chunkIds = 'deterministic';
-  config.optimization.minimize = true;
+  if (config.output) {
+    config.output.filename = '[name]-bundle-[hash].min.js';
+    config.output.chunkFilename = '[name]-chunk-[chunkhash].min.js';
+  }
+  if (config.optimization) {
+    config.optimization.chunkIds = 'deterministic';
+    config.optimization.minimize = true;
+  }
 }
 
 export default config;

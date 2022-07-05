@@ -99,6 +99,8 @@ objects:
     kind: ConsolePlugin
     metadata:
       name: "${PLUGIN_NAME}"
+      annotations:
+        console.openshift.io/use-i18n: "true"
     spec:
       displayName: "Console Plugin Kubevirt Template"
       service:
