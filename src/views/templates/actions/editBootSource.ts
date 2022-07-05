@@ -35,7 +35,7 @@ const DATA_VOLUME: V1beta1DataVolume = {
   spec: {},
 };
 
-const createDataVolume = (
+export const createDataVolume = (
   name: string,
   namespace: string,
   bootSource: V1beta1DataVolumeSpec,
@@ -80,7 +80,7 @@ export const getBootDataSource = async (
 };
 
 export const hasEditableBootSource = (dataSource: V1beta1DataSource): boolean => {
-  return dataSource && !dataSource.metadata.labels['cdi.kubevirt.io/dataImportCron'];
+  return dataSource && !dataSource.metadata.labels?.['cdi.kubevirt.io/dataImportCron'];
 };
 
 const waitPVCGetDeleted = (name: string, namespace: string): Promise<void> => {
@@ -131,7 +131,12 @@ export const editBootSource = async (
   });
 };
 
-export const getEditBootSourceRefDescription = (t: TFunction, dataSource: V1beta1DataSource) => {
+export const getEditBootSourceRefDescription = (
+  t: TFunction,
+  dataSource: V1beta1DataSource,
+  canEditBootSource: boolean,
+) => {
+  if (!canEditBootSource) return t('This user is not allowed to edit this boot source');
   if (!dataSource) return t('Template does not use boot source reference');
   if (!hasEditableBootSource(dataSource)) return t('Boot source reference cannot be edited');
 };
