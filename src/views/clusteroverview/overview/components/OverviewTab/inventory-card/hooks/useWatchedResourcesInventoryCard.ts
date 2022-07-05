@@ -11,7 +11,7 @@ import VirtualMachineModel, {
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
 
-import { getAllowedResources, getAllowedTemplateResources } from '../../../utils/utils';
+import { getAllowedResources, getAllowedTemplateResources } from '../../../../utils/utils';
 
 import { useProjectNames } from './useProjectNames';
 

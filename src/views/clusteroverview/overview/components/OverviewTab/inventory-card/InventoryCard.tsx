@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardHeader, CardTitle, Grid, GridItem } from '@patternfly/react-core';
 
-import { getAllowedResourceData } from '../../utils/utils';
+import { getAllowedResourceData } from '../../../utils/utils';
 
 import { useWatchedResourcesHook } from './hooks/useWatchedResourcesInventoryCard';
 import ResourcesSection from './utils/ResourcesSection';

@@ -7,7 +7,7 @@ import SubscriptionModel from '@kubevirt-ui/kubevirt-api/console/models/Subscrip
 import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { useDeepCompareMemoize } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/hooks/useDeepCompareMemoize';
 
-import { useDebounceCallback } from '../../../utils/hooks/useDebounceCallback';
+import { useDebounceCallback } from '../../../../utils/hooks/useDebounceCallback';
 import { LSO_NAME, ODF_OPERATOR_NAME } from '../constants';
 import { ClusterServiceVersionKind } from '../types';
 

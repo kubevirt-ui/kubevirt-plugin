@@ -7,7 +7,7 @@ import { K8sResourceCommon, WatchK8sResults } from '@openshift-console/dynamic-p
 import { ResourceInventoryItem } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Stack, StackItem } from '@patternfly/react-core';
 
-import { getAllowedResourceData } from '../../../utils/utils';
+import { getAllowedResourceData } from '../../../../utils/utils';
 
 import './ResourcesSection.scss';
 

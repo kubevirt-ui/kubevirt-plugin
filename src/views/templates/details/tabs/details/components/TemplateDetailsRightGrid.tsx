@@ -1,6 +1,6 @@
 import React from 'react';
 import produce from 'immer';
-import { isCommonTemplate } from 'src/views/clusteroverview/overview/components/inventory-card/utils/flattenTemplates';
+import { isCommonTemplate } from 'src/views/clusteroverview/overview/components/OverviewTab/inventory-card/utils/flattenTemplates';
 import DescriptionItem from 'src/views/templates/details/tabs/details/components//DescriptionItem';
 import BootOrderItem from 'src/views/templates/details/tabs/details/components/BootOrderItem';
 import BootSource from 'src/views/templates/details/tabs/details/components/BootSource';

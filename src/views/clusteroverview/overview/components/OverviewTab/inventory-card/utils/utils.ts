@@ -10,7 +10,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { InProgressIcon, OffIcon, PausedIcon, SyncAltIcon } from '@patternfly/react-icons';
 
-import { getVMStatus } from '../../../utils/utils';
+import { getVMStatus } from '../../../../utils/utils';
 
 import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from './constants';
 import { flattenTemplates } from './flattenTemplates';
