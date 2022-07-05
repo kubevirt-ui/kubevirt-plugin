@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { DetailsBody } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { OverviewDetailItem } from '@openshift-console/plugin-shared';
 import { Card, CardActions, CardBody, CardHeader, CardTitle } from '@patternfly/react-core';
@@ -21,12 +22,12 @@ const DetailsCard: React.FC = () => {
     version,
     updateChannel,
     operatorLink,
-    kubevirtSub,
+    kubevirtSubscription,
     catalogSourceMissing,
     loaded,
-    loadError,
+    loadErrors,
   } = kvCsvDetails;
-  const isLoading = !loaded && !loadError && !kubevirtSub;
+  const isLoaded = loaded && isEmpty(loadErrors) && kubevirtSubscription;
 
   return (
     isAdmin && (
@@ -39,23 +40,23 @@ const DetailsCard: React.FC = () => {
         </CardHeader>
         <CardBody>
           <DetailsBody>
-            <OverviewDetailItem isLoading={isLoading} title={t('Service name')}>
+            <OverviewDetailItem isLoading={!isLoaded} title={t('Service name')}>
               {displayName}
             </OverviewDetailItem>
-            <OverviewDetailItem isLoading={isLoading} title={t('Provider')}>
+            <OverviewDetailItem isLoading={!isLoaded} title={t('Provider')}>
               {provider}
             </OverviewDetailItem>
-            <OverviewDetailItem isLoading={isLoading} title={t('OpenShift Virtualization version')}>
+            <OverviewDetailItem isLoading={!isLoaded} title={t('OpenShift Virtualization version')}>
               {version}
               <div>
                 {catalogSourceMissing ? (
                   <SourceMissingStatus />
                 ) : (
-                  <SubscriptionStatus subscription={kubevirtSub} />
+                  <SubscriptionStatus subscription={kubevirtSubscription} />
                 )}
               </div>
             </OverviewDetailItem>
-            <OverviewDetailItem isLoading={isLoading} title={t('Update Channel')}>
+            <OverviewDetailItem isLoading={!isLoaded} title={t('Update Channel')}>
               {updateChannel}
             </OverviewDetailItem>
           </DetailsBody>
