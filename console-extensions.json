@@ -307,5 +307,16 @@
       },
       "component": { "$codeRef": "DataSourcesList" }
     }
+  },
+  {
+    "type": "console.page/resource/details",
+    "properties": {
+      "model": {
+        "group": "cdi.kubevirt.io",
+        "kind": "DataImportCron",
+        "version": "v1beta1"
+      },
+      "component": { "$codeRef": "DataImportCronPage" }
+    }
   }
 ]

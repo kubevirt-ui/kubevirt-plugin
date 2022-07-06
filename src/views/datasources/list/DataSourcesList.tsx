@@ -1,9 +1,11 @@
 import React from 'react';
 
+import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ListPageBody,
+  ListPageCreate,
   ListPageFilter,
   ListPageHeader,
   useK8sWatchResource,
@@ -35,7 +37,11 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
 
   return (
     <>
-      <ListPageHeader title={t('DataSources')} />
+      <ListPageHeader title={t('DataSources')}>
+        <ListPageCreate groupVersionKind={DataSourceModelRef}>
+          {t('Create DataSource')}
+        </ListPageCreate>
+      </ListPageHeader>
       <ListPageBody>
         <ListPageFilter
           data={unfilteredData}
