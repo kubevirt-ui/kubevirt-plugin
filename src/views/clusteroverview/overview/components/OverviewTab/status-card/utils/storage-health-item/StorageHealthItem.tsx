@@ -10,11 +10,11 @@ import StatusCardStoragePopover from './StatusStorageCardPopover';
 
 const StorageHealthItem = () => {
   const { t } = useKubevirtTranslation();
-  const { lsoCSV, odfCSV, loaded, loadError } = useKubevirtStorageOperatorCSVs();
+  const { lsoCSV, odfCSV, loaded, loadErrors } = useKubevirtStorageOperatorCSVs();
 
-  const lsoState = getStorageOperatorHealthStatus(lsoCSV, loaded, loadError, t);
-  const odfState = getStorageOperatorHealthStatus(odfCSV, loaded, loadError, t);
-  const status = getOverallStorageStatus(lsoState, odfState, loaded, loadError);
+  const lsoState = getStorageOperatorHealthStatus(lsoCSV, loaded, loadErrors, t);
+  const odfState = getStorageOperatorHealthStatus(odfCSV, loaded, loadErrors, t);
+  const status = getOverallStorageStatus(lsoState, odfState, loaded, loadErrors);
 
   return (
     <HealthItem
