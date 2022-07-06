@@ -23,8 +23,18 @@ export const printableVMStatus = {
   Unknown: 'Unknown',
 };
 
+export const errorPrintableVMStatus = {
+  CrashLoopBackOff: 'CrashLoopBackOff',
+  ErrorUnschedulable: 'ErrorUnschedulable',
+  ErrImagePull: 'ErrImagePull',
+  ImagePullBackOff: 'ImagePullBackOff',
+  ErrorPvcNotFound: 'ErrorPvcNotFound',
+  ErrorDataVolumeNotFound: 'ErrorDataVolumeNotFound',
+  DataVolumeError: 'DataVolumeError',
+};
+
 export const isFailedPrintableStatus = (printableStatus: string) =>
-  printableStatus?.toLowerCase()?.includes('error');
+  Object.values(errorPrintableVMStatus).includes(printableStatus);
 
 export const getVMStatusIcon = (
   status: string,
