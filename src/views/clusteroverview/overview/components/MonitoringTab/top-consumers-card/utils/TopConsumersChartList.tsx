@@ -1,59 +1,47 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { CardBody } from '@patternfly/react-core';
 
+import {
+  SHOW_TOP_5_ITEMS,
+  TOP_CONSUMERS_DURATION_KEY,
+  TOP_CONSUMERS_NUM_ITEMS_KEY,
+} from './constants';
 import NoDataAvailableMessage from './NoDataAvailableMessage';
 import { getTopConsumerQuery } from './queries';
 import { TopConsumerMetric } from './topConsumerMetric';
 import { TopConsumerScope } from './topConsumerScope';
 import TopConsumersProgressChart from './TopConsumersProgressChart';
-import { getHumanizedValue, getValue } from './utils';
+import { getChartTitle, getHumanizedValue, getValue } from './utils';
 
 import './TopConsumersChartList.scss';
 
-const getChartTitle = (scope, queryData) => {
-  let title = '';
-  const metricData = queryData?.metric;
-  switch (scope) {
-    case TopConsumerScope.NODE:
-      title = metricData?.node;
-      break;
-    case TopConsumerScope.PROJECT:
-      title = metricData?.namespace;
-      break;
-    case TopConsumerScope.VM:
-    default:
-      title =
-        metricData?.name || metricData?.label_vm_kubevirt_io_name || `VMI (${metricData.pod})`;
-      break;
-  }
-
-  return title;
-};
-
 type TopConsumersChartListProps = {
-  numItems: number;
   metric: TopConsumerMetric;
   scope: TopConsumerScope;
 };
 
-export const TopConsumersChartList: React.FC<TopConsumersChartListProps> = ({
-  numItems,
-  metric,
-  scope,
-}) => {
+export const TopConsumersChartList: React.FC<TopConsumersChartListProps> = ({ metric, scope }) => {
   const { t } = useKubevirtTranslation();
+  const [duration] = useLocalStorage(TOP_CONSUMERS_DURATION_KEY);
+  const [numItemsLabel] = useLocalStorage(TOP_CONSUMERS_NUM_ITEMS_KEY);
+  const numItemsToShow = React.useMemo(
+    () => (numItemsLabel === SHOW_TOP_5_ITEMS ? 5 : 10),
+    [numItemsLabel],
+  );
+
   const [query] = usePrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY,
-    query: getTopConsumerQuery(metric.getValue(), scope.getValue(), numItems),
+    query: getTopConsumerQuery(metric.getValue(), scope.getValue(), numItemsToShow, duration),
     endTime: Date.now(),
   });
   const numQueryResults = query?.data?.result?.length;
 
   const ChartList = React.useMemo(() => {
-    const numLinesToShow = numQueryResults >= numItems ? numItems : numQueryResults;
+    const numLinesToShow = numQueryResults >= numItemsToShow ? numItemsToShow : numQueryResults;
     const max = getValue(query?.data?.result[0]?.value?.[1]);
     const charts = [];
 
@@ -75,7 +63,7 @@ export const TopConsumersChartList: React.FC<TopConsumersChartListProps> = ({
       );
     }
     return charts;
-  }, [query, metric, scope, numItems, numQueryResults]);
+  }, [query, metric, scope, numItemsToShow, numQueryResults]);
 
   const showNoDataMessage = numQueryResults === 0;
 

@@ -1,33 +1,29 @@
+import DropdownEnum from '@kubevirt-utils/utils/dropdownEnum';
 import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
 
 type TopConsumerScopeData = {
   dropdownLabel: string;
 };
 
-abstract class TopConsumerScopeObjectEnum<T> extends ObjectEnum<T> {
+abstract class TopConsumerScopeObjectEnum<T> extends DropdownEnum<T> {
   protected readonly dropdownLabel: string;
 
   protected constructor(value: T, { dropdownLabel }: TopConsumerScopeData) {
-    super(value);
+    super(value, { dropdownLabel });
     this.dropdownLabel = dropdownLabel;
   }
-
-  getDropdownLabel = (): string => this.dropdownLabel;
 }
 
 export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
   static readonly PROJECT = new TopConsumerScope('PROJECT', {
-    // t('Project')
     dropdownLabel: 'Project',
   });
 
   static readonly VM = new TopConsumerScope('VM', {
-    // t('VM')
     dropdownLabel: 'VM',
   });
 
   static readonly NODE = new TopConsumerScope('NODE', {
-    // t('Node')
     dropdownLabel: 'Node',
   });
 

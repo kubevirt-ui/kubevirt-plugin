@@ -88,3 +88,23 @@ export const initialTopConsumerCardSettings: {
     metric: TopConsumerMetric.STORAGE_IOPS,
   },
 };
+
+export const getChartTitle = (scope, queryData) => {
+  let title = '';
+  const metricData = queryData?.metric;
+  switch (scope) {
+    case TopConsumerScope.NODE:
+      title = metricData?.node;
+      break;
+    case TopConsumerScope.PROJECT:
+      title = metricData?.namespace;
+      break;
+    case TopConsumerScope.VM:
+    default:
+      title =
+        metricData?.name || metricData?.label_vm_kubevirt_io_name || `VMI (${metricData.pod})`;
+      break;
+  }
+
+  return title;
+};
