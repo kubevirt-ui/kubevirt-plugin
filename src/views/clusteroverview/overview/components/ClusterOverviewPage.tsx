@@ -12,24 +12,6 @@ import { KUBEVIRT_QUICK_START_USER_SETTINGS_KEY } from './utils/constants';
 import PageHeader from './utils/PageHeader';
 import RestoreGettingStartedButton from './utils/RestoreGettingStartedButton';
 
-const overviewTabs: NavPage[] = [
-  {
-    href: '',
-    name: 'Overview',
-    component: OverviewTab,
-  },
-  {
-    href: 'monitoring',
-    name: 'Monitoring',
-    component: MonitoringTab,
-  },
-  {
-    href: 'settings',
-    name: 'Settings',
-    component: SettingsTab,
-  },
-];
-
 const ClusterOverviewPage: React.FC = () => {
   const { t } = useKubevirtTranslation();
   const title = t('Virtualization');
@@ -37,6 +19,24 @@ const ClusterOverviewPage: React.FC = () => {
   const badge = (
     <RestoreGettingStartedButton userSettingsKey={KUBEVIRT_QUICK_START_USER_SETTINGS_KEY} />
   );
+
+  const overviewTabs: NavPage[] = [
+    {
+      href: '',
+      name: t('Overview'),
+      component: OverviewTab,
+    },
+    {
+      href: 'monitoring',
+      name: t('Monitoring'),
+      component: MonitoringTab,
+    },
+    {
+      href: 'settings',
+      name: t('Settings'),
+      component: SettingsTab,
+    },
+  ];
 
   return (
     <>

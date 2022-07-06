@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
+import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
   CardActions,
@@ -42,7 +43,7 @@ const TopConsumersCard: React.FC = () => {
     setDuration(DurationOption.fromDropdownLabel(value).toString());
 
   return (
-    <div className="kv-top-consumers-card">
+    <Overview>
       <Card data-test="kv-top-consumers-card">
         <CardHeader className="kv-top-consumers-card__header">
           <CardTitle>{t('Top consumers')} </CardTitle>
@@ -72,7 +73,7 @@ const TopConsumersCard: React.FC = () => {
           <TopConsumersGridRow rowNumber={2} />
         </CardBody>
       </Card>
-    </div>
+    </Overview>
   );
 };
 
