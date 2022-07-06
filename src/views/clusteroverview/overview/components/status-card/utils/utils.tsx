@@ -3,6 +3,7 @@ import { TFunction } from 'i18next';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import NetworkAddonsConfigModel from '@kubevirt-ui/kubevirt-api/console/models/NetworkAddonsConfigModel';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   GreenCheckCircleIcon,
   HealthState,
@@ -73,24 +74,24 @@ const getHealthStatusFromCSV = (csv: ClusterServiceVersionKind, t: TFunction) =>
   }
 };
 
-export const getStorageOperatorHealthStatus = (operatorCSV, loaded, loadError, t) => {
+export const getStorageOperatorHealthStatus = (operatorCSV, loaded, loadErrors, t) => {
   if (!loaded) {
     return { state: HealthState.LOADING };
   }
-  if (loadError || !operatorCSV) {
+  if (!isEmpty(loadErrors) || !operatorCSV) {
     return { state: HealthState.NOT_AVAILABLE, message: t('Not available') };
   }
   return getHealthStatusFromCSV(operatorCSV, t);
 };
 
-export const getOverallStorageStatus = (lsoState, odfState, loaded, loadError) => {
+export const getOverallStorageStatus = (lsoState, odfState, loaded, loadErrors) => {
   const lsoAvailable = lsoState.state === HealthState.OK;
   const odfAvailable = odfState.state === HealthState.OK;
 
   if (!loaded) {
     return { state: HealthState.LOADING };
   }
-  if (loadError) {
+  if (!isEmpty(loadErrors)) {
     return { state: HealthState.ERROR };
   }
   if (lsoAvailable || odfAvailable) {
