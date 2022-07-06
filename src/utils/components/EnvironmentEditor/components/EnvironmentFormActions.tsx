@@ -10,9 +10,9 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-import './VirtualMachineEnvironmentTabFooter.scss';
+import './EnvironmentFormActions.scss';
 
-type VirtualMachineEnvironmentTabFooterProps = {
+type EnvironmentFormActionsProps = {
   error?: any;
   isSaveDisabled?: boolean;
   closeError: () => void;
@@ -20,7 +20,7 @@ type VirtualMachineEnvironmentTabFooterProps = {
   onReload: () => void;
 };
 
-const VirtualMachineEnvironmentTabFooter: React.FC<VirtualMachineEnvironmentTabFooterProps> = ({
+const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
   error,
   isSaveDisabled,
   onSave,
@@ -29,24 +29,42 @@ const VirtualMachineEnvironmentTabFooter: React.FC<VirtualMachineEnvironmentTabF
 }) => {
   const { t } = useKubevirtTranslation();
   const [success, setSuccess] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [apiError, setApiError] = React.useState<any>();
 
-  const _onSave = async () => {
-    await onSave();
-    setSuccess(true);
+  const onSubmit = async () => {
+    setLoading(true);
+    try {
+      await onSave();
+      setSuccess(true);
+      setApiError(undefined);
+    } catch (onSaveError) {
+      setApiError(onSaveError);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const closeAlert = () => {
+    if (apiError) {
+      setApiError(undefined);
+    } else {
+      closeError();
+    }
   };
 
   return (
-    <Stack className="vm-environment-tab__buttons">
+    <Stack className="environment-form__buttons">
       <StackItem>
-        {error && (
+        {(error || apiError) && (
           <Alert
             isInline
             className="co-alert co-alert--scrollable"
             variant="danger"
             title={t('An error occurred')}
-            actionClose={<AlertActionCloseButton onClose={closeError} />}
+            actionClose={<AlertActionCloseButton onClose={closeAlert} />}
           >
-            <div className="co-pre-line">{error?.message}</div>
+            <div className="co-pre-line">{error?.message || apiError?.message}</div>
           </Alert>
         )}
         {success && (
@@ -61,7 +79,13 @@ const VirtualMachineEnvironmentTabFooter: React.FC<VirtualMachineEnvironmentTabF
       </StackItem>
       <StackItem>
         <ActionGroup className="pf-c-form">
-          <Button isDisabled={isSaveDisabled} type="submit" variant="primary" onClick={_onSave}>
+          <Button
+            isDisabled={isSaveDisabled || loading}
+            type="submit"
+            variant="primary"
+            onClick={onSubmit}
+            isLoading={loading}
+          >
             {t('Save')}
           </Button>
           <Button type="button" variant="secondary" onClick={onReload}>
@@ -73,4 +97,4 @@ const VirtualMachineEnvironmentTabFooter: React.FC<VirtualMachineEnvironmentTabF
   );
 };
 
-export default VirtualMachineEnvironmentTabFooter;
+export default EnvironmentFormActions;

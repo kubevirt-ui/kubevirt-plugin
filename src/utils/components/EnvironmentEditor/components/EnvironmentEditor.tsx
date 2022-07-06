@@ -67,8 +67,8 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
   const onFilter = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, value: string): React.ReactElement[] => {
       const filteredSecrets = secrets
-        .filter((secret) => secret.metadata.name.includes(value))
-        .map((secret) => (
+        ?.filter((secret) => secret.metadata.name.includes(value))
+        ?.map((secret) => (
           <EnvironmentSelectOption
             key={secret.metadata.name}
             kind={EnvironmentKind.secret}
@@ -78,8 +78,8 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
         ));
 
       const filteredConfigMaps = configMaps
-        .filter((configMap) => configMap.metadata.name.includes(value))
-        .map((configMap) => (
+        ?.filter((configMap) => configMap.metadata.name.includes(value))
+        ?.map((configMap) => (
           <EnvironmentSelectOption
             key={configMap.metadata.name}
             kind={EnvironmentKind.configMap}
@@ -89,8 +89,8 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
         ));
 
       const filteredServiceAccounts = serviceAccounts
-        .filter((serviceAccount) => serviceAccount.metadata.name.includes(value))
-        .map((serviceAccount) => (
+        ?.filter((serviceAccount) => serviceAccount.metadata.name.includes(value))
+        ?.map((serviceAccount) => (
           <EnvironmentSelectOption
             key={serviceAccount.metadata.name}
             kind={EnvironmentKind.serviceAccount}

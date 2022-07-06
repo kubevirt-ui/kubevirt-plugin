@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { EnvironmentKind, EnvironmentVariable } from '../constants';
 import { addEnvironmentsToVM, getRandomSerial, getVMEnvironmentsVariables } from '../utils';
@@ -25,8 +25,10 @@ type UseEnvironmentsType = {
 
 const useEnvironments = (
   vm: V1VirtualMachine,
-  updateVM: UpdateValidatedVM,
+  updateVM: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>,
+  onEditChange?: (edited: boolean) => void,
 ): UseEnvironmentsType => {
+  const { t } = useKubevirtTranslation();
   const initialEnvironments = React.useMemo(() => getVMEnvironmentsVariables(vm), [vm]);
   const [environments, setEnvironments] = React.useState(initialEnvironments);
   const [environmentsEdited, setEnvironmentsEdited] = React.useState(false);
@@ -41,7 +43,7 @@ const useEnvironments = (
   const onEnvironmentChange = React.useCallback(
     (environmentIndex: number, name: string, serial: string, kind: EnvironmentKind) => {
       if (environments.find((env, index) => env.name === name && index !== environmentIndex)) {
-        return setError(new Error('Resource already selected'));
+        return setError(new Error(t('Resource already selected')));
       }
 
       setEnvironments((envs) => {
@@ -49,20 +51,30 @@ const useEnvironments = (
         newEnvironments.splice(environmentIndex, 1, { name, serial: serial || '', kind });
         return newEnvironments;
       });
+
+      setError(undefined);
     },
-    [environments],
+    [environments, t],
   );
 
   const onEnvironmentRemove = React.useCallback((environmentIndex: number) => {
-    setEnvironments((envs) => envs.filter((_, index) => index !== environmentIndex));
+    setEnvironments((envs) => envs?.filter((_, index) => index !== environmentIndex));
+    setError(undefined);
   }, []);
 
   const onReload = React.useCallback(() => {
     setEnvironments(initialEnvironments);
+    setError(undefined);
   }, [initialEnvironments]);
 
   const onSave = React.useCallback(async () => {
-    await updateVM(addEnvironmentsToVM(vm, environments));
+    try {
+      await updateVM(addEnvironmentsToVM(vm, environments));
+      setError(undefined);
+    } catch (apiError) {
+      setError(apiError);
+      throw apiError;
+    }
   }, [environments, updateVM, vm]);
 
   React.useEffect(() => {
@@ -71,8 +83,11 @@ const useEnvironments = (
         initialEnvironments?.[index]?.name === name &&
         initialEnvironments?.[index]?.serial === serial,
     );
+    const edited = !unchanged || environments.length !== initialEnvironments.length;
+
+    if (onEditChange) onEditChange(edited);
     setEnvironmentsEdited(!unchanged || environments.length !== initialEnvironments.length);
-  }, [environments, initialEnvironments]);
+  }, [environments, initialEnvironments, onEditChange]);
 
   return {
     onSave,
