@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -11,17 +11,20 @@ import {
   KebabToggle,
 } from '@patternfly/react-core';
 
-import { useDataSourceActionsProvider } from '../hooks/useDataSourceActions';
+import { useDataImportCronActionsProvider } from '../hooks/useDataImportCronActions';
 
-type DataSourceActionProps = {
-  dataSource: V1beta1DataSource;
+type DataImportCronActionProps = {
+  dataImportCron: V1beta1DataImportCron;
   isKebabToggle?: boolean;
 };
 
-const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKebabToggle }) => {
+const DataImportCronActions: React.FC<DataImportCronActionProps> = ({
+  dataImportCron,
+  isKebabToggle,
+}) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
-  const actions = useDataSourceActionsProvider(dataSource);
+  const actions = useDataImportCronActionsProvider(dataImportCron);
 
   const handleClick = (action: Action) => {
     if (typeof action?.cta === 'function') {
@@ -32,7 +35,7 @@ const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKeba
 
   return (
     <Dropdown
-      data-test-id="data-source-actions"
+      data-test-id="data-import-cron-actions"
       isPlain={isKebabToggle}
       isOpen={isOpen}
       position={DropdownPosition.right}
@@ -58,4 +61,4 @@ const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKeba
   );
 };
 
-export default DataSourceActions;
+export default DataImportCronActions;

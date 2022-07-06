@@ -1,10 +1,10 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
-import DataSourceModel, {
-  DataSourceModelRef,
-} from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import DataImportCronModel, {
+  DataImportCronModelRef,
+} from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
+import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
@@ -14,9 +14,11 @@ import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
-type UseDataSourceActionsProvider = (dataSource: V1beta1DataSource) => Action[];
+type UseDataImportCronActionsProvider = (DataImportCron: V1beta1DataImportCron) => Action[];
 
-export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataSource) => {
+export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider = (
+  dataImportCron,
+) => {
   const [namespace] = useActiveNamespace();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -25,19 +27,19 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
   return React.useMemo(
     () => [
       {
-        id: 'datasource-action-edit-labels',
+        id: 'dataimportcron-action-edit-labels',
         disabled: false,
         label: t('Edit labels'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <LabelsModal
-              obj={dataSource}
+              obj={dataImportCron}
               isOpen={isOpen}
               onClose={onClose}
               onLabelsSubmit={(labels) =>
                 k8sPatch({
-                  model: DataSourceModel,
-                  resource: dataSource,
+                  model: DataImportCronModel,
+                  resource: dataImportCron,
                   data: [
                     {
                       op: 'replace',
@@ -51,19 +53,19 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
           )),
       },
       {
-        id: 'datasource-action-edit-annotations',
+        id: 'dataimportcron-action-edit-annotations',
         disabled: false,
         label: t('Edit annotations'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <AnnotationsModal
-              obj={dataSource}
+              obj={dataImportCron}
               isOpen={isOpen}
               onClose={onClose}
               onSubmit={(updatedAnnotations) =>
                 k8sPatch({
-                  model: DataSourceModel,
-                  resource: dataSource,
+                  model: DataImportCronModel,
+                  resource: dataImportCron,
                   data: [
                     {
                       op: 'replace',
@@ -77,37 +79,37 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
           )),
       },
       {
-        id: 'datasource-action-edit-datasource',
+        id: 'dataimportcron-action-edit-DataImportCron',
         disabled: false,
-        label: t('Edit DataSource'),
+        label: t('Edit DataImportCron'),
         cta: () =>
           history.push(
-            `/k8s/ns/${dataSource.metadata.namespace || namespace}/${DataSourceModelRef}/${
-              dataSource.metadata.name
+            `/k8s/ns/${dataImportCron.metadata.namespace || namespace}/${DataImportCronModelRef}/${
+              dataImportCron.metadata.name
             }/yaml`,
           ),
       },
       {
-        id: 'datasource-action-delete',
-        label: t('Delete DataSource'),
+        id: 'dataimportcron-action-delete',
+        label: t('Delete DataImportCron'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <DeleteModal
-              obj={dataSource}
+              obj={dataImportCron}
               isOpen={isOpen}
               onClose={onClose}
-              headerText={t('Delete DataSource?')}
+              headerText={t('Delete DataImportCron?')}
               onDeleteSubmit={() =>
                 k8sDelete({
-                  model: DataSourceModel,
-                  resource: dataSource,
+                  model: DataImportCronModel,
+                  resource: dataImportCron,
                 })
               }
             />
           )),
-        accessReview: asAccessReview(DataSourceModel, dataSource, 'delete'),
+        accessReview: asAccessReview(DataImportCronModel, dataImportCron, 'delete'),
       },
     ],
-    [t, dataSource, createModal, history, namespace],
+    [t, dataImportCron, createModal, history, namespace],
   );
 };
