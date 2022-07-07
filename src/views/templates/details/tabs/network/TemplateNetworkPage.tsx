@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { isCommonTemplate } from 'src/views/clusteroverview/overview/components/OverviewTab/inventory-card/utils/flattenTemplates';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
+
+import { isCommonVMTemplate } from '../../../utils';
 
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
@@ -29,7 +30,7 @@ const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
       <ListPageBody>
         <ListPageCreateButton
           className="list-page-create-button-margin"
-          isDisabled={isCommonTemplate(template)}
+          isDisabled={isCommonVMTemplate(template)}
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <NetworkInterfaceModal

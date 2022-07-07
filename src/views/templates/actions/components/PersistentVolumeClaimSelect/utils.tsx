@@ -1,14 +1,11 @@
 import * as React from 'react';
-import {
-  getAllowedResourceData,
-  getAllowedResources,
-} from 'src/views/clusteroverview/overview/utils/utils';
 
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
   ProjectModel,
 } from '@kubevirt-ui/kubevirt-api/console';
+import { getAllowedResourceData, getAllowedResources } from '@kubevirt-utils/resources/shared';
 import {
   K8sResourceCommon,
   useK8sWatchResource,

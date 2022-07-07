@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { K8sResourceCondition } from 'src/views/clusteroverview/overview/components/OverviewTab/details-card/utils/types';
 
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { ConditionsTable } from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';
+import {
+  ConditionsTable,
+  K8sResourceCondition,
+} from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, PageSection, Title } from '@patternfly/react-core';
 

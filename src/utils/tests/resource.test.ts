@@ -1,6 +1,9 @@
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 
-import { getResourceUrl } from '../resources/shared';
+jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
+  k8sCreate: jest.fn().mockResolvedValue({}),
+}));
 
 test('getResourceUrl', () => {
   const resource = {

@@ -1,6 +1,5 @@
 import React from 'react';
 import produce from 'immer';
-import { isCommonTemplate } from 'src/views/clusteroverview/overview/components/OverviewTab/inventory-card/utils/flattenTemplates';
 import DescriptionItem from 'src/views/templates/details/tabs/details/components//DescriptionItem';
 import BootOrderItem from 'src/views/templates/details/tabs/details/components/BootOrderItem';
 import BootSource from 'src/views/templates/details/tabs/details/components/BootSource';
@@ -19,6 +18,8 @@ import {
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList } from '@patternfly/react-core';
+
+import { isCommonVMTemplate } from '../../../../utils';
 
 const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
@@ -55,7 +56,7 @@ const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template
         content={
           <HardwareDevices
             vm={getTemplateVirtualMachineObject(template)}
-            canEdit={!isCommonTemplate(template)}
+            canEdit={!isCommonVMTemplate(template)}
             onSubmit={onSubmit}
           />
         }
