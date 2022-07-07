@@ -21,7 +21,6 @@ type UseVMAlerts = (vm: V1VirtualMachine) => VMAlerts;
 const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
   const [query] = usePrometheusPoll({
     endpoint: PrometheusEndpoint?.RULES,
-    namespace: vm?.metadata?.namespace,
   });
 
   const vmAlerts = React.useMemo(() => {
