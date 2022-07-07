@@ -1,11 +1,18 @@
-import { V1alpha1Condition } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { V1alpha1Condition, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { TemplateModel } from '@kubevirt-utils/models';
 import {
   AccessReviewResourceAttributes,
   K8sModel,
   K8sResourceCommon,
   K8sVerb,
+  Operator,
   OwnerReference,
+  WatchK8sResults,
 } from '@openshift-console/dynamic-plugin-sdk';
+
+import { isEmpty } from './../utils/utils';
+import { TEMPLATE_TYPE_LABEL } from './template';
 
 /**
  * function for getting an entity's annotation
@@ -157,3 +164,98 @@ export const asAccessReview = (
  * */
 export const getAPIVersionForModel = (model: K8sModel): string =>
   !model?.apiGroup ? model.apiVersion : `${model.apiGroup}/${model.apiVersion}`;
+
+/**
+ * Get vm printable status
+ * @date 7/6/2022 - 11:23:32 AM
+ *
+ * @param {V1VirtualMachine} vm
+ * @returns {*}
+ */
+export const getVMStatus = (vm: V1VirtualMachine) => vm?.status?.printableStatus;
+
+/**
+ * Get allowed resource for project
+ * @date 7/6/2022 - 11:23:32 AM
+ *
+ * @param {string[]} projectNames
+ * @param {K8sModel} model
+ * @returns {*}
+ */
+export const getAllowedResources = (projectNames: string[], model: K8sModel) => {
+  return Object.fromEntries(
+    (projectNames || []).map((projName) => [
+      `${projName}/${model.plural}`,
+      {
+        groupVersionKind: modelToGroupVersionKind(model),
+        namespaced: true,
+        namespace: projName,
+        isList: true,
+      },
+    ]),
+  );
+};
+
+/**
+ * Get allowed resources data
+ * @date 7/6/2022 - 11:23:32 AM
+ *
+ * @param {WatchK8sResults<{
+    [key: string]: K8sResourceCommon[];
+  }>} resources
+ * @param {K8sModel} model
+ * @returns {{ data: any; loaded: any; loadError: any; }}
+ */
+export const getAllowedResourceData = (
+  resources: WatchK8sResults<{
+    [key: string]: K8sResourceCommon[];
+  }>,
+  model: K8sModel,
+) => {
+  const resourcesArray = Object.entries(resources)
+    .map(([key, { data, loaded, loadError }]) => {
+      if (loaded && key?.includes(model.plural) && !isEmpty(data)) {
+        return { data, loaded, loadError };
+      }
+    })
+    .filter(Boolean);
+
+  const resourceData = (resourcesArray || []).map(({ data }) => data).flat();
+  const resourceLoaded = (resourcesArray || [])
+    .map(({ loaded }) => loaded)
+    ?.every((vmLoaded) => vmLoaded);
+  const resourceLoadError = (resourcesArray || [])
+    .map(({ loadError }) => loadError)
+    ?.filter(Boolean)
+    ?.join('');
+  return { data: resourceData, loaded: resourceLoaded, loadError: resourceLoadError };
+};
+
+/**
+ * Get allowed templates resources
+ * @date 7/6/2022 - 11:23:32 AM
+ *
+ * @param {string[]} projectNames
+ * @returns {*}
+ */
+export const getAllowedTemplateResources = (projectNames: string[]) => {
+  const TemplateModelGroupVersionKind = modelToGroupVersionKind(TemplateModel);
+  return Object.fromEntries(
+    (projectNames || []).map((projName) => [
+      `${projName}/${TemplateModel.plural}`,
+      {
+        groupVersionKind: TemplateModelGroupVersionKind,
+        namespace: projName,
+        selector: {
+          matchExpressions: [
+            {
+              operator: Operator.Exists,
+              key: TEMPLATE_TYPE_LABEL,
+            },
+          ],
+        },
+        isList: true,
+      },
+    ]),
+  );
+};

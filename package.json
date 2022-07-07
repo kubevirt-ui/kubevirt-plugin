@@ -43,7 +43,7 @@
       "useVirtualMachineActionsProvider": "./views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts",
       "VirtualMachinesInstancesList": "./views/virtualmachinesinstance/list/VirtualMachinesInstancesList.tsx",
       "useVirtualMachineInstanceActionsProvider": "./views/virtualmachinesinstance/actions/hooks/useVirtualMachineInstanceActionsProvider.tsx",
-      "ClusterOverviewPage": "./views/clusteroverview/overview/components/ClusterOverviewPage.tsx",
+      "ClusterOverviewPage": "./views/clusteroverview/ClusterOverviewPage.tsx",
       "VirtualMachineTemplatesList": "./views/templates/list/VirtualMachineTemplatesList.tsx",
       "modalProvider": "./utils/components/ModalProvider/ModalProvider.tsx",
       "TemplateNavPage": "./views/templates/details/TemplateNavPage.tsx",
