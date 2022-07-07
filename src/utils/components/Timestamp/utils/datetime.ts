@@ -68,12 +68,12 @@ export const fromNow = (dateTime: string | Date, now?: Date, options?) => {
 
   if (options?.omitSuffix) {
     if (days) {
-      return `${days} ${DAY}`;
+      return { value: days, time: DAY };
     }
     if (hours) {
-      return `${hours} ${HOUR}`;
+      return { value: hours, time: HOUR };
     }
-    return `${minutes} ${MINTUE}`;
+    return { value: minutes, time: MINTUE };
   }
 
   // Fallback to normal date/time formatting if Intl.RelativeTimeFormat is not

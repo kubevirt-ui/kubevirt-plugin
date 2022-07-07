@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Tooltip } from '@patternfly/react-core';
+import { pluralize, Tooltip } from '@patternfly/react-core';
 import { GlobeAmericasIcon } from '@patternfly/react-icons';
 
 import { isValid, timestampFor, utcDateTimeFormatter } from './utils/datetime';
@@ -20,6 +20,10 @@ const Timestamp: React.FC<TimestampProps> = ({ timestamp, omitSuffix }) => {
 
   const newTimestamp = timestampFor(mdate, new Date(Date.now()), omitSuffix);
 
+  const timeStamp = omitSuffix
+    ? pluralize(newTimestamp['value'], newTimestamp['time'])
+    : newTimestamp;
+
   return (
     <div className={'co-timestamp co-icon-and-text'}>
       <GlobeAmericasIcon className="co-icon-and-text__icon" />
@@ -30,7 +34,7 @@ const Timestamp: React.FC<TimestampProps> = ({ timestamp, omitSuffix }) => {
           </span>,
         ]}
       >
-        <span data-test="timestamp">{newTimestamp}</span>
+        <span data-test="timestamp">{timeStamp}</span>
       </Tooltip>
     </div>
   );
