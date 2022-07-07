@@ -16,14 +16,14 @@ const HardwareDeviceTitle: React.FC<HardwareDeviceTitleProps> = ({ title, canEdi
   if (!canEdit) return <DescriptionListTerm>{title}</DescriptionListTerm>;
   else
     return (
-      <Button isInline variant="link" onClick={onClick} className="pf-m-link--align-left">
-        <DescriptionListTerm>
+      <DescriptionListTerm>
+        <Button isInline variant="link" onClick={onClick} className="pf-m-link--align-left" isLarge>
           {title}
           {canEdit && (
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain " alt={t('Edit')} />
+            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" alt={t('Edit')} />
           )}
-        </DescriptionListTerm>
-      </Button>
+        </Button>
+      </DescriptionListTerm>
     );
 };
 

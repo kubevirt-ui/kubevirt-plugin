@@ -125,13 +125,10 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
           )}
         </Flex>
       </DescriptionListTermHelpText>
-      {isEdit && !showEditOnTitle ? (
-        description
-      ) : (
-        <DescriptionListDescription data-test-id={testId}>
-          {descriptionData}
-        </DescriptionListDescription>
-      )}
+
+      <DescriptionListDescription data-test-id={testId}>
+        {isEdit && !showEditOnTitle ? description : descriptionData}
+      </DescriptionListDescription>
     </DescriptionListGroup>
   );
 };
