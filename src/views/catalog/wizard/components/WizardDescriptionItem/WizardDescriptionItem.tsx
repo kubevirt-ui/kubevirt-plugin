@@ -102,17 +102,19 @@ export const WizardDescriptionItem: React.FC<WizardDescriptionItemProps> = React
           </Flex>
         </DescriptionListTermHelpText>
         {isEdit && !showEditOnTitle ? (
-          <Button
-            data-test-id={`${testId}-edit`}
-            type="button"
-            isInline
-            isDisabled={isDisabled}
-            onClick={onEditClick}
-            variant="link"
-          >
-            {description ?? <span className="text-muted">{t('Not available')}</span>}
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
+          <DescriptionListDescription>
+            <Button
+              data-test-id={`${testId}-edit`}
+              type="button"
+              isInline
+              isDisabled={isDisabled}
+              onClick={onEditClick}
+              variant="link"
+            >
+              {description ?? <span className="text-muted">{t('Not available')}</span>}
+              <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+            </Button>
+          </DescriptionListDescription>
         ) : (
           <div data-test-id={testId}>
             <DescriptionListDescription>
