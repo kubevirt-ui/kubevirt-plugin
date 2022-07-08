@@ -21,6 +21,7 @@ import {
   Divider,
   Grid,
   GridItem,
+  pluralize,
   Popover,
   PopoverPosition,
   Skeleton,
@@ -54,6 +55,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
     new Date(Date.now()),
     true,
   );
+  const timestampPluralized = pluralize(timestamp['value'], timestamp['time']);
 
   const guestAgentIsRequired = <MutedTextSpan text={t('Guest agent is required')} />;
 
@@ -99,7 +101,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Created')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-created">
-                    {timestamp}
+                    {t('{{timestampPluralized}} ago', { timestampPluralized })}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
