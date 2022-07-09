@@ -10,7 +10,10 @@ import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/Cloudi
 import { addSecretToVM } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineObject,
+  replaceTemplateVM,
+} from '@kubevirt-utils/resources/template';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
@@ -33,6 +36,8 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { isCommonVMTemplate } from '../../../utils';
 
+import SysPrepItem from './SysPrepItem';
+
 type TemplateScriptsPageProps = RouteComponentProps<{
   ns: string;
   name: string;
@@ -53,9 +58,7 @@ const TemplateScriptsPage: React.FC<TemplateScriptsPageProps> = ({ obj: template
 
   const onSubmit = React.useCallback(
     async (updatedVM: V1VirtualMachine) => {
-      const updatedTemplate = produce(template, (draftTemplate) => {
-        draftTemplate.objects[0] = updatedVM;
-      });
+      const updatedTemplate = replaceTemplateVM(template, updatedVM);
       await k8sUpdate({
         model: TemplateModel,
         data: updatedTemplate,
@@ -69,14 +72,12 @@ const TemplateScriptsPage: React.FC<TemplateScriptsPageProps> = ({ obj: template
   const onSSHChange = async (serviceName: string) => {
     let updatedTemplate = undefined;
     if (serviceName) {
-      updatedTemplate = produce(template, (draftTemplate) => {
-        draftTemplate.objects[0] = addSecretToVM(vm, serviceName);
-      });
+      updatedTemplate = replaceTemplateVM(template, addSecretToVM(vm, serviceName));
     } else {
       if (!vmAttachedSecretName) return;
 
       updatedTemplate = produce(template, (draftTemplate) => {
-        draftTemplate.objects[0].spec.template.spec.accessCredentials = null;
+        getTemplateVirtualMachineObject(draftTemplate).spec.template.spec.accessCredentials = null;
       });
     }
 
@@ -168,6 +169,8 @@ const TemplateScriptsPage: React.FC<TemplateScriptsPageProps> = ({ obj: template
                 </Stack>
               </DescriptionListDescription>
             </DescriptionListGroup>
+            <Divider />
+            <SysPrepItem template={template} />
           </DescriptionList>
         </GridItem>
       </Grid>
