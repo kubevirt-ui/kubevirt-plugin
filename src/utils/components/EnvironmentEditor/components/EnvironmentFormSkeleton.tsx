@@ -2,18 +2,18 @@ import * as React from 'react';
 
 import { Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
-import WizardEnvironmentTabTitle from './WizardEnvironmentTabTitle';
+import EnvironmentFormTitle from './EnvironmentFormTitle';
 
-const WizardEnvironmentTabSkeleton: React.FC = React.memo(() => (
+const EnvironmentFormSkeleton: React.FC = React.memo(() => (
   <div className="co-m-pane__body">
     <Stack hasGutter>
-      <WizardEnvironmentTabTitle />
+      <EnvironmentFormTitle />
       <StackItem />
       <Skeleton width="80%" height="40px" />
       <Skeleton width="40%" height="30px" />
     </Stack>
   </div>
 ));
-WizardEnvironmentTabSkeleton.displayName = 'WizardEnvironmentTabSkeleton';
+EnvironmentFormSkeleton.displayName = 'EnvironmentFormSkeleton';
 
-export default WizardEnvironmentTabSkeleton;
+export default EnvironmentFormSkeleton;
