@@ -103,6 +103,7 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
       onClose={onClose}
       onSubmit={onClone}
       obj={clonedVirtualMachine}
+      submitBtnText={t('Clone')}
     >
       <Form isHorizontal>
         <NameInput name={cloneName} setName={setCloneName} />
