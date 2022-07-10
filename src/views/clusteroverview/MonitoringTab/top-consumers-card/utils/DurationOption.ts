@@ -3,19 +3,19 @@ import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
 
 class DurationOption extends DropdownEnum<string> {
   static readonly FIVE_MIN = new DurationOption('5m', {
-    dropdownLabel: '5 minutes',
+    dropdownLabel: 'Last 5 minutes',
   });
 
   static readonly ONE_HOUR = new DurationOption('1h', {
-    dropdownLabel: '1 hour',
+    dropdownLabel: 'Last 1 hour',
   });
 
   static readonly FOUR_HOURS = new DurationOption('4h', {
-    dropdownLabel: '4 hours',
+    dropdownLabel: 'Last 4 hours',
   });
 
   static readonly ONE_DAY = new DurationOption('1d', {
-    dropdownLabel: '1 day',
+    dropdownLabel: 'Last 1 day',
   });
 
   private static readonly ALL = Object.freeze(
