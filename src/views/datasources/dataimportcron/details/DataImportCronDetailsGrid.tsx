@@ -15,6 +15,8 @@ import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import DataSourceAnnotations from '../../details/components/DataSourceAnnotations/DataSourceAnnotations';
 
+import { DataImportCronManageDetails } from './DataImportCronManageDetails/DataImportCronManageDetails';
+
 type DataImportCronDetailsGridProps = {
   dataImportCron: V1beta1DataImportCron;
 };
@@ -138,6 +140,10 @@ export const DataImportCronDetailsGrid: React.FC<DataImportCronDetailsGridProps>
             breadcrumb="DataImportCron.metadata.creationTimestamp"
           />
           <OwnerDetailsItem obj={dataImportCron} />
+          <DataImportCronManageDetails
+            dataImportCron={dataImportCron}
+            onEditClick={() => console.log('edit')}
+          />
         </DescriptionList>
       </GridItem>
     </Grid>

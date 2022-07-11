@@ -17,7 +17,7 @@ import { DescriptionItemHeader } from './DescriptionItemHeader';
 import './DescriptionItem.scss';
 
 type DescriptionItemProps = {
-  descriptionData: any;
+  descriptionData: React.ReactNode;
   descriptionHeader?: string;
   bodyContent?: React.ReactNode;
   moreInfoURL?: string;
