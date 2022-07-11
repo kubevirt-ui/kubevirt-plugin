@@ -1,0 +1,14 @@
+@import '~@patternfly/patternfly/sass-utilities/colors';
+
+.kv-monitoring-card__body {
+    padding: 0;
+  }
+
+.kv-monitoring-card__header,
+.kv-monitoring-card__grid {
+    border-bottom: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
+}
+  
+.kv-monitoring-card__card-grid-item {
+    border-right: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
+}

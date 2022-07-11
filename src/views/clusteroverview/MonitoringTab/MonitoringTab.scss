@@ -1,0 +1,22 @@
+.kv-sub-tabs {
+    padding-left: 0.5rem;
+}
+
+.kv-sub-tab-container {
+    .pf-c-tabs__link {
+        padding: 0;
+        padding-top: var(--pf-c-tabs__link--PaddingTop);
+        padding-bottom: var(--pf-c-tabs__link--PaddingBottom);
+        margin-right: 1rem;
+        margin-left: 1rem;
+    }
+}
+
+.kv-sub-tab-item {
+    font-size: 18px;
+}
+
+.kv-sub-tab-item--active {
+    color: var(--pf-global--link--Color);
+}
+
