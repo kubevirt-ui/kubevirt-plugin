@@ -129,6 +129,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           breadcrumb="VirtualMachine.metadata.labels"
           isEdit
           showEditOnTitle
+          editOnTitleJustify
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <LabelsModal

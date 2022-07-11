@@ -31,6 +31,7 @@ type VirtualMachineDescriptionItemProps = {
   onEditClick?: () => void;
   isDisabled?: boolean;
   showEditOnTitle?: boolean;
+  editOnTitleJustify?: boolean;
   'data-test-id'?: string;
 };
 
@@ -45,6 +46,7 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
   onEditClick,
   isDisabled,
   showEditOnTitle,
+  editOnTitleJustify = false,
   'data-test-id': testId,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -106,7 +108,12 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
   return (
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
-        <Flex className="vm-description-item__title">
+        <Flex
+          className="vm-description-item__title"
+          justifyContent={{
+            default: editOnTitleJustify ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
+          }}
+        >
           <FlexItem>{getItemHeader()}</FlexItem>
           {isEdit && showEditOnTitle && (
             <FlexItem>

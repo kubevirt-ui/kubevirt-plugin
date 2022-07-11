@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClipboardCopy } from '@patternfly/react-core';
 
@@ -17,7 +16,7 @@ const UserCredentials: React.FC<UserCredentialsProps> = ({ vmi, sshService }) =>
   const { t } = useKubevirtTranslation();
   const { command, sshServiceRunning } = useSSHCommand(vmi, sshService);
 
-  if (!sshServiceRunning) return <MutedTextSpan text={t('Requires SSH service')} />;
+  if (!sshServiceRunning) return null;
 
   return (
     <ClipboardCopy
