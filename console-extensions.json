@@ -17,6 +17,17 @@
     }
   },
   {
+    "type": "console.flag/model",
+    "properties": {
+      "flag": "CONSOLE_CLI_DOWNLOAD",
+      "model": {
+        "group": "console.openshift.io",
+        "version": "v1",
+        "kind": "ConsoleCLIDownload"
+      }
+    }
+  },
+  {
     "type": "console.navigation/section",
     "properties": {
       "id": "virtualization",
