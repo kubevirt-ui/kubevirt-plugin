@@ -47,12 +47,12 @@ const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ cardID }) => {
           <FormPFSelect
             toggleId="kv-top-consumers-card-metric-select"
             variant={SelectVariant.single}
-            selections={t(TopConsumerMetric.fromString(metricKey).getDropdownLabel())}
+            selections={t(TopConsumerMetric.fromString(metricKey)?.getDropdownLabel())}
             onSelect={(e, value) => onMetricSelect(value)}
             isCheckboxSelectionBadgeHidden
           >
             {TopConsumerMetric.getAll().map((metric) => (
-              <SelectOption key={metric.getValue()} value={t(metric.getDropdownLabel())} />
+              <SelectOption key={metric.getValue()} value={t(metric?.getDropdownLabel())} />
             ))}
           </FormPFSelect>
         </div>
@@ -60,12 +60,12 @@ const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ cardID }) => {
           <FormPFSelect
             toggleId="kv-top-consumers-card-scope-select"
             variant={SelectVariant.single}
-            selections={t(TopConsumerScope.fromString(scopeKey).getDropdownLabel())}
+            selections={t(TopConsumerScope.fromString(scopeKey)?.getDropdownLabel())}
             onSelect={(e, value) => onScopeSelect(value)}
             isCheckboxSelectionBadgeHidden
           >
             {TopConsumerScope.getAll().map((scope) => (
-              <SelectOption key={scope.getValue()} value={t(scope.getDropdownLabel())} />
+              <SelectOption key={scope.getValue()} value={t(scope?.getDropdownLabel())} />
             ))}
           </FormPFSelect>
         </div>
