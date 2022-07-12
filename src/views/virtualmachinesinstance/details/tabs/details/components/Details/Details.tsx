@@ -2,9 +2,7 @@ import * as React from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
-import UserCredentials from '@kubevirt-utils/components/UserCredentials/UserCredentials';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -38,7 +36,7 @@ import Node from './Node/Node';
 import OperatingSystem from './OperatingSystem/OperatingSystem';
 import Owner from './Owner/Owner';
 import Pods from './Pods/Pods';
-import SSHDetails from './SSHAccess/SSHAccess';
+import SSHDetails from './SSHDetails/SSHDetails';
 import Timezone from './Timezone/Timezone';
 import WorkloadProfile from './WorkloadProfile/WorkloadProfile';
 
@@ -55,7 +53,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
     name: vmi?.metadata?.name,
     namespace: vmi?.metadata?.namespace,
   });
-  const [sshService, sshServiceLoading] = useSSHService(vmi);
+  const [sshService, sshServiceLoaded] = useSSHService(vmi);
 
   return (
     <div>
@@ -66,7 +64,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
         {t('VirtualMachineInstance Details')}
       </Title>
       <Grid hasGutter>
-        <GridItem span={6}>
+        <GridItem span={5}>
           <DescriptionList>
             <DescriptionListGroup>
               <Name name={vmi?.metadata?.name} />
@@ -109,7 +107,8 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
             </DescriptionListGroup>
           </DescriptionList>
         </GridItem>
-        <GridItem span={6}>
+        <GridItem span={1}></GridItem>
+        <GridItem span={5}>
           <DescriptionList>
             <DescriptionListGroup>
               <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
@@ -167,18 +166,8 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
                 vmi={vmi}
                 vm={vm}
                 sshService={sshService}
-                sshServiceLoaded={sshServiceLoading}
+                sshServiceLoaded={sshServiceLoaded}
               />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('SSH command')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {sshServiceLoading ? (
-                  <UserCredentials sshService={sshService} vmi={vmi} />
-                ) : (
-                  <Loading />
-                )}
-              </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
               <DescriptionListTerm>{t('Hardware devices')}</DescriptionListTerm>
