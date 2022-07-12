@@ -3,13 +3,14 @@ import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
 import SSHAccessModal from '@kubevirt-utils/components/SSHAccess/SSHAccessModal';
+import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
@@ -25,16 +26,16 @@ import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/V
 type VirtualMachineDetailsRightGridLayout = {
   vm: V1VirtualMachine;
   vmDetailsRightGridObj: VirtualMachineDetailsRightGridLayoutPresentation;
-  sshService?: IoK8sApiCoreV1Service;
   vmi?: V1VirtualMachineInstance;
 };
 
 const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightGridLayout> = ({
   vm,
-  sshService,
   vmDetailsRightGridObj,
   vmi,
 }) => {
+  const [sshService, sshServiceLoaded] = useSSHService(vm);
+
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -147,9 +148,11 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           data-test-id={`${vm?.metadata?.name}-workload-profile`}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={vmDetailsRightGridObj?.sshAccess}
-          isEdit={!!vmi}
+          descriptionData={
+            <SSHAccess sshService={sshService} vmi={vmi} sshServiceLoaded={sshServiceLoaded} />
+          }
           showEditOnTitle
+          isEdit
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <SSHAccessModal

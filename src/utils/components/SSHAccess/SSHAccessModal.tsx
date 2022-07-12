@@ -36,7 +36,7 @@ const SSHAccessModal: React.FC<SSHAccessModalProps> = ({
     if (initiallyEnabled === isEnabled) return;
 
     if (isEnabled) {
-      await createSSHService(vmi, vm);
+      await createSSHService(vm, vmi);
     } else {
       await k8sDelete({
         model: ServiceModel,
