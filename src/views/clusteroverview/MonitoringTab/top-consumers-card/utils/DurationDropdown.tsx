@@ -27,8 +27,8 @@ const DurationDropdown: React.FC<DurationDropdownProps> = ({ selectedDuration, s
       variant={SelectVariant.single}
     >
       {DurationOption.getAll().map((durationOption) => {
-        const dropdownLabel = durationOption.getDropdownLabel();
-        const durationValue = durationOption.getValue();
+        const dropdownLabel = durationOption?.getDropdownLabel() || '';
+        const durationValue = durationOption?.getValue() || '';
 
         return (
           <SelectOption data-test-id={durationValue} key={durationValue} value={dropdownLabel}>
