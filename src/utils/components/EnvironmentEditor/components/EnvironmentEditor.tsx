@@ -108,6 +108,7 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
     <div className="row pairs-list__row">
       <div className="col-xs-5 pairs-list__value-pair-field">
         <Select
+          menuAppendTo="parent"
           aria-labelledby="environment-name-header"
           isOpen={isOpen}
           onToggle={(isExpanded) => setOpen(isExpanded)}
