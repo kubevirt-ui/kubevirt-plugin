@@ -4,12 +4,14 @@ import { getWorkloadProfile } from 'src/views/templates/utils/selectors';
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateWorkload,
   TEMPLATE_WORKLOAD_LABEL,
   WORKLOADS,
 } from '@kubevirt-utils/resources/template';
+import { getWorkload } from '@kubevirt-utils/resources/vm';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
@@ -21,8 +23,6 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-import WorkloadProfileModal from './WorkloadProfileModal';
-
 const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
@@ -32,10 +32,7 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ template, editabl
     const vmObjectIndex = template?.objects.findIndex(
       (obj) => obj.kind === VirtualMachineModel.kind,
     );
-    const hasWorkload =
-      template?.objects?.[vmObjectIndex]?.spec?.template?.metadata?.annotations?.[
-        'vm.kubevirt.io/workload'
-      ];
+    const hasWorkload = getWorkload(template?.objects?.[vmObjectIndex]);
     const workloadPath = `/objects/${vmObjectIndex}/spec/template/metadata/annotations/vm.kubevirt.io~1workload`;
 
     return k8sPatch({
@@ -63,7 +60,7 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ template, editabl
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <WorkloadProfileModal
-        obj={template}
+        initialWorkload={getTemplateWorkload(template)}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={updateWorkload}

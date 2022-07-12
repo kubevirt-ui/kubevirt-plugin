@@ -1,4 +1,7 @@
 import { V1Disk, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getAnnotation } from '@kubevirt-utils/resources/shared';
+
+import { VM_WORKLOAD_ANNOTATION } from './annotations';
 
 /**
  * A selector for the virtual machine's networks
@@ -126,3 +129,10 @@ export const getBootDisk = (vm: V1VirtualMachine): V1Disk =>
  */
 export const getMachineType = (vm: V1VirtualMachine): string =>
   vm?.spec?.template?.spec?.domain?.machine?.type;
+
+/**
+ * A selector that returns the workload of a given virtual machine
+ * @param {V1VirtualMachine} vm the virtual machine
+ */
+export const getWorkload = (vm: V1VirtualMachine): string =>
+  getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION);
