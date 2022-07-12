@@ -142,6 +142,7 @@
     "mochawesome-merge": "^4.2.1",
     "pluralize": "^8.0.0",
     "prettier": "^2.5.1",
+    "reselect": "^4.1.6",
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.49.7",
     "sass-loader": "^12.4.0",
@@ -159,8 +160,5 @@
   "resolutions": {
     "webpack": "^5.68.0",
     "@types/react": "17.0.40"
-  },
-  "peerDependencies": {
-    "reselect": "^4.1.6"
   }
 }
