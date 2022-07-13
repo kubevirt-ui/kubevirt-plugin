@@ -1,9 +1,13 @@
 import { CatalogSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/CatalogSourceModel';
-import { ClusterServiceVersionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/ClusterServiceVersionModel';
+import ClusterServiceVersionModel, {
+  ClusterServiceVersionModelGroupVersionKind,
+} from '@kubevirt-ui/kubevirt-api/console/models/ClusterServiceVersionModel';
 import { SubscriptionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/SubscriptionModel';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CatalogSourceKind, ClusterServiceVersionKind, SubscriptionKind } from '../types';
+
+import { buildUrlForCSVSubscription } from './../utils';
 
 const getKubevirtCSV = (
   clusterServiceVersions: ClusterServiceVersionKind[],
@@ -28,9 +32,6 @@ const catalogSourceForSubscription = (
       source?.metadata?.namespace === subscription?.spec?.sourceNamespace,
   );
 
-const getOperatorLink = (name, namespace) =>
-  `/k8s/ns/${namespace}/operators.coreos.com~v1alpha1~ClusterServiceVersion/${name}`;
-
 type UseKubevirtCSVDetails = {
   displayName: string;
   provider: string;
@@ -40,7 +41,7 @@ type UseKubevirtCSVDetails = {
   kubevirtSubscription: SubscriptionKind;
   catalogSourceMissing: boolean;
   loaded: boolean;
-  loadErrors: string[];
+  loadErrors: Error[];
 };
 
 type Resources = {
@@ -69,8 +70,12 @@ const kubevirtCSVResources = {
 export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
   const resources = useK8sWatchResources<Resources>(kubevirtCSVResources);
 
-  const loadErrors = Object.keys(resources).filter((key) => resources?.[key]?.loadError);
-  const loaded = Object.keys(resources).every((key) => resources?.[key]?.loaded);
+  const loadErrors = Object.values(resources).reduce((acc, value) => {
+    value?.loadError && acc.push(value?.loadError);
+    return acc;
+  }, []);
+
+  const loaded = Object.values(resources).every((value) => value?.loaded);
 
   const kubevirtSubscription = getKubevirtSubscription(resources.subscriptions.data);
 
@@ -89,8 +94,11 @@ export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
     provider: { name: provider = '' } = {},
   } = kubevirtCSV?.spec || {};
 
-  const operatorLink =
-    getOperatorLink(kubevirtCSV?.metadata?.name, kubevirtCSV?.metadata?.namespace) || '';
+  const operatorLink = buildUrlForCSVSubscription(
+    ClusterServiceVersionModel,
+    kubevirtSubscription?.status?.installedCSV,
+    kubevirtSubscription?.metadata?.namespace,
+  );
 
   const updateChannel = kubevirtSubscription?.spec?.channel || '';
 
