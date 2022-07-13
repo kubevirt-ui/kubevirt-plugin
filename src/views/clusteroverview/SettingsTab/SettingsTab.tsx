@@ -5,6 +5,7 @@ import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import GeneralTab from './General Tab/GeneralTab';
+import LiveMigrationTab from './LiveMigrationTab/LiveMigrationTab';
 
 import './settings-tab.scss';
 
@@ -26,7 +27,9 @@ const SettingsTab: React.FC = () => {
             </div>
           </Tab>
           <Tab eventKey={1} title={<TabTitleText>{t('Live migration')}</TabTitleText>}>
-            <div className="settings-tab__content">Live migration placeholder</div>
+            <div className="settings-tab__content">
+              <LiveMigrationTab />
+            </div>
           </Tab>
           <Tab eventKey={2} title={<TabTitleText>{t('Templates project')}</TabTitleText>}>
             <div className="settings-tab__content">Templates project placeholder</div>
