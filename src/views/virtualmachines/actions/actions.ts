@@ -10,11 +10,10 @@ import {
   consoleFetch,
   k8sCreate,
   k8sDelete,
-  K8sKind,
   K8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-export const VirtualMachineInstanceMigrationModel: K8sKind = {
+export const VirtualMachineInstanceMigrationModel: K8sModel = {
   label: 'VirtualMachineInstanceMigration',
   labelPlural: 'VirtualMachineInstanceMigrations',
   apiVersion: 'v1',

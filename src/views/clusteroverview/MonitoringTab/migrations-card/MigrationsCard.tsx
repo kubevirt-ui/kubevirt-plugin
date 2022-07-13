@@ -17,6 +17,8 @@ import { MIGRATIONS_DURATION_KEY } from '../top-consumers-card/utils/constants';
 import DurationDropdown from '../top-consumers-card/utils/DurationDropdown';
 import DurationOption from '../top-consumers-card/utils/DurationOption';
 
+import MigrationTable from './components/MigrationsTable/MigrationsTable';
+
 import './MigrationsCard.scss';
 
 const MigrationsCard: React.FC = () => {
@@ -59,7 +61,9 @@ const MigrationsCard: React.FC = () => {
             </GridItem>
             <GridItem span={12}>
               <Card>
-                <CardBody isFilled>Migrations table placholder</CardBody>
+                <CardBody>
+                  <MigrationTable />
+                </CardBody>
               </Card>
             </GridItem>
           </Grid>
