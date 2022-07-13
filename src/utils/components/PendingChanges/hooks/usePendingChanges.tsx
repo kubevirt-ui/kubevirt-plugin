@@ -121,7 +121,7 @@ export const usePendingChanges = (
     {
       hasPendingChange: bootModeChanged,
       tabLabel: VirtualMachineDetailsTabLabel.Details,
-      label: t('Boot method'),
+      label: t('Boot mode'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
