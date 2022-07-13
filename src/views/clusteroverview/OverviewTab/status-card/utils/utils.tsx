@@ -18,7 +18,7 @@ import { Extension, ExtensionTypeGuard } from '@openshift-console/dynamic-plugin
 import { Alert } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 import { InProgressIcon } from '@patternfly/react-icons';
 
-import BlueArrowCircleUpIcon from '../../details-card/SourceMissingStatus/BlueArrowCircleUpIcon';
+import BlueArrowCircleUpIcon from '../../../utils/Components/BlueArrowCircleUpIcon';
 import { ClusterServiceVersionPhase } from '../../../utils/types';
 
 import BlueSyncIcon from './health-state-icons/BlueSyncIcon';
