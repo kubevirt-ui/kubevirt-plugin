@@ -6,10 +6,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, Popover, PopoverPosition } from '@patternfly/react-core';
 
-import { VIRTCTL_DOWNLOADS } from './constants';
-import { K8sResourceKind } from './types';
+import { VIRTCTL_DOWNLOADS } from '../utils/constants';
+import { K8sResourceKind } from '../utils/types';
 
-import './VirtctlPopup.scss';
+import './virtctl-popup.scss';
 
 const VirtctlPopup: React.FC = () => {
   const { t } = useKubevirtTranslation();

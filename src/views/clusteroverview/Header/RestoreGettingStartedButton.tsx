@@ -4,18 +4,16 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Label } from '@patternfly/react-core';
 
 import useGettingStartedShowState from '../OverviewTab/getting-started-card/utils/hooks/useGettingStartedShowState';
+import {
+  GETTING_STARTED_SHOW_STATE,
+  KUBEVIRT_QUICK_START_USER_SETTINGS_KEY,
+} from '../utils/constants';
 
-import { GETTING_STARTED_SHOW_STATE } from './constants';
-
-interface RestoreGettingStartedButtonProps {
-  userSettingsKey: string;
-}
-
-const RestoreGettingStartedButton: React.FC<RestoreGettingStartedButtonProps> = ({
-  userSettingsKey,
-}) => {
+const RestoreGettingStartedButton: React.FC = () => {
   const { t } = useKubevirtTranslation();
-  const [showState, setShowState, showStateLoaded] = useGettingStartedShowState(userSettingsKey);
+  const [showState, setShowState, showStateLoaded] = useGettingStartedShowState(
+    KUBEVIRT_QUICK_START_USER_SETTINGS_KEY,
+  );
 
   if (!showStateLoaded || showState !== GETTING_STARTED_SHOW_STATE.HIDE) {
     return null;
