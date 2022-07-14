@@ -29,12 +29,6 @@ export const updateLiveMigrationConfig = (
     ],
   });
 
-export const getHyperConvergedObject = (hyperConverged): HyperConverged => {
-  if (hyperConverged?.items) return hyperConverged?.items?.[0];
-  if (Array.isArray(hyperConverged)) return hyperConverged?.[0];
-  return hyperConverged;
-};
-
 export const getLiveMigrationNetwork = (hyperConverged: HyperConverged) =>
   hyperConverged?.spec?.liveMigrationConfig?.network;
 

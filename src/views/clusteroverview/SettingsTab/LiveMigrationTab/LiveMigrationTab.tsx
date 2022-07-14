@@ -5,9 +5,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
+import { getHyperConvergedObject } from '../../utils/utils';
+
 import Limits from './Limits/Limits';
 import Network from './Network/Network';
-import { getHyperConvergedObject, HyperConverged } from './utils/utils';
+import { HyperConverged } from './utils/utils';
 
 import './live-migration-tab.scss';
 

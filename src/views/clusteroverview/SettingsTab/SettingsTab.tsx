@@ -6,6 +6,7 @@ import { Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import GeneralTab from './GeneralTab/GeneralTab';
 import LiveMigrationTab from './LiveMigrationTab/LiveMigrationTab';
+import TemplatesProjectTab from './TemplatesProjectTab/TemplatesProjectTab';
 
 import './settings-tab.scss';
 
@@ -32,7 +33,9 @@ const SettingsTab: React.FC = () => {
             </div>
           </Tab>
           <Tab eventKey={2} title={<TabTitleText>{t('Templates project')}</TabTitleText>}>
-            <div className="settings-tab__content">Templates project placeholder</div>
+            <div className="settings-tab__content">
+              <TemplatesProjectTab />
+            </div>
           </Tab>
         </Tabs>
       </Card>

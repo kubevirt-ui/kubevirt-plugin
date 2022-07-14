@@ -32,7 +32,6 @@ const Network = ({ hyperConverge }) => {
     groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
     isList: true,
   });
-  console.log('nads: ', nads);
 
   useEffect(() => {
     if (hyperConverge) {
