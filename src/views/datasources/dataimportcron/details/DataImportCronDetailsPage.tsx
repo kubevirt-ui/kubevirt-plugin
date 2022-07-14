@@ -22,7 +22,6 @@ const DataImportCronDetailsPage: React.FC<DataImportCronDetailsPageProps> = ({
   obj: dataImportCron,
 }) => {
   const { t } = useKubevirtTranslation();
-
   return (
     <div>
       <PageSection>

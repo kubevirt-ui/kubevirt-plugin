@@ -1,49 +1,62 @@
 import React from 'react';
 
-import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  V1beta1DataImportCron,
+  V1beta1DataSource,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  ClipboardCopy,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
 } from '@patternfly/react-core';
 
+import { isDataImportCronAutoUpdated, isDataResourceOwnedBySSP } from '../../../utils';
+
 import './DataImportCronManageDetails.scss';
 
 type DataImportCronManageDetailsProps = {
+  dataSource: V1beta1DataSource;
   dataImportCron: V1beta1DataImportCron;
   onEditClick: () => void;
 };
 
 export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsProps> = ({
+  dataSource,
   dataImportCron,
   onEditClick,
 }) => {
   const { t } = useKubevirtTranslation();
-  const NotAvailable = <MutedTextSpan text={t('Not available')} />;
 
   const source = dataImportCron?.spec?.template.spec?.source?.registry?.url;
   const importsToKeep = dataImportCron?.spec?.importsToKeep || t('3 (default)');
+  const isAutoUpdated = isDataImportCronAutoUpdated(dataSource, dataImportCron);
+  const isOwnedBySSP = isDataResourceOwnedBySSP(dataImportCron);
 
   return (
     <DescriptionItem
       descriptionHeader={t('Automatic update and scheduling')}
       data-test-id="dataimportcron-manage-details"
-      isEdit
+      isEdit={!isOwnedBySSP}
       showEditOnTitle
       onEditClick={onEditClick}
       descriptionData={
         <DescriptionList className="kv-dataimportcron-managed-details">
           <DescriptionListGroup>
             <DescriptionListTerm>{t('Automatic updates')}</DescriptionListTerm>
-            <DescriptionListDescription>{t('On')}</DescriptionListDescription>
+            <DescriptionListDescription>
+              {isAutoUpdated ? t('On') : t('Off')}
+            </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup>
             <DescriptionListTerm>{t('Source')}</DescriptionListTerm>
-            <DescriptionListDescription>{source ?? NotAvailable}</DescriptionListDescription>
+            <DescriptionListDescription>
+              {source ?? <MutedTextSpan text={t('Not available')} />}
+            </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup>
             <DescriptionListTerm>{t('Retain revisions')}</DescriptionListTerm>
@@ -54,12 +67,6 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
             <DescriptionListDescription>
               <DescriptionList isHorizontal>
                 <DescriptionListGroup>
-<<<<<<< HEAD
-                  <DescriptionListTerm>{t('Starts at')}</DescriptionListTerm>
-                  <DescriptionListDescription>5:00 AM</DescriptionListDescription>
-                  <DescriptionListTerm>{t('Repeats every')}</DescriptionListTerm>
-                  <DescriptionListDescription>2 Weeks on Monday</DescriptionListDescription>
-=======
                   <DescriptionListTerm>{t('Cron expression')}</DescriptionListTerm>
                   <DescriptionListDescription>
                     <ClipboardCopy
@@ -71,7 +78,6 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
                       {dataImportCron?.spec?.schedule}
                     </ClipboardCopy>
                   </DescriptionListDescription>
->>>>>>> 044c2733 (add dic manage modal and logic)
                 </DescriptionListGroup>
               </DescriptionList>
             </DescriptionListDescription>

@@ -1,4 +1,3 @@
-import cronParser from 'cron-parser';
 import produce from 'immer';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
@@ -12,15 +11,6 @@ import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { k8sCreate, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 export const CRON_DOC_URL = 'https://www.redhat.com/sysadmin/automate-linux-tasks-cron';
-
-export const isCronValid = (cron: string): boolean => {
-  try {
-    const expression = cronParser.parseExpression(cron);
-    return expression.hasNext();
-  } catch (e) {
-    return false;
-  }
-};
 
 export const onDataImportCronManageSubmit = async ({
   data: { url, importsToKeep, schedule, allowAutoUpdate },
@@ -37,49 +27,74 @@ export const onDataImportCronManageSubmit = async ({
     allowAutoUpdate: boolean;
   };
 }) => {
+  const updateDataSourceLabel = async (
+    dataSourceToUpdate: V1beta1DataSource,
+    dataImportCronName: string,
+  ) => {
+    const updatedLabels = produce(dataSourceToUpdate.metadata.labels, (labels) => {
+      if (dataImportCronName) {
+        labels[DATA_SOURCE_CRONJOB_LABEL] = dataImportCronName;
+      } else {
+        delete labels[DATA_SOURCE_CRONJOB_LABEL];
+      }
+    });
+    await k8sPatch({
+      model: DataSourceModel,
+      resource: dataSourceToUpdate,
+      data: [
+        {
+          op: 'replace',
+          path: '/metadata/labels',
+          value: updatedLabels,
+        },
+      ],
+    });
+  };
+
   // remove DIC label from DS if allow automatic update is disabled
   try {
-    if (!allowAutoUpdate && dataSource?.metadata?.labels[DATA_SOURCE_CRONJOB_LABEL]) {
-      const updatedLabels = produce(dataSource.metadata.labels, (labels) => {
-        delete labels[DATA_SOURCE_CRONJOB_LABEL];
-      });
-
-      await k8sPatch({
-        model: DataSourceModel,
-        resource: dataSource,
-        data: [
-          {
-            op: 'replace',
-            path: '/metadata/labels',
-            value: updatedLabels,
-          },
-        ],
-      });
+    if (!allowAutoUpdate && dataSource?.metadata?.labels?.[DATA_SOURCE_CRONJOB_LABEL]) {
+      await updateDataSourceLabel(dataSource, null);
     }
 
     // update DIC label on DS if allow automatic update is enabled and DIC is not already set
-    if (allowAutoUpdate && !dataSource?.metadata?.labels[DATA_SOURCE_CRONJOB_LABEL]) {
-      const updatedLabels = produce(dataSource.metadata.labels || {}, (labels) => {
-        labels[DATA_SOURCE_CRONJOB_LABEL] = dataImportCron.metadata.name;
-      });
-
-      await k8sPatch({
-        model: DataSourceModel,
-        resource: dataSource,
-        data: [
-          {
-            op: 'replace',
-            path: '/metadata/labels',
-            value: updatedLabels,
-          },
-        ],
-      });
+    if (allowAutoUpdate && !dataSource?.metadata?.labels?.[DATA_SOURCE_CRONJOB_LABEL]) {
+      await updateDataSourceLabel(dataSource, dataImportCron?.metadata?.name);
     }
   } catch (e) {
     return Promise.reject(e);
   }
 
-  // now we can update the DIC, it is immutable, so we have to delete it if it exists and create a new one
+  // now we can update the DIC. it is immutable, so we have to delete it if it exists and create a new one
+  const updatedDataImportCron = produce(dataImportCron, (dic) => {
+    ensurePath(dic, 'spec.template.spec.source.registry.url');
+
+    // delete specific metadata fields from the DIC
+    delete dic.metadata.resourceVersion;
+    delete dic.metadata.creationTimestamp;
+    delete dic.metadata.generation;
+    delete dic.metadata.uid;
+
+    dic.spec.template.spec.source.registry.url = url;
+    dic.spec.importsToKeep = importsToKeep;
+    dic.spec.schedule = schedule;
+  });
+
+  // first we need to validate the changes with a dry run
+  try {
+    await k8sCreate<V1beta1DataImportCron>({
+      model: DataImportCronModel,
+      queryParams: {
+        dryRun: 'All',
+        fieldManager: 'kubectl-create',
+      },
+      data: produce(updatedDataImportCron, (dic) => {
+        dic.metadata.name = `${dataImportCron?.metadata?.name}-dry-run`;
+      }),
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
   try {
     await k8sDelete({
       model: DataImportCronModel,
@@ -91,20 +106,6 @@ export const onDataImportCronManageSubmit = async ({
   } catch (e) {}
 
   try {
-    const updatedDataImportCron = produce(dataImportCron, (dic) => {
-      ensurePath(dic, 'spec.template.spec.source.registry.url');
-
-      // delete specific metadata fields from the DIC
-      delete dic.metadata.resourceVersion;
-      delete dic.metadata.creationTimestamp;
-      delete dic.metadata.generation;
-      delete dic.metadata.uid;
-
-      dic.spec.template.spec.source.registry.url = url;
-      dic.spec.importsToKeep = importsToKeep;
-      dic.spec.schedule = schedule;
-    });
-
     return await k8sCreate<V1beta1DataImportCron>({
       model: DataImportCronModel,
       data: updatedDataImportCron,

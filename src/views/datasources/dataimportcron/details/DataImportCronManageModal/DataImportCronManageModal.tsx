@@ -26,7 +26,7 @@ import {
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
-import { CRON_DOC_URL, isCronValid, onDataImportCronManageSubmit } from './utils';
+import { CRON_DOC_URL, onDataImportCronManageSubmit } from './utils';
 
 export type DataImportCronManageFormType = {
   url: string;
@@ -76,7 +76,7 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
           dataSource,
         },
       }),
-    Promise.reject,
+    () => Promise.reject(t('Missing required fields')),
   );
 
   return (
@@ -194,17 +194,12 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
                   validated={
                     errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default
                   }
-                  helperTextInvalid={
-                    errors?.['schedule']?.type === 'validCron'
-                      ? t('Invalid cron pattern')
-                      : t('This field is required')
-                  }
+                  helperTextInvalid={t('This field is required')}
                   helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
                 >
                   <FormTextInput
                     {...register('schedule', {
                       validate: {
-                        validCron: (value) => isCronValid(value),
                         required: (value) => {
                           if (!value && allowAutoUpdate) {
                             return t('Required when automatic update is enabled');
