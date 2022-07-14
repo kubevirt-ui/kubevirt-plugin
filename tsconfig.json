@@ -16,7 +16,8 @@
     "paths": {
       "@kubevirt-utils": ["src/utils"],
       "@kubevirt-utils/*": ["src/utils/*"],
-      "@catalog/*": ["src/views/catalog/*"]
+      "@catalog/*": ["src/views/catalog/*"],
+      "@virtualmachines/*": ["src/views/virtualmachines/*"]
     }
   },
   "include": ["src"],

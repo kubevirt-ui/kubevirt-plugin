@@ -6,10 +6,12 @@ import {
   VirtualMachineInstanceModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import {
+  V1alpha1MigrationPolicy,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import {
   ListPageBody,
   ListPageFilter,
@@ -18,6 +20,8 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
+
+import { MIGRATIONS_DURATION_KEY } from '../../../top-consumers-card/utils/constants';
 
 import useVirtualMachineInstanceMigrationsColumns from './hooks/useVirtualMachineInstanceMigrationsColumns';
 import { getSourceNodeFilter, getStatusFilter, getTargetNodeFilter } from './utils/filters';
@@ -39,7 +43,17 @@ const MigrationTable: React.FC = () => {
     isList: true,
   });
 
-  const migrationsData = getMigrationsTableData(vmims, vmis);
+  const [mps] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
+    groupVersionKind: {
+      kind: 'MigrationPolicy',
+      group: 'migrations.kubevirt.io',
+      version: 'v1alpha1',
+    },
+    isList: true,
+  });
+
+  const [duration] = useLocalStorage(MIGRATIONS_DURATION_KEY);
+  const migrationsData = getMigrationsTableData(vmims, vmis, mps, duration);
 
   const filters = [
     ...getStatusFilter(t),

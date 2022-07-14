@@ -111,8 +111,6 @@ export const cancelMigration = async (vmim: V1VirtualMachineInstanceMigration) =
   await k8sDelete({
     model: VirtualMachineInstanceMigrationModel,
     resource: vmim,
-    json: undefined,
-    requestInit: undefined,
   });
 };
 
@@ -120,7 +118,5 @@ export const deleteVM = async (vm: V1VirtualMachine) => {
   await k8sDelete({
     model: VirtualMachineModel,
     resource: vm,
-    json: undefined,
-    requestInit: undefined,
   });
 };

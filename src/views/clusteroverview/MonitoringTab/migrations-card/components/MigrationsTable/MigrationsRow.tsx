@@ -7,18 +7,23 @@ import {
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   GenericStatus,
   ResourceLink,
   RowProps,
   TableData,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { Tooltip } from '@patternfly/react-core';
 
-import { iconMapper } from './utils/statuses';
+import { iconMapper, vmimStatuses } from './utils/statuses';
 import { MigrationTableDataLayout } from './utils/utils';
+import MigrationActionsDropdown from './MigrationActionsDropdown';
 
 const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, activeColumnIDs }) => {
+  const { t } = useKubevirtTranslation();
   const StatusIcon = iconMapper[obj?.vmim?.status?.phase];
   return (
     <>
@@ -30,7 +35,17 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, acti
         />
       </TableData>
       <TableData id="status" activeColumnIDs={activeColumnIDs}>
-        <GenericStatus title={obj?.vmim?.status?.phase} Icon={StatusIcon} />
+        <Tooltip
+          content={`${obj?.vmim?.status?.phase} ${
+            obj?.vmiObj?.status?.migrationState?.endTimestamp || ''
+          }`}
+          hidden={
+            obj?.vmim?.status?.phase !== vmimStatuses.Failed &&
+            obj?.vmim?.status?.phase !== vmimStatuses.Succeeded
+          }
+        >
+          <GenericStatus title={obj?.vmim?.status?.phase} Icon={StatusIcon} />
+        </Tooltip>
       </TableData>
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
         {obj?.vmiObj?.status?.migrationState?.sourceNode ? (
@@ -53,11 +68,38 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, acti
         )}
       </TableData>
       <TableData id="migration-policy" activeColumnIDs={activeColumnIDs}>
-        {/* <ResourceLink
-          groupVersionKind={modelToGroupVersionKind(MigrationPolicyModel)}
-          name={obj?.vmiObj?.status?.migrationState?.sourceNode}
-        /> */}
-        {obj?.vmiObj?.status?.migrationState?.migrationPolicyName || NO_DATA_DASH}
+        {obj?.vmiObj?.status?.migrationState?.migrationPolicyName ? (
+          <Tooltip
+            content={
+              <>
+                <div>
+                  {t('Bandwidth per migration')}:{' '}
+                  {readableSizeUnit(obj?.mpObj?.spec?.bandwidthPerMigration)}
+                </div>
+                <div>
+                  {t('Auto converge')}: {obj?.mpObj?.spec?.allowAutoConverge ? t('Yes') : t('No')}
+                </div>
+                <div>
+                  {t('Post copy')}: {obj?.mpObj?.spec?.allowPostCopy ? t('Yes') : t('No')}
+                </div>
+                <div>
+                  {t('Completion timeout')}: {obj?.mpObj?.spec?.completionTimeoutPerGiB}
+                </div>
+              </>
+            }
+          >
+            <ResourceLink
+              groupVersionKind={{
+                kind: 'MigrationPolicy',
+                group: 'migrations.kubevirt.io',
+                version: 'v1alpha1',
+              }}
+              name={obj?.vmiObj?.status?.migrationState?.migrationPolicyName}
+            />
+          </Tooltip>
+        ) : (
+          NO_DATA_DASH
+        )}
       </TableData>
       <TableData id="vmim-name" activeColumnIDs={activeColumnIDs}>
         <ResourceLink
@@ -72,7 +114,9 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, acti
         id="actions"
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
-      ></TableData>
+      >
+        <MigrationActionsDropdown vmim={obj?.vmim} isKebabToggle />
+      </TableData>
     </>
   );
 };
