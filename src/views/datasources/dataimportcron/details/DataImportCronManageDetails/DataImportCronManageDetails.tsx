@@ -54,10 +54,24 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
             <DescriptionListDescription>
               <DescriptionList isHorizontal>
                 <DescriptionListGroup>
+<<<<<<< HEAD
                   <DescriptionListTerm>{t('Starts at')}</DescriptionListTerm>
                   <DescriptionListDescription>5:00 AM</DescriptionListDescription>
                   <DescriptionListTerm>{t('Repeats every')}</DescriptionListTerm>
                   <DescriptionListDescription>2 Weeks on Monday</DescriptionListDescription>
+=======
+                  <DescriptionListTerm>{t('Cron expression')}</DescriptionListTerm>
+                  <DescriptionListDescription>
+                    <ClipboardCopy
+                      isReadOnly
+                      data-test="cron-copy-command"
+                      clickTip={t('Copied')}
+                      hoverTip={t('Copy to clipboard')}
+                    >
+                      {dataImportCron?.spec?.schedule}
+                    </ClipboardCopy>
+                  </DescriptionListDescription>
+>>>>>>> 044c2733 (add dic manage modal and logic)
                 </DescriptionListGroup>
               </DescriptionList>
             </DescriptionListDescription>
