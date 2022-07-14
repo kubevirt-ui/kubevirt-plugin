@@ -8,6 +8,7 @@ import {
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import {
@@ -15,7 +16,7 @@ import {
   useAccessReview,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Grid, GridItem, Title } from '@patternfly/react-core';
+import { Flex, FlexItem, Grid, GridItem, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
 import VirtualMachineSchedulingLeftGrid from '../VirtualMachineSchedulingLeftGrid';
@@ -48,7 +49,12 @@ const SchedulingSection: React.FC<SchedulingSectionProps> = ({ vm, pathname }) =
         <LinkIcon size="sm" />
       </a>
       <Title headingLevel="h2" className="co-section-heading">
-        {t('Scheduling and resources requirements')}
+        <Flex>
+          <FlexItem>{t('Scheduling and resources requirements')}</FlexItem>
+          <FlexItem>
+            <SidebarEditorSwitch />
+          </FlexItem>
+        </Flex>
       </Title>
       <Grid hasGutter>
         <VirtualMachineSchedulingLeftGrid

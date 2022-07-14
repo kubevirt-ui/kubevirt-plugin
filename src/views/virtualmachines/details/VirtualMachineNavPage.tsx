@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
 import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
@@ -23,10 +24,10 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   });
   const pages = useVirtualMachineTabs();
   return (
-    <>
+    <SidebarEditorProvider>
       <VirtualMachineNavPageTitle vm={vm} name={name} />
       <HorizontalNav pages={pages} resource={vm} />
-    </>
+    </SidebarEditorProvider>
   );
 };
 
