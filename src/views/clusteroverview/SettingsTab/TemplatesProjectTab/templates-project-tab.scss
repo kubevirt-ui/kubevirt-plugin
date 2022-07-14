@@ -1,0 +1,14 @@
+.templates-project-tab {
+  &__main {
+    &--help {
+      color: var(--pf-global--Color--200);
+    }
+    &--field-title {
+      margin-top: var(--pf-global--spacer--lg);
+      margin-bottom: 0;
+    }
+    &--error {
+      margin-top: var(--pf-global--spacer--lg);
+    }
+  }
+}
