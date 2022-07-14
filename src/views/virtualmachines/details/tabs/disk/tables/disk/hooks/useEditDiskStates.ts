@@ -36,7 +36,11 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
     : [...(getDisks(vm) || []), ...getRunningVMMissingDisksFromVMI(getDisks(vm) || [], vmi)];
   const disk = disks?.find(({ name }) => name === diskName);
 
-  const { diskSource, diskSize, isBootDisk } = React.useMemo(() => {
+  const {
+    diskSource,
+    diskSize,
+    isBootDisk: asBootSource,
+  } = React.useMemo(() => {
     const volumes = !vmi
       ? getVolumes(vm)
       : [
@@ -54,11 +58,13 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
       ].includes(key),
     );
 
+    const isBootDisk = diskName === getBootDisk(vm)?.name;
+
     if (volumeSource === sourceTypes.EPHEMERAL) {
       initialDiskSourceState.ephemeralSource = volume.containerDisk?.image;
-      return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC };
+      return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC, isBootDisk };
     }
-    return { isBootDisk: diskName === getBootDisk(vm)?.name, diskSource: OTHER, diskSize: null };
+    return { isBootDisk, diskSource: OTHER, diskSize: null };
   }, [initialDiskSourceState, vm, vmi, diskName]);
 
   const initialDiskState: DiskFormState = {
@@ -74,7 +80,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
     applyStorageProfileSettings: true,
     storageClassProvisioner: null,
     storageProfileSettingsCheckboxDisabled: false,
-    asBootSource: isBootDisk,
+    asBootSource,
   };
 
   return { initialDiskState, initialDiskSourceState };
