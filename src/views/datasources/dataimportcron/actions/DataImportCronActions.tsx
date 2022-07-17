@@ -26,7 +26,7 @@ const DataImportCronActions: React.FC<DataImportCronActionProps> = ({
   isKebabToggle,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const [actions, onLazyOpen] = useDataImportCronActionsProvider(dataImportCron);
 
   const handleClick = (action: Action) => {

@@ -15,6 +15,8 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
+import './TabModal.scss';
+
 type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   isOpen: boolean;
   obj?: T;
@@ -89,7 +91,7 @@ const TabModal: TabModalFC = React.memo(
         title={headerText}
         titleIconVariant={titleIconVariant}
         footer={
-          <Stack hasGutter>
+          <Stack className="kv-tabmodal-footer" hasGutter>
             {error && (
               <StackItem>
                 <Alert isInline variant={AlertVariant.danger} title={t('An error occurred')}>

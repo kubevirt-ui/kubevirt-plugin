@@ -17,11 +17,10 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Split, SplitItem } from '@patternfly/react-core';
 
 import { DataImportCronManageModal } from '../dataimportcron/details/DataImportCronManageModal/DataImportCronManageModal';
-import { getDataSourceCronJob } from '../utils';
+import { getDataSourceCronJob, isDataResourceOwnedBySSP } from '../utils';
 
 type UseDataSourceActionsProvider = (
   dataSource: V1beta1DataSource,
@@ -30,24 +29,25 @@ type UseDataSourceActionsProvider = (
 export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataSource) => {
   const dataImportCronName = getDataSourceCronJob(dataSource);
   const [dataImportCron, setDataImportCron] = React.useState<V1beta1DataImportCron>();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [namespace] = useActiveNamespace();
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const history = useHistory();
+  const isOwnedBySSP = isDataResourceOwnedBySSP(dataSource);
 
-  const lazyLoadDataImportCron = React.useCallback(async () => {
-    if (!dataImportCron) {
+  const lazyLoadDataImportCron = React.useCallback(() => {
+    if (dataImportCronName && !dataImportCron && !isOwnedBySSP) {
       setIsLoading(true);
-      const lazyDataImportCron = await k8sGet<V1beta1DataImportCron>({
+      k8sGet<V1beta1DataImportCron>({
         model: DataImportCronModel,
         name: dataImportCronName,
-        ns: namespace,
-      });
-      lazyDataImportCron?.kind !== 'DataImportCronList' && setDataImportCron(lazyDataImportCron);
+        ns: dataSource?.metadata?.namespace,
+      })
+        .then((dic) => setDataImportCron(dic))
+        .catch(console.error)
+        .finally(() => setIsLoading(false));
     }
-    setIsLoading(false);
-  }, [dataImportCron, dataImportCronName, namespace]);
+  }, [dataImportCron, dataImportCronName, dataSource?.metadata?.namespace, isOwnedBySSP]);
 
   const actions = React.useMemo(
     () => [
@@ -109,9 +109,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
         label: t('Edit DataSource'),
         cta: () =>
           history.push(
-            `/k8s/ns/${dataSource.metadata.namespace || namespace}/${DataSourceModelRef}/${
-              dataSource.metadata.name
-            }/yaml`,
+            `/k8s/ns/${dataSource.metadata.namespace}/${DataSourceModelRef}/${dataSource.metadata.name}/yaml`,
           ),
       },
       {
@@ -138,7 +136,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
         id: 'datasource-action-manage-source',
         label: (
           <Split hasGutter>
-            <SplitItem>{t('Manage source')}</SplitItem>{' '}
+            <SplitItem>{t('Manage source')}</SplitItem>
             {isLoading && (
               <SplitItem>
                 <Loading />
@@ -146,19 +144,22 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
             )}
           </Split>
         ),
-        disabled: !dataImportCron || isLoading,
+        disabled: !dataImportCron || isOwnedBySSP || isLoading,
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <DataImportCronManageModal
               dataImportCron={dataImportCron}
               dataSource={dataSource}
               isOpen={isOpen}
-              onClose={onClose}
+              onClose={() => {
+                onClose();
+                setDataImportCron(undefined);
+              }}
             />
           )),
       },
     ],
-    [t, dataSource, isLoading, dataImportCron, createModal, history, namespace],
+    [t, dataSource, isLoading, dataImportCron, isOwnedBySSP, createModal, history],
   );
 
   return [actions, lazyLoadDataImportCron];

@@ -24,7 +24,7 @@ type DataSourceActionProps = {
 
 const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKebabToggle }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const [actions, onLazyOpen] = useDataSourceActionsProvider(dataSource);
 
   const dsActions = actions.filter((a) => a.id !== 'datasource-action-manage-source');

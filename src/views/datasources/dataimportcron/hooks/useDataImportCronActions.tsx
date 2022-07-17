@@ -16,10 +16,10 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Loading } from '@patternfly/quickstarts';
 import { Split, SplitItem } from '@patternfly/react-core';
 
+import { isDataResourceOwnedBySSP } from '../../utils';
 import { DataImportCronManageModal } from '../details/DataImportCronManageModal/DataImportCronManageModal';
 
 type UseDataImportCronActionsProvider = (
@@ -31,24 +31,25 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
 ) => {
   const dataSourceName = dataImportCron?.spec?.managedDataSource;
   const [dataSource, setDataSource] = React.useState<V1beta1DataSource>();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [namespace] = useActiveNamespace();
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const history = useHistory();
+  const isOwnedBySSP = isDataResourceOwnedBySSP(dataImportCron);
 
-  const lazyLoadDataSource = React.useCallback(async () => {
-    if (!dataSource) {
+  const lazyLoadDataSource = React.useCallback(() => {
+    if (dataSourceName && !dataSource && !isOwnedBySSP) {
       setIsLoading(true);
-      const lazyDataSource = await k8sGet<V1beta1DataSource>({
+      k8sGet<V1beta1DataSource>({
         model: DataSourceModel,
         name: dataSourceName,
-        ns: namespace,
-      });
-      lazyDataSource?.kind !== 'DataSourceList' && setDataSource(lazyDataSource);
+        ns: dataImportCron?.metadata?.namespace,
+      })
+        .then((ds) => setDataSource(ds))
+        .catch(console.error)
+        .finally(() => setIsLoading(false));
     }
-    setIsLoading(false);
-  }, [dataSource, dataSourceName, namespace]);
+  }, [dataSource, dataSourceName, dataImportCron?.metadata?.namespace, isOwnedBySSP]);
 
   const actions = React.useMemo(
     () => [
@@ -64,14 +65,17 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
             )}
           </Split>
         ),
-        disabled: !dataImportCron || isLoading,
+        disabled: !dataImportCron || isOwnedBySSP || isLoading,
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <DataImportCronManageModal
               dataImportCron={dataImportCron}
               dataSource={dataSource}
               isOpen={isOpen}
-              onClose={onClose}
+              onClose={() => {
+                onClose();
+                setDataSource(undefined);
+              }}
             />
           )),
       },
@@ -133,9 +137,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
         label: t('Edit DataImportCron'),
         cta: () =>
           history.push(
-            `/k8s/ns/${dataImportCron.metadata.namespace || namespace}/${DataImportCronModelRef}/${
-              dataImportCron.metadata.name
-            }/yaml`,
+            `/k8s/ns/${dataImportCron.metadata.namespace}/${DataImportCronModelRef}/${dataImportCron.metadata.name}/yaml`,
           ),
       },
       {
@@ -159,7 +161,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
         accessReview: asAccessReview(DataImportCronModel, dataImportCron, 'delete'),
       },
     ],
-    [t, dataImportCron, isLoading, createModal, history, namespace, dataSource],
+    [t, isLoading, dataImportCron, isOwnedBySSP, createModal, dataSource, history],
   );
 
   return [actions, lazyLoadDataSource];

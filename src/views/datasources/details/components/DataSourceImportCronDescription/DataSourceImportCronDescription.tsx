@@ -22,17 +22,17 @@ const DataSourceImportCronDescription: React.FC<DataSourceImportCronDescriptionP
     namespace: namespace,
   });
 
+  if (!dataImportCron) return null;
+
   return (
     <DescriptionItem
       descriptionHeader={t('DataImportCron')}
       descriptionData={
-        dataImportCron && (
-          <ResourceLink
-            groupVersionKind={DataImportCronModelGroupVersionKind}
-            name={dataImportCron?.metadata?.name}
-            namespace={dataImportCron?.metadata?.namespace}
-          />
-        )
+        <ResourceLink
+          groupVersionKind={DataImportCronModelGroupVersionKind}
+          name={dataImportCron?.metadata?.name}
+          namespace={dataImportCron?.metadata?.namespace}
+        />
       }
     />
   );
