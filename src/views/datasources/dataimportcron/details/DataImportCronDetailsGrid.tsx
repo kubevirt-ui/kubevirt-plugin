@@ -1,8 +1,12 @@
 import React from 'react';
 
 import WizardMetadataLabels from '@catalog/wizard/tabs/metadata/components/WizardMetadataLabels';
+import { DataSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
-import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  V1beta1DataImportCron,
+  V1beta1DataSource,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
@@ -10,10 +14,13 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sPatch, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sPatch, ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import DataSourceAnnotations from '../../details/components/DataSourceAnnotations/DataSourceAnnotations';
+
+import { DataImportCronManageDetails } from './DataImportCronManageDetails/DataImportCronManageDetails';
+import { DataImportCronManageModal } from './DataImportCronManageModal/DataImportCronManageModal';
 
 type DataImportCronDetailsGridProps = {
   dataImportCron: V1beta1DataImportCron;
@@ -24,6 +31,11 @@ export const DataImportCronDetailsGrid: React.FC<DataImportCronDetailsGridProps>
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const [dataSource] = useK8sWatchResource<V1beta1DataSource>({
+    groupVersionKind: DataSourceModelGroupVersionKind,
+    name: dataImportCron?.spec?.managedDataSource,
+    namespace: dataImportCron?.metadata?.namespace,
+  });
 
   return (
     <Grid hasGutter>
@@ -138,6 +150,20 @@ export const DataImportCronDetailsGrid: React.FC<DataImportCronDetailsGridProps>
             breadcrumb="DataImportCron.metadata.creationTimestamp"
           />
           <OwnerDetailsItem obj={dataImportCron} />
+          <DataImportCronManageDetails
+            dataSource={dataSource}
+            dataImportCron={dataImportCron}
+            onEditClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <DataImportCronManageModal
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  dataImportCron={dataImportCron}
+                  dataSource={dataSource}
+                />
+              ))
+            }
+          />
         </DescriptionList>
       </GridItem>
     </Grid>

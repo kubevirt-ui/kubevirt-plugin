@@ -25,16 +25,19 @@ export type ConditionsProps = {
 
 export const ConditionsTable: React.FC<ConditionsProps> = ({ conditions }) => {
   const columns = useConditionsTableColumns();
+  const isValidConditions = React.useMemo(() => conditions?.some((c) => !!c.type), [conditions]);
 
   return (
-    <VirtualizedTable
-      data={conditions}
-      unfilteredData={conditions}
-      loaded
-      loadError={null}
-      columns={columns}
-      Row={ConditionsTableRow}
-    />
+    isValidConditions && (
+      <VirtualizedTable<K8sResourceCondition>
+        data={conditions}
+        unfilteredData={conditions}
+        loaded
+        loadError={null}
+        columns={columns}
+        Row={ConditionsTableRow}
+      />
+    )
   );
 };
 ConditionsTable.displayName = 'ConditionsTable';
