@@ -1,28 +1,55 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
+import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
 import DataSourceModel, {
   DataSourceModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  V1beta1DataImportCron,
+  V1beta1DataSource,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { Action, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { Action, k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { Split, SplitItem } from '@patternfly/react-core';
 
-type UseDataSourceActionsProvider = (dataSource: V1beta1DataSource) => Action[];
+import { DataImportCronManageModal } from '../dataimportcron/details/DataImportCronManageModal/DataImportCronManageModal';
+import { getDataSourceCronJob } from '../utils';
+
+type UseDataSourceActionsProvider = (
+  dataSource: V1beta1DataSource,
+) => [actions: Action[], onOpen: () => void];
 
 export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataSource) => {
+  const dataImportCronName = getDataSourceCronJob(dataSource);
+  const [dataImportCron, setDataImportCron] = React.useState<V1beta1DataImportCron>();
+  const [isLoading, setIsLoading] = React.useState(true);
   const [namespace] = useActiveNamespace();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const history = useHistory();
 
-  return React.useMemo(
+  const lazyLoadDataImportCron = React.useCallback(async () => {
+    if (!dataImportCron) {
+      setIsLoading(true);
+      const lazyDataImportCron = await k8sGet<V1beta1DataImportCron>({
+        model: DataImportCronModel,
+        name: dataImportCronName,
+        ns: namespace,
+      });
+      lazyDataImportCron?.kind !== 'DataImportCronList' && setDataImportCron(lazyDataImportCron);
+    }
+    setIsLoading(false);
+  }, [dataImportCron, dataImportCronName, namespace]);
+
+  const actions = React.useMemo(
     () => [
       {
         id: 'datasource-action-edit-labels',
@@ -107,7 +134,32 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
           )),
         accessReview: asAccessReview(DataSourceModel, dataSource, 'delete'),
       },
+      {
+        id: 'datasource-action-manage-source',
+        label: (
+          <Split hasGutter>
+            <SplitItem>{t('Manage source')}</SplitItem>{' '}
+            {isLoading && (
+              <SplitItem>
+                <Loading />
+              </SplitItem>
+            )}
+          </Split>
+        ),
+        disabled: !dataImportCron || isLoading,
+        cta: () =>
+          createModal(({ isOpen, onClose }) => (
+            <DataImportCronManageModal
+              dataImportCron={dataImportCron}
+              dataSource={dataSource}
+              isOpen={isOpen}
+              onClose={onClose}
+            />
+          )),
+      },
     ],
-    [t, dataSource, createModal, history, namespace],
+    [t, dataSource, isLoading, dataImportCron, createModal, history, namespace],
   );
+
+  return [actions, lazyLoadDataImportCron];
 };

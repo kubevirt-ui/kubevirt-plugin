@@ -14,6 +14,8 @@ import {
 
 import { useDataImportCronActionsProvider } from '../hooks/useDataImportCronActions';
 
+import './DataImportCronActions.scss';
+
 type DataImportCronActionProps = {
   dataImportCron: V1beta1DataImportCron;
   isKebabToggle?: boolean;
@@ -25,13 +27,18 @@ const DataImportCronActions: React.FC<DataImportCronActionProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
-  const actions = useDataImportCronActionsProvider(dataImportCron);
+  const [actions, onLazyOpen] = useDataImportCronActionsProvider(dataImportCron);
 
   const handleClick = (action: Action) => {
     if (typeof action?.cta === 'function') {
       action.cta();
     }
     setIsOpen(false);
+  };
+
+  const onDropDownToggle = (value: boolean) => {
+    setIsOpen(value);
+    if (value) onLazyOpen();
   };
 
   return (
@@ -43,9 +50,9 @@ const DataImportCronActions: React.FC<DataImportCronActionProps> = ({
       position={DropdownPosition.right}
       toggle={
         isKebabToggle ? (
-          <KebabToggle onToggle={setIsOpen} />
+          <KebabToggle onToggle={onDropDownToggle} />
         ) : (
-          <DropdownToggle onToggle={setIsOpen}>{t('Actions')}</DropdownToggle>
+          <DropdownToggle onToggle={onDropDownToggle}>{t('Actions')}</DropdownToggle>
         )
       }
       dropdownItems={actions?.map((action) => (
