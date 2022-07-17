@@ -24,6 +24,8 @@ import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/Virt
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 
+import './VirtualMachinesList.scss';
+
 type VirtualMachinesListProps = {
   kind: string;
   namespace: string;
