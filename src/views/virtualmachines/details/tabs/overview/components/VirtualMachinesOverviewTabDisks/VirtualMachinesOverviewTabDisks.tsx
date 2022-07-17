@@ -7,7 +7,7 @@ import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/const
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
 
-import { createURL } from '../../utils/url';
+import { createURL } from '../../utils/utils';
 
 import useVirtualMachinesOverviewTabDisksColumns from './hooks/useVirtualMachinesOverviewTabDisksColumns';
 import VirtualMachinesOverviewTabDisksRow from './VirtualMachinesOverviewTabDisksRow';

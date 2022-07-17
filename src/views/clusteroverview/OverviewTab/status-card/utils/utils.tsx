@@ -23,7 +23,7 @@ import { ClusterServiceVersionPhase } from '../../../utils/types';
 
 import BlueSyncIcon from './health-state-icons/BlueSyncIcon';
 import GrayUnknownIcon from './health-state-icons/GrayUnknownIcon';
-import { CLUSTER, OPERATOR_LABEL_KEY } from './constants';
+import { CLUSTER } from './constants';
 import { ClusterServiceVersionKind } from './types';
 
 export const NetworkAddonsConfigResource: WatchK8sResource = {
@@ -175,8 +175,6 @@ export const labelsToParams = (labels: PrometheusLabels) =>
 
 export const getAlertURL = (alert: Alert, ruleID: string) =>
   `${AlertResource.plural}/${ruleID}?${labelsToParams(alert.labels)}`;
-
-export const isKubeVirtAlert = (alert) => alert?.labels?.[OPERATOR_LABEL_KEY] === 'kubevirt';
 
 export const asArray = (value) => {
   if (!value) {

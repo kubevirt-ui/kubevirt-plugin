@@ -1,17 +1,7 @@
-import React from 'react';
 import { murmur3 } from 'murmurhash-js';
 
 import { PrometheusLabels, PrometheusRule } from '@openshift-console/dynamic-plugin-sdk';
-import ExclamationCircleIcon from '@patternfly/react-icons/dist/js/icons/exclamation-circle-icon';
-import ExclamationTriangleIcon from '@patternfly/react-icons/dist/js/icons/exclamation-triangle-icon';
 
-export enum AlertType {
-  critical = 'critical',
-  warning = 'warning',
-  info = 'info',
-}
-
-export const KUBEVIRT = 'kubevirt';
 export const MONITORING_URL_BASE = '/monitoring/alerts';
 const MONITORING_SALT = 'monitoring-salt';
 
@@ -26,10 +16,6 @@ export type PrometheusRulesResponse = {
     groups?: Group[];
   };
   status: string;
-};
-
-export type VMAlerts = {
-  [key in AlertType]: { time: string; alertName: string; description: string; link: string }[];
 };
 
 export const generateAlertId = (group: Group, rule: PrometheusRule): string => {
@@ -49,15 +35,5 @@ export const labelsToParams = (labels: PrometheusLabels): string => {
     .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
     .join('&');
 };
-
-export const icon = {
-  [AlertType.critical]: <ExclamationCircleIcon />,
-  [AlertType.warning]: <ExclamationTriangleIcon />,
-  [AlertType.info]: <ExclamationCircleIcon />,
-};
-
-export const color = {
-  [AlertType.critical]: 'red',
-  [AlertType.warning]: 'orange',
-  [AlertType.info]: 'blue',
-};
+export const createURL = (append: string, url: string): string =>
+  url?.endsWith('/') ? `${url}${append}` : `${url}/${append}`;

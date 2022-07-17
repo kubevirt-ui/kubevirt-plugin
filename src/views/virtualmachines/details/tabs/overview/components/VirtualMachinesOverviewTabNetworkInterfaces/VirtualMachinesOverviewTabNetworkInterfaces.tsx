@@ -5,7 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
 
-import { createURL } from '../../utils/url';
+import { createURL } from '../../utils/utils';
 
 import useVirtualMachinesOverviewTabInterfacesColumns from './hooks/useVirtualMachinesOverviewTabInterfacesColumns';
 import useVirtualMachinesOverviewTabInterfacesData from './hooks/useVirtualMachinesOverviewTabInterfacesData';

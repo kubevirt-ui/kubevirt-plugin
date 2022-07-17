@@ -1,6 +1,9 @@
 import React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
+import { createAlertKey } from '@kubevirt-utils/components/AlertsCard/utils/utils';
+import { KUBEVIRT } from '@kubevirt-utils/constants/constants';
 import {
   PrometheusEndpoint,
   RuleStates,
@@ -9,14 +12,12 @@ import {
 
 import {
   generateAlertId,
-  KUBEVIRT,
   labelsToParams,
   MONITORING_URL_BASE,
   PrometheusRulesResponse,
-  VMAlerts,
-} from '../utils/utils';
+} from '../utils';
 
-type UseVMAlerts = (vm: V1VirtualMachine) => VMAlerts;
+type UseVMAlerts = (vm: V1VirtualMachine) => SimplifiedAlerts;
 
 const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
   const [query] = usePrometheusPoll({
@@ -52,6 +53,8 @@ const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
                       ruleGroup,
                       rule,
                     )}?${labelsToParams(alert?.labels)}`,
+                    key: createAlertKey(alert?.activeAt, alert?.labels),
+                    isVMAlert: true,
                   },
                 ];
               }

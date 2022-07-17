@@ -9,7 +9,7 @@ import { CopyIcon } from '@patternfly/react-icons';
 
 import { pauseVM, startVM, stopVM, unpauseVM } from '../../../../../../actions/actions';
 import { printableVMStatus } from '../../../../../../utils';
-import { createURL } from '../../../utils/url';
+import { createURL } from '../../../utils/utils';
 
 type VirtualMachinesOverviewTabDetailsTitleProps = {
   vm: V1VirtualMachine;
