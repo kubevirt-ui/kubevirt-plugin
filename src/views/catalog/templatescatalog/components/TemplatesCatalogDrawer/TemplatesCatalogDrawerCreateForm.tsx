@@ -1,6 +1,11 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
+import produce from 'immer';
 
+import {
+  extractParameterNameFromMetadataName,
+  replaceTemplateParameterValue,
+} from '@catalog/customize/utils';
 import { quickCreateVM } from '@catalog/utils/quick-create-vm';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -45,7 +50,12 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
       setIsQuickCreating(true);
       setQuickCreateError(undefined);
 
-      quickCreateVM(template, { name: vmName, namespace, startVM })
+      const parameterForName = extractParameterNameFromMetadataName(template);
+      const templateToProcess = produce(template, (draftTemplate) => {
+        replaceTemplateParameterValue(draftTemplate, parameterForName, vmName);
+      });
+
+      quickCreateVM(templateToProcess, { name: vmName, namespace, startVM })
         .then((vm) => {
           setIsQuickCreating(false);
           history.push(getResourceUrl(VirtualMachineModel, vm));
