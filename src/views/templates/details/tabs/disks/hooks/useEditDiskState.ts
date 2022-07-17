@@ -64,60 +64,68 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
   const initialDiskSourceState = React.useMemo(() => ({ ...initialStateDiskSource }), []);
   const disk = getDisks(vm)?.find(({ name }) => name === diskName);
 
-  const { diskSource, diskSize, isBootDisk, accessMode, volumeMode, applyStorageProfileSettings } =
-    React.useMemo(() => {
-      const dataVolumeTemplates = getDataVolumeTemplates(vm);
+  const {
+    diskSource,
+    diskSize,
+    isBootDisk: asBootSource,
+    accessMode,
+    volumeMode,
+    applyStorageProfileSettings,
+  } = React.useMemo(() => {
+    const dataVolumeTemplates = getDataVolumeTemplates(vm);
 
-      const volumes = getVolumes(vm);
-      const volume = volumes?.find(({ name }) => name === diskName);
-      // volume consists of 2 keys:
-      // name and one of: containerDisk/cloudInitNoCloud
-      const volumeSource = Object.keys(volume).find((key) =>
-        [
-          volumeTypes.CONTAINER_DISK,
-          volumeTypes.DATA_VOLUME,
-          volumeTypes.PERSISTENT_VOLUME_CLAIM,
-        ].includes(key),
-      );
+    const volumes = getVolumes(vm);
+    const volume = volumes?.find(({ name }) => name === diskName);
+    // volume consists of 2 keys:
+    // name and one of: containerDisk/cloudInitNoCloud
+    const volumeSource = Object.keys(volume).find((key) =>
+      [
+        volumeTypes.CONTAINER_DISK,
+        volumeTypes.DATA_VOLUME,
+        volumeTypes.PERSISTENT_VOLUME_CLAIM,
+      ].includes(key),
+    );
+    const isBootDisk = getBootDisk(vm)?.name === diskName;
 
-      if (volumeSource === sourceTypes.EPHEMERAL) {
-        initialDiskSourceState.ephemeralSource = volume.containerDisk?.image;
-        return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC };
-      }
+    if (volumeSource === sourceTypes.EPHEMERAL) {
+      initialDiskSourceState.ephemeralSource = volume.containerDisk?.image;
+      return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC, isBootDisk };
+    }
 
-      if (volumeSource === volumeTypes.PERSISTENT_VOLUME_CLAIM) {
-        initialDiskSourceState.pvcSourceName = volume.persistentVolumeClaim?.claimName;
-        return {
-          diskSource: sourceTypes.PVC,
-        };
-      }
+    if (volumeSource === volumeTypes.PERSISTENT_VOLUME_CLAIM) {
+      initialDiskSourceState.pvcSourceName = volume.persistentVolumeClaim?.claimName;
+      return {
+        diskSource: sourceTypes.PVC,
+        isBootDisk,
+      };
+    }
 
-      const dataVolumeTemplate = dataVolumeTemplates?.find(
-        (dataVolume) => dataVolume.metadata.name === volume.dataVolume?.name,
-      );
+    const dataVolumeTemplate = dataVolumeTemplates?.find(
+      (dataVolume) => dataVolume.metadata.name === volume.dataVolume?.name,
+    );
 
-      if (
-        dataVolumeTemplate &&
-        (dataVolumeTemplate.spec?.source || dataVolumeTemplate.spec?.sourceRef)
-      ) {
-        setInitialStateFromDataVolume(dataVolumeTemplate, initialDiskSourceState);
-        const applySPSettings =
-          !dataVolumeTemplate?.spec?.storage?.accessModes &&
-          !dataVolumeTemplate?.spec?.storage?.volumeMode;
-        return {
-          isBootDisk: getBootDisk(vm)?.name === diskName,
-          diskSource: getSourceFromDataVolume(dataVolumeTemplate),
-          diskSize:
-            dataVolumeTemplate.spec?.storage?.resources?.requests?.storage ||
-            dataVolumeTemplate.spec?.pvc?.resources?.requests?.storage,
-          accessMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.accessModes?.[0] : null,
-          volumeMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.volumeMode : null,
-          applyStorageProfileSettings: applySPSettings,
-        };
-      }
+    if (
+      dataVolumeTemplate &&
+      (dataVolumeTemplate.spec?.source || dataVolumeTemplate.spec?.sourceRef)
+    ) {
+      setInitialStateFromDataVolume(dataVolumeTemplate, initialDiskSourceState);
+      const applySPSettings =
+        !dataVolumeTemplate?.spec?.storage?.accessModes &&
+        !dataVolumeTemplate?.spec?.storage?.volumeMode;
+      return {
+        isBootDisk,
+        diskSource: getSourceFromDataVolume(dataVolumeTemplate),
+        diskSize:
+          dataVolumeTemplate.spec?.storage?.resources?.requests?.storage ||
+          dataVolumeTemplate.spec?.pvc?.resources?.requests?.storage,
+        accessMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.accessModes?.[0] : null,
+        volumeMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.volumeMode : null,
+        applyStorageProfileSettings: applySPSettings,
+      };
+    }
 
-      return { diskSource: OTHER, diskSize: null, isBootDisk: getBootDisk(vm)?.name === diskName };
-    }, [initialDiskSourceState, vm, diskName]);
+    return { diskSource: OTHER, diskSize: null, isBootDisk };
+  }, [initialDiskSourceState, vm, diskName]);
 
   const initialDiskState: DiskFormState = {
     diskName,
@@ -132,7 +140,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
     applyStorageProfileSettings: applyStorageProfileSettings ?? true,
     storageClassProvisioner: null,
     storageProfileSettingsCheckboxDisabled: false,
-    asBootSource: isBootDisk,
+    asBootSource,
   };
 
   return { initialDiskState, initialDiskSourceState };
