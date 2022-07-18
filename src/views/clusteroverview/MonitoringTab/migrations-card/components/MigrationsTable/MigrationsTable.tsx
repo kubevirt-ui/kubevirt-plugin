@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { VirtualMachineInstanceMigrationModel } from 'src/views/virtualmachines/actions/actions';
 
 import {
-  modelToGroupVersionKind,
+  MigrationPolicyModelGroupVersionKind,
   VirtualMachineInstanceModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import {
@@ -25,18 +24,17 @@ import { MIGRATIONS_DURATION_KEY } from '../../../top-consumers-card/utils/const
 
 import useVirtualMachineInstanceMigrationsColumns from './hooks/useVirtualMachineInstanceMigrationsColumns';
 import { getSourceNodeFilter, getStatusFilter, getTargetNodeFilter } from './utils/filters';
-import { getMigrationsTableData } from './utils/utils';
+import { getMigrationsTableData, MigrationTableDataLayout } from './utils/utils';
 import MigrationsRow from './MigrationsRow';
 
-const MigrationTable: React.FC = () => {
-  const { t } = useKubevirtTranslation();
+type MigrationTableProps = {
+  vmims: V1VirtualMachineInstanceMigration[];
+  vmimsLoaded: boolean;
+  vmimsErrors: any;
+};
 
-  const [vmims, vmimsLoaded, vmimsErrors] = useK8sWatchResource<
-    V1VirtualMachineInstanceMigration[]
-  >({
-    groupVersionKind: modelToGroupVersionKind(VirtualMachineInstanceMigrationModel),
-    isList: true,
-  });
+const MigrationTable: React.FC<MigrationTableProps> = ({ vmims, vmimsLoaded, vmimsErrors }) => {
+  const { t } = useKubevirtTranslation();
 
   const [vmis, vmisLoaded, vmisErrors] = useK8sWatchResource<V1VirtualMachineInstance[]>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
@@ -44,11 +42,7 @@ const MigrationTable: React.FC = () => {
   });
 
   const [mps] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
-    groupVersionKind: {
-      kind: 'MigrationPolicy',
-      group: 'migrations.kubevirt.io',
-      version: 'v1alpha1',
-    },
+    groupVersionKind: MigrationPolicyModelGroupVersionKind,
     isList: true,
   });
 
@@ -72,14 +66,18 @@ const MigrationTable: React.FC = () => {
           rowFilters={filters}
           onFilterChange={onFilterChange}
         />
-        <VirtualizedTable
+        <VirtualizedTable<MigrationTableDataLayout>
           data={data}
           unfilteredData={unfilteredData}
           loaded={vmimsLoaded && vmisLoaded}
           loadError={vmimsErrors || vmisErrors}
           columns={columns}
           Row={MigrationsRow}
-          EmptyMsg={() => <Bullseye>{t('No migrations found')}</Bullseye>}
+          EmptyMsg={() => (
+            <Bullseye>
+              <div className="co-m-pane__body">{t('No migrations found')}</div>
+            </Bullseye>
+          )}
         />
       </ListPageBody>
     </>

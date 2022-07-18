@@ -24,7 +24,7 @@ const MigrationActionsDropdown: React.FC<MigrationActionsDropdownProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const [actions] = useVirtualMachineInstanceMigrationActionsProvider(vmim);
 
   const handleClick = (action: Action) => {

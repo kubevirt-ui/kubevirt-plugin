@@ -1,9 +1,13 @@
 import * as React from 'react';
 
+import { VirtualMachineInstanceMigrationModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
-import { Overview } from '@openshift-console/dynamic-plugin-sdk';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { Overview, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Bullseye,
   Card,
   CardActions,
   CardBody,
@@ -17,17 +21,29 @@ import { MIGRATIONS_DURATION_KEY } from '../top-consumers-card/utils/constants';
 import DurationDropdown from '../top-consumers-card/utils/DurationDropdown';
 import DurationOption from '../top-consumers-card/utils/DurationOption';
 
+import MigrationsChartDonut from './components/MigrationsChartDonut/MigrationsChartDonut';
+import MigrationsLimitionsPopover from './components/MigrationsLimitionsPopover/MigrationsLimitionsPopover';
 import MigrationTable from './components/MigrationsTable/MigrationsTable';
+import { getFilteredDurationVMIMS } from './components/MigrationsTable/utils/utils';
 
 import './MigrationsCard.scss';
 
 const MigrationsCard: React.FC = () => {
   const { t } = useKubevirtTranslation();
 
+  const [vmims, vmimsLoaded, vmimsErrors] = useK8sWatchResource<
+    V1VirtualMachineInstanceMigration[]
+  >({
+    groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
+    isList: true,
+  });
+
   const [duration, setDuration] = useLocalStorage(
     MIGRATIONS_DURATION_KEY,
     DurationOption.FIVE_MIN.toString(),
   );
+
+  const filteredVMIMS = getFilteredDurationVMIMS(vmims, duration);
 
   const onDurationSelect = (value: string) =>
     setDuration(DurationOption.fromDropdownLabel(value)?.toString());
@@ -44,27 +60,47 @@ const MigrationsCard: React.FC = () => {
           </CardActions>
         </CardHeader>
         <CardBody className="kv-monitoring-card__body">
-          <Grid className="kv-monitoring-card__grid">
-            <GridItem className="kv-monitoring-card__card-grid-item" span={6}>
-              <Card>
-                <CardHeader className="kv-monitoring-card__header">
-                  <CardTitle>Migrations</CardTitle>
-                </CardHeader>
-              </Card>
-            </GridItem>
-            <GridItem className="kv-monitoring-card__card-grid-item" span={6}>
-              <Card>
-                <CardHeader className="kv-monitoring-card__header">
-                  <CardTitle>Bandwidth consumption</CardTitle>
-                </CardHeader>
-              </Card>
-            </GridItem>
-            <GridItem span={12}>
-              <Card>
-                <MigrationTable />
-              </Card>
-            </GridItem>
-          </Grid>
+          {!isEmpty(filteredVMIMS) ? (
+            <Grid>
+              <GridItem span={6}>
+                <Card className="kv-monitoring-card__card-right-border">
+                  <CardHeader>
+                    <CardTitle>{t('Migrations')}</CardTitle>
+                    <CardActions className="co-overview-card__actions">
+                      <MigrationsLimitionsPopover />
+                    </CardActions>
+                  </CardHeader>
+                  <CardBody className="kv-monitoring-card__body">
+                    <MigrationsChartDonut vmims={filteredVMIMS} />
+                  </CardBody>
+                </Card>
+              </GridItem>
+              <GridItem span={6}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{t('Bandwidth consumption')}</CardTitle>
+                  </CardHeader>
+                  <CardBody className="kv-monitoring-card__body">
+                    {' '}
+                    **** Chart placeholder ****
+                  </CardBody>
+                </Card>
+              </GridItem>
+              <GridItem span={12}>
+                <Card>
+                  <MigrationTable
+                    vmims={vmims}
+                    vmimsLoaded={vmimsLoaded}
+                    vmimsErrors={vmimsErrors}
+                  />
+                </Card>
+              </GridItem>
+            </Grid>
+          ) : (
+            <Bullseye>
+              <div className="co-m-pane__body">{t('No migrations found')}</div>
+            </Bullseye>
+          )}
         </CardBody>
       </Card>
     </Overview>

@@ -5,10 +5,10 @@
   }
 
 .kv-monitoring-card__header,
-.kv-monitoring-card__grid {
+.kv-monitoring-card__body {
     border-bottom: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
 }
   
-.kv-monitoring-card__card-grid-item {
+.kv-monitoring-card__card-right-border {
     border-right: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
 }

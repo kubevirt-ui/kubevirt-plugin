@@ -4,6 +4,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
+import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../../utils';
@@ -29,7 +30,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
         : VirtualMachineActionFactory.stop(vm, t);
 
     const migrateOrCancelMigration =
-      printableStatus === Migrating || vmim
+      printableStatus === Migrating ||
+      (vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase))
         ? VirtualMachineActionFactory.cancelMigration(vm, vmim, t)
         : VirtualMachineActionFactory.migrate(vm, t);
 
