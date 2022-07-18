@@ -7,6 +7,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import {
   ButtonVariant,
   Dropdown,
@@ -91,6 +92,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   return (
     <>
       <Dropdown
+        menuAppendTo={getContentScrollableElement}
         onSelect={() => setIsDropdownOpen(false)}
         toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-6" />}
         isOpen={isDropdownOpen}

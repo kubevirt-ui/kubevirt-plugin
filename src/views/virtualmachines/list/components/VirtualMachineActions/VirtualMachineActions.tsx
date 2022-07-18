@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 // import { LazyActionMenu } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
@@ -41,6 +42,7 @@ const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
 
   return (
     <Dropdown
+      menuAppendTo={getContentScrollableElement}
       data-test-id="virtual-machine-actions"
       isPlain={isKebabToggle}
       isOpen={isOpen}

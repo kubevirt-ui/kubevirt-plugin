@@ -8,6 +8,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ButtonVariant,
@@ -102,6 +103,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
 
   return (
     <Dropdown
+      menuAppendTo={getContentScrollableElement}
       onSelect={() => setIsDropdownOpen(false)}
       toggle={
         <KebabToggle

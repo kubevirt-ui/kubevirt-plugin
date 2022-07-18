@@ -6,6 +6,7 @@ import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
 
@@ -110,6 +111,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
   return (
     <>
       <Dropdown
+        menuAppendTo={getContentScrollableElement}
         onSelect={() => setIsDropdownOpen(false)}
         toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-6" />}
         isOpen={isDropdownOpen}
