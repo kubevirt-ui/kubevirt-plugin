@@ -2,6 +2,7 @@ import React from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Dropdown,
@@ -32,6 +33,7 @@ const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKeba
 
   return (
     <Dropdown
+      menuAppendTo={getContentScrollableElement}
       data-test-id="data-source-actions"
       isPlain={isKebabToggle}
       isOpen={isOpen}

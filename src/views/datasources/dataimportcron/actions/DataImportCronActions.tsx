@@ -2,6 +2,7 @@ import React from 'react';
 
 import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Dropdown,
@@ -35,6 +36,7 @@ const DataImportCronActions: React.FC<DataImportCronActionProps> = ({
 
   return (
     <Dropdown
+      menuAppendTo={getContentScrollableElement}
       data-test-id="data-import-cron-actions"
       isPlain={isKebabToggle}
       isOpen={isOpen}

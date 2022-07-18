@@ -36,3 +36,6 @@ export const validateSSHPublicKey = (value: string): boolean => {
   const trimmedValue = value?.trim();
   return isEmpty(trimmedValue) || Boolean(SSH_PUBLIC_KEY_VALIDATION_REGEX?.test(trimmedValue));
 };
+
+export const getContentScrollableElement = (): HTMLElement =>
+  document.getElementById('content-scrollable');
