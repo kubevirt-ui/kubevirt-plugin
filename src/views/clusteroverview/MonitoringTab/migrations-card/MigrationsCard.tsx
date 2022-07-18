@@ -1,8 +1,8 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
-import { useLocalStorage } from '@patternfly/quickstarts';
 import {
   Card,
   CardActions,
@@ -17,6 +17,8 @@ import { MIGRATIONS_DURATION_KEY } from '../top-consumers-card/utils/constants';
 import DurationDropdown from '../top-consumers-card/utils/DurationDropdown';
 import DurationOption from '../top-consumers-card/utils/DurationOption';
 
+import MigrationTable from './components/MigrationsTable/MigrationsTable';
+
 import './MigrationsCard.scss';
 
 const MigrationsCard: React.FC = () => {
@@ -28,7 +30,7 @@ const MigrationsCard: React.FC = () => {
   );
 
   const onDurationSelect = (value: string) =>
-    setDuration(DurationOption.fromDropdownLabel(value).toString());
+    setDuration(DurationOption.fromDropdownLabel(value)?.toString());
 
   return (
     <Overview>
@@ -59,7 +61,7 @@ const MigrationsCard: React.FC = () => {
             </GridItem>
             <GridItem span={12}>
               <Card>
-                <CardBody isFilled>Migrations table placholder</CardBody>
+                <MigrationTable />
               </Card>
             </GridItem>
           </Grid>
