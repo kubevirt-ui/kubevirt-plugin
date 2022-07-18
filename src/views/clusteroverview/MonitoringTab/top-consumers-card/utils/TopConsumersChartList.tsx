@@ -35,7 +35,7 @@ export const TopConsumersChartList: React.FC<TopConsumersChartListProps> = ({ me
 
   const [query] = usePrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY,
-    query: getTopConsumerQuery(metric.getValue(), scope.getValue(), numItemsToShow, duration),
+    query: getTopConsumerQuery(metric?.getValue(), scope?.getValue(), numItemsToShow, duration),
     endTime: Date.now(),
   });
   const numQueryResults = query?.data?.result?.length;
@@ -58,7 +58,7 @@ export const TopConsumersChartList: React.FC<TopConsumersChartListProps> = ({ me
           labelValue={humanizedValue.value}
           labelUnit={humanizedValue.unit}
           maxValue={max}
-          key={`chart-${metric.getValue()}-${scope.getValue()}-${i}`}
+          key={`chart-${metric?.getValue()}-${scope?.getValue()}-${i}`}
         />,
       );
     }
@@ -69,7 +69,7 @@ export const TopConsumersChartList: React.FC<TopConsumersChartListProps> = ({ me
 
   return (
     <CardBody className="kv-top-consumers-card__chart-list-container">
-      <div className="kv-top-consumers-card__metric-title">{t(metric.getChartLabel())}</div>
+      <div className="kv-top-consumers-card__metric-title">{t(metric?.getChartLabel())}</div>
       <div className="kv-top-consumers-card__chart-list-body">
         {showNoDataMessage ? (
           <NoDataAvailableMessage isVCPU={metric === TopConsumerMetric.VCPU_WAIT} />
