@@ -102,7 +102,7 @@ export const getChartTitle = (scope, queryData) => {
     case TopConsumerScope.VM:
     default:
       title =
-        metricData?.name || metricData?.label_vm_kubevirt_io_name || `VMI (${metricData.pod})`;
+        metricData?.name || metricData?.label_vm_kubevirt_io_name || `VMI (${metricData?.pod})`;
       break;
   }
 
