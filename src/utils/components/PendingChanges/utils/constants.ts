@@ -1,6 +1,7 @@
 export enum VirtualMachineDetailsTab {
   Overview = '',
   Details = 'details',
+  Metrics = 'metrics',
   YAML = 'yaml',
   Scheduling = 'scheduling',
   Environment = 'environment',
@@ -17,6 +18,8 @@ export enum VirtualMachineDetailsTabLabel {
   Overview = 'Overview',
   // t('Details')
   Details = 'Details',
+  // t('Metrics')
+  Metrics = 'Metrics',
   // t('YAML')
   YAML = 'YAML',
   // t('Scheduling')

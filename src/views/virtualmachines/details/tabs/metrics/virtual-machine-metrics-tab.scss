@@ -1,0 +1,42 @@
+.virtual-machine-metrics-tab {
+  &__main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    .timerange {
+      &--main {
+        display: flex;
+        justify-content: space-between;
+        margin: var(--pf-global--spacer--md);
+        &__text {
+          font-weight: var(--pf-global--FontWeight--bold);
+          display: inline-flex;
+          align-items: baseline;
+          &--title {
+            margin-right: var(--pf-global--spacer--sm);
+            width: 100%;
+          }
+        }
+        a {
+          align-self: center;
+        }
+      }
+    }
+  }
+  &__charts {
+    flex-grow: 1;
+    .pf-c-card {
+      margin: var(--pf-global--spacer--sm);
+    }
+    .pf-c-expandable-section__toggle {
+      align-items: center;
+      &-text {
+        font-size: var(--pf-global--FontSize--lg);
+        font-weight: var(--pf-global--FontWeight--bold);
+      }
+    }
+    .pf-c-expandable-section__content {
+      margin-top: 0;
+    }
+  }
+}
