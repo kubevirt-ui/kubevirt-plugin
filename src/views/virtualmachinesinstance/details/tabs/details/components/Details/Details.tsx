@@ -53,7 +53,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
     name: vmi?.metadata?.name,
     namespace: vmi?.metadata?.namespace,
   });
-  const [sshService, sshServiceLoaded] = useSSHService(vmi);
+  const [sshService, sshServiceLoaded] = useSSHService(vm);
 
   return (
     <div>

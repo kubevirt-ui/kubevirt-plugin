@@ -16,7 +16,7 @@ describe('Test getServicesForVmi', () => {
     const services: IoK8sApiCoreV1Service[] = [];
     const vmi: V1VirtualMachineInstance = vmiMock;
 
-    const result = getServicesForVmi(services, vmi);
+    const result = getServicesForVmi(services, vmi?.metadata?.labels);
 
     expect(result).toEqual([]);
   });
@@ -25,7 +25,7 @@ describe('Test getServicesForVmi', () => {
     const services: IoK8sApiCoreV1Service[] = [serviceWithUndefinedSelectors];
     const vmi: V1VirtualMachineInstance = vmiMock;
 
-    const result = getServicesForVmi(services, vmi);
+    const result = getServicesForVmi(services, vmi?.metadata?.labels);
 
     expect(result).toEqual([]);
   });
@@ -34,7 +34,7 @@ describe('Test getServicesForVmi', () => {
     const services: IoK8sApiCoreV1Service[] = [serviceWithoutSelectors];
     const vmi: V1VirtualMachineInstance = vmiMock;
 
-    const result = getServicesForVmi(services, vmi);
+    const result = getServicesForVmi(services, vmi?.metadata?.labels);
 
     expect(result).toEqual([]);
   });
@@ -43,7 +43,7 @@ describe('Test getServicesForVmi', () => {
     const services: IoK8sApiCoreV1Service[] = [serviceWithoutMatchingSelectors];
     const vmi: V1VirtualMachineInstance = vmiMock;
 
-    const result = getServicesForVmi(services, vmi);
+    const result = getServicesForVmi(services, vmi?.metadata?.labels);
 
     expect(result).toEqual([]);
   });
@@ -52,7 +52,7 @@ describe('Test getServicesForVmi', () => {
     const services: IoK8sApiCoreV1Service[] = [serviceWithMatchingSelectors];
     const vmi: V1VirtualMachineInstance = vmiMock;
 
-    const result = getServicesForVmi(services, vmi);
+    const result = getServicesForVmi(services, vmi?.metadata?.labels);
 
     expect(result).toEqual([serviceWithMatchingSelectors]);
   });

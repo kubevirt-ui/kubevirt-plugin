@@ -8,8 +8,6 @@ import {
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
-import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
-import { UseSSHServiceReturnType } from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import { getVMIIPAddresses, getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -22,7 +20,6 @@ export type VirtualMachineDetailsRightGridLayoutPresentation = {
   hostname: React.ReactNode;
   timezone: React.ReactNode;
   node: React.ReactNode;
-  sshAccess: React.ReactNode;
 };
 
 export const getStoppedVMRightGridPresentation = (
@@ -38,7 +35,6 @@ export const getStoppedVMRightGridPresentation = (
     hostname: NotAvailable,
     timezone: VirtualMachineIsNotRunning,
     node: NotAvailable,
-    sshAccess: VirtualMachineIsNotRunning,
   };
 };
 
@@ -47,7 +43,6 @@ export const getRunningVMRightGridPresentation = (
   vmi: V1VirtualMachineInstance,
   pods: K8sResourceCommon[],
   guestAgentData?: V1VirtualMachineInstanceGuestAgentInfo,
-  watchSSHService?: UseSSHServiceReturnType,
 ): VirtualMachineDetailsRightGridLayoutPresentation => {
   const vmiPod = getVMIPod(vmi, pods);
   const ipAddresses = getVMIIPAddresses(vmi);
@@ -55,8 +50,6 @@ export const getRunningVMRightGridPresentation = (
   const guestAgentIsRequired = guestAgentData && Object.keys(guestAgentData)?.length === 0;
 
   const GuestAgentIsRequiredText = <MutedTextSpan text={t('Guest agent is required')} />;
-
-  const [sshService, sshServiceLoaded] = watchSSHService;
 
   return {
     pod: (
@@ -79,6 +72,5 @@ export const getRunningVMRightGridPresentation = (
       ? GuestAgentIsRequiredText
       : guestAgentData?.timezone?.split(',')[0],
     node: <ResourceLink kind={NodeModel.kind} name={nodeName} />,
-    sshAccess: <SSHAccess sshService={sshService} sshServiceLoaded={sshServiceLoaded} vmi={vmi} />,
   };
 };

@@ -1,12 +1,11 @@
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export const getServicesForVmi = (
   services: IoK8sApiCoreV1Service[],
-  vmi: V1VirtualMachineInstance,
+  vmiLabels: {
+    [key: string]: string;
+  },
 ): IoK8sApiCoreV1Service[] => {
-  const vmiLabels = vmi?.metadata?.labels;
-
   if (!vmiLabels) return [];
 
   return (services || []).filter((service) => {

@@ -23,7 +23,7 @@ const VirtualMachinesOverviewTabDetailsTitle: React.FC<
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const { t } = useKubevirtTranslation();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const [sshService] = useSSHService(vmi);
+  const [sshService] = useSSHService(vm);
   const { command } = useSSHCommand(vmi, sshService);
 
   const isMachinePaused = vm?.status?.printableStatus === printableVMStatus.Paused;
