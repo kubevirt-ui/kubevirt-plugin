@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { DataImportCronModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,10 +17,10 @@ type DataImportCronPageProps = {
   kind: string;
 };
 
-const DataImportCronNavPage: React.FC<DataImportCronPageProps> = ({ name, namespace, kind }) => {
+const DataImportCronNavPage: React.FC<DataImportCronPageProps> = ({ name, namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dataImportCron, loaded] = useK8sWatchResource<V1beta1DataImportCron>({
-    kind,
+    groupVersionKind: DataImportCronModelGroupVersionKind,
     name,
     namespace,
   });

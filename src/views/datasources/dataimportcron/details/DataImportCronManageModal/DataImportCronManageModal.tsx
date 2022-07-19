@@ -21,7 +21,6 @@ import {
   Popover,
   Stack,
   StackItem,
-  TextInput,
   ValidatedOptions,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
@@ -94,18 +93,13 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
         </StackItem>
         <StackItem>
           <Form>
-            <FormGroup fieldId="dataimportcron-manage-source-type" label={t('Source type')}>
-              <TextInput
-                id="dataimportcron-manage-source-type-input"
-                isDisabled
-                isReadOnly
-                value={t('Registry')}
-              />
-            </FormGroup>
             <FormGroup
               fieldId="dataimportcron-manage-source-url"
-              label={t('URL')}
+              label={t('Registry URL')}
               validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
+              helperText={t('Example: {{exampleURL}}', {
+                exampleURL: 'docker://quay.io/containerdisks/centos:7-2009',
+              })}
               helperTextInvalid={t('This field is required')}
               helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
               isRequired
@@ -114,7 +108,7 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
                 {...register('url', { required: true })}
                 id={'dataimportcron-manage-source-url'}
                 type="text"
-                aria-label={t('Source URL')}
+                aria-label={t('Registry URL')}
                 data-test-id={'dataimportcron-manage-source-url'}
                 validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
                 defaultValue={dataImportCron?.spec?.template.spec?.source?.registry?.url}
