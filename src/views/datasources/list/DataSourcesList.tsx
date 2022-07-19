@@ -1,11 +1,13 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ListPageBody,
-  ListPageCreate,
+  ListPageCreateDropdown,
   ListPageFilter,
   ListPageHeader,
   useK8sWatchResource,
@@ -13,9 +15,12 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import { CreateDataSourceModal } from './CreateDataSourceModal/CreateDataSourceModal';
 import { useDataSourcesColumns } from './hooks/useDataSourcesColumns';
 import { getDataImportCronFilter } from './DataSourcesListFilters';
 import { DataSourcesListRow } from './DataSourcesListRow';
+
+import './DataSourcesList.scss';
 
 type DataSourcesListProps = {
   kind: string;
@@ -24,6 +29,8 @@ type DataSourcesListProps = {
 
 const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
+  const history = useHistory();
 
   const [dataSources, loaded, loadError] = useK8sWatchResource<V1beta1DataSource[]>({
     kind,
@@ -35,12 +42,22 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
   const filters = getDataImportCronFilter(t);
   const [unfilteredData, data, onFilterChange] = useListPageFilter(dataSources, filters);
 
+  const createItems = {
+    form: t('With Form'),
+    yaml: t('With YAML'),
+  };
+
+  const onCreate = (type: string) =>
+    type === 'form'
+      ? createModal((props) => <CreateDataSourceModal namespace={namespace} {...props} />)
+      : history.push(`/k8s/ns/${namespace || 'default'}/${DataSourceModelRef}/~new`);
+
   return (
     <>
       <ListPageHeader title={t('DataSources')}>
-        <ListPageCreate groupVersionKind={DataSourceModelRef}>
+        <ListPageCreateDropdown items={createItems} onClick={onCreate}>
           {t('Create DataSource')}
-        </ListPageCreate>
+        </ListPageCreateDropdown>
       </ListPageHeader>
       <ListPageBody>
         <ListPageFilter
