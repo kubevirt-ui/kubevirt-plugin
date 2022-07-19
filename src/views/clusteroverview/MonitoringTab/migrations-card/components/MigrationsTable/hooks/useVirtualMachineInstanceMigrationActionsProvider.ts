@@ -3,10 +3,9 @@ import * as React from 'react';
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
+import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { cancelMigration } from '@virtualmachines/actions/actions';
-
-import { vmimStatuses } from '../utils/statuses';
 
 type UseVirtualMachineInstanceMigrationActionsProvider = (
   vmim: V1VirtualMachineInstanceMigration,

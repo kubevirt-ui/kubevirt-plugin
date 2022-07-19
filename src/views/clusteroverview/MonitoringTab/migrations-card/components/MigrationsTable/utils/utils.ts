@@ -38,6 +38,19 @@ const valueToMSMapper = {
   '2d': TWO_DAYS_IN_MS,
   '1w': ONE_WEEK_IN_MS,
 };
+export const getFilteredDurationVMIMS = (
+  vmims: V1VirtualMachineInstanceMigration[],
+  selectedDuration: string,
+): V1VirtualMachineInstanceMigration[] => {
+  const filteredVMIMS = (vmims || []).filter((vmim) => {
+    const vmimCreateDurationMs =
+      new Date().getTime() - new Date(vmim?.metadata?.creationTimestamp).getTime();
+
+    if (vmimCreateDurationMs < valueToMSMapper[selectedDuration]) return vmim;
+  });
+
+  return filteredVMIMS;
+};
 
 export const getMigrationsTableData = (
   vmims: V1VirtualMachineInstanceMigration[],
@@ -45,12 +58,7 @@ export const getMigrationsTableData = (
   mps: V1alpha1MigrationPolicy[],
   selectedDuration: string,
 ): MigrationTableDataLayout[] => {
-  const filteredVMIMS = (vmims || []).filter((vmim) => {
-    const vmimCreateDurationMs =
-      new Date().getTime() - new Date(vmim?.metadata?.creationTimestamp).getTime();
-
-    if (vmimCreateDurationMs < valueToMSMapper[selectedDuration]) return vmim;
-  });
+  const filteredVMIMS = getFilteredDurationVMIMS(vmims, selectedDuration);
 
   const migrationsData = (filteredVMIMS || []).map((vmim) => {
     const vmiObj = (vmis || []).find(

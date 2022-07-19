@@ -1,3 +1,4 @@
+import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
@@ -12,19 +13,6 @@ import {
   k8sDelete,
   K8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
-
-export const VirtualMachineInstanceMigrationModel: K8sModel = {
-  label: 'VirtualMachineInstanceMigration',
-  labelPlural: 'VirtualMachineInstanceMigrations',
-  apiVersion: 'v1',
-  apiGroup: 'kubevirt.io',
-  plural: 'virtualmachineinstancemigrations',
-  abbr: 'VMIM',
-  namespaced: true,
-  kind: 'VirtualMachineInstanceMigration',
-  id: 'virtualmachineinstancemigration',
-  crd: true,
-};
 
 const generateRandomString = () => Math.random().toString(36).substring(2, 7);
 
