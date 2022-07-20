@@ -2,14 +2,16 @@ import React from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
+import {
+  getUtilizationQueries,
+  PrometheusEndpoint,
+} from '@kubevirt-utils/components/Charts/utils/queries';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
-
-import { getUtilizationQueries, PrometheusEndpoint } from '../../utils/queries';
-import ComponentReady from '../ComponentReady/ComponentReady';
 
 type MemoryUtilProps = {
   vmi: V1VirtualMachineInstance;

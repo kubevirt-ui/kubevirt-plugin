@@ -2,12 +2,14 @@ import React from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
+import {
+  getMultilineUtilizationQueries,
+  PrometheusEndpoint,
+} from '@kubevirt-utils/components/Charts/utils/queries';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
-
-import { getMultilineUtilizationQueries, PrometheusEndpoint } from '../../utils/queries';
-import ComponentReady from '../ComponentReady/ComponentReady';
 
 type NetworkUtilProps = {
   vmi: V1VirtualMachineInstance;

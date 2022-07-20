@@ -1,13 +1,15 @@
 import React from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
+import {
+  getUtilizationQueries,
+  PrometheusEndpoint,
+} from '@kubevirt-utils/components/Charts/utils/queries';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { K8sResourceCommon, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
-
-import { getUtilizationQueries, PrometheusEndpoint } from '../../utils/queries';
-import ComponentReady from '../ComponentReady/ComponentReady';
 
 type CPUUtilProps = {
   vmi: V1VirtualMachineInstance;

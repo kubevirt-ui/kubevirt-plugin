@@ -1,9 +1,12 @@
 import * as React from 'react';
 
+import {
+  DEFAULT_DURATION_KEY,
+  DURATION_VALUES,
+  DurationKeys,
+} from '@kubevirt-utils/components/Charts/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
-
-import { DEFAULT_DURATION_KEY, DURATION_VALUES, DurationKeys } from '../utils/utils';
 
 export type TimeDropdownProps = {
   setDuration: React.Dispatch<React.SetStateAction<number>>;

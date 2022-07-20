@@ -1,13 +1,20 @@
 import React from 'react';
 
+import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import CPUThresholdChart from '@kubevirt-utils/components/Charts/CPUUtil/CPUThresholdChart';
+import MemoryThresholdChart from '@kubevirt-utils/components/Charts/MemoryUtil/MemoryThresholdChart';
+import NetworkThresholdChart from '@kubevirt-utils/components/Charts/NetworkUtil/NetworkThresholdChart';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-core';
 
 type UtilizationChartsProps = {
-  duration: string;
+  timespan: number;
+  vmi: V1VirtualMachineInstance;
+  pods: K8sResourceCommon[];
 };
 
-const UtilizationCharts: React.FC<UtilizationChartsProps> = () => {
+const UtilizationCharts: React.FC<UtilizationChartsProps> = ({ timespan, vmi, pods }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -15,19 +22,25 @@ const UtilizationCharts: React.FC<UtilizationChartsProps> = () => {
       <GridItem span={6}>
         <Card>
           <CardTitle>{t('Memory')}</CardTitle>
-          <CardBody>** chart **</CardBody>
+          <CardBody>
+            <MemoryThresholdChart timespan={timespan} vmi={vmi} />
+          </CardBody>
         </Card>
       </GridItem>
       <GridItem span={6}>
         <Card>
           <CardTitle>{t('CPU')}</CardTitle>
-          <CardBody>** chart **</CardBody>
+          <CardBody>
+            <CPUThresholdChart timespan={timespan} vmi={vmi} pods={pods} />
+          </CardBody>
         </Card>
       </GridItem>
       <GridItem span={6}>
         <Card>
           <CardTitle>{t('Network interfaces')}</CardTitle>
-          <CardBody>** chart **</CardBody>
+          <CardBody>
+            <NetworkThresholdChart timespan={timespan} vmi={vmi} />
+          </CardBody>
         </Card>
       </GridItem>
     </Grid>

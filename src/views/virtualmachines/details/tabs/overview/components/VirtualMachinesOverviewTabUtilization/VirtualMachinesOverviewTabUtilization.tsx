@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
 import {
@@ -19,7 +20,6 @@ import {
 
 import { printableVMStatus } from '../../../../../utils';
 
-import ComponentReady from './components/ComponentReady/ComponentReady';
 import CPUUtil from './components/CPUUtil/CPUUtil';
 import MemoryUtil from './components/MemoryUtil/MemoryUtil';
 import NetworkUtil from './components/NetworkUtil/NetworkUtil';
