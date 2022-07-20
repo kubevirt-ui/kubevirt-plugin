@@ -1,11 +1,9 @@
 import * as React from 'react';
 
-import { VirtualMachineInstanceMigrationModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Overview, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Bullseye,
   Card,
@@ -25,23 +23,21 @@ import MigrationsChartDonut from './components/MigrationsChartDonut/MigrationsCh
 import MigrationsLimitionsPopover from './components/MigrationsLimitionsPopover/MigrationsLimitionsPopover';
 import MigrationTable from './components/MigrationsTable/MigrationsTable';
 import { getFilteredDurationVMIMS } from './components/MigrationsTable/utils/utils';
+import useMigrationCardDataAndFilters from './hooks/useMigrationCardData';
 
 import './MigrationsCard.scss';
 
 const MigrationsCard: React.FC = () => {
   const { t } = useKubevirtTranslation();
 
-  const [vmims, vmimsLoaded, vmimsErrors] = useK8sWatchResource<
-    V1VirtualMachineInstanceMigration[]
-  >({
-    groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
-    isList: true,
-  });
-
   const [duration, setDuration] = useLocalStorage(
     MIGRATIONS_DURATION_KEY,
     DurationOption.FIVE_MIN.toString(),
   );
+
+  const migrationCardDataAndFilters = useMigrationCardDataAndFilters(duration);
+
+  const { vmims, onFilterChange } = migrationCardDataAndFilters || {};
 
   const filteredVMIMS = getFilteredDurationVMIMS(vmims, duration);
 
@@ -71,7 +67,7 @@ const MigrationsCard: React.FC = () => {
                     </CardActions>
                   </CardHeader>
                   <CardBody className="kv-monitoring-card__body">
-                    <MigrationsChartDonut vmims={filteredVMIMS} />
+                    <MigrationsChartDonut vmims={filteredVMIMS} onFilterChange={onFilterChange} />
                   </CardBody>
                 </Card>
               </GridItem>
@@ -88,11 +84,7 @@ const MigrationsCard: React.FC = () => {
               </GridItem>
               <GridItem span={12}>
                 <Card>
-                  <MigrationTable
-                    vmims={vmims}
-                    vmimsLoaded={vmimsLoaded}
-                    vmimsErrors={vmimsErrors}
-                  />
+                  <MigrationTable tableData={migrationCardDataAndFilters} />
                 </Card>
               </GridItem>
             </Grid>

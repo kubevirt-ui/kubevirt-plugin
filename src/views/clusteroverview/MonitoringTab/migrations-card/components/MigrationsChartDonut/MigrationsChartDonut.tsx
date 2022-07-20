@@ -3,12 +3,14 @@ import { getColorList } from 'src/views/clusteroverview/OverviewTab/running-vms-
 
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonut } from '@patternfly/react-charts';
 
 import MigrationChartLegend from './MigrationChartLegend';
 
 type MigrationsChartDonutProps = {
   vmims: V1VirtualMachineInstanceMigration[];
+  onFilterChange: OnFilterChange;
 };
 
 export type ChartDataItem = {
@@ -17,7 +19,7 @@ export type ChartDataItem = {
   fill: any; // color to display in chart and legend
 };
 
-const MigrationsChartDonut: React.FC<MigrationsChartDonutProps> = ({ vmims }) => {
+const MigrationsChartDonut: React.FC<MigrationsChartDonutProps> = ({ vmims, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
 
   if (!vmims?.length) return null;
@@ -60,7 +62,7 @@ const MigrationsChartDonut: React.FC<MigrationsChartDonutProps> = ({ vmims }) =>
           },
         }}
       />
-      <MigrationChartLegend legendItems={chartData} />
+      <MigrationChartLegend legendItems={chartData} onFilterChange={onFilterChange} />
     </>
   );
 };

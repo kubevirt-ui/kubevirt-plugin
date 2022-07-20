@@ -1,76 +1,49 @@
 import * as React from 'react';
 
-import {
-  MigrationPolicyModelGroupVersionKind,
-  VirtualMachineInstanceModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
-import {
-  V1alpha1MigrationPolicy,
-  V1VirtualMachineInstance,
-  V1VirtualMachineInstanceMigration,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import {
   ListPageBody,
   ListPageFilter,
-  useK8sWatchResource,
-  useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
 
-import { MIGRATIONS_DURATION_KEY } from '../../../top-consumers-card/utils/constants';
+import { UseMigrationCardDataAndFiltersValues } from '../../hooks/useMigrationCardData';
 
 import useVirtualMachineInstanceMigrationsColumns from './hooks/useVirtualMachineInstanceMigrationsColumns';
-import { getSourceNodeFilter, getStatusFilter, getTargetNodeFilter } from './utils/filters';
-import { getMigrationsTableData, MigrationTableDataLayout } from './utils/utils';
+import { MigrationTableDataLayout } from './utils/utils';
 import MigrationsRow from './MigrationsRow';
 
 type MigrationTableProps = {
-  vmims: V1VirtualMachineInstanceMigration[];
-  vmimsLoaded: boolean;
-  vmimsErrors: any;
+  tableData: UseMigrationCardDataAndFiltersValues;
 };
 
-const MigrationTable: React.FC<MigrationTableProps> = ({ vmims, vmimsLoaded, vmimsErrors }) => {
+const MigrationTable: React.FC<MigrationTableProps> = ({ tableData }) => {
   const { t } = useKubevirtTranslation();
 
-  const [vmis, vmisLoaded, vmisErrors] = useK8sWatchResource<V1VirtualMachineInstance[]>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    isList: true,
-  });
-
-  const [mps] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
-    groupVersionKind: MigrationPolicyModelGroupVersionKind,
-    isList: true,
-  });
-
-  const [duration] = useLocalStorage(MIGRATIONS_DURATION_KEY);
-  const migrationsData = getMigrationsTableData(vmims, vmis, mps, duration);
-
-  const filters = [
-    ...getStatusFilter(t),
-    ...getSourceNodeFilter(vmis, t),
-    ...getTargetNodeFilter(vmis, t),
-  ];
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(migrationsData, filters);
-
+  const {
+    loaded,
+    loadErrors,
+    filters,
+    migrationsTableUnfilteredData,
+    migrationsTableFilteredData,
+    onFilterChange,
+  } = tableData || {};
   const columns = useVirtualMachineInstanceMigrationsColumns();
   return (
     <>
       <ListPageBody>
         <ListPageFilter
-          data={unfilteredData}
-          loaded={vmimsLoaded && vmisLoaded}
+          data={migrationsTableUnfilteredData}
+          loaded={loaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
         />
         <VirtualizedTable<MigrationTableDataLayout>
-          data={data}
-          unfilteredData={unfilteredData}
-          loaded={vmimsLoaded && vmisLoaded}
-          loadError={vmimsErrors || vmisErrors}
+          data={migrationsTableFilteredData}
+          unfilteredData={migrationsTableUnfilteredData}
+          loaded={loaded}
+          loadError={loadErrors}
           columns={columns}
           Row={MigrationsRow}
           EmptyMsg={() => (
