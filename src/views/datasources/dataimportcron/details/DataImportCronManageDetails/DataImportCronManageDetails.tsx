@@ -33,7 +33,7 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
   const { t } = useKubevirtTranslation();
 
   const source = dataImportCron?.spec?.template.spec?.source?.registry?.url;
-  const importsToKeep = dataImportCron?.spec?.importsToKeep || t('3 (default)');
+  const importsToKeep = dataImportCron?.spec?.importsToKeep?.toString() || t('3 (default)');
   const isAutoUpdated = isDataImportCronAutoUpdated(dataSource, dataImportCron);
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataImportCron);
 

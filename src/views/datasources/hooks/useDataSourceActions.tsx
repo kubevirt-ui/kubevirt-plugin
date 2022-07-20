@@ -1,10 +1,7 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
-import DataSourceModel, {
-  DataSourceModelRef,
-} from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
@@ -29,10 +26,9 @@ type UseDataSourceActionsProvider = (
 export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataSource) => {
   const dataImportCronName = getDataSourceCronJob(dataSource);
   const [dataImportCron, setDataImportCron] = React.useState<V1beta1DataImportCron>();
-  const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const history = useHistory();
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataSource);
 
   const lazyLoadDataImportCron = React.useCallback(() => {
@@ -104,15 +100,6 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
           )),
       },
       {
-        id: 'datasource-action-edit-datasource',
-        disabled: false,
-        label: t('Edit DataSource'),
-        cta: () =>
-          history.push(
-            `/k8s/ns/${dataSource.metadata.namespace}/${DataSourceModelRef}/${dataSource.metadata.name}/yaml`,
-          ),
-      },
-      {
         id: 'datasource-action-delete',
         label: t('Delete DataSource'),
         cta: () =>
@@ -144,6 +131,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
             )}
           </Split>
         ),
+        description: isOwnedBySSP && t('Red Hat DataSources cannot be edited'),
         disabled: !dataImportCron || isOwnedBySSP || isLoading,
         cta: () =>
           createModal(({ isOpen, onClose }) => (
@@ -159,7 +147,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
           )),
       },
     ],
-    [t, dataSource, isLoading, dataImportCron, isOwnedBySSP, createModal, history],
+    [t, dataSource, isLoading, dataImportCron, isOwnedBySSP, createModal],
   );
 
   return [actions, lazyLoadDataImportCron];
