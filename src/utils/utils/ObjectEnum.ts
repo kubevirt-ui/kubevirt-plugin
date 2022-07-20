@@ -7,10 +7,10 @@ export abstract class ObjectEnum<T> {
       .filter((value) => Clazz[value] instanceof Clazz)
       .map((key) => {
         const result = Clazz[key];
-        if (usedValues.has(result.getValue())) {
+        if (usedValues.has(result?.getValue())) {
           throw new Error(`${result}: value must be unique`);
         }
-        usedValues.add(result.getValue());
+        usedValues.add(result?.getValue());
         return result;
       }) as A[];
   };
