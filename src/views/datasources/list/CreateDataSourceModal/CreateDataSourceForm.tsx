@@ -14,7 +14,6 @@ import {
   Popover,
   Stack,
   StackItem,
-  TextInput,
   ValidatedOptions,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
@@ -60,18 +59,14 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
           validated={errors?.['name'] ? ValidatedOptions.error : ValidatedOptions.default}
         />
       </FormGroup>
-      <FormGroup fieldId="datasource-create-source-type" label={t('Source type')}>
-        <TextInput
-          id="datasource-create-source-type-input"
-          isDisabled
-          isReadOnly
-          value={t('Registry')}
-        />
-      </FormGroup>
       <FormGroup
         fieldId="datasource-create-source-url"
-        label={t('URL')}
+        label={t('Registry URL')}
         validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
+        helperText={t('Example: {{exampleURL}}', {
+          exampleURL: 'docker://quay.io/containerdisks/centos:7-2009',
+        })}
+        aria-label={t('Registry URL')}
         helperTextInvalid={t('This field is required')}
         helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
         isRequired
@@ -80,7 +75,7 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
           {...register('url', { required: true })}
           id={'datasource-create-source-url'}
           type="text"
-          aria-label={t('Source URL')}
+          aria-label={t('Registry URL')}
           data-test-id={'datasource-create-source-url'}
           validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
         />

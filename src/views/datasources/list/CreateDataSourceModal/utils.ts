@@ -69,26 +69,9 @@ export const createDataSourceWithImportCron = async ({
   schedule: string;
 }) => {
   const dataImportCronName = `${dataSourceName}-import-cron`;
-
-  const createdDataSource = await k8sCreate<V1beta1DataSource>({
-    model: DataSourceModel,
-    data: produce(initialDataSource, (draft) => {
-      draft.metadata.name = dataSourceName;
-      draft.metadata.namespace = namespace;
-
-      draft.metadata.labels = {
-        [DATA_SOURCE_CRONJOB_LABEL]: dataImportCronName,
-      };
-    }),
-  });
-
   const dataImportCron = produce(initialDataImportCron, (draft) => {
     draft.metadata.name = dataImportCronName;
     draft.metadata.namespace = namespace;
-    draft.metadata.ownerReferences = [
-      buildOwnerReference(createdDataSource, { blockOwnerDeletion: false }),
-    ];
-
     draft.spec = {
       garbageCollect: 'Outdated',
       managedDataSource: dataSourceName,
@@ -112,9 +95,34 @@ export const createDataSourceWithImportCron = async ({
       },
     };
   });
-
+  // dry run to validate the DataImportCron
   await k8sCreate<V1beta1DataImportCron>({
     model: DataImportCronModel,
     data: dataImportCron,
+    queryParams: {
+      dryRun: 'All',
+      fieldManager: 'kubectl-create',
+    },
+  });
+
+  const createdDataSource = await k8sCreate<V1beta1DataSource>({
+    model: DataSourceModel,
+    data: produce(initialDataSource, (draft) => {
+      draft.metadata.name = dataSourceName;
+      draft.metadata.namespace = namespace;
+
+      draft.metadata.labels = {
+        [DATA_SOURCE_CRONJOB_LABEL]: dataImportCronName,
+      };
+    }),
+  });
+
+  await k8sCreate<V1beta1DataImportCron>({
+    model: DataImportCronModel,
+    data: produce(dataImportCron, (draft) => {
+      draft.metadata.ownerReferences = [
+        buildOwnerReference(createdDataSource, { blockOwnerDeletion: false }),
+      ];
+    }),
   });
 };
