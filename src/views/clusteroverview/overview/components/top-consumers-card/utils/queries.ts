@@ -47,4 +47,4 @@ const topConsumerQueries = {
 };
 
 export const getTopConsumerQuery = (metric, scope, numItemsToShow = 5, duration = '5m') =>
-  topConsumerQueries[scope][metric](numItemsToShow, duration);
+  topConsumerQueries?.[scope]?.[metric]?.(numItemsToShow, duration);
