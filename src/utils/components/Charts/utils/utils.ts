@@ -4,8 +4,19 @@ export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
 export const FIVE_MINUTES = 5 * ONE_MINUTE;
 export const ONE_HOUR = 60 * ONE_MINUTE;
+export const FOUR_HOUR = 4 * ONE_HOUR;
 export const ONE_DAY = 24 * ONE_HOUR;
 export const ONE_WEEK = 7 * ONE_DAY;
+
+const mapperDuration = {
+  '1h': ONE_HOUR,
+  '5m': FIVE_MINUTES,
+  '1d': ONE_DAY,
+  '4h': FOUR_HOUR,
+};
+
+export const getDurationMilliseconds = (duration) =>
+  mapperDuration?.[duration] || mapperDuration?.['5m'];
 
 export const adjustDurationForStart = (start: number, createdAt: string): number => {
   if (!createdAt) {
@@ -55,8 +66,8 @@ export const tickFormat = (timespan: number) => (tick: any, index: number, ticks
   if (isLast || isFirst) {
     const dateNow = new Date(Date.now());
     const datePast = new Date(+dateNow - timespan);
-    return `${(isLast ? datePast : dateNow).getHours()}:${(
-      '0' + (isLast ? datePast : dateNow).getMinutes()
+    return `${(isLast ? dateNow : datePast).getHours()}:${(
+      '0' + (isLast ? dateNow : datePast).getMinutes()
     ).slice(-2)}`;
   }
 

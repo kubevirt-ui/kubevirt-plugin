@@ -1,15 +1,18 @@
 import React from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import CPUThresholdChart from '@kubevirt-utils/components/Charts/CPUUtil/CPUThresholdChart';
+import MemoryThresholdChart from '@kubevirt-utils/components/Charts/MemoryUtil/MemoryThresholdChart';
+import NetworkThresholdChart from '@kubevirt-utils/components/Charts/NetworkUtil/NetworkThresholdChart';
+import StorageThresholdChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageThresholdChart';
+import {
+  adjustDurationForStart,
+  getCreationTimestamp,
+  ONE_HOUR,
+} from '@kubevirt-utils/components/Charts/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { GridItem } from '@patternfly/react-core';
 
-import { adjustDurationForStart, getCreationTimestamp, ONE_HOUR } from '../utils/utils';
-
-import CPUThresholdChart from './CPUUtil/CPUThresholdChart';
-import MemoryThresholdChart from './MemoryUtil/MemoryThresholdChart';
-import NetworkThresholdChart from './NetworkUtil/NetworkThresholdChart';
-import StorageThresholdChart from './StorageUtil/StorageThresholdChart';
 import TimeDropdown from './TimeDropdown';
 
 type UtilizationThresholdChartsProps = {

@@ -12,16 +12,15 @@ import {
   ChartAxis,
   ChartGroup,
   ChartThreshold,
-  ChartTooltip,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
-import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
-import { getUtilizationQueries } from '../../utils/queries';
-import { queriesToLink, tickFormat } from '../../utils/utils';
 import ComponentReady from '../ComponentReady/ComponentReady';
+import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import { getUtilizationQueries } from '../utils/queries';
+import { queriesToLink, tickFormat } from '../utils/utils';
 
 type MemoryThresholdChartProps = {
   timespan: number;
@@ -33,6 +32,7 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ timespan, v
     () => getUtilizationQueries({ vmName: vmi?.metadata?.name }),
     [vmi],
   );
+  const { ref, width, height } = useResponsiveCharts();
 
   const requests = vmi?.spec?.domain?.resources?.requests as {
     [key: string]: string;
@@ -61,19 +61,18 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ timespan, v
 
   return (
     <ComponentReady isReady={isReady}>
-      <div className="util-threshold-chart">
+      <div className="util-threshold-chart" ref={ref}>
         <Link to={queriesToLink(queries?.MEMORY_USAGE)}>
           <Chart
-            height={200}
+            height={height}
+            width={width}
+            padding={35}
             scale={{ x: 'time', y: 'linear' }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
                   return `${datum?.name}: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
                 }}
-                labelComponent={
-                  <ChartTooltip style={{ fontSize: chart_global_FontSize_2xl.value }} />
-                }
                 constrainToVisibleArea
               />
             }
@@ -87,9 +86,6 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ timespan, v
                 ticks: {
                   stroke: 'transparent',
                 },
-                tickLabels: {
-                  fontSize: 24,
-                },
               }}
               axisComponent={<></>}
             />
@@ -97,9 +93,6 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ timespan, v
               tickFormat={tickFormat(timespan)}
               style={{
                 ticks: { stroke: 'transparent' },
-                tickLabels: {
-                  fontSize: 24,
-                },
               }}
               axisComponent={<></>}
             />
@@ -119,7 +112,6 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ timespan, v
                 data: {
                   stroke: chart_color_orange_300.value,
                   strokeDasharray: 10,
-                  strokeWidth: 7,
                 },
               }}
             />

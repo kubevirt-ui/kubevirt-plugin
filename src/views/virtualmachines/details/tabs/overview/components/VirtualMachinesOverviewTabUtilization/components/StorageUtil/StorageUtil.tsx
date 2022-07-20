@@ -2,11 +2,10 @@ import React from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
-
-import ComponentReady from '../ComponentReady/ComponentReady';
 
 type StorageUtilProps = {
   vmi: V1VirtualMachineInstance;

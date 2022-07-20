@@ -11,16 +11,15 @@ import {
   ChartArea,
   ChartAxis,
   ChartGroup,
-  ChartTooltip,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_blue_400 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
-import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
-import { getMultilineUtilizationQueries } from '../../utils/queries';
-import { queriesToLink, tickFormat } from '../../utils/utils';
 import ComponentReady from '../ComponentReady/ComponentReady';
+import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import { getMultilineUtilizationQueries } from '../utils/queries';
+import { queriesToLink, tickFormat } from '../utils/utils';
 
 type NetworkThresholdChartProps = {
   timespan: number;
@@ -35,6 +34,7 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ timespan,
       }),
     [vmi],
   );
+  const { ref, width, height } = useResponsiveCharts();
 
   const [networkInQuery, networkOutQuery] = queries?.NETWORK_USAGE;
 
@@ -66,19 +66,18 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ timespan,
 
   return (
     <ComponentReady isReady={isReady}>
-      <div className="util-threshold-chart">
+      <div className="util-threshold-chart" ref={ref}>
         <Link to={queriesToLink([networkInQuery?.query, networkOutQuery?.query])}>
           <Chart
-            height={200}
+            height={height}
+            width={width}
+            padding={35}
             scale={{ x: 'time', y: 'linear' }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
                   return `${datum?.name}: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
                 }}
-                labelComponent={
-                  <ChartTooltip style={{ fontSize: chart_global_FontSize_2xl.value }} />
-                }
                 constrainToVisibleArea
               />
             }
@@ -87,9 +86,6 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ timespan,
               tickFormat={tickFormat(timespan)}
               style={{
                 ticks: { stroke: 'transparent' },
-                tickLabels: {
-                  fontSize: 24,
-                },
               }}
               axisComponent={<></>}
             />

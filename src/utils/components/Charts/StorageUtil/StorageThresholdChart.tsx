@@ -9,15 +9,14 @@ import {
   ChartArea,
   ChartAxis,
   ChartGroup,
-  ChartTooltip,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
-import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
-import { getMultilineUtilizationQueries } from '../../utils/queries';
-import { tickFormat } from '../../utils/utils';
 import ComponentReady from '../ComponentReady/ComponentReady';
+import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import { getMultilineUtilizationQueries } from '../utils/queries';
+import { tickFormat } from '../utils/utils';
 // import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 
 type StorageThresholdChartProps = {
@@ -32,6 +31,7 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan,
     () => getMultilineUtilizationQueries({ vmName: vmi?.metadata?.name }),
     [vmi],
   );
+  const { ref, width, height } = useResponsiveCharts();
 
   const [data] = usePrometheusPoll({
     query: queries?.FILESYSTEM_USAGE?.[1]?.query,
@@ -53,18 +53,17 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan,
 
   return (
     <ComponentReady isReady={!isEmpty(chartData)}>
-      <div className="util-threshold-chart">
+      <div className="util-threshold-chart" ref={ref}>
         <Chart
-          height={200}
+          height={height}
+          width={width}
+          padding={35}
           scale={{ x: 'time', y: 'linear' }}
           containerComponent={
             <ChartVoronoiContainer
               labels={({ datum }) => {
                 return `Data written: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
               }}
-              labelComponent={
-                <ChartTooltip style={{ fontSize: chart_global_FontSize_2xl.value }} />
-              }
               constrainToVisibleArea
             />
           }
@@ -73,9 +72,6 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan,
             tickFormat={tickFormat(timespan)}
             style={{
               ticks: { stroke: 'transparent' },
-              tickLabels: {
-                fontSize: 24,
-              },
             }}
             axisComponent={<></>}
           />
