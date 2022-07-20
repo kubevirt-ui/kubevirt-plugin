@@ -9,6 +9,7 @@ import {
   DropdownGroup,
   DropdownItem,
   DropdownPosition,
+  DropdownSeparator,
   DropdownToggle,
   KebabToggle,
 } from '@patternfly/react-core';
@@ -72,6 +73,7 @@ const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKeba
             </DropdownItem>
           ))}
         </DropdownGroup>,
+        <DropdownSeparator key="dropdown separator" />,
         <DropdownGroup label={t('DataImportCron')} key="datasource-manage">
           <DropdownItem
             data-test-id="datasource-manage"

@@ -188,6 +188,9 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
                   validated={
                     errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default
                   }
+                  helperText={t('Example (At 00:00 on Tuesday): {{exampleCron}}', {
+                    exampleCron: '0 0 * * 2',
+                  })}
                   helperTextInvalid={t('This field is required')}
                   helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
                 >
