@@ -48,7 +48,8 @@
       "modalProvider": "./utils/components/ModalProvider/ModalProvider.tsx",
       "TemplateNavPage": "./views/templates/details/TemplateNavPage.tsx",
       "ConsoleStandAlone": "./utils/components/Consoles/ConsoleStandAlone.tsx",
-      "yamlTemplates": "src/templates/index.ts"
+      "yamlTemplates": "src/templates/index.ts",
+      "MigrationPoliciesList": "./views/migrationpolicies/list/MigrationPoliciesList.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"

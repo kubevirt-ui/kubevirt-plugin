@@ -329,5 +329,33 @@
       },
       "component": { "$codeRef": "DataImportCronPage" }
     }
+  },
+  {
+    "type": "console.navigation/resource-cluster",
+    "properties": {
+      "id": "migrationpolicies",
+      "name": "%plugin__kubevirt-plugin~MigrationPolicies%",
+      "section": "virtualization",
+      "model": {
+        "group": "migrations.kubevirt.io",
+        "kind": "MigrationPolicy",
+        "version": "v1alpha1"
+      },
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-migrationpolicies",
+        "data-test-id": "migrationpolicies-nav-item"
+      }
+    }
+  },
+  {
+    "type": "console.page/resource/list",
+    "properties": {
+      "model": {
+        "group": "migrations.kubevirt.io",
+        "kind": "MigrationPolicy",
+        "version": "v1alpha1"
+      },
+      "component": { "$codeRef": "MigrationPoliciesList" }
+    }
   }
 ]
