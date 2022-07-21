@@ -3,9 +3,11 @@ import * as React from 'react';
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { LabelGroup } from '@patternfly/react-core';
 
+import MigrationPoliciesActions from '../../../actions/components/MigrationPoliciesActions';
 import { MigrationPolicyMatchExpressionSelectorList } from '../MigrationPolicyMatchExpressionSelectorList/MigrationPolicyMatchExpressionSelectorList';
 import { MigrationPolicyMatchLabelSelectorList } from '../MigrationPolicyMatchLabelSelectorList/MigrationPolicyMatchLabelSelectorList';
 
@@ -24,7 +26,7 @@ const MigrationPoliciesRow: React.FC<RowProps<V1alpha1MigrationPolicy>> = ({
         />
       </TableData>
       <TableData id="bandwidth" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
-        {obj?.spec?.bandwidthPerMigration}
+        {obj?.spec?.bandwidthPerMigration ?? t('Unlimited')}
       </TableData>
       <TableData id="auto-converge" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
         {getBooleanText(obj?.spec?.allowAutoConverge)}
@@ -37,7 +39,7 @@ const MigrationPoliciesRow: React.FC<RowProps<V1alpha1MigrationPolicy>> = ({
         activeColumnIDs={activeColumnIDs}
         className="pf-m-width-10"
       >
-        {obj?.spec?.completionTimeoutPerGiB}
+        {obj?.spec?.completionTimeoutPerGiB ?? NO_DATA_DASH}
       </TableData>
       <TableData id="project-labels" activeColumnIDs={activeColumnIDs}>
         <LabelGroup>
@@ -68,7 +70,7 @@ const MigrationPoliciesRow: React.FC<RowProps<V1alpha1MigrationPolicy>> = ({
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
-        {/* <MigrationPoliciesActions mp={obj} isKebab/> */}
+        <MigrationPoliciesActions mp={obj} isKebabToggle />
       </TableData>
     </>
   );
