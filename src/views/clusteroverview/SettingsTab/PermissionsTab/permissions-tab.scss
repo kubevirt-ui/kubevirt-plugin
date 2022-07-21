@@ -1,0 +1,11 @@
+.permissions-tab {
+  &--main {
+    width: 35vw;
+    &__divider {
+      margin: var(--pf-global--spacer--sm) 0 var(--pf-global--spacer--md) 0;
+    }
+    &__row {
+      margin: var(--pf-global--spacer--sm) 0 var(--pf-global--spacer--md) 0;
+    }
+  }
+}
