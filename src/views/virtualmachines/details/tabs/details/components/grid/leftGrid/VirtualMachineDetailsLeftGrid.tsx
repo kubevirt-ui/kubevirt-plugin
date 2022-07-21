@@ -40,6 +40,7 @@ import CPUMemory from '../../CPUMemory/CPUMemory';
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import VirtualMachineLabels from '../../VirtualMachineLabels/VirtualMachineLabels';
+import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 
 type VirtualMachineDetailsLeftGridProps = {
   vm?: V1VirtualMachine;
@@ -256,6 +257,24 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
             ))
           }
           data-test-id={`${vm?.metadata?.name}-boot-method`}
+        />
+        <VirtualMachineDescriptionItem
+          descriptionData={vm?.spec?.template?.spec?.startStrategy ? t('ON') : t('OFF')}
+          descriptionHeader={t('Start in pause mode')}
+          isEdit={canUpdateVM}
+          data-test-id="start-pause-mode"
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <StartPauseModal
+                vm={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={onSubmit}
+                headerText={t('Start in pause mode')}
+                vmi={vmi}
+              />
+            ))
+          }
         />
         <VirtualMachineDescriptionItem
           descriptionData={

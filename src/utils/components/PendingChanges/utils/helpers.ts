@@ -188,6 +188,18 @@ export const getChangedEvictionStrategy = (
   return vmEvictionStrategy !== vmiEvictionStrategy || currentSelection !== vmiEvictionStrategy;
 };
 
+export const getChangedStartStrategy = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  const vmStartStrategy = !!vm?.spec?.template?.spec?.startStrategy;
+  const vmiStartStrategy = !!vmi?.spec?.startStrategy;
+  return vmStartStrategy !== vmiStartStrategy;
+};
+
 export const getChangedNodeSelector = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,

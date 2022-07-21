@@ -11,6 +11,7 @@ import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/Cloudi
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
+import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesModal';
@@ -43,6 +44,7 @@ import {
   getChangedNodeSelector,
   getChangedTolerations,
   getTabURL,
+  getChangedStartStrategy,
 } from '../utils/helpers';
 import { PendingChange } from '../utils/types';
 
@@ -66,6 +68,7 @@ export const usePendingChanges = (
     vmi,
     vm?.spec?.template?.spec?.domain?.cpu?.dedicatedCpuPlacement || false,
   );
+  const startStrategyChanged = getChangedStartStrategy(vm, vmi);
   const evictionStrategyChanged = getChangedEvictionStrategy(
     vm,
     vmi,
@@ -236,6 +239,23 @@ export const usePendingChanges = (
             onClose={onClose}
             onSubmit={onSubmit}
             headerText={t('Eviction Strategy')}
+            vmi={vmi}
+          />
+        ));
+      },
+    },
+    {
+      hasPendingChange: startStrategyChanged,
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
+      label: t('Start in pause mode'),
+      handleAction: () => {
+        createModal(({ isOpen, onClose }) => (
+          <StartPauseModal
+            vm={vm}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+            headerText={t('Start in pause mode')}
             vmi={vmi}
           />
         ));
