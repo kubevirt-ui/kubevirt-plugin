@@ -11,7 +11,7 @@ export const TemplatesCatalogPageHeader: React.FC<{ namespace: string; isAdmin: 
       <div className="pf-c-page__main-breadcrumb">
         <Stack hasGutter>
           <StackItem className="co-m-pane__heading">
-            <Title headingLevel="h1">{t('Create new VirtualMachine from catalog')}</Title>
+            <Title headingLevel="h1">{t('Create VirtualMachine from catalog')}</Title>
           </StackItem>
           {!namespace && !isAdmin && (
             <StackItem>
