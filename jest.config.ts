@@ -27,6 +27,9 @@ const config: Config.InitialOptions = {
     ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
   },
   globals: {
+    SERVER_FLAGS: {
+      basePath: 'http://localhost:9000/',
+    },
     'ts-jest': {
       isolatedModules: true,
       diagnostics: {

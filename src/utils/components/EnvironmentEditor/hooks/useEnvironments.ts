@@ -4,7 +4,12 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { EnvironmentKind, EnvironmentVariable } from '../constants';
-import { addEnvironmentsToVM, getRandomSerial, getVMEnvironmentsVariables } from '../utils';
+import {
+  addEnvironmentsToVM,
+  areEnvironmentsChanged,
+  getRandomSerial,
+  getVMEnvironmentsVariables,
+} from '../utils';
 
 type UseEnvironmentsType = {
   onSave: () => void;
@@ -78,15 +83,10 @@ const useEnvironments = (
   }, [environments, updateVM, vm]);
 
   React.useEffect(() => {
-    const unchanged = environments.every(
-      ({ name, serial }, index) =>
-        initialEnvironments?.[index]?.name === name &&
-        initialEnvironments?.[index]?.serial === serial,
-    );
-    const edited = !unchanged || environments.length !== initialEnvironments.length;
+    const edited = areEnvironmentsChanged(environments, initialEnvironments);
 
     if (onEditChange) onEditChange(edited);
-    setEnvironmentsEdited(!unchanged || environments.length !== initialEnvironments.length);
+    setEnvironmentsEdited(edited);
   }, [environments, initialEnvironments, onEditChange]);
 
   return {
