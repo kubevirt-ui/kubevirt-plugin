@@ -15,6 +15,7 @@ import {
   generateVMName,
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template/utils/selectors';
+import { findAllIndexes } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { NAME_INPUT_FIELD } from './constants';
@@ -26,7 +27,7 @@ export const overrideVirtualMachineDataVolumeSpec = (
 ): V1VirtualMachine => {
   return produceVMDisks(virtualMachine, (draftVM) => {
     const dataVolumeTemplate = draftVM.spec.dataVolumeTemplates[0];
-    if (dataVolumeTemplate && !!customSource) {
+    if (dataVolumeTemplate && Boolean(customSource)) {
       draftVM.spec.dataVolumeTemplates[0].spec = customSource;
 
       const shouldAddImmediateBind = customSource?.source?.blank || customSource?.source?.upload;
@@ -81,7 +82,7 @@ export const hasCustomizableSource = (template: V1Template): boolean => {
 
 export const extractParameterNameFromMetadataName = (template: V1Template): string => {
   const virtualMachineObject = getTemplateVirtualMachineObject(template);
-  return virtualMachineObject?.metadata.name?.replace(/[${}\"]+/g, '');
+  return virtualMachineObject?.metadata.name?.replace(/[${}"]+/g, '');
 };
 
 export const processTemplate = async ({
@@ -97,20 +98,21 @@ export const processTemplate = async ({
 }): Promise<V1Template> => {
   const virtualMachineName = formData.get(NAME_INPUT_FIELD) as string;
 
-  let templateToProcess = await produce(template, async (draftTemplate) => {
-    draftTemplate.metadata.namespace = namespace;
+  let templateToProcess = produce(template, (draftTemplate) => {
+    let draftVMTemplate = draftTemplate;
+    draftVMTemplate.metadata.namespace = namespace;
+
     const parameterForName = extractParameterNameFromMetadataName(template);
 
-    draftTemplate = setTemplateParameters(draftTemplate, formData);
+    draftVMTemplate = setTemplateParameters(draftVMTemplate, formData);
 
-    draftTemplate = replaceTemplateParameterValue(
-      draftTemplate,
+    draftVMTemplate = replaceTemplateParameterValue(
+      draftVMTemplate,
       parameterForName,
       virtualMachineName,
     );
 
-    const draftVM = getTemplateVirtualMachineObject(draftTemplate);
-
+    const draftVM = getTemplateVirtualMachineObject(draftVMTemplate);
     draftVM.metadata.name = virtualMachineName;
   });
 
@@ -127,16 +129,49 @@ export const processTemplate = async ({
   });
 };
 
+// set some value for required template parameters to get the template processed successfully
+export const setValueForRequiredParams = (template: V1Template): V1Template => {
+  const requiredParamsIndexes = findAllIndexes(
+    template?.parameters || [],
+    (parameter) => parameter?.required,
+  );
+
+  const templateToProcess = produce(template, (draftTemplate) => {
+    requiredParamsIndexes.map((paramIndex) => {
+      draftTemplate.parameters[paramIndex].value = 'val'; // must be any non-empty string
+    });
+    return draftTemplate;
+  });
+
+  return templateToProcess;
+};
+
+export const getVMName = async (template: V1Template): Promise<string> => {
+  const templateToProcess = setValueForRequiredParams(template); // need to set some value if required params occur
+
+  return await k8sCreate<V1Template>({
+    model: ProcessedTemplatesModel,
+    data: templateToProcess,
+    queryParams: {
+      dryRun: 'All',
+    },
+  }).then(
+    (simpleProcessedTemplate) =>
+      simpleProcessedTemplate?.parameters?.find((obj: { name: string }) => obj?.name === 'NAME')
+        ?.value || generateVMName(template),
+  );
+};
+
 export const getVirtualMachineNameField = (
-  template: V1Template,
+  vmName: string,
   t: TFunction<'plugin__kubevirt-plugin', undefined>,
 ): TemplateParameter => {
   return {
     required: true,
     name: NAME_INPUT_FIELD,
     displayName: t('Name'),
-    description: t('VirtualMachine Name'),
-    value: generateVMName(template),
+    description: t('VirtualMachine name'),
+    value: vmName,
   };
 };
 

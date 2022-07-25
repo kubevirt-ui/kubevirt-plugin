@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -68,7 +69,10 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({
   });
 
   const [requiredFields, optionalFields] = React.useMemo(() => buildFields(template), [template]);
-  const nameField = React.useMemo(() => getVirtualMachineNameField(template, t), [template, t]);
+
+  const { vm } = useWizardVMContext();
+
+  const nameField = React.useMemo(() => getVirtualMachineNameField(vm?.metadata?.name, t), [vm, t]);
 
   return (
     <FormProvider {...methods}>
