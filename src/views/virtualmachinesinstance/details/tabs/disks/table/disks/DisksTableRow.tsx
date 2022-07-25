@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+import {
+  modelToGroupVersionKind,
+  PersistentVolumeClaimModel,
+} from '@kubevirt-ui/kubevirt-api/console';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -25,7 +29,7 @@ const DisksTableRow: React.FC<DiskTableRowProps> = ({ obj, activeColumnIDs }) =>
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
         {obj?.namespace ? (
           <ResourceLink
-            kind={'PersistentVolumeClaim'}
+            groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
             name={obj?.name}
             namespace={obj?.namespace}
           />
