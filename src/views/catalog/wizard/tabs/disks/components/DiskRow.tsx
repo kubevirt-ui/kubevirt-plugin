@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
@@ -37,7 +37,11 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ obj, activeColumnIDs }
       </TableData>
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
         {isPVCSource ? (
-          <ResourceLink kind={PersistentVolumeClaimModel.kind} name={obj?.source} />
+          <ResourceLink
+            groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
+            name={obj?.source}
+            namespace={obj?.namespace}
+          />
         ) : (
           obj?.source
         )}
