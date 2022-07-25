@@ -17,6 +17,7 @@ const useDashboardSubsystems = <E extends Extension>(
 
   return React.useMemo(
     () => filterSubsystems<E>(dynamicSubsystemExtensions, typeGuard, allK8sModels),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dynamicSubsystemExtensions, allK8sModels],
   );
 };

@@ -169,7 +169,7 @@ export const getAPIVersionForModel = (model: K8sModel): string =>
  * Get vm printable status
  * @date 7/6/2022 - 11:23:32 AM
  *
- * @param {V1VirtualMachine} vm
+ * @param {V1VirtualMachine} vm - vm to get status from
  * @returns {*}
  */
 export const getVMStatus = (vm: V1VirtualMachine) => vm?.status?.printableStatus;
@@ -178,8 +178,8 @@ export const getVMStatus = (vm: V1VirtualMachine) => vm?.status?.printableStatus
  * Get allowed resource for project
  * @date 7/6/2022 - 11:23:32 AM
  *
- * @param {string[]} projectNames
- * @param {K8sModel} model
+ * @param {string[]} projectNames - project names
+ * @param {K8sModel} model - k8s model
  * @returns {*}
  */
 export const getAllowedResources = (projectNames: string[], model: K8sModel) => {
@@ -202,8 +202,8 @@ export const getAllowedResources = (projectNames: string[], model: K8sModel) => 
  *
  * @param {WatchK8sResults<{
     [key: string]: K8sResourceCommon[];
-  }>} resources
- * @param {K8sModel} model
+  }>} resources - resources
+ * @param {K8sModel} model - k8s model
  * @returns {{ data: any; loaded: any; loadError: any; }}
  */
 export const getAllowedResourceData = (
@@ -235,7 +235,7 @@ export const getAllowedResourceData = (
  * Get allowed templates resources
  * @date 7/6/2022 - 11:23:32 AM
  *
- * @param {string[]} projectNames
+ * @param {string[]} projectNames - project names
  * @returns {*}
  */
 export const getAllowedTemplateResources = (projectNames: string[]) => {

@@ -57,6 +57,7 @@ const useDashboardPrometheusActivities = () => {
           (q) => prometheusResults.getIn([q, 'data']) || prometheusResults.getIn([q, 'loadError']),
         ),
       ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [prometheusResults],
   );
 
