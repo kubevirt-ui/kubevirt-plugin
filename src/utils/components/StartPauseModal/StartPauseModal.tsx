@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import produce from 'immer';
+import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
-import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { getChangedStartStrategy } from '../PendingChanges/utils/helpers';

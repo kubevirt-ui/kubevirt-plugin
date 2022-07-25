@@ -11,13 +11,13 @@ import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/Cloudi
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
-import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
+import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { VMAuthorizedSSHKeyModal } from '@kubevirt-utils/components/VMAuthorizedSSHKeyModal/VMAuthorizedSSHKeyModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -42,9 +42,9 @@ import {
   getChangedHostDevices,
   getChangedNics,
   getChangedNodeSelector,
+  getChangedStartStrategy,
   getChangedTolerations,
   getTabURL,
-  getChangedStartStrategy,
 } from '../utils/helpers';
 import { PendingChange } from '../utils/types';
 

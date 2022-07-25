@@ -15,6 +15,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
+import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview, getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
@@ -40,7 +41,6 @@ import CPUMemory from '../../CPUMemory/CPUMemory';
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
 import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import VirtualMachineLabels from '../../VirtualMachineLabels/VirtualMachineLabels';
-import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 
 type VirtualMachineDetailsLeftGridProps = {
   vm?: V1VirtualMachine;
