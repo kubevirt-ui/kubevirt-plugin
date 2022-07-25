@@ -178,6 +178,13 @@ export const useCustomizeFormSubmit = ({
     }
   };
 
+  React.useEffect(() => {
+    if (templateError) {
+      setTemplateError(undefined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [diskSource?.source]);
+
   return {
     onSubmit,
     onCancel: async () => {
