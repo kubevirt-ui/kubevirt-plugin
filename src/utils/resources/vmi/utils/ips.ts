@@ -13,6 +13,6 @@ export const getVMIIPAddresses = (vmi: V1VirtualMachineInstance): string[] => {
     iface?.ipAddress,
     ...(iface?.ipAddresses || []),
   ]);
-  const trimmedIPAddresses = ipAddresses?.map((ip) => ip.trim())?.filter((ip) => ip.length > 0);
+  const trimmedIPAddresses = ipAddresses?.map((ip) => ip?.trim())?.filter((ip) => ip?.length > 0);
   return [...new Set(trimmedIPAddresses)];
 };
