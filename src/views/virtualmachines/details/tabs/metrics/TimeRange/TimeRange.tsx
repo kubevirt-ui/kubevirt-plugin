@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import DurationDropdown from 'src/views/clusteroverview/MonitoringTab/top-consumers-card/utils/DurationDropdown';
-import DurationOption from 'src/views/clusteroverview/MonitoringTab/top-consumers-card/utils/DurationOption';
 
+import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
+import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import useDuration from '../hooks/useDuration';

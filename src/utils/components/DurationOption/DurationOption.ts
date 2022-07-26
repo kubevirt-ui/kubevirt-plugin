@@ -29,8 +29,7 @@ const mapperDuration = {
   '1w': ONE_WEEK,
 };
 
-export const getDurationMilliseconds = (duration) =>
-  mapperDuration?.[duration] || mapperDuration?.['5m'];
+const getDurationMilliseconds = (duration) => mapperDuration?.[duration] || mapperDuration?.['5m'];
 
 class DurationOption extends DropdownEnum<string> {
   protected readonly millisecondsTime: number;

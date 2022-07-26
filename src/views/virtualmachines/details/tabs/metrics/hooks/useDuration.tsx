@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import DurationOption from 'src/views/clusteroverview/MonitoringTab/top-consumers-card/utils/DurationOption';
 
 import { SINGLE_VM_DURATION } from '@kubevirt-utils/components/Charts/utils/utils';
+import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 
 type UseDuration = () => {
