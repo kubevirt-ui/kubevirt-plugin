@@ -1,8 +1,7 @@
 import * as React from 'react';
 
+import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
-
-import DurationOption from './DurationOption';
 
 export type DurationDropdownProps = {
   selectedDuration: string;

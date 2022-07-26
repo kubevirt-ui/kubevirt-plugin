@@ -1,5 +1,4 @@
-import DurationOption from 'src/views/clusteroverview/MonitoringTab/top-consumers-card/utils/DurationOption';
-
+import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 
 export const SINGLE_VM_DURATION = 'SINGLE_VM_DURATION';

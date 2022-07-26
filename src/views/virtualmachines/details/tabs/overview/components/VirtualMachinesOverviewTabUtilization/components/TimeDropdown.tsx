@@ -1,7 +1,7 @@
 import * as React from 'react';
-import DurationDropdown from 'src/views/clusteroverview/MonitoringTab/top-consumers-card/utils/DurationDropdown';
-import DurationOption from 'src/views/clusteroverview/MonitoringTab/top-consumers-card/utils/DurationOption';
 
+import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
+import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 const TimeDropdown: React.FC = () => {

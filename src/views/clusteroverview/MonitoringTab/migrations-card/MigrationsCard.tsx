@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
+import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -16,8 +18,6 @@ import {
 } from '@patternfly/react-core';
 
 import { MIGRATIONS_DURATION_KEY } from '../top-consumers-card/utils/constants';
-import DurationDropdown from '../top-consumers-card/utils/DurationDropdown';
-import DurationOption from '../top-consumers-card/utils/DurationOption';
 
 import MigrationsChartDonut from './components/MigrationsChartDonut/MigrationsChartDonut';
 import MigrationsLimitionsPopover from './components/MigrationsLimitionsPopover/MigrationsLimitionsPopover';
