@@ -34,7 +34,7 @@ import {
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
-import { isCommonVMTemplate } from '../../../utils';
+import { isCommonVMTemplate } from '../../../utils/utils';
 
 import SysPrepItem from './SysPrepItem';
 

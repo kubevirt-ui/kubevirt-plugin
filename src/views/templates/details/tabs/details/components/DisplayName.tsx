@@ -1,7 +1,7 @@
 import * as React from 'react';
 import produce from 'immer';
-import { ensurePath } from 'src/views/templates/utils';
 import { ANNOTATIONS } from 'src/views/templates/utils/constants';
+import { ensurePath } from 'src/views/templates/utils/utils';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

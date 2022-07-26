@@ -1,6 +1,6 @@
 import * as React from 'react';
 import produce from 'immer';
-import { isCommonVMTemplate } from 'src/views/templates/utils';
+import { isCommonVMTemplate } from 'src/views/templates/utils/utils';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {

@@ -17,7 +17,7 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { isCommonVMTemplate } from '../../../utils';
+import { isCommonVMTemplate } from '../../../utils/utils';
 
 import DiskListTitle from './components/DiskListTitle';
 import DiskRow from './components/DiskRow';

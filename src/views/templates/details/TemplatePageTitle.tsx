@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
 import { Breadcrumb, BreadcrumbItem, Button, Label, Title } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../utils';
+import { isCommonVMTemplate } from '../utils/utils';
 
 import NoEditableTemplateAlert from './NoEditableTemplateAlert';
 import TemplateActions from './TemplateActions';

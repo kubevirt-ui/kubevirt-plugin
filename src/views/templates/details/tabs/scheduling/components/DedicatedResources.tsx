@@ -1,6 +1,6 @@
 import React from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
-import { isDedicatedCPUPlacement } from 'src/views/templates/utils';
+import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

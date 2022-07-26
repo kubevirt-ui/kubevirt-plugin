@@ -7,7 +7,7 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid, GridItem } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../../../utils';
+import { isCommonVMTemplate } from '../../../utils/utils';
 
 import './TemplateSchedulingTab.scss';
 

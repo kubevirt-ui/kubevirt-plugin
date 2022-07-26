@@ -1,6 +1,6 @@
 import * as React from 'react';
 import produce from 'immer';
-import { isDeschedulerOn } from 'src/views/templates/utils';
+import { isDeschedulerOn } from 'src/views/templates/utils/utils';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';

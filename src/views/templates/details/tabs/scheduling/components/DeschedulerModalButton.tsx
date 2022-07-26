@@ -1,5 +1,5 @@
 import React from 'react';
-import { isDeschedulerOn } from 'src/views/templates/utils';
+import { isDeschedulerOn } from 'src/views/templates/utils/utils';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

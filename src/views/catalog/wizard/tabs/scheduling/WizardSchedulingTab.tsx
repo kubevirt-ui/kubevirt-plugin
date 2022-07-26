@@ -10,9 +10,11 @@ import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyMo
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
+import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
+import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
 
@@ -32,11 +34,12 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
     isList: true,
   });
 
+  const isDeschedulerInstalled = useDeschedulerInstalled();
+  const isAdmin = useIsAdmin();
+  const isDeschedulerEditable = isAdmin && isDeschedulerInstalled;
+
   return (
     <div className="co-m-pane__body">
-      <Title headingLevel="h2" className="co-section-heading">
-        {t('Scheduling and resources requirements')}
-      </Title>
       <Grid hasGutter>
         <GridItem span={6} rowSpan={4}>
           <DescriptionList>
@@ -100,7 +103,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
             <WizardDescriptionItem
               title={t('Descheduler')}
               description={<Descheduler vm={vm} />}
-              isEdit
+              isEdit={isDeschedulerEditable}
               testId="descheduler"
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
