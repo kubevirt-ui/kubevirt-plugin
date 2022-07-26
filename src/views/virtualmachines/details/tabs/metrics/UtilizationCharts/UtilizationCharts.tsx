@@ -9,12 +9,11 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-core';
 
 type UtilizationChartsProps = {
-  timespan: number;
   vmi: V1VirtualMachineInstance;
   pods: K8sResourceCommon[];
 };
 
-const UtilizationCharts: React.FC<UtilizationChartsProps> = ({ timespan, vmi, pods }) => {
+const UtilizationCharts: React.FC<UtilizationChartsProps> = ({ vmi, pods }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -23,7 +22,7 @@ const UtilizationCharts: React.FC<UtilizationChartsProps> = ({ timespan, vmi, po
         <Card>
           <CardTitle>{t('Memory')}</CardTitle>
           <CardBody>
-            <MemoryThresholdChart timespan={timespan} vmi={vmi} />
+            <MemoryThresholdChart vmi={vmi} />
           </CardBody>
         </Card>
       </GridItem>
@@ -31,7 +30,7 @@ const UtilizationCharts: React.FC<UtilizationChartsProps> = ({ timespan, vmi, po
         <Card>
           <CardTitle>{t('CPU')}</CardTitle>
           <CardBody>
-            <CPUThresholdChart timespan={timespan} vmi={vmi} pods={pods} />
+            <CPUThresholdChart vmi={vmi} pods={pods} />
           </CardBody>
         </Card>
       </GridItem>
@@ -39,7 +38,7 @@ const UtilizationCharts: React.FC<UtilizationChartsProps> = ({ timespan, vmi, po
         <Card>
           <CardTitle>{t('Network interfaces')}</CardTitle>
           <CardBody>
-            <NetworkThresholdChart timespan={timespan} vmi={vmi} />
+            <NetworkThresholdChart vmi={vmi} />
           </CardBody>
         </Card>
       </GridItem>

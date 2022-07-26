@@ -7,7 +7,6 @@ import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableSection } from '@patternfly/react-core';
 
-import useDuration from './hooks/useDuration';
 import MigrationCharts from './MigrationCharts/MigrationCharts';
 import StorageCharts from './StorageCharts/StorageCharts';
 import TimeRange from './TimeRange/TimeRange';
@@ -23,7 +22,6 @@ type VirtualMachineMetricsTabProps = RouteComponentProps & {
 const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const { vmi, pods } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const [timespan, duration, setDuration] = useDuration(vmi);
   const [expended, setExpended] = useState<{ [key in MetricsTabExpendedSections]: boolean }>({
     [MetricsTabExpendedSections.utilization]: true,
     [MetricsTabExpendedSections.storage]: true,
@@ -35,14 +33,14 @@ const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({ obj
 
   return (
     <div className="virtual-machine-metrics-tab__main">
-      <TimeRange duration={duration} setDuration={setDuration} />
+      <TimeRange />
       <Overview className="virtual-machine-metrics-tab__charts">
         <ExpandableSection
           toggleText={t('Utilization')}
           onToggle={onToggle(MetricsTabExpendedSections.utilization)}
           isExpanded={expended?.[MetricsTabExpendedSections.utilization]}
         >
-          <UtilizationCharts timespan={timespan} vmi={vmi} pods={pods} />
+          <UtilizationCharts vmi={vmi} pods={pods} />
         </ExpandableSection>
 
         <ExpandableSection
@@ -50,14 +48,14 @@ const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({ obj
           onToggle={onToggle(MetricsTabExpendedSections.storage)}
           isExpanded={expended?.[MetricsTabExpendedSections.storage]}
         >
-          <StorageCharts duration={duration} />
+          <StorageCharts vmi={vmi} />
         </ExpandableSection>
         <ExpandableSection
           toggleText={t('Migration')}
           onToggle={onToggle(MetricsTabExpendedSections.migration)}
           isExpanded={expended?.[MetricsTabExpendedSections.migration]}
         >
-          <MigrationCharts duration={duration} />
+          <MigrationCharts />
         </ExpandableSection>
       </Overview>
     </div>

@@ -1,32 +1,25 @@
-import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import DurationOption from 'src/views/clusteroverview/MonitoringTab/top-consumers-card/utils/DurationOption';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  adjustDurationForStart,
-  getCreationTimestamp,
-  getDurationMilliseconds,
-} from '@kubevirt-utils/components/Charts/utils/utils';
+import { SINGLE_VM_DURATION } from '@kubevirt-utils/components/Charts/utils/utils';
+import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 
-type UseDuration = (
-  vmi: V1VirtualMachineInstance,
-) => [timespan: number, duration: string, setDuration: Dispatch<SetStateAction<string>>];
+type UseDuration = () => {
+  currentTime: number;
+  duration: string;
+  durationMilliseconds: number;
+  setDuration: (newValue: string) => void;
+};
 
-const useDuration: UseDuration = (vmi) => {
-  const [duration, setDuration] = useState<string>('5m');
-
-  const createdAt = useMemo(() => getCreationTimestamp(vmi), [vmi]);
-
-  const adjustDuration = useCallback(
-    (start) => adjustDurationForStart(start, createdAt),
-    [createdAt],
+const useDuration: UseDuration = () => {
+  const [duration, setDuration] = useLocalStorage(
+    SINGLE_VM_DURATION,
+    DurationOption.FIVE_MIN.toString(),
   );
+  const currentTime = useMemo<number>(() => Date.now(), []);
+  const durationMilliseconds = DurationOption?.getMilliseconds(duration);
 
-  const timespan = useMemo(
-    () => adjustDuration(getDurationMilliseconds(duration)),
-    [adjustDuration, duration],
-  );
-
-  return [timespan, duration, setDuration];
+  return { currentTime, duration, durationMilliseconds, setDuration };
 };
 
 export default useDuration;

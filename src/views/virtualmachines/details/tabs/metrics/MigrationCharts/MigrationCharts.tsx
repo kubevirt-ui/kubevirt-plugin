@@ -3,11 +3,7 @@ import React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-core';
 
-type MigrationChartsProps = {
-  duration: string;
-};
-
-const MigrationCharts: React.FC<MigrationChartsProps> = () => {
+const MigrationCharts: React.FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
