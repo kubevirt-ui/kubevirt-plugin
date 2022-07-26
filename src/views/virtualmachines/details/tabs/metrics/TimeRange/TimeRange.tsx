@@ -5,13 +5,11 @@ import DurationOption from 'src/views/clusteroverview/MonitoringTab/top-consumer
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-type TimeDurationProps = {
-  duration: string;
-  setDuration: (value: string) => void;
-};
+import useDuration from '../hooks/useDuration';
 
-const TimeRange: React.FC<TimeDurationProps> = ({ duration, setDuration }) => {
+const TimeRange: React.FC = () => {
   const { t } = useKubevirtTranslation();
+  const { duration, setDuration } = useDuration();
   const onDurationSelect = (value: string) =>
     setDuration(DurationOption.fromDropdownLabel(value).toString());
 

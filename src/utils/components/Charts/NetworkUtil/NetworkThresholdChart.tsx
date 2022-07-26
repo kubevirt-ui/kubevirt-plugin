@@ -4,7 +4,6 @@ import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-// import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -15,41 +14,34 @@ import {
 } from '@patternfly/react-charts';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_blue_400 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
+import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
-import { getMultilineUtilizationQueries } from '../utils/queries';
+import { getUtilizationQueries } from '../utils/queries';
 import { queriesToLink, tickFormat } from '../utils/utils';
 
 type NetworkThresholdChartProps = {
-  timespan: number;
   vmi: V1VirtualMachineInstance;
 };
 
-const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ timespan, vmi }) => {
-  const queries = React.useMemo(
-    () =>
-      getMultilineUtilizationQueries({
-        vmName: vmi?.metadata?.name,
-      }),
-    [vmi],
-  );
+const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) => {
+  const { currentTime, duration } = useDuration();
+  const queries = React.useMemo(() => getUtilizationQueries(vmi, duration), [vmi, duration]);
   const { ref, width, height } = useResponsiveCharts();
 
-  const [networkInQuery, networkOutQuery] = queries?.NETWORK_USAGE;
-
   const [networkIn] = usePrometheusPoll({
-    query: networkInQuery?.query,
+    query: queries?.NETWORK_IN_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
-    timespan,
+    endTime: currentTime,
   });
 
   const [networkOut] = usePrometheusPoll({
-    query: networkOutQuery?.query,
+    query: queries?.NETWORK_OUT_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
-    timespan,
+    endTime: currentTime,
   });
 
   const networkInData = networkIn?.data?.result?.[0]?.values;
@@ -67,7 +59,7 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ timespan,
   return (
     <ComponentReady isReady={isReady}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={queriesToLink([networkInQuery?.query, networkOutQuery?.query])}>
+        <Link to={queriesToLink([queries?.NETWORK_IN_USAGE, queries?.NETWORK_OUT_USAGE])}>
           <Chart
             height={height}
             width={width}
@@ -83,7 +75,7 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ timespan,
             }
           >
             <ChartAxis
-              tickFormat={tickFormat(timespan)}
+              tickFormat={tickFormat(duration, currentTime)}
               style={{
                 ticks: { stroke: 'transparent' },
               }}

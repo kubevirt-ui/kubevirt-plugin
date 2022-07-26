@@ -16,6 +16,7 @@ import {
 } from '@patternfly/react-charts';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
+import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
@@ -23,15 +24,12 @@ import { getUtilizationQueries } from '../utils/queries';
 import { queriesToLink, tickFormat } from '../utils/utils';
 
 type MemoryThresholdChartProps = {
-  timespan: number;
   vmi: V1VirtualMachineInstance;
 };
 
-const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ timespan, vmi }) => {
-  const queries = React.useMemo(
-    () => getUtilizationQueries({ vmName: vmi?.metadata?.name }),
-    [vmi],
-  );
+const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
+  const { currentTime, duration } = useDuration();
+  const queries = React.useMemo(() => getUtilizationQueries(vmi, duration), [vmi, duration]);
   const { ref, width, height } = useResponsiveCharts();
 
   const requests = vmi?.spec?.domain?.resources?.requests as {
@@ -43,7 +41,7 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ timespan, v
     query: queries?.MEMORY_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
-    timespan,
+    endTime: currentTime,
   });
 
   const prometheusMemoryData = data?.data?.result?.[0]?.values;
@@ -90,7 +88,7 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ timespan, v
               axisComponent={<></>}
             />
             <ChartAxis
-              tickFormat={tickFormat(timespan)}
+              tickFormat={tickFormat(duration, currentTime)}
               style={{
                 ticks: { stroke: 'transparent' },
               }}

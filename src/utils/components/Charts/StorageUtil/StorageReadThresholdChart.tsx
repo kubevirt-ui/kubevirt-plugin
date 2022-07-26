@@ -12,32 +12,29 @@ import {
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
+import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
-import { getMultilineUtilizationQueries } from '../utils/queries';
+import { getUtilizationQueries } from '../utils/queries';
 import { tickFormat } from '../utils/utils';
-// import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 
 type StorageThresholdChartProps = {
-  timespan: number;
   vmi: V1VirtualMachineInstance;
 };
 
 const GIB_IN_BYTES = 1024;
 
-const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan, vmi }) => {
-  const queries = React.useMemo(
-    () => getMultilineUtilizationQueries({ vmName: vmi?.metadata?.name }),
-    [vmi],
-  );
+const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }) => {
+  const { currentTime, duration } = useDuration();
+  const queries = React.useMemo(() => getUtilizationQueries(vmi, duration), [vmi, duration]);
   const { ref, width, height } = useResponsiveCharts();
 
   const [data] = usePrometheusPoll({
-    query: queries?.FILESYSTEM_USAGE?.[1]?.query,
+    query: queries?.FILESYSTEM_READ_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
-    timespan,
+    endTime: currentTime,
   });
 
   const storageWriteData = data?.data?.result?.[0]?.values;
@@ -45,11 +42,6 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan,
   const chartData = storageWriteData?.map(([, item], index) => {
     return { x: index, y: Number(+item / GIB_IN_BYTES) };
   });
-
-  //! should be fixed once promethesus request adjust
-  // const thresholdLine = new Array(chartData?.length || 0)
-  //   .fill(0)
-  //   .map((_, index) => ({ x: index, y: threshold / GIB_IN_BYTES }));
 
   return (
     <ComponentReady isReady={!isEmpty(chartData)}>
@@ -62,14 +54,14 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan,
           containerComponent={
             <ChartVoronoiContainer
               labels={({ datum }) => {
-                return `Data written: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
+                return `Data read: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
               }}
               constrainToVisibleArea
             />
           }
         >
           <ChartAxis
-            tickFormat={tickFormat(timespan)}
+            tickFormat={tickFormat(duration, currentTime)}
             style={{
               ticks: { stroke: 'transparent' },
             }}
@@ -85,21 +77,10 @@ const StorageThresholdChart: React.FC<StorageThresholdChartProps> = ({ timespan,
               }}
             />
           </ChartGroup>
-          {/* ! should be fixed once promethesus request adjust */}
-          {/* <ChartThreshold
-          data={thresholdLine}
-          style={{
-            data: {
-              stroke: chart_color_orange_300.value,
-              strokeDasharray: 10,
-              strokeWidth: 3,
-            },
-          }}
-        /> */}
         </Chart>
       </div>
     </ComponentReady>
   );
 };
 
-export default StorageThresholdChart;
+export default StorageReadThresholdChart;

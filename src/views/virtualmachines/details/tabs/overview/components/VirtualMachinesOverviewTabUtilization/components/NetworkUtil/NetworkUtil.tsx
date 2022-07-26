@@ -3,13 +3,11 @@ import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
-import {
-  getMultilineUtilizationQueries,
-  PrometheusEndpoint,
-} from '@kubevirt-utils/components/Charts/utils/queries';
+import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type NetworkUtilProps = {
   vmi: V1VirtualMachineInstance;
@@ -17,26 +15,21 @@ type NetworkUtilProps = {
 
 const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-
-  const queries = React.useMemo(
-    () =>
-      getMultilineUtilizationQueries({
-        vmName: vmi?.metadata?.name,
-      }),
-    [vmi],
-  );
-  const [networkInQuery, networkOutQuery] = queries?.NETWORK_USAGE;
+  const { currentTime, duration } = useDuration();
+  const queries = React.useMemo(() => getUtilizationQueries(vmi, duration), [vmi, duration]);
 
   const [networkIn] = usePrometheusPoll({
-    query: networkInQuery?.query,
+    query: queries?.NETWORK_IN_USAGE,
     endpoint: PrometheusEndpoint?.QUERY,
     namespace: vmi?.metadata?.namespace,
+    endTime: currentTime,
   });
 
   const [networkOut] = usePrometheusPoll({
-    query: networkOutQuery?.query,
+    query: queries?.NETWORK_OUT_USAGE,
     endpoint: PrometheusEndpoint?.QUERY,
     namespace: vmi?.metadata?.namespace,
+    endTime: currentTime,
   });
 
   const networkInData = +networkIn?.data?.result?.[0]?.value?.[1];

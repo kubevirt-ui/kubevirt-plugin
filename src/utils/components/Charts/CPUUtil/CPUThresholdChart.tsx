@@ -19,6 +19,7 @@ import {
 } from '@patternfly/react-charts';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
+import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
@@ -26,35 +27,31 @@ import { getUtilizationQueries } from '../utils/queries';
 import { queriesToLink, tickFormat } from '../utils/utils';
 
 type CPUThresholdChartProps = {
-  timespan: number;
   vmi: V1VirtualMachineInstance;
   pods: K8sResourceCommon[];
 };
 
-const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ timespan, vmi, pods }) => {
+const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
   const vmiPod = React.useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
+  const { currentTime, duration } = useDuration();
   const { ref, width, height } = useResponsiveCharts();
   const queries = React.useMemo(
-    () =>
-      getUtilizationQueries({
-        vmName: vmi?.metadata?.name,
-        launcherPodName: vmiPod?.metadata?.name,
-      }),
-    [vmi, vmiPod],
+    () => getUtilizationQueries(vmi, duration, vmiPod?.metadata?.name),
+    [vmi, vmiPod, duration],
   );
 
   const [dataCPURequested] = usePrometheusPoll({
     query: queries.CPU_REQUESTED,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
-    timespan,
+    endTime: currentTime,
   });
 
   const [dataCPUUsage] = usePrometheusPoll({
     query: queries?.CPU_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
-    timespan,
+    endTime: currentTime,
   });
 
   const cpuUsage = dataCPUUsage?.data?.result?.[0]?.values;
@@ -100,7 +97,7 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ timespan, vmi, po
               axisComponent={<></>}
             />
             <ChartAxis
-              tickFormat={tickFormat(timespan)}
+              tickFormat={tickFormat(duration, currentTime)}
               style={{
                 ticks: { stroke: 'transparent' },
               }}

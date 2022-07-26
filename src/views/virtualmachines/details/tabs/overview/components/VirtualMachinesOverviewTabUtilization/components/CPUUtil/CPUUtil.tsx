@@ -2,14 +2,16 @@ import React from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
-import {
-  getUtilizationQueries,
-  PrometheusEndpoint,
-} from '@kubevirt-utils/components/Charts/utils/queries';
+import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
-import { K8sResourceCommon, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  K8sResourceCommon,
+  PrometheusEndpoint,
+  usePrometheusPoll,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
+import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type CPUUtilProps = {
   vmi: V1VirtualMachineInstance;
@@ -19,26 +21,24 @@ type CPUUtilProps = {
 const CPUUtil: React.FC<CPUUtilProps> = ({ vmi, pods }) => {
   const { t } = useKubevirtTranslation();
   const vmiPod = React.useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
-
+  const { currentTime, duration } = useDuration();
   const queries = React.useMemo(
-    () =>
-      getUtilizationQueries({
-        vmName: vmi?.metadata?.name,
-        launcherPodName: vmiPod?.metadata?.name,
-      }),
-    [vmi, vmiPod],
+    () => getUtilizationQueries(vmi, duration, vmiPod?.metadata?.name),
+    [vmi, vmiPod, duration],
   );
 
   const [dataCPURequested] = usePrometheusPoll({
     query: queries.CPU_REQUESTED,
     endpoint: PrometheusEndpoint?.QUERY,
     namespace: vmi?.metadata?.namespace,
+    endTime: currentTime,
   });
 
   const [dataCPUUsage] = usePrometheusPoll({
     query: queries?.CPU_USAGE,
     endpoint: PrometheusEndpoint?.QUERY,
     namespace: vmi?.metadata?.namespace,
+    endTime: currentTime,
   });
 
   const cpuUsage = +dataCPUUsage?.data?.result?.[0]?.value?.[1];

@@ -3,15 +3,13 @@ import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
-import {
-  getUtilizationQueries,
-  PrometheusEndpoint,
-} from '@kubevirt-utils/components/Charts/utils/queries';
+import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
+import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type MemoryUtilProps = {
   vmi: V1VirtualMachineInstance;
@@ -19,11 +17,8 @@ type MemoryUtilProps = {
 
 const MemoryUtil: React.FC<MemoryUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-
-  const queries = React.useMemo(
-    () => getUtilizationQueries({ vmName: vmi?.metadata?.name }),
-    [vmi],
-  );
+  const { currentTime, duration } = useDuration();
+  const queries = React.useMemo(() => getUtilizationQueries(vmi, duration), [vmi, duration]);
 
   const requests = vmi?.spec?.domain?.resources?.requests as {
     [key: string]: string;
@@ -34,6 +29,7 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ vmi }) => {
     query: queries?.MEMORY_USAGE,
     endpoint: PrometheusEndpoint?.QUERY,
     namespace: vmi?.metadata?.namespace,
+    endTime: currentTime,
   });
 
   const memoryUsed = +data?.data?.result?.[0]?.value?.[1];

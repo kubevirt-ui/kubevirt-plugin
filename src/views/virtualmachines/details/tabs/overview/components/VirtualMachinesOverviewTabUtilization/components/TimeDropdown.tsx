@@ -1,54 +1,18 @@
 import * as React from 'react';
+import DurationDropdown from 'src/views/clusteroverview/MonitoringTab/top-consumers-card/utils/DurationDropdown';
+import DurationOption from 'src/views/clusteroverview/MonitoringTab/top-consumers-card/utils/DurationOption';
 
-import {
-  DEFAULT_DURATION_KEY,
-  DURATION_VALUES,
-  DurationKeys,
-} from '@kubevirt-utils/components/Charts/utils/utils';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
-export type TimeDropdownProps = {
-  setDuration: React.Dispatch<React.SetStateAction<number>>;
-};
+const TimeDropdown: React.FC = () => {
+  const { duration, setDuration } = useDuration();
 
-const TimeDropdown: React.FC<TimeDropdownProps> = ({ setDuration }) => {
-  const [isOpen, setOpen] = React.useState(false);
-  const [selectedKey, setSelectedKey] = React.useState(DEFAULT_DURATION_KEY);
-  const { t } = useKubevirtTranslation();
-
-  const items = {
-    [DurationKeys.FiveMinutes]: t('5 minutes'),
-    [DurationKeys.OneHour]: t('1 hour'),
-    [DurationKeys.SixHours]: t('6 hours'),
-    [DurationKeys.TwentyFourHours]: t('24 hours'),
-  };
-
-  const onSelect = React.useCallback(
-    (event, newSelected) => {
-      setSelectedKey(newSelected);
-      setDuration(DURATION_VALUES[newSelected]);
-      setOpen(false);
-    },
-    [setDuration],
-  );
+  const onDurationSelect = (value: string) =>
+    setDuration(DurationOption.fromDropdownLabel(value).toString());
 
   return (
     <div className="duration-select" data-test-id="duration-select">
-      <Select
-        variant={SelectVariant.single}
-        onToggle={setOpen}
-        onSelect={onSelect}
-        selections={selectedKey}
-        isOpen={isOpen}
-        isPlain
-      >
-        {Object.keys(items).map((key) => (
-          <SelectOption key={key} value={key}>
-            {items[key]}
-          </SelectOption>
-        ))}
-      </Select>
+      <DurationDropdown selectedDuration={duration} selectHandler={onDurationSelect} />
     </div>
   );
 };
