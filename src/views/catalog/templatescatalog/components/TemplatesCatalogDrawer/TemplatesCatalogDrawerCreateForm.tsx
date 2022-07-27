@@ -12,6 +12,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { generateVMName } from '@kubevirt-utils/resources/template';
+import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   Button,
@@ -45,6 +46,7 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
     const [startVM, setStartVM] = React.useState(true);
     const [isQuickCreating, setIsQuickCreating] = React.useState(false);
     const [quickCreateError, setQuickCreateError] = React.useState(undefined);
+    const [models, modelsLoading] = useK8sModels();
 
     const onQuickCreate = () => {
       setIsQuickCreating(true);
@@ -55,7 +57,11 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
         replaceTemplateParameterValue(draftTemplate, parameterForName, vmName);
       });
 
-      quickCreateVM(templateToProcess, { name: vmName, namespace, startVM })
+      quickCreateVM({
+        template: templateToProcess,
+        models,
+        overrides: { name: vmName, namespace, startVM },
+      })
         .then((vm) => {
           setIsQuickCreating(false);
           history.push(getResourceUrl(VirtualMachineModel, vm));
@@ -134,8 +140,10 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
                     data-test-id="quick-create-vm-btn"
                     type="submit"
                     form="quick-create-form"
-                    isLoading={isQuickCreating}
-                    isDisabled={!isBootSourceAvailable || isQuickCreating || !vmName}
+                    isLoading={isQuickCreating || modelsLoading}
+                    isDisabled={
+                      !isBootSourceAvailable || isQuickCreating || !vmName || modelsLoading
+                    }
                     onClick={(e) => {
                       e.preventDefault();
                       onQuickCreate();
