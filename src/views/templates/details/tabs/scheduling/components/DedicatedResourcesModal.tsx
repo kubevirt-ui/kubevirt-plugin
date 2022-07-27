@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import produce from 'immer';
-import { isDedicatedCPUPlacement } from 'src/views/templates/utils';
+import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {

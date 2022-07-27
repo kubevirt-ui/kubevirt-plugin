@@ -2,7 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import TemplateDetailsLeftGrid from 'src/views/templates/details/tabs/details/components/TemplateDetailsLeftGrid';
 import TemplateDetailsRightGrid from 'src/views/templates/details/tabs/details/components/TemplateDetailsRightGrid';
-import { isCommonVMTemplate } from 'src/views/templates/utils';
+import { isCommonVMTemplate } from 'src/views/templates/utils/utils';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';

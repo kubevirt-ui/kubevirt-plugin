@@ -19,7 +19,7 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../../../../utils';
+import { isCommonVMTemplate } from '../../../../utils/utils';
 
 const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();

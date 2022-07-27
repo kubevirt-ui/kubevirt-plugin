@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ActionGroup, Alert, AlertVariant, Button, Divider } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../../../utils';
+import { isCommonVMTemplate } from '../../../utils/utils';
 
 import ParameterEditor from './ParameterEditor';
 

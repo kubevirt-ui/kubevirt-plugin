@@ -1,8 +1,9 @@
 import React from 'react';
-import { isDeschedulerOn, useDeschedulerInstalled } from 'src/views/templates/utils';
 import { DESCHEDULER_URL } from 'src/views/templates/utils/constants';
+import { isDeschedulerOn } from 'src/views/templates/utils/utils';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';

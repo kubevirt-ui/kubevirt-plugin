@@ -10,6 +10,8 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
+import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
@@ -41,6 +43,10 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
   const isMachineNotLiveMirgation = !!vm?.status?.conditions?.find(
     ({ type, status }) => type === 'LiveMigratable' && status === 'False',
   );
+
+  const isDeschedulerInstalled = useDeschedulerInstalled();
+  const isAdmin = useIsAdmin();
+  const isDeschedulerEditable = isAdmin && isDeschedulerInstalled && !isMachineNotLiveMirgation;
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -116,7 +122,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         <VirtualMachineDescriptionItem
           descriptionData={<Descheduler vm={vm} />}
           descriptionHeader={t('Descheduler')}
-          isEdit={!isMachineNotLiveMirgation}
+          isEdit={isDeschedulerEditable}
           data-test-id="descheduler"
           isPopover
           bodyContent={

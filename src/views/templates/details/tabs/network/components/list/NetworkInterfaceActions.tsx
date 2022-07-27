@@ -18,7 +18,7 @@ import {
   KebabToggle,
 } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../../../../../utils';
+import { isCommonVMTemplate } from '../../../../../utils/utils';
 import EditNetworkInterfaceModal from '../modal/EditNetworkInterfaceModal';
 
 type NetworkInterfaceActionsProps = {

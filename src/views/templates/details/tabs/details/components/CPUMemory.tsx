@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useVirtualMachineTemplatesCPUMemory } from 'src/views/templates/list/hooks/useVirtualMachineTemplatesCPUMemory';
-import { isCommonVMTemplate } from 'src/views/templates/utils';
+import { isCommonVMTemplate } from 'src/views/templates/utils/utils';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

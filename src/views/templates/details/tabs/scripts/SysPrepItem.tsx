@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import { isCommonVMTemplate } from 'src/views/templates/utils';
+import { isCommonVMTemplate } from 'src/views/templates/utils/utils';
 
 import {
   ConfigMapModel,
