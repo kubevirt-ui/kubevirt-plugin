@@ -8,6 +8,8 @@ import { Label as PFLabel, Stack, StackItem } from '@patternfly/react-core';
 
 import { isLabelValid, labelsArrayToObject, labelsToArray } from './utils';
 
+import './LabelsModal.scss';
+
 type LabelsModalProps = {
   isOpen: boolean;
   obj: K8sResourceCommon;
@@ -114,7 +116,7 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
             )}
           </StackItem>
           <StackItem>
-            <div className="co-search-input pf-c-form-control">
+            <div className="kv-labels-modal-body">
               <tags-input>
                 <TagsInput
                   className="tags"
