@@ -8,6 +8,7 @@ import {
   getTemplateOS,
   getTemplateVirtualMachineObject,
   OS_NAME_TYPES,
+  replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
 import { Form } from '@patternfly/react-core';
 
@@ -43,7 +44,7 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ tem
       let virtualMachine = getTemplateVirtualMachineObject(template);
 
       virtualMachine = overrideVirtualMachineDataVolumeSpec(virtualMachine, diskSource);
-      newTemplate = { ...template, objects: [virtualMachine] };
+      newTemplate = replaceTemplateVM(template, virtualMachine);
     }
 
     if (cdSource) newTemplate = addCDToTemplate(newTemplate, cdSource);
