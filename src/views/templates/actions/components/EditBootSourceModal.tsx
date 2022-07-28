@@ -57,7 +57,7 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({
           <Trans ns="plugin__kubevirt-plugin">
             Editing the DataSource will affect{' '}
             <Popover
-              headerContent={t('Affected Templates')}
+              headerContent={t('Affected templates')}
               bodyContent={(affectedTemplates || []).map((template) => (
                 <ResourceLink
                   key={template.metadata.uid}
