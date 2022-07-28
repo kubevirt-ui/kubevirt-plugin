@@ -13,6 +13,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-utils/models';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -58,7 +59,9 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
 
   const updatedTemplate = React.useMemo(() => {
     return produce<V1Template>(template, (templateDraft: V1Template) => {
-      templateDraft.objects[0].spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;
+      getTemplateVirtualMachineObject(
+        templateDraft,
+      ).spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;
     });
   }, [checked, template]);
 

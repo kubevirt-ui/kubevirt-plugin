@@ -5,6 +5,7 @@ import { getEvictionStrategy } from 'src/views/templates/utils/selectors';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
 
 type EvictionStrategyModalProps = {
@@ -25,9 +26,10 @@ const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
 
   const updatedTemplate = React.useMemo(() => {
     return produce<V1Template>(template, (templateDraft: V1Template) => {
+      const draftVM = getTemplateVirtualMachineObject(templateDraft);
       checked
-        ? (templateDraft.objects[0].spec.template.spec.evictionStrategy = 'LiveMigrate')
-        : delete templateDraft.objects[0].spec.template.spec.evictionStrategy;
+        ? (draftVM.spec.template.spec.evictionStrategy = 'LiveMigrate')
+        : delete draftVM.spec.template.spec.evictionStrategy;
     });
   }, [checked, template]);
 

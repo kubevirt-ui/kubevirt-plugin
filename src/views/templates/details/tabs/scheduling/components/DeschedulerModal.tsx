@@ -5,6 +5,7 @@ import { isDeschedulerOn } from 'src/views/templates/utils';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Checkbox, Form, FormGroup } from '@patternfly/react-core';
@@ -47,13 +48,14 @@ const DeschedulerModal: React.FC<DeschedulerModalProps> = ({ template, isOpen, o
 
   const updatedTemplate = React.useMemo(() => {
     return produce<V1Template>(template, (draft: V1Template) => {
-      ensurePath(draft, 'spec.template.metadata.annotations');
-      if (!draft.objects[0].spec.template.metadata.annotations)
-        draft.objects[0].spec.template.metadata.annotations = {};
+      const draftVM = getTemplateVirtualMachineObject(draft);
+      ensurePath(draftVM, 'spec.template.metadata.annotations');
+      if (!draftVM.spec.template.metadata.annotations)
+        draftVM.spec.template.metadata.annotations = {};
       if (isOn) {
-        draft.objects[0].spec.template.metadata.annotations[DESCHEDULER_EVICT_LABEL] = 'true';
+        draftVM.spec.template.metadata.annotations[DESCHEDULER_EVICT_LABEL] = 'true';
       } else {
-        delete draft.objects[0].spec.template.metadata.annotations[DESCHEDULER_EVICT_LABEL];
+        delete draftVM.spec.template.metadata.annotations[DESCHEDULER_EVICT_LABEL];
       }
     });
   }, [template, isOn]);

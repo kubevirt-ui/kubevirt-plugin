@@ -18,6 +18,7 @@ import {
 } from '@kubevirt-utils/components/TolerationsModal/utils/constants';
 import { getNodeTaintQualifier } from '@kubevirt-utils/components/TolerationsModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, ModalVariant } from '@patternfly/react-core';
@@ -54,20 +55,23 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
   const onSelectorLabelAdd = () =>
     onTolerationAdd({ id: null, key: '', value: '', effect: TOLERATIONS_EFFECTS[0] });
 
-  const updatedTemplate = React.useMemo(() => {
-    return produce<V1Template>(template, (templateDraft: V1Template) => {
-      const updatedTolerations: K8sIoApiCoreV1Toleration[] = (tolerationsLabels || []).map(
-        (toleration) => {
-          return {
-            ...toleration,
-            operator: toleration?.value ? 'Equal' : Operator.Exists,
-          };
-        },
-      );
+  const updatedTemplate = React.useMemo(
+    () =>
+      produce<V1Template>(template, (templateDraft: V1Template) => {
+        const updatedTolerations: K8sIoApiCoreV1Toleration[] = (tolerationsLabels || []).map(
+          (toleration) => {
+            return {
+              ...toleration,
+              operator: toleration?.value ? 'Equal' : Operator.Exists,
+            };
+          },
+        );
 
-      templateDraft.objects[0].spec.template.spec.tolerations = updatedTolerations;
-    });
-  }, [template, tolerationsLabels]);
+        getTemplateVirtualMachineObject(templateDraft).spec.template.spec.tolerations =
+          updatedTolerations;
+      }),
+    [template, tolerationsLabels],
+  );
 
   return (
     <TabModal

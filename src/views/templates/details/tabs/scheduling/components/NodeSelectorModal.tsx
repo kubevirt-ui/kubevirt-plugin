@@ -16,6 +16,7 @@ import {
 import { IDLabel } from '@kubevirt-utils/components/NodeSelectorModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form } from '@patternfly/react-core';
@@ -50,26 +51,28 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
 
   const onSelectorLabelAdd = () => onLabelAdd({ id: null, key: '', value: '' });
 
-  const updatedTemplate = React.useMemo(() => {
-    const updatedVMTemplate = produce<V1Template>(template, (templateDraft: V1Template) => {
-      if (!getNodeSelector(templateDraft)) {
-        templateDraft.objects[0].spec.template.spec.nodeSelector = {};
-      }
+  const updatedTemplate = React.useMemo(
+    () =>
+      produce<V1Template>(template, (templateDraft: V1Template) => {
+        const draftVM = getTemplateVirtualMachineObject(templateDraft);
+        if (!getNodeSelector(templateDraft)) {
+          draftVM.spec.template.spec.nodeSelector = {};
+        }
 
-      const k8sSelector: { [key: string]: string } = selectorLabels.reduce(
-        (acc, { key, value }) => {
-          acc[key] = value;
-          return acc;
-        },
-        {},
-      );
+        const k8sSelector: { [key: string]: string } = selectorLabels.reduce(
+          (acc, { key, value }) => {
+            acc[key] = value;
+            return acc;
+          },
+          {},
+        );
 
-      if (!isEqualObject(getNodeSelector(templateDraft), k8sSelector)) {
-        templateDraft.objects[0].spec.template.spec.nodeSelector = k8sSelector;
-      }
-    });
-    return updatedVMTemplate;
-  }, [template, selectorLabels]);
+        if (!isEqualObject(getNodeSelector(templateDraft), k8sSelector)) {
+          draftVM.spec.template.spec.nodeSelector = k8sSelector;
+        }
+      }),
+    [template, selectorLabels],
+  );
 
   return (
     <TabModal

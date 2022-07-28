@@ -47,16 +47,18 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
   const [memoryUnit, setMemoryUnit] = React.useState<string>();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
 
-  const updatedTemplate = React.useMemo(() => {
-    const updatedVMTemplate = produce<V1Template>(template, (templateDraft: V1Template) => {
-      templateDraft.objects[0].spec.template.spec.domain.resources.requests = {
-        ...vm?.spec?.template?.spec?.domain?.resources?.requests,
-        memory: `${memory}${memoryUnit}`,
-      };
-      templateDraft.objects[0].spec.template.spec.domain.cpu.cores = cpuCores;
-    });
-    return updatedVMTemplate;
-  }, [vm, memory, cpuCores, memoryUnit, template]);
+  const updatedTemplate = React.useMemo(
+    () =>
+      produce<V1Template>(template, (templateDraft: V1Template) => {
+        const draftVM = getTemplateVirtualMachineObject(templateDraft);
+        draftVM.spec.template.spec.domain.resources.requests = {
+          ...vm?.spec?.template?.spec?.domain?.resources?.requests,
+          memory: `${memory}${memoryUnit}`,
+        };
+        draftVM.spec.template.spec.domain.cpu.cores = cpuCores;
+      }),
+    [vm, memory, cpuCores, memoryUnit, template],
+  );
 
   React.useEffect(() => {
     if (vm?.metadata) {

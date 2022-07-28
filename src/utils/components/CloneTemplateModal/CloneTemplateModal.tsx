@@ -6,6 +6,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ANNOTATIONS,
+  getTemplateVirtualMachineObject,
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
   TEMPLATE_TYPE_VM,
@@ -50,6 +51,7 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
 
   const onSubmit = async () => {
     let templateToCreate: V1Template = produce(obj, (draftTemplate) => {
+      const draftVM = getTemplateVirtualMachineObject(draftTemplate);
       draftTemplate.metadata = {
         annotations: {
           ...draftTemplate?.metadata?.annotations,
@@ -65,19 +67,19 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
         namespace: selectedProject,
       };
 
-      draftTemplate.objects[0].metadata.labels[LABEL_USED_TEMPLATE_NAME] = templateName;
-      draftTemplate.objects[0].metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedProject;
-      delete draftTemplate.objects[0].metadata.labels[TEMPLATE_VERSION_LABEL];
+      draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = templateName;
+      draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedProject;
+      delete draftVM.metadata.labels[TEMPLATE_VERSION_LABEL];
     });
 
     if (isCloneStorageEnabled) {
       await cloneStorage(obj, pvcName, selectedProject);
 
       templateToCreate = produce(templateToCreate, (draftTemplate) => {
-        delete draftTemplate.objects[0].spec.dataVolumeTemplates[0].spec.sourceRef;
-        draftTemplate.objects[0].spec.dataVolumeTemplates[0].spec.source.pvc.name = pvcName;
-        draftTemplate.objects[0].spec.dataVolumeTemplates[0].spec.source.pvc.namespace =
-          selectedProject;
+        const draftVM = getTemplateVirtualMachineObject(draftTemplate);
+        delete draftVM.spec.dataVolumeTemplates[0].spec.sourceRef;
+        draftVM.spec.dataVolumeTemplates[0].spec.source.pvc.name = pvcName;
+        draftVM.spec.dataVolumeTemplates[0].spec.source.pvc.namespace = selectedProject;
       });
     }
     const clonedTemplate = await k8sCreate<V1Template>({

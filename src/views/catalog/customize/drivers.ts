@@ -1,6 +1,9 @@
 import { produceVMDisks } from '@catalog/utils/WizardVMContext/utils/vm-produce';
 import { ConfigMapModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineObject,
+  replaceTemplateVM,
+} from '@kubevirt-utils/resources/template';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -48,7 +51,7 @@ export const mountWinDriversToTemplate = async (template: V1Template): Promise<V
 
   const virtualMachine = getTemplateVirtualMachineObject(template);
 
-  template.objects[0] = produceVMDisks(virtualMachine, (draftVM) => {
+  const newVM = produceVMDisks(virtualMachine, (draftVM) => {
     draftVM.spec.template.spec.domain.devices.disks.push({
       name: WINDOWS_DRIVERS_DISK,
       cdrom: {
@@ -64,5 +67,5 @@ export const mountWinDriversToTemplate = async (template: V1Template): Promise<V
     });
   });
 
-  return template;
+  return replaceTemplateVM(template, newVM);
 };
