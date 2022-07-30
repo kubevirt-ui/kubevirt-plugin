@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
@@ -8,7 +9,6 @@ import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
 
 import { PersistentVolumeClaimSelect } from './PersistentVolumeClaimSelect/PersistentVolumeClaimSelect';
 import SelectSourceOption from './SelectSourceOption';
-import { VolumeSize } from './VolumeSize';
 
 const getGenericSourceCustomization = (
   diskSourceId: SOURCE_OPTIONS_IDS,
@@ -178,7 +178,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
       )}
 
       {withSize && selectedSourceType !== SOURCE_TYPES.defaultSource && (
-        <VolumeSize quantity={volumeQuantity} onChange={setVolumeQuantity} />
+        <CapacityInput size={volumeQuantity} onChange={setVolumeQuantity} label={t('Disk size')} />
       )}
     </>
   );
