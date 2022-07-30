@@ -1,7 +1,8 @@
 import * as React from 'react';
 
-import { PVC_SIZE_FORMATS } from '@catalog/customize/components/CustomizeSource';
-import { bytesFromQuantity, remoteByteUnit } from '@catalog/utils/quantity';
+import { CAPACITY_UNITS } from '@catalog/customize/components/CustomizeSource';
+import { bytesFromQuantity } from '@catalog/utils/quantity';
+import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -15,54 +16,53 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
-type DiskSizeNumberInputProps = {
-  diskSize: string;
+type CapacityInputProps = {
+  size: string;
   onChange: (quantity: string) => void;
-  label?: string;
+  label: string;
 };
 
-const DiskSizeNumberInput: React.FC<DiskSizeNumberInputProps> = ({ diskSize, onChange, label }) => {
+const CapacityInput: React.FC<CapacityInputProps> = ({ size, onChange, label }) => {
   const { t } = useKubevirtTranslation();
-
-  const [value, quantityUnit] = bytesFromQuantity(diskSize);
-
   const [selectOpen, toggleSelect] = React.useState(false);
 
+  const [value, quantityUnit] = bytesFromQuantity(size);
+
   const onFormatChange = React.useCallback(
-    (event, newUnit: PVC_SIZE_FORMATS) => {
-      onChange(`${value}${remoteByteUnit(newUnit)}`);
+    (event, newUnit: CAPACITY_UNITS) => {
+      onChange(`${value}${removeByteSuffix(newUnit)}`);
       toggleSelect(false);
     },
     [onChange, value],
   );
 
   const onMinus = React.useCallback(() => {
-    if (value > 0) onChange(`${(value || 0) - 1}${remoteByteUnit(quantityUnit)}`);
+    if (value > 0) onChange(`${(value || 0) - 1}${removeByteSuffix(quantityUnit)}`);
   }, [onChange, quantityUnit, value]);
 
   const onPlus = React.useCallback(
-    () => onChange(`${(value || 0) + 1}${remoteByteUnit(quantityUnit)}`),
+    () => onChange(`${(value || 0) + 1}${removeByteSuffix(quantityUnit)}`),
     [onChange, quantityUnit, value],
   );
 
   const onChangeSize = React.useCallback(
-    (event) => onChange(`${Number(event.currentTarget.value)}${remoteByteUnit(quantityUnit)}`),
+    (event) => onChange(`${Number(event.currentTarget.value)}${removeByteSuffix(quantityUnit)}`),
     [onChange, quantityUnit],
   );
 
-  const unitOptions = Object.values(PVC_SIZE_FORMATS);
+  const unitOptions = Object.values(CAPACITY_UNITS);
 
-  if (!unitOptions?.includes(quantityUnit as PVC_SIZE_FORMATS)) {
-    unitOptions.push(quantityUnit as PVC_SIZE_FORMATS);
+  if (!unitOptions?.includes(quantityUnit as CAPACITY_UNITS)) {
+    unitOptions.push(quantityUnit as CAPACITY_UNITS);
   }
 
   return (
     <FormGroup
-      label={label || t('Persistent Volume Claim size')}
-      fieldId={`pvc-size-required`}
+      label={label}
+      fieldId={`size-required`}
       isRequired
       validated={!value || value <= 0 ? ValidatedOptions.error : ValidatedOptions.default}
-      helperTextInvalid={t('Volume size cannot be {{errorValue}}', {
+      helperTextInvalid={t('Size cannot be {{errorValue}}', {
         errorValue: value < 0 ? 'negative' : 'zero',
       })}
       helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
@@ -98,4 +98,4 @@ const DiskSizeNumberInput: React.FC<DiskSizeNumberInputProps> = ({ diskSize, onC
   );
 };
 
-export default DiskSizeNumberInput;
+export default CapacityInput;

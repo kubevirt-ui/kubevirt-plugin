@@ -3,11 +3,10 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
+import CapacityInput from '../../../CapacityInput/CapacityInput';
 import { diskReducerActions, DiskReducerActionType } from '../../state/actions';
 import { DiskFormState } from '../../state/initialState';
 import { DYNAMIC, OTHER, sourceTypes } from '../utils/constants';
-
-import DiskSizeNumberInput from './DiskSizeNumberInput';
 
 type DiskSizeInputProps = {
   diskState: DiskFormState;
@@ -38,7 +37,9 @@ const DiskSizeInput: React.FC<DiskSizeInputProps> = ({ diskState, dispatchDiskSt
     );
   }
 
-  return <DiskSizeNumberInput diskSize={diskSize} onChange={onChange} />;
+  return (
+    <CapacityInput size={diskSize} onChange={onChange} label={t('Persistent Volume Claim size')} />
+  );
 };
 
 export default DiskSizeInput;

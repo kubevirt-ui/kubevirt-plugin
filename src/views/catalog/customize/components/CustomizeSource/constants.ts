@@ -16,9 +16,3 @@ export type SOURCE_OPTIONS_IDS =
   | typeof UPLOAD_SOURCE_NAME
   | typeof CONTAINER_DISK_SOURCE_NAME
   | typeof PVC_EPHEMERAL_SOURCE_NAME;
-
-export enum PVC_SIZE_FORMATS {
-  MiB = 'MiB',
-  GiB = 'GiB',
-  TiB = 'TiB',
-}
