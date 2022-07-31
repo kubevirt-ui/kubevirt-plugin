@@ -79,7 +79,7 @@ export const BootOrderModalBody: React.FC<{
 
     const newDevices = [
       ...devices.filter((device) => device.value.name !== name),
-      { ...deviceToUpdate, value: { ...deviceToUpdate.value, bootOrder: null } },
+      { ...deviceToUpdate, value: { ...deviceToUpdate.value, bootOrder: undefined } },
     ];
 
     onChange(newDevices);
