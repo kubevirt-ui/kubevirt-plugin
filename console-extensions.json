@@ -357,5 +357,46 @@
       },
       "component": { "$codeRef": "MigrationPoliciesList" }
     }
+  },
+  {
+    "type": "dev-console.add/action",
+    "properties": {
+      "id": "dev-catalog-virtualization",
+      "groupId": "developer-catalog",
+      "href": "/k8s/ns/:namespace/templatescatalog",
+      "label": "%plugin__kubevirt-plugin~Virtual Machines%",
+      "description": "%plugin__kubevirt-plugin~Create a Virtual Machine from a template%",
+      "icon": { "$codeRef": "icons.vmIconElement" }
+    }
+  },
+  {
+    "type": "console.dashboards/overview/health/url",
+    "properties": {
+      "name": "%plugin__kubevirt-plugin~Virtualization%",
+      "url": "apis/subresources.kubevirt.io/v1/healthz",
+      "healthHandler": {
+        "$codeRef": "dashboardExtensions.getKubevirtHealthState"
+      }
+    }
+  },
+  {
+    "type": "console.navigation/href",
+    "properties": {
+      "id": "hardwaredevices",
+      "section": "compute",
+      "name": "%plugin__kubevirt-plugin~Hardware Devices%",
+      "insertBefore": "baremetalhosts",
+      "href": "/hardwaredevices",
+      "prefixNamespaced": false
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
+      "path": ["/hardwaredevices"],
+      "component": {
+        "$codeRef": "HardwareDevicesPage.HardwareDevicesPage"
+      }
+    }
   }
 ]

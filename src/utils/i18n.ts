@@ -6,6 +6,7 @@
 
 // t('plugin__kubevirt-plugin~Virtualization')
 // t('plugin__kubevirt-plugin~VirtualMachines')
+// t('plugin__kubevirt-plugin~Virtual Machines')
 // t('plugin__kubevirt-plugin~Create Virtual Machine')
 // t('plugin__kubevirt-plugin~Catalog')
 // t('plugin__kubevirt-plugin~VirtualMachineInstances')
@@ -37,3 +38,5 @@
 // t('plugin__kubevirt-plugin~Project')
 // t('plugin__kubevirt-plugin~VM')
 // t('plugin__kubevirt-plugin~Node')
+// t('plugin__kubevirt-plugin~Create a Virtual Machine from a template')
+// t('plugin__kubevirt-plugin~Hardware Devices')

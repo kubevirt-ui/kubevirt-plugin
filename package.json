@@ -32,6 +32,7 @@
     "version": "0.0.0",
     "displayName": "Kubevirt Plugin",
     "exposedModules": {
+      "icons": "./utils/icons.tsx",
       "kubevirtFlags": "./utils/flags",
       "VirtualMachinesList": "./views/virtualmachines/list/VirtualMachinesList.tsx",
       "TemplatesCatalog": "./views/catalog/Catalog.tsx",
@@ -49,7 +50,9 @@
       "TemplateNavPage": "./views/templates/details/TemplateNavPage.tsx",
       "ConsoleStandAlone": "./utils/components/Consoles/ConsoleStandAlone.tsx",
       "yamlTemplates": "src/templates/index.ts",
-      "MigrationPoliciesList": "./views/migrationpolicies/list/MigrationPoliciesList.tsx"
+      "MigrationPoliciesList": "./views/migrationpolicies/list/MigrationPoliciesList.tsx",
+      "dashboardExtensions": "./utils/extensions/dashboard/index.ts",
+      "HardwareDevicesPage": "./utils/components/HardwareDevices/HardwareDevicesPage.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
