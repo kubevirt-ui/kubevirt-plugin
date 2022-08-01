@@ -27,7 +27,10 @@ type NetworkThresholdChartProps = {
 
 const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration } = useDuration();
-  const queries = React.useMemo(() => getUtilizationQueries(vmi, duration), [vmi, duration]);
+  const queries = React.useMemo(
+    () => getUtilizationQueries({ obj: vmi, duration }),
+    [vmi, duration],
+  );
   const { ref, width, height } = useResponsiveCharts();
 
   const [networkIn] = usePrometheusPoll({

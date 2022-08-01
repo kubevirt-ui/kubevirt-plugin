@@ -16,7 +16,10 @@ type NetworkUtilProps = {
 const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration } = useDuration();
-  const queries = React.useMemo(() => getUtilizationQueries(vmi, duration), [vmi, duration]);
+  const queries = React.useMemo(
+    () => getUtilizationQueries({ obj: vmi, duration }),
+    [vmi, duration],
+  );
 
   const [networkIn] = usePrometheusPoll({
     query: queries?.NETWORK_IN_USAGE,

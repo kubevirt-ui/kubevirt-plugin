@@ -27,7 +27,10 @@ const GIB_IN_BYTES = 1024;
 
 const StorageWriteThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration } = useDuration();
-  const queries = React.useMemo(() => getUtilizationQueries(vmi, duration), [vmi, duration]);
+  const queries = React.useMemo(
+    () => getUtilizationQueries({ obj: vmi, duration }),
+    [vmi, duration],
+  );
   const { ref, width, height } = useResponsiveCharts();
 
   const [data] = usePrometheusPoll({

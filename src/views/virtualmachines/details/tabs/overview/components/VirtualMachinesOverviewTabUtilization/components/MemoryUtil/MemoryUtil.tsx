@@ -18,7 +18,10 @@ type MemoryUtilProps = {
 const MemoryUtil: React.FC<MemoryUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration } = useDuration();
-  const queries = React.useMemo(() => getUtilizationQueries(vmi, duration), [vmi, duration]);
+  const queries = React.useMemo(
+    () => getUtilizationQueries({ obj: vmi, duration }),
+    [vmi, duration],
+  );
 
   const requests = vmi?.spec?.domain?.resources?.requests as {
     [key: string]: string;
