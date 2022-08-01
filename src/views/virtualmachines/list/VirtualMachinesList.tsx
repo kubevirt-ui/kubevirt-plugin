@@ -37,7 +37,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
 
   const catalogURL = `/k8s/ns/${namespace || 'default'}/templatescatalog`;
 
-  const [vms, loaded] = useKubevirtWatchResource({
+  const [vms, loaded, loadError] = useKubevirtWatchResource({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
     namespaced: true,
@@ -89,7 +89,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
           unfilteredData={unfilteredData}
           loaded={loaded}
           columns={columns}
-          loadError={null}
+          loadError={loadError}
           Row={VirtualMachineRow}
           rowData={{ kind, vmis }}
           NoDataEmptyMsg={() => <VirtualMachineEmptyState catalogURL={catalogURL} />}
