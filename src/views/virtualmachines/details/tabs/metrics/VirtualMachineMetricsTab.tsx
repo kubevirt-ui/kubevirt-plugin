@@ -8,6 +8,7 @@ import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableSection } from '@patternfly/react-core';
 
 import MigrationCharts from './MigrationCharts/MigrationCharts';
+import NetworkCharts from './NetworkCharts/NetworkCharts';
 import StorageCharts from './StorageCharts/StorageCharts';
 import TimeRange from './TimeRange/TimeRange';
 import UtilizationCharts from './UtilizationCharts/UtilizationCharts';
@@ -25,6 +26,7 @@ const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({ obj
   const [expended, setExpended] = useState<{ [key in MetricsTabExpendedSections]: boolean }>({
     [MetricsTabExpendedSections.utilization]: true,
     [MetricsTabExpendedSections.storage]: true,
+    [MetricsTabExpendedSections.network]: true,
     [MetricsTabExpendedSections.migration]: true,
   });
 
@@ -49,6 +51,13 @@ const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({ obj
           isExpanded={expended?.[MetricsTabExpendedSections.storage]}
         >
           <StorageCharts vmi={vmi} />
+        </ExpandableSection>
+        <ExpandableSection
+          toggleText={t('Network')}
+          onToggle={onToggle(MetricsTabExpendedSections.network)}
+          isExpanded={expended?.[MetricsTabExpendedSections.network]}
+        >
+          <NetworkCharts vmi={vmi} />
         </ExpandableSection>
         <ExpandableSection
           toggleText={t('Migration')}

@@ -29,7 +29,10 @@ type MemoryThresholdChartProps = {
 
 const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration } = useDuration();
-  const queries = React.useMemo(() => getUtilizationQueries(vmi, duration), [vmi, duration]);
+  const queries = React.useMemo(
+    () => getUtilizationQueries({ obj: vmi, duration }),
+    [vmi, duration],
+  );
   const { ref, width, height } = useResponsiveCharts();
 
   const requests = vmi?.spec?.domain?.resources?.requests as {

@@ -36,7 +36,7 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
   const { currentTime, duration } = useDuration();
   const { ref, width, height } = useResponsiveCharts();
   const queries = React.useMemo(
-    () => getUtilizationQueries(vmi, duration, vmiPod?.metadata?.name),
+    () => getUtilizationQueries({ obj: vmi, duration, launcherPodName: vmiPod?.metadata?.name }),
     [vmi, vmiPod, duration],
   );
 

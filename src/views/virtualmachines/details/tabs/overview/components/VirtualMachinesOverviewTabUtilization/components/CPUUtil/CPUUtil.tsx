@@ -23,7 +23,7 @@ const CPUUtil: React.FC<CPUUtilProps> = ({ vmi, pods }) => {
   const vmiPod = React.useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
   const { currentTime, duration } = useDuration();
   const queries = React.useMemo(
-    () => getUtilizationQueries(vmi, duration, vmiPod?.metadata?.name),
+    () => getUtilizationQueries({ obj: vmi, duration, launcherPodName: vmiPod?.metadata?.name }),
     [vmi, vmiPod, duration],
   );
 

@@ -1,5 +1,5 @@
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
-import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusResponse, PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
 
 export const SINGLE_VM_DURATION = 'SINGLE_VM_DURATION';
 
@@ -29,3 +29,6 @@ export const tickFormat =
 
     return '';
   };
+
+export const getPrometheusData = (response: PrometheusResponse): PrometheusValue[] =>
+  response?.data?.result?.[0]?.values;
