@@ -3,17 +3,17 @@ import { useHistory } from 'react-router-dom';
 
 import {
   VirtualMachineInstanceModelGroupVersionKind,
+  VirtualMachineModelGroupVersionKind,
   VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
 import {
   K8sResourceCommon,
   ListPageBody,
   ListPageCreateDropdown,
   ListPageFilter,
   ListPageHeader,
-  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -35,14 +35,14 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
 
   const catalogURL = `/k8s/ns/${namespace || 'default'}/templatescatalog`;
 
-  const [vms, loaded, loadError] = useK8sWatchResource<V1VirtualMachine[]>({
-    kind,
+  const [vms, loaded] = useKubevirtWatchResource({
+    groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
     namespaced: true,
     namespace,
   });
 
-  const [vmis] = useK8sWatchResource<V1VirtualMachineInstance[]>({
+  const [vmis] = useKubevirtWatchResource({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: true,
     namespaced: true,
@@ -86,11 +86,11 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
           data={data}
           unfilteredData={unfilteredData}
           loaded={loaded}
-          loadError={loadError}
           columns={columns}
+          loadError={null}
           Row={VirtualMachineRow}
           rowData={{ kind, vmis }}
-          EmptyMsg={() => <VirtualMachineEmptyState catalogURL={catalogURL} />}
+          NoDataEmptyMsg={() => <VirtualMachineEmptyState catalogURL={catalogURL} />}
         />
       </ListPageBody>
     </>
