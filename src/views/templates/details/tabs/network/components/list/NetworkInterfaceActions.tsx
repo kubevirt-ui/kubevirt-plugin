@@ -55,14 +55,12 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
 
   const onDelete = React.useCallback(async () => {
     const updatedTemplate = produce(template, (draftTemplate) => {
-      const vm = getTemplateVirtualMachineObject(template);
+      const vm = getTemplateVirtualMachineObject(draftTemplate);
       vm.spec.template.spec.networks = vm.spec.template.spec.networks.filter(
         ({ name }) => name !== nicName,
       );
       vm.spec.template.spec.domain.devices.interfaces =
         vm.spec.template.spec.domain.devices.interfaces.filter(({ name }) => name !== nicName);
-
-      draftTemplate.objects = [vm];
     });
 
     return k8sUpdate({

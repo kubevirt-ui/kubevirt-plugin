@@ -1,13 +1,15 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import produce from 'immer';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineObject,
+  replaceTemplateVM,
+} from '@kubevirt-utils/resources/template';
 import {
   k8sUpdate,
   ListPageBody,
@@ -43,15 +45,11 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
   const isEditDisabled = isCommonVMTemplate(template);
 
   const onUpdate = async (updatedVM: V1VirtualMachine) => {
-    const updatedTemplate = produce(template, (draftTemplate) => {
-      draftTemplate.objects = [updatedVM];
-    });
-
     await k8sUpdate({
       model: TemplateModel,
-      data: updatedTemplate,
-      ns: updatedTemplate?.metadata?.namespace,
-      name: updatedTemplate?.metadata?.name,
+      data: replaceTemplateVM(template, updatedVM),
+      ns: template?.metadata?.namespace,
+      name: template?.metadata?.name,
     });
   };
 

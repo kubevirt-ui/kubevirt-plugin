@@ -1,5 +1,3 @@
-import produce from 'immer';
-
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
@@ -8,7 +6,10 @@ import {
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineObject,
+  replaceTemplateVM,
+} from '@kubevirt-utils/resources/template';
 
 import { INSTALLATION_CDROM_DISK, INSTALLATION_CDROM_NAME } from './constants';
 
@@ -27,7 +28,7 @@ export const addInstallationCDRom = (
         image: cdSource.source?.registry.url,
       },
     };
-  } else if (cdSource.source?.http || cdSource?.source?.pvc) {
+  } else if (cdSource?.source?.http || cdSource?.source?.pvc) {
     cdVolume = {
       name: INSTALLATION_CDROM_NAME,
       dataVolume: {
@@ -70,11 +71,7 @@ export const addCDToTemplate = (
   template: V1Template,
   cdSource: V1beta1DataVolumeSpec,
 ): V1Template => {
-  return produce(template, (draftTemplate) => {
-    if (!cdSource) return draftTemplate;
-    let virtualMachine = getTemplateVirtualMachineObject(draftTemplate);
-    virtualMachine = addInstallationCDRom(virtualMachine, cdSource);
+  const virtualMachine = addInstallationCDRom(getTemplateVirtualMachineObject(template), cdSource);
 
-    return { ...draftTemplate, objects: [virtualMachine] };
-  });
+  return replaceTemplateVM(template, virtualMachine);
 };
