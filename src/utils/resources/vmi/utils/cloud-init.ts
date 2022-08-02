@@ -1,4 +1,11 @@
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { load } from 'js-yaml';
+
+type CloudinitUserDataObject = {
+  user?: string;
+  password?: string;
+  passwd?: { users: { name: string; password: string }[] };
+};
 
 export const getCloudInitCredentials = (
   vmi: V1VirtualMachineInstance,
@@ -9,15 +16,24 @@ export const getCloudInitCredentials = (
 
   const cloudInit = cloudInitVolume?.cloudInitNoCloud || cloudInitVolume?.cloudInitConfigDrive;
 
-  const cloudInitValuesStrings = cloudInit?.userData
-    ?.split('\n')
-    ?.filter((row) => !row?.includes('#cloud-config'));
+  try {
+    const cloudinitObject: CloudinitUserDataObject = load(cloudInit?.userData);
 
-  const password = cloudInitValuesStrings
-    ?.find((row) => row?.includes('password'))
-    ?.split(': ')?.[1];
+    if (cloudinitObject?.user || cloudinitObject?.password) {
+      return {
+        user: cloudinitObject?.user,
+        password: cloudinitObject?.password,
+      };
+    }
 
-  const user = cloudInitValuesStrings?.find((row) => row?.includes('user'))?.split(': ')?.[1];
-
-  return { user, password };
+    if (cloudinitObject?.passwd?.users) {
+      return {
+        user: cloudinitObject?.passwd?.users?.[0]?.name,
+        password: cloudinitObject?.passwd?.users?.[0]?.password,
+      };
+    }
+  } catch (e) {
+    console.log(e?.message);
+  }
+  return { user: null, password: null };
 };
