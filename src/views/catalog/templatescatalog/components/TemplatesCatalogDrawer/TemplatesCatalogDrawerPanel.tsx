@@ -3,6 +3,7 @@ import * as React from 'react';
 import { WizardOverviewDisksTable } from '@catalog/wizard/tabs/overview/components/WizardOverviewDisksTable/WizardOverviewDisksTable';
 import { WizardOverviewNetworksTable } from '@catalog/wizard/tabs/overview/components/WizardOverviewNetworksTable/WizardOverviewNetworksTable';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import AdditionalResources from '@kubevirt-utils/components/AdditionalResources/AdditionalResources';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateFlavorData } from '@kubevirt-utils/resources/template/utils';
@@ -130,6 +131,7 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                           )}
                         </DescriptionListDescription>
                       </DescriptionListGroup>
+                      <AdditionalResources template={template} />
                     </DescriptionList>
                   </GridItem>
                   <GridItem span={6}>
