@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import StorageReadThresholdChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageReadThresholdChart';
-import StorageWriteThresholdChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageWriteThresholdChart';
+import StorageIOPSTotalThresholdChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageIOPSTotalThresholdChart';
+import StorageTotalReadWriteThresholdChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageTotalReadWriteThresholdChart';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-core';
 
@@ -17,17 +17,17 @@ const StorageCharts: React.FC<StorageChartsProps> = ({ vmi }) => {
     <Grid>
       <GridItem span={6}>
         <Card>
-          <CardTitle>{t('Storage write')}</CardTitle>
+          <CardTitle>{t('Storage total read / write')}</CardTitle>
           <CardBody>
-            <StorageWriteThresholdChart vmi={vmi} />
+            <StorageTotalReadWriteThresholdChart vmi={vmi} />
           </CardBody>
         </Card>
       </GridItem>
       <GridItem span={6}>
         <Card>
-          <CardTitle>{t('Storage read')}</CardTitle>
+          <CardTitle>{t('Storage iops total read / write')}</CardTitle>
           <CardBody>
-            <StorageReadThresholdChart vmi={vmi} />
+            <StorageIOPSTotalThresholdChart vmi={vmi} />
           </CardBody>
         </Card>
       </GridItem>
