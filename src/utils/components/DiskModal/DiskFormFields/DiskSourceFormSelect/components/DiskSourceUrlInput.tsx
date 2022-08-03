@@ -16,7 +16,7 @@ const URLSourceHelperText: React.FC<{ os: OS_NAME_TYPES }> = ({ os }) => {
     <>
       {beforeLabelText}
       <strong>
-        <a href={OS_IMAGE_LINKS[os]} target="_blank" rel="noreferrer">
+        <a href={OS_IMAGE_LINKS[os || OS_NAME_TYPES.fedora]} target="_blank" rel="noreferrer">
           {label}
         </a>
       </strong>
