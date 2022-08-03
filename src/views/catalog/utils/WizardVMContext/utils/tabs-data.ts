@@ -2,6 +2,7 @@ import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 
 export type TabsData = {
+  additionalObjects?: any[];
   overview?: {
     templateMetadata?: {
       name?: string;

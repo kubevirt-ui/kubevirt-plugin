@@ -6,8 +6,9 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { createVmSSHSecret } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { createSysprepConfigMap } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
-import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, k8sDelete, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 
+import { createMultipleResources } from './utils';
 import { produceVMSysprep, useWizardVMContext } from './WizardVMContext';
 
 type CreateVMArguments = {
@@ -23,6 +24,7 @@ type UseWizardVmCreateValues = {
 
 export const useWizardVmCreate = (): UseWizardVmCreateValues => {
   const { vm, tabsData } = useWizardVMContext();
+  const [models] = useK8sModels();
   const [loaded, setLoaded] = useState<boolean>(true);
   const [error, setError] = useState<any>();
   const [isVmCreated, setIsVmCreated] = useState<boolean>(false);
@@ -45,6 +47,15 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
         }),
       });
       setIsVmCreated(true);
+
+      // create additional objects
+      if (tabsData?.additionalObjects?.length > 0) {
+        await createMultipleResources(
+          tabsData?.additionalObjects,
+          models,
+          newVM.metadata.namespace,
+        );
+      }
 
       // sysprep configmap
       if (tabsData?.scripts?.sysprep?.autounattend || tabsData?.scripts?.sysprep?.unattended) {
