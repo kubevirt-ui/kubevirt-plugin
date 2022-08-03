@@ -7,6 +7,7 @@ declare global {
       selectProject(name: string): void;
       newProject(name: string): void;
       selectTestProject(): void;
+      switchProject(name: string): void;
     }
   }
 }
@@ -26,4 +27,10 @@ Cypress.Commands.add('newProject', (project: string) => {
 
 Cypress.Commands.add('selectTestProject', () => {
   cy.selectProject(TEST_NS);
+});
+
+Cypress.Commands.add('switchProject', (projectName: string) => {
+  cy.byLegacyTestID('namespace-bar-dropdown').contains('Project:').click();
+  cy.byTestID('showSystemSwitch').check();
+  cy.byTestID('dropdown-menu-item-link').contains(projectName).click();
 });

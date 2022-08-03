@@ -28,7 +28,7 @@ export enum K8S_KIND {
   DV = 'DataVolume',
   NAD = 'net-attach-def',
   PVC = 'PersistentVolumeClaim',
-  Template = 'Template',
+  TEMPLATE = 'Template',
   VM = 'VirtualMachine',
   VMI = 'VirtualMachineInstance',
 }

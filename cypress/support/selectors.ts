@@ -18,6 +18,7 @@ declare global {
       byTestOperandLink(selector: string): Chainable;
       byTestRows(selector: string): Chainable;
       clickNavLink(path: [string, string?]): Chainable;
+      clickVirtLink(path: string): void;
       byTestOperatorRow(
         selector: string,
         options?: Partial<Loggable & Timeoutable & Withinable & Shadow>,
@@ -66,3 +67,13 @@ Cypress.Commands.add('clickNavLink', (path: [string, string?]) => {
 Cypress.Commands.add('byButtonText', (selector: string) =>
   cy.contains('button[type="button"]', `${selector}`),
 );
+
+Cypress.Commands.add('clickVirtLink', (navItemSelector: string) => {
+  cy.contains('Virtualization').should('be.visible');
+  cy.get('[data-test-id="virtualization-nav-item"]', { timeout: 10000 }).should(($el) => {
+    if ($el.attr('aria-expanded') == 'false') {
+      $el.click();
+    }
+  });
+  cy.get(navItemSelector).click();
+});
