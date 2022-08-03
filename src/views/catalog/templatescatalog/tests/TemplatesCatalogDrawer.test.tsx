@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { BOOT_SOURCE } from '@kubevirt-utils/resources/template';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,6 +12,13 @@ import { containerTemplateMock } from './mocks';
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   k8sCreate: jest.fn().mockResolvedValue({}),
   useK8sWatchResource: jest.fn(() => [[], true]),
+  useK8sModels: jest.fn(() => [
+    {
+      [`${VirtualMachineModel.apiGroup}~${VirtualMachineModel.apiVersion}~${VirtualMachineModel.kind}`]:
+        VirtualMachineModel,
+    },
+    true,
+  ]),
 }));
 
 jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => ({
