@@ -97,7 +97,7 @@ export const processTemplate = async ({
 }): Promise<V1Template> => {
   const virtualMachineName = formData.get(NAME_INPUT_FIELD) as string;
 
-  const templateToProcess = await produce(template, async (draftTemplate) => {
+  let templateToProcess = await produce(template, async (draftTemplate) => {
     draftTemplate.metadata.namespace = namespace;
     const parameterForName = extractParameterNameFromMetadataName(template);
 
@@ -109,21 +109,22 @@ export const processTemplate = async ({
       virtualMachineName,
     );
 
-    if (withWindowsDrivers) {
-      draftTemplate = await mountWinDriversToTemplate(draftTemplate);
-    }
+    const draftVM = getTemplateVirtualMachineObject(draftTemplate);
+
+    draftVM.metadata.name = virtualMachineName;
   });
 
-  const processedTemplate = await k8sCreate<V1Template>({
+  if (withWindowsDrivers) {
+    templateToProcess = await mountWinDriversToTemplate(templateToProcess);
+  }
+
+  return await k8sCreate<V1Template>({
     model: ProcessedTemplatesModel,
     data: templateToProcess,
     queryParams: {
       dryRun: 'All',
     },
   });
-
-  processedTemplate.objects[0].metadata.name = virtualMachineName;
-  return processedTemplate;
 };
 
 export const getVirtualMachineNameField = (

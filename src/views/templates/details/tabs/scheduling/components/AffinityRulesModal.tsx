@@ -18,6 +18,7 @@ import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/util
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-utils/models';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { ModalVariant } from '@patternfly/react-core';
@@ -91,14 +92,15 @@ const AffinityRulesModal: React.FC<AffinityModalProps> = ({
 
   const updatedTemplate = React.useMemo(() => {
     return produce<V1Template>(template, (templateDraft: V1Template) => {
+      const draftVM = getTemplateVirtualMachineObject(templateDraft);
       if (!getAffinity(templateDraft)) {
-        templateDraft.objects[0].spec.template.spec.affinity = [];
+        draftVM.spec.template.spec.affinity = null;
       }
 
       const updatedAffinity = getAffinityFromRowsData(affinities);
 
       if (!isEqualObject(getAffinity(templateDraft), updatedAffinity)) {
-        templateDraft.objects[0].spec.template.spec.affinity = updatedAffinity;
+        draftVM.spec.template.spec.affinity = updatedAffinity;
       }
     });
   }, [affinities, template]);
