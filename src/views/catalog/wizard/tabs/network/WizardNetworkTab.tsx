@@ -14,7 +14,7 @@ const WizardNetworkTab: WizardTab = ({ vm, updateVM }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const actionText = t('Add Network Interface');
+  const actionText = t('Add network interface');
   return (
     <>
       <ListPageBody>

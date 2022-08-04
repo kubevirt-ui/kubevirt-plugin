@@ -70,7 +70,7 @@ const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, isOpen, onClose }) =>
         })
       }
       onClose={onClose}
-      headerText={t('Add Snapshot')}
+      headerText={t('Take snapshot')}
       isDisabled={isSubmitDisabled}
     >
       {

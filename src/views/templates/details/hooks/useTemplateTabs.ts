@@ -32,7 +32,7 @@ export const useVirtualMachineTabs = () => {
       },
       {
         href: 'network-interfaces',
-        name: t('Network Interfaces'),
+        name: t('Network interfaces'),
         component: TemplateNetworkPage,
       },
       {

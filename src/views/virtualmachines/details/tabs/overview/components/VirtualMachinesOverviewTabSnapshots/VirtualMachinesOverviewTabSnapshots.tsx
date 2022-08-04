@@ -53,7 +53,7 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
             variant={ButtonVariant.link}
             onClick={() => createModal((props) => <SnapshotModal vm={vm} {...props} />)}
           >
-            {t('Take Snapshot')}
+            {t('Take snapshot')}
           </Button>
         </CardTitle>
         <Divider />

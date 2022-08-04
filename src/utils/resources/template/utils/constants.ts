@@ -90,7 +90,7 @@ export enum BOOT_SOURCE {
 // t('PVC (auto import)')
 // t('URL')
 // t('Registry')
-// t('Container Disk')
+// t('Container disk')
 // t('No boot source')
 
 export const BOOT_SOURCE_LABELS = {
@@ -99,7 +99,7 @@ export const BOOT_SOURCE_LABELS = {
   [BOOT_SOURCE.DATA_SOURCE_AUTO_IMPORT]: 'PVC (auto import)',
   [BOOT_SOURCE.URL]: 'URL',
   [BOOT_SOURCE.REGISTRY]: 'Registry',
-  [BOOT_SOURCE.CONTAINER_DISK]: 'Container Disk',
+  [BOOT_SOURCE.CONTAINER_DISK]: 'Container disk',
   [BOOT_SOURCE.NONE]: 'No boot source',
 };
 

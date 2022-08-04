@@ -30,8 +30,8 @@ export enum VirtualMachineDetailsTabLabel {
   Events = 'Events',
   // t('Console')
   Console = 'Console',
-  // t('Network Interfaces')
-  NetworkInterfaces = 'Network Interfaces',
+  // t('Network interfaces')
+  NetworkInterfaces = 'Network interfaces',
   // t('Disks')
   Disks = 'Disks',
   // t('Snapshots')

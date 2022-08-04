@@ -38,7 +38,7 @@ const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
             ))
           }
         >
-          {t('Add Snapshot')}
+          {t('Take snapshot')}
         </ListPageCreateButton>
         <SnapshotList
           snapshots={snapshots}
