@@ -37,14 +37,15 @@ const Limits = ({ hyperConverge }) => {
           <Title headingLevel="h6" size="md">
             {t('Max. Migration per cluster')}
           </Title>
-          {migrationPerCluster ? (
+          {!isNaN(migrationPerCluster) ? (
             <NumberInput
               value={migrationPerCluster}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setMigrationPerCluster(() => {
-                  updateValuesCluster(hyperConverge, +event.target.value, MIGRATION_PER_CLUSTER);
-                  return +event.target.value;
-                });
+                +event.target.value >= 0 &&
+                  setMigrationPerCluster(() => {
+                    updateValuesCluster(hyperConverge, +event.target.value, MIGRATION_PER_CLUSTER);
+                    return +event.target.value;
+                  });
               }}
               min={0}
               onMinus={() =>
@@ -78,10 +79,11 @@ const Limits = ({ hyperConverge }) => {
           <Title headingLevel="h6" size="md">
             {t('Max. Migration per node')}
           </Title>
-          {migrationPerNode ? (
+          {!isNaN(migrationPerNode) ? (
             <NumberInput
               value={migrationPerNode}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                +event.target.value >= 0 &&
                 setMigrationPerNode(() => {
                   updateValuesNode(hyperConverge, +event.target.value, MIGRATION_PER_NODE);
                   return +event.target.value;
