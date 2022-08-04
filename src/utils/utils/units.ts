@@ -1,4 +1,4 @@
-enum BinaryUnit {
+export enum BinaryUnit {
   B = 'B',
   Ki = 'Ki',
   Mi = 'Mi',

@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { LabelGroup } from '@patternfly/react-core';
 
 import { MigrationPolicyMatchLabelSelectorLabel } from './MigrationPolicyMatchLabelSelectorLabel';
 
@@ -13,7 +14,7 @@ export const MigrationPolicyMatchLabelSelectorList: React.FC<MigrationPolicyMatc
   memo(({ matchLabels, isVMILabel }) => {
     if (isEmpty(matchLabels)) return null;
     return (
-      <>
+      <LabelGroup>
         {Object.entries(matchLabels)?.map(([key, value]) => (
           <MigrationPolicyMatchLabelSelectorLabel
             key={key}
@@ -22,6 +23,6 @@ export const MigrationPolicyMatchLabelSelectorList: React.FC<MigrationPolicyMatc
             isVMILabel={isVMILabel}
           />
         ))}
-      </>
+      </LabelGroup>
     );
   });
