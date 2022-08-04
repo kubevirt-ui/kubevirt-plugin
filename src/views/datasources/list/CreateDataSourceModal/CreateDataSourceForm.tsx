@@ -1,7 +1,7 @@
 import React from 'react';
 import { FieldError, UseFormRegister, UseFormSetValue } from 'react-hook-form';
 
-import DiskSizeNumberInput from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSizeInput/DiskSizeNumberInput';
+import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -80,8 +80,8 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
           validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
         />
       </FormGroup>
-      <DiskSizeNumberInput
-        diskSize={size}
+      <CapacityInput
+        size={size}
         onChange={(value) => setValue('size', value)}
         label={t('Disk size')}
       />

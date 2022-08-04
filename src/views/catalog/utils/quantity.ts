@@ -1,5 +1,7 @@
 import byteSize, { ByteSizeResult } from 'byte-size';
 
+import { toIECUnit } from '@kubevirt-utils/utils/units';
+
 const multipliers: Record<string, number> = {};
 multipliers.B = 1;
 multipliers.Ki = multipliers.B * 1024;
@@ -50,11 +52,16 @@ export const bytesFromQuantity = (
     const ISUnit = /[KMGTPEZ]i$/.exec(quantity);
     const bytesUnit = /[KMGTPEZ]iB$/.exec(quantity);
     const decimalUnit = /[KMGTPEZ]$/.exec(quantity.toUpperCase());
+    const originalUnit = ISUnit || bytesUnit || decimalUnit;
 
-    if (ISUnit?.length || bytesUnit?.length || decimalUnit?.length) {
+    if (originalUnit?.length) {
       const bytes = value * multipliers[bytesUnit?.[0] || ISUnit?.[0] || decimalUnit?.[0]];
-
       byteSizeResult = bytesToIECBytes(bytes, precision);
+
+      // Prevents units from changing to 'B' when user enters 0 or erases existing value
+      if (value === 0) {
+        byteSizeResult.unit = toIECUnit(originalUnit?.[0]) || byteSizeResult?.unit;
+      }
     } else {
       byteSizeResult = bytesToIECBytes(value, precision);
     }
@@ -62,5 +69,3 @@ export const bytesFromQuantity = (
 
   return [parseFloat(byteSizeResult.value), byteSizeResult.unit];
 };
-
-export const remoteByteUnit = (quantity: string): string => quantity.replace(/[Bb]/, '');
