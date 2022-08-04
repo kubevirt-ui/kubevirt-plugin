@@ -7,6 +7,7 @@ import { getTemplateProviderName } from 'src/views/templates/utils/selectors';
 
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import AdditionalResources from '@kubevirt-utils/components/AdditionalResources/AdditionalResources';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -55,6 +56,7 @@ const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template
           />
         }
       />
+      <AdditionalResources template={template} />
     </DescriptionList>
   );
 };

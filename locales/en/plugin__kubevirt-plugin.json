@@ -74,6 +74,7 @@
   "Add toleration": "Add toleration",
   "Add toleration to specify qualifying Nodes": "Add toleration to specify qualifying Nodes",
   "Add tolerations to allow a VirtualMachine to schedule onto Nodes with matching taints.": "Add tolerations to allow a VirtualMachine to schedule onto Nodes with matching taints.",
+  "Additional resources": "Additional resources",
   "Address": "Address",
   "Affected templates": "Affected templates",
   "Affinity rules": "Affinity rules",
