@@ -4,13 +4,14 @@ import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/c
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
-  createAllTemplateObjects,
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
 import { k8sCreate, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+
+import { createMultipleResources } from './utils';
 
 type QuickCreateVMType = (inputs: {
   template: V1Template;
@@ -46,11 +47,8 @@ export const quickCreateVM: QuickCreateVMType = async ({
     }
   });
 
-  const createdObjects = await createAllTemplateObjects(
-    replaceTemplateVM(processedTemplate, overridedVM),
-    models,
-    namespace,
-  );
+  const { objects } = replaceTemplateVM(processedTemplate, overridedVM);
+  const createdObjects = await createMultipleResources(objects, models, namespace);
 
   const createdVM = createdObjects.find(
     (object) => object.kind === VirtualMachineModel.kind,

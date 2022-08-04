@@ -3,6 +3,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DataUpload, useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -77,6 +78,9 @@ export const useCustomizeFormSubmit = ({
       });
 
       const vmObj = getTemplateVirtualMachineObject(processedTemplate);
+      const additionalObjects = processedTemplate.objects.filter(
+        (obj) => obj.kind !== VirtualMachineModel.kind,
+      );
 
       const dataVolumeTemplate = vmObj?.spec?.dataVolumeTemplates?.[0];
       const updatedVM = produce(vmObj, (vmDraft) => {
@@ -112,6 +116,10 @@ export const useCustomizeFormSubmit = ({
 
       // keep template's name and namespace for navigation
       updateTabsData((tabsDataDraft) => {
+        // additional objects
+        tabsDataDraft.additionalObjects = additionalObjects;
+
+        // overview
         ensurePath(tabsDataDraft, 'overview.templateMetadata');
         tabsDataDraft.overview.templateMetadata.name = template.metadata.name;
         tabsDataDraft.overview.templateMetadata.namespace = template.metadata.namespace;
@@ -121,6 +129,7 @@ export const useCustomizeFormSubmit = ({
           ANNOTATIONS.displayName,
         );
 
+        // upload dvs
         if (tabsDataDraft?.disks?.dataVolumesToAddOwnerRef) {
           tabsDataDraft.disks.dataVolumesToAddOwnerRef = [];
         }
