@@ -1,10 +1,11 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ListPageBody,
-  ListPageCreate,
+  ListPageCreateDropdown,
   ListPageFilter,
   ListPageHeader,
   useK8sWatchResource,
@@ -14,6 +15,7 @@ import {
 
 import MigrationPoliciesRow from './components/MigrationPoliciesRow/MigrationPoliciesRow';
 import useMigrationPoliciesListColumns from './hooks/useMigrationPoliciesListColumns';
+import { migrationPoliciesPageBaseURL } from './utils/constants';
 
 type MigrationPoliciesListProps = {
   kind: string;
@@ -21,6 +23,7 @@ type MigrationPoliciesListProps = {
 
 const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
+  const history = useHistory();
   const [mps, loaded, loadError] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
     kind,
     isList: true,
@@ -30,10 +33,23 @@ const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) =
   const columns = useMigrationPoliciesListColumns();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(mps);
 
+  const createItems = {
+    form: t('With form'),
+    yaml: t('With YAML'),
+  };
+
+  const onCreate = (type: string) => {
+    return type === 'form'
+      ? history.push(`${migrationPoliciesPageBaseURL}/form`)
+      : history.push(`${migrationPoliciesPageBaseURL}/~new`);
+  };
+
   return (
     <>
       <ListPageHeader title={t('MigrationPolicies')}>
-        <ListPageCreate groupVersionKind={kind}>{t('Create MigrationPolicy')}</ListPageCreate>
+        <ListPageCreateDropdown items={createItems} onClick={onCreate}>
+          {t('Create MigrationPolicy')}
+        </ListPageCreateDropdown>
       </ListPageHeader>
       <ListPageBody>
         <ListPageFilter data={unfilteredData} loaded={loaded} onFilterChange={onFilterChange} />

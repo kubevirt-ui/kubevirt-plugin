@@ -398,5 +398,14 @@
         "$codeRef": "HardwareDevicesPage.HardwareDevicesPage"
       }
     }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
+      "path": "/k8s/cluster/migrations.kubevirt.io~v1alpha1~MigrationPolicy/form",
+      "component": {
+        "$codeRef": "MigrationPolicyCreateForm"
+      }
+    }
   }
 ]
