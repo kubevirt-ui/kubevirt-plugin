@@ -38,17 +38,6 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
   const autoUnattend = tabsData?.scripts?.sysprep?.autounattend;
   const selectedSysprep = tabsData?.scripts?.sysprep?.selectedSysprep;
 
-  const onUnattendChange = (value: string) =>
-    updateTabsData((tabsDraft) => {
-      ensurePath(tabsDraft, 'scripts.sysprep');
-      if (value) {
-        tabsDraft.scripts.sysprep.unattended = value;
-        delete tabsDraft.scripts.sysprep.selectedSysprep;
-      } else {
-        delete tabsDraft.scripts.sysprep.unattended;
-      }
-    });
-
   const onSysprepSelected = (newSysprep: string) =>
     updateTabsData((tabsDraft) => {
       ensurePath(tabsDraft, 'scripts.sysprep');
@@ -61,14 +50,14 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
       }
     });
 
-  const onAutoUnattendChange = (value: string) =>
+  const onSysprepCreation = (unattended: string, autounattend: string) =>
     updateTabsData((tabsDraft) => {
       ensurePath(tabsDraft, 'scripts.sysprep');
-      if (value) {
-        tabsDraft.scripts.sysprep.autounattend = value;
+      tabsDraft.scripts.sysprep.autounattend = autounattend;
+      tabsDraft.scripts.sysprep.unattended = unattended;
+
+      if (unattended || autounattend) {
         delete tabsDraft.scripts.sysprep.selectedSysprep;
-      } else {
-        delete tabsDraft.scripts.sysprep.autounattend;
       }
     });
 
@@ -167,8 +156,7 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
                     {...modalProps}
                     unattend={unattend}
                     autoUnattend={autoUnattend}
-                    onAutoUnattendChange={onAutoUnattendChange}
-                    onUnattendChange={onUnattendChange}
+                    onSysprepCreation={onSysprepCreation}
                     onSysprepSelected={onSysprepSelected}
                     sysprepSelected={selectedSysprep}
                   />

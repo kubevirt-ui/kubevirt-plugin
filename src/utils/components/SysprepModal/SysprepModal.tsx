@@ -12,8 +12,7 @@ export const SysprepModal: React.FC<{
   isOpen: boolean;
   autoUnattend: string;
   unattend: string;
-  onAutoUnattendChange?: (value: string) => void | Promise<void>;
-  onUnattendChange?: (value: string) => void | Promise<void>;
+  onSysprepCreation?: (unattended: string, autoUnattend: string) => void | Promise<void>;
   onClose: () => void;
   enableCreation?: boolean;
   onSysprepSelected?: (sysprepName: string) => void | Promise<void>;
@@ -23,8 +22,7 @@ export const SysprepModal: React.FC<{
   onClose,
   autoUnattend: initialAutoUnattend,
   unattend: initialUnattend,
-  onAutoUnattendChange,
-  onUnattendChange,
+  onSysprepCreation,
   enableCreation = true,
   onSysprepSelected,
   sysprepSelected,
@@ -37,8 +35,7 @@ export const SysprepModal: React.FC<{
 
   const submitHandler = async () => {
     if (enableCreation && creationSectionOpen) {
-      await onAutoUnattendChange(autoUnattend);
-      await onUnattendChange(unattend);
+      return await onSysprepCreation(unattend, autoUnattend);
     }
 
     if (onSysprepSelected) await onSysprepSelected(selectedSysprepName);

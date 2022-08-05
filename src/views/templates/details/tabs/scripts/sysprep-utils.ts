@@ -1,12 +1,21 @@
+import produce from 'immer';
+
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { ConfigMapModel, TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { SYSPREP, sysprepDisk } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
+import {
+  AUTOUNATTEND,
+  SYSPREP,
+  sysprepDisk,
+  UNATTEND,
+} from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import {
   getTemplateVirtualMachineObject,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 const addSysprepConfig = (draftVM: V1VirtualMachine, newSysprepName: string) => {
@@ -28,10 +37,50 @@ const removeSysprepConfig = (draftVM: V1VirtualMachine, sysprepVolumeName: strin
   );
 };
 
-export const updateTemplateSysprep = async (
+const generateNewSysprepConfig = (vm: V1VirtualMachine, data) => ({
+  kind: ConfigMapModel.kind,
+  apiVersion: ConfigMapModel.apiVersion,
+  metadata: {
+    name: `sysprep-config-${vm?.metadata?.name}-${getRandomChars()}`,
+    namespace: vm?.metadata?.namespace,
+  },
+  data,
+});
+
+export const getTemplateSysprepObject = (
   template: V1Template,
-  newSysprepName: string | undefined,
-  oldSysprepName: string | undefined,
+  sysprepName: string,
+): IoK8sApiCoreV1ConfigMap | undefined =>
+  template.objects.find((object) => object?.metadata?.name === sysprepName);
+
+export const deleteTemplateSysprepObject = (template: V1Template, sysprepName: string) =>
+  produce(template, (draftTemplate) => {
+    draftTemplate.objects = (draftTemplate?.objects || []).filter(
+      (object) => object?.metadata?.name !== sysprepName,
+    );
+  });
+
+export const replaceTemplateSysprepObject = (
+  template: V1Template,
+  sysprepConfig: IoK8sApiCoreV1ConfigMap,
+  oldSysprepName?: string,
+) =>
+  produce(template, (draftTemplate) => {
+    const sysprepIndex = draftTemplate.objects.findIndex(
+      (object) => object?.metadata?.name === oldSysprepName,
+    );
+
+    if (sysprepIndex >= 0) {
+      draftTemplate.objects.splice(sysprepIndex, 1, sysprepConfig);
+    } else {
+      draftTemplate.objects.push(sysprepConfig);
+    }
+  });
+
+export const updateTemplateWithSysprep = async (
+  template: V1Template,
+  newSysprepName?: string,
+  oldSysprepName?: string,
 ) => {
   if (newSysprepName === oldSysprepName) return;
 
@@ -67,4 +116,23 @@ export const updateTemplateSysprep = async (
     ns: template?.metadata?.namespace,
     name: template?.metadata?.name,
   });
+};
+
+export const updateSysprepObject = (
+  sysprepConfig: IoK8sApiCoreV1ConfigMap,
+  unattend: string,
+  autoUnattend: string,
+  vm: V1VirtualMachine,
+): IoK8sApiCoreV1ConfigMap | undefined => {
+  if (!unattend && !autoUnattend) return undefined;
+
+  if (sysprepConfig) {
+    return produce(sysprepConfig, (draftConfig) => {
+      draftConfig.data[AUTOUNATTEND] = autoUnattend;
+
+      draftConfig.data[UNATTEND] = unattend;
+    });
+  } else {
+    return generateNewSysprepConfig(vm, { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend });
+  }
 };
