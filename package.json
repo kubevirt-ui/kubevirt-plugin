@@ -51,6 +51,7 @@
       "ConsoleStandAlone": "./utils/components/Consoles/ConsoleStandAlone.tsx",
       "yamlTemplates": "src/templates/index.ts",
       "MigrationPoliciesList": "./views/migrationpolicies/list/MigrationPoliciesList.tsx",
+      "MigrationPolicyPage": "./views/migrationpolicies/details/MigrationPolicyDetailsNav.tsx",
       "dashboardExtensions": "./utils/extensions/dashboard/index.ts",
       "HardwareDevicesPage": "./utils/components/HardwareDevices/HardwareDevicesPage.tsx",
       "MigrationPolicyCreateForm": "./views/migrationpolicies/list/components/MigrationPolicyCreateForm/MigrationPolicyCreateForm.tsx"
