@@ -359,6 +359,17 @@
     }
   },
   {
+    "type": "console.page/resource/details",
+    "properties": {
+      "model": {
+        "group": "migrations.kubevirt.io",
+        "kind": "MigrationPolicy",
+        "version": "v1alpha1"
+      },
+      "component": { "$codeRef": "MigrationPolicyPage" }
+    }
+  },
+  {
     "type": "dev-console.add/action",
     "properties": {
       "id": "dev-catalog-virtualization",

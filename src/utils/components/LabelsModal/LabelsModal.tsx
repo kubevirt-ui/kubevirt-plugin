@@ -3,6 +3,7 @@ import TagsInput from 'react-tagsinput';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Label as PFLabel, Stack, StackItem } from '@patternfly/react-core';
 
@@ -16,16 +17,32 @@ type LabelsModalProps = {
   labelClassName?: string;
   onLabelsSubmit: (labels: { [key: string]: string }) => Promise<void | K8sResourceCommon>;
   onClose: () => void;
+  initialLabels?: {
+    [key: string]: string;
+  };
+  modalDescriptionText?: string;
 };
 
 export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
-  ({ isOpen, obj, labelClassName, onLabelsSubmit, onClose }) => {
+  ({
+    isOpen,
+    obj,
+    labelClassName,
+    onLabelsSubmit,
+    onClose,
+    initialLabels,
+    modalDescriptionText,
+  }) => {
     const { t } = useKubevirtTranslation();
     const [inputValue, setInputValue] = React.useState('');
     const [isInputValid, setIsInputValid] = React.useState(true);
-    const [labels, setLabels] = React.useState<string[]>(
-      labelsToArray(obj?.metadata?.labels || {}),
-    );
+
+    const initLabels = React.useMemo(() => {
+      if (!isEmpty(initialLabels)) return initialLabels;
+      if (!isEmpty(obj?.metadata?.labels)) return obj?.metadata?.labels;
+      return {};
+    }, [initialLabels, obj?.metadata?.labels]);
+    const [labels, setLabels] = React.useState<string[]>(labelsToArray(initLabels));
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
@@ -77,14 +94,6 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
       );
     };
 
-    // reset labels when modal is closed
-    React.useEffect(() => {
-      if (obj?.metadata?.labels) {
-        setLabels(labelsToArray(obj?.metadata?.labels || {}));
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isOpen]);
-
     const inputProps = {
       autoFocus: true,
       className: 'input'.concat(isInputValid ? '' : ' invalid-tag'),
@@ -111,9 +120,10 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
       >
         <Stack hasGutter>
           <StackItem>
-            {t(
-              'Labels help you organize and select resources. Adding labels below will let you query for objects that have similar, overlapping or dissimilar labels.',
-            )}
+            {modalDescriptionText ??
+              t(
+                'Labels help you organize and select resources. Adding labels below will let you query for objects that have similar, overlapping or dissimilar labels.',
+              )}
           </StackItem>
           <StackItem>
             <div className="kv-labels-modal-body">
