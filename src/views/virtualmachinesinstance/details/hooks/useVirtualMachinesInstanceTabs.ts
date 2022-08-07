@@ -42,7 +42,7 @@ const useVirtualMachinesInstanceTabs = () => {
       },
       {
         href: 'network',
-        name: t('Network Interfaces'),
+        name: t('Network interfaces'),
         component: VirtualMachinesInstancePageNetworkTab,
       },
       {

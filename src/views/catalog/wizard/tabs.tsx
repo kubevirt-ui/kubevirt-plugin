@@ -46,7 +46,7 @@ export const wizardNavPages: NavPage[] = [
   },
   {
     href: 'network-interfaces',
-    name: 'Network Interfaces',
+    name: 'Network interfaces',
     component: withWizardVMContext(WizardNetworkTab),
   },
   {

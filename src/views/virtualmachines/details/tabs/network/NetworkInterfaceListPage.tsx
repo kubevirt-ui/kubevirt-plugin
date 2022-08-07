@@ -23,7 +23,7 @@ const NetworkInterfaceListPage: React.FC<NetworkInterfaceListPageProps> = ({ obj
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const actionText = t('Add Network Interface');
+  const actionText = t('Add network interface');
 
   return (
     <>

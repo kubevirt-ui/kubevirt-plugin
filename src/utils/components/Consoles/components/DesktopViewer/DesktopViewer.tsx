@@ -53,7 +53,7 @@ const DesktopViewer: React.FC<DesktopViewerProps> = ({ vm, vmi }) => {
   return (
     <>
       <Form isHorizontal className="kv-vm-consoles__rdp-actions">
-        <FormGroup fieldId="network-dropdown" label={t('Network Interface')}>
+        <FormGroup fieldId="network-dropdown" label={t('Network interface')}>
           <Dropdown
             id="network-dropdown"
             onSelect={() => setIsDropdownOpen(false)}
@@ -67,7 +67,7 @@ const DesktopViewer: React.FC<DesktopViewerProps> = ({ vm, vmi }) => {
                 {selectedNetwork?.name}
               </DropdownToggle>
             }
-            title={t('--- Select Network Interface ---')}
+            title={t('--- Select network interface ---')}
           />
         </FormGroup>
       </Form>

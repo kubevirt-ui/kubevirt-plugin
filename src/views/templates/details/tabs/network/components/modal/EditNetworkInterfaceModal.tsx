@@ -96,7 +96,7 @@ const EditNetworkInterfaceModal: React.FC<EditNetworkInterfaceModalProps> = ({
       onSubmit={onSubmit}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('Edit Network Interface')}
+      headerText={t('Edit network interface')}
       isDisabled={submitDisabled}
     >
       <Form>

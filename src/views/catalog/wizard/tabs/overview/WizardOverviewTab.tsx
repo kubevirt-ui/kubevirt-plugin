@@ -176,7 +176,7 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
         <GridItem span={6} rowSpan={4}>
           <DescriptionList>
             <WizardDescriptionItem
-              title={t('Network Interfaces')}
+              title={t('Network interfaces')}
               count={networks?.length}
               onTitleClick={() =>
                 history.push(`/k8s/ns/${ns}/templatescatalog/review/network-interfaces`)

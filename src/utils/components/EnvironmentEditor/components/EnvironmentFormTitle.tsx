@@ -9,7 +9,7 @@ const EnvironmentFormTitle: React.FC = React.memo(() => {
   return (
     <Title headingLevel="h2" className="co-section-heading">
       <span>
-        {t('Include all values from existing config maps, secrets or service accounts (as Disk)')}{' '}
+        {t('Include all values from existing config maps, secrets or service accounts (as disk)')}{' '}
         <Popover
           aria-label={'Help'}
           bodyContent={() => (

@@ -5,7 +5,7 @@ export enum tabs {
   Environment = 'horizontal-link-Environment',
   Events = 'horizontal-link-public~Events',
   Console = 'horizontal-link-Console',
-  NetworkInterfaces = 'horizontal-link-Network Interfaces',
+  NetworkInterfaces = 'horizontal-link-Network interfaces',
   Disks = 'horizontal-link-Disks',
   Snapshots = 'horizontal-link-Snapshots',
 }

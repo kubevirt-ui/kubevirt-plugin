@@ -23,7 +23,7 @@ type TemplateNetworkProps = RouteComponentProps<{
 const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const actionText = t('Add Network Interface');
+  const actionText = t('Add network interface');
 
   return (
     <div>

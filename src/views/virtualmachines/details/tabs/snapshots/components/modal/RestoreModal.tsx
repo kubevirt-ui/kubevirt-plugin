@@ -36,7 +36,7 @@ const RestoreModal: React.FC<DeleteResourceModalProps> = ({ snapshot, onClose, i
         })
       }
       onClose={onClose}
-      headerText={t('Restore Snapshot')}
+      headerText={t('Restore snapshot')}
       submitBtnText={t('Restore')}
     >
       {t('Are you sure you want to restore {{name}}?', {
