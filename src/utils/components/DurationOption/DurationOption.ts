@@ -102,7 +102,7 @@ class DurationOption extends DropdownEnum<string> {
   );
 
   static getMilliseconds = (duration: string): number =>
-    DurationOption.stringMapper?.[duration].millisecondsTime;
+    DurationOption.stringMapper?.[duration]?.millisecondsTime;
 
   static fromString = (source: string): DurationOption => DurationOption.stringMapper[source];
 
