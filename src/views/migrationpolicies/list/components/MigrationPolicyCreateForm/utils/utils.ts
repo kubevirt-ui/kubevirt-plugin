@@ -5,12 +5,7 @@ import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BinaryUnit } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-export const getEmptyMigrationPolicy = (): V1alpha1MigrationPolicy => ({
-  apiVersion: 'migrations.kubevirt.io/v1alpha1',
-  kind: 'MigrationPolicy',
-  metadata: { annotations: {} },
-  spec: { selectors: {} },
-});
+import { getEmptyMigrationPolicy } from '../../../../utils/utils';
 
 const generateMigrationPolicyName = (): string => {
   return `policy-${uniqueNamesGenerator({
@@ -41,7 +36,7 @@ export const initialMigrationPolicyState: InitialMigrationPolicyState = {
   namespaceSelectorMatchLabel: {},
 };
 
-export const produceUpdatedMigrationPolicy = (state: InitialMigrationPolicyState) =>
+export const produceMigrationPolicy = (state: InitialMigrationPolicyState) =>
   produce<V1alpha1MigrationPolicy>(
     getEmptyMigrationPolicy(),
     (mpDraft: V1alpha1MigrationPolicy) => {
