@@ -11,6 +11,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { CopyIcon } from '@patternfly/react-icons';
 
 import { printableVMStatus } from '../utils';
 
@@ -156,6 +157,15 @@ export const VirtualMachineActionFactory = {
   //       ),
   //   };
   // },
+  copySSHCommand: (command: string, t: TFunction): Action => {
+    return {
+      id: 'vm-action-copy-ssh',
+      label: t('Copy SSH command'),
+      icon: <CopyIcon />,
+      description: t('SSH using virtctl'),
+      cta: () => command && navigator.clipboard.writeText(command),
+    };
+  },
   editLabels: (
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,

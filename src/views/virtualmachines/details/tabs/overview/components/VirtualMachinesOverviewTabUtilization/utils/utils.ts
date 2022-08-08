@@ -52,12 +52,15 @@ export const queriesToLink = (queries: string[] | string) => {
 export const tickFormat = (timespan: number) => (tick: any, index: number, ticks: any[]) => {
   const isFirst = index === 0;
   const isLast = index === ticks.length - 1;
+
   if (isLast || isFirst) {
     const dateNow = new Date(Date.now());
     const datePast = new Date(+dateNow - timespan);
-    return `${(isLast ? datePast : dateNow).getHours()}:${(
-      '0' + (isLast ? datePast : dateNow).getMinutes()
-    ).slice(-2)}`;
+
+    return `${(isLast ? datePast : dateNow).getHours()}:${`0${(isLast
+      ? datePast
+      : dateNow
+    ).getMinutes()}`.slice(-2)}`;
   }
 
   return '';

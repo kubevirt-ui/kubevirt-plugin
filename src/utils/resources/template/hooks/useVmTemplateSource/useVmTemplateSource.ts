@@ -132,6 +132,8 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
           setIsBootSourceAvailable(true);
         }
         break;
+      default:
+        break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bootSource]);

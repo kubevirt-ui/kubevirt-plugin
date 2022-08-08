@@ -81,7 +81,7 @@ export const hasCustomizableSource = (template: V1Template): boolean => {
 
 export const extractParameterNameFromMetadataName = (template: V1Template): string => {
   const virtualMachineObject = getTemplateVirtualMachineObject(template);
-  return virtualMachineObject?.metadata.name?.replace(/[${}\"]+/g, '');
+  return virtualMachineObject?.metadata.name?.replace(/[${}"]+/g, '');
 };
 
 export const processTemplate = async ({

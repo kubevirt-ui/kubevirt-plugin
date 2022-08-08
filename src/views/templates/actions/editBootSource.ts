@@ -12,8 +12,10 @@ import {
   V1beta1DataVolumeSpec,
   V1DataVolumeTemplateSpec,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { poorManProcess } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineObject,
+  poorManProcess,
+} from '@kubevirt-utils/resources/template';
 import {
   getDataSource,
   getDataVolume,
@@ -114,7 +116,9 @@ export const editBootSource = async (
 
   try {
     dataVolume = await getDataVolume(dataSourcePVCName, dataSourcePVCNamespace);
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+  }
 
   if (dataVolume) {
     await k8sDelete({

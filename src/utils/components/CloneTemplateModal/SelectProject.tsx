@@ -2,8 +2,11 @@ import * as React from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  K8sResourceCommon,
+  ResourceLink,
+  useK8sWatchResource,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import Loading from '../Loading/Loading';

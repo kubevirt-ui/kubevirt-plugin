@@ -80,6 +80,8 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
           <span data-test-id={BLANK_SOURCE_NAME}>{t('Blank')}</span>
         </SelectOption>
       );
+    default:
+      break;
   }
 };
 

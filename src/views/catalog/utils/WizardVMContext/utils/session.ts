@@ -8,7 +8,9 @@ const TABS_DATA_CACHE_KEY = 'wizard-tabs-data-cache';
 export const setSessionStorageVM = (value: V1VirtualMachine) => {
   try {
     window.sessionStorage.setItem(VM_CACHE_KEY, JSON.stringify(value));
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 export const getSessionStorageVM = (): V1VirtualMachine | undefined => {
@@ -23,7 +25,9 @@ export const getSessionStorageVM = (): V1VirtualMachine | undefined => {
 export const setSessionStorageTabsData = (value: TabsData) => {
   try {
     window.sessionStorage.setItem(TABS_DATA_CACHE_KEY, JSON.stringify(value));
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 export const getSessionStorageTabsData = (): TabsData => {
@@ -39,5 +43,7 @@ export const clearSessionStorageVM = () => {
   try {
     window.sessionStorage.removeItem(VM_CACHE_KEY);
     window.sessionStorage.removeItem(TABS_DATA_CACHE_KEY);
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 };

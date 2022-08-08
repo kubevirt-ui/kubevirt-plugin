@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 
-import VirtualMachineActions from '../list/components/VirtualMachineActions/VirtualMachineActions';
+import VirtualMachineActions from '../actions/components/VirtualMachineActions/VirtualMachineActions';
 import VirtualMachineBreadcrumb from '../list/components/VirtualMachineBreadcrumb/VirtualMachineBreadcrumb';
 import { getVMStatusIcon } from '../utils';
 

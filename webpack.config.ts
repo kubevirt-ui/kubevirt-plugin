@@ -109,9 +109,8 @@ const config: Configuration = {
             test: /\.svg$/,
             type: 'asset/inline',
             generator: {
-              dataUrl: (content) => {
-                content = content.toString();
-                return svgToMiniDataURI(content);
+              dataUrl: (content: { toString: () => any }) => {
+                return svgToMiniDataURI(content.toString());
               },
             },
           },

@@ -107,6 +107,8 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
             showSizeInput ? volumeQuantity : null,
           ),
         );
+      default:
+        break;
     }
   }, [
     onSourceChange,
