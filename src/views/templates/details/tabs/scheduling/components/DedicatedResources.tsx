@@ -24,7 +24,7 @@ const DedicatedResources: React.FC<TemplateSchedulingGridProps> = ({
   const { t } = useKubevirtTranslation();
   const dedicatedResourcesText = isDedicatedCPUPlacement(template)
     ? t('Workload scheduled with dedicated resources (guaranteed policy)')
-    : t('No Dedicated resources applied');
+    : t('No dedicated resources applied');
 
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (

@@ -48,7 +48,7 @@ const useVirtualMachinesInstancesColumns = (): { title: string; id: string }[] =
         sort: 'metadata.creationTimestamp',
       },
       {
-        title: t('IP Address'),
+        title: t('IP address'),
         id: 'ipAddress',
       },
       {

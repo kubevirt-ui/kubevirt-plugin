@@ -13,7 +13,7 @@ const IP: React.FC<IPProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const ipAddresses = getVMIIPAddresses(vmi);
 
-  return <FirstItemListPopover items={ipAddresses} headerContent={t('IP Addresses')} />;
+  return <FirstItemListPopover items={ipAddresses} headerContent={t('IP addresses')} />;
 };
 
 export default IP;

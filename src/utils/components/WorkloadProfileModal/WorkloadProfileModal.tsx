@@ -27,7 +27,7 @@ const WorkloadProfileModal: React.FC<WorkloadProfileModalProps> = React.memo(
 
     return (
       <TabModal
-        headerText={t('Edit Workload profile')}
+        headerText={t('Edit workload profile')}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={() => onSubmit(workload)}

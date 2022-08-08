@@ -18,7 +18,7 @@ const VirtualMachinesInstancesIP: React.FC<VirtualMachinesInstancesIPProps> = ({
       <div>{ips?.[0]}</div>
       {ips?.length > 1 && (
         <Popover
-          headerContent={t('IP Addresses')}
+          headerContent={t('IP addresses')}
           bodyContent={ips?.map((item) => (
             <div key={item}>{item}</div>
           ))}

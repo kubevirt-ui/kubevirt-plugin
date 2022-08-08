@@ -13,7 +13,7 @@ const Hostname: React.FC<HostnameProps> = ({ guestAgentData }) => {
   return (
     <>
       {guestAgentData?.hostname ?? (
-        <div className="text-muted">{t('Guest Agent is required')} </div>
+        <div className="text-muted">{t('Guest agent is required')} </div>
       )}
     </>
   );

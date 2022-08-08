@@ -48,7 +48,7 @@ const VirtualMachinesOverviewTabInterfacesRow: React.FC<
         <div data-test-id={`network-interface-${obj?.ipAddresses}`}>
           <FirstItemListPopover
             items={obj?.ipAddresses}
-            headerContent={'IP Addresses'}
+            headerContent={'IP addresses'}
             includeCopyFirstItem
           />
         </div>

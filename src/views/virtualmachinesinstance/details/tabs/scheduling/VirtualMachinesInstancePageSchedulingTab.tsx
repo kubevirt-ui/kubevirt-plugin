@@ -35,7 +35,7 @@ const VirtualMachinesInstancePageSchedulingTab: React.FC<
         <GridItem span={6}>
           <DescriptionList>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('Node Selector')}</DescriptionListTerm>
+              <DescriptionListTerm>{t('Node selector')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <NodeSelector vmi={vmi} />
               </DescriptionListDescription>
@@ -47,7 +47,7 @@ const VirtualMachinesInstancePageSchedulingTab: React.FC<
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('Affinity Rules')}</DescriptionListTerm>
+              <DescriptionListTerm>{t('Affinity rules')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <Affinity vmi={vmi} />
               </DescriptionListDescription>
@@ -63,13 +63,13 @@ const VirtualMachinesInstancePageSchedulingTab: React.FC<
         <GridItem span={6}>
           <DescriptionList>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('Dedicated Resources')}</DescriptionListTerm>
+              <DescriptionListTerm>{t('Dedicated resources')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <DedicatedResources vmi={vmi} />
               </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('Eviction Strategy')}</DescriptionListTerm>
+              <DescriptionListTerm>{t('Eviction strategy')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <EvictionStrategy vmi={vmi} />
               </DescriptionListDescription>

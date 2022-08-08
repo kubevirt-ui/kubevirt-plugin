@@ -238,7 +238,7 @@ export const usePendingChanges = (
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={onSubmit}
-            headerText={t('Eviction Strategy')}
+            headerText={t('Eviction strategy')}
             vmi={vmi}
           />
         ));

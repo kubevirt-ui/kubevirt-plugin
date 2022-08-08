@@ -95,7 +95,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         />
         <VirtualMachineDescriptionItem
           descriptionData={<BootOrderSummary vm={vm} />}
-          descriptionHeader={t('Boot Order')}
+          descriptionHeader={t('Boot order')}
           isEdit
           onEditClick={() =>
             createModal((props) => (
@@ -106,7 +106,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.ipAddress}
-          descriptionHeader={t('IP Address')}
+          descriptionHeader={t('IP address')}
           data-test-id={`${vm?.metadata?.name}-ip-address`}
         />
         <VirtualMachineDescriptionItem
@@ -116,7 +116,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.timezone}
-          descriptionHeader={t('Time Zone')}
+          descriptionHeader={t('Time zone')}
           data-test-id={`${vm?.metadata?.name}-timezone`}
         />
         {canGetNode && (
@@ -144,7 +144,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
               />
             ))
           }
-          descriptionHeader={t('Workload Profile')}
+          descriptionHeader={t('Workload profile')}
           data-test-id={`${vm?.metadata?.name}-workload-profile`}
         />
         <VirtualMachineDescriptionItem

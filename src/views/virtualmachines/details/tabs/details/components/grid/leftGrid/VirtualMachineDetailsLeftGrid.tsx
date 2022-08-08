@@ -211,7 +211,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           }
           isPopover
           // body-content text copied from:
-          descriptionHeader={t('Operating System')}
+          descriptionHeader={t('Operating system')}
           data-test-id={`${vm?.metadata?.name}-os`}
         />
         <VirtualMachineDescriptionItem

@@ -64,7 +64,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
       <DescriptionList>
         <VirtualMachineDescriptionItem
           descriptionData={<NodeSelector vm={vm} />}
-          descriptionHeader={t('Node Selector')}
+          descriptionHeader={t('Node selector')}
           isEdit={canUpdateVM}
           data-test-id="node-selector"
           onEditClick={() =>
@@ -102,7 +102,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
         />
         <VirtualMachineDescriptionItem
           descriptionData={<Affinity vm={vm} />}
-          descriptionHeader={t('Affinity Rules')}
+          descriptionHeader={t('Affinity rules')}
           isEdit={canUpdateVM}
           data-test-id="affinity-rules"
           onEditClick={() =>

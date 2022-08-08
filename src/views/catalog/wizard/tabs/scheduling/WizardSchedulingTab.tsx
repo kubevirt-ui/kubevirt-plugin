@@ -44,7 +44,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
         <GridItem span={6} rowSpan={4}>
           <DescriptionList>
             <WizardDescriptionItem
-              title={t('Node Selector')}
+              title={t('Node selector')}
               description={<NodeSelector vm={vm} />}
               isEdit
               testId="node-selector"
@@ -82,7 +82,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
             />
 
             <WizardDescriptionItem
-              title={t('Affinity Rules')}
+              title={t('Affinity rules')}
               description={<Affinity vm={vm} />}
               testId="affinity-rules"
               isEdit
@@ -117,7 +117,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
         <GridItem span={6} rowSpan={4}>
           <DescriptionList>
             <WizardDescriptionItem
-              title={t('Dedicated Resources')}
+              title={t('Dedicated resources')}
               description={<DedicatedResources vm={vm} />}
               isEdit
               testId="dedicated-resources"
@@ -135,7 +135,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
             />
 
             <WizardDescriptionItem
-              title={t('Eviction Strategy')}
+              title={t('Eviction strategy')}
               description={<EvictionStrategy vm={vm} />}
               isEdit
               testId="eviction-strategy"
@@ -146,7 +146,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
                     isOpen={isOpen}
                     onClose={onClose}
                     onSubmit={updateVM}
-                    headerText={t('Eviction Strategy')}
+                    headerText={t('Eviction strategy')}
                   />
                 ))
               }

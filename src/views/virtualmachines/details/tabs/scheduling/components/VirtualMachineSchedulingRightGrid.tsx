@@ -44,7 +44,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
       <DescriptionList>
         <VirtualMachineDescriptionItem
           descriptionData={<DedicatedResources vm={vm} />}
-          descriptionHeader={t('Dedicated Resources')}
+          descriptionHeader={t('Dedicated resources')}
           isEdit={canUpdateVM}
           data-test-id="dedicated-resources"
           onEditClick={() =>
@@ -62,7 +62,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
         />
         <VirtualMachineDescriptionItem
           descriptionData={<EvictionStrategy vm={vm} />}
-          descriptionHeader={t('Eviction Strategy')}
+          descriptionHeader={t('Eviction strategy')}
           isEdit={canUpdateVM}
           data-test-id="eviction-strategy"
           onEditClick={() =>
@@ -72,7 +72,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                headerText={t('Eviction Strategy')}
+                headerText={t('Eviction strategy')}
                 vmi={vmi}
               />
             ))

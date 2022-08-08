@@ -22,7 +22,7 @@ const VirtualMachineRunningRow: React.FC<
       rowData={{
         kind,
         node: <ResourceLink kind="Node" name={vmi?.status?.nodeName} />,
-        ips: <FirstItemListPopover items={ipAddressess} headerContent={t('IP Addresses')} />,
+        ips: <FirstItemListPopover items={ipAddressess} headerContent={t('IP addresses')} />,
       }}
     />
   );

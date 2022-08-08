@@ -15,8 +15,8 @@ const MultusNetwork: React.FC<MultusNetworkProps> = ({ vmi, selectedNetwork }) =
 
   if (!guestAgent) {
     return (
-      <Alert variant="warning" isInline title={t('Missing Guest Agent')}>
-        {t('Guest Agent is not installed on VirtualMachine')}
+      <Alert variant="warning" isInline title={t('Missing guest agent')}>
+        {t('Guest agent is not installed on VirtualMachine')}
       </Alert>
     );
   }
