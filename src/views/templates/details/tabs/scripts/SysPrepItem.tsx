@@ -14,6 +14,7 @@ import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepMod
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
@@ -26,7 +27,13 @@ import {
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
-import { updateTemplateSysprep } from './sysprep-utils';
+import {
+  deleteTemplateSysprepObject,
+  getTemplateSysprepObject,
+  replaceTemplateSysprepObject,
+  updateSysprepObject,
+  updateTemplateWithSysprep,
+} from './sysprep-utils';
 import { SysprepDescription } from './SysPrepDescription';
 
 type SysPrepItemProps = {
@@ -37,28 +44,46 @@ const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const isEditDisabled = isCommonVMTemplate(template);
   const vm = getTemplateVirtualMachineObject(template);
+  const currentVMSysprepName = getVolumes(vm)?.find((volume) => volume?.sysprep?.configMap?.name)
+    ?.sysprep?.configMap?.name;
+
+  const sysPrepObject = getTemplateSysprepObject(template, currentVMSysprepName);
 
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const vmSysPrepName = getVolumes(vm)?.find((volume) => volume?.sysprep?.configMap?.name)?.sysprep
-    ?.configMap?.name;
+  const externalSysprepSelected = isEmpty(sysPrepObject) && currentVMSysprepName;
 
-  const [sysPrepConfig, loaded, sysprepLoadError] = useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
-    vmSysPrepName
-      ? {
-          groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-          namespace,
-          name: vmSysPrepName,
-        }
-      : null,
-  );
+  const [externalSysprepConfig, sysprepLoaded, sysprepLoadError] =
+    useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
+      externalSysprepSelected
+        ? {
+            groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
+            namespace,
+            name: externalSysprepSelected,
+          }
+        : null,
+    );
 
-  const autoUnattend = sysPrepConfig?.data?.[AUTOUNATTEND];
-  const unattend = sysPrepConfig?.data?.[UNATTEND];
+  const { [UNATTEND]: unattend, [AUTOUNATTEND]: autoUnattend } =
+    externalSysprepConfig?.data || sysPrepObject?.data || {};
 
   const onSysprepSelected = async (newSysprepName: string) => {
-    return updateTemplateSysprep(template, newSysprepName, vmSysPrepName);
+    const templateNoSysprepObj = deleteTemplateSysprepObject(template, currentVMSysprepName);
+    return updateTemplateWithSysprep(templateNoSysprepObj, newSysprepName, currentVMSysprepName);
+  };
+
+  const onSysprepCreation = (newUnattended: string, newAutoUnattend: string) => {
+    const newSysPrepObject = updateSysprepObject(sysPrepObject, newUnattended, newAutoUnattend, vm);
+    const templateWithSysPrep = newSysPrepObject
+      ? replaceTemplateSysprepObject(template, newSysPrepObject, currentVMSysprepName)
+      : deleteTemplateSysprepObject(template, currentVMSysprepName);
+
+    return updateTemplateWithSysprep(
+      templateWithSysPrep,
+      newSysPrepObject?.metadata?.name,
+      externalSysprepSelected,
+    );
   };
 
   return (
@@ -79,8 +104,8 @@ const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
                         unattend={unattend}
                         autoUnattend={autoUnattend}
                         onSysprepSelected={onSysprepSelected}
-                        sysprepSelected={vmSysPrepName}
-                        enableCreation={false}
+                        sysprepSelected={externalSysprepSelected}
+                        onSysprepCreation={onSysprepCreation}
                       />
                     ))
                   }
@@ -98,7 +123,7 @@ const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
         <SysprepDescription
           hasAutoUnattend={!!autoUnattend}
           hasUnattend={!!unattend}
-          loaded={loaded}
+          loaded={sysprepLoaded}
           error={sysprepLoadError}
         />
       </DescriptionListDescription>
