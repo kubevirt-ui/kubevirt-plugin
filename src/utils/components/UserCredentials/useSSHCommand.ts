@@ -15,7 +15,8 @@ const useSSHCommand = (
 ): useSSHCommandResult => {
   const consoleHostname = window.location.hostname; // fallback to console hostname
 
-  const { user } = getCloudInitCredentials(vmi);
+  const { users } = getCloudInitCredentials(vmi);
+  const user = users?.[0]?.name;
   const sshServicePort = getSSHNodePort(sshService);
 
   let command = 'ssh ';
