@@ -1,15 +1,15 @@
 import React, { useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Checkbox, Form, FormGroup, StackItem, TextInput } from '@patternfly/react-core';
+import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
-import BandwidthInput from './copmonents/BandwidthInput/BandwidthInput';
-import CompletionTimeoutInput from './copmonents/CompletionTimeoutInput/CompletionTimeoutInput';
+import MigrationPolicyConfigurationsFormGroup from '../../../components/MigrationPolicyConfigurationsFormGroup/MigrationPolicyConfigurationsFormGroup';
+
 import MigrationPolicyCreateFormHeader from './copmonents/MigrationPolicyCreateFormHeader/MigrationPolicyCreateFormHeader';
 import MigrationPolicyFormDescription from './copmonents/MigrationPolicyFormDescription/MigrationPolicyFormDescription';
 import MigrationPolicyFormFooter from './copmonents/MigrationPolicyFormFooter/MigrationPolicyFormFooter';
 import SelectorLabelMatchGroup from './copmonents/SelectorLabelMatchGroup/SelectorLabelMatchGroup';
-import { initialMigrationPolicyState, produceUpdatedMigrationPolicy } from './utils/utils';
+import { initialMigrationPolicyState, produceMigrationPolicy } from './utils/utils';
 
 import './MigrationPolicyCreateForm.scss';
 
@@ -25,7 +25,7 @@ const MigrationPolicyCreateForm: React.FC = () => {
       [field]: isvaluefunction ? value(prevState?.[field]) : value,
     }));
   };
-  const migrationPolicy = useMemo(() => produceUpdatedMigrationPolicy(state), [state]);
+  const migrationPolicy = useMemo(() => produceMigrationPolicy(state), [state]);
 
   return (
     <div className="migration-policy__form">
@@ -49,45 +49,7 @@ const MigrationPolicyCreateForm: React.FC = () => {
           <TextInput value={state?.description} onChange={setStateField('description')} />
         </FormGroup>
         <h2>{t('Configurations')}</h2>
-        <FormGroup
-          fieldId="migration-policy-bandwidth"
-          label={t('Bandwidth consumption')}
-          helperText={t('To gain unlimited bandwidth, set to 0')}
-        >
-          <BandwidthInput
-            bandwidth={state?.bandwidthPerMigration}
-            setBandwidth={setStateField('bandwidthPerMigration')}
-          />
-        </FormGroup>
-        <Checkbox
-          isChecked={state?.autoConverge}
-          onChange={(checked) => {
-            const setAutoConverge = setStateField('autoConverge');
-            setAutoConverge(checked);
-            if (checked) {
-              const setCompletionTimeoutEnabled = setStateField('completionTimeout');
-              setCompletionTimeoutEnabled((prev) => ({ ...prev, enabled: checked }));
-            }
-          }}
-          label={<div className="pf-c-form__label">{t('Enable auto converge')}</div>}
-          id="migration-policy-auto-converge"
-          data-test-id="migration-policy-auto-converge"
-        />
-        <Checkbox
-          isChecked={state?.postCopy}
-          onChange={setStateField('postCopy')}
-          label={<div className="pf-c-form__label">{t('Enable post-copy')}</div>}
-          id="migration-policy-post-copy"
-          data-test-id="migration-policy-post-copy"
-        />
-        <FormGroup fieldId="migration-policy-completion-timeout">
-          <StackItem>
-            <CompletionTimeoutInput
-              completionTimeout={state?.completionTimeout}
-              setCompletionTimeout={setStateField('completionTimeout')}
-            />
-          </StackItem>
-        </FormGroup>
+        <MigrationPolicyConfigurationsFormGroup state={state} setStateField={setStateField} />
         <h2>{t('Selectors')}</h2>
         <FormGroup fieldId="migration-policy-project-selector" label={t('Project selectors')}>
           <SelectorLabelMatchGroup

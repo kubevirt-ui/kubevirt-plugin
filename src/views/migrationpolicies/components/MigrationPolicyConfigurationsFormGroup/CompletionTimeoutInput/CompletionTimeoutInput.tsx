@@ -44,9 +44,9 @@ const CompletionTimeoutInput: React.FC<CompletionTimeoutInputProps> = ({
             data-test-id="migration-policy-completion-timeout-input"
             id="migration-policy-completion-timeout-input"
             value={completionTimeout?.value}
-            onChange={(event: React.FormEvent<HTMLInputElement>) =>
-              +event.currentTarget.value >= 0 &&
-              setCompletionTimeout((prev) => ({ ...prev, value: +event.currentTarget.value }))
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              +event?.target?.value >= 0 &&
+              setCompletionTimeout((prev) => ({ ...prev, value: +event.target.value }))
             }
             onPlus={() => setCompletionTimeout((prev) => ({ ...prev, value: ++prev.value }))}
             onMinus={() => setCompletionTimeout((prev) => ({ ...prev, value: --prev.value }))}

@@ -5,6 +5,7 @@ import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
@@ -63,14 +64,16 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
         </Button>
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
-        <LabelGroup isEditable className="migration-policy-selectors-group">
-          <MigrationPolicyMatchExpressionSelectorList
-            matchExpressions={mp?.spec?.selectors?.namespaceSelector?.matchExpressions}
-          />
-          <MigrationPolicyMatchLabelSelectorList
-            matchLabels={mp?.spec?.selectors?.namespaceSelector?.matchLabels}
-          />
-        </LabelGroup>
+        {!isEmpty(mp?.spec?.selectors?.namespaceSelector) && (
+          <LabelGroup isEditable className="migration-policy-selectors-group">
+            <MigrationPolicyMatchExpressionSelectorList
+              matchExpressions={mp?.spec?.selectors?.namespaceSelector?.matchExpressions}
+            />
+            <MigrationPolicyMatchLabelSelectorList
+              matchLabels={mp?.spec?.selectors?.namespaceSelector?.matchLabels}
+            />
+          </LabelGroup>
+        )}
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

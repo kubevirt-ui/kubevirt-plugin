@@ -8,6 +8,8 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Action, k8sDelete, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
+import MigrationPolicyEditModal from '../../components/MigrationPolicyEditModal/MigrationPolicyEditModal';
+
 type UseMigrationPoliciesActionsProviderValues = [Action[], boolean];
 
 type UseMigrationPoliciesActionsProvider = (
@@ -22,7 +24,15 @@ const useMigrationPoliciesActionsProvider: UseMigrationPoliciesActionsProvider =
 
   const actions: Action[] = useMemo(() => {
     return [
-      // TODO edit action
+      {
+        id: 'mp-action-edit',
+        disabled: false,
+        label: t('Edit'),
+        cta: () =>
+          createModal(({ isOpen, onClose }) => (
+            <MigrationPolicyEditModal isOpen={isOpen} onClose={onClose} mp={mp} />
+          )),
+      },
       {
         id: 'mp-action-delete',
         disabled: false,

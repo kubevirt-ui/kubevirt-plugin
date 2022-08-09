@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DescriptionList,
@@ -14,6 +15,7 @@ import {
 } from '@patternfly/react-core';
 import { LinkIcon, PencilAltIcon } from '@patternfly/react-icons';
 
+import MigrationPolicyEditModal from '../../../../../components/MigrationPolicyEditModal/MigrationPolicyEditModal';
 import {
   getBandwidthPerMigrationText,
   getBooleanText,
@@ -36,6 +38,7 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
   pathname,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
 
   return (
     <div>
@@ -50,7 +53,13 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
           <DescriptionList>
             <MigrationPolicyDescriptionItem title={t('Name')} description={mp?.metadata?.name} />
             <>
-              <DescriptionListTermHelpTextButton /*onClick={Open editconfigmodal}*/>
+              <DescriptionListTermHelpTextButton
+                onClick={() =>
+                  createModal(({ isOpen, onClose }) => (
+                    <MigrationPolicyEditModal isOpen={isOpen} onClose={onClose} mp={mp} />
+                  ))
+                }
+              >
                 <Flex spaceItems={{ default: 'spaceItemsNone' }}>
                   <FlexItem>
                     <Title headingLevel="h2">{t('Configurations')}</Title>

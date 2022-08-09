@@ -11,6 +11,8 @@ import {
   SplitItem,
 } from '@patternfly/react-core';
 
+import { fromIECUnit } from '../../MigrationPolicyEditModal/utils/utils';
+
 type BandwidthInputProps = {
   bandwidth: {
     value: number;
@@ -35,7 +37,7 @@ const BandwidthInput: React.FC<BandwidthInputProps> = ({ bandwidth, setBandwidth
       event: React.MouseEvent<Element, MouseEvent> | React.ChangeEvent<Element>,
       newUnit: BinaryUnit,
     ) => {
-      setBandwidth((prev) => ({ ...prev, unit: newUnit }));
+      setBandwidth((prev) => ({ ...prev, unit: fromIECUnit(newUnit) }));
       setIsQuantitySelectOpen(false);
     },
     [setBandwidth],
@@ -48,9 +50,9 @@ const BandwidthInput: React.FC<BandwidthInputProps> = ({ bandwidth, setBandwidth
           min={0}
           value={bandwidth?.value}
           onMinus={() => setBandwidth((prev) => ({ ...prev, value: --prev.value }))}
-          onChange={(event) =>
-            +event.currentTarget.value >= 0 &&
-            setBandwidth((prev) => ({ ...prev, value: +event.currentTarget.value }))
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            +event.target.value >= 0 &&
+            setBandwidth((prev) => ({ ...prev, value: +event.target.value }))
           }
           onPlus={() => setBandwidth((prev) => ({ ...prev, value: ++prev.value }))}
           minusBtnAriaLabel={t('Decrement')}
