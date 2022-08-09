@@ -13,7 +13,7 @@ const Timezone: React.FC<TimezoneProps> = ({ guestAgentData }) => {
   return (
     <>
       {guestAgentData?.timezone?.split(',')?.[0] ?? (
-        <div className="text-muted">{t('Guest Agent is required')} </div>
+        <div className="text-muted">{t('Guest agent is required')} </div>
       )}
     </>
   );

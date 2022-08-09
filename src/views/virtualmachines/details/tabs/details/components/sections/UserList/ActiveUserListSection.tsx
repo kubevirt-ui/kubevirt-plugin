@@ -38,14 +38,14 @@ const ActiveUserListSection: React.FC<ActiveUserListProps> = ({ vm, pathname }) 
         Row={ActiveUserListRowVm}
         NoDataEmptyMsg={() => (
           <div id="no-active-users-msg" className="pf-u-text-align-center">
-            {t('No Active Users')}
+            {t('No active users')}
           </div>
         )}
       />
     ) : (
       <Bullseye>
         <MutedTextSpan
-          text={vmi ? t('Guest Agent is required') : t('VirtualMachine is not running')}
+          text={vmi ? t('Guest agent is required') : t('VirtualMachine is not running')}
         />
       </Bullseye>
     );
@@ -56,7 +56,7 @@ const ActiveUserListSection: React.FC<ActiveUserListProps> = ({ vm, pathname }) 
         <LinkIcon size="sm" />
       </a>
       <Title headingLevel="h2" className="co-section-heading">
-        {t('Active Users')}
+        {t('Active users')}
       </Title>
       {bodyTable}
     </div>

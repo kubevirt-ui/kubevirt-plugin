@@ -95,7 +95,7 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                   <GridItem span={6}>
                     <DescriptionList>
                       <DescriptionListGroup>
-                        <DescriptionListTerm>{t('Operating System')}</DescriptionListTerm>
+                        <DescriptionListTerm>{t('Operating system')}</DescriptionListTerm>
                         <DescriptionListDescription>{displayName}</DescriptionListDescription>
                       </DescriptionListGroup>
                       <DescriptionListGroup>

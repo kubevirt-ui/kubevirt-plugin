@@ -9,7 +9,7 @@ const FileSystemTableTitle = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <ListPageHeader title={t('File Systems')}>
+    <ListPageHeader title={t('File systems')}>
       <Popover
         bodyContent={
           <div>

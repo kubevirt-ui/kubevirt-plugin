@@ -50,7 +50,7 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
             />
           </FormGroup>
           <FormGroup
-            label={t('IP Addresses')}
+            label={t('IP addresses')}
             fieldId={'address'}
             className="kv-cloudint-advanced-tab--validation-text"
             helperText={t('Use commas to separate between IP addresses')}

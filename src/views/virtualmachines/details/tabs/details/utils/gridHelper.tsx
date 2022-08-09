@@ -66,7 +66,7 @@ export const getRunningVMRightGridPresentation = (
         namespace={vmi?.metadata?.namespace}
       />
     ),
-    ipAddress: <FirstItemListPopover items={ipAddresses} headerContent={'IP Addresses'} />,
+    ipAddress: <FirstItemListPopover items={ipAddresses} headerContent={'IP addresses'} />,
     hostname: guestAgentIsRequired ? GuestAgentIsRequiredText : guestAgentData?.hostname,
     timezone: guestAgentIsRequired
       ? GuestAgentIsRequiredText

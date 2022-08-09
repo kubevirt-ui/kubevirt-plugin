@@ -31,7 +31,7 @@ const ActiveUserList: React.FC<ActiveUserListProps> = ({ vmi, pathname }) => {
         <LinkIcon size="sm" />
       </a>
       <Title headingLevel="h2" className="co-section-heading">
-        {t('Active Users')}
+        {t('Active users')}
       </Title>
       {isGuestAgentConnected ? (
         <VirtualizedTable<V1VirtualMachineInstanceGuestOSUser>
@@ -43,13 +43,13 @@ const ActiveUserList: React.FC<ActiveUserListProps> = ({ vmi, pathname }) => {
           Row={ActiveUserListRow}
           NoDataEmptyMsg={() => (
             <Bullseye>
-              <MutedTextSpan text={t('No Active Users')} />
+              <MutedTextSpan text={t('No active users')} />
             </Bullseye>
           )}
         />
       ) : (
         <Bullseye>
-          <MutedTextSpan text={t('Guest Agent is required')} />
+          <MutedTextSpan text={t('Guest agent is required')} />
         </Bullseye>
       )}
     </div>

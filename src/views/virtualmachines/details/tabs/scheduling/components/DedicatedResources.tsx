@@ -13,7 +13,7 @@ const DedicatedResources: React.FC<DedicatedResourcesProps> = ({ vm }) => {
 
   return isDedicatedResources
     ? t('Workload scheduled with dedicated resources (guaranteed policy)')
-    : t('No Dedicated resources applied');
+    : t('No dedicated resources applied');
 };
 
 export default DedicatedResources;
