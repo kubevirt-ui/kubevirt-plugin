@@ -25,7 +25,7 @@ export const AuthorizedSSHKeyModal: React.FC<{
   sshKey?: string;
   vmSecretName: string;
   enableCreation?: boolean;
-  onSubmit: (secretName: string, sshKey?: string) => Promise<void>;
+  onSubmit: (secretName: string, sshKey?: string) => Promise<void | any>;
 }> = ({ sshKey, vmSecretName, onSubmit, onClose, isOpen, enableCreation = true }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
@@ -36,9 +36,8 @@ export const AuthorizedSSHKeyModal: React.FC<{
   const [isValidatedKey, setIsValidatedKey] = React.useState<boolean>(true);
 
   const submitHandler = React.useCallback(async () => {
-    if (selectedSecretName) await onSubmit(selectedSecretName);
-    else await onSubmit(undefined, value);
-  }, [onSubmit, selectedSecretName, value]);
+    createSecretOpen ? await onSubmit(undefined, value) : await onSubmit(selectedSecretName);
+  }, [createSecretOpen, onSubmit, selectedSecretName, value]);
 
   if (!enableCreation) {
     return (

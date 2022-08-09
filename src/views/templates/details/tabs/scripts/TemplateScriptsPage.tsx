@@ -1,13 +1,10 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import produce from 'immer';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { AuthorizedSSHKeyModal } from '@kubevirt-utils/components/AuthorizedSSHKeyModal/AuthorizedSSHKeyModal';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
-import { addSecretToVM } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -28,15 +25,13 @@ import {
   Grid,
   GridItem,
   PageSection,
-  Stack,
-  Text,
-  TextVariants,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { isCommonVMTemplate } from '../../../utils/utils';
 
-import SysPrepItem from './SysPrepItem';
+import SSHKey from './components/SSHKey/SSHKey';
+import SysPrepItem from './components/SysPrepItem/SysPrepItem';
 
 type TemplateScriptsPageProps = RouteComponentProps<{
   ns: string;
@@ -49,10 +44,6 @@ const TemplateScriptsPage: React.FC<TemplateScriptsPageProps> = ({ obj: template
   const { t } = useKubevirtTranslation();
   const isEditDisabled = isCommonVMTemplate(template);
   const vm = getTemplateVirtualMachineObject(template);
-
-  const vmAttachedSecretName = vm?.spec?.template?.spec?.accessCredentials?.find(
-    (ac) => ac?.sshPublicKey?.source?.secret?.secretName,
-  )?.sshPublicKey?.source?.secret?.secretName;
 
   const { createModal } = useModal();
 
@@ -68,26 +59,6 @@ const TemplateScriptsPage: React.FC<TemplateScriptsPageProps> = ({ obj: template
     },
     [template],
   );
-
-  const onSSHChange = async (serviceName: string) => {
-    let updatedTemplate = undefined;
-    if (serviceName) {
-      updatedTemplate = replaceTemplateVM(template, addSecretToVM(vm, serviceName));
-    } else {
-      if (!vmAttachedSecretName) return;
-
-      updatedTemplate = produce(template, (draftTemplate) => {
-        getTemplateVirtualMachineObject(draftTemplate).spec.template.spec.accessCredentials = null;
-      });
-    }
-
-    await k8sUpdate({
-      model: TemplateModel,
-      data: updatedTemplate,
-      ns: template?.metadata?.namespace,
-      name: template?.metadata?.name,
-    });
-  };
 
   return (
     <PageSection>
@@ -130,45 +101,7 @@ const TemplateScriptsPage: React.FC<TemplateScriptsPageProps> = ({ obj: template
             </DescriptionListGroup>
 
             <Divider />
-            <DescriptionListGroup>
-              <DescriptionListTerm>
-                <DescriptionListTermHelpText>
-                  <Flex className="vm-description-item__title">
-                    <FlexItem>{t('Authorized SSH Key')}</FlexItem>
-                    {!isEditDisabled && (
-                      <FlexItem>
-                        <Button
-                          type="button"
-                          isInline
-                          onClick={() =>
-                            createModal((modalProps) => (
-                              <AuthorizedSSHKeyModal
-                                {...modalProps}
-                                enableCreation={false}
-                                vmSecretName={vmAttachedSecretName}
-                                onSubmit={onSSHChange}
-                              />
-                            ))
-                          }
-                          variant="link"
-                        >
-                          {t('Edit')}
-                          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-                        </Button>
-                      </FlexItem>
-                    )}
-                  </Flex>
-                </DescriptionListTermHelpText>
-              </DescriptionListTerm>
-              <DescriptionListDescription>
-                <Stack hasGutter>
-                  <div data-test="ssh-popover">
-                    <Text component={TextVariants.p}>{t('Select an available secret')}</Text>
-                  </div>
-                  <span>{vmAttachedSecretName ? t('Available') : t('Not available')}</span>
-                </Stack>
-              </DescriptionListDescription>
-            </DescriptionListGroup>
+            <SSHKey template={template} />
             <Divider />
             <SysPrepItem template={template} />
           </DescriptionList>
