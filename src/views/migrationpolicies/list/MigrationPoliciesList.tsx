@@ -13,6 +13,7 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import MigrationPoliciesEmptyState from './components/MigrationPoliciesEmptyState/MigrationPoliciesEmptyState';
 import MigrationPoliciesRow from './components/MigrationPoliciesRow/MigrationPoliciesRow';
 import useMigrationPoliciesListColumns from './hooks/useMigrationPoliciesListColumns';
 import { migrationPoliciesPageBaseURL } from './utils/constants';
@@ -60,7 +61,7 @@ const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) =
           loadError={loadError}
           columns={columns}
           Row={MigrationPoliciesRow}
-          //   EmptyMsg={() => <MigrationPoliciesEmptyState />} TODO
+          EmptyMsg={() => <MigrationPoliciesEmptyState />}
         />
       </ListPageBody>
     </>

@@ -20,6 +20,6 @@
       "@virtualmachines/*": ["src/views/virtualmachines/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src","images"],
   "exclude": ["**/node_modules", "**/dist"]
 }

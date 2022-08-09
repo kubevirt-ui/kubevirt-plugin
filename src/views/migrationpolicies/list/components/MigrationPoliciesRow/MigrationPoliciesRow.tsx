@@ -5,7 +5,6 @@ import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import MigrationPoliciesActions from '../../../actions/components/MigrationPoliciesActions';
-import { MigrationPolicyMatchExpressionSelectorList } from '../../../components/MigrationPolicyMatchExpressionSelectorList/MigrationPolicyMatchExpressionSelectorList';
 import { MigrationPolicyMatchLabelSelectorList } from '../../../components/MigrationPolicyMatchLabelSelectorList/MigrationPolicyMatchLabelSelectorList';
 import {
   getBandwidthPerMigrationText,
@@ -37,18 +36,11 @@ const MigrationPoliciesRow: React.FC<RowProps<V1alpha1MigrationPolicy>> = ({
       {getCompletionTimeoutText(mp?.spec?.completionTimeoutPerGiB)}
     </TableData>
     <TableData id="project-labels" activeColumnIDs={activeColumnIDs}>
-      <MigrationPolicyMatchExpressionSelectorList
-        matchExpressions={mp?.spec?.selectors?.namespaceSelector?.matchExpressions}
-      />{' '}
       <MigrationPolicyMatchLabelSelectorList
         matchLabels={mp?.spec?.selectors?.namespaceSelector?.matchLabels}
       />
     </TableData>
     <TableData id="vm-labels" activeColumnIDs={activeColumnIDs}>
-      <MigrationPolicyMatchExpressionSelectorList
-        matchExpressions={mp?.spec?.selectors?.virtualMachineInstanceSelector?.matchExpressions}
-        isVMILabel
-      />{' '}
       <MigrationPolicyMatchLabelSelectorList
         matchLabels={mp?.spec?.selectors?.virtualMachineInstanceSelector?.matchLabels}
         isVMILabel
