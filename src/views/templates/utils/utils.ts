@@ -16,7 +16,7 @@ export const isDedicatedCPUPlacement = (template: V1Template): boolean =>
 // check if the descheduler is ON
 export const isDeschedulerOn = (template: V1Template): boolean =>
   // check for the descheduler.alpha.kubernetes.io/evict: 'true' annotation
-  getTemplateVirtualMachineObject(template)?.spec?.template?.metadata?.annotations[
+  getTemplateVirtualMachineObject(template)?.spec?.template?.metadata?.annotations?.[
     DESCHEDULER_EVICT_LABEL
   ] === 'true';
 

@@ -10,7 +10,7 @@ type DeschedulerProps = {
 
 const Descheduler: React.FC<DeschedulerProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const deschedulerLabel = Boolean(vmi?.metadata?.annotations[DESCHEDULER_EVICT_LABEL]);
+  const deschedulerLabel = Boolean(vmi?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL]);
 
   return deschedulerLabel ? t('ON') : t('OFF');
 };
