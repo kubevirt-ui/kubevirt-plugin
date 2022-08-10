@@ -6,7 +6,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -16,8 +16,8 @@ import {
   LabelGroup,
 } from '@patternfly/react-core';
 
-import { MigrationPolicyMatchExpressionSelectorList } from '../../../../../../components/MigrationPolicyMatchExpressionSelectorList/MigrationPolicyMatchExpressionSelectorList';
 import { MigrationPolicyMatchLabelSelectorList } from '../../../../../../components/MigrationPolicyMatchLabelSelectorList/MigrationPolicyMatchLabelSelectorList';
+import { ensureMigrationPolicyMatchLabels } from '../utils/utils';
 
 type MigrationPolicyVirtualMachineLabelsProps = {
   mp: V1alpha1MigrationPolicy;
@@ -27,6 +27,8 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
+  const mpNamespaceMatchLabels = mp?.spec?.selectors?.namespaceSelector?.matchLabels;
 
   return (
     <DescriptionListGroup>
@@ -42,18 +44,11 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
                 obj={mp}
                 isOpen={isOpen}
                 onClose={onClose}
-                initialLabels={mp?.spec?.selectors?.namespaceSelector?.matchLabels}
+                initialLabels={mpNamespaceMatchLabels}
                 onLabelsSubmit={(labels) =>
-                  k8sPatch({
+                  k8sUpdate({
                     model: MigrationPolicyModel,
-                    resource: mp,
-                    data: [
-                      {
-                        op: 'replace',
-                        path: '/spec/selectors/namespaceSelector/matchLabels',
-                        value: labels,
-                      },
-                    ],
+                    data: ensureMigrationPolicyMatchLabels(mp, labels, 'namespaceSelector'),
                   })
                 }
               />
@@ -64,14 +59,9 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
         </Button>
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
-        {!isEmpty(mp?.spec?.selectors?.namespaceSelector) && (
+        {!isEmpty(mpNamespaceMatchLabels) && (
           <LabelGroup isEditable className="migration-policy-selectors-group">
-            <MigrationPolicyMatchExpressionSelectorList
-              matchExpressions={mp?.spec?.selectors?.namespaceSelector?.matchExpressions}
-            />
-            <MigrationPolicyMatchLabelSelectorList
-              matchLabels={mp?.spec?.selectors?.namespaceSelector?.matchLabels}
-            />
+            <MigrationPolicyMatchLabelSelectorList matchLabels={mpNamespaceMatchLabels} />
           </LabelGroup>
         )}
       </DescriptionListDescription>

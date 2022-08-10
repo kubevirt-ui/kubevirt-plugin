@@ -6,7 +6,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -16,8 +16,8 @@ import {
   LabelGroup,
 } from '@patternfly/react-core';
 
-import { MigrationPolicyMatchExpressionSelectorList } from '../../../../../../components/MigrationPolicyMatchExpressionSelectorList/MigrationPolicyMatchExpressionSelectorList';
 import { MigrationPolicyMatchLabelSelectorList } from '../../../../../../components/MigrationPolicyMatchLabelSelectorList/MigrationPolicyMatchLabelSelectorList';
+import { ensureMigrationPolicyMatchLabels } from '../utils/utils';
 
 type MigrationPolicyVirtualMachineLabelsProps = {
   mp: V1alpha1MigrationPolicy;
@@ -27,6 +27,9 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
+  const mpVirtualMachineMatchLabels =
+    mp?.spec?.selectors?.virtualMachineInstanceSelector?.matchLabels;
 
   return (
     <DescriptionListGroup>
@@ -42,18 +45,15 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
                 obj={mp}
                 isOpen={isOpen}
                 onClose={onClose}
-                initialLabels={mp?.spec?.selectors?.virtualMachineInstanceSelector?.matchLabels}
+                initialLabels={mpVirtualMachineMatchLabels}
                 onLabelsSubmit={(labels) =>
-                  k8sPatch({
+                  k8sUpdate({
                     model: MigrationPolicyModel,
-                    resource: mp,
-                    data: [
-                      {
-                        op: 'replace',
-                        path: '/spec/selectors/virtualMachineInstanceSelector/matchLabels',
-                        value: labels,
-                      },
-                    ],
+                    data: ensureMigrationPolicyMatchLabels(
+                      mp,
+                      labels,
+                      'virtualMachineInstanceSelector',
+                    ),
                   })
                 }
               />
@@ -64,16 +64,10 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
         </Button>
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
-        {!isEmpty(mp?.spec?.selectors?.virtualMachineInstanceSelector) && (
+        {!isEmpty(mpVirtualMachineMatchLabels) && (
           <LabelGroup isEditable className="migration-policy-selectors-group">
-            <MigrationPolicyMatchExpressionSelectorList
-              matchExpressions={
-                mp?.spec?.selectors?.virtualMachineInstanceSelector?.matchExpressions
-              }
-              isVMILabel
-            />
             <MigrationPolicyMatchLabelSelectorList
-              matchLabels={mp?.spec?.selectors?.virtualMachineInstanceSelector?.matchLabels}
+              matchLabels={mpVirtualMachineMatchLabels}
               isVMILabel
             />
           </LabelGroup>

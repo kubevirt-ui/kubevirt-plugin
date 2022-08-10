@@ -2,6 +2,7 @@ import produce from 'immer';
 
 import { bytesFromQuantity } from '@catalog/utils/quantity';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { BinaryUnit } from '@kubevirt-utils/utils/units';
 
 import { getEmptyMigrationPolicy } from '../../../utils/utils';
@@ -60,5 +61,11 @@ export const produceUpdatedMigrationPolicy = (
       mpDraft.spec.bandwidthPerMigration =
         bandwidthPerMigration?.value &&
         `${bandwidthPerMigration?.value}${bandwidthPerMigration?.unit}`;
+
+      if (mp?.metadata?.name !== state?.migrationPolicyName) {
+        mpDraft.metadata.annotations[DESCRIPTION_ANNOTATION] =
+          mp?.metadata?.annotations?.[DESCRIPTION_ANNOTATION];
+        mpDraft.spec.selectors = { ...mp?.spec?.selectors };
+      }
     },
   );
