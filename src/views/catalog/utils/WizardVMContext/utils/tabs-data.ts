@@ -14,9 +14,4 @@ export type TabsData = {
   disks?: {
     dataVolumesToAddOwnerRef?: V1beta1DataVolume[];
   };
-  scripts?: {
-    cloudInit: {
-      sshKey?: string;
-    };
-  };
 };

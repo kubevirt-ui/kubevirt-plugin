@@ -3,7 +3,6 @@ import produce from 'immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { createVmSSHSecret } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { k8sCreate, k8sDelete, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -48,11 +47,6 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
           models,
           newVM.metadata.namespace,
         );
-      }
-
-      // ssh key
-      if (tabsData?.scripts?.cloudInit?.sshKey) {
-        await createVmSSHSecret(newVM, tabsData?.scripts?.cloudInit?.sshKey);
       }
 
       // add missing ownerReferences to upload data volumes
