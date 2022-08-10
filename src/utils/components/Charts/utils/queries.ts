@@ -13,6 +13,9 @@ enum VMQueries {
   NETWORK_OUT_BY_INTERFACE_USAGE = 'NETWORK_OUT_BY_INTERFACE_USAGE',
   NETWORK_TOTAL_USAGE = 'NETWORK_TOTAL_USAGE',
   STORAGE_IOPS_TOTAL = 'STORAGE_IOPS_TOTAL',
+  MIGRATION_DATA_PROCESSED = 'MIGRATION_DATA_PROCESSED',
+  MIGRATION_DATA_REMAINING = 'MIGRATION_DATA_REMAINING',
+  MIGRATION_MEMORY_DIRTY_RATE = 'MIGRATION_MEMORY_DIRTY_RATE',
 }
 
 type UtilizationQueriesArgs = {
@@ -46,5 +49,8 @@ export const getUtilizationQueries: GetUtilizationQueries = ({
     [VMQueries.FILESYSTEM_WRITE_USAGE]: `sum(rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.FILESYSTEM_USAGE_TOTAL]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}]) + rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.STORAGE_IOPS_TOTAL]: `sum(rate(kubevirt_vmi_storage_iops_read_total{name='${name}',namespace='${namespace}'}[${duration}]) + rate(kubevirt_vmi_storage_iops_write_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
+    [VMQueries.MIGRATION_DATA_PROCESSED]: `sum(sum_over_time(kubevirt_migrate_vmi_data_processed_bytes{name='${name}',namespace='${namespace}'}[${duration}]))  BY (name, namespace)`,
+    [VMQueries.MIGRATION_DATA_REMAINING]: `sum(sum_over_time(kubevirt_migrate_vmi_data_remaining_bytes{name='${name}',namespace='${namespace}'}[${duration}]))  BY (name, namespace)`,
+    [VMQueries.MIGRATION_MEMORY_DIRTY_RATE]: `sum(sum_over_time(kubevirt_migrate_vmi_dirty_memory_rate_bytes{name='${name}',namespace='${namespace}'}[${duration}]))  BY (name, namespace)`,
   };
 };
