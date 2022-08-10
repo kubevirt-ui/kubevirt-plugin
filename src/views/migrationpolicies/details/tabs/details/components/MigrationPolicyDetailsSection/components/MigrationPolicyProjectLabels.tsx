@@ -16,7 +16,7 @@ import {
   LabelGroup,
 } from '@patternfly/react-core';
 
-import { MigrationPolicyMatchLabelSelectorList } from '../../../../../../components/MigrationPolicyMatchLabelSelectorList/MigrationPolicyMatchLabelSelectorList';
+import { MigrationPolicySelectorList } from '../../../../../../components/MigrationPolicySelectorList/MigrationPolicySelectorList';
 import { ensureMigrationPolicyMatchLabels } from '../utils/utils';
 
 type MigrationPolicyVirtualMachineLabelsProps = {
@@ -28,7 +28,7 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const mpNamespaceMatchLabels = mp?.spec?.selectors?.namespaceSelector?.matchLabels;
+  const mpNamespaceSelector = mp?.spec?.selectors?.namespaceSelector;
 
   return (
     <DescriptionListGroup>
@@ -44,7 +44,7 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
                 obj={mp}
                 isOpen={isOpen}
                 onClose={onClose}
-                initialLabels={mpNamespaceMatchLabels}
+                initialLabels={mpNamespaceSelector}
                 onLabelsSubmit={(labels) =>
                   k8sUpdate({
                     model: MigrationPolicyModel,
@@ -59,9 +59,9 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
         </Button>
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
-        {!isEmpty(mpNamespaceMatchLabels) && (
+        {!isEmpty(mpNamespaceSelector) && (
           <LabelGroup isEditable className="migration-policy-selectors-group">
-            <MigrationPolicyMatchLabelSelectorList matchLabels={mpNamespaceMatchLabels} />
+            <MigrationPolicySelectorList selector={mpNamespaceSelector} />
           </LabelGroup>
         )}
       </DescriptionListDescription>

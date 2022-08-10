@@ -16,7 +16,7 @@ import {
   LabelGroup,
 } from '@patternfly/react-core';
 
-import { MigrationPolicyMatchLabelSelectorList } from '../../../../../../components/MigrationPolicyMatchLabelSelectorList/MigrationPolicyMatchLabelSelectorList';
+import { MigrationPolicySelectorList } from '../../../../../../components/MigrationPolicySelectorList/MigrationPolicySelectorList';
 import { ensureMigrationPolicyMatchLabels } from '../utils/utils';
 
 type MigrationPolicyVirtualMachineLabelsProps = {
@@ -28,8 +28,7 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const mpVirtualMachineMatchLabels =
-    mp?.spec?.selectors?.virtualMachineInstanceSelector?.matchLabels;
+  const mpVirtualMachineSelector = mp?.spec?.selectors?.virtualMachineInstanceSelector;
 
   return (
     <DescriptionListGroup>
@@ -45,7 +44,7 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
                 obj={mp}
                 isOpen={isOpen}
                 onClose={onClose}
-                initialLabels={mpVirtualMachineMatchLabels}
+                initialLabels={mpVirtualMachineSelector}
                 onLabelsSubmit={(labels) =>
                   k8sUpdate({
                     model: MigrationPolicyModel,
@@ -64,12 +63,9 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
         </Button>
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
-        {!isEmpty(mpVirtualMachineMatchLabels) && (
+        {!isEmpty(mpVirtualMachineSelector) && (
           <LabelGroup isEditable className="migration-policy-selectors-group">
-            <MigrationPolicyMatchLabelSelectorList
-              matchLabels={mpVirtualMachineMatchLabels}
-              isVMILabel
-            />
+            <MigrationPolicySelectorList selector={mpVirtualMachineSelector} isVMILabel />
           </LabelGroup>
         )}
       </DescriptionListDescription>

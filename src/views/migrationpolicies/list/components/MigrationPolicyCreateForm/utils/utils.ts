@@ -69,13 +69,13 @@ export const produceMigrationPolicy = (state: InitialMigrationPolicyState) =>
 
       if (!isEmpty(vmiSelectorMatchLabel)) {
         mpDraft.spec.selectors.virtualMachineInstanceSelector = {
-          matchLabels: { ...vmiSelectorMatchLabel },
+          ...vmiSelectorMatchLabel,
         };
       }
 
       if (!isEmpty(namespaceSelectorMatchLabel)) {
         mpDraft.spec.selectors.namespaceSelector = {
-          matchLabels: { ...namespaceSelectorMatchLabel },
+          ...namespaceSelectorMatchLabel,
         };
       }
     },

@@ -8,5 +8,5 @@ export const ensureMigrationPolicyMatchLabels = (
   selector: string,
 ) =>
   produce<V1alpha1MigrationPolicy>(mp, (mpDraft: V1alpha1MigrationPolicy) => {
-    mpDraft.spec.selectors[selector] = { matchLabels: { ...labels } };
+    mpDraft.spec.selectors[selector] = { ...labels };
   });

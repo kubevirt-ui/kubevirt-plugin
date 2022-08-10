@@ -1,7 +1,6 @@
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { IoK8sApiCoreV1ServiceSpecTypeEnum } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -24,7 +23,7 @@ const buildSSHServiceFromVM = (vm: V1VirtualMachine, sshLabel: string) => ({
         targetPort: SSH_PORT,
       },
     ],
-    type: IoK8sApiCoreV1ServiceSpecTypeEnum.NodePort,
+    type: 'NodePort',
     selector: {
       [VMI_LABEL_AS_SSH_SERVICE_SELECTOR]: sshLabel,
     },

@@ -5,7 +5,7 @@ import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import MigrationPoliciesActions from '../../../actions/components/MigrationPoliciesActions';
-import { MigrationPolicyMatchLabelSelectorList } from '../../../components/MigrationPolicyMatchLabelSelectorList/MigrationPolicyMatchLabelSelectorList';
+import { MigrationPolicySelectorList } from '../../../components/MigrationPolicySelectorList/MigrationPolicySelectorList';
 import {
   getBandwidthPerMigrationText,
   getBooleanText,
@@ -36,13 +36,11 @@ const MigrationPoliciesRow: React.FC<RowProps<V1alpha1MigrationPolicy>> = ({
       {getCompletionTimeoutText(mp?.spec?.completionTimeoutPerGiB)}
     </TableData>
     <TableData id="project-labels" activeColumnIDs={activeColumnIDs}>
-      <MigrationPolicyMatchLabelSelectorList
-        matchLabels={mp?.spec?.selectors?.namespaceSelector?.matchLabels}
-      />
+      <MigrationPolicySelectorList selector={mp?.spec?.selectors?.namespaceSelector} />
     </TableData>
     <TableData id="vm-labels" activeColumnIDs={activeColumnIDs}>
-      <MigrationPolicyMatchLabelSelectorList
-        matchLabels={mp?.spec?.selectors?.virtualMachineInstanceSelector?.matchLabels}
+      <MigrationPolicySelectorList
+        selector={mp?.spec?.selectors?.virtualMachineInstanceSelector}
         isVMILabel
       />
     </TableData>
