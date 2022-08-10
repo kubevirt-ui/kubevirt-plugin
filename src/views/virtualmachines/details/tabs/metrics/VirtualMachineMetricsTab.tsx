@@ -64,7 +64,7 @@ const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({ obj
           onToggle={onToggle(MetricsTabExpendedSections.migration)}
           isExpanded={expended?.[MetricsTabExpendedSections.migration]}
         >
-          <MigrationCharts />
+          <MigrationCharts vmi={vmi} />
         </ExpandableSection>
       </Overview>
     </div>
