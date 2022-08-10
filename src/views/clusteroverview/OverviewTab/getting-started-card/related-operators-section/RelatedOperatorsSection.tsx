@@ -34,7 +34,7 @@ const RelatedOperatorsSection: React.FC = () => {
       id: 'openshift-data-foundation',
       title: t('OpenShift Data Foundation'),
       href: isAdmin
-        ? '/operatorhub/all-namespaces?keyword=OCS'
+        ? '/operatorhub/all-namespaces?keyword=ODF'
         : 'https://access.redhat.com/documentation/en-us/red_hat_openshift_data_foundation/4.10/html-single/red_hat_openshift_data_foundation_architecture/index',
       external: !isAdmin,
     },
