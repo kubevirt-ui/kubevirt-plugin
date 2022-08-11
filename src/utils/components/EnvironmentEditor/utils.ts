@@ -117,6 +117,16 @@ export const addEnvironmentsToVM = (
   });
 };
 
+export const areEnvironmentsChanged = (
+  environments: EnvironmentVariable[],
+  initialEnvironments: EnvironmentVariable[],
+): boolean => {
+  const allEnvsInInitial = environments.every(({ name, serial }) =>
+    initialEnvironments.find((e) => e.name === name && e.serial === serial),
+  );
+  return !allEnvsInInitial || environments.length !== initialEnvironments.length;
+};
+
 export class EnvironmentOption implements SelectOptionObject {
   private name: string;
   private kind: EnvironmentKind;
