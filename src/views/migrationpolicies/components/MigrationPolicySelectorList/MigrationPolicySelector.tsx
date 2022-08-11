@@ -6,14 +6,14 @@ import { Label, Popover, PopoverPosition } from '@patternfly/react-core';
 
 import '../MigrationPolicySelectorLabel.scss';
 
-type MigrationPolicyMatchLabelSelectorLabelProps = {
+type MigrationPolicySelectorProps = {
   matchKey: string;
   value: string;
   isVMILabel?: boolean;
 };
 
-export const MigrationPolicyMatchLabelSelectorLabel: React.FC<MigrationPolicyMatchLabelSelectorLabelProps> =
-  memo(({ matchKey, value, isVMILabel }) => {
+export const MigrationPolicySelector: React.FC<MigrationPolicySelectorProps> = memo(
+  ({ matchKey, value, isVMILabel }) => {
     const { t } = useKubevirtTranslation();
     const labelBodyContent = `${matchKey}: ${value}`;
     return (
@@ -36,4 +36,5 @@ export const MigrationPolicyMatchLabelSelectorLabel: React.FC<MigrationPolicyMat
         </Label>
       </Popover>
     );
-  });
+  },
+);

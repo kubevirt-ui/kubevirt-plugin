@@ -30,7 +30,7 @@ const DeleteModal: React.FC<DeleteModalProps> = React.memo(
             const pathname = history?.location?.pathname;
             return (
               pathname?.includes(obj?.metadata?.name) &&
-              history.push(pathname.replace(obj?.metadata?.name, ''))
+              history.push(pathname.replace(`${obj?.metadata?.name}/`, ''))
             );
           });
         }}
