@@ -20,7 +20,7 @@ import './TabModal.scss';
 type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   isOpen: boolean;
   obj?: T;
-  onSubmit: (obj: T) => Promise<T | void>;
+  onSubmit: (obj: T) => Promise<T | T[] | void>;
   onClose: () => Promise<void> | void;
   headerText: string;
   children: React.ReactNode;
