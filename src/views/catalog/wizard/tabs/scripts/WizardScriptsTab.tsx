@@ -9,7 +9,6 @@ import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescri
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import { addSecretToVM } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DescriptionList,
@@ -21,7 +20,7 @@ import {
   TextVariants,
 } from '@patternfly/react-core';
 
-import { SysprepDescription } from './components/SysprepDescription';
+import Sysprep from './components/Sysprep';
 
 import './WizardScriptsTab.scss';
 
@@ -33,33 +32,6 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
   const vmAttachedSecretName = vm?.spec?.template?.spec?.accessCredentials?.find(
     (ac) => ac?.sshPublicKey?.source?.secret?.secretName,
   )?.sshPublicKey?.source?.secret?.secretName;
-
-  const unattend = tabsData?.scripts?.sysprep?.unattended;
-  const autoUnattend = tabsData?.scripts?.sysprep?.autounattend;
-  const selectedSysprep = tabsData?.scripts?.sysprep?.selectedSysprep;
-
-  const onSysprepSelected = (newSysprep: string) =>
-    updateTabsData((tabsDraft) => {
-      ensurePath(tabsDraft, 'scripts.sysprep');
-      if (newSysprep) {
-        tabsDraft.scripts.sysprep.selectedSysprep = newSysprep;
-        delete tabsDraft.scripts.sysprep.unattended;
-        delete tabsDraft.scripts.sysprep.autounattend;
-      } else {
-        delete tabsDraft.scripts.sysprep.selectedSysprep;
-      }
-    });
-
-  const onSysprepCreation = (unattended: string, autounattend: string) =>
-    updateTabsData((tabsDraft) => {
-      ensurePath(tabsDraft, 'scripts.sysprep');
-      tabsDraft.scripts.sysprep.autounattend = autounattend;
-      tabsDraft.scripts.sysprep.unattended = unattended;
-
-      if (unattended || autounattend) {
-        delete tabsDraft.scripts.sysprep.selectedSysprep;
-      }
-    });
 
   const onSSHChange = (secretName: string, value?: string) => {
     updateTabsData((tabsDraft) => {
@@ -138,31 +110,7 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM, tabsData, updateTabsData })
               }
             />
             <Divider />
-            <WizardDescriptionItem
-              testId="wizard-sysprep"
-              title={t('Sysprep')}
-              description={
-                <SysprepDescription
-                  hasAutoUnattend={!!autoUnattend}
-                  hasUnattend={!!unattend}
-                  selectedSysprepName={selectedSysprep}
-                />
-              }
-              isEdit
-              showEditOnTitle
-              onEditClick={() =>
-                createModal((modalProps) => (
-                  <SysprepModal
-                    {...modalProps}
-                    unattend={unattend}
-                    autoUnattend={autoUnattend}
-                    onSysprepCreation={onSysprepCreation}
-                    onSysprepSelected={onSysprepSelected}
-                    sysprepSelected={selectedSysprep}
-                  />
-                ))
-              }
-            />
+            <Sysprep />
           </DescriptionList>
         </GridItem>
       </Grid>

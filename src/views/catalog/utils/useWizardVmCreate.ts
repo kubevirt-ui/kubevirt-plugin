@@ -4,12 +4,11 @@ import produce from 'immer';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { createVmSSHSecret } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
-import { createSysprepConfigMap } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { k8sCreate, k8sDelete, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createMultipleResources } from './utils';
-import { produceVMSysprep, useWizardVMContext } from './WizardVMContext';
+import { useWizardVMContext } from './WizardVMContext';
 
 type CreateVMArguments = {
   startVM: boolean;
@@ -38,12 +37,6 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
         model: VirtualMachineModel,
         data: produce(vm, (vmDraft) => {
           vmDraft.spec.running = startVM;
-
-          // sysprep disk addition
-          if (tabsData?.scripts?.sysprep) {
-            const produced = produceVMSysprep(vmDraft, tabsData?.scripts?.sysprep?.selectedSysprep);
-            vmDraft.spec = produced.spec;
-          }
         }),
       });
       setIsVmCreated(true);
@@ -55,11 +48,6 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
           models,
           newVM.metadata.namespace,
         );
-      }
-
-      // sysprep configmap
-      if (tabsData?.scripts?.sysprep?.autounattend || tabsData?.scripts?.sysprep?.unattended) {
-        await createSysprepConfigMap(newVM, tabsData?.scripts?.sysprep);
       }
 
       // ssh key
