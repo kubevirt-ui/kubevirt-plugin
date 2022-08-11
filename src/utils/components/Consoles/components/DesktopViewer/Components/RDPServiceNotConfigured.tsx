@@ -1,0 +1,34 @@
+import React from 'react';
+import { Trans } from 'react-i18next';
+
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { RDPServiceNotConfiguredProps } from '../utils/types';
+import { Button, ButtonVariant } from '@patternfly/react-core';
+import RDPServiceModal from './RDPServiceModal';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import './rdp-service.scss';
+const RDPServiceNotConfigured: React.FC<RDPServiceNotConfiguredProps> = ({ vm, vmi }) => {
+  const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
+  return (
+    <Trans t={t} ns="plugin__kubevirt-plugin">
+      <span>
+        This is a Windows VirtualMachine but no Service for the RDP (Remote Desktop Protocol) can be
+        found.
+      </span>
+      <br />
+      <span>
+        For better experience accessing Windows console, it is recommended to use the RDP.
+        <Button
+          className="kv-create-rdp-service-button"
+          variant={ButtonVariant.secondary}
+          onClick={() => createModal((props) => <RDPServiceModal vm={vm} vmi={vmi} {...props} />)}
+        >
+          Create RDP Service
+        </Button>
+      </span>
+    </Trans>
+  );
+};
+
+export default RDPServiceNotConfigured;

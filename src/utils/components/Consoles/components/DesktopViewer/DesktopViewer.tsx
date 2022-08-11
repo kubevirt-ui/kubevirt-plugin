@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { modelToGroupVersionKind, PodModel, ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Pod, IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
@@ -15,19 +15,19 @@ import { getDefaultNetwork, getRdpAddressPort, getVmRdpNetworks } from './utils/
 const DesktopViewer: React.FC<DesktopViewerProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
-  const [pods] = useK8sWatchResource<IoK8sApiCoreV1Pod[]>({
+  const [pods, podsLoaded] = useK8sWatchResource<IoK8sApiCoreV1Pod[]>({
     groupVersionKind: modelToGroupVersionKind(PodModel),
     isList: true,
+    namespace: vm.metadata.namespace,
   });
 
-  const vmPod = getVMIPod(vmi, pods);
+  const vmPod = useMemo(() => getVMIPod(vmi, pods), [vmi, pods]);
 
-  const [services] = useK8sWatchResource<IoK8sApiCoreV1Service[]>({
+  const [services, servicesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Service[]>({
     groupVersionKind: modelToGroupVersionKind(ServiceModel),
     isList: true,
     namespace: vm?.metadata?.namespace,
   });
-
   const rdpServiceAddressPort = getRdpAddressPort(vmi, services, vmPod);
   const networks = getVmRdpNetworks(vm, vmi);
   const [selectedNetwork, setSelectedNetwork] = React.useState<Network>(
@@ -72,7 +72,12 @@ const DesktopViewer: React.FC<DesktopViewerProps> = ({ vm, vmi }) => {
         </FormGroup>
       </Form>
       {networkType === 'POD' && (
-        <RDPConnector rdpServiceAddressPort={rdpServiceAddressPort} vm={vm} />
+        <RDPConnector
+          rdpServiceAddressPort={rdpServiceAddressPort}
+          isLoading={!podsLoaded || !servicesLoaded}
+          vm={vm}
+          vmi={vmi}
+        />
       )}
       {networkType === 'MULTUS' && <MultusNetwork vmi={vmi} selectedNetwork={selectedNetwork} />}
     </>

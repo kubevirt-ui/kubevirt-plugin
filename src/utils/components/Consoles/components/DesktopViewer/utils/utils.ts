@@ -1,4 +1,10 @@
 import { saveAs } from 'file-saver';
+import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { k8sCreate, k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+
+import { buildOwnerReference } from '../../../../../resources/shared';
 
 import {
   IoK8sApiCoreV1Pod,
@@ -14,6 +20,7 @@ import {
   DEFAULT_RDP_PORT,
   DEFAULT_VV_MIMETYPE,
   TEMPLATE_VM_NAME_LABEL,
+  VMI_LABEL_AS_RDP_SERVICE_SELECTOR,
 } from './constants';
 import { ConsoleDetailPropType, Network } from './types';
 
@@ -212,4 +219,68 @@ export const getDefaultNetwork = (networks: Network[]) => {
     );
   }
   return null;
+};
+
+export const createRDPService = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): Promise<K8sResourceCommon[]> => {
+  const { namespace, name } = vm?.metadata || {};
+  const vmiLabels = vm?.spec?.template?.metadata?.labels;
+  const labelSelector = vmiLabels?.[VMI_LABEL_AS_RDP_SERVICE_SELECTOR] || name;
+
+  const vmPromise = k8sPatch<V1VirtualMachine>({
+    model: VirtualMachineModel,
+    resource: vm,
+    data: [
+      {
+        op: 'add',
+        path: `/spec/template/metadata/labels/${VMI_LABEL_AS_RDP_SERVICE_SELECTOR.replaceAll(
+          '/',
+          '~1',
+        )}`,
+        value: labelSelector,
+      },
+    ],
+  });
+
+  const vmiPromise = k8sPatch<V1VirtualMachineInstance>({
+    model: VirtualMachineInstanceModel,
+    resource: vmi,
+    data: [
+      {
+        op: 'add',
+        path: `/metadata/labels/${VMI_LABEL_AS_RDP_SERVICE_SELECTOR.replaceAll('/', '~1')}`,
+        value: labelSelector,
+      },
+    ],
+  });
+
+  const servicePromise = k8sCreate({
+    model: ServiceModel,
+    data: {
+      kind: ServiceModel.kind,
+      apiVersion: ServiceModel.apiVersion,
+      metadata: {
+        name: `${vm?.metadata?.name}-rdp`,
+        namespace: vm?.metadata?.namespace,
+        ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
+      },
+      spec: {
+        ports: [
+          {
+            port: DEFAULT_RDP_PORT,
+            targetPort: DEFAULT_RDP_PORT,
+          },
+        ],
+        type: 'NodePort',
+        selector: {
+          [VMI_LABEL_AS_RDP_SERVICE_SELECTOR]: labelSelector,
+        },
+      },
+    },
+    ns: namespace,
+  });
+
+  return Promise.all([vmPromise, vmiPromise, servicePromise]);
 };

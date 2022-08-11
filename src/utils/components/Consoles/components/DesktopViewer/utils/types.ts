@@ -86,6 +86,7 @@ export type RDPProps = ConnectWithRemoteViewerProps & {
   textMoreRDPInfo?: string;
   /** The information content appearing above the description list for guidelines to install virt-viewer */
   textMoreRDPInfoContent?: string | React.ReactNode;
+  isLoading?: boolean;
 };
 
 export type ManualConnectionProps = React.HTMLProps<HTMLDivElement> & {
@@ -157,8 +158,9 @@ export type DesktopViewerProps = {
   type: string;
 };
 
-export type RdpServiceNotConfiguredProps = {
+export type RDPServiceNotConfiguredProps = {
   vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
 export type Network = {
@@ -170,6 +172,8 @@ export type Network = {
 export type RDPConnectorProps = {
   rdpServiceAddressPort: ConsoleDetailPropType;
   vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
+  isLoading: boolean;
 };
 
 export type MultusNetworkProps = {
