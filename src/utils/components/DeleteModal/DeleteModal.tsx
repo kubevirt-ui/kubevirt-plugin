@@ -28,10 +28,8 @@ const DeleteModal: React.FC<DeleteModalProps> = React.memo(
         onSubmit={() => {
           return onDeleteSubmit().then(() => {
             const pathname = history?.location?.pathname;
-            return (
-              pathname?.includes(obj?.metadata?.name) &&
-              history.push(pathname.replace(`${obj?.metadata?.name}/`, ''))
-            );
+            const url = pathname.slice(0, pathname.indexOf(obj?.metadata?.name));
+            pathname?.includes(obj?.metadata?.name) && history.push(url);
           });
         }}
         isOpen={isOpen}

@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
-import MigrationPolicyConfigurationsFormGroup from '../../../components/MigrationPolicyConfigurationsFormGroup/MigrationPolicyConfigurationsFormGroup';
+import MigrationPolicyConfigurations from '../../../components/MigrationPolicyConfigurations/MigrationPolicyConfigurations';
 
 import MigrationPolicyCreateFormHeader from './copmonents/MigrationPolicyCreateFormHeader/MigrationPolicyCreateFormHeader';
 import MigrationPolicyFormDescription from './copmonents/MigrationPolicyFormDescription/MigrationPolicyFormDescription';
@@ -49,15 +49,19 @@ const MigrationPolicyCreateForm: React.FC = () => {
           <TextInput value={state?.description} onChange={setStateField('description')} />
         </FormGroup>
         <h2>{t('Configurations')}</h2>
-        <MigrationPolicyConfigurationsFormGroup state={state} setStateField={setStateField} />
-        <h2>{t('Selectors')}</h2>
-        <FormGroup fieldId="migration-policy-project-selector" label={t('Project selectors')}>
+        <MigrationPolicyConfigurations
+          state={state}
+          setState={setState}
+          setStateField={setStateField}
+        />
+        <h2>{t('Labels')}</h2>
+        <FormGroup fieldId="migration-policy-project-selector" label={t('Project labels')}>
           <SelectorLabelMatchGroup
             labels={state?.namespaceSelectorMatchLabel}
             setLabels={setStateField('namespaceSelectorMatchLabel')}
           />
         </FormGroup>
-        <FormGroup fieldId="migration-policy-vmi-selector" label={t('VirtualMachine selectors')}>
+        <FormGroup fieldId="migration-policy-vmi-selector" label={t('VirtualMachine labels')}>
           <SelectorLabelMatchGroup
             labels={state?.vmiSelectorMatchLabel}
             setLabels={setStateField('vmiSelectorMatchLabel')}

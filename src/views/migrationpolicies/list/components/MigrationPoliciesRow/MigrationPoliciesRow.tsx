@@ -2,10 +2,12 @@ import * as React from 'react';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import MigrationPoliciesActions from '../../../actions/components/MigrationPoliciesActions';
 import { MigrationPolicySelectorList } from '../../../components/MigrationPolicySelectorList/MigrationPolicySelectorList';
+import { migrationPolicySpecKeys } from '../../../utils/constants';
 import {
   getBandwidthPerMigrationText,
   getBooleanText,
@@ -24,16 +26,24 @@ const MigrationPoliciesRow: React.FC<RowProps<V1alpha1MigrationPolicy>> = ({
       />
     </TableData>
     <TableData id="bandwidth" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
-      {getBandwidthPerMigrationText(mp?.spec?.bandwidthPerMigration)}
+      {migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION in mp?.spec
+        ? getBandwidthPerMigrationText(mp?.spec?.bandwidthPerMigration)
+        : NO_DATA_DASH}
     </TableData>
     <TableData id="auto-converge" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
-      {getBooleanText(mp?.spec?.allowAutoConverge)}
+      {migrationPolicySpecKeys.ALLOW_AUTO_CONVERGE in mp?.spec
+        ? getBooleanText(mp?.spec?.allowAutoConverge)
+        : NO_DATA_DASH}
     </TableData>
     <TableData id="post-copy" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
-      {getBooleanText(mp?.spec?.allowPostCopy)}
+      {migrationPolicySpecKeys.ALLOW_POST_COPY in mp?.spec
+        ? getBooleanText(mp?.spec?.allowPostCopy)
+        : NO_DATA_DASH}
     </TableData>
     <TableData id="completion-timeout" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
-      {getCompletionTimeoutText(mp?.spec?.completionTimeoutPerGiB)}
+      {migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB in mp?.spec
+        ? getCompletionTimeoutText(mp?.spec?.completionTimeoutPerGiB)
+        : NO_DATA_DASH}
     </TableData>
     <TableData id="project-labels" activeColumnIDs={activeColumnIDs}>
       <MigrationPolicySelectorList selector={mp?.spec?.selectors?.namespaceSelector} />

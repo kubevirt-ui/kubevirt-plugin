@@ -1,23 +1,23 @@
 .migration-policy__form {
-  max-width: 50%;
-
-}
-
-.migration-policy__form-body {
+  width: 50%;
+  &-config-dropdown {
+    min-width: fit-content;
+    width: 50%;
+  }
+  &-body {
     margin: var(--pf-global--spacer--lg) 0 0;
     padding: 0 var(	--pf-global--spacer--md) var(--pf-global--spacer--lg);
     padding-left: var(--pf-global--spacer--lg);
     padding-right: var(--pf-global--spacer--lg);
-}
-
-.migration-policy__form-header {
+  }
+  &-header {
     margin-top: var(--pf-global--spacer--lg);
     padding: 0 var(--pf-global--spacer--lg);
     align-items: baseline;
     display: flex;
     justify-content: space-between;
-}
-
-.migration-policy__form-header-link {
+  }
+  &-header-link {
     font-size: var(--pf-global--FontSize--md);
+  }
 }

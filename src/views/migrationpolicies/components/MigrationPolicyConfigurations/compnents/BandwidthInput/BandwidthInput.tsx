@@ -11,14 +11,14 @@ import {
   SplitItem,
 } from '@patternfly/react-core';
 
-import { fromIECUnit } from '../../MigrationPolicyEditModal/utils/utils';
+import { fromIECUnit } from '../../../MigrationPolicyEditModal/utils/utils';
 
 type BandwidthInputProps = {
-  bandwidth: {
+  state: {
     value: number;
     unit: BinaryUnit;
   };
-  setBandwidth: React.Dispatch<
+  setState: React.Dispatch<
     React.SetStateAction<{
       value: number;
       unit: BinaryUnit;
@@ -28,7 +28,7 @@ type BandwidthInputProps = {
 
 const unitOptions = [BinaryUnit.Ki, BinaryUnit.Mi, BinaryUnit.Gi];
 
-const BandwidthInput: React.FC<BandwidthInputProps> = ({ bandwidth, setBandwidth }) => {
+const BandwidthInput: React.FC<BandwidthInputProps> = ({ state, setState }) => {
   const { t } = useKubevirtTranslation();
   const [isQuantitySelectOpen, setIsQuantitySelectOpen] = useState<boolean>(false);
 
@@ -37,10 +37,10 @@ const BandwidthInput: React.FC<BandwidthInputProps> = ({ bandwidth, setBandwidth
       event: React.MouseEvent<Element, MouseEvent> | React.ChangeEvent<Element>,
       newUnit: BinaryUnit,
     ) => {
-      setBandwidth((prev) => ({ ...prev, unit: fromIECUnit(newUnit) }));
+      setState((prev) => ({ ...prev, unit: fromIECUnit(newUnit) }));
       setIsQuantitySelectOpen(false);
     },
-    [setBandwidth],
+    [setState],
   );
 
   return (
@@ -48,13 +48,13 @@ const BandwidthInput: React.FC<BandwidthInputProps> = ({ bandwidth, setBandwidth
       <SplitItem>
         <NumberInput
           min={0}
-          value={bandwidth?.value}
-          onMinus={() => setBandwidth((prev) => ({ ...prev, value: --prev.value }))}
+          value={state?.value}
+          onMinus={() => setState((prev) => ({ ...prev, value: --prev.value }))}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             +event.target.value >= 0 &&
-            setBandwidth((prev) => ({ ...prev, value: +event.target.value }))
+            setState((prev) => ({ ...prev, value: +event.target.value }))
           }
-          onPlus={() => setBandwidth((prev) => ({ ...prev, value: ++prev.value }))}
+          onPlus={() => setState((prev) => ({ ...prev, value: prev?.value + 1 || 1 }))}
           minusBtnAriaLabel={t('Decrement')}
           plusBtnAriaLabel={t('Increment')}
         />
@@ -66,7 +66,7 @@ const BandwidthInput: React.FC<BandwidthInputProps> = ({ bandwidth, setBandwidth
           onToggle={setIsQuantitySelectOpen}
           onSelect={onSelectUnit}
           variant={SelectVariant.single}
-          selections={toIECUnit(bandwidth?.unit)}
+          selections={toIECUnit(state?.unit)}
         >
           {unitOptions.map((unitOption) => (
             <SelectOption key={unitOption} value={toIECUnit(unitOption)} />

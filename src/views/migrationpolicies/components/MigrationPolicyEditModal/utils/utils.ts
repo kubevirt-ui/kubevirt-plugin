@@ -1,4 +1,5 @@
 import produce from 'immer';
+import { migrationPolicySpecKeys } from 'src/views/migrationpolicies/utils/constants';
 
 import { bytesFromQuantity } from '@catalog/utils/quantity';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -17,20 +18,23 @@ export const fromIECUnit = (unit: string): BinaryUnit => {
 export const extractEditMigrationPolicyInitialValues = (
   mp: V1alpha1MigrationPolicy,
 ): EditMigrationPolicyInitialState => {
-  const [value, unit] = bytesFromQuantity(mp?.spec?.bandwidthPerMigration);
-  return {
-    autoConverge: mp?.spec?.allowAutoConverge,
-    bandwidthPerMigration: {
-      unit: fromIECUnit(unit),
-      value,
-    },
-    completionTimeout: {
-      value: mp?.spec?.completionTimeoutPerGiB ?? 0,
-      enabled: !!mp?.spec?.completionTimeoutPerGiB,
-    },
-    postCopy: mp?.spec?.allowPostCopy,
+  const initState: EditMigrationPolicyInitialState = {
     migrationPolicyName: mp?.metadata?.name,
   };
+  if (migrationPolicySpecKeys.ALLOW_AUTO_CONVERGE in mp?.spec) {
+    initState.allowAutoConverge = mp?.spec?.allowAutoConverge;
+  }
+  if (migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION in mp?.spec) {
+    const [value, unit] = bytesFromQuantity(mp?.spec?.bandwidthPerMigration);
+    initState.bandwidthPerMigration = { unit: fromIECUnit(unit), value };
+  }
+  if (migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB in mp?.spec) {
+    initState.completionTimeoutPerGiB = mp?.spec?.completionTimeoutPerGiB;
+  }
+  if (migrationPolicySpecKeys.ALLOW_POST_COPY in mp?.spec) {
+    initState.allowPostCopy = mp?.spec?.allowPostCopy;
+  }
+  return initState;
 };
 
 export const produceUpdatedMigrationPolicy = (
@@ -41,25 +45,23 @@ export const produceUpdatedMigrationPolicy = (
     mp?.metadata?.name !== state?.migrationPolicyName ? getEmptyMigrationPolicy() : mp,
     (mpDraft: V1alpha1MigrationPolicy) => {
       const {
-        autoConverge,
+        allowAutoConverge,
         bandwidthPerMigration,
-        completionTimeout,
+        completionTimeoutPerGiB,
         migrationPolicyName,
-        postCopy,
+        allowPostCopy,
       } = state || {};
 
       mpDraft.metadata.name = migrationPolicyName;
 
-      mpDraft.spec.allowAutoConverge = autoConverge;
+      mpDraft.spec.allowAutoConverge = allowAutoConverge;
 
-      mpDraft.spec.allowPostCopy = postCopy;
+      mpDraft.spec.allowPostCopy = allowPostCopy;
 
-      mpDraft.spec.completionTimeoutPerGiB = completionTimeout?.enabled
-        ? completionTimeout?.value
-        : null;
+      mpDraft.spec.completionTimeoutPerGiB = completionTimeoutPerGiB;
 
       mpDraft.spec.bandwidthPerMigration =
-        bandwidthPerMigration?.value &&
+        bandwidthPerMigration?.unit &&
         `${bandwidthPerMigration?.value}${bandwidthPerMigration?.unit}`;
 
       if (mp?.metadata?.name !== state?.migrationPolicyName) {
