@@ -20,7 +20,7 @@ const TolerationModalDescriptionText: React.FC = () => {
       </Text>
       <Text
         component={TextVariants.a}
-        href="https://kubevirt.io/user-guide/operations/node_assignment/#taints-and-tolerations"
+        href="https://docs.openshift.com/container-platform/4.10/virt/virtual_machines/advanced_vm_management/virt-specifying-nodes-for-vms.html#virt-about-node-placement-vms_virt-specifying-nodes-for-vms"
         target="_blank"
       >
         {t('Taints and Tolerations documentation')} <ExternalLinkAltIcon />
