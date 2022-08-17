@@ -123,11 +123,10 @@ const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => {
                   <CPUMemoryModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
                 ))
               }
-              description={
-                <>
-                  {t('CPU')} {cpuCount} | {t('Memory')} {readableSizeUnit(memory)}
-                </>
-              }
+              description={t('{{cpuCount}} CPU | {{memory}} Memory', {
+                cpuCount,
+                memory: readableSizeUnit(memory),
+              })}
             />
 
             <WizardDescriptionItem
