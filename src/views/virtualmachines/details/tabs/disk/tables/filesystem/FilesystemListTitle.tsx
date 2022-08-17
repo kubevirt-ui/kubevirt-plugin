@@ -9,7 +9,7 @@ const FilesystemListTitle = () => {
 
   return (
     <span>
-      <h3 className="HeaderWithIcon">{t('File system')}</h3>
+      <h3 className="HeaderWithIcon">{t('File systems')}</h3>
       <Popover
         bodyContent={t(
           'The following information regarding how the disks are partitioned is provided by the guest agent.',
