@@ -3,6 +3,7 @@ import * as React from 'react';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   DescriptionList,
   DescriptionListDescription,
@@ -16,6 +17,7 @@ import {
 import { LinkIcon, PencilAltIcon } from '@patternfly/react-icons';
 
 import MigrationPolicyEditModal from '../../../../../components/MigrationPolicyEditModal/MigrationPolicyEditModal';
+import { migrationPolicySpecKeys } from '../../../../../utils/constants';
 import {
   getBandwidthPerMigrationText,
   getBooleanText,
@@ -39,7 +41,7 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-
+  const hasOwnPropertySpec = (key: string) => key in (mp?.spec || {});
   return (
     <div>
       <a href={`${pathname}#details`} className="link-icon">
@@ -73,22 +75,35 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
                 <DescriptionList>
                   <MigrationPolicyDescriptionItem
                     title={t('Bandwidth per migration')}
-                    description={getBandwidthPerMigrationText(mp?.spec?.bandwidthPerMigration)}
+                    description={
+                      hasOwnPropertySpec(migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION)
+                        ? getBandwidthPerMigrationText(mp?.spec?.bandwidthPerMigration)
+                        : NO_DATA_DASH
+                    }
                   />
-
                   <MigrationPolicyDescriptionItem
                     title={t('Auto converge')}
-                    description={getBooleanText(mp?.spec?.allowAutoConverge)}
+                    description={
+                      hasOwnPropertySpec(migrationPolicySpecKeys.ALLOW_AUTO_CONVERGE)
+                        ? getBooleanText(mp?.spec?.allowAutoConverge)
+                        : NO_DATA_DASH
+                    }
                   />
-
                   <MigrationPolicyDescriptionItem
                     title={t('Post-copy')}
-                    description={getBooleanText(mp?.spec?.allowPostCopy)}
+                    description={
+                      hasOwnPropertySpec(migrationPolicySpecKeys.ALLOW_POST_COPY)
+                        ? getBooleanText(mp?.spec?.allowPostCopy)
+                        : NO_DATA_DASH
+                    }
                   />
-
                   <MigrationPolicyDescriptionItem
                     title={t('Completion timeout')}
-                    description={getCompletionTimeoutText(mp?.spec?.completionTimeoutPerGiB)}
+                    description={
+                      hasOwnPropertySpec(migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB)
+                        ? getCompletionTimeoutText(mp?.spec?.completionTimeoutPerGiB)
+                        : NO_DATA_DASH
+                    }
                   />
                 </DescriptionList>
               </DescriptionListDescription>

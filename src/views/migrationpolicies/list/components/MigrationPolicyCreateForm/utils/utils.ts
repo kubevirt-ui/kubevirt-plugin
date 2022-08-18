@@ -16,22 +16,17 @@ const generateMigrationPolicyName = (): string => {
 
 export type InitialMigrationPolicyState = {
   migrationPolicyName: string;
-  description: string;
-  autoConverge: boolean;
-  postCopy: boolean;
-  completionTimeout: { enabled: boolean; value: number };
-  bandwidthPerMigration: { value: number; unit: BinaryUnit };
   vmiSelectorMatchLabel: { [key: string]: string };
   namespaceSelectorMatchLabel: { [key: string]: string };
+  description?: string;
+  allowAutoConverge?: boolean;
+  allowPostCopy?: boolean;
+  completionTimeoutPerGiB?: number;
+  bandwidthPerMigration?: { value: number; unit: BinaryUnit };
 };
 
 export const initialMigrationPolicyState: InitialMigrationPolicyState = {
   migrationPolicyName: generateMigrationPolicyName(),
-  description: null,
-  autoConverge: false,
-  postCopy: false,
-  completionTimeout: { enabled: false, value: 0 },
-  bandwidthPerMigration: { value: 0, unit: BinaryUnit.Mi },
   vmiSelectorMatchLabel: {},
   namespaceSelectorMatchLabel: {},
 };
@@ -41,13 +36,13 @@ export const produceMigrationPolicy = (state: InitialMigrationPolicyState) =>
     getEmptyMigrationPolicy(),
     (mpDraft: V1alpha1MigrationPolicy) => {
       const {
-        autoConverge,
+        allowAutoConverge,
         bandwidthPerMigration,
-        completionTimeout,
+        completionTimeoutPerGiB,
         description,
         migrationPolicyName,
         namespaceSelectorMatchLabel,
-        postCopy,
+        allowPostCopy,
         vmiSelectorMatchLabel,
       } = state || {};
 
@@ -55,16 +50,14 @@ export const produceMigrationPolicy = (state: InitialMigrationPolicyState) =>
 
       mpDraft.metadata.annotations['description'] = description ? description : null;
 
-      mpDraft.spec.allowAutoConverge = autoConverge;
+      mpDraft.spec.allowAutoConverge = allowAutoConverge;
 
-      mpDraft.spec.allowPostCopy = postCopy;
+      mpDraft.spec.allowPostCopy = allowPostCopy;
 
-      mpDraft.spec.completionTimeoutPerGiB = completionTimeout?.enabled
-        ? completionTimeout?.value
-        : null;
+      mpDraft.spec.completionTimeoutPerGiB = completionTimeoutPerGiB;
 
       mpDraft.spec.bandwidthPerMigration =
-        bandwidthPerMigration?.value &&
+        bandwidthPerMigration?.unit &&
         `${bandwidthPerMigration?.value}${bandwidthPerMigration?.unit}`;
 
       if (!isEmpty(vmiSelectorMatchLabel)) {

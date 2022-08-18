@@ -8,7 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { k8sCreate, k8sDelete, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
-import MigrationPolicyConfigurationsFormGroup from '../MigrationPolicyConfigurationsFormGroup/MigrationPolicyConfigurationsFormGroup';
+import MigrationPolicyConfigurations from '../MigrationPolicyConfigurations/MigrationPolicyConfigurations';
 
 import { EditMigrationPolicyInitialState } from './utils/constants';
 import {
@@ -85,7 +85,11 @@ const MigrationPolicyEditModal: React.FC<MigrationPolicyEditModalProps> = ({
             onChange={setStateField('migrationPolicyName')}
           />
         </FormGroup>
-        <MigrationPolicyConfigurationsFormGroup state={state} setStateField={setStateField} />
+        <MigrationPolicyConfigurations
+          state={state}
+          setState={setState}
+          setStateField={setStateField}
+        />
       </Form>
     </TabModal>
   );
