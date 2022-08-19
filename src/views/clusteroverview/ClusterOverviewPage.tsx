@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { HorizontalNav, NavPage } from '@openshift-console/dynamic-plugin-sdk';
+import { HorizontalNav, NamespaceBar, NavPage } from '@openshift-console/dynamic-plugin-sdk';
 
 import ClusterOverviewPageHeader from './Header/ClusterOverviewPageHeader';
 import MonitoringTab from './MonitoringTab/MonitoringTab';
@@ -34,6 +34,7 @@ const ClusterOverviewPage: React.FC = () => {
 
   return (
     <>
+      <NamespaceBar />
       <Helmet>
         <title>{t('Virtualization')}</title>
       </Helmet>

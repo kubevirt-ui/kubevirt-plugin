@@ -209,8 +209,8 @@
       "section": "virtualization",
       "insertBefore": "virtualization-catalog",
       "name": "%plugin__kubevirt-plugin~Overview%",
-      "href": "/overview",
-      "prefixNamespaced": false,
+      "href": "/virtualization-overview",
+      "namespaced": true,
       "dataAttributes": {
         "data-quickstart-id": "qs-nav-virtualization-overview",
         "data-test-id": "virtualization-overview-nav-item"
@@ -223,7 +223,8 @@
   {
     "type": "console.page/route",
     "properties": {
-      "path": "/overview",
+      "exact": false,
+      "path": ["/virtualization-overview/ns/:ns", "/virtualization-overview/all-namespaces"],
       "component": {
         "$codeRef": "ClusterOverviewPage"
       }
