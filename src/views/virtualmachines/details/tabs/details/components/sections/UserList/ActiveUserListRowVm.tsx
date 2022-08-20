@@ -4,7 +4,7 @@ import { V1VirtualMachineInstanceGuestOSUser } from '@kubevirt-ui/kubevirt-api/k
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { fromNow } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import {
-  MILI_SECONDS_TO_SECONDS_MULTIPLIYER,
+  MILLISECONDS_TO_SECONDS_MULTIPLIER,
   NO_DATA_DASH,
 } from '@kubevirt-utils/resources/vm/utils/constants';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
@@ -12,7 +12,7 @@ import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 type ActiveUserListRowProps = RowProps<V1VirtualMachineInstanceGuestOSUser, { kind: string }>;
 
 const ActiveUserListRowVm: React.FC<ActiveUserListRowProps> = ({ obj, activeColumnIDs }) => {
-  const time = obj?.loginTime * MILI_SECONDS_TO_SECONDS_MULTIPLIYER;
+  const time = obj?.loginTime * MILLISECONDS_TO_SECONDS_MULTIPLIER;
   return (
     <>
       <TableData id="userName" activeColumnIDs={activeColumnIDs}>
