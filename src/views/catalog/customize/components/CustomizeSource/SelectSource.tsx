@@ -199,6 +199,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
                 <Controller
                   name={`${testId}-uploadFile`}
                   control={control}
+                  shouldUnregister
                   rules={{ required: true }}
                   render={({ field: { value: fileValue, onChange }, fieldState: { error } }) => (
                     <FileUpload
