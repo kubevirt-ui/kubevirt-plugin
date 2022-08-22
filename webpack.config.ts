@@ -73,7 +73,8 @@ const config: Configuration = {
       },
       {
         test: /\.scss$/,
-        exclude: /node_modules\/(?!(@patternfly|@openshift-console\/plugin-shared)\/).*/,
+        exclude:
+          /node_modules\/(?!(@patternfly|@openshift-console\/plugin-shared|@openshift-console\/dynamic-plugin-sdk)\/).*/,
         use: [
           { loader: 'style-loader' },
           {

@@ -77,7 +77,9 @@
       "id": "templates",
       "section": "virtualization",
       "name": "%plugin__kubevirt-plugin~Templates%",
-      "resource": "templates",
+      "model": {
+        "kind": "Template"
+      },
       "dataAttributes": {
         "data-quickstart-id": "qs-nav-templates",
         "data-test-id": "templates-nav-item"
