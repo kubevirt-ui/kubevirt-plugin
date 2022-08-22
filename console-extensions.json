@@ -78,7 +78,9 @@
       "section": "virtualization",
       "name": "%plugin__kubevirt-plugin~Templates%",
       "model": {
-        "kind": "Template"
+        "group": "template.openshift.io",
+        "kind": "Template",
+        "version": "v1"
       },
       "dataAttributes": {
         "data-quickstart-id": "qs-nav-templates",
