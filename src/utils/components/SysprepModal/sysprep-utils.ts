@@ -1,7 +1,9 @@
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
 export const SYSPREP = 'sysprep';
 export const AUTOUNATTEND = 'Autounattend.xml';
@@ -18,28 +20,46 @@ export const sysprepVolume = (sysprepName: string) => ({
   name: SYSPREP,
 });
 
-export const createSysprepConfigMap = async (vm: V1VirtualMachine, data: SysprepData) => {
-  try {
-    await k8sCreate({
-      model: ConfigMapModel,
-      data: {
-        kind: ConfigMapModel.kind,
-        apiVersion: ConfigMapModel.apiVersion,
-        metadata: {
-          name: `sysprep-config-${vm?.metadata?.name}`,
-          namespace: vm?.metadata?.namespace,
-          ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
-        },
-        ...(data && {
-          data: {
-            ...(data?.autounattend && { [AUTOUNATTEND]: data?.autounattend }),
-            ...(data?.unattended && { [UNATTEND]: data?.unattended }),
-          },
-        }),
-      },
-    });
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Failed to create sysprep ConfigMap', e.message);
-  }
+export const addSysprepConfig = (vm: V1VirtualMachine, newSysprepName: string) => {
+  getVolumes(vm).push({
+    sysprep: {
+      configMap: { name: newSysprepName },
+    },
+    name: SYSPREP,
+  });
+  getDisks(vm).push(sysprepDisk());
 };
+
+export const removeSysprepConfig = (vm: V1VirtualMachine, sysprepVolumeName: string) => {
+  vm.spec.template.spec.volumes = getVolumes(vm).filter(
+    (volume) => sysprepVolumeName !== volume.name,
+  );
+  vm.spec.template.spec.domain.devices.disks = getDisks(vm).filter(
+    (disk) => sysprepVolumeName !== disk.name,
+  );
+};
+
+type GenerateNewSysprepConfigInputType = {
+  vm: V1VirtualMachine;
+  data: IoK8sApiCoreV1ConfigMap['data'];
+  sysprepName?: string;
+  withOwnerReference?: boolean;
+};
+
+export const generateNewSysprepConfig = ({
+  vm,
+  data,
+  sysprepName,
+  withOwnerReference = false,
+}: GenerateNewSysprepConfigInputType): IoK8sApiCoreV1ConfigMap => ({
+  kind: ConfigMapModel.kind,
+  apiVersion: ConfigMapModel.apiVersion,
+  metadata: {
+    name: sysprepName || `sysprep-config-${vm?.metadata?.name}-${getRandomChars()}`,
+    namespace: vm?.metadata?.namespace,
+    ownerReferences: withOwnerReference
+      ? [buildOwnerReference(vm, { blockOwnerDeletion: false })]
+      : null,
+  },
+  data,
+});

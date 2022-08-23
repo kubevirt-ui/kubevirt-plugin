@@ -1,51 +1,22 @@
 import produce from 'immer';
 
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
-import { ConfigMapModel, TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
+  addSysprepConfig,
   AUTOUNATTEND,
-  SYSPREP,
-  sysprepDisk,
+  generateNewSysprepConfig,
+  removeSysprepConfig,
   UNATTEND,
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import {
   getTemplateVirtualMachineObject,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
-import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-
-const addSysprepConfig = (draftVM: V1VirtualMachine, newSysprepName: string) => {
-  getVolumes(draftVM).push({
-    sysprep: {
-      configMap: { name: newSysprepName },
-    },
-    name: SYSPREP,
-  });
-  getDisks(draftVM).push(sysprepDisk());
-};
-
-const removeSysprepConfig = (draftVM: V1VirtualMachine, sysprepVolumeName: string) => {
-  draftVM.spec.template.spec.volumes = getVolumes(draftVM).filter(
-    (volume) => sysprepVolumeName !== volume.name,
-  );
-  draftVM.spec.template.spec.domain.devices.disks = getDisks(draftVM).filter(
-    (disk) => sysprepVolumeName !== disk.name,
-  );
-};
-
-const generateNewSysprepConfig = (vm: V1VirtualMachine, data) => ({
-  kind: ConfigMapModel.kind,
-  apiVersion: ConfigMapModel.apiVersion,
-  metadata: {
-    name: `sysprep-config-${vm?.metadata?.name}-${getRandomChars()}`,
-    namespace: vm?.metadata?.namespace,
-  },
-  data,
-});
 
 export const getTemplateSysprepObject = (
   template: V1Template,
@@ -133,6 +104,7 @@ export const updateSysprepObject = (
       draftConfig.data[UNATTEND] = unattend;
     });
   } else {
-    return generateNewSysprepConfig(vm, { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend });
+    const data = { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend };
+    return generateNewSysprepConfig({ vm, data });
   }
 };
