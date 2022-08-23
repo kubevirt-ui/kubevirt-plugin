@@ -19,6 +19,7 @@ import {
 
 import { MIGRATIONS_DURATION_KEY } from '../top-consumers-card/utils/constants';
 
+import MigrationEmptyState from './components/MigrationEmptyState/MigrationEmptyState';
 import MigrationsChartDonut from './components/MigrationsChartDonut/MigrationsChartDonut';
 import MigrationsLimitionsPopover from './components/MigrationsLimitionsPopover/MigrationsLimitionsPopover';
 import MigrationTable from './components/MigrationsTable/MigrationsTable';
@@ -90,7 +91,7 @@ const MigrationsCard: React.FC = () => {
             </Grid>
           ) : (
             <Bullseye>
-              <div className="co-m-pane__body">{t('No migrations found')}</div>
+              <MigrationEmptyState />
             </Bullseye>
           )}
         </CardBody>
