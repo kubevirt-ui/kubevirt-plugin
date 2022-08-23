@@ -1,17 +1,14 @@
 import * as React from 'react';
 
 import {
-  MigrationPolicyModelGroupVersionKind,
   modelToGroupVersionKind,
   NodeModel,
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   GenericStatus,
   ResourceLink,
@@ -20,15 +17,14 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Tooltip } from '@patternfly/react-core';
 
+import MigrationPolicyTooltip from './components/MigrationPolicyTooltip/MigrationPolicyTooltip';
 import { iconMapper } from './utils/statuses';
 import { MigrationTableDataLayout } from './utils/utils';
 import MigrationActionsDropdown from './MigrationActionsDropdown';
 
 const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, activeColumnIDs }) => {
-  const { t } = useKubevirtTranslation();
   const StatusIcon = iconMapper?.[obj?.vmim?.status?.phase];
 
-  const bandwidthPerMigration = obj?.mpObj?.spec?.bandwidthPerMigration;
   return (
     <>
       <TableData id="vm-name" activeColumnIDs={activeColumnIDs}>
@@ -72,36 +68,7 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, acti
         )}
       </TableData>
       <TableData id="migration-policy" activeColumnIDs={activeColumnIDs}>
-        {obj?.vmiObj?.status?.migrationState?.migrationPolicyName ? (
-          <Tooltip
-            content={
-              <>
-                <div>
-                  {t('Bandwidth per migration')}:{' '}
-                  {typeof bandwidthPerMigration === 'string'
-                    ? readableSizeUnit(bandwidthPerMigration)
-                    : bandwidthPerMigration}
-                </div>
-                <div>
-                  {t('Auto converge')}: {obj?.mpObj?.spec?.allowAutoConverge ? t('Yes') : t('No')}
-                </div>
-                <div>
-                  {t('Post copy')}: {obj?.mpObj?.spec?.allowPostCopy ? t('Yes') : t('No')}
-                </div>
-                <div>
-                  {t('Completion timeout')}: {obj?.mpObj?.spec?.completionTimeoutPerGiB}
-                </div>
-              </>
-            }
-          >
-            <ResourceLink
-              groupVersionKind={MigrationPolicyModelGroupVersionKind}
-              name={obj?.vmiObj?.status?.migrationState?.migrationPolicyName}
-            />
-          </Tooltip>
-        ) : (
-          NO_DATA_DASH
-        )}
+        <MigrationPolicyTooltip obj={obj} />
       </TableData>
       <TableData id="vmim-name" activeColumnIDs={activeColumnIDs}>
         <ResourceLink
