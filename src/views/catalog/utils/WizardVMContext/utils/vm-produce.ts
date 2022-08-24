@@ -85,7 +85,7 @@ export const produceVMSysprep = (vm: V1VirtualMachine, sysprepName?: string) => 
   });
 };
 
-export const produceVMSSHKey = (vm: V1VirtualMachine) => {
+export const produceVMSSHKey = (vm: V1VirtualMachine, secretName?: string) => {
   return produce(vm, (vmDraft) => {
     const cloudInitNoCloudVolume = vmDraft.spec.template.spec.volumes.find(
       (v) => v.cloudInitNoCloud,
@@ -105,7 +105,7 @@ export const produceVMSSHKey = (vm: V1VirtualMachine) => {
         sshPublicKey: {
           source: {
             secret: {
-              secretName: `${vmDraft.metadata.name}-ssh-key`,
+              secretName: secretName || `${vmDraft.metadata.name}-ssh-key`,
             },
           },
           propagationMethod: {
