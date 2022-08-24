@@ -16,6 +16,7 @@ import {
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import useHCMigrations from '../components/MigrationsLimitionsPopover/hooks/useHCMigrations';
 import {
   getSourceNodeFilter,
   getStatusFilter,
@@ -40,6 +41,8 @@ type UseMigrationCardDataAndFilters = (duration: string) => UseMigrationCardData
 
 const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration: string) => {
   const { t } = useKubevirtTranslation();
+  const migrationsDefaultConfigurations = useHCMigrations();
+
   const [vmims, vmimsLoaded, vmimsErrors] = useK8sWatchResource<
     V1VirtualMachineInstanceMigration[]
   >({
@@ -57,7 +60,13 @@ const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration
     isList: true,
   });
 
-  const migrationsData = getMigrationsTableData(vmims, vmis, mps, duration);
+  const migrationsData = getMigrationsTableData(
+    vmims,
+    vmis,
+    mps,
+    migrationsDefaultConfigurations,
+    duration,
+  );
 
   const filters = [
     ...getStatusFilter(t),

@@ -1,5 +1,6 @@
 import {
   V1alpha1MigrationPolicy,
+  V1MigrationConfiguration,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -12,6 +13,7 @@ export type MigrationTableDataLayout = {
   vmim: V1VirtualMachineInstanceMigration;
   vmiObj: V1VirtualMachineInstance;
   mpObj?: V1alpha1MigrationPolicy;
+  migrationsDefaultConfigurations?: V1MigrationConfiguration;
 };
 export const getFilteredDurationVMIMS = (
   vmims: V1VirtualMachineInstanceMigration[],
@@ -31,6 +33,7 @@ export const getMigrationsTableData = (
   vmims: V1VirtualMachineInstanceMigration[],
   vmis: V1VirtualMachineInstance[],
   mps: V1alpha1MigrationPolicy[],
+  migrationsDefaultConfigurations: V1MigrationConfiguration,
   selectedDuration: string,
 ): MigrationTableDataLayout[] => {
   const filteredVMIMS = getFilteredDurationVMIMS(vmims, selectedDuration);
@@ -53,6 +56,7 @@ export const getMigrationsTableData = (
       vmim,
       vmiObj,
       mpObj,
+      migrationsDefaultConfigurations,
     };
   });
 
