@@ -9,7 +9,6 @@ import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/Hardware
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
-import SSHAccessModal from '@kubevirt-utils/components/SSHAccess/SSHAccessModal';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -149,20 +148,12 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         />
         <VirtualMachineDescriptionItem
           descriptionData={
-            <SSHAccess sshService={sshService} vmi={vmi} sshServiceLoaded={sshServiceLoaded} />
-          }
-          showEditOnTitle
-          isEdit
-          onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <SSHAccessModal
-                vm={vm}
-                vmi={vmi}
-                isOpen={isOpen}
-                onClose={onClose}
-                sshService={sshService}
-              />
-            ))
+            <SSHAccess
+              sshService={sshService}
+              vmi={vmi}
+              sshServiceLoaded={sshServiceLoaded}
+              vm={vm}
+            />
           }
           descriptionHeader={t('SSH access')}
           data-test-id={`${vm?.metadata?.name}-ssh-access`}
