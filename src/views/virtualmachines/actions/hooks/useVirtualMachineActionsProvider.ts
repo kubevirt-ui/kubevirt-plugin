@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
@@ -18,6 +19,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const vmim = useVirtualMachineInstanceMigration(vm);
+  const virtctlCommand = getConsoleVirtctlCommand(vm?.metadata?.name, vm?.metadata?.namespace);
 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
   const actions: Action[] = React.useMemo(() => {
@@ -39,6 +41,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
       printableStatus === Paused
         ? VirtualMachineActionFactory.unpause(vm, t)
         : VirtualMachineActionFactory.pause(vm, t);
+
     return [
       startOrStop,
       VirtualMachineActionFactory.restart(vm, t),
@@ -46,11 +49,12 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) 
       VirtualMachineActionFactory.clone(vm, createModal, t),
       migrateOrCancelMigration,
       // VirtualMachineActionFactory.openConsole(vm),
+      VirtualMachineActionFactory.copySSHCommand(virtctlCommand, t),
       VirtualMachineActionFactory.editLabels(vm, createModal, t),
       VirtualMachineActionFactory.editAnnotations(vm, createModal, t),
       VirtualMachineActionFactory.delete(vm, createModal, t),
     ];
-  }, [vm, vmim, createModal, t]);
+  }, [vm, vmim, virtctlCommand, createModal, t]);
 
   return React.useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };

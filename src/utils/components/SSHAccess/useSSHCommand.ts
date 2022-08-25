@@ -9,6 +9,7 @@ export type useSSHCommandResult = {
   sshServiceRunning: boolean;
 };
 
+// SSH over NodePort
 const useSSHCommand = (
   vmi: V1VirtualMachineInstance,
   sshService: IoK8sApiCoreV1Service,

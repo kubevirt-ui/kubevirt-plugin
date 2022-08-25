@@ -4,7 +4,7 @@ import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert, AlertVariant, ClipboardCopy } from '@patternfly/react-core';
+import { Alert, AlertVariant, ClipboardCopy, Popover } from '@patternfly/react-core';
 import {
   DescriptionListDescription,
   DescriptionListGroup,
@@ -12,6 +12,7 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+import { HelpIcon } from '@patternfly/react-icons';
 
 import useSSHCommand from '../useSSHCommand';
 import { createSSHService, deleteSSHService } from '../utils';
@@ -55,7 +56,18 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
   return (
     <DescriptionListGroup>
       <DescriptionListTerm className="pf-u-font-size-xs">
-        {t('SSH over NodePort')}
+        {t('SSH over NodePort')}{' '}
+        <Popover
+          aria-label={'Help'}
+          position="right"
+          bodyContent={() =>
+            t(
+              'This option allows access through any SSH client via a NodePort Service. Additional network ports will be allocated. The node must be accessible from the outside network.',
+            )
+          }
+        >
+          <HelpIcon />
+        </Popover>
       </DescriptionListTerm>
 
       <DescriptionListDescription>

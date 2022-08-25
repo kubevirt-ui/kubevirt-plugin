@@ -7,6 +7,7 @@ import { Button, ButtonVariant } from '@patternfly/react-core';
 import RDPServiceModal from './RDPServiceModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import './rdp-service.scss';
+
 const RDPServiceNotConfigured: React.FC<RDPServiceNotConfiguredProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
