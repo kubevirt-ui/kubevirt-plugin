@@ -2,8 +2,8 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useSSHCommand from '@kubevirt-utils/components/SSHAccess/useSSHCommand';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
-import useSSHCommand from '@kubevirt-utils/components/UserCredentials/useSSHCommand';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
 import { CardTitle, Dropdown, DropdownItem, KebabToggle } from '@patternfly/react-core';
