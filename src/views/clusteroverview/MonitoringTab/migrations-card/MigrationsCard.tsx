@@ -19,6 +19,7 @@ import {
 
 import { MIGRATIONS_DURATION_KEY } from '../top-consumers-card/utils/constants';
 
+import BandwidthConsumptionChart from './components/BandwidthConsumptionChart/BandwidthConsumptionChart';
 import MigrationEmptyState from './components/MigrationEmptyState/MigrationEmptyState';
 import MigrationsChartDonut from './components/MigrationsChartDonut/MigrationsChartDonut';
 import MigrationsLimitionsPopover from './components/MigrationsLimitionsPopover/MigrationsLimitionsPopover';
@@ -49,7 +50,7 @@ const MigrationsCard: React.FC = () => {
     <Overview>
       <Card data-test="kv-monitoring-card">
         <CardHeader className="kv-monitoring-card__header">
-          <CardTitle>{t('VirtualMachine Migrations information')} </CardTitle>
+          <CardTitle>{t('VirtualMachineInstanceMigrations information')} </CardTitle>
           <CardActions className="co-overview-card__actions">
             <div className="kv-top-consumers-card__dropdown--duration">
               <DurationDropdown selectedDuration={duration} selectHandler={onDurationSelect} />
@@ -59,34 +60,27 @@ const MigrationsCard: React.FC = () => {
         <CardBody className="kv-monitoring-card__body">
           {!isEmpty(filteredVMIMS) ? (
             <Grid>
-              <GridItem span={6}>
-                <Card className="kv-monitoring-card__card-right-border">
-                  <CardHeader>
-                    <CardTitle>{t('Migrations')}</CardTitle>
-                    <CardActions className="co-overview-card__actions">
-                      <MigrationsLimitionsPopover />
-                    </CardActions>
-                  </CardHeader>
-                  <CardBody className="kv-monitoring-card__body">
-                    <MigrationsChartDonut vmims={filteredVMIMS} onFilterChange={onFilterChange} />
-                  </CardBody>
-                </Card>
+              <GridItem className="kv-monitoring-card__graph-separator" span={6}>
+                <CardHeader>
+                  <CardTitle>{t('Migrations')}</CardTitle>
+                  <CardActions className="co-overview-card__actions">
+                    <MigrationsLimitionsPopover />
+                  </CardActions>
+                </CardHeader>
+                <CardBody className="kv-monitoring-card__body">
+                  <MigrationsChartDonut vmims={filteredVMIMS} onFilterChange={onFilterChange} />
+                </CardBody>
               </GridItem>
               <GridItem span={6}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{t('Bandwidth consumption')}</CardTitle>
-                  </CardHeader>
-                  <CardBody className="kv-monitoring-card__body">
-                    {' '}
-                    **** Chart placeholder ****
-                  </CardBody>
-                </Card>
+                <CardHeader>
+                  <CardTitle>{t('Bandwidth consumption')}</CardTitle>
+                </CardHeader>
+                <CardBody className="kv-monitoring-card__body">
+                  <BandwidthConsumptionChart duration={duration} />
+                </CardBody>
               </GridItem>
-              <GridItem span={12}>
-                <Card>
-                  <MigrationTable tableData={migrationCardDataAndFilters} />
-                </Card>
+              <GridItem className="kv-monitoring-card__table-separator" span={12}>
+                <MigrationTable tableData={migrationCardDataAndFilters} />
               </GridItem>
             </Grid>
           ) : (
