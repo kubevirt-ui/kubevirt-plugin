@@ -19,7 +19,9 @@ const useVirtualMachineInstanceMigrationActionsProvider: UseVirtualMachineInstan
 
     const cancelMigrationDescription = React.useCallback(() => {
       if ([vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase))
-        return t(`Cannot cancel migration for '${vmim?.status?.phase}' status`);
+        return t('Cannot cancel migration for "{{ status }}" status', {
+          status: vmim?.status?.phase,
+        });
       return null;
     }, [t, vmim?.status?.phase]);
 
