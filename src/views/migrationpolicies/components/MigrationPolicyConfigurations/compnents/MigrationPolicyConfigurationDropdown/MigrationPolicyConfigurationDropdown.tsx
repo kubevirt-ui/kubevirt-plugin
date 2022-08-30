@@ -15,15 +15,15 @@ type MigrationPolicyConfigurationDropdownProps = {
   setState: React.Dispatch<
     React.SetStateAction<InitialMigrationPolicyState | EditMigrationPolicyInitialState>
   >;
-  setShowDropdown: React.Dispatch<React.SetStateAction<boolean>>;
   options: MigrationPolicyConfigurationOption;
+  isDisabled: boolean;
 };
 
 const MigrationPolicyConfigurationDropdown: React.FC<MigrationPolicyConfigurationDropdownProps> = ({
   state,
   setState,
-  setShowDropdown,
   options,
+  isDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +31,6 @@ const MigrationPolicyConfigurationDropdown: React.FC<MigrationPolicyConfiguratio
   const handleOptionClick = (key: string, defaultValue: MigrationPolicyStateDispatch) => {
     setState((prev) => ({ ...prev, [key]: defaultValue }));
     setIsOpen(false);
-    setShowDropdown(false);
   };
   return (
     <Dropdown
@@ -39,7 +38,11 @@ const MigrationPolicyConfigurationDropdown: React.FC<MigrationPolicyConfiguratio
       className="migration-policy__form-config-dropdown"
       data-test-id="migration-policies-configurations"
       isOpen={isOpen}
-      toggle={<DropdownToggle onToggle={setIsOpen}>{t('Select field')}</DropdownToggle>}
+      toggle={
+        <DropdownToggle isDisabled={isDisabled} onToggle={setIsOpen}>
+          {t('Add configuration')}
+        </DropdownToggle>
+      }
       dropdownItems={Object.entries(options).map(([key, { label, description, defaultValue }]) => (
         <DropdownItem
           data-test-id={key}
