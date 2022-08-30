@@ -16,12 +16,14 @@ type DeviceNameSelectProps = {
   deviceName: string;
   setDeviceName: (resourceName: string) => void;
   permittedHostDevices: V1PermittedHostDevices;
+  index: number;
 };
 
 const DeviceNameSelect: React.FC<DeviceNameSelectProps> = ({
   deviceName,
   setDeviceName,
   permittedHostDevices,
+  index,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isSelectOpen, setIsSelectOpen] = React.useState<boolean>(false);
@@ -33,7 +35,7 @@ const DeviceNameSelect: React.FC<DeviceNameSelectProps> = ({
 
   return (
     <GridItem span={5}>
-      <FormGroup label={t('Device name')} fieldId="deviceName" isRequired>
+      <FormGroup label={!index && t('Device name')} fieldId="deviceName" isRequired>
         <Select
           menuAppendTo={() => document.getElementById('tab-modal')}
           id="deviceName"
