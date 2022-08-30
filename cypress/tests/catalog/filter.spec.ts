@@ -40,7 +40,7 @@ describe('Test VM catalog filter', () => {
     cy.get(catalogView.SERVER).find(catalogView.checkbox).uncheck();
 
     cy.get(catalogView.DESKTOP).find(catalogView.checkbox).check();
-    cy.get(catalogView.GRID).find('a').should('have.length', 1);
+    cy.get(catalogView.GRID).find('a').should('have.length', 2);
     cy.get(catalogView.GRID).find('a').should('contain', TEMPLATE.WIN10.name);
     cy.get(catalogView.DESKTOP).find(catalogView.checkbox).uncheck();
     cy.get(catalogView.WINDOWS).find(catalogView.checkbox).uncheck();

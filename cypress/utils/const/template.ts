@@ -12,7 +12,7 @@ export const TEMPLATE = {
     metadataName: 'rhel8-server-small',
   },
   RHEL9: {
-    name: 'Red Hat Enterprise Linux 9.0 Beta VM',
+    name: 'Red Hat Enterprise Linux 9.0 VM',
     metadataName: 'rhel9-server-small',
   },
   FEDORA: {
