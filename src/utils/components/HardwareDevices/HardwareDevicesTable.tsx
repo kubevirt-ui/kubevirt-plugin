@@ -38,8 +38,10 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
         <DescriptionListTerm>{t('Hardware device name')}</DescriptionListTerm>
         <DescriptionListDescription>
           <Stack>
-            {devices.map((device) => (
-              <StackItem key={device.deviceName}>{device.deviceName}</StackItem>
+            {devices.map((device: { name: string; deviceName: string; index: number }) => (
+              <StackItem key={`${device?.name}-${device?.deviceName}`}>
+                {device.deviceName}
+              </StackItem>
             ))}
           </Stack>
         </DescriptionListDescription>

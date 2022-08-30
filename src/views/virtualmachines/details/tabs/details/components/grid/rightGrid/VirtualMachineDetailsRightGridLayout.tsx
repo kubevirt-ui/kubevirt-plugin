@@ -159,7 +159,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           data-test-id={`${vm?.metadata?.name}-ssh-access`}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<HardwareDevices vm={vm} canEdit onSubmit={onSubmit} />}
+          descriptionData={<HardwareDevices vm={vm} canEdit onSubmit={onSubmit} vmi={vmi} />}
           descriptionHeader={t('Hardware devices')}
         />
       </DescriptionList>
