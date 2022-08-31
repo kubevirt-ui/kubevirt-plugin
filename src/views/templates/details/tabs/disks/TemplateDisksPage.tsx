@@ -80,6 +80,7 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
           loaded={disksLoaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
+          hideLabelFilter
         />
         <VirtualizedTable
           data={filteredData}

@@ -70,6 +70,7 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
           loaded={loaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
+          hideLabelFilter
         />
         <VirtualizedTable
           data={filteredData}
