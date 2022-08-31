@@ -4,22 +4,24 @@ import {
   ExclamationCircleIcon,
   HourglassHalfIcon,
   InProgressIcon,
+  MigrationIcon,
   OffIcon,
   PausedIcon,
   SyncAltIcon,
   UnknownIcon,
 } from '@patternfly/react-icons';
 
+// https://github.com/kubevirt/api/blob/9689e71fe2bed9e7da5f165760bbbf6981cc1087/core/v1/types.go#L1277
 export const printableVMStatus = {
   Stopped: 'Stopped',
-  Migrating: 'Migrating',
   Provisioning: 'Provisioning',
   Starting: 'Starting',
   Running: 'Running',
   Paused: 'Paused',
   Stopping: 'Stopping',
   Terminating: 'Terminating',
-  Failed: 'Failed',
+  Migrating: 'Migrating',
+  WaitingForVolumeBinding: 'WaitingForVolumeBinding',
   Unknown: 'Unknown',
 };
 
@@ -36,33 +38,26 @@ export const errorPrintableVMStatus = {
 export const isFailedPrintableStatus = (printableStatus: string) =>
   Object.values(errorPrintableVMStatus).includes(printableStatus);
 
-export const getVMStatusIcon = (
-  status: string,
-  //   arePendingChanges: boolean,
-): React.ComponentClass | React.FC => {
-  let icon: React.ComponentClass | React.FC = UnknownIcon;
-
-  if (status === printableVMStatus.Paused) {
-    icon = PausedIcon;
-  } else if (status === printableVMStatus.Running) {
-    icon = SyncAltIcon;
-  } else if (status === printableVMStatus.Stopped) {
-    icon = OffIcon;
-  } else if (status?.toLowerCase().includes('error')) {
-    icon = ExclamationCircleIcon;
-  } else if (
-    status?.toLowerCase().includes('pending') ||
-    status?.toLowerCase().includes('provisioning')
-  ) {
-    // should be called before inProgress
-    icon = HourglassHalfIcon;
-  } else if (status?.toLowerCase().includes('starting')) {
-    icon = InProgressIcon;
+export const getVMStatusIcon = (status: string): React.ComponentClass | React.FC => {
+  switch (status) {
+    case printableVMStatus.Stopped:
+      return OffIcon;
+    case printableVMStatus.Provisioning:
+    case printableVMStatus.WaitingForVolumeBinding:
+      return HourglassHalfIcon;
+    case printableVMStatus.Starting:
+    case printableVMStatus.Stopping:
+    case printableVMStatus.Terminating:
+      return InProgressIcon;
+    case printableVMStatus.Running:
+      return SyncAltIcon;
+    case printableVMStatus.Paused:
+      return PausedIcon;
+    case printableVMStatus.Migrating:
+      return MigrationIcon;
   }
 
-  //   if (arePendingChanges) {
-  //     icon = YellowExclamationTriangleIcon;
-  //   }
+  if (isFailedPrintableStatus(status)) return ExclamationCircleIcon;
 
-  return icon;
+  return UnknownIcon;
 };

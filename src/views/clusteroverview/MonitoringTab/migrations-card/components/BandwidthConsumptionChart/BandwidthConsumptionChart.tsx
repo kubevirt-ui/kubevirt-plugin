@@ -14,6 +14,8 @@ import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynami
 import { Chart, ChartAxis, ChartLine, ChartVoronoiContainer } from '@patternfly/react-charts';
 import { Bullseye, HelperText, HelperTextItem } from '@patternfly/react-core';
 
+import { roundToNearest512MiB } from './utils';
+
 type ChartDataObject = {
   x: Date;
   y: number;
@@ -112,7 +114,10 @@ const BandwidthConsumptionChart: React.FC<BandwidthConsumptionChartProps> = ({ d
             }}
             fixLabelOverlap
           />
-          <ChartAxis dependentAxis tickFormat={(y) => xbytes(y, { iec: true, fixed: 0 })} />
+          <ChartAxis
+            dependentAxis
+            tickFormat={(y) => xbytes(roundToNearest512MiB(y), { iec: true, fixed: 1 })}
+          />
           <ChartLine data={bandwidthConsumed} />
         </Chart>
       ) : (
