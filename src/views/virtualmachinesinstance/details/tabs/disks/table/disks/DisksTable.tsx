@@ -23,7 +23,6 @@ const DisksTable: React.FC<DisksTableProps> = ({ vmi }) => {
   const columns = useDisksTableColumns();
   const [disks, loaded, loadingError] = useDisksTableDisks(vmi);
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
-
   return (
     <>
       <DiskTableTitle />
@@ -33,6 +32,7 @@ const DisksTable: React.FC<DisksTableProps> = ({ vmi }) => {
           loaded={loaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
+          hideLabelFilter
         />
         <VirtualizedTable
           data={filteredData}

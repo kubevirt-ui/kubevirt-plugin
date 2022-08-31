@@ -65,6 +65,7 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsD
           loaded={disksLoaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
+          hideLabelFilter
         />
         <VirtualizedTable
           data={filteredData}
