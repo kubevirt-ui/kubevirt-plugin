@@ -18,7 +18,7 @@ type UseVirtualMachineActionsProvider = (vm: V1VirtualMachine) => [Action[], boo
 const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const vmim = useVirtualMachineInstanceMigration(vm);
+  const vmim = useVirtualMachineInstanceMigration(vm?.metadata?.name, vm?.metadata?.namespace);
   const virtctlCommand = getConsoleVirtctlCommand(vm?.metadata?.name, vm?.metadata?.namespace);
 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);

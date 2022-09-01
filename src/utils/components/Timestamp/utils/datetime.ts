@@ -29,7 +29,7 @@ const utcDateTimeFormatterOptions: Intl.DateTimeFormatOptions = {
   timeZone: 'UTC',
   timeZoneName: 'short',
 };
-const dateTimeFormatter = new Intl.DateTimeFormat(undefined, dateTimeFormatterOptions);
+export const dateTimeFormatter = new Intl.DateTimeFormat(undefined, dateTimeFormatterOptions);
 
 export const timeFormatter = new Intl.DateTimeFormat(undefined, timeFormatterOptions);
 

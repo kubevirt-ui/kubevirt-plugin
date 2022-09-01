@@ -12,6 +12,8 @@ import { VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Button,
+  ButtonVariant,
   Card,
   CardBody,
   DescriptionList,
@@ -27,9 +29,10 @@ import {
   Skeleton,
 } from '@patternfly/react-core';
 
-import { getVMStatusIcon } from '../../../../../utils';
+import { getVMStatusIcon, printableVMStatus } from '../../../../../utils';
 import CPUMemory from '../../../details/components/CPUMemory/CPUMemory';
 
+import MigrationProgressPopover from './components/MigrationProgressPopover/MigrationProgressPopover';
 import VirtualMachinesOverviewTabDetailsConsole from './components/VirtualMachinesOverviewTabDetailsConsole';
 import VirtualMachinesOverviewTabDetailsTitle from './components/VirtualMachinesOverviewTabDetailsTitle';
 
@@ -64,6 +67,16 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
 
   const hostname = guestAgentData?.hostname ?? guestAgentIsRequired;
 
+  const vmPrintableStatus = vm?.status?.printableStatus;
+  const popoverButton = (
+    <span>
+      <Icon />{' '}
+      <Button variant={ButtonVariant.link} isInline>
+        {vmPrintableStatus}
+      </Button>
+    </span>
+  );
+
   return (
     <div className="VirtualMachinesOverviewTabDetails--details">
       <Card>
@@ -83,19 +96,19 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-status">
-                    <Popover
-                      headerContent={<div>{vm?.status?.printableStatus}</div>}
-                      bodyContent={
-                        <div>
-                          {t('VirtualMachine is currently ')} {vm?.status?.printableStatus}
-                        </div>
-                      }
-                      position={PopoverPosition.right}
-                    >
-                      <span>
-                        <Icon /> {vm?.status?.printableStatus}
-                      </span>
-                    </Popover>
+                    {vmPrintableStatus !== printableVMStatus.Migrating ? (
+                      <Popover
+                        headerContent={vmPrintableStatus}
+                        bodyContent={t('VirtualMachine is currently {{status}}', {
+                          status: vmPrintableStatus,
+                        })}
+                        position={PopoverPosition.right}
+                      >
+                        {popoverButton}
+                      </Popover>
+                    ) : (
+                      <MigrationProgressPopover vmi={vmi}>{popoverButton}</MigrationProgressPopover>
+                    )}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>

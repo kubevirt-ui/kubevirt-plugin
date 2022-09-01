@@ -22,14 +22,12 @@ export const getStatusFilter = (t: TFunction): RowFilter[] => [
     isMatch: (obj, filterStatus) => {
       return (
         filterStatus === obj?.status?.printableStatus ||
-        (filterStatus === printableVMStatus.Failed &&
-          isFailedPrintableStatus(obj?.status?.printableStatus))
+        isFailedPrintableStatus(obj?.status?.printableStatus)
       );
     },
     filter: (statuses, obj) => {
       const status = obj?.status?.printableStatus;
-      const filterFailedStatus =
-        statuses.selected?.includes(printableVMStatus.Failed) && isFailedPrintableStatus(status);
+      const filterFailedStatus = isFailedPrintableStatus(status);
 
       return (
         statuses.selected?.length === 0 || statuses.selected?.includes(status) || filterFailedStatus

@@ -48,7 +48,7 @@ const MigrationTable: React.FC<MigrationTableProps> = ({ tableData }) => {
           Row={MigrationsRow}
           EmptyMsg={() => (
             <Bullseye>
-              <div className="co-m-pane__body">{t('No migrations found')}</div>
+              <ListPageBody>{t('No migrations found')}</ListPageBody>
             </Bullseye>
           )}
         />
