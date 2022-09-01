@@ -69,7 +69,8 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
       ? history.push(catalogURL)
       : history.push(`/k8s/ns/${namespace || 'default'}/${VirtualMachineModelRef}/~new`);
 
-  const columns = useVirtualMachineColumns(namespace);
+  const [columns, activeColumns] = useVirtualMachineColumns(namespace);
+
   return (
     <>
       <ListPageHeader title={t('VirtualMachines')}>
@@ -83,12 +84,22 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
           loaded={loaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
+          columnLayout={{
+            columns: columns?.map(({ id, title, additional }) => ({
+              id,
+              title,
+              additional,
+            })),
+            id: VirtualMachineModelRef,
+            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+            type: t('VirtualMachine'),
+          }}
         />
         <VirtualizedTable<K8sResourceCommon>
           data={data}
           unfilteredData={unfilteredData}
           loaded={loaded}
-          columns={columns}
+          columns={activeColumns}
           loadError={loadError}
           Row={VirtualMachineRow}
           rowData={{ kind, vmis }}

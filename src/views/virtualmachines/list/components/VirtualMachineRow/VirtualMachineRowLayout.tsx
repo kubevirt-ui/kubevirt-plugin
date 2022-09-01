@@ -52,7 +52,7 @@ const VirtualMachineRowLayout: React.FC<
         {ips}
       </TableData>
       <TableData
-        id="actions"
+        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >

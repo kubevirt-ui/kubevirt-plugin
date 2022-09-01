@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { NodeModel, VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
@@ -11,7 +11,9 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
-const useVirtualMachineColumns = (namespace: string) => {
+const useVirtualMachineColumns = (
+  namespace: string,
+): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[]] => {
   const { t } = useKubevirtTranslation();
 
   const [canGetNode] = useAccessReview({
@@ -57,6 +59,7 @@ const useVirtualMachineColumns = (namespace: string) => {
         title: t('Created'),
         id: 'created',
         transforms: [sortable],
+        additional: true,
         sort: 'metadata.creationTimestamp',
         props: { className: 'pf-m-width-15' },
       },
@@ -67,7 +70,7 @@ const useVirtualMachineColumns = (namespace: string) => {
       },
       {
         title: '',
-        id: 'actions',
+        id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
@@ -77,10 +80,10 @@ const useVirtualMachineColumns = (namespace: string) => {
   const [activeColumns] = useActiveColumns<K8sResourceCommon>({
     columns: canGetNode ? columns : columns.filter((column) => column.id !== 'node'),
     showNamespaceOverride: false,
-    columnManagementID: '',
+    columnManagementID: VirtualMachineModelRef,
   });
 
-  return activeColumns;
+  return [columns, activeColumns];
 };
 
 export default useVirtualMachineColumns;
