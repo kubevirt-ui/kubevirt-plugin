@@ -60,10 +60,19 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
         <Popover
           aria-label={'Help'}
           position="right"
-          bodyContent={() =>
-            t(
-              'This option allows access through any SSH client via a NodePort Service. Additional network ports will be allocated. The node must be accessible from the outside network.',
-            )
+          bodyContent={
+            <span>
+              {t(
+                'A Service of type NodePort opens a specific port on all Nodes in the cluster.\nIf the Node is publicly accessible, any traffic that is sent to this port is forwarded to the Service.',
+              )}{' '}
+              <a
+                target="_blank"
+                href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.11/html-single/networking/index#configuring-ingress-cluster-traffic-nodeport"
+                rel="noreferrer"
+              >
+                {t('Learn more about configuring ingress cluster traffic using a NodePort.')}
+              </a>
+            </span>
           }
         >
           <HelpIcon />
@@ -73,11 +82,7 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
       <DescriptionListDescription>
         <Stack hasGutter>
           <StackItem>
-            <SSHCheckbox
-              vmName={vm?.metadata?.name}
-              sshServiceRunning={!!sshService}
-              setSSHServiceRunning={onSSHChange}
-            />
+            <SSHCheckbox sshServiceRunning={!!sshService} setSSHServiceRunning={onSSHChange} />
           </StackItem>
           {sshServiceLoaded && !loading ? (
             sshServiceRunning && (
