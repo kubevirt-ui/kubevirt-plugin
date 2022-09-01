@@ -12,7 +12,7 @@ export const getBandwidthPerMigrationText = (bandwidth: string | number): string
 };
 
 export const getCompletionTimeoutText = (completionTimeout: number): string =>
-  completionTimeout ? `${completionTimeout} sec` : NO_DATA_DASH;
+  completionTimeout !== undefined ? `${completionTimeout} sec` : NO_DATA_DASH;
 
 export const getEmptyMigrationPolicy = (): V1alpha1MigrationPolicy => ({
   apiVersion: `${MigrationPolicyModel.apiGroup}/${MigrationPolicyModel.apiVersion}`,

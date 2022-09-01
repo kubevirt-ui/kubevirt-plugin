@@ -14,11 +14,6 @@ const YesNoDropdown: React.FC<YesNoDropdownProps> = ({ state, setState }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSelectOption = (value: boolean) => {
-    setState(value);
-    setIsOpen(false);
-  };
-
   return (
     <Select
       menuAppendTo="parent"
@@ -27,9 +22,10 @@ const YesNoDropdown: React.FC<YesNoDropdownProps> = ({ state, setState }) => {
       variant={SelectVariant.single}
       selections={getBooleanText(state)}
       width={141}
+      onSelect={() => setIsOpen(false)}
     >
-      <SelectOption key="yes-opt" value={t('Yes')} onClick={() => handleSelectOption(true)} />
-      <SelectOption key="no-opt" value={t('No')} onClick={() => handleSelectOption(false)} />
+      <SelectOption key="yes-opt" value={t('Yes')} onClick={() => setState(true)} />
+      <SelectOption key="no-opt" value={t('No')} onClick={() => setState(false)} />
     </Select>
   );
 };
