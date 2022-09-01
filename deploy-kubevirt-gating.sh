@@ -30,9 +30,9 @@ wait_mcp_for_updated()
 # ----------------------------------------------------------------------------------------------------
 # Install HCO (kubevirt and helper operators)
 
-export HOC_IMAGE_VER=1.6.0-unstable
-export HOC_GIT_TAG=v1.6.0-unstable
-export HCO_SUBSCRIPTION_CHANNEL="1.6.0"
+export HCO_IMAGE_VER=${HCO_IMAGE_VER:-"1.8.0-unstable"}
+export HCO_GIT_TAG=${HCO_GIT_TAG:-"main"}
+export HCO_SUBSCRIPTION_CHANNEL=${HCO_SUBSCRIPTION_CHANNEL:-"1.8.0"}
 export VIRTCTL_VERSION="v0.49.0"
 export HPP_VERSION="release-v0.12"
 
@@ -44,7 +44,7 @@ metadata:
   namespace: openshift-marketplace
 spec:
   sourceType: grpc
-  image: quay.io/kubevirt/hyperconverged-cluster-index:${HOC_IMAGE_VER}
+  image: quay.io/kubevirt/hyperconverged-cluster-index:${HCO_IMAGE_VER}
   displayName: Kubevirt Hyperconverged Cluster Operator
   publisher: Kubevirt Project
 EOF
@@ -81,7 +81,7 @@ export hco_cr_is_created="false"
 for i in {1..20}
 do
   echo "Attempt ${i}/20"
-  if oc create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/${HOC_GIT_TAG}/deploy/hco.cr.yaml -n kubevirt-hyperconverged; then
+  if oc create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/${HCO_GIT_TAG}/deploy/hco.cr.yaml -n kubevirt-hyperconverged; then
     echo "HCO cr is created"
     export hco_cr_is_created="true"
     break

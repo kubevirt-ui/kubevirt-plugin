@@ -108,25 +108,18 @@ export CONSOLE_CONFIG_NAME="cluster"
 export KUBEVIRT_PLUGIN_NAME="kubevirt-plugin"
 KUBEVIRT_PLUGIN_IMAGE="$1"
 
-echo "Deploy Kubevirt Plugin"
-oc process -n ${NS} -f oc-manifest.yaml \
-  -p PLUGIN_NAME=${KUBEVIRT_PLUGIN_NAME} \
-  -p NAMESPACE=${NS} \
-  -p IMAGE=${KUBEVIRT_PLUGIN_IMAGE} \
-  | oc create -n ${NS} -f -
+echo "Modify the kubevirt console plugin image"
+CSV=$(oc get csv -o name -n ${NS})
+oc get $CSV -n ${NS} -o json > /tmp/hco_csv.json
+EXISTING_PLUGIN_IMAGE=$(jq -r '.spec.install.spec.deployments[] | select(.name=="hco-operator").spec.template.spec.containers[0].env[] | select(.name=="KV_CONSOLE_PLUGIN_IMAGE").value' /tmp/hco_csv.json)
+sed -i -r "s|$EXISTING_PLUGIN_IMAGE|$KUBEVIRT_PLUGIN_IMAGE|" /tmp/hco_csv.json
+oc apply -f /tmp/hco_csv.json
 
-echo "Enabling Console Plugin for Kubevirt"
-oc patch -n ${NS} consoles.operator.openshift.io ${CONSOLE_CONFIG_NAME} \
-  --patch '{ "spec": { "plugins": ["kubevirt-plugin"] } }' --type=merge
-
-# Installation occurs.
-# This is also the default case if the CSV is in "Installing" state initially.
-timeout 15m bash <<-'EOF'
-echo "waiting for deployment rollout to complete"
-until grep -q "successfully" <<< "$(oc rollout status -w deploy/kubevirt-plugin -n kubevirt-hyperconverged)"; do
-  sleep 1
-done
-EOF
+until \
+  oc wait pods -n ${NS} --for=jsonpath='{.spec.containers[0].image}'="$KUBEVIRT_PLUGIN_IMAGE" -l app=kubevirt-plugin
+  do
+    sleep 1
+  done
 
 INSTALLER_DIR=${INSTALLER_DIR:=${ARTIFACT_DIR}/installer}
 
