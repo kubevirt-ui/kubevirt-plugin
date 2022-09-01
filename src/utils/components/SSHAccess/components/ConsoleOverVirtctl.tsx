@@ -25,9 +25,9 @@ const ConsoleOverVirtctl: React.FC<ConsoleOverVirtctlProps> = ({ vmName, vmNames
         <Popover
           aria-label={'Help'}
           position="right"
-          bodyContent={() =>
-            t('This command is available for virtctl access, whenever the API server is reachable.')
-          }
+          bodyContent={t(
+            'SSH access using the virtctl command is possible only when the API server is reachable.',
+          )}
         >
           <HelpIcon />
         </Popover>
