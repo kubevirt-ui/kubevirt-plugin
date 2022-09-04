@@ -1,13 +1,17 @@
 export enum tabs {
   Overview = 'horizontal-link-Overview',
   Details = 'horizontal-link-Details',
-  YAML = 'horizontal-link-public~YAML',
+  Metrics = 'horizontal-link-Metrics',
+  YAML = 'horizontal-link-YAML',
+  Scheduling = 'horizontal-link-Scheduling',
   Environment = 'horizontal-link-Environment',
-  Events = 'horizontal-link-public~Events',
+  Events = 'horizontal-link-Events',
   Console = 'horizontal-link-Console',
   NetworkInterfaces = 'horizontal-link-Network interfaces',
   Disks = 'horizontal-link-Disks',
+  Scripts = 'horizontal-link-Scripts',
   Snapshots = 'horizontal-link-Snapshots',
+  Parameters = 'horizontal-link-Parameters',
 }
 
 export const navigateToTab = (tab: string) => {
@@ -22,8 +26,14 @@ export const tab = {
   navigateToDetails: () => {
     navigateToTab(tabs.Details);
   },
+  navigateToMetrics: () => {
+    navigateToTab(tabs.Metrics);
+  },
   navigateToYAML: () => {
     navigateToTab(tabs.YAML);
+  },
+  navigateToScheduling: () => {
+    navigateToTab(tabs.Scheduling);
   },
   navigateToEnvironment: () => {
     navigateToTab(tabs.Environment);
@@ -34,13 +44,19 @@ export const tab = {
   navigateToConsole: () => {
     navigateToTab(tabs.Console);
   },
-  navigateToNetwork: () => {
+  navigateToNetworks: () => {
     navigateToTab(tabs.NetworkInterfaces);
   },
-  navigateToDisk: () => {
+  navigateToDisks: () => {
     navigateToTab(tabs.Disks);
   },
-  navigateToSnapshot: () => {
+  navigateToScripts: () => {
+    navigateToTab(tabs.Scripts);
+  },
+  navigateToSnapshots: () => {
     navigateToTab(tabs.Snapshots);
+  },
+  navigateToParameters: () => {
+    navigateToTab(tabs.Parameters);
   },
 };

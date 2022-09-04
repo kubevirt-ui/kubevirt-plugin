@@ -1,17 +1,16 @@
 import { adminOnlyDescribe } from '../utils/const/index';
-import * as overview from '../views/overview';
 
 adminOnlyDescribe('Test Getting started card of the Virtualization Overview page', () => {
   before(() => {
     cy.login();
-    cy.visit('/overview');
+    cy.visitOverview();
   });
 
-  xit('ID(CNV-7924) Feature highlights card is displayed', () => {
-    cy.get(overview.featureHighlightsCard).should('exist');
+  it('ID(CNV-7924) Feature highlights card is displayed', () => {
+    cy.contains('Feature highlights').should('exist');
   });
 
-  xit('ID(CNV-7925) Recommended operators card is displayed', () => {
-    cy.get(overview.recommendedOperatorsCard).should('exist');
+  it('ID(CNV-7925) Related operators card is displayed', () => {
+    cy.contains('Related operators').should('exist');
   });
 });

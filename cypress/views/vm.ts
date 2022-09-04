@@ -3,7 +3,7 @@ import { ACTION_TIMEOUT, VM_STATUS } from '../utils/const/index';
 import { NoBootSource } from '../utils/const/string';
 
 import * as catalogView from './catalog';
-import { vmStatusOnDetails, vmStatusOnList } from './selector';
+import * as vmView from './selector';
 import { tab } from './tab';
 
 export const getRow = (name: string, within: VoidFunction) =>
@@ -14,7 +14,7 @@ export const getRow = (name: string, within: VoidFunction) =>
 export const waitForStatus = (status: string) => {
   switch (status) {
     case VM_STATUS.Running: {
-      cy.contains(vmStatusOnDetails, VM_STATUS.Running, {
+      cy.contains(vmView.vmStatusOnDetails, VM_STATUS.Running, {
         timeout: ACTION_TIMEOUT.BOOTUP,
       }).should('exist');
       // wait for vmi appear
@@ -23,25 +23,25 @@ export const waitForStatus = (status: string) => {
       break;
     }
     case VM_STATUS.Provisioning: {
-      cy.contains(vmStatusOnDetails, VM_STATUS.Provisioning, {
+      cy.contains(vmView.vmStatusOnDetails, VM_STATUS.Provisioning, {
         timeout: ACTION_TIMEOUT.IMPORT,
       }).should('exist');
       break;
     }
     case VM_STATUS.Stopped: {
-      cy.contains(vmStatusOnDetails, VM_STATUS.Stopped, {
+      cy.contains(vmView.vmStatusOnDetails, VM_STATUS.Stopped, {
         timeout: ACTION_TIMEOUT.IMPORT,
       }).should('exist');
       break;
     }
     case VM_STATUS.Starting: {
-      cy.contains(vmStatusOnDetails, VM_STATUS.Starting, {
+      cy.contains(vmView.vmStatusOnDetails, VM_STATUS.Starting, {
         timeout: ACTION_TIMEOUT.IMPORT,
       }).should('exist');
       break;
     }
     default: {
-      cy.contains(vmStatusOnDetails, status).should('exist');
+      cy.contains(vmView.vmStatusOnDetails, status).should('exist');
       break;
     }
   }
@@ -83,8 +83,14 @@ export const vm = {
       waitForStatus(VM_STATUS.Running);
     }
   },
-  testStatus: (vmName: string, status: string, waitTime = 60000) =>
+  testStatus: (vmName: string, status: string, waitTime = 60000) => {
     getRow(vmName, () =>
-      cy.contains(vmStatusOnList, status, { timeout: waitTime }).should('be.exist'),
-    ),
+      cy.contains(vmView.vmStatusOnList, status, { timeout: waitTime }).should('be.exist'),
+    );
+  },
+  createVMFromYAML: () => {
+    cy.byButtonText('Create').click();
+    cy.byButtonText('With YAML').click();
+    cy.get(vmView.saveBtn).click();
+  },
 };
