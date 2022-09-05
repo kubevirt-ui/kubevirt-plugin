@@ -17,9 +17,14 @@ import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 type UseVirtualMachineActionsProvider = (
   vm: V1VirtualMachine,
   vmim?: V1VirtualMachineInstanceMigration,
+  isSingleNodeCluster?: boolean,
 ) => [Action[], boolean, any];
 
-const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, vmim) => {
+const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
+  vm,
+  vmim,
+  isSingleNodeCluster,
+) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const virtctlCommand = getConsoleVirtctlCommand(vm?.metadata?.name, vm?.metadata?.namespace);
@@ -37,8 +42,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     const migrateOrCancelMigration =
       printableStatus === Migrating ||
       (vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase))
-        ? VirtualMachineActionFactory.cancelMigration(vm, vmim, t)
-        : VirtualMachineActionFactory.migrate(vm, t);
+        ? VirtualMachineActionFactory.cancelMigration(vm, vmim, isSingleNodeCluster, t)
+        : VirtualMachineActionFactory.migrate(vm, isSingleNodeCluster, t);
 
     const pauseOrUnpause =
       printableStatus === Paused

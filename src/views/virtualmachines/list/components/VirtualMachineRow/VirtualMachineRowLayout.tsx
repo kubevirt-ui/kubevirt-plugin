@@ -21,9 +21,10 @@ const VirtualMachineRowLayout: React.FC<
       node: React.ReactNode | string;
       ips: React.ReactNode | string;
       vmim: V1VirtualMachineInstanceMigration;
+      isSingleNodeCluster: boolean;
     }
   >
-> = ({ obj, activeColumnIDs, rowData: { kind, node, ips, vmim } }) => {
+> = ({ obj, activeColumnIDs, rowData: { kind, node, ips, vmim, isSingleNodeCluster } }) => {
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column">
@@ -64,7 +65,12 @@ const VirtualMachineRowLayout: React.FC<
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
-        <VirtualMachineActions vm={obj} isKebabToggle vmim={vmim} />
+        <VirtualMachineActions
+          vm={obj}
+          isKebabToggle
+          vmim={vmim}
+          isSingleNodeCluster={isSingleNodeCluster}
+        />
       </TableData>
     </>
   );

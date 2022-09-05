@@ -17,16 +17,18 @@ import {
 } from '@patternfly/react-core';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 
-type VirtualMachinesInsanceActionsProps = {
+type VirtualMachinesInstanceActionsProps = {
   vm: V1VirtualMachine;
   isKebabToggle?: boolean;
   vmim: V1VirtualMachineInstanceMigration;
+  isSingleNodeCluster: boolean;
 };
 
-const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
+const VirtualMachineActions: React.FC<VirtualMachinesInstanceActionsProps> = ({
   vm,
   vmim,
   isKebabToggle,
+  isSingleNodeCluster,
 }) => {
   const { t } = useKubevirtTranslation();
   // TODO: use LazyActionMenu when fixed
@@ -38,7 +40,7 @@ const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
   //   />
   // );
   const [isOpen, setIsOpen] = React.useState(false);
-  const [actions] = useVirtualMachineActionsProvider(vm, vmim);
+  const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);
 
   const handleClick = (action: Action) => {
     if (typeof action?.cta === 'function') {

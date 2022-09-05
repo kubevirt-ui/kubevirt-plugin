@@ -3,6 +3,7 @@ import * as React from 'react';
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
@@ -30,6 +31,7 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
     isList: false,
   });
   const vmim = useVirtualMachineInstanceMigration(vm);
+  const [isSingleNodeCluster] = useSingleNodeCluster();
 
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
   return (
@@ -43,7 +45,7 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
             {vm?.status?.printableStatus}
           </Label>
         </h1>
-        <VirtualMachineActions vm={vm} vmim={vmim} />
+        <VirtualMachineActions vm={vm} vmim={vmim} isSingleNodeCluster={isSingleNodeCluster} />
       </span>
       <VirtualMachinePendingChangesAlert vm={vm} vmi={vmi} />
     </div>

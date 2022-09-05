@@ -10,6 +10,7 @@ import {
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
+import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import {
   K8sResourceCommon,
   ListPageBody,
@@ -61,6 +62,8 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
     limit: OBJECTS_FETCHING_LIMIT,
   });
 
+  const [isSingleNodeCluster, isSingleNodeLoaded] = useSingleNodeCluster();
+
   const [vmims, vmimsLoaded] = useKubevirtWatchResource({
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
@@ -109,7 +112,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
         <div className="VirtualMachineList--filters__main">
           <ListPageFilter
             data={unfilteredData}
-            loaded={loaded}
+            loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded}
             rowFilters={filters}
             onFilterChange={(...args) => {
               onFilterChange(...args);
@@ -149,7 +152,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
         <VirtualizedTable<K8sResourceCommon>
           data={data}
           unfilteredData={unfilteredData}
-          loaded={loaded && vmiLoaded && vmimsLoaded}
+          loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded}
           columns={activeColumns}
           loadError={loadError}
           Row={VirtualMachineRow}
@@ -157,6 +160,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
             kind,
             getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
             getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
+            isSingleNodeCluster,
           }}
           NoDataEmptyMsg={() => <VirtualMachineEmptyState catalogURL={catalogURL} />}
         />
