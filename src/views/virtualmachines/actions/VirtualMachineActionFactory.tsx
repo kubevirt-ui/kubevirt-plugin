@@ -97,10 +97,11 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
-  migrate: (vm: V1VirtualMachine, t: TFunction): Action => {
+  migrate: (vm: V1VirtualMachine, isSingleNodeCluster: boolean, t: TFunction): Action => {
     return {
       id: 'vm-action-migrate',
       disabled:
+        isSingleNodeCluster ||
         vm?.status?.printableStatus !== Running ||
         !!vm?.status?.conditions?.find(
           ({ type, status }) => type === 'LiveMigratable' && status === 'False',
@@ -114,11 +115,12 @@ export const VirtualMachineActionFactory = {
   cancelMigration: (
     vm: V1VirtualMachine,
     vmim: V1VirtualMachineInstanceMigration,
+    isSingleNodeCluster: boolean,
     t: TFunction,
   ): Action => {
     return {
       id: 'vm-action-cancel-migrate',
-      disabled: !vmim || !!vmim?.metadata?.deletionTimestamp,
+      disabled: isSingleNodeCluster || !vmim || !!vmim?.metadata?.deletionTimestamp,
       label: t('Cancel migration'),
       cta: () => cancelMigration(vmim),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),

@@ -20,9 +20,10 @@ const VirtualMachineRow: React.FC<
       kind: string;
       getVmi: (namespace: string, name: string) => V1VirtualMachineInstance;
       getVmim: (ns: string, name: string) => V1VirtualMachineInstanceMigration;
+      isSingleNodeCluster: boolean;
     }
   >
-> = ({ obj, activeColumnIDs, rowData: { kind, getVmi, getVmim } }) => {
+> = ({ obj, activeColumnIDs, rowData: { kind, getVmi, getVmim, isSingleNodeCluster } }) => {
   return obj?.status?.printableStatus === printableVMStatus.Running ? (
     <VirtualMachineRunningRow
       obj={obj}
@@ -31,13 +32,14 @@ const VirtualMachineRow: React.FC<
         kind,
         vmi: getVmi(obj?.metadata?.namespace, obj?.metadata?.name),
         vmim: getVmim(obj?.metadata?.namespace, obj?.metadata?.name),
+        isSingleNodeCluster,
       }}
     />
   ) : (
     <VirtualMachineRowLayout
       obj={obj}
       activeColumnIDs={activeColumnIDs}
-      rowData={{ kind, node: NO_DATA_DASH, ips: NO_DATA_DASH, vmim: null }}
+      rowData={{ kind, node: NO_DATA_DASH, ips: NO_DATA_DASH, vmim: null, isSingleNodeCluster }}
     />
   );
 };
