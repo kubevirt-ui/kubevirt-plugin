@@ -6,6 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
+import useVirtualMachineInstanceMigration from '@virtualmachines/actions/hooks/useVirtualMachineInstanceMigration';
 
 import VirtualMachineBreadcrumb from '../list/components/VirtualMachineBreadcrumb/VirtualMachineBreadcrumb';
 import { getVMStatusIcon } from '../utils';
@@ -28,6 +29,8 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
     namespace: vm?.metadata?.namespace,
     isList: false,
   });
+  const vmim = useVirtualMachineInstanceMigration(vm);
+
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
   return (
     <div className="co-m-nav-title co-m-nav-title--detail">
@@ -40,7 +43,7 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
             {vm?.status?.printableStatus}
           </Label>
         </h1>
-        <VirtualMachineActions vm={vm} />
+        <VirtualMachineActions vm={vm} vmim={vmim} />
       </span>
       <VirtualMachinePendingChangesAlert vm={vm} vmi={vmi} />
     </div>

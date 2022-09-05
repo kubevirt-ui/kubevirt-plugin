@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1VirtualMachine,
+  V1VirtualMachineInstanceMigration,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,14 +14,14 @@ import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { printableVMStatus } from '../../utils';
 import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
-import useVirtualMachineInstanceMigration from './useVirtualMachineInstanceMigration';
+type UseVirtualMachineActionsProvider = (
+  vm: V1VirtualMachine,
+  vmim?: V1VirtualMachineInstanceMigration,
+) => [Action[], boolean, any];
 
-type UseVirtualMachineActionsProvider = (vm: V1VirtualMachine) => [Action[], boolean, any];
-
-const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm) => {
+const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, vmim) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const vmim = useVirtualMachineInstanceMigration(vm?.metadata?.name, vm?.metadata?.namespace);
   const virtctlCommand = getConsoleVirtctlCommand(vm?.metadata?.name, vm?.metadata?.namespace);
 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
