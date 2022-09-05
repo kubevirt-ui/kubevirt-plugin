@@ -3,3 +3,13 @@
     height: fit-content;
   }
 }
+
+.VirtualMachineList {
+  &--filters__main {
+    display: flex;
+    justify-content: space-between;
+    &-pagination {
+      flex-grow: 1;
+    }
+  }
+}

@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1VirtualMachine,
+  V1VirtualMachineInstanceMigration,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
@@ -14,10 +17,15 @@ import {
 } from '@patternfly/react-core';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 
-type VirtualMachinesInsanceActionsProps = { vm: V1VirtualMachine; isKebabToggle?: boolean };
+type VirtualMachinesInsanceActionsProps = {
+  vm: V1VirtualMachine;
+  isKebabToggle?: boolean;
+  vmim: V1VirtualMachineInstanceMigration;
+};
 
 const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
   vm,
+  vmim,
   isKebabToggle,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -30,7 +38,7 @@ const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
   //   />
   // );
   const [isOpen, setIsOpen] = React.useState(false);
-  const [actions] = useVirtualMachineActionsProvider(vm);
+  const [actions] = useVirtualMachineActionsProvider(vm, vmim);
 
   const handleClick = (action: Action) => {
     if (typeof action?.cta === 'function') {

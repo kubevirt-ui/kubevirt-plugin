@@ -20,7 +20,7 @@ type MigrationProgressPopoverProps = React.PropsWithChildren<{
 }>;
 const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ vmi, children }) => {
   const { t } = useKubevirtTranslation();
-  const vmim = useVirtualMachineInstanceMigration(vmi?.metadata?.name, vmi?.metadata?.namespace);
+  const vmim = useVirtualMachineInstanceMigration(vmi);
   const Icon = getMigrationPhaseIcon(vmim?.status?.phase);
   const [seconds, setSeconds] = useState(0);
   const [minutes, setMinutes] = useState(0);

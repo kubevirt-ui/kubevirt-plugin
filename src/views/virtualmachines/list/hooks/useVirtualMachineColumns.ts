@@ -1,6 +1,7 @@
-import * as React from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { NodeModel, VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
@@ -11,8 +12,12 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
+import { columnSorting } from './utils/utils';
+
 const useVirtualMachineColumns = (
   namespace: string,
+  pagination: { [key: string]: any },
+  data: V1VirtualMachine[],
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[]] => {
   const { t } = useKubevirtTranslation();
 
@@ -22,27 +27,32 @@ const useVirtualMachineColumns = (
     resource: NodeModel.plural,
   });
 
-  const columns: TableColumn<K8sResourceCommon>[] = React.useMemo(
+  const sorting = useCallback(
+    (direction, path) => columnSorting(data, direction, pagination, path),
+    [data, pagination],
+  );
+
+  const columns: TableColumn<K8sResourceCommon>[] = useMemo(
     () => [
       {
         title: t('Name'),
         id: 'name',
         transforms: [sortable],
-        sort: 'metadata.name',
+        sort: (_, direction) => sorting(direction, 'metadata.name'),
         props: { className: 'pf-m-width-15' },
       },
       {
         title: t('Namespace'),
         id: 'namespace',
         transforms: [sortable],
-        sort: 'metadata.namespace',
+        sort: (_, direction) => sorting(direction, 'metadata.namespace'),
         props: { className: 'pf-m-width-10' },
       },
       {
         title: t('Status'),
         id: 'status',
         transforms: [sortable],
-        sort: 'status.printableStatus',
+        sort: (_, direction) => sorting(direction, 'status.printableStatus'),
         props: { className: 'pf-m-width-10' },
       },
       {
@@ -60,7 +70,7 @@ const useVirtualMachineColumns = (
         id: 'created',
         transforms: [sortable],
         additional: true,
-        sort: 'metadata.creationTimestamp',
+        sort: (_, direction) => sorting(direction, 'metadata.creationTimestamp'),
         props: { className: 'pf-m-width-15' },
       },
       {
@@ -74,7 +84,7 @@ const useVirtualMachineColumns = (
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
-    [t],
+    [t, sorting],
   );
 
   const [activeColumns] = useActiveColumns<K8sResourceCommon>({

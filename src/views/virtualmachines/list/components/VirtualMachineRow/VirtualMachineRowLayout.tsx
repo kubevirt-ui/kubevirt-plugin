@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1VirtualMachine,
+  V1VirtualMachineInstanceMigration,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
@@ -13,9 +16,14 @@ import './virtual-machine-row-layout.scss';
 const VirtualMachineRowLayout: React.FC<
   RowProps<
     V1VirtualMachine,
-    { kind: string; node: React.ReactNode | string; ips: React.ReactNode | string }
+    {
+      kind: string;
+      node: React.ReactNode | string;
+      ips: React.ReactNode | string;
+      vmim: V1VirtualMachineInstanceMigration;
+    }
   >
-> = ({ obj, activeColumnIDs, rowData: { kind, node, ips } }) => {
+> = ({ obj, activeColumnIDs, rowData: { kind, node, ips, vmim } }) => {
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column">
@@ -56,7 +64,7 @@ const VirtualMachineRowLayout: React.FC<
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
-        <VirtualMachineActions vm={obj} isKebabToggle />
+        <VirtualMachineActions vm={obj} isKebabToggle vmim={vmim} />
       </TableData>
     </>
   );
