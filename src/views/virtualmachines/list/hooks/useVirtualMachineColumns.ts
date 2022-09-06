@@ -41,13 +41,17 @@ const useVirtualMachineColumns = (
         sort: (_, direction) => sorting(direction, 'metadata.name'),
         props: { className: 'pf-m-width-15' },
       },
-      {
-        title: t('Namespace'),
-        id: 'namespace',
-        transforms: [sortable],
-        sort: (_, direction) => sorting(direction, 'metadata.namespace'),
-        props: { className: 'pf-m-width-10' },
-      },
+      ...(!namespace
+        ? [
+            {
+              title: t('Namespace'),
+              id: 'namespace',
+              transforms: [sortable],
+              sort: (_, direction) => sorting(direction, 'metadata.namespace'),
+              props: { className: 'pf-m-width-10' },
+            },
+          ]
+        : []),
       {
         title: t('Status'),
         id: 'status',
@@ -84,7 +88,7 @@ const useVirtualMachineColumns = (
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
-    [t, sorting],
+    [t, sorting, namespace],
   );
 
   const [activeColumns] = useActiveColumns<K8sResourceCommon>({
