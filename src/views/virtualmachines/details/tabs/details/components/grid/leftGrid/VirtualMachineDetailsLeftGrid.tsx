@@ -11,6 +11,7 @@ import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryM
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
+import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -91,7 +92,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   };
 
   const None = <MutedTextSpan text={t('None')} />;
-  const GuestAgentIsRequired = <MutedTextSpan text={t('Guest agend is required')} />;
+
   return (
     <GridItem span={5}>
       <DescriptionList>
@@ -207,7 +208,8 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
         />
         <VirtualMachineDescriptionItem
           descriptionData={
-            guestAgentData?.os?.prettyName || guestAgentData?.os?.name || GuestAgentIsRequired
+            guestAgentData?.os?.prettyName ||
+            guestAgentData?.os?.name || <GuestAgentIsRequiredText vmi={vmi} />
           }
           isPopover
           // body-content text copied from:

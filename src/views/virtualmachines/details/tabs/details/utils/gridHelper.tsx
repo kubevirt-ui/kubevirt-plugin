@@ -7,6 +7,7 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { getVMIIPAddresses, getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
@@ -49,7 +50,7 @@ export const getRunningVMRightGridPresentation = (
   const nodeName = vmi?.status?.nodeName;
   const guestAgentIsRequired = guestAgentData && Object.keys(guestAgentData)?.length === 0;
 
-  const GuestAgentIsRequiredText = <MutedTextSpan text={t('Guest agent is required')} />;
+  const guestAgentIsRequiredText = <GuestAgentIsRequiredText vmi={vmi} />;
 
   return {
     pod: (
@@ -67,9 +68,9 @@ export const getRunningVMRightGridPresentation = (
       />
     ),
     ipAddress: <FirstItemListPopover items={ipAddresses} headerContent={'IP addresses'} />,
-    hostname: guestAgentIsRequired ? GuestAgentIsRequiredText : guestAgentData?.hostname,
+    hostname: guestAgentIsRequired ? guestAgentIsRequiredText : guestAgentData?.hostname,
     timezone: guestAgentIsRequired
-      ? GuestAgentIsRequiredText
+      ? guestAgentIsRequiredText
       : guestAgentData?.timezone?.split(',')[0],
     node: <ResourceLink kind={NodeModel.kind} name={nodeName} />,
   };
