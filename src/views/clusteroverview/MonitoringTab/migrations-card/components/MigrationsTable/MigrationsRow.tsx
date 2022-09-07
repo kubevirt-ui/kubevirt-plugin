@@ -80,7 +80,7 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, acti
         <Timestamp timestamp={obj?.vmim?.metadata?.creationTimestamp} />
       </TableData>
       <TableData
-        id="actions"
+        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >

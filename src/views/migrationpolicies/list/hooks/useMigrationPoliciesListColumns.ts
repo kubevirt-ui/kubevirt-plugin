@@ -1,11 +1,15 @@
 import React from 'react';
 
+import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
+import { TableColumn, useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
-const useMigrationPoliciesListColumns = () => {
+const useMigrationPoliciesListColumns = (): [
+  TableColumn<V1alpha1MigrationPolicy>[],
+  TableColumn<V1alpha1MigrationPolicy>[],
+] => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<V1alpha1MigrationPolicy>[] = React.useMemo(
@@ -47,22 +51,29 @@ const useMigrationPoliciesListColumns = () => {
       },
       {
         title: t('Project labels'),
+        additional: true,
         id: 'project-labels',
       },
       {
         title: t('VirtualMachine labels'),
+        additional: true,
         id: 'vm-labels',
       },
       {
         title: '',
-        id: 'actions',
+        id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
     [t],
   );
 
-  return columns;
+  const [activeColumns] = useActiveColumns<V1alpha1MigrationPolicy>({
+    columns,
+    showNamespaceOverride: false,
+    columnManagementID: MigrationPolicyModelRef,
+  });
+  return [columns, activeColumns];
 };
 
 export default useMigrationPoliciesListColumns;

@@ -55,7 +55,7 @@ const MigrationPoliciesRow: React.FC<RowProps<V1alpha1MigrationPolicy>> = ({
       />
     </TableData>
     <TableData
-      id="actions"
+      id=""
       activeColumnIDs={activeColumnIDs}
       className="dropdown-kebab-pf pf-c-table__action"
     >

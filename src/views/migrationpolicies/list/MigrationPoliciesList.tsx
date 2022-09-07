@@ -1,6 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -31,7 +32,7 @@ const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) =
     namespaced: false,
   });
 
-  const columns = useMigrationPoliciesListColumns();
+  const [columns, activeColumns] = useMigrationPoliciesListColumns();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(mps);
 
   const createItems = {
@@ -53,13 +54,27 @@ const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) =
         </ListPageCreateDropdown>
       </ListPageHeader>
       <ListPageBody>
-        <ListPageFilter data={unfilteredData} loaded={loaded} onFilterChange={onFilterChange} />
+        <ListPageFilter
+          data={unfilteredData}
+          loaded={loaded}
+          onFilterChange={onFilterChange}
+          columnLayout={{
+            columns: columns?.map(({ id, title, additional }) => ({
+              id,
+              title,
+              additional,
+            })),
+            id: MigrationPolicyModelRef,
+            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+            type: t('DataSource'),
+          }}
+        />
         <VirtualizedTable<V1alpha1MigrationPolicy>
           data={data}
           unfilteredData={unfilteredData}
           loaded={loaded}
           loadError={loadError}
-          columns={columns}
+          columns={activeColumns}
           Row={MigrationPoliciesRow}
           EmptyMsg={() => <MigrationPoliciesEmptyState />}
         />

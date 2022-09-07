@@ -936,6 +936,7 @@
   "VirtualMachineInstance": "VirtualMachineInstance",
   "VirtualMachineInstance details": "VirtualMachineInstance details",
   "VirtualMachineInstance Details": "VirtualMachineInstance Details",
+  "VirtualMachineInstanceMigration": "VirtualMachineInstanceMigration",
   "VirtualMachineInstanceMigration name": "VirtualMachineInstanceMigration name",
   "VirtualMachineInstanceMigrations information": "VirtualMachineInstanceMigrations information",
   "VirtualMachineInstances": "VirtualMachineInstances",

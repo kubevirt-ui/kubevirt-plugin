@@ -41,6 +41,7 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
   });
   const filters = useVirtualMachineTemplatesFilters(availableTemplatesUID);
   const [data, filteredData, onFilterChange] = useListPageFilter(templates, filters);
+  const [columns, activeColumns] = useVirtualMachineTemplatesColumns(namespace);
 
   const templatesLoaded = loaded && bootSourcesLoaded;
 
@@ -62,6 +63,16 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
               loaded={templatesLoaded}
               rowFilters={filters}
               onFilterChange={onFilterChange}
+              columnLayout={{
+                columns: columns?.map(({ id, title, additional }) => ({
+                  id,
+                  title,
+                  additional,
+                })),
+                id: modelToRef(TemplateModel),
+                selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+                type: t('Template'),
+              }}
             />
             <VirtualizedTable<
               K8sResourceCommon,
@@ -74,7 +85,7 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
               unfilteredData={data}
               loaded={templatesLoaded}
               loadError={error}
-              columns={useVirtualMachineTemplatesColumns()}
+              columns={activeColumns}
               Row={VirtualMachineTemplatesRow}
               rowData={{ availableTemplatesUID, availableDatasources }}
             />
