@@ -40,7 +40,7 @@ export const DataSourcesListRow: React.FC<RowProps<V1beta1DataSource>> = ({
         {importCron ? t('Yes') : t('No')}
       </TableData>
       <TableData
-        id="actions"
+        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >

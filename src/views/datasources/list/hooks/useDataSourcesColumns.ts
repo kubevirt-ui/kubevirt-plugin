@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TableColumn, useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
@@ -7,7 +8,7 @@ import { sortable } from '@patternfly/react-table';
 
 import { getDataSourceCronJob, getDataSourceLastUpdated } from '../../utils';
 
-export const useDataSourcesColumns = () => {
+export const useDataSourcesColumns = (namespace: string) => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<V1beta1DataSource>[] = React.useMemo(
@@ -19,13 +20,17 @@ export const useDataSourcesColumns = () => {
         sort: 'metadata.name',
         props: { className: 'pf-m-width-15' },
       },
-      {
-        title: t('Namespace'),
-        id: 'namespace',
-        transforms: [sortable],
-        sort: 'metadata.namespace',
-        props: { className: 'pf-m-width-10' },
-      },
+      ...(!namespace
+        ? [
+            {
+              title: t('Namespace'),
+              id: 'namespace',
+              transforms: [sortable],
+              sort: 'metadata.namespace',
+              props: { className: 'pf-m-width-10' },
+            },
+          ]
+        : []),
       {
         title: t('Created'),
         id: 'created',
@@ -55,6 +60,7 @@ export const useDataSourcesColumns = () => {
         title: t('Auto update'),
         id: 'import-cron',
         transforms: [sortable],
+        additional: true,
         sort: (dataSources, dir) =>
           // sort by boolean, if cron is available or not
           dataSources.sort(
@@ -66,18 +72,18 @@ export const useDataSourcesColumns = () => {
       },
       {
         title: '',
-        id: 'actions',
+        id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
-    [t],
+    [t, namespace],
   );
 
   const [activeColumns] = useActiveColumns<V1beta1DataSource>({
     columns,
     showNamespaceOverride: false,
-    columnManagementID: '',
+    columnManagementID: DataSourceModelRef,
   });
 
-  return activeColumns;
+  return [columns, activeColumns];
 };

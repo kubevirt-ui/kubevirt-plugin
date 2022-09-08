@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { VirtualMachineInstanceMigrationModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ListPageBody,
@@ -29,7 +30,7 @@ const MigrationTable: React.FC<MigrationTableProps> = ({ tableData }) => {
     migrationsTableFilteredData,
     onFilterChange,
   } = tableData || {};
-  const columns = useVirtualMachineInstanceMigrationsColumns();
+  const [columns, activeColumns] = useVirtualMachineInstanceMigrationsColumns();
   return (
     <>
       <ListPageBody>
@@ -38,13 +39,23 @@ const MigrationTable: React.FC<MigrationTableProps> = ({ tableData }) => {
           loaded={loaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
+          columnLayout={{
+            columns: columns?.map(({ id, title, additional }) => ({
+              id,
+              title,
+              additional,
+            })),
+            id: VirtualMachineInstanceMigrationModelRef,
+            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+            type: t('VirtualMachineInstanceMigration'),
+          }}
         />
         <VirtualizedTable<MigrationTableDataLayout>
           data={migrationsTableFilteredData}
           unfilteredData={migrationsTableUnfilteredData}
           loaded={loaded}
           loadError={loadErrors}
-          columns={columns}
+          columns={activeColumns}
           Row={MigrationsRow}
           EmptyMsg={() => (
             <Bullseye>

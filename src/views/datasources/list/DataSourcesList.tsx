@@ -38,7 +38,7 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
     namespaced: true,
     namespace,
   });
-  const columns = useDataSourcesColumns();
+  const [columns, activeColumns] = useDataSourcesColumns(namespace);
   const filters = getDataImportCronFilter(t);
   const [unfilteredData, data, onFilterChange] = useListPageFilter(dataSources, filters);
 
@@ -65,13 +65,23 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
           loaded={loaded}
           rowFilters={filters}
           onFilterChange={onFilterChange}
+          columnLayout={{
+            columns: columns?.map(({ id, title, additional }) => ({
+              id,
+              title,
+              additional,
+            })),
+            id: DataSourceModelRef,
+            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+            type: t('DataSource'),
+          }}
         />
         <VirtualizedTable<V1beta1DataSource>
           data={data}
           unfilteredData={unfilteredData}
           loaded={loaded}
           loadError={loadError}
-          columns={columns}
+          columns={activeColumns}
           Row={DataSourcesListRow}
         />
       </ListPageBody>

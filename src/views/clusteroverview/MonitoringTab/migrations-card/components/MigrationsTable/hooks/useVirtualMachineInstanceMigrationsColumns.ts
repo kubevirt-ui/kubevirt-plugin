@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  NodeModel,
+  VirtualMachineInstanceMigrationModelRef,
+} from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sVerb,
@@ -12,7 +15,10 @@ import { sortable } from '@patternfly/react-table';
 
 import { MigrationTableDataLayout } from '../utils/utils';
 
-const useVirtualMachineInstanceMigrationsColumns = () => {
+const useVirtualMachineInstanceMigrationsColumns = (): [
+  TableColumn<MigrationTableDataLayout>[],
+  TableColumn<MigrationTableDataLayout>[],
+] => {
   const { t } = useKubevirtTranslation();
 
   const [canGetNode] = useAccessReview({
@@ -61,12 +67,13 @@ const useVirtualMachineInstanceMigrationsColumns = () => {
       {
         title: t('Created'),
         id: 'created',
+        additional: true,
         transforms: [sortable],
         sort: 'vmim.metadata.creationTimestamp',
       },
       {
         title: '',
-        id: 'actions',
+        id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
@@ -78,10 +85,10 @@ const useVirtualMachineInstanceMigrationsColumns = () => {
       ? columns
       : columns.filter((column) => column.id !== 'source' && column.id !== 'target'),
     showNamespaceOverride: false,
-    columnManagementID: '',
+    columnManagementID: VirtualMachineInstanceMigrationModelRef,
   });
 
-  return activeColumns;
+  return [columns, activeColumns];
 };
 
 export default useVirtualMachineInstanceMigrationsColumns;
