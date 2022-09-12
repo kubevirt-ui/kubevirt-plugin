@@ -95,12 +95,14 @@ export const addEnvironmentsToVM = (
     let newSourcesDisks: V1Disk[] = [];
     let newSourcesVolumes: V1Volume[] = [];
     environments.forEach((environment) => {
-      const diskName = environment.name.toLocaleLowerCase().replaceAll('.', '-') + '-disk';
+      const diskName = `${environment.name.toLocaleLowerCase().replaceAll('.', '-')}-disk`;
 
       const newDisk: V1Disk = {
         serial: environment?.serial,
         name: diskName,
-        disk: {},
+        disk: {
+          bus: 'sata',
+        },
       };
 
       const newVolume: V1Volume = MapGettersForKind[environment.kind](diskName, environment.name);
