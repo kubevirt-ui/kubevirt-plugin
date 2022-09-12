@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -30,7 +31,7 @@ const ConfigurationSummary: React.FC<ConfigurationSummaryProps> = ({ vm, pvcs })
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const [guestAgentData] = useGuestOS(vmi);
   const osName = (guestAgentData?.os?.prettyName || guestAgentData?.os?.name) ?? (
-    <MutedTextSpan text={t('Guest agent is required')} />
+    <GuestAgentIsRequiredText vmi={vmi} />
   );
 
   return (

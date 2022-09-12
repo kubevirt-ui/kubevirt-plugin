@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -60,7 +61,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
   );
   const timestampPluralized = pluralize(timestamp['value'], timestamp['time']);
 
-  const guestAgentIsRequired = <MutedTextSpan text={t('Guest agent is required')} />;
+  const guestAgentIsRequired = <GuestAgentIsRequiredText vmi={vmi} />;
 
   const osName =
     (guestAgentData?.os?.prettyName || guestAgentData?.os?.name) ?? guestAgentIsRequired;

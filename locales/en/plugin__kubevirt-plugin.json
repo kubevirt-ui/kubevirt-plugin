@@ -395,7 +395,6 @@
   "Go to catalog": "Go to catalog",
   "GPU devices": "GPU devices",
   "GPU devices ({{gpusCount}})": "GPU devices ({{gpusCount}})",
-  "Guest agend is required": "Guest agend is required",
   "Guest agent is not installed on VirtualMachine": "Guest agent is not installed on VirtualMachine",
   "Guest agent is required": "Guest agent is required",
   "Guest login credentials": "Guest login credentials",
