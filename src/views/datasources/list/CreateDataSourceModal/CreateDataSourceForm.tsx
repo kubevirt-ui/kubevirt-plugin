@@ -64,7 +64,7 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
         label={t('Registry URL')}
         validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
         helperText={t('Example: {{exampleURL}}', {
-          exampleURL: 'docker://quay.io/containerdisks/centos:7-2009',
+          exampleURL: 'quay.io/containerdisks/centos:7-2009',
         })}
         aria-label={t('Registry URL')}
         helperTextInvalid={t('This field is required')}
