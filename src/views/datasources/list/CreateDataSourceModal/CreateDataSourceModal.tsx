@@ -54,6 +54,7 @@ export const CreateDataSourceModal: React.FC<CreateDataSourceModalProps> = ({
     (data) =>
       createDataSourceWithImportCron({
         ...data,
+        url: data?.url?.includes('docker://') ? data?.url : 'docker://' + data?.url,
         namespace: namespace || 'default',
       }).then(() =>
         history.push(`/k8s/ns/${namespace || 'default'}/${DataSourceModelRef}/${name}`),
