@@ -109,12 +109,21 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
               isOpen={isOpen}
               onClose={onClose}
               headerText={t('Delete DataSource?')}
-              onDeleteSubmit={() =>
-                k8sDelete({
-                  model: DataSourceModel,
-                  resource: dataSource,
-                })
-              }
+              onDeleteSubmit={async () => {
+                try {
+                  await k8sDelete({
+                    model: DataImportCronModel,
+                    resource: dataImportCron,
+                  });
+                } catch (e) {
+                  console.log(e?.message);
+                } finally {
+                  await k8sDelete({
+                    model: DataSourceModel,
+                    resource: dataSource,
+                  });
+                }
+              }}
             />
           )),
         accessReview: asAccessReview(DataSourceModel, dataSource, 'delete'),
