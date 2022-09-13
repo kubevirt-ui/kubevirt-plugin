@@ -11,8 +11,8 @@ import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { useActiveNamespacePath } from '@kubevirt-utils/hooks/useActiveNamespacePath';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import {
   Action,
@@ -44,7 +44,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const [bootDataSource, setBootDataSource] = React.useState<V1beta1DataSource>();
   const [loadingBootSource, setLoadingBootSource] = React.useState(true);
   const editableBootSource = hasEditableBootSource(bootDataSource);
-  const [activeNamespacePath] = useActiveNamespacePath();
+  const [lastNamespacePath] = useLastNamespacePath();
 
   const [canWriteToDataSourceNs] = useAccessReview(
     asAccessReview(
@@ -80,7 +80,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       model: TemplateModel,
       resource: template,
     });
-    history.push(`/k8s/${activeNamespacePath}/templates`);
+    history.push(`/k8s/${lastNamespacePath}/templates`);
   };
 
   const actions = [

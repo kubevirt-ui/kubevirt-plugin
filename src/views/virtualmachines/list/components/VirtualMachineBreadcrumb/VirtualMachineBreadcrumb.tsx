@@ -2,12 +2,12 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { useActiveNamespacePath } from '@kubevirt-utils/hooks/useActiveNamespacePath';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { Breadcrumb, BreadcrumbItem, Button } from '@patternfly/react-core';
 
 export const VirtualMachineBreadcrumb: React.FC = React.memo(() => {
-  const [namespacePath] = useActiveNamespacePath();
+  const [namespacePath] = useLastNamespacePath();
 
   const { t } = useKubevirtTranslation();
   const history = useHistory();
