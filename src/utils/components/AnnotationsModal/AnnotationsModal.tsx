@@ -23,7 +23,7 @@ export const AnnotationsModal: React.FC<{
 
   const [annotations, setAnnotations] = React.useState<{
     [id: number]: { [key: string]: string };
-  }>();
+  }>({});
 
   const onAnnotationAdd = () => {
     const keys = new Set([...Object.keys(annotations)]);
@@ -61,7 +61,7 @@ export const AnnotationsModal: React.FC<{
 
   // reset annotations when modal is closed
   React.useEffect(() => {
-    if (obj.metadata.annotations) {
+    if (obj?.metadata?.annotations) {
       setAnnotations(getIdAnnotations(obj.metadata.annotations));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
