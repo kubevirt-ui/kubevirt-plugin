@@ -54,6 +54,10 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
         <GridItem span={5}>
           <DescriptionList>
             <MigrationPolicyDescriptionItem title={t('Name')} description={mp?.metadata?.name} />
+            <MigrationPolicyDescriptionItem
+              title={t('Description')}
+              description={mp?.metadata?.annotations?.description}
+            />
             <>
               <DescriptionListTermHelpTextButton
                 onClick={() =>
