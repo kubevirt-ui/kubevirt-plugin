@@ -2,14 +2,14 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { VirtualMachineInstanceModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { useActiveNamespacePath } from '@kubevirt-utils/hooks/useActiveNamespacePath';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { Breadcrumb, BreadcrumbItem, Button } from '@patternfly/react-core';
 
 const VirtualMachineInstanceBreadcrumb: React.FC = React.memo(() => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const [activeNamespacePath] = useActiveNamespacePath();
+  const [lastNamespacePath] = useLastNamespacePath();
 
   return (
     <div>
@@ -19,7 +19,7 @@ const VirtualMachineInstanceBreadcrumb: React.FC = React.memo(() => {
             variant="link"
             isInline
             onClick={() =>
-              history.push(`/k8s/${activeNamespacePath}/${VirtualMachineInstanceModelRef}`)
+              history.push(`/k8s/${lastNamespacePath}/${VirtualMachineInstanceModelRef}`)
             }
           >
             {t('VirtualMachineInstances')}
