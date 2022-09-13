@@ -43,7 +43,7 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
   const [unfilteredData, data, onFilterChange] = useListPageFilter(dataSources, filters);
 
   const createItems = {
-    form: t('With Form'),
+    form: t('With form'),
     yaml: t('With YAML'),
   };
 
