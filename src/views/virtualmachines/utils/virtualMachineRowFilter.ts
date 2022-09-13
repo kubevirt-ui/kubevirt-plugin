@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import {
   V1VirtualMachine,
@@ -81,31 +81,25 @@ const useGetTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
 };
 
 const useGetOSFilter = (): RowFilter => {
+  const getOSName = useCallback((obj) => {
+    const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
+    const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
+    const osName = Object.values(OS_NAME_LABELS).find(
+      (osKey) =>
+        osAnnotation?.toLowerCase()?.startsWith(osKey?.toLowerCase()) ||
+        osLabel?.toLowerCase()?.startsWith(osKey?.toLowerCase()),
+    );
+    return osName;
+  }, []);
   return {
     filterGroupName: t('Operating system'),
     type: 'os',
-    reducer: (obj) => {
-      const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
-      const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
-      const osName = Object.values(OS_NAME_LABELS).find(
-        (osKey) =>
-          osAnnotation?.toLowerCase()?.startsWith(osKey?.toLowerCase()) ||
-          osLabel?.toLowerCase()?.startsWith(osKey?.toLowerCase()),
-      );
-      return osName;
-    },
+    reducer: getOSName,
     filter: (selectedOS, obj) => {
-      const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
-      const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
-      const osName = Object.values(OS_NAME_LABELS).find(
-        (osKey) =>
-          osAnnotation?.toLowerCase()?.startsWith(osKey?.toLowerCase()) ||
-          osLabel?.toLowerCase()?.startsWith(osKey?.toLowerCase()),
-      );
-      return selectedOS.selected?.length === 0 || selectedOS.selected?.includes(osName);
+      return selectedOS.selected?.length === 0 || selectedOS.selected?.includes(getOSName(obj));
     },
-    items: Object.entries(OS_NAME_LABELS).map(([key, osName]) => ({
-      id: key,
+    items: Object.values(OS_NAME_LABELS).map((osName) => ({
+      id: osName,
       title: osName,
     })),
   };
