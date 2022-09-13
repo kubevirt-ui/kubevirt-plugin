@@ -2,11 +2,7 @@ import React from 'react';
 import { load } from 'js-yaml';
 
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
-import {
-  V1CloudInitNoCloudSource,
-  V1VirtualMachine,
-  V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 
 import {
@@ -63,16 +59,27 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
   }, [cloudInit?.userData]);
 
   const cloudInitVolume: V1Volume = React.useMemo(() => {
-    const cloudInitNoCloud: V1CloudInitNoCloudSource = deleteObjBlankValues({
+    const cloudInitNoBlanks = deleteObjBlankValues({
       userData: convertUserDataObjectToYAML(userData, shouldAddHeader),
       networkData: convertNetworkDataObjectToYAML(networkData),
     });
 
-    return {
-      name: 'cloudinitdisk',
-      cloudInitNoCloud,
-    };
-  }, [userData, shouldAddHeader, networkData]);
+    if (cloudInitVol?.cloudInitConfigDrive) {
+      return {
+        name: 'cloudinitdisk',
+        cloudInitConfigDrive: cloudInitNoBlanks,
+      };
+    }
+
+    if (cloudInitVol?.cloudInitNoCloud) {
+      return {
+        name: 'cloudinitdisk',
+        cloudInitNoCloud: cloudInitNoBlanks,
+      };
+    }
+
+    return { name: 'cloudinitdisk' };
+  }, [userData, shouldAddHeader, networkData, cloudInitVol]);
 
   const updatedVM = React.useMemo(
     () =>
