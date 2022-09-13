@@ -1,10 +1,8 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 
 import { CAPACITY_UNITS } from '@catalog/customize/components/CustomizeSource';
-import { bytesFromQuantity } from '@catalog/utils/quantity';
 import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   FormGroup,
   NumberInput,
@@ -15,6 +13,7 @@ import {
   SplitItem,
   ValidatedOptions,
 } from '@patternfly/react-core';
+import { ExclamationCircleIcon } from '@patternfly/react-icons';
 
 type CapacityInputProps = {
   size: string;
@@ -24,37 +23,18 @@ type CapacityInputProps = {
 
 const CapacityInput: React.FC<CapacityInputProps> = ({ size, onChange, label }) => {
   const { t } = useKubevirtTranslation();
-  const [selectOpen, toggleSelect] = React.useState(false);
+  const [selectOpen, toggleSelect] = useState<boolean>(false);
+  const [unitValue] = size?.match(/[a-zA-Z]+/g);
+  const [sizeValue = 0] = size?.match(/[0-9]+/g) || [];
+  const unit = !unitValue?.endsWith('B') ? `${unitValue}B` : unitValue;
+  const value = +sizeValue;
 
-  const [value, quantityUnit] = bytesFromQuantity(size);
-
-  const onFormatChange = React.useCallback(
-    (event, newUnit: CAPACITY_UNITS) => {
-      onChange(`${value}${removeByteSuffix(newUnit)}`);
-      toggleSelect(false);
-    },
-    [onChange, value],
-  );
-
-  const onMinus = React.useCallback(() => {
-    if (value > 0) onChange(`${(value || 0) - 1}${removeByteSuffix(quantityUnit)}`);
-  }, [onChange, quantityUnit, value]);
-
-  const onPlus = React.useCallback(
-    () => onChange(`${(value || 0) + 1}${removeByteSuffix(quantityUnit)}`),
-    [onChange, quantityUnit, value],
-  );
-
-  const onChangeSize = React.useCallback(
-    (event) => onChange(`${Number(event.currentTarget.value)}${removeByteSuffix(quantityUnit)}`),
-    [onChange, quantityUnit],
-  );
-
+  const onFormatChange = (_, newUnit: CAPACITY_UNITS) => {
+    onChange(`${+value}${removeByteSuffix(newUnit)}`);
+    toggleSelect(false);
+  };
   const unitOptions = Object.values(CAPACITY_UNITS);
-
-  if (!unitOptions?.includes(quantityUnit as CAPACITY_UNITS)) {
-    unitOptions.push(quantityUnit as CAPACITY_UNITS);
-  }
+  if (!unitOptions?.includes(unit as CAPACITY_UNITS)) unitOptions.push(unit as CAPACITY_UNITS);
 
   return (
     <FormGroup
@@ -65,16 +45,18 @@ const CapacityInput: React.FC<CapacityInputProps> = ({ size, onChange, label }) 
       helperTextInvalid={t('Size cannot be {{errorValue}}', {
         errorValue: value < 0 ? 'negative' : 'zero',
       })}
-      helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
+      helperTextInvalidIcon={<ExclamationCircleIcon color="red" title="Error" />}
     >
       <Split hasGutter>
         <SplitItem>
           <NumberInput
             min={1}
             value={value}
-            onMinus={onMinus}
-            onChange={onChangeSize}
-            onPlus={onPlus}
+            onMinus={() => onChange(`${+value - 1}${removeByteSuffix(unit)}`)}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              event?.target?.value && onChange(`${+event.target.value}${removeByteSuffix(unit)}`)
+            }
+            onPlus={() => onChange(`${+value + 1}${removeByteSuffix(unit)}`)}
             minusBtnAriaLabel={t('Decrement')}
             plusBtnAriaLabel={t('Increment')}
           />
@@ -86,7 +68,7 @@ const CapacityInput: React.FC<CapacityInputProps> = ({ size, onChange, label }) 
             onToggle={toggleSelect}
             onSelect={onFormatChange}
             variant={SelectVariant.single}
-            selections={quantityUnit}
+            selections={unit}
           >
             {unitOptions.map((formatOption) => (
               <SelectOption key={formatOption} value={formatOption} />
