@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   DescriptionListDescription,
   DescriptionListGroup,
@@ -20,7 +21,7 @@ const MigrationPolicyDescriptionItem: React.FC<MigrationPolicyDescriptionItemPro
     <DescriptionListTermHelpText>
       <DescriptionListTermHelpTextButton>{title}</DescriptionListTermHelpTextButton>
     </DescriptionListTermHelpText>
-    <DescriptionListDescription>{description}</DescriptionListDescription>
+    <DescriptionListDescription>{description || NO_DATA_DASH}</DescriptionListDescription>
   </DescriptionListGroup>
 );
 
