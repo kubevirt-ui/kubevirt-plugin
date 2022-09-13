@@ -77,10 +77,8 @@ const useEnvironments = (
   }, [environments, updateVM, vm]);
 
   React.useEffect(() => {
-    const unchanged = environments.every(
-      ({ name, serial }, index) =>
-        initialEnvironments?.[index]?.name === name &&
-        initialEnvironments?.[index]?.serial === serial,
+    const unchanged = environments.every(({ name, serial }) =>
+      initialEnvironments.find((e) => e?.name === name && e?.serial === serial),
     );
     setEnvironmentsEdited(!unchanged || environments.length !== initialEnvironments.length);
   }, [environments, initialEnvironments]);
