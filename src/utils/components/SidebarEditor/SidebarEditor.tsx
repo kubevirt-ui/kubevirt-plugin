@@ -24,7 +24,7 @@ import './sidebar-editor.scss';
 type SidebarEditorProps<Resource> = {
   resource: Resource;
   onResourceUpdate?: (newResource: Resource) => Promise<Resource | void>;
-  children: (resource: Resource) => ReactNode;
+  children: ReactNode | ReactNode[] | ((resource: Resource) => ReactNode);
 };
 
 const SidebarEditor = <Resource extends K8sResourceCommon>({
@@ -50,7 +50,9 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
 
   return (
     <Sidebar isPanelRight hasGutter hasNoBackground className="sidebar-editor">
-      <SidebarContent>{children && children(editedResource ?? resource)}</SidebarContent>
+      <SidebarContent>
+        {children instanceof Function ? children(editedResource ?? resource) : children}
+      </SidebarContent>
       {showEditor && (
         <SidebarPanel
           width={{ default: 'width_33', lg: 'width_50', xl: 'width_50' }}
