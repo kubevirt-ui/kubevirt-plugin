@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { getColorList } from 'src/views/clusteroverview/OverviewTab/running-vms-per-template-card/utils/utils';
+import { getColorList } from 'src/views/clusteroverview/OverviewTab/vms-per-template-card/utils/utils';
 
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

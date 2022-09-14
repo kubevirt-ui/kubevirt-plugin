@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useMemo } from 'react';
 import { ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,18 +15,18 @@ import {
   TitleSizes,
 } from '@patternfly/react-core';
 
-import { useRunningVMsPerTemplatesHook } from './hooks/useRunningVMsPerTemplateResources';
+import useVMsPerTemplateResources from './hooks/useVMsPerTemplateResources';
 import EmptyStateNoVMs from './utils/EmptyStateNoVMs';
 import RunningVMsChartLegend from './utils/RunningVMsChartLegend';
 import { getChartData, getLegendItems, getTemplateToVMCountMap } from './utils/utils';
 
-import './RunningVMsPerTemplateCard.scss';
+import './VMsPerTemplateCard.scss';
 
-const RunningVMsPerTemplateCard = () => {
+const VMsPerTemplateCard = () => {
   const { t } = useKubevirtTranslation();
-  const useRunningVMsPerTemplatesResources = useRunningVMsPerTemplatesHook();
-  const { loaded, vms, templates } = useRunningVMsPerTemplatesResources();
-  const templateToVMCountMap = React.useMemo(
+  const { loaded, vms, templates } = useVMsPerTemplateResources();
+
+  const templateToVMCountMap = useMemo(
     () => getTemplateToVMCountMap(loaded, vms, templates),
     [loaded, vms, templates],
   );
@@ -71,9 +71,7 @@ const RunningVMsPerTemplateCard = () => {
       </EmptyState>
     );
   } else if (!numVMs) {
-    body = (
-      <EmptyStateNoVMs titleSize={TitleSizes.md} className="kv-running-vms-card__empty-state" />
-    );
+    body = <EmptyStateNoVMs titleSize={TitleSizes.md} />;
   } else {
     body = (
       <>
@@ -84,7 +82,7 @@ const RunningVMsPerTemplateCard = () => {
   }
 
   return (
-    <Card className="kv-running-vms-card__gradient" data-test-id="kv-running-vms-per-template-card">
+    <Card className="vms-per-template-card__gradient" data-test-id="vms-per-template-card">
       <CardHeader>
         <CardTitle>{t('VirtualMachines per template')}</CardTitle>
       </CardHeader>
@@ -93,4 +91,4 @@ const RunningVMsPerTemplateCard = () => {
   );
 };
 
-export default RunningVMsPerTemplateCard;
+export default VMsPerTemplateCard;
