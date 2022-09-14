@@ -3,6 +3,9 @@ import { dump } from 'js-yaml';
 
 import { K8sResourceCommon, YAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Alert,
+  AlertActionCloseButton,
+  AlertVariant,
   Button,
   ButtonVariant,
   Flex,
@@ -33,6 +36,10 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
   onResourceUpdate,
 }: SidebarEditorProps<Resource>): JSX.Element => {
   const [editableYAML, setEditableYAML] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
   const resourceYAML = useMemo(() => {
     const yaml = dump(resource, { skipInvalid: true });
     setEditableYAML(yaml);
@@ -48,14 +55,27 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
     return {};
   };
 
+  const onUpdate = (newResource: Resource) => {
+    setSuccess(false);
+    setError(null);
+    setLoading(true);
+    return onResourceUpdate(newResource)
+      .then(() => setSuccess(true))
+      .catch(setError)
+      .finally(() => setLoading(false));
+  };
+
+  const onReload = () => {
+    setSuccess(false);
+    setError(null);
+    setEditableYAML(resourceYAML);
+  };
+
   return (
     <Sidebar isPanelRight hasGutter hasNoBackground className="sidebar-editor">
       <SidebarContent>{children && children(editedResource ?? resource)}</SidebarContent>
       {showEditor && (
-        <SidebarPanel
-          width={{ default: 'width_33', lg: 'width_50', xl: 'width_50' }}
-          className="sidebar-editor"
-        >
+        <SidebarPanel width={{ default: 'width_33', lg: 'width_50', xl: 'width_50' }}>
           <Stack hasGutter>
             <StackItem isFilled>
               <Suspense fallback={<Loading />}>
@@ -63,25 +83,39 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
                   value={editableYAML}
                   minHeight="300px"
                   onChange={changeResource}
-                  onSave={() => onResourceUpdate(editedResource)}
+                  onSave={() => onUpdate(editedResource)}
                 />
               </Suspense>
             </StackItem>
+            {(success || error) && (
+              <StackItem>
+                {success && (
+                  <Alert
+                    title="Success"
+                    variant={AlertVariant.success}
+                    actionClose={<AlertActionCloseButton onClose={() => setSuccess(false)} />}
+                  ></Alert>
+                )}
+                {error && (
+                  <Alert title="Error" variant={AlertVariant.danger}>
+                    {error.message}
+                  </Alert>
+                )}
+              </StackItem>
+            )}
             <StackItem>
               <Flex>
                 <FlexItem>
                   <Button
                     variant={ButtonVariant.primary}
-                    onClick={() => onResourceUpdate(editedResource)}
+                    onClick={() => onUpdate(editedResource)}
+                    isLoading={loading}
                   >
                     Save
                   </Button>
                 </FlexItem>
                 <FlexItem>
-                  <Button
-                    variant={ButtonVariant.secondary}
-                    onClick={() => setEditableYAML(resourceYAML)}
-                  >
+                  <Button variant={ButtonVariant.secondary} onClick={onReload}>
                     Reload
                   </Button>
                 </FlexItem>
