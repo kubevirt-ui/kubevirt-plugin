@@ -1,50 +1,36 @@
-import { produceVMDisks } from '@catalog/utils/WizardVMContext';
-import { V1Disk, V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  getConfigMaps,
-  getDisks,
-  getSecrets,
-  getServiceAccounts,
-  getVolumes,
-} from '@kubevirt-utils/resources/vm';
+import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { SelectOptionObject } from '@patternfly/react-core';
 
 import { EnvironmentKind, EnvironmentVariable } from './constants';
 
+const getKindFromEnvVolume = (volume: V1Volume): EnvironmentKind | null => {
+  if (volume.configMap) return EnvironmentKind.configMap;
+  if (volume.secret) return EnvironmentKind.secret;
+  if (volume.serviceAccount) return EnvironmentKind.serviceAccount;
+
+  return null;
+};
+
 export const getVMEnvironmentsVariables = (vm: V1VirtualMachine): EnvironmentVariable[] => {
   const disksWithSerial = (getDisks(vm) || []).filter((disk) => disk?.serial);
 
-  return []
-    .concat(
-      getConfigMaps(vm).map((volume): EnvironmentVariable => {
-        const diskEnvironment = disksWithSerial.find((disk) => disk.name === volume.name);
-        return {
-          name: volume.configMap.name,
-          serial: diskEnvironment?.serial,
-          kind: EnvironmentKind.configMap,
-        };
-      }),
-    )
-    .concat(
-      getSecrets(vm).map((volume): EnvironmentVariable => {
-        const diskEnvironment = disksWithSerial.find((disk) => disk.name === volume.name);
-        return {
-          name: volume.secret.secretName,
-          serial: diskEnvironment?.serial,
-          kind: EnvironmentKind.secret,
-        };
-      }),
-    )
-    .concat(
-      getServiceAccounts(vm).map((volume): EnvironmentVariable => {
-        const diskEnvironment = disksWithSerial.find((disk) => disk.name === volume.name);
-        return {
-          name: volume.serviceAccount.serviceAccountName,
-          serial: diskEnvironment?.serial,
-          kind: EnvironmentKind.serviceAccount,
-        };
-      }),
-    );
+  return (getVolumes(vm) || []).reduce((acc, volume) => {
+    const envDisk = disksWithSerial.find((disk) => disk.name === volume.name);
+
+    if (envDisk)
+      acc.push({
+        name:
+          volume?.configMap?.name ||
+          volume?.secret?.secretName ||
+          volume?.serviceAccount?.serviceAccountName,
+        serial: envDisk?.serial,
+        kind: getKindFromEnvVolume(volume),
+        diskName: volume.name,
+      });
+
+    return acc;
+  }, []);
 };
 
 export const getRandomSerial = (len = 6): string => {
@@ -81,43 +67,11 @@ const MapGettersForKind = {
   [EnvironmentKind.serviceAccount]: getServiceAccountVolume,
 };
 
-export const addEnvironmentsToVM = (
-  vm: V1VirtualMachine,
-  environments: EnvironmentVariable[],
-): V1VirtualMachine => {
-  return produceVMDisks(vm, (draftVM) => {
-    const currentOtherDisks: V1Disk[] = (getDisks(draftVM) || []).filter((disk) => !disk?.serial);
-
-    const currentOtherVolumes: V1Volume[] = (getVolumes(draftVM) || []).filter(
-      (volume) => !volume.secret && !volume.configMap && !volume.serviceAccount,
-    );
-
-    let newSourcesDisks: V1Disk[] = [];
-    let newSourcesVolumes: V1Volume[] = [];
-    environments.forEach((environment) => {
-      const diskName = `${environment.name.toLocaleLowerCase().replaceAll('.', '-')}-disk`;
-
-      const newDisk: V1Disk = {
-        serial: environment?.serial,
-        name: diskName,
-        disk: {
-          bus: 'sata',
-        },
-      };
-
-      const newVolume: V1Volume = MapGettersForKind[environment.kind](diskName, environment.name);
-
-      newSourcesDisks.push(newDisk);
-      newSourcesVolumes.push(newVolume);
-    });
-
-    newSourcesDisks = [...currentOtherDisks, ...newSourcesDisks];
-    newSourcesVolumes = [...currentOtherVolumes, ...newSourcesVolumes];
-
-    draftVM.spec.template.spec.domain.devices.disks = newSourcesDisks;
-    draftVM.spec.template.spec.volumes = newSourcesVolumes;
-  });
-};
+export const updateVolumeForKind = (
+  envVolume: V1Volume,
+  resourceName: string,
+  kind: EnvironmentKind,
+) => MapGettersForKind[kind](envVolume.name, resourceName);
 
 export const areEnvironmentsChanged = (
   environments: EnvironmentVariable[],

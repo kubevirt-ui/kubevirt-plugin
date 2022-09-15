@@ -28,12 +28,14 @@ type SidebarEditorProps<Resource> = {
   resource: Resource;
   onResourceUpdate?: (newResource: Resource) => Promise<Resource | void>;
   children: ReactNode | ReactNode[] | ((resource: Resource) => ReactNode);
+  onChange?: (resource: Resource) => void;
 };
 
 const SidebarEditor = <Resource extends K8sResourceCommon>({
   children,
   resource,
   onResourceUpdate,
+  onChange,
 }: SidebarEditorProps<Resource>): JSX.Element => {
   const [editableYAML, setEditableYAML] = useState('');
   const [loading, setLoading] = useState(false);
@@ -52,10 +54,13 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
   const changeResource = (newValue: string) => {
     setEditableYAML(newValue);
 
+    if (onChange) onChange(safeLoad<Resource>(newValue));
     return {};
   };
 
   const onUpdate = (newResource: Resource) => {
+    if (!onResourceUpdate) return;
+
     setSuccess(false);
     setError(null);
     setLoading(true);
@@ -105,24 +110,26 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
                 )}
               </StackItem>
             )}
-            <StackItem>
-              <Flex>
-                <FlexItem>
-                  <Button
-                    variant={ButtonVariant.primary}
-                    onClick={() => onUpdate(editedResource)}
-                    isLoading={loading}
-                  >
-                    Save
-                  </Button>
-                </FlexItem>
-                <FlexItem>
-                  <Button variant={ButtonVariant.secondary} onClick={onReload}>
-                    Reload
-                  </Button>
-                </FlexItem>
-              </Flex>
-            </StackItem>
+            {onResourceUpdate && (
+              <StackItem>
+                <Flex>
+                  <FlexItem>
+                    <Button
+                      variant={ButtonVariant.primary}
+                      onClick={() => onUpdate(editedResource)}
+                      isLoading={loading}
+                    >
+                      Save
+                    </Button>
+                  </FlexItem>
+                  <FlexItem>
+                    <Button variant={ButtonVariant.secondary} onClick={onReload}>
+                      Reload
+                    </Button>
+                  </FlexItem>
+                </Flex>
+              </StackItem>
+            )}
           </Stack>
         </SidebarPanel>
       )}
