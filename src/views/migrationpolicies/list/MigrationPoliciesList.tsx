@@ -49,7 +49,11 @@ const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) =
   return (
     <>
       <ListPageHeader title={t('MigrationPolicies')}>
-        <ListPageCreateDropdown items={createItems} onClick={onCreate}>
+        <ListPageCreateDropdown
+          items={createItems}
+          onClick={onCreate}
+          createAccessReview={{ groupVersionKind: kind }}
+        >
           {t('Create MigrationPolicy')}
         </ListPageCreateDropdown>
       </ListPageHeader>

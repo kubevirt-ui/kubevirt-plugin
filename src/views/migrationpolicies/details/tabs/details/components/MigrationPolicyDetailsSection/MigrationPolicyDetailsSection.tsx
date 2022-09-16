@@ -42,6 +42,7 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const hasOwnPropertySpec = (key: string) => key in (mp?.spec || {});
+
   return (
     <div>
       <a href={`${pathname}#details`} className="link-icon">
