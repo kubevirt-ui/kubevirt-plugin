@@ -8,6 +8,8 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { VMAuthorizedSSHKeyModal } from '@kubevirt-utils/components/VMAuthorizedSSHKeyModal/VMAuthorizedSSHKeyModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
@@ -20,8 +22,6 @@ import {
 import {
   DescriptionList,
   Divider,
-  Grid,
-  GridItem,
   PageSection,
   Stack,
   Text,
@@ -66,18 +66,19 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
 
   return (
     <PageSection>
-      <Grid hasGutter>
-        <GridItem span={5}>
-          <DescriptionList>
+      <SidebarEditor resource={vm} onResourceUpdate={onSubmit}>
+        {(resource) => (
+          <DescriptionList className="vm-scripts-tab">
+            <SidebarEditorSwitch />
             <VirtualMachineDescriptionItem
-              descriptionData={<CloudInitDescription vm={vm} />}
+              descriptionData={<CloudInitDescription vm={resource} />}
               descriptionHeader={t('Cloud-init')}
               isEdit={canUpdateVM}
               showEditOnTitle
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <CloudinitModal
-                    vm={vm}
+                    vm={resource}
                     isOpen={isOpen}
                     onClose={onClose}
                     onSubmit={onSubmit}
@@ -107,13 +108,18 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               showEditOnTitle
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
-                  <VMAuthorizedSSHKeyModal vm={vm} isOpen={isOpen} onClose={onClose} vmi={vmi} />
+                  <VMAuthorizedSSHKeyModal
+                    vm={resource}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    vmi={vmi}
+                  />
                 ))
               }
             />
           </DescriptionList>
-        </GridItem>
-      </Grid>
+        )}
+      </SidebarEditor>
     </PageSection>
   );
 };

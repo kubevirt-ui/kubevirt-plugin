@@ -5,6 +5,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import {
@@ -15,6 +16,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { Flex, FlexItem } from '@patternfly/react-core';
 
 import useDiskColumns from '../../hooks/useDiskColumns';
 import useDisksFilters from '../../hooks/useDisksFilters';
@@ -41,29 +43,37 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
   return (
     <>
       <ListPageBody>
-        <ListPageCreateButton
-          className="list-page-create-button-margin"
-          onClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <DiskModal
-                vm={vm}
-                isOpen={isOpen}
-                onClose={onClose}
-                headerText={headerText}
-                onSubmit={(obj) =>
-                  k8sUpdate({
-                    model: VirtualMachineModel,
-                    data: obj,
-                    ns: obj.metadata.namespace,
-                    name: obj.metadata.name,
-                  })
-                }
-              />
-            ))
-          }
-        >
-          {t('Add disk')}
-        </ListPageCreateButton>
+        <Flex>
+          <FlexItem>
+            <ListPageCreateButton
+              className="list-page-create-button-margin"
+              onClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <DiskModal
+                    vm={vm}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    headerText={headerText}
+                    onSubmit={(obj) =>
+                      k8sUpdate({
+                        model: VirtualMachineModel,
+                        data: obj,
+                        ns: obj.metadata.namespace,
+                        name: obj.metadata.name,
+                      })
+                    }
+                  />
+                ))
+              }
+            >
+              {t('Add disk')}
+            </ListPageCreateButton>
+          </FlexItem>
+
+          <FlexItem>
+            <SidebarEditorSwitch />
+          </FlexItem>
+        </Flex>
         <DiskListTitle />
         <ListPageFilter
           data={data}
