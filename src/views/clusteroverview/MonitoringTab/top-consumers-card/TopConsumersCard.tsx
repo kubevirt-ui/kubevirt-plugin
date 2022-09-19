@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
@@ -21,7 +22,6 @@ import {
   TOP_CONSUMERS_DURATION_KEY,
   TOP_CONSUMERS_NUM_ITEMS_KEY,
 } from './utils/constants';
-import FormPFSelect from './utils/FormPFSelect';
 import TopConsumersGridRow from './utils/TopConsumersGridRow';
 import { topAmountSelectOptions } from './utils/utils';
 

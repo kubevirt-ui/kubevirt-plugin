@@ -1,10 +1,10 @@
 import * as React from 'react';
 
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { Card, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import FormPFSelect from './FormPFSelect';
 import { TopConsumerMetric } from './topConsumerMetric';
 import { TopConsumersChartList } from './TopConsumersChartList';
 import { TopConsumerScope } from './topConsumerScope';

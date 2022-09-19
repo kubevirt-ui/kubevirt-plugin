@@ -19,7 +19,7 @@ import {
 
 import SnapshotModal from '../../../snapshots/components/modal/SnapshotModal';
 import useSnapshotData from '../../../snapshots/hooks/useSnapshotData';
-import { createURL } from '../../utils/url';
+import { createURL } from '../../utils/utils';
 
 import VirtualMachinesOverviewTabSnapshotsRow from './VirtualMachinesOverviewTabSnapshotsRow';
 
