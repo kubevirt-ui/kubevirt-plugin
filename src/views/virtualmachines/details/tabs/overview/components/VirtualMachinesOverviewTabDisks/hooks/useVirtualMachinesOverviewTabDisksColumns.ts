@@ -18,6 +18,10 @@ const useVirtualMachinesOverviewTabDisksColumns = () => {
       title: t('Size'),
       id: 'size',
     },
+    {
+      title: t('Interface'),
+      id: 'interface',
+    },
   ];
 
   return columns;

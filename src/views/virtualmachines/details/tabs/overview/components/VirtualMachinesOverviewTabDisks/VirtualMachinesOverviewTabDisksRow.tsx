@@ -16,6 +16,9 @@ const VirtualMachinesOverviewTabDisksRow = ({ obj, activeColumnIDs }) => {
       <TableData id="size" activeColumnIDs={activeColumnIDs}>
         <div data-test-id={`disk-${obj?.size}`}>{readableSizeUnit(obj?.size) || NO_DATA_DASH}</div>
       </TableData>
+      <TableData id="interface" activeColumnIDs={activeColumnIDs}>
+        <div data-test-id={`disk-${obj?.interface}`}>{obj?.interface || NO_DATA_DASH}</div>
+      </TableData>
     </>
   );
 };
