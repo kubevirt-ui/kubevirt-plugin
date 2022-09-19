@@ -35,7 +35,7 @@ const TopConsumersCard: React.FC = () => {
   );
   const [duration, setDuration] = useLocalStorage(
     TOP_CONSUMERS_DURATION_KEY,
-    DurationOption.FIVE_MIN.toString(),
+    DurationOption.THIRTY_MIN.toString(),
   );
 
   const onNumItemsSelect = (value) => setNumItemsToShow(value);
