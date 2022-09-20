@@ -1,14 +1,17 @@
+import { V1beta1CDIConfig } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { mapVolumeTypeToK8sModel } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
 import {
   getVolumeResourceName,
   getVolumeType,
 } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/helpers';
-import { modelToGroupVersionKind } from '@kubevirt-utils/models';
+import { CDIConfigModelGroupVersionKind, modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { buildOwnerReference, compareOwnerReferences } from '@kubevirt-utils/resources/shared';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
+
+import { convertDataVolumeToPVC } from './utils/utils';
 
 type UseVolumeOwnedResource = (
   vm: V1VirtualMachine,
@@ -21,7 +24,14 @@ type UseVolumeOwnedResource = (
 };
 
 const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
-  const volumeType = getVolumeType(volume);
+  const [cdiConfig, isCdiConfigLoaded] = useK8sWatchResource<V1beta1CDIConfig>({
+    groupVersionKind: CDIConfigModelGroupVersionKind,
+    namespaced: false,
+    isList: false,
+  });
+
+  const updatedVolume = convertDataVolumeToPVC(volume, cdiConfig);
+  const volumeType = getVolumeType(updatedVolume);
   const volumeResourceModel = mapVolumeTypeToK8sModel[volumeType];
   const volumeResourceName = getVolumeResourceName(volume);
   const watchVolumeResource = {
@@ -46,7 +56,7 @@ const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
   });
   return {
     volumeResource: volumeResourceReference ? resource : null,
-    loaded,
+    loaded: loaded && isCdiConfigLoaded,
     volumeResourceModel,
     volumeResourceName,
   };
