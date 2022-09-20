@@ -43,16 +43,18 @@ export const getLabel = (entity: K8sResourceCommon, label: string, defaultValue?
  * @param {K8sResourceCommon} resource - resource to get the URL from
  * @returns the URL for the resource
  */
-export const getResourceUrl = (model: K8sModel, resource: K8sResourceCommon): string => {
-  if (!model || !resource) return null;
-
-  const ref = `${model.apiGroup || 'core'}~${model.apiVersion}~${model.kind}`;
+export const getResourceUrl = (model: K8sModel, resource?: K8sResourceCommon): string => {
+  if (!model) return null;
+  const { crd, namespaced, plural } = model;
 
   const namespace = resource?.metadata?.namespace
     ? `ns/${resource.metadata.namespace}`
     : 'all-namespaces';
 
-  return `/k8s/${namespace}/${ref}/${resource?.metadata?.name}`;
+  const ref = crd ? `${model.apiGroup || 'core'}~${model.apiVersion}~${model.kind}` : plural || '';
+  const name = resource?.metadata?.name || '';
+
+  return `/k8s/${namespaced ? namespace : 'cluster'}/${ref}/${name}`;
 };
 
 /**

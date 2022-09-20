@@ -16,6 +16,9 @@ test('getResourceUrl', () => {
   const url = getResourceUrl(VirtualMachineModel, resource);
   expect(url).toBe('/k8s/ns/kube/kubevirt.io~v1~VirtualMachine/vm');
 
-  const nullUrl = getResourceUrl(VirtualMachineModel, null);
+  const generalResourceURL = getResourceUrl(VirtualMachineModel, null);
+  expect(generalResourceURL).toBe('/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine/');
+
+  const nullUrl = getResourceUrl(null, resource);
   expect(nullUrl).toBe(null);
 });
