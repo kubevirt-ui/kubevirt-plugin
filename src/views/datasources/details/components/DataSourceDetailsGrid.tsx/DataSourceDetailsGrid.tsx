@@ -2,6 +2,7 @@ import React from 'react';
 import { getDataSourceCronJob } from 'src/views/datasources/utils';
 
 import WizardMetadataLabels from '@catalog/wizard/tabs/metadata/components/WizardMetadataLabels';
+import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
@@ -25,6 +26,8 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const dataImportCron = getDataSourceCronJob(dataSource);
+  const { name: pvcSourceName, namespace: pvcSourceNamespace } =
+    dataSource?.spec?.source?.pvc || {};
 
   return (
     <Grid hasGutter>
@@ -61,7 +64,18 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
               namespace={dataSource?.metadata?.namespace}
             />
           )}
-
+          {pvcSourceName && pvcSourceNamespace && (
+            <DescriptionItem
+              descriptionHeader={t('Source')}
+              descriptionData={
+                <ResourceLink
+                  kind={PersistentVolumeClaimModel.kind}
+                  name={pvcSourceName}
+                  namespace={pvcSourceNamespace}
+                />
+              }
+            />
+          )}
           <DescriptionItem
             descriptionData={<WizardMetadataLabels labels={dataSource?.metadata?.labels} />}
             descriptionHeader={t('Labels')}
