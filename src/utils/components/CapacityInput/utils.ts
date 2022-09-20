@@ -4,4 +4,4 @@ export enum CAPACITY_UNITS {
   TiB = 'TiB',
 }
 
-export const removeByteSuffix = (quantity: string): string => quantity.replace(/[Bb]/, '');
+export const removeByteSuffix = (quantity: string): string => quantity?.replace(/[Bb]/, '');
