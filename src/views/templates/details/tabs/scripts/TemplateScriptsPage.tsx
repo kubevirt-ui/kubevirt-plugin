@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -6,6 +6,8 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
@@ -22,8 +24,6 @@ import {
   Divider,
   Flex,
   FlexItem,
-  Grid,
-  GridItem,
   PageSection,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
@@ -33,6 +33,8 @@ import { isCommonVMTemplate } from '../../../utils/utils';
 import SSHKey from './components/SSHKey/SSHKey';
 import SysPrepItem from './components/SysPrepItem/SysPrepItem';
 
+import './template-scripts-tab.scss';
+
 type TemplateScriptsPageProps = RouteComponentProps<{
   ns: string;
   name: string;
@@ -40,73 +42,77 @@ type TemplateScriptsPageProps = RouteComponentProps<{
   obj: V1Template;
 };
 
-const TemplateScriptsPage: React.FC<TemplateScriptsPageProps> = ({ obj: template }) => {
+const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const isEditDisabled = isCommonVMTemplate(template);
   const vm = getTemplateVirtualMachineObject(template);
 
   const { createModal } = useModal();
 
-  const onSubmit = React.useCallback(
-    async (updatedVM: V1VirtualMachine) => {
-      const updatedTemplate = replaceTemplateVM(template, updatedVM);
-      await k8sUpdate({
+  const onSubmitTemplate = useCallback(
+    (updatedTemplate: V1Template) =>
+      k8sUpdate({
         model: TemplateModel,
         data: updatedTemplate,
-        ns: template?.metadata?.namespace,
-        name: template?.metadata?.name,
-      });
+        ns: updatedTemplate?.metadata?.namespace,
+        name: updatedTemplate?.metadata?.name,
+      }),
+    [],
+  );
+
+  const onUpdate = useCallback(
+    async (updatedVM: V1VirtualMachine) => {
+      await onSubmitTemplate(replaceTemplateVM(template, updatedVM));
     },
-    [template],
+    [onSubmitTemplate, template],
   );
 
   return (
     <PageSection>
-      <Grid hasGutter>
-        <GridItem span={5}>
-          <DescriptionList>
-            <DescriptionListGroup>
-              <DescriptionListTerm>
-                <DescriptionListTermHelpText>
-                  <Flex className="vm-description-item__title">
-                    <FlexItem>{t('Cloud-init')}</FlexItem>
-                    {!isEditDisabled && (
-                      <FlexItem>
-                        <Button
-                          type="button"
-                          isInline
-                          onClick={() =>
-                            createModal(({ isOpen, onClose }) => (
-                              <CloudinitModal
-                                vm={vm}
-                                isOpen={isOpen}
-                                onClose={onClose}
-                                onSubmit={onSubmit}
-                              />
-                            ))
-                          }
-                          variant="link"
-                        >
-                          {t('Edit')}
-                          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-                        </Button>
-                      </FlexItem>
-                    )}
-                  </Flex>
-                </DescriptionListTermHelpText>
-              </DescriptionListTerm>
-              <DescriptionListDescription>
-                <CloudInitDescription vm={vm} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
+      <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
+        <SidebarEditorSwitch />
+        <DescriptionList className="template-scripts-tab__description-list margin-top">
+          <DescriptionListGroup>
+            <DescriptionListTerm>
+              <DescriptionListTermHelpText>
+                <Flex className="vm-description-item__title">
+                  <FlexItem>{t('Cloud-init')}</FlexItem>
+                  {!isEditDisabled && (
+                    <FlexItem>
+                      <Button
+                        type="button"
+                        isInline
+                        onClick={() =>
+                          createModal(({ isOpen, onClose }) => (
+                            <CloudinitModal
+                              vm={vm}
+                              isOpen={isOpen}
+                              onClose={onClose}
+                              onSubmit={onUpdate}
+                            />
+                          ))
+                        }
+                        variant="link"
+                      >
+                        {t('Edit')}
+                        <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+                      </Button>
+                    </FlexItem>
+                  )}
+                </Flex>
+              </DescriptionListTermHelpText>
+            </DescriptionListTerm>
+            <DescriptionListDescription>
+              <CloudInitDescription vm={vm} />
+            </DescriptionListDescription>
+          </DescriptionListGroup>
 
-            <Divider />
-            <SSHKey template={template} />
-            <Divider />
-            <SysPrepItem template={template} />
-          </DescriptionList>
-        </GridItem>
-      </Grid>
+          <Divider />
+          <SSHKey template={template} />
+          <Divider />
+          <SysPrepItem template={template} />
+        </DescriptionList>
+      </SidebarEditor>
     </PageSection>
   );
 };

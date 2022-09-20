@@ -48,7 +48,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
     return yaml;
   }, [resource]);
 
-  const { showEditor } = useContext(SidebarEditorContext);
+  const { showEditor, isEditable } = useContext(SidebarEditorContext);
   const editedResource = safeLoad<Resource>(editableYAML);
 
   const changeResource = (newValue: string) => {
@@ -91,6 +91,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
                   minHeight="300px"
                   onChange={changeResource}
                   onSave={() => onUpdate(editedResource)}
+                  options={{ readOnly: !isEditable }}
                 />
               </Suspense>
             </StackItem>
@@ -110,7 +111,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
                 )}
               </StackItem>
             )}
-            {onResourceUpdate && (
+            {onResourceUpdate && isEditable && (
               <StackItem>
                 <Flex>
                   <FlexItem>
