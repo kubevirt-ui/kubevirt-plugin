@@ -1,10 +1,12 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
@@ -18,6 +20,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { Flex, FlexItem } from '@patternfly/react-core';
 
 import { isCommonVMTemplate } from '../../../utils/utils';
 
@@ -27,6 +30,8 @@ import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
 import useTemplateDisksTableData from './hooks/useTemplateDisksTableData';
 
+import './template-disk-tab.scss';
+
 type TemplateDisksPageProps = RouteComponentProps<{
   ns: string;
   name: string;
@@ -34,7 +39,7 @@ type TemplateDisksPageProps = RouteComponentProps<{
   obj: V1Template;
 };
 
-const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) => {
+const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
@@ -44,53 +49,71 @@ const TemplateDisksPage: React.FC<TemplateDisksPageProps> = ({ obj: template }) 
   const vm = getTemplateVirtualMachineObject(template);
   const isEditDisabled = isCommonVMTemplate(template);
 
-  const onUpdate = async (updatedVM: V1VirtualMachine) => {
-    await k8sUpdate({
-      model: TemplateModel,
-      data: replaceTemplateVM(template, updatedVM),
-      ns: template?.metadata?.namespace,
-      name: template?.metadata?.name,
-    });
-  };
+  const onSubmitTemplate = useCallback(
+    (updatedTemplate: V1Template) =>
+      k8sUpdate({
+        model: TemplateModel,
+        data: updatedTemplate,
+        ns: updatedTemplate?.metadata?.namespace,
+        name: updatedTemplate?.metadata?.name,
+      }),
+    [],
+  );
+
+  const onUpdate = useCallback(
+    async (updatedVM: V1VirtualMachine) => {
+      await onSubmitTemplate(replaceTemplateVM(template, updatedVM));
+    },
+    [onSubmitTemplate, template],
+  );
 
   return (
-    <div>
+    <div className="template-disk-tab">
       <ListPageBody>
-        <ListPageCreateButton
-          className="list-page-create-button-margin"
-          isDisabled={isEditDisabled}
-          onClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <DiskModal
-                vm={vm}
-                isOpen={isOpen}
-                onClose={onClose}
-                onSubmit={onUpdate}
-                headerText={t('Add disk')}
-                createOwnerReference={false}
-              />
-            ))
-          }
-        >
-          {t('Add disk')}
-        </ListPageCreateButton>
-        <DiskListTitle />
-        <ListPageFilter
-          data={data}
-          loaded={disksLoaded}
-          rowFilters={filters}
-          onFilterChange={onFilterChange}
-          hideLabelFilter
-        />
-        <VirtualizedTable
-          data={filteredData}
-          unfilteredData={data}
-          loaded={disksLoaded}
-          loadError={undefined}
-          columns={columns}
-          Row={DiskRow}
-          rowData={{ vm, onUpdate, actionsDisabled: isEditDisabled }}
-        />
+        <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
+          <Flex>
+            <FlexItem>
+              <ListPageCreateButton
+                className="list-page-create-button-margin"
+                isDisabled={isEditDisabled}
+                onClick={() =>
+                  createModal(({ isOpen, onClose }) => (
+                    <DiskModal
+                      vm={vm}
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      onSubmit={onUpdate}
+                      headerText={t('Add disk')}
+                      createOwnerReference={false}
+                    />
+                  ))
+                }
+              >
+                {t('Add disk')}
+              </ListPageCreateButton>
+            </FlexItem>
+            <FlexItem>
+              <SidebarEditorSwitch />
+            </FlexItem>
+          </Flex>
+          <DiskListTitle />
+          <ListPageFilter
+            data={data}
+            loaded={disksLoaded}
+            rowFilters={filters}
+            onFilterChange={onFilterChange}
+            hideLabelFilter
+          />
+          <VirtualizedTable
+            data={filteredData}
+            unfilteredData={data}
+            loaded={disksLoaded}
+            loadError={undefined}
+            columns={columns}
+            Row={DiskRow}
+            rowData={{ vm, onUpdate, actionsDisabled: isEditDisabled }}
+          />
+        </SidebarEditor>
       </ListPageBody>
     </div>
   );

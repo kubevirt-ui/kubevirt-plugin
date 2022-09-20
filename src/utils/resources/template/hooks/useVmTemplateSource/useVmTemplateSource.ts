@@ -1,10 +1,11 @@
-import * as React from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSourceRef,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 
 import { BOOT_SOURCE } from '../../utils/constants';
 
@@ -16,12 +17,13 @@ import { getDataSource, getPVC, getTemplateBootSourceType, TemplateBootSource } 
  * @returns the boot source and its status
  */
 export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceValue => {
-  const [templateBootSource, setTemplateBootSource] = React.useState<TemplateBootSource>(undefined);
-  const [isBootSourceAvailable, setIsBootSourceAvailable] = React.useState<boolean>(false);
-  const [loaded, setLoaded] = React.useState<boolean>(true);
-  const [error, setError] = React.useState<any>();
+  const [templateBootSource, setTemplateBootSource] = useState<TemplateBootSource>(undefined);
+  const [isBootSourceAvailable, setIsBootSourceAvailable] = useState<boolean>(false);
+  const [loaded, setLoaded] = useState<boolean>(true);
+  const [error, setError] = useState<any>();
+  const prevBootSourceRef = useRef<TemplateBootSource>();
 
-  const bootSource = React.useMemo(() => getTemplateBootSourceType(template), [template]);
+  const bootSource = useMemo(() => getTemplateBootSourceType(template), [template]);
 
   const getPVCSource = ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
     setLoaded(false);
@@ -81,7 +83,9 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
       .finally(() => setLoaded(true));
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (isEqualObject(prevBootSourceRef?.current, bootSource)) return;
+
     setError(undefined);
     setTemplateBootSource(undefined);
     setIsBootSourceAvailable(false);
@@ -133,6 +137,8 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
         }
         break;
     }
+
+    prevBootSourceRef.current = bootSource;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bootSource]);
 
