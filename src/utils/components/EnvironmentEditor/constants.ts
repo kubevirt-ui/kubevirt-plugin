@@ -8,6 +8,7 @@ export type EnvironmentVariable = {
   name: string;
   serial: string;
   kind: EnvironmentKind;
+  diskName: string;
 };
 
 export const MapKindToAbbr = {

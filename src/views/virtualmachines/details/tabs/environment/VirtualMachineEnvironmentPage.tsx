@@ -6,7 +6,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye } from '@patternfly/react-core';
+import { Bullseye, PageSection } from '@patternfly/react-core';
 
 type VirtualMachineEnvironmentPageProps = RouteComponentProps<{
   ns: string;
@@ -34,9 +34,9 @@ const VirtualMachineEnvironmentPage: React.FC<VirtualMachineEnvironmentPageProps
     );
 
   return (
-    <div className="co-m-pane__body">
+    <PageSection>
       <EnvironmentForm vm={vm} updateVM={updateVM} />
-    </div>
+    </PageSection>
   );
 };
 

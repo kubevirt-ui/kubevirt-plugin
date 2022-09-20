@@ -1,25 +1,27 @@
-import * as React from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Updater } from 'use-immer';
 
+import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
 import { EnvironmentKind, EnvironmentVariable } from '../constants';
 import {
-  addEnvironmentsToVM,
   areEnvironmentsChanged,
   getRandomSerial,
   getVMEnvironmentsVariables,
+  updateVolumeForKind,
 } from '../utils';
 
 type UseEnvironmentsType = {
-  onSave: () => void;
-  onReload: () => void;
-  onEnvironmentRemove: (index: number) => void;
+  onEnvironmentRemove: (diskName: string) => void;
   onEnvironmentChange: (
-    index: number,
     value: string,
     serial: string,
     kind: EnvironmentKind,
+    diskName: string,
   ) => void;
   onEnvironmentAdd: () => void;
   edited: boolean;
@@ -30,72 +32,97 @@ type UseEnvironmentsType = {
 
 const useEnvironments = (
   vm: V1VirtualMachine,
-  updateVM: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>,
+  originalVM: V1VirtualMachine,
+  updateVM: Updater<V1VirtualMachine>,
   onEditChange?: (edited: boolean) => void,
 ): UseEnvironmentsType => {
   const { t } = useKubevirtTranslation();
-  const initialEnvironments = React.useMemo(() => getVMEnvironmentsVariables(vm), [vm]);
-  const [environments, setEnvironments] = React.useState(initialEnvironments);
-  const [environmentsEdited, setEnvironmentsEdited] = React.useState(false);
-  const [error, setError] = React.useState<Error>();
+  const [error, setError] = useState<Error>();
+  const [edited, setEdited] = useState(false);
+  const originalEnvironments = useMemo(() => getVMEnvironmentsVariables(originalVM), [originalVM]);
+  const environments = useMemo(() => getVMEnvironmentsVariables(vm), [vm]);
 
-  const onEnvironmentAdd = React.useCallback(() => {
-    setEnvironments((envs) =>
-      envs.concat([{ name: undefined, serial: getRandomSerial().toUpperCase(), kind: undefined }]),
-    );
-  }, []);
+  useEffect(() => {
+    const envsEdited = areEnvironmentsChanged(environments, originalEnvironments);
 
-  const onEnvironmentChange = React.useCallback(
-    (environmentIndex: number, name: string, serial: string, kind: EnvironmentKind) => {
-      if (environments.find((env, index) => env.name === name && index !== environmentIndex)) {
-        return setError(new Error(t('Resource already selected')));
+    if (envsEdited !== edited) {
+      setEdited(envsEdited);
+      if (onEditChange) onEditChange(envsEdited);
+    }
+  }, [edited, environments, onEditChange, originalEnvironments]);
+
+  const onEnvironmentAdd = useCallback(() => {
+    updateVM((draftVM: V1VirtualMachine) => {
+      if (
+        !draftVM.spec.template?.spec?.domain?.devices?.disks ||
+        !draftVM.spec.template?.spec?.volumes
+      ) {
+        ensurePath(draftVM, 'spec.template.spec.domain.devices');
+        draftVM.spec.template.spec.domain.devices.disks = [];
+        draftVM.spec.template.spec.volumes = [];
       }
 
-      setEnvironments((envs) => {
-        const newEnvironments = [...envs];
-        newEnvironments.splice(environmentIndex, 1, { name, serial: serial || '', kind });
-        return newEnvironments;
+      const diskName = `environment-disk-${getRandomChars()}`;
+      getDisks(draftVM).push({
+        name: diskName,
+        serial: getRandomSerial().toUpperCase(),
+        disk: { bus: 'sata' },
       });
+      getVolumes(draftVM).push({
+        name: diskName,
+      });
+    });
+  }, [updateVM]);
 
-      setError(undefined);
+  const onEnvironmentChange = (
+    diskName: string,
+    name: string,
+    serial: string,
+    kind: EnvironmentKind,
+  ) => {
+    if (environments.find((env) => env.name === name)) {
+      return setError(new Error(t('Resource already selected')));
+    }
+
+    if (error) {
+      setError(null);
+    }
+
+    updateVM((draftVM: V1VirtualMachine) => {
+      const volumes = getVolumes(draftVM);
+      const envVolumeIndex = volumes?.findIndex((volume) => volume.name === diskName);
+      const envDisk = getDisks(draftVM)?.find((disk) => disk.name === diskName);
+
+      if (!envDisk || envVolumeIndex < 0) setError(undefined);
+
+      envDisk.serial = serial;
+
+      const newEnvVolume = updateVolumeForKind(volumes[envVolumeIndex], name, kind);
+
+      volumes.splice(envVolumeIndex, 1, newEnvVolume);
+    });
+  };
+
+  const onEnvironmentRemove = useCallback(
+    (diskName: string) => {
+      updateVM((draftVM) => {
+        draftVM.spec.template.spec.volumes = (getVolumes(draftVM) || []).filter(
+          (volume) => volume.name !== diskName,
+        );
+
+        draftVM.spec.template.spec.domain.devices.disks = (getDisks(draftVM) || []).filter(
+          (disk) => disk.name !== diskName,
+        );
+      });
     },
-    [environments, t],
+    [updateVM],
   );
 
-  const onEnvironmentRemove = React.useCallback((environmentIndex: number) => {
-    setEnvironments((envs) => envs?.filter((_, index) => index !== environmentIndex));
-    setError(undefined);
-  }, []);
-
-  const onReload = React.useCallback(() => {
-    setEnvironments(initialEnvironments);
-    setError(undefined);
-  }, [initialEnvironments]);
-
-  const onSave = React.useCallback(async () => {
-    try {
-      await updateVM(addEnvironmentsToVM(vm, environments));
-      setError(undefined);
-    } catch (apiError) {
-      setError(apiError);
-      throw apiError;
-    }
-  }, [environments, updateVM, vm]);
-
-  React.useEffect(() => {
-    const edited = areEnvironmentsChanged(environments, initialEnvironments);
-
-    if (onEditChange) onEditChange(edited);
-    setEnvironmentsEdited(edited);
-  }, [environments, initialEnvironments, onEditChange]);
-
   return {
-    onSave,
-    onReload,
     onEnvironmentRemove,
     onEnvironmentChange,
     onEnvironmentAdd,
-    edited: environmentsEdited,
+    edited,
     environments,
     error,
     setError,

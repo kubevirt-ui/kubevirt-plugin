@@ -30,10 +30,11 @@ type EnvironmentEditorProps = {
   serviceAccounts: IoK8sApiCoreV1ServiceAccount[];
   environmentName?: string;
   serial?: string;
-  kind: EnvironmentKind;
+  kind?: EnvironmentKind;
+  diskName: string;
   id: number;
-  onChange: (id: number, name: string, serial: string, kind: EnvironmentKind) => void;
-  onRemove?: (id: number) => void;
+  onChange: (diskName: string, name: string, serial: string, kind: EnvironmentKind) => void;
+  onRemove?: (diskName: string) => void;
   environmentNamesSelected: string[];
 };
 
@@ -44,6 +45,7 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
   environmentName,
   serial,
   kind,
+  diskName,
   onChange,
   onRemove,
   id,
@@ -51,18 +53,6 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setOpen] = React.useState(false);
-  const _onRemove = () => {
-    onRemove(id);
-  };
-
-  const onSelect = (event, selection: EnvironmentOption) => {
-    onChange(id, selection.getName(), serial, selection.getKind());
-    setOpen(false);
-  };
-
-  const onChangeSerial = (value) => {
-    onChange(id, environmentName, value, kind);
-  };
 
   const onFilter = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, value: string): React.ReactElement[] => {
@@ -112,7 +102,10 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
           aria-labelledby="environment-name-header"
           isOpen={isOpen}
           onToggle={(isExpanded) => setOpen(isExpanded)}
-          onSelect={onSelect}
+          onSelect={(event, selection: EnvironmentOption) => {
+            onChange(diskName, selection.getName(), serial, selection.getKind());
+            setOpen(false);
+          }}
           variant={SelectVariant.single}
           selections={new EnvironmentOption(environmentName, kind)}
           placeholderText={t('Select a resource')}
@@ -167,7 +160,7 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
           id={`${id}-serial`}
           type="text"
           value={serial}
-          onChange={onChangeSerial}
+          onChange={(value) => onChange(diskName, environmentName, value, kind)}
           aria-labelledby="environment-serial-header"
         />
       </div>
@@ -177,7 +170,7 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
             type="button"
             data-test-id="pairs-list__delete-from-btn"
             className="pairs-list__span-btns"
-            onClick={_onRemove}
+            onClick={() => onRemove(diskName)}
             variant="plain"
           >
             <MinusCircleIcon className="pairs-list__side-btn pairs-list__delete-icon" />

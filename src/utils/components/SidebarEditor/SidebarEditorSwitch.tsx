@@ -7,7 +7,9 @@ import { SidebarEditorContext } from './SidebarEditorContext';
 
 const SidebarEditorSwitch: FC = memo(() => {
   const { t } = useKubevirtTranslation();
-  const { showEditor, setEditorVisible } = useContext(SidebarEditorContext);
+  const { showEditor, setEditorVisible, showSwitch } = useContext(SidebarEditorContext);
+
+  if (!showSwitch) return null;
 
   return (
     <Switch
