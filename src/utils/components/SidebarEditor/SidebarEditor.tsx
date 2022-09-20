@@ -82,7 +82,10 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
         {children instanceof Function ? children(editedResource ?? resource) : children}
       </SidebarContent>
       {showEditor && (
-        <SidebarPanel width={{ default: 'width_33', lg: 'width_50', xl: 'width_50' }}>
+        <SidebarPanel
+          width={{ default: 'width_33', lg: 'width_50', xl: 'width_50' }}
+          className="sidebar-editor__panel"
+        >
           <Stack hasGutter>
             <StackItem isFilled>
               <Suspense fallback={<Loading />}>
@@ -118,12 +121,17 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
                       variant={ButtonVariant.primary}
                       onClick={() => onUpdate(editedResource)}
                       isLoading={loading}
+                      className="save-button"
                     >
                       Save
                     </Button>
                   </FlexItem>
                   <FlexItem>
-                    <Button variant={ButtonVariant.secondary} onClick={onReload}>
+                    <Button
+                      variant={ButtonVariant.secondary}
+                      onClick={onReload}
+                      className="reload-button"
+                    >
                       Reload
                     </Button>
                   </FlexItem>
