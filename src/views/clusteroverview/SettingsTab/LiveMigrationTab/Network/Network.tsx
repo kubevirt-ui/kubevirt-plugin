@@ -32,7 +32,6 @@ const Network = ({ hyperConverge }) => {
     groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
     isList: true,
   });
-
   useEffect(() => {
     if (hyperConverge) {
       const network = getLiveMigrationNetwork(hyperConverge);
@@ -65,12 +64,14 @@ const Network = ({ hyperConverge }) => {
           width={360}
         >
           <SelectOption key="primary" value={t('Primary live migration network')} />
-          {!isEmpty(nads) && (
+          {!isEmpty(nads) ? (
             <SelectGroup label={t('Secondary NAD networks')} key="nad">
               {nads?.map((nad) => (
                 <SelectOption key={nad?.metadata?.name} value={nad?.metadata?.name} />
               ))}
             </SelectGroup>
+          ) : (
+            <></>
           )}
         </Select>
       ) : (
