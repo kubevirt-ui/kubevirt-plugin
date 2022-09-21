@@ -43,7 +43,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
   const [success, setSuccess] = useState(false);
 
   const resourceYAML = useMemo(() => {
-    const yaml = dump(resource, { skipInvalid: true });
+    const yaml = dump(resource, { skipInvalid: true, forceQuotes: true });
     setEditableYAML(yaml);
     return yaml;
   }, [resource]);
