@@ -1,9 +1,26 @@
+
+  @import '../../../utils/styles/secondary-editor.scss';
+
 .vm-wizard-body {
   .co-m-page__body {
     height: 100%;
   }
-  @import '../../../utils/styles/secondary-editor.scss';
+
+  @include secondary-resource-yaml-editor;
+
+  .sidebar-editor__panel button {
+    &.save-button {
+      @include secondary-editor-save-button;
+    }
+  
+    &.reload-button {
+      @include secondary-editor-reload-button;
+    }
+  }
 }
+
+
+
 
 .vm-wizard-footer {
   padding: var(--pf-global--spacer--lg);
