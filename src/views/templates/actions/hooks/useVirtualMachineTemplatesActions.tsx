@@ -79,8 +79,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     await k8sDelete({
       model: TemplateModel,
       resource: template,
-    });
-    history.push(`/k8s/${lastNamespacePath}/templates`);
+    }).then(() => history.push(`/k8s/${lastNamespacePath}/templates`));
   };
 
   const actions = [

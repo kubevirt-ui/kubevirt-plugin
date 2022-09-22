@@ -9,7 +9,7 @@ const DeleteResourceMessage: React.FC<{ obj: K8sResourceCommon }> = ({ obj }) =>
   return (
     <Trans t={t}>
       Are you sure you want to delete <strong>{obj.metadata.name} </strong>in namespace{' '}
-      <strong>{obj.metadata.namespace}?</strong>
+      <strong>{obj.metadata.namespace}</strong>?
     </Trans>
   );
 };
