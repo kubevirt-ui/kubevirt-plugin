@@ -14,8 +14,6 @@ import {
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
-import './WizardDescriptionItem.scss';
-
 type WizardDescriptionItemProps = {
   /** title */
   title: string;
@@ -82,7 +80,10 @@ export const WizardDescriptionItem: React.FC<WizardDescriptionItemProps> = React
     return (
       <DescriptionListGroup className={className}>
         <DescriptionListTermHelpText>
-          <Flex className="wizard-description-item__title">
+          <Flex
+            className="wizard-description-item__title"
+            justifyContent={{ default: 'justifyContentFlexStart' }}
+          >
             <FlexItem>{getItemHeader()}</FlexItem>
             {isEdit && showEditOnTitle && (
               <FlexItem>

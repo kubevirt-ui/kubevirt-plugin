@@ -5,7 +5,7 @@ import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-u
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Label, Split, SplitItem } from '@patternfly/react-core';
+import { Flex, FlexItem, Label } from '@patternfly/react-core';
 
 import DiskRowActions from './DiskRowActions';
 
@@ -17,23 +17,23 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ obj, activeColumnIDs }
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs}>
-        <Split hasGutter>
-          <SplitItem>{obj?.name}</SplitItem>
+        <Flex>
+          <FlexItem>{obj?.name}</FlexItem>
           {obj?.isBootDisk && (
-            <SplitItem>
+            <FlexItem>
               <Label variant="filled" color="blue">
                 {t('bootable')}
               </Label>
-            </SplitItem>
+            </FlexItem>
           )}
           {obj?.isEnvDisk && (
-            <SplitItem>
+            <FlexItem>
               <Label variant="filled" color="blue">
                 {t('environment disk')}
               </Label>
-            </SplitItem>
+            </FlexItem>
           )}
-        </Split>
+        </Flex>
       </TableData>
       <TableData id="source" activeColumnIDs={activeColumnIDs}>
         {isPVCSource ? (

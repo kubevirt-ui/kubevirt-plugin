@@ -5,8 +5,10 @@ import { WizardTab } from '@catalog/wizard/tabs';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DescriptionList, Divider, Grid, GridItem } from '@patternfly/react-core';
+import { DescriptionList, Divider, PageSection } from '@patternfly/react-core';
 
 import SSHKey from './components/SSHKey';
 import Sysprep from './components/Sysprep';
@@ -18,30 +20,29 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM }) => {
   const { createModal } = useModal();
 
   return (
-    <div className="co-m-pane__body">
-      <Grid hasGutter>
-        <GridItem span={5} rowSpan={4}>
-          <DescriptionList>
-            <WizardDescriptionItem
-              testId="wizard-cloudinit"
-              title={t('Cloud-init')}
-              description={<CloudInitDescription vm={vm} />}
-              isEdit
-              showEditOnTitle
-              onEditClick={() =>
-                createModal((modalProps) => (
-                  <CloudinitModal {...modalProps} vm={vm} onSubmit={updateVM} />
-                ))
-              }
-            />
-            <Divider />
-            <SSHKey />
-            <Divider />
-            <Sysprep />
-          </DescriptionList>
-        </GridItem>
-      </Grid>
-    </div>
+    <PageSection className="wizard-scripts-tab">
+      <SidebarEditor resource={vm} onResourceUpdate={(newVM) => updateVM(newVM)}>
+        <SidebarEditorSwitch />
+        <DescriptionList className="wizard-scripts-tab__description-list">
+          <WizardDescriptionItem
+            testId="wizard-cloudinit"
+            title={t('Cloud-init')}
+            description={<CloudInitDescription vm={vm} />}
+            isEdit
+            showEditOnTitle
+            onEditClick={() =>
+              createModal((modalProps) => (
+                <CloudinitModal {...modalProps} vm={vm} onSubmit={updateVM} />
+              ))
+            }
+          />
+          <Divider />
+          <SSHKey />
+          <Divider />
+          <Sysprep />
+        </DescriptionList>
+      </SidebarEditor>
+    </PageSection>
   );
 };
 
