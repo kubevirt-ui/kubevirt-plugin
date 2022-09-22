@@ -1,11 +1,22 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { useImmer } from 'use-immer';
 
 import { TemplateModel, TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-import { ActionGroup, Alert, AlertVariant, Button, Divider } from '@patternfly/react-core';
+import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  ActionGroup,
+  Alert,
+  AlertVariant,
+  Button,
+  Divider,
+  Form,
+  PageSection,
+} from '@patternfly/react-core';
 
 import { isCommonVMTemplate } from '../../../utils/utils';
 
@@ -21,23 +32,27 @@ type TemplateParametersPageProps = RouteComponentProps<{
 };
 
 const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: template }) => {
+  const [editableTemplate, setEditableTemplate] = useImmer(template);
+
+  useEffect(() => setEditableTemplate(template), [setEditableTemplate, template]);
+
   const { t } = useKubevirtTranslation();
   const isEditDisabled = isCommonVMTemplate(template);
   const history = useHistory();
-  const [parameters, updateParameters] = useImmer<TemplateParameter[]>(template.parameters);
   const [error, setError] = React.useState();
   const [success, setSuccess] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
-  const isSaveDisabled =
-    JSON.stringify(template.parameters) === JSON.stringify(parameters) || isEditDisabled;
-
   const onParameterChange = (parameter: TemplateParameter) => {
-    updateParameters((draftParameters) => {
+    setEditableTemplate(({ parameters: draftParameters }) => {
       const parameterIndex = draftParameters.findIndex((p) => p.name === parameter.name);
       draftParameters[parameterIndex] = parameter;
     });
   };
+
+  const parameters = editableTemplate.parameters;
+
+  const isSaveDisabled = isEqualObject(template.parameters, parameters);
 
   const goBack = React.useCallback(() => {
     history.goBack();
@@ -46,16 +61,9 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
   const onSave = async () => {
     setLoading(true);
     try {
-      await k8sPatch({
+      await k8sUpdate({
         model: TemplateModel,
-        resource: template,
-        data: [
-          {
-            op: 'replace',
-            path: '/parameters',
-            value: parameters,
-          },
-        ],
+        data: editableTemplate,
       });
       setSuccess(true);
     } catch (apiError) {
@@ -66,9 +74,13 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
   };
 
   return (
-    <div className="co-m-pane__body template-parameters-page">
-      <div className="row">
-        <div className="col-md-7">
+    <PageSection className="template-parameters-page">
+      <SidebarEditor
+        resource={editableTemplate}
+        onChange={(newTemplate) => setEditableTemplate(newTemplate)}
+      >
+        <Form className="template-parameters-page__form">
+          <SidebarEditorSwitch />
           {parameters.map((parameter, index) => (
             <>
               <ParameterEditor
@@ -80,34 +92,34 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
               {index !== parameters.length - 1 && <Divider />}
             </>
           ))}
-        </div>
-      </div>
-      {error && (
-        <Alert variant={AlertVariant.danger} isInline title={t('Error')}>
-          {error}
-        </Alert>
-      )}
+          {error && (
+            <Alert variant={AlertVariant.danger} isInline title={t('Error')}>
+              {error}
+            </Alert>
+          )}
 
-      {success && (
-        <Alert variant={AlertVariant.info} isInline title={t('Success')}>
-          {t('Parameters successfully edited')}
-        </Alert>
-      )}
-      <ActionGroup className="pf-c-form">
-        <Button
-          isDisabled={isSaveDisabled}
-          type="submit"
-          variant="primary"
-          onClick={onSave}
-          isLoading={loading}
-        >
-          {t('Save')}
-        </Button>
-        <Button type="button" variant="secondary" onClick={goBack}>
-          {t('Cancel')}
-        </Button>
-      </ActionGroup>
-    </div>
+          {success && (
+            <Alert variant={AlertVariant.info} isInline title={t('Success')}>
+              {t('Parameters successfully edited')}
+            </Alert>
+          )}
+          <ActionGroup className="pf-c-form">
+            <Button
+              isDisabled={isSaveDisabled}
+              type="submit"
+              variant="primary"
+              onClick={onSave}
+              isLoading={loading}
+            >
+              {t('Save')}
+            </Button>
+            <Button type="button" variant="secondary" onClick={goBack}>
+              {t('Cancel')}
+            </Button>
+          </ActionGroup>
+        </Form>
+      </SidebarEditor>
+    </PageSection>
   );
 };
 

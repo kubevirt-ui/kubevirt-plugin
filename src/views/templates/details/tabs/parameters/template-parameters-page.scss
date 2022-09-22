@@ -1,4 +1,9 @@
 .template-parameters-page {
+
+  &__form {
+    max-width: 700px;
+  }
+  
   &.co-m-pane__body {
     border-top: none;
   }
@@ -20,6 +25,6 @@
   }
 
   .pf-c-divider {
-    margin-bottom: var(--pf-global--spacer--lg);
+    margin-bottom: var(--pf-global--spacer--md);
   }
 }
