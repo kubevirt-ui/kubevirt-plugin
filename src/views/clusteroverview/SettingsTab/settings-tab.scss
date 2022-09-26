@@ -1,4 +1,8 @@
 .settings-tab {
+  &__scope-message {
+    margin-bottom: var(--pf-global--spacer--md);
+  }
+
   &__card {
     height: 100%;
     flex-direction: row;
