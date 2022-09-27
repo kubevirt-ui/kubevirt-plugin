@@ -61,7 +61,7 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
   const cloudInitVolume: V1Volume = React.useMemo(() => {
     const cloudInitNoBlanks = deleteObjBlankValues({
       userData: convertUserDataObjectToYAML(userData, shouldAddHeader),
-      networkData: convertNetworkDataObjectToYAML(networkData),
+      networkData: enableNetworkData ? convertNetworkDataObjectToYAML(networkData) : null,
     });
 
     if (cloudInitVol?.cloudInitConfigDrive) {
@@ -79,7 +79,7 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
     }
 
     return { name: 'cloudinitdisk' };
-  }, [userData, shouldAddHeader, networkData, cloudInitVol]);
+  }, [userData, shouldAddHeader, networkData, cloudInitVol, enableNetworkData]);
 
   const updatedVM = React.useMemo(
     () =>
