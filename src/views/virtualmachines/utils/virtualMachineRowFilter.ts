@@ -27,27 +27,32 @@ type VmiMapper = {
 
 type VmimMapper = { [key: string]: { [key: string]: V1VirtualMachineInstance } };
 
+const FailedStatus = { id: 'Failed', title: 'Failed' };
+
+const statusFilterItems = [
+  ...Object.keys(printableVMStatus).map((status) => ({
+    id: status,
+    title: status,
+  })),
+  FailedStatus,
+];
+
 const useGetStatusFilter = (): RowFilter => ({
   filterGroupName: t('Status'),
   type: 'status',
   isMatch: (obj, filterStatus) => {
     return (
       filterStatus === obj?.status?.printableStatus ||
-      isFailedPrintableStatus(obj?.status?.printableStatus)
+      (filterStatus === FailedStatus.id && isFailedPrintableStatus(obj?.status?.printableStatus))
     );
   },
   filter: (statuses, obj) => {
     const status = obj?.status?.printableStatus;
-    const filterFailedStatus = isFailedPrintableStatus(status);
+    const isFailed = statuses.selected.includes(FailedStatus.id) && isFailedPrintableStatus(status);
 
-    return (
-      statuses.selected?.length === 0 || statuses.selected?.includes(status) || filterFailedStatus
-    );
+    return statuses.selected?.length === 0 || statuses.selected?.includes(status) || isFailed;
   },
-  items: Object.keys(printableVMStatus).map((status) => ({
-    id: status,
-    title: status,
-  })),
+  items: statusFilterItems,
 });
 
 const useGetTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
