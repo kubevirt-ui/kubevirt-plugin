@@ -286,6 +286,23 @@
     }
   },
   {
+    "type": "console.yaml-template",
+    "properties": {
+      "name": "default",
+      "model": {
+        "group": "cdi.kubevirt.io",
+        "kind": "DataSource",
+        "version": "v1beta1"
+      },
+      "template": {
+        "$codeRef": "yamlTemplates.defaultDataSourceYamlTemplate"
+      }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
     "type": "console.navigation/separator",
     "properties": {
       "perspective": "admin",
