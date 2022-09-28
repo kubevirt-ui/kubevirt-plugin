@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
-import { Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+import { Alert, Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import GeneralTab from './GeneralTab/GeneralTab';
 import LiveMigrationTab from './LiveMigrationTab/LiveMigrationTab';
@@ -16,6 +16,12 @@ const SettingsTab: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState<number>(0);
   return (
     <Overview>
+      <Alert
+        variant="info"
+        isInline
+        className="settings-tab__scope-message"
+        title={t('All settings are effective across the entire cluster.')}
+      />
       <Card className="settings-tab__card">
         <Tabs
           activeKey={activeTab}
