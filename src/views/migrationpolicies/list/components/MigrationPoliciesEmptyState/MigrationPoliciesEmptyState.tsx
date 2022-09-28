@@ -38,14 +38,13 @@ const MigrationPoliciesEmptyState: React.FC = () => {
         </Link>
       </EmptyStatePrimary>
       <EmptyStateSecondaryActions>
-        <Button
-          variant={ButtonVariant.link}
-          // onClick={() => history.push(MigrationPolicyDocURL)} waiting to get URL from docs team
-          icon={<ExternalLinkAltIcon />}
-          iconPosition="right"
+        <a
+          href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.11/html/virtualization/live-migration#virt-configuring-live-migration-policies"
+          target="_blank"
+          rel="noreferrer"
         >
-          {t('View documentation')}
-        </Button>
+          {t('View documentation')} <ExternalLinkAltIcon />
+        </a>
       </EmptyStateSecondaryActions>
     </EmptyState>
   );
