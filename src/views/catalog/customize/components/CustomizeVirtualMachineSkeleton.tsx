@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Skeleton, Split, Stack, StackItem } from '@patternfly/react-core';
 
 export const CustomizeVirtualMachineSkeleton = React.memo(() => (
-  <Stack data-test-id="skeleton" hasGutter>
+  <Stack data-test-id="skeleton" hasGutter className="skeleton-section">
     <StackItem />
     <Skeleton width="80%" height="40px" />
     <StackItem />

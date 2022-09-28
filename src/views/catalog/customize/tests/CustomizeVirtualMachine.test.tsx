@@ -20,6 +20,13 @@ jest.mock('@kubevirt-utils/hooks/useCDIUpload/useCDIUpload', () => ({
   }),
 }));
 
+jest.mock('@kubevirt-utils/resources/template/hooks', () => ({
+  useVmTemplateSource: jest.fn().mockImplementation(() => ({
+    isBootSourceAvailable: false,
+    loaded: true,
+  })),
+}));
+
 jest.mock('@kubevirt-utils/hooks/useURLParams', () => ({
   useURLParams: () => ({
     params: {
@@ -84,7 +91,7 @@ describe('Test CustomizeVirtualMachine', () => {
     screen.getByTestId('error-message');
   });
 
-  it('without disk source customization', async () => {
+  it('without disk source customization', () => {
     const virtualMachine = mockVirtualMachineTemplate.objects[0];
     const mockTemplate: V1Template = {
       ...mockVirtualMachineTemplate,
@@ -116,7 +123,7 @@ describe('Test CustomizeVirtualMachine', () => {
     );
   });
 
-  it('with disk source customization', async () => {
+  it('with disk source customization', () => {
     (useK8sWatchResource as jest.Mock).mockReturnValueOnce([
       mockVirtualMachineTemplate,
       true,
