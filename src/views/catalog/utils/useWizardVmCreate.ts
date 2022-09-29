@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import produce from 'immer';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
-import { k8sCreate, k8sDelete, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createMultipleResources } from './utils';
 import { useWizardVMContext } from './WizardVMContext';
@@ -25,29 +24,23 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
   const [models] = useK8sModels();
   const [loaded, setLoaded] = useState<boolean>(true);
   const [error, setError] = useState<any>();
-  const [isVmCreated, setIsVmCreated] = useState<boolean>(false);
 
   const createVM = async ({ startVM, onFullfilled }: CreateVMArguments) => {
     try {
       setLoaded(false);
       setError(undefined);
 
-      const newVM = await k8sCreate<V1VirtualMachine>({
-        model: VirtualMachineModel,
-        data: produce(vm, (vmDraft) => {
-          vmDraft.spec.running = startVM;
-        }),
+      const vmToCrete = produce(vm, (vmDraft) => {
+        vmDraft.spec.running = startVM;
       });
-      setIsVmCreated(true);
 
-      // create additional objects
-      if (tabsData?.additionalObjects?.length > 0) {
-        await createMultipleResources(
-          tabsData?.additionalObjects,
-          models,
-          newVM.metadata.namespace,
-        );
-      }
+      const createdObjects = await createMultipleResources(
+        [vmToCrete, ...(tabsData?.additionalObjects as K8sResourceCommon[] | [])],
+        models,
+        vmToCrete.metadata.namespace,
+      );
+
+      const newVM = createdObjects[0] as V1VirtualMachine;
 
       // add missing ownerReferences to upload data volumes
       if (tabsData?.disks?.dataVolumesToAddOwnerRef?.length > 0) {
@@ -61,14 +54,6 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
       setLoaded(true);
       onFullfilled(newVM);
     } catch (e) {
-      // vm has been created but other promises failed, we need to delete the vm
-      if (isVmCreated) {
-        await k8sDelete({
-          model: VirtualMachineModel,
-          resource: vm,
-        });
-      }
-
       setLoaded(true);
       setError(e);
     }
