@@ -47,15 +47,19 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
     yaml: t('With YAML'),
   };
 
-  const onCreate = (type: string) =>
-    type === 'form'
+  const onCreate = (type: string) => {
+    return type === 'form'
       ? createModal((props) => <CreateDataSourceModal namespace={namespace} {...props} />)
       : history.push(`/k8s/ns/${namespace || 'default'}/${DataSourceModelRef}/~new`);
-
+  };
   return (
     <>
       <ListPageHeader title={t('DataSources')}>
-        <ListPageCreateDropdown items={createItems} onClick={onCreate}>
+        <ListPageCreateDropdown
+          items={createItems}
+          onClick={onCreate}
+          createAccessReview={{ groupVersionKind: DataSourceModelRef, namespace: namespace }}
+        >
           {t('Create DataSource')}
         </ListPageCreateDropdown>
       </ListPageHeader>
