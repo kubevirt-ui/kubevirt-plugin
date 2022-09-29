@@ -7,6 +7,6 @@ import { TEMPLATE } from './template';
 export const defaultSourceVM: VirtualMachineData = {
   name: 'vm-from-default-source',
   namespace: TEST_NS,
-  template: TEMPLATE.FEDORA,
+  template: TEMPLATE.RHEL9,
   diskSource: DiskSource.DEFAULT,
 };

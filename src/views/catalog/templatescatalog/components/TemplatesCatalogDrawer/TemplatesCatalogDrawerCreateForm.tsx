@@ -121,7 +121,7 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
             .then(() => {
               setIsPreparingToCustomizeVM(false);
               history.push(
-                `templatescatalog/customize?name=${template.metadata.name}&namespace=${template.metadata.namespace}`,
+                `templatescatalog/customize?name=${template.metadata.name}&namespace=${template.metadata.namespace}&defaultSourceExists=${canQuickCreate}`,
               );
             })
             .catch((err) => {

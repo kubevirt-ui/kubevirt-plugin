@@ -52,6 +52,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
   template,
   diskUpload,
   cdUpload,
+  isBootSourceAvailable,
 }) => {
   const { t } = useKubevirtTranslation();
   const onCDCheckboxChange = React.useCallback(() => {
@@ -95,14 +96,24 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         onSourceChange={setDiskSource}
         selectedSource={diskSource}
         withSize
-        sourceOptions={[
-          DEFAULT_SOURCE,
-          PVC_SOURCE_NAME,
-          REGISTRY_SOURCE_NAME,
-          HTTP_SOURCE_NAME,
-          UPLOAD_SOURCE_NAME,
-          BLANK_SOURCE_NAME,
-        ]}
+        sourceOptions={
+          isBootSourceAvailable
+            ? [
+                DEFAULT_SOURCE,
+                PVC_SOURCE_NAME,
+                REGISTRY_SOURCE_NAME,
+                HTTP_SOURCE_NAME,
+                UPLOAD_SOURCE_NAME,
+                BLANK_SOURCE_NAME,
+              ]
+            : [
+                PVC_SOURCE_NAME,
+                REGISTRY_SOURCE_NAME,
+                HTTP_SOURCE_NAME,
+                UPLOAD_SOURCE_NAME,
+                BLANK_SOURCE_NAME,
+              ]
+        }
         sourceLabel={t('Disk source')}
         sourcePopOver={<SelectDiskSourcePopOver />}
         httpSourceHelperURL={httpSourceHelperURL}

@@ -30,7 +30,7 @@ const MigrationPoliciesEmptyState: React.FC = () => {
       </Title>
       <EmptyStateBody>
         <Trans t={t} ns="plugin__kubevirt-plugin">
-          Click <b>Create MigrationPolicy</b> to create you first policy
+          Click <b>Create MigrationPolicy</b> to create your first policy
         </Trans>
       </EmptyStateBody>
       <EmptyStatePrimary>

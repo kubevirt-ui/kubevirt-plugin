@@ -7,7 +7,6 @@ import {
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
-import { useVmTemplateSource } from '@kubevirt-utils/resources/template';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CustomizeError } from './components/CustomizeError';
@@ -25,6 +24,7 @@ const CustomizeVirtualMachine: React.FC = () => {
   const { params } = useURLParams();
   const name = params.get('name');
   const templateNamespace = params.get('namespace');
+  const isBootSourceAvailable = params.get('defaultSourceExists') === 'true';
 
   const [template, loaded, error] = useK8sWatchResource<V1Template>({
     groupVersionKind: modelToGroupVersionKind(TemplateModel),
@@ -33,7 +33,6 @@ const CustomizeVirtualMachine: React.FC = () => {
     name,
     namespace: templateNamespace,
   });
-  const { isBootSourceAvailable, loaded: loadedBootSource } = useVmTemplateSource(template);
 
   const Form = React.useMemo(() => {
     const withDiskSource = hasCustomizableSource(template);
@@ -47,7 +46,7 @@ const CustomizeVirtualMachine: React.FC = () => {
 
   if (error) return <CustomizeError />;
 
-  if (!loaded || !loadedBootSource) return <CustomizeVirtualMachineSkeleton />;
+  if (!loaded) return <CustomizeVirtualMachineSkeleton />;
 
   return (
     <>

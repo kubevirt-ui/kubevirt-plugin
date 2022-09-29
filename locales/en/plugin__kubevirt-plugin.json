@@ -183,7 +183,7 @@
   "check this option to add network data section to the cloud-init script.": "check this option to add network data section to the cloud-init script.",
   "Checking this option will create a new PVC of the bootsource for the new template": "Checking this option will create a new PVC of the bootsource for the new template",
   "Clear All Filters": "Clear All Filters",
-  "Click <1>Create MigrationPolicy</1> to create you first policy": "Click <1>Create MigrationPolicy</1> to create you first policy",
+  "Click <1>Create MigrationPolicy</1> to create your first policy": "Click <1>Create MigrationPolicy</1> to create your first policy",
   "Click Connect to open serial console.": "Click Connect to open serial console.",
   "Click Connect to open the VNC console.": "Click Connect to open the VNC console.",
   "Clone": "Clone",

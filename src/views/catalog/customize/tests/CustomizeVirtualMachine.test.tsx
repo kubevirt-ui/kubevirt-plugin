@@ -32,6 +32,7 @@ jest.mock('@kubevirt-utils/hooks/useURLParams', () => ({
     params: {
       namespace: 'mock-namespace',
       name: 'mock-name',
+      defaultSourceExists: 'true',
       get: function (parameter) {
         return this[parameter];
       },
