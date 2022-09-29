@@ -303,6 +303,23 @@
     }
   },
   {
+    "type": "console.yaml-template",
+    "properties": {
+      "name": "default",
+      "model": {
+        "group": "migrations.kubevirt.io",
+        "kind": "MigrationPolicy",
+        "version": "v1alpha1"
+      },
+      "template": {
+        "$codeRef": "yamlTemplates.defaultMigrationPolicyYamlTemplate"
+      }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
     "type": "console.navigation/separator",
     "properties": {
       "perspective": "admin",
