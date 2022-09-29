@@ -7,6 +7,7 @@ import {
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
+import { useVmTemplateSource } from '@kubevirt-utils/resources/template';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CustomizeError } from './components/CustomizeError';
@@ -32,6 +33,7 @@ const CustomizeVirtualMachine: React.FC = () => {
     name,
     namespace: templateNamespace,
   });
+  const { isBootSourceAvailable, loaded: loadedBootSource } = useVmTemplateSource(template);
 
   const Form = React.useMemo(() => {
     const withDiskSource = hasCustomizableSource(template);
@@ -45,6 +47,8 @@ const CustomizeVirtualMachine: React.FC = () => {
 
   if (error) return <CustomizeError />;
 
+  if (!loaded || !loadedBootSource) return <CustomizeVirtualMachineSkeleton />;
+
   return (
     <>
       <CustomizeVirtualMachineHeader namespace={ns} />
@@ -55,8 +59,7 @@ const CustomizeVirtualMachine: React.FC = () => {
             <RightHeader template={template} />
           </div>
           <div className="col-md-5 col-md-pull-7">
-            {template && loaded && <Form template={template} />}
-            {!loaded && <CustomizeVirtualMachineSkeleton />}
+            {template && <Form template={template} isBootSourceAvailable={isBootSourceAvailable} />}
           </div>
         </div>
       </div>

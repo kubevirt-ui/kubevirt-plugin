@@ -28,9 +28,13 @@ import { useCustomizeFormSubmit } from './useCustomizeFormSubmit';
 
 type CustomizeFormWithStorageProps = {
   template: V1Template;
+  isBootSourceAvailable?: boolean;
 };
 
-const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ template }) => {
+const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({
+  template,
+  isBootSourceAvailable,
+}) => {
   const { t } = useKubevirtTranslation();
   const methods = useForm();
 
@@ -77,6 +81,7 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({ tem
 
         <ExpandableCustomizeSourceSection
           diskSource={diskSource}
+          isBootSourceAvailable={isBootSourceAvailable}
           setDiskSource={setDiskSource}
           template={template}
           withDrivers={windowsDrivers}

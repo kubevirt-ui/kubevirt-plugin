@@ -19,7 +19,7 @@ import { getDataSource, getPVC, getTemplateBootSourceType, TemplateBootSource } 
 export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceValue => {
   const [templateBootSource, setTemplateBootSource] = useState<TemplateBootSource>(undefined);
   const [isBootSourceAvailable, setIsBootSourceAvailable] = useState<boolean>(false);
-  const [loaded, setLoaded] = useState<boolean>(true);
+  const [loaded, setLoaded] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const prevBootSourceRef = useRef<TemplateBootSource>();
 
@@ -135,6 +135,8 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
           });
           setIsBootSourceAvailable(true);
         }
+        break;
+      default:
         break;
     }
 

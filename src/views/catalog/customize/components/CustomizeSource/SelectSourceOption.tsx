@@ -22,15 +22,17 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
       return (
         <SelectOption
           value={DEFAULT_SOURCE}
+          key={DEFAULT_SOURCE}
           description={t('Use the default Template disk source')}
         >
-          <span data-test-id={DEFAULT_SOURCE}>{t('Default')}</span>
+          <span data-test-id={DEFAULT_SOURCE}>{t('Template default')}</span>
         </SelectOption>
       );
     case PVC_SOURCE_NAME:
       return (
         <SelectOption
           value={PVC_SOURCE_NAME}
+          key={PVC_SOURCE_NAME}
           description={t(
             'Select an existing persistent volume claim already available on the cluster and clone it.',
           )}
@@ -42,6 +44,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
       return (
         <SelectOption
           value={HTTP_SOURCE_NAME}
+          key={HTTP_SOURCE_NAME}
           description={t('Import content via URL (HTTP or S3 endpoint).')}
         >
           <span data-test-id={HTTP_SOURCE_NAME}>{t('URL (creates PVC)')}</span>
@@ -51,6 +54,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
       return (
         <SelectOption
           value={REGISTRY_SOURCE_NAME}
+          key={REGISTRY_SOURCE_NAME}
           description={t('Import content via container registry.')}
         >
           <span data-test-id={REGISTRY_SOURCE_NAME}>{t('Registry (creates PVC)')}</span>
@@ -60,6 +64,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
       return (
         <SelectOption
           value={REGISTRY_SOURCE_NAME}
+          key={REGISTRY_SOURCE_NAME}
           description={t('Import content via container registry.')}
         >
           <span data-test-id={REGISTRY_SOURCE_NAME}>{t('Registry (ContainerDisk)')}</span>
@@ -69,6 +74,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
       return (
         <SelectOption
           value={UPLOAD_SOURCE_NAME}
+          key={UPLOAD_SOURCE_NAME}
           description={t('Upload a new file to a PVC. A new PVC will be created.')}
         >
           {t('Upload (Upload a new file to a PVC)')}
@@ -76,10 +82,16 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
       );
     case BLANK_SOURCE_NAME:
       return (
-        <SelectOption value={BLANK_SOURCE_NAME} description={t('Create a new blank PVC')}>
+        <SelectOption
+          value={BLANK_SOURCE_NAME}
+          key={BLANK_SOURCE_NAME}
+          description={t('Create a new blank PVC')}
+        >
           <span data-test-id={BLANK_SOURCE_NAME}>{t('Blank')}</span>
         </SelectOption>
       );
+    default:
+      break;
   }
 };
 

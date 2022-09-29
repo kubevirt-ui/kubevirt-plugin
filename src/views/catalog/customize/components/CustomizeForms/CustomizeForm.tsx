@@ -15,6 +15,7 @@ import { useCustomizeFormSubmit } from './useCustomizeFormSubmit';
 
 type CustomizeFormProps = {
   template: V1Template;
+  isBootSourceAvailable?: boolean;
 };
 
 export const CustomizeForm: React.FC<CustomizeFormProps> = ({ template }) => {

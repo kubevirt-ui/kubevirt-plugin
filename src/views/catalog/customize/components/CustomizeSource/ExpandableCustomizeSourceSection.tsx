@@ -25,9 +25,13 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
   setCDSource,
   diskUpload,
   cdUpload,
+  isBootSourceAvailable,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [storageFieldsExpanded, setStorageFieldsExpanded] = React.useState(true);
+  const [storageFieldsExpanded, setStorageFieldsExpanded] = React.useState<boolean>(
+    !isBootSourceAvailable,
+  );
+
   return (
     <Stack hasGutter>
       <StackItem>

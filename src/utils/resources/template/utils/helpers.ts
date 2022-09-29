@@ -14,10 +14,10 @@ export const poorManProcess = (template: V1Template): V1Template => {
 
   let templateString = JSON.stringify(template);
 
-  template.parameters
-    .filter((p) => p.value)
-    .forEach((p) => {
-      templateString = templateString.replaceAll(`\${${p.name}}`, p.value);
+  template?.parameters
+    ?.filter((p) => p.value)
+    ?.forEach((p) => {
+      templateString = templateString.replaceAll(`\${${p?.name}}`, p?.value);
     });
 
   return JSON.parse(templateString);
