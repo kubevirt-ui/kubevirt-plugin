@@ -62,6 +62,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
   });
 
   const { objects } = replaceTemplateVM(processedTemplate, overridedVM);
+
   const createdObjects = await createMultipleResources(objects, models, namespace);
 
   const createdVM = createdObjects.find(
