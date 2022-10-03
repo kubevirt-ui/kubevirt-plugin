@@ -18,7 +18,7 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { queriesToLink, tickFormat } from '../utils/utils';
+import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
 
 type StorageIOPSTotalThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
@@ -26,7 +26,7 @@ type StorageIOPSTotalThresholdChartProps = {
 
 const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const { currentTime, duration } = useDuration();
+  const { currentTime, duration, timespan } = useDuration();
   const queries = React.useMemo(
     () => getUtilizationQueries({ obj: vmi, duration }),
     [vmi, duration],
@@ -38,12 +38,13 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   const storageWriteData = data?.data?.result?.[0]?.values;
 
-  const chartData = storageWriteData?.map(([, item], index) => {
-    return { x: index, y: +item };
+  const chartData = storageWriteData?.map(([x, y]) => {
+    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   return (
@@ -55,6 +56,9 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
             width={width}
             padding={35}
             scale={{ x: 'time', y: 'linear' }}
+            domain={{
+              x: [currentTime - timespan, currentTime],
+            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => t('IOPS total: {{input}}', { input: datum?.y?.toFixed(2) })}
@@ -64,6 +68,7 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
           >
             <ChartAxis
               tickFormat={tickFormat(duration, currentTime)}
+              tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
               }}

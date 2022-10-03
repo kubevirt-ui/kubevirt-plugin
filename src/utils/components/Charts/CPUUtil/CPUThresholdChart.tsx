@@ -24,7 +24,7 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { queriesToLink, tickFormat } from '../utils/utils';
+import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
 
 type CPUThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
@@ -33,7 +33,7 @@ type CPUThresholdChartProps = {
 
 const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
   const vmiPod = React.useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
-  const { currentTime, duration } = useDuration();
+  const { currentTime, duration, timespan } = useDuration();
   const { ref, width, height } = useResponsiveCharts();
   const queries = React.useMemo(
     () => getUtilizationQueries({ obj: vmi, duration, launcherPodName: vmiPod?.metadata?.name }),
@@ -45,6 +45,7 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   const [dataCPUUsage] = usePrometheusPoll({
@@ -52,17 +53,18 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   const cpuUsage = dataCPUUsage?.data?.result?.[0]?.values;
   const cpuRequested = dataCPURequested?.data?.result?.[0]?.values;
 
-  const chartData = cpuUsage?.map(([, item], index) => {
-    return { x: index, y: +item, name: 'CPU usage' };
+  const chartData = cpuUsage?.map(([x, y]) => {
+    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: 'CPU usage' };
   });
 
-  const thresholdData = cpuRequested?.map(([, item], index) => {
-    return { x: index, y: +item, name: 'CPU requested' };
+  const thresholdData = cpuRequested?.map(([x, y]) => {
+    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: 'CPU requested' };
   });
 
   const isReady = !isEmpty(chartData) && !isEmpty(thresholdData);
@@ -76,6 +78,9 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
             width={width}
             padding={35}
             scale={{ x: 'time', y: 'linear' }}
+            domain={{
+              x: [currentTime - timespan, currentTime],
+            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
@@ -98,6 +103,7 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
             />
             <ChartAxis
               tickFormat={tickFormat(duration, currentTime)}
+              tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
               }}

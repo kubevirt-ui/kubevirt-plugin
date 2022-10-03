@@ -23,7 +23,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { getPrometheusData, queriesToLink, tickFormat } from '../utils/utils';
+import {
+  getPrometheusData,
+  MILLISECONDS_MULTIPLIER,
+  queriesToLink,
+  tickFormat,
+  TICKS_COUNT,
+} from '../utils/utils';
 
 type MigrationThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
@@ -31,7 +37,7 @@ type MigrationThresholdChartProps = {
 
 const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const { currentTime, duration } = useDuration();
+  const { currentTime, duration, timespan } = useDuration();
   const queries = useMemo(() => getUtilizationQueries({ obj: vmi, duration }), [vmi, duration]);
   const { ref, width, height } = useResponsiveCharts();
 
@@ -40,6 +46,7 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   const [migrationDataRemaining] = usePrometheusPoll({
@@ -47,6 +54,7 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   const [migrationDataDirtyRate] = usePrometheusPoll({
@@ -54,6 +62,7 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   const dataProcessed = useMemo(
@@ -69,16 +78,16 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
     [migrationDataDirtyRate],
   );
 
-  const chartDataProcessed = dataProcessed?.map(([, item], index) => {
-    return { x: index, y: +item, name: t('Data Processed') };
+  const chartDataProcessed = dataProcessed?.map(([x, y]) => {
+    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: t('Data Processed') };
   });
 
-  const chartDataRemaining = dataRemaining?.map(([, item], index) => {
-    return { x: index, y: +item, name: t('Data Remaining') };
+  const chartDataRemaining = dataRemaining?.map(([x, y]) => {
+    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: t('Data Remaining') };
   });
 
-  const chartDataDirtyRate = dataDirtyRate?.map(([, item], index) => {
-    return { x: index, y: +item, name: t('Memory Dirty Rate') };
+  const chartDataDirtyRate = dataDirtyRate?.map(([x, y]) => {
+    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: t('Memory Dirty Rate') };
   });
 
   const isReady =
@@ -99,6 +108,9 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
             width={width}
             padding={{ top: 25, bottom: 55, left: 35, right: 35 }}
             scale={{ x: 'time', y: 'linear' }}
+            domain={{
+              x: [currentTime - timespan, currentTime],
+            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
@@ -117,6 +129,7 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
           >
             <ChartAxis
               tickFormat={tickFormat(duration, currentTime)}
+              tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
               }}

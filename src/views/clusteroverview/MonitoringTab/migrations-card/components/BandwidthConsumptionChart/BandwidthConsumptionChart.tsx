@@ -53,7 +53,7 @@ const BandwidthConsumptionChart: React.FC<BandwidthConsumptionChartProps> = ({ d
     )?.map(([x, y], idx) => {
       return {
         x: new Date(x * 1000),
-        y: +y,
+        y: Number(y),
         name: t('Bandwidth consumption'),
         idx,
       };
@@ -64,7 +64,7 @@ const BandwidthConsumptionChart: React.FC<BandwidthConsumptionChartProps> = ({ d
     )?.map(([x, y], idx) => {
       return {
         x: new Date(x * 1000),
-        y: +y,
+        y: Number(y),
         name: t('Running migrations'),
         idx,
       };

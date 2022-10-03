@@ -21,14 +21,14 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { queriesToLink, tickFormat } from '../utils/utils';
+import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
 
 type MemoryThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
 const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
-  const { currentTime, duration } = useDuration();
+  const { currentTime, duration, timespan } = useDuration();
   const queries = React.useMemo(
     () => getUtilizationQueries({ obj: vmi, duration }),
     [vmi, duration],
@@ -45,18 +45,21 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   const prometheusMemoryData = data?.data?.result?.[0]?.values;
   const memoryAvailableBytes = xbytes.parseSize(`${memory?.size} ${memory?.unit}B`);
 
-  const chartData = prometheusMemoryData?.map(([, item], index) => {
-    return { x: index, y: +item, name: 'Memory used' };
+  const chartData = prometheusMemoryData?.map(([x, y]) => {
+    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: 'Memory used' };
   });
 
-  const thresholdLine = new Array(chartData?.length || 0)
-    .fill(0)
-    .map((_, index) => ({ x: index, y: memoryAvailableBytes, name: 'Memory available' }));
+  const thresholdLine = new Array(chartData?.length || 0).fill(0).map((_, index) => ({
+    x: chartData?.[index]?.x,
+    y: memoryAvailableBytes,
+    name: 'Memory available',
+  }));
 
   const isReady = !isEmpty(chartData) || !isEmpty(thresholdLine);
 
@@ -69,10 +72,16 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
             width={width}
             padding={35}
             scale={{ x: 'time', y: 'linear' }}
+            domain={{
+              x: [currentTime - timespan, currentTime],
+            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
-                  return `${datum?.name}: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
+                  return `${datum?.name}: ${xbytes(datum?.y, {
+                    iec: true,
+                    fixed: 2,
+                  })}`;
                 }}
                 constrainToVisibleArea
               />
@@ -92,6 +101,7 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
             />
             <ChartAxis
               tickFormat={tickFormat(duration, currentTime)}
+              tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
               }}

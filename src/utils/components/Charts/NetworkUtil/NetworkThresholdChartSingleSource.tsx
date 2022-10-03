@@ -16,7 +16,7 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
-import { tickFormat } from '../utils/utils';
+import { MILLISECONDS_MULTIPLIER, tickFormat, TICKS_COUNT } from '../utils/utils';
 
 type NetworkThresholdSingleSourceChartProps = {
   data: PrometheusValue[];
@@ -27,12 +27,12 @@ const NetworkThresholdSingleSourceChart: React.FC<NetworkThresholdSingleSourceCh
   data,
   link,
 }) => {
-  const { currentTime, duration } = useDuration();
+  const { currentTime, duration, timespan } = useDuration();
 
   const { ref, width, height } = useResponsiveCharts();
 
-  const chartData = data?.map(([, item], index) => {
-    return { x: index, y: +item, name: 'Network In' };
+  const chartData = data?.map(([x, y]) => {
+    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: 'Network In' };
   });
 
   const isReady = !isEmpty(chartData);
@@ -46,6 +46,9 @@ const NetworkThresholdSingleSourceChart: React.FC<NetworkThresholdSingleSourceCh
             width={width}
             padding={35}
             scale={{ x: 'time', y: 'linear' }}
+            domain={{
+              x: [currentTime - timespan, currentTime],
+            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
@@ -57,6 +60,7 @@ const NetworkThresholdSingleSourceChart: React.FC<NetworkThresholdSingleSourceCh
           >
             <ChartAxis
               tickFormat={tickFormat(duration, currentTime)}
+              tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
               }}

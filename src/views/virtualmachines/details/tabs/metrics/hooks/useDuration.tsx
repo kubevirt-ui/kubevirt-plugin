@@ -7,7 +7,7 @@ import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 type UseDuration = () => {
   currentTime: number;
   duration: string;
-  durationMilliseconds: number;
+  timespan: number;
   setDuration: (newValue: string) => void;
 };
 
@@ -17,9 +17,9 @@ const useDuration: UseDuration = () => {
     DurationOption.FIVE_MIN.toString(),
   );
   const currentTime = useMemo<number>(() => Date.now(), []);
-  const durationMilliseconds = DurationOption?.getMilliseconds(duration);
+  const timespan = DurationOption?.getMilliseconds(duration);
 
-  return { currentTime, duration, durationMilliseconds, setDuration };
+  return { currentTime, duration, timespan, setDuration };
 };
 
 export default useDuration;
