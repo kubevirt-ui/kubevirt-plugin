@@ -37,7 +37,7 @@ const statusFilterItems = [
   FailedStatus,
 ];
 
-const useGetStatusFilter = (): RowFilter => ({
+const useStatusFilter = (): RowFilter => ({
   filterGroupName: t('Status'),
   type: 'status',
   isMatch: (obj, filterStatus) => {
@@ -55,27 +55,27 @@ const useGetStatusFilter = (): RowFilter => ({
   items: statusFilterItems,
 });
 
-const useGetTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
-  const other = t('Other');
+const useTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
+  const noTemplate = t('None');
   const templates = useMemo(
     () =>
       [
         ...new Set(
           (vms || []).map((vm) => {
             const templateName = vm.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME];
-            return templateName ?? other;
+            return templateName ?? noTemplate;
           }),
         ),
       ].map((template) => ({ id: template, title: template })),
-    [vms, other],
+    [vms, noTemplate],
   );
 
   return {
     filterGroupName: t('Template'),
     type: 'template',
-    reducer: (obj) => obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? other,
+    reducer: (obj) => obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? noTemplate,
     filter: (selectedTemplates, obj) => {
-      const templateName = obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? other;
+      const templateName = obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? noTemplate;
       return (
         selectedTemplates.selected?.length === 0 ||
         selectedTemplates.selected?.includes(templateName)
@@ -85,7 +85,7 @@ const useGetTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
   };
 };
 
-const useGetOSFilter = (): RowFilter => {
+const useOSFilter = (): RowFilter => {
   const getOSName = useCallback((obj) => {
     const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
     const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
@@ -109,7 +109,7 @@ const useGetOSFilter = (): RowFilter => {
     })),
   };
 };
-const useGetNodesFilter = (vmiMapper: VmiMapper): RowFilter => {
+const useNodesFilter = (vmiMapper: VmiMapper): RowFilter => {
   const sortedNodeNamesItems = useMemo(() => {
     return Object.values(vmiMapper?.nodeNames).sort((a, b) =>
       a?.id?.localeCompare(b?.id, undefined, {
@@ -133,7 +133,7 @@ const useGetNodesFilter = (vmiMapper: VmiMapper): RowFilter => {
   };
 };
 
-export const useGetVMListFilters = (
+export const useVMListFilters = (
   vmis: V1VirtualMachineInstance[],
   vms: V1VirtualMachine[],
   vmims: V1VirtualMachineInstanceMigration[],
@@ -174,10 +174,10 @@ export const useGetVMListFilters = (
     }, {});
   }, [vmims]);
 
-  const statusFilter = useGetStatusFilter();
-  const templatesFilter = useGetTemplatesFilter(vms);
-  const osFilters = useGetOSFilter();
-  const nodesFilter = useGetNodesFilter(vmiMapper);
+  const statusFilter = useStatusFilter();
+  const templatesFilter = useTemplatesFilter(vms);
+  const osFilters = useOSFilter();
+  const nodesFilter = useNodesFilter(vmiMapper);
 
   return {
     filters: [statusFilter, templatesFilter, osFilters, nodesFilter],
