@@ -27,7 +27,7 @@ import {
   paginationInitialState,
 } from '@virtualmachines/utils';
 
-import { useGetVMListFilters } from '../utils';
+import { useVMListFilters } from '../utils';
 
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
@@ -71,7 +71,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
     limit: OBJECTS_FETCHING_LIMIT,
   });
 
-  const { vmiMapper, vmimMapper, filters } = useGetVMListFilters(vmis, vms, vmims);
+  const { vmiMapper, vmimMapper, filters } = useVMListFilters(vmis, vms, vmims);
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
@@ -94,10 +94,11 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
     }));
   };
 
-  const onCreate = (type: string) =>
-    type === 'catalog'
+  const onCreate = (type: string) => {
+    return type === 'catalog'
       ? history.push(catalogURL)
       : history.push(`/k8s/ns/${namespace || 'default'}/${VirtualMachineModelRef}/~new`);
+  };
 
   const [columns, activeColumns] = useVirtualMachineColumns(namespace, pagination, data);
 
