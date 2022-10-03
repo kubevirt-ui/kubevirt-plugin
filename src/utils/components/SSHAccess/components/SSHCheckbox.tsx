@@ -6,9 +6,14 @@ import { Checkbox } from '@patternfly/react-core';
 type SSHCheckboxProps = {
   sshServiceRunning: boolean;
   setSSHServiceRunning: (checked: boolean, event: React.FormEvent<HTMLInputElement>) => void;
+  isDisabled?: boolean;
 };
 
-const SSHCheckbox: FC<SSHCheckboxProps> = ({ sshServiceRunning, setSSHServiceRunning }) => {
+const SSHCheckbox: FC<SSHCheckboxProps> = ({
+  sshServiceRunning,
+  setSSHServiceRunning,
+  isDisabled,
+}) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -19,6 +24,7 @@ const SSHCheckbox: FC<SSHCheckboxProps> = ({ sshServiceRunning, setSSHServiceRun
       isChecked={sshServiceRunning}
       data-checked-state={sshServiceRunning}
       onChange={setSSHServiceRunning}
+      isDisabled={isDisabled}
     />
   );
 };
