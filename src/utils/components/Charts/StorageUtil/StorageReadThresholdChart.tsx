@@ -17,7 +17,7 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { tickFormat } from '../utils/utils';
+import { MILLISECONDS_MULTIPLIER, tickFormat, TICKS_COUNT } from '../utils/utils';
 
 type StorageThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
@@ -26,7 +26,7 @@ type StorageThresholdChartProps = {
 const GIB_IN_BYTES = 1024;
 
 const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }) => {
-  const { currentTime, duration } = useDuration();
+  const { currentTime, duration, timespan } = useDuration();
   const queries = React.useMemo(
     () => getUtilizationQueries({ obj: vmi, duration }),
     [vmi, duration],
@@ -38,12 +38,13 @@ const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   const storageWriteData = data?.data?.result?.[0]?.values;
 
-  const chartData = storageWriteData?.map(([, item], index) => {
-    return { x: index, y: Number(+item / GIB_IN_BYTES) };
+  const chartData = storageWriteData?.map(([x, y]) => {
+    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) / GIB_IN_BYTES };
   });
 
   return (
@@ -54,6 +55,9 @@ const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }
           width={width}
           padding={35}
           scale={{ x: 'time', y: 'linear' }}
+          domain={{
+            x: [currentTime - timespan, currentTime],
+          }}
           containerComponent={
             <ChartVoronoiContainer
               labels={({ datum }) => {
@@ -65,6 +69,7 @@ const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }
         >
           <ChartAxis
             tickFormat={tickFormat(duration, currentTime)}
+            tickCount={TICKS_COUNT}
             style={{
               ticks: { stroke: 'transparent' },
             }}

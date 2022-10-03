@@ -2,6 +2,8 @@ import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOp
 import { PrometheusResponse, PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
 
 export const SINGLE_VM_DURATION = 'SINGLE_VM_DURATION';
+export const TICKS_COUNT = 100;
+export const MILLISECONDS_MULTIPLIER = 1000;
 
 export const sumOfValues = (obj: PrometheusResponse) =>
   obj?.data?.result?.[0]?.values.reduce((acc, [, v]) => acc + Number(v), 0);
@@ -21,10 +23,10 @@ export const tickFormat =
     if (isLast || isFirst) {
       const date = new Date(currentTime);
       const timespan = DurationOption?.getMilliseconds(duration);
-      const datePast = new Date(+date - timespan);
-      return `${(isLast ? date : datePast).getHours()}:${(
-        '0' + (isLast ? date : datePast).getMinutes()
-      ).slice(-2)}`;
+      const datePast = new Date(currentTime - timespan);
+      const hours = (isLast ? date : datePast).getHours();
+      const minutes = `0 + ${(isLast ? date : datePast).getMinutes()}`.slice(-2);
+      return `${hours}:${minutes}`;
     }
 
     return '';

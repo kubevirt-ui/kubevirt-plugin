@@ -22,7 +22,7 @@ type UseNetworkData = (
 ];
 
 const useNetworkData: UseNetworkData = (vmi, nic) => {
-  const { currentTime, duration } = useDuration();
+  const { currentTime, duration, timespan } = useDuration();
   const queries = useMemo(
     () => getUtilizationQueries({ obj: vmi, duration, nic }),
     [vmi, duration, nic],
@@ -33,6 +33,7 @@ const useNetworkData: UseNetworkData = (vmi, nic) => {
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   const [networkIn] = usePrometheusPoll({
@@ -40,6 +41,7 @@ const useNetworkData: UseNetworkData = (vmi, nic) => {
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   const [networkOut] = usePrometheusPoll({
@@ -47,6 +49,7 @@ const useNetworkData: UseNetworkData = (vmi, nic) => {
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    timespan,
   });
 
   return [
