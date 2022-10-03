@@ -39,7 +39,7 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
     namespace,
   });
   const [columns, activeColumns] = useDataSourcesColumns(namespace);
-  const filters = getDataImportCronFilter(t);
+  const filters = getDataImportCronFilter();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(dataSources, filters);
 
   const createItems = {
