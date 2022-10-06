@@ -21,6 +21,7 @@ import { migrationPoliciesPageBaseURL } from '../../utils/constants';
 
 const MigrationPoliciesEmptyState: React.FC = () => {
   const { t } = useKubevirtTranslation();
+
   return (
     <EmptyState variant={EmptyStateVariant.xs}>
       <EmptyStateIcon icon={() => <img src={migrationPoliciesEmptyState} />} />
