@@ -2,6 +2,7 @@ import React from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MigrationThresholdChart from '@kubevirt-utils/components/Charts/MigrationUtil/MigrationThresholdChart';
+import MigrationThresholdChartDiskRate from '@kubevirt-utils/components/Charts/MigrationUtil/MigrationThresholdChartDiskRate';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-core';
 
@@ -25,7 +26,9 @@ const MigrationCharts: React.FC<MigrationChartsProps> = ({ vmi }) => {
       <GridItem span={6}>
         <Card>
           <CardTitle>{t('KV data transfer rate')}</CardTitle>
-          <CardBody>** chart **</CardBody>
+          <CardBody>
+            <MigrationThresholdChartDiskRate vmi={vmi} />
+          </CardBody>
         </Card>
       </GridItem>
     </Grid>

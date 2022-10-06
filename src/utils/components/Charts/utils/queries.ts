@@ -16,6 +16,7 @@ enum VMQueries {
   MIGRATION_DATA_PROCESSED = 'MIGRATION_DATA_PROCESSED',
   MIGRATION_DATA_REMAINING = 'MIGRATION_DATA_REMAINING',
   MIGRATION_MEMORY_DIRTY_RATE = 'MIGRATION_MEMORY_DIRTY_RATE',
+  MIGRATION_DISK_TRANSFER_RATE = 'MIGRATION_DISK_TRANSFER_RATE',
 }
 
 type UtilizationQueriesArgs = {
@@ -52,5 +53,6 @@ export const getUtilizationQueries: GetUtilizationQueries = ({
     [VMQueries.MIGRATION_DATA_PROCESSED]: `sum(sum_over_time(kubevirt_migrate_vmi_data_processed_bytes{name='${name}',namespace='${namespace}'}[${duration}]))  BY (name, namespace)`,
     [VMQueries.MIGRATION_DATA_REMAINING]: `sum(sum_over_time(kubevirt_migrate_vmi_data_remaining_bytes{name='${name}',namespace='${namespace}'}[${duration}]))  BY (name, namespace)`,
     [VMQueries.MIGRATION_MEMORY_DIRTY_RATE]: `sum(sum_over_time(kubevirt_migrate_vmi_dirty_memory_rate_bytes{name='${name}',namespace='${namespace}'}[${duration}]))  BY (name, namespace)`,
+    [VMQueries.MIGRATION_DISK_TRANSFER_RATE]: `sum(sum_over_time(kubevirt_migrate_vmi_disk_transfer_rate_bytes{name='${name}',namespace='${namespace}'}[${duration}]))  BY (name, namespace)`,
   };
 };
