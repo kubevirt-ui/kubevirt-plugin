@@ -4,7 +4,7 @@ export const defaultDataSourceYamlTemplate = `
 apiVersion: ${DataSourceModel.apiGroup}/${DataSourceModel.apiVersion}
 kind: ${DataSourceModel.kind}
 metadata:
-  name: example
+  name: ds-example
   namespace: default
 spec: {
     source: {}
