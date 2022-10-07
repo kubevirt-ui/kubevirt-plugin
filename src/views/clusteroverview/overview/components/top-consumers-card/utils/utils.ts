@@ -3,7 +3,6 @@ import { TFunction } from 'i18next';
 import {
   humanizeBinaryBytes,
   humanizeDecimalBytes,
-  humanizeDecimalBytesPerSec,
   humanizeSeconds,
 } from '../../../../../../utils/utils/humanize';
 
@@ -29,7 +28,7 @@ export const humanizeTopConsumerMetric = (value: number, metric: TopConsumerMetr
       humanizedValue = humanizeSeconds(value, 's', 'ms');
       break;
     case TopConsumerMetric.STORAGE_THROUGHPUT:
-      humanizedValue = humanizeDecimalBytesPerSec(value, 'MBps');
+      humanizedValue = humanizeDecimalBytes(value);
       break;
     case TopConsumerMetric.STORAGE_IOPS:
       humanizedValue = { value: value.toFixed(2), unit: STORAGE_IOPS_UNIT };
