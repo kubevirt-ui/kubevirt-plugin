@@ -2,6 +2,8 @@ import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
 import { interfaceTypes, sourceTypes } from '../DiskFormFields/utils/constants';
 
+export const DEFAULT_DISK_SIZE = '30Gi';
+
 export type DiskFormState = {
   diskName: string;
   diskSource: string;
@@ -21,7 +23,7 @@ export type DiskFormState = {
 export const initialStateDiskForm: DiskFormState = {
   diskName: null,
   diskSource: sourceTypes.BLANK,
-  diskSize: '30Gi',
+  diskSize: DEFAULT_DISK_SIZE,
   diskType: diskTypes.disk,
   diskInterface: interfaceTypes.VIRTIO,
   storageClass: null,
