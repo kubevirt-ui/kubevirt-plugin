@@ -109,6 +109,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
             },
           });
           setIsBootSourceAvailable(true);
+          setLoaded(true);
         }
         break;
 
@@ -122,6 +123,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
             },
           });
           setIsBootSourceAvailable(true);
+          setLoaded(true);
         }
         break;
       case BOOT_SOURCE.CONTAINER_DISK:
@@ -134,6 +136,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
             },
           });
           setIsBootSourceAvailable(true);
+          setLoaded(true);
         }
         break;
       default:
