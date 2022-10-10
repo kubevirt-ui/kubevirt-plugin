@@ -1,5 +1,4 @@
 import { K8S_KIND } from '../utils/const/index';
-import * as vmView from '../views/selector';
 import { tab } from '../views/tab';
 import { vm } from '../views/vm';
 
@@ -15,18 +14,11 @@ describe('Check all virtualization pages can be loaded', () => {
     cy.deleteResource(K8S_KIND.TEMPLATE, 'vm-template-example', 'default');
   });
 
-  describe('Check VM and VMI list and tabs', () => {
+  describe('Check VM list and tabs', () => {
     it('create vm-example', () => {
       cy.visitVMs();
       vm.createVMFromYAML();
       cy.contains('Hostname').should('be.visible');
-
-      // start the vm
-      cy.byButtonText('Actions').click();
-      cy.get(vmView.vmActionStart).click();
-      cy.contains(vmView.vmStatusOnOverview, 'Starting').should('exist');
-      // VM in CI cannot become running
-      // cy.contains(vmView.vmStatusOnOverview, 'Running', { timeout: 600000 }).should('exist');
     });
 
     it('vm tabs are loaded', () => {
@@ -49,7 +41,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('event').should('be.visible');
 
       tab.navigateToConsole();
-      cy.contains('Guest login').should('be.visible');
+      cy.contains('This VirtualMachine is down').should('be.visible');
 
       tab.navigateToNetworks();
       cy.contains('Pod networking').should('be.visible');
@@ -61,33 +53,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('Cloud-init').should('be.visible');
 
       tab.navigateToSnapshots();
-      cy.contains('Not found').should('be.visible');
-    });
-
-    xit('vmi tabs are loaded', () => {
-      tab.navigateToDetails();
-      cy.contains('VirtualMachine Details').should('be.visible');
-      cy.byLegacyTestID('vm-example').click();
-
-      cy.contains('VirtualMachineInstance Details').should('be.visible');
-
-      tab.navigateToYAML();
-      cy.contains('Download').should('be.visible');
-
-      tab.navigateToScheduling();
-      cy.contains('Tolerations').should('be.visible');
-
-      tab.navigateToEvents();
-      cy.contains('event').should('be.visible');
-
-      tab.navigateToConsole();
-      cy.contains('Guest login').should('be.visible');
-
-      tab.navigateToNetworks();
-      cy.contains('Pod networking').should('be.visible');
-
-      tab.navigateToDisks();
-      cy.contains('rootdisk').should('be.visible');
+      cy.contains('Take snapshot').should('be.visible');
     });
   });
 
