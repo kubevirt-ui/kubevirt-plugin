@@ -65,7 +65,7 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
               vmName={vm?.metadata?.name}
               sshServiceRunning={!!sshService}
               setSSHServiceRunning={onSSHChange}
-              isDisabled={!sshServiceLoaded}
+              isDisabled={loading}
             />
           </StackItem>
           {sshServiceLoaded && !loading ? (

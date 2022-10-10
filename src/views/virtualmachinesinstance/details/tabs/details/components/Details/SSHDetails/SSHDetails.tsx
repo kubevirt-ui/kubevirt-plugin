@@ -6,14 +6,14 @@ import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DescriptionListDescription, DescriptionListTerm } from '@patternfly/react-core';
 
-type SSHAccessProps = {
+type SSHDetailsProps = {
   vmi: V1VirtualMachineInstance;
   vm: V1VirtualMachine;
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded: boolean;
 };
 
-const SSHDetails: React.FC<SSHAccessProps> = ({ vmi, vm, sshService, sshServiceLoaded }) => {
+const SSHDetails: React.FC<SSHDetailsProps> = ({ vmi, vm, sshService, sshServiceLoaded }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>

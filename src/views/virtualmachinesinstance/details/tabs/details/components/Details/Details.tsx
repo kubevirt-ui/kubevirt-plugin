@@ -33,7 +33,7 @@ import Node from './Node/Node';
 import OperationSystem from './OperationSystem/OperationSystem';
 import Owner from './Owner/Owner';
 import Pods from './Pods/Pods';
-import SSHDetails from './SSHAccess/SSHAccess';
+import SSHDetails from './SSHDetails/SSHDetails';
 import Timezone from './Timezone/Timezone';
 import WorkloadProfile from './WorkloadProfile/WorkloadProfile';
 
