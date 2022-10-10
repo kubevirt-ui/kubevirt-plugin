@@ -16,8 +16,8 @@ import {
   diskSourceReducerActions,
   DiskSourceReducerActionType,
 } from '../../state/actions';
-import { DiskFormState, DiskSourceState } from '../../state/initialState';
-import { OTHER, sourceTypes } from '../utils/constants';
+import { DEFAULT_DISK_SIZE, DiskFormState, DiskSourceState } from '../../state/initialState';
+import { DYNAMIC, OTHER, sourceTypes } from '../utils/constants';
 import { getSourceOptions } from '../utils/helpers';
 
 import DiskSourceContainer from './components/DiskSourceContainer';
@@ -46,7 +46,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
   relevantUpload,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { diskSource, diskType } = diskState || {};
+  const { diskSource, diskType, diskSize } = diskState || {};
   const isCDROMType = diskType === diskTypes.cdrom;
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const {
@@ -68,6 +68,10 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
 
   const onSelect = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
     event.preventDefault();
+
+    if (diskSize === DYNAMIC && value !== sourceTypes.EPHEMERAL)
+      dispatchDiskState({ type: diskReducerActions.SET_DISK_SIZE, payload: DEFAULT_DISK_SIZE });
+
     dispatchDiskState({ type: diskReducerActions.SET_DISK_SOURCE, payload: value });
     setIsOpen(false);
   };
