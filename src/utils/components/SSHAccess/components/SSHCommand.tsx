@@ -4,8 +4,10 @@ import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert, AlertVariant, ClipboardCopy } from '@patternfly/react-core';
 import {
+  Alert,
+  AlertVariant,
+  ClipboardCopy,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
@@ -63,7 +65,7 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
           <StackItem>
             <SSHCheckbox
               vmName={vm?.metadata?.name}
-              sshServiceRunning={!!sshService}
+              sshServiceRunning={sshServiceRunning}
               setSSHServiceRunning={onSSHChange}
               isDisabled={loading}
             />

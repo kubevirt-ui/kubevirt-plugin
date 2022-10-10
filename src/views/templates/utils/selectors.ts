@@ -1,6 +1,5 @@
 import { V1Template } from '@kubevirt-utils/models';
-import { getAnnotation } from '@kubevirt-utils/resources/shared';
-import { getLabel } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import { VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm/utils';
 

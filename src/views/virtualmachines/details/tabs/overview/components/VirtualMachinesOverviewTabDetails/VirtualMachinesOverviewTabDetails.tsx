@@ -7,8 +7,7 @@ import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetim
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
-import { VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { useVMIAndPodsForVM, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
