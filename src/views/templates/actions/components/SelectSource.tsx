@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
@@ -9,59 +9,15 @@ import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
 
 import { PersistentVolumeClaimSelect } from './PersistentVolumeClaimSelect/PersistentVolumeClaimSelect';
 import SelectSourceOption from './SelectSourceOption';
-
-const getGenericSourceCustomization = (
-  diskSourceId: SOURCE_OPTIONS_IDS,
-  url?: string,
-  storage?: string,
-): V1beta1DataVolumeSpec => {
-  const dataVolumeSpec: V1beta1DataVolumeSpec = {
-    source: {
-      [diskSourceId]: {},
-    },
-    storage: {
-      resources: {
-        requests: {
-          storage: storage ?? '30Gi',
-        },
-      },
-    },
-  };
-
-  if (url) dataVolumeSpec.source[diskSourceId].url = url;
-
-  return dataVolumeSpec;
-};
-
-const getPVCSource = (
-  pvcName: string,
-  pvcNamespace: string,
-  storage?: string,
-): V1beta1DataVolumeSpec => {
-  const dataVolumeSpec: V1beta1DataVolumeSpec = {
-    source: {
-      pvc: {
-        name: pvcName,
-        namespace: pvcNamespace,
-      },
-    },
-  };
-
-  if (storage)
-    dataVolumeSpec.storage = {
-      resources: {
-        requests: {
-          storage,
-        },
-      },
-    };
-
-  return dataVolumeSpec;
-};
-
-const appendDockerPrefix = (image: string) => 'docker://'.concat(image);
+import {
+  appendDockerPrefix,
+  getGenericSourceCustomization,
+  getPVCSource,
+  getSourceTypeFromDataVolumeSpec,
+} from './utils';
 
 type SelectSourceProps = {
+  source: V1beta1DataVolumeSpec;
   onSourceChange: (customSource: V1beta1DataVolumeSpec) => void;
   sourceLabel: React.ReactNode;
   initialVolumeQuantity?: string;
@@ -72,6 +28,7 @@ type SelectSourceProps = {
 };
 
 export const SelectSource: React.FC<SelectSourceProps> = ({
+  source,
   onSourceChange,
   initialVolumeQuantity = '30Gi',
   withSize = false,
@@ -81,52 +38,64 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   registrySourceHelperText,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [volumeQuantity, setVolumeQuantity] = React.useState(initialVolumeQuantity);
+  const selectedSourceType = getSourceTypeFromDataVolumeSpec(source);
+  const pvcNameSelected = source?.source?.pvc?.name;
+  const pvcNamespaceSelected = source?.source?.pvc?.namespace;
+  const httpURL = source?.source?.http?.url;
+  const containerImage = source?.source?.registry?.url;
+  const volumeQuantity = source?.storage?.resources?.requests?.storage || initialVolumeQuantity;
 
-  const [selectedSourceType, setSourceType] = React.useState<SOURCE_OPTIONS_IDS>(null); // sourceOptions[0]
-  const [pvcNameSelected, selectPVCName] = React.useState<string>();
-  const [pvcNamespaceSelected, selectPVCNamespace] = React.useState<string>();
-  const [httpURL, setHTTPURL] = React.useState('');
-  const [containerImage, setContainerImage] = React.useState('');
+  const onSourceSelected = (newSourceType: SOURCE_OPTIONS_IDS, newVolumeQuantity?: string) => {
+    const selectedVolumeQuantity = newVolumeQuantity || volumeQuantity;
 
-  React.useEffect(() => {
-    switch (selectedSourceType) {
+    switch (newSourceType) {
       case SOURCE_TYPES.httpSource:
         return onSourceChange(
           getGenericSourceCustomization(
-            selectedSourceType,
+            newSourceType,
             httpURL,
-            withSize ? volumeQuantity : null,
+            withSize ? selectedVolumeQuantity : null,
           ),
         );
       case SOURCE_TYPES.pvcSource:
         return onSourceChange(
-          getPVCSource(pvcNameSelected, pvcNamespaceSelected, withSize ? volumeQuantity : null),
+          getPVCSource(
+            pvcNameSelected,
+            pvcNamespaceSelected,
+            withSize ? selectedVolumeQuantity : null,
+          ),
         );
       case SOURCE_TYPES.registrySource:
         return onSourceChange(
           getGenericSourceCustomization(
-            selectedSourceType,
-            appendDockerPrefix(containerImage),
-            withSize ? volumeQuantity : null,
+            newSourceType,
+            appendDockerPrefix(containerImage || ''),
+            withSize ? selectedVolumeQuantity : null,
           ),
         );
+      default:
+        return;
     }
-  }, [
-    onSourceChange,
-    pvcNameSelected,
-    pvcNamespaceSelected,
-    httpURL,
-    containerImage,
-    volumeQuantity,
-    selectedSourceType,
-    withSize,
-  ]);
+  };
+
+  const onContainerChange = (newContainerURL) =>
+    onSourceChange(
+      getGenericSourceCustomization(
+        selectedSourceType,
+        appendDockerPrefix(newContainerURL || ''),
+        withSize ? volumeQuantity : null,
+      ),
+    );
+
+  const onURLChange = (newUrl) =>
+    onSourceChange(
+      getGenericSourceCustomization(selectedSourceType, newUrl, withSize ? volumeQuantity : null),
+    );
 
   return (
     <>
       <SelectSourceOption
-        onSelectSource={setSourceType}
+        onSelectSource={(newSourceType) => onSourceSelected(newSourceType)}
         selectedSource={selectedSourceType}
         label={sourceLabel}
         options={sourceOptions}
@@ -136,8 +105,11 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
         <PersistentVolumeClaimSelect
           pvcNameSelected={pvcNameSelected}
           projectSelected={pvcNamespaceSelected}
-          selectNamespace={selectPVCNamespace}
-          selectPVCName={selectPVCName}
+          selectPVC={(newPVCNamespace, newPVCName) =>
+            onSourceChange(
+              getPVCSource(newPVCName, newPVCNamespace, withSize ? volumeQuantity : null),
+            )
+          }
         />
       )}
 
@@ -152,7 +124,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           <TextInput
             value={containerImage}
             type="text"
-            onChange={setContainerImage}
+            onChange={onContainerChange}
             aria-label={t('Container Image')}
             validated={!containerImage ? ValidatedOptions.error : ValidatedOptions.default}
           />
@@ -170,7 +142,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           <TextInput
             value={httpURL}
             type="text"
-            onChange={setHTTPURL}
+            onChange={onURLChange}
             aria-label={t('Image URL')}
             validated={!httpURL ? ValidatedOptions.error : ValidatedOptions.default}
           />
@@ -178,7 +150,11 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
       )}
 
       {withSize && selectedSourceType !== SOURCE_TYPES.defaultSource && (
-        <CapacityInput size={volumeQuantity} onChange={setVolumeQuantity} label={t('Disk size')} />
+        <CapacityInput
+          size={volumeQuantity}
+          onChange={(newVolume) => onSourceSelected(selectedSourceType, newVolume)}
+          label={t('Disk size')}
+        />
       )}
     </>
   );

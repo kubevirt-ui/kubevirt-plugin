@@ -6,6 +6,7 @@ import {
   Select,
   SelectOption,
   SelectVariant,
+  Skeleton,
   ValidatedOptions,
 } from '@patternfly/react-core';
 
@@ -16,6 +17,7 @@ type PersistentVolumeSelectNameProps = {
   pvcNameSelected: string;
   pvcNames: string[];
   onChange: (newPVCName: string) => void;
+  isLoading?: boolean;
 };
 
 export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProps> = ({
@@ -23,6 +25,7 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
   pvcNameSelected,
   pvcNames,
   onChange,
+  isLoading,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setSelectOpen] = React.useState(false);
@@ -36,6 +39,16 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
   );
 
   const fieldId = 'pvc-name-select';
+
+  if (isLoading) {
+    return (
+      <>
+        <br />
+        <Skeleton fontSize="lg" className="pvc-selection-formgroup" />
+        <br />
+      </>
+    );
+  }
 
   return (
     <FormGroup

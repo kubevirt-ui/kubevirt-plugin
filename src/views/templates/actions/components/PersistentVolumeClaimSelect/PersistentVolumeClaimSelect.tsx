@@ -10,34 +10,32 @@ import './PersistentVolumeClaimSelect.scss';
 type PersistentVolumeClaimSelectProps = {
   pvcNameSelected: string;
   projectSelected: string;
-  selectNamespace: (namespace: string) => void;
-  selectPVCName: (pvcName: string) => void;
+  selectPVC: (pvcNamespace: string, pvcName?: string) => void;
 };
 
 export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectProps> = ({
   pvcNameSelected,
   projectSelected,
-  selectPVCName,
-  selectNamespace,
+  selectPVC,
 }) => {
-  const { projectsNames, filteredPVCNames, loaded } = useProjectsAndPVCs(projectSelected);
+  const { projectsNames, filteredPVCNames, projectsLoaded, pvcsLoaded } =
+    useProjectsAndPVCs(projectSelected);
 
   const onSelectProject = React.useCallback(
     (newProject) => {
-      selectNamespace(newProject);
-      selectPVCName(undefined);
+      selectPVC(newProject);
     },
-    [selectNamespace, selectPVCName],
+    [selectPVC],
   );
 
   const onPVCSelected = React.useCallback(
     (selection) => {
-      selectPVCName(selection);
+      selectPVC(projectSelected, selection);
     },
-    [selectPVCName],
+    [selectPVC, projectSelected],
   );
 
-  if (!loaded) return <PersistentVolumeClainSelectSkeleton />;
+  if (!projectsLoaded) return <PersistentVolumeClainSelectSkeleton />;
 
   return (
     <div>
@@ -51,6 +49,7 @@ export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectPr
         pvcNameSelected={pvcNameSelected}
         pvcNames={filteredPVCNames}
         isDisabled={!projectSelected}
+        isLoading={!pvcsLoaded}
       />
     </div>
   );

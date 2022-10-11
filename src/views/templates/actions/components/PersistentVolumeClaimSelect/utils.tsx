@@ -5,12 +5,7 @@ import {
   PersistentVolumeClaimModel,
   ProjectModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { getAllowedResourceData, getAllowedResources } from '@kubevirt-utils/resources/shared';
-import {
-  K8sResourceCommon,
-  useK8sWatchResource,
-  useK8sWatchResources,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { SelectOption } from '@patternfly/react-core';
 
 export const filter = (options: string[]) => {
@@ -31,7 +26,8 @@ export const filter = (options: string[]) => {
 type useProjectsAndPVCsReturnType = {
   projectsNames: string[];
   filteredPVCNames: string[];
-  loaded: boolean;
+  projectsLoaded: boolean;
+  pvcsLoaded: boolean;
   error: Error;
 };
 
@@ -42,24 +38,25 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
     isList: true,
   });
 
-  const projectsNames = projects.map((project) => project.metadata.name);
+  const [pvcs, pvcsLoaded, pvcsErrors] = useK8sWatchResource<K8sResourceCommon[]>(
+    projectSelected
+      ? {
+          groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
+          namespaced: true,
+          namespace: projectSelected,
+          isList: true,
+        }
+      : null,
+  );
 
-  const watchedResources = getAllowedResources(projectsNames, PersistentVolumeClaimModel);
-  const resources = useK8sWatchResources<{ [key: string]: K8sResourceCommon[] }>(watchedResources);
-  const {
-    data: pvcs,
-    loaded: pvcsLoaded,
-    loadError: pvcsErrors,
-  } = getAllowedResourceData(resources, PersistentVolumeClaimModel);
-
-  const pvcNamesFilteredByProjects = pvcs
-    .filter((pvc) => pvc.metadata.namespace === projectSelected)
-    .map((pvc) => pvc.metadata.name);
+  const projectsNames = (projects || []).map((project) => project.metadata.name);
+  const filteredPVCNames = (pvcs || []).map((pvc) => pvc.metadata.name);
 
   return {
     projectsNames,
-    filteredPVCNames: pvcNamesFilteredByProjects,
-    loaded: projectsLoaded && pvcsLoaded,
+    filteredPVCNames,
+    projectsLoaded,
+    pvcsLoaded,
     error: projectsErrors || pvcsErrors,
   };
 };
