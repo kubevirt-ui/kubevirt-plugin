@@ -4,11 +4,14 @@ import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert, AlertVariant, ClipboardCopy, Popover } from '@patternfly/react-core';
 import {
+  Alert,
+  AlertVariant,
+  ClipboardCopy,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
+  Popover,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
@@ -82,7 +85,11 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
       <DescriptionListDescription>
         <Stack hasGutter>
           <StackItem>
-            <SSHCheckbox sshServiceRunning={!!sshService} setSSHServiceRunning={onSSHChange} />
+            <SSHCheckbox
+              sshServiceRunning={Boolean(sshService)}
+              setSSHServiceRunning={onSSHChange}
+              isDisabled={loading}
+            />
           </StackItem>
           {sshServiceLoaded && !loading ? (
             sshServiceRunning && (
