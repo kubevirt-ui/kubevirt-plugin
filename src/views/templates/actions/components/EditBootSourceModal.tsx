@@ -1,7 +1,6 @@
-import * as React from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Trans } from 'react-i18next';
 
-import { getTemplateStorageQuantity } from '@catalog/customize/components/CustomizeSource/utils';
 import {
   modelToGroupVersionKind,
   TemplateModel,
@@ -19,6 +18,8 @@ import { editBootSource } from '../editBootSource';
 
 import useBootSourceEditAffectedTemplates from './hooks/useBootSourceEditAffectedTemplates';
 import { SelectSource } from './SelectSource';
+import SelectSourceSkeleton from './SelectSourceSkeleton';
+import { getDataVolumeSpec } from './utils';
 
 import './EditBootSourceModal.scss';
 
@@ -29,14 +30,22 @@ type EditBootSourceModalProps = {
   onClose: () => void;
 };
 
-const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({
+const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
   isOpen,
   obj,
   dataSource,
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [bootSource, setBootSource] = React.useState<V1beta1DataVolumeSpec>();
+  const [bootSource, setBootSource] = useState<V1beta1DataVolumeSpec>();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    getDataVolumeSpec(dataSource)
+      .then(setBootSource)
+      .finally(() => setLoading(false));
+  }, [dataSource]);
 
   const affectedTemplates = useBootSourceEditAffectedTemplates(obj);
 
@@ -79,17 +88,21 @@ const EditBootSourceModal: React.FC<EditBootSourceModalProps> = ({
 
         <Form>
           <FormGroup fieldId="boot-source-type" isRequired>
-            <SelectSource
-              onSourceChange={setBootSource}
-              sourceLabel={t('Boot source type')}
-              sourceOptions={[
-                SOURCE_TYPES.pvcSource,
-                SOURCE_TYPES.registrySource,
-                SOURCE_TYPES.httpSource,
-              ]}
-              withSize
-              initialVolumeQuantity={getTemplateStorageQuantity(obj)}
-            />
+            {loading ? (
+              <SelectSourceSkeleton />
+            ) : (
+              <SelectSource
+                source={bootSource}
+                onSourceChange={setBootSource}
+                sourceLabel={t('Boot source type')}
+                sourceOptions={[
+                  SOURCE_TYPES.pvcSource,
+                  SOURCE_TYPES.registrySource,
+                  SOURCE_TYPES.httpSource,
+                ]}
+                withSize
+              />
+            )}
           </FormGroup>
         </Form>
       </TabModal>

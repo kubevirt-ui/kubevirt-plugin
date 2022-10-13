@@ -12,8 +12,10 @@ import {
   V1beta1DataVolumeSpec,
   V1DataVolumeTemplateSpec,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { poorManProcess } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineObject,
+  poorManProcess,
+} from '@kubevirt-utils/resources/template';
 import {
   getDataSource,
   getDataVolume,
@@ -79,6 +81,22 @@ export const getBootDataSource = async (
     );
 };
 
+export const getDataSourceDataVolume = async (
+  dataSourcePVCName: string,
+  dataSourcePVCNamespace: string,
+): Promise<V1beta1DataVolume | undefined> => {
+  let dataVolume: V1beta1DataVolume = null;
+
+  try {
+    dataVolume = await getDataVolume(dataSourcePVCName, dataSourcePVCNamespace);
+  } catch (error) {
+    // If raised error means that dataVolume is not available
+    console.error(error);
+  }
+
+  return dataVolume;
+};
+
 export const hasEditableBootSource = (dataSource: V1beta1DataSource): boolean => {
   return dataSource && !dataSource.metadata.labels?.['cdi.kubevirt.io/dataImportCron'];
 };
@@ -86,7 +104,7 @@ export const hasEditableBootSource = (dataSource: V1beta1DataSource): boolean =>
 const waitPVCGetDeleted = (name: string, namespace: string): Promise<void> => {
   let timesPVCNotDeleted = 0;
   return new Promise((resolve, reject) => {
-    const pvcInterval = setInterval(async () => {
+    const pvcInterval = setInterval(() => {
       getPVC(name, namespace)
         .then(() => {
           timesPVCNotDeleted++;
@@ -110,11 +128,7 @@ export const editBootSource = async (
   const dataSourcePVCName = dataSource?.spec?.source?.pvc?.name;
   const dataSourcePVCNamespace = dataSource?.spec?.source?.pvc?.namespace;
 
-  let dataVolume = null;
-
-  try {
-    dataVolume = await getDataVolume(dataSourcePVCName, dataSourcePVCNamespace);
-  } catch (error) {}
+  const dataVolume = await getDataSourceDataVolume(dataSourcePVCName, dataSourcePVCNamespace);
 
   if (dataVolume) {
     await k8sDelete({
