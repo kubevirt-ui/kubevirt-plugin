@@ -78,6 +78,7 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
             setCDSource={setCDSource}
             diskUpload={diskUpload}
             cdUpload={cdUpload}
+            isBootSourceAvailable={isBootSourceAvailable}
           />
         </ExpandableSection>
       </StackItem>

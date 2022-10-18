@@ -50,6 +50,7 @@ describe('Test CustomizeSource', () => {
         withDrivers={false}
         setCDSource={setCDSource}
         cdSource={undefined}
+        isBootSourceAvailable
       />,
     );
 
