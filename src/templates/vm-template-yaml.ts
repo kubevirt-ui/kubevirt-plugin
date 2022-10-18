@@ -4,7 +4,7 @@ export const defaultVMTemplateYamlTemplate = `
 apiVersion: ${TemplateModel.apiGroup}/${TemplateModel.apiVersion}
 kind: ${TemplateModel.kind}
 metadata:
-  name: vm-template-example
+  name: example
   labels:
     template.kubevirt.io/type: vm
     os.template.kubevirt.io/fedora36: 'true'
@@ -23,7 +23,7 @@ objects:
         description: VM example
       labels:
         app: '\${NAME}'
-        vm.kubevirt.io/template: vm-template-example
+        vm.kubevirt.io/template: example
         os.template.kubevirt.io/fedora36: 'true'
     spec:
       running: false
@@ -87,7 +87,7 @@ parameters:
   - name: NAME
     description: Name for the new VM
     generate: expression
-    from: 'vm-template-example-[a-z0-9]{16}'
+    from: 'example-[a-z0-9]{16}'
   - name: CLOUD_USER_PASSWORD
     description: Randomized password for the cloud-init user
     generate: expression

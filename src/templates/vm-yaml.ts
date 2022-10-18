@@ -4,11 +4,11 @@ export const defaultVMYamlTemplate = `
 apiVersion: ${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}
 kind: ${VirtualMachineModel.kind}
 metadata:
-  name: vm-example
+  name: example
   annotations:
     description: VM example
   labels:
-    app: vm-example
+    app: example
     os.template.kubevirt.io/fedora36: 'true'
 spec:
   running: false
@@ -19,7 +19,7 @@ spec:
         vm.kubevirt.io/os: fedora36
         vm.kubevirt.io/workload: server
       labels:
-        kubevirt.io/domain: vm-example
+        kubevirt.io/domain: example
         kubevirt.io/size: small
     spec:
       domain:
@@ -53,7 +53,7 @@ spec:
         resources:
           requests:
             memory: 2Gi
-      hostname: vm-example
+      hostname: example
       networks:
         - name: default
           pod: {}
