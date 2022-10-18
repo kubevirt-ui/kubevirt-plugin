@@ -23,9 +23,9 @@ const Limits = ({ hyperConverge }) => {
     if (hyperConverge) {
       const liveMigrationConfig = getLiveMigrationConfig(hyperConverge);
       migrationPerCluster ??
-        setMigrationPerCluster(+liveMigrationConfig?.parallelMigrationsPerCluster || 0);
+        setMigrationPerCluster(Number(liveMigrationConfig?.parallelMigrationsPerCluster) || 0);
       migrationPerCluster ??
-        setMigrationPerNode(+liveMigrationConfig?.parallelOutboundMigrationsPerNode || 0);
+        setMigrationPerNode(Number(liveMigrationConfig?.parallelOutboundMigrationsPerNode) || 0);
     }
   }, [hyperConverge, migrationPerCluster, migrationPerNode]);
 
@@ -35,16 +35,20 @@ const Limits = ({ hyperConverge }) => {
       <div className="live-migration-tab__number--container">
         <div className="live-migration-tab__number--cluster">
           <Title headingLevel="h6" size="md">
-            {t('Max. Migration per cluster')}
+            {t('Max. Migrations per cluster')}
           </Title>
           {!isNaN(migrationPerCluster) ? (
             <NumberInput
               value={migrationPerCluster}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                +event.target.value >= 0 &&
+                Number(event.target.value) >= 0 &&
                   setMigrationPerCluster(() => {
-                    updateValuesCluster(hyperConverge, +event.target.value, MIGRATION_PER_CLUSTER);
-                    return +event.target.value;
+                    updateValuesCluster(
+                      hyperConverge,
+                      Number(event.target.value),
+                      MIGRATION_PER_CLUSTER,
+                    );
+                    return Number(event.target.value);
                   });
               }}
               min={0}
@@ -73,20 +77,19 @@ const Limits = ({ hyperConverge }) => {
           ) : (
             <Skeleton width={'140px'} height={'33px'} />
           )}
-          <div>some text</div>
         </div>
         <div>
           <Title headingLevel="h6" size="md">
-            {t('Max. Migration per node')}
+            {t('Max. Migrations per node')}
           </Title>
           {!isNaN(migrationPerNode) ? (
             <NumberInput
               value={migrationPerNode}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                +event.target.value >= 0 &&
+                Number(event.target.value) >= 0 &&
                 setMigrationPerNode(() => {
-                  updateValuesNode(hyperConverge, +event.target.value, MIGRATION_PER_NODE);
-                  return +event.target.value;
+                  updateValuesNode(hyperConverge, Number(event.target.value), MIGRATION_PER_NODE);
+                  return Number(event.target.value);
                 })
               }
               min={0}
@@ -107,7 +110,6 @@ const Limits = ({ hyperConverge }) => {
           ) : (
             <Skeleton width={'140px'} height={'33px'} />
           )}
-          <div>some text</div>
         </div>
       </div>
     </>
