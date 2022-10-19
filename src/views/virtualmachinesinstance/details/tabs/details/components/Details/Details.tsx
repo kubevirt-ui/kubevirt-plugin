@@ -2,9 +2,7 @@ import * as React from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
-import UserCredentials from '@kubevirt-utils/components/UserCredentials/UserCredentials';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -35,7 +33,7 @@ import Node from './Node/Node';
 import OperationSystem from './OperationSystem/OperationSystem';
 import Owner from './Owner/Owner';
 import Pods from './Pods/Pods';
-import SSHDetails from './SSHAccess/SSHAccess';
+import SSHDetails from './SSHDetails/SSHDetails';
 import Timezone from './Timezone/Timezone';
 import WorkloadProfile from './WorkloadProfile/WorkloadProfile';
 
@@ -153,16 +151,6 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
                 sshService={sshService}
                 sshServiceLoaded={sshServiceLoading}
               />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('SSH command')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {sshServiceLoading ? (
-                  <UserCredentials sshService={sshService} vmi={vmi} />
-                ) : (
-                  <Loading />
-                )}
-              </DescriptionListDescription>
             </DescriptionListGroup>
             <DescriptionListGroup>
               <DescriptionListTerm>{t('Hardware devices')}</DescriptionListTerm>

@@ -7,11 +7,7 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
-import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
-import { UseSSHServiceReturnType } from '@kubevirt-utils/components/SSHAccess/useSSHService';
-import UserCredentials from '@kubevirt-utils/components/UserCredentials/UserCredentials';
 import { getVMIIPAddresses, getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -24,8 +20,6 @@ export type VirtualMachineDetailsRightGridLayoutPresentation = {
   hostname: React.ReactNode;
   timezone: React.ReactNode;
   node: React.ReactNode;
-  userCredentials: React.ReactNode;
-  sshAccess: React.ReactNode;
 };
 
 export const getStoppedVMRightGridPresentation = (
@@ -41,8 +35,6 @@ export const getStoppedVMRightGridPresentation = (
     hostname: NotAvailable,
     timezone: VirtualMachineIsNotRunning,
     node: NotAvailable,
-    userCredentials: VirtualMachineIsNotRunning,
-    sshAccess: VirtualMachineIsNotRunning,
   };
 };
 
@@ -51,7 +43,6 @@ export const getRunningVMRightGridPresentation = (
   vmi: V1VirtualMachineInstance,
   pods: K8sResourceCommon[],
   guestAgentData?: V1VirtualMachineInstanceGuestAgentInfo,
-  watchSSHService?: UseSSHServiceReturnType,
 ): VirtualMachineDetailsRightGridLayoutPresentation => {
   const vmiPod = getVMIPod(vmi, pods);
   const ipAddresses = getVMIIPAddresses(vmi);
@@ -59,8 +50,6 @@ export const getRunningVMRightGridPresentation = (
   const guestAgentIsRequired = guestAgentData && Object.keys(guestAgentData)?.length === 0;
 
   const GuestAgentIsRequiredText = <MutedTextSpan text={t('Guest agent is required')} />;
-
-  const [sshService, sshServiceLoaded] = watchSSHService;
 
   return {
     pod: (
@@ -83,11 +72,5 @@ export const getRunningVMRightGridPresentation = (
       ? GuestAgentIsRequiredText
       : guestAgentData?.timezone?.split(',')[0],
     node: <ResourceLink kind={NodeModel.kind} name={nodeName} />,
-    userCredentials: sshServiceLoaded ? (
-      <UserCredentials vmi={vmi} sshService={sshService} />
-    ) : (
-      <Loading />
-    ),
-    sshAccess: sshServiceLoaded ? <SSHAccess sshService={sshService} /> : <Loading />,
   };
 };

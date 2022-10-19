@@ -27,7 +27,7 @@ const useSSHCommand = (
   return {
     command,
     user,
-    sshServiceRunning: !!sshService,
+    sshServiceRunning: Boolean(sshService),
   };
 };
 
