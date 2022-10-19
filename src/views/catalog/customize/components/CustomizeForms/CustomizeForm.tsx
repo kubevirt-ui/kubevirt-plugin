@@ -1,9 +1,8 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 
-import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Form } from '@patternfly/react-core';
 
 import { buildFields, getVirtualMachineNameField } from '../../utils';
@@ -19,15 +18,15 @@ type CustomizeFormProps = {
   isBootSourceAvailable?: boolean;
 };
 
-export const CustomizeForm: React.FC<CustomizeFormProps> = ({ template }) => {
-  const { t } = useKubevirtTranslation();
+export const CustomizeForm: FC<CustomizeFormProps> = ({ template }) => {
   const methods = useForm();
 
   const { onSubmit, loaded, error } = useCustomizeFormSubmit({ template });
   const [requiredFields, optionalFields] = buildFields(template);
 
-  const { vm } = useWizardVMContext();
-  const nameField = getVirtualMachineNameField(vm?.metadata?.name, t);
+  const { vmName } = useParams<{ vmName?: string }>();
+
+  const nameField = useMemo(() => getVirtualMachineNameField(vmName), [vmName]);
 
   return (
     <FormProvider {...methods}>

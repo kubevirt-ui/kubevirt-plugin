@@ -1,27 +1,18 @@
 import * as React from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
-import { DEFAULT_NAMESPACE } from '@catalog/customize/constants';
 import {
   extractParameterNameFromMetadataName,
-  getVMName,
   replaceTemplateParameterValue,
-  setValueForRequiredParams,
 } from '@catalog/customize/utils';
 import { quickCreateVM } from '@catalog/utils/quick-create-vm';
-import { ensurePath, useWizardVMContext } from '@catalog/utils/WizardVMContext';
-import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
-import {
-  getTemplateVirtualMachineObject,
-  LABEL_USED_TEMPLATE_NAME,
-  LABEL_USED_TEMPLATE_NAMESPACE,
-} from '@kubevirt-utils/resources/template';
-import { k8sCreate, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   Button,
@@ -39,6 +30,8 @@ import {
   TextInput,
 } from '@patternfly/react-core';
 
+import { getVMName } from './utils';
+
 type TemplatesCatalogDrawerCreateFormProps = {
   namespace: string;
   template: V1Template;
@@ -51,15 +44,11 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
   React.memo(({ namespace, template, canQuickCreate, isBootSourceAvailable, onCancel }) => {
     const history = useHistory();
     const { t } = useKubevirtTranslation();
-    const { updateVM } = useWizardVMContext();
-    const { ns } = useParams<{ ns: string }>();
 
-    const [vmName, setVMName] = React.useState('emptyname');
+    const [vmName, setVMName] = React.useState('');
     const [startVM, setStartVM] = React.useState(true);
     const [isQuickCreating, setIsQuickCreating] = React.useState(false);
     const [quickCreateError, setQuickCreateError] = React.useState(undefined);
-    const [isPreparingToCustomizeVM, setIsPreparingToCustomizeVM] = React.useState(false);
-    const [customizeVMError, setCustomizeVMError] = React.useState(undefined);
     const [models, modelsLoading] = useK8sModels();
     const [defaultStorageClass, defaultStorageClassLoaded] = useDefaultStorageClass();
 
@@ -73,8 +62,10 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
       setQuickCreateError(undefined);
 
       const parameterForName = extractParameterNameFromMetadataName(template);
+
       const templateToProcess = produce(template, (draftTemplate) => {
-        replaceTemplateParameterValue(draftTemplate, parameterForName, vmName);
+        if (parameterForName)
+          replaceTemplateParameterValue(draftTemplate, parameterForName, vmName);
       });
 
       quickCreateVM({
@@ -92,47 +83,15 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
         });
     };
 
-    const onCustomizeVM = () => {
-      setIsPreparingToCustomizeVM(true);
-      setCustomizeVMError(undefined);
+    const onCustomize = (e) => {
+      e.preventDefault();
+      let catalogUrl = `templatescatalog/customize?name=${template.metadata.name}&namespace=${template.metadata.namespace}&defaultSourceExists=${canQuickCreate}`;
 
-      // check for the required params and specify some default value for them to get the template processed successfully
-      // required parameters' values will be specified later by the user anyway, during customization process
-      const templateToProcess = setValueForRequiredParams(template);
+      if (vmName) {
+        catalogUrl += `&vmName=${vmName}`;
+      }
 
-      k8sCreate<V1Template>({
-        model: ProcessedTemplatesModel,
-        data: templateToProcess,
-        queryParams: {
-          dryRun: 'All',
-        },
-      })
-        .then((processedTemplate) => {
-          const vmObj = getTemplateVirtualMachineObject(processedTemplate);
-          const updatedVM = produce(vmObj, (vmDraft) => {
-            ensurePath(vmDraft, 'metadata.labels');
-            vmDraft.metadata.name = vmName;
-            vmDraft.metadata.namespace = ns || DEFAULT_NAMESPACE;
-            vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
-            vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] =
-              processedTemplate.metadata.namespace;
-          });
-          updateVM(updatedVM)
-            .then(() => {
-              setIsPreparingToCustomizeVM(false);
-              history.push(
-                `templatescatalog/customize?name=${template.metadata.name}&namespace=${template.metadata.namespace}&defaultSourceExists=${canQuickCreate}`,
-              );
-            })
-            .catch((err) => {
-              setIsPreparingToCustomizeVM(false);
-              setCustomizeVMError(err);
-            });
-        })
-        .catch((err) => {
-          setIsPreparingToCustomizeVM(false);
-          setCustomizeVMError(err);
-        });
+      history.push(catalogUrl);
     };
 
     return (
@@ -195,13 +154,6 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
               </Alert>
             </StackItem>
           )}
-          {customizeVMError && (
-            <StackItem>
-              <Alert variant="danger" title={t('Customize VM error')} isInline>
-                {customizeVMError.message}
-              </Alert>
-            </StackItem>
-          )}
 
           <StackItem>
             <Split hasGutter>
@@ -228,11 +180,7 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
                 <Button
                   data-test-id="customize-vm-btn"
                   variant={canQuickCreate ? ButtonVariant.secondary : ButtonVariant.primary}
-                  isLoading={isPreparingToCustomizeVM}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onCustomizeVM();
-                  }}
+                  onClick={onCustomize}
                 >
                   {t('Customize VirtualMachine')}
                 </Button>
