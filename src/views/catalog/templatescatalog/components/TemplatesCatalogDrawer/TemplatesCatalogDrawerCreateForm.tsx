@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { quickCreateVM } from '@catalog/utils/quick-create-vm';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorageClass/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { generateVMName } from '@kubevirt-utils/resources/template';
@@ -40,12 +41,13 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
     const [startVM, setStartVM] = React.useState(true);
     const [isQuickCreating, setIsQuickCreating] = React.useState(false);
     const [quickCreateError, setQuickCreateError] = React.useState(undefined);
+    const [defaultStorageClass, defaultStorageClassLoaded] = useDefaultStorageClass();
 
     const onQuickCreate = () => {
       setIsQuickCreating(true);
       setQuickCreateError(undefined);
 
-      quickCreateVM(template, { name: vmName, namespace, startVM })
+      quickCreateVM(template, { name: vmName, namespace, startVM, defaultStorageClass })
         .then((vm) => {
           setIsQuickCreating(false);
           history.push(getResourceUrl(VirtualMachineModel, vm));
@@ -124,7 +126,7 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
                     data-test-id="quick-create-vm-btn"
                     type="submit"
                     form="quick-create-form"
-                    isLoading={isQuickCreating}
+                    isLoading={isQuickCreating || !defaultStorageClassLoaded}
                     isDisabled={!isBootSourceAvailable || isQuickCreating || !vmName}
                     onClick={(e) => {
                       e.preventDefault();
