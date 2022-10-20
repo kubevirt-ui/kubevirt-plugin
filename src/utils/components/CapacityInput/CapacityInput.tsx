@@ -27,10 +27,10 @@ const CapacityInput: React.FC<CapacityInputProps> = ({ size, onChange, label }) 
   const [unitValue] = size?.match(/[a-zA-Z]+/g);
   const [sizeValue = 0] = size?.match(/[0-9]+/g) || [];
   const unit = !unitValue?.endsWith('B') ? `${unitValue}B` : unitValue;
-  const value = +sizeValue;
+  const value = Number(sizeValue);
 
   const onFormatChange = (_, newUnit: CAPACITY_UNITS) => {
-    onChange(`${+value}${removeByteSuffix(newUnit)}`);
+    onChange(`${Number(value)}${removeByteSuffix(newUnit)}`);
     toggleSelect(false);
   };
   const unitOptions = Object.values(CAPACITY_UNITS);
@@ -52,11 +52,16 @@ const CapacityInput: React.FC<CapacityInputProps> = ({ size, onChange, label }) 
           <NumberInput
             min={1}
             value={value}
-            onMinus={() => onChange(`${+value - 1}${removeByteSuffix(unit)}`)}
+            max={Number.MAX_SAFE_INTEGER}
+            onMinus={() => onChange(`${Number(value) - 1}${removeByteSuffix(unit)}`)}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              event?.target?.value && onChange(`${+event.target.value}${removeByteSuffix(unit)}`)
+              Number(event?.target?.value) <= Number.MAX_SAFE_INTEGER &&
+              onChange(`${Number(event.target.value)}${removeByteSuffix(unit)}`)
             }
-            onPlus={() => onChange(`${+value + 1}${removeByteSuffix(unit)}`)}
+            onPlus={() =>
+              Number(value) < Number.MAX_SAFE_INTEGER &&
+              onChange(`${Number(value) + 1}${removeByteSuffix(unit)}`)
+            }
             minusBtnAriaLabel={t('Decrement')}
             plusBtnAriaLabel={t('Increment')}
           />
