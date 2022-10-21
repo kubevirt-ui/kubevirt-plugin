@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Accordion,
@@ -14,10 +14,10 @@ import CloudInitCredentialsContent from './CloudInitCredentialsContent';
 import './cloud-init-credentials.scss';
 
 type CloudInitCredentialsProps = {
-  vmi: V1VirtualMachineInstance;
+  vm: V1VirtualMachine;
 };
 
-const CloudInitCredentials: React.FC<CloudInitCredentialsProps> = ({ vmi }) => {
+const CloudInitCredentials: React.FC<CloudInitCredentialsProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const [showCredentials, setShowCredentials] = React.useState<boolean>(false);
 
@@ -32,7 +32,7 @@ const CloudInitCredentials: React.FC<CloudInitCredentialsProps> = ({ vmi }) => {
           {t('Guest login credentials')}
         </AccordionToggle>
         <AccordionContent isHidden={!showCredentials}>
-          <CloudInitCredentialsContent vmi={vmi} />
+          <CloudInitCredentialsContent vm={vm} />
         </AccordionContent>
       </AccordionItem>
     </Accordion>

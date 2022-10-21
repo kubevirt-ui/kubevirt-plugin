@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { CLOUD_INIT_MISSING_USERNAME } from '@kubevirt-utils/components/Consoles/utils/constants';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -14,6 +15,7 @@ import {
   Popover,
   Stack,
   StackItem,
+  Tooltip,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
@@ -37,7 +39,7 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [sshService, setSSHService] = useState<IoK8sApiCoreV1Service>();
-  const { command, sshServiceRunning } = useSSHCommand(vmi, sshService);
+  const { command, user, sshServiceRunning } = useSSHCommand(vm, sshService);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
 
@@ -50,6 +52,8 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
 
     request.catch(setError).finally(() => setLoading(false));
   };
+
+  const hasNoUsername = user === CLOUD_INIT_MISSING_USERNAME;
 
   useEffect(() => {
     setSSHService(initialSSHService);
@@ -85,11 +89,13 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
       <DescriptionListDescription>
         <Stack hasGutter>
           <StackItem>
-            <SSHCheckbox
-              sshServiceRunning={Boolean(sshService)}
-              setSSHServiceRunning={onSSHChange}
-              isDisabled={loading}
-            />
+            <Tooltip content={CLOUD_INIT_MISSING_USERNAME} isVisible={hasNoUsername}>
+              <SSHCheckbox
+                sshServiceRunning={Boolean(sshService)}
+                setSSHServiceRunning={onSSHChange}
+                isDisabled={loading || hasNoUsername}
+              />
+            </Tooltip>
           </StackItem>
           {sshServiceLoaded && !loading ? (
             sshServiceRunning && (
