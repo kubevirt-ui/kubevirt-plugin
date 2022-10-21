@@ -1,5 +1,5 @@
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { getSSHNodePort } from '@kubevirt-utils/utils/utils';
 
@@ -11,12 +11,12 @@ export type useSSHCommandResult = {
 
 // SSH over NodePort
 const useSSHCommand = (
-  vmi: V1VirtualMachineInstance,
+  vm: V1VirtualMachine,
   sshService: IoK8sApiCoreV1Service,
 ): useSSHCommandResult => {
   const consoleHostname = window.location.hostname; // fallback to console hostname
 
-  const { users } = getCloudInitCredentials(vmi);
+  const { users } = getCloudInitCredentials(vm);
   const user = users?.[0]?.name;
   const sshServicePort = getSSHNodePort(sshService);
 
@@ -29,7 +29,7 @@ const useSSHCommand = (
   return {
     command,
     user,
-    sshServiceRunning: !!sshService,
+    sshServiceRunning: Boolean(sshService),
   };
 };
 

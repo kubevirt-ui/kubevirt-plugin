@@ -1,19 +1,19 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ClipboardCopy } from '@patternfly/react-core';
 
 type CloudInitCredentialsContentProps = {
-  vmi: V1VirtualMachineInstance;
+  vm: V1VirtualMachine;
 };
 
-const CloudInitCredentialsContent: React.FC<CloudInitCredentialsContentProps> = ({ vmi }) => {
+const CloudInitCredentialsContent: React.FC<CloudInitCredentialsContentProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
-  const { users } = getCloudInitCredentials(vmi);
+  const { users } = getCloudInitCredentials(vm);
   const usernameTitle = t('User name: ', { count: users?.length });
 
   if (isEmpty(users)) {
