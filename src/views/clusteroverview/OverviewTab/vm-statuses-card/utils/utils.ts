@@ -1,3 +1,5 @@
+import { Fragment } from 'react';
+
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
@@ -23,13 +25,13 @@ const ERROR_STATUSES = [
 export const vmStatusIcon = {
   Running: SyncAltIcon,
   Paused: PausedIcon,
-  Stopped: InProgressIcon,
+  Stopped: Fragment,
   Migrating: InProgressIcon,
-  Starting: InProgressIcon,
-  Stopping: InProgressIcon,
-  Deleting: InProgressIcon,
-  Provisioning: InProgressIcon,
-  Terminating: InProgressIcon,
+  Starting: Fragment,
+  Stopping: Fragment,
+  Deleting: Fragment,
+  Provisioning: Fragment,
+  Terminating: Fragment,
   Error: RedExclamationCircleIcon,
 };
 
@@ -53,9 +55,9 @@ export const getVMStatuses = (vms: V1VirtualMachine[]): StatusCounts => {
   });
 
   statusCounts[ERROR] = ERROR_STATUSES.reduce((acc, state) => {
-    acc += statusCounts?.[state] || 0;
+    const count = acc + (statusCounts?.[state] || 0);
     delete statusCounts[state];
-    return acc;
+    return count;
   }, 0);
 
   const primaryStatuses = PRIMARY_STATUSES.reduce((acc, state) => {

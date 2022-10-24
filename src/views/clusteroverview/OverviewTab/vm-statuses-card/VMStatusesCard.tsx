@@ -36,7 +36,7 @@ const VMStatusesCard: React.FC = () => {
   const { t } = useKubevirtTranslation();
   const [vms] = useK8sWatchResource<V1VirtualMachine[]>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
-    namespaced: !!namespace,
+    namespaced: Boolean(namespace),
     namespace: namespace,
     isList: true,
   });
