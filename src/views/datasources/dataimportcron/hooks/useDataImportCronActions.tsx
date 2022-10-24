@@ -31,7 +31,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
 ) => {
   const dataSourceName = dataImportCron?.spec?.managedDataSource;
   const [dataSource, setDataSource] = React.useState<V1beta1DataSource>();
-  const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const history = useHistory();
