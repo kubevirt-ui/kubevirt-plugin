@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Trans } from 'react-i18next';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import {
   getRemoveHotplugPromise,
   produceVMDisks,
@@ -98,16 +98,18 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onSubmit={onSubmit}
-      headerText={t('Detach {{diskName}} disk', { diskName })}
+      headerText={t('Detach {{diskName}} disk?', { diskName })}
       submitBtnText={t('Detach')}
       submitBtnVariant={ButtonVariant.danger}
     >
       <Stack hasGutter>
         <StackItem>
-          <Trans t={t}>
-            Are you sure you want to detach <strong>{diskName} </strong>in namespace{' '}
-            <strong>{updatedVirtualMachine?.metadata?.namespace}?</strong>
-          </Trans>
+          <ConfirmActionMessage
+            obj={{
+              metadata: { name: diskName, namespace: updatedVirtualMachine?.metadata?.namespace },
+            }}
+            action="detach"
+          />
         </StackItem>
         {loaded ? (
           <StackItem>

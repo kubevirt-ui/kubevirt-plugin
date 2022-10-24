@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import DeleteResourceMessage from '@kubevirt-utils/components/DeleteResourceMessage/DeleteResourceMessage';
+import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
@@ -23,11 +23,11 @@ const SnapshotDeleteModal = ({ isOpen, onClose, snapshot }) => {
           requestInit: undefined,
         })
       }
-      headerText={t('Delete VirtualMachineSnapshot')}
+      headerText={t('Delete VirtualMachineSnapshot?')}
       submitBtnText={t('Delete')}
       submitBtnVariant={ButtonVariant.danger}
     >
-      <DeleteResourceMessage obj={snapshot} />
+      <ConfirmActionMessage obj={snapshot} />
     </TabModal>
   );
 };

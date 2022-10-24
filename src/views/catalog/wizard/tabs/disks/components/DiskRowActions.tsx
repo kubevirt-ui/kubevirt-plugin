@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Trans } from 'react-i18next';
 
 import { ensurePath, produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -74,13 +74,14 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
         isOpen={isOpen}
         obj={vm}
         onSubmit={onDelete}
-        headerText={t('Detach {{diskName}} disk', { diskName })}
+        headerText={t('Detach {{diskName}} disk?', { diskName })}
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
-        <Trans t={t}>
-          Are you sure you want to detach <strong>{diskName} </strong>
-        </Trans>
+        <ConfirmActionMessage
+          obj={{ metadata: { name: diskName, namespace: vm?.metadata?.namespace } }}
+          action="detach"
+        />
       </TabModal>
     ));
   };
