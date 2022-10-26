@@ -15,7 +15,7 @@ const useMigrationPoliciesListColumns = (): [
   const columns: TableColumn<V1alpha1MigrationPolicy>[] = React.useMemo(
     () => [
       {
-        title: t('MigrationPolicy name'),
+        title: t('Name'),
         id: 'name',
         transforms: [sortable],
         sort: 'metadata.name',
