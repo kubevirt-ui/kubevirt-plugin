@@ -18,7 +18,7 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import { isFailedPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
+import { isErrorPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
 
 type VmiMapper = {
   mapper: { [key: string]: { [key: string]: V1VirtualMachineInstance } };
@@ -27,14 +27,14 @@ type VmiMapper = {
 
 type VmimMapper = { [key: string]: { [key: string]: V1VirtualMachineInstance } };
 
-const FailedStatus = { id: 'Failed', title: 'Failed' };
+const ErrorStatus = { id: 'Error', title: 'Error' };
 
 const statusFilterItems = [
   ...Object.keys(printableVMStatus).map((status) => ({
     id: status,
     title: status,
   })),
-  FailedStatus,
+  ErrorStatus,
 ];
 
 const useStatusFilter = (): RowFilter => ({
@@ -43,14 +43,14 @@ const useStatusFilter = (): RowFilter => ({
   isMatch: (obj, filterStatus) => {
     return (
       filterStatus === obj?.status?.printableStatus ||
-      (filterStatus === FailedStatus.id && isFailedPrintableStatus(obj?.status?.printableStatus))
+      (filterStatus === ErrorStatus.id && isErrorPrintableStatus(obj?.status?.printableStatus))
     );
   },
   filter: (statuses, obj) => {
     const status = obj?.status?.printableStatus;
-    const isFailed = statuses.selected.includes(FailedStatus.id) && isFailedPrintableStatus(status);
+    const isError = statuses.selected.includes(ErrorStatus.id) && isErrorPrintableStatus(status);
 
-    return statuses.selected?.length === 0 || statuses.selected?.includes(status) || isFailed;
+    return statuses.selected?.length === 0 || statuses.selected?.includes(status) || isError;
   },
   items: statusFilterItems,
 });

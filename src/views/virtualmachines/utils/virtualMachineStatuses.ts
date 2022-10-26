@@ -35,7 +35,7 @@ export const errorPrintableVMStatus = {
   DataVolumeError: 'DataVolumeError',
 };
 
-export const isFailedPrintableStatus = (printableStatus: string) =>
+export const isErrorPrintableStatus = (printableStatus: string) =>
   Object.values(errorPrintableVMStatus).includes(printableStatus);
 
 export const getVMStatusIcon = (status: string): React.ComponentClass | React.FC => {
@@ -55,9 +55,9 @@ export const getVMStatusIcon = (status: string): React.ComponentClass | React.FC
       return PausedIcon;
     case printableVMStatus.Migrating:
       return MigrationIcon;
+    case errorPrintableVMStatus[status]:
+      return ExclamationCircleIcon;
+    default:
+      return UnknownIcon;
   }
-
-  if (isFailedPrintableStatus(status)) return ExclamationCircleIcon;
-
-  return UnknownIcon;
 };

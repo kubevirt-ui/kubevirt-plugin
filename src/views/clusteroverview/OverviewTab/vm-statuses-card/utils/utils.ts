@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
@@ -68,3 +69,6 @@ export const getVMStatuses = (vms: V1VirtualMachine[]): StatusCounts => {
 
   return { primaryStatuses, additionalStatuses: statusCounts };
 };
+
+export const isAllNamespaces = (namespace: string) =>
+  !namespace || namespace === ALL_NAMESPACES || namespace === ALL_NAMESPACES_SESSION_KEY;
