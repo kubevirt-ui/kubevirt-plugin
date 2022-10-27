@@ -33,11 +33,12 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
   );
 
   return (
-    <Stack hasGutter data-test-id="expandable-customize-source-section">
+    <Stack hasGutter>
       <StackItem>
         <Flex>
           <FlexItem spacer={{ default: 'spacerNone' }}>
             <ExpandableSectionToggle
+              data-test-id="expandable-customize-source-section"
               isExpanded={storageFieldsExpanded}
               onToggle={() => setStorageFieldsExpanded(!storageFieldsExpanded)}
             >
