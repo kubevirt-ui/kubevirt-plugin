@@ -35,7 +35,7 @@ const Limits = ({ hyperConverge }) => {
       <div className="live-migration-tab__number--container">
         <div className="live-migration-tab__number--cluster">
           <Title headingLevel="h6" size="md">
-            {t('Max. Migrations per cluster')}
+            {t('Max. migrations per cluster')}
           </Title>
           {!isNaN(migrationPerCluster) ? (
             <NumberInput
@@ -80,7 +80,7 @@ const Limits = ({ hyperConverge }) => {
         </div>
         <div>
           <Title headingLevel="h6" size="md">
-            {t('Max. Migrations per node')}
+            {t('Max. migrations per node')}
           </Title>
           {!isNaN(migrationPerNode) ? (
             <NumberInput
