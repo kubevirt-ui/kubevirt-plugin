@@ -5,8 +5,7 @@ import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { GridItem } from '@patternfly/react-core';
 
-import { ERROR } from './utils/constants';
-import { vmStatusIcon } from './utils/utils';
+import { isAllNamespaces, vmStatusIcon } from './utils/utils';
 
 import './VMStatusesCard.scss';
 
@@ -18,8 +17,8 @@ type VMStatusItemProps = {
 
 const VMStatusItem: React.FC<VMStatusItemProps> = ({ status, count, namespace }) => {
   const Icon = vmStatusIcon[status];
-  const path = `/k8s/ns/${
-    namespace || ALL_NAMESPACES
+  const path = `/k8s/${
+    isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`
   }/${VirtualMachineModelRef}?rowFilter-status=${status}`;
 
   return (
@@ -30,7 +29,7 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({ status, count, namespace })
             <Icon />
           </span>
           <span className="vm-statuses-card__status-item--value">
-            {status !== ERROR ? <Link to={path}>{count.toString()}</Link> : count.toString()}
+            <Link to={path}>{count.toString()}</Link>
           </span>
         </div>
         <div className="vm-statuses-card__status-item--status">{status}</div>
