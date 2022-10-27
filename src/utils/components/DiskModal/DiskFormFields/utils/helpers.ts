@@ -21,7 +21,7 @@ export const getSourceOptions = (t: TFunction) => ({
   http: {
     id: sourceTypes.HTTP,
     name: t('URL (creates PVC)'),
-    description: t('Import content via URL (HTTP or S3 endpoint).'),
+    description: t('Import content via URL (HTTP or HTTPS endpoint).'),
   },
   pvc: {
     id: sourceTypes.PVC,
