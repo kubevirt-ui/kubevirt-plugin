@@ -24,6 +24,7 @@ import {
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
+import { appendDockerPrefix } from './components/utils';
 import { MAXIMUM_TIMES_PVC_NOT_DELETED, TIMEOUT_PVC_GETS_DELETED_INTERVAL } from './constants';
 
 const DATA_VOLUME: V1beta1DataVolume = {
@@ -49,6 +50,9 @@ export const createDataVolume = (
       namespace,
     };
 
+    if (bootSource?.source?.registry?.url) {
+      bootSource.source.registry.url = appendDockerPrefix(bootSource?.source?.registry?.url);
+    }
     draftDataVolume.spec = bootSource;
   });
 };

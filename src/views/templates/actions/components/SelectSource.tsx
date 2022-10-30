@@ -10,7 +10,6 @@ import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
 import { PersistentVolumeClaimSelect } from './PersistentVolumeClaimSelect/PersistentVolumeClaimSelect';
 import SelectSourceOption from './SelectSourceOption';
 import {
-  appendDockerPrefix,
   getGenericSourceCustomization,
   getPVCSource,
   getSourceTypeFromDataVolumeSpec,
@@ -24,7 +23,6 @@ type SelectSourceProps = {
   withSize?: boolean;
   sourceOptions: SOURCE_OPTIONS_IDS[];
   httpSourceHelperText?: string;
-  registrySourceHelperText?: string;
 };
 
 export const SelectSource: React.FC<SelectSourceProps> = ({
@@ -35,7 +33,6 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   sourceOptions,
   sourceLabel,
   httpSourceHelperText,
-  registrySourceHelperText,
 }) => {
   const { t } = useKubevirtTranslation();
   const selectedSourceType = getSourceTypeFromDataVolumeSpec(source);
@@ -69,7 +66,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
         return onSourceChange(
           getGenericSourceCustomization(
             newSourceType,
-            appendDockerPrefix(containerImage || ''),
+            containerImage || '',
             withSize ? selectedVolumeQuantity : null,
           ),
         );
@@ -82,7 +79,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
     onSourceChange(
       getGenericSourceCustomization(
         selectedSourceType,
-        appendDockerPrefix(newContainerURL || ''),
+        newContainerURL || '',
         withSize ? volumeQuantity : null,
       ),
     );
@@ -119,14 +116,19 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           fieldId={`disk-source-required-${selectedSourceType}`}
           isRequired
           className="disk-source-form-group"
-          helperText={registrySourceHelperText}
+          helperText={
+            <>
+              {t('Example: {{exampleURL}}', {
+                exampleURL: 'quay.io/containerdisks/fedora:latest',
+              })}
+            </>
+          }
         >
           <TextInput
             value={containerImage}
             type="text"
             onChange={onContainerChange}
             aria-label={t('Container Image')}
-            validated={!containerImage ? ValidatedOptions.error : ValidatedOptions.default}
           />
         </FormGroup>
       )}
