@@ -97,7 +97,7 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
       setCustomizeVMError(undefined);
 
       // check for the required params and specify some default value for them to get the template processed successfully
-      // required parameters' values will be specified later  by the user anyway, during customization process
+      // required parameters' values will be specified later by the user anyway, during customization process
       const templateToProcess = setValueForRequiredParams(template);
 
       k8sCreate<V1Template>({

@@ -53,6 +53,8 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
     await editBootSource(dataSource, bootSource);
   };
 
+  const popoverRef = React.useRef<HTMLButtonElement>(null);
+
   return (
     <>
       <TabModal<K8sResourceCommon>
@@ -65,26 +67,25 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
         <Alert isInline className="margin-bottom-md" variant="warning" title={t('Warning')}>
           <Trans ns="plugin__kubevirt-plugin">
             Editing the DataSource will affect{' '}
-            <Popover
-              headerContent={t('Affected templates')}
-              bodyContent={(affectedTemplates || []).map((template) => (
-                <ResourceLink
-                  key={template.metadata.uid}
-                  groupVersionKind={modelToGroupVersionKind(TemplateModel)}
-                  name={template.metadata.name}
-                  namespace={template.metadata.namespace}
-                  linkTo={false}
-                />
-              ))}
-            >
-              <Button variant="link" isInline>
-                {' '}
-                all templates
-              </Button>
-            </Popover>{' '}
+            <Button variant="link" isInline ref={popoverRef}>
+              all templates
+            </Button>{' '}
             that are currently using this DataSource.
           </Trans>
         </Alert>
+        <Popover
+          headerContent={t('Affected templates')}
+          bodyContent={(affectedTemplates || []).map((template) => (
+            <ResourceLink
+              key={template.metadata.uid}
+              groupVersionKind={modelToGroupVersionKind(TemplateModel)}
+              name={template.metadata.name}
+              namespace={template.metadata.namespace}
+              linkTo={false}
+            />
+          ))}
+          reference={popoverRef}
+        />
 
         <Form>
           <FormGroup fieldId="boot-source-type" isRequired>

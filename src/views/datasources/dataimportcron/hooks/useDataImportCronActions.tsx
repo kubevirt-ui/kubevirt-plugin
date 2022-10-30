@@ -134,7 +134,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
       {
         id: 'dataimportcron-action-edit-DataImportCron',
         disabled: false,
-        label: t('Edit DataImportCron'),
+        label: t('Edit'),
         cta: () =>
           history.push(
             `/k8s/ns/${dataImportCron.metadata.namespace}/${DataImportCronModelRef}/${dataImportCron.metadata.name}/yaml`,
@@ -142,7 +142,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
       },
       {
         id: 'dataimportcron-action-delete',
-        label: t('Delete DataImportCron'),
+        label: t('Delete'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <DeleteModal

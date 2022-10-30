@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant } from '@patternfly/react-core';
 
-import DeleteResourceMessage from '../DeleteResourceMessage/DeleteResourceMessage';
+import ConfirmActionMessage from '../ConfirmActionMessage/ConfirmActionMessage';
 
 type DeleteModalProps = {
   isOpen: boolean;
@@ -38,7 +38,7 @@ const DeleteModal: React.FC<DeleteModalProps> = React.memo(
         submitBtnVariant={ButtonVariant.danger}
         titleIconVariant={'warning'}
       >
-        <DeleteResourceMessage obj={obj} />
+        <ConfirmActionMessage obj={obj} />
       </TabModal>
     );
   },

@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import DeleteResourceMessage from '@kubevirt-utils/components/DeleteResourceMessage/DeleteResourceMessage';
+import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -34,7 +34,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const deleteModalHeader = t('Delete {{nicName}} NIC', { nicName });
+  const deleteModalHeader = t('Delete {{nicName}} NIC?', { nicName });
   const editBtnText = t('Edit');
   const deleteBtnText = t('Delete');
 
@@ -75,7 +75,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
-        <DeleteResourceMessage
+        <ConfirmActionMessage
           obj={{ metadata: { name: nicName, namespace: vm?.metadata?.namespace } }}
         />
       </TabModal>

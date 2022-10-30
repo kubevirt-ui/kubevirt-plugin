@@ -7,7 +7,7 @@ import VirtualMachineModel, {
   VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import DeleteResourceMessage from '@kubevirt-utils/components/DeleteResourceMessage/DeleteResourceMessage';
+import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
@@ -96,13 +96,13 @@ const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) =>
       isOpen={isOpen}
       obj={vm}
       onSubmit={onDelete}
-      headerText={t('Delete {{vmName}} VirtualMachine', { vmName: vm?.metadata?.name })}
+      headerText={t('Delete {{vmName}} VirtualMachine?', { vmName: vm?.metadata?.name })}
       submitBtnText={t('Delete')}
       submitBtnVariant={ButtonVariant.danger}
     >
       <Stack hasGutter>
         <StackItem>
-          <DeleteResourceMessage obj={vm} />
+          <ConfirmActionMessage obj={vm} />
         </StackItem>
         <DeleteOwnedResourcesMessage
           deleteOwnedResource={deleteOwnedResource}

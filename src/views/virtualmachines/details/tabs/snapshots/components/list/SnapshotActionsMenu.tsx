@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import DeleteResourceMessage from '@kubevirt-utils/components/DeleteResourceMessage/DeleteResourceMessage';
+import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -29,7 +29,7 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const deleteLabel = t('Delete VirtualMachineSnapshot');
+  const deleteLabel = t('Delete');
 
   const onRestoreModalToggle = React.useCallback(() => {
     createModal(({ isOpen, onClose }) => (
@@ -50,11 +50,11 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
             resource: obj,
           })
         }
-        headerText={deleteLabel}
-        submitBtnText={t('Delete')}
+        headerText={t('Delete VirtualMachineSnapshot?')}
+        submitBtnText={deleteLabel}
         submitBtnVariant={ButtonVariant.danger}
       >
-        <DeleteResourceMessage obj={snapshot} />
+        <ConfirmActionMessage obj={snapshot} />
       </TabModal>
     ));
     setIsDropdownOpen(false);

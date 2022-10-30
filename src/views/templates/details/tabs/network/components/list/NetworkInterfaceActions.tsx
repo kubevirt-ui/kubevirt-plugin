@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Trans } from 'react-i18next';
 import produce from 'immer';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -36,7 +36,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const { createModal } = useModal();
 
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const label = t('Delete {{nicName}} NIC', { nicName });
+  const label = t('Delete {{nicName}} NIC?', { nicName });
   const editBtnText = t('Edit');
   const submitBtnText = t('Delete');
 
@@ -63,7 +63,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
         vm.spec.template.spec.domain.devices.interfaces.filter(({ name }) => name !== nicName);
     });
 
-    return k8sUpdate({
+    return await k8sUpdate({
       model: TemplateModel,
       data: updatedTemplate,
       ns: updatedTemplate?.metadata?.namespace,
@@ -82,9 +82,9 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
         submitBtnText={submitBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
-        <Trans t={t}>
-          Are you sure you want to delete <strong>{nicName} </strong>
-        </Trans>
+        <ConfirmActionMessage
+          obj={{ metadata: { name: nicName, namespace: template?.metadata?.namespace } }}
+        />
       </TabModal>
     ));
     setIsDropdownOpen(false);
