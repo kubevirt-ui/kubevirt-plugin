@@ -28,8 +28,8 @@ export const createMultipleResources = async (
   const vm = resources.find((object) => object.kind === VirtualMachineModel.kind);
   const otherResources = resources.filter(
     (object) =>
-      object.kind !== VirtualMachineModel.kind &&
-      object.metadata.name !== vm.metadata.name &&
+      object.kind !== VirtualMachineModel.kind ||
+      object.metadata.name !== vm.metadata.name ||
       object.metadata.namespace !== vm.metadata.namespace,
   );
 
