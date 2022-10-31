@@ -15,7 +15,7 @@ import {
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
-import chart_color_blue_400 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
+import chart_color_blue_400 from '@patternfly/react-tokens/dist/esm/chart_color_blue_400';
 import chart_global_FontSize_2xl from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
 
 import { getMultilineUtilizationQueries } from '../../utils/queries';

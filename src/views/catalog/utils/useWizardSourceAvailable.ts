@@ -83,6 +83,8 @@ export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
       case undefined: {
         setIsBootSourceAvailable(false);
       }
+      default:
+        break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bootSource]);

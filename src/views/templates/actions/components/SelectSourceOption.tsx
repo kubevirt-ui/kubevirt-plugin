@@ -66,6 +66,8 @@ const getSourceOption = (
           {t('Upload (Upload a new file to a PVC)')} <ExternalLinkAltIcon />
         </SelectOption>
       );
+    default:
+      break;
   }
 };
 

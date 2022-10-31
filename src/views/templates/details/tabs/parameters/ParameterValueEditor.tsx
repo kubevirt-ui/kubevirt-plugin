@@ -41,6 +41,8 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
         delete newParameter.value;
         onChange(newParameter);
         break;
+      default:
+        break;
     }
     setIsOpen(false);
   };

@@ -1,7 +1,6 @@
 import * as React from 'react';
 
-import { TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceLink, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   convertBytes,

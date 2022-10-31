@@ -2,10 +2,8 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import useSSHCommand from '@kubevirt-utils/components/SSHAccess/useSSHCommand';
-import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
+import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
 import { CardTitle, Dropdown, DropdownItem, KebabToggle } from '@patternfly/react-core';
 import { CopyIcon } from '@patternfly/react-icons';
 
@@ -22,13 +20,10 @@ const VirtualMachinesOverviewTabDetailsTitle: React.FC<
 > = ({ vm }) => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const { t } = useKubevirtTranslation();
-  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const [sshService] = useSSHService(vmi);
-  const { command } = useSSHCommand(vmi, sshService);
+  const virtctlCommand = getConsoleVirtctlCommand(vm?.metadata?.name, vm?.metadata?.namespace);
 
   const isMachinePaused = vm?.status?.printableStatus === printableVMStatus.Paused;
   const isMachineStopped = vm?.status?.printableStatus === printableVMStatus.Stopped;
-  const isMachineRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
   return (
     <CardTitle className="text-muted card-title">
@@ -40,11 +35,11 @@ const VirtualMachinesOverviewTabDetailsTitle: React.FC<
         isPlain
         dropdownItems={[
           <DropdownItem
-            onClick={() => command && navigator.clipboard.writeText(command)}
+            onClick={() => virtctlCommand && navigator.clipboard.writeText(virtctlCommand)}
             key="copy"
-            isDisabled={!isMachineRunning || !sshService}
+            description={t('SSH using virtctl')}
           >
-            {t('Copy SSH Command')}{' '}
+            {t('Copy SSH command')}{' '}
             <span className="text-muted">
               <CopyIcon />
             </span>

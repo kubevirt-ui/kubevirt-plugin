@@ -1,6 +1,5 @@
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 

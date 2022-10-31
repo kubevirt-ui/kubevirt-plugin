@@ -47,12 +47,9 @@ export const fromNow = (dateTime: string | Date, now?: Date, options?) => {
     return '-';
   }
 
-  if (!now) {
-    now = new Date();
-  }
-
+  const actualDate = now || new Date();
   const date = new Date(dateTime);
-  const ms = now.getTime() - date.getTime();
+  const ms = actualDate.getTime() - date.getTime();
 
   // If the event occurred less than one minute in the future, assume it's clock drift and show "Just now."
   if (!options?.omitSuffix && ms < MINUTE_IN_MS && ms > MAX_CLOCK_SKEW_MS) {

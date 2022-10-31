@@ -12,7 +12,7 @@ import {
   KebabToggle,
 } from '@patternfly/react-core';
 
-import useVirtualMachineActionsProvider from '../../../actions/hooks/useVirtualMachineActionsProvider';
+import useVirtualMachineActionsProvider from '../../hooks/useVirtualMachineActionsProvider';
 
 type VirtualMachinesInsanceActionsProps = { vm: V1VirtualMachine; isKebabToggle?: boolean };
 
@@ -61,6 +61,12 @@ const VirtualMachineActions: React.FC<VirtualMachinesInsanceActionsProps> = ({
           description={action?.description}
         >
           {action?.label}
+          {action?.icon && (
+            <>
+              {' '}
+              <span className="text-muted">{action.icon}</span>
+            </>
+          )}
         </DropdownItem>
       ))}
     />
