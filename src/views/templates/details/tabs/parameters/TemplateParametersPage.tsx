@@ -58,7 +58,8 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
     history.goBack();
   }, [history]);
 
-  const onSave = async () => {
+  const onSave: React.MouseEventHandler<HTMLButtonElement> = async (event) => {
+    event.preventDefault();
     setLoading(true);
     try {
       await k8sUpdate({
