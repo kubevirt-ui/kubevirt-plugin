@@ -21,7 +21,11 @@ const useTemplateProviders = (): ItemsToFilterProps[] => {
   return [
     {
       id: 'Red Hat',
-      title: 'Red Hat',
+      title: t('Red Hat'),
+    },
+    {
+      id: 'Red Hat - Tech Preview',
+      title: t('Red Hat - Tech Preview'),
     },
     {
       id: 'Other',
@@ -31,10 +35,11 @@ const useTemplateProviders = (): ItemsToFilterProps[] => {
 };
 
 // return the name (of VM template provider/OS) or 'Other' if the name not included in the array of available items for filtering
-const getItemNameWithOther = (itemName: string, items: ItemsToFilterProps[]): string =>
-  !items?.find((s: ItemsToFilterProps) => s.id === itemName) || itemName === 'Other'
+const getItemNameWithOther = (itemName: string, items: ItemsToFilterProps[]): string => {
+  return !items?.find((s: ItemsToFilterProps) => s.id === itemName) || itemName === 'Other'
     ? 'Other'
     : itemName;
+};
 
 const includeFilter = (
   compareData: FilterValue,
