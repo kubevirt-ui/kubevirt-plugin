@@ -68,6 +68,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
     namespaced: true,
+    namespace,
     limit: OBJECTS_FETCHING_LIMIT,
   });
 
