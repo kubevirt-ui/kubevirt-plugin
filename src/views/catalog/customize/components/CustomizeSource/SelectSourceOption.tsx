@@ -45,7 +45,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
         <SelectOption
           value={HTTP_SOURCE_NAME}
           key={HTTP_SOURCE_NAME}
-          description={t('Import content via URL (HTTP or S3 endpoint).')}
+          description={t('Import content via URL (HTTP or HTTPS endpoint).')}
         >
           <span data-test-id={HTTP_SOURCE_NAME}>{t('URL (creates PVC)')}</span>
         </SelectOption>

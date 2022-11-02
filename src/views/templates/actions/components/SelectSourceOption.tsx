@@ -1,18 +1,13 @@
 import * as React from 'react';
-import { TFunction } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
 
 import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
 
-const getSourceOption = (
-  source: SOURCE_OPTIONS_IDS,
-  ns: string,
-  t: TFunction<'plugin__kubevirt-plugin', undefined>,
-) => {
+const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string) => {
   switch (source) {
     case SOURCE_TYPES.defaultSource:
       return (
@@ -38,7 +33,7 @@ const getSourceOption = (
       return (
         <SelectOption
           value={SOURCE_TYPES.httpSource}
-          description={t('Import content via URL (HTTP or S3 endpoint).')}
+          description={t('Import content via URL (HTTP or HTTPS endpoint).')}
         >
           <span data-test-id={SOURCE_TYPES.httpSource}>{t('URL (creates PVC)')}</span>
         </SelectOption>
@@ -66,6 +61,8 @@ const getSourceOption = (
           {t('Upload (Upload a new file to a PVC)')} <ExternalLinkAltIcon />
         </SelectOption>
       );
+    default:
+      return;
   }
 };
 
@@ -84,7 +81,6 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { ns } = useParams<{ ns: string }>();
-  const { t } = useKubevirtTranslation();
 
   const onSelect = React.useCallback(
     (event, selection) => {
@@ -113,7 +109,7 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
         menuAppendTo="parent"
       >
         {<SelectOption key={0} value="Select a title" isPlaceholder /> &&
-          options.map((option) => getSourceOption(option, ns, t))}
+          options.map((option) => getSourceOption(option, ns))}
       </Select>
     </FormGroup>
   );

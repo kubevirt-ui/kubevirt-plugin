@@ -408,7 +408,7 @@
   "Hot plug is enabled only for \"SCSI\" interface": "Hot plug is enabled only for \"SCSI\" interface",
   "Image URL": "Image URL",
   "Import content via container registry.": "Import content via container registry.",
-  "Import content via URL (HTTP or S3 endpoint).": "Import content via URL (HTTP or S3 endpoint).",
+  "Import content via URL (HTTP or HTTPS endpoint).": "Import content via URL (HTTP or HTTPS endpoint).",
   "In": "In",
   "Include all values from existing config maps, secrets or service accounts (as disk)": "Include all values from existing config maps, secrets or service accounts (as disk)",
   "Increment": "Increment",
