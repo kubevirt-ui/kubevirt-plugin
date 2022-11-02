@@ -12,12 +12,16 @@ import { TemplatesCatalogDrawer } from '../components/TemplatesCatalogDrawer/Tem
 
 import { containerTemplateMock } from './mocks';
 
+const mockHistoryPush = jest.fn();
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: jest.fn(() => ({
     ns: 'default',
   })),
-  useHistory: jest.fn(),
+  useHistory: () => ({
+    push: mockHistoryPush,
+  }),
 }));
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
@@ -99,6 +103,10 @@ test('TemplatesCatalogDrawer', async () => {
   // test customize vm btn
   act(() => {
     fireEvent.click(getByTestId('customize-vm-btn'));
+  });
+
+  await waitFor(() => {
+    expect(mockHistoryPush).toBeCalled();
   });
 
   // test create btn

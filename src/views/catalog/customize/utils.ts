@@ -1,4 +1,3 @@
-import { TFunction } from 'react-i18next';
 import produce from 'immer';
 
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
@@ -11,11 +10,8 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
-import {
-  generateVMName,
-  getTemplateVirtualMachineObject,
-} from '@kubevirt-utils/resources/template/utils/selectors';
-import { findAllIndexes } from '@kubevirt-utils/utils/utils';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { NAME_INPUT_FIELD } from './constants';
@@ -129,43 +125,7 @@ export const processTemplate = async ({
   });
 };
 
-// set some value for required template parameters to get the template processed successfully
-export const setValueForRequiredParams = (template: V1Template): V1Template => {
-  const requiredParamsIndexes = findAllIndexes(
-    template?.parameters || [],
-    (parameter) => parameter?.required,
-  );
-
-  const templateToProcess = produce(template, (draftTemplate) => {
-    requiredParamsIndexes.map((paramIndex) => {
-      draftTemplate.parameters[paramIndex].value = 'val'; // must be any non-empty string
-    });
-    return draftTemplate;
-  });
-
-  return templateToProcess;
-};
-
-export const getVMName = async (template: V1Template): Promise<string> => {
-  const templateToProcess = setValueForRequiredParams(template); // need to set some value if required params occur
-
-  return await k8sCreate<V1Template>({
-    model: ProcessedTemplatesModel,
-    data: templateToProcess,
-    queryParams: {
-      dryRun: 'All',
-    },
-  }).then(
-    (simpleProcessedTemplate) =>
-      simpleProcessedTemplate?.parameters?.find((obj: { name: string }) => obj?.name === 'NAME')
-        ?.value || generateVMName(template),
-  );
-};
-
-export const getVirtualMachineNameField = (
-  vmName: string,
-  t: TFunction<'plugin__kubevirt-plugin', undefined>,
-): TemplateParameter => {
+export const getVirtualMachineNameField = (vmName: string): TemplateParameter => {
   return {
     required: true,
     name: NAME_INPUT_FIELD,

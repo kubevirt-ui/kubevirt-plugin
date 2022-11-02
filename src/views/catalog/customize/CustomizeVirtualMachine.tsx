@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -7,6 +7,7 @@ import {
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
+import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CustomizeError } from './components/CustomizeError';
@@ -19,7 +20,7 @@ import { hasCustomizableSource } from './utils';
 
 import './CustomizeVirtualMachine.scss';
 
-const CustomizeVirtualMachine: React.FC = () => {
+const CustomizeVirtualMachine: FC = () => {
   const { ns } = useParams<{ ns: string }>();
   const { params } = useURLParams();
   const name = params.get('name');
@@ -34,7 +35,11 @@ const CustomizeVirtualMachine: React.FC = () => {
     namespace: templateNamespace,
   });
 
-  const Form = React.useMemo(() => {
+  const [templateWithGeneratedValues, processError] = useVMTemplateGeneratedParams(
+    loaded ? template : null,
+  );
+
+  const Form = useMemo(() => {
     const withDiskSource = hasCustomizableSource(template);
 
     if (withDiskSource) {
@@ -44,9 +49,9 @@ const CustomizeVirtualMachine: React.FC = () => {
     }
   }, [template]);
 
-  if (error) return <CustomizeError />;
+  if (error || processError) return <CustomizeError />;
 
-  if (!loaded) return <CustomizeVirtualMachineSkeleton />;
+  if (!loaded || !templateWithGeneratedValues) return <CustomizeVirtualMachineSkeleton />;
 
   return (
     <>
@@ -55,10 +60,15 @@ const CustomizeVirtualMachine: React.FC = () => {
       <div className="co-m-pane__body co-m-pane__body--no-top-margin customize-vm">
         <div className="row">
           <div className="col-md-7 col-md-push-5 co-catalog-item-info">
-            <RightHeader template={template} />
+            <RightHeader template={templateWithGeneratedValues} />
           </div>
           <div className="col-md-5 col-md-pull-7">
-            {template && <Form template={template} isBootSourceAvailable={isBootSourceAvailable} />}
+            {template && (
+              <Form
+                template={templateWithGeneratedValues}
+                isBootSourceAvailable={isBootSourceAvailable}
+              />
+            )}
           </div>
         </div>
       </div>

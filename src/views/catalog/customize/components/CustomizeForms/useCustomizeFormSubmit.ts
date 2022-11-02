@@ -52,13 +52,7 @@ export const useCustomizeFormSubmit = ({
   const [templateLoaded, setTemplateLoaded] = React.useState(true);
   const [templateError, setTemplateError] = React.useState<any>();
 
-  const {
-    updateVM,
-    tabsData,
-    updateTabsData,
-    loaded: vmLoaded,
-    error: vmError,
-  } = useWizardVMContext();
+  const { updateVM, tabsData, updateTabsData, loaded: vmLoaded } = useWizardVMContext();
   const { upload: diskUpload, uploadData: uploadDiskData } = useCDIUpload();
   const { upload: cdUpload, uploadData: uploadCDData } = useCDIUpload();
 
@@ -201,7 +195,7 @@ export const useCustomizeFormSubmit = ({
       return cdUpload?.cancelUpload();
     },
     loaded: templateLoaded && vmLoaded,
-    error: templateError || vmError,
+    error: templateError,
     diskUpload,
     cdUpload,
   };

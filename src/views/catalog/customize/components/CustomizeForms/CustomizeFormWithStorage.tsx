@@ -1,10 +1,9 @@
-import * as React from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 import {
   getTemplateOS,
   getTemplateVirtualMachineObject,
@@ -32,17 +31,18 @@ type CustomizeFormWithStorageProps = {
   isBootSourceAvailable?: boolean;
 };
 
-const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({
+const CustomizeFormWithStorage: FC<CustomizeFormWithStorageProps> = ({
   template,
   isBootSourceAvailable,
 }) => {
-  const { t } = useKubevirtTranslation();
   const methods = useForm();
+  const { params } = useURLParams();
+  const vmName = params.get('vmName');
 
-  const [diskSource, setDiskSource] = React.useState<V1beta1DataVolumeSpec>();
-  const [cdSource, setCDSource] = React.useState<V1beta1DataVolumeSpec>();
+  const [diskSource, setDiskSource] = useState<V1beta1DataVolumeSpec>();
+  const [cdSource, setCDSource] = useState<V1beta1DataVolumeSpec>();
 
-  const templateWithSources = React.useMemo(() => {
+  const templateWithSources = useMemo(() => {
     let newTemplate = template;
 
     if (diskSource) {
@@ -57,7 +57,7 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({
     return newTemplate;
   }, [cdSource, template, diskSource]);
 
-  const [windowsDrivers, setWindowsDrivers] = React.useState(
+  const [windowsDrivers, setWindowsDrivers] = useState(
     getTemplateOS(template) === OS_NAME_TYPES.windows,
   );
 
@@ -68,11 +68,9 @@ const CustomizeFormWithStorage: React.FC<CustomizeFormWithStorageProps> = ({
     withWindowsDrivers: windowsDrivers,
   });
 
-  const [requiredFields, optionalFields] = React.useMemo(() => buildFields(template), [template]);
+  const [requiredFields, optionalFields] = useMemo(() => buildFields(template), [template]);
 
-  const { vm } = useWizardVMContext();
-
-  const nameField = React.useMemo(() => getVirtualMachineNameField(vm?.metadata?.name, t), [vm, t]);
+  const nameField = useMemo(() => getVirtualMachineNameField(vmName), [vmName]);
 
   return (
     <FormProvider {...methods}>
