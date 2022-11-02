@@ -384,6 +384,9 @@
         "data-quickstart-id": "qs-nav-migrationpolicies",
         "data-test-id": "migrationpolicies-nav-item"
       }
+    },
+    "flags": {
+      "required": ["CAN_LIST_NS"]
     }
   },
   {
