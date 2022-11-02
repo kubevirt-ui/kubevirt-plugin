@@ -25,10 +25,11 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
 
   const bootSource = useMemo(() => getTemplateBootSourceType(template), [template]);
 
-  const getPVCSource = ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
+  const getPVCSource = async ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
     setLoaded(false);
-    return getPVC(name, namespace)
-      .then((pvc) => {
+    try {
+      const pvc = await getPVC(name, namespace);
+      if (pvc) {
         setIsBootSourceAvailable(true);
         setTemplateBootSource({
           type: BOOT_SOURCE.PVC,
@@ -39,48 +40,39 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
             },
           },
           sourceValue: { pvc },
-          storageClassName: pvc.spec.storageClassName,
+          storageClassName: pvc?.spec?.storageClassName,
         });
-      })
-      .catch((e) => {
-        setError(e);
-      })
-      .finally(() => setLoaded(true));
+      }
+    } catch (e) {
+      setError(e);
+    }
+    setLoaded(true);
   };
 
-  const getDataSourceCondition = ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
+  const getDataSourceCondition = async ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
     setLoaded(false);
-    return getDataSource(name, namespace)
-      .then((dataSource) => {
-        if (
-          dataSource?.status?.conditions?.find((c) => c.type === 'Ready' && c.status === 'True')
-        ) {
-          setIsBootSourceAvailable(true);
-          setTemplateBootSource({
-            type: BOOT_SOURCE.DATA_SOURCE,
-            source: {
-              pvc: dataSource?.spec?.source?.pvc,
-            },
-          });
-          return dataSource;
-        }
-      })
-      .then((dataSource) => {
-        if (dataSource) {
-          getPVC(dataSource.spec.source.pvc.name, dataSource.spec.source.pvc.namespace).then(
-            (pvc) => {
-              setTemplateBootSource((prev) => ({
-                ...prev,
-                storageClassName: pvc?.spec?.storageClassName,
-              }));
-            },
-          );
-        }
-      })
-      .catch((e) => {
-        setError(e);
-      })
-      .finally(() => setLoaded(true));
+    try {
+      const dataSource = await getDataSource(name, namespace);
+      if (
+        dataSource?.status?.conditions?.find((c) => c?.type === 'Ready' && c?.status === 'True')
+      ) {
+        setIsBootSourceAvailable(true);
+        const pvc = await getPVC(
+          dataSource?.spec?.source?.pvc?.name,
+          dataSource?.spec?.source?.pvc?.namespace,
+        );
+        setTemplateBootSource({
+          type: BOOT_SOURCE.DATA_SOURCE,
+          source: {
+            pvc: dataSource?.spec?.source?.pvc,
+          },
+          storageClassName: pvc?.spec?.storageClassName,
+        });
+      }
+    } catch (e) {
+      setError(e);
+    }
+    setLoaded(true);
   };
 
   useEffect(() => {
