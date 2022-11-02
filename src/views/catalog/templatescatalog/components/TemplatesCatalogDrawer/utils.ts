@@ -2,7 +2,7 @@ import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/c
 import { generateVMName } from '@kubevirt-utils/resources/template';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
-export const getVMName = async (template: V1Template): Promise<string> => {
+export const getVMName = async (template: V1Template, namespace: string): Promise<string> => {
   const templateToProcess: V1Template = {
     ...template,
     parameters: template.parameters.filter((parameter) => !parameter.required),
@@ -11,6 +11,7 @@ export const getVMName = async (template: V1Template): Promise<string> => {
   return await k8sCreate<V1Template>({
     model: ProcessedTemplatesModel,
     data: templateToProcess,
+    ns: namespace,
     queryParams: {
       dryRun: 'All',
     },
