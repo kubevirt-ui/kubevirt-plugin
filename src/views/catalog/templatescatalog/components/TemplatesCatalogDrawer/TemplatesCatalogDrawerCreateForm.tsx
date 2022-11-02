@@ -51,7 +51,7 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
     const [models, modelsLoading] = useK8sModels();
 
     React.useEffect(() => {
-      getVMName(template).then(setVMName);
+      getVMName(template, namespace).then(setVMName);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // run only once when it's initially rendering
 
