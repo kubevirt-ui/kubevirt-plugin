@@ -1,0 +1,46 @@
+.metric-chart-card {
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--pf-global--spacer--lg);
+
+  &__content {
+    width: 100%
+  }
+
+  &__header {
+    height: 75px;
+    text-align: center;
+    margin-bottom: var(--pf-global--spacer--xs);
+
+    &--current-value {
+      height: 40px;
+    }
+
+    &--value {
+      font-size: var(--pf-global--FontSize--4xl);
+      font-weight: var(--pf-global--FontWeight--overpass--bold);
+    }
+
+    &--unit {
+      font-size: var(--pf-global--FontSize--xl);
+      font-weight: var(--pf-global--FontWeight--overpass--bold);
+    }
+
+    &--metric {
+      font-size: var(--pf-global--FontSize--xl);
+      text-align: center;
+      margin-bottom: var(--pf-global--spacer--sm);
+    }
+  }
+
+  &__chart {
+    height: 210px;
+
+    &--label {
+      text-align: left;
+      margin-bottom: -10px;
+    }
+  }
+}

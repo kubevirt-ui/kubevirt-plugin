@@ -5,7 +5,7 @@ import { Grid, GridItem } from '@patternfly/react-core';
 
 import OverviewAlertsCard from './alerts-card/OverviewAlertsCard';
 import GettingStartedCard from './getting-started-card/GettingStartedCard';
-import ResourcesInventoryCard from './resources-inventory-card/ResourcesInventoryCard';
+import ChartsCard from './metric-charts-card/components/ChartsCard';
 import VMStatusesCard from './vm-statuses-card/VMStatusesCard';
 import VMsPerTemplateCard from './vms-per-template-card/VMsPerTemplateCard';
 
@@ -13,7 +13,7 @@ const OverviewTab: React.FC = () => {
   return (
     <Overview>
       <GettingStartedCard />
-      <ResourcesInventoryCard />
+      <ChartsCard />
       <OverviewAlertsCard />
       <Grid hasGutter>
         <GridItem span={6}>
