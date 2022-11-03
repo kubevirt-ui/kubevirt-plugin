@@ -134,7 +134,7 @@ export const VirtualMachineActionFactory = {
   ): Action => {
     return {
       id: 'vm-action-clone',
-      disabled: ![Stopped, Paused].includes(vm?.status?.printableStatus),
+      disabled: ![Stopped, Paused, Running].includes(vm?.status?.printableStatus),
       label: t('Clone'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
