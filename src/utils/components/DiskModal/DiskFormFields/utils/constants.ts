@@ -57,6 +57,7 @@ export const mapSourceTypeToVolumeType = {
   [volumeTypes.CONFIG_MAP]: OTHER,
   [volumeTypes.SECRET]: OTHER,
   [volumeTypes.SERVICE_ACCOUNT]: OTHER,
+  [volumeTypes.DATA_VOLUME]: volumeTypes.DATA_VOLUME,
   [OTHER]: OTHER,
 };
 
