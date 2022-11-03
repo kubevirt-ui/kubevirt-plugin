@@ -106,7 +106,11 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
   return (
     <>
       <ListPageHeader title={t('VirtualMachines')}>
-        <ListPageCreateDropdown items={createItems} onClick={onCreate}>
+        <ListPageCreateDropdown
+          items={createItems}
+          onClick={onCreate}
+          createAccessReview={{ groupVersionKind: VirtualMachineModelRef, namespace }}
+        >
           {t('Create')}
         </ListPageCreateDropdown>
       </ListPageHeader>
