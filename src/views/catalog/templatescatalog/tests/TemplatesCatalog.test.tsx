@@ -8,10 +8,6 @@ import TemplatesCatalog from '../TemplatesCatalog';
 
 import { containerTemplateMock, urlTemplateMock } from './mocks';
 
-jest.mock('@kubevirt-utils/hooks/useIsAdmin', () => ({
-  useIsAdmin: () => false,
-}));
-
 jest.mock('../hooks/useTemplatesWithAvailableSource', () => ({
   useTemplatesWithAvailableSource: () => ({
     templates: [urlTemplateMock, containerTemplateMock],
@@ -26,6 +22,7 @@ jest.mock('../hooks/useTemplatesWithAvailableSource', () => ({
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   k8sCreate: jest.fn().mockRejectedValue({}),
   useK8sWatchResource: jest.fn().mockReturnValue([[], true, undefined]),
+  useAccessReview: jest.fn().mockReturnValue([true, false]),
 }));
 
 jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => ({

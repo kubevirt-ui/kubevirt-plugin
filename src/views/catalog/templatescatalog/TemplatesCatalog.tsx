@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, Toolbar, ToolbarContent } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
@@ -24,9 +24,12 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   },
 }) => {
   const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
+  const [processedTemplateAccessReview] = useAccessReview({
+    namespace,
+    resource: ProcessedTemplatesModel.plural,
+    verb: 'create',
+  });
 
-  const isAdmin = useIsAdmin();
-  const disableDrawer = !namespace && !isAdmin;
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
   const { templates, availableTemplatesUID, loaded, bootSourcesLoaded, availableDatasources } =
     useTemplatesWithAvailableSource({
@@ -42,7 +45,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
 
   return (
     <Stack hasGutter className="vm-catalog">
-      <TemplatesCatalogPageHeader namespace={namespace} isAdmin={isAdmin} />
+      <TemplatesCatalogPageHeader />
       {loaded ? (
         <div className="co-catalog-page co-catalog-page--with-sidebar">
           <TemplatesCatalogFilters filters={filters} onFilterChange={onFilterChange} />
@@ -56,20 +59,22 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
                 />
               </ToolbarContent>
             </Toolbar>
-            {filteredTemplates?.length > 0 ? (
+            {filteredTemplates?.length > 0 && processedTemplateAccessReview ? (
               <TemplatesCatalogItems
                 templates={filteredTemplates}
                 availableTemplatesUID={availableTemplatesUID}
                 availableDatasources={availableDatasources}
                 bootSourcesLoaded={bootSourcesLoaded}
                 filters={filters}
-                onTemplateClick={!disableDrawer && setSelectedTemplate}
+                onTemplateClick={processedTemplateAccessReview && setSelectedTemplate}
                 loaded={loaded}
               />
             ) : (
               <TemplatesCatalogEmptyState
                 onClearFilters={clearAll}
                 bootSourcesLoaded={bootSourcesLoaded}
+                processedTemplateAccessReview={processedTemplateAccessReview}
+                namespace={namespace}
               />
             )}
           </Stack>
