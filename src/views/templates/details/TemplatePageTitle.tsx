@@ -19,7 +19,7 @@ type TemplatePageTitleTitleProps = {
 const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const [lastNamespacePath] = useLastNamespacePath();
+  const lastNamespacePath = useLastNamespacePath();
   const isEditDisabled = isCommonVMTemplate(template);
 
   return (

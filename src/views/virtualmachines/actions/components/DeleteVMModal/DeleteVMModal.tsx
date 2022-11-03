@@ -29,7 +29,7 @@ const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) =>
   const history = useHistory();
   const [deleteOwnedResource, setDeleteOwnedResource] = React.useState(true);
   const { dataVolumes, pvcs, snapshots, loaded } = useDeleteVMResources(vm);
-  const [lastNamespacePath] = useLastNamespacePath();
+  const lastNamespacePath = useLastNamespacePath();
 
   const onDelete = async (updatedVM: V1VirtualMachine) => {
     if (!deleteOwnedResource) {

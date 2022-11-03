@@ -44,7 +44,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const [bootDataSource, setBootDataSource] = React.useState<V1beta1DataSource>();
   const [loadingBootSource, setLoadingBootSource] = React.useState(true);
   const editableBootSource = hasEditableBootSource(bootDataSource);
-  const [lastNamespacePath] = useLastNamespacePath();
+  const lastNamespacePath = useLastNamespacePath();
 
   const [canWriteToDataSourceNs] = useAccessReview(
     asAccessReview(
