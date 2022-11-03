@@ -24,7 +24,7 @@ type CapacityInputProps = {
 const CapacityInput: React.FC<CapacityInputProps> = ({ size, onChange, label }) => {
   const { t } = useKubevirtTranslation();
   const [selectOpen, toggleSelect] = useState<boolean>(false);
-  const [unitValue] = size?.match(/[a-zA-Z]+/g);
+  const [unitValue = ''] = size?.match(/[a-zA-Z]+/g) || [];
   const [sizeValue = 0] = size?.match(/[0-9]+/g) || [];
   const unit = !unitValue?.endsWith('B') ? `${unitValue}B` : unitValue;
   const value = Number(sizeValue);
