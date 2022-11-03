@@ -48,7 +48,10 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
   return (
     <>
       <ListPageHeader title={t('VirtualMachine Templates')}>
-        <ListPageCreate groupVersionKind={modelToRef(TemplateModel)}>
+        <ListPageCreate
+          createAccessReview={{ groupVersionKind: modelToRef(TemplateModel), namespace }}
+          groupVersionKind={modelToRef(TemplateModel)}
+        >
           {t('Create Template')}
         </ListPageCreate>
       </ListPageHeader>
