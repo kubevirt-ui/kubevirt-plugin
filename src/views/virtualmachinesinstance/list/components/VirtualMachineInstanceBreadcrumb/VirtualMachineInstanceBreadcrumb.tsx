@@ -9,7 +9,7 @@ import { Breadcrumb, BreadcrumbItem, Button } from '@patternfly/react-core';
 const VirtualMachineInstanceBreadcrumb: React.FC = React.memo(() => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const [lastNamespacePath] = useLastNamespacePath();
+  const lastNamespacePath = useLastNamespacePath();
 
   return (
     <div>
