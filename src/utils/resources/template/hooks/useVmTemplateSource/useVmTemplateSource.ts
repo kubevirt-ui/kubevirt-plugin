@@ -132,6 +132,8 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
         }
         break;
       default:
+        setIsBootSourceAvailable(false);
+        setLoaded(true);
         break;
     }
 
