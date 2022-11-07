@@ -1,10 +1,11 @@
 import * as React from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, Checkbox, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
-import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+
 import { NODE_PORTS_LINK } from '../utils/constants';
 import { createRDPService } from '../utils/utils';
 

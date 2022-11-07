@@ -36,7 +36,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const { createModal } = useModal();
 
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const label = t('Delete {{nicName}} NIC?', { nicName });
+  const label = t('Delete NIC?');
   const editBtnText = t('Edit');
   const submitBtnText = t('Delete');
 

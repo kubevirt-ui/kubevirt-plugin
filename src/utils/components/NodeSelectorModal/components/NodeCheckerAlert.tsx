@@ -47,6 +47,7 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
   } else if (prefferedQualifiedNodesSize) {
     nodes = prefferedQualifiedNodes;
   }
+
   return (
     <Alert
       title={

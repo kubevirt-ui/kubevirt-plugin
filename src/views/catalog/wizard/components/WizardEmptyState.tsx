@@ -13,6 +13,7 @@ import {
 export const WizardEmptyState: React.FC<{ namespace: string }> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
+
   return (
     <EmptyState>
       <Title headingLevel="h4" size="lg">

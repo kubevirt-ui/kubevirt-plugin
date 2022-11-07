@@ -98,7 +98,7 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onSubmit={onSubmit}
-      headerText={t('Detach {{diskName}} disk?', { diskName })}
+      headerText={t('Detach disk?')}
       submitBtnText={t('Detach')}
       submitBtnVariant={ButtonVariant.danger}
     >

@@ -29,6 +29,7 @@ type LabelsProps = {
 const Labels: React.FC<LabelsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
   return (
     <>
       <DescriptionListTermHelpText>

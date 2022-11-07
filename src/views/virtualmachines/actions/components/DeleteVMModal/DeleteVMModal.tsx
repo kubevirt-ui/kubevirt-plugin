@@ -96,7 +96,7 @@ const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) =>
       isOpen={isOpen}
       obj={vm}
       onSubmit={onDelete}
-      headerText={t('Delete {{vmName}} VirtualMachine?', { vmName: vm?.metadata?.name })}
+      headerText={t('Delete VirtualMachine?')}
       submitBtnText={t('Delete')}
       submitBtnVariant={ButtonVariant.danger}
     >
