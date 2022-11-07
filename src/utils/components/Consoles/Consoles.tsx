@@ -40,7 +40,7 @@ const Consoles: React.FC<ConsolesProps> = ({ vmi }) => {
     </Bullseye>
   ) : (
     <Stack hasGutter>
-      <StackItem>{!isWindowsMachine && <CloudInitCredentials vmi={vmi} />}</StackItem>
+      <StackItem>{!isWindowsMachine && <CloudInitCredentials vm={vm} />}</StackItem>
       <StackItem>
         <AccessConsoles
           preselectedType={VNC_CONSOLE_TYPE}

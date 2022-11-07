@@ -15,6 +15,7 @@ type VirtualMachineDetailsRightGridProps = {
 const VirtualMachineDetailsRightGrid: React.FC<VirtualMachineDetailsRightGridProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
+
   return isVMRunning ? (
     <RunningVirtualMachineDetailsRightGrid vm={vm} />
   ) : (

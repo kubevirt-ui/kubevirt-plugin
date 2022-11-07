@@ -4,14 +4,12 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Checkbox } from '@patternfly/react-core';
 
 type SSHCheckboxProps = {
-  vmName: string;
   sshServiceRunning: boolean;
   setSSHServiceRunning: (checked: boolean, event: React.FormEvent<HTMLInputElement>) => void;
   isDisabled?: boolean;
 };
 
 const SSHCheckbox: FC<SSHCheckboxProps> = ({
-  vmName,
   sshServiceRunning,
   setSSHServiceRunning,
   isDisabled,
@@ -22,9 +20,7 @@ const SSHCheckbox: FC<SSHCheckboxProps> = ({
     <Checkbox
       id="ssh-service-checkbox"
       className="kv-ssh-service-checkbox--main"
-      label={t('Create a service to expose SSH access for VM {{vmName}}', {
-        vmName,
-      })}
+      label={t('Create a Service to expose your VirtualMachine for SSH access')}
       isChecked={sshServiceRunning}
       data-checked-state={sshServiceRunning}
       onChange={setSSHServiceRunning}
