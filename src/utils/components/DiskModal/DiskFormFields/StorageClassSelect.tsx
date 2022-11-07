@@ -34,7 +34,7 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
 
   const onSelect = useCallback(
     (event: React.MouseEvent<Element, MouseEvent>, selection: string) => {
-      setShowSCAlert(selection !== defaultSC.metadata?.name);
+      setShowSCAlert(selection !== defaultSC?.metadata?.name);
       dispatchDiskState({ type: diskReducerActions.SET_STORAGE_CLASS, payload: selection });
       setIsOpen(false);
       const provisioner = storageClasses.find(
