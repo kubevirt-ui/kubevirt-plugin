@@ -36,7 +36,7 @@ export const FormActionGroup: React.FC<FormActionGroupProps> = ({ loading, onCan
         isLoading={loading}
         data-test-id="customize-vm-submit-button"
       >
-        {t('Review and create VirtualMachine')}
+        {t('Next')}
       </Button>
       <Button variant="link" onClick={handleCancel}>
         {t('Cancel')}
