@@ -62,7 +62,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       VirtualMachineActionFactory.editAnnotations(vm, createModal, t),
       VirtualMachineActionFactory.delete(vm, createModal, t),
     ];
-  }, [vm, vmim, virtctlCommand, createModal, t]);
+  }, [vm, t, vmim, isSingleNodeCluster, createModal, virtctlCommand]);
 
   return React.useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };

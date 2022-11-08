@@ -34,7 +34,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const deleteModalHeader = t('Delete {{nicName}} NIC?', { nicName });
+  const deleteModalHeader = t('Delete NIC?');
   const editBtnText = t('Edit');
   const deleteBtnText = t('Delete');
 

@@ -62,7 +62,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate,
         isOpen={isOpen}
         obj={vm}
         onSubmit={onDelete}
-        headerText={t('Detach {{diskName}} disk?', { diskName })}
+        headerText={t('Detach disk?')}
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >

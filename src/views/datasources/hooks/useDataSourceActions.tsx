@@ -101,7 +101,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
       },
       {
         id: 'datasource-action-delete',
-        label: t('Delete DataSource'),
+        label: t('Delete'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <DeleteModal

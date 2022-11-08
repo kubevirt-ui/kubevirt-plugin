@@ -1,5 +1,6 @@
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   convertYAMLToNetworkDataObject,
   convertYAMLUserDataObject,
@@ -18,7 +19,7 @@ import {
 } from '@kubevirt-utils/resources/vm';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
+
 import { VirtualMachineDetailsTabLabel } from './constants';
 import { PendingChange } from './types';
 

@@ -48,6 +48,7 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
     setIsSubmitting(false);
     history.goBack();
   };
+
   return (
     <Stack className="kv-tabmodal-footer" hasGutter>
       {error && (
