@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
-import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { Stack, Toolbar, ToolbarContent } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
@@ -24,11 +23,6 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
   },
 }) => {
   const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
-  const [processedTemplateAccessReview] = useAccessReview({
-    namespace,
-    resource: ProcessedTemplatesModel.plural,
-    verb: 'create',
-  });
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
   const { templates, availableTemplatesUID, loaded, bootSourcesLoaded, availableDatasources } =
@@ -59,22 +53,20 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
                 />
               </ToolbarContent>
             </Toolbar>
-            {filteredTemplates?.length > 0 && processedTemplateAccessReview ? (
+            {filteredTemplates?.length > 0 ? (
               <TemplatesCatalogItems
                 templates={filteredTemplates}
                 availableTemplatesUID={availableTemplatesUID}
                 availableDatasources={availableDatasources}
                 bootSourcesLoaded={bootSourcesLoaded}
                 filters={filters}
-                onTemplateClick={processedTemplateAccessReview && setSelectedTemplate}
+                onTemplateClick={setSelectedTemplate}
                 loaded={loaded}
               />
             ) : (
               <TemplatesCatalogEmptyState
                 onClearFilters={clearAll}
                 bootSourcesLoaded={bootSourcesLoaded}
-                processedTemplateAccessReview={processedTemplateAccessReview}
-                namespace={namespace}
               />
             )}
           </Stack>

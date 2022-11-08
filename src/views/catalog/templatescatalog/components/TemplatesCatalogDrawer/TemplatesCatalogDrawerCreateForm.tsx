@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
@@ -7,11 +7,11 @@ import {
   replaceTemplateParameterValue,
 } from '@catalog/customize/utils';
 import { quickCreateVM } from '@catalog/utils/quick-create-vm';
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
+import { useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   Button,
@@ -50,7 +50,12 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
     const [quickCreateError, setQuickCreateError] = React.useState(undefined);
     const [models, modelsLoading] = useK8sModels();
 
-    React.useEffect(() => {
+    const [processedTemplateAccessReview] = useAccessReview({
+      namespace,
+      resource: ProcessedTemplatesModel.plural,
+      verb: 'create',
+    });
+    useEffect(() => {
       getVMName(template, namespace).then(setVMName);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // run only once when it's initially rendering
@@ -179,6 +184,7 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
                   data-test-id="customize-vm-btn"
                   variant={canQuickCreate ? ButtonVariant.secondary : ButtonVariant.primary}
                   onClick={onCustomize}
+                  isDisabled={!processedTemplateAccessReview}
                 >
                   {t('Customize VirtualMachine')}
                 </Button>
