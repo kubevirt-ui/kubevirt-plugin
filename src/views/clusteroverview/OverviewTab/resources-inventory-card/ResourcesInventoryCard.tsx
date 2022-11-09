@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { NodeModel, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import NetworkAttachmentDefinitionModel from '@kubevirt-ui/kubevirt-api/console/models/NetworkAttachmentDefinitionModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, Grid, GridItem } from '@patternfly/react-core';
 
 import useResourcesQuantities from './hooks/useResourcesQuantities';
@@ -17,6 +18,7 @@ const ResourcesInventoryCard: React.FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const { networks, nodes, vms, vmTemplates } = useResourcesQuantities();
+  const [activeNamespace] = useActiveNamespace();
 
   return (
     <div data-test-id="resources-inventory-card" className="resources-inventory-card">
@@ -26,7 +28,7 @@ const ResourcesInventoryCard: React.FC = () => {
             <ResourceInventoryItem
               quantity={vms}
               label={t('VirtualMachines')}
-              path={getResourceUrl(VirtualMachineModel)}
+              path={getResourceUrl(VirtualMachineModel, undefined, activeNamespace)}
             />
           </Card>
         </GridItem>
@@ -35,7 +37,7 @@ const ResourcesInventoryCard: React.FC = () => {
             <ResourceInventoryItem
               quantity={vmTemplates}
               label={t('Templates')}
-              path="/k8s/all-namespaces/templates"
+              path={getResourceUrl(TemplateModel, undefined, activeNamespace)}
             />
           </Card>
         </GridItem>
@@ -55,7 +57,7 @@ const ResourcesInventoryCard: React.FC = () => {
             <ResourceInventoryItem
               quantity={networks}
               label={t('Networks')}
-              path={getResourceUrl(NetworkAttachmentDefinitionModel)}
+              path={getResourceUrl(NetworkAttachmentDefinitionModel, undefined, activeNamespace)}
             />
           </Card>
         </GridItem>

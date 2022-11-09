@@ -1,5 +1,6 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1Condition, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TemplateModel } from '@kubevirt-utils/models';
 import {
   AccessReviewResourceAttributes,
@@ -41,20 +42,27 @@ export const getLabel = (entity: K8sResourceCommon, label: string, defaultValue?
  * function for getting a resource URL
  * @param {k8sModel} model - model to get the URL from
  * @param {K8sResourceCommon} resource - resource to get the URL from
+ * @param {string} activeNamespace - name of the actual project (the active namespace)
+
  * @returns the URL for the resource
  */
-export const getResourceUrl = (model: K8sModel, resource?: K8sResourceCommon): string => {
+export const getResourceUrl = (
+  model: K8sModel,
+  resource?: K8sResourceCommon,
+  activeNamespace?: string,
+): string => {
   if (!model) return null;
   const { crd, namespaced, plural } = model;
 
-  const namespace = resource?.metadata?.namespace
-    ? `ns/${resource.metadata.namespace}`
-    : 'all-namespaces';
+  const namespace =
+    resource?.metadata?.namespace ||
+    (activeNamespace !== ALL_NAMESPACES_SESSION_KEY && activeNamespace);
+  const namespaceUrl = namespace ? `ns/${namespace}` : 'all-namespaces';
 
   const ref = crd ? `${model.apiGroup || 'core'}~${model.apiVersion}~${model.kind}` : plural || '';
   const name = resource?.metadata?.name || '';
 
-  return `/k8s/${namespaced ? namespace : 'cluster'}/${ref}/${name}`;
+  return `/k8s/${namespaced ? namespaceUrl : 'cluster'}/${ref}/${name}`;
 };
 
 /**
