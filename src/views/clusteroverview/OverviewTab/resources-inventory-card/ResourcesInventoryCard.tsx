@@ -17,7 +17,7 @@ import './ResourcesInventoryCard.scss';
 const ResourcesInventoryCard: React.FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
-  const { networks, nodes, vms, vmTemplates } = useResourcesQuantities();
+  const { nads, nodes, vms, vmTemplates } = useResourcesQuantities();
   const [activeNamespace] = useActiveNamespace();
 
   return (
@@ -55,7 +55,7 @@ const ResourcesInventoryCard: React.FC = () => {
         <GridItem>
           <Card className="resources-inventory-card__grid-item">
             <ResourceInventoryItem
-              quantity={networks}
+              quantity={nads}
               label={t('Networks')}
               path={getResourceUrl(NetworkAttachmentDefinitionModel, undefined, activeNamespace)}
             />

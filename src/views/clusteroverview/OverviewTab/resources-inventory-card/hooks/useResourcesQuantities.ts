@@ -14,7 +14,7 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-intern
 
 type UseResourcesQuantities = () => {
   loaded: boolean;
-  networks: number;
+  nads: number;
   nodes: number;
   vms: number;
   vmTemplates: number;
@@ -50,8 +50,7 @@ const useResourcesQuantities: UseResourcesQuantities = () => {
     },
     nodes: {
       groupVersionKind: modelToGroupVersionKind(NodeModel),
-      namespaced: !!namespace,
-      namespace,
+      namespaced: false,
       isList: true,
     },
     nads: {
@@ -71,7 +70,7 @@ const useResourcesQuantities: UseResourcesQuantities = () => {
         acc.loaded = acc.loaded && value?.loaded;
         return acc;
       },
-      { loaded: false as boolean, networks: 0, nodes: 0, vms: 0, vmTemplates: 0 },
+      { loaded: false as boolean, nads: 0, nodes: 0, vms: 0, vmTemplates: 0 },
     );
   }, [resources]);
 };
