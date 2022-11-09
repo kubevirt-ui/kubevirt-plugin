@@ -18,7 +18,7 @@ import {
   KebabToggle,
 } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../../../../../utils/utils';
+import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
 import EditNetworkInterfaceModal from '../modal/EditNetworkInterfaceModal';
 
 type NetworkInterfaceActionsProps = {
@@ -34,6 +34,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const label = t('Delete {{nicName}} NIC?', { nicName });
@@ -107,7 +108,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
         <KebabToggle
           onToggle={setIsDropdownOpen}
           id="toggle-id-6"
-          isDisabled={isCommonVMTemplate(template)}
+          isDisabled={!isTemplateEditable}
         />
       }
       isOpen={isDropdownOpen}

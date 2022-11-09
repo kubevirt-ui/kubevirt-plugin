@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { isCommonVMTemplate } from 'src/views/templates/utils/utils';
+import TooltipNoEditPermissions from 'src/views/templates/details/TooltipNoEditPermissions';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { AuthorizedSSHKeyModal } from '@kubevirt-utils/components/AuthorizedSSHKeyModal/AuthorizedSSHKeyModal';
@@ -22,6 +22,8 @@ import {
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
+import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
+
 import { changeSSHKeySecret, getTemplateSSHKeySecret } from './sshkey-utils';
 
 type SSHKeyProps = {
@@ -30,7 +32,7 @@ type SSHKeyProps = {
 
 const SSHKey: React.FC<SSHKeyProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
-  const isEditDisabled = isCommonVMTemplate(template);
+  const { hasEditPermission, isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
 
   const vmAttachedSecretName = vm?.spec?.template?.spec?.accessCredentials?.find(
@@ -52,11 +54,12 @@ const SSHKey: React.FC<SSHKeyProps> = ({ template }) => {
         <DescriptionListTermHelpText>
           <Flex className="vm-description-item__title">
             <FlexItem>{t('Authorized SSH Key')}</FlexItem>
-            {!isEditDisabled && (
-              <FlexItem>
+            <FlexItem>
+              <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
                 <Button
                   type="button"
                   isInline
+                  isDisabled={!isTemplateEditable}
                   onClick={() =>
                     createModal((modalProps) => (
                       <AuthorizedSSHKeyModal
@@ -72,8 +75,8 @@ const SSHKey: React.FC<SSHKeyProps> = ({ template }) => {
                   {t('Edit')}
                   <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
                 </Button>
-              </FlexItem>
-            )}
+              </TooltipNoEditPermissions>
+            </FlexItem>
           </Flex>
         </DescriptionListTermHelpText>
       </DescriptionListTerm>

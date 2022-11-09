@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { isCommonVMTemplate } from 'src/views/templates/utils/utils';
 
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -16,6 +15,8 @@ import {
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
+import useEditTemplateAccessReview from '../../../../..//details/hooks/useIsTemplateEditable';
+
 import TemplateBootloaderModal from './TemplateBootloaderModal';
 
 type BootMethodProps = {
@@ -25,7 +26,7 @@ type BootMethodProps = {
 const BootMethod: React.FC<BootMethodProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const isCommonTemplate = isCommonVMTemplate(template);
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(
     getTemplateVirtualMachineObject(template),
     t,
@@ -55,7 +56,7 @@ const BootMethod: React.FC<BootMethodProps> = ({ template }) => {
     <DescriptionListGroup>
       <DescriptionListTerm>{t('Boot mode')}</DescriptionListTerm>
       <DescriptionListDescription>
-        {!isCommonTemplate ? (
+        {isTemplateEditable ? (
           <Button type="button" isInline onClick={onEditClick} variant="link">
             {firmwareBootloaderTitle}
             <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />

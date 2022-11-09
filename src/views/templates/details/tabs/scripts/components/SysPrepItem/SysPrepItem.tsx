@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import { isCommonVMTemplate } from 'src/views/templates/utils/utils';
+import TooltipNoEditPermissions from 'src/views/templates/details/TooltipNoEditPermissions';
 
 import {
   ConfigMapModel,
@@ -27,6 +27,8 @@ import {
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
+import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
+
 import {
   deleteTemplateSysprepObject,
   getTemplateSysprepObject,
@@ -42,7 +44,7 @@ type SysPrepItemProps = {
 
 const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
-  const isEditDisabled = isCommonVMTemplate(template);
+  const { isTemplateEditable, hasEditPermission } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
   const currentVMSysprepName = getVolumes(vm)?.find((volume) => volume?.sysprep?.configMap?.name)
     ?.sysprep?.configMap?.name;
@@ -92,10 +94,11 @@ const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
         <DescriptionListTermHelpText>
           <Flex className="vm-description-item__title">
             <FlexItem>{t('Sysprep')}</FlexItem>
-            {!isEditDisabled && (
-              <FlexItem>
+            <FlexItem>
+              <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
                 <Button
                   type="button"
+                  isDisabled={!isTemplateEditable}
                   isInline
                   onClick={() =>
                     createModal((modalProps) => (
@@ -114,8 +117,8 @@ const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
                   {t('Edit')}
                   <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
                 </Button>
-              </FlexItem>
-            )}
+              </TooltipNoEditPermissions>
+            </FlexItem>
           </Flex>
         </DescriptionListTermHelpText>
       </DescriptionListTerm>

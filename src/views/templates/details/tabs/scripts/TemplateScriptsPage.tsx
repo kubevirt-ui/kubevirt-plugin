@@ -28,7 +28,8 @@ import {
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
-import { isCommonVMTemplate } from '../../../utils/utils';
+import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
+import TooltipNoEditPermissions from '../../TooltipNoEditPermissions';
 
 import SSHKey from './components/SSHKey/SSHKey';
 import SysPrepItem from './components/SysPrepItem/SysPrepItem';
@@ -44,7 +45,7 @@ type TemplateScriptsPageProps = RouteComponentProps<{
 
 const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
-  const isEditDisabled = isCommonVMTemplate(template);
+  const { hasEditPermission, isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
 
   const { createModal } = useModal();
@@ -77,11 +78,12 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
               <DescriptionListTermHelpText>
                 <Flex className="vm-description-item__title">
                   <FlexItem>{t('Cloud-init')}</FlexItem>
-                  {!isEditDisabled && (
-                    <FlexItem>
+                  <FlexItem>
+                    <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
                       <Button
                         type="button"
                         isInline
+                        isDisabled={!isTemplateEditable}
                         onClick={() =>
                           createModal(({ isOpen, onClose }) => (
                             <CloudinitModal
@@ -97,8 +99,8 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                         {t('Edit')}
                         <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
                       </Button>
-                    </FlexItem>
-                  )}
+                    </TooltipNoEditPermissions>
+                  </FlexItem>
                 </Flex>
               </DescriptionListTermHelpText>
             </DescriptionListTerm>

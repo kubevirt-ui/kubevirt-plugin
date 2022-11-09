@@ -11,8 +11,8 @@ import {
 
 import { useModal } from '../ModalProvider/ModalProvider';
 
-import { HARDWARE_DEVICE_TYPE } from './utils/constants';
 import HardwareDevicesModal from './modal/HardwareDevicesModal';
+import { HARDWARE_DEVICE_TYPE } from './utils/constants';
 import HardwareDevicesTable from './HardwareDevicesTable';
 import HardwareDeviceTitle from './HardwareDeviceTitle';
 

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import { isCommonVMTemplate } from 'src/views/templates/utils/utils';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
@@ -21,6 +20,11 @@ import {
   useAccessReview,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import useEditTemplateAccessReview from '../../details/hooks/useIsTemplateEditable';
+import {
+  NO_DELETE_TEMPLATE_PERMISSIONS,
+  NO_EDIT_TEMPLATE_PERMISSIONS,
+} from '../../utils/constants';
 import EditBootSourceModal from '../components/EditBootSourceModal';
 import {
   createDataVolume,
@@ -38,13 +42,19 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   template: V1Template,
 ) => {
   const { t } = useKubevirtTranslation();
-  const isCommonTemplate = isCommonVMTemplate(template);
+  const { hasEditPermission, isCommonTemplate } = useEditTemplateAccessReview(template);
   const { createModal } = useModal();
   const history = useHistory();
   const [bootDataSource, setBootDataSource] = React.useState<V1beta1DataSource>();
   const [loadingBootSource, setLoadingBootSource] = React.useState(true);
   const editableBootSource = hasEditableBootSource(bootDataSource);
   const lastNamespacePath = useLastNamespacePath();
+
+  const [canDeleteTemplate] = useAccessReview({
+    verb: 'delete',
+    resource: TemplateModel.plural,
+    namespace: template?.metadata?.namespace,
+  });
 
   const [canWriteToDataSourceNs] = useAccessReview(
     asAccessReview(
@@ -106,8 +116,10 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     {
       id: 'edit-boot-source',
       label: t('Edit boot source'),
-      description: isCommonTemplate && t('Red Hat template cannot be edited'),
-      disabled: isCommonTemplate,
+      description:
+        (isCommonTemplate && t('Red Hat template cannot be edited')) ||
+        (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
+      disabled: isCommonTemplate || !hasEditPermission,
       cta: () =>
         history.push(
           `/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}/disks`,
@@ -136,8 +148,10 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     },
     {
       id: 'edit-labels',
-      description: isCommonTemplate && t('Labels cannot be edited for Red Hat templates'),
-      disabled: isCommonTemplate,
+      description:
+        (isCommonTemplate && t('Labels cannot be edited for Red Hat templates')) ||
+        (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
+      disabled: isCommonTemplate || !hasEditPermission,
       label: t('Edit labels'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
@@ -163,8 +177,10 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     },
     {
       id: 'edit-annotations',
-      description: isCommonTemplate && t('Annotations cannot be edited for Red Hat templates'),
-      disabled: isCommonTemplate,
+      description:
+        (isCommonTemplate && t('Annotations cannot be edited for Red Hat templates')) ||
+        (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
+      disabled: isCommonTemplate || !hasEditPermission,
       label: t('Edit annotations'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
@@ -191,8 +207,10 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     {
       id: 'delete-template',
       label: t('Delete'),
-      description: isCommonTemplate && t('Red Hat template cannot be deleted'),
-      disabled: isCommonTemplate,
+      description:
+        (isCommonTemplate && t('Red Hat template cannot be deleted')) ||
+        (!canDeleteTemplate && t(NO_DELETE_TEMPLATE_PERMISSIONS)),
+      disabled: isCommonTemplate || !canDeleteTemplate,
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <DeleteModal

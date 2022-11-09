@@ -6,14 +6,11 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  k8sUpdate,
-  ListPageBody,
-  ListPageCreateButton,
-} from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, FlexItem } from '@patternfly/react-core';
+import { k8sUpdate, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
+import { Button, Flex, FlexItem } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../../../utils/utils';
+import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
+import TooltipNoEditPermissions from '../../TooltipNoEditPermissions';
 
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
@@ -31,6 +28,7 @@ type TemplateNetworkProps = RouteComponentProps<{
 const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { hasEditPermission, isTemplateEditable } = useEditTemplateAccessReview(template);
   const actionText = t('Add network interface');
 
   const onSubmitTemplate = React.useCallback(
@@ -48,24 +46,25 @@ const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
     <div className="template-network-tab">
       <ListPageBody>
         <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
-          <Flex>
+          <Flex className="list-page-create-button-margin">
             <FlexItem>
-              <ListPageCreateButton
-                className="list-page-create-button-margin"
-                isDisabled={isCommonVMTemplate(template)}
-                onClick={() =>
-                  createModal(({ isOpen, onClose }) => (
-                    <NetworkInterfaceModal
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      headerText={actionText}
-                      template={template}
-                    />
-                  ))
-                }
-              >
-                {actionText}
-              </ListPageCreateButton>
+              <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
+                <Button
+                  isDisabled={!isTemplateEditable}
+                  onClick={() =>
+                    createModal(({ isOpen, onClose }) => (
+                      <NetworkInterfaceModal
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        headerText={actionText}
+                        template={template}
+                      />
+                    ))
+                  }
+                >
+                  {actionText}
+                </Button>
+              </TooltipNoEditPermissions>
             </FlexItem>
             <FlexItem>
               <SidebarEditorSwitch />

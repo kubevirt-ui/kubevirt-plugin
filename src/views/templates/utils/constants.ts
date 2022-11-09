@@ -27,3 +27,11 @@ export type SOURCE_OPTIONS_IDS =
   | typeof SOURCE_TYPES.uploadSource;
 
 export const SUPPORT_URL = 'https://access.redhat.com/articles/4234591';
+
+// t('You do not have permission to edit. To make changes to this template, contact your administrator.')
+export const NO_EDIT_TEMPLATE_PERMISSIONS =
+  'You do not have permission to edit. To make changes to this template, contact your administrator.';
+
+// t('You do not have permission to delete. To make changes to this template, contact your administrator.')
+export const NO_DELETE_TEMPLATE_PERMISSIONS =
+  'You do not have permission to delete. To make changes to this template, contact your administrator.';

@@ -19,10 +19,11 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../../../../utils/utils';
+import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
 
 const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
   const providerContent = getTemplateProviderName(template)?.trim()
     ? getTemplateProviderName(template)?.trim()
@@ -51,7 +52,7 @@ const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template
         content={
           <HardwareDevices
             vm={getTemplateVirtualMachineObject(template)}
-            canEdit={!isCommonVMTemplate(template)}
+            canEdit={isTemplateEditable}
             onSubmit={onSubmit}
           />
         }
