@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
@@ -16,7 +16,9 @@ import { k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 
 import DeleteOwnedResourcesMessage from './components/DeleteOwnedResourcesMessage';
+import { GracePeriodInput } from './components/GracePeriodInput';
 import useDeleteVMResources from './hooks/useDeleteVMResources';
+import { DEFAULT_GRACE_PERIOD } from './constants';
 
 type DeleteVMModalProps = {
   vm: V1VirtualMachine;
@@ -24,10 +26,14 @@ type DeleteVMModalProps = {
   onClose: () => void;
 };
 
-const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
+const DeleteVMModal: FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const [deleteOwnedResource, setDeleteOwnedResource] = React.useState(true);
+  const [deleteOwnedResource, setDeleteOwnedResource] = useState<boolean>(true);
+  const [gracePeriodCheckbox, setGracePeriodCheckbox] = useState<boolean>(false);
+  const [gracePeriodSeconds, setGracePeriodSeconds] = useState<number>(
+    vm?.spec?.template?.spec?.terminationGracePeriodSeconds || DEFAULT_GRACE_PERIOD,
+  );
   const { dataVolumes, pvcs, snapshots, loaded } = useDeleteVMResources(vm);
   const lastNamespacePath = useLastNamespacePath();
 
@@ -86,6 +92,9 @@ const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) =>
     await k8sDelete({
       model: VirtualMachineModel,
       resource: updatedVM,
+      json: gracePeriodCheckbox
+        ? { kind: 'DeleteOptions', apiVersion: 'v1', gracePeriodSeconds }
+        : null,
     });
     history.push(`/k8s/${lastNamespacePath}/${VirtualMachineModelRef}`);
   };
@@ -104,6 +113,12 @@ const DeleteVMModal: React.FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) =>
         <StackItem>
           <ConfirmActionMessage obj={vm} />
         </StackItem>
+        <GracePeriodInput
+          isChecked={gracePeriodCheckbox}
+          onCheckboxChange={setGracePeriodCheckbox}
+          gracePeriodSeconds={gracePeriodSeconds}
+          setGracePeriodSeconds={setGracePeriodSeconds}
+        />
         <DeleteOwnedResourcesMessage
           deleteOwnedResource={deleteOwnedResource}
           setDeleteOwnedResource={setDeleteOwnedResource}
