@@ -36,6 +36,7 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
       },
       true,
     ]),
+    useAccessReview: jest.fn().mockReturnValue([true, false]),
   };
 });
 
