@@ -8,8 +8,10 @@ export const DESCHEDULER_URL =
   'https://kubevirt.io/user-guide/operations/node_assignment/#node-balancing-with-descheduler';
 
 export const LABELS = {
-  labelName: 'vm.kubevirt.io/template',
-  labelNamespace: 'vm.kubevirt.io/template.namespace',
+  name: 'vm.kubevirt.io/template',
+  namespace: 'vm.kubevirt.io/template.namespace',
+  type: 'template.kubevirt.io/type',
+  provider: 'template.kubevirt.io/provider',
 };
 
 export const SOURCE_TYPES = {

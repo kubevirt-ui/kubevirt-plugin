@@ -37,8 +37,8 @@ export const getWorkloadProfile = (template: V1Template): string =>
 export const getVMTemplateBaseName = (
   template: V1Template,
 ): { name: string; namespace: string } => {
-  const name = getLabel(template, LABELS.labelName);
-  const namespace = getLabel(template, LABELS.labelNamespace);
+  const name = getLabel(template, LABELS.name);
+  const namespace = getLabel(template, LABELS.namespace);
 
   return name && namespace ? { name, namespace } : null;
 };

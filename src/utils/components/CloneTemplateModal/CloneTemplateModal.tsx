@@ -1,5 +1,6 @@
 import * as React from 'react';
 import produce from 'immer';
+import { LABELS } from 'src/views/templates/utils/constants';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -56,14 +57,16 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
       draftTemplate.metadata = {
         annotations: {
           ...draftTemplate?.metadata?.annotations,
-          'template.kubevirt.io/provider': templateProvider,
+          [LABELS.provider]: templateProvider,
           [ANNOTATIONS.providerDisplayName]: templateProvider,
           [ANNOTATIONS.displayName]: templateDisplayName,
         },
         labels: {
           ...draftTemplate?.metadata?.labels,
-          'template.kubevirt.io/type': TEMPLATE_TYPE_VM,
+          [LABELS.type]: TEMPLATE_TYPE_VM,
           [TEMPLATE_APP_NAME_LABEL]: CUSTOM_TEMPLATES,
+          [LABELS.name]: obj?.metadata?.name,
+          [LABELS.namespace]: obj?.metadata?.namespace,
         },
         name: templateName,
         namespace: selectedProject,
