@@ -10,6 +10,7 @@ import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootload
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -44,6 +45,7 @@ const WizardOverviewGrid: React.FC<WizardOverviewGridProps> = ({ vm, tabsData, u
   const { cpuCount, memory } = getVmCPUMemory(vm);
   const description = getAnnotation(vm, 'description');
   const workloadAnnotation = getWorkload(vm);
+  const startStrategy = vm?.spec?.template?.spec?.startStrategy;
   const networks = vm?.spec?.template?.spec?.networks;
   const interfaces = vm?.spec?.template?.spec?.domain?.devices?.interfaces;
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
@@ -156,6 +158,24 @@ const WizardOverviewGrid: React.FC<WizardOverviewGridProps> = ({ vm, tabsData, u
               ))
             }
             description={getBootloaderTitleFromVM(vm, t)}
+          />
+
+          <WizardDescriptionItem
+            title={t('Start in pause mode')}
+            description={startStrategy ? t('ON') : t('OFF')}
+            isEdit
+            testId="start-in-pause-mode"
+            onEditClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <StartPauseModal
+                  vm={vm}
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  onSubmit={updateVM}
+                  headerText={t('Start in pause mode')}
+                />
+              ))
+            }
           />
 
           <WizardDescriptionItem
