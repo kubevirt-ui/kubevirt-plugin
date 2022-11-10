@@ -7,6 +7,7 @@ import { INSECURE, SECURE } from '@kubevirt-utils/components/Consoles/utils/cons
 import { isConnectionEncrypted } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
+import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Button } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
@@ -23,10 +24,16 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
 
   const isEncrypted = isConnectionEncrypted();
   const isVMRunning = vmi?.status?.phase === vmiStatuses.Running;
-
+  const [canConnectConsole] = useAccessReview({
+    resource: 'virtualmachineinstances/vnc',
+    group: 'subresources.kubevirt.io',
+    namespace: vmi?.metadata?.namespace,
+    name: vmi?.metadata?.name,
+    verb: 'get',
+  });
   return (
     <Bullseye className="bullseye">
-      {isVMRunning ? (
+      {isVMRunning && canConnectConsole ? (
         <>
           <VncConsole
             type={VNC_CONSOLE_TYPE}
@@ -46,7 +53,7 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
       )}
       <div className="link">
         <Button
-          isDisabled={!isVMRunning}
+          isDisabled={!isVMRunning || !canConnectConsole}
           onClick={() =>
             window.open(
               `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
