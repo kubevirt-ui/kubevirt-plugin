@@ -64,11 +64,15 @@ const useVirtualMachineColumns = (
         id: 'conditions',
         props: { className: 'pf-m-width-20' },
       },
-      {
-        title: t('Node'),
-        id: 'node',
-        props: { className: 'pf-m-width-15' },
-      },
+      ...(canGetNode
+        ? [
+            {
+              title: t('Node'),
+              id: 'node',
+              props: { className: 'pf-m-width-15' },
+            },
+          ]
+        : []),
       {
         title: t('Created'),
         id: 'created',
@@ -88,7 +92,7 @@ const useVirtualMachineColumns = (
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
-    [t, sorting, namespace],
+    [t, sorting, namespace, canGetNode],
   );
 
   const [activeColumns] = useActiveColumns<K8sResourceCommon>({
