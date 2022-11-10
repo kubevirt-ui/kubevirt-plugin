@@ -36,7 +36,7 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
       startVM,
       onFullfilled: (createdVM) => {
         clearSessionStorageVM();
-        history.push(getResourceUrl(VirtualMachineModel, createdVM));
+        history.push(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
       },
     });
 

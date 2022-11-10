@@ -38,19 +38,20 @@ export const getAnnotation = (
 export const getLabel = (entity: K8sResourceCommon, label: string, defaultValue?: string): string =>
   entity?.metadata?.labels?.[label] ?? defaultValue;
 
+type ResourceUrlProps = {
+  model: K8sModel;
+  resource?: K8sResourceCommon;
+  activeNamespace?: string;
+};
+
 /**
  * function for getting a resource URL
- * @param {k8sModel} model - model to get the URL from
- * @param {K8sResourceCommon} resource - resource to get the URL from
- * @param {string} activeNamespace - name of the actual project (the active namespace)
-
- * @returns the URL for the resource
+ * @param {ResourceUrlProps} urlProps - object with model, resource to get the URL from (optional) and active namespace/project name (optional)
+ * @returns {string} the URL for the resource
  */
-export const getResourceUrl = (
-  model: K8sModel,
-  resource?: K8sResourceCommon,
-  activeNamespace?: string,
-): string => {
+export const getResourceUrl = (urlProps: ResourceUrlProps): string => {
+  const { model, resource, activeNamespace } = urlProps;
+
   if (!model) return null;
   const { crd, namespaced, plural } = model;
 
