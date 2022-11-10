@@ -78,7 +78,7 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
       })
         .then((vm) => {
           setIsQuickCreating(false);
-          history.push(getResourceUrl(VirtualMachineModel, vm));
+          history.push(getResourceUrl({ model: VirtualMachineModel, resource: vm }));
         })
         .catch((err) => {
           setIsQuickCreating(false);

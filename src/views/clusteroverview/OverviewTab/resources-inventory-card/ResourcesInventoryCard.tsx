@@ -28,7 +28,7 @@ const ResourcesInventoryCard: React.FC = () => {
             <ResourceInventoryItem
               quantity={vms}
               label={t('VirtualMachines')}
-              path={getResourceUrl(VirtualMachineModel, undefined, activeNamespace)}
+              path={getResourceUrl({ model: VirtualMachineModel, activeNamespace })}
             />
           </Card>
         </GridItem>
@@ -37,7 +37,7 @@ const ResourcesInventoryCard: React.FC = () => {
             <ResourceInventoryItem
               quantity={vmTemplates}
               label={t('Templates')}
-              path={getResourceUrl(TemplateModel, undefined, activeNamespace)}
+              path={getResourceUrl({ model: TemplateModel, activeNamespace })}
             />
           </Card>
         </GridItem>
@@ -47,7 +47,7 @@ const ResourcesInventoryCard: React.FC = () => {
               <ResourceInventoryItem
                 quantity={nodes}
                 label={t('Nodes')}
-                path={getResourceUrl(NodeModel)}
+                path={getResourceUrl({ model: NodeModel })}
               />
             </Card>
           </GridItem>
@@ -57,7 +57,7 @@ const ResourcesInventoryCard: React.FC = () => {
             <ResourceInventoryItem
               quantity={nads}
               label={t('Networks')}
-              path={getResourceUrl(NetworkAttachmentDefinitionModel, undefined, activeNamespace)}
+              path={getResourceUrl({ model: NetworkAttachmentDefinitionModel, activeNamespace })}
             />
           </Card>
         </GridItem>

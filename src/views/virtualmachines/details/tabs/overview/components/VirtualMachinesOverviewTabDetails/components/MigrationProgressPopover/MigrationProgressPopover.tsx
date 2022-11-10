@@ -84,7 +84,12 @@ const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ vmi
             </Trans>
           </StackItem>
           <StackItem>
-            <Link to={`${getResourceUrl(VirtualMachineModel, vmi)}/metrics?migration`}>
+            <Link
+              to={`${getResourceUrl({
+                model: VirtualMachineModel,
+                resource: vmi,
+              })}/metrics?migration`}
+            >
               {t('Migration metrics')}
             </Link>
           </StackItem>
