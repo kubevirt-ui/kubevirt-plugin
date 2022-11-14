@@ -1,4 +1,7 @@
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import {
+  useActiveNamespace,
+  useLastNamespace,
+} from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import {
   ALL_NAMESPACES,
@@ -7,13 +10,14 @@ import {
 
 type UseActiveNamespacePathType = () => string;
 
+const buildNSPath = (namespace: string): string =>
+  [ALL_NAMESPACES_ACTIVE_KEY, ALL_NAMESPACES].includes(namespace)
+    ? ALL_NAMESPACES
+    : `ns/${namespace}`;
+
 export const useLastNamespacePath: UseActiveNamespacePathType = () => {
-  const lastNamespace = JSON.parse(localStorage.getItem('console-user-settings'))?.[
-    'console.lastNamespace'
-  ];
-  const activeNamespace = useActiveNamespace();
-  if (!lastNamespace) {
-    return `ns/${activeNamespace}`;
-  }
-  return lastNamespace === ALL_NAMESPACES_ACTIVE_KEY ? ALL_NAMESPACES : `ns/${lastNamespace}`;
+  const [lastNamespace] = useLastNamespace();
+  const [activeNamespace] = useActiveNamespace();
+
+  return !lastNamespace ? buildNSPath(activeNamespace) : buildNSPath(lastNamespace);
 };
