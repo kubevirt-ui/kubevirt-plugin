@@ -3,7 +3,13 @@ import { useHistory } from 'react-router-dom';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import {
+  getGroupVersionKindForResource,
+  K8sResourceCommon,
+} from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/hooks/useK8sModel';
+import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { ButtonVariant } from '@patternfly/react-core';
 
 import ConfirmActionMessage from '../ConfirmActionMessage/ConfirmActionMessage';
@@ -21,15 +27,16 @@ const DeleteModal: React.FC<DeleteModalProps> = React.memo(
     const { t } = useKubevirtTranslation();
     const history = useHistory();
 
+    const [model] = useK8sModel(getGroupVersionKindForResource(obj));
+    const [lastNamespace] = useLastNamespace();
+    const url = getResourceUrl({ model, activeNamespace: lastNamespace });
     return (
       <TabModal<K8sResourceCommon>
         obj={obj}
         headerText={headerText || t('Delete Resource?')}
         onSubmit={() => {
           return onDeleteSubmit().then(() => {
-            const pathname = history?.location?.pathname;
-            const url = pathname.slice(0, pathname.indexOf(obj?.metadata?.name));
-            pathname?.includes(obj?.metadata?.name) && history.push(url);
+            history.push(url);
           });
         }}
         isOpen={isOpen}
