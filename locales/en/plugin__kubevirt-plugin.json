@@ -981,5 +981,7 @@
   "You can customize the Templates storage by overriding the original parameters": "You can customize the Templates storage by overriding the original parameters",
   "You can edit the boot order in the <1>{t('Disks tab')}</1>": "You can edit the boot order in the <1>{t('Disks tab')}</1>",
   "You can select the boot source in the <2>Disks</2> tab.": "You can select the boot source in the <2>Disks</2> tab.",
-  "You can use cloud-init for post installation configuration of the guest operating system.": "You can use cloud-init for post installation configuration of the guest operating system."
+  "You can use cloud-init for post installation configuration of the guest operating system.": "You can use cloud-init for post installation configuration of the guest operating system.",
+  "You do not have permission to delete. To make changes to this template, contact your administrator.": "You do not have permission to delete. To make changes to this template, contact your administrator.",
+  "You do not have permission to edit. To make changes to this template, contact your administrator.": "You do not have permission to edit. To make changes to this template, contact your administrator."
 }

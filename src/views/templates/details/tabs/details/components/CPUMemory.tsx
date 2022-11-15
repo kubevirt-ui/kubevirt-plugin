@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useVirtualMachineTemplatesCPUMemory } from 'src/views/templates/list/hooks/useVirtualMachineTemplatesCPUMemory';
-import { isCommonVMTemplate } from 'src/views/templates/utils/utils';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,6 +13,8 @@ import {
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
+import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
+
 import CPUMemoryModal from './CPUMemoryModal';
 
 type CPUMemoryProps = {
@@ -24,7 +25,7 @@ const CPUMemory: React.FC<CPUMemoryProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const CPUMemData = useVirtualMachineTemplatesCPUMemory(template);
   const { createModal } = useModal();
-  const isCommonTemplate = isCommonVMTemplate(template);
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
   const onSubmitCPU = React.useCallback(
     (updatedTemplate: V1Template) =>
@@ -51,7 +52,7 @@ const CPUMemory: React.FC<CPUMemoryProps> = ({ template }) => {
     <DescriptionListGroup>
       <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
       <DescriptionListDescription>
-        {!isCommonTemplate ? (
+        {isTemplateEditable ? (
           <Button type="button" isInline onClick={onEditClick} variant="link">
             {CPUMemData}
             <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />

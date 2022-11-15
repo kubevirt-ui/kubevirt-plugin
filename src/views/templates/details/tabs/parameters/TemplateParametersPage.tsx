@@ -18,7 +18,7 @@ import {
   PageSection,
 } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../../../utils/utils';
+import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
 import ParameterEditor from './ParameterEditor';
 
@@ -37,7 +37,7 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
   useEffect(() => setEditableTemplate(template), [setEditableTemplate, template]);
 
   const { t } = useKubevirtTranslation();
-  const isEditDisabled = isCommonVMTemplate(template);
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const history = useHistory();
   const [error, setError] = React.useState();
   const [success, setSuccess] = React.useState(false);
@@ -88,7 +88,7 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
                 key={parameter.name}
                 parameter={parameter}
                 onChange={onParameterChange}
-                isEditDisabled={isEditDisabled}
+                isEditDisabled={!isTemplateEditable}
               />
               {index !== parameters.length - 1 && <Divider />}
             </>

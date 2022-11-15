@@ -1,6 +1,5 @@
 import * as React from 'react';
 import produce from 'immer';
-import { isCommonVMTemplate } from 'src/views/templates/utils/utils';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
@@ -25,6 +24,8 @@ import {
   TitleSizes,
 } from '@patternfly/react-core';
 
+import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
+
 import './cpu-memory-modal.scss';
 
 type CPUMemoryModalProps = {
@@ -38,7 +39,8 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
 
-  const isCommonTemplate = isCommonVMTemplate(template);
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
+
   const [updateInProcess, setUpdateInProcess] = React.useState<boolean>(false);
   const [updateError, setUpdateError] = React.useState<string>();
 
@@ -115,7 +117,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
             {t('CPUs')}
           </Title>
           <NumberInput
-            isDisabled={isCommonTemplate}
+            isDisabled={!isTemplateEditable}
             value={cpuCores}
             onMinus={() => setCpuCores((cpus) => +cpus - 1)}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,7 +134,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
             {t('Memory')}
           </Title>
           <NumberInput
-            isDisabled={isCommonTemplate}
+            isDisabled={!isTemplateEditable}
             value={memory}
             onMinus={() => setMemory((mem) => +mem - 1)}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

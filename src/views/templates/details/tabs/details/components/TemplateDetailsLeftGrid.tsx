@@ -16,26 +16,29 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { DescriptionList } from '@patternfly/react-core';
 
+import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
+
 import BootMethod from './BootMethod/BootMethod';
 import CPUMemory from './CPUMemory';
 import Description from './Description';
 import DisplayName from './DisplayName';
 import WorkloadProfile from './WorkloadProfile';
 
-const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
+const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const machineType = getMachineType(getTemplateVirtualMachineObject(template)) || NO_DATA_DASH;
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
   return (
     <DescriptionList>
       <Name name={template?.metadata?.name} />
       <Namespace namespace={template?.metadata?.namespace} />
-      <Labels template={template} editable={editable} />
-      <Annotations template={template} editable={editable} />
-      <DisplayName template={template} editable={editable} />
-      <Description template={template} editable={editable} />
+      <Labels template={template} editable={isTemplateEditable} />
+      <Annotations template={template} editable={isTemplateEditable} />
+      <DisplayName template={template} editable={isTemplateEditable} />
+      <Description template={template} editable={isTemplateEditable} />
       <DescriptionItem title={t('Operating system')} content={getOperatingSystemName(template)} />
-      <WorkloadProfile template={template} editable={editable} />
+      <WorkloadProfile template={template} editable={isTemplateEditable} />
       <CPUMemory template={template} />
       <DescriptionItem title={t('Machine type')} content={machineType} />
       <BootMethod template={template} />

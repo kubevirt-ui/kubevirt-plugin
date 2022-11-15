@@ -11,8 +11,7 @@ import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/
 import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../utils/utils';
-
+import useEditTemplateAccessReview from './hooks/useIsTemplateEditable';
 import { useVirtualMachineTabs } from './hooks/useTemplateTabs';
 import TemplatePageTitle from './TemplatePageTitle';
 
@@ -34,6 +33,7 @@ const TemplateNavPage: React.FC<TemplateNavPageProps> = ({
     namespaced: true,
   });
   const pages = useVirtualMachineTabs();
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
   if (!loaded)
     return (
@@ -42,10 +42,8 @@ const TemplateNavPage: React.FC<TemplateNavPageProps> = ({
       </Bullseye>
     );
 
-  const isCommonTemplate = isCommonVMTemplate(template);
-
   return (
-    <SidebarEditorProvider isEditable={!isCommonTemplate}>
+    <SidebarEditorProvider isEditable={isTemplateEditable}>
       <TemplatePageTitle template={template} />
       <HorizontalNav pages={pages} resource={template} />
     </SidebarEditorProvider>
