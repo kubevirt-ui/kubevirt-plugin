@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import TooltipNoEditPermissions from 'src/views/templates/details/TooltipNoEditPermissions';
+import ButtonWithPermissionTooltip from 'src/views/templates/details/ButtonWithPermissionTooltip';
 
 import {
   ConfigMapModel,
@@ -17,7 +17,6 @@ import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  Button,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
@@ -26,8 +25,6 @@ import {
   FlexItem,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
-
-import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
 
 import {
   deleteTemplateSysprepObject,
@@ -44,7 +41,6 @@ type SysPrepItemProps = {
 
 const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
-  const { isTemplateEditable, hasEditPermission } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
   const currentVMSysprepName = getVolumes(vm)?.find((volume) => volume?.sysprep?.configMap?.name)
     ?.sysprep?.configMap?.name;
@@ -95,29 +91,27 @@ const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
           <Flex className="vm-description-item__title">
             <FlexItem>{t('Sysprep')}</FlexItem>
             <FlexItem>
-              <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
-                <Button
-                  type="button"
-                  isDisabled={!isTemplateEditable}
-                  isInline
-                  onClick={() =>
-                    createModal((modalProps) => (
-                      <SysprepModal
-                        {...modalProps}
-                        unattend={unattend}
-                        autoUnattend={autoUnattend}
-                        onSysprepSelected={onSysprepSelected}
-                        sysprepSelected={externalSysprepSelected}
-                        onSysprepCreation={onSysprepCreation}
-                      />
-                    ))
-                  }
-                  variant="link"
-                >
-                  {t('Edit')}
-                  <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-                </Button>
-              </TooltipNoEditPermissions>
+              <ButtonWithPermissionTooltip
+                template={template}
+                type="button"
+                isInline
+                onClick={() =>
+                  createModal((modalProps) => (
+                    <SysprepModal
+                      {...modalProps}
+                      unattend={unattend}
+                      autoUnattend={autoUnattend}
+                      onSysprepSelected={onSysprepSelected}
+                      sysprepSelected={externalSysprepSelected}
+                      onSysprepCreation={onSysprepCreation}
+                    />
+                  ))
+                }
+                variant="link"
+              >
+                {t('Edit')}
+                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+              </ButtonWithPermissionTooltip>
             </FlexItem>
           </Flex>
         </DescriptionListTermHelpText>

@@ -15,7 +15,6 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  Button,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
@@ -28,8 +27,7 @@ import {
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
-import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
-import TooltipNoEditPermissions from '../../TooltipNoEditPermissions';
+import ButtonWithPermissionTooltip from '../../ButtonWithPermissionTooltip';
 
 import SSHKey from './components/SSHKey/SSHKey';
 import SysPrepItem from './components/SysPrepItem/SysPrepItem';
@@ -45,7 +43,6 @@ type TemplateScriptsPageProps = RouteComponentProps<{
 
 const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
-  const { hasEditPermission, isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
 
   const { createModal } = useModal();
@@ -79,27 +76,25 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                 <Flex className="vm-description-item__title">
                   <FlexItem>{t('Cloud-init')}</FlexItem>
                   <FlexItem>
-                    <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
-                      <Button
-                        type="button"
-                        isInline
-                        isDisabled={!isTemplateEditable}
-                        onClick={() =>
-                          createModal(({ isOpen, onClose }) => (
-                            <CloudinitModal
-                              vm={vm}
-                              isOpen={isOpen}
-                              onClose={onClose}
-                              onSubmit={onUpdate}
-                            />
-                          ))
-                        }
-                        variant="link"
-                      >
-                        {t('Edit')}
-                        <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-                      </Button>
-                    </TooltipNoEditPermissions>
+                    <ButtonWithPermissionTooltip
+                      template={template}
+                      type="button"
+                      isInline
+                      onClick={() =>
+                        createModal(({ isOpen, onClose }) => (
+                          <CloudinitModal
+                            vm={vm}
+                            isOpen={isOpen}
+                            onClose={onClose}
+                            onSubmit={onUpdate}
+                          />
+                        ))
+                      }
+                      variant="link"
+                    >
+                      {t('Edit')}
+                      <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+                    </ButtonWithPermissionTooltip>
                   </FlexItem>
                 </Flex>
               </DescriptionListTermHelpText>

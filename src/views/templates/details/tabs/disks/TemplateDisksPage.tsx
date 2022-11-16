@@ -19,10 +19,10 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Flex, FlexItem } from '@patternfly/react-core';
+import { Flex, FlexItem } from '@patternfly/react-core';
 
+import ButtonWithPermissionTooltip from '../../ButtonWithPermissionTooltip';
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
-import TooltipNoEditPermissions from '../../TooltipNoEditPermissions';
 
 import DiskListTitle from './components/DiskListTitle';
 import DiskRow from './components/DiskRow';
@@ -47,7 +47,7 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
   const vm = getTemplateVirtualMachineObject(template);
-  const { hasEditPermission, isTemplateEditable } = useEditTemplateAccessReview(template);
+  const { hasEditPermission } = useEditTemplateAccessReview(template);
 
   const onSubmitTemplate = useCallback(
     (updatedTemplate: V1Template) =>
@@ -73,25 +73,23 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
         <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
           <Flex className="list-page-create-button-margin">
             <FlexItem>
-              <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
-                <Button
-                  isDisabled={!isTemplateEditable}
-                  onClick={() =>
-                    createModal(({ isOpen, onClose }) => (
-                      <DiskModal
-                        vm={vm}
-                        isOpen={isOpen}
-                        onClose={onClose}
-                        onSubmit={onUpdate}
-                        headerText={t('Add disk')}
-                        createOwnerReference={false}
-                      />
-                    ))
-                  }
-                >
-                  {t('Add disk')}
-                </Button>
-              </TooltipNoEditPermissions>
+              <ButtonWithPermissionTooltip
+                template={template}
+                onClick={() =>
+                  createModal(({ isOpen, onClose }) => (
+                    <DiskModal
+                      vm={vm}
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      onSubmit={onUpdate}
+                      headerText={t('Add disk')}
+                      createOwnerReference={false}
+                    />
+                  ))
+                }
+              >
+                {t('Add disk')}
+              </ButtonWithPermissionTooltip>
             </FlexItem>
             <FlexItem>
               <SidebarEditorSwitch />
