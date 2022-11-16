@@ -25,9 +25,9 @@ import {
 import TopConsumersGridRow from './utils/TopConsumersGridRow';
 import { topAmountSelectOptions } from './utils/utils';
 
-import './TopConsumersCard.scss';
+import './TopConsumersTab.scss';
 
-const TopConsumersCard: React.FC = () => {
+const TopConsumersTab: React.FC = () => {
   const { t } = useKubevirtTranslation();
   const [numItemsToShow, setNumItemsToShow] = useLocalStorage(
     TOP_CONSUMERS_NUM_ITEMS_KEY,
@@ -77,4 +77,4 @@ const TopConsumersCard: React.FC = () => {
   );
 };
 
-export default TopConsumersCard;
+export default TopConsumersTab;
