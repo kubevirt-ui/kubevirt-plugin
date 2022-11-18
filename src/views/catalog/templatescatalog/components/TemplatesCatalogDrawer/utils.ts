@@ -10,7 +10,7 @@ export const getVMName = async (template: V1Template, namespace: string): Promis
 
   return await k8sCreate<V1Template>({
     model: ProcessedTemplatesModel,
-    data: templateToProcess,
+    data: { ...templateToProcess, metadata: { ...template?.metadata, namespace } },
     ns: namespace,
     queryParams: {
       dryRun: 'All',

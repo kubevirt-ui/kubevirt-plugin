@@ -26,7 +26,11 @@ export default (template: V1Template): [template: V1Template, error: Error] => {
 
     k8sCreate<V1Template>({
       model: ProcessedTemplatesModel,
-      data: { ...template, parameters: parametersToGenerate },
+      data: {
+        ...template,
+        parameters: parametersToGenerate,
+        metadata: { ...template?.metadata, namespace },
+      },
       ns: namespace,
       queryParams: {
         dryRun: 'All',
