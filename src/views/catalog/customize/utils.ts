@@ -118,7 +118,7 @@ export const processTemplate = async ({
 
   return await k8sCreate<V1Template>({
     model: ProcessedTemplatesModel,
-    data: templateToProcess,
+    data: { ...templateToProcess, metadata: { ...template?.metadata, namespace } },
     queryParams: {
       dryRun: 'All',
     },
