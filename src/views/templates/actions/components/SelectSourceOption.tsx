@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
@@ -54,7 +55,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string) => {
           description={t('Upload new file using the "Upload data to Persistent Volume Claim" page')}
           onClick={() =>
             window
-              .open(`/k8s/ns/${ns || 'default'}/persistentvolumeclaims/~new/data`, '_blank')
+              .open(`/k8s/ns/${ns || DEFAULT_NAMESPACE}/persistentvolumeclaims/~new/data`, '_blank')
               .focus()
           }
         >

@@ -1,4 +1,5 @@
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
@@ -12,7 +13,6 @@ test('getResourceUrl', () => {
       name: 'vm',
     },
   };
-  const activeNamespace = 'default';
 
   const url = getResourceUrl({ model: VirtualMachineModel, resource });
   expect(url).toBe('/k8s/ns/kube/kubevirt.io~v1~VirtualMachine/vm');
@@ -23,6 +23,9 @@ test('getResourceUrl', () => {
   const nullUrl = getResourceUrl({ model: null, resource });
   expect(nullUrl).toBe(null);
 
-  const urlWithNamespace = getResourceUrl({ model: VirtualMachineModel, activeNamespace });
-  expect(urlWithNamespace).toBe(`/k8s/ns/${activeNamespace}/kubevirt.io~v1~VirtualMachine/`);
+  const urlWithNamespace = getResourceUrl({
+    model: VirtualMachineModel,
+    activeNamespace: DEFAULT_NAMESPACE,
+  });
+  expect(urlWithNamespace).toBe(`/k8s/ns/${DEFAULT_NAMESPACE}/kubevirt.io~v1~VirtualMachine/`);
 });

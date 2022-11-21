@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Breadcrumb,
@@ -31,7 +32,9 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
           <Button
             variant="link"
             isInline
-            onClick={() => onBreadcrumbClick(`/k8s/ns/${namespace || 'default'}/templatescatalog`)}
+            onClick={() =>
+              onBreadcrumbClick(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`)
+            }
           >
             {t('Catalog')}
           </Button>
@@ -43,7 +46,7 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
             onClick={() =>
               onBreadcrumbClick(
                 `/k8s/ns/${
-                  namespace || 'default'
+                  namespace || DEFAULT_NAMESPACE
                 }/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
               )
             }

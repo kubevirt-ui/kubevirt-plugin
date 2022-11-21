@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Breadcrumb, BreadcrumbItem, Label } from '@patternfly/react-core';
 
@@ -27,7 +28,7 @@ const DataSourcePageTitle: React.FC<DataSourcePageTitleProps> = ({
       <div className="pf-c-page__main-breadcrumb">
         <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
           <BreadcrumbItem>
-            <Link to={`/k8s/ns/${namespace || 'default'}/${DataSourceModelRef}`}>
+            <Link to={`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}`}>
               {t('DataSources')}
             </Link>
           </BreadcrumbItem>

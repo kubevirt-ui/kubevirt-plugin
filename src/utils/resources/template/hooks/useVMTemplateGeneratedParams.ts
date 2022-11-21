@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 export default (template: V1Template): [template: V1Template, error: Error] => {
   const [error, setError] = useState<Error>();
-  const { ns: namespace } = useParams<{ ns: string }>();
+  const { ns: namespace = DEFAULT_NAMESPACE } = useParams<{ ns: string }>();
   const [templateWithGeneratedValues, setTemplateWithGeneratedValues] = useState<V1Template>();
 
   useEffect(() => {

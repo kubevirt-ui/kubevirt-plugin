@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem } from '@patternfly/react-core';
 
@@ -55,9 +56,9 @@ export const CreateDataSourceModal: React.FC<CreateDataSourceModalProps> = ({
       createDataSourceWithImportCron({
         ...data,
         url: data?.url?.includes('docker://') ? data?.url : 'docker://' + data?.url,
-        namespace: namespace || 'default',
+        namespace: namespace || DEFAULT_NAMESPACE,
       }).then(() =>
-        history.push(`/k8s/ns/${namespace || 'default'}/${DataSourceModelRef}/${name}`),
+        history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/${name}`),
       ),
     () => Promise.reject({ message: t('Missing required fields') }),
   );
