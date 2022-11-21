@@ -1,5 +1,4 @@
 import * as React from 'react';
-import TooltipNoEditPermissions from 'src/views/templates/details/TooltipNoEditPermissions';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { AuthorizedSSHKeyModal } from '@kubevirt-utils/components/AuthorizedSSHKeyModal/AuthorizedSSHKeyModal';
@@ -32,7 +31,7 @@ type SSHKeyProps = {
 
 const SSHKey: React.FC<SSHKeyProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
-  const { hasEditPermission, isTemplateEditable } = useEditTemplateAccessReview(template);
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
 
   const vmAttachedSecretName = vm?.spec?.template?.spec?.accessCredentials?.find(
@@ -55,27 +54,25 @@ const SSHKey: React.FC<SSHKeyProps> = ({ template }) => {
           <Flex className="vm-description-item__title">
             <FlexItem>{t('Authorized SSH Key')}</FlexItem>
             <FlexItem>
-              <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
-                <Button
-                  type="button"
-                  isInline
-                  isDisabled={!isTemplateEditable}
-                  onClick={() =>
-                    createModal((modalProps) => (
-                      <AuthorizedSSHKeyModal
-                        {...modalProps}
-                        sshKey={secretKey}
-                        vmSecretName={externalSecretName}
-                        onSubmit={onSSHChange}
-                      />
-                    ))
-                  }
-                  variant={ButtonVariant.link}
-                >
-                  {t('Edit')}
-                  <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-                </Button>
-              </TooltipNoEditPermissions>
+              <Button
+                type="button"
+                isInline
+                isDisabled={!isTemplateEditable}
+                onClick={() =>
+                  createModal((modalProps) => (
+                    <AuthorizedSSHKeyModal
+                      {...modalProps}
+                      sshKey={secretKey}
+                      vmSecretName={externalSecretName}
+                      onSubmit={onSSHChange}
+                    />
+                  ))
+                }
+                variant={ButtonVariant.link}
+              >
+                {t('Edit')}
+                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+              </Button>
             </FlexItem>
           </Flex>
         </DescriptionListTermHelpText>

@@ -7,9 +7,9 @@ import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath
 import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
 import { Breadcrumb, BreadcrumbItem, Button, Label, Title } from '@patternfly/react-core';
 
-import { isCommonVMTemplate } from '../utils/utils';
-
-import NoEditableTemplateAlert from './NoEditableTemplateAlert';
+import useEditTemplateAccessReview from './hooks/useIsTemplateEditable';
+import CommonTemplateAlert from './CommonTemplateAlert';
+import NoPermissionTemplateAlert from './NoPermissionTemplateAlert';
 import TemplateActions from './TemplateActions';
 
 type TemplatePageTitleTitleProps = {
@@ -20,7 +20,7 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const lastNamespacePath = useLastNamespacePath();
-  const isEditDisabled = isCommonVMTemplate(template);
+  const { isCommonTemplate, hasEditPermission } = useEditTemplateAccessReview(template);
 
   return (
     <div className="pf-c-page__main-breadcrumb">
@@ -47,7 +47,8 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
         </span>
         <TemplateActions template={template} />
       </Title>
-      {isEditDisabled && <NoEditableTemplateAlert template={template} />}
+      {isCommonTemplate && <CommonTemplateAlert template={template} />}
+      {!isCommonTemplate && !hasEditPermission && <NoPermissionTemplateAlert />}
     </div>
   );
 };

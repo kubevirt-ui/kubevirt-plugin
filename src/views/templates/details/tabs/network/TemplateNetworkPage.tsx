@@ -10,7 +10,6 @@ import { k8sUpdate, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, Flex, FlexItem } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
-import TooltipNoEditPermissions from '../../TooltipNoEditPermissions';
 
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
@@ -28,7 +27,7 @@ type TemplateNetworkProps = RouteComponentProps<{
 const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { hasEditPermission, isTemplateEditable } = useEditTemplateAccessReview(template);
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const actionText = t('Add network interface');
 
   const onSubmitTemplate = React.useCallback(
@@ -48,23 +47,21 @@ const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
         <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
           <Flex className="list-page-create-button-margin">
             <FlexItem>
-              <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
-                <Button
-                  isDisabled={!isTemplateEditable}
-                  onClick={() =>
-                    createModal(({ isOpen, onClose }) => (
-                      <NetworkInterfaceModal
-                        isOpen={isOpen}
-                        onClose={onClose}
-                        headerText={actionText}
-                        template={template}
-                      />
-                    ))
-                  }
-                >
-                  {actionText}
-                </Button>
-              </TooltipNoEditPermissions>
+              <Button
+                isDisabled={!isTemplateEditable}
+                onClick={() =>
+                  createModal(({ isOpen, onClose }) => (
+                    <NetworkInterfaceModal
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      headerText={actionText}
+                      template={template}
+                    />
+                  ))
+                }
+              >
+                {actionText}
+              </Button>
             </FlexItem>
             <FlexItem>
               <SidebarEditorSwitch />
