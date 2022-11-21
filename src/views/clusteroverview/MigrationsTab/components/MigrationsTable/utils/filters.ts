@@ -1,10 +1,9 @@
-import { TFunction } from 'react-i18next';
-
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-export const getStatusFilter = (t: TFunction): RowFilter[] => [
+export const getStatusFilter = (): RowFilter[] => [
   {
     filterGroupName: t('Status'),
     type: 'status',
@@ -21,10 +20,7 @@ export const getStatusFilter = (t: TFunction): RowFilter[] => [
   },
 ];
 
-export const getSourceNodeFilter = (
-  vmis: V1VirtualMachineInstance[],
-  t: TFunction,
-): RowFilter[] => {
+export const getSourceNodeFilter = (vmis: V1VirtualMachineInstance[]): RowFilter[] => {
   if (vmis?.length === 0 || vmis?.every((vmi) => !vmi?.status?.migrationState?.sourceNode)) {
     return [] as RowFilter[];
   }
@@ -53,10 +49,7 @@ export const getSourceNodeFilter = (
   ];
 };
 
-export const getTargetNodeFilter = (
-  vmis: V1VirtualMachineInstance[],
-  t: TFunction,
-): RowFilter[] => {
+export const getTargetNodeFilter = (vmis: V1VirtualMachineInstance[]): RowFilter[] => {
   if (vmis?.length === 0 || vmis?.every((vm) => !vm?.status?.migrationState?.targetNode)) {
     return [] as RowFilter[];
   }

@@ -6,10 +6,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { HorizontalNav, NavPage } from '@openshift-console/dynamic-plugin-sdk';
 
 import ClusterOverviewPageHeader from './Header/ClusterOverviewPageHeader';
-import MigrationsCard from './MonitoringTab/migrations-card/MigrationsCard';
-import TopConsumersCard from './MonitoringTab/top-consumers-card/TopConsumersCard';
+import MigrationsTab from './MigrationsTab/MigrationsTab';
 import OverviewTab from './OverviewTab/OverviewTab';
 import SettingsTab from './SettingsTab/SettingsTab';
+import TopConsumersTab from './TopConsumersTab/TopConsumersTab';
 
 const ClusterOverviewPage: React.FC = () => {
   const { t } = useKubevirtTranslation();
@@ -24,12 +24,12 @@ const ClusterOverviewPage: React.FC = () => {
     {
       href: 'top-consumers',
       name: t('Top consumers'),
-      component: TopConsumersCard,
+      component: TopConsumersTab,
     },
     {
       href: 'migrations',
       name: t('Migrations'),
-      component: MigrationsCard,
+      component: MigrationsTab,
     },
     {
       href: 'settings',

@@ -8,13 +8,14 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import {
   OnFilterChange,
   RowFilter,
   useK8sWatchResource,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import useHCMigrations from '../components/MigrationsLimitionsPopover/hooks/useHCMigrations';
 import {
@@ -40,19 +41,22 @@ export type UseMigrationCardDataAndFiltersValues = {
 type UseMigrationCardDataAndFilters = (duration: string) => UseMigrationCardDataAndFiltersValues;
 
 const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration: string) => {
-  const { t } = useKubevirtTranslation();
   const migrationsDefaultConfigurations = useHCMigrations();
+  const [activeNamespace] = useActiveNamespace();
+  const namespace = activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : null;
 
   const [vmims, vmimsLoaded, vmimsErrors] = useK8sWatchResource<
     V1VirtualMachineInstanceMigration[]
   >({
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
+    namespace,
   });
 
   const [vmis, vmisLoaded, vmisErrors] = useK8sWatchResource<V1VirtualMachineInstance[]>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: true,
+    namespace,
   });
 
   const [mps] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
@@ -69,9 +73,9 @@ const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration
   );
 
   const filters = [
-    ...getStatusFilter(t),
-    ...getSourceNodeFilter(vmis, t),
-    ...getTargetNodeFilter(vmis, t),
+    ...getStatusFilter(),
+    ...getSourceNodeFilter(vmis),
+    ...getTargetNodeFilter(vmis),
   ];
   const [unfilteredData, data, onFilterChange] = useListPageFilter(migrationsData, filters);
 

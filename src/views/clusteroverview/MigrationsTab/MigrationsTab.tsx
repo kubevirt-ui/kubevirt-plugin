@@ -17,19 +17,18 @@ import {
   GridItem,
 } from '@patternfly/react-core';
 
-import { MIGRATIONS_DURATION_KEY } from '../top-consumers-card/utils/constants';
-
-import BandwidthConsumptionChart from './components/BandwidthConsumptionChart/BandwidthConsumptionChart';
+import BandwidthConsumptionCharts from './components/BandwidthConsumptionCharts/BandwidthConsumptionCharts';
 import MigrationEmptyState from './components/MigrationEmptyState/MigrationEmptyState';
 import MigrationsChartDonut from './components/MigrationsChartDonut/MigrationsChartDonut';
 import MigrationsLimitionsPopover from './components/MigrationsLimitionsPopover/MigrationsLimitionsPopover';
 import MigrationTable from './components/MigrationsTable/MigrationsTable';
 import { getFilteredDurationVMIMS } from './components/MigrationsTable/utils/utils';
 import useMigrationCardDataAndFilters from './hooks/useMigrationCardData';
+import { MIGRATIONS_DURATION_KEY } from './utils/constants';
 
-import './MigrationsCard.scss';
+import './MigrationsTab.scss';
 
-const MigrationsCard: React.FC = () => {
+const MigrationsTab: React.FC = () => {
   const { t } = useKubevirtTranslation();
 
   const [duration, setDuration] = useLocalStorage(
@@ -76,7 +75,7 @@ const MigrationsCard: React.FC = () => {
                   <CardTitle>{t('Bandwidth consumption')}</CardTitle>
                 </CardHeader>
                 <CardBody className="kv-monitoring-card__body">
-                  <BandwidthConsumptionChart duration={duration} />
+                  <BandwidthConsumptionCharts duration={duration} />
                 </CardBody>
               </GridItem>
               <GridItem className="kv-monitoring-card__table-separator" span={12}>
@@ -94,4 +93,4 @@ const MigrationsCard: React.FC = () => {
   );
 };
 
-export default MigrationsCard;
+export default MigrationsTab;
