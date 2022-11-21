@@ -8,10 +8,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  getTemplateVirtualMachineObject,
-  replaceTemplateVM,
-} from '@kubevirt-utils/resources/template';
+import { replaceTemplateVM } from '@kubevirt-utils/resources/template';
 import {
   k8sUpdate,
   ListPageBody,
@@ -29,6 +26,7 @@ import DiskRow from './components/DiskRow';
 import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
 import useTemplateDisksTableData from './hooks/useTemplateDisksTableData';
+import { getTemplateVMWithNamespace } from './utils';
 
 import './template-disk-tab.scss';
 
@@ -46,7 +44,8 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
   const [disks, disksLoaded] = useTemplateDisksTableData(template);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
-  const vm = getTemplateVirtualMachineObject(template);
+  const vm = getTemplateVMWithNamespace(template);
+
   const { hasEditPermission, isTemplateEditable } = useEditTemplateAccessReview(template);
 
   const onSubmitTemplate = useCallback(
