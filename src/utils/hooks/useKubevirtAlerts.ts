@@ -10,9 +10,10 @@ import { Alert } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/co
 
 import { OPERATOR_LABEL_KEY } from '../../views/clusteroverview/OverviewTab/status-card/utils/constants';
 
-const isKubeVirtAlert = (alert): boolean => alert?.labels?.[OPERATOR_LABEL_KEY] === KUBEVIRT;
+const isKubeVirtAlert = (alert: Alert): boolean => alert?.labels?.[OPERATOR_LABEL_KEY] === KUBEVIRT;
 
-const inNamespace = (namespace, alert): boolean => alert?.labels?.namespace === namespace;
+const inNamespace = (namespace: string, alert: Alert): boolean =>
+  alert?.labels?.namespace === namespace;
 
 export type UseKubevirtAlerts = () => [Alert[], boolean, Error];
 
@@ -28,7 +29,7 @@ const useKubevirtAlerts: UseKubevirtAlerts = () => {
     }
 
     return alerts?.filter((alert) => isKubeVirtAlert(alert));
-  }, [activeNamespace, alerts, isKubeVirtAlert]);
+  }, [activeNamespace, alerts]);
 
   return [filteredAlerts, loaded, loadError];
 };
