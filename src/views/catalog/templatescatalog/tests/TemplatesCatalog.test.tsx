@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { BOOT_SOURCE } from '@kubevirt-utils/resources/template/utils/constants';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -56,7 +57,7 @@ test('TemplatesCatalog', async () => {
         isExact: false,
         path: '/templatescatalog',
         url: '/templatescatalog',
-        params: { ns: 'default' },
+        params: { ns: DEFAULT_NAMESPACE },
       }}
     />,
   );

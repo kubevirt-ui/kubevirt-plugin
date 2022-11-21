@@ -9,6 +9,7 @@ import {
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
@@ -83,7 +84,7 @@ export const extractParameterNameFromMetadataName = (template: V1Template): stri
 
 export const processTemplate = async ({
   template,
-  namespace,
+  namespace = DEFAULT_NAMESPACE,
   formData,
   withWindowsDrivers,
 }: {

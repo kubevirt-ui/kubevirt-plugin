@@ -8,6 +8,7 @@ import {
   VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
@@ -44,7 +45,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
   const { t } = useKubevirtTranslation();
   const history = useHistory();
 
-  const catalogURL = `/k8s/ns/${namespace || 'default'}/templatescatalog`;
+  const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`;
 
   const [vms, loaded, loadError] = useKubevirtWatchResource({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
@@ -98,7 +99,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
   const onCreate = (type: string) => {
     return type === 'catalog'
       ? history.push(catalogURL)
-      : history.push(`/k8s/ns/${namespace || 'default'}/${VirtualMachineModelRef}/~new`);
+      : history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${VirtualMachineModelRef}/~new`);
   };
 
   const [columns, activeColumns] = useVirtualMachineColumns(namespace, pagination, data);

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { DataImportCronModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core';
 
@@ -26,7 +27,7 @@ const DataImportCronPageTitle: React.FC<DataImportCronPageTitleProps> = ({
       <div className="pf-c-page__main-breadcrumb">
         <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
           <BreadcrumbItem>
-            <Link to={`/k8s/ns/${namespace || 'default'}/${DataImportCronModelRef}`}>
+            <Link to={`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataImportCronModelRef}`}>
               {t('DataImportCrons')}
             </Link>
           </BreadcrumbItem>
