@@ -10,13 +10,13 @@ import { getTemplateProviderName } from '@kubevirt-utils/resources/template';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
-import './no-editable-template-alert.scss';
+import './template-header-alert.scss';
 
-type NoEditableTemplateAlertProps = {
+type CommonTemplateAlertProps = {
   template: V1Template;
 };
 
-const NoEditableTemplateAlert: React.FC<NoEditableTemplateAlertProps> = ({ template }) => {
+const CommonTemplateAlert: React.FC<CommonTemplateAlertProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const osName = getOperatingSystemName(template);
   const providerName = getTemplateProviderName(template);
@@ -34,7 +34,7 @@ const NoEditableTemplateAlert: React.FC<NoEditableTemplateAlertProps> = ({ templ
 
   return (
     <Alert
-      className="alert-margin-top-bottom no-editable-template-alert"
+      className="alert-margin-top-bottom template-header-alert"
       isInline
       variant={AlertVariant.info}
       title={t('Templates provided by {{providerName}} are not editable.', {
@@ -68,4 +68,4 @@ const NoEditableTemplateAlert: React.FC<NoEditableTemplateAlertProps> = ({ templ
   );
 };
 
-export default NoEditableTemplateAlert;
+export default CommonTemplateAlert;

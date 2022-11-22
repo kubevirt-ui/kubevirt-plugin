@@ -162,6 +162,8 @@
   "By vCPU wait": "By vCPU wait",
   "Can detach only hotplug volumes while VirtualMachine is Running": "Can detach only hotplug volumes while VirtualMachine is Running",
   "Can edit only when VirtualMachine is stopped": "Can edit only when VirtualMachine is stopped",
+  "Can not delete in view-only mode": "Can not delete in view-only mode",
+  "Can not edit in view-only mode": "Can not edit in view-only mode",
   "Cancel": "Cancel",
   "Cancel migration": "Cancel migration",
   "Cancel upload": "Cancel upload",
@@ -853,6 +855,7 @@
   "Time of login": "Time of login",
   "Time range": "Time range",
   "Time zone": "Time zone",
+  "To edit this template, contact your administrator.": "To edit this template, contact your administrator.",
   "To enable the Descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more Descheduler profiles.": "To enable the Descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more Descheduler profiles.",
   "To gain unlimited bandwidth, set to 0": "To gain unlimited bandwidth, set to 0",
   "To see the vCPU metric, you must set the schedstats=enable kernel argument in the MachineConfig object.": "To see the vCPU metric, you must set the schedstats=enable kernel argument in the MachineConfig object.",
@@ -984,6 +987,5 @@
   "You can edit the boot order in the <1>{t('Disks tab')}</1>": "You can edit the boot order in the <1>{t('Disks tab')}</1>",
   "You can select the boot source in the <2>Disks</2> tab.": "You can select the boot source in the <2>Disks</2> tab.",
   "You can use cloud-init for post installation configuration of the guest operating system.": "You can use cloud-init for post installation configuration of the guest operating system.",
-  "You do not have permission to delete. To make changes to this template, contact your administrator.": "You do not have permission to delete. To make changes to this template, contact your administrator.",
-  "You do not have permission to edit. To make changes to this template, contact your administrator.": "You do not have permission to edit. To make changes to this template, contact your administrator."
+  "You're in view-only mode": "You're in view-only mode"
 }

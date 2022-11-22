@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import TooltipNoEditPermissions from 'src/views/templates/details/TooltipNoEditPermissions';
 
 import {
   ConfigMapModel,
@@ -44,7 +43,7 @@ type SysPrepItemProps = {
 
 const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
-  const { isTemplateEditable, hasEditPermission } = useEditTemplateAccessReview(template);
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
   const currentVMSysprepName = getVolumes(vm)?.find((volume) => volume?.sysprep?.configMap?.name)
     ?.sysprep?.configMap?.name;
@@ -95,29 +94,27 @@ const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
           <Flex className="vm-description-item__title">
             <FlexItem>{t('Sysprep')}</FlexItem>
             <FlexItem>
-              <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
-                <Button
-                  type="button"
-                  isDisabled={!isTemplateEditable}
-                  isInline
-                  onClick={() =>
-                    createModal((modalProps) => (
-                      <SysprepModal
-                        {...modalProps}
-                        unattend={unattend}
-                        autoUnattend={autoUnattend}
-                        onSysprepSelected={onSysprepSelected}
-                        sysprepSelected={externalSysprepSelected}
-                        onSysprepCreation={onSysprepCreation}
-                      />
-                    ))
-                  }
-                  variant="link"
-                >
-                  {t('Edit')}
-                  <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-                </Button>
-              </TooltipNoEditPermissions>
+              <Button
+                type="button"
+                isDisabled={!isTemplateEditable}
+                isInline
+                onClick={() =>
+                  createModal((modalProps) => (
+                    <SysprepModal
+                      {...modalProps}
+                      unattend={unattend}
+                      autoUnattend={autoUnattend}
+                      onSysprepSelected={onSysprepSelected}
+                      sysprepSelected={externalSysprepSelected}
+                      onSysprepCreation={onSysprepCreation}
+                    />
+                  ))
+                }
+                variant="link"
+              >
+                {t('Edit')}
+                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+              </Button>
             </FlexItem>
           </Flex>
         </DescriptionListTermHelpText>

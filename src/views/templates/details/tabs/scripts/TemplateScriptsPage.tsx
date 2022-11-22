@@ -29,7 +29,6 @@ import {
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
-import TooltipNoEditPermissions from '../../TooltipNoEditPermissions';
 
 import SSHKey from './components/SSHKey/SSHKey';
 import SysPrepItem from './components/SysPrepItem/SysPrepItem';
@@ -45,7 +44,7 @@ type TemplateScriptsPageProps = RouteComponentProps<{
 
 const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
-  const { hasEditPermission, isTemplateEditable } = useEditTemplateAccessReview(template);
+  const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
 
   const { createModal } = useModal();
@@ -79,27 +78,25 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                 <Flex className="vm-description-item__title">
                   <FlexItem>{t('Cloud-init')}</FlexItem>
                   <FlexItem>
-                    <TooltipNoEditPermissions hasEditPermission={hasEditPermission}>
-                      <Button
-                        type="button"
-                        isInline
-                        isDisabled={!isTemplateEditable}
-                        onClick={() =>
-                          createModal(({ isOpen, onClose }) => (
-                            <CloudinitModal
-                              vm={vm}
-                              isOpen={isOpen}
-                              onClose={onClose}
-                              onSubmit={onUpdate}
-                            />
-                          ))
-                        }
-                        variant="link"
-                      >
-                        {t('Edit')}
-                        <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-                      </Button>
-                    </TooltipNoEditPermissions>
+                    <Button
+                      type="button"
+                      isInline
+                      isDisabled={!isTemplateEditable}
+                      onClick={() =>
+                        createModal(({ isOpen, onClose }) => (
+                          <CloudinitModal
+                            vm={vm}
+                            isOpen={isOpen}
+                            onClose={onClose}
+                            onSubmit={onUpdate}
+                          />
+                        ))
+                      }
+                      variant="link"
+                    >
+                      {t('Edit')}
+                      <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+                    </Button>
                   </FlexItem>
                 </Flex>
               </DescriptionListTermHelpText>
