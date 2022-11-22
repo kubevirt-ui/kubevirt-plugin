@@ -13,6 +13,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionToggle,
+  Button,
+  ButtonVariant,
   Flex,
   Label,
 } from '@patternfly/react-core';
@@ -22,19 +24,20 @@ type AlertsDrawerProps = {
 };
 
 const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
-  const [alertOpen, setAlertOpen] = React.useState<AlertType>(null);
+  const [alertTypeOpen, setAlertTypeOpen] = React.useState<AlertType>(null);
+
   const [titleOpen, setTitleOpen] = React.useState<boolean>(false);
   const [defaultOpenCritical, setDefaultOpenCritical] = React.useState<boolean>(false);
 
   const handleDrawerToggleClick = React.useCallback((alertType: AlertType): void => {
-    setAlertOpen((alert) => (alert === alertType ? null : alertType));
+    setAlertTypeOpen((alert) => (alert === alertType ? null : alertType));
   }, []);
 
   React.useEffect(() => {
     //open critical alerts by default, if exists, only for the first time loading
     if (!defaultOpenCritical && !isEmpty(sortedAlerts?.critical)) {
       setTitleOpen(true);
-      setAlertOpen(AlertType.critical);
+      setAlertTypeOpen(AlertType.critical);
       setDefaultOpenCritical(true);
     }
   }, [sortedAlerts, defaultOpenCritical]);
@@ -45,7 +48,10 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
         <AccordionItem>
           <AccordionToggle
             onClick={() => {
-              setTitleOpen((title) => !title);
+              setTitleOpen((title) => {
+                title && setAlertTypeOpen(null);
+                return !title;
+              });
             }}
             isExpanded={titleOpen}
             id="toggle-main"
@@ -63,7 +69,20 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                 }
 
                 return (
-                  <span key={alertType}>
+                  <Button
+                    variant={ButtonVariant.plain}
+                    className="pf-m-link--align-left"
+                    key={alertType}
+                    onClick={(e) => {
+                      setAlertTypeOpen((prevAlertOpen) =>
+                        titleOpen && prevAlertOpen === alertType ? null : (alertType as AlertType),
+                      );
+                      setTitleOpen(
+                        (prevTitleOpen) => !prevTitleOpen || alertTypeOpen !== alertType,
+                      );
+                      e?.stopPropagation();
+                    }}
+                  >
                     <Label
                       key={alertType}
                       color={labelColor[alertType]}
@@ -73,7 +92,7 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                       {numAlerts || 0}
                     </Label>
                     <span className="alerts-label--text">{labelText[alertType]}</span>
-                  </span>
+                  </Button>
                 );
               })}
             </Flex>
@@ -82,7 +101,7 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
             {Object.entries(sortedAlerts)?.map(([alertType, alerts]) => (
               <AlertsCardAccordionItem
                 key={alertType}
-                alertOpen={alertOpen}
+                alertOpen={alertTypeOpen}
                 alertType={AlertType[alertType]}
                 alerts={alerts}
                 handleDrawerToggleClick={handleDrawerToggleClick}
