@@ -144,7 +144,7 @@ export const isDefaultStorageClass = (storageClass: IoK8sApiStorageV1StorageClas
 
 export const getDefaultStorageClass = (
   storageClasses: IoK8sApiStorageV1StorageClass[],
-): IoK8sApiStorageV1StorageClass => storageClasses.find(isDefaultStorageClass);
+): IoK8sApiStorageV1StorageClass => storageClasses?.find(isDefaultStorageClass);
 
 export const generateDiskName = () => {
   return `disk-${uniqueNamesGenerator({

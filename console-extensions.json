@@ -223,7 +223,10 @@
   {
     "type": "console.page/route",
     "properties": {
-      "path": ["/k8s/ns/:ns/virtualization-overview", "/k8s/all-namespaces/virtualization-overview"],
+      "path": [
+        "/k8s/ns/:ns/virtualization-overview",
+        "/k8s/all-namespaces/virtualization-overview"
+      ],
       "component": {
         "$codeRef": "ClusterOverviewPage"
       }
@@ -458,6 +461,78 @@
       "component": {
         "$codeRef": "MigrationPolicyCreateForm"
       }
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
+      "exact": true,
+      "path": ["/k8s/ns/:ns/persistentvolumeclaims/~new/data"],
+      "component": {
+        "$codeRef": "UploadPVC"
+      }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
+    "type": "console.pvc/create-prop",
+    "properties": {
+      "label": "%plugin__kubevirt-plugin~With Data upload form%",
+      "path": "~new/data"
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
+    "type": "console.pvc/alert",
+    "properties": {
+      "alert": { "$codeRef": "pvcAlert" }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
+    "type": "console.pvc/status",
+    "properties": {
+      "priority": 10,
+      "predicate": { "$codeRef": "pvcSelectors.isPvcUploading" },
+      "status": { "$codeRef": "pvcUploadStatus" }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
+    "type": "console.pvc/status",
+    "properties": {
+      "priority": 9,
+      "predicate": { "$codeRef": "pvcSelectors.isPvcCloning" },
+      "status": { "$codeRef": "pvcCloneStatus" }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
+    "type": "console.pvc/delete",
+    "properties": {
+      "predicate": { "$codeRef": "pvcSelectors.isPvcBoundToCDI" },
+      "onPVCKill": { "$codeRef": "pvcUploadUtils.killCDIBoundPVC" },
+      "alert": { "$codeRef": "pvcDelete" }
+    }
+  },
+  {
+    "type": "console.context-provider",
+    "properties": {
+      "provider": { "$codeRef": "contextProvider.CDIUploadProvider" },
+      "useValueHook": { "$codeRef": "useCDIUpload" }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
     }
   }
 ]

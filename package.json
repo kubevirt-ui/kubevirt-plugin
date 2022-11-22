@@ -54,7 +54,16 @@
       "MigrationPolicyPage": "./views/migrationpolicies/details/MigrationPolicyDetailsNav.tsx",
       "dashboardExtensions": "./utils/extensions/dashboard/index.ts",
       "HardwareDevicesPage": "./utils/components/HardwareDevices/HardwareDevicesPage.tsx",
-      "MigrationPolicyCreateForm": "./views/migrationpolicies/list/components/MigrationPolicyCreateForm/MigrationPolicyCreateForm.tsx"
+      "MigrationPolicyCreateForm": "./views/migrationpolicies/list/components/MigrationPolicyCreateForm/MigrationPolicyCreateForm.tsx",
+      "contextProvider": "src/views/cdi-upload-provider/utils/context.tsx",
+      "useCDIUpload": "src/views/cdi-upload-provider/hooks/useCDIUpload.tsx",
+      "pvcSelectors": "src/views/cdi-upload-provider/utils/selectors.ts",
+      "pvcAlert": "src/views/cdi-upload-provider/PVCAlertExtension.tsx",
+      "pvcUploadStatus": "src/views/cdi-upload-provider/popover/UploadPVCPopover.tsx",
+      "pvcCloneStatus": "src/views/cdi-upload-provider/upload-pvc-form/statuses/ClonePVCStatus.tsx",
+      "pvcDelete": "src/views/cdi-upload-provider/PVCDeleteAlertExtension.tsx",
+      "pvcUploadUtils": "src/views/cdi-upload-provider/utils/utils.tsx",
+      "UploadPVC": "src/views/cdi-upload-provider/upload-pvc-form/UploadPVC.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
