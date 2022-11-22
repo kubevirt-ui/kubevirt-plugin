@@ -1,6 +1,5 @@
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-export const DEFAULT_NAMESPACE = 'default';
 export const NAME_INPUT_FIELD = 'NAME';
 
 export const INSTALLATION_CDROM_NAME = 'installation-cdrom';

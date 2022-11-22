@@ -5,6 +5,7 @@ import produce from 'immer';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { DataUpload, useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import {
@@ -19,7 +20,7 @@ import {
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 
 import { ensurePath, useWizardVMContext } from '../../../utils/WizardVMContext';
-import { DEFAULT_NAMESPACE, INSTALLATION_CDROM_NAME } from '../../constants';
+import { INSTALLATION_CDROM_NAME } from '../../constants';
 import { getUploadDataVolume, processTemplate } from '../../utils';
 
 type useCustomizeFormSubmitType = {
@@ -171,7 +172,7 @@ export const useCustomizeFormSubmit = ({
       // update context vm
       await updateVM(updatedVM);
 
-      history.push(`/k8s/ns/${ns || 'default'}/templatescatalog/review`);
+      history.push(`/k8s/ns/${ns || DEFAULT_NAMESPACE}/templatescatalog/review`);
       setTemplateError(undefined);
     } catch (error) {
       console.error(error);

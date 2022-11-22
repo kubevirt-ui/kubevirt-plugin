@@ -3,6 +3,7 @@ import produce from 'immer';
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import {
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
@@ -26,7 +27,7 @@ type QuickCreateVMType = (inputs: {
 export const quickCreateVM: QuickCreateVMType = async ({
   template,
   models,
-  overrides: { namespace, name, startVM },
+  overrides: { namespace = DEFAULT_NAMESPACE, name, startVM },
 }) => {
   const processedTemplate = await k8sCreate<V1Template>({
     model: ProcessedTemplatesModel,

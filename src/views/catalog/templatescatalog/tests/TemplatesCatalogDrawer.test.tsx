@@ -4,6 +4,7 @@ import { WizardVMContextProvider } from '@catalog/utils/WizardVMContext';
 import VirtualMachineModel, {
   VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { BOOT_SOURCE } from '@kubevirt-utils/resources/template';
 import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -17,7 +18,7 @@ const mockHistoryPush = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: jest.fn(() => ({
-    ns: 'default',
+    ns: DEFAULT_NAMESPACE,
   })),
   useHistory: () => ({
     push: mockHistoryPush,
@@ -72,7 +73,7 @@ test('TemplatesCatalogDrawer', async () => {
 
   const { getByText, getAllByText, getByTestId } = render(
     <TemplatesCatalogDrawer
-      namespace="default"
+      namespace={DEFAULT_NAMESPACE}
       isOpen
       onClose={handleClose}
       template={containerTemplateMock}
