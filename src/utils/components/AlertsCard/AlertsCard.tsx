@@ -46,7 +46,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
   const isAdmin = useIsAdmin();
   const [alertScope, setAlertScope] = useLocalStorage(
     ALERTS_SCOPE_KEY,
-    isAdmin ? VIRTUALIZATION_ONLY_ALERTS : ALL_ALERTS,
+    isAdmin ? VIRTUALIZATION_ONLY_ALERTS : ALL_ALERTS, // for admins show the number of virtualization health alerts by default
   );
 
   const alerts = React.useMemo(() => {
@@ -55,8 +55,9 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
       : removeVMAlerts(sortedAlerts);
   }, [alertScope, isAdmin, isOverviewPage, sortedAlerts]);
 
+  // number of alerts according to the selected scope: Virtualization health only or all alerts
   const alertsQuantity =
-    Object.values(sortedAlerts)?.reduce((acc, category) => acc + category?.length, 0) || 0;
+    Object.values(alerts)?.reduce((acc, category) => acc + category?.length, 0) || 0;
 
   return (
     <Card className={classNames('alerts-card', className)}>
