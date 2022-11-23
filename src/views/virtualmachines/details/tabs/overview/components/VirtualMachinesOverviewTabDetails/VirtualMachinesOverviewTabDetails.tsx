@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -9,12 +9,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
 import { useVMIAndPodsForVM, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
-import { useGuestOS } from '@kubevirt-utils/resources/vmi';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getOsNameFromGuestAgent, useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  Button,
-  ButtonVariant,
   Card,
   CardBody,
   DescriptionList,
@@ -25,15 +24,15 @@ import {
   Grid,
   GridItem,
   pluralize,
-  Popover,
-  PopoverPosition,
   Skeleton,
 } from '@patternfly/react-core';
 
-import { getVMStatusIcon, printableVMStatus } from '../../../../../utils';
+import { printableVMStatus } from '../../../../../utils';
 import CPUMemory from '../../../details/components/CPUMemory/CPUMemory';
 
 import MigrationProgressPopover from './components/MigrationProgressPopover/MigrationProgressPopover';
+import StatusPopoverButton from './components/StatusPopoverButton/StatusPopoverButton';
+import VirtualMachineOverviewStatus from './components/VirtualMachineOverviewStatus/VirtualMachineOverviewStatus';
 import VirtualMachinesOverviewTabDetailsConsole from './components/VirtualMachinesOverviewTabDetailsConsole';
 import VirtualMachinesOverviewTabDetailsTitle from './components/VirtualMachinesOverviewTabDetailsTitle';
 
@@ -43,13 +42,10 @@ type VirtualMachinesOverviewTabDetailsProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDetailsProps> = ({
-  vm,
-}) => {
+const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
-  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const [guestAgentData, loaded] = useGuestOS(vmi);
-  const Icon = getVMStatusIcon(vm?.status?.printableStatus);
+  const { vmi, loaded } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const [guestAgentData, loadedGuestAgent] = useGuestOS(vmi);
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
   const None = <MutedTextSpan text={t('None')} />;
@@ -59,26 +55,25 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
     new Date(Date.now()),
     true,
   );
+
   const timestampPluralized = pluralize(timestamp['value'], timestamp['time']);
 
-  const guestAgentIsRequired = <GuestAgentIsRequiredText vmi={vmi} />;
-
-  const osName =
-    loaded && !isEmpty(guestAgentData)
-      ? `${guestAgentData?.os?.name} ${guestAgentData?.os?.version}`
-      : guestAgentIsRequired;
-
-  const hostname = guestAgentData?.hostname ?? guestAgentIsRequired;
+  const { osName, hostname, fallback } = useMemo(() => {
+    if (!loadedGuestAgent || !loaded)
+      return {
+        fallback: <Skeleton />,
+      };
+    if (!isEmpty(guestAgentData))
+      return {
+        osName: getOsNameFromGuestAgent(guestAgentData),
+        hostname: guestAgentData?.hostname,
+      };
+    return {
+      fallback: <GuestAgentIsRequiredText vmi={vmi} />,
+    };
+  }, [guestAgentData, loadedGuestAgent, vmi, loaded]);
 
   const vmPrintableStatus = vm?.status?.printableStatus;
-  const popoverButton = (
-    <span>
-      <Icon />{' '}
-      <Button variant={ButtonVariant.link} isInline>
-        {vmPrintableStatus}
-      </Button>
-    </span>
-  );
 
   return (
     <div className="VirtualMachinesOverviewTabDetails--details">
@@ -93,37 +88,33 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                   <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-name">
                     {' '}
-                    {vm?.metadata?.name}
+                    {vm?.metadata?.name || NO_DATA_DASH}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-status">
                     {vmPrintableStatus !== printableVMStatus.Migrating ? (
-                      <Popover
-                        headerContent={vmPrintableStatus}
-                        bodyContent={t('VirtualMachine is currently {{status}}', {
-                          status: vmPrintableStatus,
-                        })}
-                        position={PopoverPosition.right}
-                      >
-                        {popoverButton}
-                      </Popover>
+                      <VirtualMachineOverviewStatus vmPrintableStatus={vmPrintableStatus} />
                     ) : (
-                      <MigrationProgressPopover vmi={vmi}>{popoverButton}</MigrationProgressPopover>
+                      <MigrationProgressPopover vmi={vmi}>
+                        <StatusPopoverButton vmPrintableStatus={vmPrintableStatus} />
+                      </MigrationProgressPopover>
                     )}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Created')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-created">
-                    {t('{{timestampPluralized}} ago', { timestampPluralized })}
+                    {timestamp !== NO_DATA_DASH
+                      ? t('{{timestampPluralized}} ago', { timestampPluralized })
+                      : NO_DATA_DASH}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Operating system')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-os">
-                    {loaded ? osName : <Skeleton />}
+                    {osName ?? fallback}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
@@ -135,7 +126,7 @@ const VirtualMachinesOverviewTabDetails: React.FC<VirtualMachinesOverviewTabDeta
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Hostname')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-host">
-                    {loaded ? hostname : <Skeleton />}
+                    {hostname ?? fallback}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
