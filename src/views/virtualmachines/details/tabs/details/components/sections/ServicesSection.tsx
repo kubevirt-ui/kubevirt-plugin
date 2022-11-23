@@ -20,7 +20,10 @@ const ServicesSection = ({ vm, pathname }) => {
   });
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
 
-  const data = getServicesForVmi(services, vmi);
+  const data = getServicesForVmi(
+    services,
+    vmi?.metadata?.labels || vm?.spec?.template?.metadata?.labels,
+  );
 
   return (
     <div className="VirtualMachinesDetailsSection">

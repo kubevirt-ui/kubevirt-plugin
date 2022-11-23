@@ -31,10 +31,10 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
   vmDetailsRightGridObj,
   vmi,
 }) => {
+  const [sshService, sshServiceLoaded] = useSSHService(vm);
+
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-
-  const [sshService, sshServiceLoaded] = useSSHService(vmi);
 
   const [canGetNode] = useAccessReview({
     namespace: vmi?.metadata?.namespace,
