@@ -50,7 +50,8 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
     name: vmi?.metadata?.name,
     namespace: vmi?.metadata?.namespace,
   });
-  const [sshService, sshServiceLoading] = useSSHService(vmi);
+  const [sshService, sshServiceLoaded] = useSSHService(vm);
+
   return (
     <div>
       <a href={`${pathname}#details`} className="link-icon">
@@ -149,7 +150,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
                 vmi={vmi}
                 vm={vm}
                 sshService={sshService}
-                sshServiceLoaded={sshServiceLoading}
+                sshServiceLoaded={sshServiceLoaded}
               />
             </DescriptionListGroup>
             <DescriptionListGroup>
