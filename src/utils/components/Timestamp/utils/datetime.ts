@@ -1,3 +1,5 @@
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+
 import {
   DAY,
   HOUR,
@@ -113,7 +115,7 @@ export const fromNow = (dateTime: string | Date, now?: Date, options?) => {
 
 export const timestampFor = (mdate: Date, now: Date, omitSuffix: boolean) => {
   if (!isValid(mdate)) {
-    return '-';
+    return NO_DATA_DASH;
   }
 
   const timeDifference = now.getTime() - mdate.getTime();
