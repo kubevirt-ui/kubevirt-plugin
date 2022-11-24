@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 /**
@@ -11,7 +12,7 @@ import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
  */
 export const useProcessedTemplate = (
   template: V1Template,
-  namespace: string,
+  namespace: string = DEFAULT_NAMESPACE,
 ): [V1Template, boolean, any] => {
   const [processedTemplate, setProcessedTemplate] = React.useState<V1Template | undefined>(
     undefined,

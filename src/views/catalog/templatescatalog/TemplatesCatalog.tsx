@@ -2,6 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { Stack, Toolbar, ToolbarContent } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
@@ -75,7 +76,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
         skeletonCatalog
       )}
       <TemplatesCatalogDrawer
-        namespace={namespace ?? 'default'}
+        namespace={namespace ?? DEFAULT_NAMESPACE}
         isOpen={!!selectedTemplate}
         template={selectedTemplate}
         onClose={() => setSelectedTemplate(undefined)}

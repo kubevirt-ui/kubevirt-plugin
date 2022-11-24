@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
@@ -26,7 +27,7 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
   namespace,
 }) => {
   const { t } = useKubevirtTranslation();
-  const catalogURL = `/k8s/ns/${namespace || 'default'}/templatescatalog`;
+  const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`;
 
   const [vmis, loaded, loadError] = useK8sWatchResource<V1VirtualMachineInstance[]>({
     kind,

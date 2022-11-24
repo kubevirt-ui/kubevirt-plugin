@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Breadcrumb, BreadcrumbItem, Button } from '@patternfly/react-core';
 
@@ -16,7 +17,9 @@ export const CustomizeVirtualMachineHeader: React.FC<{ namespace: string }> = Re
             <Button
               variant="link"
               isInline
-              onClick={() => history.push(`/k8s/ns/${namespace || 'default'}/templatescatalog`)}
+              onClick={() =>
+                history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`)
+              }
             >
               {t('Catalog')}
             </Button>

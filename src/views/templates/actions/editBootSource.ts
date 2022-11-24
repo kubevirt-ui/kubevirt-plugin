@@ -12,6 +12,7 @@ import {
   V1beta1DataVolumeSpec,
   V1DataVolumeTemplateSpec,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import {
   getTemplateVirtualMachineObject,
   poorManProcess,
@@ -81,7 +82,7 @@ export const getBootDataSource = async (
   )
     return await getDataSource(
       dataVolume?.spec?.sourceRef?.name,
-      dataVolume?.spec?.sourceRef?.namespace || dataVolume.metadata.namespace || 'default',
+      dataVolume?.spec?.sourceRef?.namespace || dataVolume.metadata.namespace || DEFAULT_NAMESPACE,
     );
 };
 
