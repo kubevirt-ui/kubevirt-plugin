@@ -28,7 +28,8 @@ import {
   VM_TEMPLATE_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { useGuestOS } from '@kubevirt-utils/resources/vmi';
+import { getOsNameFromGuestAgent, useGuestOS } from '@kubevirt-utils/resources/vmi';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   k8sPatch,
   k8sUpdate,
@@ -55,7 +56,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
 
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
-  const [guestAgentData] = useGuestOS(vmi);
+  const [guestAgentData, loadedGuestAgent] = useGuestOS(vmi);
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(vm, t);
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
@@ -208,8 +209,9 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
         />
         <VirtualMachineDescriptionItem
           descriptionData={
-            guestAgentData?.os?.prettyName ||
-            guestAgentData?.os?.name || <GuestAgentIsRequiredText vmi={vmi} />
+            (loadedGuestAgent &&
+              !isEmpty(guestAgentData) &&
+              getOsNameFromGuestAgent(guestAgentData)) || <GuestAgentIsRequiredText vmi={vmi} />
           }
           isPopover
           // body-content text copied from:
