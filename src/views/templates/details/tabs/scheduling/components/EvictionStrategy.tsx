@@ -9,7 +9,6 @@ import {
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
-  Text,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -38,20 +37,17 @@ const EvictionStrategy: React.FC<TemplateSchedulingGridProps> = ({
     <DescriptionListGroup>
       <DescriptionListTerm>{t('Eviction strategy')}</DescriptionListTerm>
       <DescriptionListDescription>
-        {editable ? (
-          <Button
-            type="button"
-            isInline
-            onClick={onEditClick}
-            variant="link"
-            data-test-id="eviction-strategy"
-          >
-            {strategy}
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        ) : (
-          <Text className="text-muted">{strategy}</Text>
-        )}
+        <Button
+          type="button"
+          isInline
+          onClick={onEditClick}
+          variant="link"
+          data-test-id="eviction-strategy"
+          isDisabled={!editable}
+        >
+          {strategy}
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </Button>
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

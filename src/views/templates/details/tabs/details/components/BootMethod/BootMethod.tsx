@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
@@ -56,14 +55,16 @@ const BootMethod: React.FC<BootMethodProps> = ({ template }) => {
     <DescriptionListGroup>
       <DescriptionListTerm>{t('Boot mode')}</DescriptionListTerm>
       <DescriptionListDescription>
-        {isTemplateEditable ? (
-          <Button type="button" isInline onClick={onEditClick} variant="link">
-            {firmwareBootloaderTitle}
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        ) : (
-          <MutedTextSpan text={firmwareBootloaderTitle} />
-        )}
+        <Button
+          type="button"
+          isInline
+          onClick={onEditClick}
+          isDisabled={!isTemplateEditable}
+          variant="link"
+        >
+          {firmwareBootloaderTitle}
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </Button>
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

@@ -9,7 +9,6 @@ import {
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
-  Text,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -31,20 +30,17 @@ const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ template, editable
     <DescriptionListGroup>
       <DescriptionListTerm>{t('Tolerations')}</DescriptionListTerm>
       <DescriptionListDescription>
-        {editable ? (
-          <Button
-            type="button"
-            isInline
-            onClick={onEditClick}
-            variant="link"
-            data-test-id="tolerations"
-          >
-            {tolerationsCount}
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        ) : (
-          <Text className="text-muted">{tolerationsCount}</Text>
-        )}
+        <Button
+          type="button"
+          isInline
+          onClick={onEditClick}
+          variant="link"
+          data-test-id="tolerations"
+          isDisabled={!editable}
+        >
+          {tolerationsCount}
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </Button>
       </DescriptionListDescription>
     </DescriptionListGroup>
   );
