@@ -1,6 +1,7 @@
 import React, { FC, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { getTemplateNameParameterValue } from '@catalog/customize/utils';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
@@ -37,7 +38,7 @@ const CustomizeFormWithStorage: FC<CustomizeFormWithStorageProps> = ({
 }) => {
   const methods = useForm();
   const { params } = useURLParams();
-  const vmName = params.get('vmName');
+  const vmName = params.get('vmName') || getTemplateNameParameterValue(template);
 
   const [diskSource, setDiskSource] = useState<V1beta1DataVolumeSpec>();
   const [cdSource, setCDSource] = useState<V1beta1DataVolumeSpec>();

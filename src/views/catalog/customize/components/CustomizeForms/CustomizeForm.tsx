@@ -1,6 +1,7 @@
 import React, { FC, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { getTemplateNameParameterValue } from '@catalog/customize/utils';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 import { Form } from '@patternfly/react-core';
@@ -25,7 +26,7 @@ export const CustomizeForm: FC<CustomizeFormProps> = ({ template }) => {
   const [requiredFields, optionalFields] = buildFields(template);
 
   const { params } = useURLParams();
-  const vmName = params.get('vmName');
+  const vmName = params.get('vmName') || getTemplateNameParameterValue(template);
 
   const nameField = useMemo(() => getVirtualMachineNameField(vmName), [vmName]);
 
