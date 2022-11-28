@@ -72,11 +72,9 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ template, editabl
       <DescriptionListTerm>{t('Workload profile')}</DescriptionListTerm>
       <DescriptionListDescription>
         {t(workload)}
-        {editable && (
-          <Button type="button" isInline onClick={onEditClick} variant="link">
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        )}
+        <Button type="button" isInline onClick={onEditClick} isDisabled={!editable} variant="link">
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </Button>
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

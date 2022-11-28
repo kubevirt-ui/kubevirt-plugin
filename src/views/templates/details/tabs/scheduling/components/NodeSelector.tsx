@@ -12,7 +12,6 @@ import {
   DescriptionListTerm,
   Label,
   LabelGroup,
-  Text,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -46,20 +45,17 @@ const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ template, editabl
     <DescriptionListGroup>
       <DescriptionListTerm>{t('Node selector')}</DescriptionListTerm>
       <DescriptionListDescription>
-        {editable ? (
-          <Button
-            type="button"
-            isInline
-            onClick={onEditClick}
-            variant="link"
-            data-test-id="node-selector"
-          >
-            {nodeSelectorLabels}
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        ) : (
-          <Text className="text-muted">{nodeSelectorLabels}</Text>
-        )}
+        <Button
+          type="button"
+          isInline
+          onClick={onEditClick}
+          isDisabled={!editable}
+          variant="link"
+          data-test-id="node-selector"
+        >
+          {nodeSelectorLabels}
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </Button>
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

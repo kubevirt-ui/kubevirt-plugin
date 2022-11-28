@@ -13,18 +13,21 @@ type HardwareDeviceTitleProps = {
 const HardwareDeviceTitle: React.FC<HardwareDeviceTitleProps> = ({ title, canEdit, onClick }) => {
   const { t } = useKubevirtTranslation();
 
-  if (!canEdit) return <DescriptionListTerm>{title}</DescriptionListTerm>;
-  else
-    return (
-      <DescriptionListTerm>
-        <Button isInline variant="link" onClick={onClick} className="pf-m-link--align-left" isLarge>
-          {title}
-          {canEdit && (
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" alt={t('Edit')} />
-          )}
-        </Button>
-      </DescriptionListTerm>
-    );
+  return (
+    <DescriptionListTerm>
+      <Button
+        isInline
+        variant="link"
+        onClick={onClick}
+        isDisabled={!canEdit}
+        className="pf-m-link--align-left"
+        isLarge
+      >
+        {title}
+        <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" alt={t('Edit')} />
+      </Button>
+    </DescriptionListTerm>
+  );
 };
 
 export default HardwareDeviceTitle;

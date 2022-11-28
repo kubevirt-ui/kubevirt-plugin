@@ -79,14 +79,10 @@ const Annotations: React.FC<TemplateDetailsGridProps> = ({ template, editable })
       </DescriptionListTermHelpText>
 
       <DescriptionListDescription>
-        {editable ? (
-          <Button type="button" isInline onClick={onEditClick} variant="link">
-            {annotationsText}
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        ) : (
-          annotationsText
-        )}
+        <Button type="button" isInline onClick={onEditClick} isDisabled={!editable} variant="link">
+          {annotationsText}
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </Button>
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

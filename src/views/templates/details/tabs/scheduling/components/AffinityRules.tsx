@@ -10,7 +10,6 @@ import {
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
-  Text,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -37,20 +36,17 @@ const AffinityRules: React.FC<TemplateSchedulingGridProps> = ({ template, editab
     <DescriptionListGroup>
       <DescriptionListTerm>{t('Affinity rules')}</DescriptionListTerm>
       <DescriptionListDescription>
-        {editable ? (
-          <Button
-            type="button"
-            isInline
-            onClick={onEditClick}
-            variant="link"
-            data-test-id="affinity-rules"
-          >
-            {rulesCount}
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        ) : (
-          <Text className="text-muted">{rulesCount}</Text>
-        )}
+        <Button
+          type="button"
+          isInline
+          onClick={onEditClick}
+          variant="link"
+          data-test-id="affinity-rules"
+          isDisabled={!editable}
+        >
+          {rulesCount}
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </Button>
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

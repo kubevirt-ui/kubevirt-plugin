@@ -80,14 +80,18 @@ const Labels: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
               <DescriptionListTermHelpTextButton>{t('Labels')}</DescriptionListTermHelpTextButton>
             </Popover>
           </FlexItem>
-          {editable && (
-            <FlexItem>
-              <Button type="button" isInline onClick={onEditClick} variant="link">
-                {t('Edit')}
-                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-              </Button>
-            </FlexItem>
-          )}
+          <FlexItem>
+            <Button
+              type="button"
+              isInline
+              onClick={onEditClick}
+              isDisabled={!editable}
+              variant="link"
+            >
+              {t('Edit')}
+              <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+            </Button>
+          </FlexItem>
         </Flex>
       </DescriptionListTermHelpText>
 

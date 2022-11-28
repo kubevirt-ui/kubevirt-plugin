@@ -52,14 +52,16 @@ const CPUMemory: React.FC<CPUMemoryProps> = ({ template }) => {
     <DescriptionListGroup>
       <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
       <DescriptionListDescription>
-        {isTemplateEditable ? (
-          <Button type="button" isInline onClick={onEditClick} variant="link">
-            {CPUMemData}
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        ) : (
-          CPUMemData
-        )}
+        <Button
+          type="button"
+          isInline
+          onClick={onEditClick}
+          isDisabled={!isTemplateEditable}
+          variant="link"
+        >
+          {CPUMemData}
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </Button>
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

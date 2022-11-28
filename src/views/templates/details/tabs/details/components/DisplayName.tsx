@@ -60,11 +60,9 @@ const DisplayName: React.FC<TemplateDetailsGridProps> = ({ template, editable })
       <DescriptionListTerm>{t('Display name')}</DescriptionListTerm>
       <DescriptionListDescription>
         {displayName || <MutedTextSpan text={t('No display name')} />}
-        {editable && (
-          <Button type="button" isInline onClick={onEditClick} variant="link">
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        )}
+        <Button type="button" isInline onClick={onEditClick} isDisabled={!editable} variant="link">
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </Button>
       </DescriptionListDescription>
     </DescriptionListGroup>
   );
