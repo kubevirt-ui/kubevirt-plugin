@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -37,15 +36,17 @@ export const DescriptionItemHeader: React.FC<DescriptionItemHeaderProps> = ({
             {moreInfoURL && (
               <>
                 {t('More info: ')}
-                <Link to={moreInfoURL}>{moreInfoURL}</Link>
+                <a href={moreInfoURL}>{moreInfoURL}</a>
               </>
             )}
             {breadcrumb && (
-              <Breadcrumb>
-                {breadcrumb.split('.').map((item) => (
-                  <BreadcrumbItem key={item}>{item}</BreadcrumbItem>
-                ))}
-              </Breadcrumb>
+              <div className="margin-top">
+                <Breadcrumb>
+                  {breadcrumb.split('.').map((item) => (
+                    <BreadcrumbItem key={item}>{item}</BreadcrumbItem>
+                  ))}
+                </Breadcrumb>
+              </div>
             )}
           </>
         }

@@ -1,20 +1,15 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 
+import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Button,
   DescriptionListDescription,
   DescriptionListGroup,
-  DescriptionListTerm,
   DescriptionListTermHelpText,
-  DescriptionListTermHelpTextButton,
   Flex,
   FlexItem,
-  Popover,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -52,41 +47,6 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
   const { t } = useKubevirtTranslation();
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
 
-  const getItemHeader = () => {
-    if (isPopover && bodyContent) {
-      return (
-        <Popover
-          headerContent={descriptionHeader}
-          bodyContent={
-            <>
-              {bodyContent}
-              {moreInfoURL && (
-                <>
-                  {t('More info: ')}
-                  <Link to={moreInfoURL}>{moreInfoURL}</Link>
-                </>
-              )}
-              {breadcrumb && (
-                <Breadcrumb>
-                  {breadcrumb.split('.').map((item) => (
-                    <BreadcrumbItem key={item}>{item}</BreadcrumbItem>
-                  ))}
-                </Breadcrumb>
-              )}
-            </>
-          }
-        >
-          <DescriptionListTermHelpTextButton>
-            {' '}
-            {descriptionHeader}{' '}
-          </DescriptionListTermHelpTextButton>
-        </Popover>
-      );
-    }
-
-    return <DescriptionListTerm>{descriptionHeader}</DescriptionListTerm>;
-  };
-
   const description = (
     <Button
       type="button"
@@ -114,7 +74,15 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
             default: editOnTitleJustify ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
           }}
         >
-          <FlexItem>{getItemHeader()}</FlexItem>
+          <FlexItem>
+            <DescriptionItemHeader
+              isPopover={isPopover}
+              bodyContent={bodyContent}
+              moreInfoURL={moreInfoURL}
+              breadcrumb={breadcrumb}
+              descriptionHeader={descriptionHeader}
+            />
+          </FlexItem>
           {isEdit && showEditOnTitle && (
             <FlexItem>
               <Button
