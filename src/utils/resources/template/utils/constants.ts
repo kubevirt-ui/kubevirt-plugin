@@ -6,6 +6,7 @@ export const TEMPLATE_FLAVOR_LABEL = 'flavor.template.kubevirt.io';
 export const TEMPLATE_WORKLOAD_LABEL = 'workload.template.kubevirt.io';
 export const TEMPLATE_BASE_IMAGE_NAME_PARAMETER = 'SRC_PVC_NAME';
 export const TEMPLATE_BASE_IMAGE_NAMESPACE_PARAMETER = 'SRC_PVC_NAMESPACE';
+export const TEMPLATE_VM_COMMON_NAMESPACE = 'openshift';
 export const TEMPLATE_DATA_SOURCE_NAME_PARAMETER = 'DATA_SOURCE_NAME';
 export const TEMPLATE_DATA_SOURCE_NAMESPACE_PARAMETER = 'DATA_SOURCE_NAMESPACE';
 export const LABEL_USED_TEMPLATE_NAME = 'vm.kubevirt.io/template';

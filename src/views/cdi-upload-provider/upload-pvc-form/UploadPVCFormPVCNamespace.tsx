@@ -1,0 +1,32 @@
+import React from 'react';
+
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+
+type UploadPVCFormPVCNamespaceProps = { namespace: string };
+
+const UploadPVCFormPVCNamespace: React.FC<UploadPVCFormPVCNamespaceProps> = ({ namespace }) => {
+  const { t } = useKubevirtTranslation();
+  return (
+    <>
+      <label className="control-label co-required" htmlFor="pvc-namespace">
+        {t('Namespace')}
+      </label>
+      <div className="form-group">
+        <input
+          disabled
+          className="pf-c-form-control"
+          type="text"
+          aria-describedby="pvc-namespace-help"
+          id="pvc-namespace"
+          value={namespace || ''}
+          required
+        />
+        <p className="help-block" id="pvc-namespace-help">
+          {t('A unique namespace for the storage claim within the project')}
+        </p>
+      </div>
+    </>
+  );
+};
+
+export default UploadPVCFormPVCNamespace;
