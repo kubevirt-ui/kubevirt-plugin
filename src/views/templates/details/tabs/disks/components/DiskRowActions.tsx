@@ -7,6 +7,7 @@ import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import {
   ButtonVariant,
   Dropdown,
@@ -89,6 +90,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate,
 
   return (
     <Dropdown
+      menuAppendTo={getContentScrollableElement}
       onSelect={() => setIsDropdownOpen(false)}
       toggle={
         <KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-disk" isDisabled={isDisabled} />
