@@ -15,7 +15,7 @@ import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsReq
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
-import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
+import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -308,16 +308,7 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           )}
           breadcrumb="VirtualMachine.metadata.creationTimestamp"
         />
-        <VirtualMachineDescriptionItem
-          descriptionData={<OwnerReferences obj={vm} />}
-          descriptionHeader={t('Owner')}
-          isPopover
-          // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L110
-          bodyContent={t(
-            'List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.',
-          )}
-          breadcrumb="VirtualMachine.metadata.ownerReferences"
-        />
+        <OwnerDetailsItem obj={vm} />
       </DescriptionList>
     </GridItem>
   );
