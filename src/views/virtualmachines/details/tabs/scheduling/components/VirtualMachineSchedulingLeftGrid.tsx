@@ -40,13 +40,13 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const isMachineNotLiveMirgation = !!vm?.status?.conditions?.find(
-    ({ type, status }) => type === 'LiveMigratable' && status === 'False',
+  const isLiveMigratableNotFalse = !!vm?.status?.conditions?.find(
+    ({ type, status }) => type === 'LiveMigratable' && status !== 'False',
   );
 
   const isDeschedulerInstalled = useDeschedulerInstalled();
   const isAdmin = useIsAdmin();
-  const isDeschedulerEditable = isAdmin && isDeschedulerInstalled && !isMachineNotLiveMirgation;
+  const isDeschedulerEditable = isAdmin && isDeschedulerInstalled && isLiveMigratableNotFalse;
 
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -132,7 +132,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
                 rescheduled onto a more suitable node.
               </p>
               <br />
-              <p>Note: if VirtualMachine have LiveMigration=False condition, edit is disabled.</p>
+              <p>Note: if VirtualMachine has LiveMigratable=False condition, edit is disabled.</p>
             </Trans>
           }
           onEditClick={() =>

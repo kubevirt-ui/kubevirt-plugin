@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { getBooleanText } from 'src/views/migrationpolicies/utils/utils';
 
 import {
   V1VirtualMachine,
@@ -7,6 +8,7 @@ import {
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
+import { isLiveMigratable } from '@virtualmachines/utils';
 
 import VirtualMachineStatus from '../VirtualMachineStatus/VirtualMachineStatus';
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
@@ -46,6 +48,13 @@ const VirtualMachineRowLayout: React.FC<
         className="pf-m-width-20 vm-column"
       >
         <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
+      </TableData>
+      <TableData
+        id="live-migratable"
+        activeColumnIDs={activeColumnIDs}
+        className="pf-m-width-10 vm-column"
+      >
+        {getBooleanText(isLiveMigratable(obj, isSingleNodeCluster))}
       </TableData>
       <TableData id="node" activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column">
         {node}

@@ -6,6 +6,7 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
@@ -18,6 +19,8 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
+import { booleanTextIds } from './constants';
+import { isLiveMigratable } from './utils';
 import { isErrorPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
 
 type VmiMapper = {
@@ -54,6 +57,29 @@ const useStatusFilter = (): RowFilter => ({
   },
   items: statusFilterItems,
 });
+
+const useLiveMigratableFilter = (): RowFilter => {
+  const [isSingleNodeCluster] = useSingleNodeCluster();
+
+  return {
+    filterGroupName: t('Live migratable'),
+    type: 'live-migratable',
+    items: [
+      { id: booleanTextIds.yes, title: t('Yes') },
+      { id: booleanTextIds.no, title: t('No') },
+    ],
+    reducer: (obj) =>
+      isLiveMigratable(obj, isSingleNodeCluster) ? booleanTextIds.yes : booleanTextIds.no,
+    filter: (selectedItems, obj) => {
+      const isMigratable = isLiveMigratable(obj, isSingleNodeCluster);
+      return (
+        selectedItems?.selected?.length === 0 ||
+        (selectedItems?.selected?.includes(booleanTextIds.yes) && isMigratable) ||
+        (selectedItems?.selected?.includes(booleanTextIds.no) && !isMigratable)
+      );
+    },
+  };
+};
 
 const useTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
   const noTemplate = t('None');
@@ -96,6 +122,7 @@ const useOSFilter = (): RowFilter => {
     );
     return osName;
   }, []);
+
   return {
     filterGroupName: t('Operating system'),
     type: 'os',
@@ -109,6 +136,7 @@ const useOSFilter = (): RowFilter => {
     })),
   };
 };
+
 const useNodesFilter = (vmiMapper: VmiMapper): RowFilter => {
   const sortedNodeNamesItems = useMemo(() => {
     return Object.values(vmiMapper?.nodeNames).sort((a, b) =>
@@ -178,9 +206,10 @@ export const useVMListFilters = (
   const templatesFilter = useTemplatesFilter(vms);
   const osFilters = useOSFilter();
   const nodesFilter = useNodesFilter(vmiMapper);
+  const liveMigratableFilter = useLiveMigratableFilter();
 
   return {
-    filters: [statusFilter, templatesFilter, osFilters, nodesFilter],
+    filters: [statusFilter, templatesFilter, osFilters, liveMigratableFilter, nodesFilter],
     vmiMapper,
     vmimMapper,
   };

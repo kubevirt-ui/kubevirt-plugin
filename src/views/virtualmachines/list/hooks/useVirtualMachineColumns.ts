@@ -64,6 +64,12 @@ const useVirtualMachineColumns = (
         id: 'conditions',
         props: { className: 'pf-m-width-20' },
       },
+      {
+        title: t('Live migratable'),
+        id: 'live-migratable',
+        transforms: [sortable],
+        props: { className: 'pf-m-width-10' },
+      },
       ...(canGetNode
         ? [
             {

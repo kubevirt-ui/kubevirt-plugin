@@ -13,7 +13,7 @@ import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 
-import { printableVMStatus } from '../utils';
+import { isLiveMigratable, printableVMStatus } from '../utils';
 
 import CloneVMModal from './components/CloneVMModal/CloneVMModal';
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
@@ -98,12 +98,7 @@ export const VirtualMachineActionFactory = {
   migrate: (vm: V1VirtualMachine, isSingleNodeCluster: boolean, t: TFunction): Action => {
     return {
       id: 'vm-action-migrate',
-      disabled:
-        isSingleNodeCluster ||
-        vm?.status?.printableStatus !== Running ||
-        !!vm?.status?.conditions?.find(
-          ({ type, status }) => type === 'LiveMigratable' && status === 'False',
-        ),
+      disabled: !isLiveMigratable(vm, isSingleNodeCluster),
       label: t('Migrate'),
       cta: () => migrateVM(vm),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
