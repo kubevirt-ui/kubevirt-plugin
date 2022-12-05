@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, DropdownToggle } from '@patternfly/react-core';
 
@@ -35,6 +36,7 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({ template }) => {
 
   return (
     <Dropdown
+      menuAppendTo={getContentScrollableElement}
       isOpen={isDropDownOpen}
       position={DropdownPosition.right}
       toggle={<DropdownToggle onToggle={onDropDownToggle}>{t('Actions')}</DropdownToggle>}

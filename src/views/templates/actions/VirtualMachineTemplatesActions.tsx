@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
 
@@ -29,6 +30,7 @@ const VirtualMachineTemplatesActions: React.FC<VirtualMachineTemplatesActionsPro
   return (
     // TODO: use LazyActionMenu when fixed
     <Dropdown
+      menuAppendTo={getContentScrollableElement}
       isPlain
       isOpen={isOpen}
       position={DropdownPosition.right}
