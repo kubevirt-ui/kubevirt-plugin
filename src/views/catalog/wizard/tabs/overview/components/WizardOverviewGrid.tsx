@@ -9,6 +9,7 @@ import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/De
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
+import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
@@ -46,6 +47,8 @@ const WizardOverviewGrid: React.FC<WizardOverviewGridProps> = ({ vm, tabsData, u
   const description = getAnnotation(vm, 'description');
   const workloadAnnotation = getWorkload(vm);
   const startStrategy = vm?.spec?.template?.spec?.startStrategy;
+  const hostname = vm?.spec?.template?.spec?.hostname;
+  const vmName = vm?.metadata?.name;
   const networks = vm?.spec?.template?.spec?.networks;
   const interfaces = vm?.spec?.template?.spec?.domain?.devices?.interfaces;
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
@@ -228,6 +231,18 @@ const WizardOverviewGrid: React.FC<WizardOverviewGridProps> = ({ vm, tabsData, u
             description={<HardwareDevices vm={vm} onSubmit={updateVM} />}
             title={t('Hardware devices')}
             testId="wizard-overview-hardware-devices"
+          />
+
+          <WizardDescriptionItem
+            title={t('Hostname')}
+            description={hostname || vmName}
+            isEdit
+            testId="wizard-overview-hostname"
+            onEditClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <HostnameModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
+              ))
+            }
           />
         </DescriptionList>
       </GridItem>

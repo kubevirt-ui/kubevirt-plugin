@@ -202,6 +202,17 @@ export const getChangedStartStrategy = (
   const vmiStartStrategy = !!vmi?.spec?.startStrategy;
   return vmStartStrategy !== vmiStartStrategy;
 };
+export const getChangedHostname = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  const vmHostname = vm?.spec?.template?.spec?.hostname;
+  const vmiHostname = vmi?.spec?.hostname;
+  return vmHostname !== vmiHostname;
+};
 
 export const getChangedNodeSelector = (
   vm: V1VirtualMachine,

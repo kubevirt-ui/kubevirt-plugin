@@ -6,6 +6,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
+import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
@@ -37,7 +38,8 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
 
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-
+  const hostname = vm?.spec?.template?.spec?.hostname;
+  const vmName = vm?.metadata?.name;
   const [canGetNode] = useAccessReview({
     namespace: vmi?.metadata?.namespace,
     verb: 'get' as K8sVerb,
@@ -109,9 +111,21 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           data-test-id={`${vm?.metadata?.name}-ip-address`}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={vmDetailsRightGridObj?.hostname}
+          descriptionData={hostname || vmName}
           descriptionHeader={t('Hostname')}
+          isEdit
           data-test-id={`${vm?.metadata?.name}-hostname`}
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <HostnameModal
+                vm={vm}
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={onSubmit}
+                vmi={vmi}
+              />
+            ))
+          }
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.timezone}

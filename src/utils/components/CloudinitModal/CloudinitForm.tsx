@@ -116,19 +116,6 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
               </Button>
             </InputGroup>
           </FormGroup>
-          <FormGroup
-            label={t('Hostname')}
-            fieldId={'cloudinit-hostname'}
-            className="kv-cloudint-advanced-tab--validation-text"
-            helperText={t('Please provide hostname.')}
-          >
-            <TextInput
-              value={userData?.hostname || ''}
-              type="text"
-              id={'cloudinit-hostname'}
-              onChange={(v) => updateUserField('hostname', v)}
-            />
-          </FormGroup>
           <CloudinitNetworkForm
             networkData={networkData}
             updateNetworkField={updateNetworkField}
