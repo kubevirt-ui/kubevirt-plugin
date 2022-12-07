@@ -15,6 +15,7 @@ import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyMo
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/modal/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
+import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
@@ -40,6 +41,7 @@ import {
   getChangedEvictionStrategy,
   getChangedGPUDevices,
   getChangedHostDevices,
+  getChangedHostname,
   getChangedNics,
   getChangedNodeSelector,
   getChangedStartStrategy,
@@ -69,6 +71,7 @@ export const usePendingChanges = (
     vm?.spec?.template?.spec?.domain?.cpu?.dedicatedCpuPlacement || false,
   );
   const startStrategyChanged = getChangedStartStrategy(vm, vmi);
+  const hostnameChanged = getChangedHostname(vm, vmi);
   const evictionStrategyChanged = getChangedEvictionStrategy(
     vm,
     vmi,
@@ -118,6 +121,17 @@ export const usePendingChanges = (
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <BootOrderModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vmi={vmi} />
+        ));
+      },
+    },
+    {
+      hasPendingChange: hostnameChanged,
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
+      label: t('Hostname'),
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        createModal(({ isOpen, onClose }) => (
+          <HostnameModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vmi={vmi} />
         ));
       },
     },
