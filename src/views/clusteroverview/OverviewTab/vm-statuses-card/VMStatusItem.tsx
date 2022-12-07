@@ -25,9 +25,7 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({ status, count, namespace })
     <GridItem span={3} className="vm-statuses-card__grid-item">
       <div className="vm-statuses-card__status-item">
         <div className="vm-statuses-card__status-item--count">
-          <span className="vm-statuses-card__status-item--icon">
-            <Icon />
-          </span>
+          <span className="vm-statuses-card__status-item--icon">{Icon && <Icon />}</span>
           <span className="vm-statuses-card__status-item--value">
             <Link to={path}>{count.toString()}</Link>
           </span>
