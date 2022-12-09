@@ -34,6 +34,10 @@ const DataSourceImportCronDescription: React.FC<DataSourceImportCronDescriptionP
           namespace={dataImportCron?.metadata?.namespace}
         />
       }
+      isPopover
+      bodyContent={t(
+        'The DataImportCron polls disk images and imports the images as persistent volume claims. You can configure the image source and other settings on the DataImportCron details page.',
+      )}
     />
   );
 };
