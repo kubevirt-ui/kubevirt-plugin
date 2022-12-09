@@ -36,11 +36,12 @@ describe('Test VM catalog filter', () => {
   it('ID(CNV-8466) Filter VM catalog by OS and Workload', () => {
     cy.get(catalogView.WINDOWS).find(catalogView.checkbox).check();
     cy.get(catalogView.SERVER).find(catalogView.checkbox).check();
-    cy.get(catalogView.GRID).find('a').should('have.length', 3);
+    cy.get(catalogView.GRID).find('a').should('contain', TEMPLATE.WIN2K12R2.name);
+    cy.get(catalogView.GRID).find('a').should('contain', TEMPLATE.WIN2K16.name);
+    cy.get(catalogView.GRID).find('a').should('contain', TEMPLATE.WIN2K19.name);
     cy.get(catalogView.SERVER).find(catalogView.checkbox).uncheck();
 
     cy.get(catalogView.DESKTOP).find(catalogView.checkbox).check();
-    cy.get(catalogView.GRID).find('a').should('have.length', 2);
     cy.get(catalogView.GRID).find('a').should('contain', TEMPLATE.WIN10.name);
     cy.get(catalogView.DESKTOP).find(catalogView.checkbox).uncheck();
     cy.get(catalogView.WINDOWS).find(catalogView.checkbox).uncheck();
