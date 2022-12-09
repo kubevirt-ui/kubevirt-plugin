@@ -1,15 +1,10 @@
-export const OBJECTS_FETCHING_LIMIT = 10000;
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-export const paginationDefaultValues = [
-  { title: '15', value: 15 },
-  { title: '50', value: 50 },
-  { title: '100', value: 100 },
-  { title: '200', value: 200 },
-];
+import { printableVMStatus } from './virtualMachineStatuses';
 
-export const paginationInitialState = {
-  page: 1,
-  perPage: 15,
-  startIndex: 0,
-  endIndex: 50,
-};
+export const isLiveMigratable = (vm: V1VirtualMachine, isSingleNodeCluster: boolean): boolean =>
+  !isSingleNodeCluster &&
+  vm?.status?.printableStatus === printableVMStatus.Running &&
+  !!vm?.status?.conditions?.find(
+    ({ type, status }) => type === 'LiveMigratable' && status === 'True',
+  );
