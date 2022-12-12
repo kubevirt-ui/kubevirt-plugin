@@ -1,57 +1,59 @@
-import * as React from 'react';
-import { Trans } from 'react-i18next';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ClipboardCopy } from '@patternfly/react-core';
+import { Stack, StackItem } from '@patternfly/react-core';
+
+import InlineCodeClipboardCopy from './InlineCodeClipboardCopy';
 
 type CloudInitCredentialsContentProps = {
   vm: V1VirtualMachine;
 };
 
-const CloudInitCredentialsContent: React.FC<CloudInitCredentialsContentProps> = ({ vm }) => {
+const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const { users } = getCloudInitCredentials(vm);
-  const usernameTitle = t('User name: ', { count: users?.length });
 
   if (isEmpty(users)) {
     return <>{t('No credentials, see operating system documentation for the default username.')}</>;
   }
 
+  const { usernames, passwords } = users.reduce(
+    (acc, user) => ({
+      usernames: (
+        <>
+          {acc.usernames} <InlineCodeClipboardCopy clipboardText={user.name} />
+        </>
+      ),
+      passwords: (
+        <>
+          {acc.passwords} <InlineCodeClipboardCopy clipboardText={user.password} />
+        </>
+      ),
+    }),
+    { usernames: <></>, passwords: <></> },
+  );
   return (
-    <>
-      <Trans ns="plugin__kubevirt-plugin">
-        The following credentials for this operating system were created via cloud-init. If
-        unsuccessful, cloud-init could be improperly configured. Please contact the image provider
-        for more information.
-      </Trans>
-      <div>
-        <strong>{usernameTitle}</strong>
-        {users.map((user, index) => (
-          <>
-            {user?.name}
-            {index + 1 < users?.length ? ', ' : ''}
-
-            {user?.password && (
-              <>
-                <strong>{t(' Password: ')} </strong>
-
-                <ClipboardCopy
-                  variant="inline-compact"
-                  isCode
-                  clickTip={t('Copied')}
-                  hoverTip={t('Copy to clipboard')}
-                >
-                  {user.password}
-                </ClipboardCopy>
-              </>
+    <Stack>
+      <Stack hasGutter>
+        <Stack>
+          <StackItem>
+            {t(
+              'The following credentials for this operating system were created via cloud-init. If unsuccessful, cloud-init could be improperly configured.',
             )}
-          </>
-        ))}
-      </div>
-    </>
+          </StackItem>
+          <StackItem>{t('Contact the image provider for more information.')}</StackItem>
+        </Stack>
+        <StackItem>
+          <strong>{t('User name')}</strong> {usernames}
+        </StackItem>
+        <StackItem>
+          <strong>{t('Password')}</strong> {passwords}
+        </StackItem>
+      </Stack>
+    </Stack>
   );
 };
 

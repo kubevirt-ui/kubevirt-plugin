@@ -6,6 +6,8 @@ export type VncConsoleActionsProps = {
   additionalButtons?: React.ReactNode[];
   /** VNC console additional send keys elements */
   customButtons?: { text: string; onClick: () => void }[];
+  /** Injext text to VNC console from copied clipboard text */
+  onInjectTextFromClipboard?: () => void;
 };
 
 export type VncConsoleProps = React.HTMLProps<HTMLDivElement> & {
