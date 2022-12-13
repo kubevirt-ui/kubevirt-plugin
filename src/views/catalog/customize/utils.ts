@@ -82,6 +82,12 @@ export const extractParameterNameFromMetadataName = (template: V1Template): stri
   return virtualMachineObject?.metadata.name?.replace(/[${}"]+/g, '');
 };
 
+export const getTemplateNameParameterValue = (template: V1Template): string => {
+  const nameParameter = extractParameterNameFromMetadataName(template) || 'NAME';
+
+  return template?.parameters?.find((parameter) => parameter.name === nameParameter)?.value;
+};
+
 export const processTemplate = async ({
   template,
   namespace = DEFAULT_NAMESPACE,

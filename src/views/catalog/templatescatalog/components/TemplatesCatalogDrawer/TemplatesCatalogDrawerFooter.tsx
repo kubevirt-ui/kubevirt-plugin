@@ -3,6 +3,10 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  generateVMName,
+  getTemplateVirtualMachineObject,
+} from '@kubevirt-utils/resources/template';
+import {
   useProcessedTemplate,
   useVmTemplateSource,
 } from '@kubevirt-utils/resources/template/hooks';
@@ -42,6 +46,9 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
     return <TemplatesCatalogDrawerFooterSkeleton />;
   }
 
+  const initialVMName =
+    getTemplateVirtualMachineObject(processedTemplate)?.metadata?.name || generateVMName(template);
+
   return (
     <Stack className="template-catalog-drawer-info">
       <div className="template-catalog-drawer-footer-section">
@@ -71,6 +78,7 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
             namespace={namespace}
             template={template}
             canQuickCreate={canQuickCreate}
+            initialVMName={initialVMName}
             isBootSourceAvailable={isBootSourceAvailable}
             onCancel={onCancel}
           />
