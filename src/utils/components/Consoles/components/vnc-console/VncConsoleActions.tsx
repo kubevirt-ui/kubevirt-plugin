@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -8,27 +8,28 @@ import {
   DropdownItem,
   DropdownToggle,
 } from '@patternfly/react-core';
+import { PasteIcon } from '@patternfly/react-icons';
 import { css } from '@patternfly/react-styles';
 import styles from '@patternfly/react-styles/css/components/Consoles/VncConsole';
 
 import { VncConsoleActionsProps } from './utils/VncConsoleTypes';
 
-export const VncConsoleActions: React.FC<VncConsoleActionsProps> = ({
+export const VncConsoleActions: FC<VncConsoleActionsProps> = ({
   textSendShortcut,
   textDisconnect,
   onDisconnect,
   additionalButtons = [],
   customButtons,
+  onInjectTextFromClipboard,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <div className={css(styles.consoleActionsVnc)}>
         {additionalButtons}
         <Dropdown
-          id="pf-c-console__send-shortcut"
           onSelect={() => setIsOpen(false)}
           toggle={
             <DropdownToggle
@@ -44,6 +45,15 @@ export const VncConsoleActions: React.FC<VncConsoleActionsProps> = ({
               {text}
             </DropdownItem>
           ))}
+        />
+        <Button
+          variant={ButtonVariant.link}
+          onClick={onInjectTextFromClipboard}
+          icon={
+            <span>
+              <PasteIcon /> {t('Paste')}
+            </span>
+          }
         />
       </div>
       <Button

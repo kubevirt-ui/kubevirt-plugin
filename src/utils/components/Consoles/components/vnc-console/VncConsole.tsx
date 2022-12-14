@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import cn from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,6 +20,7 @@ import styles from '@patternfly/react-styles/css/components/Consoles/VncConsole'
 
 import { ConsoleState, WS, WSS } from '../utils/ConsoleConsts';
 
+import { isShiftKeyRequired } from './utils/util';
 import { VncConsoleProps } from './utils/VncConsoleTypes';
 import VncConsoleActions from './VncConsoleActions';
 
@@ -28,7 +29,7 @@ import './vnc-console.scss';
 
 const { connected, connecting, disconnected } = ConsoleState;
 
-export const VncConsole: React.FC<VncConsoleProps> = ({
+export const VncConsole: FC<VncConsoleProps> = ({
   children,
   host,
   port = '80',
@@ -43,7 +44,7 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
   vncLogging = 'warn',
   consoleContainerId,
   showAccessControls = true,
-  additionalButtons = [] as React.ReactNode[],
+  additionalButtons = [] as ReactNode[],
   onDisconnected,
   onInitFailed,
   onSecurityFailure,
@@ -58,11 +59,11 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
   hasGPU,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [rfb, setRfb] = React.useState<any>();
-  const [status, setStatus] = React.useState<ConsoleState>(disconnected);
-  const [activeTabKey, setActiveTabKey] = React.useState<number | string>(0);
-  const staticRenderLocaitonRef = React.useRef(null);
-  const StaticRenderLocaiton = React.useMemo(
+  const [rfb, setRfb] = useState<any>();
+  const [status, setStatus] = useState<ConsoleState>(disconnected);
+  const [activeTabKey, setActiveTabKey] = useState<number | string>(0);
+  const staticRenderLocaitonRef = useRef(null);
+  const StaticRenderLocaiton = useMemo(
     () => (
       <div
         className={cn('vnc-container', { hide: status !== connected })}
@@ -73,12 +74,12 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
     [staticRenderLocaitonRef, consoleContainerId, status],
   );
 
-  const url = React.useMemo(
+  const url = useMemo(
     () => `${encrypt ? WSS : WS}://${host}:${port}/${path}`,
     [encrypt, host, path, port],
   );
 
-  const options = React.useMemo(
+  const options = useMemo(
     () => ({
       repeaterID,
       shared,
@@ -87,7 +88,7 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
     [repeaterID, shared, credentials],
   );
 
-  const connect = React.useCallback(() => {
+  const connect = useCallback(() => {
     setStatus(connecting);
     setRfb(() => {
       const rfbInstnce = new RFBCreate(staticRenderLocaitonRef.current, url, options);
@@ -111,7 +112,7 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
         this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
         this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
       };
-      rfbInstnce.sendCtrlAlt2 = function sendCtrlAlt1() {
+      rfbInstnce.sendCtrlAlt2 = function sendCtrlAlt2() {
         if (this._rfbConnectionState !== connected || this._viewOnly) {
           return;
         }
@@ -122,23 +123,29 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
         this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
         this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
       };
+      rfbInstnce.sendPasteCMD = async function sendPasteCMD() {
+        if (this._rfbConnectionState !== connected || this._viewOnly) {
+          return;
+        }
+        const clipboardText = await navigator?.clipboard?.readText?.();
+
+        [...clipboardText].map((char) => {
+          const shiftRequired = isShiftKeyRequired(char);
+
+          shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', true);
+          this.sendKey(char.charCodeAt(0));
+          shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
+        });
+        this.sendKey(KeyTable.XK_KP_Enter);
+      };
       rfbInstnce.viewOnly = viewOnly;
       rfbInstnce.scaleViewport = scaleViewport;
       rfbInstnce.resizeSession = resizeSession;
       return rfbInstnce;
     });
-  }, [
-    url,
-    options,
-    staticRenderLocaitonRef,
-    resizeSession,
-    scaleViewport,
-    viewOnly,
-    onDisconnected,
-    onSecurityFailure,
-  ]);
+  }, [url, options, viewOnly, scaleViewport, resizeSession, onDisconnected, onSecurityFailure]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!rfb && status === disconnected) {
       try {
         initLogging(vncLogging);
@@ -177,6 +184,7 @@ export const VncConsole: React.FC<VncConsoleProps> = ({
           textDisconnect={textDisconnect}
           onDisconnect={() => rfb?.disconnect()}
           additionalButtons={additionalButtons}
+          onInjectTextFromClipboard={() => rfb?.sendPasteCMD()}
         />
       )}
       <div className={css(styles.consoleVnc)}>
