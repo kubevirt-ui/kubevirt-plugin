@@ -10,7 +10,6 @@ import { TemplatesCatalogEmptyState } from './components/TemplatesCatalogEmptySt
 import { TemplatesCatalogFilters } from './components/TemplatesCatalogFilters/TemplatesCatalogFilters';
 import { TemplatesCatalogHeader } from './components/TemplatesCatalogHeader';
 import { TemplatesCatalogItems } from './components/TemplatesCatalogItems';
-import { TemplatesCatalogPageHeader } from './components/TemplatesCatalogPageHeader';
 import { skeletonCatalog } from './components/TemplatesCatalogSkeleton';
 import { useTemplatesWithAvailableSource } from './hooks/useTemplatesWithAvailableSource';
 import { useTemplatesFilters } from './hooks/useVmTemplatesFilters';
@@ -40,7 +39,6 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
 
   return (
     <Stack hasGutter className="vm-catalog">
-      <TemplatesCatalogPageHeader />
       {loaded ? (
         <div className="co-catalog-page co-catalog-page--with-sidebar">
           <TemplatesCatalogFilters filters={filters} onFilterChange={onFilterChange} />

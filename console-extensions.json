@@ -126,7 +126,12 @@
   {
     "type": "console.page/route",
     "properties": {
-      "path": ["/k8s/ns/:ns/templatescatalog", "/k8s/all-namespaces/templatescatalog"],
+      "path": [
+        "/k8s/ns/:ns/templatescatalog",
+        "/k8s/all-namespaces/templatescatalog",
+        "/k8s/ns/:ns/templatescatalog/instanceTypes",
+        "/k8s/all-namespaces/templatescatalog/instanceTypes"
+      ],
       "component": {
         "$codeRef": "TemplatesCatalog"
       }

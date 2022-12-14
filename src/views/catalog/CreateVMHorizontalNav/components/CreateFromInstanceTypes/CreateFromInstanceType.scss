@@ -1,0 +1,30 @@
+.create-vm-instance-type-section {
+  padding: var(--pf-global--spacer--md);
+  &__step {
+    font-size: var(--pf-global--FontSize--xl);
+    height: var(--pf-global--spacer--xl);
+    width: var(--pf-global--spacer--xl);
+    margin-right: var(--pf-global--spacer--md);
+    background-color: var(--pf-global--BackgroundColor--200);
+    color: var(--pf-global--Color--dark-100);
+    border-radius: 50%;
+    display: inline-grid;
+    align-items: center;
+    text-align: center;
+  }
+  &__step.current {
+    background-color: var(--pf-global--primary-color--100);
+    color: var(--pf-global--Color--light-100);
+    font-weight: bolder;
+  }
+  &__header {
+    font-size: var(--pf-global--FontSize--xl);
+  }
+  &__header.current {
+    color: var(--pf-global--primary-color--100);
+    font-weight: bolder;
+  }
+  &__add-volume-btn {
+    padding-right: var(--pf-global--spacer--sm);
+  }
+}
