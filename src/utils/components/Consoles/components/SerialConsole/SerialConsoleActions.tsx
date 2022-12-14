@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button } from '@patternfly/react-core';
 import { css } from '@patternfly/react-styles';
 import styles from '@patternfly/react-styles/css/components/Consoles/SerialConsole';
@@ -12,8 +13,8 @@ export type SerialConsoleActionsProps = React.HTMLProps<HTMLDivElement> & {
 };
 
 export const SerialConsoleActions: React.FunctionComponent<SerialConsoleActionsProps> = ({
-  textDisconnect = 'Disconnect',
-  textReset = 'Reset',
+  textDisconnect = t('Disconnect'),
+  textReset = t('Reset'),
   onDisconnect,
   onReset,
 }: SerialConsoleActionsProps) => (
