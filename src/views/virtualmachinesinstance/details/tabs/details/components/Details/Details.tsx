@@ -89,10 +89,7 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               />
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <CPUMemory vmi={vmi} />
-              </DescriptionListDescription>
+              <CPUMemory vmi={vmi} />
             </DescriptionListGroup>
             <DescriptionListGroup>
               <DescriptionListTerm>{t('Machine type')}</DescriptionListTerm>

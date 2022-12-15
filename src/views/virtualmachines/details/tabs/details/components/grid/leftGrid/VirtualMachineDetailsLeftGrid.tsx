@@ -7,6 +7,7 @@ import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-ap
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
+import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
@@ -222,6 +223,8 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           descriptionData={<CPUMemory vm={vm} />}
           descriptionHeader={t('CPU | Memory')}
           isEdit={canUpdateVM}
+          isPopover
+          bodyContent={<CPUDescription cpu={vm?.spec?.template?.spec?.domain?.cpu} />}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <CPUMemoryModal
