@@ -138,7 +138,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
       <div className="inputs">
         <div className="input-cpu">
           <Title headingLevel="h6" size={TitleSizes.md}>
-            {t('CPUs')}
+            {t('CPU cores')}
           </Title>
           <NumberInput
             value={cpuCores}

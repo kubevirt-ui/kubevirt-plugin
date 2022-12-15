@@ -1,15 +1,19 @@
 import * as React from 'react';
 import { useVirtualMachineTemplatesCPUMemory } from 'src/views/templates/list/hooks/useVirtualMachineTemplatesCPUMemory';
 
+import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   DescriptionListDescription,
   DescriptionListGroup,
-  DescriptionListTerm,
+  DescriptionListTermHelpText,
+  DescriptionListTermHelpTextButton,
+  Popover,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -50,7 +54,20 @@ const CPUMemory: React.FC<CPUMemoryProps> = ({ template }) => {
 
   return (
     <DescriptionListGroup>
-      <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
+      <DescriptionListTermHelpText>
+        <Popover
+          hasAutoWidth
+          maxWidth="30rem"
+          headerContent={t('CPU | Memory')}
+          bodyContent={
+            <CPUDescription
+              cpu={getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.cpu}
+            />
+          }
+        >
+          <DescriptionListTermHelpTextButton>{t('CPU | Memory')}</DescriptionListTermHelpTextButton>
+        </Popover>
+      </DescriptionListTermHelpText>
       <DescriptionListDescription>
         <Button
           type="button"

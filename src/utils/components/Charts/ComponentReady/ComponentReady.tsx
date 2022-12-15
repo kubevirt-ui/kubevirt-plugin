@@ -1,9 +1,9 @@
 import React from 'react';
 
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Bullseye } from '@patternfly/react-core';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 
 type ComponentReadyProps = React.PropsWithChildren<{
   isReady: boolean;

@@ -4,6 +4,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { TabsData } from '@catalog/utils/WizardVMContext/utils/tabs-data';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
@@ -128,6 +129,10 @@ const WizardOverviewGrid: React.FC<WizardOverviewGridProps> = ({ vm, tabsData, u
             title={t('CPU | Memory')}
             isEdit
             testId="wizard-overview-cpu-memory"
+            helperPopover={{
+              header: t('CPU | Memory'),
+              content: <CPUDescription cpu={vm?.spec?.template?.spec?.domain?.cpu} />,
+            }}
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <CPUMemoryModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
