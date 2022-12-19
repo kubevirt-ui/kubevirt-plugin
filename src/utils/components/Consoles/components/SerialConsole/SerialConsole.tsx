@@ -1,15 +1,19 @@
 import * as React from 'react';
+import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
+  ButtonVariant,
   EmptyState,
   EmptyStateBody,
   EmptyStateIcon,
   Spinner,
 } from '@patternfly/react-core';
+import { PasteIcon } from '@patternfly/react-icons';
 import { css } from '@patternfly/react-styles';
 import styles from '@patternfly/react-styles/css/components/Consoles/SerialConsole';
+import stylesVNC from '@patternfly/react-styles/css/components/Consoles/VncConsole';
 
 import { ConsoleState } from '../utils/ConsoleConsts';
 
@@ -19,6 +23,7 @@ import { SerialConsoleActions } from './SerialConsoleActions';
 
 import '@patternfly/react-styles/css/components/Consoles/xterm.css';
 import '@patternfly/react-styles/css/components/Consoles/SerialConsole.css';
+import './SerialConsole.scss';
 
 const { connected, disconnected, loading } = ConsoleState;
 
@@ -67,6 +72,12 @@ const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
     focusTerminal();
   };
 
+  const onClipboardPaste = () => {
+    navigator.clipboard
+      .readText()
+      .then((clipboardText) => onData(clipboardText.concat(String.fromCharCode(13)))); // concat "Enter" key
+  };
+
   let terminal = null;
   switch (status) {
     case connected:
@@ -105,6 +116,17 @@ const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
 
   return (
     <>
+      <Button
+        // Using VNC styles to avoid code dupe for paste button
+        className={classNames('paste-from-clipboard-btn', stylesVNC.consoleActionsVnc)}
+        variant={ButtonVariant.link}
+        onClick={onClipboardPaste}
+        icon={
+          <span>
+            <PasteIcon /> {t('Paste')}
+          </span>
+        }
+      />
       {status !== disconnected && (
         <SerialConsoleActions
           onDisconnect={onDisconnectClick}
