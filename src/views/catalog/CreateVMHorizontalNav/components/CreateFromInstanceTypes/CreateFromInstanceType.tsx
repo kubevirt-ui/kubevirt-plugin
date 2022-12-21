@@ -1,6 +1,7 @@
 import React, { FC, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
+import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
@@ -47,11 +48,11 @@ const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
               </SectionListItem>
               <Divider inset={{ default: 'insetLg' }} />
               <SectionListItem
-                headerText={t('Select InstanceType')}
+                headerText={t('Select Instancetype')}
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_INSTANCE_TYPE}
                 sectionState={sectionState}
               >
-                <div>Placeholder for InstanceTypesCards</div>
+                <SelectInstanceTypeSection />
               </SectionListItem>
               <Divider inset={{ default: 'insetLg' }} />
               <SectionListItem
