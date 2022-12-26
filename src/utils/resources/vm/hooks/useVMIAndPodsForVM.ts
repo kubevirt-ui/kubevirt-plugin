@@ -34,7 +34,7 @@ export const useVMIAndPodsForVM = (
   const error = vmiLoadError || podsLoadError;
 
   return {
-    vmi,
+    vmi: vmName === vmi?.metadata?.name && vmNamespace === vmi?.metadata?.namespace && vmi,
     pods,
     loaded,
     error,

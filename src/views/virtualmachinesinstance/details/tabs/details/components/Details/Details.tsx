@@ -47,7 +47,7 @@ type DetailsProps = {
 
 const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
   const { t } = useKubevirtTranslation();
-  const [guestAgentData] = useGuestOS(vmi);
+  const [guestAgentData, loadedGuestAgent] = useGuestOS(vmi);
   const [vm] = useK8sWatchResource<V1VirtualMachine>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     name: vmi?.metadata?.name,
@@ -82,7 +82,11 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               <Description vmi={vmi} />
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <OperatingSystem vmi={vmi} />
+              <OperatingSystem
+                vmi={vmi}
+                guestAgentData={guestAgentData}
+                loadedGuestAgent={loadedGuestAgent}
+              />
             </DescriptionListGroup>
             <DescriptionListGroup>
               <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
