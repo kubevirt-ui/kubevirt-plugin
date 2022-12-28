@@ -21,18 +21,16 @@ const PVCAlertExtension: React.FC<PVCAlertExtension> = ({ pvc }) => {
       upl?.uploadStatus === UPLOAD_STATUS.UPLOADING,
   );
 
-  return (
-    isUploading && (
-      <Alert
-        className="co-m-form-row"
-        isInline
-        variant={AlertVariant.warning}
-        title={t("Please don't close this browser tab")}
-      >
-        {t('Closing it will cause the upload to fail. You may still navigate the console.')}
-      </Alert>
-    )
-  );
+  return isUploading ? (
+    <Alert
+      className="co-m-form-row"
+      isInline
+      variant={AlertVariant.warning}
+      title={t("Please don't close this browser tab")}
+    >
+      {t('Closing it will cause the upload to fail. You may still navigate the console.')}
+    </Alert>
+  ) : null;
 };
 
 export default PVCAlertExtension;
