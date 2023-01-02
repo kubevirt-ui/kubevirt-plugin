@@ -1,5 +1,6 @@
 import * as React from 'react';
 import produce from 'immer';
+import { getBooleanText } from 'src/views/migrationpolicies/utils/utils';
 
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -13,10 +14,12 @@ import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { WORKLOADS, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import { getWorkload, VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
+import { isLiveMigratable } from '@virtualmachines/utils';
 
 import VirtualMachineStatus from '../../../../../../list/components/VirtualMachineStatus/VirtualMachineStatus';
 import { VirtualMachineDetailsRightGridLayoutPresentation } from '../../../utils/gridHelper';
@@ -35,6 +38,8 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
   vmi,
 }) => {
   const [sshService, sshServiceLoaded] = useSSHService(vm);
+
+  const [isSingleNodeCluster] = useSingleNodeCluster();
 
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -84,6 +89,11 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
           descriptionData={<VirtualMachineStatus printableStatus={vm?.status?.printableStatus} />}
           descriptionHeader={t('Status')}
           data-test-id={`${vm?.metadata?.name}-status`}
+        />
+        <VirtualMachineDescriptionItem
+          descriptionData={getBooleanText(isLiveMigratable(vm, isSingleNodeCluster))}
+          descriptionHeader={t('Live migratable')}
+          data-test-id={`${vm?.metadata?.name}-migratable`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.pod}
