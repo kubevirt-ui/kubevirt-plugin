@@ -84,6 +84,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
 
   const createItems = {
     catalog: t('From catalog'),
+    volume: t('From bootable Volume'),
     yaml: t('With YAML'),
   };
 
@@ -97,9 +98,16 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
   };
 
   const onCreate = (type: string) => {
-    return type === 'catalog'
-      ? history.push(catalogURL)
-      : history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${VirtualMachineModelRef}/~new`);
+    switch (type) {
+      case 'catalog':
+        return history.push(catalogURL);
+      case 'volume':
+        return history.push(`${catalogURL}/instanceTypes`);
+      default:
+        return history.push(
+          `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${VirtualMachineModelRef}/~new`,
+        );
+    }
   };
 
   const [columns, activeColumns] = useVirtualMachineColumns(namespace, pagination, data);
