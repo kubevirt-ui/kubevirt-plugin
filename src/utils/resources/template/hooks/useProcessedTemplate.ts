@@ -25,7 +25,7 @@ export const useProcessedTemplate = (
     if (template) {
       k8sCreate<V1Template>({
         model: ProcessedTemplatesModel,
-        data: template,
+        data: { ...template, metadata: { ...template?.metadata, namespace } },
         ns: namespace,
         queryParams: {
           dryRun: 'All',
