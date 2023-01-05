@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import migrationPoliciesEmptyState from 'images/migrationPoliciesEmptyState.png';
+import migrationPoliciesEmptyState from 'images/migrationPoliciesEmptyState.svg';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -19,12 +19,16 @@ import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import { migrationPoliciesPageBaseURL } from '../../utils/constants';
 
+import './MigrationPoliciesEmptyState.scss';
+
 const MigrationPoliciesEmptyState: React.FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
     <EmptyState variant={EmptyStateVariant.xs}>
-      <EmptyStateIcon icon={() => <img src={migrationPoliciesEmptyState} />} />
+      <EmptyStateIcon
+        icon={() => <img src={migrationPoliciesEmptyState} className="emptyStateImg" />}
+      />
       <Title headingLevel="h4" size="lg">
         {t('No MigrationPolicies are defined yet')}
       </Title>
