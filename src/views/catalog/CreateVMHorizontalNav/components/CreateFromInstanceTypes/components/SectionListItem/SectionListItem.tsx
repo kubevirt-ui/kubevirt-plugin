@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 
-import { INSTANCE_TYPES_SECTIONS } from '@catalog/CreateVMHorizontalNav/components/CreateFromInstanceTypes/constants';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, ListItem, Split, SplitItem } from '@patternfly/react-core';
+import { ListItem, Split, SplitItem } from '@patternfly/react-core';
+
+import { INSTANCE_TYPES_SECTIONS } from '../../utils/constants';
 
 type SectionListItemProps = {
   sectionKey: INSTANCE_TYPES_SECTIONS;
@@ -12,15 +12,16 @@ type SectionListItemProps = {
     INSTANCE_TYPES_SECTIONS,
     React.Dispatch<React.SetStateAction<INSTANCE_TYPES_SECTIONS>>,
   ];
+  headerAction?: ReactNode;
 };
 
 const SectionListItem: FC<SectionListItemProps> = ({
   sectionKey,
   headerText,
   sectionState: [currentSection, setCurrentSection],
+  headerAction,
   children,
 }) => {
-  const { t } = useKubevirtTranslation();
   const currentSectionClass = currentSection === sectionKey && 'current';
   return (
     <ListItem
@@ -38,12 +39,10 @@ const SectionListItem: FC<SectionListItemProps> = ({
         >
           {headerText}
         </SplitItem>
-        {sectionKey === INSTANCE_TYPES_SECTIONS.SELECT_VOLUME && (
+        {headerAction && (
           <>
             <SplitItem isFilled />
-            <SplitItem>
-              <Button variant={ButtonVariant.secondary}>{t('Add bootable Volume')}</Button>
-            </SplitItem>
+            <SplitItem>{headerAction}</SplitItem>
           </>
         )}
       </Split>

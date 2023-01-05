@@ -1,14 +1,13 @@
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import NetworkAttachmentDefinitionModel from '@kubevirt-ui/kubevirt-api/console/models/NetworkAttachmentDefinitionModel';
+import {
+  KUBEVIRT_OS_IMAGES_NS,
+  OPENSHIFT_NAMESPACE,
+  OPENSHIFT_OS_IMAGES_NS,
+} from '@kubevirt-utils/constants/constants';
 import { FLAG_KUBEVIRT_CDI } from '@kubevirt-utils/flags/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useAccessReview, useFlag } from '@openshift-console/dynamic-plugin-sdk';
-
-import {
-  KUBEVIRT_OS_IMAGES_NS,
-  NAMESPACE_OPENSHIFT,
-  OPENSHIFT_OS_IMAGES_NS,
-} from '../utils/constants';
 
 export type UsePermissions = () => {
   capabilitiesData: { taskName: string; isLoading: boolean; allowed: boolean }[];
@@ -20,13 +19,13 @@ const usePermissions: UsePermissions = () => {
   const cdiInstalled = useFlag(FLAG_KUBEVIRT_CDI);
 
   const [canReadOpenshiftNs, canReadOpenshiftNsLoading] = useAccessReview({
-    namespace: NAMESPACE_OPENSHIFT,
+    namespace: OPENSHIFT_NAMESPACE,
     verb: 'get',
     resource: TemplateModel.plural,
   });
 
   const [canWriteToOpenshiftNs, canWriteToOpenshiftNsLoading] = useAccessReview({
-    namespace: NAMESPACE_OPENSHIFT,
+    namespace: OPENSHIFT_NAMESPACE,
     verb: 'create',
     resource: TemplateModel.plural,
   });
