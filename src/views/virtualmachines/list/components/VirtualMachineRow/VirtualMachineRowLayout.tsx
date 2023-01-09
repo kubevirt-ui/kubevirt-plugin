@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { getBooleanText } from 'src/views/migrationpolicies/utils/utils';
 
 import {
   V1VirtualMachine,
@@ -27,6 +26,8 @@ const VirtualMachineRowLayout: React.FC<
     }
   >
 > = ({ obj, activeColumnIDs, rowData: { kind, node, ips, vmim, isSingleNodeCluster } }) => {
+  const isMigratable = isLiveMigratable(obj, isSingleNodeCluster);
+
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column">
@@ -39,8 +40,11 @@ const VirtualMachineRowLayout: React.FC<
       >
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
       </TableData>
-      <TableData id="status" activeColumnIDs={activeColumnIDs} className="pf-m-width-10 vm-column">
-        <VirtualMachineStatus printableStatus={obj?.status?.printableStatus} />
+      <TableData id="status" activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column">
+        <VirtualMachineStatus
+          printableStatus={obj?.status?.printableStatus}
+          isMigratable={isMigratable}
+        />
       </TableData>
       <TableData
         id="conditions"
@@ -48,13 +52,6 @@ const VirtualMachineRowLayout: React.FC<
         className="pf-m-width-20 vm-column"
       >
         <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
-      </TableData>
-      <TableData
-        id="live-migratable"
-        activeColumnIDs={activeColumnIDs}
-        className="pf-m-width-10 vm-column"
-      >
-        {getBooleanText(isLiveMigratable(obj, isSingleNodeCluster))}
       </TableData>
       <TableData id="node" activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column">
         {node}

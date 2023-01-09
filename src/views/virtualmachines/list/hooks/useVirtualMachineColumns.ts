@@ -57,18 +57,12 @@ const useVirtualMachineColumns = (
         id: 'status',
         transforms: [sortable],
         sort: (_, direction) => sorting(direction, 'status.printableStatus'),
-        props: { className: 'pf-m-width-10' },
+        props: { className: 'pf-m-width-15' },
       },
       {
         title: t('Conditions'),
         id: 'conditions',
         props: { className: 'pf-m-width-20' },
-      },
-      {
-        title: t('Live migratable'),
-        id: 'live-migratable',
-        transforms: [sortable],
-        props: { className: 'pf-m-width-10' },
       },
       ...(canGetNode
         ? [
