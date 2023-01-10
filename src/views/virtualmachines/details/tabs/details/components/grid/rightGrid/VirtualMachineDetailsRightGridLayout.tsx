@@ -82,11 +82,18 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
     });
   };
 
+  const isMigratable = isLiveMigratable(vm, isSingleNodeCluster);
+
   return (
     <GridItem span={5}>
       <DescriptionList>
         <VirtualMachineDescriptionItem
-          descriptionData={<VirtualMachineStatus printableStatus={vm?.status?.printableStatus} />}
+          descriptionData={
+            <VirtualMachineStatus
+              printableStatus={vm?.status?.printableStatus}
+              isMigratable={isMigratable}
+            />
+          }
           descriptionHeader={t('Status')}
           data-test-id={`${vm?.metadata?.name}-status`}
         />

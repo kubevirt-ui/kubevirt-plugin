@@ -19,7 +19,6 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import { booleanTextIds } from './constants';
 import { isLiveMigratable } from './utils';
 import { isErrorPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
 
@@ -65,17 +64,16 @@ const useLiveMigratableFilter = (): RowFilter => {
     filterGroupName: t('Live migratable'),
     type: 'live-migratable',
     items: [
-      { id: booleanTextIds.yes, title: t('Yes') },
-      { id: booleanTextIds.no, title: t('No') },
+      { id: 'migratable', title: t('Migratable') },
+      { id: 'notMigratable', title: t('Not migratable') },
     ],
-    reducer: (obj) =>
-      isLiveMigratable(obj, isSingleNodeCluster) ? booleanTextIds.yes : booleanTextIds.no,
+    reducer: (obj) => (isLiveMigratable(obj, isSingleNodeCluster) ? 'migratable' : 'notMigratable'),
     filter: (selectedItems, obj) => {
       const isMigratable = isLiveMigratable(obj, isSingleNodeCluster);
       return (
         selectedItems?.selected?.length === 0 ||
-        (selectedItems?.selected?.includes(booleanTextIds.yes) && isMigratable) ||
-        (selectedItems?.selected?.includes(booleanTextIds.no) && !isMigratable)
+        (selectedItems?.selected?.includes('migratable') && isMigratable) ||
+        (selectedItems?.selected?.includes('notMigratable') && !isMigratable)
       );
     },
   };
