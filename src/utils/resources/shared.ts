@@ -270,3 +270,11 @@ export const getAllowedTemplateResources = (projectNames: string[]) => {
     ]),
   );
 };
+
+/**
+ *
+ * @param resource k8s resource
+ * @returns resource's name
+ */
+export const getName = <A extends K8sResourceCommon = K8sResourceCommon>(resource: A) =>
+  resource?.metadata?.name;

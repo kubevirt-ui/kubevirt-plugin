@@ -52,10 +52,9 @@ describe('Test ensurePath', () => {
         },
       };
 
-      ensurePath(data, ['spec.template.spec.domain.devices', 'spec.flavor.kind']);
+      ensurePath(data, ['spec.template.spec.domain.devices']);
 
       expect(data.spec.template.spec.domain.devices).toBeDefined();
-      expect(data.spec.flavor.kind).toBeDefined();
     });
 
     it('Non existing and existing paths', () => {
@@ -68,10 +67,9 @@ describe('Test ensurePath', () => {
         },
       };
 
-      ensurePath(data, ['spec.template', 'spec.flavor.kind']);
+      ensurePath(data, ['spec.template']);
 
       expect(data.spec.template).toBeDefined();
-      expect(data.spec.flavor.kind).toBeDefined();
     });
   });
 });

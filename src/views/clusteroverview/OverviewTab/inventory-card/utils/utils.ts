@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { isUpstream } from '@kubevirt-utils/utils/utils';
 import {
@@ -11,7 +12,6 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { InProgressIcon, OffIcon, PausedIcon, SyncAltIcon } from '@patternfly/react-icons';
 
-import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from './constants';
 import { flattenTemplates } from './flattenTemplates';
 
 export const getOSImagesNS = (): string =>

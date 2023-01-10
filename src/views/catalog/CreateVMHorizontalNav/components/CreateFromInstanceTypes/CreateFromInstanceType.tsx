@@ -2,16 +2,20 @@ import React, { FC, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
+import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBootableVolumeButton';
 import CreateVMFooter from './components/CreateVMFooter/CreateVMFooter';
 import SectionListItem from './components/SectionListItem/SectionListItem';
-import { INSTANCE_TYPES_SECTIONS } from './constants';
+import useInstanceTypesAndPreferences from './hooks/useInstanceTypesAndPreferences';
+import { INSTANCE_TYPES_SECTIONS } from './utils/constants';
 
 import './CreateFromInstanceType.scss';
 
 const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
+  const { preferences, instanceTypes, loaded } = useInstanceTypesAndPreferences();
   return (
     <>
       <Grid className="co-dashboard-body">
@@ -22,6 +26,13 @@ const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
                 headerText={t('Select bootable Volume')}
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_VOLUME}
                 sectionState={sectionState}
+                headerAction={
+                  <AddBootableVolumeButton
+                    preferencesNames={(preferences || []).map(getName)}
+                    instanceTypesNames={(instanceTypes || []).map(getName)}
+                    loaded={loaded}
+                  />
+                }
               >
                 <div>Placeholder for BootableVolumesTable</div>
               </SectionListItem>

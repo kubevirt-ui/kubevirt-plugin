@@ -110,7 +110,7 @@
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.11.0",
-    "@kubevirt-ui/kubevirt-api": "^0.0.47",
+    "@kubevirt-ui/kubevirt-api": "^0.0.49",
     "@openshift-console/dynamic-plugin-sdk": "0.0.18",
     "@openshift-console/dynamic-plugin-sdk-internal": "0.0.11",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.9",
