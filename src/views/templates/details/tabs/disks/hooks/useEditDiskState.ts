@@ -71,6 +71,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
     accessMode,
     volumeMode,
     applyStorageProfileSettings,
+    storageClass,
   } = React.useMemo(() => {
     const dataVolumeTemplates = getDataVolumeTemplates(vm);
 
@@ -121,6 +122,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
         accessMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.accessModes?.[0] : null,
         volumeMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.volumeMode : null,
         applyStorageProfileSettings: applySPSettings,
+        storageClass: dataVolumeTemplate?.spec?.storage?.storageClassName,
       };
     }
 
@@ -133,7 +135,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
     diskType: diskTypes[getDiskDrive(disk)],
     diskSource,
     enablePreallocation: false,
-    storageClass: null,
+    storageClass,
     volumeMode,
     accessMode,
     diskInterface: getDiskInterface(disk),

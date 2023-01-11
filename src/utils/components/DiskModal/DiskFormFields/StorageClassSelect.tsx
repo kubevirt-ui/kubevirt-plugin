@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -7,19 +7,19 @@ import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/mode
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, FormGroup, Select, SelectVariant } from '@patternfly/react-core';
 
-import { diskReducerActions, DiskReducerActionType } from '../state/actions';
-
 import { FilterSCSelect, getSCSelectOptions } from './utils/Filters';
 import { getDefaultStorageClass } from './utils/helpers';
 
 type StorageClassSelectProps = {
   storageClass: string;
-  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
+  setStorageClassName: (scName: string) => void;
+  setStorageClassProvisioner?: (scProvisioner: string) => void;
 };
 
 const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
   storageClass,
-  dispatchDiskState,
+  setStorageClassName,
+  setStorageClassProvisioner,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -35,38 +35,16 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
   const onSelect = useCallback(
     (event: React.MouseEvent<Element, MouseEvent>, selection: string) => {
       setShowSCAlert(selection !== defaultSC?.metadata?.name);
-      dispatchDiskState({ type: diskReducerActions.SET_STORAGE_CLASS, payload: selection });
+      setStorageClassName(selection);
       setIsOpen(false);
-      const provisioner = storageClasses.find(
-        (sc) => sc?.metadata?.name === selection,
-      )?.provisioner;
-      dispatchDiskState({
-        type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER,
-        payload: provisioner,
-      });
+      setStorageClassProvisioner?.(
+        (storageClasses || []).find((sc) => sc?.metadata?.name === selection)?.provisioner,
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [storageClasses],
   );
 
-  // inserting the default storage class as initial value
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    } else if (storageClasses.length === 0) {
-      dispatchDiskState({ type: diskReducerActions.SET_STORAGE_CLASS, payload: null });
-    } else if (!storageClass) {
-      dispatchDiskState({
-        type: diskReducerActions.SET_STORAGE_CLASS,
-        payload: defaultSC?.metadata.name || storageClasses?.[0].metadata.name,
-      });
-      dispatchDiskState({
-        type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER,
-        payload: defaultSC?.provisioner || storageClasses?.[0].provisioner,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded, storageClass, storageClasses]);
   return (
     <>
       <FormGroup fieldId="storage-class" label={t('StorageClass')}>
@@ -79,12 +57,12 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
               onSelect={onSelect}
               variant={SelectVariant.single}
               selections={storageClass}
-              onFilter={FilterSCSelect(storageClasses, t)}
+              onFilter={FilterSCSelect(storageClasses)}
               hasInlineFilter
               maxHeight={200}
-              direction="up"
+              placeholderText={t('Select StorageClass')}
             >
-              {getSCSelectOptions(storageClasses, t)}
+              {getSCSelectOptions(storageClasses)}
             </Select>
           ) : (
             <Loading />

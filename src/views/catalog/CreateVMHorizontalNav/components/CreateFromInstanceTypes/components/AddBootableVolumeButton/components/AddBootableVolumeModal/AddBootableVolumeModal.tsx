@@ -16,12 +16,14 @@ import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInpu
 import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 import DiskSourcePVCSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourcePVCSelect';
 import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourceUploadPVC';
+import StorageClassSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClassSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, Form, FormGroup, TextInput, Title } from '@patternfly/react-core';
 
@@ -65,6 +67,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
       pvcNamespace,
       uploadFile,
       uploadFilename,
+      storageClassName,
     },
     setBootableVolume,
   ] = useState<AddBootableVolumeState>(initialBootableVolumeState);
@@ -78,41 +81,55 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         }))
       : setBootableVolume((prevState) => ({ ...prevState, [key]: value }));
 
-  const handleSubmitDataVolume = (emptyBootableVolume: V1beta1DataVolume) => {
+  const createDataSource = (dataSource: V1beta1DataSource) => {
+    const dataSourceToCreate = produce(dataSource, (draftDataSource) => {
+      draftDataSource.metadata.name = bootableVolumeName;
+      draftDataSource.metadata.annotations = annotations;
+      draftDataSource.metadata.labels = labels;
+      if (isEmpty(draftDataSource.spec.source)) {
+        draftDataSource.spec.source = { pvc: { name: pvcName, namespace: pvcNamespace } };
+      }
+    });
+
+    return k8sCreate({ model: DataSourceModel, data: dataSourceToCreate });
+  };
+
+  const createBootableVolume = (emptyBootableVolume: V1beta1DataVolume) => {
     const bootableVolumeToCreate = produce(emptyBootableVolume, (draftBootableVolume) => {
       draftBootableVolume.metadata.name = bootableVolumeName;
-      draftBootableVolume.metadata.annotations = annotations;
-      draftBootableVolume.metadata.labels = labels;
       draftBootableVolume.spec.storage.resources.requests.storage = size;
+      if (storageClassName && isUploadForm) {
+        draftBootableVolume.spec.storage.storageClassName = storageClassName;
+      }
 
       draftBootableVolume.spec.source = isUploadForm
         ? { upload: {} }
         : { pvc: { name: pvcName, namespace: pvcNamespace } };
     });
 
-    return isUploadForm
+    const promise = isUploadForm
       ? uploadData({
           file: uploadFile as File,
           dataVolume: bootableVolumeToCreate,
         })
       : k8sCreate({ model: DataVolumeModel, data: bootableVolumeToCreate });
-  };
 
-  const handleSubmitDataSource = (dataSource: V1beta1DataSource) => {
-    const dataSourceToCreate = produce(dataSource, (draftDataSource) => {
-      draftDataSource.metadata.name = bootableVolumeName;
-      draftDataSource.metadata.annotations = annotations;
-      draftDataSource.metadata.labels = labels;
-      draftDataSource.spec.source = { pvc: { name: pvcName, namespace: pvcNamespace } };
+    const dataSourceToCreate = produce(emptyDataSource, (draftDataSource) => {
+      draftDataSource.spec.source = {
+        pvc: {
+          name: bootableVolumeToCreate.metadata.name,
+          namespace: bootableVolumeToCreate.metadata.namespace,
+        },
+      };
     });
 
-    return k8sCreate({ model: DataSourceModel, data: dataSourceToCreate });
+    return promise.then(() => createDataSource(dataSourceToCreate));
   };
 
   return (
     <TabModal
       obj={cloneExistingPVC || isUploadForm ? emptySourceDataVolume : emptyDataSource}
-      onSubmit={cloneExistingPVC || isUploadForm ? handleSubmitDataVolume : handleSubmitDataSource}
+      onSubmit={cloneExistingPVC || isUploadForm ? createBootableVolume : createDataSource}
       headerText={t('Add bootable Volume')}
       isOpen={isOpen}
       onClose={() => {
@@ -144,20 +161,13 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           />
         </FormGroup>
         {isUploadForm ? (
-          <>
-            <DiskSourceUploadPVC
-              relevantUpload={upload}
-              uploadFile={uploadFile}
-              uploadFileName={uploadFilename}
-              setUploadFile={setBootableVolumeField('uploadFile')}
-              setUploadFileName={setBootableVolumeField('uploadFilename')}
-            />
-            <CapacityInput
-              size={size}
-              onChange={setBootableVolumeField('size')}
-              label={t('Disk size')}
-            />
-          </>
+          <DiskSourceUploadPVC
+            relevantUpload={upload}
+            uploadFile={uploadFile}
+            uploadFileName={uploadFilename}
+            setUploadFile={setBootableVolumeField('uploadFile')}
+            setUploadFileName={setBootableVolumeField('uploadFilename')}
+          />
         ) : (
           <>
             <DiskSourcePVCSelect
@@ -179,8 +189,21 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             />
           </>
         )}
-        <Title headingLevel="h4">{t('Annotations for the bootable Volume')}</Title>
-        <FormGroup label={t('Preferences')}>
+        {(isUploadForm || cloneExistingPVC) && (
+          <>
+            <CapacityInput
+              size={size}
+              onChange={setBootableVolumeField('size')}
+              label={t('Disk size')}
+            />
+            <StorageClassSelect
+              storageClass={storageClassName}
+              setStorageClassName={setBootableVolumeField('storageClassName')}
+            />
+          </>
+        )}
+        <Title headingLevel="h4">{t('Labels for the bootable Volume')}</Title>
+        <FormGroup label={t('Preferences')} isRequired>
           <FilterSelect
             selected={labels?.[DEFAULT_PREFERENCE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
@@ -188,12 +211,12 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             optionLabelText={t('Preference')}
           />
         </FormGroup>
-        <FormGroup label={t('Preferred Instancetype')}>
+        <FormGroup label={t('Instancetypes')} isRequired>
           <FilterSelect
             selected={labels?.[DEFAULT_INSTANCETYPE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)}
             options={instanceTypesNames}
-            optionLabelText={t('InstanceType')}
+            optionLabelText={t('Instancetype')}
           />
         </FormGroup>
         <FormGroup label={t('Description')}>

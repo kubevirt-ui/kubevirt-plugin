@@ -21,6 +21,8 @@ export type AddBootableVolumeState = {
   size: string;
   labels: { [key: string]: string };
   annotations: { [key: string]: string };
+  storageClassName: string;
+  storageClassProvisioner: string;
 };
 export const initialBootableVolumeState: AddBootableVolumeState = {
   bootableVolumeName: null,
@@ -31,6 +33,8 @@ export const initialBootableVolumeState: AddBootableVolumeState = {
   size: DEFAULT_DISK_SIZE,
   labels: {},
   annotations: {},
+  storageClassName: null,
+  storageClassProvisioner: null,
 };
 
 export const emptySourceDataVolume: V1beta1DataVolume = {

@@ -15,7 +15,7 @@ import './CreateFromInstanceType.scss';
 
 const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
-  const { preferences, instanceTypes, loaded } = useInstanceTypesAndPreferences();
+  const { preferences, instanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();
   return (
     <>
       <Grid className="co-dashboard-body">
@@ -31,6 +31,7 @@ const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
                     preferencesNames={(preferences || []).map(getName)}
                     instanceTypesNames={(instanceTypes || []).map(getName)}
                     loaded={loaded}
+                    loadError={loadError}
                   />
                 }
               >

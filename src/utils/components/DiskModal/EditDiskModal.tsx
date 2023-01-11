@@ -26,6 +26,7 @@ import NameFormField from './DiskFormFields/NameFormField';
 import StorageClassSelect from './DiskFormFields/StorageClassSelect';
 import { sourceTypes } from './DiskFormFields/utils/constants';
 import VolumeMode from './DiskFormFields/VolumeMode';
+import { diskReducerActions } from './state/actions';
 import { DiskFormState, DiskSourceState } from './state/initialState';
 import { diskReducer, diskSourceReducer } from './state/reducers';
 import {
@@ -230,7 +231,15 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
           <>
             <StorageClassSelect
               storageClass={diskState.storageClass}
-              dispatchDiskState={dispatchDiskState}
+              setStorageClassName={(scName) =>
+                dispatchDiskState({ type: diskReducerActions.SET_STORAGE_CLASS, payload: scName })
+              }
+              setStorageClassProvisioner={(scProvisioner: string) =>
+                dispatchDiskState({
+                  type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER,
+                  payload: scProvisioner,
+                })
+              }
             />
             <ApplyStorageProfileSettingsCheckbox
               diskState={diskState}
