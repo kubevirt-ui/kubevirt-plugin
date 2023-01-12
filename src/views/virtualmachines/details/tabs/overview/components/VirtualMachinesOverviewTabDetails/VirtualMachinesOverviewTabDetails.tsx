@@ -1,5 +1,4 @@
 import React, { FC, useMemo } from 'react';
-import { getBooleanText } from 'src/views/migrationpolicies/utils/utils';
 
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -7,7 +6,6 @@ import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsReq
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
 import { useVMIAndPodsForVM, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
@@ -27,9 +25,12 @@ import {
   GridItem,
   pluralize,
   Skeleton,
+  Split,
+  SplitItem,
 } from '@patternfly/react-core';
+import VMNotMigratableBadge from '@virtualmachines/list/components/VMNotMigratableBadge/VMNotMigratableBadge';
 
-import { isLiveMigratable, printableVMStatus } from '../../../../../utils';
+import { printableVMStatus } from '../../../../../utils';
 import CPUMemory from '../../../details/components/CPUMemory/CPUMemory';
 
 import MigrationProgressPopover from './components/MigrationProgressPopover/MigrationProgressPopover';
@@ -77,8 +78,6 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
 
   const vmPrintableStatus = vm?.status?.printableStatus;
 
-  const [isSingleNodeCluster] = useSingleNodeCluster();
-
   return (
     <div className="VirtualMachinesOverviewTabDetails--details">
       <Card>
@@ -98,20 +97,18 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-status">
-                    {vmPrintableStatus !== printableVMStatus.Migrating ? (
-                      <VirtualMachineOverviewStatus vmPrintableStatus={vmPrintableStatus} />
-                    ) : (
-                      <MigrationProgressPopover vmi={vmi}>
-                        <StatusPopoverButton vmPrintableStatus={vmPrintableStatus} />
-                      </MigrationProgressPopover>
-                    )}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Live migratable')}</DescriptionListTerm>
-                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-migratable">
-                    {getBooleanText(isLiveMigratable(vm, isSingleNodeCluster))}
+                    <Split hasGutter>
+                      <SplitItem>
+                        {vmPrintableStatus !== printableVMStatus.Migrating ? (
+                          <VirtualMachineOverviewStatus vmPrintableStatus={vmPrintableStatus} />
+                        ) : (
+                          <MigrationProgressPopover vmi={vmi}>
+                            <StatusPopoverButton vmPrintableStatus={vmPrintableStatus} />
+                          </MigrationProgressPopover>
+                        )}
+                      </SplitItem>
+                      <VMNotMigratableBadge vm={vm} />
+                    </Split>
                   </DescriptionListDescription>
                 </DescriptionListGroup>
 

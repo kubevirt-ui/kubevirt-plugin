@@ -7,7 +7,6 @@ import {
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
-import { isLiveMigratable } from '@virtualmachines/utils';
 
 import VirtualMachineStatus from '../VirtualMachineStatus/VirtualMachineStatus';
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
@@ -26,8 +25,6 @@ const VirtualMachineRowLayout: React.FC<
     }
   >
 > = ({ obj, activeColumnIDs, rowData: { kind, node, ips, vmim, isSingleNodeCluster } }) => {
-  const isMigratable = isLiveMigratable(obj, isSingleNodeCluster);
-
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column">
@@ -41,10 +38,7 @@ const VirtualMachineRowLayout: React.FC<
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
       </TableData>
       <TableData id="status" activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column">
-        <VirtualMachineStatus
-          printableStatus={obj?.status?.printableStatus}
-          isMigratable={isMigratable}
-        />
+        <VirtualMachineStatus vm={obj} />
       </TableData>
       <TableData
         id="conditions"

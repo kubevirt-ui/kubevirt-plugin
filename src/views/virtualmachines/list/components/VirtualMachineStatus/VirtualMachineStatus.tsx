@@ -1,15 +1,17 @@
 import * as React from 'react';
 
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Badge, HelperText, HelperTextItem, Split, SplitItem } from '@patternfly/react-core';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { HelperText, HelperTextItem, Split, SplitItem } from '@patternfly/react-core';
 
 import { getVMStatusIcon } from '../../../utils';
+import VMNotMigratableBadge from '../VMNotMigratableBadge/VMNotMigratableBadge';
 
-const VirtualMachineStatus: React.FC<VirtualMachinesPageStatusProps> = ({
-  printableStatus,
-  isMigratable,
-}) => {
-  const { t } = useKubevirtTranslation();
+type VirtualMachinesPageStatusProps = {
+  vm: V1VirtualMachine;
+};
+
+const VirtualMachineStatus: React.FC<VirtualMachinesPageStatusProps> = ({ vm }) => {
+  const printableStatus = vm?.status?.printableStatus;
   const Icon = getVMStatusIcon(printableStatus);
 
   return (
@@ -19,18 +21,9 @@ const VirtualMachineStatus: React.FC<VirtualMachinesPageStatusProps> = ({
           <HelperTextItem icon={<Icon />}>{printableStatus}</HelperTextItem>
         </HelperText>
       </SplitItem>
-      {!isMigratable && (
-        <SplitItem>
-          <Badge key="available-boot">{t('Not migratable')}</Badge>
-        </SplitItem>
-      )}
+      <VMNotMigratableBadge vm={vm} />
     </Split>
   );
-};
-
-type VirtualMachinesPageStatusProps = {
-  printableStatus: string;
-  isMigratable: boolean;
 };
 
 export default VirtualMachineStatus;
