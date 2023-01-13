@@ -333,8 +333,34 @@
       "section": "virtualization",
       "id": "VirtualizationSeparator",
       "insertAfter": "templates",
-      "insertBefore": "datasources",
+      "insertBefore": "bootablevolumes",
       "testID": "VirtualizationSeparator"
+    }
+  },
+  {
+    "type": "console.navigation/href",
+    "properties": {
+      "prefixNamespaced": true,
+      "id": "virtualization-bootablevolumes",
+      "section": "virtualization",
+      "name": "%plugin__kubevirt-plugin~Bootable volumes%",
+      "href": "bootablevolumes",
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-bootablevolumes",
+        "data-test-id": "-bootablevolumes-nav-item"
+      }
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
+      "path": [
+        "/k8s/ns/:ns/bootablevolumes",
+        "/k8s/all-namespaces/bootablevolumes"
+      ],
+      "component": {
+        "$codeRef": "BootableVolumesList"
+      }
     }
   },
   {

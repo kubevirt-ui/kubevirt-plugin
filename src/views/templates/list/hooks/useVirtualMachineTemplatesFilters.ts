@@ -5,14 +5,11 @@ import {
   isDefaultVariantTemplate,
   OS_NAMES,
 } from '@kubevirt-utils/resources/template';
-import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { ItemsToFilterProps } from '@kubevirt-utils/utils/types';
+import { getItemNameWithOther, includeFilter } from '@kubevirt-utils/utils/utils';
+import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getTemplateProviderName } from '../../utils/selectors';
-
-type ItemsToFilterProps = {
-  id: string;
-  title: string;
-};
 
 const useTemplateProviders = (): ItemsToFilterProps[] => {
   const { t } = useKubevirtTranslation();
@@ -31,23 +28,6 @@ const useTemplateProviders = (): ItemsToFilterProps[] => {
       title: t('Other'),
     },
   ];
-};
-
-// return the name (of VM template provider/OS) or 'Other' if the name not included in the array of available items for filtering
-const getItemNameWithOther = (itemName: string, items: ItemsToFilterProps[]): string => {
-  return !items?.find((s: ItemsToFilterProps) => s.id === itemName) || itemName === 'Other'
-    ? 'Other'
-    : itemName;
-};
-
-const includeFilter = (
-  compareData: FilterValue,
-  items: ItemsToFilterProps[],
-  itemName: string,
-): boolean => {
-  const compareString = getItemNameWithOther(itemName, items);
-
-  return compareData.selected?.length === 0 || compareData.selected?.includes(compareString);
 };
 
 const useVirtualMachineTemplatesFilters = (

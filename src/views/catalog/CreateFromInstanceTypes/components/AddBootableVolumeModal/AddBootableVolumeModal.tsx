@@ -128,7 +128,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     <TabModal
       obj={emptyDataSource}
       onSubmit={createDataSource}
-      headerText={t('Add bootable Volume')}
+      headerText={t('Add bootable volume')}
       isOpen={isOpen}
       onClose={() => {
         if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
@@ -180,7 +180,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             value={OPENSHIFT_OS_IMAGES_NS}
           />
         </FormGroup>
-        <Title headingLevel="h4">{t('Labels for the bootable Volume')}</Title>
+        <Title headingLevel="h4">{t('Labels for the bootable volume')}</Title>
         <FormGroup label={t('Default Preference')} isRequired>
           <FilterSelect
             selected={labels?.[DEFAULT_PREFERENCE_LABEL]}

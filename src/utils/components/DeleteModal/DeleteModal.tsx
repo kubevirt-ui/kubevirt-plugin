@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, memo, ReactNode } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -20,16 +20,19 @@ type DeleteModalProps = {
   onDeleteSubmit: () => Promise<void | K8sResourceCommon>;
   onClose: () => void;
   headerText?: string;
+  bodyText?: string | ReactNode;
+  redirectUrl?: string;
 };
 
-const DeleteModal: React.FC<DeleteModalProps> = React.memo(
-  ({ isOpen, obj, onDeleteSubmit, onClose, headerText }) => {
+const DeleteModal: FC<DeleteModalProps> = memo(
+  ({ isOpen, obj, onDeleteSubmit, onClose, headerText, bodyText, redirectUrl }) => {
     const { t } = useKubevirtTranslation();
     const history = useHistory();
 
     const [model] = useK8sModel(getGroupVersionKindForResource(obj));
     const [lastNamespace] = useLastNamespace();
-    const url = getResourceUrl({ model, activeNamespace: lastNamespace });
+    const url = redirectUrl || getResourceUrl({ model, activeNamespace: lastNamespace });
+
     return (
       <TabModal<K8sResourceCommon>
         obj={obj}
@@ -45,7 +48,7 @@ const DeleteModal: React.FC<DeleteModalProps> = React.memo(
         submitBtnVariant={ButtonVariant.danger}
         titleIconVariant={'warning'}
       >
-        <ConfirmActionMessage obj={obj} />
+        {bodyText || <ConfirmActionMessage obj={obj} />}
       </TabModal>
     );
   },

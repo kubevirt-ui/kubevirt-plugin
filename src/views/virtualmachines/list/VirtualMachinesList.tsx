@@ -84,7 +84,7 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
 
   const createItems = {
     catalog: t('From catalog'),
-    volume: t('From bootable Volume'),
+    volume: t('From bootable volume'),
     yaml: t('With YAML'),
   };
 
