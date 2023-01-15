@@ -9,12 +9,15 @@ import {
   Popover,
 } from '@patternfly/react-core';
 
+import './DescriptionItem.scss';
+
 type DescriptionItemHeaderProps = {
   isPopover: boolean;
   bodyContent: React.ReactNode;
   moreInfoURL?: string;
   breadcrumb?: string;
   descriptionHeader: string;
+  maxWidth?: string;
 };
 
 export const DescriptionItemHeader: React.FC<DescriptionItemHeaderProps> = ({
@@ -23,12 +26,15 @@ export const DescriptionItemHeader: React.FC<DescriptionItemHeaderProps> = ({
   moreInfoURL,
   breadcrumb,
   descriptionHeader,
+  maxWidth,
 }) => {
   const { t } = useKubevirtTranslation();
 
   if (isPopover && bodyContent) {
     return (
       <Popover
+        hasAutoWidth
+        maxWidth={maxWidth || '30rem'}
         headerContent={descriptionHeader}
         bodyContent={
           <>
