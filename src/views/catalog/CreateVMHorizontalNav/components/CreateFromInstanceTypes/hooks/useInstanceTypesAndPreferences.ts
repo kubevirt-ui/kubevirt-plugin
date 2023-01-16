@@ -38,7 +38,7 @@ const useInstanceTypesAndPreferences: UseInstanceTypeAndPreferences = () => {
   return {
     preferences: errorState ? null : preferences,
     instanceTypes: errorState ? null : instanceTypes,
-    loaded,
+    loaded: loadError ? true : loaded,
     loadError,
   };
 };

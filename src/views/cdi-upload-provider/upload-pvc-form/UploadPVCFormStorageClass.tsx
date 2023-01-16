@@ -31,12 +31,12 @@ const UploadPVCFormStorageClass = ({
           }}
           variant={SelectVariant.single}
           selections={storageClassName}
-          onFilter={FilterSCSelect(storageClasses, t)}
+          onFilter={FilterSCSelect(storageClasses)}
           hasInlineFilter
           maxHeight={200}
           direction="up"
         >
-          {getSCSelectOptions(storageClasses, t)}
+          {getSCSelectOptions(storageClasses)}
         </Select>
       </StackItem>
       <StackItem>

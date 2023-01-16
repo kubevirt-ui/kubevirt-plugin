@@ -131,7 +131,7 @@ export const getDataVolumeFromState = ({
   createOwnerReference?: boolean;
 }): V1beta1DataVolume => {
   const dataVolume = getEmptyVMDataVolumeResource(vm, createOwnerReference);
-  const dvName = resultVolume?.dataVolume?.name || `uploaded-${diskState.diskName}`;
+  const dvName = resultVolume?.dataVolume?.name || `${vm?.metadata?.name}-${diskState.diskName}`;
 
   dataVolume.metadata.name = dvName;
   dataVolume.spec.storage.resources.requests.storage = diskState.diskSize;
@@ -174,6 +174,7 @@ export const getDataVolumeFromState = ({
     dataVolume.spec.source = {
       upload: {},
     };
+    dataVolume.metadata.name = `uploaded-${diskState.diskName}`;
   }
   return dataVolume;
 };

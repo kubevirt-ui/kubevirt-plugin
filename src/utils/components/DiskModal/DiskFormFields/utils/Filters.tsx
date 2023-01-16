@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { TFunction } from 'i18next';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { StorageClassModel } from '@kubevirt-utils/models';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { SelectOption } from '@patternfly/react-core';
@@ -25,7 +25,6 @@ export const FilterPVCSelect = (options: string[]) => {
 
 export const getSCSelectOptions = (
   storageClasses: IoK8sApiStorageV1StorageClass[],
-  t: TFunction,
 ): React.ReactElement[] => {
   return storageClasses?.map((sc) => {
     const scName = sc?.metadata?.name;
@@ -46,7 +45,7 @@ export const getSCSelectOptions = (
   });
 };
 
-export const FilterSCSelect = (options: IoK8sApiStorageV1StorageClass[], t: TFunction) => {
+export const FilterSCSelect = (options: IoK8sApiStorageV1StorageClass[]) => {
   return (_, value: string): React.ReactElement[] => {
     let newOptions = options;
 
@@ -55,6 +54,6 @@ export const FilterSCSelect = (options: IoK8sApiStorageV1StorageClass[], t: TFun
       newOptions = options.filter((sc) => regex.test(sc.metadata.name));
     }
 
-    return getSCSelectOptions(newOptions, t);
+    return getSCSelectOptions(newOptions);
   };
 };

@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import StorageProfileModel from '@kubevirt-ui/kubevirt-api/console/models/StorageProfileModel';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -18,21 +16,17 @@ type UseStorageProfileClaimPropertySetsValue = {
 const useStorageProfileClaimPropertySets = (
   storageClassName: string,
 ): UseStorageProfileClaimPropertySetsValue => {
-  const watchStorageProfileResource = React.useMemo(
-    () => ({
-      groupVersionKind: modelToGroupVersionKind(StorageProfileModel),
-      isList: false,
-      name: storageClassName,
-    }),
-    [storageClassName],
-  );
+  const [storageProfile, loaded, error] = useK8sWatchResource<StorageProfile>({
+    groupVersionKind: modelToGroupVersionKind(StorageProfileModel),
+    isList: false,
+    name: storageClassName,
+  });
 
-  const [storageProfile, loaded, error] = useK8sWatchResource<StorageProfile>(
-    watchStorageProfileResource,
-  );
+  const errorState = !storageClassName || !loaded || error;
+
   const { claimPropertySets } = storageProfile?.status || {};
 
-  return { claimPropertySets, loaded, error };
+  return { claimPropertySets: errorState ? null : claimPropertySets, loaded, error };
 };
 
 export default useStorageProfileClaimPropertySets;
