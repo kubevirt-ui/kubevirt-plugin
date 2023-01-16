@@ -14,10 +14,10 @@ const SidebarEditorSwitch: FC = memo(() => {
   return (
     <Switch
       id="sidebar-editor-switch"
-      label={t('YAML: ON')}
-      labelOff={t('YAML: OFF')}
+      label={t('YAML')}
       isChecked={showEditor}
       onChange={setEditorVisible}
+      className="regular-font-weight"
     />
   );
 });
