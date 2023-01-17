@@ -19,3 +19,5 @@ console-extensions.md
 !.yarn/sdks
 !.yarn/versions
 .idea/
+scripts/ca.crt
+scripts/console-client-secret
