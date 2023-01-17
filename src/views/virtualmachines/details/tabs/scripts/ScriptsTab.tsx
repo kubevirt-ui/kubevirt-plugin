@@ -94,9 +94,6 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
                   <div data-test="ssh-popover">
                     <Trans t={t} ns="plugin__kubevirt-plugin">
                       <Text component={TextVariants.p}>Store the key in a project secret.</Text>
-                      <Text component={TextVariants.p}>
-                        The key will be stored after the machine is created
-                      </Text>
                     </Trans>
                   </div>
                   <span>{hasSSHKey ? t('Available') : t('Not available')}</span>
