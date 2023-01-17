@@ -144,22 +144,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         <FormGroup>
           <FormSelectionRadio formSelection={formSelection} setFormSelection={setFormSelection} />
         </FormGroup>
-        <FormGroup label={t('Name')} isRequired>
-          <TextInput
-            id="name"
-            type="text"
-            value={bootableVolumeName}
-            onChange={setBootableVolumeField('bootableVolumeName')}
-          />
-        </FormGroup>
-        <FormGroup label={t('Destination project')}>
-          <TextInput
-            id="destination-project"
-            type="text"
-            isDisabled
-            value={OPENSHIFT_OS_IMAGES_NS}
-          />
-        </FormGroup>
         {isUploadForm ? (
           <DiskSourceUploadPVC
             relevantUpload={upload}
@@ -202,8 +186,24 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             />
           </>
         )}
+        <FormGroup label={t('Name')} isRequired>
+          <TextInput
+            id="name"
+            type="text"
+            value={bootableVolumeName}
+            onChange={setBootableVolumeField('bootableVolumeName')}
+          />
+        </FormGroup>
+        <FormGroup label={t('Destination project')}>
+          <TextInput
+            id="destination-project"
+            type="text"
+            isDisabled
+            value={OPENSHIFT_OS_IMAGES_NS}
+          />
+        </FormGroup>
         <Title headingLevel="h4">{t('Labels for the bootable Volume')}</Title>
-        <FormGroup label={t('Preferences')} isRequired>
+        <FormGroup label={t('Default Preference')} isRequired>
           <FilterSelect
             selected={labels?.[DEFAULT_PREFERENCE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
@@ -211,7 +211,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             optionLabelText={t('Preference')}
           />
         </FormGroup>
-        <FormGroup label={t('Instancetypes')} isRequired>
+        <FormGroup label={t('Default Instancetype')}>
           <FilterSelect
             selected={labels?.[DEFAULT_INSTANCETYPE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)}

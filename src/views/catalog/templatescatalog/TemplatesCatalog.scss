@@ -12,8 +12,9 @@
   }
 
   &-row-icon {
-    width: 2rem;
+    width: var(--pf-global--spacer--xl);
     padding-right: var(--pf-global--spacer--sm);
+    vertical-align: bottom;
   }
 
   &-grid {

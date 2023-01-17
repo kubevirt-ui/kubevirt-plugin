@@ -278,3 +278,29 @@ export const getAllowedTemplateResources = (projectNames: string[]) => {
  */
 export const getName = <A extends K8sResourceCommon = K8sResourceCommon>(resource: A) =>
   resource?.metadata?.name;
+
+/**
+ * convertResourceArrayToMap is a function that takes in an array of
+ * K8sResourceCommon objects and an optional boolean value.
+ * It returns an object with the resourceKeyName as the key,
+ * and the K8sResourceCommon object as the value.
+ * If isNamespaced is true, then the resourceKeyName will be a combination of the namespace and name
+ * of the K8sResourceCommon object. (for example: objName[namespace][name])
+ * Otherwise, it will just be the name of the K8sResourceCommon object. (for example: objName[name])
+ * @param {A extends K8sResourceCommon} resources - resources array
+ * @param {boolean} isNamespaced - (optional) - a flag to indicate if the resource is namespace-scoped
+ */
+export const convertResourceArrayToMap = <A extends K8sResourceCommon = K8sResourceCommon>(
+  resources: A[],
+  isNamespaced?: boolean,
+): { [resourceKeyName: string]: A } =>
+  (resources || []).reduce((map, resource) => {
+    const { name, namespace } = resource?.metadata || {};
+    if (isNamespaced) {
+      if (!map[namespace]) map[namespace] = {};
+      map[namespace][name] = resource;
+      return map;
+    }
+    map[name] = resource;
+    return map;
+  }, {});

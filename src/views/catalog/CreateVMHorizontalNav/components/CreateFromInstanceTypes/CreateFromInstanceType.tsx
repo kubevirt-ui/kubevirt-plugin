@@ -1,11 +1,13 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
 import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBootableVolumeButton';
+import BootableVolumeList from './components/BootableVolumeList/BootableVolumeList';
 import CreateVMFooter from './components/CreateVMFooter/CreateVMFooter';
 import SectionListItem from './components/SectionListItem/SectionListItem';
 import useInstanceTypesAndPreferences from './hooks/useInstanceTypesAndPreferences';
@@ -15,7 +17,9 @@ import './CreateFromInstanceType.scss';
 
 const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
+  const bootableVolumeSelectedState = useState<V1beta1DataSource>();
   const { preferences, instanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();
+  const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
   return (
     <>
       <Grid className="co-dashboard-body">
@@ -28,14 +32,18 @@ const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
                 sectionState={sectionState}
                 headerAction={
                   <AddBootableVolumeButton
-                    preferencesNames={(preferences || []).map(getName)}
+                    preferencesNames={Object.keys(preferencesMap)}
                     instanceTypesNames={(instanceTypes || []).map(getName)}
                     loaded={loaded}
                     loadError={loadError}
                   />
                 }
               >
-                <div>Placeholder for BootableVolumesTable</div>
+                <BootableVolumeList
+                  preferences={preferencesMap}
+                  bootableVolumeSelectedState={bootableVolumeSelectedState}
+                  displayShowAllButton
+                />
               </SectionListItem>
               <Divider inset={{ default: 'insetLg' }} />
               <SectionListItem
