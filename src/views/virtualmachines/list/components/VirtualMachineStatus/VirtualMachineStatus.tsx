@@ -4,7 +4,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { HelperText, HelperTextItem, Split, SplitItem } from '@patternfly/react-core';
 
 import { getVMStatusIcon } from '../../../utils';
-import VMNotMigratableBadge from '../VMNotMigratableBadge/VMNotMigratableBadge';
+import VMNotMigratableLabel from '../VMNotMigratableLabel/VMNotMigratableLabel';
 
 type VirtualMachinesPageStatusProps = {
   vm: V1VirtualMachine;
@@ -21,7 +21,7 @@ const VirtualMachineStatus: React.FC<VirtualMachinesPageStatusProps> = ({ vm }) 
           <HelperTextItem icon={<Icon />}>{printableStatus}</HelperTextItem>
         </HelperText>
       </SplitItem>
-      <VMNotMigratableBadge vm={vm} />
+      <VMNotMigratableLabel vm={vm} />
     </Split>
   );
 };

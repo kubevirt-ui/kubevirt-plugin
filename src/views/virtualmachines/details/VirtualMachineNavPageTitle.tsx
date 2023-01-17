@@ -8,7 +8,7 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Split, SplitItem } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineInstanceMigration from '@virtualmachines/actions/hooks/useVirtualMachineInstanceMigration';
-import VMNotMigratableBadge from '@virtualmachines/list/components/VMNotMigratableBadge/VMNotMigratableBadge';
+import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 
 import VirtualMachineBreadcrumb from '../list/components/VirtualMachineBreadcrumb/VirtualMachineBreadcrumb';
 import { getVMStatusIcon } from '../utils';
@@ -49,7 +49,7 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
                 {vm?.status?.printableStatus}
               </Label>
             </SplitItem>
-            <VMNotMigratableBadge vm={vm} />
+            <VMNotMigratableLabel vm={vm} />
           </Split>
         </h1>
         <VirtualMachineActions vm={vm} vmim={vmim} isSingleNodeCluster={isSingleNodeCluster} />

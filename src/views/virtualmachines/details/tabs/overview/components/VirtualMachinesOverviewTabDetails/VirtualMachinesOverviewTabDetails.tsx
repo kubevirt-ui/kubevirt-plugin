@@ -28,7 +28,7 @@ import {
   Split,
   SplitItem,
 } from '@patternfly/react-core';
-import VMNotMigratableBadge from '@virtualmachines/list/components/VMNotMigratableBadge/VMNotMigratableBadge';
+import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 
 import { printableVMStatus } from '../../../../../utils';
 import CPUMemory from '../../../details/components/CPUMemory/CPUMemory';
@@ -107,7 +107,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                           </MigrationProgressPopover>
                         )}
                       </SplitItem>
-                      <VMNotMigratableBadge vm={vm} />
+                      <VMNotMigratableLabel vm={vm} />
                     </Split>
                   </DescriptionListDescription>
                 </DescriptionListGroup>
