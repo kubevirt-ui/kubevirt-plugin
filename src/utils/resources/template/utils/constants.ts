@@ -77,6 +77,10 @@ export const OS_NAMES = [
     id: OS_NAME_TYPES.windows,
     title: OS_NAME_LABELS.windows,
   },
+  {
+    id: OS_NAME_TYPES.other,
+    title: OS_NAME_LABELS.other,
+  },
 ];
 
 export enum BOOT_SOURCE {

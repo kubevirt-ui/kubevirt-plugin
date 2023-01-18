@@ -3,7 +3,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   getTemplateOS,
   isDefaultVariantTemplate,
-  OS_NAME_TYPES,
   OS_NAMES,
 } from '@kubevirt-utils/resources/template';
 import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
@@ -56,13 +55,6 @@ const useVirtualMachineTemplatesFilters = (
 ): RowFilter<V1Template>[] => {
   const { t } = useKubevirtTranslation();
   const providers = useTemplateProviders();
-  const osNames = [
-    ...OS_NAMES,
-    {
-      id: OS_NAME_TYPES.other,
-      title: t('Other'),
-    },
-  ];
 
   return [
     {
@@ -101,10 +93,10 @@ const useVirtualMachineTemplatesFilters = (
     {
       filterGroupName: t('Operating system'),
       type: 'osName',
-      reducer: (obj) => getItemNameWithOther(getTemplateOS(obj), osNames),
+      reducer: (obj) => getItemNameWithOther(getTemplateOS(obj), OS_NAMES),
       filter: (availableOsNames, obj) =>
-        includeFilter(availableOsNames, osNames, getTemplateOS(obj)),
-      items: osNames,
+        includeFilter(availableOsNames, OS_NAMES, getTemplateOS(obj)),
+      items: OS_NAMES,
     },
   ];
 };
