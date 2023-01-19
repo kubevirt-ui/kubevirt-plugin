@@ -1,11 +1,14 @@
 import React, { FC, useState } from 'react';
 import produce from 'immer';
-import xbytes from 'xbytes';
 
 import {
   DEFAULT_INSTANCETYPE_LABEL,
   DEFAULT_PREFERENCE_LABEL,
-} from '@catalog/CreateVMHorizontalNav/components/CreateFromInstanceTypes/utils/constants';
+} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import {
+  VirtualMachineClusterInstancetypeModelGroupVersionKind,
+  VirtualMachineClusterPreferenceModelGroupVersionKind,
+} from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import {
@@ -13,9 +16,6 @@ import {
   V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
-import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
-import DiskSourcePVCSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourcePVCSelect';
-import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourceUploadPVC';
 import StorageClassSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClassSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
@@ -25,12 +25,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-import { Checkbox, Form, FormGroup, TextInput, Title } from '@patternfly/react-core';
+import { Form, FormGroup, TextInput, Title } from '@patternfly/react-core';
 
-import { AddBootableVolumeButtonProps } from '../../AddBootableVolumeButton';
+import { AddBootableVolumeButtonProps } from '../AddBootableVolumeButton/AddBootableVolumeButton';
 
 import FilterSelect from './components/FilterSelect/FilterSelect';
 import FormSelectionRadio from './components/FormSelectionRadio/FormSelectionRadio';
+import VolumeSource from './components/VolumeSource/VolumeSource';
 import {
   AddBootableVolumeState,
   emptyDataSource,
@@ -57,22 +58,23 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   const [cloneExistingPVC, setCloneExistingPVC] = useState(true);
   const { upload, uploadData } = useCDIUpload();
 
-  const [
-    {
-      bootableVolumeName,
-      size,
-      annotations,
-      labels,
-      pvcName,
-      pvcNamespace,
-      uploadFile,
-      uploadFilename,
-      storageClassName,
-    },
-    setBootableVolume,
-  ] = useState<AddBootableVolumeState>(initialBootableVolumeState);
+  const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>(
+    initialBootableVolumeState,
+  );
+
+  const {
+    bootableVolumeName,
+    size,
+    annotations,
+    labels,
+    pvcName,
+    pvcNamespace,
+    uploadFile,
+    storageClassName,
+  } = bootableVolume || {};
 
   const isUploadForm = formSelection === RADIO_FORM_SELECTION.UPLOAD_IMAGE;
+
   const setBootableVolumeField = (key: string, fieldKey?: string) => (value: string) =>
     fieldKey
       ? setBootableVolume((prevState) => ({
@@ -144,35 +146,14 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         <FormGroup>
           <FormSelectionRadio formSelection={formSelection} setFormSelection={setFormSelection} />
         </FormGroup>
-        {isUploadForm ? (
-          <DiskSourceUploadPVC
-            relevantUpload={upload}
-            uploadFile={uploadFile}
-            uploadFileName={uploadFilename}
-            setUploadFile={setBootableVolumeField('uploadFile')}
-            setUploadFileName={setBootableVolumeField('uploadFilename')}
-          />
-        ) : (
-          <>
-            <DiskSourcePVCSelect
-              pvcNameSelected={pvcName}
-              pvcNamespaceSelected={pvcNamespace}
-              selectPVCName={setBootableVolumeField('pvcName')}
-              selectPVCNamespace={setBootableVolumeField('pvcNamespace')}
-              setDiskSize={(newSize) =>
-                setBootableVolumeField('size')(
-                  removeByteSuffix(xbytes(Number(newSize), { iec: true, space: false })),
-                )
-              }
-            />
-            <Checkbox
-              id="clone-pvc-checkbox"
-              isChecked={cloneExistingPVC}
-              onChange={setCloneExistingPVC}
-              label={t('Clone existing PVC')}
-            />
-          </>
-        )}
+        <VolumeSource
+          bootableVolume={bootableVolume}
+          setBootableVolumeField={setBootableVolumeField}
+          cloneExistingPVC={cloneExistingPVC}
+          setCloneExistingPVC={setCloneExistingPVC}
+          isUploadForm={isUploadForm}
+          upload={upload}
+        />
         {(isUploadForm || cloneExistingPVC) && (
           <>
             <CapacityInput
@@ -208,6 +189,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             selected={labels?.[DEFAULT_PREFERENCE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
             options={preferencesNames}
+            groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
             optionLabelText={t('Preference')}
           />
         </FormGroup>
@@ -216,6 +198,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             selected={labels?.[DEFAULT_INSTANCETYPE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)}
             options={instanceTypesNames}
+            groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
             optionLabelText={t('Instancetype')}
           />
         </FormGroup>

@@ -928,6 +928,7 @@
   "Terms": "Terms",
   "The changes you have made require this VirtualMachine to be restarted.": "The changes you have made require this VirtualMachine to be restarted.",
   "The channel to track and receive the updates from.": "The channel to track and receive the updates from.",
+  "The cloned copy of this PersistentVolumeClaim will be moved to the destination project": "The cloned copy of this PersistentVolumeClaim will be moved to the destination project",
   "The cloud-init service is enabled by default in Fedora and RHEL images.": "The cloud-init service is enabled by default in Fedora and RHEL images.",
   "The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.": "The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.",
   "The Descheduler can be used to evict a running VirtualMachine so that the VirtualMachine can be rescheduled onto a more suitable Node via a live migration.": "The Descheduler can be used to evict a running VirtualMachine so that the VirtualMachine can be rescheduled onto a more suitable Node via a live migration.",

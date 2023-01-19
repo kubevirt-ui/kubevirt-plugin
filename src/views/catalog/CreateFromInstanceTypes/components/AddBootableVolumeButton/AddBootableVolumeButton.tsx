@@ -4,7 +4,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
-import AddBootableVolumeModal from './components/AddBootableVolumeModal/AddBootableVolumeModal';
+import AddBootableVolumeModal from '../AddBootableVolumeModal/AddBootableVolumeModal';
 
 export type AddBootableVolumeButtonProps = {
   preferencesNames: string[];

@@ -1,7 +1,12 @@
 import * as React from 'react';
 
+import {
+  modelToGroupVersionKind,
+  PersistentVolumeClaimModel,
+} from '@kubevirt-ui/kubevirt-api/console';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import { FilterPVCSelect } from '../../utils/Filters';
@@ -52,7 +57,13 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
           maxHeight={400}
         >
           {pvcNames.map((name) => (
-            <SelectOption key={name} value={name} />
+            <SelectOption key={name} value={name}>
+              <ResourceLink
+                groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
+                linkTo={false}
+                name={name}
+              />
+            </SelectOption>
           ))}
         </Select>
       ) : (
