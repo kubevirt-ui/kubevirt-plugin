@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
-import CreateFromInstanceType from '@catalog/CreateVMHorizontalNav/components/CreateFromInstanceTypes/CreateFromInstanceType';
+import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromInstanceType';
 import TemplatesCatalog from '@catalog/templatescatalog/TemplatesCatalog';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
