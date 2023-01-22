@@ -3,7 +3,7 @@ import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { DEFAULT_INSTANCETYPE_LABEL, DEFAULT_PREFERENCE_LABEL } from '../utils/constants';
+import { DEFAULT_PREFERENCE_LABEL } from '../utils/constants';
 
 type UseBootableVolumes = () => {
   bootableVolumes: V1beta1DataSource[];
@@ -18,10 +18,7 @@ const useBootableVolumes: UseBootableVolumes = () => {
     groupVersionKind: DataSourceModelGroupVersionKind,
     isList: true,
     selector: {
-      matchExpressions: [
-        { key: DEFAULT_PREFERENCE_LABEL, operator: Operator.Exists },
-        { key: DEFAULT_INSTANCETYPE_LABEL, operator: Operator.Exists },
-      ],
+      matchExpressions: [{ key: DEFAULT_PREFERENCE_LABEL, operator: Operator.Exists }],
     },
   });
 

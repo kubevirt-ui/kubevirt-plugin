@@ -1,20 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 
+import { InstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { Grid, GridItem } from '@patternfly/react-core';
 
 import CategoryCard from './components/category-card/components/CategoryCard/CategoryCard';
 import CustomMenu from './components/category-card/components/InstanceTypesMenu/components/CustomMenu';
 import { InstanceTypeCategory, InstanceTypeSize } from './utils/types';
+import { seriesDetails } from './utils/utils';
 
 import './SelectInstanceTypeSection.scss';
 
-const SelectInstanceTypeSection: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<InstanceTypeCategory>(null);
-  const [selectedSize, setSelectedSize] = useState<InstanceTypeSize>(null);
+type SelectInstanceTypeSectionProps = {
+  selectedInstanceType: InstanceTypeState;
+  setSelectedInstanceType: React.Dispatch<React.SetStateAction<InstanceTypeState>>;
+};
 
-  const handleSelect = (category: InstanceTypeCategory, instanceType: InstanceTypeSize) => {
-    setSelectedCategory(category);
-    setSelectedSize(instanceType);
+const SelectInstanceTypeSection: React.FC<SelectInstanceTypeSectionProps> = ({
+  selectedInstanceType,
+  setSelectedInstanceType,
+}) => {
+  const handleSelect = (category: InstanceTypeCategory, size: InstanceTypeSize) => {
+    setSelectedInstanceType({ category, size, name: `${seriesDetails[category].prefix}.${size}` });
   };
 
   return (
@@ -26,8 +32,8 @@ const SelectInstanceTypeSection: React.FC = () => {
             onSelect={handleSelect}
             customData={{
               category: instanceType,
-              selectedCategory: selectedCategory,
-              selectedSize: selectedSize,
+              selectedCategory: selectedInstanceType?.category,
+              selectedSize: selectedInstanceType?.size,
             }}
           />
         </GridItem>

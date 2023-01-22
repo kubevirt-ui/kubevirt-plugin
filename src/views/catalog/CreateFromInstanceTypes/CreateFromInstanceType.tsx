@@ -5,6 +5,7 @@ import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/componen
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBootableVolumeButton';
@@ -12,13 +13,22 @@ import BootableVolumeList from './components/BootableVolumeList/BootableVolumeLi
 import CreateVMFooter from './components/CreateVMFooter/CreateVMFooter';
 import SectionListItem from './components/SectionListItem/SectionListItem';
 import useInstanceTypesAndPreferences from './hooks/useInstanceTypesAndPreferences';
-import { INSTANCE_TYPES_SECTIONS } from './utils/constants';
+import {
+  initialInstanceTypeState,
+  INSTANCE_TYPES_SECTIONS,
+  InstanceTypeState,
+} from './utils/constants';
+import { produceVirtualMachine } from './utils/utils';
 
 import './CreateFromInstanceType.scss';
 
 const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
-  const bootableVolumeSelectedState = useState<V1beta1DataSource>();
+  const [selectedBootableVolume, setSelectedBootableVolume] = useState<V1beta1DataSource>();
+  const [selectedInstanceType, setSelectedInstanceType] =
+    useState<InstanceTypeState>(initialInstanceTypeState);
+
+  const [ns] = useActiveNamespace();
   const { preferences, instanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
   return (
@@ -42,7 +52,7 @@ const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
               >
                 <BootableVolumeList
                   preferences={preferencesMap}
-                  bootableVolumeSelectedState={bootableVolumeSelectedState}
+                  bootableVolumeSelectedState={[selectedBootableVolume, setSelectedBootableVolume]}
                   displayShowAllButton
                 />
               </SectionListItem>
@@ -52,7 +62,10 @@ const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_INSTANCE_TYPE}
                 sectionState={sectionState}
               >
-                <SelectInstanceTypeSection />
+                <SelectInstanceTypeSection
+                  selectedInstanceType={selectedInstanceType}
+                  setSelectedInstanceType={setSelectedInstanceType}
+                />
               </SectionListItem>
               <Divider inset={{ default: 'insetLg' }} />
               <SectionListItem
@@ -66,7 +79,14 @@ const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
           </Card>
         </GridItem>
       </Grid>
-      <CreateVMFooter />
+      <CreateVMFooter
+        vm={produceVirtualMachine(selectedBootableVolume, ns, selectedInstanceType.name)}
+        onCancel={() => {
+          setSelectedBootableVolume(null);
+          setSelectedInstanceType(initialInstanceTypeState);
+        }}
+        selectedBootableVolume={selectedBootableVolume}
+      />
     </>
   );
 };
