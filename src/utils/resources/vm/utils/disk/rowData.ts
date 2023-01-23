@@ -13,6 +13,7 @@ import {
   getPrintableDiskInterface,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { NO_DATA_DASH } from '../constants';
 
@@ -33,10 +34,10 @@ export const getDiskRowDataLayout = (
     const volumeSource = Object.keys(device?.volume).find((key) => key !== 'name');
 
     const diskRowDataObject: DiskRowDataLayout = {
-      name: device?.disk?.name,
-      interface: getPrintableDiskInterface(device?.disk),
-      drive: getPrintableDiskDrive(device?.disk),
-      metadata: { name: device?.disk?.name },
+      name: device?.volume?.name,
+      interface: isEmpty(device?.disk) ? NO_DATA_DASH : getPrintableDiskInterface(device?.disk),
+      drive: isEmpty(device?.disk) ? NO_DATA_DASH : getPrintableDiskDrive(device?.disk),
+      metadata: { name: device?.volume?.name },
       namespace: device?.pvc?.metadata?.namespace,
       source: t(OTHER),
       size: NO_DATA_DASH,

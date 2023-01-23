@@ -13,7 +13,7 @@ import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternf
 import { printableVMStatus } from '../../../../../utils';
 import DeleteDiskModal from '../../modal/DeleteDiskModal';
 
-import { useEditDiskStates } from './hooks/useEditDiskStates';
+import { getEditDiskStates } from './utils/getEditDiskStates';
 import { isHotplugVolume } from './utils/helpers';
 
 type DiskRowActionsProps = {
@@ -33,11 +33,12 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
 
-  const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName, vmi);
-
   const isVMRunning = vm?.status?.printableStatus !== printableVMStatus.Stopped;
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
+  const isEditDisabled = isVMRunning || pvcResourceExists;
 
+  const { initialDiskState, initialDiskSourceState } =
+    !isEditDisabled && getEditDiskStates(vm, diskName, vmi);
   const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
   const volume = volumes?.find(({ name }) => name === diskName);
 
@@ -89,14 +90,14 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
     <DropdownItem
       onClick={() => onModalOpen(createEditDiskModal)}
       key="disk-edit"
-      isDisabled={isVMRunning || pvcResourceExists}
+      isDisabled={isEditDisabled}
       description={disabledEditText}
     >
       {editBtnText}
     </DropdownItem>,
     <DropdownItem
       onClick={() => onModalOpen(createDeleteDiskModal)}
-      key="disk-edit"
+      key="disk-delete"
       isDisabled={!isHotplug && isVMRunning}
       description={
         !isHotplug && isVMRunning

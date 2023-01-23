@@ -1,8 +1,7 @@
-import * as React from 'react';
-
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   DYNAMIC,
+  interfaceTypes,
   OTHER,
   sourceTypes,
   volumeTypes,
@@ -19,6 +18,7 @@ import {
 import { getBootDisk, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getDiskDrive, getDiskInterface } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 type UseEditDiskStates = (
   vm: V1VirtualMachine,
@@ -29,18 +29,14 @@ type UseEditDiskStates = (
   initialDiskSourceState: DiskSourceState;
 };
 
-export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
-  const initialDiskSourceState = React.useMemo(() => ({ ...initialStateDiskSource }), []);
+export const getEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
+  const initialDiskSourceState: DiskSourceState = { ...initialStateDiskSource };
   const disks = !vmi
     ? getDisks(vm)
     : [...(getDisks(vm) || []), ...getRunningVMMissingDisksFromVMI(getDisks(vm) || [], vmi)];
   const disk = disks?.find(({ name }) => name === diskName);
 
-  const {
-    diskSource,
-    diskSize,
-    isBootDisk: asBootSource,
-  } = React.useMemo(() => {
+  const getDiskDetails = () => {
     const volumes = !vmi
       ? getVolumes(vm)
       : [
@@ -65,23 +61,25 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
       return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC, isBootDisk };
     }
     return { isBootDisk, diskSource: OTHER, diskSize: null };
-  }, [initialDiskSourceState, vm, vmi, diskName]);
+  };
+
+  const { diskSource, diskSize, isBootDisk: asBootSource } = getDiskDetails();
 
   const initialDiskState: DiskFormState = {
     diskName,
     diskSize,
-    diskType: diskTypes[getDiskDrive(disk)],
+    diskType: isEmpty(disk) ? diskTypes.disk : diskTypes[getDiskDrive(disk)],
     diskSource,
     enablePreallocation: false,
     storageClass: null,
     volumeMode: null,
     accessMode: null,
-    diskInterface: getDiskInterface(disk),
+    diskInterface: isEmpty(disk) ? interfaceTypes.VIRTIO : getDiskInterface(disk),
     applyStorageProfileSettings: true,
     storageClassProvisioner: null,
     storageProfileSettingsCheckboxDisabled: false,
     asBootSource,
   };
 
-  return { initialDiskState, initialDiskSourceState };
+  return { initialDiskState, initialDiskSourceState: initialStateDiskSource };
 };
