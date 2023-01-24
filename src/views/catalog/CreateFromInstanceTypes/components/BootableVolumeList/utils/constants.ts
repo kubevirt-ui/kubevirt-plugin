@@ -13,12 +13,12 @@ export const paginationInitialStateForm = {
   page: 1,
   perPage: 5,
   startIndex: 0,
-  endIndex: 50,
+  endIndex: 5,
 };
 
 export const paginationInitialStateModal = {
   page: 1,
   perPage: 15,
   startIndex: 0,
-  endIndex: 50,
+  endIndex: 15,
 };

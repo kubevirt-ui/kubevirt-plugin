@@ -11,10 +11,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import {
-  V1beta1DataSource,
-  V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import StorageClassSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClassSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -23,7 +20,6 @@ import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, TextInput, Title } from '@patternfly/react-core';
 
@@ -84,20 +80,20 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
       : setBootableVolume((prevState) => ({ ...prevState, [key]: value }));
 
   const createDataSource = (dataSource: V1beta1DataSource) => {
-    const dataSourceToCreate = produce(dataSource, (draftDataSource) => {
+    const updatedDataSource = produce(dataSource, (draftDataSource) => {
       draftDataSource.metadata.name = bootableVolumeName;
       draftDataSource.metadata.annotations = annotations;
       draftDataSource.metadata.labels = labels;
-      if (isEmpty(draftDataSource.spec.source)) {
-        draftDataSource.spec.source = { pvc: { name: pvcName, namespace: pvcNamespace } };
-      }
     });
 
-    return k8sCreate({ model: DataSourceModel, data: dataSourceToCreate });
-  };
+    if (!cloneExistingPVC && !isUploadForm) {
+      const dataSourceToCreate = produce(updatedDataSource, (draftDS) => {
+        draftDS.spec.source = { pvc: { name: pvcName, namespace: pvcNamespace } };
+      });
+      return k8sCreate({ model: DataSourceModel, data: dataSourceToCreate });
+    }
 
-  const createBootableVolume = (emptyBootableVolume: V1beta1DataVolume) => {
-    const bootableVolumeToCreate = produce(emptyBootableVolume, (draftBootableVolume) => {
+    const bootableVolumeToCreate = produce(emptySourceDataVolume, (draftBootableVolume) => {
       draftBootableVolume.metadata.name = bootableVolumeName;
       draftBootableVolume.spec.storage.resources.requests.storage = size;
       if (storageClassName && isUploadForm) {
@@ -116,8 +112,8 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         })
       : k8sCreate({ model: DataVolumeModel, data: bootableVolumeToCreate });
 
-    const dataSourceToCreate = produce(emptyDataSource, (draftDataSource) => {
-      draftDataSource.spec.source = {
+    const dataSourceToCreate = produce(updatedDataSource, (draftDS) => {
+      draftDS.spec.source = {
         pvc: {
           name: bootableVolumeToCreate.metadata.name,
           namespace: bootableVolumeToCreate.metadata.namespace,
@@ -125,13 +121,13 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
       };
     });
 
-    return promise.then(() => createDataSource(dataSourceToCreate));
+    return promise.then(() => k8sCreate({ model: DataSourceModel, data: dataSourceToCreate }));
   };
 
   return (
     <TabModal
-      obj={cloneExistingPVC || isUploadForm ? emptySourceDataVolume : emptyDataSource}
-      onSubmit={cloneExistingPVC || isUploadForm ? createBootableVolume : createDataSource}
+      obj={emptyDataSource}
+      onSubmit={createDataSource}
       headerText={t('Add bootable Volume')}
       isOpen={isOpen}
       onClose={() => {
@@ -141,6 +137,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         onClose();
       }}
       submitBtnText={t('Add')}
+      isDisabled={!labels?.[DEFAULT_PREFERENCE_LABEL]}
     >
       <Form>
         <FormGroup>
@@ -154,7 +151,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           isUploadForm={isUploadForm}
           upload={upload}
         />
-        {(isUploadForm || cloneExistingPVC) && (
+        {(cloneExistingPVC || isUploadForm) && (
           <>
             <CapacityInput
               size={size}

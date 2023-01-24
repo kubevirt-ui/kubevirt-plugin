@@ -6,7 +6,7 @@ import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/react-core';
-import { TableComposable, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
+import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 
 import useBootableVolumes from '../../hooks/useBootableVolumes';
 import { DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
@@ -71,7 +71,15 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
         <SplitItem className="bootable-volume-list-bar__filter">
           <ListPageFilter
             hideLabelFilter
-            onFilterChange={onFilterChange}
+            onFilterChange={(...args) => {
+              onFilterChange(...args);
+              setPagination((prevPagination) => ({
+                ...prevPagination,
+                page: 1,
+                startIndex: 0,
+                endIndex: prevPagination?.perPage,
+              }));
+            }}
             loaded={loaded}
             data={unfilteredData}
             // nameFilter={!displayShowAllButton && "modal-name"} can remove comment once this merged https://github.com/openshift/console/pull/12438 and build into new SDK version
@@ -104,7 +112,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           />
         )}
       </Split>
-      <TableComposable variant="compact">
+      <TableComposable variant={TableVariant.compact}>
         <Thead>
           <Tr>
             {columns.map((col) => (
@@ -115,7 +123,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           </Tr>
         </Thead>
         <Tbody>
-          {data?.map((bs) => (
+          {data?.slice(pagination.startIndex, pagination.endIndex)?.map((bs) => (
             <BootableVolumeRow
               key={bs?.metadata?.name}
               bootableVolume={bs}
