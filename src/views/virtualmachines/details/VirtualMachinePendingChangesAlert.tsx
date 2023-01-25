@@ -6,6 +6,7 @@ import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/P
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
 import { getPendingChangesByTab } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { List } from '@patternfly/react-core';
 
 import { printableVMStatus } from '../utils';
@@ -32,7 +33,14 @@ const VirtualMachinePendingChangesAlert: React.FC<VirtualMachinePendingChangesAl
 
   const hasPendingChanges = pendingChanges?.some((change) => change?.hasPendingChange);
 
-  if (!vmi || vm?.status?.printableStatus === printableVMStatus.Stopped || !hasPendingChanges) {
+  const isInstanceTypeVM = !isEmpty(vm?.spec?.instancetype) || !isEmpty(vm?.spec?.preference);
+
+  if (
+    !vmi ||
+    vm?.status?.printableStatus === printableVMStatus.Stopped ||
+    !hasPendingChanges ||
+    isInstanceTypeVM
+  ) {
     return null;
   }
 
