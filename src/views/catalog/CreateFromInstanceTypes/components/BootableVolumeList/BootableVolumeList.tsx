@@ -65,6 +65,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               className="bootable-volume-list-bar__volume-namespace"
               value={OPENSHIFT_OS_IMAGES_NS}
               isDisabled
+              aria-label="bootable volume list"
             />
           </FormGroup>
         </SplitItem>

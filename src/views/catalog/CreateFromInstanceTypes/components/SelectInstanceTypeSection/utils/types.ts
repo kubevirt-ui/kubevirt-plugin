@@ -20,12 +20,13 @@ export type CategoryCustomData = {
   selectedSize: InstanceTypeSize;
 };
 
-export type InstanceTypeDetails = {
+export type CategoryDetails = {
   title: string;
   Icon: any;
   prefix: string;
+  prefixLabel: string;
   seriesLabel: string;
   instanceTypes: InstanceTypeSizeDetails[];
 };
 
-export type InstanceTypesDetails = { [key in InstanceTypeCategory]: InstanceTypeDetails };
+export type CategoryDetailsMap = { [key in InstanceTypeCategory]: CategoryDetails };

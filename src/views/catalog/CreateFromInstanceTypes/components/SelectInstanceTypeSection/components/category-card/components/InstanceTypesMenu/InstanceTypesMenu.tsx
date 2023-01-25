@@ -3,7 +3,7 @@ import React from 'react';
 import { Menu, MenuContent, MenuItem, MenuList } from '@patternfly/react-core';
 
 import { CategoryCustomData } from '../../../../utils/types';
-import { seriesDetails } from '../../../../utils/utils';
+import { categoryDetailsMap } from '../../../../utils/utils';
 
 import './InstanceTypesMenu.scss';
 
@@ -21,7 +21,7 @@ const InstanceTypesMenu: React.FC<InstanceTypesMenuProps> = ({
   onSelect,
 }) => {
   const { category, selectedSize } = customData;
-  const { instanceTypes } = seriesDetails[category];
+  const { instanceTypes } = categoryDetailsMap[category];
 
   const handleSelect = (e, selectedItem) => {
     onSelect(category, selectedItem);

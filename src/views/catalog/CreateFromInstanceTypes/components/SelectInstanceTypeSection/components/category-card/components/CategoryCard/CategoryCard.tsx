@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { AngleDownIcon } from '@patternfly/react-icons';
 
 import { CategoryCustomData } from '../../../../utils/types';
-import { findInstanceType, seriesDetails } from '../../../../utils/utils';
+import { categoryDetailsMap, getInstancetype } from '../../../../utils/utils';
 
 import './CategoryCard.scss';
 
@@ -22,12 +22,12 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   customData,
 }) => {
   const { category, selectedCategory, selectedSize } = customData;
-  const details = seriesDetails[category];
+  const details = categoryDetailsMap[category];
   const { Icon, instanceTypes, seriesLabel, title } = details;
 
   const isSelectedCategory = selectedCategory === category;
   const displaySelection = isSelectedCategory && Boolean(selectedSize);
-  const selectedInstanceTypeDetails = findInstanceType(selectedSize, instanceTypes);
+  const selectedInstanceTypeDetails = getInstancetype(selectedSize, instanceTypes);
 
   return (
     <div
