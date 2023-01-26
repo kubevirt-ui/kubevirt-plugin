@@ -6,7 +6,7 @@ import { Grid, GridItem } from '@patternfly/react-core';
 import CategoryCard from './components/category-card/components/CategoryCard/CategoryCard';
 import CustomMenu from './components/category-card/components/InstanceTypesMenu/components/CustomMenu';
 import { InstanceTypeCategory, InstanceTypeSize } from './utils/types';
-import { seriesDetails } from './utils/utils';
+import { categoryDetailsMap } from './utils/utils';
 
 import './SelectInstanceTypeSection.scss';
 
@@ -20,7 +20,11 @@ const SelectInstanceTypeSection: React.FC<SelectInstanceTypeSectionProps> = ({
   setSelectedInstanceType,
 }) => {
   const handleSelect = (category: InstanceTypeCategory, size: InstanceTypeSize) => {
-    setSelectedInstanceType({ category, size, name: `${seriesDetails[category].prefix}.${size}` });
+    setSelectedInstanceType({
+      category,
+      size,
+      name: `${categoryDetailsMap[category]?.prefix}.${size}`,
+    });
   };
 
   return (
