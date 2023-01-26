@@ -6,10 +6,14 @@ import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
 import { DEFAULT_INSTANCETYPE_LABEL, DEFAULT_PREFERENCE_LABEL } from './constants';
 
-export const produceVirtualMachine = (
+const generateCloudInitPassword = () =>
+  `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
+
+export const generateVM = (
   dataSource: V1beta1DataSource,
   activeNamespace: string,
   instanceTypeName: string,
@@ -36,11 +40,28 @@ export const produceVirtualMachine = (
       running: true,
       template: {
         spec: {
-          domain: { devices: {} },
+          domain: {
+            devices: {
+              disks: [
+                {
+                  disk: {
+                    bus: 'virtio',
+                  },
+                  name: 'cloudinitdisk',
+                },
+              ],
+            },
+          },
           volumes: [
             {
               dataVolume: { name: `${virtualmachineName}-volume` },
               name: `${virtualmachineName}-disk`,
+            },
+            {
+              cloudInitNoCloud: {
+                userData: `#cloud-config\nuser: fedora\npassword: ${generateCloudInitPassword()}\nchpasswd: { expire: False }`,
+              },
+              name: 'cloudinitdisk',
             },
           ],
         },
