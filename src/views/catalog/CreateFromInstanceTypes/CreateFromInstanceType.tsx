@@ -1,10 +1,11 @@
 import React, { FC, useMemo, useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
@@ -24,7 +25,7 @@ import { produceVirtualMachine } from './utils/utils';
 
 import './CreateFromInstanceType.scss';
 
-const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
+const CreateFromInstanceType: FC = () => {
   const [ns] = useActiveNamespace();
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
   const [selectedBootableVolume, setSelectedBootableVolume] = useState<V1beta1DataSource>();
@@ -38,6 +39,8 @@ const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
       separator: '-',
     }),
   );
+
+  const namespace = ns === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : ns;
 
   return (
     <>
@@ -82,7 +85,7 @@ const CreateFromInstanceType: FC<RouteComponentProps<{ ns: string }>> = () => {
                 sectionState={sectionState}
               >
                 <VMDetailsSection
-                  namespace={ns}
+                  namespace={namespace}
                   vmName={vmName}
                   setVMName={setVMName}
                   bootSource={selectedBootableVolume}
