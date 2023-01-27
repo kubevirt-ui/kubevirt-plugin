@@ -2,6 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
+import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -21,7 +22,7 @@ import {
   INSTANCE_TYPES_SECTIONS,
   InstanceTypeState,
 } from './utils/constants';
-import { produceVirtualMachine } from './utils/utils';
+import { generateVM } from './utils/utils';
 
 import './CreateFromInstanceType.scss';
 
@@ -39,6 +40,10 @@ const CreateFromInstanceType: FC = () => {
       separator: '-',
     }),
   );
+  const [sshSecretCredentials, setSSHSecretCredentials] = useState<SSHSecretCredentials>({
+    sshSecretName: '',
+    sshSecretKey: '',
+  });
 
   const namespace = ns === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : ns;
 
@@ -90,6 +95,8 @@ const CreateFromInstanceType: FC = () => {
                   setVMName={setVMName}
                   bootSource={selectedBootableVolume}
                   instancetype={selectedInstanceType}
+                  sshSecretCredentials={sshSecretCredentials}
+                  setSSHSecretCredentials={setSSHSecretCredentials}
                 />
               </SectionListItem>
             </List>
@@ -97,12 +104,13 @@ const CreateFromInstanceType: FC = () => {
         </GridItem>
       </Grid>
       <CreateVMFooter
-        vm={produceVirtualMachine(selectedBootableVolume, ns, selectedInstanceType?.name, vmName)}
+        vm={generateVM(selectedBootableVolume, ns, selectedInstanceType?.name, vmName)}
         onCancel={() => {
           setSelectedBootableVolume(null);
           setSelectedInstanceType(initialInstanceTypeState);
         }}
         selectedBootableVolume={selectedBootableVolume}
+        sshSecretCredentials={sshSecretCredentials}
       />
     </>
   );

@@ -2,12 +2,15 @@ import React, { FC, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
+import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { createVmSSHSecret } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getPVC } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -27,14 +30,22 @@ type CreateVMFooterProps = {
   vm: V1VirtualMachine;
   onCancel: () => void;
   selectedBootableVolume: V1beta1DataSource;
+  sshSecretCredentials: SSHSecretCredentials;
 };
 
-const CreateVMFooter: FC<CreateVMFooterProps> = ({ vm, onCancel, selectedBootableVolume }) => {
+const CreateVMFooter: FC<CreateVMFooterProps> = ({
+  vm,
+  onCancel,
+  selectedBootableVolume,
+  sshSecretCredentials,
+}) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const [startVM, setStartVM] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<Error | any>(null);
+
+  const { sshSecretName, sshSecretKey } = sshSecretCredentials;
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -49,15 +60,46 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ vm, onCancel, selectedBootabl
       draftVM.spec.running = startVM;
       draftVM.spec.dataVolumeTemplates[0].spec.storage.resources.requests.storage =
         pvc?.spec?.resources?.requests?.storage;
+      if (sshSecretCredentials?.sshSecretName) {
+        const cloudInitNoCloudVolume = vm.spec.template.spec.volumes?.find(
+          (v) => v.cloudInitNoCloud,
+        );
+        if (cloudInitNoCloudVolume) {
+          draftVM.spec.template.spec.volumes = vm.spec.template.spec.volumes.filter(
+            (v) => !v.cloudInitNoCloud,
+          );
+          draftVM.spec.template.spec.volumes.push({
+            name: cloudInitNoCloudVolume.name,
+            cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
+          });
+        }
+        draftVM.spec.template.spec.accessCredentials = [
+          {
+            sshPublicKey: {
+              source: {
+                secret: {
+                  secretName: sshSecretName || `${vm.metadata.name}-ssh-key-${getRandomChars()}`,
+                },
+              },
+              propagationMethod: {
+                configDrive: {},
+              },
+            },
+          },
+        ];
+      }
     });
 
     return k8sCreate({
       data: vmToCreate,
       model: VirtualMachineModel,
     })
-      .then(() =>
-        history.push(getResourceUrl({ model: VirtualMachineModel, resource: vmToCreate })),
-      )
+      .then((createdVM) => {
+        if (!isEmpty(sshSecretKey)) {
+          createVmSSHSecret(createdVM, sshSecretKey, sshSecretName);
+        }
+        history.push(getResourceUrl({ model: VirtualMachineModel, resource: vmToCreate }));
+      })
       .catch(setError)
       .finally(() => setIsSubmitting(false));
   };
