@@ -1,22 +1,19 @@
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import {
-  IoK8sApiCoreV1Service,
-  IoK8sApiCoreV1ServiceSpecTypeEnum,
-} from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { buildOwnerReference } from './../../resources/shared';
-import { PORT, SSH_PORT, VMI_LABEL_AS_SSH_SERVICE_SELECTOR } from './constants';
+import { PORT, SERVICE_TYPES, SSH_PORT, VMI_LABEL_AS_SSH_SERVICE_SELECTOR } from './constants';
 
-const buildSSHServiceFromVM = (vm: V1VirtualMachine, sshLabel: string) => ({
+const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES, sshLabel: string) => ({
   kind: ServiceModel.kind,
   apiVersion: ServiceModel.apiVersion,
   metadata: {
-    name: `${vm?.metadata?.name}-ssh-service`,
+    name: `${vm?.metadata?.name}-${type.toLowerCase()}-ssh-service`,
     namespace: vm?.metadata?.namespace,
     ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
   },
@@ -27,7 +24,7 @@ const buildSSHServiceFromVM = (vm: V1VirtualMachine, sshLabel: string) => ({
         targetPort: SSH_PORT,
       },
     ],
-    type: IoK8sApiCoreV1ServiceSpecTypeEnum.NodePort,
+    type,
     selector: {
       [VMI_LABEL_AS_SSH_SERVICE_SELECTOR]: sshLabel,
     },
@@ -42,7 +39,11 @@ export const deleteSSHService = (sshService: IoK8sApiCoreV1Service) =>
     ns: sshService?.metadata?.namespace,
   });
 
-export const createSSHService = async (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance) => {
+export const createSSHService = async (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+  type: SERVICE_TYPES,
+): Promise<IoK8sApiCoreV1Service> => {
   const { namespace, name } = vm?.metadata || {};
   const vmiLabels = vm?.spec?.template?.metadata?.labels;
   const labelSelector =
@@ -78,7 +79,7 @@ export const createSSHService = async (vm: V1VirtualMachine, vmi: V1VirtualMachi
       });
   }
 
-  const serviceResource = buildSSHServiceFromVM(vm, labelSelector);
+  const serviceResource = buildSSHServiceFromVM(vm, type, labelSelector);
 
   return k8sCreate({
     model: ServiceModel,
