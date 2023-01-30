@@ -5,3 +5,11 @@ export const PORT = 22000;
 export const SSH_PORT = 22;
 
 export const VMI_LABEL_AS_SSH_SERVICE_SELECTOR = 'kubevirt.io/domain';
+
+export enum SERVICE_TYPES {
+  NONE = 'None',
+  LOAD_BALANCER = 'LoadBalancer',
+  NODE_PORT = 'NodePort',
+}
+
+export const METALLB_GROUP = 'metallb.io';

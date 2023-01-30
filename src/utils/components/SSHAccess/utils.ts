@@ -12,13 +12,13 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { buildOwnerReference } from './../../resources/shared';
-import { PORT, SSH_PORT, VMI_LABEL_AS_SSH_SERVICE_SELECTOR } from './constants';
+import { PORT, SERVICE_TYPES, SSH_PORT, VMI_LABEL_AS_SSH_SERVICE_SELECTOR } from './constants';
 
-const buildSSHServiceFromVM = (vm: V1VirtualMachine, sshLabel: string) => ({
+const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES, sshLabel: string) => ({
   kind: ServiceModel.kind,
   apiVersion: ServiceModel.apiVersion,
   metadata: {
-    name: `${vm?.metadata?.name}-ssh-service`,
+    name: `${vm?.metadata?.name}-${type.toLowerCase()}-ssh-service`,
     namespace: vm?.metadata?.namespace,
     ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
   },
@@ -29,7 +29,7 @@ const buildSSHServiceFromVM = (vm: V1VirtualMachine, sshLabel: string) => ({
         targetPort: SSH_PORT,
       },
     ],
-    type: 'NodePort',
+    type,
     selector: {
       [VMI_LABEL_AS_SSH_SERVICE_SELECTOR]: sshLabel,
     },
@@ -47,6 +47,7 @@ export const deleteSSHService = (sshService: IoK8sApiCoreV1Service) =>
 export const createSSHService = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
+  type: SERVICE_TYPES,
 ): Promise<K8sResourceCommon> => {
   const { namespace, name } = vm?.metadata || {};
   const vmiLabels = vm?.spec?.template?.metadata?.labels;
@@ -83,7 +84,7 @@ export const createSSHService = (
       });
   }
 
-  const serviceResource = buildSSHServiceFromVM(vm, labelSelector);
+  const serviceResource = buildSSHServiceFromVM(vm, type, labelSelector);
 
   return k8sCreate({
     model: ServiceModel,
