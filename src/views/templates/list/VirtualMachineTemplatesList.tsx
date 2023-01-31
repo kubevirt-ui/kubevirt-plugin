@@ -33,6 +33,7 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
     error,
     availableTemplatesUID,
     availableDatasources,
+    cloneInProgressDatasources,
     bootSourcesLoaded,
   } = useTemplatesWithAvailableSource({
     namespace,
@@ -82,6 +83,7 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
               {
                 availableTemplatesUID: Set<string>;
                 availableDatasources: Record<string, V1beta1DataSource>;
+                cloneInProgressDatasources: Record<string, V1beta1DataSource>;
               }
             >
               data={filteredData}
@@ -90,7 +92,7 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
               loadError={error}
               columns={activeColumns}
               Row={VirtualMachineTemplatesRow}
-              rowData={{ availableTemplatesUID, availableDatasources }}
+              rowData={{ availableTemplatesUID, availableDatasources, cloneInProgressDatasources }}
             />
           </StackItem>
         </Stack>

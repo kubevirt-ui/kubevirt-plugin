@@ -45,6 +45,7 @@ export const useTemplatesWithAvailableSource = ({
   });
   const {
     availableDatasources,
+    cloneInProgressDatasources,
     availablePVCs,
     loaded: bootSourcesLoaded,
   } = useAvailableDataSourcesAndPVCs(templates, loaded);
@@ -98,6 +99,7 @@ export const useTemplatesWithAvailableSource = ({
     templates: filteredTemplates,
     availableTemplatesUID,
     availableDatasources,
+    cloneInProgressDatasources,
     loaded,
     bootSourcesLoaded,
     error: loadError,
@@ -108,6 +110,7 @@ type useTemplatesWithAvailableSourceValues = {
   templates: V1Template[];
   availableTemplatesUID: Set<string>;
   availableDatasources: Record<string, V1beta1DataSource>;
+  cloneInProgressDatasources: Record<string, V1beta1DataSource>;
   loaded: boolean;
   bootSourcesLoaded: boolean;
   error: any;
