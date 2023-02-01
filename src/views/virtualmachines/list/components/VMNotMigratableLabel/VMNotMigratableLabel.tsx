@@ -6,6 +6,8 @@ import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { Label, SplitItem } from '@patternfly/react-core';
 import { isLiveMigratable } from '@virtualmachines/utils';
 
+import './VMNotMigratableLabel.scss';
+
 type VMNotMigratableLabelProps = {
   vm: V1VirtualMachine;
 };
@@ -17,7 +19,9 @@ const VMNotMigratableLabel: React.FC<VMNotMigratableLabelProps> = ({ vm }) => {
 
   return !isMigratable ? (
     <SplitItem>
-      <Label key="available-boot">{t('Not migratable')}</Label>
+      <Label isCompact variant="outline" key="not-migratable" className="migratable-label">
+        {t('Not migratable')}
+      </Label>
     </SplitItem>
   ) : null;
 };
