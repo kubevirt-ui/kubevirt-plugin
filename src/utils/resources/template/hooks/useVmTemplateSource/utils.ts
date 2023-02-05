@@ -109,6 +109,19 @@ export const isDataSourceReady = (dataSource: V1beta1DataSource): boolean =>
   dataSource?.status?.conditions?.some((c) => c.type === 'Ready' && c.status === 'True');
 
 /**
+ * a function that returns true if the data source is cloning in progress
+ * @param dataSource the data source to check if cloning
+ * @returns true if the data source is in cloning state, false otherwise
+ */
+export const isDataSourceCloning = (dataSource: V1beta1DataSource): boolean =>
+  dataSource?.status?.conditions?.some(
+    (c) =>
+      c.type === 'Ready' &&
+      c.status === 'False' &&
+      ['CloneScheduled', 'CloneInProgress'].includes(c?.reason),
+  );
+
+/**
  * update template's boot source storage class
  * @param template the template to get the boot source from
  * @param storageClassName the storage class name to use

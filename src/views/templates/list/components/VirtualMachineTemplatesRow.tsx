@@ -17,9 +17,17 @@ import VirtualMachineTemplatesSource from './VirtualMachineTemplatesSource';
 const VirtualMachineTemplatesRow: React.FC<
   RowProps<
     V1Template,
-    { availableTemplatesUID: Set<string>; availableDatasources: Record<string, V1beta1DataSource> }
+    {
+      availableTemplatesUID: Set<string>;
+      availableDatasources: Record<string, V1beta1DataSource>;
+      cloneInProgressDatasources: Record<string, V1beta1DataSource>;
+    }
   >
-> = ({ obj, activeColumnIDs, rowData: { availableDatasources, availableTemplatesUID } }) => {
+> = ({
+  obj,
+  activeColumnIDs,
+  rowData: { availableDatasources, cloneInProgressDatasources, availableTemplatesUID },
+}) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
 
@@ -47,6 +55,7 @@ const VirtualMachineTemplatesRow: React.FC<
         <VirtualMachineTemplatesSource
           template={obj}
           availableDatasources={availableDatasources}
+          cloneInProgressDatasources={cloneInProgressDatasources}
           availableTemplatesUID={availableTemplatesUID}
         />
       </TableData>

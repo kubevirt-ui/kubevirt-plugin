@@ -7,6 +7,7 @@ import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/k
 import { BOOT_SOURCE } from '@kubevirt-utils/resources/template';
 import {
   getTemplateBootSourceType,
+  isDataSourceCloning,
   isDataSourceReady,
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import {
@@ -81,14 +82,26 @@ export const useAvailableDataSourcesAndPVCs = (
     (watchResource) => watchResource.loaded || watchResource.loadError,
   );
 
-  const availableDatasources = Object.values(watchDataSources).reduce(
+  const { availableDatasources, cloneInProgressDatasources } = Object.values(
+    watchDataSources,
+  ).reduce(
     (acc, { data: dataSource }) => {
       if (isDataSourceReady(dataSource as V1beta1DataSource)) {
-        acc[`${dataSource?.metadata?.namespace}-${dataSource?.metadata?.name}`] = dataSource;
+        acc.availableDatasources[
+          `${dataSource?.metadata?.namespace}-${dataSource?.metadata?.name}`
+        ] = dataSource;
+        return acc;
+      }
+
+      if (isDataSourceCloning(dataSource)) {
+        acc.cloneInProgressDatasources[
+          `${dataSource?.metadata?.namespace}-${dataSource?.metadata?.name}`
+        ] = dataSource;
+        return acc;
       }
       return acc;
     },
-    {},
+    { availableDatasources: {}, cloneInProgressDatasources: {} },
   );
 
   const availablePVCs = new Set(
@@ -97,5 +110,5 @@ export const useAvailableDataSourcesAndPVCs = (
     ),
   );
 
-  return { availableDatasources, availablePVCs, loaded };
+  return { availableDatasources, cloneInProgressDatasources, availablePVCs, loaded };
 };
