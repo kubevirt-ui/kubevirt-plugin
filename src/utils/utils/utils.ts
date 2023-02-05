@@ -1,4 +1,7 @@
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
+
+import { ItemsToFilterProps } from './types';
 
 export const isEmpty = (obj) =>
   [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
@@ -51,3 +54,20 @@ export const findAllIndexes = <T>(
     (acc, [index, element]) => (predicate(element, index, array) ? [...acc, index] : acc),
     [],
   );
+
+// return the name or 'Other' if the name not included in the array of available items for filtering
+export const getItemNameWithOther = (itemName: string, items: ItemsToFilterProps[]): string => {
+  return !items?.find((item: ItemsToFilterProps) => item.id === itemName) || itemName === 'Other'
+    ? 'Other'
+    : itemName;
+};
+
+export const includeFilter = (
+  compareData: FilterValue,
+  items: ItemsToFilterProps[],
+  itemName: string,
+): boolean => {
+  const compareString = getItemNameWithOther(itemName, items);
+
+  return compareData.selected?.length === 0 || compareData.selected?.includes(compareString);
+};

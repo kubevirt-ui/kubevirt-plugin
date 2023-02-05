@@ -37,6 +37,7 @@
       "VirtualMachinesList": "./views/virtualmachines/list/VirtualMachinesList.tsx",
       "TemplatesCatalog": "./views/catalog/Catalog.tsx",
       "VirtualMachineNavPage": "./views/virtualmachines/details/VirtualMachineNavPage.tsx",
+      "BootableVolumesList": "./views/bootablevolumes/list/BootableVolumesList.tsx",
       "DataSourcesList": "./views/datasources/list/DataSourcesList.tsx",
       "DataSourcePage": "./views/datasources/details/DataSourcePage.tsx",
       "DataImportCronPage": "./views/datasources/dataimportcron/details/DataImportCronPage.tsx",
