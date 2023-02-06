@@ -65,7 +65,9 @@ export const getDayBoundaryIndexes = (
         // Add current day to acc if it hasn't been encountered yet
         acc[pointDay] = { start: idx, end: -1 };
         // Set the end value for the previous day to the previous index
-        acc[getPrevDay(pointDay)]['end'] = idx - 1;
+        if (acc[getPrevDay(pointDay)]) {
+          acc[getPrevDay(pointDay)]['end'] = idx - 1;
+        }
       }
 
       if (idx === chartData.length - 1) {
