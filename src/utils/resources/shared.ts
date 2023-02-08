@@ -1,4 +1,5 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha1Condition, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TemplateModel } from '@kubevirt-utils/models';
@@ -11,6 +12,8 @@ import {
   OwnerReference,
   WatchK8sResults,
 } from '@openshift-console/dynamic-plugin-sdk';
+
+import { isDataSourceReady } from '../../views/datasources/utils';
 
 import { isEmpty } from './../utils/utils';
 import { TEMPLATE_TYPE_LABEL } from './template';
@@ -304,3 +307,11 @@ export const convertResourceArrayToMap = <A extends K8sResourceCommon = K8sResou
     map[name] = resource;
     return map;
   }, {});
+
+/**
+ * function to get all V1beta1DataSource objects with condition type 'Ready'and status to be 'True'
+ * @param {V1beta1DataSource[]} dataSources list of DataSources to be filtered
+ * @returns list of available/ready DataSources
+ */
+export const getAvailableDataSources = (dataSources: V1beta1DataSource[]): V1beta1DataSource[] =>
+  dataSources?.filter((dataSource) => isDataSourceReady(dataSource));

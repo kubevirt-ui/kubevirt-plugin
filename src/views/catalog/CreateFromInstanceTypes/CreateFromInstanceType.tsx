@@ -59,8 +59,12 @@ const CreateFromInstanceType: FC = () => {
                 sectionState={sectionState}
                 headerAction={
                   <AddBootableVolumeButton
-                    preferencesNames={Object.keys(preferencesMap)}
-                    instanceTypesNames={(instanceTypes || []).map(getName)}
+                    preferencesNames={Object.keys(preferencesMap).sort((a, b) =>
+                      a.localeCompare(b),
+                    )}
+                    instanceTypesNames={(instanceTypes || [])
+                      .map(getName)
+                      .sort((a, b) => a.localeCompare(b))}
                     loaded={loaded}
                     loadError={loadError}
                   />

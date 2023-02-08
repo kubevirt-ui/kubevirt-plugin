@@ -25,7 +25,7 @@ const DiskSourceUploadPVC: React.FC<DiskSourceUploadPVCProps> = ({
 
   return (
     <>
-      <FormGroup label={t('Upload Data')} fieldId="disk-source-upload" isRequired>
+      <FormGroup label={t('Upload data')} fieldId="disk-source-upload" isRequired>
         <FileUpload
           id="simple-file"
           data-test-id="disk-source-upload-pvc-file"

@@ -1,5 +1,3 @@
-import { isDataSourceReady } from 'src/views/datasources/utils';
-
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -8,9 +6,6 @@ import { ANNOTATIONS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { BootableVolumeMetadata } from './types';
-
-export const getAvailableDataSources = (dataSources: V1beta1DataSource[]) =>
-  dataSources.filter((dataSource) => isDataSourceReady(dataSource));
 
 export const getDataSourcePreferenceLabelValue = (
   obj: V1beta1DataSource | K8sResourceCommon,
