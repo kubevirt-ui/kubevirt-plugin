@@ -90,7 +90,7 @@ export const vm = {
   },
   createVMFromYAML: () => {
     cy.byButtonText('Create').click();
-    cy.byButtonText('With YAML').click();
+    cy.byButtonText('From YAML').click();
     cy.get(vmView.saveBtn).click();
   },
 };

@@ -54,7 +54,7 @@ const CreateFromInstanceType: FC = () => {
           <Card>
             <List isPlain>
               <SectionListItem
-                headerText={t('Select bootable volume')}
+                headerText={t('Select volume to boot from')}
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_VOLUME}
                 sectionState={sectionState}
                 headerAction={

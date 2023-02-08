@@ -41,7 +41,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
       isLoading={!loaded}
       isDisabled={!loaded || loadError}
     >
-      {buttonTitle || t('Add bootable volume')}
+      {buttonTitle || t('Add volume')}
     </Button>
   );
 };

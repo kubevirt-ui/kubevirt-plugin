@@ -8,6 +8,7 @@ import {
   VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
@@ -83,9 +84,13 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
   >(vms, filters);
 
   const createItems = {
-    catalog: t('From catalog'),
-    volume: t('From bootable volume'),
-    yaml: t('With YAML'),
+    catalog: t('From template'),
+    volume: (
+      <>
+        {t('From volume')} <DeveloperPreviewLabel />
+      </>
+    ),
+    yaml: t('From YAML'),
   };
 
   const onPageChange = ({ page, perPage, startIndex, endIndex }) => {
