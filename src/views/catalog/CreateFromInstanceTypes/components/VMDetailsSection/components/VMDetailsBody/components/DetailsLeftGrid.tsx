@@ -44,7 +44,7 @@ const DetailsLeftGrid: React.FC<DetailsLeftGridProps> = ({
           <TextInput
             isRequired
             type="text"
-            data-test-id="vm-name-input"
+            data-test-id="instancetypes-vm-name-input"
             name="vmname"
             aria-label="instancetypes virtualmachine name"
             value={vmName}

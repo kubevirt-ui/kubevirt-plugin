@@ -94,13 +94,13 @@ test('TemplatesCatalogDrawer', async () => {
 
   // wait for mocked useIsTemplateSupportsQuickCreate to return true and render the quick create form
   await waitFor(() => {
-    expect(getByTestId('vm-name-input')).toBeInTheDocument();
+    expect(getByTestId('template-catalog-vm-name-input')).toBeInTheDocument();
   });
 
   // change vm name
-  userEvent.clear(getByTestId('vm-name-input'));
-  userEvent.type(getByTestId('vm-name-input'), 'new-vm');
-  expect(getByTestId('vm-name-input')).toHaveValue('new-vm');
+  userEvent.clear(getByTestId('template-catalog-vm-name-input'));
+  userEvent.type(getByTestId('template-catalog-vm-name-input'), 'new-vm');
+  expect(getByTestId('template-catalog-vm-name-input')).toHaveValue('new-vm');
 
   // test customize vm btn
   act(() => {

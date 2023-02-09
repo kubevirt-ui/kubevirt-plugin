@@ -112,7 +112,7 @@ export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCr
                         <TextInput
                           isRequired
                           type="text"
-                          data-test-id="vm-name-input"
+                          data-test-id="template-catalog-vm-name-input"
                           name="vmname"
                           aria-label="virtualmachine name"
                           value={vmName}
