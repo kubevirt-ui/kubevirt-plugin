@@ -3,21 +3,7 @@ import { WritableDraft } from 'immer/dist/internal';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
-
-export const ensurePath = <T extends object>(data: T, paths: string | string[]) => {
-  let current = data;
-
-  if (Array.isArray(paths)) {
-    paths.forEach((path) => ensurePath(data, path));
-  } else {
-    const keys = paths.split('.');
-
-    for (const key of keys) {
-      if (!current[key]) current[key] = {};
-      current = current[key];
-    }
-  }
-};
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 export const produceVMNetworks = (
   vm: V1VirtualMachine,

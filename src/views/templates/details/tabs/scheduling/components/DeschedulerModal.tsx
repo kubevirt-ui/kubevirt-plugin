@@ -7,23 +7,9 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Checkbox, Form, FormGroup } from '@patternfly/react-core';
-
-const ensurePath = <T extends object>(data: T, paths: string | string[]) => {
-  let current = data;
-
-  if (Array.isArray(paths)) {
-    paths.forEach((path) => ensurePath(data, path));
-  } else {
-    const keys = paths.split('.');
-
-    for (const key of keys) {
-      if (!current[key]) current[key] = {};
-      current = current[key];
-    }
-  }
-};
 
 type DeschedulerModalProps = {
   template: V1Template;

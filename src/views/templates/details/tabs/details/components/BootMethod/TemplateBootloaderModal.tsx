@@ -1,7 +1,6 @@
 import * as React from 'react';
 import produce from 'immer';
 
-import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
   BootloaderLabel,
@@ -11,6 +10,7 @@ import { getBootloaderFromVM } from '@kubevirt-utils/components/FirmwareBootload
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Form, FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 type TemplateBootloaderModalProps = {

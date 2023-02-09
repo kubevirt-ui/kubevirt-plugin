@@ -1,7 +1,6 @@
 import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
-import { ensurePath } from '@catalog/utils/WizardVMContext';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -15,6 +14,7 @@ import {
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import {

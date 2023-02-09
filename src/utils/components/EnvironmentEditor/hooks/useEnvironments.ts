@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Updater } from 'use-immer';
 
-import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { ensurePath, getRandomChars } from '@kubevirt-utils/utils/utils';
 
 import { EnvironmentKind, EnvironmentVariable } from '../constants';
 import {

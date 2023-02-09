@@ -19,18 +19,3 @@ export const isDeschedulerOn = (template: V1Template): boolean =>
   getTemplateVirtualMachineObject(template)?.spec?.template?.metadata?.annotations?.[
     DESCHEDULER_EVICT_LABEL
   ] === 'true';
-
-export const ensurePath = <T extends object>(data: T, paths: string | string[]) => {
-  let current = data;
-
-  if (Array.isArray(paths)) {
-    paths.forEach((path) => ensurePath(data, path));
-  } else {
-    const keys = paths.split('.');
-
-    for (const key of keys) {
-      if (!current[key]) current[key] = {};
-      current = current[key];
-    }
-  }
-};

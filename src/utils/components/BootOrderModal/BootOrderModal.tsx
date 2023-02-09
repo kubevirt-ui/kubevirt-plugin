@@ -1,7 +1,6 @@
 import * as React from 'react';
 import produce from 'immer';
 
-import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
@@ -10,6 +9,7 @@ import {
   DeviceType,
   transformDevices,
 } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { checkBootOrderChanged } from '../PendingChanges/utils/helpers';

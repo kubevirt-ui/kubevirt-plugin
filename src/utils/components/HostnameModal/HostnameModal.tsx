@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import produce from 'immer';
 
-import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';

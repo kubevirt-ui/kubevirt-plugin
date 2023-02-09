@@ -1,12 +1,5 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-
-import { ensurePath } from '../WizardVMContext/utils/vm-produce';
-
-jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
-  return {
-    k8sCreate: jest.fn().mockResolvedValue({}),
-  };
-});
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 describe('Test ensurePath', () => {
   describe('Only one path', () => {

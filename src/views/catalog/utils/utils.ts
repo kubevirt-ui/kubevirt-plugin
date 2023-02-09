@@ -3,6 +3,7 @@ import produce from 'immer';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   getGroupVersionKindForResource,
   k8sCreate,
@@ -10,8 +11,6 @@ import {
   K8sModel,
   K8sResourceCommon,
 } from '@openshift-console/dynamic-plugin-sdk';
-
-import { ensurePath } from './WizardVMContext';
 
 /**
  * create multiple resources from a list of dynamic objects

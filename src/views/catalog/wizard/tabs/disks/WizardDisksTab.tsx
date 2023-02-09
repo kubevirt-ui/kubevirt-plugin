@@ -1,12 +1,12 @@
 import * as React from 'react';
 
-import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { WizardTab } from '@catalog/wizard/tabs';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   ListPageCreateButton,

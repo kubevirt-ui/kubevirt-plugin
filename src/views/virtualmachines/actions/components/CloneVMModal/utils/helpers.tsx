@@ -2,13 +2,13 @@ import * as React from 'react';
 import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
-import { ensurePath } from '@catalog/utils/WizardVMContext';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getDisks, getInterfaces, getVolumes } from '@kubevirt-utils/resources/vm';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 export const getRandomChars = (len: number): string => {
   return Math.random()

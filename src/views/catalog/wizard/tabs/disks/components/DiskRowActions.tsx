@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { ensurePath, produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
+import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
@@ -8,7 +8,7 @@ import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
+import { ensurePath, getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ButtonVariant,

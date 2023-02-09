@@ -1,12 +1,12 @@
 import * as React from 'react';
 import produce from 'immer';
 import { ANNOTATIONS } from 'src/views/templates/utils/constants';
-import { ensurePath } from 'src/views/templates/utils/utils';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
