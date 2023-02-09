@@ -29,6 +29,7 @@ const VirtualMachinePendingChangesAlert: React.FC<VirtualMachinePendingChangesAl
     pendingChangesEnvTab,
     pendingChangesNICsTab,
     pendingChangesScriptsTab,
+    pendingChangesDisksTab,
   } = getPendingChangesByTab(pendingChanges);
 
   const hasPendingChanges = pendingChanges?.some((change) => change?.hasPendingChange);
@@ -55,6 +56,7 @@ const VirtualMachinePendingChangesAlert: React.FC<VirtualMachinePendingChangesAl
         <PendingChangesBreadcrumb pendingChanges={pendingChangesEnvTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesNICsTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesScriptsTab} />
+        <PendingChangesBreadcrumb pendingChanges={pendingChangesDisksTab} />
       </List>
     </PendingChangesAlert>
   );
