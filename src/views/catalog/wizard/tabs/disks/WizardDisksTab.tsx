@@ -5,6 +5,7 @@ import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
+import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
@@ -73,13 +74,20 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsD
             </FlexItem>
           </Flex>
           <DiskListTitle />
-          <ListPageFilter
-            data={data}
-            loaded={disksLoaded}
-            rowFilters={filters}
-            onFilterChange={onFilterChange}
-            hideLabelFilter
-          />
+          <Flex>
+            <FlexItem>
+              <ListPageFilter
+                data={data}
+                loaded={disksLoaded}
+                rowFilters={filters}
+                onFilterChange={onFilterChange}
+                hideLabelFilter
+              />
+            </FlexItem>
+            <FlexItem>
+              <WindowsDrivers vm={vm} updateVM={updateVM} />
+            </FlexItem>
+          </Flex>
           <VirtualizedTable
             data={filteredData}
             unfilteredData={data}

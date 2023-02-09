@@ -6,6 +6,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
+import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import {
@@ -75,13 +76,31 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
           </FlexItem>
         </Flex>
         <DiskListTitle />
-        <ListPageFilter
-          data={data}
-          loaded={loaded}
-          rowFilters={filters}
-          onFilterChange={onFilterChange}
-          hideLabelFilter
-        />
+        <Flex>
+          <FlexItem>
+            <ListPageFilter
+              data={data}
+              loaded={loaded}
+              rowFilters={filters}
+              onFilterChange={onFilterChange}
+              hideLabelFilter
+            />
+          </FlexItem>
+
+          <FlexItem>
+            <WindowsDrivers
+              vm={vm}
+              updateVM={(newVM) =>
+                k8sUpdate({
+                  model: VirtualMachineModel,
+                  data: newVM,
+                  ns: newVM?.metadata?.namespace,
+                  name: newVM?.metadata?.name,
+                })
+              }
+            />
+          </FlexItem>
+        </Flex>
         <VirtualizedTable
           data={filteredData}
           unfilteredData={data}
