@@ -1,6 +1,5 @@
 import produce from 'immer';
 
-import { ensurePath } from '@catalog/utils/WizardVMContext';
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import {
@@ -8,6 +7,7 @@ import {
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 export const CRON_DOC_URL = 'https://www.redhat.com/sysadmin/automate-linux-tasks-cron';

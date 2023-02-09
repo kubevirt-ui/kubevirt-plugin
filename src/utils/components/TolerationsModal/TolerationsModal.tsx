@@ -1,7 +1,6 @@
 import * as React from 'react';
 import produce from 'immer';
 
-import { ensurePath } from '@catalog/utils/WizardVMContext';
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import {
@@ -15,7 +14,7 @@ import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hook
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTolerations } from '@kubevirt-utils/resources/vm';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
 

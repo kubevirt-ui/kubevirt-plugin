@@ -18,8 +18,9 @@ import {
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 
-import { ensurePath, useWizardVMContext } from '../../../utils/WizardVMContext';
+import { useWizardVMContext } from '../../../utils/WizardVMContext';
 import { INSTALLATION_CDROM_NAME } from '../../constants';
 import { getUploadDataVolume, processTemplate } from '../../utils';
 
