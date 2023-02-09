@@ -45,7 +45,7 @@ const Network = ({ hyperConverge }) => {
       <Title headingLevel="h6" size="md" className="live-migration-tab__network--title">
         {t('Live migration network')}
       </Title>
-      {nadsLoading ? (
+      {!isEmpty(nads) && nadsLoading ? (
         <Select
           variant={SelectVariant.single}
           onSelect={(_event: React.ChangeEvent<Element>, selectedValue: string) => {
@@ -64,18 +64,14 @@ const Network = ({ hyperConverge }) => {
           width={360}
         >
           <SelectOption key="primary" value={t('Primary live migration network')} />
-          {!isEmpty(nads) ? (
-            <SelectGroup label={t('Secondary NAD networks')} key="nad">
-              {nads?.map((nad) => (
-                <SelectOption key={nad?.metadata?.name} value={nad?.metadata?.name} />
-              ))}
-            </SelectGroup>
-          ) : (
-            <></>
-          )}
+          <SelectGroup label={t('Secondary NAD networks')} key="nad">
+            {nads?.map((nad) => (
+              <SelectOption key={nad?.metadata?.name} value={nad?.metadata?.name} />
+            ))}
+          </SelectGroup>
         </Select>
       ) : (
-        <Skeleton width={'360px'} />
+        !nadsError && <Skeleton width={'360px'} />
       )}
       {nadsError && (
         <Alert
@@ -84,7 +80,7 @@ const Network = ({ hyperConverge }) => {
           title={t('Error')}
           className="live-migration-tab--error"
         >
-          {nadsError}
+          {nadsError?.message}
         </Alert>
       )}
     </>
