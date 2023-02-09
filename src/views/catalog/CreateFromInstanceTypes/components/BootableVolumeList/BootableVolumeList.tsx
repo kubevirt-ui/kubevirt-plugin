@@ -4,6 +4,7 @@ import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getAvailableDataSources } from '@kubevirt-utils/resources/shared';
 import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/react-core';
 import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
@@ -42,7 +43,10 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const { bootableVolumes, loaded } = useBootableVolumes();
   const columns = useBootVolumeColumns();
   const filters = useBootVolumeFilters(`osName${!displayShowAllButton && '-modal'}`);
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(bootableVolumes, filters);
+  const [unfilteredData, data, onFilterChange] = useListPageFilter(
+    getAvailableDataSources(bootableVolumes),
+    filters,
+  );
 
   const [pagination, setPagination] = useState(
     displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal,

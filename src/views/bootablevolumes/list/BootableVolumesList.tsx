@@ -5,7 +5,11 @@ import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/hoo
 import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DataSourceModelGroupVersionKind, DataSourceModelRef } from '@kubevirt-utils/models';
-import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
+import {
+  convertResourceArrayToMap,
+  getAvailableDataSources,
+  getName,
+} from '@kubevirt-utils/resources/shared';
 import {
   K8sResourceCommon,
   ListPageBody,
@@ -16,8 +20,6 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Pagination, Stack, StackItem } from '@patternfly/react-core';
 import { paginationDefaultValues, paginationInitialState } from '@virtualmachines/utils';
-
-import { getAvailableDataSources } from '../utils/utils';
 
 import BootableVolumesRow from './components/BootableVolumesRow';
 import useBootableVolumes from './hooks/useBootableVolumes';

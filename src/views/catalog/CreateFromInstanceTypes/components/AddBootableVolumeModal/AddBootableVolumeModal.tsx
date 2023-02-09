@@ -181,13 +181,13 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           />
         </FormGroup>
         <Title headingLevel="h4">{t('Labels for the bootable volume')}</Title>
-        <FormGroup label={t('Default Preference')} isRequired>
+        <FormGroup label={t('Default preference')} isRequired>
           <FilterSelect
             selected={labels?.[DEFAULT_PREFERENCE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
             options={preferencesNames}
             groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
-            optionLabelText={t('Preference')}
+            optionLabelText={t('preference')}
           />
         </FormGroup>
         <FormGroup label={t('Default Instancetype')}>

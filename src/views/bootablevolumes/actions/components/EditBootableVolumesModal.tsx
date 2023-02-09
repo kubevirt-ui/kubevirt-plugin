@@ -21,7 +21,7 @@ import { Form, FormGroup, TextArea } from '@patternfly/react-core';
 import { BootableVolumeMetadata } from '../../utils/types';
 import { changeBootableVolumeMetadata } from '../../utils/utils';
 
-type EditBootableVolumesModallProps = {
+type EditBootableVolumesModalProps = {
   dataSource: V1beta1DataSource;
   isOpen: boolean;
   onClose: () => void;
@@ -29,7 +29,7 @@ type EditBootableVolumesModallProps = {
   instanceTypesNames: string[];
 };
 
-const EditBootableVolumesModal: FC<EditBootableVolumesModallProps> = ({
+const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
   dataSource,
   isOpen,
   onClose,
