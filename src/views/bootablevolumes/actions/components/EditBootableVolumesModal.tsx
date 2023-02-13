@@ -16,10 +16,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, TextArea } from '@patternfly/react-core';
+import { Form, FormGroup, Grid, GridItem, TextArea } from '@patternfly/react-core';
 
 import { BootableVolumeMetadata } from '../../utils/types';
-import { changeBootableVolumeMetadata } from '../../utils/utils';
+import { changeBootableVolumeMetadata, getInstanceTypesToSizesMap } from '../../utils/utils';
 
 type EditBootableVolumesModalProps = {
   dataSource: V1beta1DataSource;
@@ -41,19 +41,60 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
     () => Object.keys(convertResourceArrayToMap(preferences)).sort((a, b) => a.localeCompare(b)),
     [preferences],
   );
-  const initialMetadata: BootableVolumeMetadata = useMemo(() => {
+
+  const instanceTypesToSizesMap = useMemo(
+    () => getInstanceTypesToSizesMap(instanceTypesNames),
+    [instanceTypesNames],
+  );
+
+  const initialParams = useMemo(() => {
+    const instanceTypeLabel =
+      dataSource?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL]?.split('.');
+
     return {
-      labels: dataSource?.metadata?.labels,
-      annotations: dataSource?.metadata?.annotations,
+      preference: dataSource?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
+      instanceType: instanceTypeLabel?.[0],
+      size: instanceTypeLabel?.[1],
+      description: dataSource?.metadata?.annotations?.[ANNOTATIONS.description],
     };
   }, [dataSource]);
-  const [metadata, setMetadata] = useState<BootableVolumeMetadata>(initialMetadata);
 
-  const setBootableVolumeMetadata = (key: string, fieldKey: string) => (value: string) =>
-    setMetadata((prevState) => ({
-      ...prevState,
-      [key]: { ...prevState[key], [fieldKey]: value },
-    }));
+  const [preference, setPreference] = useState<string>(initialParams.preference);
+  const [instanceType, setInstanceType] = useState<string>(initialParams.instanceType);
+  const [size, setSize] = useState<string>(initialParams.size);
+  const [description, setDescription] = useState<string>(initialParams.description);
+
+  const sizeOptions = useMemo(
+    () => instanceTypesToSizesMap[instanceType] || [],
+    [instanceType, instanceTypesToSizesMap],
+  );
+
+  const onInstanceTypeChange = (instanceTypeName: string) => {
+    setInstanceType(instanceTypeName);
+    setSize(instanceTypesToSizesMap[instanceTypeName][0]);
+  };
+
+  const onChangeVolumeParams = () => {
+    const preferenceLabel = preference && { [DEFAULT_PREFERENCE_LABEL]: preference };
+    const instanceLabel = instanceType && {
+      [DEFAULT_INSTANCETYPE_LABEL]: `${instanceType}.${size}`,
+    };
+    const descriptionAnnotation = description && { [ANNOTATIONS.description]: description };
+
+    const metadata: BootableVolumeMetadata = {
+      labels: {
+        ...dataSource?.metadata?.labels,
+        ...preferenceLabel,
+        ...instanceLabel,
+      },
+      annotations: {
+        ...dataSource?.metadata?.annotations,
+        ...descriptionAnnotation,
+      },
+    };
+
+    return changeBootableVolumeMetadata(dataSource, metadata);
+  };
 
   return (
     <TabModal<K8sResourceCommon>
@@ -61,31 +102,46 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       headerText={t('Edit volume parameters')}
-      onSubmit={changeBootableVolumeMetadata(dataSource, initialMetadata, metadata)}
+      onSubmit={onChangeVolumeParams()}
     >
       <Form>
         <FormGroup label={t('Preference')} isRequired>
           <FilterSelect
-            selected={metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]}
-            setSelected={setBootableVolumeMetadata('labels', DEFAULT_PREFERENCE_LABEL)}
+            selected={preference}
+            setSelected={setPreference}
             options={preferencesNames}
             groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
             optionLabelText={t('preference')}
           />
         </FormGroup>
-        <FormGroup label={t('Default InstanceType')}>
-          <FilterSelect
-            selected={metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL]}
-            setSelected={setBootableVolumeMetadata('labels', DEFAULT_INSTANCETYPE_LABEL)}
-            options={instanceTypesNames}
-            groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
-            optionLabelText={t('InstanceType')}
-          />
-        </FormGroup>
+        <Grid hasGutter>
+          <GridItem span={6}>
+            <FormGroup label={t('Default InstanceType')}>
+              <FilterSelect
+                selected={instanceType}
+                setSelected={onInstanceTypeChange}
+                options={Object.keys(instanceTypesToSizesMap) || []}
+                groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
+                optionLabelText={t('InstanceType')}
+              />
+            </FormGroup>
+          </GridItem>
+          <GridItem span={6}>
+            <FormGroup label={t('Size')}>
+              <FilterSelect
+                selected={size}
+                setSelected={setSize}
+                options={sizeOptions}
+                groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
+                optionLabelText={t('size')}
+              />
+            </FormGroup>
+          </GridItem>
+        </Grid>
         <FormGroup label={t('Description')}>
           <TextArea
-            value={metadata?.annotations?.description}
-            onChange={setBootableVolumeMetadata('annotations', ANNOTATIONS?.description)}
+            value={description}
+            onChange={setDescription}
             resizeOrientation="vertical"
             aria-label={t('description text area')}
           />
