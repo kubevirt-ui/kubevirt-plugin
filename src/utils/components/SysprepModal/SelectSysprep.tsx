@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useParams } from 'react-router-dom';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
@@ -23,14 +22,15 @@ type SelectSysprepProps = {
   selectedSysprepName: string;
   onSelectSysprep: (secretName: string) => void;
   id?: string;
+  namespace: string;
 };
 
 const SelectSysprep: React.FC<SelectSysprepProps> = ({
   selectedSysprepName,
   onSelectSysprep,
   id,
+  namespace,
 }) => {
-  const { ns: namespace } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
   const [isSecretSelectOpen, setSecretSelectOpen] = React.useState(false);
 
