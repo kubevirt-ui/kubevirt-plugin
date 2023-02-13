@@ -139,7 +139,7 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({
                 onClick={handleSubmit}
                 variant={ButtonVariant.primary}
               >
-                {t('Quick create VirtualMachine')}
+                {t('Create VirtualMachine')}
               </Button>
             </SplitItem>
             <SplitItem>

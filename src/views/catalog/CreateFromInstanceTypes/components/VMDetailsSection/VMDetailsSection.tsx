@@ -36,7 +36,7 @@ const VMDetailsSection: React.FC<VMDetailsSectionProps> = ({
   return (
     <div className="instancetypes-vm-details-section">
       <ExpandableSection
-        toggleText={t('Advanced')}
+        toggleText={t('Advanced settings')}
         data-test-id="expandable-advanced-section"
         onToggle={() => setAdvancedSectionOpen(!advancedSectionOpen)}
         isExpanded={advancedSectionOpen}

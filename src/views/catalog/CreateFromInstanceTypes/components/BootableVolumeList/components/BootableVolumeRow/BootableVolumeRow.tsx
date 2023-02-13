@@ -35,7 +35,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
     >
       <Td id="volume-name">
         <img src={getOSIcon(preference)} alt="os-icon" className="vm-catalog-row-icon" />
-        <Text component={TextVariants.a}>{bootVolumeName}</Text>
+        <Text component={TextVariants.small}>{bootVolumeName}</Text>
       </Td>
       <Td id="operating-system">{preference?.metadata?.annotations?.[ANNOTATIONS.displayName]}</Td>
       <Td id={ANNOTATIONS.description}>

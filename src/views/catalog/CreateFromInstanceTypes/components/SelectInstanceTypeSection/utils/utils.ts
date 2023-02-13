@@ -1,6 +1,7 @@
 import { TFunction } from 'i18next';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { CubesIcon, PuzzlePieceIcon, ServerGroupIcon, StarIcon } from '@patternfly/react-icons';
 
 import {
@@ -199,6 +200,6 @@ export const getCPUMemoryString = (resources: InstanceTypeSizeDetails, tFunc: TF
   resources
     ? tFunc('{{count}} Cores | {{memory}} Memory', {
         count: resources?.cores,
-        memory: resources?.memory,
+        memory: readableSizeUnit(resources?.memory),
       })
     : null;

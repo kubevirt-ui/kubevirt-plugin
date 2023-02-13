@@ -32,7 +32,7 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSave as () => Promise<void>}
-      headerText={t('Bootable volumes')}
+      headerText={t('Volumes to boot from')}
       modalVariant={ModalVariant.large}
     >
       <BootableVolumeList
