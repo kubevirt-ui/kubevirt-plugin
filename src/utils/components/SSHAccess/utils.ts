@@ -92,5 +92,5 @@ export const createSSHService = (
   });
 };
 
-export const getConsoleVirtctlCommand = (vmName: string, vmNamespace?: string) =>
-  `virtctl ${vmNamespace ? `-n ${vmNamespace}` : ''} ssh ${vmName}`;
+export const getConsoleVirtctlCommand = (vmName: string, vmNamespace?: string, userName?: string) =>
+  `virtctl ${vmNamespace ? `-n ${vmNamespace}` : ''} ssh ${userName}@${vmName}`;

@@ -15,9 +15,14 @@ import { getConsoleVirtctlCommand } from '../utils';
 type ConsoleOverVirtctlProps = {
   vmName: string;
   vmNamespace: string;
+  userName?: string;
 };
 
-const ConsoleOverVirtctl: React.FC<ConsoleOverVirtctlProps> = ({ vmName, vmNamespace }) => {
+const ConsoleOverVirtctl: React.FC<ConsoleOverVirtctlProps> = ({
+  vmName,
+  vmNamespace,
+  userName,
+}) => {
   return (
     <DescriptionListGroup>
       <DescriptionListTerm className="pf-u-font-size-xs">
@@ -40,7 +45,7 @@ const ConsoleOverVirtctl: React.FC<ConsoleOverVirtctlProps> = ({ vmName, vmNames
           clickTip={t('Copied')}
           hoverTip={t('Copy to clipboard')}
         >
-          {getConsoleVirtctlCommand(vmName, vmNamespace)}
+          {getConsoleVirtctlCommand(vmName, vmNamespace, userName)}
         </ClipboardCopy>
       </DescriptionListDescription>
     </DescriptionListGroup>
