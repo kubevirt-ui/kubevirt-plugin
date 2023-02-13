@@ -1,9 +1,8 @@
-import { produceVMDisks } from '@catalog/utils/WizardVMContext/utils/vm-produce';
-import { ConfigMapModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import {
-  getTemplateVirtualMachineObject,
-  replaceTemplateVM,
-} from '@kubevirt-utils/resources/template';
+import produce from 'immer';
+
+import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -39,19 +38,29 @@ const getVirtioWinConfigMap = async (): Promise<any> => {
   throw lastException;
 };
 
-export const mountWinDriversToTemplate = async (template: V1Template): Promise<V1Template> => {
-  let driversImage = DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE;
-
+export const getDriversImage = async (): Promise<string> => {
+  const driversImage = DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE;
   try {
     const configMap = await getVirtioWinConfigMap();
-    if (configMap?.data?.[VIRTIO_WIN_IMAGE]) driversImage = configMap.data[VIRTIO_WIN_IMAGE];
+    if (configMap?.data?.[VIRTIO_WIN_IMAGE]) return configMap.data[VIRTIO_WIN_IMAGE];
   } catch (error) {
     console.error(error);
   }
 
-  const virtualMachine = getTemplateVirtualMachineObject(template);
+  return driversImage;
+};
 
-  const newVM = produceVMDisks(virtualMachine, (draftVM) => {
+export const mountWinDriversToVM = async (vm: V1VirtualMachine): Promise<V1VirtualMachine> => {
+  const driversImage = await getDriversImage();
+
+  return produce(vm, (draftVM) => {
+    ensurePath(draftVM, ['spec.template.spec.domain.devices']);
+
+    if (!draftVM.spec.template.spec.domain.devices.disks)
+      draftVM.spec.template.spec.domain.devices.disks = [];
+
+    if (!draftVM.spec.template.spec.volumes) draftVM.spec.template.spec.volumes = [];
+
     draftVM.spec.template.spec.domain.devices.disks.push({
       name: WINDOWS_DRIVERS_DISK,
       cdrom: {
@@ -66,6 +75,4 @@ export const mountWinDriversToTemplate = async (template: V1Template): Promise<V
       },
     });
   });
-
-  return replaceTemplateVM(template, newVM);
 };

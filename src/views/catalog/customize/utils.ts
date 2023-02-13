@@ -12,11 +12,11 @@ import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-a
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { mountWinDriversToTemplate } from '@kubevirt-utils/resources/template/utils/drivers';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { NAME_INPUT_FIELD } from './constants';
-import { mountWinDriversToTemplate } from './drivers';
 
 export const overrideVirtualMachineDataVolumeSpec = (
   virtualMachine: V1VirtualMachine,
