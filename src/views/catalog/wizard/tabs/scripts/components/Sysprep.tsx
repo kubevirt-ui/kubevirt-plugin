@@ -96,6 +96,7 @@ const Sysprep: React.FC = () => {
         createModal((modalProps) => (
           <SysprepModal
             {...modalProps}
+            namespace={vm?.metadata?.namespace}
             unattend={unattend}
             autoUnattend={autoUnattend}
             onSysprepCreation={onSysprepCreation}
