@@ -64,7 +64,10 @@
       "pvcCloneStatus": "src/views/cdi-upload-provider/upload-pvc-form/statuses/ClonePVCStatus.tsx",
       "pvcDelete": "src/views/cdi-upload-provider/PVCDeleteAlertExtension.tsx",
       "pvcUploadUtils": "src/views/cdi-upload-provider/utils/utils.tsx",
-      "UploadPVC": "src/views/cdi-upload-provider/upload-pvc-form/UploadPVC.tsx"
+      "UploadPVC": "src/views/cdi-upload-provider/upload-pvc-form/UploadPVC.tsx",
+      "dashboardInventory": "src/views/dashboard-extensions/Inventory.tsx",
+      "dashboardActivity": "src/views/dashboard-extensions/Activity.tsx",
+      "dashboardActivityUtils": "src/views/dashboard-extensions/utils.ts"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
