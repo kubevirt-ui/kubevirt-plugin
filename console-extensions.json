@@ -354,10 +354,7 @@
   {
     "type": "console.page/route",
     "properties": {
-      "path": [
-        "/k8s/ns/:ns/bootablevolumes",
-        "/k8s/all-namespaces/bootablevolumes"
-      ],
+      "path": ["/k8s/ns/:ns/bootablevolumes", "/k8s/all-namespaces/bootablevolumes"],
       "component": {
         "$codeRef": "BootableVolumesList"
       }
@@ -561,6 +558,50 @@
     "properties": {
       "provider": { "$codeRef": "contextProvider.CDIUploadProvider" },
       "useValueHook": { "$codeRef": "useCDIUpload" }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
+    "type": "console.dashboards/overview/inventory/item",
+    "properties": {
+      "mapper": { "$codeRef": "dashboardInventory.getVMStatusGroups" },
+      "model": { "$codeRef": "dashboardActivityUtils.VirtualMachineModel" }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
+    "type": "console.dashboards/project/overview/item",
+    "properties": {
+      "mapper": { "$codeRef": "dashboardInventory.getVMStatusGroups" },
+      "model": { "$codeRef": "dashboardActivityUtils.VirtualMachineModel" }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
+    "type": "console.dashboards/overview/inventory/item/group",
+    "properties": {
+      "id": "vm-stopped",
+      "icon": { "$codeRef": "dashboardInventory.VMOffGroupIcon" }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
+    "type": "console.dashboards/overview/activity/resource",
+    "properties": {
+      "component": { "$codeRef": "dashboardActivity.DiskImportActivity" },
+      "getTimestamp": { "$codeRef": "dashboardActivityUtils.getTimestamp" },
+      "isActivity": { "$codeRef": "dashboardActivityUtils.isDVActivity" },
+      "k8sResource": {
+        "$codeRef": "dashboardActivityUtils.k8sDVResource"
+      }
     },
     "flags": {
       "required": ["KUBEVIRT"]
