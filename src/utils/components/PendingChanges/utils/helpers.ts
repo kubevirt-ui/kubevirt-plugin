@@ -1,5 +1,12 @@
+import differenceWith from 'lodash/differenceWith';
+import isEqual from 'lodash/isEqual';
+
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+  V1Volume,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   convertYAMLToNetworkDataObject,
@@ -18,6 +25,7 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
+import { getVMIVolumes } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { VirtualMachineDetailsTabLabel } from './constants';
@@ -159,6 +167,24 @@ export const getChangedHostDevices = (
       []),
   ];
   return changedHostDevices;
+};
+
+export const getChangedVolumesHotplug = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): V1Volume[] => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return [];
+  }
+
+  const differentVolumes: V1Volume[] = differenceWith(getVMIVolumes(vmi), getVolumes(vm), isEqual);
+
+  if (!isEmpty(differentVolumes)) {
+    return differentVolumes.filter(
+      (volume: V1Volume) =>
+        volume?.dataVolume?.hotpluggable || volume?.persistentVolumeClaim?.hotpluggable,
+    );
+  }
 };
 
 export const getChangedDedicatedResources = (
@@ -331,6 +357,10 @@ export const getPendingChangesByTab = (pendingChanges: PendingChange[]) => {
     (change) =>
       change?.tabLabel === VirtualMachineDetailsTabLabel.Scripts && change?.hasPendingChange,
   );
+  const pendingChangesDisksTab = pendingChanges?.filter(
+    (change) =>
+      change?.tabLabel === VirtualMachineDetailsTabLabel.Disks && change?.hasPendingChange,
+  );
 
   return {
     pendingChangesDetailsTab,
@@ -338,5 +368,6 @@ export const getPendingChangesByTab = (pendingChanges: PendingChange[]) => {
     pendingChangesEnvTab,
     pendingChangesNICsTab,
     pendingChangesScriptsTab,
+    pendingChangesDisksTab,
   };
 };

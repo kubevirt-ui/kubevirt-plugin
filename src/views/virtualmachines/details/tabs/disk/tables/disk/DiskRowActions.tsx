@@ -12,6 +12,7 @@ import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternf
 
 import { printableVMStatus } from '../../../../../utils';
 import DeleteDiskModal from '../../modal/DeleteDiskModal';
+import MakePersistentModal from '../../modal/MakePersistentModal';
 
 import { getEditDiskStates } from './utils/getEditDiskStates';
 import { isHotplugVolume } from './utils/helpers';
@@ -44,6 +45,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
 
   const editBtnText = t('Edit');
   const deleteBtnText = t('Detach');
+  const removeHotplugBtnText = t('Make Persistent');
 
   const disabledEditText = React.useMemo(() => {
     if (isVMRunning) {
@@ -80,6 +82,10 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
     createModal(({ isOpen, onClose }) => (
       <DeleteDiskModal isOpen={isOpen} onClose={onClose} vm={vm} volume={volume} />
     ));
+  const makePersistent = () =>
+    createModal(({ isOpen, onClose }) => (
+      <MakePersistentModal isOpen={isOpen} onClose={onClose} vm={vm} volume={volume} />
+    ));
 
   const onModalOpen = (createModalCallback: () => void) => {
     createModalCallback();
@@ -109,6 +115,17 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
     </DropdownItem>,
   ];
 
+  if (isHotplug) {
+    items.push(
+      <DropdownItem
+        onClick={() => onModalOpen(makePersistent)}
+        key="make-persistent"
+        description={t('Will make disk persistent on next reboot')}
+      >
+        {removeHotplugBtnText}
+      </DropdownItem>,
+    );
+  }
   return (
     <>
       <Dropdown

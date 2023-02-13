@@ -46,6 +46,7 @@ import {
   getChangedNodeSelector,
   getChangedStartStrategy,
   getChangedTolerations,
+  getChangedVolumesHotplug,
   getTabURL,
 } from '../utils/helpers';
 import { PendingChange } from '../utils/types';
@@ -92,6 +93,8 @@ export const usePendingChanges = (
   const modifiedNics = getChangedNics(vm, vmi);
   const modifiedGPUDevices = getChangedGPUDevices(vm, vmi);
   const modifiedHostDevices = getChangedHostDevices(vm, vmi);
+
+  const modifiedVolumsHotplug = getChangedVolumesHotplug(vm, vmi);
 
   const onSubmit = (updatedVM: V1VirtualMachine) =>
     k8sUpdate({
@@ -369,6 +372,14 @@ export const usePendingChanges = (
         createModal(({ isOpen, onClose }) => (
           <VMAuthorizedSSHKeyModal vm={vm} isOpen={isOpen} onClose={onClose} vmi={vmi} />
         ));
+      },
+    },
+    {
+      hasPendingChange: !isEmpty(modifiedVolumsHotplug),
+      tabLabel: VirtualMachineDetailsTabLabel.Disks,
+      label: t('Make Persistent disk'),
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Disks));
       },
     },
   ];
