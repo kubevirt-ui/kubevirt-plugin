@@ -27,12 +27,16 @@ const SelectSecret: React.FC<SelectSecretProps> = ({
   const { t } = useKubevirtTranslation();
   const [isSecretSelectOpen, setSecretSelectOpen] = React.useState(false);
 
-  const [secrets, secretsLoaded, secretsError] = useK8sWatchResource<IoK8sApiCoreV1Secret[]>({
-    groupVersionKind: modelToGroupVersionKind(SecretModel),
-    namespaced: true,
-    isList: true,
-    namespace,
-  });
+  const [secrets, secretsLoaded, secretsError] = useK8sWatchResource<IoK8sApiCoreV1Secret[]>(
+    namespace
+      ? {
+          groupVersionKind: modelToGroupVersionKind(SecretModel),
+          namespaced: true,
+          isList: true,
+          namespace,
+        }
+      : null,
+  );
 
   const sshKeySecrets = secrets?.filter((secret) => validateSSHPublicKey(decodeSecret(secret)));
 

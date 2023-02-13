@@ -71,6 +71,7 @@ const SSHKey: React.FC = () => {
         createModal((modalProps) => (
           <AuthorizedSSHKeyModal
             {...modalProps}
+            namespace={vm?.metadata?.namespace}
             sshKey={secretKey}
             vmSecretName={!sshSecretObject && vmAttachedSecretName}
             onSubmit={onSSHChange}
