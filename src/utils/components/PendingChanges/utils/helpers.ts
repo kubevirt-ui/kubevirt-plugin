@@ -332,6 +332,19 @@ export const getChangedAuthorizedSSHKey = (
   return !isEqualObject(vmAccessCredentials, vmiAccessCredentials);
 };
 
+export const getChangedHeadlessMode = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  const vmHeadless = !!vm?.spec?.template?.spec?.domain?.devices?.autoattachGraphicsDevice;
+  const vmiHeadless = !!vmi?.spec?.domain?.devices?.autoattachGraphicsDevice;
+
+  return vmHeadless !== vmiHeadless;
+};
+
 export const getTabURL = (vm: V1VirtualMachine, tab: string) =>
   `/k8s/ns/${vm?.metadata?.namespace}/${VirtualMachineModelRef}/${vm?.metadata?.name}/${tab}`;
 

@@ -13,6 +13,7 @@ import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourc
 import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
+import HardwareDevicesHeadlessModeModal from '@kubevirt-utils/components/HardwareDevices/modal/HardwareDevicesHeadlessModeModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/modal/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
@@ -40,6 +41,7 @@ import {
   getChangedEnvDisks,
   getChangedEvictionStrategy,
   getChangedGPUDevices,
+  getChangedHeadlessMode,
   getChangedHostDevices,
   getChangedHostname,
   getChangedNics,
@@ -95,6 +97,7 @@ export const usePendingChanges = (
   const modifiedHostDevices = getChangedHostDevices(vm, vmi);
 
   const modifiedVolumsHotplug = getChangedVolumesHotplug(vm, vmi);
+  const modifiedHedlessMode = getChangedHeadlessMode(vm, vmi);
 
   const onSubmit = (updatedVM: V1VirtualMachine) =>
     k8sUpdate({
@@ -380,6 +383,23 @@ export const usePendingChanges = (
       label: t('Make Persistent disk'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Disks));
+      },
+    },
+    {
+      hasPendingChange: modifiedHedlessMode,
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
+      label: t('Headless mode'),
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        createModal(({ isOpen, onClose }) => (
+          <HardwareDevicesHeadlessModeModal
+            vm={vm}
+            isOpen={isOpen}
+            onClose={onClose}
+            vmi={vmi}
+            onSubmit={onSubmit}
+          />
+        ));
       },
     },
   ];
