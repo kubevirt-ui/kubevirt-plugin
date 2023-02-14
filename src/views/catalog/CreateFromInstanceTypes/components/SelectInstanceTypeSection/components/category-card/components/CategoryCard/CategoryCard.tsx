@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { AngleDownIcon } from '@patternfly/react-icons';
 
 import { CategoryCustomData } from '../../../../utils/types';
@@ -48,7 +49,9 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
       {displaySelection && (
         <div className="category-card__size-label">
           <div>{`${selectedInstanceTypeDetails?.label}:`}</div>
-          <div>{`${selectedInstanceTypeDetails?.cores} Cores, ${selectedInstanceTypeDetails?.memory} Memory`}</div>
+          <div>{`${selectedInstanceTypeDetails?.cores} Cores, ${readableSizeUnit(
+            selectedInstanceTypeDetails?.memory,
+          )} Memory`}</div>
         </div>
       )}
     </div>

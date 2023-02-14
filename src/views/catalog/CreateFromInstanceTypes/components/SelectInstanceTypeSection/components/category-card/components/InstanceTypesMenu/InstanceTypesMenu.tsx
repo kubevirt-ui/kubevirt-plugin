@@ -1,8 +1,9 @@
 import React from 'react';
 
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { Menu, MenuContent, MenuItem, MenuList } from '@patternfly/react-core';
 
-import { CategoryCustomData } from '../../../../utils/types';
+import { CategoryCustomData, InstanceTypeSize } from '../../../../utils/types';
 import { categoryDetailsMap } from '../../../../utils/utils';
 
 import './InstanceTypesMenu.scss';
@@ -23,7 +24,7 @@ const InstanceTypesMenu: React.FC<InstanceTypesMenuProps> = ({
   const { category, selectedSize } = customData;
   const { instanceTypes } = categoryDetailsMap[category];
 
-  const handleSelect = (e, selectedItem) => {
+  const handleSelect = (e, selectedItem: InstanceTypeSize) => {
     onSelect(category, selectedItem);
     onClick();
   };
@@ -40,10 +41,9 @@ const InstanceTypesMenu: React.FC<InstanceTypesMenuProps> = ({
           {instanceTypes?.map((instanceType) => {
             const { cores, name, memory } = instanceType;
             return (
-              <MenuItem
-                key={name}
-                itemId={name}
-              >{`${name}: ${cores} Cores, ${memory} Memory`}</MenuItem>
+              <MenuItem key={name} itemId={name}>{`${name}: ${cores} Cores, ${readableSizeUnit(
+                memory,
+              )} Memory`}</MenuItem>
             );
           })}
         </MenuList>
