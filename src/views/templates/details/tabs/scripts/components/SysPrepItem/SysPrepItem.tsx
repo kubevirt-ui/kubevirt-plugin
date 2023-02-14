@@ -102,6 +102,7 @@ const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
                   createModal((modalProps) => (
                     <SysprepModal
                       {...modalProps}
+                      namespace={vm?.metadata?.namespace}
                       unattend={unattend}
                       autoUnattend={autoUnattend}
                       onSysprepSelected={onSysprepSelected}

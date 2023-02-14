@@ -17,6 +17,7 @@ export const SysprepModal: React.FC<{
   enableCreation?: boolean;
   onSysprepSelected?: (sysprepName: string) => void | Promise<void>;
   sysprepSelected?: string;
+  namespace: string;
 }> = ({
   isOpen,
   onClose,
@@ -26,6 +27,7 @@ export const SysprepModal: React.FC<{
   enableCreation = true,
   onSysprepSelected,
   sysprepSelected,
+  namespace,
 }) => {
   const { t } = useKubevirtTranslation();
   const [autoUnattend, setAutoUnattend] = React.useState(initialAutoUnattend);
@@ -54,6 +56,7 @@ export const SysprepModal: React.FC<{
             <SelectSysprep
               selectedSysprepName={selectedSysprepName}
               onSelectSysprep={setSelectedSysprepName}
+              namespace={namespace}
             />
           </FormGroup>
         </div>
@@ -94,6 +97,7 @@ export const SysprepModal: React.FC<{
           <SelectSysprep
             selectedSysprepName={selectedSysprepName}
             onSelectSysprep={setSelectedSysprepName}
+            namespace={namespace}
           />
         </ExpandableSection>
       </div>
