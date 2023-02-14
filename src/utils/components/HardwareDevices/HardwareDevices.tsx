@@ -13,6 +13,7 @@ import { useModal } from '../ModalProvider/ModalProvider';
 
 import HardwareDevicesModal from './modal/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from './utils/constants';
+import HardwareDevicesHeadlessMode from './HardwareDevicesHeadlessMode';
 import HardwareDevicesTable from './HardwareDevicesTable';
 import HardwareDeviceTitle from './HardwareDeviceTitle';
 
@@ -80,6 +81,9 @@ const HardwareDevices: React.FC<HardwareDevicesProps> = ({ vm, vmi, onSubmit, ca
         <DescriptionListDescription>
           <HardwareDevicesTable devices={hostDevices} />
         </DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+        <HardwareDevicesHeadlessMode vm={vm} vmi={vmi} />
       </DescriptionListGroup>
     </DescriptionList>
   );
