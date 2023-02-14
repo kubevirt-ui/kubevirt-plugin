@@ -20,7 +20,10 @@ const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES, sshLab
   kind: ServiceModel.kind,
   apiVersion: ServiceModel.apiVersion,
   metadata: {
-    name: `${vm?.metadata?.name}-${type.toLowerCase()}-ssh-service`,
+    // max name length is 63 characters
+    name: `${vm?.metadata?.name}-${type.toLowerCase()}-ssh-service`
+      .substring(0, 56)
+      .concat(`-${getRandomChars(4)}`),
     namespace: vm?.metadata?.namespace,
     ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
   },
