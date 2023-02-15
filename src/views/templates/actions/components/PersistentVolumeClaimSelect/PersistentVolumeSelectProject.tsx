@@ -37,11 +37,12 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
 
   return (
     <FormGroup
-      label={t('Persistent Volume Claim project')}
+      label={t('PVC project')}
       fieldId={fieldId}
       id={fieldId}
       isRequired
       className="pvc-selection-formgroup"
+      helperText={t('Location of the existing PVC')}
     >
       <Select
         aria-labelledby={fieldId}
@@ -52,7 +53,7 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
         onFilter={filter(projectsName)}
         hasInlineFilter
         selections={selectedProject}
-        placeholderText={t('--- Select PersistentVolumeClaim project ---')}
+        placeholderText={t('--- Select PVC project ---')}
         validated={!selectedProject ? ValidatedOptions.error : ValidatedOptions.default}
         aria-invalid={!selectedProject ? true : false}
         maxHeight={400}

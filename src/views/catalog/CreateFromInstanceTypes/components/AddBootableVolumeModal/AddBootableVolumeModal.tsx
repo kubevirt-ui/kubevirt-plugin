@@ -51,7 +51,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   const [formSelection, setFormSelection] = useState<RADIO_FORM_SELECTION>(
     RADIO_FORM_SELECTION.UPLOAD_IMAGE,
   );
-  const [cloneExistingPVC, setCloneExistingPVC] = useState(true);
+  const cloneExistingPVC = true; // we want to clone the existing PVC by default, may change in the future versions
   const { upload, uploadData } = useCDIUpload();
 
   const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>(
@@ -136,18 +136,18 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         }
         onClose();
       }}
-      submitBtnText={t('Add')}
+      submitBtnText={t('Upload')}
       isDisabled={!labels?.[DEFAULT_PREFERENCE_LABEL]}
     >
+      {t('You can upload a new volume or use an existing PersistentVolumeClaim (PVC)')}
       <Form>
+        <FormGroup>{/* Spacer */}</FormGroup>
         <FormGroup>
           <FormSelectionRadio formSelection={formSelection} setFormSelection={setFormSelection} />
         </FormGroup>
         <VolumeSource
           bootableVolume={bootableVolume}
           setBootableVolumeField={setBootableVolumeField}
-          cloneExistingPVC={cloneExistingPVC}
-          setCloneExistingPVC={setCloneExistingPVC}
           isUploadForm={isUploadForm}
           upload={upload}
         />
@@ -164,7 +164,11 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             />
           </>
         )}
-        <FormGroup label={t('Name')} isRequired>
+        <FormGroup
+          label={t('Volume name')}
+          isRequired
+          helperText={t('Name given to the cloned PVC')}
+        >
           <TextInput
             id="name"
             type="text"
@@ -180,8 +184,11 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             value={OPENSHIFT_OS_IMAGES_NS}
           />
         </FormGroup>
-        <Title headingLevel="h4">{t('Labels for the bootable volume')}</Title>
-        <FormGroup label={t('Default preference')} isRequired>
+
+        <FormGroup>{/* Spacer */}</FormGroup>
+
+        <Title headingLevel="h4">{t('Volume parameters')}</Title>
+        <FormGroup label={t('Preference')} isRequired>
           <FilterSelect
             selected={labels?.[DEFAULT_PREFERENCE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
@@ -190,13 +197,13 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             optionLabelText={t('preference')}
           />
         </FormGroup>
-        <FormGroup label={t('Default Instancetype')}>
+        <FormGroup label={t('Default InstanceType')}>
           <FilterSelect
             selected={labels?.[DEFAULT_INSTANCETYPE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)}
             options={instanceTypesNames}
             groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
-            optionLabelText={t('Instancetype')}
+            optionLabelText={t('InstanceType')}
           />
         </FormGroup>
         <FormGroup label={t('Description')}>

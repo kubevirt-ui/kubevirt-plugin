@@ -46,7 +46,7 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
 
   return (
     <FormGroup
-      label={t('Persistent Volume Claim project')}
+      label={t('PVC project')}
       fieldId={testId}
       id={testId}
       isRequired
@@ -54,6 +54,7 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
       validated={errors?.['pvcNamespace'] ? ValidatedOptions.error : ValidatedOptions.default}
       helperTextInvalid={t('This field is required')}
       helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
+      helperText={t('Location of the existing PVC')}
     >
       {loaded ? (
         <Controller
@@ -74,7 +75,7 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
                 onFilter={filter(projectsName)}
                 hasInlineFilter
                 selections={selectedProject}
-                placeholderText={t('--- Select PersistentVolumeClaim project ---')}
+                placeholderText={t('--- Select PVC project ---')}
                 validated={error ? ValidatedOptions.error : ValidatedOptions.default}
                 aria-invalid={error ? true : false}
                 maxHeight={400}

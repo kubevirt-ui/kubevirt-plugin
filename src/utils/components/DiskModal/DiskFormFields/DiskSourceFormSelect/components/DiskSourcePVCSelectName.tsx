@@ -40,7 +40,7 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
   const fieldId = 'pvc-name-select';
 
   return (
-    <FormGroup label={t('Persistent Volume Claim name')} fieldId={fieldId} id={fieldId} isRequired>
+    <FormGroup label={t('PVC name')} fieldId={fieldId} id={fieldId} isRequired>
       {pvcsLoaded ? (
         <Select
           menuAppendTo="parent"
@@ -52,7 +52,7 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
           hasInlineFilter
           selections={pvcNameSelected}
           onFilter={FilterPVCSelect(pvcNames)}
-          placeholderText={t('--- Select PersistentVolumeClaim name ---')}
+          placeholderText={t('--- Select PVC name ---')}
           isDisabled={isDisabled}
           maxHeight={400}
         >

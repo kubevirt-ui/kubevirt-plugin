@@ -52,7 +52,7 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
 
   return (
     <FormGroup
-      label={t('Persistent Volume Claim name')}
+      label={t('PVC name')}
       fieldId={fieldId}
       id={fieldId}
       isRequired
@@ -66,7 +66,7 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
         variant={SelectVariant.typeahead}
         selections={pvcNameSelected}
         onFilter={filter(pvcNames)}
-        placeholderText={t('--- Select PersistentVolumeClaim name ---')}
+        placeholderText={t('--- Select PVC name ---')}
         isDisabled={isDisabled}
         validated={!pvcNameSelected ? ValidatedOptions.error : ValidatedOptions.default}
         aria-invalid={!pvcNameSelected ? true : false}

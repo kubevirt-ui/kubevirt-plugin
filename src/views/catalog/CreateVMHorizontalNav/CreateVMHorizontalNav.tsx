@@ -44,7 +44,7 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
           <StackItem>
             <Title headingLevel="h1">{t('Create new VirtualMachine')}</Title>
           </StackItem>
-          <StackItem>{t('Select an option from which to create a VirtualMachine.')}</StackItem>
+          <StackItem>{t('Select an option to create a VirtualMachine from.')}</StackItem>
         </Stack>
       </div>
       <Tabs usePageInsets activeKey={currentTab} onSelect={handleTabClick}>

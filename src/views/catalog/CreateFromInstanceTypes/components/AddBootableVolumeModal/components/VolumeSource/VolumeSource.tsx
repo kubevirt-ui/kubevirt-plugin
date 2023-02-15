@@ -11,13 +11,13 @@ import { HelpIcon } from '@patternfly/react-icons';
 
 import { AddBootableVolumeState } from '../../utils/constants';
 
+import './VolumeSource.scss';
+
 type VolumeSourceProps = {
   bootableVolume: AddBootableVolumeState;
   setBootableVolumeField: (key: string, fieldKey?: string) => (value: string) => void;
   upload: DataUpload;
   isUploadForm: boolean;
-  cloneExistingPVC: boolean;
-  setCloneExistingPVC: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const VolumeSource: FC<VolumeSourceProps> = ({
@@ -25,11 +25,10 @@ const VolumeSource: FC<VolumeSourceProps> = ({
   setBootableVolumeField,
   upload,
   isUploadForm,
-  cloneExistingPVC,
-  setCloneExistingPVC,
 }) => {
   const { t } = useKubevirtTranslation();
   const { uploadFile, uploadFilename, pvcName, pvcNamespace } = bootableVolume || {};
+
   return isUploadForm ? (
     <DiskSourceUploadPVC
       relevantUpload={upload}
@@ -37,6 +36,7 @@ const VolumeSource: FC<VolumeSourceProps> = ({
       uploadFileName={uploadFilename}
       setUploadFile={setBootableVolumeField('uploadFile')}
       setUploadFileName={setBootableVolumeField('uploadFilename')}
+      label={t('Upload PVC image')}
     />
   ) : (
     <>
@@ -53,18 +53,19 @@ const VolumeSource: FC<VolumeSourceProps> = ({
       />
       <Checkbox
         id="clone-pvc-checkbox"
-        isChecked={cloneExistingPVC}
-        onChange={setCloneExistingPVC}
+        isChecked
+        isDisabled
         label={
           <Split hasGutter>
             <SplitItem>{t('Clone existing PVC')}</SplitItem>
             <SplitItem onClick={(e) => e.preventDefault()}>
               <Popover
+                position="right"
                 bodyContent={t(
-                  'The cloned copy of this PersistentVolumeClaim will be moved to the destination project',
+                  'The cloned copy of this PVC will be moved to the destination project',
                 )}
               >
-                <HelpIcon />
+                <HelpIcon className="icon-size-small" />
               </Popover>
             </SplitItem>
           </Split>
