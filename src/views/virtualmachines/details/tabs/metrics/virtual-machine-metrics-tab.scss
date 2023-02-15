@@ -49,3 +49,12 @@
   width: 100%;
   height: 150px;
 }
+.network ul.pf-c-dropdown__menu {
+  max-height: 200px;
+  overflow-y: scroll;
+}
+.network-popover {
+  display: flex;
+  justify-content: space-between;
+}
+

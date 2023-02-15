@@ -3,7 +3,7 @@ import React from 'react';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import NetworkThresholdSingleSourceChart from '@kubevirt-utils/components/Charts/NetworkUtil/NetworkThresholdChartSingleSource';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Card, CardBody, CardTitle, Grid, GridItem, Title } from '@patternfly/react-core';
+import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-core';
 
 import useNetworkData from './hook/useNetworkData';
 
@@ -14,20 +14,16 @@ type NetworkChartsByNICProps = {
 
 const NetworkChartsByNIC: React.FC<NetworkChartsByNICProps> = ({ vmi, nic }) => {
   const { t } = useKubevirtTranslation();
-  const [networkTotal, networkIn, networkOut, links] = useNetworkData(vmi, nic);
+  const { data, links } = useNetworkData(vmi, nic);
 
   return (
     <div>
-      <Title headingLevel="h4" className="networkcharts-by-nic--title">
-        {t('Network interface:')}
-      </Title>{' '}
-      {nic}
       <Grid>
         <GridItem span={4}>
           <Card>
             <CardTitle>{t('Network in')}</CardTitle>
             <CardBody>
-              <NetworkThresholdSingleSourceChart data={networkOut} link={links?.out} />
+              <NetworkThresholdSingleSourceChart data={data?.in} link={links?.in} />
             </CardBody>
           </Card>
         </GridItem>
@@ -35,7 +31,7 @@ const NetworkChartsByNIC: React.FC<NetworkChartsByNICProps> = ({ vmi, nic }) => 
           <Card>
             <CardTitle>{t('Network out')}</CardTitle>
             <CardBody>
-              <NetworkThresholdSingleSourceChart data={networkIn} link={links?.in} />
+              <NetworkThresholdSingleSourceChart data={data?.out} link={links?.out} />
             </CardBody>
           </Card>
         </GridItem>
@@ -43,7 +39,7 @@ const NetworkChartsByNIC: React.FC<NetworkChartsByNICProps> = ({ vmi, nic }) => 
           <Card>
             <CardTitle>{t('Network bandwidth')}</CardTitle>
             <CardBody>
-              <NetworkThresholdSingleSourceChart data={networkTotal} link={links?.total} />
+              <NetworkThresholdSingleSourceChart data={data?.total} link={links?.total} />
             </CardBody>
           </Card>
         </GridItem>
