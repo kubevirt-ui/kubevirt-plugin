@@ -3,7 +3,6 @@ import React from 'react';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUThresholdChart from '@kubevirt-utils/components/Charts/CPUUtil/CPUThresholdChart';
 import MemoryThresholdChart from '@kubevirt-utils/components/Charts/MemoryUtil/MemoryThresholdChart';
-import NetworkThresholdChart from '@kubevirt-utils/components/Charts/NetworkUtil/NetworkThresholdChart';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-core';
@@ -31,14 +30,6 @@ const UtilizationCharts: React.FC<UtilizationChartsProps> = ({ vmi, pods }) => {
           <CardTitle>{t('CPU')}</CardTitle>
           <CardBody>
             <CPUThresholdChart vmi={vmi} pods={pods} />
-          </CardBody>
-        </Card>
-      </GridItem>
-      <GridItem span={6}>
-        <Card>
-          <CardTitle>{t('Network interfaces')}</CardTitle>
-          <CardBody>
-            <NetworkThresholdChart vmi={vmi} />
           </CardBody>
         </Card>
       </GridItem>

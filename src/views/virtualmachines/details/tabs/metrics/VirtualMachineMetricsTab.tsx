@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -26,25 +26,27 @@ const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({
   location,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { vmi, pods } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { vmi, pods, loaded } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
 
-  const getKeyExpandedValue = (key: string): boolean => {
-    if (isEmpty(location?.search)) return true;
-    return location?.search?.includes(key);
-  };
   const [expended, setExpended] = useState<{ [key in MetricsTabExpendedSections]: boolean }>({
-    [MetricsTabExpendedSections.utilization]: getKeyExpandedValue(
-      MetricsTabExpendedSections.utilization,
-    ),
-    [MetricsTabExpendedSections.storage]: getKeyExpandedValue(MetricsTabExpendedSections.storage),
-    [MetricsTabExpendedSections.network]: getKeyExpandedValue(MetricsTabExpendedSections.network),
-    [MetricsTabExpendedSections.migration]: getKeyExpandedValue(
-      MetricsTabExpendedSections.migration,
-    ),
+    [MetricsTabExpendedSections.utilization]: true,
+    [MetricsTabExpendedSections.storage]: true,
+    [MetricsTabExpendedSections.network]: true,
+    [MetricsTabExpendedSections.migration]: true,
   });
 
   const onToggle = (value) => () =>
     setExpended((currentOpen) => ({ ...currentOpen, [value]: !currentOpen?.[value] }));
+
+  useEffect(() => {
+    if (!isEmpty(location?.search) && loaded) {
+      const focusedSectionId = Object.values(MetricsTabExpendedSections).find((focusedSection) =>
+        location?.search?.includes(focusedSection),
+      );
+      const focusedExpandableSection = document.getElementById(focusedSectionId);
+      focusedExpandableSection.scrollIntoView();
+    }
+  }, [location?.search, loaded]);
 
   return (
     <div className="virtual-machine-metrics-tab__main">
@@ -54,6 +56,7 @@ const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({
           toggleText={t('Utilization')}
           onToggle={onToggle(MetricsTabExpendedSections.utilization)}
           isExpanded={expended?.[MetricsTabExpendedSections.utilization]}
+          id={MetricsTabExpendedSections.utilization}
         >
           <UtilizationCharts vmi={vmi} pods={pods} />
         </ExpandableSection>
@@ -62,6 +65,7 @@ const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({
           toggleText={t('Storage')}
           onToggle={onToggle(MetricsTabExpendedSections.storage)}
           isExpanded={expended?.[MetricsTabExpendedSections.storage]}
+          id={MetricsTabExpendedSections.storage}
         >
           <StorageCharts vmi={vmi} />
         </ExpandableSection>
@@ -69,6 +73,7 @@ const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({
           toggleText={t('Network')}
           onToggle={onToggle(MetricsTabExpendedSections.network)}
           isExpanded={expended?.[MetricsTabExpendedSections.network]}
+          id={MetricsTabExpendedSections.network}
         >
           <NetworkCharts vmi={vmi} />
         </ExpandableSection>
@@ -76,6 +81,7 @@ const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({
           toggleText={t('Migration')}
           onToggle={onToggle(MetricsTabExpendedSections.migration)}
           isExpanded={expended?.[MetricsTabExpendedSections.migration]}
+          id={MetricsTabExpendedSections.migration}
         >
           <MigrationCharts vmi={vmi} />
         </ExpandableSection>
