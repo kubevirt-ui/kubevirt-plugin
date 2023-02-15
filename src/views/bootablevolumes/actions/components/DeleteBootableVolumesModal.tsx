@@ -6,7 +6,7 @@ import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 
-import { deletePreferenceLabel } from '../../utils/utils';
+import { deleteBootableVolumeMetadata } from '../../utils/utils';
 
 type DeleteBootableVolumesModalProps = {
   dataSource: V1beta1DataSource;
@@ -27,12 +27,12 @@ const DeleteBootableVolumesModal: FC<DeleteBootableVolumesModalProps> = ({
       obj={dataSource}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('Delete label?')}
-      onDeleteSubmit={deletePreferenceLabel(dataSource)}
+      headerText={t('Delete labels?')}
+      onDeleteSubmit={deleteBootableVolumeMetadata(dataSource)}
       bodyText={
         <Trans t={t}>
-          Please note that only the label data will be deleted and that the bootable volume will
-          remain. Are you sure you want to delete the label for bootable volume{' '}
+          Please note that only the labels data will be deleted and that the bootable volume will
+          remain. Are you sure you want to delete the labels for bootable volume{' '}
           <strong>{dataSource?.metadata?.name}</strong>?
         </Trans>
       }
