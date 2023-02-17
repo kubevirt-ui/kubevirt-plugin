@@ -50,7 +50,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (
       id: 'delete-bootablevolume',
       disabled: !canUpdateDataSource,
       label: t('Delete'),
-      description: 'Only the label data will be deleted',
+      description: 'Only the labels data will be deleted',
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <DeleteBootableVolumesModal dataSource={dataSource} isOpen={isOpen} onClose={onClose} />

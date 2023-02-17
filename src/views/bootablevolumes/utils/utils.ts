@@ -1,4 +1,7 @@
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import {
+  DEFAULT_INSTANCETYPE_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@catalog/CreateFromInstanceTypes/utils/constants';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -32,12 +35,21 @@ export const getPreferenceOSType = (obj: V1beta1DataSource): OS_NAME_TYPES => {
   );
 };
 
-export const deletePreferenceLabel = (obj: V1beta1DataSource) => {
-  const labelsWithoutDefaultPreference = Object.keys(obj?.metadata?.labels)
-    .filter((key) => key !== DEFAULT_PREFERENCE_LABEL)
+export const deleteBootableVolumeMetadata = (obj: V1beta1DataSource) => {
+  // labels object without default preference and instancetype labels
+  const originalLabelsObject = Object.keys(obj?.metadata?.labels)
+    .filter((key) => ![DEFAULT_PREFERENCE_LABEL, DEFAULT_INSTANCETYPE_LABEL].includes(key))
     .reduce((acc, key) => {
       return Object.assign(acc, {
         [key]: obj?.metadata?.labels?.[key],
+      });
+    }, {});
+
+  const annotationsWithoutDescription = Object.keys(obj?.metadata?.annotations)
+    .filter((key) => key !== 'description')
+    .reduce((acc, key) => {
+      return Object.assign(acc, {
+        [key]: obj?.metadata?.annotations?.[key],
       });
     }, {});
 
@@ -49,7 +61,12 @@ export const deletePreferenceLabel = (obj: V1beta1DataSource) => {
         {
           op: 'replace',
           path: '/metadata/labels',
-          value: labelsWithoutDefaultPreference,
+          value: originalLabelsObject,
+        },
+        {
+          op: 'replace',
+          path: '/metadata/annotations',
+          value: annotationsWithoutDescription,
         },
       ],
     });
