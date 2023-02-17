@@ -59,7 +59,7 @@ const DetailsLeftGrid: React.FC<DetailsLeftGridProps> = ({
       />
       <VirtualMachineDescriptionItem
         descriptionData={getInstancetypeString(instancetype?.category, instancetype?.size)}
-        descriptionHeader={t('Instancetype')}
+        descriptionHeader={t('InstanceType')}
       />
       <VirtualMachineDescriptionItem
         descriptionData={getCPUMemoryString(instancetypeSize, t)}

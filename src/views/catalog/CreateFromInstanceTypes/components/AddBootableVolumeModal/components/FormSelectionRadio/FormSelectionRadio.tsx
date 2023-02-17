@@ -18,7 +18,7 @@ const FormSelectionRadio: FC<FormSelectionRadioProps> = ({ formSelection, setFor
           isChecked={formSelection === RADIO_FORM_SELECTION.UPLOAD_IMAGE}
           id={RADIO_FORM_SELECTION.UPLOAD_IMAGE}
           name="form-selection"
-          label={t('Upload new image')}
+          label={t('Upload volume')}
           onClick={() => setFormSelection(RADIO_FORM_SELECTION.UPLOAD_IMAGE)}
         />
       </SplitItem>
@@ -27,7 +27,7 @@ const FormSelectionRadio: FC<FormSelectionRadioProps> = ({ formSelection, setFor
           isChecked={formSelection === RADIO_FORM_SELECTION.USE_EXISTING_PVC}
           id={RADIO_FORM_SELECTION.USE_EXISTING_PVC}
           name="form-selection"
-          label={t('Use existing PVC')}
+          label={t('Use existing volume')}
           onClick={() => setFormSelection(RADIO_FORM_SELECTION.USE_EXISTING_PVC)}
         />
       </SplitItem>

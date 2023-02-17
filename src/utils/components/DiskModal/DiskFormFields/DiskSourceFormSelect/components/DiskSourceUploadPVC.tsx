@@ -12,6 +12,7 @@ type DiskSourceUploadPVCProps = {
   uploadFile: File | string;
   setUploadFileName: (name: string) => void;
   setUploadFile: (file: File | string) => void;
+  label?: string;
 };
 
 const DiskSourceUploadPVC: React.FC<DiskSourceUploadPVCProps> = ({
@@ -20,12 +21,13 @@ const DiskSourceUploadPVC: React.FC<DiskSourceUploadPVCProps> = ({
   uploadFileName,
   setUploadFile,
   setUploadFileName,
+  label,
 }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <>
-      <FormGroup label={t('Upload data')} fieldId="disk-source-upload" isRequired>
+      <FormGroup label={label || t('Upload data')} fieldId="disk-source-upload" isRequired>
         <FileUpload
           id="simple-file"
           data-test-id="disk-source-upload-pvc-file"

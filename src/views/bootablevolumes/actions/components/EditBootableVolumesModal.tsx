@@ -60,11 +60,11 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
       obj={dataSource}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('Edit')}
+      headerText={t('Edit volume parameters')}
       onSubmit={changeBootableVolumeMetadata(dataSource, initialMetadata, metadata)}
     >
       <Form>
-        <FormGroup label={t('Default preference')} isRequired>
+        <FormGroup label={t('Preference')} isRequired>
           <FilterSelect
             selected={metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]}
             setSelected={setBootableVolumeMetadata('labels', DEFAULT_PREFERENCE_LABEL)}
@@ -73,13 +73,13 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
             optionLabelText={t('preference')}
           />
         </FormGroup>
-        <FormGroup label={t('Default Instancetype')}>
+        <FormGroup label={t('Default InstanceType')}>
           <FilterSelect
             selected={metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL]}
             setSelected={setBootableVolumeMetadata('labels', DEFAULT_INSTANCETYPE_LABEL)}
             options={instanceTypesNames}
             groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
-            optionLabelText={t('Instancetype')}
+            optionLabelText={t('InstanceType')}
           />
         </FormGroup>
         <FormGroup label={t('Description')}>

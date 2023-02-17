@@ -38,11 +38,12 @@ const DiskSourcePVCSelectNamespace: React.FC<DiskSourcePVCSelectNamespaceProps> 
 
   return (
     <FormGroup
-      label={t('Persistent Volume Claim project')}
+      label={t('PVC project')}
       fieldId={fieldId}
       id={fieldId}
       isRequired
       className="pvc-selection-formgroup"
+      helperText={t('Location of the existing PVC')}
     >
       {projectsLoaded ? (
         <Select
@@ -55,7 +56,7 @@ const DiskSourcePVCSelectNamespace: React.FC<DiskSourcePVCSelectNamespaceProps> 
           onFilter={FilterPVCSelect(projectsName)}
           hasInlineFilter
           selections={selectedProject}
-          placeholderText={t('--- Select PersistentVolumeClaim project ---')}
+          placeholderText={t('--- Select PVC project ---')}
           isDisabled={isDisabled}
           maxHeight={400}
         >

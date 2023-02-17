@@ -78,7 +78,7 @@ const CreateFromInstanceType: FC = () => {
               </SectionListItem>
               <Divider inset={{ default: 'insetLg' }} />
               <SectionListItem
-                headerText={t('Select Instancetype')}
+                headerText={t('Select InstanceType')}
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_INSTANCE_TYPE}
                 sectionState={sectionState}
               >
