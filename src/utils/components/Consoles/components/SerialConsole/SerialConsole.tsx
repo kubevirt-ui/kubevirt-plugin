@@ -1,15 +1,9 @@
 import * as React from 'react';
 import classNames from 'classnames';
 
+import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Button,
-  ButtonVariant,
-  EmptyState,
-  EmptyStateBody,
-  EmptyStateIcon,
-  Spinner,
-} from '@patternfly/react-core';
+import { Button, ButtonVariant, EmptyState, EmptyStateBody } from '@patternfly/react-core';
 import { PasteIcon } from '@patternfly/react-icons';
 import { css } from '@patternfly/react-styles';
 import styles from '@patternfly/react-styles/css/components/Consoles/SerialConsole';
@@ -105,12 +99,7 @@ const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
       break;
     case loading:
     default:
-      terminal = (
-        <EmptyState>
-          <EmptyStateIcon variant="container" component={Spinner} />
-          <EmptyStateBody>{textLoading || t('Loading ...')}</EmptyStateBody>
-        </EmptyState>
-      );
+      terminal = <LoadingEmptyState bodyContents={textLoading} />;
       break;
   }
 

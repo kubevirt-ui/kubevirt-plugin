@@ -455,11 +455,14 @@
   {
     "type": "console.dashboards/overview/health/url",
     "properties": {
-      "name": "%plugin__kubevirt-plugin~Virtualization%",
+      "title": "%plugin__kubevirt-plugin~OpenShift Virtualization%",
+      "name": "%plugin__kubevirt-plugin~OpenShift Virtualization%",
       "url": "apis/subresources.kubevirt.io/v1/healthz",
       "healthHandler": {
         "$codeRef": "dashboardExtensions.getKubevirtHealthState"
-      }
+      },
+      "popupComponent": { "$codeRef":  "dashboardStatus.default"},
+      "popupTitle": "%plugin__kubevirt-plugin~OpenShift Virtualization%"
     }
   },
   {

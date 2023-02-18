@@ -67,7 +67,8 @@
       "UploadPVC": "src/views/cdi-upload-provider/upload-pvc-form/UploadPVC.tsx",
       "dashboardInventory": "src/views/dashboard-extensions/Inventory.tsx",
       "dashboardActivity": "src/views/dashboard-extensions/Activity.tsx",
-      "dashboardActivityUtils": "src/views/dashboard-extensions/utils.ts"
+      "dashboardActivityUtils": "src/views/dashboard-extensions/utils.ts",
+      "dashboardStatus": "src/views/dashboard-extensions/KubevirtHealthPopup/KubevirtHealthPopup.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
