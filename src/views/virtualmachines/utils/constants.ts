@@ -7,7 +7,14 @@ export const paginationDefaultValues = [
   { title: '200', value: 200 },
 ];
 
-export const paginationInitialState = {
+export type PaginationState = {
+  page: number;
+  perPage: number;
+  startIndex: number;
+  endIndex: number;
+};
+
+export const paginationInitialState: PaginationState = {
   page: 1,
   perPage: 15,
   startIndex: 0,
