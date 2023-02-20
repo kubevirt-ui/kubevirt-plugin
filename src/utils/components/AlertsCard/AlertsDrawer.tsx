@@ -32,6 +32,8 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
   const handleDrawerToggleClick = React.useCallback((alertType: AlertType): void => {
     setAlertTypeOpen((alert) => (alert === alertType ? null : alertType));
   }, []);
+  const alertsQuantity =
+    Object.values(sortedAlerts)?.reduce((acc, category) => acc + category?.length, 0) || 0;
 
   React.useEffect(() => {
     //open critical alerts by default, if exists, only for the first time loading
@@ -44,72 +46,72 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
 
   return (
     <div className="alerts-card__drawer">
-      <Accordion isBordered asDefinitionList>
-        <AccordionItem>
-          <AccordionToggle
-            onClick={() => {
-              setTitleOpen((title) => {
-                title && setAlertTypeOpen(null);
-                return !title;
-              });
-            }}
-            isExpanded={titleOpen}
-            id="toggle-main"
-            className="alerts-card__toggle--main"
-          >
-            <Flex>
-              {Object.keys(sortedAlerts)?.map((alertType) => {
-                const numAlerts = sortedAlerts?.[alertType]?.length;
-                // Don't show critical or warning alerts in the drawer header if there are no alerts of that type
-                if (
-                  (alertType === AlertType.critical || alertType === AlertType.warning) &&
-                  numAlerts === 0
-                ) {
-                  return null;
-                }
-
-                return (
-                  <Button
-                    variant={ButtonVariant.plain}
-                    className="pf-m-link--align-left"
-                    key={alertType}
-                    onClick={(e) => {
-                      setAlertTypeOpen((prevAlertOpen) =>
-                        titleOpen && prevAlertOpen === alertType ? null : (alertType as AlertType),
-                      );
-                      setTitleOpen(
-                        (prevTitleOpen) => !prevTitleOpen || alertTypeOpen !== alertType,
-                      );
-                      e?.stopPropagation();
-                    }}
-                  >
-                    <Label
+      {alertsQuantity > 0 ? (
+        <Accordion isBordered asDefinitionList>
+          <AccordionItem>
+            <AccordionToggle
+              onClick={() => {
+                setTitleOpen((title) => {
+                  title && setAlertTypeOpen(null);
+                  return !title;
+                });
+              }}
+              isExpanded={titleOpen}
+              id="toggle-main"
+              className="alerts-card__toggle--main"
+            >
+              <Flex>
+                {Object.keys(sortedAlerts)?.map((alertType) => {
+                  const numAlerts = sortedAlerts?.[alertType]?.length;
+                  // // Don't show alerts in the drawer header if there are no alerts of the type
+                  if (numAlerts === 0) {
+                    return null;
+                  }
+                  return (
+                    <Button
+                      variant={ButtonVariant.plain}
+                      className="pf-m-link--align-left"
                       key={alertType}
-                      color={labelColor[alertType]}
-                      icon={labelIcon[alertType]}
-                      className="alerts-label"
+                      onClick={(e) => {
+                        setAlertTypeOpen((prevAlertOpen) =>
+                          titleOpen && prevAlertOpen === alertType
+                            ? null
+                            : (alertType as AlertType),
+                        );
+                        setTitleOpen(
+                          (prevTitleOpen) => !prevTitleOpen || alertTypeOpen !== alertType,
+                        );
+                        e?.stopPropagation();
+                      }}
                     >
-                      {numAlerts || 0}
-                    </Label>
-                    <span className="alerts-label--text">{labelText[alertType]}</span>
-                  </Button>
-                );
-              })}
-            </Flex>
-          </AccordionToggle>
-          <AccordionContent id="toggle-main" isHidden={!titleOpen}>
-            {Object.entries(sortedAlerts)?.map(([alertType, alerts]) => (
-              <AlertsCardAccordionItem
-                key={alertType}
-                alertOpen={alertTypeOpen}
-                alertType={AlertType[alertType]}
-                alerts={alerts}
-                handleDrawerToggleClick={handleDrawerToggleClick}
-              />
-            ))}
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+                      <Label
+                        key={alertType}
+                        color={labelColor[alertType]}
+                        icon={labelIcon[alertType]}
+                        className="alerts-label"
+                      >
+                        {numAlerts || 0}
+                      </Label>
+                      <span className="alerts-label--text">{labelText[alertType]}</span>
+                    </Button>
+                  );
+                })}
+              </Flex>
+            </AccordionToggle>
+            <AccordionContent id="toggle-main" isHidden={!titleOpen}>
+              {Object.entries(sortedAlerts)?.map(([alertType, alerts]) => (
+                <AlertsCardAccordionItem
+                  key={alertType}
+                  alertOpen={alertTypeOpen}
+                  alertType={AlertType[alertType]}
+                  alerts={alerts}
+                  handleDrawerToggleClick={handleDrawerToggleClick}
+                />
+              ))}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      ) : null}
     </div>
   );
 };
