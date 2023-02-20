@@ -31,7 +31,7 @@ export const tickFormat =
       const timespan = DurationOption?.getMilliseconds(duration);
       const datePast = new Date(currentTime - timespan);
       const hours = (isLast ? date : datePast).getHours();
-      const minutes = `0 + ${(isLast ? date : datePast).getMinutes()}`.slice(-2);
+      const minutes = ('0' + (isLast ? date : datePast).getMinutes()).slice(-2);
       return `${hours}:${minutes}`;
     }
 
