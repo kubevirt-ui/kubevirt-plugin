@@ -15,6 +15,7 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import StorageClassSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClassSelect';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
@@ -22,7 +23,15 @@ import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, Grid, GridItem, TextInput, Title } from '@patternfly/react-core';
+import {
+  Form,
+  FormGroup,
+  Grid,
+  GridItem,
+  PopoverPosition,
+  TextInput,
+  Title,
+} from '@patternfly/react-core';
 
 import { AddBootableVolumeButtonProps } from '../AddBootableVolumeButton/AddBootableVolumeButton';
 
@@ -229,7 +238,18 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         <FormGroup>{/* Spacer */}</FormGroup>
 
         <Title headingLevel="h4">{t('Volume parameters')}</Title>
-        <FormGroup label={t('Preference')} isRequired>
+        <FormGroup
+          label={
+            <>
+              {t('Preference')}{' '}
+              <HelpTextIcon
+                bodyContent={t('The default set of preferences to associate with the volume')}
+                position={PopoverPosition.right}
+              />
+            </>
+          }
+          isRequired
+        >
           <FilterSelect
             selected={labels?.[DEFAULT_PREFERENCE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
@@ -241,7 +261,19 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
 
         <Grid hasGutter>
           <GridItem span={6}>
-            <FormGroup label={t('Default InstanceType')}>
+            <FormGroup
+              label={
+                <>
+                  {t('Default InstanceType')}{' '}
+                  <HelpTextIcon
+                    bodyContent={t(
+                      'The default hardware profile that is best suited for your workload',
+                    )}
+                    position={PopoverPosition.right}
+                  />
+                </>
+              }
+            >
               <FilterSelect
                 selected={instanceType}
                 setSelected={onInstanceTypeChange}

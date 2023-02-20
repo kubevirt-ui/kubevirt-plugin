@@ -11,12 +11,13 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, Grid, GridItem, TextArea } from '@patternfly/react-core';
+import { Form, FormGroup, Grid, GridItem, PopoverPosition, TextArea } from '@patternfly/react-core';
 
 import { BootableVolumeMetadata } from '../../utils/types';
 import { changeBootableVolumeMetadata, getInstanceTypesToSizesMap } from '../../utils/utils';
@@ -105,7 +106,18 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
       onSubmit={onChangeVolumeParams()}
     >
       <Form>
-        <FormGroup label={t('Preference')} isRequired>
+        <FormGroup
+          label={
+            <>
+              {t('Preference')}{' '}
+              <HelpTextIcon
+                bodyContent={t('The default set of preferences to associate with the volume')}
+                position={PopoverPosition.right}
+              />
+            </>
+          }
+          isRequired
+        >
           <FilterSelect
             selected={preference}
             setSelected={setPreference}
@@ -116,7 +128,19 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
         </FormGroup>
         <Grid hasGutter>
           <GridItem span={6}>
-            <FormGroup label={t('Default InstanceType')}>
+            <FormGroup
+              label={
+                <>
+                  {t('Default InstanceType')}{' '}
+                  <HelpTextIcon
+                    bodyContent={t(
+                      'The default hardware profile that is best suited for your workload',
+                    )}
+                    position={PopoverPosition.right}
+                  />
+                </>
+              }
+            >
               <FilterSelect
                 selected={instanceType}
                 setSelected={onInstanceTypeChange}
