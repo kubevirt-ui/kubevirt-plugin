@@ -5,7 +5,7 @@ import {
   PersistentVolumeClaimModel,
   ProjectModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { SelectOption } from '@patternfly/react-core';
 
@@ -51,10 +51,15 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
     : null;
 
   const [pvcs, pvcsLoaded, pvcsErrors] =
-    useK8sWatchResource<V1alpha1PersistentVolumeClaim[]>(pvcWatchResource);
+    useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>(pvcWatchResource);
 
   const pvcNamesFilteredByProjects = (pvcs || [])
-    .filter((pvc) => pvc.metadata.namespace === projectSelected)
+    .filter(
+      (pvc) =>
+        pvc.metadata.namespace === projectSelected &&
+        !pvc?.metadata?.deletionTimestamp &&
+        pvc?.status?.phase === 'Bound',
+    )
     .map((pvc) => pvc.metadata.name);
 
   return {
