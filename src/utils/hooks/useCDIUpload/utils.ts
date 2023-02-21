@@ -7,10 +7,10 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadTokenRequestModel } from '@kubevirt-utils/models';
 import { buildOwnerReference, getAPIVersionForModel } from '@kubevirt-utils/resources/shared';
 import { getDataVolume } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
-import { getVolumes } from '@kubevirt-utils/resources/vm';
 import {
   k8sCreate,
   k8sDelete,
+  k8sGet,
   k8sPatch,
   K8sResourceCommon,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -149,21 +149,24 @@ export const addUploadDataVolumeOwnerReference = (
   vm: V1VirtualMachine,
   dataVolume: V1beta1DataVolume,
 ) => {
-  // make sure the disk was not deleted manually
-  const dvExists = getVolumes(vm)?.find(
-    (vol) => vol?.persistentVolumeClaim?.claimName === dataVolume?.metadata?.name,
-  );
-  if (!dvExists) return Promise.resolve();
-
-  return k8sPatch({
+  //checking DV exisit before trying to patch it
+  return k8sGet<V1beta1DataVolume>({
     model: DataVolumeModel,
-    resource: dataVolume,
-    data: [
-      {
-        op: 'replace',
-        path: '/metadata/ownerReferences',
-        value: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
-      },
-    ],
-  });
+    name: dataVolume?.metadata?.name,
+    ns: dataVolume?.metadata?.namespace,
+  })
+    .then(() =>
+      k8sPatch({
+        model: DataVolumeModel,
+        resource: dataVolume,
+        data: [
+          {
+            op: 'replace',
+            path: '/metadata/ownerReferences',
+            value: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
+          },
+        ],
+      }),
+    )
+    .catch(() => Promise.resolve());
 };
