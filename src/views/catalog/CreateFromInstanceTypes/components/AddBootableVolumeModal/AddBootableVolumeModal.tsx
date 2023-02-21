@@ -1,5 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import produce from 'immer';
+import { getInstanceTypesToSizesMap } from 'src/views/bootablevolumes/utils/utils';
 
 import {
   DEFAULT_INSTANCETYPE_LABEL,
@@ -21,7 +22,7 @@ import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, TextInput, Title } from '@patternfly/react-core';
+import { Form, FormGroup, Grid, GridItem, TextInput, Title } from '@patternfly/react-core';
 
 import { AddBootableVolumeButtonProps } from '../AddBootableVolumeButton/AddBootableVolumeButton';
 
@@ -70,6 +71,46 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   } = bootableVolume || {};
 
   const isUploadForm = formSelection === RADIO_FORM_SELECTION.UPLOAD_IMAGE;
+
+  const instanceTypesToSizesMap = useMemo(
+    () => getInstanceTypesToSizesMap(instanceTypesNames),
+    [instanceTypesNames],
+  );
+  const instanceTypeAndSize = useMemo(
+    () => labels?.[DEFAULT_INSTANCETYPE_LABEL]?.split('.') || ['', ''],
+    [labels],
+  );
+
+  const [instanceType, setInstanceType] = useState<string>(instanceTypeAndSize[0]);
+  const [instanceSize, setInstanceSize] = useState<string>(instanceTypeAndSize[1]);
+  const [sizeOptions, setSizeOptions] = useState<string[]>(
+    instanceTypesToSizesMap[instanceType] || [],
+  );
+
+  const onInstanceTypeChange = (instanceTypeName: string) => {
+    const newSizesArray = instanceTypesToSizesMap[instanceTypeName];
+    setInstanceType(instanceTypeName);
+    setSizeOptions(newSizesArray);
+    setInstanceSize(newSizesArray[0]); // when changing Default InstanceType, set the Size to 1st option
+    setBootableVolume((prevState) => ({
+      ...prevState,
+      labels: {
+        ...prevState?.labels,
+        [DEFAULT_INSTANCETYPE_LABEL]: `${instanceTypeName}.${newSizesArray[0]}`,
+      },
+    }));
+  };
+
+  const onInstanceSizeChange = (sizeValue: string) => {
+    setInstanceSize(sizeValue);
+    setBootableVolume((prevState) => ({
+      ...prevState,
+      labels: {
+        ...prevState?.labels,
+        [DEFAULT_INSTANCETYPE_LABEL]: `${instanceType}.${sizeValue}`,
+      },
+    }));
+  };
 
   const setBootableVolumeField = (key: string, fieldKey?: string) => (value: string) =>
     fieldKey
@@ -197,15 +238,32 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             optionLabelText={t('preference')}
           />
         </FormGroup>
-        <FormGroup label={t('Default InstanceType')}>
-          <FilterSelect
-            selected={labels?.[DEFAULT_INSTANCETYPE_LABEL]}
-            setSelected={setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)}
-            options={instanceTypesNames}
-            groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
-            optionLabelText={t('InstanceType')}
-          />
-        </FormGroup>
+
+        <Grid hasGutter>
+          <GridItem span={6}>
+            <FormGroup label={t('Default InstanceType')}>
+              <FilterSelect
+                selected={instanceType}
+                setSelected={onInstanceTypeChange}
+                options={Object.keys(instanceTypesToSizesMap) || []}
+                groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
+                optionLabelText={t('InstanceType')}
+              />
+            </FormGroup>
+          </GridItem>
+          <GridItem span={6}>
+            <FormGroup label={t('Size')}>
+              <FilterSelect
+                selected={instanceSize}
+                setSelected={onInstanceSizeChange}
+                options={sizeOptions}
+                groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
+                optionLabelText={t('size')}
+              />
+            </FormGroup>
+          </GridItem>
+        </Grid>
+
         <FormGroup label={t('Description')}>
           <TextInput
             id="description"

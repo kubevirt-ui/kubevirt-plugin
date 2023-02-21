@@ -8,7 +8,7 @@ import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-a
 import { ANNOTATIONS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { BootableVolumeMetadata } from './types';
+import { BootableVolumeMetadata, InstanceTypesToSizesMap } from './types';
 
 export const getDataSourcePreferenceLabelValue = (
   obj: V1beta1DataSource | K8sResourceCommon,
@@ -74,12 +74,12 @@ export const deleteBootableVolumeMetadata = (obj: V1beta1DataSource) => {
 };
 
 export const changeBootableVolumeMetadata =
-  (
-    obj: V1beta1DataSource,
-    initialMetadata: BootableVolumeMetadata,
-    metadata: BootableVolumeMetadata,
-  ) =>
-  async () => {
+  (obj: V1beta1DataSource, metadata: BootableVolumeMetadata) => async () => {
+    const initialMetadata = {
+      labels: obj?.metadata?.labels,
+      annotations: obj?.metadata?.annotations,
+    };
+
     initialMetadata !== metadata &&
       (await k8sPatch({
         model: DataSourceModel,
@@ -98,3 +98,16 @@ export const changeBootableVolumeMetadata =
         ],
       }));
   };
+
+export const getInstanceTypesToSizesMap = (
+  instanceTypesNames: string[] = [],
+): InstanceTypesToSizesMap =>
+  instanceTypesNames.reduce((instanceTypesAndSizes, instanceType) => {
+    const [instanceTypePart, sizePart] = instanceType.split('.');
+
+    instanceTypesAndSizes[instanceTypePart] !== undefined
+      ? instanceTypesAndSizes[instanceTypePart].push(sizePart)
+      : (instanceTypesAndSizes[instanceTypePart] = [sizePart]);
+
+    return instanceTypesAndSizes;
+  }, {});
