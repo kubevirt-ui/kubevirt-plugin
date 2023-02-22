@@ -28,7 +28,7 @@ import {
   TextVariants,
 } from '@patternfly/react-core';
 
-import VirtualMachineDescriptionItem from '../details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import VirtualMachineDescriptionItem from '../../details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 import './scripts-tab.scss';
 

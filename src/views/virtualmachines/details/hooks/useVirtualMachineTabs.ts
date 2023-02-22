@@ -4,17 +4,13 @@ import {
 } from '@kubevirt-utils/components/PendingChanges/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
+import VirtualMachineConfigurationTab from '../tabs/configuration/VirtualMachineConfigurationTab';
 import VirtualMachineConsolePage from '../tabs/console/VirtualMachineConsolePage';
 import VirtualMachineDetailsPage from '../tabs/details/VirtualMachineDetailsPage';
 import VirtualMachineDiagnosticTab from '../tabs/diagnostic/VirtualMachineDiagnosticTab';
-import DiskListPage from '../tabs/disk/DiskListPage';
-import VirtualMachineEnvironmentPage from '../tabs/environment/VirtualMachineEnvironmentPage';
 import VirtualMachinePageEventsTab from '../tabs/events/VirtualMachinePageEvents';
 import VirtualMachineMetricsTab from '../tabs/metrics/VirtualMachineMetricsTab';
-import NetworkInterfaceListPage from '../tabs/network/NetworkInterfaceListPage';
 import VirtualMachinesOverviewTab from '../tabs/overview/VirtualMachinesOverviewTab';
-import VirtualMachineSchedulingPage from '../tabs/scheduling/VirtualMachineSchedulingPage';
-import ScriptsTab from '../tabs/scripts/ScriptsTab';
 import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
 import VirtualMachineYAMLPage from '../tabs/yaml/VirtualMachineYAMLPage';
 
@@ -43,14 +39,9 @@ export const useVirtualMachineTabs = () => {
       component: VirtualMachineYAMLPage,
     },
     {
-      href: VirtualMachineDetailsTab.Scheduling,
-      name: t(VirtualMachineDetailsTabLabel.Scheduling),
-      component: VirtualMachineSchedulingPage,
-    },
-    {
-      href: VirtualMachineDetailsTab.Environment,
-      name: t(VirtualMachineDetailsTabLabel.Environment),
-      component: VirtualMachineEnvironmentPage,
+      href: VirtualMachineDetailsTab.Configurations,
+      name: t(VirtualMachineDetailsTabLabel.Configuration),
+      component: VirtualMachineConfigurationTab,
     },
     {
       href: VirtualMachineDetailsTab.Events,
@@ -61,21 +52,6 @@ export const useVirtualMachineTabs = () => {
       href: VirtualMachineDetailsTab.Console,
       name: t(VirtualMachineDetailsTabLabel.Console),
       component: VirtualMachineConsolePage,
-    },
-    {
-      href: VirtualMachineDetailsTab.NetworkInterfaces,
-      name: t(VirtualMachineDetailsTabLabel.NetworkInterfaces),
-      component: NetworkInterfaceListPage,
-    },
-    {
-      href: VirtualMachineDetailsTab.Disks,
-      name: t(VirtualMachineDetailsTabLabel.Disks),
-      component: DiskListPage,
-    },
-    {
-      href: VirtualMachineDetailsTab.Scripts,
-      name: t(VirtualMachineDetailsTabLabel.Scripts),
-      component: ScriptsTab,
     },
     {
       href: VirtualMachineDetailsTab.Snapshots,

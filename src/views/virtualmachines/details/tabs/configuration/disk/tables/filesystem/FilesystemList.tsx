@@ -5,8 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
-
-import { printableVMStatus } from '../../../../../utils';
+import { printableVMStatus } from '@virtualmachines/utils';
 
 import FileSystemListLayout from './FilesystemListLayout';
 
