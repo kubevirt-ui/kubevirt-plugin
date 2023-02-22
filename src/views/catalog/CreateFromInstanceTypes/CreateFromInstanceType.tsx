@@ -76,7 +76,9 @@ const CreateFromInstanceType: FC = () => {
                   displayShowAllButton
                 />
               </SectionListItem>
-              <Divider inset={{ default: 'insetLg' }} />
+
+              <Divider className="create-vm-instance-type-section__divider" />
+
               <SectionListItem
                 headerText={t('Select InstanceType')}
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_INSTANCE_TYPE}
@@ -87,7 +89,9 @@ const CreateFromInstanceType: FC = () => {
                   setSelectedInstanceType={setSelectedInstanceType}
                 />
               </SectionListItem>
-              <Divider inset={{ default: 'insetLg' }} />
+
+              <Divider className="create-vm-instance-type-section__divider" />
+
               <SectionListItem
                 headerText={t('VirtualMachine details')}
                 sectionKey={INSTANCE_TYPES_SECTIONS.VM_DETAILS}

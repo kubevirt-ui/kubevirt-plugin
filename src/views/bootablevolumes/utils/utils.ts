@@ -105,9 +105,8 @@ export const getInstanceTypesToSizesMap = (
   instanceTypesNames.reduce((instanceTypesAndSizes, instanceType) => {
     const [instanceTypePart, sizePart] = instanceType.split('.');
 
-    instanceTypesAndSizes[instanceTypePart] !== undefined
-      ? instanceTypesAndSizes[instanceTypePart].push(sizePart)
-      : (instanceTypesAndSizes[instanceTypePart] = [sizePart]);
+    instanceTypesAndSizes[instanceTypePart] ??= [];
+    instanceTypesAndSizes[instanceTypePart].push(sizePart);
 
     return instanceTypesAndSizes;
   }, {});

@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import FilterSelect from '@catalog/CreateFromInstanceTypes/components/AddBootableVolumeModal/components/FilterSelect/FilterSelect';
 import {
@@ -69,12 +69,15 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
     [instanceType, instanceTypesToSizesMap],
   );
 
-  const onInstanceTypeChange = (instanceTypeName: string) => {
-    setInstanceType(instanceTypeName);
-    setSize(instanceTypesToSizesMap[instanceTypeName][0]);
-  };
+  const onInstanceTypeChange = useCallback(
+    (instanceTypeName: string) => {
+      setInstanceType(instanceTypeName);
+      setSize(instanceTypesToSizesMap[instanceTypeName][0]);
+    },
+    [instanceTypesToSizesMap],
+  );
 
-  const onChangeVolumeParams = () => {
+  const onChangeVolumeParams = useCallback(() => {
     const preferenceLabel = preference && { [DEFAULT_PREFERENCE_LABEL]: preference };
     const instanceLabel = instanceType && {
       [DEFAULT_INSTANCETYPE_LABEL]: `${instanceType}.${size}`,
@@ -94,7 +97,7 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
     };
 
     return changeBootableVolumeMetadata(dataSource, metadata);
-  };
+  }, [dataSource, description, instanceType, preference, size]);
 
   return (
     <TabModal<K8sResourceCommon>

@@ -1,5 +1,5 @@
 .create-vm-instance-type-section {
-  padding: var(--pf-global--spacer--md);
+  padding: var(--pf-global--spacer--xl);
   &__step {
     font-size: var(--pf-global--FontSize--xl);
     height: var(--pf-global--spacer--xl);
@@ -26,5 +26,9 @@
   }
   &__add-volume-btn {
     padding-right: var(--pf-global--spacer--sm);
+  }
+  &__divider {
+    --pf-c-divider--BorderWidth--base: var(--pf-global--spacer--form-element);
+    --pf-c-divider--after--BackgroundColor: var(--pf-global--palette--black-200);
   }
 }
