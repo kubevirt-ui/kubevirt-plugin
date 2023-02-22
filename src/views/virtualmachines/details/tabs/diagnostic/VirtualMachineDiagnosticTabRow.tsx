@@ -1,7 +1,12 @@
 import React from 'react';
+import cn from 'classnames';
 
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  RedExclamationCircleIcon,
+  Timestamp,
+  YellowExclamationTriangleIcon,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableRowContent, Tbody, Td, Tr } from '@patternfly/react-table';
 
 const VirtualMachineDiagnosticTabRow = ({ obj, index, expend, setExpend, activeColumns }) => {
@@ -10,7 +15,7 @@ const VirtualMachineDiagnosticTabRow = ({ obj, index, expend, setExpend, activeC
 
   return (
     <Tbody isExpanded={isExpanded}>
-      <Tr>
+      <Tr className={cn({ 'VirtualMachineDiagnosticTabRow--row': isExpanded })}>
         <Td
           expand={
             obj?.message && {
@@ -40,7 +45,11 @@ const VirtualMachineDiagnosticTabRow = ({ obj, index, expend, setExpend, activeC
       {obj?.message && (
         <Tr isExpanded={isExpanded}>
           <Td colSpan={12}>
-            <ExpandableRowContent>{obj?.message}</ExpandableRowContent>
+            <div className="VirtualMachineDiagnosticTabRow--expanded">
+              {obj?.status === 'False' && <RedExclamationCircleIcon />}
+              {!obj?.status && <YellowExclamationTriangleIcon />}
+              <ExpandableRowContent>{obj?.message}</ExpandableRowContent>
+            </div>
           </Td>
         </Tr>
       )}
