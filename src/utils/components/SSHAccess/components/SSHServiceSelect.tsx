@@ -48,10 +48,14 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
       variant={SelectVariant.single}
       selections={sshServiceType}
       isDisabled={!sshServiceLoaded}
+      toggleId="ssh-service-select"
     >
-      <SelectOption value={SERVICE_TYPES.NONE}>{t('None')}</SelectOption>
+      <SelectOption value={SERVICE_TYPES.NONE} id={SERVICE_TYPES.NONE}>
+        {t('None')}
+      </SelectOption>
       <SelectOption
         value={SERVICE_TYPES.NODE_PORT}
+        id={SERVICE_TYPES.NODE_PORT}
         description={t(
           'Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic that is sent to this port is forwarded to the Service',
         )}
@@ -61,6 +65,7 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
       <SelectOption
         isDisabled={!hasSomeMetalCrd}
         value={SERVICE_TYPES.LOAD_BALANCER}
+        id={SERVICE_TYPES.LOAD_BALANCER}
         description={t(
           'Assigns an external IP address to the VirtualMachine. This option requires a LoadBalancer Service backend',
         )}
