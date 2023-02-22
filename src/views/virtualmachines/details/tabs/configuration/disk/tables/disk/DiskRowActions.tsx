@@ -9,8 +9,8 @@ import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
+import { printableVMStatus } from '@virtualmachines/utils';
 
-import { printableVMStatus } from '../../../../../utils';
 import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
 

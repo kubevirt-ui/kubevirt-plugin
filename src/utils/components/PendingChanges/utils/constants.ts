@@ -12,6 +12,7 @@ export enum VirtualMachineDetailsTab {
   Snapshots = 'snapshots',
   Scripts = 'scripts',
   Diagnostic = 'diagnostic',
+  Configurations = 'configurations',
 }
 
 export enum VirtualMachineDetailsTabLabel {
@@ -39,6 +40,8 @@ export enum VirtualMachineDetailsTabLabel {
   Snapshots = 'Snapshots',
   // t('Scripts')
   Scripts = 'Scripts',
-  // t('Diagnostic)
+  // t('Diagnostic')
   Diagnostic = 'Diagnostic',
+  // t('Configuration')
+  Configuration = 'Configuration',
 }
