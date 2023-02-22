@@ -2,3 +2,17 @@
   display: flex;
   justify-content: space-between;
 }
+
+.VirtualMachineDiagnosticTabRow--expanded {
+  display: inline-flex;
+  align-items: baseline;
+  margin-left: var(--pf-global--spacer--3xl);
+  svg {
+    margin-right: var(--pf-global--spacer--sm);
+  }
+}
+.pf-c-table {
+  tr.VirtualMachineDiagnosticTabRow--row {
+    border-bottom: none;
+  }
+}
