@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 
-import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
+import { AlertsByHealthImpact } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ChartDonut } from '@patternfly/react-charts';
 
 import { alertTypeToColorMap } from '../utils/utils';
 
 type HealthPopupChartProps = {
-  alerts: SimplifiedAlerts;
+  alerts: AlertsByHealthImpact;
 };
 
 const HealthPopupChart: React.FC<HealthPopupChartProps> = ({ alerts }) => {

@@ -8,10 +8,12 @@ import { labelsToParams } from '@virtualmachines/details/tabs/overview/utils/uti
 
 import { AlertResource } from '../../status-card/utils/utils';
 
+type UseSimplifiedAlerts = () => SimplifiedAlerts;
+
 const getAlertURL = (alert: Alert) =>
   `${AlertResource.plural}/${alert?.rule?.id}?${labelsToParams(alert.labels)}`;
 
-const useAlerts = (): SimplifiedAlerts => {
+const useSimplifiedAlerts: UseSimplifiedAlerts = () => {
   const [alerts] = useKubevirtAlerts();
 
   return React.useMemo(() => {
@@ -35,4 +37,4 @@ const useAlerts = (): SimplifiedAlerts => {
   }, [alerts]);
 };
 
-export default useAlerts;
+export default useSimplifiedAlerts;

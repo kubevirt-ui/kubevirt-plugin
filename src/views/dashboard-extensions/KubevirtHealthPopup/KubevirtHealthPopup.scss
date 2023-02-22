@@ -17,4 +17,8 @@
       margin-right: var(--pf-global--spacer--sm);
     }
   }
+
+  &__empty-state--no-alerts {
+    padding-top: 16px;
+  }
 }
