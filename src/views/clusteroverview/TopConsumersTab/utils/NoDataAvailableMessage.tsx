@@ -1,9 +1,8 @@
 import * as React from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Popover } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
 
 import { NON_VCPU_LINK, vCPU_LINK } from './constants';
 
@@ -36,9 +35,10 @@ const NoDataAvailableMessage: React.FC<NoDataAvailableMessageProps> = ({ isVCPU 
   return (
     <div className="kv-top-consumers-card__chart-list-no-data-msg pf-u-text-align-center">
       {t('No data available')}
-      <Popover aria-label={t('Help')} bodyContent={bodyContent}>
-        <HelpIcon className="kv-top-consumers-card__chart-list-no-data-msg--icon" />
-      </Popover>
+      <HelpTextIcon
+        bodyContent={bodyContent}
+        helpIconClassName="kv-top-consumers-card__chart-list-no-data-msg--icon"
+      />
     </div>
   );
 };
