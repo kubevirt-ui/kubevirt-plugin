@@ -10,7 +10,6 @@ import {
   createVmSSHSecret,
   removeSecretToVM,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
-import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sDelete, k8sPatch, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -79,34 +78,6 @@ export const attachVMSecret = async (
 
     return vmDraft;
   });
-
-  const updatedSecret = produce(newSSHSecret, (draftSecret) => {
-    const ownerReference = buildOwnerReference(vm, { blockOwnerDeletion: false });
-    if (draftSecret.metadata.ownerReferences)
-      draftSecret.metadata.ownerReferences.push(ownerReference);
-    else {
-      draftSecret.metadata.ownerReferences = [ownerReference];
-    }
-  });
-
-  await k8sUpdate({
-    model: SecretModel,
-    data: updatedSecret,
-  });
-
-  if (vmOldSecret) {
-    const updatedOldSecret = produce(vmOldSecret, (draftSecret) => {
-      if (draftSecret.metadata.ownerReferences)
-        draftSecret.metadata.ownerReferences = draftSecret.metadata.ownerReferences.filter(
-          (ref) => ref?.uid !== vm?.metadata?.uid,
-        );
-    });
-
-    await k8sUpdate({
-      model: SecretModel,
-      data: updatedOldSecret,
-    });
-  }
 };
 
 export const detachVMSecret = async (vm: V1VirtualMachine, vmSecret: IoK8sApiCoreV1Secret) => {
