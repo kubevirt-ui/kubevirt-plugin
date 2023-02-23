@@ -3,6 +3,8 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { getSSHNodePort } from '@kubevirt-utils/utils/utils';
 
+import { SERVICE_TYPES } from './constants';
+
 export type useSSHCommandResult = {
   command: string;
   user: string;
@@ -14,11 +16,17 @@ const useSSHCommand = (
   vm: V1VirtualMachine,
   sshService: IoK8sApiCoreV1Service,
 ): useSSHCommandResult => {
-  const consoleHostname = window.location.hostname; // fallback to console hostname
+  const consoleHostname =
+    sshService?.spec?.type === SERVICE_TYPES.LOAD_BALANCER
+      ? sshService?.status?.loadBalancer?.ingress?.[0]?.ip
+      : window.location.hostname; // fallback to console hostname
 
   const { users } = getCloudInitCredentials(vm);
   const user = users?.[0]?.name;
-  const sshServicePort = getSSHNodePort(sshService);
+  const sshServicePort =
+    sshService?.spec?.type === SERVICE_TYPES.LOAD_BALANCER
+      ? sshService?.spec?.ports?.[0]?.port
+      : getSSHNodePort(sshService);
 
   let command = 'ssh ';
 
