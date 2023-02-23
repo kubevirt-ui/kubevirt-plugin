@@ -91,4 +91,9 @@ export const getRegistryHelperText = (template: V1Template, t: TFunction) => {
     });
 };
 
-export const appendDockerPrefix = (image: string) => 'docker://'.concat(image);
+const DOCKER_PREFIX = 'docker://';
+
+export const appendDockerPrefix = (image: string) => {
+  return image?.startsWith(DOCKER_PREFIX) ? image : DOCKER_PREFIX.concat(image);
+};
+export const removeDockerPrefix = (image: string) => image.replace(DOCKER_PREFIX, '');

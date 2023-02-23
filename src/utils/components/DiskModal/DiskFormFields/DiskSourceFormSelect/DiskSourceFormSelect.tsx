@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { removeDockerPrefix } from '@catalog/customize/components/CustomizeSource/utils';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -131,7 +132,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
       )}
       {diskSource === sourceTypes.REGISTRY && (
         <DiskSourceContainer
-          url={registrySource}
+          url={removeDockerPrefix(registrySource)}
           onChange={(value) =>
             dispatchDiskSourceState({
               type: diskSourceReducerActions.SET_REGISTRY_SOURCE,
