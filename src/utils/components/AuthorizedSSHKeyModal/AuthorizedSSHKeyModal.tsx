@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
@@ -20,14 +19,14 @@ import SelectSecret from './SelectSecret';
 import './auth-ssh-key-modal.scss';
 
 export const AuthorizedSSHKeyModal: React.FC<{
+  namespace: string;
   isOpen: boolean;
   onClose: () => void;
   sshKey?: string;
   vmSecretName: string;
   enableCreation?: boolean;
   onSubmit: (secretName: string, sshKey?: string) => Promise<void | any>;
-}> = ({ sshKey, vmSecretName, onSubmit, onClose, isOpen, enableCreation = true }) => {
-  const { ns: namespace } = useParams<{ ns: string }>();
+}> = ({ sshKey, vmSecretName, onSubmit, onClose, isOpen, namespace, enableCreation = true }) => {
   const { t } = useKubevirtTranslation();
   const [value, setValue] = React.useState(sshKey);
   const [createSecretOpen, setCreateSecretOpen] = React.useState(vmSecretName ? false : true);
