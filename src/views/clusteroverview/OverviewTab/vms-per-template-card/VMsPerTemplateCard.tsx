@@ -1,19 +1,10 @@
 import React, { useMemo } from 'react';
 import { ReactNode } from 'react';
 
+import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ChartDonut } from '@patternfly/react-charts';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  EmptyState,
-  EmptyStateBody,
-  EmptyStateIcon,
-  Spinner,
-  TitleSizes,
-} from '@patternfly/react-core';
+import { Card, CardBody, CardHeader, CardTitle, TitleSizes } from '@patternfly/react-core';
 
 import useVMsPerTemplateResources from './hooks/useVMsPerTemplateResources';
 import EmptyStateNoVMs from './utils/EmptyStateNoVMs';
@@ -64,12 +55,7 @@ const VMsPerTemplateCard = () => {
 
   let body: ReactNode = null;
   if (!loaded) {
-    body = (
-      <EmptyState>
-        <EmptyStateIcon variant="container" component={Spinner} />
-        <EmptyStateBody>{t('Loading ...')}</EmptyStateBody>
-      </EmptyState>
-    );
+    body = <LoadingEmptyState />;
   } else if (!numVMs) {
     body = <EmptyStateNoVMs titleSize={TitleSizes.md} />;
   } else {

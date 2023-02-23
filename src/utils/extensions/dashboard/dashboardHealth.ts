@@ -1,23 +1,26 @@
-import { HealthState } from '@openshift-console/dynamic-plugin-sdk';
-import { URLHealthHandler } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/dashboard-types';
+import { HCOHealthStatus } from '@kubevirt-utils/extensions/dashboard/types';
+import { HealthState, PrometheusHealthHandler } from '@openshift-console/dynamic-plugin-sdk';
 
-type KubevirtHealthResponse = {
-  apiserver: {
-    connectivity: string;
-  };
-};
+export const getKubevirtHealthState: PrometheusHealthHandler = (responses) => {
+  const { response, error } = responses?.[0];
 
-export const getKubevirtHealthState: URLHealthHandler<KubevirtHealthResponse> = (
-  response,
-  error,
-) => {
   if (error) {
     return { state: HealthState.NOT_AVAILABLE };
   }
+
   if (!response) {
     return { state: HealthState.LOADING };
   }
-  return response?.apiserver?.connectivity === 'ok'
-    ? { state: HealthState.OK }
-    : { state: HealthState.ERROR };
+
+  const hcoHealthStatus = parseInt(response?.data?.result?.[0]?.value?.[1]);
+
+  switch (hcoHealthStatus) {
+    case HCOHealthStatus.none:
+      return { state: HealthState.OK };
+    case HCOHealthStatus.warning:
+      return { state: HealthState.WARNING };
+    case HCOHealthStatus.critical:
+    default:
+      return { state: HealthState.ERROR };
+  }
 };

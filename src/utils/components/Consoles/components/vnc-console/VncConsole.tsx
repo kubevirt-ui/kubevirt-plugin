@@ -1,6 +1,7 @@
 import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import cn from 'classnames';
 
+import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import KeyTable from '@novnc/novnc/core/input/keysym';
 import RFBCreate from '@novnc/novnc/core/rfb';
@@ -9,8 +10,6 @@ import {
   Button,
   EmptyState,
   EmptyStateBody,
-  EmptyStateIcon,
-  Spinner,
   Tab,
   Tabs,
   TabTitleText,
@@ -203,10 +202,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
             </EmptyState>
           ))}
         {status === connecting && (
-          <EmptyState>
-            <EmptyStateIcon variant="container" component={Spinner} />
-            <EmptyStateBody>{textConnecting || t('Connecting')}</EmptyStateBody>
-          </EmptyState>
+          <LoadingEmptyState bodyContents={textConnecting || t('Connecting')} />
         )}
 
         {hasGPU && status === connected && (
