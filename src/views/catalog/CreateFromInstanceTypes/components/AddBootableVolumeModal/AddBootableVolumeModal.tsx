@@ -186,7 +186,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         }
         onClose();
       }}
-      submitBtnText={t('Upload')}
+      submitBtnText={t('Save')}
       isDisabled={!labels?.[DEFAULT_PREFERENCE_LABEL]}
     >
       {t('You can upload a new volume or use an existing PersistentVolumeClaim (PVC)')}
