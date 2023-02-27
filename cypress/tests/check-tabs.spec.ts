@@ -14,8 +14,7 @@ describe('Check all virtualization pages can be loaded', () => {
     cy.deleteResource(K8S_KIND.TEMPLATE, 'vm-template-example', 'default');
   });
 
-  //TODO: Fix by Guohua
-  xdescribe('Check VM list and tabs', () => {
+  describe('Check VM list and tabs', () => {
     it('create vm-example', () => {
       cy.visitVMs();
       vm.createVMFromYAML();
@@ -55,6 +54,9 @@ describe('Check all virtualization pages can be loaded', () => {
 
       tab.navigateToSnapshots();
       cy.contains('Take snapshot').should('be.visible');
+
+      tab.navigateToDiagnostic();
+      cy.contains('Message').should('be.visible');
     });
   });
 
@@ -70,16 +72,16 @@ describe('Check all virtualization pages can be loaded', () => {
       tab.navigateToYAML();
       cy.contains('Download').should('be.visible');
 
-      tab.navigateToScheduling();
+      tab.navigateToTScheduling();
       cy.contains('Tolerations').should('be.visible');
 
-      tab.navigateToNetworks();
+      tab.navigateToTNetworks();
       cy.contains('Pod networking').should('be.visible');
 
-      tab.navigateToDisks();
+      tab.navigateToTDisks();
       cy.contains('rootdisk').should('be.visible');
 
-      tab.navigateToScripts();
+      tab.navigateToTScripts();
       cy.contains('Cloud-init').should('be.visible');
 
       tab.navigateToParameters();
