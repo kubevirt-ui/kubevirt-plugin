@@ -17,14 +17,14 @@ const useSSHCommand = (
   sshService: IoK8sApiCoreV1Service,
 ): useSSHCommandResult => {
   const consoleHostname =
-    sshService?.spec?.type === SERVICE_TYPES.LOAD_BALANCER
+    (sshService?.spec?.type as string) === SERVICE_TYPES.LOAD_BALANCER
       ? sshService?.status?.loadBalancer?.ingress?.[0]?.ip
       : window.location.hostname; // fallback to console hostname
 
   const { users } = getCloudInitCredentials(vm);
   const user = users?.[0]?.name;
   const sshServicePort =
-    sshService?.spec?.type === SERVICE_TYPES.LOAD_BALANCER
+    (sshService?.spec?.type as string) === SERVICE_TYPES.LOAD_BALANCER
       ? sshService?.spec?.ports?.[0]?.port
       : getSSHNodePort(sshService);
 
