@@ -99,16 +99,16 @@ describe('Check all virtualization pages can be loaded', () => {
       tab.navigateToYAML();
       cy.contains('Download').should('be.visible');
 
-      tab.navigateToScheduling();
+      tab.navigateToTScheduling();
       cy.contains('Tolerations').should('be.visible');
 
-      tab.navigateToNetworks();
+      tab.navigateToTNetworks();
       cy.contains('Pod networking').should('be.visible');
 
-      tab.navigateToDisks();
+      tab.navigateToTDisks();
       cy.contains('rootdisk').should('be.visible');
 
-      tab.navigateToScripts();
+      tab.navigateToTScripts();
       cy.contains('Cloud-init').should('be.visible');
 
       tab.navigateToParameters();
