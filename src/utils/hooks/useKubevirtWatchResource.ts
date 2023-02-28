@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import {
-  useAccessReview,
-  useK8sWatchResource,
-  WatchK8sResource,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResource, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 
 const useKubevirtWatchResource = (watchOptions: WatchK8sResource) => {
   const [data, setData] = useState([]);
@@ -12,15 +8,10 @@ const useKubevirtWatchResource = (watchOptions: WatchK8sResource) => {
   const [loadErrorData, setLoadErrorData] = useState<any>();
   const [resource, loaded, loadError] = useK8sWatchResource<any>(watchOptions);
 
-  const [getListAllowed, loading] = useAccessReview({
-    verb: 'get',
-    resource: watchOptions?.groupVersionKind?.kind || watchOptions?.kind,
-    namespace: watchOptions?.namespace,
-  });
-
   useEffect(() => {
-    if (!getListAllowed && !loading) {
+    if (loadError) {
       setLoadErrorData(loadError);
+      setLoadedData(true);
     }
     if (resource && loaded) {
       const isList = typeof resource?.[0] === 'string';
@@ -28,7 +19,7 @@ const useKubevirtWatchResource = (watchOptions: WatchK8sResource) => {
       setLoadedData(loaded);
       setLoadErrorData(null);
     }
-  }, [resource, loaded, loadError, getListAllowed, loading]);
+  }, [resource, loaded, loadError]);
   return [data, loadedData, loadErrorData];
 };
 
