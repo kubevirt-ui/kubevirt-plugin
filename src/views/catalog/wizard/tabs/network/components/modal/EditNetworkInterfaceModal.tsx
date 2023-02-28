@@ -4,6 +4,7 @@ import { produceVMNetworks, UpdateValidatedVM } from '@catalog/utils/WizardVMCon
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { Form } from '@patternfly/react-core';
@@ -48,6 +49,7 @@ const EditNetworkInterfaceModal: React.FC<EditNetworkInterfaceModalProps> = ({
     const resultNetwork: V1Network = {
       name: nicName,
     };
+
     if (!networkNameStartWithPod(networkName) && networkName) {
       resultNetwork.multus = { networkName };
     } else {
@@ -68,17 +70,19 @@ const EditNetworkInterfaceModal: React.FC<EditNetworkInterfaceModalProps> = ({
       resultInterface.sriov = {};
     }
 
+    const updatedInterfaces: V1Interface[] = [
+      ...(getInterfaces(currentVM)?.filter(({ name }) => name !== network.name) || []),
+      resultInterface,
+    ];
+
+    const updatedNetworks: V1Network[] = [
+      ...(getNetworks(currentVM)?.filter(({ name }) => name !== network.name) || []),
+      resultNetwork,
+    ];
+
     const networkProducer = produceVMNetworks(currentVM, (draft) => {
-      draft.spec.template.spec.domain.devices.interfaces.filter(
-        ({ name }) => name !== network.name,
-      );
-      draft.spec.template.spec.domain.devices.interfaces.push(resultInterface);
-
-      draft.spec.template.spec.domain.devices.interfaces.filter(
-        ({ name }) => name !== network.name,
-      );
-
-      draft.spec.template.spec.networks.push(resultNetwork);
+      draft.spec.template.spec.domain.devices.interfaces = updatedInterfaces;
+      draft.spec.template.spec.networks = updatedNetworks;
     });
 
     return updateVM(networkProducer);
