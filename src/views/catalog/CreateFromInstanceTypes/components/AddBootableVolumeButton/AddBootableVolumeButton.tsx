@@ -12,7 +12,6 @@ export type AddBootableVolumeButtonProps = {
   loaded: boolean;
   loadError?: any;
   buttonVariant?: ButtonVariant;
-  buttonTitle?: string;
 };
 
 const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
@@ -21,7 +20,6 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
   loaded,
   loadError,
   buttonVariant,
-  buttonTitle,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -41,7 +39,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
       isLoading={!loaded}
       isDisabled={!loaded || loadError}
     >
-      {buttonTitle || t('Add volume')}
+      {t('Add volume')}
     </Button>
   );
 };
