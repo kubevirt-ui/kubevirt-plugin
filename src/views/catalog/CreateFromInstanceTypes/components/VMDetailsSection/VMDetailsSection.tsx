@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useState } from 'react';
 
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ExpandableSection } from '@patternfly/react-core';
 
@@ -20,6 +21,7 @@ type VMDetailsSectionProps = {
   instancetype: InstanceTypeState;
   sshSecretCredentials: SSHSecretCredentials;
   setSSHSecretCredentials: Dispatch<SetStateAction<SSHSecretCredentials>>;
+  pvcSource: V1alpha1PersistentVolumeClaim;
 };
 
 const VMDetailsSection: React.FC<VMDetailsSectionProps> = ({
@@ -30,6 +32,7 @@ const VMDetailsSection: React.FC<VMDetailsSectionProps> = ({
   namespace,
   sshSecretCredentials,
   setSSHSecretCredentials,
+  pvcSource,
 }) => {
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState<boolean>(false);
 
@@ -54,6 +57,7 @@ const VMDetailsSection: React.FC<VMDetailsSectionProps> = ({
         namespace={namespace}
         bootSource={bootSource}
         instancetype={instancetype}
+        pvcSource={pvcSource}
       />
     </div>
   );

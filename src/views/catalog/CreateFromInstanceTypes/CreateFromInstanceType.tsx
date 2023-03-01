@@ -1,14 +1,16 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
+import { getPVC } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
@@ -28,12 +30,14 @@ import './CreateFromInstanceType.scss';
 
 const CreateFromInstanceType: FC = () => {
   const [ns] = useActiveNamespace();
+  const { preferences, instanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();
+  const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
+
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
+
   const [selectedBootableVolume, setSelectedBootableVolume] = useState<V1beta1DataSource>();
   const [selectedInstanceType, setSelectedInstanceType] =
     useState<InstanceTypeState>(initialInstanceTypeState);
-  const { preferences, instanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();
-  const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
   const [vmName, setVMName] = useState<string>(
     uniqueNamesGenerator({
       dictionaries: [adjectives, animals],
@@ -44,8 +48,26 @@ const CreateFromInstanceType: FC = () => {
     sshSecretName: '',
     sshSecretKey: '',
   });
+  const [pvcSource, setPVCSource] = useState<V1alpha1PersistentVolumeClaim>();
 
   const namespace = ns === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : ns;
+
+  useEffect(() => {
+    if (!selectedBootableVolume && pvcSource) {
+      setPVCSource(null);
+      return;
+    }
+
+    const pvcMetadata = selectedBootableVolume?.spec?.source?.pvc;
+    if (
+      pvcSource?.metadata?.name !== pvcMetadata?.name ||
+      pvcSource?.metadata?.namespace !== pvcMetadata?.namespace
+    ) {
+      getPVC(pvcMetadata?.name, pvcMetadata?.namespace).then((pvc) => {
+        setPVCSource(pvc);
+      });
+    }
+  }, [pvcSource, selectedBootableVolume]);
 
   return (
     <>
@@ -105,6 +127,7 @@ const CreateFromInstanceType: FC = () => {
                   instancetype={selectedInstanceType}
                   sshSecretCredentials={sshSecretCredentials}
                   setSSHSecretCredentials={setSSHSecretCredentials}
+                  pvcSource={pvcSource}
                 />
               </SectionListItem>
             </List>
@@ -112,7 +135,13 @@ const CreateFromInstanceType: FC = () => {
         </GridItem>
       </Grid>
       <CreateVMFooter
-        vm={generateVM(selectedBootableVolume, ns, selectedInstanceType?.name, vmName)}
+        vm={generateVM(
+          selectedBootableVolume,
+          ns,
+          selectedInstanceType?.name,
+          vmName,
+          pvcSource?.spec?.storageClassName,
+        )}
         onCancel={() => {
           setSelectedBootableVolume(null);
           setSelectedInstanceType(initialInstanceTypeState);

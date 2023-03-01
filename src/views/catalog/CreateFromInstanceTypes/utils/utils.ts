@@ -18,6 +18,7 @@ export const generateVM = (
   activeNamespace: string,
   instanceTypeName: string,
   vmName?: string,
+  storageClassName?: string,
 ) => {
   const virtualmachineName =
     vmName ??
@@ -85,7 +86,10 @@ export const generateVM = (
               name: dataSource?.metadata?.name,
               namespace: dataSource?.metadata?.namespace,
             },
-            storage: { resources: { requests: { storage: '' } } },
+            storage: {
+              storageClassName,
+              resources: { requests: { storage: '' } },
+            },
           },
         },
       ],
