@@ -13,12 +13,12 @@ type HelpTextIconProps = {
   helpIconClassName?: string;
 };
 
-const HelpTextIcon: FC<HelpTextIconProps> = (
+const HelpTextIcon: FC<HelpTextIconProps> = ({
   bodyContent,
-  position = 'top',
+  position = PopoverPosition.top,
   className = 'help-text-icon__popover',
   helpIconClassName = '',
-) => (
+}) => (
   <Popover aria-label={'Help'} bodyContent={bodyContent} className={className} position={position}>
     <HelpIcon className={helpIconClassName} />
   </Popover>
