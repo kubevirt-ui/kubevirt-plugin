@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
@@ -7,25 +7,16 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstance,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import SharedNetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
+import {
+  createInterface,
+  createNetwork,
+  updateVMNetworkInterface,
+} from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { ModalPendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { getChangedNics } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
-import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { Form } from '@patternfly/react-core';
-import NameFormField from '@virtualmachines/details/tabs/form/NameFormField';
-
-import NetworkInterfaceMACAddressInput from './NetworkInterfaceFormFields/NetworkInterfaceMacAddressInput';
-import NetworkInterfaceModelSelect from './NetworkInterfaceFormFields/NetworkInterfaceModelSelect';
-import NetworkInterfaceNetworkSelect from './NetworkInterfaceFormFields/NetworkInterfaceNetworkSelect';
-import NetworkInterfaceTypeSelect from './NetworkInterfaceFormFields/NetworkInterfaceTypeSelect';
-import { interfaceModelType, interfaceTypeTypes } from './utils/constants';
-import {
-  generateNicName,
-  networkNameStartWithPod,
-  podNetworkExists,
-  updateVMNetworkInterface,
-} from './utils/helpers';
 
 type NetworkInterfaceModalProps = {
   vm: V1VirtualMachine;
@@ -35,97 +26,47 @@ type NetworkInterfaceModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
+const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   vm,
   isOpen,
   onClose,
   headerText,
   vmi,
 }) => {
-  const [nicName, setNicName] = React.useState(generateNicName());
-  const [interfaceModel, setInterfaceModel] = React.useState(interfaceModelType.VIRTIO);
-  const [networkName, setNetworkName] = React.useState(null);
-  const [interfaceType, setInterfaceType] = React.useState(
-    podNetworkExists(vm) ? interfaceTypeTypes.BRIDGE : interfaceTypeTypes.MASQUERADE,
+  const onSubmit = useCallback(
+    ({ nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType }) =>
+      () => {
+        const resultNetwork = createNetwork(nicName, networkName);
+        const resultInterface = createInterface(
+          nicName,
+          interfaceModel,
+          interfaceMACAddress,
+          interfaceType,
+        );
+
+        const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
+        const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
+        const updatedVM = updateVMNetworkInterface(vm, updatedNetworks, updatedInterfaces);
+
+        return k8sUpdate({
+          model: VirtualMachineModel,
+          data: updatedVM,
+          ns: updatedVM.metadata.namespace,
+          name: updatedVM.metadata.name,
+        });
+      },
+    [vm],
   );
-  const [interfaceMACAddress, setInterfaceMACAddress] = React.useState(undefined);
-
-  const [submitDisabled, setSubmitDisabled] = React.useState(true);
-
-  const updatedVirtualMachine = React.useMemo(() => {
-    const resultNetwork: V1Network = {
-      name: nicName,
-    };
-    if (!networkNameStartWithPod(networkName) && networkName) {
-      resultNetwork.multus = { networkName };
-    } else {
-      resultNetwork.pod = {};
-    }
-
-    const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
-
-    const resultInterface: V1Interface = {
-      name: nicName,
-      model: interfaceModel,
-      macAddress: interfaceMACAddress,
-    };
-
-    if (interfaceType === interfaceTypeTypes.BRIDGE) {
-      resultInterface.bridge = {};
-    } else if (interfaceType === interfaceTypeTypes.MASQUERADE) {
-      resultInterface.masquerade = {};
-    } else if (interfaceType === interfaceTypeTypes.SRIOV) {
-      resultInterface.sriov = {};
-    }
-
-    const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
-
-    return updateVMNetworkInterface(vm, updatedNetworks, updatedInterfaces);
-  }, [interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName, vm]);
 
   return (
-    <TabModal
-      obj={updatedVirtualMachine}
-      onSubmit={(obj) =>
-        k8sUpdate({
-          model: VirtualMachineModel,
-          data: obj,
-          ns: obj.metadata.namespace,
-          name: obj.metadata.name,
-        })
-      }
+    <SharedNetworkInterfaceModal
       isOpen={isOpen}
       onClose={onClose}
       headerText={headerText}
-      isDisabled={submitDisabled}
-    >
-      <Form>
-        {vmi && <ModalPendingChangesAlert isChanged={getChangedNics(vm, vmi)?.length > 0} />}
-        <NameFormField objName={nicName} setObjName={setNicName} />
-        <NetworkInterfaceModelSelect
-          interfaceModel={interfaceModel}
-          setInterfaceModel={setInterfaceModel}
-        />
-        <NetworkInterfaceNetworkSelect
-          vm={vm}
-          networkName={networkName}
-          setNetworkName={setNetworkName}
-          setInterfaceType={setInterfaceType}
-          setSubmitDisabled={setSubmitDisabled}
-        />
-        <NetworkInterfaceTypeSelect
-          interfaceType={interfaceType}
-          setInterfaceType={setInterfaceType}
-          networkName={networkName}
-        />
-        <NetworkInterfaceMACAddressInput
-          interfaceMACAddress={interfaceMACAddress}
-          setInterfaceMACAddress={setInterfaceMACAddress}
-          setIsError={setSubmitDisabled}
-          isDisabled={!networkName || networkNameStartWithPod(networkName)}
-        />
-      </Form>
-    </TabModal>
+      vm={vm}
+      onSubmit={onSubmit}
+      Header={vmi && <ModalPendingChangesAlert isChanged={getChangedNics(vm, vmi)?.length > 0} />}
+    />
   );
 };
 

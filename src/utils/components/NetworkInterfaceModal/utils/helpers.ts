@@ -1,8 +1,8 @@
-import { TFunction } from 'i18next';
 import produce from 'immer';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export const generateNicName = () => {
   return `nic-${uniqueNamesGenerator({
@@ -17,6 +17,13 @@ export const podNetworkExists = (vm: V1VirtualMachine): boolean =>
 export const networkNameStartWithPod = (networkName: string): boolean =>
   networkName?.startsWith('Pod');
 
+export const getNetworkName = (network: V1Network): string => {
+  if (network) {
+    return network?.pod ? t('Pod networking') : network?.multus?.networkName;
+  }
+  return null;
+};
+
 export const updateVMNetworkInterface = (
   vm: V1VirtualMachine,
   updatedNetworks: V1Network[],
@@ -29,5 +36,30 @@ export const updateVMNetworkInterface = (
   return updatedVM;
 };
 
-export const getNetworkName = (network: V1Network, t: TFunction): string =>
-  network.pod ? t('Pod networking') : network.multus?.networkName;
+export const createNetwork = (nicName: string, networkName: string): V1Network => {
+  const network: V1Network = {
+    name: nicName,
+  };
+
+  if (!networkNameStartWithPod(networkName) && networkName) {
+    network.multus = { networkName };
+  } else {
+    network.pod = {};
+  }
+
+  return network;
+};
+
+export const createInterface = (
+  nicName: string,
+  interfaceModel: string,
+  interfaceMACAddress: string,
+  interfaceType: string,
+): V1Interface => {
+  return {
+    name: nicName,
+    model: interfaceModel,
+    macAddress: interfaceMACAddress,
+    [interfaceType]: {},
+  };
+};

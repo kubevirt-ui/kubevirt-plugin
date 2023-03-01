@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, FC, useMemo, useState } from 'react';
 
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/NetworkAttachmentDefinitionModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -19,14 +19,15 @@ import { networkNameStartWithPod, podNetworkExists } from '../utils/helpers';
 type NetworkInterfaceNetworkSelectProps = {
   vm: V1VirtualMachine;
   networkName: string;
-  setNetworkName: React.Dispatch<React.SetStateAction<string>>;
-  setInterfaceType: React.Dispatch<React.SetStateAction<string>>;
-  setSubmitDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  setNetworkName: Dispatch<React.SetStateAction<string>>;
+  setInterfaceType: Dispatch<React.SetStateAction<string>>;
+  setSubmitDisabled: Dispatch<React.SetStateAction<boolean>>;
   isEditing?: boolean | undefined;
   editInitValueNetworkName?: string | undefined;
+  namespace?: string;
 };
 
-const NetworkInterfaceNetworkSelect: React.FC<NetworkInterfaceNetworkSelectProps> = ({
+const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   vm,
   networkName,
   setNetworkName,
@@ -34,29 +35,30 @@ const NetworkInterfaceNetworkSelect: React.FC<NetworkInterfaceNetworkSelectProps
   setSubmitDisabled,
   isEditing,
   editInitValueNetworkName,
+  namespace,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const [nads, loaded, error] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
     isList: true,
-    namespace: vm?.metadata?.namespace,
+    namespace: vm?.metadata?.namespace || namespace,
   });
 
-  const hasPodNetwork = React.useMemo(() => podNetworkExists(vm), [vm]);
-  const hasNads = React.useMemo(() => nads && nads.length > 0, [nads]);
+  const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
+  const hasNads = useMemo(() => nads && nads.length > 0, [nads]);
   const isPodNetworkingOptionExists =
     !hasPodNetwork || (isEditing && networkNameStartWithPod(editInitValueNetworkName));
 
-  const canCreateNetworkInterface = React.useMemo(
+  const canCreateNetworkInterface = useMemo(
     () => hasNads || !hasPodNetwork,
     [hasNads, hasPodNetwork],
   );
 
-  const podNetworkingText = React.useMemo(() => t('Pod Networking'), [t]);
+  const podNetworkingText = useMemo(() => t('Pod Networking'), [t]);
 
-  const networkOptions = React.useMemo(() => {
+  const networkOptions = useMemo(() => {
     const options = nads?.map(({ metadata }) => ({ key: metadata?.uid, value: metadata?.name }));
     if (isPodNetworkingOptionExists) {
       options.unshift({ key: 'pod-networking', value: podNetworkingText });
@@ -85,7 +87,7 @@ const NetworkInterfaceNetworkSelect: React.FC<NetworkInterfaceNetworkSelectProps
     }
     // if networkName is empty, and pod network exists we can create a NIC with existing NAD if there is one
     else if (loaded && !error && hasNads) {
-      setNetworkName(nads[0].metadata.name);
+      setNetworkName(nads?.[0]?.metadata.name);
     }
     // if no nads and pod network already exists, we can't create a NIC
     else if (loaded && (error || !canCreateNetworkInterface)) {
@@ -118,23 +120,29 @@ const NetworkInterfaceNetworkSelect: React.FC<NetworkInterfaceNetworkSelectProps
       }
       isRequired
     >
-      {hasPodNetwork && !loaded ? (
-        <Loading />
-      ) : (
-        <Select
-          menuAppendTo="parent"
-          isDisabled={!canCreateNetworkInterface}
-          onToggle={setIsOpen}
-          isOpen={isOpen}
-          onSelect={handleChange}
-          variant={SelectVariant.single}
-          selections={networkName}
-        >
-          {networkOptions?.map(({ key, value }) => (
-            <SelectOption key={key} value={value} />
-          ))}
-        </Select>
-      )}
+      <div data-test-id="network-attachment-definition-select">
+        {hasPodNetwork && !loaded ? (
+          <Loading />
+        ) : (
+          <Select
+            menuAppendTo="parent"
+            isDisabled={!canCreateNetworkInterface}
+            onToggle={setIsOpen}
+            isOpen={isOpen}
+            onSelect={handleChange}
+            variant={SelectVariant.single}
+            selections={networkName}
+          >
+            {networkOptions?.map(({ key, value }) => (
+              <SelectOption
+                key={key}
+                value={value}
+                data-test-id={`network-attachment-definition-select-${key}`}
+              />
+            ))}
+          </Select>
+        )}
+      </div>
     </FormGroup>
   );
 };

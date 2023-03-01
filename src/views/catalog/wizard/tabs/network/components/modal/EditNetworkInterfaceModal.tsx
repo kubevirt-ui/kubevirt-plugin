@@ -1,20 +1,14 @@
-import * as React from 'react';
+import React from 'react';
 
 import { produceVMNetworks, UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
-import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
+import {
+  createInterface,
+  createNetwork,
+} from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
-import { Form } from '@patternfly/react-core';
-
-import NameFormField from './components/NameFormField';
-import NetworkInterfaceMACAddressInput from './components/NetworkInterfaceMacAddressInput';
-import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
-import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect';
-import NetworkInterfaceTypeSelect from './components/NetworkInterfaceTypeSelect';
-import { interfaceTypeTypes } from './utils/constants';
-import { getNetworkName, networkNameStartWithPod } from './utils/helpers';
 
 type EditNetworkInterfaceModalProps = {
   vm: V1VirtualMachine;
@@ -32,94 +26,46 @@ const EditNetworkInterfaceModal: React.FC<EditNetworkInterfaceModalProps> = ({
   nicPresentation,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { network, iface } = nicPresentation;
-  const [nicName, setNicName] = React.useState(network.name);
-  const [interfaceModel, setInterfaceModel] = React.useState(iface.model);
-  const [networkName, setNetworkName] = React.useState(getNetworkName(network, t));
-  const [interfaceType, setInterfaceType] = React.useState(
-    interfaceTypeTypes[getNetworkInterfaceType(iface).toUpperCase()],
-  );
 
-  const [interfaceMACAddress, setInterfaceMACAddress] = React.useState(iface.macAddress);
-
-  const [submitDisabled, setSubmitDisabled] = React.useState(true);
-
-  const onSubmit = (currentVM) => {
-    const resultNetwork: V1Network = {
-      name: nicName,
-    };
-    if (!networkNameStartWithPod(networkName) && networkName) {
-      resultNetwork.multus = { networkName };
-    } else {
-      resultNetwork.pod = {};
-    }
-
-    const resultInterface: V1Interface = {
-      name: nicName,
-      model: interfaceModel,
-      macAddress: interfaceMACAddress,
-    };
-
-    if (interfaceType === interfaceTypeTypes.BRIDGE) {
-      resultInterface.bridge = {};
-    } else if (interfaceType === interfaceTypeTypes.MASQUERADE) {
-      resultInterface.masquerade = {};
-    } else if (interfaceType === interfaceTypeTypes.SRIOV) {
-      resultInterface.sriov = {};
-    }
-
-    const networkProducer = produceVMNetworks(currentVM, (draft) => {
-      draft.spec.template.spec.domain.devices.interfaces.filter(
-        ({ name }) => name !== network.name,
-      );
-      draft.spec.template.spec.domain.devices.interfaces.push(resultInterface);
-
-      draft.spec.template.spec.domain.devices.interfaces.filter(
-        ({ name }) => name !== network.name,
+  const onSubmit =
+    ({ nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType }) =>
+    (currentVM) => {
+      const resultNetwork = createNetwork(nicName, networkName);
+      const resultInterface = createInterface(
+        nicName,
+        interfaceModel,
+        interfaceMACAddress,
+        interfaceType,
       );
 
-      draft.spec.template.spec.networks.push(resultNetwork);
-    });
+      const networkProducer = produceVMNetworks(currentVM, (draftVM) => {
+        draftVM.spec.template.spec.domain.devices.interfaces = [
+          ...(draftVM.spec.template.spec.domain.devices.interfaces.filter(
+            ({ name }) => name !== nicPresentation?.network?.name,
+          ) || []),
+          resultInterface,
+        ];
 
-    return updateVM(networkProducer);
-  };
+        draftVM.spec.template.spec.networks = [
+          ...(draftVM.spec.template.spec.networks.filter(
+            ({ name }) => name !== nicPresentation?.network?.name,
+          ) || []),
+          resultNetwork,
+        ];
+      });
+
+      return updateVM(networkProducer);
+    };
 
   return (
-    <TabModal
-      obj={vm}
+    <NetworkInterfaceModal
+      vm={vm}
+      headerText={t('Edit network interface')}
       onSubmit={onSubmit}
+      nicPresentation={nicPresentation}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('Edit network interface')}
-      isDisabled={submitDisabled}
-    >
-      <Form>
-        <NameFormField objName={nicName} setObjName={setNicName} />
-        <NetworkInterfaceModelSelect
-          interfaceModel={interfaceModel}
-          setInterfaceModel={setInterfaceModel}
-        />
-        <NetworkInterfaceNetworkSelect
-          vm={vm}
-          networkName={networkName}
-          setNetworkName={setNetworkName}
-          setInterfaceType={setInterfaceType}
-          setSubmitDisabled={setSubmitDisabled}
-          isEditing
-          editInitValueNetworkName={getNetworkName(network, t)}
-        />
-        <NetworkInterfaceTypeSelect
-          interfaceType={interfaceType}
-          setInterfaceType={setInterfaceType}
-          networkName={networkName}
-        />
-        <NetworkInterfaceMACAddressInput
-          interfaceMACAddress={interfaceMACAddress}
-          setInterfaceMACAddress={setInterfaceMACAddress}
-          isDisabled={!networkName || networkNameStartWithPod(networkName)}
-        />
-      </Form>
-    </TabModal>
+    />
   );
 };
 

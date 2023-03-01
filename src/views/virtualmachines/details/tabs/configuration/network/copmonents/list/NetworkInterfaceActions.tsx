@@ -4,6 +4,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { updateVMNetworkInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
@@ -18,7 +19,6 @@ import {
 } from '@patternfly/react-core';
 
 import EditNetworkInterfaceModal from '../modal/EditNetworkInterfaceModal';
-import { updateVMNetworkInterface } from '../modal/utils/helpers';
 
 type NetworkInterfaceActionsProps = {
   vm: V1VirtualMachine;
