@@ -65,6 +65,15 @@ export const getVMBootSourceType = (vm: V1VirtualMachine): TemplateBootSource =>
     };
   }
 
+  if (volume?.persistentVolumeClaim) {
+    return {
+      type: BOOT_SOURCE.PVC,
+      source: {
+        pvc: { name: volume?.persistentVolumeClaim.claimName, namespace: vm?.metadata?.namespace },
+      },
+    };
+  }
+
   return { type: BOOT_SOURCE.NONE, source: {} };
 };
 
