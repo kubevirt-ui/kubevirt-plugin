@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -16,6 +16,7 @@ import BootableVolumeRow from './components/BootableVolumeRow/BootableVolumeRow'
 import ShowAllBootableVolumesButton from './components/ShowAllBootableVolumesButton/ShowAllBootableVolumesButton';
 import useBootVolumeColumns from './hooks/useBootVolumeColumns';
 import useBootVolumeFilters from './hooks/useBootVolumeFilters';
+import useBootVolumeSortColumns from './hooks/useBootVolumeSortColumns';
 import {
   paginationDefaultValuesForm,
   paginationDefaultValuesModal,
@@ -27,10 +28,7 @@ import './BootableVolumeList.scss';
 
 export type BootableVolumeListProps = {
   preferences: { [resourceKeyName: string]: V1alpha2VirtualMachineClusterPreference };
-  bootableVolumeSelectedState: [
-    V1beta1DataSource,
-    React.Dispatch<React.SetStateAction<V1beta1DataSource>>,
-  ];
+  bootableVolumeSelectedState: [V1beta1DataSource, Dispatch<SetStateAction<V1beta1DataSource>>];
   displayShowAllButton?: boolean;
 };
 
@@ -43,6 +41,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const { bootableVolumes, loaded } = useBootableVolumes();
   const columns = useBootVolumeColumns();
   const filters = useBootVolumeFilters(`osName${!displayShowAllButton && '-modal'}`);
+
   const [unfilteredData, data, onFilterChange] = useListPageFilter(
     getAvailableDataSources(bootableVolumes),
     filters,
@@ -51,6 +50,8 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const [pagination, setPagination] = useState(
     displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal,
   );
+
+  const { sortedData, getSortType } = useBootVolumeSortColumns(data, preferences, pagination);
   const onPageChange = ({ page, perPage, startIndex, endIndex }) => {
     setPagination(() => ({
       page,
@@ -120,15 +121,20 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
       <TableComposable variant={TableVariant.compact}>
         <Thead>
           <Tr>
-            {columns.map((col) => (
-              <Th key={col?.id} id={col?.id} width={col?.id === 'description' ? 40 : 30}>
+            {columns.map((col, columnIndex) => (
+              <Th
+                sort={getSortType(columnIndex)}
+                key={col?.id}
+                id={col?.id}
+                width={col?.id === 'description' ? 40 : 30}
+              >
                 {col?.title}
               </Th>
             ))}
           </Tr>
         </Thead>
         <Tbody>
-          {data?.slice(pagination.startIndex, pagination.endIndex)?.map((bs) => (
+          {sortedData?.map((bs) => (
             <BootableVolumeRow
               key={bs?.metadata?.name}
               bootableVolume={bs}
