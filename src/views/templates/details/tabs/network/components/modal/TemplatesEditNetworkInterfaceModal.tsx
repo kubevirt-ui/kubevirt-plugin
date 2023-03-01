@@ -1,35 +1,37 @@
-import React from 'react';
+import React, { FC } from 'react';
 
-import { produceVMNetworks, UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
 import {
   createInterface,
   createNetwork,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
-type EditNetworkInterfaceModalProps = {
-  vm: V1VirtualMachine;
-  updateVM: UpdateValidatedVM;
+import { produceTemplateNetwork } from '../../utils';
+
+type TemplatesEditNetworkInterfaceModalProps = {
+  template: V1Template;
   isOpen: boolean;
   onClose: () => void;
   nicPresentation: NetworkPresentation;
 };
 
-const EditNetworkInterfaceModal: React.FC<EditNetworkInterfaceModalProps> = ({
-  vm,
-  updateVM,
+const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalProps> = ({
+  template,
   isOpen,
   onClose,
   nicPresentation,
 }) => {
   const { t } = useKubevirtTranslation();
+  const vm = getTemplateVirtualMachineObject(template);
 
   const onSubmit =
     ({ nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType }) =>
-    (currentVM) => {
+    () => {
       const resultNetwork = createNetwork(nicName, networkName);
       const resultInterface = createInterface(
         nicName,
@@ -38,7 +40,7 @@ const EditNetworkInterfaceModal: React.FC<EditNetworkInterfaceModalProps> = ({
         interfaceType,
       );
 
-      const networkProducer = produceVMNetworks(currentVM, (draftVM) => {
+      const updatedTemplate = produceTemplateNetwork(template, (draftVM) => {
         draftVM.spec.template.spec.domain.devices.interfaces = [
           ...(draftVM.spec.template.spec.domain.devices.interfaces.filter(
             ({ name }) => name !== nicPresentation?.network?.name,
@@ -54,7 +56,12 @@ const EditNetworkInterfaceModal: React.FC<EditNetworkInterfaceModalProps> = ({
         ];
       });
 
-      return updateVM(networkProducer);
+      return k8sUpdate({
+        model: TemplateModel,
+        data: updatedTemplate,
+        ns: updatedTemplate?.metadata?.namespace,
+        name: updatedTemplate?.metadata?.name,
+      });
     };
 
   return (
@@ -65,8 +72,9 @@ const EditNetworkInterfaceModal: React.FC<EditNetworkInterfaceModalProps> = ({
       nicPresentation={nicPresentation}
       isOpen={isOpen}
       onClose={onClose}
+      namespace={template?.metadata?.namespace}
     />
   );
 };
 
-export default EditNetworkInterfaceModal;
+export default TemplatesEditNetworkInterfaceModal;

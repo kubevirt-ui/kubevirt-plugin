@@ -18,7 +18,7 @@ import {
   KebabToggle,
 } from '@patternfly/react-core';
 
-import EditNetworkInterfaceModal from '../modal/EditNetworkInterfaceModal';
+import VirtualMachinesEditNetworkInterfaceModal from '../modal/VirtualMachinesEditNetworkInterfaceModal';
 
 type NetworkInterfaceActionsProps = {
   vm: V1VirtualMachine;
@@ -47,7 +47,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
 
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
-      <EditNetworkInterfaceModal
+      <VirtualMachinesEditNetworkInterfaceModal
         vm={vm}
         isOpen={isOpen}
         onClose={onClose}

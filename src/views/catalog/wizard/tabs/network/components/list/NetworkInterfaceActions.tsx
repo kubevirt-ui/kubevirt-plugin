@@ -16,7 +16,7 @@ import {
   KebabToggle,
 } from '@patternfly/react-core';
 
-import EditNetworkInterfaceModal from '../modal/EditNetworkInterfaceModal';
+import WizardEditNetworkInterfaceModal from '../modal/WizardEditNetworkInterfaceModal';
 
 type NetworkInterfaceActionsProps = {
   nicName: string;
@@ -38,7 +38,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
 
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
-      <EditNetworkInterfaceModal
+      <WizardEditNetworkInterfaceModal
         vm={vm}
         updateVM={updateVM}
         isOpen={isOpen}

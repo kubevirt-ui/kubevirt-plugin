@@ -1,14 +1,14 @@
-import React, { useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { produceVMNetworks, UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import SharedNetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
+import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
 import {
   createInterface,
   createNetwork,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 
-type NetworkInterfaceModalProps = {
+type WizardNetworkInterfaceModalProps = {
   vm: V1VirtualMachine;
   updateVM: UpdateValidatedVM;
   isOpen: boolean;
@@ -16,7 +16,7 @@ type NetworkInterfaceModalProps = {
   headerText: string;
 };
 
-const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
+const WizardNetworkInterfaceModal: FC<WizardNetworkInterfaceModalProps> = ({
   vm,
   updateVM,
   isOpen,
@@ -45,7 +45,7 @@ const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
   );
 
   return (
-    <SharedNetworkInterfaceModal
+    <NetworkInterfaceModal
       vm={vm}
       isOpen={isOpen}
       onClose={onClose}
@@ -55,4 +55,4 @@ const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
   );
 };
 
-export default NetworkInterfaceModal;
+export default WizardNetworkInterfaceModal;

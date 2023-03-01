@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -13,19 +13,16 @@ import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
-type EditNetworkInterfaceModalProps = {
+type VirtualMachinesEditNetworkInterfaceModalProps = {
   vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   nicPresentation: NetworkPresentation;
 };
 
-const EditNetworkInterfaceModal: React.FC<EditNetworkInterfaceModalProps> = ({
-  vm,
-  isOpen,
-  onClose,
-  nicPresentation,
-}) => {
+const VirtualMachinesEditNetworkInterfaceModal: FC<
+  VirtualMachinesEditNetworkInterfaceModalProps
+> = ({ vm, isOpen, onClose, nicPresentation }) => {
   const { t } = useKubevirtTranslation();
 
   const onSubmit = useCallback(
@@ -72,4 +69,4 @@ const EditNetworkInterfaceModal: React.FC<EditNetworkInterfaceModalProps> = ({
   );
 };
 
-export default EditNetworkInterfaceModal;
+export default VirtualMachinesEditNetworkInterfaceModal;

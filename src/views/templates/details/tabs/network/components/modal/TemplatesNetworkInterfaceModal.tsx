@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import SharedNetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
@@ -11,14 +11,14 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { produceTemplateNetwork } from '../../utils';
 
-type NetworkInterfaceModalProps = {
+type TemplatesNetworkInterfaceModalProps = {
   template: V1Template;
   isOpen: boolean;
   onClose: () => void;
   headerText: string;
 };
 
-const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
+const TemplatesNetworkInterfaceModal: FC<TemplatesNetworkInterfaceModalProps> = ({
   template,
   isOpen,
   onClose,
@@ -64,4 +64,4 @@ const NetworkInterfaceModal: React.FC<NetworkInterfaceModalProps> = ({
   );
 };
 
-export default NetworkInterfaceModal;
+export default TemplatesNetworkInterfaceModal;

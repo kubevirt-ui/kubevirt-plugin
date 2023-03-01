@@ -7,7 +7,7 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstance,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import SharedNetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
+import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
 import {
   createInterface,
   createNetwork,
@@ -18,7 +18,7 @@ import { getChangedNics } from '@kubevirt-utils/components/PendingChanges/utils/
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
-type NetworkInterfaceModalProps = {
+type VirtualMachinesNetworkInterfaceModalProps = {
   vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
@@ -26,7 +26,7 @@ type NetworkInterfaceModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
+const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceModalProps> = ({
   vm,
   isOpen,
   onClose,
@@ -59,7 +59,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   );
 
   return (
-    <SharedNetworkInterfaceModal
+    <NetworkInterfaceModal
       isOpen={isOpen}
       onClose={onClose}
       headerText={headerText}
@@ -70,4 +70,4 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   );
 };
 
-export default NetworkInterfaceModal;
+export default VirtualMachinesNetworkInterfaceModal;

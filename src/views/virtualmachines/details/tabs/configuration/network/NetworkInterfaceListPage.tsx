@@ -16,7 +16,7 @@ import {
 import { Flex, FlexItem } from '@patternfly/react-core';
 
 import NetworkInterfaceList from './copmonents/list/NetworkInterfaceList';
-import NetworkInterfaceModal from './copmonents/modal/NetworkInterfaceModal';
+import VirtualMachinesNetworkInterfaceModal from './copmonents/modal/VirtualMachinesNetworkInterfaceModal';
 
 import 'src/utils/styles/ListPageCreateButton.scss';
 import './network-interface-list-page.scss';
@@ -55,7 +55,7 @@ const NetworkInterfaceListPage: React.FC<NetworkInterfaceListPageProps> = ({ obj
                 className="list-page-create-button-margin"
                 onClick={() =>
                   createModal(({ isOpen, onClose }) => (
-                    <NetworkInterfaceModal
+                    <VirtualMachinesNetworkInterfaceModal
                       vm={vm}
                       isOpen={isOpen}
                       onClose={onClose}
