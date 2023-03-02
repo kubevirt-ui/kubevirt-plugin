@@ -149,6 +149,12 @@ const WizardOverviewGrid: React.FC<WizardOverviewGridProps> = ({ vm, tabsData, u
             title={t('Machine type')}
             testId="wizard-overview-machine-type"
             description={getMachineType(vm)}
+            helperPopover={{
+              header: t('Machine type'),
+              content: t(
+                'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
+              ),
+            }}
           />
 
           <WizardDescriptionItem

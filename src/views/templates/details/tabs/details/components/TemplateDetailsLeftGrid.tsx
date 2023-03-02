@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import Annotations from 'src/views/templates/details/tabs/details/components/Annotations';
 import BaseTemplate from 'src/views/templates/details/tabs/details/components/BaseTemplate';
 import CreatedAt from 'src/views/templates/details/tabs/details/components/CreatedAt';
@@ -24,7 +24,7 @@ import Description from './Description';
 import DisplayName from './DisplayName';
 import WorkloadProfile from './WorkloadProfile';
 
-const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template }) => {
+const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const machineType = getMachineType(getTemplateVirtualMachineObject(template)) || NO_DATA_DASH;
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
@@ -40,7 +40,13 @@ const TemplateDetailsLeftGrid: React.FC<TemplateDetailsGridProps> = ({ template 
       <DescriptionItem title={t('Operating system')} content={getOperatingSystemName(template)} />
       <WorkloadProfile template={template} editable={isTemplateEditable} />
       <CPUMemory template={template} />
-      <DescriptionItem title={t('Machine type')} content={machineType} />
+      <DescriptionItem
+        title={t('Machine type')}
+        content={machineType}
+        popoverContent={t(
+          'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
+        )}
+      />
       <BootMethod template={template} />
       <BaseTemplate template={template} />
       <CreatedAt template={template} />

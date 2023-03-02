@@ -4,17 +4,29 @@ import {
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
+  DescriptionListTermHelpText,
+  DescriptionListTermHelpTextButton,
+  Popover,
 } from '@patternfly/react-core';
 
 type DescriptionProps = {
   title: string;
   content: string | JSX.Element;
+  popoverContent?: string | JSX.Element;
 };
 
-// a simple DescriptionList item component
-const DescriptionItem: React.FC<DescriptionProps> = ({ title, content }) => (
+const DescriptionItem: React.FC<DescriptionProps> = ({ title, content, popoverContent }) => (
   <DescriptionListGroup>
-    <DescriptionListTerm>{title}</DescriptionListTerm>
+    {popoverContent ? (
+      <DescriptionListTermHelpText>
+        <Popover hasAutoWidth maxWidth="30rem" headerContent={title} bodyContent={popoverContent}>
+          <DescriptionListTermHelpTextButton>{title}</DescriptionListTermHelpTextButton>
+        </Popover>
+      </DescriptionListTermHelpText>
+    ) : (
+      <DescriptionListTerm>{title}</DescriptionListTerm>
+    )}
+
     <DescriptionListDescription>{content}</DescriptionListDescription>
   </DescriptionListGroup>
 );
