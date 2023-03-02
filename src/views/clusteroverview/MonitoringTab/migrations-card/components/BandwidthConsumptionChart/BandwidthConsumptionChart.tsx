@@ -11,7 +11,13 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
-import { Chart, ChartAxis, ChartLine, ChartVoronoiContainer } from '@patternfly/react-charts';
+import {
+  Chart,
+  ChartAxis,
+  ChartLine,
+  ChartTooltip,
+  ChartVoronoiContainer,
+} from '@patternfly/react-charts';
 import { Bullseye, HelperText, HelperTextItem } from '@patternfly/react-core';
 
 import { roundToNearest512MiB } from './utils';
@@ -32,6 +38,7 @@ const BandwidthConsumptionChart: React.FC<BandwidthConsumptionChartProps> = ({ d
   const currentTime = useMemo<number>(() => Date.now(), []);
   const { width, height } = useResponsiveCharts();
   const baseQuery = `sum_over_time(kubevirt_migrate_vmi_data_processed_bytes[${duration}])`;
+  const fontSize = { fontSize: 8 };
 
   const timespan = DurationOption.getMilliseconds(duration);
   const [migrationsBandwidthConsumed] = usePrometheusPoll({
@@ -87,6 +94,7 @@ const BandwidthConsumptionChart: React.FC<BandwidthConsumptionChartProps> = ({ d
           scale={{ x: 'time', y: 'linear' }}
           containerComponent={
             <ChartVoronoiContainer
+              labelComponent={<ChartTooltip style={fontSize} />}
               labels={({ datum }) => {
                 const bandwidth = bandwidthConsumed?.[datum.idx];
                 const migrationCount = migrationsCount?.[datum.idx];
@@ -113,10 +121,12 @@ const BandwidthConsumptionChart: React.FC<BandwidthConsumptionChartProps> = ({ d
               return timeFormatter.format(d);
             }}
             fixLabelOverlap
+            style={{ tickLabels: fontSize }}
           />
           <ChartAxis
             dependentAxis
             tickFormat={(y) => xbytes(roundToNearest512MiB(y), { iec: true, fixed: 1 })}
+            style={{ tickLabels: fontSize }}
           />
           <ChartLine data={bandwidthConsumed} />
         </Chart>
