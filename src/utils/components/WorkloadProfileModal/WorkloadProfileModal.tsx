@@ -2,7 +2,11 @@ import * as React from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { WORKLOADS, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
+import {
+  WORKLOADS,
+  WORKLOADS_DESCRIPTIONS,
+  WORKLOADS_LABELS,
+} from '@kubevirt-utils/resources/template';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, Select, SelectOption } from '@patternfly/react-core';
 
@@ -42,7 +46,7 @@ const WorkloadProfileModal: React.FC<WorkloadProfileModalProps> = React.memo(
               selections={workload}
             >
               {Object.entries(WORKLOADS_LABELS).map(([key, value]) => (
-                <SelectOption key={key} value={key}>
+                <SelectOption key={key} value={key} description={t(WORKLOADS_DESCRIPTIONS[key])}>
                   {t(value)}
                 </SelectOption>
               ))}

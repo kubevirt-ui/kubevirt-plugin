@@ -1,3 +1,5 @@
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+
 export const TEMPLATE_TYPE_LABEL = 'template.kubevirt.io/type';
 export const TEMPLATE_DEFAULT_VARIANT_LABEL = 'template.kubevirt.io/default-os-variant';
 export const TEMPLATE_TYPE_VM = 'vm';
@@ -50,6 +52,12 @@ export const WORKLOADS_LABELS = {
   [WORKLOADS.desktop]: 'Desktop',
   [WORKLOADS.server]: 'Server',
   [WORKLOADS.highperformance]: 'High performance',
+};
+
+export const WORKLOADS_DESCRIPTIONS = {
+  [WORKLOADS.desktop]: t('Small scale consumption, recommended for using the graphical console'),
+  [WORKLOADS.server]: t('Balances performance, compatible with a broad range of workloads'),
+  [WORKLOADS.highperformance]: t('Optimized for High resource consumption workloads'),
 };
 
 export const OS_NAME_LABELS = {
