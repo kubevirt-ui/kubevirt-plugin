@@ -80,6 +80,7 @@ objects:
             - cloudInitNoCloud:
                 userData: |-
                   #cloud-config
+                  user: fedora
                   password: '\${CLOUD_USER_PASSWORD}'
                   chpasswd: { expire: False }
               name: cloudinitdisk
