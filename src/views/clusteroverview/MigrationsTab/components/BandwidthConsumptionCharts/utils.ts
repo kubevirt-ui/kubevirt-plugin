@@ -55,7 +55,7 @@ export const getTickValuesAxisY = (maxValue: number, normalize = multipliers.Gi)
   const tickValues = [];
 
   const normalizedMaxValue = Math.ceil(maxValue / normalize);
-  const gridLineSpacer = Math.ceil(normalizedMaxValue / GRID_LINES);
+  const gridLineSpacer = Math.ceil(normalizedMaxValue / GRID_LINES) || 1;
   for (let i = 0; i <= gridLineSpacer * GRID_LINES; i += gridLineSpacer) {
     tickValues.push(i * normalize);
   }
