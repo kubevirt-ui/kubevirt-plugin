@@ -58,7 +58,6 @@ const BootableVolumesList: FC = () => {
           loaded={loaded}
           loadError={loadError}
           buttonVariant={ButtonVariant.primary}
-          buttonTitle={t('Add')}
         />
       </ListPageHeader>
 
