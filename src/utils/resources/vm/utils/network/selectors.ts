@@ -10,7 +10,7 @@ import { interfacesTypes } from './constants';
  * @returns interface type
  */
 export const getNetworkInterfaceType = (iface: V1Interface): string => {
-  const drive = Object.keys(interfacesTypes).find((ifaceType: string) => iface?.[ifaceType]);
+  const drive = Object.keys(interfacesTypes)?.find((ifaceType: string) => iface?.[ifaceType]);
   return drive ?? NO_DATA_DASH;
 };
 

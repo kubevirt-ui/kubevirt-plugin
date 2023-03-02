@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
@@ -7,15 +7,15 @@ import { interfaceModelType } from '../utils/constants';
 
 type NetworkInterfaceModelSelectProps = {
   interfaceModel: string;
-  setInterfaceModel: React.Dispatch<React.SetStateAction<string>>;
+  setInterfaceModel: Dispatch<SetStateAction<string>>;
 };
 
-const NetworkInterfaceModelSelect: React.FC<NetworkInterfaceModelSelectProps> = ({
+const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
   interfaceModel,
   setInterfaceModel,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const interfaceModelOptions = {
     virtio: {
@@ -51,7 +51,7 @@ const NetworkInterfaceModelSelect: React.FC<NetworkInterfaceModelSelectProps> = 
           variant={SelectVariant.single}
           selections={interfaceModel}
         >
-          {Object.values(interfaceModelOptions).map(({ id, name, description }) => (
+          {Object.values(interfaceModelOptions)?.map(({ id, name, description }) => (
             <SelectOption
               key={id}
               value={id}

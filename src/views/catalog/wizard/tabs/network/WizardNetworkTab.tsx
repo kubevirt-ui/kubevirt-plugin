@@ -9,7 +9,7 @@ import { ListPageBody, ListPageCreateButton } from '@openshift-console/dynamic-p
 import { Flex, FlexItem } from '@patternfly/react-core';
 
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
-import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
+import WizardNetworkInterfaceModal from './components/modal/WizardNetworkInterfaceModal';
 
 import 'src/utils/styles/ListPageCreateButton.scss';
 import './wizard-network-tab.scss';
@@ -29,7 +29,7 @@ const WizardNetworkTab: WizardTab = ({ vm, updateVM }) => {
                 className="list-page-create-button-margin"
                 onClick={() =>
                   createModal(({ isOpen, onClose }) => (
-                    <NetworkInterfaceModal
+                    <WizardNetworkInterfaceModal
                       isOpen={isOpen}
                       onClose={onClose}
                       headerText={actionText}

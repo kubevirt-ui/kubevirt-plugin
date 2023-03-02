@@ -12,7 +12,7 @@ import { Button, Flex, FlexItem } from '@patternfly/react-core';
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
-import NetworkInterfaceModal from './components/modal/NetworkInterfaceModal';
+import TemplatesNetworkInterfaceModal from './components/modal/TemplatesNetworkInterfaceModal';
 
 import 'src/utils/styles/ListPageCreateButton.scss';
 import './template-network-tab.scss';
@@ -51,7 +51,7 @@ const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
                 isDisabled={!isTemplateEditable}
                 onClick={() =>
                   createModal(({ isOpen, onClose }) => (
-                    <NetworkInterfaceModal
+                    <TemplatesNetworkInterfaceModal
                       isOpen={isOpen}
                       onClose={onClose}
                       headerText={actionText}

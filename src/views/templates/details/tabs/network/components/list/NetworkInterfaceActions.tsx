@@ -19,7 +19,7 @@ import {
 } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
-import EditNetworkInterfaceModal from '../modal/EditNetworkInterfaceModal';
+import TemplatesEditNetworkInterfaceModal from '../modal/TemplatesEditNetworkInterfaceModal';
 
 type NetworkInterfaceActionsProps = {
   nicName: string;
@@ -43,7 +43,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
 
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
-      <EditNetworkInterfaceModal
+      <TemplatesEditNetworkInterfaceModal
         template={template}
         isOpen={isOpen}
         onClose={onClose}

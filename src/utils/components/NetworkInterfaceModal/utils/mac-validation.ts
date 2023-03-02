@@ -1,4 +1,4 @@
-import { TFunction } from 'i18next';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 const HEXCH_REGEX = '[0-9A-Fa-f]';
 const MAC_REGEX_COLON_DELIMITER = new RegExp(
@@ -43,7 +43,7 @@ export const isValidMAC = (mac: string): boolean => {
   return regex ? regex.test(mac) : false;
 };
 
-export const validateMACAddress = (macAddress: string, t: TFunction): string => {
+export const validateMACAddress = (macAddress: string): string => {
   if (!isValidMAC(macAddress) && macAddress?.length > 0) {
     return t('Invalid MAC address format');
   }

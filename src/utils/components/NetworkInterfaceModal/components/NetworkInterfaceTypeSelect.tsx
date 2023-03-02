@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
@@ -8,19 +8,19 @@ import { networkNameStartWithPod } from '../utils/helpers';
 
 type NetworkInterfaceTypeSelectProps = {
   interfaceType: string;
-  setInterfaceType: React.Dispatch<React.SetStateAction<string>>;
+  setInterfaceType: Dispatch<SetStateAction<string>>;
   networkName: string | undefined;
 };
 
-const NetworkInterfaceTypeSelect: React.FC<NetworkInterfaceTypeSelectProps> = ({
+const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
   interfaceType,
   setInterfaceType,
   networkName,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const isPodNetworkName = React.useMemo(() => networkNameStartWithPod(networkName), [networkName]);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const isPodNetworkName = useMemo(() => networkNameStartWithPod(networkName), [networkName]);
+  const [isOpen, setIsOpen] = useState(false);
 
   const interfaceTypeOptions = {
     masquerade: {
@@ -70,8 +70,8 @@ const NetworkInterfaceTypeSelect: React.FC<NetworkInterfaceTypeSelectProps> = ({
           selections={interfaceType}
         >
           {Object.values(interfaceTypeOptions)
-            .filter(({ allowOption }) => allowOption)
-            .map(({ id, name, description }) => (
+            ?.filter(({ allowOption }) => allowOption)
+            ?.map(({ id, name, description }) => (
               <SelectOption
                 key={id}
                 value={id}
