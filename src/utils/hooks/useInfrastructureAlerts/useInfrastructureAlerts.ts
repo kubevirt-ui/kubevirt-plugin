@@ -4,7 +4,7 @@ import useAlerts from '@kubevirt-utils/hooks/useAlerts';
 import {
   getNumberOfAlerts,
   isFiringAlert,
-  isInfrastructureAlert,
+  isImportantInfrastructureAlert,
   sortAlertsByHealthImpact,
 } from '@kubevirt-utils/hooks/useInfrastructureAlerts/utils/utils';
 import { isKubeVirtAlert } from '@kubevirt-utils/hooks/useKubevirtAlerts';
@@ -24,7 +24,8 @@ const useInfrastructureAlerts: UseInfrastructureAlerts = () => {
 
   const alertsByHealthImpact = useMemo(() => {
     const filteredAlerts = alerts?.filter(
-      (alert) => isKubeVirtAlert(alert) && isFiringAlert(alert) && isInfrastructureAlert(alert),
+      (alert) =>
+        isKubeVirtAlert(alert) && isFiringAlert(alert) && isImportantInfrastructureAlert(alert),
     );
 
     return sortAlertsByHealthImpact(filteredAlerts);
