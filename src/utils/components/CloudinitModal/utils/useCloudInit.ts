@@ -71,14 +71,10 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
       };
     }
 
-    if (cloudInitVol?.cloudInitNoCloud) {
-      return {
-        name: 'cloudinitdisk',
-        cloudInitNoCloud: cloudInitNoBlanks,
-      };
-    }
-
-    return { name: 'cloudinitdisk' };
+    return {
+      name: 'cloudinitdisk',
+      cloudInitNoCloud: cloudInitNoBlanks,
+    };
   }, [userData, shouldAddHeader, networkData, cloudInitVol, enableNetworkData]);
 
   const updatedVM = React.useMemo(
