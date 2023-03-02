@@ -58,7 +58,7 @@ export const categoryDetailsMap: CategoryDetailsMap = {
     ],
   },
   [InstanceTypeCategory.ComputeIntensive]: {
-    title: t('Compute intensive applications'),
+    title: t('Compute-intensive applications'),
     Icon: CubesIcon,
     prefix: 'cx1',
     prefixLabel: t('cx1'),
@@ -103,7 +103,7 @@ export const categoryDetailsMap: CategoryDetailsMap = {
     ],
   },
   [InstanceTypeCategory.MemoryIntensive]: {
-    title: t('Memory intensive applications'),
+    title: t('Memory-intensive applications'),
     Icon: PuzzlePieceIcon,
     prefix: 'm1',
     prefixLabel: t('m1'),
@@ -142,7 +142,7 @@ export const categoryDetailsMap: CategoryDetailsMap = {
     ],
   },
   [InstanceTypeCategory.GpuResourcesAttached]: {
-    title: t('NVIDIA GPU resources attached'),
+    title: t('Attached NVIDIA GPU resources'),
     Icon: StarIcon,
     prefix: 'gn1',
     prefixLabel: t('gn1'),
