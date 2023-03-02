@@ -12,8 +12,11 @@ import {
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
+  DescriptionListTermHelpText,
+  DescriptionListTermHelpTextButton,
   Grid,
   GridItem,
+  Popover,
   Title,
 } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
@@ -92,7 +95,20 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
               <CPUMemory vmi={vmi} />
             </DescriptionListGroup>
             <DescriptionListGroup>
-              <DescriptionListTerm>{t('Machine type')}</DescriptionListTerm>
+              <DescriptionListTermHelpText>
+                <Popover
+                  hasAutoWidth
+                  maxWidth="30rem"
+                  headerContent={t('Machine type')}
+                  bodyContent={t(
+                    'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
+                  )}
+                >
+                  <DescriptionListTermHelpTextButton>
+                    {t('Machine type')}
+                  </DescriptionListTermHelpTextButton>
+                </Popover>
+              </DescriptionListTermHelpText>
               <DescriptionListDescription>
                 {getMachineType(vm) || NO_DATA_DASH}
               </DescriptionListDescription>

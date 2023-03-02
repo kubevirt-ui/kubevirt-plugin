@@ -967,6 +967,7 @@
   "The following information is provided by the OpenShift Virtualization operator.": "The following information is provided by the OpenShift Virtualization operator.",
   "The following information regarding how the disks are partitioned is provided by the guest agent.": "The following information regarding how the disks are partitioned is provided by the guest agent.",
   "The following resources will be deleted along with this VirtualMachine. Unchecked items will not be deleted.": "The following resources will be deleted along with this VirtualMachine. Unchecked items will not be deleted.",
+  "The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.": "The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.",
   "The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.": "The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.",
   "The VirtualMachine {{vmName}} is still running. It will be powered off while cloning.": "The VirtualMachine {{vmName}} is still running. It will be powered off while cloning.",
   "The VirtualMachine will be bridged to the selected network, ideal for L2 devices": "The VirtualMachine will be bridged to the selected network, ideal for L2 devices",

@@ -240,6 +240,10 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
         <VirtualMachineDescriptionItem
           descriptionData={getMachineType(vm) || NO_DATA_DASH}
           descriptionHeader={t('Machine type')}
+          isPopover
+          bodyContent={t(
+            'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
+          )}
         />
         <VirtualMachineDescriptionItem
           descriptionData={
