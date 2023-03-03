@@ -29,7 +29,6 @@ export const BootOrderModalBody: React.FC<{
   changeEditMode: (isEditMode: boolean) => void;
 }> = ({ devices, isEditMode, onChange, changeEditMode }) => {
   const { t } = useKubevirtTranslation();
-  const bootableDevices = devices.filter((device) => !!device.value.bootOrder);
 
   const reorder = (
     list: BootableDeviceType[],
@@ -44,14 +43,13 @@ export const BootOrderModalBody: React.FC<{
 
   const onDrop = (source, dest) => {
     if (dest) {
-      const nonBootableDevices = devices.filter((device) => !device.value.bootOrder);
-      const newBootableDevices = reorder(bootableDevices, source.index, dest.index).map(
+      const newBootableDevices = reorder(devices, source.index, dest.index).map(
         (device, index) => ({
           ...device,
           value: { ...device.value, bootOrder: index + 1 },
         }),
       );
-      onChange([...nonBootableDevices, ...newBootableDevices]);
+      onChange(newBootableDevices);
 
       return true; // Signal that this is a valid drop and not to animate the item returning home.
     }
@@ -59,9 +57,7 @@ export const BootOrderModalBody: React.FC<{
 
   const onAdd = (name: string) => {
     const maxOrder =
-      bootableDevices.length > 0
-        ? Math.max(...bootableDevices.map((device) => device.value.bootOrder))
-        : 0;
+      devices.length > 0 ? Math.max(...devices.map((device) => device.value.bootOrder)) : 0;
 
     const deviceToUpdate = devices.find((d) => d.value.name === name);
 
@@ -85,7 +81,7 @@ export const BootOrderModalBody: React.FC<{
     onChange(newDevices);
   };
 
-  const showEmpty = bootableDevices.length === 0 && !isEditMode;
+  const showEmpty = devices.length === 0 && !isEditMode;
 
   return (
     <>
@@ -107,7 +103,7 @@ export const BootOrderModalBody: React.FC<{
           <DragDrop onDrop={onDrop}>
             <Droppable hasNoWrapper>
               <DataList aria-label="draggable data list example">
-                {bootableDevices.map(({ typeLabel, value }) => (
+                {devices.map(({ typeLabel, value }) => (
                   <Draggable key={value.name} hasNoWrapper>
                     <DataListItem aria-labelledby={value.name} ref={React.createRef()}>
                       <DataListItemRow>
