@@ -45,7 +45,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
     draftVM.metadata.name = name;
 
     draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
-    draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = processedTemplate.metadata.namespace;
+    draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
     if (startVM) {
       draftVM.spec.running = true;
     }
