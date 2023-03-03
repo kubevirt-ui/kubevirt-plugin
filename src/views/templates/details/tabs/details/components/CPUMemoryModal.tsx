@@ -10,6 +10,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { toIECUnit } from '@kubevirt-utils/utils/units';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   Alert,
   Button,
@@ -53,6 +54,10 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
     () =>
       produce<V1Template>(template, (templateDraft: V1Template) => {
         const draftVM = getTemplateVirtualMachineObject(templateDraft);
+        ensurePath(draftVM, [
+          'spec.template.spec.domain.resources',
+          'spec.template.spec.domain.cpu',
+        ]);
         draftVM.spec.template.spec.domain.resources.requests = {
           ...vm?.spec?.template?.spec?.domain?.resources?.requests,
           memory: `${memory}${memoryUnit}`,

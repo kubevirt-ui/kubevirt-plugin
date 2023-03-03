@@ -4,6 +4,7 @@ import produce from 'immer';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { toIECUnit } from '@kubevirt-utils/utils/units';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   Alert,
   Button,
@@ -56,6 +57,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
 
   const updatedVirtualMachine = React.useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
+      ensurePath(vmDraft, ['spec.template.spec.domain.resources', 'spec.template.spec.domain.cpu']);
       vmDraft.spec.template.spec.domain.resources.requests = {
         ...vm?.spec?.template?.spec?.domain?.resources?.requests,
         memory: `${memory}${memoryUnit}`,
