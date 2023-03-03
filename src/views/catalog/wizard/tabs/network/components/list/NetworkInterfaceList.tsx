@@ -26,7 +26,7 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ vm }) => {
   const networkInterfacesData = getNetworkInterfaceRowData(networks, interfaces);
   const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
 
-  const columns = useNetworkColumns();
+  const columns = useNetworkColumns(filteredData);
   return (
     <>
       <ListPageFilter data={data} loaded rowFilters={filters} onFilterChange={onFilterChange} />
