@@ -66,7 +66,7 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
 
   const updatedVirtualMachine = React.useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      ensurePath(vmDraft, ['vm.spec.template.spec.domain.cpu']);
+      ensurePath(vmDraft, ['spec.template.spec.domain.cpu']);
       vmDraft.spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;
     });
     return updatedVM;

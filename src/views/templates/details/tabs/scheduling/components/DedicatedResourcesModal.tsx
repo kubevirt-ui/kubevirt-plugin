@@ -14,7 +14,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -59,9 +59,9 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
 
   const updatedTemplate = React.useMemo(() => {
     return produce<V1Template>(template, (templateDraft: V1Template) => {
-      getTemplateVirtualMachineObject(
-        templateDraft,
-      ).spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;
+      const draftVM = getTemplateVirtualMachineObject(templateDraft);
+      ensurePath(draftVM, ['spec.template.spec.domain.cpu']);
+      draftVM.spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;
     });
   }, [checked, template]);
 
