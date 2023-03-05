@@ -3,6 +3,7 @@ import * as React from 'react';
 import { produceVMSysprep, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import {
   AUTOUNATTEND,
@@ -83,6 +84,7 @@ const Sysprep: React.FC = () => {
     <WizardDescriptionItem
       testId="wizard-sysprep"
       title={t('Sysprep')}
+      label={<WindowsLabel />}
       description={
         <SysprepDescription
           hasAutoUnattend={!!autoUnattend}

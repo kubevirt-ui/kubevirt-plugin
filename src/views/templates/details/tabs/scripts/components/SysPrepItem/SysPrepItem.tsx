@@ -7,6 +7,7 @@ import {
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { AUTOUNATTEND, UNATTEND } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
@@ -92,7 +93,10 @@ const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
       <DescriptionListTerm>
         <DescriptionListTermHelpText>
           <Flex className="vm-description-item__title">
-            <FlexItem>{t('Sysprep')}</FlexItem>
+            <FlexItem>
+              {t('Sysprep')}
+              {<WindowsLabel />}
+            </FlexItem>
             <FlexItem>
               <Button
                 type="button"

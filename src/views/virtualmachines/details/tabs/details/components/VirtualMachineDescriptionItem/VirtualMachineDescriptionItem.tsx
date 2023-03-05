@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -18,7 +18,7 @@ import './VirtualMachineDescriptionItem.scss';
 type VirtualMachineDescriptionItemProps = {
   descriptionData: any;
   descriptionHeader?: string;
-  bodyContent?: React.ReactNode;
+  bodyContent?: ReactNode;
   moreInfoURL?: string;
   isPopover?: boolean;
   breadcrumb?: string;
@@ -27,10 +27,11 @@ type VirtualMachineDescriptionItemProps = {
   isDisabled?: boolean;
   showEditOnTitle?: boolean;
   editOnTitleJustify?: boolean;
+  label?: ReactNode;
   'data-test-id'?: string;
 };
 
-const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps> = ({
+const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   descriptionData,
   descriptionHeader,
   bodyContent,
@@ -42,6 +43,7 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
   isDisabled,
   showEditOnTitle,
   editOnTitleJustify = false,
+  label,
   'data-test-id': testId,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -81,6 +83,7 @@ const VirtualMachineDescriptionItem: React.FC<VirtualMachineDescriptionItemProps
               moreInfoURL={moreInfoURL}
               breadcrumb={breadcrumb}
               descriptionHeader={descriptionHeader}
+              label={label}
             />
           </FlexItem>
           {isEdit && showEditOnTitle && (

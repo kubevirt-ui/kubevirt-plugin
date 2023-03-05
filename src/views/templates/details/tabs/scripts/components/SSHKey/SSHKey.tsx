@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { AuthorizedSSHKeyModal } from '@kubevirt-utils/components/AuthorizedSSHKeyModal/AuthorizedSSHKeyModal';
+import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
@@ -52,7 +53,10 @@ const SSHKey: React.FC<SSHKeyProps> = ({ template }) => {
       <DescriptionListTerm>
         <DescriptionListTermHelpText>
           <Flex className="vm-description-item__title">
-            <FlexItem>{t('Authorized SSH Key')}</FlexItem>
+            <FlexItem>
+              {t('Authorized SSH Key')}
+              {<LinuxLabel />}
+            </FlexItem>
             <FlexItem>
               <Button
                 type="button"
