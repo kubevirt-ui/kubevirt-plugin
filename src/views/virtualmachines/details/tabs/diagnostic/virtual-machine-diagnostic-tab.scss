@@ -16,3 +16,13 @@
     border-bottom: none;
   }
 }
+.VirtualMachineDiagnosticTab--header {
+  display: inline-flex;
+  .co-m-nav-title.co-m-nav-title--row {
+    align-items: baseline;
+    .co-operator-details__actions {
+      margin-left: var(--pf-global--spacer--sm);
+      cursor: pointer;
+    }
+  }
+}

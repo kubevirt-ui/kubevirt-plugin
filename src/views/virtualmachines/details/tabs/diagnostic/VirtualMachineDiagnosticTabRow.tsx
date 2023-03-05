@@ -4,7 +4,6 @@ import cn from 'classnames';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   RedExclamationCircleIcon,
-  Timestamp,
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableRowContent, Tbody, Td, Tr } from '@patternfly/react-table';
@@ -33,11 +32,7 @@ const VirtualMachineDiagnosticTabRow = ({ obj, index, expend, setExpend, activeC
         {[...activeColumnsObj]?.map((column) => {
           return (
             <Td key={column} id={column}>
-              {column !== 'lastTransitionTime' ? (
-                obj?.[column] || NO_DATA_DASH
-              ) : (
-                <Timestamp timestamp={obj?.[column]} />
-              )}
+              {obj?.[column]?.toString() || NO_DATA_DASH}
             </Td>
           );
         })}
