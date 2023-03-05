@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -53,7 +54,15 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
 
   return (
     <>
-      <ListPageHeader title={t('Volume Snapshot Status')} />
+      <div className="VirtualMachineDiagnosticTab--header">
+        <ListPageHeader title={t('Volume snapshot status')}>
+          <HelpTextIcon
+            bodyContent={t(
+              'Volume Snapshot Status is a mechanism for reporting if a volume can be snapshotted or not.',
+            )}
+          />
+        </ListPageHeader>
+      </div>
       <ListPageBody>
         <div className="VirtualMachineDiagnosticTab--filters__main">
           <ListPageFilter

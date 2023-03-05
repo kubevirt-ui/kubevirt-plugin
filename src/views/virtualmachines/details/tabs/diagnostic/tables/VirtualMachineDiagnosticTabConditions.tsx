@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -54,7 +55,15 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
 
   return (
     <>
-      <ListPageHeader title={t('Status Conditions')} />
+      <div className="VirtualMachineDiagnosticTab--header">
+        <ListPageHeader title={t('Status conditions')}>
+          <HelpTextIcon
+            bodyContent={t(
+              'Conditions provide a standard mechanism for status reporting. Conditions are reported for all aspects of a VM.',
+            )}
+          />
+        </ListPageHeader>
+      </div>
       <ListPageBody>
         <div className="VirtualMachineDiagnosticTab--filters__main">
           <ListPageFilter
