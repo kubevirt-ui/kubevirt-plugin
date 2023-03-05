@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -44,6 +44,13 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [storageClasses],
   );
+
+  useEffect(() => {
+    if (!storageClass && loaded) {
+      setStorageClassName(defaultSC?.metadata?.name);
+      setStorageClassProvisioner(defaultSC?.provisioner);
+    }
+  }, [defaultSC, setStorageClassName, setStorageClassProvisioner, storageClass, loaded]);
 
   return (
     <>
