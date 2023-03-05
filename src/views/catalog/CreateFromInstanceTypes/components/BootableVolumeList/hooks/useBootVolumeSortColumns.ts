@@ -32,7 +32,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
     return [
       getName(bootableVolume),
       getName(preferences[bootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]]),
-      bootableVolume.metadata.annotations[DESCRIPTION_ANNOTATION],
+      bootableVolume?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
     ];
   };
 
