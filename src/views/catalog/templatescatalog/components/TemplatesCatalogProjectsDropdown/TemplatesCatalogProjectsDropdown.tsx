@@ -51,7 +51,7 @@ export const TemplatesCatalogProjectsDropdown: React.FC<TemplatesCatalogProjects
     return (
       <div className="templates-catalog-project-dropdown">
         <Text component={TextVariants.h6} className="templates-catalog-project-dropdown-label">
-          {t('Templates project')}
+          {t('Template project')}
         </Text>
         <ContextSelector
           className=""

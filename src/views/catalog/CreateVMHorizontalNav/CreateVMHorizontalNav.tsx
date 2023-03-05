@@ -50,7 +50,7 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
       <Tabs usePageInsets activeKey={currentTab} onSelect={handleTabClick}>
         <Tab
           eventKey={CREATE_VM_TAB.CATALOG}
-          title={<CreateVMTabTitle Icon={CatalogIcon} titleText={t('Templates catalog')} />}
+          title={<CreateVMTabTitle Icon={CatalogIcon} titleText={t('Template catalog')} />}
         >
           <TemplatesCatalog match={match} location={location} history={history} />
         </Tab>
