@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -18,7 +18,7 @@ type WizardDescriptionItemProps = {
   /** title */
   title: string;
   /** description */
-  description?: React.ReactNode;
+  description?: ReactNode;
   /** date-test-id of the description group */
   testId?: string;
   /** is the description group editable */
@@ -35,14 +35,15 @@ type WizardDescriptionItemProps = {
   onTitleClick?: () => void;
   /** helper popover. the popover will not be available if onTitleClick is present */
   helperPopover?: {
-    header: React.ReactNode;
-    content: React.ReactNode;
+    header: ReactNode;
+    content: ReactNode;
   };
   /** additional className */
   className?: string;
+  label?: ReactNode;
 };
 
-export const WizardDescriptionItem: React.FC<WizardDescriptionItemProps> = React.memo(
+export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
   ({
     title,
     description,
@@ -53,6 +54,7 @@ export const WizardDescriptionItem: React.FC<WizardDescriptionItemProps> = React
     testId,
     count,
     className,
+    label,
     onEditClick,
     onTitleClick,
   }) => {
@@ -74,7 +76,11 @@ export const WizardDescriptionItem: React.FC<WizardDescriptionItemProps> = React
         );
       }
 
-      return <DescriptionListTerm>{titleWithCount}</DescriptionListTerm>;
+      return (
+        <DescriptionListTerm>
+          {titleWithCount} {label}
+        </DescriptionListTerm>
+      );
     };
 
     return (

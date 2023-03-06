@@ -6,6 +6,7 @@ import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescript
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { AuthorizedSSHKeyModal } from '@kubevirt-utils/components/AuthorizedSSHKeyModal/AuthorizedSSHKeyModal';
 import { addSecretToVM } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, Text, TextVariants } from '@patternfly/react-core';
@@ -53,6 +54,7 @@ const SSHKey: React.FC = () => {
       testId="wizard-sshkey"
       title={t('Authorized SSH Key')}
       isEdit
+      label={<LinuxLabel />}
       showEditOnTitle
       description={
         <Stack hasGutter>

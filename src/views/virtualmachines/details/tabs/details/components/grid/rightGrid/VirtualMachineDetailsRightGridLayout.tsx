@@ -7,6 +7,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
+import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
@@ -170,6 +171,7 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
             />
           }
           descriptionHeader={t('SSH access')}
+          label={<LinuxLabel />}
           data-test-id={`${vm?.metadata?.name}-ssh-access`}
         />
         <VirtualMachineDescriptionItem
