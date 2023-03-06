@@ -1,14 +1,17 @@
-import * as React from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { nicsSorting } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
-const useNetworkColumns = () => {
+const useNetworkColumns = (data: NetworkPresentation[]) => {
   const { t } = useKubevirtTranslation();
 
-  const columns: TableColumn<NetworkPresentation>[] = React.useMemo(
+  const sorting = useCallback((direction) => nicsSorting(data, direction), [data]);
+
+  const columns: TableColumn<NetworkPresentation>[] = useMemo(
     () => [
       {
         title: t('Name'),
@@ -32,7 +35,7 @@ const useNetworkColumns = () => {
         title: t('Type'),
         id: 'type',
         transforms: [sortable],
-        sort: 'iface.masquerade' || 'iface.bridge' || 'iface.sriov',
+        sort: (_, direction) => sorting(direction),
       },
       {
         title: t('MAC address'),
@@ -46,7 +49,7 @@ const useNetworkColumns = () => {
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
-    [t],
+    [sorting, t],
   );
 
   return columns;
