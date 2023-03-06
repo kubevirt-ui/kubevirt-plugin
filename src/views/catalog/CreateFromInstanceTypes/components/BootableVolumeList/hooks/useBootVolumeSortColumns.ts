@@ -2,7 +2,10 @@ import { useState } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1alpha1PersistentVolumeClaim,
+  V1alpha2VirtualMachineClusterPreference,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base';
@@ -14,6 +17,9 @@ type UseBootVolumeSortColumns = (
   preferences: {
     [resourceKeyName: string]: V1alpha2VirtualMachineClusterPreference;
   },
+  pvcSources: {
+    [resourceKeyName: string]: V1alpha1PersistentVolumeClaim;
+  },
   pagination: PaginationState,
 ) => {
   sortedData: V1beta1DataSource[];
@@ -23,15 +29,22 @@ type UseBootVolumeSortColumns = (
 const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   unsortedData,
   preferences,
+  pvcSources,
   pagination,
 ) => {
   const [activeSortIndex, setActiveSortIndex] = useState<number | null>(null);
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc' | null>(null);
 
   const getSortableRowValues = (bootableVolume: V1beta1DataSource): string[] => {
+    const pvcSource =
+      pvcSources?.[bootableVolume?.spec?.source?.pvc?.namespace]?.[
+        bootableVolume?.spec?.source?.pvc?.name
+      ];
     return [
       getName(bootableVolume),
       getName(preferences[bootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]]),
+      pvcSource?.spec?.storageClassName,
+      pvcSource?.spec?.resources?.requests?.storage,
       bootableVolume?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
     ];
   };

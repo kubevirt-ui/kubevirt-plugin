@@ -2,30 +2,43 @@ import React, { FC } from 'react';
 
 import { getTemplateOSIcon as getOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1alpha1PersistentVolumeClaim,
+  V1alpha2VirtualMachineClusterPreference,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { Text, TextVariants } from '@patternfly/react-core';
-import { Td, Tr } from '@patternfly/react-table';
+import { Tr } from '@patternfly/react-table';
+
+import TableData from './TableData';
 
 type BootableVolumeRowProps = {
   bootableVolume: V1beta1DataSource;
+  activeColumnIDs: string[];
   rowData: {
     bootableVolumeSelectedState: [
       V1beta1DataSource,
       React.Dispatch<React.SetStateAction<V1beta1DataSource>>,
     ];
     preference: V1alpha2VirtualMachineClusterPreference;
+    pvcSource: V1alpha1PersistentVolumeClaim;
   };
 };
 
 const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   bootableVolume,
+  activeColumnIDs,
   rowData: {
     bootableVolumeSelectedState: [bootableVolumeSelected, setBootSourceSelected],
     preference,
+    pvcSource,
   },
 }) => {
   const bootVolumeName = bootableVolume?.metadata?.name;
+  const pvcDiskSize = pvcSource?.spec?.resources?.requests?.storage;
+  const sizeData = pvcDiskSize && humanizeBinaryBytes(pvcDiskSize);
   return (
     <Tr
       isHoverable
@@ -33,14 +46,22 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       isRowSelected={bootableVolumeSelected?.metadata?.name === bootVolumeName}
       onClick={() => setBootSourceSelected(bootableVolume)}
     >
-      <Td id="volume-name">
+      <TableData activeColumnIDs={activeColumnIDs} id="name">
         <img src={getOSIcon(preference)} alt="os-icon" className="vm-catalog-row-icon" />
         <Text component={TextVariants.small}>{bootVolumeName}</Text>
-      </Td>
-      <Td id="operating-system">{preference?.metadata?.annotations?.[ANNOTATIONS.displayName]}</Td>
-      <Td id={ANNOTATIONS.description}>
-        {bootableVolume?.metadata?.annotations?.[ANNOTATIONS.description]}
-      </Td>
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} id="operating-system">
+        {preference?.metadata?.annotations?.[ANNOTATIONS.displayName] || NO_DATA_DASH}
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} id="storage-class">
+        {pvcSource?.spec?.storageClassName || NO_DATA_DASH}
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} id="size">
+        {sizeData?.string || NO_DATA_DASH}
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description}>
+        {bootableVolume?.metadata?.annotations?.[ANNOTATIONS.description] || NO_DATA_DASH}
+      </TableData>
     </Tr>
   );
 };
