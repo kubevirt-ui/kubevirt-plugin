@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
@@ -11,13 +12,15 @@ import {
 import { sortable } from '@patternfly/react-table';
 import { columnSorting } from '@virtualmachines/list/hooks/utils/utils';
 
-import { getDataSourcePreferenceLabelValue } from '../../utils/utils';
+import { getDataSourcePreferenceLabelValue, getPreferenceReadableOS } from '../../utils/utils';
 
 const useBootableVolumesColumns = (
   pagination: { [key: string]: any },
   data: V1beta1DataSource[],
+  preferences: V1alpha2VirtualMachineClusterPreference[],
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[]] => {
   const { t } = useKubevirtTranslation();
+  const { startIndex, endIndex } = pagination;
 
   const sorting = useCallback(
     (direction, path) => columnSorting(data, direction, pagination, path),
@@ -36,6 +39,21 @@ const useBootableVolumesColumns = (
       {
         title: t('Operating system'),
         id: 'os',
+        transforms: [sortable],
+        sort: (dataSources, direction) => {
+          return dataSources
+            .sort((a, b) => {
+              const aUpdated = getPreferenceReadableOS(a, preferences);
+              const bUpdated = getPreferenceReadableOS(b, preferences);
+
+              if (aUpdated && bUpdated) {
+                return direction === 'asc'
+                  ? aUpdated.localeCompare(bUpdated)
+                  : bUpdated.localeCompare(aUpdated);
+              }
+            })
+            ?.slice(startIndex, endIndex);
+        },
         props: { className: 'pf-m-width-15' },
       },
       {
@@ -49,17 +67,19 @@ const useBootableVolumesColumns = (
         title: t('Preference'),
         id: 'preference',
         transforms: [sortable],
-        sort: (dataSources, dir) => {
-          return dataSources.sort((a, b) => {
-            const aUpdated = getDataSourcePreferenceLabelValue(a);
-            const bUpdated = getDataSourcePreferenceLabelValue(b);
+        sort: (dataSources, direction) => {
+          return dataSources
+            .sort((a, b) => {
+              const aUpdated = getDataSourcePreferenceLabelValue(a);
+              const bUpdated = getDataSourcePreferenceLabelValue(b);
 
-            if (aUpdated && bUpdated) {
-              return dir === 'asc'
-                ? aUpdated.localeCompare(bUpdated)
-                : bUpdated.localeCompare(aUpdated);
-            }
-          });
+              if (aUpdated && bUpdated) {
+                return direction === 'asc'
+                  ? aUpdated.localeCompare(bUpdated)
+                  : bUpdated.localeCompare(aUpdated);
+              }
+            })
+            ?.slice(startIndex, endIndex);
         },
         props: { className: 'pf-m-width-15' },
       },
@@ -82,7 +102,7 @@ const useBootableVolumesColumns = (
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
-    [t, sorting],
+    [t, sorting, startIndex, endIndex, preferences],
   );
 
   const [activeColumns] = useActiveColumns<K8sResourceCommon>({

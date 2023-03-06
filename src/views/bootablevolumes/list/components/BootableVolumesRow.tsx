@@ -30,7 +30,7 @@ const BootableVolumesRow: FC<
         <ResourceLink groupVersionKind={groupVersionKind} name={obj?.metadata?.name} />
       </TableData>
       <TableData id="os" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
-        {getPreferenceReadableOS(obj, preferences) || NO_DATA_DASH}
+        {getPreferenceReadableOS(obj, preferences)}
       </TableData>
       <TableData id="description" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
         {obj?.metadata?.annotations?.description || NO_DATA_DASH}

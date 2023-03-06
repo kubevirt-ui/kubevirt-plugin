@@ -38,7 +38,7 @@ const BootableVolumesList: FC = () => {
     useBootableVolumesFilters(),
   );
   const [pagination, setPagination] = useState(paginationInitialState);
-  const [columns, activeColumns] = useBootableVolumesColumns(pagination, filteredData);
+  const [columns, activeColumns] = useBootableVolumesColumns(pagination, filteredData, preferences);
 
   const onPageChange = ({ page, perPage, startIndex, endIndex }) => {
     setPagination(() => ({

@@ -6,6 +6,7 @@ import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSource
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ANNOTATIONS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { BootableVolumeMetadata, InstanceTypesToSizesMap } from './types';
@@ -15,7 +16,7 @@ export const getDataSourcePreferenceLabelValue = (
 ): string => obj?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL] || '';
 
 export const getPreferenceReadableOS = (
-  obj: V1beta1DataSource,
+  obj: V1beta1DataSource | K8sResourceCommon,
   preferences: V1alpha2VirtualMachineClusterPreference[],
 ): string => {
   const preferenceLabelValue = getDataSourcePreferenceLabelValue(obj); // preference name
@@ -23,7 +24,7 @@ export const getPreferenceReadableOS = (
     (preference) => preference?.metadata?.name === preferenceLabelValue,
   );
 
-  return preferenceObject?.metadata?.annotations?.[ANNOTATIONS.displayName];
+  return preferenceObject?.metadata?.annotations?.[ANNOTATIONS.displayName] || NO_DATA_DASH;
 };
 
 export const getPreferenceOSType = (obj: V1beta1DataSource): OS_NAME_TYPES => {
