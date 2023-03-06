@@ -48,7 +48,7 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
   useEffect(() => {
     if (!storageClass && loaded) {
       setStorageClassName(defaultSC?.metadata?.name);
-      setStorageClassProvisioner(defaultSC?.provisioner);
+      setStorageClassProvisioner?.(defaultSC?.provisioner);
     }
   }, [defaultSC, setStorageClassName, setStorageClassProvisioner, storageClass, loaded]);
 
