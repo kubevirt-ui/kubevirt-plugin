@@ -25,7 +25,7 @@ const StorageCharts: React.FC<StorageChartsProps> = ({ vmi }) => {
       </GridItem>
       <GridItem span={6}>
         <Card>
-          <CardTitle>{t('Storage iops total read / write')}</CardTitle>
+          <CardTitle>{t('Storage IOPS total read / write')}</CardTitle>
           <CardBody>
             <StorageIOPSTotalThresholdChart vmi={vmi} />
           </CardBody>
