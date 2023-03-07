@@ -39,7 +39,7 @@ const SettingsTab: React.FC = () => {
               <LiveMigrationTab />
             </div>
           </Tab>
-          <Tab eventKey={2} title={<TabTitleText>{t('Templates project')}</TabTitleText>}>
+          <Tab eventKey={2} title={<TabTitleText>{t('Template project')}</TabTitleText>}>
             <div className="settings-tab__content">
               <TemplatesProjectTab />
             </div>
