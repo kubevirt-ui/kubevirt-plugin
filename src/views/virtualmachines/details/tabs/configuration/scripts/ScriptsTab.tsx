@@ -14,6 +14,7 @@ import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/Sideba
 import { VMAuthorizedSSHKeyModal } from '@kubevirt-utils/components/VMAuthorizedSSHKeyModal/VMAuthorizedSSHKeyModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   k8sUpdate,
   K8sVerb,
@@ -70,7 +71,11 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
 
   return (
     <PageSection>
-      <SidebarEditor resource={vm} onResourceUpdate={onSubmit}>
+      <SidebarEditor
+        resource={vm}
+        onResourceUpdate={onSubmit}
+        pathsToHighlight={PATHS_TO_HIGHLIGHT.SCRIPTS_TAB}
+      >
         {(resource) => (
           <DescriptionList className="vm-scripts-tab">
             <Title headingLevel="h2">

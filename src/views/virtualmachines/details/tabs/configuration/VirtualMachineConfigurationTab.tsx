@@ -51,7 +51,7 @@ const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = 
           onClick={() => redirectTab(name)}
           title={<TabTitleText>{title}</TabTitleText>}
         >
-          <Component {...props} />
+          {activeTabKey === name && <Component {...props} />}
         </Tab>
       ))}
     </Tabs>

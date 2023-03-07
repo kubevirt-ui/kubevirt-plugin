@@ -5,6 +5,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ListPageBody, ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem } from '@patternfly/react-core';
 
@@ -22,7 +23,11 @@ const WizardNetworkTab: WizardTab = ({ vm, updateVM }) => {
   return (
     <div className="wizard-network-tab">
       <ListPageBody>
-        <SidebarEditor resource={vm} onResourceUpdate={(newVM) => updateVM(newVM)}>
+        <SidebarEditor
+          resource={vm}
+          onResourceUpdate={(newVM) => updateVM(newVM)}
+          pathsToHighlight={PATHS_TO_HIGHLIGHT.NETWORK_TAB}
+        >
           <Flex>
             <FlexItem>
               <ListPageCreateButton

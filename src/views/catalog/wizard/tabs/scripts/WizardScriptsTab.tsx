@@ -8,6 +8,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { DescriptionList, Divider, PageSection } from '@patternfly/react-core';
 
 import SSHKey from './components/SSHKey';
@@ -21,7 +22,11 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM }) => {
 
   return (
     <PageSection className="wizard-scripts-tab">
-      <SidebarEditor resource={vm} onResourceUpdate={(newVM) => updateVM(newVM)}>
+      <SidebarEditor
+        resource={vm}
+        onResourceUpdate={(newVM) => updateVM(newVM)}
+        pathsToHighlight={PATHS_TO_HIGHLIGHT.SCRIPTS_TAB}
+      >
         <SidebarEditorSwitch />
         <DescriptionList className="wizard-scripts-tab__description-list">
           <WizardDescriptionItem
