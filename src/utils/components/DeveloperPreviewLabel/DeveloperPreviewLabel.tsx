@@ -12,7 +12,7 @@ const DeveloperPreviewLabel: React.FC = () => {
   return (
     <Popover
       bodyContent={t(
-        'Developer preview features are not intended to be used in production environments. The clusters deployed with the developer preview features are considered to be development clusters and are not supported through the Red Hat Customer Portal case management system.',
+        'Developer preview features are not intended to use in production environments. The clusters deployed with the developer preview features are developmental clusters and are not currently supported by Red Hat.',
       )}
     >
       <Label isCompact icon={<InfoCircleIcon />} className="dev-preview-label">

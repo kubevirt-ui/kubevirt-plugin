@@ -62,7 +62,7 @@ const VolumeSource: FC<VolumeSourceProps> = ({
               <Popover
                 position="right"
                 bodyContent={t(
-                  'The cloned copy of this PVC will be moved to the destination project',
+                  'This will create a cloned copy of the PVC in the destination project.',
                 )}
               >
                 <HelpIcon className="icon-size-small" />
