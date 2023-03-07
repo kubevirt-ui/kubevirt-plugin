@@ -3,6 +3,8 @@ import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getLabel } from '@kubevirt-utils/resources/shared';
+import { VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { toIECUnit } from '@kubevirt-utils/utils/units';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
@@ -54,6 +56,8 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
   const [cpuCores, setCpuCores] = React.useState<number>();
   const [memoryUnit, setMemoryUnit] = React.useState<string>();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
+
+  const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
 
   const updatedVirtualMachine = React.useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
@@ -115,12 +119,13 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
           key="default"
           variant={ButtonVariant.secondary}
           isDisabled={
+            !templateName ||
             !defaultsLoaded ||
             !templateDefaultsData?.defaultCpu ||
             !templateDefaultsData?.defaultMemory ||
             defaultLoadError
           }
-          isLoading={!defaultsLoaded}
+          isLoading={templateName && !defaultsLoaded}
           onClick={() => {
             setCpuCores(templateDefaultsData?.defaultCpu);
             setMemory(templateDefaultsData?.defaultMemory?.size);
