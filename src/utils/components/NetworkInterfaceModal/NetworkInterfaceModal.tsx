@@ -95,6 +95,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           setInterfaceType={setInterfaceType}
           setSubmitDisabled={setSubmitDisabled}
           namespace={namespace}
+          isEditing={Boolean(network) && Boolean(iface)}
         />
         <NetworkInterfaceTypeSelect
           interfaceType={interfaceType}
