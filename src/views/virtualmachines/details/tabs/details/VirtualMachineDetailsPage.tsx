@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider, PageSection } from '@patternfly/react-core';
 
@@ -33,7 +34,11 @@ const VirtualMachineDetailsPage: React.FC<VirtualMachineDetailsPageProps> = ({ o
   return (
     <div>
       <PageSection>
-        <SidebarEditor resource={vm} onResourceUpdate={onChangeResource}>
+        <SidebarEditor
+          resource={vm}
+          onResourceUpdate={onChangeResource}
+          pathsToHighlight={PATHS_TO_HIGHLIGHT.DETAILS_TAB}
+        >
           {(resource) => <DetailsSection vm={resource} pathname={location?.pathname} />}
         </SidebarEditor>
       </PageSection>
