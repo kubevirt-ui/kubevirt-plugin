@@ -24,16 +24,22 @@ const HardwareDevicesHeadlessModeModal: React.FC<HardwareDevicesHeadlessModeModa
   onSubmit,
   vmi,
 }) => {
+  const devices = vm?.spec?.template?.spec?.domain?.devices;
   const { t } = useKubevirtTranslation();
   const [checked, setChecked] = useState<boolean>(
-    !vm?.spec?.template?.spec?.domain?.devices?.autoattachGraphicsDevice,
+    devices?.hasOwnProperty('autoattachGraphicsDevice') && !devices?.autoattachGraphicsDevice,
   );
 
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       if (vm) {
         ensurePath(vmDraft, ['spec.template.spec.domain.devices']);
-        vmDraft.spec.template.spec.domain.devices.autoattachGraphicsDevice = !checked ?? null;
+        if (checked) {
+          vmDraft.spec.template.spec.domain.devices.autoattachGraphicsDevice = !checked;
+          return vmDraft;
+        }
+        delete vmDraft.spec.template.spec.domain.devices.autoattachGraphicsDevice;
+        return vmDraft;
       }
     });
     return updatedVM;
