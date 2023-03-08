@@ -339,10 +339,17 @@ export const getChangedHeadlessMode = (
   if (isEmpty(vm) || isEmpty(vmi)) {
     return false;
   }
-  const vmHeadless = !!vm?.spec?.template?.spec?.domain?.devices?.autoattachGraphicsDevice;
-  const vmiHeadless = !!vmi?.spec?.domain?.devices?.autoattachGraphicsDevice;
+  const vmDevices = vm?.spec?.template?.spec?.domain?.devices;
+  const vmiDevices = vmi?.spec?.domain?.devices;
 
-  return vmHeadless !== vmiHeadless;
+  const vmHeadless = !!vmDevices?.autoattachGraphicsDevice;
+  const vmiHeadless = !!vmiDevices?.autoattachGraphicsDevice;
+
+  return (
+    vmHeadless !== vmiHeadless ||
+    vmDevices?.hasOwnProperty('autoattachGraphicsDevice') !==
+      vmiDevices?.hasOwnProperty('autoattachGraphicsDevice')
+  );
 };
 
 export const getTabURL = (vm: V1VirtualMachine, tab: string) =>

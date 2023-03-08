@@ -1,10 +1,8 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -26,23 +24,17 @@ import HardwareDevicesHeadlessModeModal from './modal/HardwareDevicesHeadlessMod
 type HardwareDevicesHeadlessModeProps = {
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
+  onSubmit: (vm: V1VirtualMachine) => Promise<void | V1VirtualMachine>;
 };
 
-const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({ vm, vmi }) => {
+const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({
+  vm,
+  vmi,
+  onSubmit,
+}) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-
-  const onSubmit = React.useCallback(
-    (updatedVM: V1VirtualMachine) =>
-      k8sUpdate({
-        model: VirtualMachineModel,
-        data: updatedVM,
-        ns: updatedVM?.metadata?.namespace,
-        name: updatedVM?.metadata?.name,
-      }),
-    [],
-  );
-
+  const devices = vm?.spec?.template?.spec?.domain?.devices;
   return (
     <>
       <DescriptionListTermHelpText>
@@ -90,7 +82,10 @@ const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({ vm,
           <Flex spaceItems={{ default: 'spaceItemsNone' }}>
             <FlexItem>
               {t(
-                !vm?.spec?.template?.spec?.domain?.devices?.autoattachGraphicsDevice ? 'ON' : 'OFF',
+                devices?.hasOwnProperty('autoattachGraphicsDevice') &&
+                  !devices?.autoattachGraphicsDevice
+                  ? 'ON'
+                  : 'OFF',
               )}
             </FlexItem>
             <FlexItem>

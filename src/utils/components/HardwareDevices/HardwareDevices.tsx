@@ -83,7 +83,7 @@ const HardwareDevices: React.FC<HardwareDevicesProps> = ({ vm, vmi, onSubmit, ca
         </DescriptionListDescription>
       </DescriptionListGroup>
       <DescriptionListGroup>
-        <HardwareDevicesHeadlessMode vm={vm} vmi={vmi} />
+        <HardwareDevicesHeadlessMode vm={vm} vmi={vmi} onSubmit={onSubmit} />
       </DescriptionListGroup>
     </DescriptionList>
   );
