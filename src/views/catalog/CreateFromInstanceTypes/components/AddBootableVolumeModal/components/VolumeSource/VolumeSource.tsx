@@ -4,14 +4,12 @@ import xbytes from 'xbytes';
 import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 import DiskSourcePVCSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourcePVCSelect';
 import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourceUploadPVC';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Checkbox, Popover, Split, SplitItem } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { Checkbox, PopoverPosition, Split, SplitItem } from '@patternfly/react-core';
 
 import { AddBootableVolumeState } from '../../utils/constants';
-
-import './VolumeSource.scss';
 
 type VolumeSourceProps = {
   bootableVolume: AddBootableVolumeState;
@@ -51,26 +49,18 @@ const VolumeSource: FC<VolumeSourceProps> = ({
           )
         }
       />
-      <Checkbox
-        id="clone-pvc-checkbox"
-        isChecked
-        isDisabled
-        label={
-          <Split hasGutter>
-            <SplitItem>{t('Clone existing PVC')}</SplitItem>
-            <SplitItem onClick={(e) => e.preventDefault()}>
-              <Popover
-                position="right"
-                bodyContent={t(
-                  'This will create a cloned copy of the PVC in the destination project.',
-                )}
-              >
-                <HelpIcon className="icon-size-small" />
-              </Popover>
-            </SplitItem>
-          </Split>
-        }
-      />
+
+      <Split hasGutter>
+        <SplitItem>
+          <Checkbox id="clone-pvc-checkbox" isChecked isDisabled label={t('Clone existing PVC')} />
+        </SplitItem>
+        <SplitItem>
+          <HelpTextIcon
+            bodyContent={t('This creates a cloned copy of the PVC in the destination project.')}
+            position={PopoverPosition.right}
+          />
+        </SplitItem>
+      </Split>
     </>
   );
 };
