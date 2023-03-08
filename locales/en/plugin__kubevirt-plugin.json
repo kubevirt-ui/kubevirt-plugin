@@ -696,7 +696,7 @@
   "Only VM-related alerts in your project will be shown": "Only VM-related alerts in your project will be shown",
   "Open Console": "Open Console",
   "Open web console": "Open web console",
-  "Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic that is sent to this port is forwarded to the Service": "Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic that is sent to this port is forwarded to the Service",
+  "Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.": "Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.",
   "OpenShift Data Foundation": "OpenShift Data Foundation",
   "OpenShift Data Foundation (ODF)": "OpenShift Data Foundation (ODF)",
   "OpenShift Data Foundation (recommended for full functionality) or another persistent storage service is required for OpenShift Virtualization": "OpenShift Data Foundation (recommended for full functionality) or another persistent storage service is required for OpenShift Virtualization",

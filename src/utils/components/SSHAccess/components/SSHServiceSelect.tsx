@@ -54,15 +54,6 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
         {t('None')}
       </SelectOption>
       <SelectOption
-        value={SERVICE_TYPES.NODE_PORT}
-        id={SERVICE_TYPES.NODE_PORT}
-        description={t(
-          'Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic that is sent to this port is forwarded to the Service',
-        )}
-      >
-        {t('SSH over NodePort')}
-      </SelectOption>
-      <SelectOption
         isDisabled={!hasSomeMetalCrd}
         value={SERVICE_TYPES.LOAD_BALANCER}
         id={SERVICE_TYPES.LOAD_BALANCER}
@@ -71,6 +62,15 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
         )}
       >
         {t('SSH over LoadBalancer')}
+      </SelectOption>
+      <SelectOption
+        value={SERVICE_TYPES.NODE_PORT}
+        id={SERVICE_TYPES.NODE_PORT}
+        description={t(
+          'Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.',
+        )}
+      >
+        {t('SSH over NodePort')}
       </SelectOption>
     </Select>
   );
