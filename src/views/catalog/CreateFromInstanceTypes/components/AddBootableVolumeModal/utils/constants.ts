@@ -6,6 +6,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
+import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 
 export enum RADIO_FORM_SELECTION {
   UPLOAD_IMAGE = 'upload',
@@ -43,6 +44,9 @@ export const emptySourceDataVolume: V1beta1DataVolume = {
   metadata: {
     name: '',
     namespace: OPENSHIFT_OS_IMAGES_NS,
+    annotations: {
+      [CDI_BIND_REQUESTED_ANNOTATION]: 'true',
+    },
   },
   spec: {
     storage: {
