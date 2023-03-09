@@ -31,7 +31,7 @@ const SSHKeySection: FC<SSHKeySectionProps> = ({
   const { t } = useKubevirtTranslation();
   const [namespace] = useActiveNamespace();
   const [newKeyValue, setNewKeyValue] = useState(sshSecretKey);
-  const [createSecretOpen, setCreateSecretOpen] = useState(!sshSecretName);
+  const [createSecretOpen, setCreateSecretOpen] = useState(false);
   const [selectedSecretName, setSelectedSecretName] = useState(sshSecretName);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isValidatedKey, setIsValidatedKey] = useState<boolean>(true);
@@ -42,6 +42,7 @@ const SSHKeySection: FC<SSHKeySectionProps> = ({
       : selectedSecretName;
     const secretKey = createSecretOpen ? newKeyValue : undefined;
     setSSHSecretCredentials({ sshSecretName: secretName, sshSecretKey: secretKey });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newKeyValue, selectedSecretName, createSecretOpen]);
 
   return (
