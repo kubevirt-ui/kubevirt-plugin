@@ -244,6 +244,7 @@
   "Connect with any viewer application for following protocols": "Connect with any viewer application for following protocols",
   "Connecting": "Connecting",
   "Console": "Console",
+  "Console is disabled in headless mode": "Console is disabled in headless mode",
   "Contact the image provider for more information.": "Contact the image provider for more information.",
   "Container": "Container",
   "Container (ephemeral)": "Container (ephemeral)",
