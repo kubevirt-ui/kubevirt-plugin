@@ -11,7 +11,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getPVC } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -46,6 +46,13 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({
   const [error, setError] = useState<Error | any>(null);
 
   const { sshSecretName, sshSecretKey } = sshSecretCredentials;
+
+  const [canCreateVM] = useAccessReview({
+    resource: VirtualMachineModel.plural,
+    verb: 'create' as K8sVerb,
+    namespace: vm?.metadata?.namespace,
+    group: VirtualMachineModel.apiGroup,
+  });
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -135,7 +142,7 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({
             <SplitItem>
               <Button
                 isLoading={isSubmitting}
-                isDisabled={isSubmitting}
+                isDisabled={isSubmitting || isEmpty(selectedBootableVolume) || !canCreateVM}
                 onClick={handleSubmit}
                 variant={ButtonVariant.primary}
               >
