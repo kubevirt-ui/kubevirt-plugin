@@ -1,19 +1,24 @@
 import React from 'react';
 import cn from 'classnames';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PlayIcon } from '@patternfly/react-icons';
 
 type VirtualMachinesOverviewTabDetailsConsoleConnectProps = {
   connect?: () => void;
   isDisabled?: boolean;
+  isHeadlessMode?: boolean;
 };
 
 const VirtualMachinesOverviewTabDetailsConsoleConnect: React.FC<
   VirtualMachinesOverviewTabDetailsConsoleConnectProps
-> = ({ connect, isDisabled }) => {
+> = ({ connect, isDisabled, isHeadlessMode }) => {
+  const { t } = useKubevirtTranslation();
+
   return (
     <div className={cn('vnc-grey-background', isDisabled && 'disabled')}>
-      <PlayIcon size="md" onClick={connect} />
+      {!isDisabled && <PlayIcon size="md" onClick={connect} />}
+      {isHeadlessMode && t('Console is disabled in headless mode')}
     </div>
   );
 };

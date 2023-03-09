@@ -4,7 +4,10 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VNC_CONSOLE_TYPE } from '@kubevirt-utils/components/Consoles/components/utils/ConsoleConsts';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
 import { INSECURE, SECURE } from '@kubevirt-utils/components/Consoles/utils/constants';
-import { isConnectionEncrypted } from '@kubevirt-utils/components/Consoles/utils/utils';
+import {
+  isConnectionEncrypted,
+  isHeadlessModeVMI,
+} from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -23,6 +26,7 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
   const { t } = useKubevirtTranslation();
 
   const isEncrypted = isConnectionEncrypted();
+  const isHeadlessMode = isHeadlessModeVMI(vmi);
   const isVMRunning = vmi?.status?.phase === vmiStatuses.Running;
   const [canConnectConsole] = useAccessReview({
     resource: 'virtualmachineinstances/vnc',
@@ -33,7 +37,7 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
   });
   return (
     <Bullseye className="bullseye">
-      {isVMRunning && canConnectConsole ? (
+      {isVMRunning && !isHeadlessMode && canConnectConsole ? (
         <>
           <VncConsole
             type={VNC_CONSOLE_TYPE}
@@ -48,12 +52,15 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
         </>
       ) : (
         <div className="pf-c-console__vnc">
-          <VirtualMachinesOverviewTabDetailsConsoleConnect isDisabled />
+          <VirtualMachinesOverviewTabDetailsConsoleConnect
+            isDisabled
+            isHeadlessMode={isHeadlessMode}
+          />
         </div>
       )}
       <div className="link">
         <Button
-          isDisabled={!isVMRunning || !canConnectConsole}
+          isDisabled={!isVMRunning || isHeadlessMode || !canConnectConsole}
           onClick={() =>
             window.open(
               `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
