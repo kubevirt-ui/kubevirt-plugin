@@ -4,7 +4,6 @@ import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAvailableDataSources } from '@kubevirt-utils/resources/shared';
 import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/react-core';
 import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
@@ -38,20 +37,22 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   displayShowAllButton,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { bootableVolumes, loaded } = useBootableVolumes();
-  const columns = useBootVolumeColumns();
+  const { bootableVolumes, loaded, pvcSources } = useBootableVolumes();
+  const { activeColumns, columnLayout } = useBootVolumeColumns(!displayShowAllButton);
   const filters = useBootVolumeFilters(`osName${!displayShowAllButton && '-modal'}`);
 
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(
-    getAvailableDataSources(bootableVolumes),
-    filters,
-  );
+  const [unfilteredData, data, onFilterChange] = useListPageFilter(bootableVolumes, filters);
 
   const [pagination, setPagination] = useState(
     displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal,
   );
 
-  const { sortedData, getSortType } = useBootVolumeSortColumns(data, preferences, pagination);
+  const { sortedData, getSortType } = useBootVolumeSortColumns(
+    data,
+    preferences,
+    pvcSources,
+    pagination,
+  );
   const onPageChange = ({ page, perPage, startIndex, endIndex }) => {
     setPagination(() => ({
       page,
@@ -90,6 +91,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             data={unfilteredData}
             // nameFilter={!displayShowAllButton && "modal-name"} can remove comment once this merged https://github.com/openshift/console/pull/12438 and build into new SDK version
             rowFilters={filters}
+            columnLayout={columnLayout}
           />
         </SplitItem>
         <SplitItem isFilled />
@@ -121,13 +123,8 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
       <TableComposable variant={TableVariant.compact}>
         <Thead>
           <Tr>
-            {columns.map((col, columnIndex) => (
-              <Th
-                sort={getSortType(columnIndex)}
-                key={col?.id}
-                id={col?.id}
-                width={col?.id === 'description' ? 40 : 30}
-              >
+            {activeColumns.map((col, columnIndex) => (
+              <Th sort={getSortType(columnIndex)} key={col?.id} id={col?.id}>
                 {col?.title}
               </Th>
             ))}
@@ -138,9 +135,12 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             <BootableVolumeRow
               key={bs?.metadata?.name}
               bootableVolume={bs}
+              activeColumnIDs={Object.values(activeColumns)?.map((col) => col?.id)}
               rowData={{
                 bootableVolumeSelectedState,
                 preference: preferences[bs?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]],
+                pvcSource:
+                  pvcSources?.[bs?.spec?.source?.pvc?.namespace]?.[bs?.spec?.source?.pvc?.name],
               }}
             />
           ))}
