@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
 
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  DEFAULT_NAMESPACE,
+  OPENSHIFT_MULTUS_NS,
+  OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
+} from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -18,20 +23,22 @@ const useNadsData: UseNadsData = (namespace) => {
       namespace: namespace,
     },
     //global ns to get usable nads
-    default: {
+    ...(namespace !== DEFAULT_NAMESPACE && {
+      default: {
+        groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
+        isList: true,
+        namespace: DEFAULT_NAMESPACE,
+      },
+    }),
+    OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS: {
       groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
       isList: true,
-      namespace: 'default',
+      namespace: OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
     },
-    'openshift-sriov-network-operator': {
+    OPENSHIFT_MULTUS_NS: {
       groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
       isList: true,
-      namespace: 'openshift-sriov-network-operator',
-    },
-    'openshift-multus': {
-      groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
-      isList: true,
-      namespace: 'openshift-multus',
+      namespace: OPENSHIFT_MULTUS_NS,
     },
   });
 
@@ -39,7 +46,7 @@ const useNadsData: UseNadsData = (namespace) => {
     return (Object.values(data) || [])?.reduce(
       (acc, nads) => {
         acc.nads.push(...nads?.data);
-        acc.loaded = acc.loaded && nads?.loaded;
+        acc.loaded = acc.loaded && (!isEmpty(nads?.loadError) || nads?.loaded);
         acc.loadError = isEmpty(nads?.loadError) ? acc.loadError : nads?.loadError;
         return acc;
       },
