@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useMemo, VFC } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -21,7 +21,7 @@ type TemplatesCatalogItemsProps = {
   loaded: boolean;
 };
 
-export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
+export const TemplatesCatalogItems: VFC<TemplatesCatalogItemsProps> = ({
   templates,
   availableTemplatesUID,
   availableDatasources,
@@ -31,6 +31,14 @@ export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
   loaded,
 }) => {
   const columns = useTemplatesCatalogColumns();
+
+  const sortedTemplates = useMemo(
+    () =>
+      templates.sort((a: V1Template, b: V1Template) =>
+        a?.metadata?.name?.localeCompare(b?.metadata?.name),
+      ),
+    [templates],
+  );
 
   return filters?.isList ? (
     <div className="vm-catalog-table-container">
@@ -47,7 +55,7 @@ export const TemplatesCatalogItems: React.VFC<TemplatesCatalogItemsProps> = ({
   ) : (
     <StackItem className="co-catalog-page__grid vm-catalog-grid-container">
       <Gallery hasGutter className="vm-catalog-grid" id="vm-catalog-grid">
-        {templates.map((template) => (
+        {sortedTemplates.map((template) => (
           <TemplateTile
             key={template?.metadata?.uid}
             template={template}

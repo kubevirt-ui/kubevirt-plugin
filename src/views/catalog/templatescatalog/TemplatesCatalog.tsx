@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -17,12 +17,12 @@ import { filterTemplates } from './utils/helpers';
 
 import './TemplatesCatalog.scss';
 
-const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
+const TemplatesCatalog: FC<RouteComponentProps<{ ns: string }>> = ({
   match: {
     params: { ns: namespace },
   },
 }) => {
-  const [selectedTemplate, setSelectedTemplate] = React.useState<V1Template | undefined>(undefined);
+  const [selectedTemplate, setSelectedTemplate] = useState<V1Template | undefined>(undefined);
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
   const { templates, availableTemplatesUID, loaded, bootSourcesLoaded, availableDatasources } =
@@ -32,7 +32,7 @@ const TemplatesCatalog: React.FC<RouteComponentProps<{ ns: string }>> = ({
       onlyDefault: filters.onlyDefault,
     });
 
-  const filteredTemplates = React.useMemo(
+  const filteredTemplates = useMemo(
     () => filterTemplates(templates, filters),
     [templates, filters],
   );
