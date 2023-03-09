@@ -46,7 +46,7 @@ export const deleteBootableVolumeMetadata = (obj: V1beta1DataSource) => {
       });
     }, {});
 
-  const annotationsWithoutDescription = Object.keys(obj?.metadata?.annotations)
+  const annotationsWithoutDescription = Object.keys(obj?.metadata?.annotations || {})
     .filter((key) => key !== 'description')
     .reduce((acc, key) => {
       return Object.assign(acc, {
