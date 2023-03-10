@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
@@ -21,15 +21,22 @@ import { clearSessionStorageVM, useWizardVMContext } from '../../utils/WizardVMC
 
 import { WizardNoBootModal } from './WizardNoBootModal';
 
-export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => {
+export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const history = useHistory();
   const { t } = useKubevirtTranslation();
-  const { tabsData, disableVmCreate, loaded: vmContextLoaded } = useWizardVMContext();
+  const {
+    tabsData,
+    updateTabsData,
+    disableVmCreate,
+    loaded: vmContextLoaded,
+  } = useWizardVMContext();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVmCreate();
   const { createModal } = useModal();
 
-  const [startVM, setStartVM] = React.useState(true);
+  const [startVM, setStartVM] = useState<boolean>(
+    isBootSourceAvailable && (tabsData?.startVM ?? true),
+  );
 
   const onCreate = () =>
     createVM({
@@ -59,12 +66,15 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
   const templateNamespace = tabsData?.overview?.templateMetadata?.namespace;
   const loaded = vmContextLoaded && vmCreateLoaded && bootSourceLoaded;
 
-  React.useEffect(() => {
-    if (loaded && startVM !== isBootSourceAvailable) {
-      setStartVM(isBootSourceAvailable);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded, isBootSourceAvailable]);
+  const onChangeStartVM = useCallback(
+    (checked: boolean) => {
+      setStartVM(checked);
+      updateTabsData((currentTabsData) => {
+        return { ...currentTabsData, startVM: checked };
+      });
+    },
+    [updateTabsData],
+  );
 
   return (
     <footer className="vm-wizard-footer">
@@ -72,9 +82,9 @@ export const WizardFooter: React.FC<{ namespace: string }> = ({ namespace }) => 
         <StackItem>
           <Checkbox
             id="start-after-create-checkbox"
-            isDisabled={!loaded || disableVmCreate}
+            isDisabled={!loaded || disableVmCreate || !isBootSourceAvailable}
             isChecked={startVM}
-            onChange={(v) => setStartVM(v)}
+            onChange={onChangeStartVM}
             label={t('Start this VirtualMachine after creation')}
           />
         </StackItem>

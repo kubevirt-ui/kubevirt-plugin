@@ -40,7 +40,7 @@ export const overrideVirtualMachineDataVolumeSpec = (
 };
 
 export const setTemplateParameters = (template: V1Template, formData: FormData): V1Template => {
-  template.parameters = template.parameters.map((parameter) => {
+  template.parameters = template?.parameters?.map((parameter) => {
     const formParameter = formData.get(parameter.name) as string;
     if (formParameter.length > 0) parameter.value = formParameter;
 

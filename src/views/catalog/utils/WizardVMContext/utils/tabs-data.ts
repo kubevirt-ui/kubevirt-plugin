@@ -14,4 +14,5 @@ export type TabsData = {
   disks?: {
     dataVolumesToAddOwnerRef?: V1beta1DataVolume[];
   };
+  startVM?: boolean;
 };
