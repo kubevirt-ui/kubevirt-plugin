@@ -48,6 +48,12 @@ export const generateVM = (
                   disk: {
                     bus: 'virtio',
                   },
+                  name: `${virtualmachineName}-disk`,
+                },
+                {
+                  disk: {
+                    bus: 'virtio',
+                  },
                   name: 'cloudinitdisk',
                 },
               ],
