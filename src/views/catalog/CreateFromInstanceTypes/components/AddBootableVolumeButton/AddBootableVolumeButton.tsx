@@ -36,8 +36,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
         ))
       }
       variant={buttonVariant || ButtonVariant.secondary}
-      isLoading={!loaded}
-      isDisabled={!loaded || loadError}
+      isDisabled={loadError}
     >
       {t('Add volume')}
     </Button>
