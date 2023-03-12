@@ -6,11 +6,13 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
+  Button,
+  ButtonVariant,
   DescriptionList,
   DescriptionListDescription,
+  DescriptionListTerm,
   DescriptionListTermHelpTextButton,
   Flex,
-  FlexItem,
   Grid,
   GridItem,
   Popover,
@@ -71,22 +73,23 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
               description={mp?.metadata?.annotations?.description}
             />
             <>
-              <DescriptionListTermHelpTextButton
-                onClick={() =>
-                  createModal(({ isOpen, onClose }) => (
-                    <MigrationPolicyEditModal isOpen={isOpen} onClose={onClose} mp={mp} />
-                  ))
-                }
-              >
-                <Flex spaceItems={{ default: 'spaceItemsNone' }}>
-                  <FlexItem>
+              <DescriptionListTerm>
+                <Button
+                  isInline
+                  onClick={() =>
+                    createModal(({ isOpen, onClose }) => (
+                      <MigrationPolicyEditModal isOpen={isOpen} onClose={onClose} mp={mp} />
+                    ))
+                  }
+                  variant={ButtonVariant.link}
+                >
+                  <Flex spaceItems={{ default: 'spaceItemsNone' }}>
                     <Title headingLevel="h2">{t('Configurations')}</Title>
-                  </FlexItem>
-                  <FlexItem>
-                    <PencilAltIcon className="kv-icon-space-l" />
-                  </FlexItem>
-                </Flex>
-              </DescriptionListTermHelpTextButton>
+                    <PencilAltIcon className="kv-icon-space-l pf-c-button-icon--plain" />
+                  </Flex>
+                </Button>
+              </DescriptionListTerm>
+
               <DescriptionListDescription>
                 <DescriptionList>
                   <MigrationPolicyDescriptionItem
