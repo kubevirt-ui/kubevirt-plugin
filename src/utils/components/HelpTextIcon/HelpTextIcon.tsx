@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { FC, ReactNode } from 'react';
+import classNames from 'classnames';
 
 import { Popover, PopoverPosition } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
@@ -20,7 +21,7 @@ const HelpTextIcon: FC<HelpTextIconProps> = ({
   helpIconClassName = '',
 }) => (
   <Popover aria-label={'Help'} bodyContent={bodyContent} className={className} position={position}>
-    <HelpIcon className={helpIconClassName} />
+    <HelpIcon className={classNames('help-icon__cursor', helpIconClassName)} />
   </Popover>
 );
 
