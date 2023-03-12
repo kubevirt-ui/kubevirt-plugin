@@ -214,11 +214,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             />
           </>
         )}
-        <FormGroup
-          label={t('Volume name')}
-          isRequired
-          helperText={t('Name given to the cloned PVC')}
-        >
+        <FormGroup label={t('Volume name')} isRequired>
           <TextInput
             id="name"
             type="text"
