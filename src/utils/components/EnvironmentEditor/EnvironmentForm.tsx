@@ -15,6 +15,8 @@ import EnvironmentFormTitle from './components/EnvironmentFormTitle';
 import useEnvironments from './hooks/useEnvironments';
 import useEnvironmentsResources from './hooks/useEnvironmentsResources';
 
+import './EnvironmentForm.scss';
+
 type EnvironmentFormProps = {
   vm: V1VirtualMachine;
   onEditChange?: (edited: boolean) => void;
@@ -59,8 +61,8 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ vm, onEditChange, updateVM 
 
   return (
     <SidebarEditor<V1VirtualMachine> resource={temporaryVM} onChange={setTemporaryVM}>
-      <Form>
-        <EnvironmentFormTitle />
+      <EnvironmentFormTitle />
+      <Form className="environment-form__form">
         {environments.length !== 0 && (
           <div className="row pairs-list__heading">
             <div className="col-xs-5 text-secondary text-uppercase" id="environment-name-header">
