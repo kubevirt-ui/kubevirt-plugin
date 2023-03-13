@@ -1,13 +1,11 @@
 import { AlertsByHealthImpact } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
-import {
-  FIRING,
-  OPERATOR_HEALTH_IMPACT_LABEL,
-} from '@kubevirt-utils/hooks/useInfrastructureAlerts/utils/constants';
-import { Alert } from '@openshift-console/dynamic-plugin-sdk';
+import { OPERATOR_HEALTH_IMPACT_LABEL } from '@kubevirt-utils/hooks/useInfrastructureAlerts/utils/constants';
+import { Alert, AlertStates } from '@openshift-console/dynamic-plugin-sdk';
 
 import { HealthImpactLevel } from '../../../../views/dashboard-extensions/KubevirtHealthPopup/utils/types';
 
-export const isFiringAlert = (alert: Alert) => alert?.state === FIRING;
+export const isFiringOrSilencedAlert = (alert: Alert): boolean =>
+  alert?.state === AlertStates.Firing || alert?.state === AlertStates.Silenced;
 
 const getHealthImpact = (alert: Alert) => alert?.labels?.[OPERATOR_HEALTH_IMPACT_LABEL];
 

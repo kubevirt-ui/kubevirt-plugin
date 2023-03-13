@@ -1,18 +1,16 @@
 import * as React from 'react';
 
-import useKubevirtAlerts from '@kubevirt-utils/hooks/useKubevirtAlerts';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { AlertItem, AlertsBody } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { Alert } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 
-import { getAlertURL } from './utils';
-
+// File will be removed with the rest of clusteroverview/OverviewTab/status-card
 const VirtualizationAlerts: React.FC = () => {
-  const [alerts, , loadError] = useKubevirtAlerts();
+  const alerts: Alert[] = [];
 
   return (
-    <AlertsBody error={!isEmpty(loadError)}>
+    <AlertsBody error={false}>
       {alerts.map((alert) => (
-        <AlertItem key={getAlertURL(alert, alert.rule.id)} alert={alert} />
+        <AlertItem key={alert?.rule?.id} alert={alert} />
       ))}
     </AlertsBody>
   );
