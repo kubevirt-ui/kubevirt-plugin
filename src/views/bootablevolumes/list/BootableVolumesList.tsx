@@ -31,7 +31,7 @@ import './BootableVolumesList.scss';
 const BootableVolumesList: FC = () => {
   const { t } = useKubevirtTranslation();
   const [dataSources, loadedDataSources, loadErrorDataSources] = useBootableVolumes();
-  const { preferences, instanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();
+  const { preferences, instanceTypes, loadError } = useInstanceTypesAndPreferences();
   const instanceTypesNames = (instanceTypes || []).map(getName).sort((a, b) => a.localeCompare(b));
   const [data, filteredData, onFilterChange] = useListPageFilter(
     getAvailableDataSources(dataSources),
@@ -55,7 +55,6 @@ const BootableVolumesList: FC = () => {
         <AddBootableVolumeButton
           preferencesNames={Object.keys(convertResourceArrayToMap(preferences))}
           instanceTypesNames={instanceTypesNames}
-          loaded={loaded}
           loadError={loadError}
           buttonVariant={ButtonVariant.primary}
         />

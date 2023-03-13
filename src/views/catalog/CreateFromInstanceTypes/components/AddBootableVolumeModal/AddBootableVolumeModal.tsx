@@ -82,7 +82,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   const isUploadForm = formSelection === RADIO_FORM_SELECTION.UPLOAD_IMAGE;
 
   const instanceTypesToSizesMap = useMemo(
-    () => getInstanceTypesToSizesMap(instanceTypesNames),
+    () => getInstanceTypesToSizesMap(instanceTypesNames.sort((a, b) => a.localeCompare(b))),
     [instanceTypesNames],
   );
   const instanceTypeAndSize = useMemo(
@@ -249,7 +249,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           <FilterSelect
             selected={labels?.[DEFAULT_PREFERENCE_LABEL]}
             setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
-            options={preferencesNames}
+            options={preferencesNames.sort((a, b) => a.localeCompare(b))}
             groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
             optionLabelText={t('preference')}
           />

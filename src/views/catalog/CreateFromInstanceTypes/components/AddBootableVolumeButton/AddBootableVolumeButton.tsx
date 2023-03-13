@@ -9,7 +9,6 @@ import AddBootableVolumeModal from '../AddBootableVolumeModal/AddBootableVolumeM
 export type AddBootableVolumeButtonProps = {
   preferencesNames: string[];
   instanceTypesNames: string[];
-  loaded: boolean;
   loadError?: any;
   buttonVariant?: ButtonVariant;
 };
@@ -17,12 +16,12 @@ export type AddBootableVolumeButtonProps = {
 const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
   preferencesNames,
   instanceTypesNames,
-  loaded,
   loadError,
   buttonVariant,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
   return (
     <Button
       onClick={() =>
