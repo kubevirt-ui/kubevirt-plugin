@@ -4,13 +4,15 @@ import produce from 'immer';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { UploadTokenRequestModel } from '@kubevirt-utils/models';
+import { PersistentVolumeClaimModel, UploadTokenRequestModel } from '@kubevirt-utils/models';
 import { buildOwnerReference, getAPIVersionForModel } from '@kubevirt-utils/resources/shared';
-import { getDataVolume } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import {
+  getDataVolume,
+  getPVC,
+} from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import {
   k8sCreate,
   k8sDelete,
-  k8sGet,
   k8sPatch,
   K8sResourceCommon,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -149,21 +151,20 @@ export const addUploadDataVolumeOwnerReference = (
   vm: V1VirtualMachine,
   dataVolume: V1beta1DataVolume,
 ) => {
-  //checking DV exisit before trying to patch it
-  return k8sGet<V1beta1DataVolume>({
-    model: DataVolumeModel,
-    name: dataVolume?.metadata?.name,
-    ns: dataVolume?.metadata?.namespace,
-  })
-    .then(() =>
+  // Since DV is GC we want underlying PVC to get ownerReference and to be associated with VM parent
+  return getPVC(dataVolume?.metadata?.name, dataVolume?.metadata?.namespace)
+    .then((pvc) =>
       k8sPatch({
-        model: DataVolumeModel,
-        resource: dataVolume,
+        model: PersistentVolumeClaimModel,
+        resource: pvc,
         data: [
           {
             op: 'replace',
             path: '/metadata/ownerReferences',
-            value: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
+            value: [
+              ...(pvc?.metadata?.ownerReferences || []),
+              buildOwnerReference(vm, { blockOwnerDeletion: false }),
+            ],
           },
         ],
       }),
