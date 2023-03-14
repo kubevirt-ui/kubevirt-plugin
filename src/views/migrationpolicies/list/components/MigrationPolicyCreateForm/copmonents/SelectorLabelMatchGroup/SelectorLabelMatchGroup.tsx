@@ -62,13 +62,18 @@ const SelectorLabelMatchGroup: React.FC<SelectorLabelMatchGroupProps> = ({
               color={isVMILabel ? 'grey' : 'blue'}
               isEditable
               onClose={onDeleteLabel(key)}
-              onEditComplete={onEditLabel(key)}
+              onEditComplete={(_, val) => onEditLabel(key)(val)}
             >
               {transformKeyValueToLabel(key, labels[key])}
             </Label>
           );
         })}
-        <Label color="blue" variant="outline" isEditable onEditComplete={onAddLabel}>
+        <Label
+          color="blue"
+          variant="outline"
+          isEditable
+          onEditComplete={(_, val) => onAddLabel(val)}
+        >
           {t('Enter key=value')}
         </Label>
       </LabelGroup>
