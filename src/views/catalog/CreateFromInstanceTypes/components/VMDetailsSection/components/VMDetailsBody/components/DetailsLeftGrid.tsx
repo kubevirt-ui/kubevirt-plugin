@@ -38,7 +38,7 @@ const DetailsLeftGrid: React.FC<DetailsLeftGridProps> = ({
   const instancetypeSize: InstanceTypeSizeDetails = getInstancetypeDetails(category, size);
 
   return (
-    <DescriptionList isHorizontal isFluid>
+    <DescriptionList isHorizontal>
       <VirtualMachineDescriptionItem
         descriptionData={
           <TextInput

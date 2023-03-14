@@ -38,7 +38,9 @@ const SelectSecret: React.FC<SelectSecretProps> = ({
       : null,
   );
 
-  const sshKeySecrets = secrets?.filter((secret) => validateSSHPublicKey(decodeSecret(secret)));
+  const sshKeySecrets = secrets
+    ? secrets?.filter((secret) => validateSSHPublicKey(decodeSecret(secret)))
+    : [];
 
   const filterSecrets = (_, value: string): React.ReactElement[] => {
     let filteredSecrets = sshKeySecrets;
