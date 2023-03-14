@@ -22,7 +22,7 @@ const MakePersistentModal: FC<MakePersistentModalProps> = ({ vm, volume, isOpen,
 
   const updatedVirtualMachine = useMemo(() => {
     return produce(vm, (draftVM) => {
-      const volumes = [...getVolumes(vm)].map((machineVolume) => {
+      const volumes = [...getVolumes(draftVM)].map((machineVolume) => {
         if (machineVolume?.name === volume?.name) {
           if (machineVolume?.dataVolume?.hotpluggable)
             delete machineVolume?.dataVolume?.hotpluggable;

@@ -1,10 +1,11 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/components/PendingChanges/utils/constants';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
-import { tabs } from './utils/utils';
+import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/utils';
 
 import './virtual-machine-configuration-tab.scss';
 
@@ -16,20 +17,38 @@ type VirtualMachineConfigurationTabProps = RouteComponentProps<{
 };
 
 const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = (props) => {
-  const [activeTabKey, setActiveTabKey] = useState<string | number>(0);
+  const { history } = props;
+
+  const [activeTabKey, setActiveTabKey] = useState<string | number>(
+    VirtualMachineDetailsTab.Scheduling,
+  );
+
+  const redirectTab = useCallback(
+    (name: string) => {
+      const isConfiguration = includesConfigurationPath(history.location.pathname);
+      history.push(isConfiguration ? name : `${VirtualMachineDetailsTab.Configurations}/${name}`);
+      setActiveTabKey(name);
+    },
+    [history],
+  );
+
+  useEffect(() => {
+    const innerTab = getInnerTabFromPath(history.location.pathname);
+    innerTab && setActiveTabKey(innerTab);
+  }, [history.location.pathname]);
 
   return (
     <Tabs
       activeKey={activeTabKey}
-      onSelect={(_, tabIndex) => setActiveTabKey(tabIndex)}
       hasBorderBottom={false}
       className="VirtualMachineConfigurationTab--main"
     >
-      {tabs.map(({ title, Component }, index) => (
+      {tabs.map(({ title, Component, name }) => (
         <Tab
-          key={title}
+          key={name}
           className="VirtualMachineConfigurationTab--tab-nav"
-          eventKey={index}
+          eventKey={name}
+          onClick={() => redirectTab(name)}
           title={<TabTitleText>{title}</TabTitleText>}
         >
           <Component {...props} />

@@ -15,6 +15,14 @@ export enum VirtualMachineDetailsTab {
   Configurations = 'configurations',
 }
 
+export const VirtualMachineConfigurationTabInner = {
+  [VirtualMachineDetailsTab.Scripts]: VirtualMachineDetailsTab.Scripts,
+  [VirtualMachineDetailsTab.Disks]: VirtualMachineDetailsTab.Disks,
+  [VirtualMachineDetailsTab.Scheduling]: VirtualMachineDetailsTab.Scheduling,
+  [VirtualMachineDetailsTab.NetworkInterfaces]: VirtualMachineDetailsTab.NetworkInterfaces,
+  [VirtualMachineDetailsTab.Environment]: VirtualMachineDetailsTab.Environment,
+};
+
 export enum VirtualMachineDetailsTabLabel {
   // t('Overview')
   Overview = 'Overview',
