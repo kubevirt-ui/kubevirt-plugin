@@ -25,3 +25,5 @@ export const booleanTextIds = {
   yes: 'yes',
   no: 'no',
 };
+
+export const NETWORK = 'netwrok';

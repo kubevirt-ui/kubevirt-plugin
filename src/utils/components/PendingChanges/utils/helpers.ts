@@ -28,7 +28,11 @@ import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { getVMIVolumes } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { VirtualMachineDetailsTabLabel } from './constants';
+import {
+  VirtualMachineConfigurationTabInner,
+  VirtualMachineDetailsTab,
+  VirtualMachineDetailsTabLabel,
+} from './constants';
 import { PendingChange } from './types';
 
 export const checkCPUMemoryChanged = (
@@ -352,8 +356,12 @@ export const getChangedHeadlessMode = (
   );
 };
 
-export const getTabURL = (vm: V1VirtualMachine, tab: string) =>
-  `/k8s/ns/${vm?.metadata?.namespace}/${VirtualMachineModelRef}/${vm?.metadata?.name}/${tab}`;
+export const getTabURL = (vm: V1VirtualMachine, tab: string) => {
+  const tabPath = VirtualMachineConfigurationTabInner[tab]
+    ? `${VirtualMachineDetailsTab.Configurations}/${tab}`
+    : tab;
+  return `/k8s/ns/${vm?.metadata?.namespace}/${VirtualMachineModelRef}/${vm?.metadata?.name}/${tabPath}`;
+};
 
 export const getPendingChangesByTab = (pendingChanges: PendingChange[]) => {
   const pendingChangesDetailsTab = pendingChanges?.filter(

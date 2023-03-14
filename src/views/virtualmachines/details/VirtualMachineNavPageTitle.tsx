@@ -15,8 +15,6 @@ import { getVMStatusIcon } from '../utils';
 
 import VirtualMachinePendingChangesAlert from './VirtualMachinePendingChangesAlert';
 
-import './virtual-machine-page-title.scss';
-
 type VirtualMachineNavPageTitleProps = {
   vm: V1VirtualMachine;
   name: string;

@@ -3,6 +3,7 @@ import {
   VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/components/PendingChanges/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { NETWORK } from '@virtualmachines/utils';
 
 import VirtualMachineConfigurationTab from '../tabs/configuration/VirtualMachineConfigurationTab';
 import VirtualMachineConsolePage from '../tabs/console/VirtualMachineConsolePage';
@@ -41,6 +42,31 @@ export const useVirtualMachineTabs = () => {
     {
       href: VirtualMachineDetailsTab.Configurations,
       name: t(VirtualMachineDetailsTabLabel.Configuration),
+      component: VirtualMachineConfigurationTab,
+    },
+    {
+      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Disks}`,
+      name: 'hide',
+      component: VirtualMachineConfigurationTab,
+    },
+    {
+      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Environment}`,
+      name: 'hide',
+      component: VirtualMachineConfigurationTab,
+    },
+    {
+      href: `${VirtualMachineDetailsTab.Configurations}/${NETWORK}`,
+      name: 'hide',
+      component: VirtualMachineConfigurationTab,
+    },
+    {
+      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scheduling}`,
+      name: 'hide',
+      component: VirtualMachineConfigurationTab,
+    },
+    {
+      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scripts}`,
+      name: 'hide',
       component: VirtualMachineConfigurationTab,
     },
     {

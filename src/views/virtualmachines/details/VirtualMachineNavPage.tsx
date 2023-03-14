@@ -11,6 +11,7 @@ export type VirtualMachineDetailsPageProps = {
   namespace: string;
   kind: string;
 };
+import './virtual-machine-page.scss';
 
 const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   name,

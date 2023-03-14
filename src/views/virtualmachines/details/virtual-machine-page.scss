@@ -1,0 +1,8 @@
+.vm-resource-label {
+  vertical-align: middle;
+}
+li.co-m-horizontal-nav__menu-item {
+  a[data-test-id='horizontal-link-hide'] {
+    display: none;
+  }
+}
