@@ -80,7 +80,7 @@
     "@patternfly/quickstarts": "2.2.4",
     "@patternfly/react-catalog-view-extension": "^4.82.8",
     "@patternfly/react-charts": "^6.84.8",
-    "@patternfly/react-core": "4.231.8",
+    "@patternfly/react-core": "^4.276.6",
     "@patternfly/react-icons": "^4.82.8",
     "@patternfly/react-table": "^4.100.8",
     "@types/byte-size": "^8.1.0",

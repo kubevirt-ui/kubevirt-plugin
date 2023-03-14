@@ -51,7 +51,9 @@ export const TemplatesCatalogHeader: React.FC<{
             type="text"
             placeholder={t('Filter by keyword...')}
             value={filters?.query}
-            onChange={setQuery}
+            onChange={(_, val) => {
+              setQuery(val);
+            }}
             onClear={() => {
               setQuery('');
               onFilterChange(CATALOG_FILTERS.QUERY, '');
