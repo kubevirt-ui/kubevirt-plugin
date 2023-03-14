@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import useAlerts from '@kubevirt-utils/hooks/useAlerts';
+import useAlerts from '@kubevirt-utils/hooks/useAlerts/useAlerts';
 import {
   getNumberOfAlerts,
   isFiringAlert,
@@ -8,7 +8,7 @@ import {
   sortAlertsByHealthImpact,
 } from '@kubevirt-utils/hooks/useInfrastructureAlerts/utils/utils';
 import { isKubeVirtAlert } from '@kubevirt-utils/hooks/useKubevirtAlerts';
-import { Alert } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
+import { Alert } from '@openshift-console/dynamic-plugin-sdk';
 
 export type AlertsByHealthImpact = { critical: Alert[]; warning: Alert[]; none: Alert[] };
 
@@ -16,7 +16,7 @@ type UseInfrastructureAlerts = () => {
   alerts: AlertsByHealthImpact;
   numberOfAlerts: number;
   loaded: boolean;
-  loadError: Error;
+  loadError: unknown;
 };
 
 const useInfrastructureAlerts: UseInfrastructureAlerts = () => {

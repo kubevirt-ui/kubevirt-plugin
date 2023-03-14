@@ -14,8 +14,8 @@ import {
   WatchK8sResource,
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { Alert } from '@openshift-console/dynamic-plugin-sdk';
 import { Extension, ExtensionTypeGuard } from '@openshift-console/dynamic-plugin-sdk/lib/types';
-import { Alert } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 import { InProgressIcon } from '@patternfly/react-icons';
 
 import BlueArrowCircleUpIcon from '../../../utils/Components/BlueArrowCircleUpIcon';

@@ -3,7 +3,7 @@ import React from 'react';
 import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { createAlertKey } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import useKubevirtAlerts from '@kubevirt-utils/hooks/useKubevirtAlerts';
-import { Alert } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
+import { Alert } from '@openshift-console/dynamic-plugin-sdk';
 import { labelsToParams } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 import { AlertResource } from '../../status-card/utils/utils';

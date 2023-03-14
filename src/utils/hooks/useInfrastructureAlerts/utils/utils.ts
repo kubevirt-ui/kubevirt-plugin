@@ -3,7 +3,7 @@ import {
   FIRING,
   OPERATOR_HEALTH_IMPACT_LABEL,
 } from '@kubevirt-utils/hooks/useInfrastructureAlerts/utils/constants';
-import { Alert } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
+import { Alert } from '@openshift-console/dynamic-plugin-sdk';
 
 import { HealthImpactLevel } from '../../../../views/dashboard-extensions/KubevirtHealthPopup/utils/types';
 

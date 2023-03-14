@@ -3,9 +3,9 @@ import { murmur3 } from 'murmurhash-js';
 import { PrometheusLabels, PrometheusRule } from '@openshift-console/dynamic-plugin-sdk';
 
 export const MONITORING_URL_BASE = '/monitoring/alerts';
-const MONITORING_SALT = 'monitoring-salt';
+export const MONITORING_SALT = 'monitoring-salt';
 
-type Group = {
+export type Group = {
   rules: PrometheusRule[];
   file: string;
   name: string;
