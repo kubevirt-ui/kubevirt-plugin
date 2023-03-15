@@ -8,10 +8,27 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
-import { DEFAULT_INSTANCETYPE_LABEL, DEFAULT_PREFERENCE_LABEL } from './constants';
+import { InstanceTypeSize } from '../components/SelectInstanceTypeSection/utils/types';
+import { categoryNamePrefixMatcher } from '../components/SelectInstanceTypeSection/utils/utils';
+
+import {
+  DEFAULT_INSTANCETYPE_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+  InstanceTypeState,
+} from './constants';
 
 const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
+
+export const getInstanceTypeState = (defaultInstanceTypeName: string): InstanceTypeState => {
+  const [prefix, size] = defaultInstanceTypeName?.split('.');
+  const category = categoryNamePrefixMatcher[prefix];
+  return {
+    category,
+    size: size as InstanceTypeSize,
+    name: defaultInstanceTypeName,
+  };
+};
 
 export const generateVM = (
   dataSource: V1beta1DataSource,

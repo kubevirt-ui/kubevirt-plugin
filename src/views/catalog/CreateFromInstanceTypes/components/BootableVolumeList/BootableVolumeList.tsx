@@ -8,7 +8,7 @@ import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-pl
 import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/react-core';
 import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 
-import useBootableVolumes from '../../hooks/useBootableVolumes';
+import { UseBootableVolumesValues } from '../../hooks/useBootableVolumes';
 import { DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
 
 import BootableVolumeRow from './components/BootableVolumeRow/BootableVolumeRow';
@@ -28,16 +28,17 @@ import './BootableVolumeList.scss';
 export type BootableVolumeListProps = {
   preferences: { [resourceKeyName: string]: V1alpha2VirtualMachineClusterPreference };
   bootableVolumeSelectedState: [V1beta1DataSource, Dispatch<SetStateAction<V1beta1DataSource>>];
+  bootableVolumesResources: UseBootableVolumesValues;
   displayShowAllButton?: boolean;
 };
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
   preferences,
   bootableVolumeSelectedState,
+  bootableVolumesResources: { bootableVolumes, loaded, pvcSources },
   displayShowAllButton,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { bootableVolumes, loaded, pvcSources } = useBootableVolumes();
   const { activeColumns, columnLayout } = useBootVolumeColumns(!displayShowAllButton);
   const filters = useBootVolumeFilters(`osName${!displayShowAllButton && '-modal'}`);
 
@@ -117,6 +118,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           <ShowAllBootableVolumesButton
             preferences={preferences}
             bootableVolumeSelectedState={bootableVolumeSelectedState}
+            bootableVolumesResources={{ bootableVolumes, loaded, pvcSources }}
           />
         )}
       </Split>

@@ -11,6 +11,13 @@ import {
   InstanceTypeSizeDetails,
 } from './types';
 
+export const categoryNamePrefixMatcher = {
+  n1: InstanceTypeCategory.GeneralPurpose,
+  cx1: InstanceTypeCategory.ComputeIntensive,
+  m1: InstanceTypeCategory.MemoryIntensive,
+  gn1: InstanceTypeCategory.GpuResourcesAttached,
+};
+
 export const categoryDetailsMap: CategoryDetailsMap = {
   [InstanceTypeCategory.GeneralPurpose]: {
     title: t('General purpose applications'),
