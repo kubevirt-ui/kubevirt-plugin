@@ -4,6 +4,12 @@
     margin-left: 180px;
   }
   &--tab-nav {
+    height: 100%;
+
+    section {
+      height: 100%;
+    }
+
     span.pf-c-tabs__item-text {
       font-size: var(--pf-global--FontSize--lg);
     }
