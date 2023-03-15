@@ -23,10 +23,13 @@ import {
 import {
   DescriptionList,
   Divider,
+  Flex,
+  FlexItem,
   PageSection,
   Stack,
   Text,
   TextVariants,
+  Title,
 } from '@patternfly/react-core';
 
 import VirtualMachineDescriptionItem from '../../details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
@@ -70,7 +73,15 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
       <SidebarEditor resource={vm} onResourceUpdate={onSubmit}>
         {(resource) => (
           <DescriptionList className="vm-scripts-tab">
-            <SidebarEditorSwitch />
+            <Title headingLevel="h2">
+              <Flex>
+                <FlexItem>{t('Scripts')}</FlexItem>
+                <FlexItem>
+                  <SidebarEditorSwitch />
+                </FlexItem>
+              </Flex>
+            </Title>
+
             <VirtualMachineDescriptionItem
               descriptionData={<CloudInitDescription vm={resource} />}
               descriptionHeader={t('Cloud-init')}

@@ -43,6 +43,7 @@ const SchedulingSection: React.FC<SchedulingSectionProps> = ({ vm, pathname }) =
   });
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
+
   return (
     <div className="vm-scheduling-section">
       <a href={`${pathname}#scheduling`} className="link-icon">
