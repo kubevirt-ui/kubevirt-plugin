@@ -56,7 +56,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   const networkOptions = useMemo(() => {
     const options = nads?.map(({ metadata }) => ({
       key: metadata?.uid,
-      value: `${metadata?.name}/${metadata?.namespace}`,
+      value: `${metadata?.namespace}/${metadata?.name}`,
     }));
     if (isPodNetworkingOptionExists) {
       options.unshift({ key: 'pod-networking', value: podNetworkingText });
