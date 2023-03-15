@@ -1,21 +1,21 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ExpandableSection,
   ExpandableSectionToggle,
   Flex,
   FlexItem,
-  Popover,
-  PopoverPosition,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
 
 import { CustomizeSource, CustomizeSourceProps } from './CustomizeSource';
 
-export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = ({
+import './ExpandableCustomizeSourceSection.scss';
+
+export const ExpandableCustomizeSourceSection: FC<CustomizeSourceProps> = ({
   diskSource,
   setDiskSource,
   template,
@@ -28,13 +28,13 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
   isBootSourceAvailable,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [storageFieldsExpanded, setStorageFieldsExpanded] = React.useState<boolean>(
+  const [storageFieldsExpanded, setStorageFieldsExpanded] = useState<boolean>(
     !isBootSourceAvailable,
   );
 
   return (
     <Stack hasGutter>
-      <StackItem>
+      <StackItem className="expandable-customize-source-section__stack-item-storage">
         <Flex>
           <FlexItem spacer={{ default: 'spacerNone' }}>
             <ExpandableSectionToggle
@@ -46,19 +46,11 @@ export const ExpandableCustomizeSourceSection: React.FC<CustomizeSourceProps> = 
             </ExpandableSectionToggle>
           </FlexItem>
           <FlexItem>
-            <Popover
-              position={PopoverPosition.top}
-              aria-label="Condition Popover"
-              bodyContent={() => (
-                <div>
-                  {t(
-                    'You can customize the Templates storage by overriding the original parameters',
-                  )}
-                </div>
+            <HelpTextIcon
+              bodyContent={t(
+                'You can customize the Templates storage by overriding the original parameters',
               )}
-            >
-              <HelpIcon />
-            </Popover>
+            />
           </FlexItem>
         </Flex>
       </StackItem>
