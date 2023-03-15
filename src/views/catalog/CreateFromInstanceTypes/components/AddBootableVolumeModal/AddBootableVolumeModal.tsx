@@ -178,7 +178,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     <TabModal
       obj={emptyDataSource}
       onSubmit={createDataSource}
-      headerText={t('Add volume to boot from')}
+      headerText={t('Add volume')}
       isOpen={isOpen}
       onClose={() => {
         if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {

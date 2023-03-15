@@ -14,14 +14,16 @@ import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin
 
 import { DEFAULT_PREFERENCE_LABEL } from '../utils/constants';
 
-type UseBootableVolumes = () => {
+export type UseBootableVolumesValues = {
   bootableVolumes: V1beta1DataSource[];
   loaded: boolean;
-  loadError: any;
+  loadError?: any;
   pvcSources: {
     [resourceKeyName: string]: V1alpha1PersistentVolumeClaim;
   };
 };
+
+type UseBootableVolumes = () => UseBootableVolumesValues;
 
 const useBootableVolumes: UseBootableVolumes = () => {
   const [dataSources, loadedDataSources, loadErrorDataSources] = useK8sWatchResource<

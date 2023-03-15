@@ -18,6 +18,7 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
   onClose,
   preferences,
   bootableVolumeSelectedState: [bvSelected, setBVSelected],
+  bootableVolumesResources,
 }) => {
   const { t } = useKubevirtTranslation();
   const [modalBootableVolumeSelected, setModalBootableVolumeSelected] =
@@ -32,12 +33,13 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSave as () => Promise<void>}
-      headerText={t('Volumes to boot from')}
+      headerText={t('Available volumes')}
       modalVariant={ModalVariant.large}
     >
       <BootableVolumeList
         preferences={preferences}
         bootableVolumeSelectedState={[modalBootableVolumeSelected, setModalBootableVolumeSelected]}
+        bootableVolumesResources={bootableVolumesResources}
       />
     </TabModal>
   );

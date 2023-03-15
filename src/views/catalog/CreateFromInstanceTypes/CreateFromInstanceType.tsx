@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
@@ -9,8 +9,7 @@ import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevir
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
-import { getPVC } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
@@ -18,20 +17,25 @@ import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBoo
 import BootableVolumeList from './components/BootableVolumeList/BootableVolumeList';
 import CreateVMFooter from './components/CreateVMFooter/CreateVMFooter';
 import SectionListItem from './components/SectionListItem/SectionListItem';
+import useBootableVolumes from './hooks/useBootableVolumes';
 import useInstanceTypesAndPreferences from './hooks/useInstanceTypesAndPreferences';
 import {
+  DEFAULT_INSTANCETYPE_LABEL,
   initialInstanceTypeState,
   INSTANCE_TYPES_SECTIONS,
   InstanceTypeState,
 } from './utils/constants';
-import { generateVM } from './utils/utils';
+import { generateVM, getInstanceTypeState } from './utils/utils';
 
 import './CreateFromInstanceType.scss';
 
 const CreateFromInstanceType: FC = () => {
   const [ns] = useActiveNamespace();
+
+  const bootableVolumesResources = useBootableVolumes();
   const { preferences, instanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
+  const instanceTypesMap = useMemo(() => convertResourceArrayToMap(instanceTypes), [instanceTypes]);
 
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
@@ -52,22 +56,21 @@ const CreateFromInstanceType: FC = () => {
 
   const namespace = ns === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : ns;
 
-  useEffect(() => {
-    if (!selectedBootableVolume && pvcSource) {
-      setPVCSource(null);
-      return;
-    }
+  const onSelectVolume = useCallback(
+    (selectedVolume: V1beta1DataSource) => {
+      const { name: pvcName, namespace: pvcNamespace } = selectedVolume?.spec?.source?.pvc || {};
+      const defaultInstanceTypeName =
+        selectedVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL];
+      const instanceType = defaultInstanceTypeName
+        ? getInstanceTypeState(defaultInstanceTypeName)
+        : initialInstanceTypeState;
 
-    const pvcMetadata = selectedBootableVolume?.spec?.source?.pvc;
-    if (
-      pvcSource?.metadata?.name !== pvcMetadata?.name ||
-      pvcSource?.metadata?.namespace !== pvcMetadata?.namespace
-    ) {
-      getPVC(pvcMetadata?.name, pvcMetadata?.namespace).then((pvc) => {
-        setPVCSource(pvc);
-      });
-    }
-  }, [pvcSource, selectedBootableVolume]);
+      setSelectedBootableVolume(selectedVolume);
+      setPVCSource(bootableVolumesResources?.pvcSources?.[pvcNamespace]?.[pvcName]);
+      setSelectedInstanceType(instanceType);
+    },
+    [bootableVolumesResources?.pvcSources],
+  );
 
   return (
     <>
@@ -84,9 +87,9 @@ const CreateFromInstanceType: FC = () => {
                     preferencesNames={Object.keys(preferencesMap).sort((a, b) =>
                       a.localeCompare(b),
                     )}
-                    instanceTypesNames={(instanceTypes || [])
-                      .map(getName)
-                      .sort((a, b) => a.localeCompare(b))}
+                    instanceTypesNames={Object.keys(instanceTypesMap).sort((a, b) =>
+                      a.localeCompare(b),
+                    )}
                     loaded={loaded}
                     loadError={loadError}
                   />
@@ -94,7 +97,8 @@ const CreateFromInstanceType: FC = () => {
               >
                 <BootableVolumeList
                   preferences={preferencesMap}
-                  bootableVolumeSelectedState={[selectedBootableVolume, setSelectedBootableVolume]}
+                  bootableVolumeSelectedState={[selectedBootableVolume, onSelectVolume]}
+                  bootableVolumesResources={bootableVolumesResources}
                   displayShowAllButton
                 />
               </SectionListItem>
@@ -144,6 +148,7 @@ const CreateFromInstanceType: FC = () => {
         )}
         onCancel={() => {
           setSelectedBootableVolume(null);
+          setPVCSource(null);
           setSelectedInstanceType(initialInstanceTypeState);
         }}
         selectedBootableVolume={selectedBootableVolume}

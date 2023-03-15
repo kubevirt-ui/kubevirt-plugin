@@ -12,7 +12,6 @@ import { InstanceTypeSizeDetails } from '../../../../SelectInstanceTypeSection/u
 import {
   getCPUMemoryString,
   getInstancetypeDetails,
-  getInstancetypeString,
 } from '../../../../SelectInstanceTypeSection/utils/utils';
 import { getOSFromDefaultPreference } from '../../../utils/utils';
 
@@ -34,7 +33,7 @@ const DetailsLeftGrid: React.FC<DetailsLeftGridProps> = ({
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
   const operatingSystem = getOSFromDefaultPreference(bootSource, preferencesMap);
 
-  const { category, size } = instancetype;
+  const { category, size, name } = instancetype;
   const instancetypeSize: InstanceTypeSizeDetails = getInstancetypeDetails(category, size);
 
   return (
@@ -57,10 +56,7 @@ const DetailsLeftGrid: React.FC<DetailsLeftGridProps> = ({
         descriptionData={operatingSystem}
         descriptionHeader={t('Operating system')}
       />
-      <VirtualMachineDescriptionItem
-        descriptionData={getInstancetypeString(instancetype?.category, instancetype?.size)}
-        descriptionHeader={t('InstanceType')}
-      />
+      <VirtualMachineDescriptionItem descriptionData={name} descriptionHeader={t('InstanceType')} />
       <VirtualMachineDescriptionItem
         descriptionData={getCPUMemoryString(instancetypeSize, t)}
         descriptionHeader={t('CPU | Memory')}
