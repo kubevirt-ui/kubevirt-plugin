@@ -1,33 +1,34 @@
 import { useMemo } from 'react';
 
+import { SUCCESS } from '@kubevirt-utils/hooks/useAlerts/utils/constants';
 import {
   getAlertsAndRules,
   silenceFiringAlerts,
 } from '@kubevirt-utils/hooks/useAlerts/utils/utils';
 import useSilences from '@kubevirt-utils/hooks/useSilences/useSilences';
+import { PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
 import {
   Alert,
   PrometheusEndpoint,
   usePrometheusPoll,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { PrometheusRulesResponse } from '@virtualmachines/details/tabs/overview/utils/utils';
 
-type UseAlerts = () => { alerts: Alert[]; loaded: boolean; loadError: unknown };
+type UseAlerts = () => { alerts: Alert[]; loaded: boolean };
 
 const useAlerts: UseAlerts = () => {
+  const { silences } = useSilences();
   const [response] = usePrometheusPoll({
     endpoint: PrometheusEndpoint?.RULES,
   });
-  const { silences } = useSilences();
+  const pollingStatus = (response as PrometheusRulesResponse)?.status;
 
   const allAlerts = useMemo(() => {
-    const data = (response as PrometheusRulesResponse)?.data;
-    const { alerts } = getAlertsAndRules(data);
+    const { alerts } = getAlertsAndRules((response as PrometheusRulesResponse)?.data);
 
     return silenceFiringAlerts(alerts, silences);
   }, [response]);
 
-  return { alerts: allAlerts || [], loaded: true, loadError: null };
+  return { alerts: allAlerts || [], loaded: pollingStatus === SUCCESS };
 };
 
 export default useAlerts;
