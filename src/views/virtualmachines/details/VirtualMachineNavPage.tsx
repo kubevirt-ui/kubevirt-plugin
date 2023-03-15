@@ -27,7 +27,9 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   return (
     <SidebarEditorProvider>
       <VirtualMachineNavPageTitle vm={vm} name={name} />
-      <HorizontalNav pages={pages} resource={vm} />
+      <div className="VirtualMachineNavPage--tabs__main">
+        <HorizontalNav pages={pages} resource={vm} />
+      </div>
     </SidebarEditorProvider>
   );
 };
