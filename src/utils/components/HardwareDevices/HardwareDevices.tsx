@@ -82,9 +82,11 @@ const HardwareDevices: React.FC<HardwareDevicesProps> = ({ vm, vmi, onSubmit, ca
           <HardwareDevicesTable devices={hostDevices} />
         </DescriptionListDescription>
       </DescriptionListGroup>
-      <DescriptionListGroup>
-        <HardwareDevicesHeadlessMode vm={vm} vmi={vmi} onSubmit={onSubmit} />
-      </DescriptionListGroup>
+      {canEdit && (
+        <DescriptionListGroup>
+          <HardwareDevicesHeadlessMode vm={vm} vmi={vmi} onSubmit={onSubmit} />
+        </DescriptionListGroup>
+      )}
     </DescriptionList>
   );
 };
