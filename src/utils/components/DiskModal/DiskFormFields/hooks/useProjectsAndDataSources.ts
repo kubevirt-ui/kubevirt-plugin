@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
@@ -20,7 +22,10 @@ export const useDataSourcesTypeResources = (
     isList: true,
   });
 
-  const projectsNames = projects.map((project) => project.metadata.name);
+  const projectsNames = useMemo(
+    () => projects?.map((project) => project?.metadata?.name)?.sort((a, b) => a?.localeCompare(b)),
+    [projects],
+  );
 
   const dataSourceWathcResource = projectSelected
     ? {
@@ -31,12 +36,17 @@ export const useDataSourcesTypeResources = (
       }
     : null;
 
-  const [dataSources, dataSourcesLoaded, dataSourcesError] =
+  const [dataSourcesRaw, dataSourcesLoaded, dataSourcesError] =
     useK8sWatchResource<V1beta1DataSource[]>(dataSourceWathcResource);
+
+  const dataSources = useMemo(
+    () => dataSourcesRaw?.sort((a, b) => a?.metadata?.name?.localeCompare(b?.metadata?.name)) || [],
+    [dataSourcesRaw],
+  );
 
   return {
     projectsNames,
-    dataSources: dataSources || [],
+    dataSources,
     projectsLoaded,
     dataSourcesLoaded,
     error: projectsErrors || dataSourcesError,

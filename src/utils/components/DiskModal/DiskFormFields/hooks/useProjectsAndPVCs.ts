@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import {
   modelToGroupVersionKind,
@@ -21,7 +23,10 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
     isList: true,
   });
 
-  const projectsNames = projects.map((project) => project.metadata.name);
+  const projectsNames = useMemo(
+    () => projects?.map((project) => project?.metadata?.name)?.sort((a, b) => a?.localeCompare(b)),
+    [projects],
+  );
 
   const pvcWathcResource = projectSelected
     ? {
@@ -32,12 +37,17 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
       }
     : null;
 
-  const [pvcs, pvcsLoaded, pvcsErrors] =
+  const [pvcsRaw, pvcsLoaded, pvcsErrors] =
     useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>(pvcWathcResource);
+
+  const pvcs = useMemo(
+    () => (pvcsRaw || [])?.sort((a, b) => a?.metadata?.name?.localeCompare(b?.metadata?.name)),
+    [pvcsRaw],
+  );
 
   return {
     projectsNames,
-    pvcs: pvcs || [],
+    pvcs,
     projectsLoaded,
     pvcsLoaded,
     error: projectsErrors || pvcsErrors,
