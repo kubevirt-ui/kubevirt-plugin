@@ -4,18 +4,14 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { createAlertKey } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import { KUBEVIRT } from '@kubevirt-utils/constants/constants';
+import { MONITORING_URL_BASE } from '@kubevirt-utils/constants/prometheus';
+import { PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
+import { generateAlertId, labelsToParams } from '@kubevirt-utils/utils/prometheus';
 import {
   PrometheusEndpoint,
   RuleStates,
   usePrometheusPoll,
 } from '@openshift-console/dynamic-plugin-sdk';
-
-import {
-  generateAlertId,
-  labelsToParams,
-  MONITORING_URL_BASE,
-  PrometheusRulesResponse,
-} from '../utils';
 
 type UseVMAlerts = (vm: V1VirtualMachine) => SimplifiedAlerts;
 

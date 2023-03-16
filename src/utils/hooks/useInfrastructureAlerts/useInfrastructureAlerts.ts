@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 
-import useAlerts from '@kubevirt-utils/hooks/useAlerts';
+import useAlerts from '@kubevirt-utils/hooks/useAlerts/useAlerts';
 import {
   getNumberOfAlerts,
-  isFiringAlert,
+  isFiringOrSilencedAlert,
   isImportantInfrastructureAlert,
   sortAlertsByHealthImpact,
 } from '@kubevirt-utils/hooks/useInfrastructureAlerts/utils/utils';
-import { isKubeVirtAlert } from '@kubevirt-utils/hooks/useKubevirtAlerts';
-import { Alert } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
+import { isKubeVirtAlert } from '@kubevirt-utils/utils/prometheus';
+import { Alert } from '@openshift-console/dynamic-plugin-sdk';
 
 export type AlertsByHealthImpact = { critical: Alert[]; warning: Alert[]; none: Alert[] };
 
@@ -16,16 +16,17 @@ type UseInfrastructureAlerts = () => {
   alerts: AlertsByHealthImpact;
   numberOfAlerts: number;
   loaded: boolean;
-  loadError: Error;
 };
 
 const useInfrastructureAlerts: UseInfrastructureAlerts = () => {
-  const { alerts, loaded, loadError } = useAlerts();
+  const { alerts, loaded } = useAlerts();
 
   const alertsByHealthImpact = useMemo(() => {
     const filteredAlerts = alerts?.filter(
       (alert) =>
-        isKubeVirtAlert(alert) && isFiringAlert(alert) && isImportantInfrastructureAlert(alert),
+        isKubeVirtAlert(alert) &&
+        isFiringOrSilencedAlert(alert) &&
+        isImportantInfrastructureAlert(alert),
     );
 
     return sortAlertsByHealthImpact(filteredAlerts);
@@ -35,7 +36,6 @@ const useInfrastructureAlerts: UseInfrastructureAlerts = () => {
     alerts: alertsByHealthImpact,
     numberOfAlerts: getNumberOfAlerts(alertsByHealthImpact) || 0,
     loaded,
-    loadError,
   };
 };
 
