@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, memo, MouseEvent, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
@@ -7,6 +7,7 @@ import {
   replaceTemplateParameterValue,
 } from '@catalog/customize/utils';
 import { quickCreateVM } from '@catalog/utils/quick-create-vm';
+import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -40,161 +41,168 @@ type TemplatesCatalogDrawerCreateFormProps = {
   initialVMName?: string;
 };
 
-export const TemplatesCatalogDrawerCreateForm: React.FC<TemplatesCatalogDrawerCreateFormProps> =
-  React.memo(
-    ({ namespace, template, canQuickCreate, isBootSourceAvailable, onCancel, initialVMName }) => {
-      const history = useHistory();
-      const { t } = useKubevirtTranslation();
+export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFormProps> = memo(
+  ({ namespace, template, canQuickCreate, isBootSourceAvailable, onCancel, initialVMName }) => {
+    const history = useHistory();
+    const { t } = useKubevirtTranslation();
+    const { updateTabsData } = useWizardVMContext();
 
-      const [vmName, setVMName] = React.useState(initialVMName || '');
-      const [startVM, setStartVM] = React.useState(true);
-      const [isQuickCreating, setIsQuickCreating] = React.useState(false);
-      const [quickCreateError, setQuickCreateError] = React.useState(undefined);
-      const [models, modelsLoading] = useK8sModels();
+    const [vmName, setVMName] = useState(initialVMName || '');
+    const [startVM, setStartVM] = useState(true);
+    const [isQuickCreating, setIsQuickCreating] = useState(false);
+    const [quickCreateError, setQuickCreateError] = useState(undefined);
+    const [models, modelsLoading] = useK8sModels();
 
-      const [processedTemplateAccessReview] = useAccessReview({
-        namespace,
-        resource: ProcessedTemplatesModel.plural,
-        verb: 'create',
+    const [processedTemplateAccessReview] = useAccessReview({
+      namespace,
+      resource: ProcessedTemplatesModel.plural,
+      verb: 'create',
+    });
+
+    const onQuickCreate = () => {
+      setIsQuickCreating(true);
+      setQuickCreateError(undefined);
+
+      const parameterForName = extractParameterNameFromMetadataName(template) || 'NAME';
+
+      const templateToProcess = produce(template, (draftTemplate) => {
+        if (parameterForName)
+          replaceTemplateParameterValue(draftTemplate, parameterForName, vmName);
       });
 
-      const onQuickCreate = () => {
-        setIsQuickCreating(true);
-        setQuickCreateError(undefined);
-
-        const parameterForName = extractParameterNameFromMetadataName(template) || 'NAME';
-
-        const templateToProcess = produce(template, (draftTemplate) => {
-          if (parameterForName)
-            replaceTemplateParameterValue(draftTemplate, parameterForName, vmName);
-        });
-
-        quickCreateVM({
-          template: templateToProcess,
-          models,
-          overrides: { name: vmName, namespace, startVM },
+      quickCreateVM({
+        template: templateToProcess,
+        models,
+        overrides: { name: vmName, namespace, startVM },
+      })
+        .then((vm) => {
+          setIsQuickCreating(false);
+          history.push(getResourceUrl({ model: VirtualMachineModel, resource: vm }));
         })
-          .then((vm) => {
-            setIsQuickCreating(false);
-            history.push(getResourceUrl({ model: VirtualMachineModel, resource: vm }));
-          })
-          .catch((err) => {
-            setIsQuickCreating(false);
-            setQuickCreateError(err);
-          });
-      };
+        .catch((err) => {
+          setIsQuickCreating(false);
+          setQuickCreateError(err);
+        });
+    };
 
-      const onCustomize = (e) => {
-        e.preventDefault();
-        let catalogUrl = `templatescatalog/customize?name=${template.metadata.name}&namespace=${template.metadata.namespace}&defaultSourceExists=${canQuickCreate}`;
+    const onCustomize = (e: MouseEvent) => {
+      e.preventDefault();
+      let catalogUrl = `templatescatalog/customize?name=${template.metadata.name}&namespace=${template.metadata.namespace}&defaultSourceExists=${canQuickCreate}`;
 
-        if (vmName) {
-          catalogUrl += `&vmName=${vmName}`;
-        }
+      if (vmName) {
+        catalogUrl += `&vmName=${vmName}`;
+      }
 
-        history.push(catalogUrl);
-      };
+      history.push(catalogUrl);
+    };
 
-      return (
-        <form className="template-catalog-drawer-form" id="quick-create-form">
-          <Stack hasGutter>
-            {canQuickCreate ? (
-              <>
-                <StackItem>
-                  <Split hasGutter>
-                    <SplitItem>
-                      <FormGroup
-                        label={t('VirtualMachine name')}
-                        isRequired
-                        className="template-catalog-drawer-form-name"
-                        fieldId="vm-name-field"
-                      >
-                        <TextInput
-                          isRequired
-                          type="text"
-                          data-test-id="template-catalog-vm-name-input"
-                          name="vmname"
-                          aria-label="virtualmachine name"
-                          value={vmName}
-                          onChange={setVMName}
-                        />
-                      </FormGroup>
-                    </SplitItem>
-                    <SplitItem>
-                      <DescriptionList>
-                        <DescriptionListGroup>
-                          <DescriptionListTerm>{t('Project')}</DescriptionListTerm>
-                          <DescriptionListDescription>{namespace}</DescriptionListDescription>
-                        </DescriptionListGroup>
-                      </DescriptionList>
-                    </SplitItem>
-                  </Split>
-                </StackItem>
-                <StackItem />
-                <StackItem>
-                  <Checkbox
-                    id="start-after-create-checkbox"
-                    isChecked={startVM}
-                    onChange={(v) => setStartVM(v)}
-                    label={t('Start this VirtualMachine after creation')}
-                  />
-                </StackItem>
-              </>
-            ) : (
+    const onChangeStartVM = (checked: boolean) => {
+      setStartVM(checked);
+      updateTabsData((currentTabsData) => {
+        return { ...currentTabsData, startVM: checked };
+      });
+    };
+
+    return (
+      <form className="template-catalog-drawer-form" id="quick-create-form">
+        <Stack hasGutter>
+          {canQuickCreate ? (
+            <>
               <StackItem>
-                {t(
-                  'This Template requires some additional parameters. Click the Customize VirtualMachine button to complete the creation flow.',
-                )}
-              </StackItem>
-            )}
-            <StackItem />
-            {quickCreateError && (
-              <StackItem>
-                <Alert variant={AlertVariant.danger} title={t('Quick create error')} isInline>
-                  {quickCreateError?.message}
-                </Alert>
-              </StackItem>
-            )}
-
-            <StackItem>
-              <Split hasGutter>
-                {canQuickCreate && (
+                <Split hasGutter>
                   <SplitItem>
-                    <Button
-                      data-test-id="quick-create-vm-btn"
-                      type="submit"
-                      form="quick-create-form"
-                      isLoading={isQuickCreating || modelsLoading}
-                      isDisabled={
-                        !isBootSourceAvailable || isQuickCreating || !vmName || isEmpty(models)
-                      }
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onQuickCreate();
-                      }}
+                    <FormGroup
+                      label={t('VirtualMachine name')}
+                      isRequired
+                      className="template-catalog-drawer-form-name"
+                      fieldId="vm-name-field"
                     >
-                      {t('Quick create VirtualMachine')}
-                    </Button>
+                      <TextInput
+                        isRequired
+                        type="text"
+                        data-test-id="template-catalog-vm-name-input"
+                        name="vmname"
+                        aria-label="virtualmachine name"
+                        value={vmName}
+                        onChange={setVMName}
+                      />
+                    </FormGroup>
                   </SplitItem>
-                )}
+                  <SplitItem>
+                    <DescriptionList>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>{t('Project')}</DescriptionListTerm>
+                        <DescriptionListDescription>{namespace}</DescriptionListDescription>
+                      </DescriptionListGroup>
+                    </DescriptionList>
+                  </SplitItem>
+                </Split>
+              </StackItem>
+              <StackItem />
+              <StackItem>
+                <Checkbox
+                  id="start-after-create-checkbox"
+                  isChecked={startVM}
+                  onChange={onChangeStartVM}
+                  label={t('Start this VirtualMachine after creation')}
+                />
+              </StackItem>
+            </>
+          ) : (
+            <StackItem>
+              {t(
+                'This Template requires some additional parameters. Click the Customize VirtualMachine button to complete the creation flow.',
+              )}
+            </StackItem>
+          )}
+          <StackItem />
+          {quickCreateError && (
+            <StackItem>
+              <Alert variant={AlertVariant.danger} title={t('Quick create error')} isInline>
+                {quickCreateError?.message}
+              </Alert>
+            </StackItem>
+          )}
+
+          <StackItem>
+            <Split hasGutter>
+              {canQuickCreate && (
                 <SplitItem>
                   <Button
-                    data-test-id="customize-vm-btn"
-                    variant={canQuickCreate ? ButtonVariant.secondary : ButtonVariant.primary}
-                    onClick={onCustomize}
-                    isDisabled={!processedTemplateAccessReview}
+                    data-test-id="quick-create-vm-btn"
+                    type="submit"
+                    form="quick-create-form"
+                    isLoading={isQuickCreating || modelsLoading}
+                    isDisabled={
+                      !isBootSourceAvailable || isQuickCreating || !vmName || isEmpty(models)
+                    }
+                    onClick={(e: MouseEvent) => {
+                      e.preventDefault();
+                      onQuickCreate();
+                    }}
                   >
-                    {t('Customize VirtualMachine')}
+                    {t('Quick create VirtualMachine')}
                   </Button>
                 </SplitItem>
-                <Button variant={ButtonVariant.link} onClick={() => onCancel()}>
-                  {t('Cancel')}
+              )}
+              <SplitItem>
+                <Button
+                  data-test-id="customize-vm-btn"
+                  variant={canQuickCreate ? ButtonVariant.secondary : ButtonVariant.primary}
+                  onClick={onCustomize}
+                  isDisabled={!processedTemplateAccessReview}
+                >
+                  {t('Customize VirtualMachine')}
                 </Button>
-              </Split>
-            </StackItem>
-          </Stack>
-        </form>
-      );
-    },
-  );
+              </SplitItem>
+              <Button variant={ButtonVariant.link} onClick={() => onCancel()}>
+                {t('Cancel')}
+              </Button>
+            </Split>
+          </StackItem>
+        </Stack>
+      </form>
+    );
+  },
+);
 TemplatesCatalogDrawerCreateForm.displayName = 'TemplatesCatalogDrawerCreateForm';
