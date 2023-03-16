@@ -33,7 +33,7 @@ const CreateFromInstanceType: FC = () => {
   const [ns] = useActiveNamespace();
 
   const bootableVolumesResources = useBootableVolumes();
-  const { preferences, instanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();
+  const { preferences, instanceTypes, loadError } = useInstanceTypesAndPreferences();
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
   const instanceTypesMap = useMemo(() => convertResourceArrayToMap(instanceTypes), [instanceTypes]);
 
@@ -84,13 +84,8 @@ const CreateFromInstanceType: FC = () => {
                 sectionState={sectionState}
                 headerAction={
                   <AddBootableVolumeButton
-                    preferencesNames={Object.keys(preferencesMap).sort((a, b) =>
-                      a.localeCompare(b),
-                    )}
-                    instanceTypesNames={Object.keys(instanceTypesMap).sort((a, b) =>
-                      a.localeCompare(b),
-                    )}
-                    loaded={loaded}
+                    preferencesNames={Object.keys(preferencesMap)}
+                    instanceTypesNames={Object.keys(instanceTypesMap)}
                     loadError={loadError}
                   />
                 }
