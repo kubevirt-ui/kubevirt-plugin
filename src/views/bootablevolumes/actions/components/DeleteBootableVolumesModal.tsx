@@ -27,13 +27,12 @@ const DeleteBootableVolumesModal: FC<DeleteBootableVolumesModalProps> = ({
       obj={dataSource}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('Delete labels?')}
+      headerText={t('Delete volume parameters?')}
       onDeleteSubmit={deleteBootableVolumeMetadata(dataSource)}
       bodyText={
         <Trans t={t}>
-          Please note that only the labels data will be deleted and that the bootable volume will
-          remain. Are you sure you want to delete the labels for bootable volume{' '}
-          <strong>{dataSource?.metadata?.name}</strong>?
+          Deleting the parameters will mark this volume as non-bootable and remove it from the
+          bootable volumes list. The volume will still be available in the cluster.
         </Trans>
       }
       redirectUrl={`/k8s/${lastNamespacePath}/bootablevolumes`}
