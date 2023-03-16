@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 
 import { useProjectsAndPVCs } from '../../hooks/useProjectsAndPVCs';
 
@@ -13,7 +13,7 @@ type DiskSourcePVCSelectProps = {
   setDiskSize?: (value: string) => void;
 };
 
-const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
+const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
   pvcNameSelected,
   pvcNamespaceSelected,
   selectPVCName,
@@ -23,7 +23,7 @@ const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
   const { projectsNames, pvcs, projectsLoaded, pvcsLoaded } =
     useProjectsAndPVCs(pvcNamespaceSelected);
 
-  const onSelectProject = React.useCallback(
+  const onSelectProject = useCallback(
     (newProject) => {
       selectPVCNamespace && selectPVCNamespace(newProject);
       selectPVCName(undefined);
@@ -31,19 +31,20 @@ const DiskSourcePVCSelect: React.FC<DiskSourcePVCSelectProps> = ({
     [selectPVCNamespace, selectPVCName],
   );
 
-  const onPVCSelected = React.useCallback(
+  const onPVCSelected = useCallback(
     (selection) => {
       selectPVCName(selection);
-      const selectedPVC = pvcs?.find((pvc) => pvc.metadata.name === selection);
+      const selectedPVC = pvcs?.find((pvc) => pvc?.metadata?.name === selection);
       const selectedPVCSize = selectedPVC?.spec?.resources?.requests?.storage;
       setDiskSize && setDiskSize(selectedPVCSize);
     },
     [selectPVCName, pvcs, setDiskSize],
   );
 
-  const pvcNames = React.useMemo(() => {
-    return pvcs?.map((pvc) => pvc?.metadata?.name);
-  }, [pvcs]);
+  const pvcNames = useMemo(
+    () => pvcs?.map((pvc) => pvc?.metadata?.name)?.sort((a, b) => a?.localeCompare(b)),
+    [pvcs],
+  );
 
   return (
     <div>

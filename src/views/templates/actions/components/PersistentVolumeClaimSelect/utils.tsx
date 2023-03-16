@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ReactElement, useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -9,17 +9,17 @@ import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynam
 import { SelectOption } from '@patternfly/react-core';
 
 export const filter = (options: string[]) => {
-  return (_, value: string): React.ReactElement[] => {
+  return (_, value: string): ReactElement[] => {
     let newOptions = options;
 
     if (value) {
       const regex = new RegExp(value, 'i');
-      newOptions = options.filter((namespace) => regex.test(namespace));
+      newOptions = options?.filter((namespace) => regex.test(namespace));
     }
 
-    return newOptions.map((namespace) => (
+    return newOptions?.map((namespace) => (
       <SelectOption key={namespace} value={namespace} />
-    )) as React.ReactElement[];
+    )) as ReactElement[];
   };
 };
 
@@ -49,8 +49,14 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
       : null,
   );
 
-  const projectsNames = (projects || []).map((project) => project.metadata.name);
-  const filteredPVCNames = (pvcs || []).map((pvc) => pvc.metadata.name);
+  const projectsNames = useMemo(
+    () =>
+      (projects || [])
+        ?.map((project) => project?.metadata?.name)
+        ?.sort((a, b) => a?.localeCompare(b)),
+    [projects],
+  );
+  const filteredPVCNames = useMemo(() => (pvcs || [])?.map((pvc) => pvc?.metadata?.name), [pvcs]);
 
   return {
     projectsNames,
