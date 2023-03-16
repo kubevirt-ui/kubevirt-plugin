@@ -96,7 +96,7 @@ export const usePendingChanges = (
   const modifiedGPUDevices = getChangedGPUDevices(vm, vmi);
   const modifiedHostDevices = getChangedHostDevices(vm, vmi);
 
-  const modifiedVolumsHotplug = getChangedVolumesHotplug(vm, vmi);
+  const modifiedVolumesHotplug = getChangedVolumesHotplug(vm, vmi);
   const modifiedHedlessMode = getChangedHeadlessMode(vm, vmi);
 
   const onSubmit = (updatedVM: V1VirtualMachine) =>
@@ -378,9 +378,11 @@ export const usePendingChanges = (
       },
     },
     {
-      hasPendingChange: !isEmpty(modifiedVolumsHotplug),
+      hasPendingChange: !isEmpty(modifiedVolumesHotplug),
       tabLabel: VirtualMachineDetailsTabLabel.Disks,
-      label: t('Make Persistent disk'),
+      label: `${t('Make Persistent disk')} - (${(modifiedVolumesHotplug || [])
+        .map((volume) => volume?.name)
+        .join(', ')})`,
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Disks));
       },
