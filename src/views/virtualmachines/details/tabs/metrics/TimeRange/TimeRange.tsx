@@ -20,7 +20,9 @@ const TimeRange: React.FC = () => {
         <DurationDropdown selectedDuration={duration} selectHandler={onDurationSelect} />
       </span>
 
-      <Link to={'/overview'}>{t('Virtualization dashboard')}</Link>
+      <Link to={'/monitoring/dashboards/grafana-dashboard-kubevirt-top-consumers'}>
+        {t('Virtualization dashboard')}
+      </Link>
     </div>
   );
 };
