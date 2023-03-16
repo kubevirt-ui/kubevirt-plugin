@@ -82,7 +82,7 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
           isInline
           variant={AlertVariant.info}
         >
-          {t('Selecting a different StorageClass might cause poor performance.')}
+          {t('This StorageClass might cause slower cloning.')}
         </Alert>
       )}
     </>
