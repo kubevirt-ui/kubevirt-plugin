@@ -70,7 +70,7 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
           <Chart
             height={height}
             width={width}
-            padding={35}
+            padding={{ top: 35, bottom: 35, left: 50, right: 35 }}
             scale={{ x: 'time', y: 'linear' }}
             domain={{
               x: [currentTime - timespan, currentTime],
