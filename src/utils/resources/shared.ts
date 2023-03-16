@@ -16,6 +16,7 @@ import {
 import { isDataSourceReady } from '../../views/datasources/utils';
 
 import { isEmpty } from './../utils/utils';
+import { isDataSourceCloning } from './template/hooks/useVmTemplateSource/utils';
 import { TEMPLATE_TYPE_LABEL } from './template';
 
 /**
@@ -315,3 +316,16 @@ export const convertResourceArrayToMap = <A extends K8sResourceCommon = K8sResou
  */
 export const getAvailableDataSources = (dataSources: V1beta1DataSource[]): V1beta1DataSource[] =>
   dataSources?.filter((dataSource) => isDataSourceReady(dataSource));
+
+/**
+ * function to get all V1beta1DataSource objects with condition type 'Ready'and status 'True'
+ * and/or also those with 'False' status but only 'CloneScheduled' or 'CloneInProgress' reason (cloning of the DS in progress)
+ * @param {V1beta1DataSource[]} dataSources list of DataSources to be filtered
+ * @returns list of available/ready/cloning DataSources
+ */
+export const getAvailableOrCloningDataSources = (
+  dataSources: V1beta1DataSource[],
+): V1beta1DataSource[] =>
+  dataSources?.filter(
+    (dataSource) => isDataSourceReady(dataSource) || isDataSourceCloning(dataSource),
+  );
