@@ -9,9 +9,12 @@ import {
   SecretSelectionOption,
   SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
-import { Grid, GridItem } from '@patternfly/react-core';
+import { Grid, GridItem, PopoverPosition } from '@patternfly/react-core';
+
+import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 
 import './SSHSecretSection.scss';
 
@@ -46,6 +49,13 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({ sshSecretDetails, setSSHS
 
   return (
     <Grid className="ssh-secret-section">
+      <GridItem className="ssh-secret-section__title">
+        {t('Authorized SSH key')}{' '}
+        <HelpTextIcon
+          bodyContent={t('SSH key is saved in the namespace as a secret')}
+          position={PopoverPosition.right}
+        />
+      </GridItem>
       <GridItem span={12}>
         <SecretSelectionRadioGroup
           selectedOption={secretSelectionOption}

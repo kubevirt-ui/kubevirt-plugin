@@ -1,3 +1,7 @@
 .instancetypes-vm-details-section {
   margin-top: var(--pf-global--spacer--lg);
+
+  .pf-c-expandable-section__content {
+    --pf-c-expandable-section__content--MarginTop: var(--pf-global--spacer--xs);
+  }
 }

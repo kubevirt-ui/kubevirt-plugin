@@ -37,7 +37,7 @@ const SSHKeyUpload: React.FC<SSHKeyUploadProps> = ({
     <Form isHorizontal>
       <FileUpload
         id={'ssh-key-upload'}
-        className="ssh-secret-selection__file-upload"
+        className="ssh-key-upload__file-upload"
         type="text"
         value={sshSecretKey}
         onChange={(v: string) => {
@@ -58,8 +58,10 @@ const SSHKeyUpload: React.FC<SSHKeyUploadProps> = ({
         )}
       </FileUpload>
       <FormGroup
-        label="Name"
+        className="ssh-key-upload__form-group"
+        label={t('Secret name')}
         fieldId="new-secret-name"
+        isRequired
         validated={isValidName ? ValidatedOptions.default : ValidatedOptions.error}
         helperTextInvalid={t('Secret name must be unique in this namespace.')}
       >
@@ -68,6 +70,7 @@ const SSHKeyUpload: React.FC<SSHKeyUploadProps> = ({
           id="new-secret-name"
           name="new-secret-name"
           value={sshSecretName}
+          isRequired
           onChange={(v: string) => {
             setIsValidName(validateSecretName(v, secrets));
             setSSHSecretCredentials((prevState) => ({ ...prevState, sshSecretName: v }));
