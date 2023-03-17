@@ -2,6 +2,8 @@ import React, { FC } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   K8sGroupVersionKind,
@@ -10,6 +12,7 @@ import {
   TableData,
   Timestamp,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { Label, Split, SplitItem } from '@patternfly/react-core';
 
 import BootableVolumesActions from '../../actions/BootableVolumesActions';
 import { getDataSourcePreferenceLabelValue, getPreferenceReadableOS } from '../../utils/utils';
@@ -24,10 +27,21 @@ const BootableVolumesRow: FC<
     }
   >
 > = ({ obj, activeColumnIDs, rowData: { groupVersionKind, preferences, instanceTypesNames } }) => {
+  const { t } = useKubevirtTranslation();
+
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
-        <ResourceLink groupVersionKind={groupVersionKind} name={obj?.metadata?.name} />
+        <Split hasGutter>
+          <SplitItem>
+            <ResourceLink groupVersionKind={groupVersionKind} name={obj?.metadata?.name} />
+          </SplitItem>
+          {isDataSourceCloning(obj) && (
+            <SplitItem>
+              <Label>{t('Clone in progress')}</Label>
+            </SplitItem>
+          )}
+        </Split>
       </TableData>
       <TableData id="os" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
         {getPreferenceReadableOS(obj, preferences)}

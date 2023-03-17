@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { DataSourceModelGroupVersionKind, DataSourceModelRef } from '@kubevirt-utils/models';
 import {
   convertResourceArrayToMap,
-  getAvailableDataSources,
+  getAvailableOrCloningDataSources,
   getName,
 } from '@kubevirt-utils/resources/shared';
 import {
@@ -34,7 +34,7 @@ const BootableVolumesList: FC = () => {
   const { preferences, instanceTypes, loadError } = useInstanceTypesAndPreferences();
   const instanceTypesNames = (instanceTypes || []).map(getName).sort((a, b) => a.localeCompare(b));
   const [data, filteredData, onFilterChange] = useListPageFilter(
-    getAvailableDataSources(dataSources),
+    getAvailableOrCloningDataSources(dataSources),
     useBootableVolumesFilters(),
   );
   const [pagination, setPagination] = useState(paginationInitialState);
