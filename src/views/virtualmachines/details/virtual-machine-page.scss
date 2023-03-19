@@ -3,6 +3,12 @@
 }
 
 .VirtualMachineNavPage--tabs__main {
+  height: 100%;
+
+  .co-m-page__body {
+    height: 100%;
+  }
+
   li.co-m-horizontal-nav__menu-item {
     a[data-test-id='horizontal-link-hide'] {
       display: none;
