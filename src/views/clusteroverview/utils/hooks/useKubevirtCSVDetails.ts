@@ -1,36 +1,23 @@
+import { useMemo } from 'react';
+
 import { CatalogSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/CatalogSourceModel';
 import ClusterServiceVersionModel, {
   ClusterServiceVersionModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console/models/ClusterServiceVersionModel';
 import { SubscriptionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/SubscriptionModel';
-import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import { isUpstream } from '@kubevirt-utils/utils/utils';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
+import {
+  HCO_OPERATORHUB_NAME,
+  KUBEVIRT_HYPERCONVERGED,
+  OPENSHIFT_CNV,
+  OPENSHIFT_OPERATOR_LIFECYCLE_MANAGER_NAMESPACE,
+  PACKAGESERVER,
+} from '../constants';
 import { CatalogSourceKind, ClusterServiceVersionKind, SubscriptionKind } from '../types';
 
 import { buildUrlForCSVSubscription } from './../utils';
-
-const getKubevirtCSV = (
-  clusterServiceVersions: ClusterServiceVersionKind[],
-  installedCSV: string,
-): ClusterServiceVersionKind | null =>
-  clusterServiceVersions.find((csv) => csv?.metadata?.name === installedCSV);
-
-const getKubevirtSubscription = (subscriptions: SubscriptionKind[]): SubscriptionKind | null =>
-  subscriptions.find((sub) => sub?.metadata?.name === 'hco-operatorhub');
-
-const isPackageServer = (csv: ClusterServiceVersionKind) =>
-  csv?.metadata?.name === 'packageserver' &&
-  csv?.metadata?.namespace === 'openshift-operator-lifecycle-manager';
-
-const catalogSourceForSubscription = (
-  subscription: SubscriptionKind,
-  catalogSources: CatalogSourceKind[],
-): CatalogSourceKind =>
-  catalogSources?.find(
-    (source) =>
-      source?.metadata?.name === subscription?.spec?.source &&
-      source?.metadata?.namespace === subscription?.spec?.sourceNamespace,
-  );
 
 type UseKubevirtCSVDetails = {
   displayName: string;
@@ -44,71 +31,69 @@ type UseKubevirtCSVDetails = {
   loadErrors: Error[];
 };
 
-type Resources = {
-  installedCSVs: ClusterServiceVersionKind[];
-  subscriptions: SubscriptionKind[];
-  catalogSources: CatalogSourceKind[];
-};
-
-const kubevirtCSVResources = {
-  installedCSVs: {
-    groupVersionKind: ClusterServiceVersionModelGroupVersionKind,
-    isList: true,
-    namespaced: false,
-  },
-  subscriptions: {
-    groupVersionKind: SubscriptionModelGroupVersionKind,
-    isList: true,
-    namespaced: false,
-  },
-  catalogSources: {
-    groupVersionKind: CatalogSourceModelGroupVersionKind,
-    isList: true,
-    optional: true,
-  },
-};
 export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
-  const resources = useK8sWatchResources<Resources>(kubevirtCSVResources);
+  const [subscription, loadedSubscription, loadSubscriptionError] =
+    useK8sWatchResource<SubscriptionKind>({
+      groupVersionKind: SubscriptionModelGroupVersionKind,
+      name: HCO_OPERATORHUB_NAME,
+      namespace: isUpstream ? KUBEVIRT_HYPERCONVERGED : OPENSHIFT_CNV,
+    });
 
-  const loadErrors = Object.values(resources).reduce((acc, value) => {
-    value?.loadError && acc.push(value?.loadError);
-    return acc;
-  }, []);
-
-  const loaded = Object.values(resources).every((value) => value?.loaded);
-
-  const kubevirtSubscription = getKubevirtSubscription(resources.subscriptions.data);
-
-  const kubevirtCSV = getKubevirtCSV(
-    resources.installedCSVs.data,
-    kubevirtSubscription?.status?.installedCSV,
+  const [installedCSV, loadedCSV, loadCSVError] = useK8sWatchResource<ClusterServiceVersionKind>(
+    subscription && {
+      groupVersionKind: ClusterServiceVersionModelGroupVersionKind,
+      name: subscription?.status?.installedCSV,
+      namespace: subscription?.metadata?.namespace,
+    },
   );
 
-  const catalogSourceMissing =
-    !catalogSourceForSubscription(kubevirtSubscription, resources.catalogSources.data) &&
-    !isPackageServer(kubevirtCSV);
-
-  const {
-    displayName = '',
-    version = '',
-    provider: { name: provider = '' } = {},
-  } = kubevirtCSV?.spec || {};
-
-  const operatorLink = buildUrlForCSVSubscription(
-    ClusterServiceVersionModel,
-    kubevirtSubscription?.status?.installedCSV,
-    kubevirtSubscription?.metadata?.namespace,
+  const [catalogSource, loadedSource, loadSourceError] = useK8sWatchResource<CatalogSourceKind>(
+    subscription && {
+      groupVersionKind: CatalogSourceModelGroupVersionKind,
+      name: subscription?.spec?.source,
+      namespace: subscription?.spec?.sourceNamespace,
+    },
   );
 
-  const updateChannel = kubevirtSubscription?.spec?.channel || '';
+  const loadErrors = loadSourceError || loadSubscriptionError || loadCSVError;
+
+  const loaded = loadedSubscription && loadedCSV && loadedSource;
+
+  const catalogSourceMissing = useMemo(
+    () =>
+      !catalogSource &&
+      !(
+        installedCSV?.metadata?.name === PACKAGESERVER &&
+        installedCSV?.metadata?.namespace === OPENSHIFT_OPERATOR_LIFECYCLE_MANAGER_NAMESPACE
+      ),
+    [catalogSource, installedCSV?.metadata],
+  );
+
+  const { displayName, version, provider } = useMemo(() => {
+    return {
+      displayName: installedCSV?.spec?.displayName,
+      version: installedCSV?.spec?.version,
+      provider: installedCSV?.spec?.provider?.name,
+    };
+  }, [installedCSV?.spec]);
+
+  const operatorLink = useMemo(
+    () =>
+      buildUrlForCSVSubscription(
+        ClusterServiceVersionModel,
+        installedCSV?.metadata?.name,
+        installedCSV?.metadata?.namespace,
+      ),
+    [installedCSV?.metadata],
+  );
 
   return {
     displayName,
     provider,
     version,
-    updateChannel,
+    updateChannel: subscription?.spec?.channel,
     operatorLink,
-    kubevirtSubscription,
+    kubevirtSubscription: subscription,
     catalogSourceMissing,
     loaded,
     loadErrors,
