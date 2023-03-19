@@ -39,23 +39,21 @@ const GeneralTab = () => {
     loadErrors,
   } = useKubevirtCSVDetails();
 
-  const isLoaded = loaded && kubevirtSubscription;
-
   return (
     <>
-      <OverviewDetailItem isLoading={!isLoaded} title={t('Service name')}>
+      <OverviewDetailItem isLoading={!loaded} title={t('Service name')}>
         {displayName}
       </OverviewDetailItem>
       <Divider className="general-tab__divider" />
-      <OverviewDetailItem isLoading={!isLoaded} title={t('Provider')}>
+      <OverviewDetailItem isLoading={!loaded} title={t('Provider')}>
         {provider}
       </OverviewDetailItem>
       <Divider className="general-tab__divider" />
-      <OverviewDetailItem isLoading={!isLoaded} title={t('Installed version')}>
+      <OverviewDetailItem isLoading={!loaded} title={t('Installed version')}>
         {version}
       </OverviewDetailItem>
       <Divider className="general-tab__divider" />
-      <OverviewDetailItem isLoading={!isLoaded} title={t('Update status')}>
+      <OverviewDetailItem isLoading={!loaded} title={t('Update status')}>
         {catalogSourceMissing ? (
           <SourceMissingStatus />
         ) : (
@@ -74,7 +72,7 @@ const GeneralTab = () => {
             </Popover>
           </DescriptionListTermHelpText>
           <DescriptionListDescription>
-            {isLoaded ? (
+            {loaded ? (
               <ExternalLink href={operatorLink}>{updateChannel}</ExternalLink>
             ) : (
               <Skeleton />
@@ -82,16 +80,14 @@ const GeneralTab = () => {
           </DescriptionListDescription>
         </DescriptionListGroup>
       </DescriptionList>
-      {!isEmpty(loadErrors) && (
+      {!isEmpty(loadErrors) && loaded && (
         <Alert
           variant={AlertVariant.danger}
           isInline
           title={t('Error')}
           className="live-migration-tab--error"
         >
-          {loadErrors.map((error) => (
-            <div key={error?.message}>{error?.message}</div>
-          ))}
+          {loadErrors.toString()}
         </Alert>
       )}
     </>
