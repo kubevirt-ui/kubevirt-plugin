@@ -1,3 +1,5 @@
+import { NETWORK } from '@virtualmachines/utils';
+
 export enum VirtualMachineDetailsTab {
   Overview = '',
   Details = 'details',
@@ -19,7 +21,7 @@ export const VirtualMachineConfigurationTabInner = {
   [VirtualMachineDetailsTab.Scripts]: VirtualMachineDetailsTab.Scripts,
   [VirtualMachineDetailsTab.Disks]: VirtualMachineDetailsTab.Disks,
   [VirtualMachineDetailsTab.Scheduling]: VirtualMachineDetailsTab.Scheduling,
-  [VirtualMachineDetailsTab.NetworkInterfaces]: VirtualMachineDetailsTab.NetworkInterfaces,
+  [VirtualMachineDetailsTab.NetworkInterfaces]: NETWORK,
   [VirtualMachineDetailsTab.Environment]: VirtualMachineDetailsTab.Environment,
 };
 
