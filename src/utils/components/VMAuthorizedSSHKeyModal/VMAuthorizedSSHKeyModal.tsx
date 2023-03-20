@@ -108,7 +108,7 @@ export const VMAuthorizedSSHKeyModal: React.FC<{
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Authorized SSH Key')}
+      headerText={t('Authorized SSH key')}
       isDisabled={!isValidatedKey}
     >
       <div className="vm-auth-ssh-key-modal">
@@ -140,7 +140,7 @@ export const VMAuthorizedSSHKeyModal: React.FC<{
           >
             {!isValidatedKey && (
               <HelperText>
-                <HelperTextItem variant="error">{t('SSH Key is invalid')}</HelperTextItem>
+                <HelperTextItem variant="error">{t('SSH key is invalid')}</HelperTextItem>
               </HelperText>
             )}
           </FileUpload>

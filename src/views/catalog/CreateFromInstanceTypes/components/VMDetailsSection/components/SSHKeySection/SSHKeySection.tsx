@@ -71,7 +71,7 @@ const SSHKeySection: FC<SSHKeySectionProps> = ({
         >
           {!isValidatedKey && (
             <HelperText>
-              <HelperTextItem variant="error">{t('SSH Key is invalid')}</HelperTextItem>
+              <HelperTextItem variant="error">{t('SSH key is invalid')}</HelperTextItem>
             </HelperText>
           )}
         </FileUpload>
