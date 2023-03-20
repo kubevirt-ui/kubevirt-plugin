@@ -149,7 +149,7 @@ export type UseCDIUploadValues = {
   uploadData: ({ file, dataVolume }: UploadDataProps) => Promise<void>;
 };
 
-type UploadDataProps = {
+export type UploadDataProps = {
   file: File;
   dataVolume: V1beta1DataVolume;
 };

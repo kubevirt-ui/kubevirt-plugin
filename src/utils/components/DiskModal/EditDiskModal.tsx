@@ -23,7 +23,7 @@ import DiskTypeSelect from './DiskFormFields/DiskTypeSelect';
 import EnablePreallocationCheckbox from './DiskFormFields/EnablePreallocationCheckbox';
 import useStorageProfileClaimPropertySets from './DiskFormFields/hooks/useStorageProfileClaimPropertySets';
 import NameFormField from './DiskFormFields/NameFormField';
-import StorageClassSelect from './DiskFormFields/StorageClassSelect';
+import AlertedStorageClassSelect from './DiskFormFields/StorageClass/AlertedStorageClassSelect';
 import { sourceTypes } from './DiskFormFields/utils/constants';
 import VolumeMode from './DiskFormFields/VolumeMode';
 import { diskReducerActions } from './state/actions';
@@ -229,7 +229,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
         />
         {(sourceRequiresDataVolume || diskState.diskSource === sourceTypes.UPLOAD) && (
           <>
-            <StorageClassSelect
+            <AlertedStorageClassSelect
               storageClass={diskState.storageClass}
               setStorageClassName={(scName) =>
                 dispatchDiskState({ type: diskReducerActions.SET_STORAGE_CLASS, payload: scName })
