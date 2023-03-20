@@ -358,7 +358,7 @@ export const getChangedHeadlessMode = (
 
 export const getTabURL = (vm: V1VirtualMachine, tab: string) => {
   const tabPath = VirtualMachineConfigurationTabInner[tab]
-    ? `${VirtualMachineDetailsTab.Configurations}/${tab}`
+    ? `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineConfigurationTabInner[tab]}`
     : tab;
   return `/k8s/ns/${vm?.metadata?.namespace}/${VirtualMachineModelRef}/${vm?.metadata?.name}/${tabPath}`;
 };
