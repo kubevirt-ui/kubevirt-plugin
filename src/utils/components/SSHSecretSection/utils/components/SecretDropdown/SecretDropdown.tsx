@@ -5,12 +5,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import { validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 import { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, AlertVariant, Select, SelectVariant } from '@patternfly/react-core';
+import { Alert, AlertVariant, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import Loading from '../../../../Loading/Loading';
 import { decodeSecret } from '../../utils';
-
-import SecretSelectOption from './components/SecretSelectOption';
 
 type SecretDropdownProps = {
   secretsResourceData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
@@ -30,7 +28,9 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
 
   const [allSecrets, secretsLoaded, secretsError] = secretsResourceData;
   const sshKeySecrets = allSecrets
-    ? allSecrets?.filter((secret) => validateSSHPublicKey(decodeSecret(secret)))
+    ? allSecrets
+        ?.filter((secret) => validateSSHPublicKey(decodeSecret(secret)))
+        ?.sort((a, b) => a?.metadata?.name.localeCompare(b?.metadata?.name))
     : [];
 
   const onSelect = (event, newSecretName) => {
@@ -41,9 +41,10 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
   const filterSecrets = (_, userInput: string): ReactElement[] =>
     sshKeySecrets
       ?.filter((secret) => getName(secret)?.includes(userInput))
-      ?.map((secret) => (
-        <SecretSelectOption key={getName(secret)} secret={secret} />
-      )) as ReactElement[];
+      ?.map((secret) => {
+        const name = getName(secret);
+        return <SelectOption key={name} value={name} />;
+      });
 
   if (!secretsLoaded) return <Loading />;
 
@@ -68,9 +69,10 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
       maxHeight={400}
       id={id || 'select-secret'}
     >
-      {sshKeySecrets?.map((secret) => (
-        <SecretSelectOption key={getName(secret)} secret={secret} />
-      ))}
+      {sshKeySecrets?.map((secret) => {
+        const name = getName(secret);
+        return <SelectOption key={name} value={name} />;
+      })}
     </Select>
   );
 };
