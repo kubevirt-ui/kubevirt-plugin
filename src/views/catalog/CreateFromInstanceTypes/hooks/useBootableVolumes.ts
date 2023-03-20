@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { DataSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -39,7 +39,7 @@ const useBootableVolumes: UseBootableVolumes = () => {
 
   const [pvcSources, setPVCSources] = useState<V1alpha1PersistentVolumeClaim[]>([]);
 
-  const readyDataSources = getAvailableDataSources(dataSources);
+  const readyDataSources = useMemo(() => getAvailableDataSources(dataSources), [dataSources]);
 
   useEffect(() => {
     if (loadedDataSources && !loadErrorDataSources && !isEmpty(readyDataSources)) {
