@@ -52,7 +52,7 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({ sshSecretDetails, setSSHS
       <GridItem className="ssh-secret-section__title">
         {t('Authorized SSH key')}{' '}
         <HelpTextIcon
-          bodyContent={t('SSH key is saved in the namespace as a secret')}
+          bodyContent={t('SSH key is saved in the project as a secret')}
           position={PopoverPosition.right}
         />
       </GridItem>

@@ -52,7 +52,7 @@ const SSHKey: React.FC = () => {
   return (
     <WizardDescriptionItem
       testId="wizard-sshkey"
-      title={t('Authorized SSH Key')}
+      title={t('Authorized SSH key')}
       isEdit
       label={<LinuxLabel />}
       showEditOnTitle

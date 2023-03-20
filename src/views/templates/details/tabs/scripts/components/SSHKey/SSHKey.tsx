@@ -54,7 +54,7 @@ const SSHKey: React.FC<SSHKeyProps> = ({ template }) => {
         <DescriptionListTermHelpText>
           <Flex className="vm-description-item__title">
             <FlexItem>
-              {t('Authorized SSH Key')}
+              {t('Authorized SSH key')}
               {<LinuxLabel />}
             </FlexItem>
             <FlexItem>

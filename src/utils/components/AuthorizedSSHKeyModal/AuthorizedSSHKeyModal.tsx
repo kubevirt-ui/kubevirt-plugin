@@ -44,7 +44,7 @@ export const AuthorizedSSHKeyModal: React.FC<{
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={submitHandler}
-        headerText={t('Authorized SSH Key')}
+        headerText={t('Authorized SSH key')}
         isDisabled={!isValidatedKey}
       >
         <div className="auth-ssh-key-modal">
@@ -75,7 +75,7 @@ export const AuthorizedSSHKeyModal: React.FC<{
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={submitHandler}
-      headerText={t('Authorized SSH Key')}
+      headerText={t('Authorized SSH key')}
       isDisabled={!isValidatedKey}
     >
       <div className="auth-ssh-key-modal">
@@ -103,7 +103,7 @@ export const AuthorizedSSHKeyModal: React.FC<{
           >
             {!isValidatedKey && (
               <HelperText>
-                <HelperTextItem variant="error">{t('SSH Key is invalid')}</HelperTextItem>
+                <HelperTextItem variant="error">{t('SSH key is invalid')}</HelperTextItem>
               </HelperText>
             )}
           </FileUpload>
