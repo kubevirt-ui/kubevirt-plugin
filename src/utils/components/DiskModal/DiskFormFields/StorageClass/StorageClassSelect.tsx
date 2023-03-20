@@ -1,29 +1,38 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  ChangeEvent,
+  Dispatch,
+  FC,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, AlertVariant, FormGroup, Select, SelectVariant } from '@patternfly/react-core';
+import { FormGroup, Select, SelectVariant } from '@patternfly/react-core';
 
-import { FilterSCSelect, getSCSelectOptions } from './utils/Filters';
-import { getDefaultStorageClass } from './utils/helpers';
+import { FilterSCSelect, getSCSelectOptions } from '../utils/Filters';
+import { getDefaultStorageClass } from '../utils/helpers';
+
+import { AlertedStorageClassSelectProps } from './AlertedStorageClassSelect';
 
 type StorageClassSelectProps = {
-  storageClass: string;
-  setStorageClassName: (scName: string) => void;
-  setStorageClassProvisioner?: (scProvisioner: string) => void;
-};
+  setShowSCAlert: Dispatch<SetStateAction<boolean>>;
+} & AlertedStorageClassSelectProps;
 
-const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
+const StorageClassSelect: FC<StorageClassSelectProps> = ({
   storageClass,
   setStorageClassName,
+  setShowSCAlert,
   setStorageClassProvisioner,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [showSCAlert, setShowSCAlert] = useState<boolean>(false);
 
   const [storageClasses, loaded] = useK8sWatchResource<IoK8sApiStorageV1StorageClass[]>({
     groupVersionKind: modelToGroupVersionKind(StorageClassModel),
@@ -33,7 +42,7 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
   const defaultSC = useMemo(() => getDefaultStorageClass(storageClasses), [storageClasses]);
 
   const onSelect = useCallback(
-    (event: React.MouseEvent<Element, MouseEvent>, selection: string) => {
+    (event: ChangeEvent<Element>, selection: string) => {
       setShowSCAlert(selection !== defaultSC?.metadata?.name);
       setStorageClassName(selection);
       setIsOpen(false);
@@ -76,15 +85,6 @@ const StorageClassSelect: React.FC<StorageClassSelectProps> = ({
           )}
         </div>
       </FormGroup>
-      {showSCAlert && (
-        <Alert
-          title={t('Selected StorageClass is different from the default StorageClass')}
-          isInline
-          variant={AlertVariant.info}
-        >
-          {t('This StorageClass might cause slower cloning.')}
-        </Alert>
-      )}
     </>
   );
 };
