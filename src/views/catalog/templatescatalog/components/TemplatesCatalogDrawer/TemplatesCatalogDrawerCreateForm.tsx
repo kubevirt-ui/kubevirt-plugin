@@ -87,7 +87,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
     const onCustomize = (e: MouseEvent) => {
       e.preventDefault();
-      let catalogUrl = `templatescatalog/customize?name=${template.metadata.name}&namespace=${template.metadata.namespace}&defaultSourceExists=${canQuickCreate}`;
+      let catalogUrl = `templatescatalog/customize?name=${template.metadata.name}&namespace=${template.metadata.namespace}&defaultSourceExists=${isBootSourceAvailable}`;
 
       if (vmName) {
         catalogUrl += `&vmName=${vmName}`;
