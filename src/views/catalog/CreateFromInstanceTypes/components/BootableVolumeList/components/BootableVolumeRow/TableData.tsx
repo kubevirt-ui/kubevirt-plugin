@@ -1,13 +1,18 @@
 import React, { FC } from 'react';
 
-import { Td } from '@patternfly/react-table';
+import { BaseCellProps, Td } from '@patternfly/react-table';
 
 type TableDataProps = {
   id: string;
   activeColumnIDs: string[];
+  width?: BaseCellProps['width'];
 };
 
-const TableData: FC<TableDataProps> = ({ children, id, activeColumnIDs }) =>
-  activeColumnIDs?.some((activeID) => activeID === id) ? <Td id={id}>{children}</Td> : null;
+const TableData: FC<TableDataProps> = ({ children, id, activeColumnIDs, width = 10 }) =>
+  activeColumnIDs?.some((activeID) => activeID === id) ? (
+    <Td id={id} width={width}>
+      {children}
+    </Td>
+  ) : null;
 
 export default TableData;
