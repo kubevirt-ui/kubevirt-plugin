@@ -13,6 +13,8 @@ import {
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
+import EditButtonWithTooltip from './EditButtonWithTooltip';
+
 import './VirtualMachineDescriptionItem.scss';
 
 type VirtualMachineDescriptionItemProps = {
@@ -29,6 +31,7 @@ type VirtualMachineDescriptionItemProps = {
   editOnTitleJustify?: boolean;
   label?: ReactNode;
   'data-test-id'?: string;
+  messageOnDisabled?: string;
 };
 
 const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
@@ -45,26 +48,20 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   editOnTitleJustify = false,
   label,
   'data-test-id': testId,
+  messageOnDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
 
   const description = (
-    <Button
-      type="button"
-      isInline
-      isDisabled={isDisabled}
-      onClick={onEditClick}
-      variant="link"
-      data-test-id={testId}
+    <EditButtonWithTooltip
+      isEditable={!isDisabled}
+      onEditClick={onEditClick}
+      testId={testId}
+      tooltipContent={messageOnDisabled}
     >
-      <Flex spaceItems={{ default: 'spaceItemsNone' }}>
-        <FlexItem>{descriptionData ?? NotAvailable}</FlexItem>
-        <FlexItem>
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </FlexItem>
-      </Flex>
-    </Button>
+      {descriptionData ?? NotAvailable}
+    </EditButtonWithTooltip>
   );
 
   return (

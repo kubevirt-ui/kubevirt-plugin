@@ -263,6 +263,7 @@
   "CPU": "CPU",
   "CPU | Memory": "CPU | Memory",
   "CPU | Memory depend on parameters": "CPU | Memory depend on parameters",
+  "CPU and Memory can not be edited if the VirtualMachine is created from InstanceType": "CPU and Memory can not be edited if the VirtualMachine is created from InstanceType",
   "CPU cores": "CPU cores",
   "CPU used": "CPU used",
   "CPUs": "CPUs",

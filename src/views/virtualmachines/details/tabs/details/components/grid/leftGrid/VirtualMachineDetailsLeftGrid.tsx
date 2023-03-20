@@ -222,6 +222,10 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
           descriptionData={<CPUMemory vm={vm} />}
           descriptionHeader={t('CPU | Memory')}
           isEdit={canUpdateVM}
+          isDisabled={!!vm?.spec?.instancetype}
+          messageOnDisabled={t(
+            'CPU and Memory can not be edited if the VirtualMachine is created from InstanceType',
+          )}
           isPopover
           bodyContent={<CPUDescription cpu={vm?.spec?.template?.spec?.domain?.cpu} />}
           onEditClick={() =>

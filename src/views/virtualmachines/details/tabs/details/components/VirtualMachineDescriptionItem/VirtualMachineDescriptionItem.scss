@@ -1,6 +1,8 @@
-.vm-description-item__title {
-  justify-content: space-between;
-  flex: 1;
+.vm-description-item {
+  &__title {
+    justify-content: space-between;
+    flex: 1;
+  }
 }
 
 .margin-top {
