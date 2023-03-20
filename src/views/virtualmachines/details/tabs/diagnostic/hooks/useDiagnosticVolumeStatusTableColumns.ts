@@ -12,11 +12,11 @@ type DiagnosticColumn = {
   sort: (columnIndex: any) => ThSortType;
 };
 
-type UseDiagnosticVolumeStatusTableColumns = () => [
-  columns: TableColumn<DiagnosticColumn>[],
-  activeColumns: TableColumn<DiagnosticColumn>[],
-  sort: DiagnosticSort,
-];
+type UseDiagnosticVolumeStatusTableColumns = () => {
+  columns: TableColumn<DiagnosticColumn>[];
+  activeColumns: TableColumn<DiagnosticColumn>[];
+  sorting: DiagnosticSort;
+};
 const useDiagnosticVolumeStatusTableColumns: UseDiagnosticVolumeStatusTableColumns = () => {
   const { t } = useKubevirtTranslation();
   const { getSorting, sort } = useDiagnosticSort();
@@ -45,7 +45,7 @@ const useDiagnosticVolumeStatusTableColumns: UseDiagnosticVolumeStatusTableColum
     columnManagementID: 'diagnostic-tab-volume',
   });
 
-  return [columns, activeColumns, sort];
+  return { columns, activeColumns, sorting: sort };
 };
 
 export default useDiagnosticVolumeStatusTableColumns;
