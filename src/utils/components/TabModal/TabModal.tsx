@@ -69,7 +69,10 @@ const TabModal: TabModalFC = React.memo(
 
       onSubmit(obj)
         .then(onClose)
-        .catch(setError)
+        .catch((submitError) => {
+          setError(submitError);
+          console.error(submitError);
+        })
         .finally(() => setIsSubmitting(false));
     };
 

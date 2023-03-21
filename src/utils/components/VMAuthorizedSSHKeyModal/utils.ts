@@ -8,7 +8,6 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   addSecretToVM,
   createVmSSHSecret,
-  removeSecretToVM,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sDelete, k8sPatch, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
@@ -55,11 +54,9 @@ export const changeVMSecret = async (
     });
 
     return await createVmSSHSecret(vm, newSSHKey, sshSecretName);
-  } else {
+  } else if (!!vm?.spec?.template?.spec?.accessCredentials) {
     await produceAndUpdate(vm, (vmDraft) => {
-      const produced = removeSecretToVM(vm);
-      vmDraft.spec = produced.spec;
-
+      delete vmDraft.spec.template.spec.accessCredentials;
       return vmDraft;
     });
   }
