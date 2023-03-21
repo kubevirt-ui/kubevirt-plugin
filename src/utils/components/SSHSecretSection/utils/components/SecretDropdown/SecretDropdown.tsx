@@ -29,7 +29,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
   const [allSecrets, secretsLoaded, secretsError] = secretsResourceData;
   const sshKeySecrets = allSecrets
     ? allSecrets
-        ?.filter((secret) => validateSSHPublicKey(decodeSecret(secret)))
+        ?.filter((secret) => secret?.data && validateSSHPublicKey(decodeSecret(secret)))
         ?.sort((a, b) => a?.metadata?.name.localeCompare(b?.metadata?.name))
     : [];
 
