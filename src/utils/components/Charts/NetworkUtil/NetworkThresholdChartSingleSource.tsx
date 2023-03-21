@@ -109,6 +109,7 @@ const NetworkThresholdSingleSourceChart: React.FC<NetworkThresholdSingleSourceCh
               tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
+                tickLabels: { padding: 2 },
               }}
               axisComponent={<></>}
             />

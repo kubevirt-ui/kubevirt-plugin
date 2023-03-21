@@ -132,6 +132,7 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
               tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
+                tickLabels: { padding: 2 },
               }}
               axisComponent={<></>}
             />
