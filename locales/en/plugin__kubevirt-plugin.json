@@ -665,6 +665,8 @@
   "No MigrationPolicies are defined yet": "No MigrationPolicies are defined yet",
   "No MigrationPolicy": "No MigrationPolicy",
   "No migrations found": "No migrations found",
+  "No network interface definitions found. Click the \"Add network interface\" to define one.": "No network interface definitions found. Click the \"Add network interface\" to define one.",
+  "No network interface definitions found. The VirtualMachine has no networks and interfaces specified, therefore it's using a default interface and network configuration.": "No network interface definitions found. The VirtualMachine has no networks and interfaces specified, therefore it's using a default interface and network configuration.",
   "No network interfaces found": "No network interfaces found",
   "No NetworkAttachmentDefinitions available. Contact your system administrator for additional support.": "No NetworkAttachmentDefinitions available. Contact your system administrator for additional support.",
   "No optimized StorageProfile settings for this StorageClass.": "No optimized StorageProfile settings for this StorageClass.",
