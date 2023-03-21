@@ -9,6 +9,7 @@ import {
   SecretSelectionOption,
   SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
@@ -29,14 +30,13 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({ sshSecretDetails, setSSHS
     SecretSelectionOption.none,
   );
 
-  const secretsResourceData = useK8sWatchResource<IoK8sApiCoreV1Secret[]>(
-    activeNamespace && {
-      groupVersionKind: modelToGroupVersionKind(SecretModel),
-      namespaced: true,
-      isList: true,
+  const secretsResourceData = useK8sWatchResource<IoK8sApiCoreV1Secret[]>({
+    groupVersionKind: modelToGroupVersionKind(SecretModel),
+    isList: true,
+    ...(activeNamespace !== ALL_NAMESPACES_SESSION_KEY && {
       namespace: activeNamespace,
-    },
-  );
+    }),
+  });
 
   const setSelectedSecretName = (secretName) => {
     setSSHSecretDetails({ sshSecretName: secretName, sshSecretKey: '' });
