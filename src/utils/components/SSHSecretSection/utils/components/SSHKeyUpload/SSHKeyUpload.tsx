@@ -53,7 +53,7 @@ const SSHKeyUpload: React.FC<SSHKeyUploadProps> = ({
       >
         {!isValidKey && (
           <HelperText>
-            <HelperTextItem variant="error">{t('SSH Key is invalid')}</HelperTextItem>
+            <HelperTextItem variant="error">{t('SSH key is invalid')}</HelperTextItem>
           </HelperText>
         )}
       </FileUpload>

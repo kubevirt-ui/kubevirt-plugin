@@ -369,7 +369,7 @@ export const usePendingChanges = (
     {
       hasPendingChange: sshServiceChanged,
       tabLabel: VirtualMachineDetailsTabLabel.Scripts,
-      label: t('Authorized SSH Key'),
+      label: t('Authorized SSH key'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
         createModal(({ isOpen, onClose }) => (

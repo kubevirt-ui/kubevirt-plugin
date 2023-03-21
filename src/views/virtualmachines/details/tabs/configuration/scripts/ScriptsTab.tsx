@@ -111,7 +111,7 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
                   <span>{hasSSHKey ? t('Available') : t('Not available')}</span>
                 </Stack>
               }
-              descriptionHeader={t('Authorized SSH Key')}
+              descriptionHeader={t('Authorized SSH key')}
               isEdit={canUpdateVM}
               label={<LinuxLabel />}
               data-test-id="authorized-ssh-key-button"
