@@ -97,7 +97,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-status">
-                    <Split hasGutter>
+                    <Split hasGutter isWrappable>
                       <SplitItem>
                         {vmPrintableStatus !== printableVMStatus.Migrating ? (
                           <VirtualMachineOverviewStatus vmPrintableStatus={vmPrintableStatus} />
