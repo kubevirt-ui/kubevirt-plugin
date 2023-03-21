@@ -106,6 +106,7 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
               tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
+                tickLabels: { padding: 2 },
               }}
               axisComponent={<></>}
             />

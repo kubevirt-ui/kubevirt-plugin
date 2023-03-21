@@ -1,4 +1,8 @@
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
+import {
+  dateFormatterNoYear,
+  timeFormatter,
+} from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   PrometheusResponse,
@@ -11,9 +15,6 @@ export const SINGLE_VM_DURATION = 'SINGLE_VM_DURATION';
 export const TICKS_COUNT = 100;
 export const MILLISECONDS_MULTIPLIER = 1000;
 
-export const sumOfValues = (obj: PrometheusResponse) =>
-  obj?.data?.result?.[0]?.values.reduce((acc, [, v]) => acc + Number(v), 0);
-
 export const queriesToLink = (queries: string[] | string) => {
   const queriesArray = Array.isArray(queries) ? queries : [queries];
   return queriesArray?.reduce(
@@ -22,17 +23,21 @@ export const queriesToLink = (queries: string[] | string) => {
   );
 };
 
+const isMultiDayDuration = (duration: string): boolean =>
+  [DurationOption.ONE_DAY, DurationOption.TWO_DAYS, DurationOption.ONE_WEEK].includes(
+    DurationOption.fromString(duration),
+  );
+
 export const tickFormat =
   (duration: string, currentTime: number) => (tick: any, index: number, ticks: any[]) => {
     const isFirst = index === 0;
     const isLast = index === ticks.length - 1;
     if (isLast || isFirst) {
-      const date = new Date(currentTime);
       const timespan = DurationOption?.getMilliseconds(duration);
-      const datePast = new Date(currentTime - timespan);
-      const hours = (isLast ? date : datePast).getHours();
-      const minutes = ('0' + (isLast ? date : datePast).getMinutes()).slice(-2);
-      return `${hours}:${minutes}`;
+      const date = isLast ? currentTime : currentTime - timespan;
+      const monthDay = dateFormatterNoYear.format(date);
+      const time = timeFormatter.format(date);
+      return isMultiDayDuration(duration) ? `${monthDay}\n${time}` : time;
     }
 
     return '';
