@@ -3,19 +3,12 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  ListPageBody,
-  ListPageFilter,
-  ListPageHeader,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 import { TableComposable, Th, Thead, Tr } from '@patternfly/react-table';
 import { columnSorting } from '@virtualmachines/list/hooks/utils/utils';
 import { paginationDefaultValues } from '@virtualmachines/utils';
 
-import useDiagnosticFilter from '../hooks/useDiagnosticFilter';
 import useDiagnosticVolumeStatusTableColumns from '../hooks/useDiagnosticVolumeStatusTableColumns';
 import { VirtualizationVolumeSnapshotStatus } from '../utils/types';
 import VirtualMachineDiagnosticTabRow from '../VirtualMachineDiagnosticTabRow';
@@ -33,14 +26,12 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
     ids: new Set(),
   });
 
-  const [columns, activeColumns, sorting] = useDiagnosticVolumeStatusTableColumns();
+  const { columns, sorting } = useDiagnosticVolumeStatusTableColumns();
   const [pagination, onPaginationChange] = usePagination();
   const sortedData = useMemo(
     () => columnSorting(volumeSnapshotStatuses, sorting?.direction, pagination, sorting?.column),
     [volumeSnapshotStatuses, sorting, pagination],
   );
-  const filters = useDiagnosticFilter();
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(sortedData, filters);
 
   useEffect(
     () =>
@@ -54,7 +45,7 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
 
   return (
     <>
-      <div className="VirtualMachineDiagnosticTab--header">
+      <div className="VirtualMachineDiagnosticTab--header extra-margin">
         <ListPageHeader title={t('Volume snapshot status')}>
           <HelpTextIcon
             bodyContent={t(
@@ -62,36 +53,9 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
             )}
           />
         </ListPageHeader>
-      </div>
-      <ListPageBody>
         <div className="VirtualMachineDiagnosticTab--filters__main">
-          <ListPageFilter
-            data={unfilteredData}
-            loaded={!isEmpty(unfilteredData)}
-            rowFilters={filters}
-            nameFilterPlaceholder={t('Search by reason...')}
-            hideLabelFilter
-            onFilterChange={(...args) => {
-              onFilterChange(...args);
-              onPaginationChange({
-                page: 1,
-                startIndex: 0,
-                endIndex: pagination?.perPage,
-                perPage: pagination?.perPage,
-              });
-            }}
-            columnLayout={{
-              columns: columns?.map(({ id, title }) => ({
-                id,
-                title,
-              })),
-              id: 'diagnostic-tab-volume',
-              selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-              type: t('VirtualMachine'),
-            }}
-          />
           <Pagination
-            itemCount={filteredData?.length}
+            itemCount={sortedData?.length}
             page={pagination?.page}
             perPage={pagination?.perPage}
             defaultToFullPage
@@ -104,7 +68,7 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
             perPageOptions={paginationDefaultValues}
           />
         </div>
-      </ListPageBody>
+      </div>
       <TableComposable isExpandable>
         <Thead>
           <Tr>
@@ -120,7 +84,7 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
                 },
               }}
             />
-            {activeColumns?.map(({ title, cell: { sort } }, index) => {
+            {columns?.map(({ title, cell: { sort } }, index) => {
               return (
                 <Th sort={sort(index)} key={title}>
                   {title}
@@ -129,14 +93,14 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
             })}
           </Tr>
         </Thead>
-        {filteredData.map((row, index) => (
+        {sortedData.map((row, index) => (
           <VirtualMachineDiagnosticTabRow
             obj={row}
             key={row?.metadata?.name}
             index={index}
             expend={expend}
             setExpend={setExpend}
-            activeColumns={activeColumns}
+            activeColumns={columns}
           />
         ))}
       </TableComposable>
