@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,10 +21,17 @@ type HardwareDevicesProps = {
   vm: V1VirtualMachine;
   onSubmit?: (vm: V1VirtualMachine) => Promise<void | V1VirtualMachine>;
   canEdit?: boolean;
+  hideEdit?: boolean;
   vmi?: V1VirtualMachineInstance;
 };
 
-const HardwareDevices: React.FC<HardwareDevicesProps> = ({ vm, vmi, onSubmit, canEdit = true }) => {
+const HardwareDevices: FC<HardwareDevicesProps> = ({
+  vm,
+  vmi,
+  onSubmit,
+  canEdit = true,
+  hideEdit = false,
+}) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -66,7 +73,12 @@ const HardwareDevices: React.FC<HardwareDevicesProps> = ({ vm, vmi, onSubmit, ca
   return (
     <DescriptionList>
       <DescriptionListGroup>
-        <HardwareDeviceTitle title={t('GPU devices')} onClick={onEditGPU} canEdit={canEdit} />
+        <HardwareDeviceTitle
+          title={t('GPU devices')}
+          onClick={onEditGPU}
+          canEdit={canEdit}
+          hideEdit={hideEdit}
+        />
         <DescriptionListDescription>
           <HardwareDevicesTable devices={gpus} />
         </DescriptionListDescription>
@@ -77,12 +89,13 @@ const HardwareDevices: React.FC<HardwareDevicesProps> = ({ vm, vmi, onSubmit, ca
           title={t('Host devices')}
           onClick={onEditHostDevices}
           canEdit={canEdit}
+          hideEdit={hideEdit}
         />
         <DescriptionListDescription>
           <HardwareDevicesTable devices={hostDevices} />
         </DescriptionListDescription>
       </DescriptionListGroup>
-      {canEdit && (
+      {canEdit && !hideEdit && (
         <DescriptionListGroup>
           <HardwareDevicesHeadlessMode vm={vm} vmi={vmi} onSubmit={onSubmit} />
         </DescriptionListGroup>

@@ -172,7 +172,7 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                           {` (${hardwareDevicesCount})`}
                         </DescriptionListTerm>
                         <DescriptionListDescription>
-                          <HardwareDevices canEdit={false} vm={vmObject} />
+                          <HardwareDevices hideEdit vm={vmObject} />
                         </DescriptionListDescription>
                       </DescriptionListGroup>
                     </DescriptionList>

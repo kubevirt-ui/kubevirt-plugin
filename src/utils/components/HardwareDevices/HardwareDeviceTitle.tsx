@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, DescriptionListTerm } from '@patternfly/react-core';
@@ -7,11 +7,19 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 type HardwareDeviceTitleProps = {
   title: string;
   canEdit: boolean;
+  hideEdit?: boolean;
   onClick?: () => void;
 };
 
-const HardwareDeviceTitle: React.FC<HardwareDeviceTitleProps> = ({ title, canEdit, onClick }) => {
+const HardwareDeviceTitle: FC<HardwareDeviceTitleProps> = ({
+  title,
+  canEdit,
+  hideEdit = false,
+  onClick,
+}) => {
   const { t } = useKubevirtTranslation();
+
+  if (hideEdit) return <DescriptionListTerm>{title}</DescriptionListTerm>;
 
   return (
     <DescriptionListTerm>
