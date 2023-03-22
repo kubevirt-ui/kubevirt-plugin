@@ -1,8 +1,8 @@
 import { PerPageOptions } from '@patternfly/react-core';
 
 export const paginationDefaultValuesForm = [
-  { title: '5', value: 5 },
-  { title: '10', value: 10 },
+  { title: '8', value: 8 },
+  { title: '16', value: 16 },
 ];
 
 export const paginationDefaultValuesModal: PerPageOptions[] = [
@@ -20,14 +20,14 @@ export type PaginationState = {
 
 export const paginationInitialStateForm: PaginationState = {
   page: 1,
-  perPage: 5,
+  perPage: 8,
   startIndex: 0,
-  endIndex: 5,
+  endIndex: 8,
 };
 
 export const paginationInitialStateModal: PaginationState = {
   page: 1,
-  perPage: 15,
+  perPage: 16,
   startIndex: 0,
-  endIndex: 15,
+  endIndex: 16,
 };
