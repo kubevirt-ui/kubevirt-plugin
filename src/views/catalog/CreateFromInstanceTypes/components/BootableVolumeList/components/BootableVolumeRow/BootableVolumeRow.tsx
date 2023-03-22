@@ -39,6 +39,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   const bootVolumeName = bootableVolume?.metadata?.name;
   const pvcDiskSize = pvcSource?.spec?.resources?.requests?.storage;
   const sizeData = pvcDiskSize && humanizeBinaryBytes(pvcDiskSize);
+
   return (
     <Tr
       isHoverable
@@ -46,20 +47,20 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       isRowSelected={bootableVolumeSelected?.metadata?.name === bootVolumeName}
       onClick={() => setBootSourceSelected(bootableVolume)}
     >
-      <TableData activeColumnIDs={activeColumnIDs} id="name">
+      <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
         <img src={getOSIcon(preference)} alt="os-icon" className="vm-catalog-row-icon" />
         <Text component={TextVariants.small}>{bootVolumeName}</Text>
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id="operating-system">
+      <TableData activeColumnIDs={activeColumnIDs} id="operating-system" width={20}>
         {preference?.metadata?.annotations?.[ANNOTATIONS.displayName] || NO_DATA_DASH}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id="storage-class">
+      <TableData activeColumnIDs={activeColumnIDs} id="storage-class" width={20}>
         {pvcSource?.spec?.storageClassName || NO_DATA_DASH}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id="size">
+      <TableData activeColumnIDs={activeColumnIDs} id="size" width={10}>
         {sizeData?.string || NO_DATA_DASH}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description}>
+      <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description} width={30}>
         {bootableVolume?.metadata?.annotations?.[ANNOTATIONS.description] || NO_DATA_DASH}
       </TableData>
     </Tr>
