@@ -1,7 +1,7 @@
 import {
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,
-} from '@kubevirt-utils/components/PendingChanges/utils/constants';
+} from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NETWORK } from '@virtualmachines/utils';
 

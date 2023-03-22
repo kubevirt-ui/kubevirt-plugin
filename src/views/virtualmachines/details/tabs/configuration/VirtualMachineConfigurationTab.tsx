@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { VirtualMachineDetailsTab } from '@kubevirt-utils/components/PendingChanges/utils/constants';
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/utils';
