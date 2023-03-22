@@ -10,7 +10,7 @@ export enum InstanceTypeCategory {
 export type InstanceTypeSizeDetails = {
   name: InstanceTypeSize;
   label: string;
-  cores: number;
+  cpus: number;
   memory: string;
 };
 
