@@ -71,6 +71,7 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
               tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
+                tickLabels: { padding: 2 },
               }}
               axisComponent={<></>}
             />

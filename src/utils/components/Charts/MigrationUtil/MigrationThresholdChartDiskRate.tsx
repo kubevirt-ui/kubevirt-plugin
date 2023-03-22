@@ -80,6 +80,7 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
               tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
+                tickLabels: { padding: 2 },
               }}
               axisComponent={<></>}
             />
