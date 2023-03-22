@@ -19,7 +19,6 @@ import {
 } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-import { AddDevice } from './add-device';
 import { BootOrderEmptyState } from './BootOrderEmptyState';
 
 export const BootOrderModalBody: React.FC<{
@@ -53,20 +52,6 @@ export const BootOrderModalBody: React.FC<{
 
       return true; // Signal that this is a valid drop and not to animate the item returning home.
     }
-  };
-
-  const onAdd = (name: string) => {
-    const maxOrder =
-      devices.length > 0 ? Math.max(...devices.map((device) => device.value.bootOrder)) : 0;
-
-    const deviceToUpdate = devices.find((d) => d.value.name === name);
-
-    const newDevices = [
-      ...devices.filter((device) => device.value.name !== name),
-      { ...deviceToUpdate, value: { ...deviceToUpdate.value, bootOrder: maxOrder + 1 } },
-    ];
-
-    onChange(newDevices);
   };
 
   // Remove a bootOrder from a device by index.
@@ -103,7 +88,7 @@ export const BootOrderModalBody: React.FC<{
           <DragDrop onDrop={onDrop}>
             <Droppable hasNoWrapper>
               <DataList aria-label="draggable data list example">
-                {devices.map(({ typeLabel, value }) => (
+                {devices.map(({ typeLabel, value }, index) => (
                   <Draggable key={value.name} hasNoWrapper>
                     <DataListItem aria-labelledby={value.name} ref={React.createRef()}>
                       <DataListItemRow>
@@ -126,14 +111,16 @@ export const BootOrderModalBody: React.FC<{
                                   </span>
                                 </SplitItem>
                                 <SplitItem>
-                                  <Button
-                                    id={`${value.name}-delete-btn`}
-                                    onClick={() => onDelete(value.name)}
-                                    variant="link"
-                                    className="kubevirt-boot-order__add-device-delete-btn"
-                                  >
-                                    <MinusCircleIcon />
-                                  </Button>
+                                  {index !== devices.length - 1 && (
+                                    <Button
+                                      id={`${value.name}-delete-btn`}
+                                      onClick={() => onDelete(value.name)}
+                                      variant="link"
+                                      className="kubevirt-boot-order__add-device-delete-btn"
+                                    >
+                                      <MinusCircleIcon />
+                                    </Button>
+                                  )}
                                 </SplitItem>
                               </Split>
                             </DataListCell>,
@@ -146,12 +133,6 @@ export const BootOrderModalBody: React.FC<{
               </DataList>
             </Droppable>
           </DragDrop>
-          <AddDevice
-            devices={devices}
-            onAdd={onAdd}
-            isEditMode={isEditMode}
-            setEditMode={changeEditMode}
-          />
         </>
       )}
     </>
