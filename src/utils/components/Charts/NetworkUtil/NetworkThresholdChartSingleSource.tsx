@@ -13,17 +13,18 @@ import {
   ChartThemeColor,
   createContainer,
 } from '@patternfly/react-charts';
+import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import {
-  findChartMaxYAxis,
+  findNetworkMaxYValue,
+  formatNetworkYTick,
+  getNetworkTickValues,
   MILLISECONDS_MULTIPLIER,
   tickFormat,
   TICKS_COUNT,
-  tickValue,
-  yTickFormat,
 } from '../utils/utils';
 type NetworkThresholdSingleSourceChartProps = {
   data: PrometheusResult[];
@@ -49,7 +50,7 @@ const NetworkThresholdSingleSourceChart: React.FC<NetworkThresholdSingleSourceCh
       });
     });
   const isReady = !isEmpty(chartData);
-  const Ymax = findChartMaxYAxis(chartData);
+  const Ymax = findNetworkMaxYValue(chartData);
 
   const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
   const legendData =
@@ -69,7 +70,7 @@ const NetworkThresholdSingleSourceChart: React.FC<NetworkThresholdSingleSourceCh
             themeColor={ChartThemeColor.multiUnordered}
             domain={{
               x: [currentTime - timespan, currentTime],
-              y: [0, tickValue(Ymax + 1)?.length],
+              y: [0, getNetworkTickValues(Ymax + 1)?.length],
             }}
             containerComponent={
               <CursorVoronoiContainer
@@ -95,11 +96,14 @@ const NetworkThresholdSingleSourceChart: React.FC<NetworkThresholdSingleSourceCh
           >
             <ChartAxis
               dependentAxis
-              tickFormat={yTickFormat}
-              tickValues={tickValue(Ymax)}
+              tickFormat={formatNetworkYTick}
+              tickValues={getNetworkTickValues(Ymax)}
               style={{
                 ticks: {
                   stroke: 'transparent',
+                },
+                grid: {
+                  stroke: chart_color_black_200.value,
                 },
               }}
               axisComponent={<></>}

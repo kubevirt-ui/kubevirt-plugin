@@ -1,3 +1,5 @@
+import xbytes from 'xbytes';
+
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -64,7 +66,10 @@ export const getPrometheusDataAllNics = (response: PrometheusResponse): Promethe
     },
   ];
 };
-export const findChartMaxYAxis = (chartData: { x: Date; y: number; name: string }[][]) => {
+
+export const findNetworkMaxYValue = (
+  chartData: { x: Date; y: number; name: string }[][],
+): number => {
   const yValues =
     !isEmpty(chartData) &&
     chartData?.map((dataArray) => {
@@ -74,7 +79,7 @@ export const findChartMaxYAxis = (chartData: { x: Date; y: number; name: string 
   return maxY;
 };
 
-export const tickValue = (Ymax: number) => {
+export const getNetworkTickValues = (Ymax: number) => {
   const tickValues = Array.from({ length: Ymax + 1 }, (_, index) => {
     if (index === 0) return '1 Bps';
     if (index === Math.round(Ymax)) return `${Math.round(Ymax + 1)} Bps`;
@@ -82,11 +87,33 @@ export const tickValue = (Ymax: number) => {
   });
   return tickValues;
 };
-export const yTickFormat = (tick: any, index: number, ticks: any[]) => {
+
+export const formatNetworkYTick = (tick: any, index: number, ticks: any[]) => {
   const isFirst = index === 0;
   const isLast = index === ticks.length - 1;
   if (isLast || isFirst) {
     return tick;
   }
   return;
+};
+
+export const formatMemoryYTick = (yMax: number, fixedDigits: number) => (tick: number) => {
+  const humanizedValue = xbytes(yMax, { iec: true, fixed: fixedDigits });
+  const unit = humanizedValue?.split(' ')?.[1];
+  if (tick === 0 && unit) return `0 ${unit}`;
+  return humanizedValue || '';
+};
+
+export const findMaxYValue = (
+  chartData: { x: Date; y: number; name?: string }[],
+): number | null => {
+  const yValues = chartData?.map((point) => point?.y);
+  return yValues ? Math.max(...yValues) : 0;
+};
+
+export const findMigrationMaxYValue = (processedData, remainingData, dirtyRateData) => {
+  const max = [processedData, remainingData, dirtyRateData]?.map((chartData) =>
+    findMaxYValue(chartData),
+  );
+  return Math.max(...max);
 };

@@ -13,13 +13,21 @@ import {
   ChartGroup,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
+import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
+import {
+  findMaxYValue,
+  formatMemoryYTick,
+  MILLISECONDS_MULTIPLIER,
+  queriesToLink,
+  tickFormat,
+  TICKS_COUNT,
+} from '../utils/utils';
 
 type StorageTotalReadWriteThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
@@ -50,6 +58,7 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
   const chartData = storageWriteData?.map(([x, y]) => {
     return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
+  const yMax = findMaxYValue(chartData);
 
   return (
     <ComponentReady isReady={!isEmpty(chartData)}>
@@ -58,10 +67,11 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
           <Chart
             height={height}
             width={width}
-            padding={35}
+            padding={{ top: 35, bottom: 35, left: 80, right: 35 }}
             scale={{ x: 'time', y: 'linear' }}
             domain={{
               x: [currentTime - timespan, currentTime],
+              y: [0, yMax],
             }}
             containerComponent={
               <ChartVoronoiContainer
@@ -74,6 +84,16 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
               />
             }
           >
+            <ChartAxis
+              dependentAxis
+              tickValues={[0, yMax]}
+              tickFormat={formatMemoryYTick(yMax, 2)}
+              style={{
+                grid: {
+                  stroke: chart_color_black_200.value,
+                },
+              }}
+            />
             <ChartAxis
               tickFormat={tickFormat(duration, currentTime)}
               tickCount={TICKS_COUNT}
