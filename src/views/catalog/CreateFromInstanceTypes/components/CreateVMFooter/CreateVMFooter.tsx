@@ -1,8 +1,9 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
+import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -53,6 +54,14 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({
     namespace: vm?.metadata?.namespace,
     group: VirtualMachineModel.apiGroup,
   });
+
+  const hasNameAndInstanceType = useMemo(
+    () =>
+      !isEmpty(vm?.metadata?.name) &&
+      (!isEmpty(selectedBootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL]) ||
+        !isEmpty(vm?.spec?.instancetype?.name)),
+    [selectedBootableVolume, vm],
+  );
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -110,6 +119,7 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({
       .catch(setError)
       .finally(() => setIsSubmitting(false));
   };
+
   return (
     <footer className="create-vm-instance-type-footer">
       <Stack hasGutter>
@@ -142,7 +152,12 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({
             <SplitItem>
               <Button
                 isLoading={isSubmitting}
-                isDisabled={isSubmitting || isEmpty(selectedBootableVolume) || !canCreateVM}
+                isDisabled={
+                  isSubmitting ||
+                  isEmpty(selectedBootableVolume) ||
+                  !canCreateVM ||
+                  !hasNameAndInstanceType
+                }
                 onClick={handleSubmit}
                 variant={ButtonVariant.primary}
               >
