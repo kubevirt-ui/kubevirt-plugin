@@ -183,7 +183,7 @@ export const getDataVolumeFromState = ({
 
 export const getDataVolumeTemplate = (dataVolume: V1beta1DataVolume): V1DataVolumeTemplateSpec => {
   const dataVolumeTemplate: V1DataVolumeTemplateSpec = { metadata: {}, spec: {} };
-  dataVolumeTemplate.metadata = { ...dataVolume.metadata };
+  dataVolumeTemplate.metadata = { name: dataVolume.metadata.name };
   dataVolumeTemplate.spec = { ...dataVolume.spec };
   return dataVolumeTemplate;
 };
