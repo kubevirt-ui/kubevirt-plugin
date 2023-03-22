@@ -14,6 +14,7 @@ import {
   ChartThreshold,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
+import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
@@ -21,7 +22,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
+import {
+  formatMemoryYTick,
+  MILLISECONDS_MULTIPLIER,
+  queriesToLink,
+  tickFormat,
+  TICKS_COUNT,
+} from '../utils/utils';
 
 type MemoryThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
@@ -70,7 +77,7 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
           <Chart
             height={height}
             width={width}
-            padding={{ top: 35, bottom: 35, left: 50, right: 35 }}
+            padding={{ top: 35, bottom: 35, left: 55, right: 35 }}
             scale={{ x: 'time', y: 'linear' }}
             domain={{
               x: [currentTime - timespan, currentTime],
@@ -90,11 +97,14 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
             <ChartAxis
               dependentAxis
               tickCount={2}
-              tickValues={[thresholdLine?.[0]?.y]}
-              tickFormat={(tick: number) => xbytes(tick, { iec: true, fixed: 0 })}
+              tickValues={[0, thresholdLine?.[0]?.y]}
+              tickFormat={formatMemoryYTick(thresholdLine?.[0]?.y, 0)}
               style={{
                 ticks: {
                   stroke: 'transparent',
+                },
+                grid: {
+                  stroke: chart_color_black_200.value,
                 },
               }}
               axisComponent={<></>}

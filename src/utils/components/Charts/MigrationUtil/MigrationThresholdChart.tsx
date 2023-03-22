@@ -15,6 +15,7 @@ import {
   ChartLegendPosition,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
+import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_green_300 from '@patternfly/react-tokens/dist/esm/chart_color_green_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
@@ -24,6 +25,8 @@ import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
 import {
+  findMigrationMaxYValue,
+  formatMemoryYTick,
   getPrometheusData,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
@@ -92,6 +95,7 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
 
   const isReady =
     !isEmpty(chartDataProcessed) || !isEmpty(chartDataRemaining) || !isEmpty(chartDataDirtyRate);
+  const yMax = findMigrationMaxYValue(chartDataProcessed, chartDataRemaining, chartDataDirtyRate);
 
   return (
     <ComponentReady isReady={isReady}>
@@ -110,6 +114,7 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
             scale={{ x: 'time', y: 'linear' }}
             domain={{
               x: [currentTime - timespan, currentTime],
+              y: [0, yMax],
             }}
             containerComponent={
               <ChartVoronoiContainer
@@ -127,6 +132,16 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
             legendOrientation={ChartLegendOrientation.horizontal}
             legendPosition={ChartLegendPosition.bottom}
           >
+            <ChartAxis
+              dependentAxis
+              tickValues={[0, yMax]}
+              tickFormat={formatMemoryYTick(yMax, 2)}
+              style={{
+                grid: {
+                  stroke: chart_color_black_200.value,
+                },
+              }}
+            />
             <ChartAxis
               tickFormat={tickFormat(duration, currentTime)}
               tickCount={TICKS_COUNT}
