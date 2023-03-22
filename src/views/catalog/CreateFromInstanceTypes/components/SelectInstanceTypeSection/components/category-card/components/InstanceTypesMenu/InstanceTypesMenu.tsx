@@ -39,9 +39,9 @@ const InstanceTypesMenu: React.FC<InstanceTypesMenuProps> = ({
       <MenuContent>
         <MenuList>
           {instanceTypes?.map((instanceType) => {
-            const { cores, name, memory } = instanceType;
+            const { cpus, name, memory } = instanceType;
             return (
-              <MenuItem key={name} itemId={name}>{`${name}: ${cores} Cores, ${readableSizeUnit(
+              <MenuItem key={name} itemId={name}>{`${name}: ${cpus} CPUs, ${readableSizeUnit(
                 memory,
               )} Memory`}</MenuItem>
             );

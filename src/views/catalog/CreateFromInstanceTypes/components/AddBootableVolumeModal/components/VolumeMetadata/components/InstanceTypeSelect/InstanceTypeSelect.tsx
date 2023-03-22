@@ -90,12 +90,12 @@ const InstanceTypeSelect: FC<InstanceTypeSelectProps> = ({ setBootableVolumeFiel
             placeholderText={t('Select size')}
             selections={categorySize}
           >
-            {instanceTypes?.map(({ label, cores, memory }) => (
+            {instanceTypes?.map(({ label, cpus, memory }) => (
               <SelectOption
                 key={label}
                 value={label}
-                description={t('{{cores}} Cores, {{memory}} Memory', {
-                  cores,
+                description={t('{{cpus}} CPUs, {{memory}} Memory', {
+                  cpus,
                   memory: readableSizeUnit(memory),
                 })}
               >
