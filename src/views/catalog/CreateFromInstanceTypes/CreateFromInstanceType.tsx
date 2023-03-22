@@ -1,15 +1,17 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
+import { convertResourceArrayToMap, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
@@ -31,11 +33,11 @@ import './CreateFromInstanceType.scss';
 
 const CreateFromInstanceType: FC = () => {
   const [ns] = useActiveNamespace();
+  const history = useHistory();
 
   const bootableVolumesResources = useBootableVolumes();
-  const { preferences, instanceTypes, loadError } = useInstanceTypesAndPreferences();
+  const { preferences, loadError } = useInstanceTypesAndPreferences();
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
-  const instanceTypesMap = useMemo(() => convertResourceArrayToMap(instanceTypes), [instanceTypes]);
 
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
@@ -85,7 +87,6 @@ const CreateFromInstanceType: FC = () => {
                 headerAction={
                   <AddBootableVolumeButton
                     preferencesNames={Object.keys(preferencesMap)}
-                    instanceTypesNames={Object.keys(instanceTypesMap)}
                     loadError={loadError}
                   />
                 }
@@ -142,9 +143,7 @@ const CreateFromInstanceType: FC = () => {
           pvcSource?.spec?.storageClassName,
         )}
         onCancel={() => {
-          setSelectedBootableVolume(null);
-          setPVCSource(null);
-          setSelectedInstanceType(initialInstanceTypeState);
+          history.push(getResourceUrl({ model: VirtualMachineModel, activeNamespace: ns }));
         }}
         selectedBootableVolume={selectedBootableVolume}
         sshSecretCredentials={sshSecretCredentials}

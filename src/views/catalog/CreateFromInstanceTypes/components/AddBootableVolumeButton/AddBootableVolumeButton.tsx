@@ -1,26 +1,34 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
 import AddBootableVolumeModal from '../AddBootableVolumeModal/AddBootableVolumeModal';
 
 export type AddBootableVolumeButtonProps = {
   preferencesNames: string[];
-  instanceTypesNames: string[];
   loadError?: any;
   buttonVariant?: ButtonVariant;
 };
 
 const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
   preferencesNames,
-  instanceTypesNames,
   loadError,
   buttonVariant,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const [preferences, setPreferences] = useState<string[]>([]);
+
+  useEffect(() => {
+    isEmpty(preferences) &&
+      setPreferences((prevPreferences) => {
+        prevPreferences.push(...preferencesNames);
+        return prevPreferences;
+      });
+  }, [preferences, preferencesNames]);
 
   return (
     <Button
@@ -29,8 +37,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
           <AddBootableVolumeModal
             isOpen={isOpen}
             onClose={onClose}
-            preferencesNames={preferencesNames}
-            instanceTypesNames={instanceTypesNames}
+            preferencesNames={preferences}
           />
         ))
       }

@@ -54,7 +54,6 @@ const BootableVolumesList: FC = () => {
       <ListPageHeader title={t('Bootable volumes')} badge={<DeveloperPreviewLabel />}>
         <AddBootableVolumeButton
           preferencesNames={Object.keys(convertResourceArrayToMap(preferences))}
-          instanceTypesNames={instanceTypesNames}
           loadError={loadError}
           buttonVariant={ButtonVariant.primary}
         />
