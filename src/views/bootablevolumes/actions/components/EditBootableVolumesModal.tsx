@@ -83,7 +83,9 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
     const instanceLabel = instanceType && {
       [DEFAULT_INSTANCETYPE_LABEL]: `${instanceType}.${size}`,
     };
-    const descriptionAnnotation = description && { [ANNOTATIONS.description]: description };
+    const descriptionAnnotation = description?.trim()
+      ? { [ANNOTATIONS.description]: description.trim() }
+      : { [ANNOTATIONS.description]: undefined }; // we do want undefined here to get the annotation removed from the resource, if description not provided
 
     const metadata: BootableVolumeMetadata = {
       labels: {
