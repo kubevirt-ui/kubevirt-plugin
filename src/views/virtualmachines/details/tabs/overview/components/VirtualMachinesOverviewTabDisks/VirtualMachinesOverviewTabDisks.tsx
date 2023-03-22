@@ -1,6 +1,7 @@
-import * as React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
@@ -23,7 +24,12 @@ const VirtualMachinesOverviewTabDisks = ({ vm }) => {
     <div className="VirtualMachinesOverviewTabDisks--main">
       <Card>
         <CardTitle className="text-muted">
-          <Link to={createURL('disks', location?.pathname)}>
+          <Link
+            to={createURL(
+              `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Disks}`,
+              location?.pathname,
+            )}
+          >
             {t('Disks ({{count}})', { count: disks.length || 0 })}
           </Link>
         </CardTitle>
