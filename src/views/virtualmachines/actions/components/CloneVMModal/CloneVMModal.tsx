@@ -72,7 +72,7 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
       if (osId && osName) {
         draftVM.metadata.annotations[`${NAME_OS_TEMPLATE_ANNOTATION}/${osId}`] = osName;
       }
-
+      if (!draftVM?.spec?.template?.metadata?.labels) draftVM.spec.template.metadata.labels = {};
       draftVM.spec.template.metadata.labels[TEMPLATE_VM_NAME_LABEL] = cloneName;
 
       // withClonedPVCs
