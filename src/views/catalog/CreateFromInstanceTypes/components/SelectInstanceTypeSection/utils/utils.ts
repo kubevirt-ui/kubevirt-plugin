@@ -29,37 +29,37 @@ export const categoryDetailsMap: CategoryDetailsMap = {
       {
         name: 'medium',
         label: t('medium'),
-        cores: 1,
+        cpus: 1,
         memory: '4Gi',
       },
       {
         name: 'large',
         label: t('large'),
-        cores: 2,
+        cpus: 2,
         memory: '8Gi',
       },
       {
         name: 'xlarge',
         label: t('xlarge'),
-        cores: 4,
+        cpus: 4,
         memory: '16Gi',
       },
       {
         name: '2xlarge',
         label: t('2xlarge'),
-        cores: 8,
+        cpus: 8,
         memory: '32Gi',
       },
       {
         name: '4xlarge',
         label: t('4xlarge'),
-        cores: 16,
+        cpus: 16,
         memory: '64Gi',
       },
       {
         name: '8xlarge',
         label: t('8xlarge'),
-        cores: 32,
+        cpus: 32,
         memory: '128Gi',
       },
     ],
@@ -74,37 +74,37 @@ export const categoryDetailsMap: CategoryDetailsMap = {
       {
         name: 'medium',
         label: t('medium'),
-        cores: 1,
+        cpus: 1,
         memory: '2Gi',
       },
       {
         name: 'large',
         label: t('large'),
-        cores: 2,
+        cpus: 2,
         memory: '4Gi',
       },
       {
         name: 'xlarge',
         label: t('xlarge'),
-        cores: 4,
+        cpus: 4,
         memory: '8Gi',
       },
       {
         name: '2xlarge',
         label: t('2xlarge'),
-        cores: 8,
+        cpus: 8,
         memory: '16Gi',
       },
       {
         name: '4xlarge',
         label: t('4xlarge'),
-        cores: 16,
+        cpus: 16,
         memory: '32Gi',
       },
       {
         name: '8xlarge',
         label: t('8xlarge'),
-        cores: 32,
+        cpus: 32,
         memory: '64Gi',
       },
     ],
@@ -119,31 +119,31 @@ export const categoryDetailsMap: CategoryDetailsMap = {
       {
         name: 'large',
         label: t('large'),
-        cores: 2,
+        cpus: 2,
         memory: '16Gi',
       },
       {
         name: 'xlarge',
         label: t('xlarge'),
-        cores: 4,
+        cpus: 4,
         memory: '32Gi',
       },
       {
         name: '2xlarge',
         label: t('2xlarge'),
-        cores: 8,
+        cpus: 8,
         memory: '64Gi',
       },
       {
         name: '4xlarge',
         label: t('4xlarge'),
-        cores: 16,
+        cpus: 16,
         memory: '128Gi',
       },
       {
         name: '8xlarge',
         label: t('8xlarge'),
-        cores: 32,
+        cpus: 32,
         memory: '256Gi',
       },
     ],
@@ -158,25 +158,25 @@ export const categoryDetailsMap: CategoryDetailsMap = {
       {
         name: 'xlarge',
         label: t('xlarge'),
-        cores: 4,
+        cpus: 4,
         memory: '16Gi',
       },
       {
         name: '2xlarge',
         label: t('2xlarge'),
-        cores: 8,
+        cpus: 8,
         memory: '32Gi',
       },
       {
         name: '4xlarge',
         label: t('4xlarge'),
-        cores: 16,
+        cpus: 16,
         memory: '64Gi',
       },
       {
         name: '8xlarge',
         label: t('8xlarge'),
-        cores: 32,
+        cpus: 32,
         memory: '128Gi',
       },
     ],
@@ -205,8 +205,8 @@ export const getInstancetypeDetails = (
 
 export const getCPUMemoryString = (resources: InstanceTypeSizeDetails, tFunc: TFunction) =>
   resources
-    ? tFunc('{{count}} Cores | {{memory}} Memory', {
-        count: resources?.cores,
+    ? tFunc('{{count}} cpus | {{memory}} Memory', {
+        count: resources?.cpus,
         memory: readableSizeUnit(resources?.memory),
       })
     : null;

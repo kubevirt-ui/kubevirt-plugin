@@ -49,7 +49,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
       {displaySelection && (
         <div className="category-card__size-label">
           <div>{`${selectedInstanceTypeDetails?.label}:`}</div>
-          <div>{`${selectedInstanceTypeDetails?.cores} Cores, ${readableSizeUnit(
+          <div>{`${selectedInstanceTypeDetails?.cpus} CPUs, ${readableSizeUnit(
             selectedInstanceTypeDetails?.memory,
           )} Memory`}</div>
         </div>
