@@ -1,7 +1,7 @@
 import {
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,
-} from '@kubevirt-utils/components/PendingChanges/utils/constants';
+} from '@kubevirt-utils/constants/tabs-constants';
 import { NETWORK } from '@virtualmachines/utils';
 
 import DiskListPage from '../disk/DiskListPage';

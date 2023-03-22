@@ -26,4 +26,4 @@ export const booleanTextIds = {
   no: 'no',
 };
 
-export const NETWORK = 'netwrok';
+export const NETWORK = 'network';

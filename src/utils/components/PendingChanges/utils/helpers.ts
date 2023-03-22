@@ -16,6 +16,11 @@ import {
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import {
+  VirtualMachineConfigurationTabInner,
+  VirtualMachineDetailsTab,
+  VirtualMachineDetailsTabLabel,
+} from '@kubevirt-utils/constants/tabs-constants';
+import {
   getAffinity,
   getGPUDevices,
   getHostDevices,
@@ -28,11 +33,6 @@ import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { getVMIVolumes } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import {
-  VirtualMachineConfigurationTabInner,
-  VirtualMachineDetailsTab,
-  VirtualMachineDetailsTabLabel,
-} from './constants';
 import { PendingChange } from './types';
 
 export const checkCPUMemoryChanged = (

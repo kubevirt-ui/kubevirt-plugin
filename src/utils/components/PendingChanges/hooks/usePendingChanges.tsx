@@ -22,13 +22,16 @@ import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/Node
 import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { VMAuthorizedSSHKeyModal } from '@kubevirt-utils/components/VMAuthorizedSSHKeyModal/VMAuthorizedSSHKeyModal';
+import {
+  VirtualMachineDetailsTab,
+  VirtualMachineDetailsTabLabel,
+} from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { VirtualMachineDetailsTab, VirtualMachineDetailsTabLabel } from '../utils/constants';
 import {
   checkBootModeChanged,
   checkBootOrderChanged,
