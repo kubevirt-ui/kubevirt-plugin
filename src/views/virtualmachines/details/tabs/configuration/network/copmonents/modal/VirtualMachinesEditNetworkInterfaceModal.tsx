@@ -65,6 +65,7 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
       nicPresentation={nicPresentation}
       isOpen={isOpen}
       onClose={onClose}
+      fixedName
     />
   );
 };
