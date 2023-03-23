@@ -34,7 +34,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (
       id: 'edit-bootablevolume',
       disabled: !canUpdateDataSource,
       label: t('Edit'),
-      description: 'You can edit multiple parameters',
+      description: 'You can edit bootable metadata',
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <EditBootableVolumesModal
