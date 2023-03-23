@@ -107,7 +107,7 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
       obj={dataSource}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('Edit volume parameters')}
+      headerText={t('Edit volume metadata')}
       onSubmit={onChangeVolumeParams()}
     >
       <Form>

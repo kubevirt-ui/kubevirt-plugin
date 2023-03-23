@@ -27,11 +27,11 @@ const DeleteBootableVolumesModal: FC<DeleteBootableVolumesModalProps> = ({
       obj={dataSource}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('Delete volume parameters?')}
+      headerText={t('Delete volume metadata?')}
       onDeleteSubmit={deleteBootableVolumeMetadata(dataSource)}
       bodyText={
         <Trans t={t}>
-          Deleting the parameters will mark this volume as non-bootable and remove it from the
+          Deleting the metadata will mark this volume as non-bootable and remove it from the
           bootable volumes list. The volume will still be available in the cluster.
         </Trans>
       }
