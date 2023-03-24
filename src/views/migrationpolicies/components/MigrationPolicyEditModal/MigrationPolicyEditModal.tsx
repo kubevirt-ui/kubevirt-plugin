@@ -8,6 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { k8sCreate, k8sDelete, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
+import { migrationPoliciesPageBaseURL } from '../../list/utils/constants';
 import MigrationPolicyConfigurations from '../MigrationPolicyConfigurations/MigrationPolicyConfigurations';
 
 import { EditMigrationPolicyInitialState } from './utils/constants';
@@ -34,6 +35,9 @@ const MigrationPolicyEditModal: React.FC<MigrationPolicyEditModalProps> = ({
     extractEditMigrationPolicyInitialValues(mp),
   );
 
+  const actualPathArray = history.location.pathname.split('/');
+  const lastPolicyPathElement = actualPathArray[actualPathArray.length - 1]; // last part of url after "/", MigrationPolicy's previous name or ''
+
   const setStateField = (field: string) => (value: any) => {
     const isValueFunction = typeof value === 'function';
     setState((prevState) => ({
@@ -51,10 +55,11 @@ const MigrationPolicyEditModal: React.FC<MigrationPolicyEditModalProps> = ({
     if (updatedMP?.metadata?.name !== mp?.metadata?.name) {
       return k8sCreate({ model: MigrationPolicyModel, data: updatedMP }).then(() => {
         return k8sDelete({ model: MigrationPolicyModel, resource: mp }).then(() => {
-          if (history?.location?.pathname?.includes(mp?.metadata?.name)) {
-            history.push(
-              history.location.pathname.replace(mp?.metadata?.name, updatedMP?.metadata?.name),
-            );
+          if (lastPolicyPathElement === mp?.metadata?.name) {
+            // if we were on MigrationPolicy details page, stay there and just update the data
+            history.push(`${migrationPoliciesPageBaseURL}/${updatedMP?.metadata?.name}`);
+          } else {
+            history.push(migrationPoliciesPageBaseURL); // MigrationPolicies list
           }
         });
       });
