@@ -7,12 +7,15 @@ import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/ho
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { Badge, Label, Split, SplitItem } from '@patternfly/react-core';
 
+import './VirtualMachineTemplatesSource.scss';
+
 type VirtualMachineTemplatesSourceProps = {
   template: V1Template;
   availableDatasources: Record<string, V1beta1DataSource>;
   cloneInProgressDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
 };
+
 const VirtualMachineTemplatesSource: React.FC<VirtualMachineTemplatesSourceProps> = ({
   template,
   availableDatasources,
@@ -35,7 +38,9 @@ const VirtualMachineTemplatesSource: React.FC<VirtualMachineTemplatesSourceProps
 
   return (
     <Split hasGutter>
-      <SplitItem>{bootSourceLabel}</SplitItem>
+      <SplitItem className="virtual-machine-templates-source__boot-source-label">
+        {bootSourceLabel}
+      </SplitItem>
       {isBootSourceAvailable && (
         <SplitItem>
           <Badge key="available-boot">{t('Source available')}</Badge>

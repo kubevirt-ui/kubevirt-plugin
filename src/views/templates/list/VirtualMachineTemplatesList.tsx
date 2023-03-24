@@ -16,7 +16,7 @@ import {
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import VirtualMachineTemplatesRow from './components/VirtualMachineTemplatesRow';
-import VirtualMachineTemplateSupport from './components/VirtualMachineTemplateSupport';
+import VirtualMachineTemplateSupport from './components/VirtualMachineTemplateSupport/VirtualMachineTemplateSupport';
 import { useTemplatesWithAvailableSource } from './hooks/useTemplatesWithAvailableSource';
 import useVirtualMachineTemplatesColumns from './hooks/useVirtualMachineTemplatesColumns';
 import useVirtualMachineTemplatesFilters from './hooks/useVirtualMachineTemplatesFilters';
