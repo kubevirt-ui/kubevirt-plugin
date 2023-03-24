@@ -10,7 +10,7 @@ import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { Text, TextVariants } from '@patternfly/react-core';
-import { Tr } from '@patternfly/react-table';
+import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 
 import TableData from './TableData';
 
@@ -61,7 +61,9 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         {sizeData?.string || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description} width={30}>
-        {bootableVolume?.metadata?.annotations?.[ANNOTATIONS.description] || NO_DATA_DASH}
+        <TableText wrapModifier={WrapModifier.truncate}>
+          {bootableVolume?.metadata?.annotations?.[ANNOTATIONS.description] || NO_DATA_DASH}
+        </TableText>
       </TableData>
     </Tr>
   );
