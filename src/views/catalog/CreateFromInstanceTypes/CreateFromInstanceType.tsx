@@ -79,7 +79,7 @@ const CreateFromInstanceType: FC = () => {
       <Grid className="co-dashboard-body">
         <GridItem>
           <Card>
-            <List isPlain>
+            <List className="create-vm-instance-type-section__list" isPlain>
               <SectionListItem
                 headerText={t('Select volume to boot from')}
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_VOLUME}
