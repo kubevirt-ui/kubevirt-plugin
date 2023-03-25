@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
@@ -13,6 +14,7 @@ import {
   Timestamp,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Split, SplitItem } from '@patternfly/react-core';
+import { TableText, WrapModifier } from '@patternfly/react-table';
 
 import BootableVolumesActions from '../../actions/BootableVolumesActions';
 import { getDataSourcePreferenceLabelValue, getPreferenceReadableOS } from '../../utils/utils';
@@ -47,7 +49,9 @@ const BootableVolumesRow: FC<
         {getPreferenceReadableOS(obj, preferences)}
       </TableData>
       <TableData id="description" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
-        {obj?.metadata?.annotations?.description || NO_DATA_DASH}
+        <TableText wrapModifier={WrapModifier.truncate}>
+          {obj?.metadata?.annotations?.[ANNOTATIONS.description] || NO_DATA_DASH}
+        </TableText>
       </TableData>
       <TableData id="preference" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
         {getDataSourcePreferenceLabelValue(obj)}
