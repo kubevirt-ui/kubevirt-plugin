@@ -1,13 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { DataSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
-import {
-  convertResourceArrayToMap,
-  getAvailableDataSources,
-} from '@kubevirt-utils/resources/shared';
+import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { getPVC } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { isEmpty, isUpstream } from '@kubevirt-utils/utils/utils';
 import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -39,20 +36,18 @@ const useBootableVolumes: UseBootableVolumes = () => {
 
   const [pvcSources, setPVCSources] = useState<V1alpha1PersistentVolumeClaim[]>([]);
 
-  const readyDataSources = useMemo(() => getAvailableDataSources(dataSources), [dataSources]);
-
   useEffect(() => {
-    if (loadedDataSources && !loadErrorDataSources && !isEmpty(readyDataSources)) {
-      const pvcSourcePromises = (readyDataSources || []).map((ds) =>
+    if (loadedDataSources && !loadErrorDataSources && !isEmpty(dataSources)) {
+      const pvcSourcePromises = (dataSources || []).map((ds) =>
         getPVC(ds?.spec?.source?.pvc?.name, ds?.spec?.source?.pvc?.namespace),
       );
 
       Promise.all(pvcSourcePromises).then((pvcs) => setPVCSources(pvcs));
     }
-  }, [readyDataSources, loadErrorDataSources, loadedDataSources, dataSources]);
+  }, [loadErrorDataSources, loadedDataSources, dataSources]);
 
   return {
-    bootableVolumes: loadErrorDataSources || isEmpty(readyDataSources) ? null : readyDataSources,
+    bootableVolumes: loadErrorDataSources || isEmpty(dataSources) ? null : dataSources,
     loaded: loadErrorDataSources ? true : loadedDataSources,
     loadError: loadErrorDataSources,
     pvcSources: convertResourceArrayToMap(pvcSources, true),
