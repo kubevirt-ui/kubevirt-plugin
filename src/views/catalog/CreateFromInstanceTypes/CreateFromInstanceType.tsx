@@ -16,18 +16,18 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-intern
 import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBootableVolumeButton';
+import { getInstanceTypeFromVolume } from './components/AddBootableVolumeModal/utils/utils';
 import BootableVolumeList from './components/BootableVolumeList/BootableVolumeList';
 import CreateVMFooter from './components/CreateVMFooter/CreateVMFooter';
 import SectionListItem from './components/SectionListItem/SectionListItem';
 import useBootableVolumes from './hooks/useBootableVolumes';
 import useInstanceTypesAndPreferences from './hooks/useInstanceTypesAndPreferences';
 import {
-  DEFAULT_INSTANCETYPE_LABEL,
   initialInstanceTypeState,
   INSTANCE_TYPES_SECTIONS,
   InstanceTypeState,
 } from './utils/constants';
-import { generateVM, getInstanceTypeState } from './utils/utils';
+import { generateVM } from './utils/utils';
 
 import './CreateFromInstanceType.scss';
 
@@ -60,18 +60,25 @@ const CreateFromInstanceType: FC = () => {
 
   const onSelectVolume = useCallback(
     (selectedVolume: V1beta1DataSource) => {
-      const { name: pvcName, namespace: pvcNamespace } = selectedVolume?.spec?.source?.pvc || {};
-      const defaultInstanceTypeName =
-        selectedVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL];
-      const instanceType = defaultInstanceTypeName
-        ? getInstanceTypeState(defaultInstanceTypeName)
-        : initialInstanceTypeState;
+      const { name, namespace: pvcNS } = selectedVolume?.spec?.source?.pvc || {};
+      const instanceType = getInstanceTypeFromVolume(selectedVolume);
 
       setSelectedBootableVolume(selectedVolume);
-      setPVCSource(bootableVolumesResources?.pvcSources?.[pvcNamespace]?.[pvcName]);
+      setPVCSource(bootableVolumesResources?.pvcSources?.[pvcNS]?.[name]);
       setSelectedInstanceType(instanceType);
     },
     [bootableVolumesResources?.pvcSources],
+  );
+
+  const onSelectCreatedVolume = useCallback(
+    (selectedVolume: V1beta1DataSource, selectedPVCSource: V1alpha1PersistentVolumeClaim) => {
+      const instanceType = getInstanceTypeFromVolume(selectedVolume);
+
+      setSelectedBootableVolume(selectedVolume);
+      setPVCSource(selectedPVCSource);
+      setSelectedInstanceType(instanceType);
+    },
+    [],
   );
 
   return (
@@ -88,6 +95,7 @@ const CreateFromInstanceType: FC = () => {
                   <AddBootableVolumeButton
                     preferencesNames={Object.keys(preferencesMap)}
                     loadError={loadError}
+                    onSelectCreatedVolume={onSelectCreatedVolume}
                   />
                 }
               >
