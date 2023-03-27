@@ -57,7 +57,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       VirtualMachineActionFactory.clone(vm, createModal, t),
       migrateOrCancelMigration,
       // VirtualMachineActionFactory.openConsole(vm),
-      VirtualMachineActionFactory.copySSHCommand(virtctlCommand, t),
+      VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand, t),
       VirtualMachineActionFactory.editLabels(vm, createModal, t),
       VirtualMachineActionFactory.editAnnotations(vm, createModal, t),
       VirtualMachineActionFactory.delete(vm, createModal, t),

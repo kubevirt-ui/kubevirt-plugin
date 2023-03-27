@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { TFunction } from 'i18next';
 
+import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
   V1VirtualMachine,
@@ -101,7 +102,12 @@ export const VirtualMachineActionFactory = {
       disabled: !isLiveMigratable(vm, isSingleNodeCluster),
       label: t('Migrate'),
       cta: () => migrateVM(vm),
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      accessReview: {
+        resource: VirtualMachineInstanceMigrationModel.plural,
+        namespace: vm?.metadata?.namespace,
+        verb: 'create',
+        group: VirtualMachineInstanceMigrationModel.apiGroup,
+      },
       description: t('Migrate to a different Node'),
     };
   },
@@ -116,7 +122,12 @@ export const VirtualMachineActionFactory = {
       disabled: isSingleNodeCluster || !vmim || !!vmim?.metadata?.deletionTimestamp,
       label: t('Cancel migration'),
       cta: () => cancelMigration(vmim),
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      accessReview: {
+        resource: VirtualMachineInstanceMigrationModel.plural,
+        namespace: vm?.metadata?.namespace,
+        verb: 'delete',
+        group: VirtualMachineInstanceMigrationModel.apiGroup,
+      },
       description: !!vmim?.metadata?.deletionTimestamp && t('Canceling ongoing migration'),
     };
   },
@@ -150,13 +161,14 @@ export const VirtualMachineActionFactory = {
   //       ),
   //   };
   // },
-  copySSHCommand: (command: string, t: TFunction): Action => {
+  copySSHCommand: (vm: V1VirtualMachine, command: string, t: TFunction): Action => {
     return {
       id: 'vm-action-copy-ssh',
       label: t('Copy SSH command'),
       icon: <CopyIcon />,
       description: t('SSH using virtctl'),
       cta: () => command && navigator.clipboard.writeText(command),
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
   editLabels: (
@@ -168,6 +180,7 @@ export const VirtualMachineActionFactory = {
       id: 'vm-action-edit-labels',
       disabled: false,
       label: t('Edit labels'),
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <LabelsModal
@@ -200,6 +213,7 @@ export const VirtualMachineActionFactory = {
       id: 'vm-action-edit-annotations',
       disabled: false,
       label: t('Edit annotations'),
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <AnnotationsModal
