@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MigrationThresholdChart from '@kubevirt-utils/components/Charts/MigrationUtil/MigrationThresholdChart';
@@ -10,7 +10,7 @@ type MigrationChartsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const MigrationCharts: React.FC<MigrationChartsProps> = ({ vmi }) => {
+const MigrationCharts: React.FC<MigrationChartsProps> = memo(({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -33,6 +33,6 @@ const MigrationCharts: React.FC<MigrationChartsProps> = ({ vmi }) => {
       </GridItem>
     </Grid>
   );
-};
+});
 
 export default MigrationCharts;

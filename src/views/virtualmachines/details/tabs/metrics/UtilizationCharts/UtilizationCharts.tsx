@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUThresholdChart from '@kubevirt-utils/components/Charts/CPUUtil/CPUThresholdChart';
@@ -12,7 +12,7 @@ type UtilizationChartsProps = {
   pods: K8sResourceCommon[];
 };
 
-const UtilizationCharts: React.FC<UtilizationChartsProps> = ({ vmi, pods }) => {
+const UtilizationCharts: React.FC<UtilizationChartsProps> = memo(({ vmi, pods }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -35,6 +35,6 @@ const UtilizationCharts: React.FC<UtilizationChartsProps> = ({ vmi, pods }) => {
       </GridItem>
     </Grid>
   );
-};
+});
 
 export default UtilizationCharts;

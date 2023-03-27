@@ -1,51 +1,27 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import NetworkThresholdSingleSourceChart from '@kubevirt-utils/components/Charts/NetworkUtil/NetworkThresholdChartSingleSource';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-core';
+import { Grid } from '@patternfly/react-core';
 
-import useNetworkData from './hook/useNetworkData';
+import NetworkBandwidth from './NetworkBandwidth';
+import NetworkIn from './NetworkIn';
+import NetworkOut from './NetworkOut';
 
 type NetworkChartsByNICProps = {
   vmi: V1VirtualMachineInstance;
   nic: string;
 };
 
-const NetworkChartsByNIC: React.FC<NetworkChartsByNICProps> = ({ vmi, nic }) => {
-  const { t } = useKubevirtTranslation();
-  const { data, links } = useNetworkData(vmi, nic);
-
+const NetworkChartsByNIC: React.FC<NetworkChartsByNICProps> = memo(({ vmi, nic }) => {
   return (
     <div>
       <Grid>
-        <GridItem span={4}>
-          <Card>
-            <CardTitle>{t('Network in')}</CardTitle>
-            <CardBody>
-              <NetworkThresholdSingleSourceChart data={data?.in} link={links?.in} />
-            </CardBody>
-          </Card>
-        </GridItem>
-        <GridItem span={4}>
-          <Card>
-            <CardTitle>{t('Network out')}</CardTitle>
-            <CardBody>
-              <NetworkThresholdSingleSourceChart data={data?.out} link={links?.out} />
-            </CardBody>
-          </Card>
-        </GridItem>
-        <GridItem span={4}>
-          <Card>
-            <CardTitle>{t('Network bandwidth')}</CardTitle>
-            <CardBody>
-              <NetworkThresholdSingleSourceChart data={data?.total} link={links?.total} />
-            </CardBody>
-          </Card>
-        </GridItem>
+        <NetworkIn vmi={vmi} nic={nic} />
+        <NetworkOut vmi={vmi} nic={nic} />
+        <NetworkBandwidth vmi={vmi} nic={nic} />
       </Grid>
     </div>
   );
-};
+});
 
 export default NetworkChartsByNIC;
