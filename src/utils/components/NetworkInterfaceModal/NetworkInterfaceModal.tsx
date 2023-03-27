@@ -37,6 +37,7 @@ type NetworkInterfaceModalProps = {
   headerText: string;
   namespace?: string;
   nicPresentation?: NetworkPresentation;
+  fixedName?: boolean;
   onSubmit: (
     args: NetworkInterfaceModalOnSubmit,
   ) => (
@@ -53,6 +54,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   headerText,
   namespace,
   nicPresentation = { network: null, iface: null },
+  fixedName = false,
 }) => {
   const { network = null, iface = null } = nicPresentation;
   const [nicName, setNicName] = useState(network?.name || generateNicName());
@@ -83,7 +85,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     >
       <Form>
         {Header}
-        <NameFormField objName={nicName} setObjName={setNicName} />
+        <NameFormField objName={nicName} setObjName={setNicName} isDisabled={fixedName} />
         <NetworkInterfaceModelSelect
           interfaceModel={interfaceModel}
           setInterfaceModel={setInterfaceModel}
