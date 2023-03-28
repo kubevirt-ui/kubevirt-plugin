@@ -125,3 +125,6 @@ export const OS_IMAGE_LINKS = {
   [OS_NAME_TYPES.windows]: 'https://www.microsoft.com/en-us/software-download/windows10ISO',
   [OS_NAME_TYPES.other]: 'https://alt.fedoraproject.org/cloud/',
 };
+
+export const GENERATE_VM_PRETTY_NAME_ANNOTATION =
+  'openshift.kubevirt.io/pronounceable-suffix-for-name-expression';

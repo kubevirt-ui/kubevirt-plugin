@@ -5,6 +5,8 @@ import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/c
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
+import { generateParamsWithPrettyName } from './../utils/helpers';
+
 export default (template: V1Template): [template: V1Template, error: Error] => {
   const [error, setError] = useState<Error>();
   const { ns: namespace = DEFAULT_NAMESPACE } = useParams<{ ns: string }>();
@@ -12,12 +14,15 @@ export default (template: V1Template): [template: V1Template, error: Error] => {
 
   useEffect(() => {
     if (!template) return;
-
-    const { parametersToGenerate, excludedParameters } = template.parameters.reduce(
+    const parameters = generateParamsWithPrettyName(template);
+    const { parametersToGenerate, excludedParameters } = parameters.reduce(
       (acc, parameter) => {
-        if (parameter.generate) acc.parametersToGenerate.push(parameter);
-        else acc.excludedParameters.push(parameter);
+        if (parameter?.generate) {
+          acc.parametersToGenerate.push(parameter);
+          return acc;
+        }
 
+        acc.excludedParameters.push(parameter);
         return acc;
       },
       { parametersToGenerate: [], excludedParameters: [] },
