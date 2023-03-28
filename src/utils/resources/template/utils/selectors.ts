@@ -1,5 +1,3 @@
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
-
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1Disk, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -179,18 +177,6 @@ export const getTemplatePVCName = (template: V1Template): string =>
  */
 export const getTemplateDescription = (template: V1Template): string =>
   getAnnotation(template, ANNOTATIONS.description);
-
-/**
- * A function for generating a unique vm name
- * @param {V1Template} template - template
- * @returns a unique vm name
- */
-export const generateVMName = (template: V1Template): string => {
-  return `${getTemplatePVCName(template) || template?.metadata?.name}-${uniqueNamesGenerator({
-    dictionaries: [adjectives, animals],
-    separator: '-',
-  })}`;
-};
 
 /**
  * A selector that returns the CPU of a given template

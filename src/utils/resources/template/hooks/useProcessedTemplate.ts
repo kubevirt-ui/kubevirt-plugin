@@ -1,8 +1,10 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+
+import { generateParamsWithPrettyName } from './../utils/helpers';
 
 /**
  * A Hook that processes a given template and returns the processed template.
@@ -14,19 +16,21 @@ export const useProcessedTemplate = (
   template: V1Template,
   namespace: string = DEFAULT_NAMESPACE,
 ): [V1Template, boolean, any] => {
-  const [processedTemplate, setProcessedTemplate] = React.useState<V1Template | undefined>(
-    undefined,
-  );
-  const [loaded, setLoaded] = React.useState(false);
-  const [error, setError] = React.useState<any>();
-
-  React.useEffect(() => {
+  const [processedTemplate, setProcessedTemplate] = useState<V1Template | undefined>(undefined);
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState<any>();
+  useEffect(() => {
     setLoaded(false);
 
     if (template) {
+      const parameters = generateParamsWithPrettyName(template);
       k8sCreate<V1Template>({
         model: ProcessedTemplatesModel,
-        data: { ...template, metadata: { ...template?.metadata, namespace } },
+        data: {
+          ...template,
+          metadata: { ...template?.metadata, namespace },
+          parameters,
+        },
         ns: namespace,
         queryParams: {
           dryRun: 'All',
