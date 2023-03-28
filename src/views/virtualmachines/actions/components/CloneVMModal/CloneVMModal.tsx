@@ -52,7 +52,7 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
 
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
-  const { projects, pvcs, dataVolumes, loaded } = useCloneVMResources(vm);
+  const { projects, pvcs, loaded } = useCloneVMResources(vm);
 
   const projectNames = React.useMemo(
     () => (projects || [])?.map((project) => project.metadata.name),
@@ -76,14 +76,14 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
       draftVM.spec.template.metadata.labels[TEMPLATE_VM_NAME_LABEL] = cloneName;
 
       // withClonedPVCs
-      draftVM = updateClonedPersistentVolumeClaims(draftVM, pvcs);
+      updateClonedPersistentVolumeClaims(draftVM, pvcs);
 
       // withClonedDataVolumes
-      draftVM = updateClonedDataVolumes(draftVM, dataVolumes, pvcs);
+      updateClonedDataVolumes(draftVM, pvcs);
     });
 
     return clonedVM;
-  }, [cloneDescription, cloneName, cloneProject, dataVolumes, pvcs, startCloneVM, vm]);
+  }, [cloneDescription, cloneName, cloneProject, pvcs, startCloneVM, vm]);
 
   const onClone = async (updatedVM: V1VirtualMachine) => {
     if (isVMRunning) {
