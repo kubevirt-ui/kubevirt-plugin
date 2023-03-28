@@ -6,6 +6,7 @@ import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourc
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 import VirtualMachineDescriptionItem from '@virtualmachines/details/tabs/details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
@@ -45,6 +46,10 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
           descriptionData={<DedicatedResources vm={vm} />}
           descriptionHeader={t('Dedicated resources')}
           isEdit={canUpdateVM}
+          isDisabled={!isEmpty(vm?.spec?.instancetype)}
+          messageOnDisabled={t(
+            'Can not configure dedicated resources if the VirtualMachine is created from InstanceType',
+          )}
           data-test-id="dedicated-resources"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
