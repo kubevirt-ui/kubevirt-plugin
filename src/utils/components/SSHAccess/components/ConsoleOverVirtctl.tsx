@@ -45,7 +45,7 @@ const ConsoleOverVirtctl: React.FC<ConsoleOverVirtctlProps> = ({
           clickTip={t('Copied')}
           hoverTip={t('Copy to clipboard')}
         >
-          {getConsoleVirtctlCommand(vmName, vmNamespace, userName)}
+          {getConsoleVirtctlCommand(userName, vmName, vmNamespace)}
         </ClipboardCopy>
       </DescriptionListDescription>
     </DescriptionListGroup>

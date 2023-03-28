@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { CardTitle, Dropdown, DropdownItem, KebabToggle } from '@patternfly/react-core';
 import { CopyIcon } from '@patternfly/react-icons';
 
@@ -20,7 +21,12 @@ const VirtualMachinesOverviewTabDetailsTitle: React.FC<
 > = ({ vm }) => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const { t } = useKubevirtTranslation();
-  const virtctlCommand = getConsoleVirtctlCommand(vm?.metadata?.name, vm?.metadata?.namespace);
+  const userName = getCloudInitCredentials(vm)?.users?.[0]?.name;
+  const virtctlCommand = getConsoleVirtctlCommand(
+    userName,
+    vm?.metadata?.name,
+    vm?.metadata?.namespace,
+  );
 
   const isMachinePaused = vm?.status?.printableStatus === printableVMStatus.Paused;
   const isMachineStopped = vm?.status?.printableStatus === printableVMStatus.Stopped;
