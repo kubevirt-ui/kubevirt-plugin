@@ -57,7 +57,6 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
 
   return (
     <Select
-      menuAppendTo="parent"
       isOpen={isOpen}
       onToggle={() => setIsOpen(!isOpen)}
       onSelect={onSelect}
