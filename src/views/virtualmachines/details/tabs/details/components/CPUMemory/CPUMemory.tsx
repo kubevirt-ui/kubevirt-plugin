@@ -9,6 +9,7 @@ import {
   V1InstancetypeMatcher,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vCPUCount } from '@kubevirt-utils/resources/template/utils';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
@@ -25,7 +26,7 @@ const CPUMemory: FC<CPUMemoryProps> = ({ vm }) => {
 
   const it: V1InstancetypeMatcher = vm?.spec?.instancetype;
 
-  const [instanceType, loaded] = useK8sWatchResource<V1alpha2VirtualMachineInstancetype>(
+  const [instanceType, loaded, error] = useK8sWatchResource<V1alpha2VirtualMachineInstancetype>(
     !isEmpty(it) && {
       groupVersionKind: it.kind.includes('cluster')
         ? VirtualMachineClusterInstancetypeModelGroupVersionKind
@@ -33,6 +34,8 @@ const CPUMemory: FC<CPUMemoryProps> = ({ vm }) => {
       name: it.name,
     },
   );
+
+  if (error && !isEmpty(it)) return <MutedTextSpan text={t('Not available')} />;
 
   if (!vm || !loaded) return <Skeleton />;
 
