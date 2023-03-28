@@ -1,20 +1,14 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
 // import { LazyActionMenu } from '@openshift-console/dynamic-plugin-sdk-internal';
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownPosition,
-  DropdownToggle,
-  KebabToggle,
-} from '@patternfly/react-core';
+import { Dropdown, DropdownPosition, DropdownToggle, KebabToggle } from '@patternfly/react-core';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 
 type VirtualMachinesInstanceActionsProps = {
@@ -39,15 +33,8 @@ const VirtualMachineActions: React.FC<VirtualMachinesInstanceActionsProps> = ({
   //     context={{ [VirtualMachineModelRef]: vm }}
   //   />
   // );
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);
-
-  const handleClick = (action: Action) => {
-    if (typeof action?.cta === 'function') {
-      action?.cta();
-      setIsOpen(false);
-    }
-  };
 
   return (
     <Dropdown
@@ -64,21 +51,7 @@ const VirtualMachineActions: React.FC<VirtualMachinesInstanceActionsProps> = ({
         )
       }
       dropdownItems={actions?.map((action) => (
-        <DropdownItem
-          data-test-id={`${action.id}`}
-          key={action?.id}
-          onClick={() => handleClick(action)}
-          isDisabled={action?.disabled}
-          description={action?.description}
-        >
-          {action?.label}
-          {action?.icon && (
-            <>
-              {' '}
-              <span className="text-muted">{action.icon}</span>
-            </>
-          )}
-        </DropdownItem>
+        <ActionDropdownItem key={action?.id} action={action} setIsOpen={setIsOpen} />
       ))}
     />
   );
