@@ -17,6 +17,10 @@
     vertical-align: bottom;
   }
 
+  &-row-label {
+    margin-left: var(--pf-global--spacer--sm);
+  }
+
   &-grid {
     padding: var(--pf-global--spacer--lg);
 

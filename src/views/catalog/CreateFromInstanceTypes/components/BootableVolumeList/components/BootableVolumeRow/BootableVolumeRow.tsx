@@ -6,10 +6,12 @@ import {
   V1alpha1PersistentVolumeClaim,
   V1alpha2VirtualMachineClusterPreference,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
+import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
-import { Text, TextVariants } from '@patternfly/react-core';
+import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { Label, Text, TextVariants } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 
 import TableData from './TableData';
@@ -36,9 +38,9 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
     pvcSource,
   },
 }) => {
+  const { t } = useKubevirtTranslation();
   const bootVolumeName = bootableVolume?.metadata?.name;
-  const pvcDiskSize = pvcSource?.spec?.resources?.requests?.storage;
-  const sizeData = pvcDiskSize && humanizeBinaryBytes(pvcDiskSize);
+  const sizeData = formatBytes(pvcSource?.spec?.resources?.requests?.storage);
 
   return (
     <Tr
@@ -50,6 +52,9 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
         <img src={getOSIcon(preference)} alt="os-icon" className="vm-catalog-row-icon" />
         <Text component={TextVariants.small}>{bootVolumeName}</Text>
+        {isDataSourceCloning(bootableVolume) && (
+          <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>
+        )}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="operating-system" width={20}>
         {preference?.metadata?.annotations?.[ANNOTATIONS.displayName] || NO_DATA_DASH}
@@ -58,7 +63,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         {pvcSource?.spec?.storageClassName || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="size" width={10}>
-        {sizeData?.string || NO_DATA_DASH}
+        {sizeData || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description} width={30}>
         <TableText wrapModifier={WrapModifier.truncate}>
