@@ -47,7 +47,7 @@ type VirtualMachinesOverviewTabDetailsProps = {
 
 const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
-  const { vmi, loaded } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { vmi, loaded, error } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const [guestAgentData, loadedGuestAgent] = useGuestOS(vmi);
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
@@ -62,7 +62,8 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
   const timestampPluralized = pluralize(timestamp['value'], timestamp['time']);
 
   const { osName, hostname, fallback } = useMemo(() => {
-    if (!loadedGuestAgent || !loaded)
+    const isLoadingVMI = !loaded && !error;
+    if (!loadedGuestAgent || isLoadingVMI)
       return {
         fallback: <Skeleton />,
       };
@@ -74,7 +75,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
     return {
       fallback: <GuestAgentIsRequiredText vmi={vmi} />,
     };
-  }, [guestAgentData, loadedGuestAgent, vmi, loaded]);
+  }, [loadedGuestAgent, loaded, error, guestAgentData, vmi]);
 
   const vmPrintableStatus = vm?.status?.printableStatus;
 
