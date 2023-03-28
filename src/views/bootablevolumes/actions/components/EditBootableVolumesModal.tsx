@@ -11,6 +11,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -116,7 +117,19 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
             <>
               {t('Preference')}{' '}
               <HelpTextIcon
-                bodyContent={t('The default set of preferences to associate with the volume')}
+                bodyContent={
+                  <>
+                    {t(
+                      'The preferred VirtualMachine attribute values required to run a given workload.',
+                    )}
+                    <ExternalLink
+                      href={
+                        'https://kubevirt.io/user-guide/virtual_machines/instancetypes/#virtualmachinepreference'
+                      }
+                      text={t('Read more')}
+                    />
+                  </>
+                }
                 position={PopoverPosition.right}
               />
             </>
@@ -138,9 +151,7 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
                 <>
                   {t('Default InstanceType')}{' '}
                   <HelpTextIcon
-                    bodyContent={t(
-                      'The default hardware profile that is best suited for your workload',
-                    )}
+                    bodyContent={t('The default InstanceType for this volume.')}
                     position={PopoverPosition.right}
                   />
                 </>
