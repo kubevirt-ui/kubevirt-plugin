@@ -63,10 +63,6 @@ export const produceCleanClonedVM = (
       delete draftVM?.metadata?.generation;
     }
 
-    if (draftVM?.spec?.template?.spec?.domain) {
-      delete draftVM?.spec?.template?.spec?.domain?.firmware;
-    }
-
     delete draftVM?.status;
     draftVM.spec.dataVolumeTemplates = [];
 
