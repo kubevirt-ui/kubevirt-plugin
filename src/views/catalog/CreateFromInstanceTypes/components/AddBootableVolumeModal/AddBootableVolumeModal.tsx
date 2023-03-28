@@ -43,7 +43,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     initialBootableVolumeState,
   );
 
-  const { bootableVolumeName, labels } = bootableVolume || {};
+  const { labels } = bootableVolume || {};
 
   const isUploadForm = formSelection === RADIO_FORM_SELECTION.UPLOAD_IMAGE;
 
@@ -95,7 +95,8 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         <FormGroup>{/* Spacer */}</FormGroup>
         <Title headingLevel="h5">{t('Destination details')}</Title>
         <VolumeDestination
-          bootableVolumeName={bootableVolumeName}
+          bootableVolume={bootableVolume}
+          setBootableVolumeField={setBootableVolumeField}
           setBootableVolumeName={setBootableVolumeField('bootableVolumeName')}
         />
         <FormGroup>{/* Spacer */}</FormGroup>
