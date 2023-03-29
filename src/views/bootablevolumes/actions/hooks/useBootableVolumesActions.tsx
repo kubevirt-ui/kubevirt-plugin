@@ -34,7 +34,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (
       id: 'edit-bootablevolume',
       disabled: !canUpdateDataSource,
       label: t('Edit'),
-      description: 'You can edit bootable metadata',
+      description: t('You can edit bootable metadata'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <EditBootableVolumesModal
@@ -50,7 +50,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (
       id: 'delete-bootablevolume',
       disabled: !canUpdateDataSource,
       label: t('Delete'),
-      description: 'Only the labels data will be deleted',
+      description: t('Only the bootable metadata will be deleted'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <DeleteBootableVolumesModal dataSource={dataSource} isOpen={isOpen} onClose={onClose} />

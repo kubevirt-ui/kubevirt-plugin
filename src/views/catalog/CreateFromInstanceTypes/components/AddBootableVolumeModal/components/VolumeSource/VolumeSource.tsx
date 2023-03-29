@@ -58,7 +58,7 @@ const VolumeSource: FC<VolumeSourceProps> = ({
         </SplitItem>
         <SplitItem>
           <HelpTextIcon
-            bodyContent={t('This creates a cloned copy of the PVC in the destination project.')}
+            bodyContent={t('This will create a cloned copy of the PVC in the destination project.')}
             position={PopoverPosition.right}
           />
         </SplitItem>

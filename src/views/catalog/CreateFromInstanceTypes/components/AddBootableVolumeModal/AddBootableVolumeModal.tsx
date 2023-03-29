@@ -1,11 +1,12 @@
 import React, { FC, useCallback, useState } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Form, FormGroup, Title } from '@patternfly/react-core';
+import { Form, FormGroup, PopoverPosition, Title } from '@patternfly/react-core';
 
 import { AddBootableVolumeButtonProps } from '../AddBootableVolumeButton/AddBootableVolumeButton';
 
@@ -20,6 +21,8 @@ import {
   RADIO_FORM_SELECTION,
 } from './utils/constants';
 import { createDataSource } from './utils/utils';
+
+import './AddBootableVolumeModal.scss';
 
 type AddBootableVolumeModalProps = {
   isOpen: boolean;
@@ -100,7 +103,14 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           setBootableVolumeName={setBootableVolumeField('bootableVolumeName')}
         />
         <FormGroup>{/* Spacer */}</FormGroup>
-        <Title headingLevel="h5">{t('Volume metadata')}</Title>
+        <Title headingLevel="h5">
+          {t('Volume metadata')}{' '}
+          <HelpTextIcon
+            bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}
+            position={PopoverPosition.right}
+            helpIconClassName="add-bootable-volume-modal__title-help-text-icon"
+          />
+        </Title>
         <VolumeMetadata
           bootableVolume={bootableVolume}
           setBootableVolumeField={setBootableVolumeField}
