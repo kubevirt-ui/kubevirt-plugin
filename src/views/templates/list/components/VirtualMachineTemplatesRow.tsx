@@ -12,7 +12,7 @@ import VirtualMachineTemplatesActions from '../../actions/VirtualMachineTemplate
 import { getWorkloadProfile } from '../../utils/selectors';
 import { useVirtualMachineTemplatesCPUMemory } from '../hooks/useVirtualMachineTemplatesCPUMemory';
 
-import VirtualMachineTemplatesSource from './VirtualMachineTemplatesSource';
+import VirtualMachineTemplatesSource from './VirtualMachineTemplatesSource/VirtualMachineTemplatesSource';
 
 const VirtualMachineTemplatesRow: React.FC<
   RowProps<

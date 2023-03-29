@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Button } from '@patternfly/react-core';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
 
-import { SUPPORT_URL } from '../../utils/constants';
+import { SUPPORT_URL } from '../../../utils/constants';
 
 import './VirtualMachineTemplateSupport.scss';
 

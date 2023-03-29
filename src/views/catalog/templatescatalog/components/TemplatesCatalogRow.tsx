@@ -17,7 +17,7 @@ import { Button } from '@patternfly/react-core';
 
 import { getTemplateOSIcon } from '../utils/os-icons';
 
-import TemplateRowAvailableSource from './TemplateRowAvailableSource';
+import TemplateRowAvailableSource from './TemplateRowAvailableSource/TemplateRowAvailableSource';
 
 export const TemplatesCatalogRow: React.FC<
   RowProps<
