@@ -81,7 +81,7 @@ export const findNetworkMaxYValue = (
       return Math.max(...dataArray?.map((data) => data?.y));
     });
   const maxY = Math.max(...(yValues || []));
-  return maxY;
+  return Number.isInteger(maxY) ? maxY : 0;
 };
 
 export const getNetworkTickValues = (Ymax: number) => {
