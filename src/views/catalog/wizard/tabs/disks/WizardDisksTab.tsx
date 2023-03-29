@@ -7,6 +7,7 @@ import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEdito
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
@@ -36,7 +37,11 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsD
   return (
     <div className="wizard-disk-tab">
       <ListPageBody>
-        <SidebarEditor resource={vm} onResourceUpdate={(newVM) => updateVM(newVM)}>
+        <SidebarEditor
+          resource={vm}
+          onResourceUpdate={(newVM) => updateVM(newVM)}
+          pathsToHighlight={PATHS_TO_HIGHLIGHT.DISKS_TAB}
+        >
           <Flex>
             <FlexItem>
               <ListPageCreateButton

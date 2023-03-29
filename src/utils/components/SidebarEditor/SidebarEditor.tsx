@@ -1,6 +1,7 @@
 import React, { ReactNode, Suspense, useContext, useMemo, useState } from 'react';
 import { dump } from 'js-yaml';
 
+import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { K8sResourceCommon, YAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -20,6 +21,7 @@ import {
 import Loading from '../Loading/Loading';
 
 import { SidebarEditorContext } from './SidebarEditorContext';
+import { useEditorHighlighter } from './useEditorHighlighter';
 import { safeLoad } from './utils';
 
 import './sidebar-editor.scss';
@@ -29,6 +31,7 @@ type SidebarEditorProps<Resource> = {
   onResourceUpdate?: (newResource: Resource) => Promise<Resource | void>;
   children: ReactNode | ReactNode[] | ((resource: Resource) => ReactNode);
   onChange?: (resource: Resource) => void;
+  pathsToHighlight?: string[];
 };
 
 const SidebarEditor = <Resource extends K8sResourceCommon>({
@@ -36,6 +39,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
   resource,
   onResourceUpdate,
   onChange,
+  pathsToHighlight = PATHS_TO_HIGHLIGHT.DEFAULT,
 }: SidebarEditorProps<Resource>): JSX.Element => {
   const [editableYAML, setEditableYAML] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,6 +54,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
 
   const { showEditor, isEditable } = useContext(SidebarEditorContext);
   const editedResource = safeLoad<Resource>(editableYAML);
+  const editorRef = useEditorHighlighter(editableYAML, pathsToHighlight, showEditor);
 
   const changeResource = (newValue: string) => {
     setEditableYAML(newValue);
@@ -95,6 +100,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
                   onChange={changeResource}
                   onSave={() => onUpdate(editedResource)}
                   options={{ readOnly: !isEditable }}
+                  ref={editorRef}
                 />
               </Suspense>
             </StackItem>

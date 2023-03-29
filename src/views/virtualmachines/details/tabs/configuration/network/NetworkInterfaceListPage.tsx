@@ -5,6 +5,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
+import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { k8sUpdate, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem } from '@patternfly/react-core';
 
@@ -36,7 +37,11 @@ const NetworkInterfaceListPage: FC<NetworkInterfaceListPageProps> = ({ obj: vm }
   return (
     <div className="network-interface-list-page">
       <ListPageBody>
-        <SidebarEditor resource={vm} onResourceUpdate={onSubmit}>
+        <SidebarEditor
+          resource={vm}
+          onResourceUpdate={onSubmit}
+          pathsToHighlight={PATHS_TO_HIGHLIGHT.NETWORK_TAB}
+        >
           <Flex>
             <FlexItem>
               <AddNetworkInterfaceButton vm={vm} />
