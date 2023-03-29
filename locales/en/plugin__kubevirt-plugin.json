@@ -192,6 +192,7 @@
   "By vCPU wait": "By vCPU wait",
   "Can detach only hotplug volumes while VirtualMachine is Running": "Can detach only hotplug volumes while VirtualMachine is Running",
   "Can edit only when VirtualMachine is stopped": "Can edit only when VirtualMachine is stopped",
+  "Can not configure dedicated resources if the VirtualMachine is created from InstanceType": "Can not configure dedicated resources if the VirtualMachine is created from InstanceType",
   "Can not delete in view-only mode": "Can not delete in view-only mode",
   "Can not edit in view-only mode": "Can not edit in view-only mode",
   "Cancel": "Cancel",
