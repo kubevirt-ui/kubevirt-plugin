@@ -30,6 +30,7 @@ const InstanceTypeSelect: FC<InstanceTypeSelectProps> = ({ setBootableVolumeFiel
   const [category, setCategory] = useState<string>();
   const [categorySize, setCategorySize] = useState<string>();
 
+  // update options for 'Size' dropdown according to chosen 'category' in 'Default InstanceType' dropdown
   const { instanceTypes, prefix }: CategoryDetails = useMemo(
     () => (category ? categoryDetailsMap[category] : {}),
     [category],
@@ -38,6 +39,15 @@ const InstanceTypeSelect: FC<InstanceTypeSelectProps> = ({ setBootableVolumeFiel
   const onCategorySelect = (event: ChangeEvent<HTMLSelectElement>, newCategory: string) => {
     setCategory(newCategory);
     setIsCategoryOpen(false);
+
+    // when setting category, we need to set also some default categorySize, because the instanceType label on a bootable volume cannot be without that
+    const newCategoryObject = categoryDetailsMap[newCategory];
+    const newCategorySize = newCategoryObject.instanceTypes[0].label;
+    setCategorySize(newCategorySize);
+    setBootableVolumeField(
+      'labels',
+      DEFAULT_INSTANCETYPE_LABEL,
+    )(`${newCategoryObject.prefix}.${newCategorySize}`);
   };
 
   const onCategorySizeSelect = (event: ChangeEvent<HTMLSelectElement>, newCategorySize: string) => {
