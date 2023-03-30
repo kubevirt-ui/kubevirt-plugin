@@ -44,7 +44,8 @@ export const updateSSHKeyObject = (
   updateTabsData: WizardVMContextType['updateTabsData'],
   sshkey: string,
 ) => {
-  const sshSecretName = `${vm.metadata.name}-ssh-key-${getRandomChars()}`;
+  // secret name must be under 51 chars, or machine will fail starting. substring vm name to 37.
+  const sshSecretName = `${vm?.metadata?.name.substring(0, 37)}-sshkey-${getRandomChars()}`;
 
   updateTabsData((draftTabs) => {
     if (!draftTabs.additionalObjects) draftTabs.additionalObjects = [];
