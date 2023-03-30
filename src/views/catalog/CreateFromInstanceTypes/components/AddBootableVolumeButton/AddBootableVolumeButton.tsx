@@ -2,7 +2,6 @@ import React, { FC, useEffect, useState } from 'react';
 
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,17 +15,14 @@ export type AddBootableVolumeButtonProps = {
   preferencesNames: string[];
   loadError?: any;
   buttonVariant?: ButtonVariant;
-  onSelectCreatedVolume?: (
-    selectedVolume: V1beta1DataSource,
-    pvcSource: V1alpha1PersistentVolumeClaim,
-  ) => void;
+  onSelectVolume?: (selectedVolume: V1beta1DataSource) => void;
 };
 
 const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
   preferencesNames,
   loadError,
   buttonVariant,
-  onSelectCreatedVolume,
+  onSelectVolume,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -54,7 +50,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
             isOpen={isOpen}
             onClose={onClose}
             preferencesNames={preferences}
-            onSelectCreatedVolume={onSelectCreatedVolume}
+            onSelectVolume={onSelectVolume}
           />
         ))
       }
