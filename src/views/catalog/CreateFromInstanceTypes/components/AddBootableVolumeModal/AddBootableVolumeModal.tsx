@@ -33,7 +33,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   isOpen,
   onClose,
   preferencesNames,
-  onSelectCreatedVolume,
+  onSelectVolume,
 }) => {
   const { t } = useKubevirtTranslation();
   const [formSelection, setFormSelection] = useState<RADIO_FORM_SELECTION>(
@@ -69,7 +69,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         uploadData,
         isUploadForm,
         cloneExistingPVC,
-        onSelectCreatedVolume,
+        onSelectVolume,
       )}
       headerText={t('Add volume')}
       isOpen={isOpen}
