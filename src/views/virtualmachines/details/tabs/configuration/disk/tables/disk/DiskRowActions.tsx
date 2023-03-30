@@ -45,7 +45,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
 
   const editBtnText = t('Edit');
   const deleteBtnText = t('Detach');
-  const removeHotplugBtnText = t('Make Persistent');
+  const removeHotplugBtnText = t('Make persistent');
 
   const disabledEditText = React.useMemo(() => {
     if (isVMRunning) {
