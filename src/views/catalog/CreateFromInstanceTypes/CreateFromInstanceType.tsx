@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
@@ -12,22 +12,23 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBootableVolumeButton';
+import { getInstanceTypeFromVolume } from './components/AddBootableVolumeModal/utils/utils';
 import BootableVolumeList from './components/BootableVolumeList/BootableVolumeList';
 import CreateVMFooter from './components/CreateVMFooter/CreateVMFooter';
 import SectionListItem from './components/SectionListItem/SectionListItem';
 import useBootableVolumes from './hooks/useBootableVolumes';
 import useInstanceTypesAndPreferences from './hooks/useInstanceTypesAndPreferences';
 import {
-  DEFAULT_INSTANCETYPE_LABEL,
   initialInstanceTypeState,
   INSTANCE_TYPES_SECTIONS,
   InstanceTypeState,
 } from './utils/constants';
-import { generateVM, getInstanceTypeState } from './utils/utils';
+import { generateVM } from './utils/utils';
 
 import './CreateFromInstanceType.scss';
 
@@ -35,7 +36,7 @@ const CreateFromInstanceType: FC = () => {
   const [ns] = useActiveNamespace();
   const history = useHistory();
 
-  const bootableVolumesResources = useBootableVolumes();
+  const { pvcSources, ...BootableVolumesObject } = useBootableVolumes();
   const { preferences, loadError } = useInstanceTypesAndPreferences();
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
 
@@ -60,19 +61,22 @@ const CreateFromInstanceType: FC = () => {
 
   const onSelectVolume = useCallback(
     (selectedVolume: V1beta1DataSource) => {
-      const { name: pvcName, namespace: pvcNamespace } = selectedVolume?.spec?.source?.pvc || {};
-      const defaultInstanceTypeName =
-        selectedVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL];
-      const instanceType = defaultInstanceTypeName
-        ? getInstanceTypeState(defaultInstanceTypeName)
-        : initialInstanceTypeState;
+      const { name, namespace: pvcNS } = selectedVolume?.spec?.source?.pvc || {};
+      const instanceType = getInstanceTypeFromVolume(selectedVolume);
 
       setSelectedBootableVolume(selectedVolume);
-      setPVCSource(bootableVolumesResources?.pvcSources?.[pvcNamespace]?.[pvcName]);
+      setPVCSource(pvcSources?.[pvcNS]?.[name] ?? null);
       setSelectedInstanceType(instanceType);
     },
-    [bootableVolumesResources?.pvcSources],
+    [pvcSources],
   );
+
+  useEffect(() => {
+    if (!isEmpty(selectedBootableVolume) && isEmpty(pvcSource)) {
+      const { name, namespace: pvcNS } = selectedBootableVolume?.spec?.source?.pvc || {};
+      setPVCSource(pvcSources?.[pvcNS]?.[name] ?? null);
+    }
+  }, [pvcSource, pvcSources, selectedBootableVolume]);
 
   return (
     <>
@@ -88,13 +92,14 @@ const CreateFromInstanceType: FC = () => {
                   <AddBootableVolumeButton
                     preferencesNames={Object.keys(preferencesMap)}
                     loadError={loadError}
+                    onSelectVolume={onSelectVolume}
                   />
                 }
               >
                 <BootableVolumeList
                   preferences={preferencesMap}
                   bootableVolumeSelectedState={[selectedBootableVolume, onSelectVolume]}
-                  bootableVolumesResources={bootableVolumesResources}
+                  bootableVolumesResources={{ pvcSources, ...BootableVolumesObject }}
                   displayShowAllButton
                 />
               </SectionListItem>

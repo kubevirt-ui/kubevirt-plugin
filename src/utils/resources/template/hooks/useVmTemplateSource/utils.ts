@@ -118,7 +118,18 @@ export const isDataSourceCloning = (dataSource: V1beta1DataSource): boolean =>
     (c) =>
       c.type === 'Ready' &&
       c.status === 'False' &&
-      ['CloneScheduled', 'CloneInProgress'].includes(c?.reason),
+      [
+        'CloneScheduled',
+        'CloneInProgress',
+        'SnapshotForSmartCloneInProgress',
+        'Pending',
+        'PVCBound',
+      ].includes(c?.reason),
+  );
+
+export const isDataSourceUploading = (dataSource: V1beta1DataSource): boolean =>
+  dataSource?.status?.conditions?.some(
+    (c) => c.type === 'Ready' && c.status === 'False' && c?.reason === 'UploadScheduled',
   );
 
 /**
