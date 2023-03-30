@@ -1046,6 +1046,7 @@
   "Upload data to Persistent Volume Claim": "Upload data to Persistent Volume Claim",
   "Upload error": "Upload error",
   "Upload finished": "Upload finished",
+  "Upload in progress": "Upload in progress",
   "Upload new file using the \"Upload data to Persistent Volume Claim\" page": "Upload new file using the \"Upload data to Persistent Volume Claim\" page",
   "Upload PVC image": "Upload PVC image",
   "Upload volume": "Upload volume",

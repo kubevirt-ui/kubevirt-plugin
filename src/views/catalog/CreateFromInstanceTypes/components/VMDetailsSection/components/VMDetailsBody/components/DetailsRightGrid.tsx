@@ -3,10 +3,9 @@ import React from 'react';
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
 import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { DescriptionList } from '@patternfly/react-core';
 import VirtualMachineDescriptionItem from '@virtualmachines/details/tabs/details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
-
-import { humanizeBinaryBytes } from '../../../../../../../../utils/utils/humanize';
 
 type DetailsRightGridProps = {
   pvcSource: V1alpha1PersistentVolumeClaim;
@@ -20,13 +19,13 @@ const DetailsRightGrid: React.FC<DetailsRightGridProps> = ({
   sshSecretCredentials,
 }) => {
   const pvcDiskSize = pvcSource?.spec?.resources?.requests?.storage;
-  const sizeData = humanizeBinaryBytes(pvcDiskSize);
+  const sizeData = formatBytes(pvcDiskSize);
 
   return (
     <DescriptionList isHorizontal>
       <VirtualMachineDescriptionItem descriptionData={namespace} descriptionHeader={t('Project')} />
       <VirtualMachineDescriptionItem
-        descriptionData={pvcDiskSize && sizeData?.string}
+        descriptionData={pvcDiskSize && sizeData}
         descriptionHeader={t('Boot disk size')}
       />
       <VirtualMachineDescriptionItem

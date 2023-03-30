@@ -10,6 +10,7 @@ import StorageClassSelect from '@kubevirt-utils/components/DiskModal/DiskFormFie
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import {
   Checkbox,
   Grid,
@@ -59,7 +60,9 @@ const VolumeSource: FC<VolumeSourceProps> = ({
             selectPVCNamespace={setBootableVolumeField('pvcNamespace')}
             setDiskSize={(newSize) =>
               setBootableVolumeField('size')(
-                removeByteSuffix(xbytes(Number(newSize), { iec: true, space: false })),
+                hasSizeUnit(newSize)
+                  ? newSize
+                  : removeByteSuffix(xbytes(Number(newSize), { iec: true, space: false })),
               )
             }
           />
