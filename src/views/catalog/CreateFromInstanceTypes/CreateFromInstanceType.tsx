@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
@@ -12,6 +12,7 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
@@ -35,7 +36,7 @@ const CreateFromInstanceType: FC = () => {
   const [ns] = useActiveNamespace();
   const history = useHistory();
 
-  const bootableVolumesResources = useBootableVolumes();
+  const { pvcSources, ...BootableVolumesObject } = useBootableVolumes();
   const { preferences, loadError } = useInstanceTypesAndPreferences();
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
 
@@ -64,22 +65,18 @@ const CreateFromInstanceType: FC = () => {
       const instanceType = getInstanceTypeFromVolume(selectedVolume);
 
       setSelectedBootableVolume(selectedVolume);
-      setPVCSource(bootableVolumesResources?.pvcSources?.[pvcNS]?.[name]);
+      setPVCSource(pvcSources?.[pvcNS]?.[name] ?? null);
       setSelectedInstanceType(instanceType);
     },
-    [bootableVolumesResources?.pvcSources],
+    [pvcSources],
   );
 
-  const onSelectCreatedVolume = useCallback(
-    (selectedVolume: V1beta1DataSource, selectedPVCSource: V1alpha1PersistentVolumeClaim) => {
-      const instanceType = getInstanceTypeFromVolume(selectedVolume);
-
-      setSelectedBootableVolume(selectedVolume);
-      setPVCSource(selectedPVCSource);
-      setSelectedInstanceType(instanceType);
-    },
-    [],
-  );
+  useEffect(() => {
+    if (!isEmpty(selectedBootableVolume) && isEmpty(pvcSource)) {
+      const { name, namespace: pvcNS } = selectedBootableVolume?.spec?.source?.pvc || {};
+      setPVCSource(pvcSources?.[pvcNS]?.[name] ?? null);
+    }
+  }, [pvcSource, pvcSources, selectedBootableVolume]);
 
   return (
     <>
@@ -95,14 +92,14 @@ const CreateFromInstanceType: FC = () => {
                   <AddBootableVolumeButton
                     preferencesNames={Object.keys(preferencesMap)}
                     loadError={loadError}
-                    onSelectCreatedVolume={onSelectCreatedVolume}
+                    onSelectVolume={onSelectVolume}
                   />
                 }
               >
                 <BootableVolumeList
                   preferences={preferencesMap}
                   bootableVolumeSelectedState={[selectedBootableVolume, onSelectVolume]}
-                  bootableVolumesResources={bootableVolumesResources}
+                  bootableVolumesResources={{ pvcSources, ...BootableVolumesObject }}
                   displayShowAllButton
                 />
               </SectionListItem>

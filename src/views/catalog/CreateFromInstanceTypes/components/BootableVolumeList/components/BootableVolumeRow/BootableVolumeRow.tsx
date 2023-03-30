@@ -8,7 +8,10 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
-import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import {
+  isDataSourceCloning,
+  isDataSourceUploading,
+} from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { Label, Text, TextVariants } from '@patternfly/react-core';
@@ -54,6 +57,9 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         <Text component={TextVariants.small}>{bootVolumeName}</Text>
         {isDataSourceCloning(bootableVolume) && (
           <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>
+        )}
+        {isDataSourceUploading(bootableVolume) && (
+          <Label className="vm-catalog-row-label">{t('Upload in progress')}</Label>
         )}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="operating-system" width={20}>

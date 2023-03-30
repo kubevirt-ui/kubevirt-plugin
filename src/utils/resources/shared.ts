@@ -16,7 +16,10 @@ import {
 import { isDataSourceReady } from '../../views/datasources/utils';
 
 import { isEmpty } from './../utils/utils';
-import { isDataSourceCloning } from './template/hooks/useVmTemplateSource/utils';
+import {
+  isDataSourceCloning,
+  isDataSourceUploading,
+} from './template/hooks/useVmTemplateSource/utils';
 import { TEMPLATE_TYPE_LABEL } from './template';
 
 /**
@@ -328,4 +331,14 @@ export const getAvailableOrCloningDataSources = (
 ): V1beta1DataSource[] =>
   dataSources?.filter(
     (dataSource) => isDataSourceReady(dataSource) || isDataSourceCloning(dataSource),
+  );
+
+export const getReadyOrCloningOrUploadingDataSources = (
+  dataSources: V1beta1DataSource[],
+): V1beta1DataSource[] =>
+  dataSources?.filter(
+    (dataSource) =>
+      isDataSourceReady(dataSource) ||
+      isDataSourceCloning(dataSource) ||
+      isDataSourceUploading(dataSource),
   );

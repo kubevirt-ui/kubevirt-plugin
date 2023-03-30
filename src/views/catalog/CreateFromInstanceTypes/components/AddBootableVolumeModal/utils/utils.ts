@@ -12,9 +12,7 @@ import {
   V1beta1DataSource,
   V1beta1DataVolumeSourcePVC,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
-import { getPVC } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { AddBootableVolumeState, emptySourceDataVolume } from './constants';
@@ -25,10 +23,7 @@ export const createDataSource =
     uploadData: ({ file, dataVolume }: UploadDataProps) => Promise<void>,
     isUploadForm: boolean,
     cloneExistingPVC: boolean,
-    onSelectCreatedVolume: (
-      selectedVolume: V1beta1DataSource,
-      pvcSource: V1alpha1PersistentVolumeClaim,
-    ) => void,
+    onSelectVolume: (selectedVolume: V1beta1DataSource) => void,
   ) =>
   async (dataSource: V1beta1DataSource) => {
     const {
@@ -85,9 +80,7 @@ export const createDataSource =
 
     const newDataSource = await k8sCreate({ model: DataSourceModel, data: dataSourceToCreate });
 
-    const pvcSource = await getPVC(name, namespace);
-
-    onSelectCreatedVolume?.(newDataSource, pvcSource);
+    onSelectVolume?.(newDataSource);
   };
 
 export const getInstanceTypeFromVolume = (dataSource: V1beta1DataSource): InstanceTypeState => {
