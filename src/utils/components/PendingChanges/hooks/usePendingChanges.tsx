@@ -383,7 +383,7 @@ export const usePendingChanges = (
     {
       hasPendingChange: !isEmpty(modifiedVolumesHotplug),
       tabLabel: VirtualMachineDetailsTabLabel.Disks,
-      label: `${t('Make Persistent disk')} - (${(modifiedVolumesHotplug || [])
+      label: `${t('Make persistent disk')} - (${(modifiedVolumesHotplug || [])
         .map((volume) => volume?.name)
         .join(', ')})`,
       handleAction: () => {
