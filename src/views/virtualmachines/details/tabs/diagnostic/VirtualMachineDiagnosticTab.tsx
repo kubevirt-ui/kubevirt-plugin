@@ -17,7 +17,7 @@ const VirtualMachineDiagnosticTab: FC<VirtualMachineDiagnosticTabProps> = ({ obj
   const { conditions, volumeSnapshotStatuses } = useDiagnosticData(vm);
 
   return (
-    <div className="co-m-pane__body--no-top-margin">
+    <div className="co-m-pane__body--no-top-margin VirtualMachineDiagnosticTab--main">
       <>
         <VirtualMachineDiagnosticTabConditions conditions={conditions} />
         <VirtualMachineDiagnosticTabVolumeStatus volumeSnapshotStatuses={volumeSnapshotStatuses} />
