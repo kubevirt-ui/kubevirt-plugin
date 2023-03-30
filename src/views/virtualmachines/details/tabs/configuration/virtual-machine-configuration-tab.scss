@@ -1,7 +1,6 @@
 .VirtualMachineConfigurationTab {
   &--main {
     margin: var(--pf-global--spacer--sm);
-    margin-left: 180px;
   }
   &--tab-nav {
     height: 100%;
@@ -11,7 +10,7 @@
     }
 
     span.pf-c-tabs__item-text {
-      font-size: var(--pf-global--FontSize--lg);
+      font-size: 1rem;
     }
   }
 }
