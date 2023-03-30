@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { getPrometheusData } from '@kubevirt-utils/components/Charts/utils/utils';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
@@ -35,7 +36,7 @@ const useMetricChartData: UseMetricChartData = (metric) => {
   const [queryData] = usePrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY_RANGE,
     query: getMetricQuery(metric, activeNamespace),
-    namespace: activeNamespace,
+    namespace: activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace,
     endTime: currentTime,
     timespan,
   });
