@@ -36,7 +36,7 @@ const InstanceTypeSelect: FC<InstanceTypeSelectProps> = ({ setBootableVolumeFiel
     [category],
   );
 
-  const onCategorySelect = (event: ChangeEvent<HTMLSelectElement>, newCategory: string) => {
+  const onCategorySelect = (_event: ChangeEvent<HTMLSelectElement>, newCategory: string) => {
     setCategory(newCategory);
     setIsCategoryOpen(false);
 
@@ -50,11 +50,15 @@ const InstanceTypeSelect: FC<InstanceTypeSelectProps> = ({ setBootableVolumeFiel
     )(`${newCategoryObject.prefix}.${newCategorySize}`);
   };
 
-  const onCategorySizeSelect = (event: ChangeEvent<HTMLSelectElement>, newCategorySize: string) => {
+  const onCategorySizeSelect = (
+    _event: ChangeEvent<HTMLSelectElement>,
+    newCategorySize: string,
+  ) => {
     setCategorySize(newCategorySize);
     setIsCategorySizeOpen(false);
     setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)(`${prefix}.${newCategorySize}`);
   };
+
   return (
     <Grid hasGutter span={12}>
       <GridItem span={6}>

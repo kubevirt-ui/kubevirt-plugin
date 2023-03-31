@@ -9,7 +9,7 @@ import { ANNOTATIONS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { BootableVolumeMetadata, InstanceTypesToSizesMap } from './types';
+import { BootableVolumeMetadata } from './types';
 
 export const getDataSourcePreferenceLabelValue = (
   obj: V1beta1DataSource | K8sResourceCommon,
@@ -99,15 +99,3 @@ export const changeBootableVolumeMetadata =
         ],
       }));
   };
-
-export const getInstanceTypesToSizesMap = (
-  instanceTypesNames: string[] = [],
-): InstanceTypesToSizesMap =>
-  instanceTypesNames.reduce((instanceTypesAndSizes, instanceType) => {
-    const [instanceTypePart, sizePart] = instanceType.split('.');
-
-    instanceTypesAndSizes[instanceTypePart] ??= [];
-    instanceTypesAndSizes[instanceTypePart].push(sizePart);
-
-    return instanceTypesAndSizes;
-  }, {});
