@@ -11,15 +11,10 @@ import useBootableVolumesActions from './hooks/useBootableVolumesActions';
 type BootableVolumesActionsProps = {
   dataSource: V1beta1DataSource;
   preferences: V1alpha2VirtualMachineClusterPreference[];
-  instanceTypesNames: string[];
 };
 
-const BootableVolumesActions: FC<BootableVolumesActionsProps> = ({
-  dataSource,
-  preferences,
-  instanceTypesNames,
-}) => {
-  const [actions] = useBootableVolumesActions(dataSource, preferences, instanceTypesNames);
+const BootableVolumesActions: FC<BootableVolumesActionsProps> = ({ dataSource, preferences }) => {
+  const [actions] = useBootableVolumesActions(dataSource, preferences);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleClick = (action: Action) => {

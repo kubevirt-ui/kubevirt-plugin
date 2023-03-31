@@ -8,7 +8,6 @@ import { DataSourceModelGroupVersionKind, DataSourceModelRef } from '@kubevirt-u
 import {
   convertResourceArrayToMap,
   getAvailableOrCloningDataSources,
-  getName,
 } from '@kubevirt-utils/resources/shared';
 import {
   K8sResourceCommon,
@@ -31,8 +30,7 @@ import './BootableVolumesList.scss';
 const BootableVolumesList: FC = () => {
   const { t } = useKubevirtTranslation();
   const [dataSources, loadedDataSources, loadErrorDataSources] = useBootableVolumes();
-  const { preferences, instanceTypes, loadError } = useInstanceTypesAndPreferences();
-  const instanceTypesNames = (instanceTypes || []).map(getName).sort((a, b) => a.localeCompare(b));
+  const { preferences, loadError } = useInstanceTypesAndPreferences();
   const [data, filteredData, onFilterChange] = useListPageFilter(
     getAvailableOrCloningDataSources(dataSources),
     useBootableVolumesFilters(),
@@ -114,7 +112,6 @@ const BootableVolumesList: FC = () => {
             rowData={{
               groupVersionKind: DataSourceModelGroupVersionKind,
               preferences,
-              instanceTypesNames,
             }}
           />
         </Stack>

@@ -25,10 +25,9 @@ const BootableVolumesRow: FC<
     {
       groupVersionKind: K8sGroupVersionKind;
       preferences: V1alpha2VirtualMachineClusterPreference[];
-      instanceTypesNames: string[];
     }
   >
-> = ({ obj, activeColumnIDs, rowData: { groupVersionKind, preferences, instanceTypesNames } }) => {
+> = ({ obj, activeColumnIDs, rowData: { groupVersionKind, preferences } }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -67,11 +66,7 @@ const BootableVolumesRow: FC<
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
-        <BootableVolumesActions
-          dataSource={obj}
-          preferences={preferences}
-          instanceTypesNames={instanceTypesNames}
-        />
+        <BootableVolumesActions dataSource={obj} preferences={preferences} />
       </TableData>
     </>
   );
