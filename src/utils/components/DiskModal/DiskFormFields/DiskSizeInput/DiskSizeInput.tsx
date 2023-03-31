@@ -38,7 +38,7 @@ const DiskSizeInput: React.FC<DiskSizeInputProps> = ({ diskState, dispatchDiskSt
   }
 
   return (
-    <CapacityInput size={diskSize} onChange={onChange} label={t('Persistent Volume Claim size')} />
+    <CapacityInput size={diskSize} onChange={onChange} label={t('PersistentVolumeClaim size')} />
   );
 };
 
