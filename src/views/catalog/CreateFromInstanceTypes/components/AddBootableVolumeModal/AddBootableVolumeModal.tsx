@@ -100,7 +100,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         <VolumeDestination
           bootableVolume={bootableVolume}
           setBootableVolumeField={setBootableVolumeField}
-          setBootableVolumeName={setBootableVolumeField('bootableVolumeName')}
         />
         <FormGroup>{/* Spacer */}</FormGroup>
         <Title headingLevel="h5">

@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import DefaultStorageClassAlert from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClass/DefaultStorageClassAlert';
@@ -13,13 +13,11 @@ import { AddBootableVolumeState } from '../../utils/constants';
 type VolumeDestinationProps = {
   bootableVolume: AddBootableVolumeState;
   setBootableVolumeField: (key: string, fieldKey?: string) => (value: string) => void;
-  setBootableVolumeName: Dispatch<SetStateAction<string>>;
 };
 
 const VolumeDestination: FC<VolumeDestinationProps> = ({
   bootableVolume,
   setBootableVolumeField,
-  setBootableVolumeName,
 }) => {
   const { t } = useKubevirtTranslation();
   const [showSCAlert, setShowSCAlert] = useState(false);
@@ -55,7 +53,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
           id="name"
           type="text"
           value={bootableVolumeName}
-          onChange={setBootableVolumeName}
+          onChange={setBootableVolumeField('bootableVolumeName')}
         />
       </FormGroup>
       <FormGroup label={t('Destination project')}>
