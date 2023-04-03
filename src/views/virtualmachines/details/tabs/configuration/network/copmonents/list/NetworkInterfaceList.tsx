@@ -43,9 +43,7 @@ const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm }) => {
         columns={columns}
         Row={NetworkInterfaceRow}
         rowData={{ vm }}
-        EmptyMsg={() => (
-          <AutoAttachedNetworkEmptyState vm={vm} isAutoAttached={autoattachPodInterface} />
-        )}
+        EmptyMsg={() => <AutoAttachedNetworkEmptyState isAutoAttached={autoattachPodInterface} />}
       />
     </>
   );
