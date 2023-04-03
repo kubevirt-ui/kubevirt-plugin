@@ -47,7 +47,7 @@ const VolumeSource: FC<VolumeSourceProps> = ({
         setDiskSize={(newSize) =>
           setBootableVolumeField('size')(
             hasSizeUnit(newSize)
-              ? newSize
+              ? removeByteSuffix(newSize)
               : removeByteSuffix(xbytes(Number(newSize), { iec: true, space: false })),
           )
         }
