@@ -55,7 +55,9 @@ export const VncConsole: FC<VncConsoleProps> = ({
   textCtrlAltDel,
   autoConnect = true,
   CustomConnectComponent,
+  CustomDisabledComponent,
   hasGPU,
+  disabled,
 }) => {
   const { t } = useKubevirtTranslation();
   const [rfb, setRfb] = useState<any>();
@@ -88,61 +90,72 @@ export const VncConsole: FC<VncConsoleProps> = ({
   );
 
   const connect = useCallback(() => {
-    setStatus(connecting);
-    setRfb(() => {
-      const rfbInstnce = new RFBCreate(staticRenderLocaitonRef.current, url, options);
-      rfbInstnce?.addEventListener('connect', () => setStatus(connected));
-      rfbInstnce?.addEventListener('disconnect', (e: any) => {
-        setStatus(disconnected);
-        onDisconnected && onDisconnected(e);
-      });
-      rfbInstnce?.addEventListener('securityfailure', (e: any) => {
-        setStatus(disconnected);
-        onSecurityFailure && onSecurityFailure(e);
-      });
-      rfbInstnce.sendCtrlAlt1 = function sendCtrlAlt1() {
-        if (this._rfbConnectionState !== connected || this._viewOnly) {
-          return;
-        }
-        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', true);
-        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', true);
-        this.sendKey(KeyTable.XK_1, 'One', true);
-        this.sendKey(KeyTable.XK_1, 'One', false);
-        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
-        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
-      };
-      rfbInstnce.sendCtrlAlt2 = function sendCtrlAlt2() {
-        if (this._rfbConnectionState !== connected || this._viewOnly) {
-          return;
-        }
-        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', true);
-        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', true);
-        this.sendKey(KeyTable.XK_2, 'Two', true);
-        this.sendKey(KeyTable.XK_2, 'Two', false);
-        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
-        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
-      };
-      rfbInstnce.sendPasteCMD = async function sendPasteCMD() {
-        if (this._rfbConnectionState !== connected || this._viewOnly) {
-          return;
-        }
-        const clipboardText = await navigator?.clipboard?.readText?.();
-
-        [...clipboardText].map((char) => {
-          const shiftRequired = isShiftKeyRequired(char);
-
-          shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', true);
-          this.sendKey(char.charCodeAt(0));
-          shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
+    if (!disabled) {
+      setStatus(connecting);
+      setRfb(() => {
+        const rfbInstnce = new RFBCreate(staticRenderLocaitonRef.current, url, options);
+        rfbInstnce?.addEventListener('connect', () => setStatus(connected));
+        rfbInstnce?.addEventListener('disconnect', (e: any) => {
+          setStatus(disconnected);
+          onDisconnected && onDisconnected(e);
         });
-        this.sendKey(KeyTable.XK_KP_Enter);
-      };
-      rfbInstnce.viewOnly = viewOnly;
-      rfbInstnce.scaleViewport = scaleViewport;
-      rfbInstnce.resizeSession = resizeSession;
-      return rfbInstnce;
-    });
-  }, [url, options, viewOnly, scaleViewport, resizeSession, onDisconnected, onSecurityFailure]);
+        rfbInstnce?.addEventListener('securityfailure', (e: any) => {
+          setStatus(disconnected);
+          onSecurityFailure && onSecurityFailure(e);
+        });
+        rfbInstnce.sendCtrlAlt1 = function sendCtrlAlt1() {
+          if (this._rfbConnectionState !== connected || this._viewOnly) {
+            return;
+          }
+          this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', true);
+          this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', true);
+          this.sendKey(KeyTable.XK_1, 'One', true);
+          this.sendKey(KeyTable.XK_1, 'One', false);
+          this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
+          this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
+        };
+        rfbInstnce.sendCtrlAlt2 = function sendCtrlAlt2() {
+          if (this._rfbConnectionState !== connected || this._viewOnly) {
+            return;
+          }
+          this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', true);
+          this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', true);
+          this.sendKey(KeyTable.XK_2, 'Two', true);
+          this.sendKey(KeyTable.XK_2, 'Two', false);
+          this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
+          this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
+        };
+        rfbInstnce.sendPasteCMD = async function sendPasteCMD() {
+          if (this._rfbConnectionState !== connected || this._viewOnly) {
+            return;
+          }
+          const clipboardText = await navigator?.clipboard?.readText?.();
+
+          [...clipboardText].map((char) => {
+            const shiftRequired = isShiftKeyRequired(char);
+
+            shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', true);
+            this.sendKey(char.charCodeAt(0));
+            shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
+          });
+          this.sendKey(KeyTable.XK_KP_Enter);
+        };
+        rfbInstnce.viewOnly = viewOnly;
+        rfbInstnce.scaleViewport = scaleViewport;
+        rfbInstnce.resizeSession = resizeSession;
+        return rfbInstnce;
+      });
+    }
+  }, [
+    url,
+    options,
+    viewOnly,
+    scaleViewport,
+    resizeSession,
+    onDisconnected,
+    onSecurityFailure,
+    disabled,
+  ]);
 
   useEffect(() => {
     if (!rfb && status === disconnected) {
@@ -160,6 +173,14 @@ export const VncConsole: FC<VncConsoleProps> = ({
       }
     };
   }, [connect, onInitFailed, vncLogging, rfb, status, autoConnect]);
+
+  if (disabled) {
+    return (
+      <EmptyState className={css(styles.consoleVnc)}>
+        <EmptyStateBody>{CustomDisabledComponent || t('Console is disabled')}</EmptyStateBody>
+      </EmptyState>
+    );
+  }
 
   return (
     <>
