@@ -21,7 +21,7 @@ import {
 } from './components/utils/ConsoleConsts';
 import VncConsole from './components/vnc-console/VncConsole';
 import { INSECURE, SECURE } from './utils/constants';
-import { isConnectionEncrypted } from './utils/utils';
+import { isConnectionEncrypted, isHeadlessModeVMI } from './utils/utils';
 
 const Consoles: React.FC<ConsolesProps> = ({ vmi }) => {
   const isEncrypted = isConnectionEncrypted();
@@ -33,6 +33,7 @@ const Consoles: React.FC<ConsolesProps> = ({ vmi }) => {
     namespace: vmi?.metadata?.namespace,
   });
   const gpus = getGPUDevices(vm);
+  const isHeadlessMode = isHeadlessModeVMI(vmi);
 
   return !vmi?.metadata ? (
     <Bullseye>
@@ -52,6 +53,8 @@ const Consoles: React.FC<ConsolesProps> = ({ vmi }) => {
           <VncConsole
             type={VNC_CONSOLE_TYPE}
             encrypt={isEncrypted}
+            disabled={isHeadlessMode}
+            CustomDisabledComponent={t('Console is disabled in headless mode')}
             host={window.location.hostname}
             port={window.location.port || (isEncrypted ? SECURE : INSECURE)}
             path={`api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`}
