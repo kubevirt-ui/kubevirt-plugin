@@ -74,7 +74,7 @@ const FirmwareBootloaderModal: React.FC<FirmwareBootloaderModalProps> = ({
       switch (selectedFirmwareBootloader) {
         case 'uefi':
           vmDraft.spec.template.spec.domain.firmware.bootloader = {
-            efi: {},
+            efi: { secureBoot: false },
           };
           break;
         case 'uefiSecure':
