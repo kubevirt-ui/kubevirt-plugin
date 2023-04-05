@@ -7,7 +7,7 @@ import {
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { FormGroup, Select, SelectOption, SelectVariant, Truncate } from '@patternfly/react-core';
 
 import { FilterPVCSelect } from '../../utils/Filters';
 
@@ -61,8 +61,9 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
               <ResourceLink
                 groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
                 linkTo={false}
-                name={name}
-              />
+              >
+                <Truncate content={name} />
+              </ResourceLink>
             </SelectOption>
           ))}
         </Select>
