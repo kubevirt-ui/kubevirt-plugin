@@ -14,14 +14,9 @@ import EditBootableVolumesModal from '../components/EditBootableVolumesModal';
 type BootableVolumesActionsProps = (
   dataSource: V1beta1DataSource,
   preferences: V1alpha2VirtualMachineClusterPreference[],
-  instanceTypesNames: string[],
 ) => [actions: Action[]];
 
-const useBootableVolumesActions: BootableVolumesActionsProps = (
-  dataSource,
-  preferences,
-  instanceTypesNames,
-) => {
+const useBootableVolumesActions: BootableVolumesActionsProps = (dataSource, preferences) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -42,7 +37,6 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (
             isOpen={isOpen}
             onClose={onClose}
             preferences={preferences}
-            instanceTypesNames={instanceTypesNames}
           />
         )),
     },
