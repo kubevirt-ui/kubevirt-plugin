@@ -21,7 +21,7 @@ const GettingStartedLinkExtraContent: React.FC<GettingStartedLinkExtraContentPro
       <ExternalLink
         href={link?.secondaryLinkHref}
         text={link?.secondaryLinkText}
-        additionalClassName="getting-started-link-extra-content__more-block--link"
+        className="getting-started-link-extra-content__more-block--link"
       />
     ) : (
       <Link to={link?.secondaryLinkHref}>{link?.secondaryLinkText}</Link>

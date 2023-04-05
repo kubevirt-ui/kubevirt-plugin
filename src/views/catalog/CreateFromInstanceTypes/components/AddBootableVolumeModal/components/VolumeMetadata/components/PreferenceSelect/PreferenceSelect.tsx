@@ -31,7 +31,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
               <>
                 {t(
                   'The preferred VirtualMachine attribute values required to run a given workload.',
-                )}
+                )}{' '}
                 <ExternalLink
                   href={
                     'https://kubevirt.io/user-guide/virtual_machines/instancetypes/#virtualmachinepreference'

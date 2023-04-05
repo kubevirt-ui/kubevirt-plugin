@@ -1,12 +1,10 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import migrationPoliciesEmptyState from 'images/migrationPoliciesEmptyState.svg';
 
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  Button,
-  ButtonVariant,
   EmptyState,
   EmptyStateBody,
   EmptyStateIcon,
@@ -15,13 +13,16 @@ import {
   EmptyStateVariant,
   Title,
 } from '@patternfly/react-core';
-import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
-import { migrationPoliciesPageBaseURL } from '../../utils/constants';
+import MigrationPoliciesCreateButton from '../MigrationPoliciesCreateButton/MigrationPoliciesCreateButton';
 
 import './MigrationPoliciesEmptyState.scss';
 
-const MigrationPoliciesEmptyState: React.FC = () => {
+type MigrationPoliciesEmptyStateProps = {
+  kind: string;
+};
+
+const MigrationPoliciesEmptyState: FC<MigrationPoliciesEmptyStateProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -38,18 +39,15 @@ const MigrationPoliciesEmptyState: React.FC = () => {
         </Trans>
       </EmptyStateBody>
       <EmptyStatePrimary>
-        <Link to={`${migrationPoliciesPageBaseURL}/form`}>
-          <Button variant={ButtonVariant.primary}>{t('Create MigrationPolicy')}</Button>
-        </Link>
+        <MigrationPoliciesCreateButton kind={kind} />
       </EmptyStatePrimary>
       <EmptyStateSecondaryActions>
-        <a
-          href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.11/html/virtualization/live-migration#virt-configuring-live-migration-policies"
-          target="_blank"
-          rel="noreferrer"
-        >
-          {t('View documentation')} <ExternalLinkAltIcon />
-        </a>
+        <ExternalLink
+          href={
+            'https://access.redhat.com/documentation/en-us/openshift_container_platform/4.11/html/virtualization/live-migration#virt-configuring-live-migration-policies'
+          }
+          text={t('View documentation')}
+        />
       </EmptyStateSecondaryActions>
     </EmptyState>
   );
