@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { WizardTab } from '@catalog/wizard/tabs';
+import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
@@ -18,7 +19,6 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem } from '@patternfly/react-core';
 
-import DiskListTitle from './components/DiskListTitle';
 import DiskRow from './components/DiskRow';
 import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
@@ -44,41 +44,43 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsD
         >
           <Flex>
             <FlexItem>
-              <ListPageCreateButton
-                className="list-page-create-button-margin"
-                isDisabled={!loaded}
-                onClick={() =>
-                  createModal(({ isOpen, onClose }) => (
-                    <DiskModal
-                      vm={vm}
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      onSubmit={updateVM}
-                      headerText={t('Add disk')}
-                      createOwnerReference={false}
-                      onUploadedDataVolume={(dataVolume) =>
-                        updateTabsData((draft) => {
-                          ensurePath(draft, 'disks.dataVolumesToAddOwnerRef');
-                          if (draft.disks) {
-                            draft.disks.dataVolumesToAddOwnerRef = [
-                              ...(tabsData?.disks?.dataVolumesToAddOwnerRef || []),
-                              dataVolume,
-                            ];
-                          }
-                        })
-                      }
-                    />
-                  ))
-                }
-              >
-                {t('Add disk')}
-              </ListPageCreateButton>
+              <DiskListTitle />
             </FlexItem>
             <FlexItem>
               <SidebarEditorSwitch />
             </FlexItem>
           </Flex>
-          <DiskListTitle />
+
+          <ListPageCreateButton
+            className="wizard-disk-tab__list-page-create-button"
+            isDisabled={!loaded}
+            onClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <DiskModal
+                  vm={vm}
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  onSubmit={updateVM}
+                  headerText={t('Add disk')}
+                  createOwnerReference={false}
+                  onUploadedDataVolume={(dataVolume) =>
+                    updateTabsData((draft) => {
+                      ensurePath(draft, 'disks.dataVolumesToAddOwnerRef');
+                      if (draft.disks) {
+                        draft.disks.dataVolumesToAddOwnerRef = [
+                          ...(tabsData?.disks?.dataVolumesToAddOwnerRef || []),
+                          dataVolume,
+                        ];
+                      }
+                    })
+                  }
+                />
+              ))
+            }
+          >
+            {t('Add disk')}
+          </ListPageCreateButton>
+
           <Flex>
             <FlexItem>
               <ListPageFilter

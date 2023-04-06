@@ -30,7 +30,7 @@ const DiskRow: React.FC<
           </StackItem>
           {obj?.isBootDisk && (
             <StackItem>
-              <Label variant="filled" color="blue" className="icon-size-small">
+              <Label variant="filled" color="blue" className="disk-row-label-bootable">
                 {t('bootable')}
               </Label>
             </StackItem>

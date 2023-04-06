@@ -1,4 +1,4 @@
-.wizard-disk-tab {
+.template-disks-page {
   height: 100%;
 
   .co-m-pane__body {
@@ -9,7 +9,7 @@
     padding-top: var(--pf-global--spacer--md);
   }
 
-  &__list-page-create-button {
+  &__button {
     margin: 1rem 0 0.5rem 0;
   }
 }
