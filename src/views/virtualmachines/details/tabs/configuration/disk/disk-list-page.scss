@@ -4,4 +4,8 @@
     .pf-c-sidebar__panel {
         padding: var(--pf-global--spacer--md);
     }
+
+    &__list-page-create-button {
+      margin: 1rem 0 0.5rem 0;
+    }
 }
