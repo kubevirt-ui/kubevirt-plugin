@@ -426,6 +426,7 @@
     "properties": {
       "name": "%plugin__kubevirt-plugin~Virtualization%",
       "url": "apis/subresources.kubevirt.io/v1/healthz",
+      "title": "%plugin__kubevirt-plugin~Virtualization%",
       "healthHandler": {
         "$codeRef": "dashboardExtensions.getKubevirtHealthState"
       }
