@@ -3,6 +3,7 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
@@ -20,14 +21,13 @@ import { Button, Flex, FlexItem } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
-import DiskListTitle from './components/DiskListTitle';
 import DiskRow from './components/DiskRow';
 import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
 import useTemplateDisksTableData from './hooks/useTemplateDisksTableData';
 import { getTemplateVMWithNamespace } from './utils';
 
-import './template-disk-tab.scss';
+import './TemplateDisksPage.scss';
 
 type TemplateDisksPageProps = RouteComponentProps<{
   ns: string;
@@ -66,34 +66,37 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
   );
 
   return (
-    <div className="template-disk-tab">
+    <div className="template-disks-page">
       <ListPageBody>
         <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
-          <Flex className="list-page-create-button-margin">
+          <Flex>
             <FlexItem>
-              <Button
-                isDisabled={!isTemplateEditable}
-                onClick={() =>
-                  createModal(({ isOpen, onClose }) => (
-                    <DiskModal
-                      vm={vm}
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      onSubmit={onUpdate}
-                      headerText={t('Add disk')}
-                      createOwnerReference={false}
-                    />
-                  ))
-                }
-              >
-                {t('Add disk')}
-              </Button>
+              <DiskListTitle />
             </FlexItem>
             <FlexItem>
               <SidebarEditorSwitch />
             </FlexItem>
           </Flex>
-          <DiskListTitle />
+
+          <Button
+            className="template-disks-page__button"
+            isDisabled={!isTemplateEditable}
+            onClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <DiskModal
+                  vm={vm}
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  onSubmit={onUpdate}
+                  headerText={t('Add disk')}
+                  createOwnerReference={false}
+                />
+              ))
+            }
+          >
+            {t('Add disk')}
+          </Button>
+
           <ListPageFilter
             data={data}
             loaded={disksLoaded}

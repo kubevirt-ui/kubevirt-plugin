@@ -1,26 +1,25 @@
 import * as React from 'react';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Popover, PopoverPosition } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { PopoverPosition, Title } from '@patternfly/react-core';
 
-import '../tables.scss';
+import './DiskListTitle.scss';
 
 const DiskListTitle = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <div>
-      <h3 className="HeaderWithIcon">{t('Disks')}</h3>
-      <Popover
+    <Title headingLevel="h2" className="disk-list-title">
+      {t('Disks')}{' '}
+      <HelpTextIcon
         bodyContent={t(
           'The following information is provided by the OpenShift Virtualization operator.',
         )}
         position={PopoverPosition.right}
-      >
-        <HelpIcon className="icon-size-small" />
-      </Popover>
-    </div>
+        helpIconClassName="title-help-text-icon"
+      />
+    </Title>
   );
 };
 

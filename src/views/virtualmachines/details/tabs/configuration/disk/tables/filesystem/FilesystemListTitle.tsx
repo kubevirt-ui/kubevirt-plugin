@@ -1,24 +1,23 @@
 import * as React from 'react';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Popover, PopoverPosition } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { PopoverPosition, Title } from '@patternfly/react-core';
 
 const FilesystemListTitle = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <span>
-      <h3 className="HeaderWithIcon">{t('File systems')}</h3>
-      <Popover
+    <Title headingLevel="h2" className="title">
+      {t('File systems')}{' '}
+      <HelpTextIcon
         bodyContent={t(
           'The following information regarding how the disks are partitioned is provided by the guest agent.',
         )}
         position={PopoverPosition.right}
-      >
-        <HelpIcon className="icon-size-small" />
-      </Popover>
-    </span>
+        helpIconClassName="title-help-text-icon"
+      />
+    </Title>
   );
 };
 
