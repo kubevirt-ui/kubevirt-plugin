@@ -65,6 +65,8 @@ export type VncConsoleProps = React.HTMLProps<HTMLDivElement> & {
   autoConnect?: boolean;
   /** A custom component to replace th default connect button screen */
   CustomConnectComponent?: React.FC<{ connect: () => void }>;
+  /** A custom component to replace th default disabled component */
+  CustomDisabledComponent?: React.ReactNode;
   /** Should console render alt tabs */
   hasGPU?: boolean;
 };
