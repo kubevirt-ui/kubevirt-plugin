@@ -116,13 +116,6 @@ export const getChangedEnvDisks = (
     ...(vmiEnvDisksNames?.filter((disk) => !unchangedEnvDisks?.includes(disk)) || []),
   ];
 
-  if (
-    vmEnvDisksNames.length === 0 &&
-    vmiEnvDisksNames.length === 1 &&
-    vmiEnvDisksNames?.[0] === 'default'
-  )
-    return [];
-
   return changedEnvDisks;
 };
 
@@ -141,6 +134,15 @@ export const getChangedNics = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
     ...(vmNicsNames?.filter((nic) => !unchangedNics?.includes(nic)) || []),
     ...(vmiNicsNames?.filter((nic) => !unchangedNics?.includes(nic)) || []),
   ];
+
+  if (
+    (!vmInterfaces || vmInterfaces?.length === 0) &&
+    vmiInterfaces?.length === 1 &&
+    vmiInterfaces?.[0].name === 'default' &&
+    vmiInterfaces?.[0]?.masquerade
+  )
+    return [];
+
   return changedNics;
 };
 export const getChangedGPUDevices = (
