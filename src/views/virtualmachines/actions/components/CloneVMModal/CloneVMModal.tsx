@@ -27,9 +27,11 @@ import StartClonedVMCheckbox from './components/StartClonedVMCheckbox';
 import useCloneVMResources from './hooks/useCloneVMResources';
 import { TEMPLATE_VM_NAME_LABEL } from './utils/constants';
 import {
+  cloneControllerRevision,
   produceCleanClonedVM,
   updateClonedDataVolumes,
   updateClonedPersistentVolumeClaims,
+  updateControllerRevisionOwnerReference,
 } from './utils/helpers';
 
 type CloneVMModalProps = {
@@ -89,7 +91,22 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
     if (isVMRunning) {
       await stopVM(vm);
     }
-    await k8sCreate({ model: VirtualMachineModel, data: updatedVM });
+
+    const cloneRevisionInstanceType = await cloneControllerRevision(
+      updatedVM?.spec?.instancetype?.revisionName,
+      updatedVM.metadata.namespace,
+      vm.metadata.namespace,
+    );
+    const cloneRevisionPreference = await cloneControllerRevision(
+      updatedVM?.spec?.preference?.revisionName,
+      updatedVM.metadata.namespace,
+      vm.metadata.namespace,
+    );
+
+    const createdVM = await k8sCreate({ model: VirtualMachineModel, data: updatedVM });
+
+    await updateControllerRevisionOwnerReference(cloneRevisionInstanceType, createdVM);
+    await updateControllerRevisionOwnerReference(cloneRevisionPreference, createdVM);
 
     history.push(
       `/k8s/ns/${updatedVM.metadata.namespace}/${VirtualMachineModelRef}/${updatedVM.metadata.name}`,
