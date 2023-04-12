@@ -18,15 +18,8 @@ import { isLiveMigratable, printableVMStatus } from '../utils';
 
 import CloneVMModal from './components/CloneVMModal/CloneVMModal';
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
-import {
-  cancelMigration,
-  migrateVM,
-  pauseVM,
-  restartVM,
-  startVM,
-  stopVM,
-  unpauseVM,
-} from './actions';
+import StopVMModal from './components/StopVMModal/StopVMModal';
+import { cancelMigration, migrateVM, pauseVM, restartVM, startVM, unpauseVM } from './actions';
 
 const {
   Stopped,
@@ -58,15 +51,24 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
-  stop: (vm: V1VirtualMachine, t: TFunction): Action => {
+  stop: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+    t: TFunction,
+  ): Action => {
     return {
       id: 'vm-action-stop',
       disabled: [Stopping, Terminating, Stopped, Unknown].includes(vm?.status?.printableStatus),
       label: t('Stop'),
-      cta: () => stopVM(vm),
+
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <StopVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
+        )),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
+
   restart: (vm: V1VirtualMachine, t: TFunction): Action => {
     return {
       id: 'vm-action-restart',
