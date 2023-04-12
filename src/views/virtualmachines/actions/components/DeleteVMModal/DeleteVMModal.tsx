@@ -8,6 +8,7 @@ import VirtualMachineModel, {
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
+import { GracePeriodInput } from '@kubevirt-utils/components/GracePeriodInput/GracePeriodInput';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
@@ -16,7 +17,6 @@ import { k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 
 import DeleteOwnedResourcesMessage from './components/DeleteOwnedResourcesMessage';
-import { GracePeriodInput } from './components/GracePeriodInput';
 import useDeleteVMResources from './hooks/useDeleteVMResources';
 import { DEFAULT_GRACE_PERIOD } from './constants';
 
