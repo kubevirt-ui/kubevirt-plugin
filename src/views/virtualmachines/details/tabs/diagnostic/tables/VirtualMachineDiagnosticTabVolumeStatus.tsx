@@ -3,8 +3,8 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination';
-import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
-import { Pagination } from '@patternfly/react-core';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
+import { Flex, FlexItem, Pagination, Title } from '@patternfly/react-core';
 import { TableComposable, Th, Thead, Tr } from '@patternfly/react-table';
 import { columnSorting } from '@virtualmachines/list/hooks/utils/utils';
 import { paginationDefaultValues } from '@virtualmachines/utils';
@@ -45,30 +45,37 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
 
   return (
     <>
-      <div className="VirtualMachineDiagnosticTab--header extra-margin">
-        <ListPageHeader title={t('Volume snapshot status')}>
-          <HelpTextIcon
-            bodyContent={t(
-              'Volume Snapshot Status is a mechanism for reporting if a volume can be snapshotted or not.',
-            )}
-          />
-        </ListPageHeader>
-        <div className="VirtualMachineDiagnosticTab--filters__main">
-          <Pagination
-            itemCount={sortedData?.length}
-            page={pagination?.page}
-            perPage={pagination?.perPage}
-            defaultToFullPage
-            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-              onPaginationChange({ page, perPage, startIndex, endIndex })
-            }
-            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-              onPaginationChange({ page, perPage, startIndex, endIndex })
-            }
-            perPageOptions={paginationDefaultValues}
-          />
-        </div>
-      </div>
+      <ListPageBody>
+        <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
+          <FlexItem>
+            <Title headingLevel="h2" className="VirtualMachineDiagnosticTab--header">
+              {t('Volume snapshot status')}{' '}
+              <HelpTextIcon
+                bodyContent={t(
+                  'Volume Snapshot Status is a mechanism for reporting if a volume can be snapshotted or not.',
+                )}
+                helpIconClassName="title-help-text-icon"
+              />
+            </Title>
+          </FlexItem>
+          <FlexItem>
+            <Pagination
+              itemCount={sortedData?.length}
+              page={pagination?.page}
+              perPage={pagination?.perPage}
+              defaultToFullPage
+              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                onPaginationChange({ page, perPage, startIndex, endIndex })
+              }
+              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                onPaginationChange({ page, perPage, startIndex, endIndex })
+              }
+              perPageOptions={paginationDefaultValues}
+            />
+          </FlexItem>
+        </Flex>
+      </ListPageBody>
+
       <TableComposable isExpandable>
         <Thead>
           <Tr>
