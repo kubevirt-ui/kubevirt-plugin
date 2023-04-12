@@ -7,10 +7,9 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   ListPageFilter,
-  ListPageHeader,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Pagination } from '@patternfly/react-core';
+import { Flex, FlexItem, Pagination, Title } from '@patternfly/react-core';
 import { TableComposable, Th, Thead, Tr } from '@patternfly/react-table';
 import { columnSorting } from '@virtualmachines/list/hooks/utils/utils';
 import { paginationDefaultValues } from '@virtualmachines/utils';
@@ -55,58 +54,64 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
 
   return (
     <>
-      <div className="VirtualMachineDiagnosticTab--header">
-        <ListPageHeader title={t('Status conditions')}>
+      <ListPageBody>
+        <Title headingLevel="h2" className="VirtualMachineDiagnosticTab--header">
+          {t('Status conditions')}{' '}
           <HelpTextIcon
             bodyContent={t(
               'Conditions provide a standard mechanism for status reporting. Conditions are reported for all aspects of a VM.',
             )}
+            helpIconClassName="title-help-text-icon"
           />
-        </ListPageHeader>
-      </div>
-      <ListPageBody>
-        <div className="VirtualMachineDiagnosticTab--filters__main">
-          <ListPageFilter
-            data={unfilteredData}
-            loaded={!isEmpty(unfilteredData)}
-            rowFilters={filters}
-            nameFilterPlaceholder={t('Search by reason...')}
-            hideLabelFilter
-            onFilterChange={(...args) => {
-              onFilterChange(...args);
-              onPaginationChange({
-                page: 1,
-                startIndex: 0,
-                endIndex: pagination?.perPage,
-                perPage: pagination?.perPage,
-              });
-            }}
-            columnLayout={{
-              columns: columns?.map(({ id, title }) => ({
-                id,
-                title,
-              })),
-              id: 'diagnostic-tab-status',
-              selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+        </Title>
 
-              type: t('VirtualMachine'),
-            }}
-          />
-          <Pagination
-            itemCount={filteredData?.length}
-            page={pagination?.page}
-            perPage={pagination?.perPage}
-            defaultToFullPage
-            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-              onPaginationChange({ page, perPage, startIndex, endIndex })
-            }
-            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-              onPaginationChange({ page, perPage, startIndex, endIndex })
-            }
-            perPageOptions={paginationDefaultValues}
-          />
-        </div>
+        <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
+          <FlexItem>
+            <ListPageFilter
+              data={unfilteredData}
+              loaded={!isEmpty(unfilteredData)}
+              rowFilters={filters}
+              nameFilterPlaceholder={t('Search by reason...')}
+              hideLabelFilter
+              onFilterChange={(...args) => {
+                onFilterChange(...args);
+                onPaginationChange({
+                  page: 1,
+                  startIndex: 0,
+                  endIndex: pagination?.perPage,
+                  perPage: pagination?.perPage,
+                });
+              }}
+              columnLayout={{
+                columns: columns?.map(({ id, title }) => ({
+                  id,
+                  title,
+                })),
+                id: 'diagnostic-tab-status',
+                selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+
+                type: t('VirtualMachine'),
+              }}
+            />
+          </FlexItem>
+          <FlexItem>
+            <Pagination
+              itemCount={filteredData?.length}
+              page={pagination?.page}
+              perPage={pagination?.perPage}
+              defaultToFullPage
+              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                onPaginationChange({ page, perPage, startIndex, endIndex })
+              }
+              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                onPaginationChange({ page, perPage, startIndex, endIndex })
+              }
+              perPageOptions={paginationDefaultValues}
+            />
+          </FlexItem>
+        </Flex>
       </ListPageBody>
+
       <TableComposable isExpandable>
         <Thead>
           <Tr>
