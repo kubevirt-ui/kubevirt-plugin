@@ -43,7 +43,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
     const startOrStop =
       printableStatus === Stopped
         ? VirtualMachineActionFactory.start(vm, t)
-        : VirtualMachineActionFactory.stop(vm, t);
+        : VirtualMachineActionFactory.stop(vm, createModal, t);
 
     const migrateOrCancelMigration =
       printableStatus === Migrating ||

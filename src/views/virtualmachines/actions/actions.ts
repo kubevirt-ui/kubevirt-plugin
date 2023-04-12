@@ -4,6 +4,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import {
   V1AddVolumeOptions,
   V1RemoveVolumeOptions,
+  V1StopOptions,
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -30,7 +31,7 @@ export const VMActionRequest = async (
   vm: V1VirtualMachine,
   action: VMActionType,
   model: K8sModel,
-  body?: V1AddVolumeOptions | V1RemoveVolumeOptions,
+  body?: V1AddVolumeOptions | V1RemoveVolumeOptions | V1StopOptions,
 ) => {
   const {
     metadata: { name, namespace },
@@ -64,8 +65,8 @@ export const VMActionRequest = async (
 
 export const startVM = async (vm: V1VirtualMachine) =>
   VMActionRequest(vm, VMActionType.Start, VirtualMachineModel);
-export const stopVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Stop, VirtualMachineModel);
+export const stopVM = async (vm: V1VirtualMachine, body?: V1StopOptions) =>
+  VMActionRequest(vm, VMActionType.Stop, VirtualMachineModel, body);
 export const restartVM = async (vm: V1VirtualMachine) =>
   VMActionRequest(vm, VMActionType.Restart, VirtualMachineModel);
 export const pauseVM = async (vm: V1VirtualMachine) =>
