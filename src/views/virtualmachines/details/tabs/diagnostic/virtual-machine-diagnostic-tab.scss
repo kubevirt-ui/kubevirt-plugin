@@ -2,23 +2,8 @@
   &--main {
     margin-left: var(--pf-global--spacer--sm);
   }
-  &--filters__main {
-    display: flex;
-    justify-content: space-between;
-  }
   &--header {
-    display: flex;
-    justify-content: space-between;
-    &.extra-margin {
-      margin-top: var(--pf-global--spacer--lg);
-    }
-    .co-m-nav-title.co-m-nav-title--row {
-      align-items: baseline;
-      .co-operator-details__actions {
-        margin-left: var(--pf-global--spacer--sm);
-        cursor: pointer;
-      }
-    }
+    margin-top: var(--pf-global--spacer--lg);
   }
 }
 
