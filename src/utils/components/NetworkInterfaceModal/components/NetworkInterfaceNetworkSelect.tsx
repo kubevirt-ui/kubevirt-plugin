@@ -14,7 +14,7 @@ import {
 import { interfaceTypeTypes } from '../utils/constants';
 import { networkNameStartWithPod, podNetworkExists } from '../utils/helpers';
 
-import useNadsData from './hooks/useNadsData';
+import useNADsData from './hooks/useNADsData';
 
 type NetworkInterfaceNetworkSelectProps = {
   vm: V1VirtualMachine;
@@ -39,7 +39,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const { nads, loaded, loadError } = useNadsData(vm?.metadata?.namespace || namespace);
+  const { nads, loaded, loadError } = useNADsData(vm?.metadata?.namespace || namespace);
 
   const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
   const hasNads = useMemo(() => nads && nads.length > 0, [nads]);
