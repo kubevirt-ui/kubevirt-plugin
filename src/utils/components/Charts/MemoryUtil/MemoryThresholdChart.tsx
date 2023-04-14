@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import xbytes from 'xbytes';
 
@@ -34,12 +34,9 @@ type MemoryThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
+const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
-  const queries = React.useMemo(
-    () => getUtilizationQueries({ obj: vmi, duration }),
-    [vmi, duration],
-  );
+  const queries = useMemo(() => getUtilizationQueries({ obj: vmi, duration }), [vmi, duration]);
   const { ref, width, height } = useResponsiveCharts();
 
   const requests = vmi?.spec?.domain?.resources?.requests as {
@@ -100,14 +97,10 @@ const MemoryThresholdChart: React.FC<MemoryThresholdChartProps> = ({ vmi }) => {
               tickValues={[0, thresholdLine?.[0]?.y]}
               tickFormat={formatMemoryYTick(thresholdLine?.[0]?.y, 0)}
               style={{
-                ticks: {
-                  stroke: 'transparent',
-                },
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
-              axisComponent={<></>}
             />
             <ChartAxis
               tickFormat={tickFormat(duration, currentTime)}

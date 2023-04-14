@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -11,11 +11,12 @@ import useQuery from './hook/useQuery';
 import NetworkChartsByNIC from './NetworkChartsByNIC';
 
 import '../virtual-machine-metrics-tab.scss';
+
 type NetworkChartsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const NetworkCharts: React.FC<NetworkChartsProps> = ({ vmi }) => {
+const NetworkCharts: FC<NetworkChartsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
 
@@ -26,8 +27,8 @@ const NetworkCharts: React.FC<NetworkChartsProps> = ({ vmi }) => {
   }, [vmi]);
 
   const query = useQuery();
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
-  const [selectedNetwork, setSelectedNetwork] = React.useState<string>(
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [selectedNetwork, setSelectedNetwork] = useState<string>(
     query?.get('network') || ALL_NETWORKS,
   );
 

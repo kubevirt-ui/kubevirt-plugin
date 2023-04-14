@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 import xbytes from 'xbytes';
 
@@ -26,12 +26,13 @@ import {
   tickFormat,
   TICKS_COUNT,
 } from '../utils/utils';
+
 type NetworkThresholdSingleSourceChartProps = {
   data: PrometheusResult[];
   link: string;
 };
 
-const NetworkThresholdSingleSourceChart: React.FC<NetworkThresholdSingleSourceChartProps> = ({
+const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartProps> = ({
   data,
   link,
 }) => {
@@ -58,6 +59,7 @@ const NetworkThresholdSingleSourceChart: React.FC<NetworkThresholdSingleSourceCh
     chartData?.map((newChartdata, index) => {
       return { childName: newChartdata?.[index]?.name, name: newChartdata?.[index]?.name };
     });
+
   return (
     <ComponentReady isReady={isReady}>
       <div className="util-threshold-chart" ref={ref}>
@@ -99,14 +101,10 @@ const NetworkThresholdSingleSourceChart: React.FC<NetworkThresholdSingleSourceCh
               tickFormat={formatNetworkYTick}
               tickValues={getNetworkTickValues(Ymax)}
               style={{
-                ticks: {
-                  stroke: 'transparent',
-                },
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
-              axisComponent={<></>}
             />
             <ChartAxis
               tickFormat={tickFormat(duration, currentTime)}
