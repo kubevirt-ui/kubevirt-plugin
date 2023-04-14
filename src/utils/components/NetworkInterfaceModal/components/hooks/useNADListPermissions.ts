@@ -1,4 +1,5 @@
 import NetworkAttachmentDefinitionModel from '@kubevirt-ui/kubevirt-api/console/models/NetworkAttachmentDefinitionModel';
+import { NADListPermissionsMap } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
 import {
   DEFAULT_NAMESPACE,
   OPENSHIFT_MULTUS_NS,
@@ -6,7 +7,7 @@ import {
 } from '@kubevirt-utils/constants/constants';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseNADListPermissions = () => boolean;
+type UseNADListPermissions = () => NADListPermissionsMap;
 
 const useNADListPermissions: UseNADListPermissions = () => {
   const [canListDefaultNSNads] = useAccessReview({
@@ -27,11 +28,11 @@ const useNADListPermissions: UseNADListPermissions = () => {
     resource: NetworkAttachmentDefinitionModel.plural,
   });
 
-  return [
-    canListDefaultNSNads,
-    canListOpenShiftSRIOVNetworkOperatorNamespaceNADs,
-    canListOpenShiftMultusNamespaceNADs,
-  ].every((permission) => permission);
+  return {
+    default: canListDefaultNSNads,
+    OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS: canListOpenShiftSRIOVNetworkOperatorNamespaceNADs,
+    OPENSHIFT_MULTUS_NS: canListOpenShiftMultusNamespaceNADs,
+  };
 };
 
 export default useNADListPermissions;
