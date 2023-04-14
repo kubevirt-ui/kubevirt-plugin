@@ -1,28 +1,23 @@
-import * as React from 'react';
+import React from 'react';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
-import { Popover, PopoverPosition } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { PopoverPosition, Title } from '@patternfly/react-core';
 
 const FileSystemTableTitle = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <ListPageHeader title={t('File systems')}>
-      <Popover
-        bodyContent={
-          <div>
-            {t(
-              'The following information regarding how the disks are partitioned is provided by the guest agent.',
-            )}
-          </div>
-        }
+    <Title headingLevel="h2">
+      {t('File systems')}{' '}
+      <HelpTextIcon
+        bodyContent={t(
+          'The following information regarding how the disks are partitioned is provided by the guest agent.',
+        )}
         position={PopoverPosition.right}
-      >
-        <HelpIcon className="FileSystemTableTitle-icon" />
-      </Popover>
-    </ListPageHeader>
+        helpIconClassName="title-help-text-icon"
+      />
+    </Title>
   );
 };
 

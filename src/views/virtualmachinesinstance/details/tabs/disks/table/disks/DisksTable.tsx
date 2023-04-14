@@ -1,6 +1,7 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import {
   ListPageBody,
   ListPageFilter,
@@ -13,37 +14,35 @@ import useDisksTableDisks from '../../hooks/useDisksTableDisks';
 import { filters } from '../../utils/virtualMachinesInstancePageDisksTabUtils';
 
 import DisksTableRow from './DisksTableRow';
-import DiskTableTitle from './DisksTableTitle';
 
 type DisksTableProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const DisksTable: React.FC<DisksTableProps> = ({ vmi }) => {
+const DisksTable: FC<DisksTableProps> = ({ vmi }) => {
   const columns = useDisksTableColumns();
   const [disks, loaded, loadingError] = useDisksTableDisks(vmi);
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
+
   return (
-    <>
-      <DiskTableTitle />
-      <ListPageBody>
-        <ListPageFilter
-          data={data}
-          loaded={loaded}
-          rowFilters={filters}
-          onFilterChange={onFilterChange}
-          hideLabelFilter
-        />
-        <VirtualizedTable
-          data={filteredData}
-          unfilteredData={disks}
-          loaded={loaded}
-          loadError={loadingError}
-          columns={columns}
-          Row={DisksTableRow}
-        />
-      </ListPageBody>
-    </>
+    <ListPageBody>
+      <DiskListTitle />
+      <ListPageFilter
+        data={data}
+        loaded={loaded}
+        rowFilters={filters}
+        onFilterChange={onFilterChange}
+        hideLabelFilter
+      />
+      <VirtualizedTable
+        data={filteredData}
+        unfilteredData={disks}
+        loaded={loaded}
+        loadError={loadingError}
+        columns={columns}
+        Row={DisksTableRow}
+      />
+    </ListPageBody>
   );
 };
 
