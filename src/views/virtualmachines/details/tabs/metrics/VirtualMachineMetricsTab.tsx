@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -21,10 +21,7 @@ type VirtualMachineMetricsTabProps = RouteComponentProps & {
   obj: V1VirtualMachine;
 };
 
-const VirtualMachineMetricsTab: React.FC<VirtualMachineMetricsTabProps> = ({
-  obj: vm,
-  location,
-}) => {
+const VirtualMachineMetricsTab: FC<VirtualMachineMetricsTabProps> = ({ obj: vm, location }) => {
   const { t } = useKubevirtTranslation();
   const { vmi, pods, loaded } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
 

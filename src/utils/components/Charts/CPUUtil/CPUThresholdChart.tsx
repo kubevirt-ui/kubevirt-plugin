@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -32,11 +32,11 @@ type CPUThresholdChartProps = {
   pods: K8sResourceCommon[];
 };
 
-const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
-  const vmiPod = React.useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
+const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
+  const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
   const { currentTime, duration, timespan } = useDuration();
   const { ref, width, height } = useResponsiveCharts();
-  const queries = React.useMemo(
+  const queries = useMemo(
     () => getUtilizationQueries({ obj: vmi, duration, launcherPodName: vmiPod?.metadata?.name }),
     [vmi, vmiPod, duration],
   );
@@ -97,17 +97,10 @@ const CPUThresholdChart: React.FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
               tickValues={[0, thresholdData?.[0]?.y]}
               tickFormat={(tick: number) => `${tick === 0 ? tick : tick?.toFixed(2)} s`}
               style={{
-                ticks: {
-                  stroke: 'transparent',
-                },
-                tickLabels: {
-                  padding: 20,
-                },
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
-              axisComponent={<></>}
             />
             <ChartAxis
               tickFormat={tickFormat(duration, currentTime)}
