@@ -30,13 +30,18 @@ export const checkCPUMemoryChanged = (
   if (isEmpty(vm) || isEmpty(vmi)) {
     return false;
   }
-  const vmRequests = vm?.spec?.template?.spec?.domain?.resources?.requests || {};
+  const vmRequests = vm?.spec?.template?.spec?.domain?.resources?.requests;
   const vmCPU = vm?.spec?.template?.spec?.domain?.cpu?.cores || 0;
 
-  const vmiRequests = vmi?.spec?.domain?.resources?.requests || {};
+  const vmiRequests: { [key in string]?: string } = vmi?.spec?.domain?.resources?.requests || {};
+
   const vmiCPU = vmi?.spec?.domain?.cpu?.cores || 0;
 
-  return !isEqualObject(vmRequests, vmiRequests) || vmCPU !== vmiCPU;
+  const memoryChanged = vmRequests
+    ? !isEqualObject(vmRequests, vmiRequests)
+    : vmiRequests?.memory !== vm?.spec?.template?.spec?.domain?.memory?.guest;
+
+  return memoryChanged || vmCPU !== vmiCPU;
 };
 
 export const checkBootOrderChanged = (
@@ -98,6 +103,7 @@ export const getChangedEnvDisks = (
     ...(vmEnvDisksNames?.filter((disk) => !unchangedEnvDisks?.includes(disk)) || []),
     ...(vmiEnvDisksNames?.filter((disk) => !unchangedEnvDisks?.includes(disk)) || []),
   ];
+
   return changedEnvDisks;
 };
 
@@ -116,6 +122,15 @@ export const getChangedNics = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
     ...(vmNicsNames?.filter((nic) => !unchangedNics?.includes(nic)) || []),
     ...(vmiNicsNames?.filter((nic) => !unchangedNics?.includes(nic)) || []),
   ];
+
+  if (
+    (!vmInterfaces || vmInterfaces?.length === 0) &&
+    vmiInterfaces?.length === 1 &&
+    vmiInterfaces?.[0].name === 'default' &&
+    vmiInterfaces?.[0]?.masquerade
+  )
+    return [];
+
   return changedNics;
 };
 export const getChangedGPUDevices = (
