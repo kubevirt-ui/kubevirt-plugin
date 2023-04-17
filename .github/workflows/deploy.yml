@@ -1,8 +1,13 @@
 name: DEPLOY
+env:
+  VERSION_TAG: ${{github.ref_name == 'main' && 'latest' || github.ref_name}}
 on:
   push:
     branches:
       - main
+    tags:
+      - v*
+
 jobs:
   deploy:
     name: deploy
@@ -34,4 +39,4 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
         with:
           push: true
-          tags: quay.io/kubevirt-ui/kubevirt-plugin:latest
+          tags: quay.io/kubevirt-ui/kubevirt-plugin:${{env.VERSION_TAG}}
