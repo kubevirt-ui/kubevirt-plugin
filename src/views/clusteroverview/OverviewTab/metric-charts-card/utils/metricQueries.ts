@@ -8,8 +8,9 @@ const metricQueriesForNamespace = {
   [METRICS.VCPU_USAGE]: (namespace) =>
     `count(kubevirt_vmi_vcpu_wait_seconds{namespace="${namespace}"})`,
   [METRICS.MEMORY]: (namespace) =>
-    `sum(kubevirt_vmi_memory_available_bytes - kubevirt_vmi_memory_usable_bytes) by (${namespace})`,
-  [METRICS.STORAGE]: (namespace) => `sum(kubevirt_vmi_filesystem_used_bytes) by (${namespace})`,
+    `sum by (namespace)(kubevirt_vmi_memory_available_bytes{namespace="${namespace}"} - kubevirt_vmi_memory_usable_bytes{namespace="${namespace}"})`,
+  [METRICS.STORAGE]: (namespace) =>
+    `sum by (namespace)(kubevirt_vmi_filesystem_used_bytes{namespace="${namespace}"})`,
 };
 
 const metricQueriesForAllNamespaces = {
