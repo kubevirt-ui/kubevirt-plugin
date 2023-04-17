@@ -52,7 +52,7 @@ export const createDataSource =
     const bootableVolumeToCreate = produce(emptySourceDataVolume, (draftBootableVolume) => {
       draftBootableVolume.metadata.name = bootableVolumeName;
       draftBootableVolume.spec.storage.resources.requests.storage = size;
-      if (storageClassName && isUploadForm) {
+      if (storageClassName) {
         draftBootableVolume.spec.storage.storageClassName = storageClassName;
       }
 
