@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import NetworkThresholdSingleSourceChart from '@kubevirt-utils/components/Charts/NetworkUtil/NetworkThresholdChartSingleSource';
@@ -12,7 +12,7 @@ type NetworkChartsByNICProps = {
   nic: string;
 };
 
-const NetworkChartsByNIC: React.FC<NetworkChartsByNICProps> = ({ vmi, nic }) => {
+const NetworkChartsByNIC: FC<NetworkChartsByNICProps> = ({ vmi, nic }) => {
   const { t } = useKubevirtTranslation();
   const { data, links } = useNetworkData(vmi, nic);
 
