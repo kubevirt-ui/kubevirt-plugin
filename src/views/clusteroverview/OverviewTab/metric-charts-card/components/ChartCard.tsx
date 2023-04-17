@@ -2,6 +2,7 @@ import React from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Bullseye, Card, Grid, GridItem } from '@patternfly/react-core';
 
 import useMetricChartData from '../utils/hooks/useMetricChartData';
@@ -40,7 +41,15 @@ const ChartCard: React.FC<ChartCardProps> = ({ metric }) => {
             </span>
           ) : (
             <Bullseye>
-              <MutedTextSpan text={t('No data available')} />
+              <MutedTextSpan
+                text={
+                  isEmpty(chartData)
+                    ? t('No data available')
+                    : t(
+                        'VMs in this namespace are new, therefore not enough data is collected to display a graph.',
+                      )
+                }
+              />
             </Bullseye>
           )}
         </GridItem>
