@@ -9,7 +9,7 @@ import BootableVolumeListModal from '../BootableVolumeListModal/BootableVolumeLi
 
 export type ShowAllBootableVolumesButtonProps = BootableVolumeListProps;
 
-const ShowAllBootableVolumesButton: FC<BootableVolumeListProps> = (props) => {
+const ShowAllBootableVolumesButton: FC<ShowAllBootableVolumesButtonProps> = (props) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   return (

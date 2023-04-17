@@ -1,9 +1,11 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/react-core';
 import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
@@ -22,6 +24,7 @@ import {
   paginationInitialStateForm,
   paginationInitialStateModal,
 } from './utils/constants';
+import { getPaginationFromVolumeIndex } from './utils/utils';
 
 import './BootableVolumeList.scss';
 
@@ -34,7 +37,7 @@ export type BootableVolumeListProps = {
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
   preferences,
-  bootableVolumeSelectedState,
+  bootableVolumeSelectedState: [bootableVolumeSelected, setBootableVolumeSelected],
   bootableVolumesResources: { bootableVolumes, loaded, pvcSources },
   displayShowAllButton,
 }) => {
@@ -62,6 +65,15 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
       endIndex,
     }));
   };
+
+  useEffect(() => {
+    if (displayShowAllButton && !isEmpty(bootableVolumeSelected)) {
+      const selectedVolumeIndex = bootableVolumes?.findIndex(
+        (volume) => getName(volume) === getName(bootableVolumeSelected),
+      );
+      setPagination(getPaginationFromVolumeIndex(selectedVolumeIndex));
+    }
+  }, [bootableVolumeSelected, bootableVolumes, displayShowAllButton]);
 
   return (
     <>
@@ -117,7 +129,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
         {displayShowAllButton && (
           <ShowAllBootableVolumesButton
             preferences={preferences}
-            bootableVolumeSelectedState={bootableVolumeSelectedState}
+            bootableVolumeSelectedState={[bootableVolumeSelected, setBootableVolumeSelected]}
             bootableVolumesResources={{ bootableVolumes, loaded, pvcSources }}
           />
         )}
@@ -139,7 +151,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               bootableVolume={bs}
               activeColumnIDs={Object.values(activeColumns)?.map((col) => col?.id)}
               rowData={{
-                bootableVolumeSelectedState,
+                bootableVolumeSelectedState: [bootableVolumeSelected, setBootableVolumeSelected],
                 preference: preferences[bs?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]],
                 pvcSource:
                   pvcSources?.[bs?.spec?.source?.pvc?.namespace]?.[bs?.spec?.source?.pvc?.name],
