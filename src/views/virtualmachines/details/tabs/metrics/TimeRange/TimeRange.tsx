@@ -16,7 +16,7 @@ const TimeRange: React.FC = () => {
   return (
     <div className="timerange--main">
       <span className="timerange--main__text">
-        <span className="timerange--main__text--title">{t('Time range')}</span>
+        <span className="timerange--main__text--time-range">{t('Time range')}</span>
         <DurationDropdown selectedDuration={duration} selectHandler={onDurationSelect} />
       </span>
 

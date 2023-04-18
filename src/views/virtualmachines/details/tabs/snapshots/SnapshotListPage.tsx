@@ -1,16 +1,19 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
+import { Title } from '@patternfly/react-core';
 
 import { printableVMStatus } from '../../../utils';
 
 import SnapshotList from './components/list/SnapshotList';
 import SnapshotModal from './components/modal/SnapshotModal';
 import useSnapshotData from './hooks/useSnapshotData';
+
+import './SnapshotListPage.scss';
 
 type SnapshotListPageProps = RouteComponentProps<{
   ns: string;
@@ -19,7 +22,7 @@ type SnapshotListPageProps = RouteComponentProps<{
   obj?: V1VirtualMachine;
 };
 
-const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
+const SnapshotListPage: FC<SnapshotListPageProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { snapshots, restoresMap, loaded, error } = useSnapshotData(
@@ -30,6 +33,9 @@ const SnapshotListPage: React.FC<SnapshotListPageProps> = ({ obj: vm }) => {
   return (
     <>
       <ListPageBody>
+        <Title headingLevel="h2" className="snapshot-list-page__title">
+          {t('Snapshots')}
+        </Title>
         <ListPageCreateButton
           className="list-page-create-button-margin"
           onClick={() =>

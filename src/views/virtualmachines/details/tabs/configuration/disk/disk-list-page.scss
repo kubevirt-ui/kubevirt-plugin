@@ -1,11 +1,12 @@
 .disk-list-page {
-    height: 100%;
+  height: 100%;
 
-    .pf-c-sidebar__panel {
-        padding: var(--pf-global--spacer--md);
-    }
+  .pf-c-sidebar__panel {
+    padding: var(--pf-global--spacer--lg);
+    padding-left: 0;
+  }
 
-    &__list-page-create-button {
-      margin: 1rem 0 0.5rem 0;
-    }
+  &__list-page-create-button {
+    margin: 1rem 0 0.5rem 0;
+  }
 }

@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
-import { ExpandableSection } from '@patternfly/react-core';
+import { ExpandableSection, Title } from '@patternfly/react-core';
 
 import MigrationCharts from './MigrationCharts/MigrationCharts';
 import NetworkCharts from './NetworkCharts/NetworkCharts';
@@ -47,6 +47,9 @@ const VirtualMachineMetricsTab: FC<VirtualMachineMetricsTabProps> = ({ obj: vm, 
 
   return (
     <div className="virtual-machine-metrics-tab__main">
+      <Title headingLevel="h2" className="title">
+        {t('Metrics')}
+      </Title>
       <TimeRange />
       <Overview className="virtual-machine-metrics-tab__charts">
         <ExpandableSection

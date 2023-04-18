@@ -17,9 +17,10 @@ const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({ vm }) =
   const { createModal } = useModal();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const actionText = t('Add network interface');
+
   return (
     <ListPageCreateButton
-      className="list-page-create-button-margin"
+      className="add-network-interface-button"
       onClick={() =>
         createModal(({ isOpen, onClose }) => (
           <VirtualMachinesNetworkInterfaceModal

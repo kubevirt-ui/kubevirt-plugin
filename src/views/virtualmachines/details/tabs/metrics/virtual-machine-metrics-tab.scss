@@ -7,12 +7,12 @@
       &--main {
         display: flex;
         justify-content: space-between;
-        margin: var(--pf-global--spacer--md);
+        margin: var(--pf-global--spacer--sm) var(--pf-global--spacer--lg) var(--pf-global--spacer--md) var(--pf-global--spacer--lg);
         &__text {
           font-weight: var(--pf-global--FontWeight--bold);
           display: inline-flex;
-          align-items: baseline;
-          &--title {
+          align-items: center;
+          &--time-range {
             margin-right: var(--pf-global--spacer--sm);
             width: 100%;
           }
@@ -21,6 +21,10 @@
           align-self: center;
         }
       }
+    }
+
+    .title {
+      margin: var(--pf-global--spacer--lg) var(--pf-global--spacer--lg) var(--pf-global--spacer--sm) var(--pf-global--spacer--lg);
     }
   }
   &__charts {

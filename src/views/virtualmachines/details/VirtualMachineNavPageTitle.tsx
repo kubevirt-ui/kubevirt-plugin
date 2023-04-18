@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -13,6 +14,7 @@ import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratab
 import VirtualMachineBreadcrumb from '../list/components/VirtualMachineBreadcrumb/VirtualMachineBreadcrumb';
 import { getVMStatusIcon } from '../utils';
 
+import { vmTabsWithYAML } from './utils/constants';
 import VirtualMachinePendingChangesAlert from './VirtualMachinePendingChangesAlert';
 
 type VirtualMachineNavPageTitleProps = {
@@ -20,7 +22,7 @@ type VirtualMachineNavPageTitleProps = {
   name: string;
 };
 
-const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({ vm, name }) => {
+const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ vm, name }) => {
   const { t } = useKubevirtTranslation();
 
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
@@ -33,6 +35,10 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
   const [isSingleNodeCluster] = useSingleNodeCluster();
 
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
+
+  const isSidebarEditorDisplayed = vmTabsWithYAML.find((tab) =>
+    window.location.pathname.includes(`/${name}/${tab}`),
+  );
 
   return (
     <div className="co-m-nav-title co-m-nav-title--detail">
@@ -50,7 +56,16 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
             <VMNotMigratableLabel vm={vm} />
           </Split>
         </h1>
-        <VirtualMachineActions vm={vm} vmim={vmim} isSingleNodeCluster={isSingleNodeCluster} />
+        <Split hasGutter>
+          {isSidebarEditorDisplayed && (
+            <SplitItem className="VirtualMachineNavPageTitle__SidebarEditorSwitch">
+              <SidebarEditorSwitch />
+            </SplitItem>
+          )}
+          <SplitItem>
+            <VirtualMachineActions vm={vm} vmim={vmim} isSingleNodeCluster={isSingleNodeCluster} />
+          </SplitItem>
+        </Split>
       </span>
       <VirtualMachinePendingChangesAlert vm={vm} vmi={vmi} />
     </div>

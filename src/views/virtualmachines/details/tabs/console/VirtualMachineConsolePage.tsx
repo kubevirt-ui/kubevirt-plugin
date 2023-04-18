@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
@@ -11,11 +11,13 @@ import { Bullseye, EmptyState, EmptyStateBody, PageSection } from '@patternfly/r
 
 import { printableVMStatus } from '../../../utils';
 
+import VirtualMachineConsolePageTitle from './components/VirtualMachineConsolePageTitle';
+
 type VirtualMachineConsolePageProps = RouteComponentProps & {
   obj: V1VirtualMachine;
 };
 
-const VirtualMachineConsolePage: React.FC<VirtualMachineConsolePageProps> = ({ obj: vm }) => {
+const VirtualMachineConsolePage: FC<VirtualMachineConsolePageProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const [vmi, vmiLoaded] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
@@ -26,26 +28,35 @@ const VirtualMachineConsolePage: React.FC<VirtualMachineConsolePageProps> = ({ o
 
   if (!vmi || vm?.status?.printableStatus === printableVMStatus.Stopped) {
     return (
-      <EmptyState>
-        <EmptyStateBody>
-          {t('This VirtualMachine is down. Please start it to access its console.')}
-        </EmptyStateBody>
-      </EmptyState>
+      <>
+        <VirtualMachineConsolePageTitle />
+        <EmptyState>
+          <EmptyStateBody>
+            {t('This VirtualMachine is down. Please start it to access its console.')}
+          </EmptyStateBody>
+        </EmptyState>
+      </>
     );
   }
 
   if (!vmiLoaded) {
     return (
-      <Bullseye>
-        <Loading />
-      </Bullseye>
+      <>
+        <VirtualMachineConsolePageTitle />
+        <Bullseye>
+          <Loading />
+        </Bullseye>
+      </>
     );
   }
 
   return (
-    <PageSection>
-      <Consoles vmi={vmi} />
-    </PageSection>
+    <>
+      <VirtualMachineConsolePageTitle />
+      <PageSection>
+        <Consoles vmi={vmi} />
+      </PageSection>
+    </>
   );
 };
 

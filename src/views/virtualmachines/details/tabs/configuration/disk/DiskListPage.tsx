@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -19,8 +19,8 @@ type DiskListPageProps = RouteComponentProps<{
   obj?: V1VirtualMachine;
 };
 
-const DiskListPage: React.FC<DiskListPageProps> = ({ obj }) => {
-  const onSubmit = React.useCallback(
+const DiskListPage: FC<DiskListPageProps> = ({ obj }) => {
+  const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
         model: VirtualMachineModel,
