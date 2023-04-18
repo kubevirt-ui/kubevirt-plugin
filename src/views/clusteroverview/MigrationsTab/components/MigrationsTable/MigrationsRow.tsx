@@ -74,6 +74,7 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, acti
         <ResourceLink
           groupVersionKind={VirtualMachineInstanceMigrationModelGroupVersionKind}
           name={obj?.vmim?.metadata?.name}
+          namespace={obj?.vmim?.metadata?.namespace}
         />
       </TableData>
       <TableData id="created" activeColumnIDs={activeColumnIDs}>
