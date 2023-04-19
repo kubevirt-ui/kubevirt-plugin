@@ -7,7 +7,6 @@ export const useKubevirtTranslation = () => useTranslation('plugin__kubevirt-plu
 
 /**
  * a function to perform translation to 'plugin__kubevirt-plugin' namespace
- * @param value string to translate
  */
 // skipcq: JS-C1002
-export const t = (value: string) => getI18n().t(value, { ns: 'plugin__kubevirt-plugin' });
+export const t = getI18n().t;
