@@ -1129,6 +1129,7 @@
   "VM": "VM",
   "VMI": "VMI",
   "VMs": "VMs",
+  "VMs in this namespace are new, therefore not enough data is collected to display a graph.": "VMs in this namespace are new, therefore not enough data is collected to display a graph.",
   "VNC Address": "VNC Address",
   "VNC console": "VNC console",
   "VNC Port": "VNC Port",
