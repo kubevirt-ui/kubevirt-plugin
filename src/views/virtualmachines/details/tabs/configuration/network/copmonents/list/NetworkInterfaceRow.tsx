@@ -37,7 +37,7 @@ const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation, { vm: V1Virtua
         {iface.macAddress || NO_DATA_DASH}
       </TableData>
       <TableData
-        id="actions"
+        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >

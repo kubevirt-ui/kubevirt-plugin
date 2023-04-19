@@ -59,7 +59,7 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ obj, activeColumnIDs }
         {obj?.storageClass}
       </TableData>
       <TableData
-        id="actions"
+        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
