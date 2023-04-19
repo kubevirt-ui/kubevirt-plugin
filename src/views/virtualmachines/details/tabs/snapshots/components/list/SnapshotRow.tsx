@@ -44,7 +44,7 @@ const SnapshotRow: React.FC<
         <IndicationLabelList snapshot={snapshot} />
       </TableData>
       <TableData
-        id="actions"
+        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >

@@ -74,7 +74,7 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
         <TemplateValue value={obj?.storageClass} />
       </TableData>
       <TableData
-        id="actions"
+        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
       >
