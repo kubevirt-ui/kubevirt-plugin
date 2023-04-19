@@ -1,7 +1,10 @@
 import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { BootableDeviceType } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
+import {
+  BootableDeviceType,
+  DeviceType,
+} from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import {
   Button,
   DataList,
@@ -20,6 +23,7 @@ import {
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { BootOrderEmptyState } from './BootOrderEmptyState';
+import DeviceTypeIcon from './DeviceTypeIcon';
 
 export const BootOrderModalBody: React.FC<{
   devices: BootableDeviceType[];
@@ -88,7 +92,7 @@ export const BootOrderModalBody: React.FC<{
           <DragDrop onDrop={onDrop}>
             <Droppable hasNoWrapper>
               <DataList aria-label="draggable data list example">
-                {devices.map(({ typeLabel, value }, index) => (
+                {devices.map(({ type, value }, index) => (
                   <Draggable key={value.name} hasNoWrapper>
                     <DataListItem aria-labelledby={value.name} ref={React.createRef()}>
                       <DataListItemRow>
@@ -105,9 +109,10 @@ export const BootOrderModalBody: React.FC<{
                             <DataListCell key={value.name}>
                               <Split>
                                 <SplitItem isFilled>
-                                  <span id={value.name}>
-                                    {value.name}
-                                    {` (${typeLabel})`}
+                                  <span id={value.name}>{value.name}</span>
+
+                                  <span className="pf-u-ml-sm">
+                                    <DeviceTypeIcon type={type as DeviceType} />
                                   </span>
                                 </SplitItem>
                                 <SplitItem>
@@ -116,7 +121,7 @@ export const BootOrderModalBody: React.FC<{
                                       id={`${value.name}-delete-btn`}
                                       onClick={() => onDelete(value.name)}
                                       variant="link"
-                                      className="kubevirt-boot-order__add-device-delete-btn"
+                                      className="kubevirt-boot-order__delete-btn"
                                     >
                                       <MinusCircleIcon />
                                     </Button>
