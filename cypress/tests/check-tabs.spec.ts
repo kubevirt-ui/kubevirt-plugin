@@ -5,17 +5,17 @@ import { vm } from '../views/vm';
 describe('Check all virtualization pages can be loaded', () => {
   before(() => {
     cy.login();
-    cy.deleteResource(K8S_KIND.VM, 'vm-example', 'default');
-    cy.deleteResource(K8S_KIND.TEMPLATE, 'vm-template-example', 'default');
+    cy.deleteResource(K8S_KIND.VM, 'example', 'default');
+    cy.deleteResource(K8S_KIND.TEMPLATE, 'example', 'default');
   });
 
   after(() => {
-    cy.deleteResource(K8S_KIND.VM, 'vm-example', 'default');
-    cy.deleteResource(K8S_KIND.TEMPLATE, 'vm-template-example', 'default');
+    cy.deleteResource(K8S_KIND.VM, 'example', 'default');
+    cy.deleteResource(K8S_KIND.TEMPLATE, 'example', 'default');
   });
 
   describe('Check VM list and tabs', () => {
-    it('create vm-example', () => {
+    it('create example VM', () => {
       cy.visitVMs();
       vm.createVMFromYAML();
       cy.contains('Hostname').should('be.visible');
@@ -67,7 +67,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('centos7-desktop-large').click();
 
       cy.contains('Display name').should('be.visible');
-      cy.contains('Templates provided by KubeVirt are not editable').should('be.visible');
+      cy.byTestID('common-template-alert').should('be.visible');
 
       tab.navigateToYAML();
       cy.contains('Download').should('be.visible');
