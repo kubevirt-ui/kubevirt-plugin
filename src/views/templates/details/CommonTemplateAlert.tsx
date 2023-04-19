@@ -40,6 +40,7 @@ const CommonTemplateAlert: React.FC<CommonTemplateAlertProps> = ({ template }) =
       title={t('Templates provided by {{providerName}} are not editable.', {
         providerName,
       })}
+      data-test="common-template-alert"
     >
       <Trans ns="plugin__kubevirt-plugin">
         {{ osName }} VirtualMachine can not be edited because it is provided by OpenShift
