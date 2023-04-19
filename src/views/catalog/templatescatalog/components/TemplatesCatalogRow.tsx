@@ -13,7 +13,7 @@ import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/ho
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Button } from '@patternfly/react-core';
+import { Button, Label } from '@patternfly/react-core';
 
 import { getTemplateOSIcon } from '../utils/os-icons';
 
@@ -45,11 +45,12 @@ export const TemplatesCatalogRow: React.FC<
 
     return (
       <>
-        <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-20">
+        <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
           <img src={getTemplateOSIcon(obj)} alt="" className="vm-catalog-row-icon" />
           <Button variant="link" isInline onClick={() => onTemplateClick(obj)}>
             {getTemplateName(obj)}
-          </Button>
+          </Button>{' '}
+          <Label>{obj?.metadata?.name}</Label>
         </TableData>
         <TableData id="workload" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
           {WORKLOADS_LABELS?.[workload]}
