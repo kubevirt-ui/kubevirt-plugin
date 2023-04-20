@@ -53,7 +53,7 @@ const useVirtualMachinesInstancesColumns = (): { title: string; id: string }[] =
       },
       {
         title: '',
-        id: 'actions',
+        id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
