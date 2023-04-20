@@ -3,7 +3,9 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import {
+  ANNOTATIONS,
   getTemplateFlavorData,
   getTemplateName,
   getTemplateWorkload,
@@ -12,8 +14,9 @@ import {
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Button } from '@patternfly/react-core';
+import { Button, Label } from '@patternfly/react-core';
 
 import { getTemplateOSIcon } from '../utils/os-icons';
 
@@ -45,10 +48,15 @@ export const TemplatesCatalogRow: React.FC<
 
     return (
       <>
-        <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-20">
+        <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-40">
           <img src={getTemplateOSIcon(obj)} alt="" className="vm-catalog-row-icon" />
           <Button variant="link" isInline onClick={() => onTemplateClick(obj)}>
-            {getTemplateName(obj)}
+            {getTemplateName(obj)}{' '}
+            {!isEmpty(getAnnotation(obj, ANNOTATIONS.displayName)) && (
+              <Label isCompact variant="outline">
+                {getName(obj)}
+              </Label>
+            )}
           </Button>
         </TableData>
         <TableData id="workload" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
@@ -60,7 +68,7 @@ export const TemplatesCatalogRow: React.FC<
             isBootSourceAvailable={availableTemplatesUID.has(obj.metadata.uid)}
           />
         </TableData>
-        <TableData id="cpu" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
+        <TableData id="cpu" activeColumnIDs={activeColumnIDs} className="pf-m-width-20">
           {t('CPU')} {cpuCount} | {t('Memory')} {readableSizeUnit(memory)}
         </TableData>
       </>
