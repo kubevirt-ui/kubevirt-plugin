@@ -12,6 +12,7 @@ import {
   getDisks,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
+import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { Form } from '@patternfly/react-core';
 
 import AccessMode from './DiskFormFields/AccessMode';
@@ -37,6 +38,7 @@ import {
   getDiskFromState,
   getPersistentVolumeClaimHotplugPromise,
   getVolumeFromState,
+  nameWithoutParameter,
   produceVMDisks,
   requiresDataVolume,
 } from './utils/helpers';
@@ -87,11 +89,11 @@ const DiskModal: React.FC<DiskModalProps> = ({
         );
       }
       if (diskState.diskSource === sourceTypes.UPLOAD) {
-        return getPersistentVolumeClaimHotplugPromise(
-          vmObj,
+        const pvcName = nameWithoutParameter(
           `${vm?.metadata?.name}-${diskState.diskName}`,
-          resultDisk,
+          `${diskState.diskName}-${getRandomChars()}`,
         );
+        return getPersistentVolumeClaimHotplugPromise(vmObj, pvcName, resultDisk);
       }
       const resultDataVolume = getDataVolumeFromState({
         vm: vmObj,
@@ -106,7 +108,10 @@ const DiskModal: React.FC<DiskModalProps> = ({
 
   const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {
     const updatedVM = produceVMDisks(vm, (vmDraft) => {
-      const dvName = `${vmDraft?.metadata?.name}-${diskState.diskName}`;
+      const dvName = nameWithoutParameter(
+        `${vmDraft?.metadata?.name}-${diskState.diskName}`,
+        `${diskState.diskName}-${getRandomChars()}`,
+      );
 
       const resultDisk = getDiskFromState(diskState);
       const resultVolume = getVolumeFromState(vm, diskState, diskSourceState, dvName);
