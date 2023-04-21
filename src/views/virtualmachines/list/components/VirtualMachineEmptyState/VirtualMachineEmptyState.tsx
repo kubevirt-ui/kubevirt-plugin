@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
@@ -16,13 +16,17 @@ import {
 } from '@patternfly/react-core';
 import { RocketIcon, VirtualMachineIcon } from '@patternfly/react-icons';
 
+import VirtualMachinesCreateButton from '../VirtualMachinesCreateButton/VirtualMachinesCreateButton';
+
 type VirtualMachineEmptyStateProps = {
   catalogURL: string;
+  namespace: string;
 };
 
-const VirtualMachineEmptyState: React.FC<VirtualMachineEmptyStateProps> = ({ catalogURL }) => {
+const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ catalogURL, namespace }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
+
   return (
     <EmptyState variant={EmptyStateVariant.large}>
       <EmptyStateIcon icon={VirtualMachineIcon} />
@@ -39,9 +43,10 @@ const VirtualMachineEmptyState: React.FC<VirtualMachineEmptyStateProps> = ({ cat
         </Trans>
       </EmptyStateBody>
       <EmptyStatePrimary>
-        <Button variant={ButtonVariant.primary} onClick={() => history.push(catalogURL)}>
-          {t('Create VirtualMachine')}
-        </Button>
+        <VirtualMachinesCreateButton
+          namespace={namespace}
+          buttonText={t('Create VirtualMachine')}
+        />
       </EmptyStatePrimary>
       <EmptyStateSecondaryActions>
         <Button

@@ -1,12 +1,11 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 
 import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
-  ListPageCreateDropdown,
   ListPageFilter,
   ListPageHeader,
   useK8sWatchResource,
@@ -14,10 +13,10 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import MigrationPoliciesCreateButton from './components/MigrationPoliciesCreateButton/MigrationPoliciesCreateButton';
 import MigrationPoliciesEmptyState from './components/MigrationPoliciesEmptyState/MigrationPoliciesEmptyState';
 import MigrationPoliciesRow from './components/MigrationPoliciesRow/MigrationPoliciesRow';
 import useMigrationPoliciesListColumns from './hooks/useMigrationPoliciesListColumns';
-import { migrationPoliciesPageBaseURL } from './utils/constants';
 
 type MigrationPoliciesListProps = {
   kind: string;
@@ -25,7 +24,6 @@ type MigrationPoliciesListProps = {
 
 const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
   const [mps, loaded, loadError] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
     kind,
     isList: true,
@@ -35,28 +33,12 @@ const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) =
   const [columns, activeColumns] = useMigrationPoliciesListColumns();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(mps);
 
-  const createItems = {
-    form: t('With form'),
-    yaml: t('With YAML'),
-  };
-
-  const onCreate = (type: string) => {
-    return type === 'form'
-      ? history.push(`${migrationPoliciesPageBaseURL}/form`)
-      : history.push(`${migrationPoliciesPageBaseURL}/~new`);
-  };
-
   return (
     <>
       <ListPageHeader title={t('MigrationPolicies')}>
-        <ListPageCreateDropdown
-          items={createItems}
-          onClick={onCreate}
-          createAccessReview={{ groupVersionKind: kind }}
-        >
-          {t('Create MigrationPolicy')}
-        </ListPageCreateDropdown>
+        {!isEmpty(mps) && <MigrationPoliciesCreateButton kind={kind} />}
       </ListPageHeader>
+
       <ListPageBody>
         <ListPageFilter
           data={unfilteredData}
@@ -80,7 +62,7 @@ const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) =
           loadError={loadError}
           columns={activeColumns}
           Row={MigrationPoliciesRow}
-          EmptyMsg={() => <MigrationPoliciesEmptyState />}
+          EmptyMsg={() => <MigrationPoliciesEmptyState kind={kind} />}
         />
       </ListPageBody>
     </>

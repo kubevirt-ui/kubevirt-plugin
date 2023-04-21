@@ -1,31 +1,32 @@
-import * as React from 'react';
-import classNames from 'classnames';
+import React, { FC } from 'react';
+
+import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 type ExternalLinkProps = {
   href: string;
   text?: React.ReactNode;
-  additionalClassName?: string;
+  className?: string;
   dataTestID?: string;
   stopPropagation?: boolean;
 };
 
-const ExternalLink: React.FC<ExternalLinkProps> = ({
+const ExternalLink: FC<ExternalLinkProps> = ({
   children,
   href,
   text,
-  additionalClassName = '',
+  className = '',
   dataTestID,
   stopPropagation,
 }) => (
   <a
-    className={classNames('co-external-link', additionalClassName)}
+    className={className}
     href={href}
     target="_blank"
     rel="noopener noreferrer"
     data-test-id={dataTestID}
     {...(stopPropagation ? { onClick: (e) => e.stopPropagation() } : {})}
   >
-    {children || text}
+    {children || text} <ExternalLinkAltIcon />
   </a>
 );
 

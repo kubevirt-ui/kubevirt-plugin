@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { FC, useState } from 'react';
 
 import {
   VirtualMachineInstanceMigrationModelGroupVersionKind,
@@ -8,15 +7,14 @@ import {
   VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
   ListPageBody,
-  ListPageCreateDropdown,
   ListPageFilter,
   ListPageHeader,
   useListPageFilter,
@@ -33,6 +31,7 @@ import { useVMListFilters } from '../utils';
 
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
+import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 
 import './VirtualMachinesList.scss';
@@ -42,9 +41,8 @@ type VirtualMachinesListProps = {
   namespace: string;
 };
 
-const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespace }) => {
+const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
 
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`;
 
@@ -83,16 +81,6 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
     V1VirtualMachine
   >(vms, filters);
 
-  const createItems = {
-    catalog: t('From template'),
-    volume: (
-      <>
-        {t('From volume')} <DeveloperPreviewLabel />
-      </>
-    ),
-    yaml: t('From YAML'),
-  };
-
   const onPageChange = ({ page, perPage, startIndex, endIndex }) => {
     setPagination(() => ({
       page,
@@ -102,31 +90,12 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
     }));
   };
 
-  const onCreate = (type: string) => {
-    switch (type) {
-      case 'catalog':
-        return history.push(catalogURL);
-      case 'volume':
-        return history.push(`${catalogURL}/instanceTypes`);
-      default:
-        return history.push(
-          `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${VirtualMachineModelRef}/~new`,
-        );
-    }
-  };
-
   const [columns, activeColumns] = useVirtualMachineColumns(namespace, pagination, data);
 
   return (
     <>
       <ListPageHeader title={t('VirtualMachines')}>
-        <ListPageCreateDropdown
-          items={createItems}
-          onClick={onCreate}
-          createAccessReview={{ groupVersionKind: VirtualMachineModelRef, namespace }}
-        >
-          {t('Create')}
-        </ListPageCreateDropdown>
+        {!isEmpty(vms) && <VirtualMachinesCreateButton namespace={namespace} />}
       </ListPageHeader>
       <ListPageBody>
         <div className="VirtualMachineList--filters__main">
@@ -154,20 +123,22 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
               type: t('VirtualMachine'),
             }}
           />
-          <Pagination
-            className="VirtualMachineList--filters__main-pagination"
-            itemCount={data?.length}
-            page={pagination?.page}
-            perPage={pagination?.perPage}
-            defaultToFullPage
-            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-              onPageChange({ page, perPage, startIndex, endIndex })
-            }
-            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-              onPageChange({ page, perPage, startIndex, endIndex })
-            }
-            perPageOptions={paginationDefaultValues}
-          />
+          {!isEmpty(vms) && (
+            <Pagination
+              className="VirtualMachineList--filters__main-pagination"
+              itemCount={data?.length}
+              page={pagination?.page}
+              perPage={pagination?.perPage}
+              defaultToFullPage
+              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                onPageChange({ page, perPage, startIndex, endIndex })
+              }
+              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                onPageChange({ page, perPage, startIndex, endIndex })
+              }
+              perPageOptions={paginationDefaultValues}
+            />
+          )}
         </div>
         <VirtualizedTable<K8sResourceCommon>
           data={data}
@@ -182,7 +153,9 @@ const VirtualMachinesList: React.FC<VirtualMachinesListProps> = ({ kind, namespa
             getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
             isSingleNodeCluster,
           }}
-          NoDataEmptyMsg={() => <VirtualMachineEmptyState catalogURL={catalogURL} />}
+          NoDataEmptyMsg={() => (
+            <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
+          )}
         />
       </ListPageBody>
     </>
