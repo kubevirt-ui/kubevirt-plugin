@@ -85,8 +85,8 @@ export const useVirtualMachineTabs = () => {
       component: SnapshotListPage,
     },
     {
-      href: VirtualMachineDetailsTab.Diagnostic,
-      name: t(VirtualMachineDetailsTabLabel.Diagnostic),
+      href: VirtualMachineDetailsTab.Diagnostics,
+      name: t(VirtualMachineDetailsTabLabel.Diagnostics),
       component: VirtualMachineDiagnosticTab,
     },
   ];

@@ -364,7 +364,7 @@
   "Developer preview": "Developer preview",
   "Developer preview features are not intended to use in production environments. The clusters deployed with the developer preview features are developmental clusters and are not currently supported by Red Hat.": "Developer preview features are not intended to use in production environments. The clusters deployed with the developer preview features are developmental clusters and are not currently supported by Red Hat.",
   "Device name": "Device name",
-  "Diagnostic": "Diagnostic",
+  "Diagnostics": "Diagnostics",
   "DIC": "DIC",
   "Disconnect": "Disconnect",
   "Disk size": "Disk size",

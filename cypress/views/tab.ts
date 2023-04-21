@@ -15,7 +15,7 @@ export enum tabs {
   Scripts = 'horizontal-link-Scripts',
   Snapshots = 'horizontal-link-Snapshots',
   Parameters = 'horizontal-link-Parameters',
-  Diagnostic = 'horizontal-link-Diagnostic',
+  Diagnostics = 'horizontal-link-Diagnostics',
 }
 
 export const navigateToTab = (tab: string) => {
@@ -71,8 +71,8 @@ export const tab = {
   navigateToParameters: () => {
     navigateToTab(tabs.Parameters);
   },
-  navigateToDiagnostic: () => {
-    navigateToTab(tabs.Diagnostic);
+  navigateToDiagnostics: () => {
+    navigateToTab(tabs.Diagnostics);
   },
   // navigate template's tabs
   navigateToTScheduling: () => {
