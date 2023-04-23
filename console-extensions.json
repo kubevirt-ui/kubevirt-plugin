@@ -479,6 +479,37 @@
     }
   },
   {
+    "type": "console.navigation/resource-cluster",
+    "properties": {
+      "id": "virtualmachineclusterpreferences",
+      "name": "%plugin__kubevirt-plugin~Preferences%",
+      "section": "virtualization",
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineClusterPreference",
+        "version": "v1alpha2"
+      },
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualmachineclusterpreferences",
+        "data-test-id": "virtualmachineclusterpreferences-nav-item"
+      }
+    },
+    "flags": {
+      "required": ["CAN_LIST_NS"]
+    }
+  },
+  {
+    "type": "console.page/resource/list",
+    "properties": {
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineClusterPreference",
+        "version": "v1alpha2"
+      },
+      "component": { "$codeRef": "ClusterPreferenceList" }
+    }
+  },
+  {
     "type": "console.page/resource/details",
     "properties": {
       "model": {
