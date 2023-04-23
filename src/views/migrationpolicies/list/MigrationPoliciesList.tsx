@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -50,9 +49,9 @@ const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) =
               title,
               additional,
             })),
-            id: MigrationPolicyModelRef,
+            id: kind,
             selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-            type: t('DataSource'),
+            type: t('MigrationPolicy'),
           }}
         />
         <VirtualizedTable<V1alpha1MigrationPolicy>

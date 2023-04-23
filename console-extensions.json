@@ -327,6 +327,23 @@
     }
   },
   {
+    "type": "console.yaml-template",
+    "properties": {
+      "name": "default",
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineClusterInstancetype",
+        "version": "v1alpha2"
+      },
+      "template": {
+        "$codeRef": "yamlTemplates.defaultVirtualMachineClusterInstancetypeYamlTemplate"
+      }
+    },
+    "flags": {
+      "required": ["KUBEVIRT"]
+    }
+  },
+  {
     "type": "console.navigation/separator",
     "properties": {
       "perspective": "admin",
@@ -428,6 +445,37 @@
         "version": "v1alpha1"
       },
       "component": { "$codeRef": "MigrationPoliciesList" }
+    }
+  },
+  {
+    "type": "console.navigation/resource-cluster",
+    "properties": {
+      "id": "virtualmachineclusterinstancetypes",
+      "name": "%plugin__kubevirt-plugin~Instancetypes%",
+      "section": "virtualization",
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineClusterInstancetype",
+        "version": "v1alpha2"
+      },
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualmachineclusterinstancetypes",
+        "data-test-id": "virtualmachineclusterinstancetypes-nav-item"
+      }
+    },
+    "flags": {
+      "required": ["CAN_LIST_NS"]
+    }
+  },
+  {
+    "type": "console.page/resource/list",
+    "properties": {
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineClusterInstancetype",
+        "version": "v1alpha2"
+      },
+      "component": { "$codeRef": "ClusterInstancetypeList" }
     }
   },
   {
