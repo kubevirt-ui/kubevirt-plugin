@@ -55,7 +55,7 @@ describe('Check all virtualization pages can be loaded', () => {
       tab.navigateToSnapshots();
       cy.contains('Take snapshot').should('be.visible');
 
-      tab.navigateToDiagnostic();
+      tab.navigateToDiagnostics();
       cy.contains('Message').should('be.visible');
     });
   });
