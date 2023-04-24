@@ -32,8 +32,13 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
 
   const diskName = volume?.name;
 
-  const { volumeResource, loaded, volumeResourceName, volumeResourceModel } =
-    useVolumeOwnedResource(vm, volume);
+  const {
+    volumeResource,
+    loaded,
+    error: loadingError,
+    volumeResourceName,
+    volumeResourceModel,
+  } = useVolumeOwnedResource(vm, volume);
 
   const updatedVirtualMachine = React.useMemo(() => {
     const updatedDisks = (getDisks(vm) || [])?.filter(({ name }) => name !== diskName);
@@ -101,6 +106,7 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
       headerText={t('Detach disk?')}
       submitBtnText={t('Detach')}
       submitBtnVariant={ButtonVariant.danger}
+      modalError={loadingError}
     >
       <Stack hasGutter>
         <StackItem>
@@ -111,7 +117,7 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
             action="detach"
           />
         </StackItem>
-        {loaded ? (
+        {loaded && (
           <StackItem>
             {volumeResource && (
               <Checkbox
@@ -128,9 +134,9 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
               />
             )}
           </StackItem>
-        ) : (
-          <Loading />
         )}
+
+        {!loaded && !loadingError && <Loading />}
       </Stack>
     </TabModal>
   );

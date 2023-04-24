@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ComponentType, memo, MouseEventHandler, ReactNode, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
@@ -23,26 +23,21 @@ type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   onSubmit: (obj: T) => Promise<T | T[] | void>;
   onClose: () => Promise<void> | void;
   headerText: string;
-  children: React.ReactNode;
+  children: ReactNode;
   isDisabled?: boolean;
   submitBtnText?: string;
   modalVariant?: ModalVariant;
   positionTop?: boolean;
   submitBtnVariant?: ButtonVariant;
-  titleIconVariant?:
-    | 'success'
-    | 'danger'
-    | 'warning'
-    | 'info'
-    | 'default'
-    | React.ComponentType<any>;
+  modalError?: any;
+  titleIconVariant?: 'success' | 'danger' | 'warning' | 'info' | 'default' | ComponentType<any>;
 };
 
 export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(
   props: TabModalProps<T>,
 ) => JSX.Element;
 
-const TabModal: TabModalFC = React.memo(
+const TabModal: TabModalFC = memo(
   ({
     obj,
     onSubmit,
@@ -56,34 +51,37 @@ const TabModal: TabModalFC = React.memo(
     positionTop = true,
     submitBtnVariant,
     titleIconVariant,
+    modalError,
   }) => {
     const { t } = useKubevirtTranslation();
 
-    const [isSubmitting, setIsSubmitting] = React.useState(false);
-    const [error, setError] = React.useState(undefined);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [apiError, setApiError] = useState<any>(undefined);
 
-    const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    const handleSubmit: MouseEventHandler<HTMLButtonElement> = (e) => {
       e.preventDefault();
       setIsSubmitting(true);
-      setError(undefined);
+      setApiError(undefined);
 
       onSubmit(obj)
         .then(onClose)
         .catch((submitError) => {
-          setError(submitError);
+          setApiError(submitError);
           console.error(submitError);
         })
         .finally(() => setIsSubmitting(false));
     };
 
     const closeModal = () => {
-      setError(undefined);
+      setApiError(undefined);
       setIsSubmitting(false);
 
       const promise = onClose();
 
-      if (promise) promise?.catch(setError);
+      if (promise) promise?.catch(setApiError);
     };
+
+    const error = apiError || modalError;
 
     return (
       <Modal
