@@ -69,7 +69,8 @@
       "dashboardActivity": "src/views/dashboard-extensions/Activity.tsx",
       "dashboardActivityUtils": "src/views/dashboard-extensions/utils.ts",
       "dashboardStatus": "src/views/dashboard-extensions/KubevirtHealthPopup/KubevirtHealthPopup.tsx",
-      "ClusterInstancetypeList": "./views/instancetypes/list/ClusterInstancetypeList.tsx"
+      "ClusterInstancetypeList": "./views/instancetypes/list/ClusterInstancetypeList.tsx",
+      "ClusterPreferenceList": "./views/preferences/list/ClusterPreferenceList.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
