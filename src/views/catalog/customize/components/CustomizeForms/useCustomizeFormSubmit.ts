@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import produce from 'immer';
 
@@ -51,10 +51,11 @@ export const useCustomizeFormSubmit = ({
 }): useCustomizeFormSubmitType => {
   const { ns } = useParams<{ ns: string }>();
   const history = useHistory();
-  const [templateLoaded, setTemplateLoaded] = React.useState(true);
-  const [templateError, setTemplateError] = React.useState<any>();
+  const [templateLoaded, setTemplateLoaded] = useState(true);
+  const [templateError, setTemplateError] = useState<any>();
 
-  const { updateVM, tabsData, updateTabsData, loaded: vmLoaded } = useWizardVMContext();
+  const { vm, updateVM, tabsData, updateTabsData, loaded: vmLoaded } = useWizardVMContext();
+
   const { upload: diskUpload, uploadData: uploadDiskData } = useCDIUpload();
   const { upload: cdUpload, uploadData: uploadCDData } = useCDIUpload();
 
@@ -80,9 +81,19 @@ export const useCustomizeFormSubmit = ({
 
       const dataVolumeTemplate = vmObj?.spec?.dataVolumeTemplates?.[0];
       const updatedVM = produce(vmObj, (vmDraft) => {
+        ensurePath(vmDraft, [
+          'spec.template.spec.domain.resources',
+          'spec.template.spec.domain.cpu',
+        ]);
+
         vmDraft.metadata.namespace = ns || DEFAULT_NAMESPACE;
         vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
         vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
+        vmDraft.spec.template.spec.domain.resources.requests = {
+          ...vmDraft?.spec?.template?.spec?.domain?.resources?.requests,
+          memory: `${vm.spec.template.spec.domain.resources.requests['memory']}`,
+        };
+        vmDraft.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
 
         // upload is required, we need to patch the volume and delete the data volume template (keep only cd dv template if available)
         if (diskUploadFile) {
@@ -183,7 +194,7 @@ export const useCustomizeFormSubmit = ({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (templateError) {
       setTemplateError(undefined);
     }

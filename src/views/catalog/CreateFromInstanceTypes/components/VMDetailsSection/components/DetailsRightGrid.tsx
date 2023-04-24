@@ -5,10 +5,10 @@ import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/u
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { DescriptionList } from '@patternfly/react-core';
-import VirtualMachineDescriptionItem from '@virtualmachines/details/tabs/details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 const DetailsRightGrid: FC = () => {
   const { t } = useKubevirtTranslation();

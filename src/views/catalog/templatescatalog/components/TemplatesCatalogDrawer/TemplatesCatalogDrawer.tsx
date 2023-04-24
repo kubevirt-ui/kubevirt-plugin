@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';
@@ -19,7 +19,7 @@ type TemplatesCatalogDrawerProps = {
   onClose: () => void;
 };
 
-export const TemplatesCatalogDrawer: React.FC<TemplatesCatalogDrawerProps> = ({
+export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({
   namespace,
   template,
   isOpen,

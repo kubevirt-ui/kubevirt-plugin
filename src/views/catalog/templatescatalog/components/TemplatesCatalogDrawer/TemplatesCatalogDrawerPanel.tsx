@@ -1,12 +1,19 @@
-import * as React from 'react';
+import React, { FC, memo, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
+import { updateVMCPUMemory } from '@catalog/templatescatalog/utils/helpers';
+import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { WizardOverviewDisksTable } from '@catalog/wizard/tabs/overview/components/WizardOverviewDisksTable/WizardOverviewDisksTable';
 import { WizardOverviewNetworksTable } from '@catalog/wizard/tabs/overview/components/WizardOverviewNetworksTable/WizardOverviewNetworksTable';
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AdditionalResources from '@kubevirt-utils/components/AdditionalResources/AdditionalResources';
+import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
+import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateFlavorData } from '@kubevirt-utils/resources/template/utils';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
 import {
   getTemplateDescription,
@@ -20,14 +27,15 @@ import {
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
+import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Alert,
+  AlertVariant,
   Button,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
-  ExpandableSection,
   Grid,
   GridItem,
   Stack,
@@ -36,34 +44,18 @@ import {
 } from '@patternfly/react-core';
 import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
 
+import TemplateExpandableDescription from './TemplateExpandableDescription';
+
 type TemplatesCatalogDrawerPanelProps = {
   template: V1Template;
 };
 
-const TemplateExpandableDescription: React.FC<{ description: string }> = ({ description }) => {
-  const { t } = useKubevirtTranslation();
-  const [isExpanded, setIsExpanded] = React.useState(description?.length <= 120);
-  return (
-    <Stack className="template-catalog-drawer-description">
-      <StackItem>
-        <ExpandableSection isExpanded isDetached contentId="expandable-content">
-          {isExpanded ? description : description.slice(0, 120).concat('...')}
-        </ExpandableSection>
-      </StackItem>
-      {description.length > 120 && (
-        <StackItem>
-          <Button isInline variant="link" onClick={() => setIsExpanded(!isExpanded)}>
-            {isExpanded ? t('Collapse') : t('Read more')}
-          </Button>
-        </StackItem>
-      )}
-    </Stack>
-  );
-};
-
-export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelProps> = React.memo(
+export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> = memo(
   ({ template }) => {
     const { t } = useKubevirtTranslation();
+    const { createModal } = useModal();
+    const { updateVM } = useWizardVMContext();
+    const { ns } = useParams<{ ns: string }>();
 
     const notAvailable = t('N/A');
     const vmObject = getTemplateVirtualMachineObject(template);
@@ -75,10 +67,37 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
     const interfaces = getTemplateInterfaces(template);
     const disks = getTemplateDisks(template);
     const isDefaultTemplate = isDefaultVariantTemplate(template);
-    const { memory, cpuCount } = getTemplateFlavorData(template);
     const hostDevicesCount = getHostDevices(vmObject)?.length || 0;
     const gpusCount = getGPUDevices(vmObject)?.length || 0;
     const hardwareDevicesCount = hostDevicesCount + gpusCount;
+
+    const [updatedVM, setUpdatedVM] = useState<V1VirtualMachine>(undefined);
+    const [error, setError] = useState(undefined);
+
+    useEffect(() => {
+      setError(undefined);
+
+      k8sCreate<V1Template>({
+        model: ProcessedTemplatesModel,
+        data: template,
+        queryParams: {
+          dryRun: 'All',
+        },
+      })
+        .then((processedTemplate) => {
+          updateVMCPUMemory(
+            ns,
+            updateVM,
+            setUpdatedVM,
+          )(getTemplateVirtualMachineObject(processedTemplate)).catch((err) => {
+            setError(err);
+          });
+        })
+        .catch((err) => {
+          setError(err);
+        });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ns, template]);
 
     return (
       <div className="modal-body modal-body-border modal-body-content">
@@ -136,15 +155,21 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                   </GridItem>
                   <GridItem span={6}>
                     <DescriptionList>
-                      <DescriptionListGroup>
-                        <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
-                        <DescriptionListDescription>
-                          {t('{{cpuCount}} CPU | {{memory}} Memory', {
-                            cpuCount,
-                            memory: readableSizeUnit(memory),
-                          })}
-                        </DescriptionListDescription>
-                      </DescriptionListGroup>
+                      <VirtualMachineDescriptionItem
+                        descriptionData={<CPUMemory vm={updatedVM} />}
+                        descriptionHeader={t('CPU | Memory')}
+                        isEdit
+                        onEditClick={() =>
+                          createModal(({ isOpen, onClose }) => (
+                            <CPUMemoryModal
+                              vm={updatedVM}
+                              isOpen={isOpen}
+                              onClose={onClose}
+                              onSubmit={updateVMCPUMemory(ns, updateVM, setUpdatedVM)}
+                            />
+                          ))
+                        }
+                      />
                       <DescriptionListGroup>
                         <DescriptionListTerm>
                           {t('Network interfaces')}
@@ -179,6 +204,13 @@ export const TemplatesCatalogDrawerPanel: React.FC<TemplatesCatalogDrawerPanelPr
                   </GridItem>
                 </Grid>
               </StackItem>
+              {error && (
+                <StackItem>
+                  <Alert variant={AlertVariant.danger} title={t('Error')} isInline>
+                    {error?.message}
+                  </Alert>
+                </StackItem>
+              )}
             </Stack>
           </div>
         </div>

@@ -12,17 +12,17 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import { getWorkload, VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
+import VirtualMachineStatus from '@virtualmachines/list/components/VirtualMachineStatus/VirtualMachineStatus';
 
-import VirtualMachineStatus from '../../../../../../list/components/VirtualMachineStatus/VirtualMachineStatus';
 import { VirtualMachineDetailsRightGridLayoutPresentation } from '../../../utils/gridHelper';
 import BootOrderSummary from '../../BootOrderSummary/BootOrderSummary';
-import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 type VirtualMachineDetailsRightGridLayout = {
   vm: V1VirtualMachine;

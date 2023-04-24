@@ -12,7 +12,8 @@ import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/c
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -45,7 +46,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
   ({ namespace, template, canQuickCreate, isBootSourceAvailable, onCancel, initialVMName }) => {
     const history = useHistory();
     const { t } = useKubevirtTranslation();
-    const { updateTabsData } = useWizardVMContext();
+    const { vm, updateTabsData } = useWizardVMContext();
 
     const [vmName, setVMName] = useState(initialVMName || '');
     const [startVM, setStartVM] = useState(true);
@@ -68,6 +69,19 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
       const templateToProcess = produce(template, (draftTemplate) => {
         if (parameterForName)
           replaceTemplateParameterValue(draftTemplate, parameterForName, vmName);
+
+        if (vm?.spec?.template) {
+          const vmObject = getTemplateVirtualMachineObject(draftTemplate);
+          ensurePath(vmObject, [
+            'spec.template.spec.domain.resources',
+            'spec.template.spec.domain.cpu',
+          ]);
+          vmObject.spec.template.spec.domain.resources.requests = {
+            ...vmObject?.spec?.template?.spec?.domain?.resources?.requests,
+            memory: `${vm.spec.template.spec.domain.resources.requests['memory']}`,
+          };
+          vmObject.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
+        }
       });
 
       quickCreateVM({
@@ -75,9 +89,9 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
         models,
         overrides: { name: vmName, namespace, startVM },
       })
-        .then((vm) => {
+        .then((quickCreatedVM) => {
           setIsQuickCreating(false);
-          history.push(getResourceUrl({ model: VirtualMachineModel, resource: vm }));
+          history.push(getResourceUrl({ model: VirtualMachineModel, resource: quickCreatedVM }));
         })
         .catch((err) => {
           setIsQuickCreating(false);
