@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -11,6 +11,7 @@ import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { AUTOUNATTEND, UNATTEND } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
@@ -42,7 +43,7 @@ type SysPrepItemProps = {
   template: V1Template;
 };
 
-const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
+const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
@@ -106,7 +107,7 @@ const SysPrepItem: React.FC<SysPrepItemProps> = ({ template }) => {
                   createModal((modalProps) => (
                     <SysprepModal
                       {...modalProps}
-                      namespace={vm?.metadata?.namespace}
+                      namespace={vm?.metadata?.namespace || DEFAULT_NAMESPACE}
                       unattend={unattend}
                       autoUnattend={autoUnattend}
                       onSysprepSelected={onSysprepSelected}
