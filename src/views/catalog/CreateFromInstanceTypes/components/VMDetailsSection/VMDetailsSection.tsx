@@ -1,13 +1,12 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import SSHSecretSection from '@kubevirt-utils/components/SSHSecretSection/SSHSecretSection';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ExpandableSection } from '@patternfly/react-core';
 
-import { InstanceTypeState } from '../../utils/constants';
+import { BootableVolume, InstanceTypeState } from '../../utils/constants';
 
 import VMDetailsBody from './components/VMDetailsBody/VMDetailsBody';
 
@@ -17,7 +16,7 @@ type VMDetailsSectionProps = {
   vmName: string;
   setVMName: Dispatch<SetStateAction<string>>;
   namespace: string;
-  bootSource: V1beta1DataSource;
+  bootSource: BootableVolume;
   instancetype: InstanceTypeState;
   sshSecretCredentials: SSHSecretCredentials;
   setSSHSecretCredentials: Dispatch<SetStateAction<SSHSecretCredentials>>;

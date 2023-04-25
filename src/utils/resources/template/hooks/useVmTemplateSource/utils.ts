@@ -7,6 +7,7 @@ import {
   V1beta1DataSource,
   V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1alpha1PersistentVolumeClaim,
   V1beta1DataVolumeSourceHTTP,
@@ -57,7 +58,7 @@ export const getTemplateBootSourceType = (template: V1Template): TemplateBootSou
  * @returns a promise that resolves into the PVC
  */
 export const getPVC = (name: string, ns: string) =>
-  k8sGet<V1alpha1PersistentVolumeClaim>({
+  k8sGet<IoK8sApiCoreV1PersistentVolumeClaim>({
     model: PersistentVolumeClaimModel,
     name,
     ns,

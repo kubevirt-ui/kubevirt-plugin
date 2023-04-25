@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { getBootableVolumePVCSource } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/
 import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 
 import { UseBootableVolumesValues } from '../../hooks/useBootableVolumes';
-import { DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
+import { BootableVolume, DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
 
 import BootableVolumeRow from './components/BootableVolumeRow/BootableVolumeRow';
 import ShowAllBootableVolumesButton from './components/ShowAllBootableVolumesButton/ShowAllBootableVolumesButton';
@@ -30,7 +30,7 @@ import './BootableVolumeList.scss';
 
 export type BootableVolumeListProps = {
   preferences: { [resourceKeyName: string]: V1alpha2VirtualMachineClusterPreference };
-  bootableVolumeSelectedState: [V1beta1DataSource, Dispatch<SetStateAction<V1beta1DataSource>>];
+  bootableVolumeSelectedState: [BootableVolume, Dispatch<SetStateAction<BootableVolume>>];
   bootableVolumesResources: UseBootableVolumesValues;
   displayShowAllButton?: boolean;
 };
@@ -153,8 +153,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               rowData={{
                 bootableVolumeSelectedState: [bootableVolumeSelected, setBootableVolumeSelected],
                 preference: preferences[bs?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]],
-                pvcSource:
-                  pvcSources?.[bs?.spec?.source?.pvc?.namespace]?.[bs?.spec?.source?.pvc?.name],
+                pvcSource: getBootableVolumePVCSource(bs, pvcSources),
               }}
             />
           ))}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { InstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { Grid, GridItem } from '@patternfly/react-core';
@@ -12,10 +12,10 @@ import './SelectInstanceTypeSection.scss';
 
 type SelectInstanceTypeSectionProps = {
   selectedInstanceType: InstanceTypeState;
-  setSelectedInstanceType: React.Dispatch<React.SetStateAction<InstanceTypeState>>;
+  setSelectedInstanceType: Dispatch<SetStateAction<InstanceTypeState>>;
 };
 
-const SelectInstanceTypeSection: React.FC<SelectInstanceTypeSectionProps> = ({
+const SelectInstanceTypeSection: FC<SelectInstanceTypeSectionProps> = ({
   selectedInstanceType,
   setSelectedInstanceType,
 }) => {

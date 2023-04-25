@@ -6,8 +6,7 @@ import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/componen
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,11 +23,12 @@ import SectionListItem from './components/SectionListItem/SectionListItem';
 import useBootableVolumes from './hooks/useBootableVolumes';
 import useInstanceTypesAndPreferences from './hooks/useInstanceTypesAndPreferences';
 import {
+  BootableVolume,
   initialInstanceTypeState,
   INSTANCE_TYPES_SECTIONS,
   InstanceTypeState,
 } from './utils/constants';
-import { generateVM } from './utils/utils';
+import { generateVM, getBootableVolumePVCSource } from './utils/utils';
 
 import './CreateFromInstanceType.scss';
 
@@ -42,7 +42,7 @@ const CreateFromInstanceType: FC = () => {
 
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
-  const [selectedBootableVolume, setSelectedBootableVolume] = useState<V1beta1DataSource>();
+  const [selectedBootableVolume, setSelectedBootableVolume] = useState<BootableVolume>();
   const [selectedInstanceType, setSelectedInstanceType] =
     useState<InstanceTypeState>(initialInstanceTypeState);
   const [vmName, setVMName] = useState<string>(
@@ -55,17 +55,16 @@ const CreateFromInstanceType: FC = () => {
     sshSecretName: '',
     sshSecretKey: '',
   });
-  const [pvcSource, setPVCSource] = useState<V1alpha1PersistentVolumeClaim>();
+  const [pvcSource, setPVCSource] = useState<IoK8sApiCoreV1PersistentVolumeClaim>();
 
   const namespace = ns === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : ns;
 
   const onSelectVolume = useCallback(
-    (selectedVolume: V1beta1DataSource) => {
-      const { name, namespace: pvcNS } = selectedVolume?.spec?.source?.pvc || {};
+    (selectedVolume: BootableVolume) => {
       const instanceType = getInstanceTypeFromVolume(selectedVolume);
 
       setSelectedBootableVolume(selectedVolume);
-      setPVCSource(pvcSources?.[pvcNS]?.[name] ?? null);
+      setPVCSource(getBootableVolumePVCSource(selectedVolume, pvcSources) ?? null);
       setSelectedInstanceType(instanceType);
     },
     [pvcSources],
@@ -73,8 +72,7 @@ const CreateFromInstanceType: FC = () => {
 
   useEffect(() => {
     if (!isEmpty(selectedBootableVolume) && isEmpty(pvcSource)) {
-      const { name, namespace: pvcNS } = selectedBootableVolume?.spec?.source?.pvc || {};
-      setPVCSource(pvcSources?.[pvcNS]?.[name] ?? null);
+      setPVCSource(getBootableVolumePVCSource(selectedBootableVolume, pvcSources) ?? null);
     }
   }, [pvcSource, pvcSources, selectedBootableVolume]);
 
@@ -152,6 +150,7 @@ const CreateFromInstanceType: FC = () => {
         }}
         selectedBootableVolume={selectedBootableVolume}
         sshSecretCredentials={sshSecretCredentials}
+        pvcSource={pvcSource}
       />
     </>
   );

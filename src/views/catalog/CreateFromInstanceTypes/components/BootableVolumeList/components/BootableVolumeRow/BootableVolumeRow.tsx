@@ -1,11 +1,11 @@
-import React, { FC } from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { getBootableVolumeGroupVersionKind } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { getTemplateOSIcon as getOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import {
-  V1alpha1PersistentVolumeClaim,
-  V1alpha2VirtualMachineClusterPreference,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import {
@@ -14,21 +14,19 @@ import {
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Text, TextVariants } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 
 import TableData from './TableData';
 
 type BootableVolumeRowProps = {
-  bootableVolume: V1beta1DataSource;
+  bootableVolume: BootableVolume;
   activeColumnIDs: string[];
   rowData: {
-    bootableVolumeSelectedState: [
-      V1beta1DataSource,
-      React.Dispatch<React.SetStateAction<V1beta1DataSource>>,
-    ];
+    bootableVolumeSelectedState: [BootableVolume, Dispatch<SetStateAction<BootableVolume>>];
     preference: V1alpha2VirtualMachineClusterPreference;
-    pvcSource: V1alpha1PersistentVolumeClaim;
+    pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   };
 };
 
@@ -53,12 +51,13 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       onClick={() => setBootSourceSelected(bootableVolume)}
     >
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
+        <ResourceIcon groupVersionKind={getBootableVolumeGroupVersionKind(bootableVolume)} />
         <img src={getOSIcon(preference)} alt="os-icon" className="vm-catalog-row-icon" />
         <Text component={TextVariants.small}>{bootVolumeName}</Text>
-        {isDataSourceCloning(bootableVolume) && (
+        {isDataSourceCloning(bootableVolume as V1beta1DataSource) && (
           <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>
         )}
-        {isDataSourceUploading(bootableVolume) && (
+        {isDataSourceUploading(bootableVolume as V1beta1DataSource) && (
           <Label className="vm-catalog-row-label">{t('Upload in progress')}</Label>
         )}
       </TableData>

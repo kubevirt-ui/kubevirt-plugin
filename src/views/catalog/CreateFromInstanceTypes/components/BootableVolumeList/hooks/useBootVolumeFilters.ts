@@ -1,4 +1,4 @@
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
 import { getItemNameWithOther } from '@kubevirt-utils/utils/utils';
@@ -6,7 +6,7 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getBootVolumeOS } from '../utils/utils';
 
-const useBootVolumeFilters = (type?: string): RowFilter<V1beta1DataSource>[] => {
+const useBootVolumeFilters = (type?: string): RowFilter<BootableVolume>[] => {
   const { t } = useKubevirtTranslation();
 
   return [
