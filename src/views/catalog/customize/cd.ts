@@ -2,6 +2,7 @@ import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1DataVolumeSpec,
+  V1ContainerDiskSource,
   V1DataVolumeTemplateSpec,
   V1VirtualMachine,
   V1Volume,
@@ -11,24 +12,36 @@ import {
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
 
+import { removeDockerPrefix } from './components/CustomizeSource/utils';
 import { INSTALLATION_CDROM_DISK, INSTALLATION_CDROM_NAME } from './constants';
 
 export const addInstallationCDRom = (
   virtualMachine: V1VirtualMachine,
-  cdSource: V1beta1DataVolumeSpec,
+  cdSource: V1beta1DataVolumeSpec | V1ContainerDiskSource,
 ): V1VirtualMachine => {
   let cdVolume: V1Volume = undefined;
   let cdDataVolumeTemplate: V1DataVolumeTemplateSpec = undefined;
   const dataVolumeName = `${virtualMachine?.metadata?.name}-${INSTALLATION_CDROM_NAME}`;
 
-  if (cdSource?.source?.registry) {
+  if ((cdSource as V1ContainerDiskSource)?.image) {
     cdVolume = {
       name: INSTALLATION_CDROM_NAME,
       containerDisk: {
-        image: cdSource.source?.registry.url,
+        image: removeDockerPrefix((cdSource as V1ContainerDiskSource).image),
       },
     };
-  } else if (cdSource?.source?.http || cdSource?.source?.pvc) {
+  }
+
+  const cdDataVolumeSource = (cdSource as V1beta1DataVolumeSpec)?.source;
+
+  if (cdDataVolumeSource?.registry) {
+    cdVolume = {
+      name: INSTALLATION_CDROM_NAME,
+      containerDisk: {
+        image: removeDockerPrefix(cdDataVolumeSource?.registry.url),
+      },
+    };
+  } else if (cdDataVolumeSource?.http || cdDataVolumeSource?.pvc) {
     cdVolume = {
       name: INSTALLATION_CDROM_NAME,
       dataVolume: {
@@ -38,9 +51,9 @@ export const addInstallationCDRom = (
 
     cdDataVolumeTemplate = {
       metadata: { name: dataVolumeName },
-      spec: { source: cdSource?.source, storage: cdSource?.storage },
+      spec: { source: cdDataVolumeSource, storage: (cdSource as V1beta1DataVolumeSpec)?.storage },
     };
-  } else if (cdSource?.source?.upload) {
+  } else if (cdDataVolumeSource?.upload) {
     cdVolume = {
       name: INSTALLATION_CDROM_NAME,
       persistentVolumeClaim: {
@@ -69,7 +82,7 @@ export const addInstallationCDRom = (
 
 export const addCDToTemplate = (
   template: V1Template,
-  cdSource: V1beta1DataVolumeSpec,
+  cdSource: V1beta1DataVolumeSpec | V1ContainerDiskSource,
 ): V1Template => {
   const virtualMachine = addInstallationCDRom(getTemplateVirtualMachineObject(template), cdSource);
 

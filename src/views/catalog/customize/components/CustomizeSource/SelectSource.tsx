@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
@@ -23,11 +23,16 @@ import {
 } from './constants';
 import SelectSourceOption from './SelectSourceOption';
 import { SelectSourceUploadPVCProgress } from './SelectSourceUploadPVCProgress';
-import { appendDockerPrefix, getGenericSourceCustomization, getPVCSource } from './utils';
+import {
+  appendDockerPrefix,
+  getContainerDiskSource,
+  getGenericSourceCustomization,
+  getPVCSource,
+} from './utils';
 
 export type SelectSourceProps = {
-  onSourceChange: (customSource: V1beta1DataVolumeSpec) => void;
-  selectedSource?: V1beta1DataVolumeSpec;
+  onSourceChange: (customSource: V1beta1DataVolumeSpec | V1ContainerDiskSource) => void;
+  selectedSource?: V1beta1DataVolumeSpec | V1ContainerDiskSource;
   sourceLabel: React.ReactNode | string;
   sourcePopOver?: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
   initialVolumeQuantity?: string;
@@ -99,6 +104,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           ),
         );
       case CONTAINER_DISK_SOURCE_NAME:
+        return onSourceChange(getContainerDiskSource(containerImage));
       case REGISTRY_SOURCE_NAME:
         return onSourceChange(
           getGenericSourceCustomization(
