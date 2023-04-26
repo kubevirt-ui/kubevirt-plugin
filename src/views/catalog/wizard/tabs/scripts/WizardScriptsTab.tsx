@@ -9,7 +9,14 @@ import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEdito
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { DescriptionList, Divider, PageSection } from '@patternfly/react-core';
+import {
+  Alert,
+  AlertVariant,
+  DescriptionList,
+  DescriptionListDescription,
+  Divider,
+  PageSection,
+} from '@patternfly/react-core';
 
 import SSHKey from './components/SSHKey';
 import Sysprep from './components/Sysprep';
@@ -29,6 +36,20 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM }) => {
       >
         <SidebarEditorSwitch />
         <DescriptionList className="wizard-scripts-tab__description-list">
+          <DescriptionListDescription>
+            <Alert
+              className="scripts-alert"
+              title={t(
+                'Cloud-init and SSH key configurations will be applied to the VirtualMachine only at the first boot.',
+              )}
+              isInline
+              variant={AlertVariant.warning}
+            >
+              {t(
+                'Please, make sure the configuration is correct before starting the VirtualMachine.',
+              )}
+            </Alert>
+          </DescriptionListDescription>
           <WizardDescriptionItem
             testId="wizard-cloudinit"
             title={t('Cloud-init')}

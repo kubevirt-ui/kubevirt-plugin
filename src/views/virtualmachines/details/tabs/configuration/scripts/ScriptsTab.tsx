@@ -22,7 +22,10 @@ import {
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Alert,
+  AlertVariant,
   DescriptionList,
+  DescriptionListDescription,
   Divider,
   Flex,
   FlexItem,
@@ -86,6 +89,21 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
                 </FlexItem>
               </Flex>
             </Title>
+
+            <DescriptionListDescription>
+              <Alert
+                className="scripts-alert"
+                title={t(
+                  'Cloud-init and SSH key configurations will be applied to the VirtualMachine only at the first boot.',
+                )}
+                isInline
+                variant={AlertVariant.warning}
+              >
+                {t(
+                  'Please, make sure the configuration is correct before starting the VirtualMachine.',
+                )}
+              </Alert>
+            </DescriptionListDescription>
 
             <VirtualMachineDescriptionItem
               descriptionData={<CloudInitDescription vm={resource} />}
