@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
@@ -18,11 +18,11 @@ type CPUUtilProps = {
   pods: K8sResourceCommon[];
 };
 
-const CPUUtil: React.FC<CPUUtilProps> = ({ vmi, pods }) => {
+const CPUUtil: FC<CPUUtilProps> = ({ vmi, pods }) => {
   const { t } = useKubevirtTranslation();
-  const vmiPod = React.useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
+  const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
   const { currentTime, duration } = useDuration();
-  const queries = React.useMemo(
+  const queries = useMemo(
     () => getUtilizationQueries({ obj: vmi, duration, launcherPodName: vmiPod?.metadata?.name }),
     [vmi, vmiPod, duration],
   );
@@ -71,6 +71,7 @@ const CPUUtil: React.FC<CPUUtilProps> = ({ vmi, pods }) => {
             subTitle={t('Used')}
             subTitleComponent={<ChartLabel y={135} />}
             title={`${averageCPUUsage.toFixed(2) || 0}%`}
+            style={{ labels: { fontSize: 20 } }}
           />
         </ComponentReady>
       </div>

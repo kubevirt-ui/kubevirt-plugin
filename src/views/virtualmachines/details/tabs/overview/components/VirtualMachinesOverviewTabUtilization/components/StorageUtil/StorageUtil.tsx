@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -11,7 +11,7 @@ type StorageUtilProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const StorageUtil: React.FC<StorageUtilProps> = ({ vmi }) => {
+const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const [guestAgentData, loaded] = useGuestOS(vmi);
@@ -59,6 +59,7 @@ const StorageUtil: React.FC<StorageUtilProps> = ({ vmi }) => {
             subTitle={t('Used')}
             subTitleComponent={<ChartLabel y={135} />}
             title={`${usedPercentage.toFixed(2) || 0}%`}
+            style={{ labels: { fontSize: 20 } }}
           />
         </ComponentReady>
       </div>
