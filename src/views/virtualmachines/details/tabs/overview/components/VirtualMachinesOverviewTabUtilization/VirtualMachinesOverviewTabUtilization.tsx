@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -32,9 +32,9 @@ type VirtualMachinesOverviewTabUtilizationProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachinesOverviewTabUtilization: React.FC<
-  VirtualMachinesOverviewTabUtilizationProps
-> = ({ vm }) => {
+const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtilizationProps> = ({
+  vm,
+}) => {
   const { t } = useKubevirtTranslation();
   const { vmi, pods } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useMemo } from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -15,13 +15,10 @@ type MemoryUtilProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const MemoryUtil: React.FC<MemoryUtilProps> = ({ vmi }) => {
+const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration } = useDuration();
-  const queries = React.useMemo(
-    () => getUtilizationQueries({ obj: vmi, duration }),
-    [vmi, duration],
-  );
+  const queries = useMemo(() => getUtilizationQueries({ obj: vmi, duration }), [vmi, duration]);
 
   const requests = vmi?.spec?.domain?.resources?.requests as {
     [key: string]: string;
@@ -69,6 +66,7 @@ const MemoryUtil: React.FC<MemoryUtilProps> = ({ vmi }) => {
             subTitle={t('Used')}
             subTitleComponent={<ChartLabel y={135} />}
             title={`${Number(percentageMemoryUsed?.toFixed(2))}%`}
+            style={{ labels: { fontSize: 20 } }}
           />
         </ComponentReady>
       </div>
