@@ -1,7 +1,7 @@
 import { TFunction } from 'react-i18next';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   getTemplateContainerDisks,
   getTemplateVirtualMachineObject,
@@ -9,6 +9,7 @@ import {
 
 import {
   BLANK_SOURCE_NAME,
+  CONTAINER_DISK_SOURCE_NAME,
   DEFAULT_SOURCE,
   HTTP_SOURCE_NAME,
   PVC_SOURCE_NAME,
@@ -17,12 +18,14 @@ import {
 } from './constants';
 
 export const getSourceTypeFromDiskSource = (
-  diskSource: V1beta1DataVolumeSpec,
+  diskSource: V1beta1DataVolumeSpec | V1ContainerDiskSource,
 ): SOURCE_OPTIONS_IDS => {
-  if (diskSource.source.blank) return BLANK_SOURCE_NAME;
-  if (diskSource.source.http) return HTTP_SOURCE_NAME;
-  if (diskSource.source.registry) return REGISTRY_SOURCE_NAME;
-  if (diskSource.source.pvc) return PVC_SOURCE_NAME;
+  if ((diskSource as V1ContainerDiskSource).image) return CONTAINER_DISK_SOURCE_NAME;
+
+  if ((diskSource as V1beta1DataVolumeSpec).source.blank) return BLANK_SOURCE_NAME;
+  if ((diskSource as V1beta1DataVolumeSpec).source.http) return HTTP_SOURCE_NAME;
+  if ((diskSource as V1beta1DataVolumeSpec).source.registry) return REGISTRY_SOURCE_NAME;
+  if ((diskSource as V1beta1DataVolumeSpec).source.pvc) return PVC_SOURCE_NAME;
 
   return DEFAULT_SOURCE;
 };
@@ -49,6 +52,10 @@ export const getGenericSourceCustomization = (
 
   return dataVolumeSpec;
 };
+
+export const getContainerDiskSource = (imageURL: string): V1ContainerDiskSource => ({
+  image: imageURL,
+});
 
 export const getPVCSource = (
   pvcName: string,
