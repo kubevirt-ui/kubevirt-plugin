@@ -7,8 +7,6 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -16,11 +14,11 @@ import { InstanceTypeSize } from '../components/SelectInstanceTypeSection/utils/
 import { categoryNamePrefixMatcher } from '../components/SelectInstanceTypeSection/utils/utils';
 
 import {
-  BootableVolume,
   DEFAULT_INSTANCETYPE_LABEL,
   DEFAULT_PREFERENCE_LABEL,
   InstanceTypeState,
 } from './constants';
+import { BootableVolume } from './types';
 
 const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
@@ -37,7 +35,7 @@ export const getInstanceTypeState = (defaultInstanceTypeName: string): InstanceT
 
 export const generateVM = (
   bootableVolume: BootableVolume,
-  activeNamespace: string,
+  namespace: string,
   instanceTypeName: string,
   vmName?: string,
   storageClassName?: string,
@@ -49,15 +47,17 @@ export const generateVM = (
       separator: '-',
     });
 
-  const targetNamespace =
-    activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : DEFAULT_NAMESPACE;
+  const sourceMetadata = {
+    name: bootableVolume?.metadata?.name,
+    namespace: bootableVolume?.metadata?.namespace,
+  };
 
   const emptyVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
     kind: VirtualMachineModel.kind,
     metadata: {
       name: virtualmachineName,
-      namespace: targetNamespace,
+      namespace,
     },
     spec: {
       running: true,
@@ -112,17 +112,13 @@ export const generateVM = (
             ...(isBootableVolumePVCKind(bootableVolume)
               ? {
                   source: {
-                    pvc: {
-                      name: bootableVolume?.metadata?.name,
-                      namespace: bootableVolume?.metadata?.namespace,
-                    },
+                    pvc: { ...sourceMetadata },
                   },
                 }
               : {
                   sourceRef: {
                     kind: DataSourceModel.kind,
-                    name: bootableVolume?.metadata?.name,
-                    namespace: bootableVolume?.metadata?.namespace,
+                    ...sourceMetadata,
                   },
                 }),
             storage: {

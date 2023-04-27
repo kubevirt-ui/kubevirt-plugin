@@ -1,9 +1,7 @@
 import { useState } from 'react';
 
-import {
-  BootableVolume,
-  DEFAULT_PREFERENCE_LABEL,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { getBootableVolumePVCSource } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import {
   V1alpha1PersistentVolumeClaim,
@@ -40,13 +38,15 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
 
   const getSortableRowValues = (bootableVolume: BootableVolume): string[] => {
     const pvcSource = getBootableVolumePVCSource(bootableVolume, pvcSources);
+    const { labels, annotations, namespace } = bootableVolume?.metadata || {};
 
     return [
       getName(bootableVolume),
-      getName(preferences[bootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]]),
+      namespace,
+      getName(preferences[labels?.[DEFAULT_PREFERENCE_LABEL]]),
       pvcSource?.spec?.storageClassName,
       pvcSource?.spec?.resources?.requests?.storage,
-      bootableVolume?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
+      annotations?.[DESCRIPTION_ANNOTATION],
     ];
   };
 
@@ -74,8 +74,8 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   });
 
   const sortedData = (unsortedData || [])
-    ?.slice(pagination.startIndex, pagination.endIndex)
-    ?.sort(sortVolumes);
+    ?.sort(sortVolumes)
+    ?.slice(pagination.startIndex, pagination.endIndex);
 
   return { sortedData, getSortType };
 };

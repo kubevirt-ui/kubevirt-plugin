@@ -40,14 +40,16 @@ const FilterSelect: FC<FilterSelectProps> = ({
       hasInlineFilter
       onFilter={(_, value: string) => {
         if (!value) {
-          return options.map((option) => (
-            <FilterSelectOption
-              key={option}
-              optionLabel={optionLabelText}
-              optionName={option}
-              groupVersionKind={groupVersionKind}
-            />
-          ));
+          return options
+            ?.sort((a, b) => a.localeCompare(b))
+            ?.map((option) => (
+              <FilterSelectOption
+                key={option}
+                optionLabel={optionLabelText}
+                optionName={option}
+                groupVersionKind={groupVersionKind}
+              />
+            ));
         }
         const regex = new RegExp(value, 'i');
         const newOptions = options.filter((name) => regex.test(name));

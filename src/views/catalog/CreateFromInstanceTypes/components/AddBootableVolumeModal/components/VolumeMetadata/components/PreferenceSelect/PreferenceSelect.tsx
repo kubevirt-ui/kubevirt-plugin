@@ -49,7 +49,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
       <FilterSelect
         selected={selectedPreference}
         setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
-        options={preferencesNames?.sort((a, b) => a.localeCompare(b))}
+        options={preferencesNames}
         groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
         optionLabelText={t('preference')}
       />

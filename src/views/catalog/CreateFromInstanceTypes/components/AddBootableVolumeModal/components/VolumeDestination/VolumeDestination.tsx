@@ -3,12 +3,14 @@ import React, { FC, useState } from 'react';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import DefaultStorageClassAlert from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClass/DefaultStorageClassAlert';
 import StorageClassSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClass/StorageClassSelect';
-import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isUpstream } from '@kubevirt-utils/utils/utils';
+import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState } from '../../utils/constants';
+import FilterSelect from '../FilterSelect/FilterSelect';
 
 type VolumeDestinationProps = {
   bootableVolume: AddBootableVolumeState;
@@ -21,8 +23,14 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [showSCAlert, setShowSCAlert] = useState(false);
+  const [projects] = useK8sWatchResource<K8sResourceCommon[]>({
+    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    namespaced: false,
+    isList: true,
+  });
 
-  const { bootableVolumeName, size, storageClassName } = bootableVolume || {};
+  const { bootableVolumeName, size, storageClassName, bootableVolumeNamespace } =
+    bootableVolume || {};
 
   return (
     <>
@@ -56,12 +64,14 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
           onChange={setBootableVolumeField('bootableVolumeName')}
         />
       </FormGroup>
+
       <FormGroup label={t('Destination project')}>
-        <TextInput
-          id="destination-project"
-          type="text"
-          isDisabled
-          value={isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS}
+        <FilterSelect
+          selected={bootableVolumeNamespace}
+          setSelected={setBootableVolumeField('bootableVolumeNamespace')}
+          groupVersionKind={modelToGroupVersionKind(ProjectModel)}
+          options={projects?.map(getName)}
+          optionLabelText={t('Project')}
         />
       </FormGroup>
     </>

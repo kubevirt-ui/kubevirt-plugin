@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { getBootableVolumeGroupVersionKind } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { getTemplateOSIcon as getOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -15,7 +15,7 @@ import {
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
-import { Label, Text, TextVariants } from '@patternfly/react-core';
+import { Label, Text, TextVariants, Truncate } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 
 import TableData from './TableData';
@@ -61,10 +61,13 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
           <Label className="vm-catalog-row-label">{t('Upload in progress')}</Label>
         )}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id="operating-system" width={20}>
+      <TableData activeColumnIDs={activeColumnIDs} id="namespace" width={10}>
+        <Truncate content={bootableVolume?.metadata?.namespace} />
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} id="operating-system" width={15}>
         {preference?.metadata?.annotations?.[ANNOTATIONS.displayName] || NO_DATA_DASH}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id="storage-class" width={20}>
+      <TableData activeColumnIDs={activeColumnIDs} id="storage-class" width={15}>
         {pvcSource?.spec?.storageClassName || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="size" width={10}>

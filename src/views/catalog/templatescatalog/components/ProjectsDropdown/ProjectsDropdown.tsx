@@ -1,25 +1,26 @@
-import * as React from 'react';
+import React, { FC, memo, useEffect, useState } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { ContextSelector, ContextSelectorItem, Text, TextVariants } from '@patternfly/react-core';
 
-import './TemplatesCatalogProjectsDropdown.scss';
+import './ProjectsDropdown.scss';
 
-type TemplatesCatalogProjectsDropdownProps = {
+type ProjectsDropdownProps = {
   selectedProject: string;
   onChange: (project: string) => void;
+  title?: string;
 };
 
 const ALL_PROJECTS_SELECTOR = 'All projects';
 
-export const TemplatesCatalogProjectsDropdown: React.FC<TemplatesCatalogProjectsDropdownProps> =
-  React.memo(({ selectedProject, onChange }) => {
+export const ProjectsDropdown: FC<ProjectsDropdownProps> = memo(
+  ({ selectedProject, onChange, title }) => {
     const { t } = useKubevirtTranslation();
-    const [isOpen, setOpen] = React.useState(false);
-    const [searchValue, setSearchValue] = React.useState('');
-    const [filteredProjects, setFilteredProjects] = React.useState<K8sResourceCommon[]>([]);
+    const [isOpen, setOpen] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+    const [filteredProjects, setFilteredProjects] = useState<K8sResourceCommon[]>([]);
     const [projects] = useK8sWatchResource<K8sResourceCommon[]>({
       groupVersionKind: modelToGroupVersionKind(ProjectModel),
       namespaced: false,
@@ -41,7 +42,7 @@ export const TemplatesCatalogProjectsDropdown: React.FC<TemplatesCatalogProjects
       setFilteredProjects(filtered || []);
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
       if (filteredProjects.length === 0 && searchValue === '') {
         setFilteredProjects(projects);
       }
@@ -51,7 +52,7 @@ export const TemplatesCatalogProjectsDropdown: React.FC<TemplatesCatalogProjects
     return (
       <div className="templates-catalog-project-dropdown">
         <Text component={TextVariants.h6} className="templates-catalog-project-dropdown-label">
-          {t('Template project')}
+          {title || t('Project')}
         </Text>
         <ContextSelector
           className=""
@@ -81,6 +82,7 @@ export const TemplatesCatalogProjectsDropdown: React.FC<TemplatesCatalogProjects
         </ContextSelector>
       </div>
     );
-  });
+  },
+);
 
-TemplatesCatalogProjectsDropdown.displayName = 'TemplatesCatalogProjectsDropdown';
+ProjectsDropdown.displayName = 'ProjectsDropdown';

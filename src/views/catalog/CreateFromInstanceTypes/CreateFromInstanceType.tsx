@@ -23,11 +23,11 @@ import SectionListItem from './components/SectionListItem/SectionListItem';
 import useBootableVolumes from './hooks/useBootableVolumes';
 import useInstanceTypesAndPreferences from './hooks/useInstanceTypesAndPreferences';
 import {
-  BootableVolume,
   initialInstanceTypeState,
   INSTANCE_TYPES_SECTIONS,
   InstanceTypeState,
 } from './utils/constants';
+import { BootableVolume } from './utils/types';
 import { generateVM, getBootableVolumePVCSource } from './utils/utils';
 
 import './CreateFromInstanceType.scss';
@@ -35,10 +35,6 @@ import './CreateFromInstanceType.scss';
 const CreateFromInstanceType: FC = () => {
   const [ns] = useActiveNamespace();
   const history = useHistory();
-
-  const { pvcSources, ...BootableVolumesObject } = useBootableVolumes();
-  const { preferences, loadError } = useInstanceTypesAndPreferences();
-  const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
 
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
@@ -56,8 +52,16 @@ const CreateFromInstanceType: FC = () => {
     sshSecretKey: '',
   });
   const [pvcSource, setPVCSource] = useState<IoK8sApiCoreV1PersistentVolumeClaim>();
+  const [volumeNamespace, setVolumeNamespace] = useState<string>('');
 
-  const namespace = ns === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : ns;
+  const { pvcSources, ...BootableVolumesObject } = useBootableVolumes(volumeNamespace);
+  const { preferences, loadError } = useInstanceTypesAndPreferences();
+  const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
+
+  const namespace = useMemo(
+    () => (ns === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : ns),
+    [ns],
+  );
 
   const onSelectVolume = useCallback(
     (selectedVolume: BootableVolume) => {
@@ -91,6 +95,7 @@ const CreateFromInstanceType: FC = () => {
                     preferencesNames={Object.keys(preferencesMap)}
                     loadError={loadError}
                     onSelectVolume={onSelectVolume}
+                    volumeNamespace={volumeNamespace}
                   />
                 }
               >
@@ -98,6 +103,7 @@ const CreateFromInstanceType: FC = () => {
                   preferences={preferencesMap}
                   bootableVolumeSelectedState={[selectedBootableVolume, onSelectVolume]}
                   bootableVolumesResources={{ pvcSources, ...BootableVolumesObject }}
+                  volumeNamespaceState={[volumeNamespace, setVolumeNamespace]}
                   displayShowAllButton
                 />
               </SectionListItem>
@@ -140,7 +146,7 @@ const CreateFromInstanceType: FC = () => {
       <CreateVMFooter
         vm={generateVM(
           selectedBootableVolume,
-          ns,
+          namespace,
           selectedInstanceType?.name,
           vmName,
           pvcSource?.spec?.storageClassName,

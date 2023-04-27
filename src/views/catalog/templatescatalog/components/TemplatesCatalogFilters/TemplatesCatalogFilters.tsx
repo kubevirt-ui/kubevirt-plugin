@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, memo } from 'react';
 
 import { CATALOG_FILTERS } from '@catalog/templatescatalog/utils/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,21 +12,22 @@ import { VerticalTabs, VerticalTabsTab } from '@patternfly/react-catalog-view-ex
 import { FilterSidePanel } from '@patternfly/react-catalog-view-extension/dist/esm/components/FilterSidePanel';
 
 import { TemplateFilters } from '../../hooks/useVmTemplatesFilters';
-import { TemplatesCatalogProjectsDropdown } from '../TemplatesCatalogProjectsDropdown/TemplatesCatalogProjectsDropdown';
+import { ProjectsDropdown } from '../ProjectsDropdown/ProjectsDropdown';
 
 import { TemplatesCatalogFiltersGroup } from './TemplatesCatalogFiltersGroup';
 
-export const TemplatesCatalogFilters: React.FC<{
+export const TemplatesCatalogFilters: FC<{
   filters: TemplateFilters;
   onFilterChange: (type: CATALOG_FILTERS, value: string | boolean) => void;
-}> = React.memo(({ filters, onFilterChange }) => {
+}> = memo(({ filters, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <div className="co-catalog-page__tabs">
-      <TemplatesCatalogProjectsDropdown
+      <ProjectsDropdown
         selectedProject={filters.namespace}
         onChange={(project) => onFilterChange(CATALOG_FILTERS.NAMESPACE, project)}
+        title={t('Template project')}
       />
 
       <VerticalTabs>

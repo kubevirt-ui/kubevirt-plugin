@@ -1,9 +1,7 @@
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
 
-import {
-  BootableVolume,
-  InstanceTypeState,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { InstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

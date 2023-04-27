@@ -15,6 +15,7 @@ export enum RADIO_FORM_SELECTION {
 
 export type AddBootableVolumeState = {
   bootableVolumeName: string;
+  bootableVolumeNamespace: string;
   pvcName: string;
   pvcNamespace: string;
   uploadFile: File | string;
@@ -27,6 +28,7 @@ export type AddBootableVolumeState = {
 };
 export const initialBootableVolumeState: AddBootableVolumeState = {
   bootableVolumeName: null,
+  bootableVolumeNamespace: null,
   pvcName: null,
   pvcNamespace: null,
   uploadFile: null,

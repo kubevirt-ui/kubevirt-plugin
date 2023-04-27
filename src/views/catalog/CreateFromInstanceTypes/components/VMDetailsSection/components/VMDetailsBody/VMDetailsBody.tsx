@@ -1,10 +1,8 @@
 import React, { Dispatch, SetStateAction } from 'react';
 
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
-import {
-  BootableVolume,
-  InstanceTypeState,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { InstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { Grid, GridItem } from '@patternfly/react-core';
 

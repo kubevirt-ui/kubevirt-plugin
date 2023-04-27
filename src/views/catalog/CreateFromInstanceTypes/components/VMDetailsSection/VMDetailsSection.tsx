@@ -1,12 +1,13 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import SSHSecretSection from '@kubevirt-utils/components/SSHSecretSection/SSHSecretSection';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ExpandableSection } from '@patternfly/react-core';
 
-import { BootableVolume, InstanceTypeState } from '../../utils/constants';
+import { InstanceTypeState } from '../../utils/constants';
 
 import VMDetailsBody from './components/VMDetailsBody/VMDetailsBody';
 

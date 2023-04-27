@@ -1,11 +1,11 @@
 import produce from 'immer';
 
 import {
-  BootableVolume,
   DEFAULT_INSTANCETYPE_LABEL,
   initialInstanceTypeState,
   InstanceTypeState,
 } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { getInstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
@@ -26,6 +26,7 @@ export const createDataSource =
   async (dataSource: V1beta1DataSource) => {
     const {
       bootableVolumeName,
+      bootableVolumeNamespace,
       size,
       annotations,
       labels,
@@ -36,6 +37,7 @@ export const createDataSource =
     } = bootableVolume || {};
     const draftDataSource = produce(dataSource, (draftDS) => {
       draftDS.metadata.name = bootableVolumeName;
+      draftDS.metadata.namespace = bootableVolumeNamespace;
       draftDS.metadata.annotations = annotations;
       draftDS.metadata.labels = labels;
     });
@@ -49,6 +51,7 @@ export const createDataSource =
 
     const bootableVolumeToCreate = produce(emptySourceDataVolume, (draftBootableVolume) => {
       draftBootableVolume.metadata.name = bootableVolumeName;
+      draftBootableVolume.metadata.namespace = bootableVolumeNamespace;
       draftBootableVolume.spec.storage.resources.requests.storage = size;
       draftBootableVolume.metadata.labels = labels;
       if (storageClassName) {

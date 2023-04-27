@@ -8,15 +8,15 @@ import {
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import {
   convertResourceArrayToMap,
   getReadyOrCloningOrUploadingDataSources,
 } from '@kubevirt-utils/resources/shared';
-import { isEmpty, isUpstream } from '@kubevirt-utils/utils/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { BootableVolume, DEFAULT_PREFERENCE_LABEL } from '../utils/constants';
+import { DEFAULT_PREFERENCE_LABEL } from '../utils/constants';
+import { BootableVolume } from '../utils/types';
 
 export type UseBootableVolumesValues = {
   bootableVolumes: BootableVolume[];
@@ -27,15 +27,15 @@ export type UseBootableVolumesValues = {
   };
 };
 
-type UseBootableVolumes = () => UseBootableVolumesValues;
+type UseBootableVolumes = (namespace: string) => UseBootableVolumesValues;
 
-const useBootableVolumes: UseBootableVolumes = () => {
+const useBootableVolumes: UseBootableVolumes = (namespace) => {
   const [dataSources, loadedDataSources, loadErrorDataSources] = useK8sWatchResource<
     V1beta1DataSource[]
   >({
     groupVersionKind: DataSourceModelGroupVersionKind,
     isList: true,
-    namespace: isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS,
+    namespace,
     selector: {
       matchExpressions: [{ key: DEFAULT_PREFERENCE_LABEL, operator: Operator.Exists }],
     },
@@ -47,7 +47,7 @@ const useBootableVolumes: UseBootableVolumes = () => {
   >({
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
-    namespace: isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS,
+    namespace,
   });
 
   const loadError = useMemo(
@@ -69,9 +69,9 @@ const useBootableVolumes: UseBootableVolumes = () => {
   // getting all underlying PVCs to get size and SC data from
   const pvcSourcesFromDS: IoK8sApiCoreV1PersistentVolumeClaim[] = useMemo(() => {
     return readyOrCloningDataSources?.map((ds) => {
-      const { name, namespace } = ds?.spec?.source?.pvc || {};
-      if (!isEmpty(pvcSources?.[namespace]?.[name])) {
-        return pvcSources?.[namespace]?.[name];
+      const { name: pvcName, namespace: pvcNamespace } = ds?.spec?.source?.pvc || {};
+      if (!isEmpty(pvcSources?.[pvcNamespace]?.[pvcName])) {
+        return pvcSources?.[pvcNamespace]?.[pvcName];
       }
     });
   }, [pvcSources, readyOrCloningDataSources]);
@@ -80,7 +80,7 @@ const useBootableVolumes: UseBootableVolumes = () => {
   const labeledPVCs = useMemo(
     () =>
       pvcs?.filter((pvc) => {
-        if (!isEmpty(pvc?.metadata?.labels[DEFAULT_PREFERENCE_LABEL])) {
+        if (!isEmpty(pvc?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL])) {
           const existingPVC = pvcSourcesFromDS?.find((pvcSource) => isEqualObject(pvcSource, pvc));
           if (!existingPVC) return pvc;
         }

@@ -1,19 +1,22 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { getBootableVolumePVCSource } from '@catalog/CreateFromInstanceTypes/utils/utils';
+import { ProjectsDropdown } from '@catalog/templatescatalog/components/ProjectsDropdown/ProjectsDropdown';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/react-core';
+import { Pagination, Split, SplitItem } from '@patternfly/react-core';
 import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 
 import { UseBootableVolumesValues } from '../../hooks/useBootableVolumes';
-import { BootableVolume, DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
+import { DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
 
 import BootableVolumeRow from './components/BootableVolumeRow/BootableVolumeRow';
+import BootableVolumesEmptyState from './components/BootableVolumesEmptyState/BootableVolumesEmptyState';
+import BootableVolumesSkeleton from './components/BootableVolumesSkeleton/BootableVolumesSkeleton';
 import ShowAllBootableVolumesButton from './components/ShowAllBootableVolumesButton/ShowAllBootableVolumesButton';
 import useBootVolumeColumns from './hooks/useBootVolumeColumns';
 import useBootVolumeFilters from './hooks/useBootVolumeFilters';
@@ -32,17 +35,22 @@ export type BootableVolumeListProps = {
   preferences: { [resourceKeyName: string]: V1alpha2VirtualMachineClusterPreference };
   bootableVolumeSelectedState: [BootableVolume, Dispatch<SetStateAction<BootableVolume>>];
   bootableVolumesResources: UseBootableVolumesValues;
+  volumeNamespaceState: [string, Dispatch<SetStateAction<string>>];
   displayShowAllButton?: boolean;
 };
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
   preferences,
   bootableVolumeSelectedState: [bootableVolumeSelected, setBootableVolumeSelected],
-  bootableVolumesResources: { bootableVolumes, loaded, pvcSources },
+  bootableVolumesResources: { bootableVolumes, loaded, loadError, pvcSources },
+  volumeNamespaceState: [volumeNamespace, setVolumeNamespace],
   displayShowAllButton,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { activeColumns, columnLayout } = useBootVolumeColumns(!displayShowAllButton);
+  const { activeColumns, columnLayout } = useBootVolumeColumns(
+    !displayShowAllButton,
+    volumeNamespace,
+  );
   const filters = useBootVolumeFilters(`osName${!displayShowAllButton && '-modal'}`);
 
   const [unfilteredData, data, onFilterChange] = useListPageFilter(bootableVolumes, filters);
@@ -57,6 +65,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     pvcSources,
     pagination,
   );
+
   const onPageChange = ({ page, perPage, startIndex, endIndex }) => {
     setPagination(() => ({
       page,
@@ -64,6 +73,14 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
       startIndex,
       endIndex,
     }));
+  };
+
+  const handleVolumeNamespaceSelect = (project: string) => {
+    if (bootableVolumeSelected?.metadata?.namespace !== project && project !== '') {
+      setBootableVolumeSelected(null);
+    }
+
+    return setVolumeNamespace(project);
   };
 
   useEffect(() => {
@@ -75,18 +92,28 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     }
   }, [bootableVolumeSelected, bootableVolumes, displayShowAllButton]);
 
+  if (!loaded && !loadError) {
+    return <BootableVolumesSkeleton />;
+  }
+
+  if (isEmpty(bootableVolumes)) {
+    return (
+      <BootableVolumesEmptyState
+        volumeNamespace={volumeNamespace}
+        setVolumeNamespace={setVolumeNamespace}
+      />
+    );
+  }
+
   return (
     <>
       <Split className="bootable-volume-list-bar" hasGutter>
         <SplitItem>
-          <FormGroup label={t('Volumes project')}>
-            <TextInput
-              className="bootable-volume-list-bar__volume-namespace"
-              value={OPENSHIFT_OS_IMAGES_NS}
-              isDisabled
-              aria-label="bootable volume list"
-            />
-          </FormGroup>
+          <ProjectsDropdown
+            selectedProject={volumeNamespace}
+            onChange={handleVolumeNamespaceSelect}
+            title={t('Volumes project')}
+          />
         </SplitItem>
         <SplitItem className="bootable-volume-list-bar__filter">
           <ListPageFilter
@@ -131,6 +158,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             preferences={preferences}
             bootableVolumeSelectedState={[bootableVolumeSelected, setBootableVolumeSelected]}
             bootableVolumesResources={{ bootableVolumes, loaded, pvcSources }}
+            volumeNamespaceState={[volumeNamespace, setVolumeNamespace]}
           />
         )}
       </Split>

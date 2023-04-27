@@ -1,22 +1,29 @@
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TableColumn, useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
 import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 
-type UseBootVolumesColumns = (isModal: boolean) => {
+type UseBootVolumesColumns = (
+  isModal: boolean,
+  namespace: string,
+) => {
   columns: TableColumn<BootableVolume>[];
   activeColumns: TableColumn<BootableVolume>[];
   columnLayout: ColumnLayout | null;
 };
 
-const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
+const useBootVolumeColumns: UseBootVolumesColumns = (isModal, namespace) => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<BootableVolume>[] = [
     {
       title: t('Volume name'),
       id: 'name',
+    },
+    {
+      title: t('Namespace'),
+      id: 'namespace',
     },
     {
       title: t('Operating system'),
@@ -38,7 +45,7 @@ const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
 
   const [activeColumns] = useActiveColumns<BootableVolume>({
     columns,
-    showNamespaceOverride: false,
+    showNamespaceOverride: !namespace,
     columnManagementID: DataSourceModelRef,
   });
 

@@ -3,10 +3,8 @@ import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
-import {
-  BootableVolume,
-  DEFAULT_INSTANCETYPE_LABEL,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
