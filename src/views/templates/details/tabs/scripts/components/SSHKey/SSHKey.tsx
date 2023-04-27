@@ -1,9 +1,10 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { AuthorizedSSHKeyModal } from '@kubevirt-utils/components/AuthorizedSSHKeyModal/AuthorizedSSHKeyModal';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -30,7 +31,7 @@ type SSHKeyProps = {
   template: V1Template;
 };
 
-const SSHKey: React.FC<SSHKeyProps> = ({ template }) => {
+const SSHKey: FC<SSHKeyProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
@@ -66,7 +67,7 @@ const SSHKey: React.FC<SSHKeyProps> = ({ template }) => {
                   createModal((modalProps) => (
                     <AuthorizedSSHKeyModal
                       {...modalProps}
-                      namespace={vm?.metadata?.namespace}
+                      namespace={vm?.metadata?.namespace || DEFAULT_NAMESPACE}
                       sshKey={secretKey}
                       vmSecretName={externalSecretName}
                       onSubmit={onSSHChange}
