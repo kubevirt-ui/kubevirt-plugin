@@ -14,7 +14,8 @@ import {
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { hasTemplateParameter } from '@kubevirt-utils/resources/template';
+import { ensurePath, getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -23,6 +24,13 @@ import {
 } from '../../../../views/virtualmachines/actions/actions';
 import { sourceTypes } from '../DiskFormFields/utils/constants';
 import { DiskFormState, DiskSourceState } from '../state/initialState';
+
+export const nameWithoutParameter = (name: string, defaultValue?) => {
+  if (hasTemplateParameter(name)) {
+    return defaultValue;
+  }
+  return name;
+};
 
 export const getEmptyVMDataVolumeResource = (
   vm: V1VirtualMachine,
@@ -136,7 +144,11 @@ export const getDataVolumeFromState = ({
     resultVolume?.persistentVolumeClaim?.claimName ||
     `${vm?.metadata?.name}-${diskState.diskName}`;
 
-  dataVolume.metadata.name = dvName;
+  dataVolume.metadata.name = nameWithoutParameter(
+    dvName,
+    `${diskState.diskName}-${getRandomChars()}`,
+  );
+
   dataVolume.spec.storage.resources.requests.storage = diskState.diskSize;
   dataVolume.spec.storage.storageClassName = diskState.storageClass;
   if (!diskState.applyStorageProfileSettings) {

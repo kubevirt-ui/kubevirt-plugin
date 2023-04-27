@@ -66,3 +66,5 @@ export const generateParamsWithPrettyName = (template: V1Template) => {
   }
   return [];
 };
+
+export const hasTemplateParameter = (stringToTest: string) => /[${}]/.test(stringToTest);
