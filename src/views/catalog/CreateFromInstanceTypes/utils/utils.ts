@@ -1,17 +1,22 @@
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import DataSourceModel, {
+  DataSourceModelGroupVersionKind,
+} from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { InstanceTypeSize } from '../components/SelectInstanceTypeSection/utils/types';
 import { categoryNamePrefixMatcher } from '../components/SelectInstanceTypeSection/utils/utils';
 
 import {
+  BootableVolume,
   DEFAULT_INSTANCETYPE_LABEL,
   DEFAULT_PREFERENCE_LABEL,
   InstanceTypeState,
@@ -31,7 +36,7 @@ export const getInstanceTypeState = (defaultInstanceTypeName: string): InstanceT
 };
 
 export const generateVM = (
-  dataSource: V1beta1DataSource,
+  bootableVolume: BootableVolume,
   activeNamespace: string,
   instanceTypeName: string,
   vmName?: string,
@@ -92,11 +97,11 @@ export const generateVM = (
       },
       instancetype: {
         // inferFromVolume: `${virtualmachineName}-disk`,
-        name: instanceTypeName || dataSource?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
+        name: instanceTypeName || bootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
       },
       preference: {
         // inferFromVolume: `${virtualmachineName}-disk`,
-        name: dataSource?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
+        name: bootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
       },
       dataVolumeTemplates: [
         {
@@ -104,11 +109,22 @@ export const generateVM = (
             name: `${virtualmachineName}-volume`,
           },
           spec: {
-            sourceRef: {
-              kind: DataSourceModel.kind,
-              name: dataSource?.metadata?.name,
-              namespace: dataSource?.metadata?.namespace,
-            },
+            ...(isBootableVolumePVCKind(bootableVolume)
+              ? {
+                  source: {
+                    pvc: {
+                      name: bootableVolume?.metadata?.name,
+                      namespace: bootableVolume?.metadata?.namespace,
+                    },
+                  },
+                }
+              : {
+                  sourceRef: {
+                    kind: DataSourceModel.kind,
+                    name: bootableVolume?.metadata?.name,
+                    namespace: bootableVolume?.metadata?.namespace,
+                  },
+                }),
             storage: {
               storageClassName,
               resources: { requests: { storage: '' } },
@@ -120,4 +136,26 @@ export const generateVM = (
   };
 
   return emptyVM;
+};
+
+export const isBootableVolumePVCKind = (bootableVolume: BootableVolume): boolean =>
+  bootableVolume?.kind !== DataSourceModel.kind;
+
+export const getBootableVolumeGroupVersionKind = (bootableVolume: BootableVolume) =>
+  isBootableVolumePVCKind(bootableVolume)
+    ? modelToGroupVersionKind(PersistentVolumeClaimModel)
+    : DataSourceModelGroupVersionKind;
+
+export const getBootableVolumePVCSource = (
+  bootableVolume: BootableVolume,
+  pvcSources: {
+    [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
+  },
+) => {
+  if (isEmpty(bootableVolume)) return null;
+  return isBootableVolumePVCKind(bootableVolume)
+    ? bootableVolume
+    : pvcSources?.[(bootableVolume as V1beta1DataSource)?.spec?.source?.pvc?.namespace]?.[
+        (bootableVolume as V1beta1DataSource)?.spec?.source?.pvc?.name
+      ];
 };

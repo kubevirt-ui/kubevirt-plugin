@@ -1,6 +1,7 @@
 import produce from 'immer';
 
 import {
+  BootableVolume,
   DEFAULT_INSTANCETYPE_LABEL,
   initialInstanceTypeState,
   InstanceTypeState,
@@ -8,10 +9,7 @@ import {
 import { getInstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import {
-  V1beta1DataSource,
-  V1beta1DataVolumeSourcePVC,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -36,14 +34,14 @@ export const createDataSource =
       uploadFile,
       storageClassName,
     } = bootableVolume || {};
-    const updatedDataSource = produce(dataSource, (draftDataSource) => {
-      draftDataSource.metadata.name = bootableVolumeName;
-      draftDataSource.metadata.annotations = annotations;
-      draftDataSource.metadata.labels = labels;
+    const draftDataSource = produce(dataSource, (draftDS) => {
+      draftDS.metadata.name = bootableVolumeName;
+      draftDS.metadata.annotations = annotations;
+      draftDS.metadata.labels = labels;
     });
 
     if (!cloneExistingPVC && !isUploadForm) {
-      const dataSourceToCreate = produce(updatedDataSource, (draftDS) => {
+      const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
         draftDS.spec.source = { pvc: { name: pvcName, namespace: pvcNamespace } };
       });
       return k8sCreate({ model: DataSourceModel, data: dataSourceToCreate });
@@ -52,6 +50,7 @@ export const createDataSource =
     const bootableVolumeToCreate = produce(emptySourceDataVolume, (draftBootableVolume) => {
       draftBootableVolume.metadata.name = bootableVolumeName;
       draftBootableVolume.spec.storage.resources.requests.storage = size;
+      draftBootableVolume.metadata.labels = labels;
       if (storageClassName) {
         draftBootableVolume.spec.storage.storageClassName = storageClassName;
       }
@@ -68,13 +67,12 @@ export const createDataSource =
         })
       : await k8sCreate({ model: DataVolumeModel, data: bootableVolumeToCreate });
 
-    const { name, namespace }: V1beta1DataVolumeSourcePVC = {
-      name: bootableVolumeToCreate.metadata.name,
-      namespace: bootableVolumeToCreate.metadata.namespace,
-    };
-    const dataSourceToCreate = produce(updatedDataSource, (draftDS) => {
+    const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
       draftDS.spec.source = {
-        pvc: { name, namespace },
+        pvc: {
+          name: bootableVolumeToCreate.metadata.name,
+          namespace: bootableVolumeToCreate.metadata.namespace,
+        },
       };
     });
 
@@ -83,8 +81,8 @@ export const createDataSource =
     onSelectVolume?.(newDataSource);
   };
 
-export const getInstanceTypeFromVolume = (dataSource: V1beta1DataSource): InstanceTypeState => {
-  const defaultInstanceTypeName = dataSource?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL];
+export const getInstanceTypeFromVolume = (bootableVolume: BootableVolume): InstanceTypeState => {
+  const defaultInstanceTypeName = bootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL];
   return defaultInstanceTypeName
     ? getInstanceTypeState(defaultInstanceTypeName)
     : initialInstanceTypeState;

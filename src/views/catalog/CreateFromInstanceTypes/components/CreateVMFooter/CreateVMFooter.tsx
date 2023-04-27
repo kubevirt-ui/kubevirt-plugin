@@ -3,14 +3,16 @@ import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
-import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import {
+  BootableVolume,
+  DEFAULT_INSTANCETYPE_LABEL,
+} from '@catalog/CreateFromInstanceTypes/utils/constants';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { createVmSSHSecret } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { getPVC } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -30,8 +32,9 @@ import './CreateVMFooter.scss';
 type CreateVMFooterProps = {
   vm: V1VirtualMachine;
   onCancel: () => void;
-  selectedBootableVolume: V1beta1DataSource;
+  selectedBootableVolume: BootableVolume;
   sshSecretCredentials: SSHSecretCredentials;
+  pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
 };
 
 const CreateVMFooter: FC<CreateVMFooterProps> = ({
@@ -39,6 +42,7 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({
   onCancel,
   selectedBootableVolume,
   sshSecretCredentials,
+  pvcSource,
 }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
@@ -67,15 +71,10 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({
     setIsSubmitting(true);
     setError(null);
 
-    const pvc = await getPVC(
-      selectedBootableVolume?.spec?.source?.pvc?.name,
-      selectedBootableVolume?.spec?.source?.pvc?.namespace,
-    );
-
     const vmToCreate = produce(vm, (draftVM) => {
       draftVM.spec.running = startVM;
       draftVM.spec.dataVolumeTemplates[0].spec.storage.resources.requests.storage =
-        pvc?.spec?.resources?.requests?.storage;
+        pvcSource?.spec?.resources?.requests?.storage;
       if (sshSecretCredentials?.sshSecretName) {
         const cloudInitNoCloudVolume = vm.spec.template.spec.volumes?.find(
           (v) => v.cloudInitNoCloud,

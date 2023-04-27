@@ -1,7 +1,10 @@
 import { useState } from 'react';
 
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  BootableVolume,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { getBootableVolumePVCSource } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import {
   V1alpha1PersistentVolumeClaim,
   V1alpha2VirtualMachineClusterPreference,
@@ -13,7 +16,7 @@ import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/ba
 import { PaginationState } from '../utils/constants';
 
 type UseBootVolumeSortColumns = (
-  unsortedData: V1beta1DataSource[],
+  unsortedData: BootableVolume[],
   preferences: {
     [resourceKeyName: string]: V1alpha2VirtualMachineClusterPreference;
   },
@@ -22,7 +25,7 @@ type UseBootVolumeSortColumns = (
   },
   pagination: PaginationState,
 ) => {
-  sortedData: V1beta1DataSource[];
+  sortedData: BootableVolume[];
   getSortType: (columnIndex: number) => ThSortType;
 };
 
@@ -35,11 +38,9 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   const [activeSortIndex, setActiveSortIndex] = useState<number | null>(null);
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc' | null>(null);
 
-  const getSortableRowValues = (bootableVolume: V1beta1DataSource): string[] => {
-    const pvcSource =
-      pvcSources?.[bootableVolume?.spec?.source?.pvc?.namespace]?.[
-        bootableVolume?.spec?.source?.pvc?.name
-      ];
+  const getSortableRowValues = (bootableVolume: BootableVolume): string[] => {
+    const pvcSource = getBootableVolumePVCSource(bootableVolume, pvcSources);
+
     return [
       getName(bootableVolume),
       getName(preferences[bootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]]),
@@ -49,7 +50,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
     ];
   };
 
-  const sortVolumes = (a: V1beta1DataSource, b: V1beta1DataSource): number => {
+  const sortVolumes = (a: BootableVolume, b: BootableVolume): number => {
     const aValue = getSortableRowValues(a)[activeSortIndex];
     const bValue = getSortableRowValues(b)[activeSortIndex];
 

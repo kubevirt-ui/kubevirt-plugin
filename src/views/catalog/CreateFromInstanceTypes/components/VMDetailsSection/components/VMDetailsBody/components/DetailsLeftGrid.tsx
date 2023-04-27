@@ -1,7 +1,9 @@
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
 
-import { InstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  BootableVolume,
+  InstanceTypeState,
+} from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -17,7 +19,7 @@ import {
 type DetailsLeftGridProps = {
   vmName: string;
   setVMName: Dispatch<SetStateAction<string>>;
-  bootSource: V1beta1DataSource;
+  bootSource: BootableVolume;
   instancetype: InstanceTypeState;
 };
 

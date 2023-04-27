@@ -1,9 +1,11 @@
 import React, { Dispatch, SetStateAction } from 'react';
 
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
-import { InstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  BootableVolume,
+  InstanceTypeState,
+} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { Grid, GridItem } from '@patternfly/react-core';
 
 import DetailsLeftGrid from './components/DetailsLeftGrid';
@@ -15,9 +17,9 @@ type VMDetailsBodyProps = {
   vmName: string;
   setVMName: Dispatch<SetStateAction<string>>;
   namespace: string;
-  bootSource: V1beta1DataSource;
+  bootSource: BootableVolume;
   instancetype: InstanceTypeState;
-  pvcSource: V1alpha1PersistentVolumeClaim;
+  pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   sshSecretCredentials: SSHSecretCredentials;
 };
 

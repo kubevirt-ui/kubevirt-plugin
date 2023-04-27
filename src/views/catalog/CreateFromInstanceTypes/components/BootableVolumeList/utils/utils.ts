@@ -1,12 +1,11 @@
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { PaginationState } from '@virtualmachines/utils';
 
-import { DEFAULT_PREFERENCE_LABEL } from '../../../utils/constants';
+import { BootableVolume, DEFAULT_PREFERENCE_LABEL } from '../../../utils/constants';
 
 import { paginationInitialStateForm } from './constants';
 
-export const getBootVolumeOS = (bootVolume: V1beta1DataSource): OS_NAME_TYPES => {
+export const getBootVolumeOS = (bootVolume: BootableVolume): OS_NAME_TYPES => {
   const bootVolumePreference = bootVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL];
   return (
     Object.values(OS_NAME_TYPES).find((osName) => bootVolumePreference?.includes(osName)) ??

@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ModalVariant } from '@patternfly/react-core';
@@ -22,7 +22,7 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [modalBootableVolumeSelected, setModalBootableVolumeSelected] =
-    useState<V1beta1DataSource>(bvSelected);
+    useState<BootableVolume>(bvSelected);
 
   const onSave = () => {
     setBVSelected(modalBootableVolumeSelected);

@@ -29,6 +29,8 @@ type AddBootableVolumeModalProps = {
   onClose: () => void;
 } & Omit<AddBootableVolumeButtonProps, 'loaded'>;
 
+const cloneExistingPVC = true; // we want to clone the existing PVC by default, may change in the future versions
+
 const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   isOpen,
   onClose,
@@ -39,7 +41,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   const [formSelection, setFormSelection] = useState<RADIO_FORM_SELECTION>(
     RADIO_FORM_SELECTION.UPLOAD_IMAGE,
   );
-  const cloneExistingPVC = true; // we want to clone the existing PVC by default, may change in the future versions
   const { upload, uploadData } = useCDIUpload();
 
   const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>(

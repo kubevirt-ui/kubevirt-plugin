@@ -1,8 +1,8 @@
 import {
+  BootableVolume,
   DEFAULT_PREFERENCE_LABEL,
   PREFERENCE_DISPLAY_NAME_KEY,
 } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   V1alpha2VirtualMachineClusterInstancetype,
   V1alpha2VirtualMachineClusterPreference,
@@ -12,12 +12,12 @@ import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 
 export const getOSFromDefaultPreference = (
-  bootSource: V1beta1DataSource,
+  bootableVolume: BootableVolume,
   preferencesMap: {
     [resourceKeyName: string]: V1alpha2VirtualMachineClusterPreference;
   },
 ): string => {
-  const defaultPreferenceName = getLabel(bootSource, DEFAULT_PREFERENCE_LABEL);
+  const defaultPreferenceName = getLabel(bootableVolume, DEFAULT_PREFERENCE_LABEL);
 
   const defaultPreference = preferencesMap?.[defaultPreferenceName];
 
