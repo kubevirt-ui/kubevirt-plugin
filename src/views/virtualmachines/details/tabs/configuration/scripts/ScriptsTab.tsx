@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 import { Trans } from 'react-i18next';
 import { RouteComponentProps } from 'react-router-dom';
 
@@ -10,7 +10,6 @@ import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/Cloudi
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { VMAuthorizedSSHKeyModal } from '@kubevirt-utils/components/VMAuthorizedSSHKeyModal/VMAuthorizedSSHKeyModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
@@ -24,13 +23,10 @@ import {
 import {
   DescriptionList,
   Divider,
-  Flex,
-  FlexItem,
   PageSection,
   Stack,
   Text,
   TextVariants,
-  Title,
 } from '@patternfly/react-core';
 
 import VirtualMachineDescriptionItem from '../../details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
@@ -44,7 +40,7 @@ type VirtualMachineScriptPageProps = RouteComponentProps<{
   obj?: V1VirtualMachine;
 };
 
-const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
+const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
@@ -58,7 +54,7 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
 
   const hasSSHKey = vm?.spec?.template?.spec?.accessCredentials?.length > 0;
 
-  const onSubmit = React.useCallback(
+  const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
         model: VirtualMachineModel,
@@ -78,15 +74,6 @@ const ScriptsTab: React.FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
       >
         {(resource) => (
           <DescriptionList className="vm-scripts-tab">
-            <Title headingLevel="h2">
-              <Flex>
-                <FlexItem>{t('Scripts')}</FlexItem>
-                <FlexItem>
-                  <SidebarEditorSwitch />
-                </FlexItem>
-              </Flex>
-            </Title>
-
             <VirtualMachineDescriptionItem
               descriptionData={<CloudInitDescription vm={resource} />}
               descriptionHeader={t('Cloud-init')}

@@ -4,13 +4,13 @@ import { RouteComponentProps } from 'react-router';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { k8sUpdate, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, FlexItem } from '@patternfly/react-core';
+import { Title } from '@patternfly/react-core';
 
-import AddNetworkInterfaceButton from './copmonents/AddNetworkInterfaceButton';
-import NetworkInterfaceList from './copmonents/list/NetworkInterfaceList';
+import AddNetworkInterfaceButton from './components/AddNetworkInterfaceButton';
+import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 
 import 'src/utils/styles/ListPageCreateButton.scss';
 import './network-interface-list-page.scss';
@@ -23,6 +23,8 @@ type NetworkInterfaceListPageProps = RouteComponentProps<{
 };
 
 const NetworkInterfaceListPage: FC<NetworkInterfaceListPageProps> = ({ obj: vm }) => {
+  const { t } = useKubevirtTranslation();
+
   const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
@@ -42,15 +44,10 @@ const NetworkInterfaceListPage: FC<NetworkInterfaceListPageProps> = ({ obj: vm }
           onResourceUpdate={onSubmit}
           pathsToHighlight={PATHS_TO_HIGHLIGHT.NETWORK_TAB}
         >
-          <Flex>
-            <FlexItem>
-              <AddNetworkInterfaceButton vm={vm} />
-            </FlexItem>
-
-            <FlexItem>
-              <SidebarEditorSwitch />{' '}
-            </FlexItem>
-          </Flex>
+          <Title headingLevel="h2" className="network-interface-list-page__title">
+            {t('Network interfaces')}
+          </Title>
+          <AddNetworkInterfaceButton vm={vm} />
           <NetworkInterfaceList vm={vm} />
         </SidebarEditor>
       </ListPageBody>

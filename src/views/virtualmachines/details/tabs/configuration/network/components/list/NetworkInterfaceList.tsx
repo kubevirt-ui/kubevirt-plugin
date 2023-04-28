@@ -9,7 +9,7 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import useNetworkColumns from '../..//hooks/useNetworkColumns';
+import useNetworkColumns from '../../hooks/useNetworkColumns';
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
 
 import AutoAttachedNetworkEmptyState from './AutoAttachedNetworkEmptyState';

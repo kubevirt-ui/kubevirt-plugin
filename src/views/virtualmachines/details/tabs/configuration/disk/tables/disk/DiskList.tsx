@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -6,7 +6,6 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
@@ -29,7 +28,7 @@ type DiskListProps = {
   vm?: V1VirtualMachine;
 };
 
-const DiskList: React.FC<DiskListProps> = ({ vm }) => {
+const DiskList: FC<DiskListProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
@@ -44,14 +43,7 @@ const DiskList: React.FC<DiskListProps> = ({ vm }) => {
   return (
     <>
       <ListPageBody>
-        <Flex>
-          <FlexItem>
-            <DiskListTitle />
-          </FlexItem>
-          <FlexItem>
-            <SidebarEditorSwitch />
-          </FlexItem>
-        </Flex>
+        <DiskListTitle />
 
         <ListPageCreateButton
           className="disk-list-page__list-page-create-button"

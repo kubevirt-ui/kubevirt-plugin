@@ -1,7 +1,6 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Flex, FlexItem, Grid, GridItem, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
@@ -16,7 +15,7 @@ type DetailsSectionProps = {
   pathname: string;
 };
 
-const DetailsSection: React.FC<DetailsSectionProps> = ({ vm, pathname }) => {
+const DetailsSection: FC<DetailsSectionProps> = ({ vm, pathname }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -26,10 +25,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ vm, pathname }) => {
       </a>
       <Title headingLevel="h2" className="co-section-heading">
         <Flex>
-          <FlexItem>{t('VirtualMachine Details')} </FlexItem>
-          <FlexItem>
-            <SidebarEditorSwitch />
-          </FlexItem>
+          <FlexItem>{t('VirtualMachine details')} </FlexItem>
         </Flex>
       </Title>
       <Grid hasGutter>

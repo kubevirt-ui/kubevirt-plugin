@@ -23,7 +23,7 @@ describe('Check all virtualization pages can be loaded', () => {
 
     it('vm tabs are loaded', () => {
       tab.navigateToDetails();
-      cy.contains('VirtualMachine Details').should('be.visible');
+      cy.contains('VirtualMachine details').scrollIntoView().should('be.visible');
 
       tab.navigateToMetrics();
       cy.contains('Utilization').should('be.visible');
@@ -32,7 +32,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('Download').should('be.visible');
 
       tab.navigateToScheduling();
-      cy.contains('Scheduling and resources requirements').should('be.visible');
+      cy.contains('Scheduling and resource requirements').should('be.visible');
 
       tab.navigateToEnvironment();
       cy.contains('Include all values').should('be.visible');
