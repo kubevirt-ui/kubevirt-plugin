@@ -1,9 +1,8 @@
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { PaginationState } from '@virtualmachines/utils';
 
-import { BootableVolume, DEFAULT_PREFERENCE_LABEL } from '../../../utils/constants';
-
-import { paginationInitialStateForm } from './constants';
+import { DEFAULT_PREFERENCE_LABEL } from '../../../utils/constants';
 
 export const getBootVolumeOS = (bootVolume: BootableVolume): OS_NAME_TYPES => {
   const bootVolumePreference = bootVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL];
@@ -16,8 +15,8 @@ export const getBootVolumeOS = (bootVolume: BootableVolume): OS_NAME_TYPES => {
 export const getPaginationFromVolumeIndex =
   (volumeIndex: number) =>
   (prevPagination: PaginationState): PaginationState => {
-    if (volumeIndex <= 0 || volumeIndex / prevPagination.perPage < 1) {
-      return paginationInitialStateForm;
+    if (volumeIndex < 0) {
+      return prevPagination;
     }
 
     const perPage = prevPagination.perPage;

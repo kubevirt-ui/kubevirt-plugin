@@ -1,31 +1,27 @@
 import React, { FC, useState } from 'react';
 
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ModalVariant } from '@patternfly/react-core';
 
 import BootableVolumeList from '../../BootableVolumeList';
-import { ShowAllBootableVolumesButtonProps } from '../ShowAllBootableVolumesButton/ShowAllBootableVolumesButton';
 
 type BootableVolumeListModalProps = {
   isOpen: boolean;
   onClose: () => void;
-} & ShowAllBootableVolumesButtonProps;
+};
 
-const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
-  isOpen,
-  onClose,
-  preferences,
-  bootableVolumeSelectedState: [bvSelected, setBVSelected],
-  bootableVolumesResources,
-}) => {
+const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({ isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
-  const [modalBootableVolumeSelected, setModalBootableVolumeSelected] =
-    useState<BootableVolume>(bvSelected);
+
+  const { onSelectVolume, instanceTypeVMState } = useInstanceTypeVMStore();
+  const { selectedBootableVolume } = instanceTypeVMState;
+  const selectedBootableVolumeState = useState<BootableVolume>(selectedBootableVolume);
 
   const onSave = () => {
-    setBVSelected(modalBootableVolumeSelected);
+    onSelectVolume(selectedBootableVolumeState[0]);
     onClose();
   };
   return (
@@ -36,11 +32,7 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
       headerText={t('Available volumes')}
       modalVariant={ModalVariant.large}
     >
-      <BootableVolumeList
-        preferences={preferences}
-        bootableVolumeSelectedState={[modalBootableVolumeSelected, setModalBootableVolumeSelected]}
-        bootableVolumesResources={bootableVolumesResources}
-      />
+      <BootableVolumeList selectedBootableVolumeState={selectedBootableVolumeState} />
     </TabModal>
   );
 };

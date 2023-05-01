@@ -1,11 +1,13 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 
+import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { Form, FormGroup, PopoverPosition, Title } from '@patternfly/react-core';
 
 import { AddBootableVolumeButtonProps } from '../AddBootableVolumeButton/AddBootableVolumeButton';
@@ -27,17 +29,16 @@ import './AddBootableVolumeModal.scss';
 type AddBootableVolumeModalProps = {
   isOpen: boolean;
   onClose: () => void;
-} & Omit<AddBootableVolumeButtonProps, 'loaded'>;
+} & AddBootableVolumeButtonProps;
 
 const cloneExistingPVC = true; // we want to clone the existing PVC by default, may change in the future versions
 
-const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
-  isOpen,
-  onClose,
-  preferencesNames,
-  onSelectVolume,
-}) => {
+const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({ isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
+
+  const { instanceTypesAndPreferencesData, onSelectVolume } = useInstanceTypeVMStore();
+  const { preferences } = instanceTypesAndPreferencesData;
+  const preferencesNames = useMemo(() => preferences.map(getName), [preferences]);
   const [formSelection, setFormSelection] = useState<RADIO_FORM_SELECTION>(
     RADIO_FORM_SELECTION.UPLOAD_IMAGE,
   );

@@ -1,4 +1,4 @@
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
 import { getItemNameWithOther } from '@kubevirt-utils/utils/utils';

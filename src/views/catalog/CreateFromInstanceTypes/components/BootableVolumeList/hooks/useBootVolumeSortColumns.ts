@@ -1,9 +1,7 @@
 import { useState } from 'react';
 
-import {
-  BootableVolume,
-  DEFAULT_PREFERENCE_LABEL,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { getBootableVolumePVCSource } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import {
   V1alpha1PersistentVolumeClaim,

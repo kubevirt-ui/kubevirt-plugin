@@ -1,18 +1,14 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
-import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
-import {
-  BootableVolume,
-  DEFAULT_INSTANCETYPE_LABEL,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { generateVM } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { createVmSSHSecret } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -29,58 +25,56 @@ import {
 
 import './CreateVMFooter.scss';
 
-type CreateVMFooterProps = {
-  vm: V1VirtualMachine;
-  onCancel: () => void;
-  selectedBootableVolume: BootableVolume;
-  sshSecretCredentials: SSHSecretCredentials;
-  pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
-};
-
-const CreateVMFooter: FC<CreateVMFooterProps> = ({
-  vm,
-  onCancel,
-  selectedBootableVolume,
-  sshSecretCredentials,
-  pvcSource,
-}) => {
+const CreateVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const [startVM, setStartVM] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<Error | any>(null);
 
+  const { instanceTypeVMState, activeNamespace, vmNamespaceTarget } = useInstanceTypeVMStore();
+  const { sshSecretCredentials, selectedBootableVolume, pvcSource } = instanceTypeVMState;
   const { sshSecretName, sshSecretKey } = sshSecretCredentials;
+
+  const updatedVM = useMemo(
+    () => generateVM(instanceTypeVMState, vmNamespaceTarget),
+    [instanceTypeVMState, vmNamespaceTarget],
+  );
+
+  const onCancel = useCallback(
+    () => history.push(getResourceUrl({ model: VirtualMachineModel, activeNamespace })),
+    [activeNamespace, history],
+  );
 
   const [canCreateVM] = useAccessReview({
     resource: VirtualMachineModel.plural,
     verb: 'create' as K8sVerb,
-    namespace: vm?.metadata?.namespace,
+    namespace: updatedVM?.metadata?.namespace,
     group: VirtualMachineModel.apiGroup,
   });
 
   const hasNameAndInstanceType = useMemo(
     () =>
-      !isEmpty(vm?.metadata?.name) &&
+      !isEmpty(getName(updatedVM)) &&
       (!isEmpty(selectedBootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL]) ||
-        !isEmpty(vm?.spec?.instancetype?.name)),
-    [selectedBootableVolume, vm],
+        !isEmpty(updatedVM?.spec?.instancetype?.name)),
+    [selectedBootableVolume, updatedVM],
   );
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setError(null);
 
-    const vmToCreate = produce(vm, (draftVM) => {
+    const vmToCreate = produce(updatedVM, (draftVM) => {
       draftVM.spec.running = startVM;
       draftVM.spec.dataVolumeTemplates[0].spec.storage.resources.requests.storage =
         pvcSource?.spec?.resources?.requests?.storage;
-      if (sshSecretCredentials?.sshSecretName) {
-        const cloudInitNoCloudVolume = vm.spec.template.spec.volumes?.find(
+      if (sshSecretName) {
+        const cloudInitNoCloudVolume = updatedVM.spec.template.spec.volumes?.find(
           (v) => v.cloudInitNoCloud,
         );
         if (cloudInitNoCloudVolume) {
-          draftVM.spec.template.spec.volumes = vm.spec.template.spec.volumes.filter(
+          draftVM.spec.template.spec.volumes = updatedVM.spec.template.spec.volumes.filter(
             (v) => !v.cloudInitNoCloud,
           );
           draftVM.spec.template.spec.volumes.push({
@@ -93,7 +87,7 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({
             sshPublicKey: {
               source: {
                 secret: {
-                  secretName: sshSecretName || `${vm.metadata.name}-ssh-key-${getRandomChars()}`,
+                  secretName: sshSecretName || `${getName(updatedVM)}-ssh-key-${getRandomChars()}`,
                 },
               },
               propagationMethod: {

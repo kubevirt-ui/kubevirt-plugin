@@ -1,43 +1,30 @@
-import React, { Dispatch, SetStateAction, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
-import {
-  BootableVolume,
-  InstanceTypeState,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { DescriptionList, TextInput } from '@patternfly/react-core';
 import VirtualMachineDescriptionItem from '@virtualmachines/details/tabs/details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
-import useInstanceTypesAndPreferences from '../../../../../hooks/useInstanceTypesAndPreferences';
 import {
   getCPUAndMemoryFromDefaultInstanceType,
   getOSFromDefaultPreference,
 } from '../../../utils/utils';
 
-type DetailsLeftGridProps = {
-  vmName: string;
-  setVMName: Dispatch<SetStateAction<string>>;
-  bootSource: BootableVolume;
-  instancetype: InstanceTypeState;
-};
-
-const DetailsLeftGrid: React.FC<DetailsLeftGridProps> = ({
-  bootSource,
-  instancetype,
-  vmName,
-  setVMName,
-}) => {
+const DetailsLeftGrid: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { preferences, instanceTypes } = useInstanceTypesAndPreferences();
-
-  const { name } = instancetype;
+  const { instanceTypeVMState, setInstanceTypeVMState, instanceTypesAndPreferencesData } =
+    useInstanceTypeVMStore();
+  const { vmName, selectedBootableVolume, selectedInstanceType } = instanceTypeVMState;
+  const { preferences, instanceTypes } = instanceTypesAndPreferencesData;
+  const { name } = selectedInstanceType;
 
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
   const instanceTypesMap = useMemo(() => convertResourceArrayToMap(instanceTypes), [instanceTypes]);
 
-  const operatingSystem = getOSFromDefaultPreference(bootSource, preferencesMap);
+  const operatingSystem = getOSFromDefaultPreference(selectedBootableVolume, preferencesMap);
   const cpuMemoryString = !isEmpty(instanceTypesMap?.[name])
     ? getCPUAndMemoryFromDefaultInstanceType(instanceTypesMap[name])
     : null;
@@ -53,7 +40,9 @@ const DetailsLeftGrid: React.FC<DetailsLeftGridProps> = ({
             name="vmname"
             aria-label="instancetypes virtualmachine name"
             value={vmName}
-            onChange={setVMName}
+            onChange={(newVMName) =>
+              setInstanceTypeVMState({ type: instanceTypeActionType.setVMName, payload: newVMName })
+            }
           />
         }
         descriptionHeader={t('Name')}

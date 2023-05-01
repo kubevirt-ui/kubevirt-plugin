@@ -1,17 +1,17 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
+import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { getBootableVolumePVCSource } from '@catalog/CreateFromInstanceTypes/utils/utils';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { convertResourceArrayToMap, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/react-core';
 import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 
-import { UseBootableVolumesValues } from '../../hooks/useBootableVolumes';
-import { BootableVolume, DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
+import { DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
 
 import BootableVolumeRow from './components/BootableVolumeRow/BootableVolumeRow';
 import ShowAllBootableVolumesButton from './components/ShowAllBootableVolumesButton/ShowAllBootableVolumesButton';
@@ -28,20 +28,31 @@ import { getPaginationFromVolumeIndex } from './utils/utils';
 
 import './BootableVolumeList.scss';
 
-export type BootableVolumeListProps = {
-  preferences: { [resourceKeyName: string]: V1alpha2VirtualMachineClusterPreference };
-  bootableVolumeSelectedState: [BootableVolume, Dispatch<SetStateAction<BootableVolume>>];
-  bootableVolumesResources: UseBootableVolumesValues;
+type BootableVolumeListProps = {
+  selectedBootableVolumeState?: [BootableVolume, (selectedVolume: BootableVolume) => void];
   displayShowAllButton?: boolean;
 };
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
-  preferences,
-  bootableVolumeSelectedState: [bootableVolumeSelected, setBootableVolumeSelected],
-  bootableVolumesResources: { bootableVolumes, loaded, pvcSources },
-  displayShowAllButton,
+  selectedBootableVolumeState,
+  displayShowAllButton = false,
 }) => {
   const { t } = useKubevirtTranslation();
+  const {
+    instanceTypeVMState,
+    bootableVolumesData,
+    onSelectVolume,
+    instanceTypesAndPreferencesData,
+  } = useInstanceTypeVMStore();
+
+  const { selectedBootableVolume } = instanceTypeVMState;
+  const { bootableVolumes, loaded, pvcSources } = bootableVolumesData;
+
+  const preferencesMap = useMemo(() => {
+    const { preferences } = instanceTypesAndPreferencesData;
+    return convertResourceArrayToMap(preferences);
+  }, [instanceTypesAndPreferencesData]);
+
   const { activeColumns, columnLayout } = useBootVolumeColumns(!displayShowAllButton);
   const filters = useBootVolumeFilters(`osName${!displayShowAllButton && '-modal'}`);
 
@@ -53,7 +64,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
 
   const { sortedData, getSortType } = useBootVolumeSortColumns(
     data,
-    preferences,
+    preferencesMap,
     pvcSources,
     pagination,
   );
@@ -67,13 +78,13 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   };
 
   useEffect(() => {
-    if (displayShowAllButton && !isEmpty(bootableVolumeSelected)) {
+    if (displayShowAllButton && !isEmpty(selectedBootableVolume)) {
       const selectedVolumeIndex = bootableVolumes?.findIndex(
-        (volume) => getName(volume) === getName(bootableVolumeSelected),
+        (volume) => getName(volume) === getName(selectedBootableVolume),
       );
       setPagination(getPaginationFromVolumeIndex(selectedVolumeIndex));
     }
-  }, [bootableVolumeSelected, bootableVolumes, displayShowAllButton]);
+  }, [selectedBootableVolume, bootableVolumes, displayShowAllButton]);
 
   return (
     <>
@@ -91,6 +102,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
         <SplitItem className="bootable-volume-list-bar__filter">
           <ListPageFilter
             hideLabelFilter
+            hideNameLabelFilters={!displayShowAllButton}
             onFilterChange={(...args) => {
               onFilterChange(...args);
               setPagination((prevPagination) => ({
@@ -100,7 +112,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                 endIndex: prevPagination?.perPage,
               }));
             }}
-            loaded={loaded}
+            loaded={Boolean(loaded)}
             data={unfilteredData}
             // nameFilter={!displayShowAllButton && "modal-name"} can remove comment once this merged https://github.com/openshift/console/pull/12438 and build into new SDK version
             rowFilters={filters}
@@ -126,13 +138,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             isCompact={displayShowAllButton}
           />
         </SplitItem>
-        {displayShowAllButton && (
-          <ShowAllBootableVolumesButton
-            preferences={preferences}
-            bootableVolumeSelectedState={[bootableVolumeSelected, setBootableVolumeSelected]}
-            bootableVolumesResources={{ bootableVolumes, loaded, pvcSources }}
-          />
-        )}
+        {displayShowAllButton && <ShowAllBootableVolumesButton />}
       </Split>
       <TableComposable variant={TableVariant.compact}>
         <Thead>
@@ -147,12 +153,14 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
         <Tbody>
           {sortedData?.map((bs) => (
             <BootableVolumeRow
-              key={bs?.metadata?.name}
+              key={getName(bs)}
               bootableVolume={bs}
-              activeColumnIDs={Object.values(activeColumns)?.map((col) => col?.id)}
+              activeColumnIDs={activeColumns?.map((col) => col?.id)}
               rowData={{
-                bootableVolumeSelectedState: [bootableVolumeSelected, setBootableVolumeSelected],
-                preference: preferences[bs?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]],
+                bootableVolumeSelectedState: !displayShowAllButton
+                  ? selectedBootableVolumeState
+                  : [selectedBootableVolume, onSelectVolume],
+                preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
                 pvcSource: getBootableVolumePVCSource(bs, pvcSources),
               }}
             />
