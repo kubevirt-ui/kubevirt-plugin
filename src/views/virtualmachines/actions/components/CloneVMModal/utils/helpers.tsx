@@ -2,9 +2,14 @@ import * as React from 'react';
 import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
+import ControllerRevisionModel from '@kubevirt-ui/kubevirt-api/console/models/ControllerRevisionModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import {
+  IoK8sApiAppsV1ControllerRevision,
+  IoK8sApiCoreV1PersistentVolumeClaim,
+} from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import {
   getDataVolumeTemplates,
   getDisks,
@@ -13,6 +18,7 @@ import {
 } from '@kubevirt-utils/resources/vm';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { k8sCreate, k8sGet, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 export const getRandomChars = (len: number): string => {
   return Math.random()
@@ -171,4 +177,69 @@ export const updateClonedDataVolumes = (
   vm.spec.dataVolumeTemplates = updatedDVT;
   vm.spec.template.spec.volumes = updatedVolumes;
   return vm;
+};
+
+const getControllerIfExist = async (name: string, ns: string) => {
+  try {
+    return await k8sGet<IoK8sApiAppsV1ControllerRevision>({
+      model: ControllerRevisionModel,
+      name,
+      ns,
+    });
+  } catch (error) {
+    if (error.code !== 404) {
+      throw error;
+    }
+
+    return null;
+  }
+};
+
+export const cloneControllerRevision = async (
+  revisionName: string,
+  destinationNamespace: string,
+  originNamespace: string,
+) => {
+  const destNamespaceCR = await getControllerIfExist(revisionName, destinationNamespace);
+
+  if (destNamespaceCR) return destNamespaceCR;
+
+  const controllerRevision = await k8sGet<IoK8sApiAppsV1ControllerRevision>({
+    model: ControllerRevisionModel,
+    name: revisionName,
+    ns: originNamespace,
+  });
+
+  const controllerRevisionClone = produce(controllerRevision, (draftController) => {
+    draftController.metadata.namespace = destinationNamespace;
+
+    delete draftController.metadata.resourceVersion;
+    delete draftController.metadata.uid;
+    delete draftController.metadata.ownerReferences;
+  });
+
+  return await k8sCreate<IoK8sApiAppsV1ControllerRevision>({
+    model: ControllerRevisionModel,
+    data: controllerRevisionClone,
+  });
+};
+
+export const updateControllerRevisionOwnerReference = (
+  controllerRevision: IoK8sApiAppsV1ControllerRevision,
+  vm: V1VirtualMachine,
+): Promise<IoK8sApiAppsV1ControllerRevision> => {
+  const controllerRevisionWithOwner = produce(controllerRevision, (draftController) => {
+    if (!draftController.metadata.ownerReferences) draftController.metadata.ownerReferences = [];
+
+    draftController.metadata.ownerReferences.push(
+      buildOwnerReference(vm, { blockOwnerDeletion: false }),
+    );
+  });
+
+  return k8sUpdate<IoK8sApiAppsV1ControllerRevision>({
+    model: ControllerRevisionModel,
+    data: controllerRevisionWithOwner,
+    ns: controllerRevisionWithOwner?.metadata?.namespace,
+    name: controllerRevisionWithOwner?.metadata?.name,
+  });
 };
