@@ -2,7 +2,7 @@
 const { CustomJSONLexer } = require('./i18n-scripts/lexers');
 
 module.exports = {
-  input: ['src/**/*.{js,jsx,ts,tsx}'],
+  input: ['src/**/*.{js,jsx,ts,tsx,json}', './console-extensions.json'],
   sort: true,
   createOldCatalogs: false,
   keySeparator: false,
