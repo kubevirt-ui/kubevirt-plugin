@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 
 import {
   ConfigMapModel,
-  UserModel,
   modelToGroupVersionKind,
+  UserModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   k8sCreate,
@@ -13,16 +14,17 @@ import {
   k8sPatch,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 
-type UseUserSettings = (
+import userSettingsInitialState, { UserSettingsState } from './utils/userSettingsInitialState';
+
+type UseKubevirtUserSettings = (
   key?: string,
 ) => [{ [key: string]: any }, (val: any) => void, boolean, Error];
 
-const useUserSettings: UseUserSettings = (key) => {
+const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   const [error, setError] = useState<Error>();
   const [userName, setUserName] = useState<string>();
-  const [userSettings, setUserSettings] = useState<{ [key: string]: any }>();
+  const [userSettings, setUserSettings] = useState<UserSettingsState>();
   const [loading, setLoading] = useState<boolean>(false);
   const userConfigMapName = useMemo(() => `${userName}-kubevirt-settings`, [userName]);
 
@@ -61,6 +63,7 @@ const useUserSettings: UseUserSettings = (key) => {
               name: userConfigMapName,
               namespace: DEFAULT_NAMESPACE,
             },
+            data: { settings: JSON.stringify(userSettingsInitialState) },
           },
         });
       } catch (e) {
@@ -68,11 +71,13 @@ const useUserSettings: UseUserSettings = (key) => {
       }
       setLoading(false);
     }
-  }, [configMapError?.code, userName]);
+  }, [configMapError?.code, userName, userConfigMapName]);
 
   useEffect(() => {
     if (!isEmpty(userConfigMap) && !userSettings) {
-      setUserSettings(userConfigMap?.data || {});
+      setUserSettings(
+        (<unknown>JSON.parse(userConfigMap?.data?.settings) || {}) as UserSettingsState,
+      );
     }
   }, [userConfigMap, userSettings]);
 
@@ -83,16 +88,16 @@ const useUserSettings: UseUserSettings = (key) => {
       return data;
     });
     setLoading(true);
-    const updateResource = (data: { [key: string]: any }) => {
+    const updateResource = async (data: { [key: string]: any }) => {
       try {
-        k8sPatch({
+        await k8sPatch({
           model: ConfigMapModel,
           resource: userConfigMap,
           data: [
             {
               op: 'replace',
               path: '/data',
-              value: data,
+              value: { settings: JSON.stringify(data) },
             },
           ],
         });
@@ -111,4 +116,4 @@ const useUserSettings: UseUserSettings = (key) => {
   ];
 };
 
-export default useUserSettings;
+export default useKubevirtUserSettings;

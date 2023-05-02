@@ -1,8 +1,9 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { NodeModel, VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import {
   K8sResourceCommon,
   K8sVerb,
@@ -92,7 +93,7 @@ const useVirtualMachineColumns = (
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
       },
     ],
-    [t, sorting, namespace, canGetNode],
+    [canGetNode, namespace, sorting, t],
   );
 
   const [activeColumns] = useActiveColumns<K8sResourceCommon>({
@@ -100,6 +101,12 @@ const useVirtualMachineColumns = (
     showNamespaceOverride: false,
     columnManagementID: VirtualMachineModelRef,
   });
+
+  const updateLayout = useKubevirtUserSettingsTableColumns(VirtualMachineModelRef);
+
+  useEffect(() => {
+    updateLayout(activeColumns);
+  }, [activeColumns, updateLayout]);
 
   return [columns, activeColumns];
 };
