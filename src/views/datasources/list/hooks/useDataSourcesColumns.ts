@@ -3,7 +3,8 @@ import * as React from 'react';
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { TableColumn, useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 import { getDataSourceCronJob, getDataSourceLastUpdated } from '../../utils';
@@ -79,9 +80,8 @@ export const useDataSourcesColumns = (namespace: string) => {
     [t, namespace],
   );
 
-  const [activeColumns] = useActiveColumns<V1beta1DataSource>({
+  const [activeColumns] = useKubevirtUserSettingsTableColumns<V1beta1DataSource>({
     columns,
-    showNamespaceOverride: false,
     columnManagementID: DataSourceModelRef,
   });
 

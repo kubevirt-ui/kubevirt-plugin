@@ -3,7 +3,8 @@ import { useMemo } from 'react';
 import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha2VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { TableColumn, useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 const useClusterInstancetypeListColumns = (): [
@@ -45,11 +46,12 @@ const useClusterInstancetypeListColumns = (): [
     [t],
   );
 
-  const [activeColumns] = useActiveColumns<V1alpha2VirtualMachineClusterInstancetype>({
-    columns,
-    showNamespaceOverride: false,
-    columnManagementID: VirtualMachineClusterInstancetypeModelRef,
-  });
+  const [activeColumns] =
+    useKubevirtUserSettingsTableColumns<V1alpha2VirtualMachineClusterInstancetype>({
+      columns,
+      columnManagementID: VirtualMachineClusterInstancetypeModelRef,
+    });
+
   return [columns, activeColumns];
 };
 

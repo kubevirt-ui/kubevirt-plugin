@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { NodeModel, VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -9,7 +9,6 @@ import {
   K8sVerb,
   TableColumn,
   useAccessReview,
-  useActiveColumns,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
@@ -96,17 +95,10 @@ const useVirtualMachineColumns = (
     [canGetNode, namespace, sorting, t],
   );
 
-  const [activeColumns] = useActiveColumns<K8sResourceCommon>({
+  const [activeColumns] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
     columns: canGetNode ? columns : columns.filter((column) => column.id !== 'node'),
-    showNamespaceOverride: false,
     columnManagementID: VirtualMachineModelRef,
   });
-
-  const updateLayout = useKubevirtUserSettingsTableColumns(VirtualMachineModelRef);
-
-  useEffect(() => {
-    updateLayout(activeColumns);
-  }, [activeColumns, updateLayout]);
 
   return [columns, activeColumns];
 };
