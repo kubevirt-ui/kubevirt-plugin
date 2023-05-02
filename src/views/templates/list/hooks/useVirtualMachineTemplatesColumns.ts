@@ -1,10 +1,7 @@
 import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  K8sResourceCommon,
-  TableColumn,
-  useActiveColumns,
-} from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import { K8sResourceCommon, TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 const useVirtualMachineTemplatesColumns = (
@@ -54,9 +51,8 @@ const useVirtualMachineTemplatesColumns = (
     },
   ];
 
-  const [activeColumns] = useActiveColumns<K8sResourceCommon>({
+  const [activeColumns] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
     columns,
-    showNamespaceOverride: false,
     columnManagementID: modelToRef(TemplateModel),
   });
 

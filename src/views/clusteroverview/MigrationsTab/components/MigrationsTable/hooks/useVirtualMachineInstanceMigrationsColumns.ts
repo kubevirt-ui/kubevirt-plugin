@@ -5,12 +5,8 @@ import {
   VirtualMachineInstanceMigrationModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  K8sVerb,
-  TableColumn,
-  useAccessReview,
-  useActiveColumns,
-} from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import { K8sVerb, TableColumn, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 import { MigrationTableDataLayout } from '../utils/utils';
@@ -80,11 +76,10 @@ const useVirtualMachineInstanceMigrationsColumns = (): [
     [t],
   );
 
-  const [activeColumns] = useActiveColumns<MigrationTableDataLayout>({
+  const [activeColumns] = useKubevirtUserSettingsTableColumns<MigrationTableDataLayout>({
     columns: canGetNode
       ? columns
       : columns.filter((column) => column.id !== 'source' && column.id !== 'target'),
-    showNamespaceOverride: false,
     columnManagementID: VirtualMachineInstanceMigrationModelRef,
   });
 

@@ -3,7 +3,8 @@ import React from 'react';
 import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { TableColumn, useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 const useMigrationPoliciesListColumns = (): [
@@ -68,11 +69,11 @@ const useMigrationPoliciesListColumns = (): [
     [t],
   );
 
-  const [activeColumns] = useActiveColumns<V1alpha1MigrationPolicy>({
+  const [activeColumns] = useKubevirtUserSettingsTableColumns<V1alpha1MigrationPolicy>({
     columns,
-    showNamespaceOverride: false,
     columnManagementID: MigrationPolicyModelRef,
   });
+
   return [columns, activeColumns];
 };
 

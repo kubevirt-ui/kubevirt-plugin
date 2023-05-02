@@ -1,7 +1,8 @@
 import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { TableColumn, useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 
 type UseBootVolumesColumns = (isModal: boolean) => {
@@ -36,9 +37,8 @@ const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
     },
   ];
 
-  const [activeColumns] = useActiveColumns<BootableVolume>({
+  const [activeColumns] = useKubevirtUserSettingsTableColumns<BootableVolume>({
     columns,
-    showNamespaceOverride: false,
     columnManagementID: DataSourceModelRef,
   });
 

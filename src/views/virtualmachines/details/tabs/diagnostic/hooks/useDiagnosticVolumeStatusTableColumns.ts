@@ -1,5 +1,6 @@
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { TableColumn, useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base';
 
 import { DiagnosticSort } from '../utils/types';
@@ -39,9 +40,8 @@ const useDiagnosticVolumeStatusTableColumns: UseDiagnosticVolumeStatusTableColum
     },
   ];
 
-  const [activeColumns] = useActiveColumns({
+  const [activeColumns] = useKubevirtUserSettingsTableColumns<DiagnosticColumn>({
     columns,
-    showNamespaceOverride: false,
     columnManagementID: 'diagnostic-tab-volume',
   });
 
