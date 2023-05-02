@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
@@ -48,7 +48,7 @@ type VirtualMachineDetailsLeftGridProps = {
   vm?: V1VirtualMachine;
 };
 
-const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps> = ({ vm }) => {
+const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const { createModal } = useModal();
@@ -57,11 +57,11 @@ const VirtualMachineDetailsLeftGrid: React.FC<VirtualMachineDetailsLeftGridProps
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
   const [guestAgentData, loadedGuestAgent] = useGuestOS(vmi);
-  const firmwareBootloaderTitle = getBootloaderTitleFromVM(vm, t);
+  const firmwareBootloaderTitle = getBootloaderTitleFromVM(vm);
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
 
-  const onSubmit = React.useCallback(
+  const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
         model: VirtualMachineModel,

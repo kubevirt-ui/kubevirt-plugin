@@ -11,7 +11,6 @@ export const adminOnlyDescribe = Cypress.env('NON_PRIV') ? xdescribe : describe;
 
 export const TEST_NS = 'auto-test-ns';
 
-// VM Status
 export enum VM_STATUS {
   Starting = 'Starting',
   Running = 'Running',
