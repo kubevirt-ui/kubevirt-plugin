@@ -4,7 +4,7 @@ import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { DataUpload, useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -46,7 +46,7 @@ export const useCustomizeFormSubmit = ({
 }: {
   template: V1Template;
   diskSource?: V1beta1DataVolumeSpec;
-  cdSource?: V1beta1DataVolumeSpec;
+  cdSource?: V1beta1DataVolumeSpec | V1ContainerDiskSource;
   withWindowsDrivers?: boolean;
 }): useCustomizeFormSubmitType => {
   const { ns } = useParams<{ ns: string }>();
@@ -138,7 +138,7 @@ export const useCustomizeFormSubmit = ({
       const cdUploadDV = getUploadDataVolume(
         `${updatedVM?.metadata?.name}-${INSTALLATION_CDROM_NAME}`,
         updatedVM.metadata.namespace,
-        cdSource?.storage?.resources?.requests?.storage || '30Gi',
+        (cdSource as V1beta1DataVolumeSpec)?.storage?.resources?.requests?.storage || '30Gi',
       );
 
       await Promise.all(

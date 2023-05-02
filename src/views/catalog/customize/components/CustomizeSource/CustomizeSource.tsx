@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateImportURLs } from '@kubevirt-utils/resources/template';
@@ -34,8 +34,8 @@ export type CustomizeSourceProps = {
   setDiskSource: (customSource: V1beta1DataVolumeSpec | undefined) => void;
   withDrivers: boolean;
   setDrivers: (withDrivers: boolean) => void;
-  cdSource: V1beta1DataVolumeSpec | undefined;
-  setCDSource: (cdSource: V1beta1DataVolumeSpec | undefined) => void;
+  cdSource: V1beta1DataVolumeSpec | V1ContainerDiskSource | undefined;
+  setCDSource: (cdSource: V1beta1DataVolumeSpec | V1ContainerDiskSource | undefined) => void;
   template: V1Template;
   diskUpload?: DataUpload;
   cdUpload?: DataUpload;
