@@ -5,6 +5,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import AlertScripts from '@kubevirt-utils/components/AlertScripts/AlertScripts';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
@@ -22,6 +23,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
   DescriptionList,
+  DescriptionListDescription,
   Divider,
   PageSection,
   Stack,
@@ -74,6 +76,9 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
       >
         {(resource) => (
           <DescriptionList className="vm-scripts-tab">
+            <DescriptionListDescription>
+              <AlertScripts />
+            </DescriptionListDescription>
             <VirtualMachineDescriptionItem
               descriptionData={<CloudInitDescription vm={resource} />}
               descriptionHeader={t('Cloud-init')}

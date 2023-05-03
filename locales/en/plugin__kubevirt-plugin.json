@@ -231,6 +231,7 @@
   "Cloning": "Cloning",
   "Closing it will cause the upload to fail. You may still navigate the console.": "Closing it will cause the upload to fail. You may still navigate the console.",
   "Cloud-init": "Cloud-init",
+  "Cloud-init and SSH key configurations will be applied to the VirtualMachine only at the first boot.": "Cloud-init and SSH key configurations will be applied to the VirtualMachine only at the first boot.",
   "Cluster scope migrations": "Cluster scope migrations",
   "Collapse": "Collapse",
   "Completion timeout": "Completion timeout",
@@ -1177,5 +1178,6 @@
   "You can select the boot source in the <2>Disks</2> tab.": "You can select the boot source in the <2>Disks</2> tab.",
   "You can upload a new volume or use an existing PersistentVolumeClaim (PVC)": "You can upload a new volume or use an existing PersistentVolumeClaim (PVC)",
   "You can use cloud-init to initialize the operating system with a specific configuration when the VirtualMachine is started.": "You can use cloud-init to initialize the operating system with a specific configuration when the VirtualMachine is started.",
+  "You must ensure that the configuration is correct before starting the VirtualMachine.": "You must ensure that the configuration is correct before starting the VirtualMachine.",
   "You're in view-only mode": "You're in view-only mode"
 }
