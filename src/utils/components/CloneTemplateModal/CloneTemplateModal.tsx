@@ -7,11 +7,11 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ANNOTATIONS,
+  APP_NAME_LABEL,
   CUSTOM_TEMPLATES,
   getTemplateVirtualMachineObject,
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
-  TEMPLATE_APP_NAME_LABEL,
   TEMPLATE_TYPE_VM,
   TEMPLATE_VERSION_LABEL,
 } from '@kubevirt-utils/resources/template';
@@ -64,7 +64,7 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
         labels: {
           ...draftTemplate?.metadata?.labels,
           [LABELS.type]: TEMPLATE_TYPE_VM,
-          [TEMPLATE_APP_NAME_LABEL]: CUSTOM_TEMPLATES,
+          [APP_NAME_LABEL]: CUSTOM_TEMPLATES,
           [LABELS.name]: obj?.metadata?.name,
           [LABELS.namespace]: obj?.metadata?.namespace,
         },
