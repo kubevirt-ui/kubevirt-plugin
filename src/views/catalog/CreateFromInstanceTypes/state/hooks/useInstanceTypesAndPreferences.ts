@@ -9,12 +9,9 @@ import {
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseInstanceTypeAndPreferences = () => {
-  preferences: V1alpha2VirtualMachineClusterPreference[];
-  instanceTypes: V1alpha2VirtualMachineClusterInstancetype[];
-  loaded: boolean;
-  loadError: any;
-};
+import { UseInstanceTypeAndPreferencesValues } from '../utils/types';
+
+type UseInstanceTypeAndPreferences = () => UseInstanceTypeAndPreferencesValues;
 
 const useInstanceTypesAndPreferences: UseInstanceTypeAndPreferences = () => {
   const [preferences, preferencesLoaded, preferencesLoadError] = useK8sWatchResource<
@@ -36,8 +33,8 @@ const useInstanceTypesAndPreferences: UseInstanceTypeAndPreferences = () => {
 
   const errorState = !loaded || loadError || isEmpty(preferences) || isEmpty(instanceTypes);
   return {
-    preferences: errorState ? null : preferences,
-    instanceTypes: errorState ? null : instanceTypes,
+    preferences: errorState ? [] : preferences,
+    instanceTypes: errorState ? [] : instanceTypes,
     loaded: loadError ? true : loaded,
     loadError,
   };

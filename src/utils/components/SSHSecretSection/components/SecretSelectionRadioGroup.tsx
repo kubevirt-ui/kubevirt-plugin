@@ -1,5 +1,7 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback } from 'react';
 
+import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Split, SplitItem } from '@patternfly/react-core';
@@ -13,6 +15,24 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
   selectedOption,
   setSelectedOption,
 }) => {
+  const { setInstanceTypeVMState } = useInstanceTypeVMStore();
+
+  // Inputs should not persist between changes of secretSelectionOption
+  const onSelectSecretOption = useCallback(
+    (secretOption: SecretSelectionOption) => {
+      setSelectedOption((prevSecretOption) => {
+        if (prevSecretOption !== secretOption) {
+          setInstanceTypeVMState({
+            type: instanceTypeActionType.setSSHCredentials,
+            payload: { sshSecretName: '', sshSecretKey: '' },
+          });
+        }
+
+        return secretOption;
+      });
+    },
+    [setInstanceTypeVMState, setSelectedOption],
+  );
   return (
     <Split hasGutter>
       <SplitItem>
@@ -21,7 +41,7 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
           id={SecretSelectionOption.none}
           name="ssh-secret-selection"
           label={t('None')}
-          onClick={() => setSelectedOption(SecretSelectionOption.none)}
+          onClick={() => onSelectSecretOption(SecretSelectionOption.none)}
         />
       </SplitItem>
       <SplitItem>
@@ -30,7 +50,7 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
           id={SecretSelectionOption.useExisting}
           name="ssh-secret-selection"
           label={t('Use existing')}
-          onClick={() => setSelectedOption(SecretSelectionOption.useExisting)}
+          onClick={() => onSelectSecretOption(SecretSelectionOption.useExisting)}
         />
       </SplitItem>
       <SplitItem>
@@ -39,7 +59,7 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
           id={SecretSelectionOption.addNew}
           name="ssh-secret-selection"
           label={t('Add new')}
-          onClick={() => setSelectedOption(SecretSelectionOption.addNew)}
+          onClick={() => onSelectSecretOption(SecretSelectionOption.addNew)}
         />
       </SplitItem>
     </Split>

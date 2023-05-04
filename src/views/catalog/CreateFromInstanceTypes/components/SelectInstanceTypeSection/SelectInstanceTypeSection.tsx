@@ -1,6 +1,7 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { FC } from 'react';
 
-import { InstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { Grid, GridItem } from '@patternfly/react-core';
 
 import CategoryCard from './components/category-card/components/CategoryCard/CategoryCard';
@@ -10,20 +11,17 @@ import { categoryDetailsMap } from './utils/utils';
 
 import './SelectInstanceTypeSection.scss';
 
-type SelectInstanceTypeSectionProps = {
-  selectedInstanceType: InstanceTypeState;
-  setSelectedInstanceType: Dispatch<SetStateAction<InstanceTypeState>>;
-};
-
-const SelectInstanceTypeSection: FC<SelectInstanceTypeSectionProps> = ({
-  selectedInstanceType,
-  setSelectedInstanceType,
-}) => {
+const SelectInstanceTypeSection: FC = () => {
+  const { instanceTypeVMState, setInstanceTypeVMState } = useInstanceTypeVMStore();
+  const { selectedInstanceType } = instanceTypeVMState;
   const handleSelect = (category: InstanceTypeCategory, size: InstanceTypeSize) => {
-    setSelectedInstanceType({
-      category,
-      size,
-      name: `${categoryDetailsMap[category]?.prefix}.${size}`,
+    setInstanceTypeVMState({
+      type: instanceTypeActionType.setSelectedInstanceType,
+      payload: {
+        category,
+        size,
+        name: `${categoryDetailsMap[category]?.prefix}.${size}`,
+      },
     });
   };
 

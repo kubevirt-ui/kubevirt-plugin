@@ -1,11 +1,10 @@
 import produce from 'immer';
 
 import {
-  BootableVolume,
   DEFAULT_INSTANCETYPE_LABEL,
   initialInstanceTypeState,
-  InstanceTypeState,
 } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume, InstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { getInstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';

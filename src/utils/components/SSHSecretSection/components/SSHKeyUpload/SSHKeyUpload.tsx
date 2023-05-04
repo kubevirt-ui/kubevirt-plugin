@@ -1,9 +1,10 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { FC, useState } from 'react';
 
-import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
+import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { validateSecretName } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 import {
   FileUpload,
@@ -19,16 +20,13 @@ import './SSHKeyUpload.scss';
 
 type SSHKeyUploadProps = {
   secrets: IoK8sApiCoreV1Secret[];
-  sshSecretCredentials: SSHSecretCredentials;
-  setSSHSecretCredentials: Dispatch<SetStateAction<SSHSecretCredentials>>;
 };
 
-const SSHKeyUpload: React.FC<SSHKeyUploadProps> = ({
-  secrets,
-  sshSecretCredentials,
-  setSSHSecretCredentials,
-}) => {
-  const { sshSecretName, sshSecretKey } = sshSecretCredentials;
+const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets }) => {
+  const { t } = useKubevirtTranslation();
+  const { instanceTypeVMState, setInstanceTypeVMState } = useInstanceTypeVMStore();
+  const { sshSecretCredentials } = instanceTypeVMState;
+  const { sshSecretKey, sshSecretName } = sshSecretCredentials;
   const [isValidName, setIsValidName] = useState<boolean>(true);
   const [isValidKey, setIsValidKey] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -40,9 +38,12 @@ const SSHKeyUpload: React.FC<SSHKeyUploadProps> = ({
         className="ssh-key-upload__file-upload"
         type="text"
         value={sshSecretKey}
-        onChange={(v: string) => {
-          setIsValidKey(validateSSHPublicKey(v));
-          setSSHSecretCredentials((prevState) => ({ ...prevState, sshSecretKey: v?.trim() }));
+        onChange={(sshPublicKey: string) => {
+          setIsValidKey(validateSSHPublicKey(sshPublicKey));
+          setInstanceTypeVMState({
+            type: instanceTypeActionType.setSSHCredentials,
+            payload: { ...sshSecretCredentials, sshSecretKey: sshPublicKey?.trim() },
+          });
         }}
         onReadStarted={() => setIsLoading(true)}
         onReadFinished={() => setIsLoading(false)}
@@ -71,9 +72,12 @@ const SSHKeyUpload: React.FC<SSHKeyUploadProps> = ({
           name="new-secret-name"
           value={sshSecretName}
           isRequired
-          onChange={(v: string) => {
-            setIsValidName(validateSecretName(v, secrets));
-            setSSHSecretCredentials((prevState) => ({ ...prevState, sshSecretName: v }));
+          onChange={(secretName: string) => {
+            setIsValidName(validateSecretName(secretName, secrets));
+            setInstanceTypeVMState({
+              type: instanceTypeActionType.setSSHCredentials,
+              payload: { ...sshSecretCredentials, sshSecretName: secretName },
+            });
           }}
         />
       </FormGroup>

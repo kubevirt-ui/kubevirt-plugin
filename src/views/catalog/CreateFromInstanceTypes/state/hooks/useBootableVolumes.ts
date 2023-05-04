@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import {
   DataSourceModelGroupVersionKind,
   modelToGroupVersionKind,
@@ -16,16 +18,7 @@ import {
 import { isEmpty, isUpstream } from '@kubevirt-utils/utils/utils';
 import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { BootableVolume, DEFAULT_PREFERENCE_LABEL } from '../utils/constants';
-
-export type UseBootableVolumesValues = {
-  bootableVolumes: BootableVolume[];
-  loaded: boolean;
-  loadError?: any;
-  pvcSources: {
-    [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
-  };
-};
+import { UseBootableVolumesValues } from '../utils/types';
 
 type UseBootableVolumes = () => UseBootableVolumesValues;
 
@@ -80,7 +73,7 @@ const useBootableVolumes: UseBootableVolumes = () => {
   const labeledPVCs = useMemo(
     () =>
       pvcs?.filter((pvc) => {
-        if (!isEmpty(pvc?.metadata?.labels[DEFAULT_PREFERENCE_LABEL])) {
+        if (!isEmpty(pvc?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL])) {
           const existingPVC = pvcSourcesFromDS?.find((pvcSource) => isEqualObject(pvcSource, pvc));
           if (!existingPVC) return pvc;
         }

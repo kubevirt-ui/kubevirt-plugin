@@ -1,14 +1,11 @@
 import React, { FC, useState } from 'react';
 
 import AddBootableVolumeButton from '@catalog/CreateFromInstanceTypes/components/AddBootableVolumeButton/AddBootableVolumeButton';
-import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/hooks/useInstanceTypesAndPreferences';
+import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DataSourceModelGroupVersionKind, DataSourceModelRef } from '@kubevirt-utils/models';
-import {
-  convertResourceArrayToMap,
-  getAvailableOrCloningDataSources,
-} from '@kubevirt-utils/resources/shared';
+import { getAvailableOrCloningDataSources } from '@kubevirt-utils/resources/shared';
 import {
   K8sResourceCommon,
   ListPageBody,
@@ -30,7 +27,7 @@ import './BootableVolumesList.scss';
 const BootableVolumesList: FC = () => {
   const { t } = useKubevirtTranslation();
   const [dataSources, loadedDataSources, loadErrorDataSources] = useBootableVolumes();
-  const { preferences, loadError } = useInstanceTypesAndPreferences();
+  const { preferences } = useInstanceTypesAndPreferences();
   const [data, filteredData, onFilterChange] = useListPageFilter(
     getAvailableOrCloningDataSources(dataSources),
     useBootableVolumesFilters(),
@@ -50,11 +47,7 @@ const BootableVolumesList: FC = () => {
   return (
     <>
       <ListPageHeader title={t('Bootable volumes')} badge={<DeveloperPreviewLabel />}>
-        <AddBootableVolumeButton
-          preferencesNames={Object.keys(convertResourceArrayToMap(preferences))}
-          loadError={loadError}
-          buttonVariant={ButtonVariant.primary}
-        />
+        <AddBootableVolumeButton buttonVariant={ButtonVariant.primary} />
       </ListPageHeader>
 
       <ListPageBody>

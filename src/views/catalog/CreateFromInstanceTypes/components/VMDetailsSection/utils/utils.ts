@@ -1,8 +1,8 @@
 import {
-  BootableVolume,
   DEFAULT_PREFERENCE_LABEL,
   PREFERENCE_DISPLAY_NAME_KEY,
 } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import {
   V1alpha2VirtualMachineClusterInstancetype,
   V1alpha2VirtualMachineClusterPreference,

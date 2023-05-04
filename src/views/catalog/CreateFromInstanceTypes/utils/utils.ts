@@ -7,20 +7,16 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { InstanceTypeSize } from '../components/SelectInstanceTypeSection/utils/types';
 import { categoryNamePrefixMatcher } from '../components/SelectInstanceTypeSection/utils/utils';
+import { InstanceTypeVMState } from '../state/utils/types';
 
-import {
-  BootableVolume,
-  DEFAULT_INSTANCETYPE_LABEL,
-  DEFAULT_PREFERENCE_LABEL,
-  InstanceTypeState,
-} from './constants';
+import { DEFAULT_INSTANCETYPE_LABEL, DEFAULT_PREFERENCE_LABEL } from './constants';
+import { BootableVolume, InstanceTypeState } from './types';
 
 const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
@@ -35,13 +31,8 @@ export const getInstanceTypeState = (defaultInstanceTypeName: string): InstanceT
   };
 };
 
-export const generateVM = (
-  bootableVolume: BootableVolume,
-  activeNamespace: string,
-  instanceTypeName: string,
-  vmName?: string,
-  storageClassName?: string,
-) => {
+export const generateVM = (instanceTypeState: InstanceTypeVMState, targetNamespace: string) => {
+  const { vmName, selectedInstanceType, selectedBootableVolume, pvcSource } = instanceTypeState;
   const virtualmachineName =
     vmName ??
     uniqueNamesGenerator({
@@ -49,8 +40,10 @@ export const generateVM = (
       separator: '-',
     });
 
-  const targetNamespace =
-    activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : DEFAULT_NAMESPACE;
+  const sourcePVC = {
+    name: getName(selectedBootableVolume),
+    namespace: getNamespace(selectedBootableVolume),
+  };
 
   const emptyVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
@@ -97,11 +90,13 @@ export const generateVM = (
       },
       instancetype: {
         // inferFromVolume: `${virtualmachineName}-disk`,
-        name: instanceTypeName || bootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
+        name:
+          selectedInstanceType?.name ||
+          selectedBootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
       },
       preference: {
         // inferFromVolume: `${virtualmachineName}-disk`,
-        name: bootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
+        name: selectedBootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
       },
       dataVolumeTemplates: [
         {
@@ -109,24 +104,20 @@ export const generateVM = (
             name: `${virtualmachineName}-volume`,
           },
           spec: {
-            ...(isBootableVolumePVCKind(bootableVolume)
+            ...(isBootableVolumePVCKind(selectedBootableVolume)
               ? {
                   source: {
-                    pvc: {
-                      name: bootableVolume?.metadata?.name,
-                      namespace: bootableVolume?.metadata?.namespace,
-                    },
+                    pvc: { ...sourcePVC },
                   },
                 }
               : {
                   sourceRef: {
                     kind: DataSourceModel.kind,
-                    name: bootableVolume?.metadata?.name,
-                    namespace: bootableVolume?.metadata?.namespace,
+                    ...sourcePVC,
                   },
                 }),
             storage: {
-              storageClassName,
+              storageClassName: pvcSource?.spec?.storageClassName,
               resources: { requests: { storage: '' } },
             },
           },
