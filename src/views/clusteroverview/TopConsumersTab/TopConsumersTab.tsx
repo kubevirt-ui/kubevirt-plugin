@@ -1,11 +1,11 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
+import useKubevirtUserSettingsTopConsumerCards from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTopConsumerCards';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
@@ -17,30 +17,22 @@ import {
   SelectVariant,
 } from '@patternfly/react-core';
 
-import {
-  SHOW_TOP_5_ITEMS,
-  TOP_CONSUMERS_DURATION_KEY,
-  TOP_CONSUMERS_NUM_ITEMS_KEY,
-} from './utils/constants';
+import { TOP_CONSUMERS_DURATION_KEY, TOP_CONSUMERS_NUM_ITEMS_KEY } from './utils/constants';
 import TopConsumersGridRow from './utils/TopConsumersGridRow';
 import { topAmountSelectOptions } from './utils/utils';
 
 import './TopConsumersTab.scss';
 
-const TopConsumersTab: React.FC = () => {
+const TopConsumersTab: FC = () => {
   const { t } = useKubevirtTranslation();
-  const [numItemsToShow, setNumItemsToShow] = useLocalStorage(
-    TOP_CONSUMERS_NUM_ITEMS_KEY,
-    SHOW_TOP_5_ITEMS,
-  );
-  const [duration, setDuration] = useLocalStorage(
-    TOP_CONSUMERS_DURATION_KEY,
-    DurationOption.THIRTY_MIN.toString(),
-  );
 
-  const onNumItemsSelect = (value) => setNumItemsToShow(value);
+  const [localStorageData, setLocalStorageData] = useKubevirtUserSettingsTopConsumerCards();
+  const onNumItemsSelect = (value) => setLocalStorageData(TOP_CONSUMERS_NUM_ITEMS_KEY, value);
   const onDurationSelect = (value: string) =>
-    setDuration(DurationOption.fromDropdownLabel(value).toString());
+    setLocalStorageData(
+      TOP_CONSUMERS_DURATION_KEY,
+      DurationOption.fromDropdownLabel(value).toString(),
+    );
 
   return (
     <Overview>
@@ -52,13 +44,16 @@ const TopConsumersTab: React.FC = () => {
               {t('View virtualization dashboard')}
             </Link>
             <div className="kv-top-consumers-card__dropdown--duration">
-              <DurationDropdown selectedDuration={duration} selectHandler={onDurationSelect} />
+              <DurationDropdown
+                selectedDuration={localStorageData?.[TOP_CONSUMERS_DURATION_KEY]}
+                selectHandler={onDurationSelect}
+              />
             </div>
             <div className="kv-top-consumers-card__dropdown--num-items">
               <FormPFSelect
                 toggleId="kv-top-consumers-card-amount-select"
                 variant={SelectVariant.single}
-                selections={numItemsToShow}
+                selections={localStorageData?.[TOP_CONSUMERS_NUM_ITEMS_KEY]}
                 onSelect={(e, value) => onNumItemsSelect(value)}
               >
                 {topAmountSelectOptions(t).map((opt) => (
@@ -69,8 +64,17 @@ const TopConsumersTab: React.FC = () => {
           </CardActions>
         </CardHeader>
         <CardBody className="kv-top-consumers-card__body">
-          <TopConsumersGridRow rowNumber={1} topGrid />
-          <TopConsumersGridRow rowNumber={2} />
+          <TopConsumersGridRow
+            rowNumber={1}
+            topGrid
+            localStorageData={localStorageData}
+            setLocalStorageData={setLocalStorageData}
+          />
+          <TopConsumersGridRow
+            rowNumber={2}
+            localStorageData={localStorageData}
+            setLocalStorageData={setLocalStorageData}
+          />
         </CardBody>
       </Card>
     </Overview>
