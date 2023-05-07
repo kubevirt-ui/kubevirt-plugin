@@ -1,38 +1,59 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
+import {
+  SetTopConsumerData,
+  TopConsumersData,
+} from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { Card, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import { TopConsumerMetric } from './topConsumerMetric';
 import { TopConsumersChartList } from './TopConsumersChartList';
 import { TopConsumerScope } from './topConsumerScope';
-import { initialTopConsumerCardSettings } from './utils';
 
 import './TopConsumerCard.scss';
 
 type TopConsumersMetricCard = {
   cardID: string;
+  localStorageData: TopConsumersData;
+  setLocalStorageData: SetTopConsumerData;
 };
 
-const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ cardID }) => {
+const TopConsumerCard: FC<TopConsumersMetricCard> = ({
+  cardID,
+  localStorageData,
+  setLocalStorageData,
+}) => {
   const { t } = useKubevirtTranslation();
 
-  const [metricKey, setMetricKey] = useLocalStorage(
-    `${cardID}-metric-value`,
-    initialTopConsumerCardSettings[cardID]?.metric.toString(),
+  const metricKey = useMemo(
+    () => localStorageData?.[cardID]?.metric?.value,
+    [cardID, localStorageData],
   );
-  const [scopeKey, setScopeKey] = useLocalStorage(
-    `${cardID}-scope-value`,
-    initialTopConsumerCardSettings[cardID]?.scope.toString(),
+
+  const scopeKey = useMemo(
+    () => localStorageData?.[cardID]?.scope?.value,
+    [cardID, localStorageData],
   );
 
   const onMetricSelect = (value) => {
-    setMetricKey(TopConsumerMetric.fromDropdownLabel(value).toString());
+    setLocalStorageData(cardID, {
+      ...localStorageData?.[cardID],
+      metric: {
+        ...localStorageData?.[cardID]?.metric,
+        value: TopConsumerMetric.fromDropdownLabel(value).toString(),
+      },
+    });
   };
   const onScopeSelect = (value) => {
-    setScopeKey(TopConsumerScope.fromDropdownLabel(value).toString());
+    setLocalStorageData(cardID, {
+      ...localStorageData?.[cardID],
+      scope: {
+        ...localStorageData?.[cardID]?.scope,
+        value: TopConsumerScope.fromDropdownLabel(value).toString(),
+      },
+    });
   };
 
   return (
@@ -72,6 +93,7 @@ const TopConsumerCard: React.FC<TopConsumersMetricCard> = ({ cardID }) => {
       <TopConsumersChartList
         metric={TopConsumerMetric.fromString(metricKey)}
         scope={TopConsumerScope.fromString(scopeKey)}
+        localStorageData={localStorageData}
       />
     </Card>
   );

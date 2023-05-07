@@ -1,7 +1,7 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
+import { TopConsumersData } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { CardBody } from '@patternfly/react-core';
 
@@ -22,13 +22,24 @@ import './TopConsumersChartList.scss';
 type TopConsumersChartListProps = {
   metric: TopConsumerMetric;
   scope: TopConsumerScope;
+  localStorageData: TopConsumersData;
 };
 
-export const TopConsumersChartList: React.FC<TopConsumersChartListProps> = ({ metric, scope }) => {
+export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
+  metric,
+  scope,
+  localStorageData,
+}) => {
   const { t } = useKubevirtTranslation();
-  const [duration] = useLocalStorage(TOP_CONSUMERS_DURATION_KEY);
-  const [numItemsLabel] = useLocalStorage(TOP_CONSUMERS_NUM_ITEMS_KEY);
-  const numItemsToShow = React.useMemo(
+  const duration = useMemo(
+    () => localStorageData?.[TOP_CONSUMERS_DURATION_KEY],
+    [localStorageData],
+  );
+  const numItemsLabel = useMemo(
+    () => localStorageData?.[TOP_CONSUMERS_NUM_ITEMS_KEY],
+    [localStorageData],
+  );
+  const numItemsToShow = useMemo(
     () => (numItemsLabel === SHOW_TOP_5_ITEMS ? 5 : 10),
     [numItemsLabel],
   );

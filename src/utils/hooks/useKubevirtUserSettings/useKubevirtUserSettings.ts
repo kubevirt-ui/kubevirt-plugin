@@ -16,6 +16,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import userSettingsInitialState, { UserSettingsState } from './utils/userSettingsInitialState';
+import { parseNestedJSON } from './utils/utils';
 
 type UseKubevirtUserSettings = (
   key?: string,
@@ -25,20 +26,20 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   const [error, setError] = useState<Error>();
   const [userName, setUserName] = useState<string>();
   const [userSettings, setUserSettings] = useState<UserSettingsState>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingUserName, setLoadingUserName] = useState<boolean>(true);
   const userConfigMapName = useMemo(() => `${userName}-kubevirt-settings`, [userName]);
 
   useEffect(() => {
     const fetchUserName = async () => {
       setError(null);
-      setLoading(true);
       try {
         const user = await k8sGet({ model: UserModel, path: '~' });
         setUserName(user?.metadata?.name?.replace(':', '-'));
       } catch (e) {
         setError(e);
       }
-      setLoading(false);
+      setLoadingUserName(false);
     };
     fetchUserName();
   }, []);
@@ -53,30 +54,31 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
     );
 
   useEffect(() => {
-    if (configMapError?.code === 404 && userName) {
-      setLoading(true);
-      try {
-        k8sCreate({
-          model: ConfigMapModel,
-          data: {
-            metadata: {
-              name: userConfigMapName,
-              namespace: DEFAULT_NAMESPACE,
+    if (userName) {
+      if (configMapError?.code === 404) {
+        try {
+          k8sCreate({
+            model: ConfigMapModel,
+            data: {
+              metadata: {
+                name: userConfigMapName,
+                namespace: DEFAULT_NAMESPACE,
+              },
+              data: { settings: JSON.stringify(userSettingsInitialState) },
             },
-            data: { settings: JSON.stringify(userSettingsInitialState) },
-          },
-        });
-      } catch (e) {
-        setError(e);
+          });
+        } catch (e) {
+          setError(e);
+        }
       }
-      setLoading(false);
+      loadedConfigMap && setLoading(false);
     }
-  }, [configMapError?.code, userName, userConfigMapName]);
+  }, [configMapError?.code, userName, userConfigMapName, loadedConfigMap]);
 
   useEffect(() => {
     if (!isEmpty(userConfigMap) && !userSettings) {
       setUserSettings(
-        (<unknown>JSON.parse(userConfigMap?.data?.settings) || {}) as UserSettingsState,
+        (<unknown>parseNestedJSON(userConfigMap?.data?.settings) || {}) as UserSettingsState,
       );
     }
   }, [userConfigMap, userSettings]);
@@ -87,7 +89,6 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
       updateResource(data);
       return data;
     });
-    setLoading(true);
     const updateResource = async (data: { [key: string]: any }) => {
       try {
         await k8sPatch({
@@ -104,14 +105,13 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
       } catch (e) {
         setError(e);
       }
-      setLoading(false);
     };
   };
 
   return [
     key ? userSettings?.[key] : userSettings,
     userSettings && updateUserSetting,
-    loading || loadedConfigMap,
+    !loading && !loadingUserName && loadedConfigMap,
     error || configMapError,
   ];
 };
