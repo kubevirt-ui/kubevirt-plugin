@@ -1,3 +1,5 @@
+import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretSection/utils/constants';
+
 import { initialInstanceTypeState } from '../../utils/constants';
 
 import {
@@ -12,10 +14,7 @@ const instanceTypeVMInitialState: InstanceTypeVMState = {
   selectedBootableVolume: null,
   selectedInstanceType: initialInstanceTypeState,
   vmName: getRandomVMName(),
-  sshSecretCredentials: {
-    sshSecretName: '',
-    sshSecretKey: '',
-  },
+  sshSecretCredentials: initialSSHCredentials,
   pvcSource: null,
 };
 

@@ -5,6 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import TabModal from '../TabModal/TabModal';
 
+import { initialSSHCredentials } from './utils/constants';
 import { SSHSecretDetails } from './utils/types';
 import SSHSecretSection from './SSHSecretSection';
 
@@ -18,10 +19,8 @@ type SSHSecretModalProps = {
 const SSHSecretModal: FC<SSHSecretModalProps> = ({ onSubmit, onClose, isOpen, ...restProps }) => {
   const { t } = useKubevirtTranslation();
 
-  const [sshSecretCredentials, setSSHSecretCredentials] = useState<SSHSecretDetails>({
-    sshSecretName: '',
-    sshSecretKey: '',
-  });
+  const [sshSecretCredentials, setSSHSecretCredentials] =
+    useState<SSHSecretDetails>(initialSSHCredentials);
 
   return (
     <TabModal

@@ -1,3 +1,4 @@
+import produce from 'immer';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import DataSourceModel, {
@@ -31,8 +32,14 @@ export const getInstanceTypeState = (defaultInstanceTypeName: string): InstanceT
   };
 };
 
-export const generateVM = (instanceTypeState: InstanceTypeVMState, targetNamespace: string) => {
-  const { vmName, selectedInstanceType, selectedBootableVolume, pvcSource } = instanceTypeState;
+export const generateVM = (
+  instanceTypeState: InstanceTypeVMState,
+  targetNamespace: string,
+  startVM: boolean,
+) => {
+  const { vmName, selectedInstanceType, selectedBootableVolume, pvcSource, sshSecretCredentials } =
+    instanceTypeState;
+  const { sshSecretName } = sshSecretCredentials;
   const virtualmachineName =
     vmName ??
     uniqueNamesGenerator({
@@ -53,7 +60,7 @@ export const generateVM = (instanceTypeState: InstanceTypeVMState, targetNamespa
       namespace: targetNamespace,
     },
     spec: {
-      running: true,
+      running: startVM,
       template: {
         spec: {
           domain: {
@@ -118,7 +125,7 @@ export const generateVM = (instanceTypeState: InstanceTypeVMState, targetNamespa
                 }),
             storage: {
               storageClassName: pvcSource?.spec?.storageClassName,
-              resources: { requests: { storage: '' } },
+              resources: { requests: { storage: pvcSource?.spec?.resources?.requests?.storage } },
             },
           },
         },
@@ -126,7 +133,38 @@ export const generateVM = (instanceTypeState: InstanceTypeVMState, targetNamespa
     },
   };
 
-  return emptyVM;
+  const vmToCreate = produce(emptyVM, (draftVM) => {
+    if (sshSecretName) {
+      const cloudInitNoCloudVolume = emptyVM.spec.template.spec.volumes?.find(
+        (v) => v.cloudInitNoCloud,
+      );
+      if (cloudInitNoCloudVolume) {
+        draftVM.spec.template.spec.volumes = emptyVM.spec.template.spec.volumes.filter(
+          (v) => !v.cloudInitNoCloud,
+        );
+        draftVM.spec.template.spec.volumes.push({
+          name: cloudInitNoCloudVolume.name,
+          cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
+        });
+      }
+      draftVM.spec.template.spec.accessCredentials = [
+        {
+          sshPublicKey: {
+            source: {
+              secret: {
+                secretName: sshSecretName || `${vmName}-ssh-key-${getRandomChars()}`,
+              },
+            },
+            propagationMethod: {
+              configDrive: {},
+            },
+          },
+        },
+      ];
+    }
+  });
+
+  return vmToCreate;
 };
 
 export const isBootableVolumePVCKind = (bootableVolume: BootableVolume): boolean =>

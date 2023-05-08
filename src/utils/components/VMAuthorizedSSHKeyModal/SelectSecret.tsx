@@ -3,13 +3,12 @@ import * as React from 'react';
 import { modelToGroupVersionKind, SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import Loading from '../Loading/Loading';
-
-import { decodeSecret } from './utils';
 
 type SelectSecretProps = {
   selectedSecret: IoK8sApiCoreV1Secret;

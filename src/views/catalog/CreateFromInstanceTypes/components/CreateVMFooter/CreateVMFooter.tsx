@@ -1,15 +1,14 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import produce from 'immer';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { generateVM } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { createVmSSHSecret } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
+import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -22,6 +21,9 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+import { EyeIcon } from '@patternfly/react-icons';
+
+import YamlAndCLIViewerModal from './components/YamlAndCLIViewerModal/YamlAndCLIViewerModal';
 
 import './CreateVMFooter.scss';
 
@@ -31,15 +33,12 @@ const CreateVMFooter: FC = () => {
   const [startVM, setStartVM] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<Error | any>(null);
+  const { createModal } = useModal();
 
   const { instanceTypeVMState, activeNamespace, vmNamespaceTarget } = useInstanceTypeVMStore();
-  const { sshSecretCredentials, selectedBootableVolume, pvcSource } = instanceTypeVMState;
-  const { sshSecretName, sshSecretKey } = sshSecretCredentials;
-
-  const updatedVM = useMemo(
-    () => generateVM(instanceTypeVMState, vmNamespaceTarget),
-    [instanceTypeVMState, vmNamespaceTarget],
-  );
+  const { sshSecretCredentials, selectedBootableVolume, vmName, selectedInstanceType } =
+    instanceTypeVMState;
+  const { sshSecretName, sshPubKey, createNewSecret } = sshSecretCredentials;
 
   const onCancel = useCallback(
     () => history.push(getResourceUrl({ model: VirtualMachineModel, activeNamespace })),
@@ -49,63 +48,28 @@ const CreateVMFooter: FC = () => {
   const [canCreateVM] = useAccessReview({
     resource: VirtualMachineModel.plural,
     verb: 'create' as K8sVerb,
-    namespace: updatedVM?.metadata?.namespace,
+    namespace: vmNamespaceTarget,
     group: VirtualMachineModel.apiGroup,
   });
 
   const hasNameAndInstanceType = useMemo(
-    () =>
-      !isEmpty(getName(updatedVM)) &&
-      (!isEmpty(selectedBootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL]) ||
-        !isEmpty(updatedVM?.spec?.instancetype?.name)),
-    [selectedBootableVolume, updatedVM],
+    () => !isEmpty(vmName) && !isEmpty(selectedInstanceType),
+    [vmName, selectedInstanceType],
   );
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setError(null);
 
-    const vmToCreate = produce(updatedVM, (draftVM) => {
-      draftVM.spec.running = startVM;
-      draftVM.spec.dataVolumeTemplates[0].spec.storage.resources.requests.storage =
-        pvcSource?.spec?.resources?.requests?.storage;
-      if (sshSecretName) {
-        const cloudInitNoCloudVolume = updatedVM.spec.template.spec.volumes?.find(
-          (v) => v.cloudInitNoCloud,
-        );
-        if (cloudInitNoCloudVolume) {
-          draftVM.spec.template.spec.volumes = updatedVM.spec.template.spec.volumes.filter(
-            (v) => !v.cloudInitNoCloud,
-          );
-          draftVM.spec.template.spec.volumes.push({
-            name: cloudInitNoCloudVolume.name,
-            cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
-          });
-        }
-        draftVM.spec.template.spec.accessCredentials = [
-          {
-            sshPublicKey: {
-              source: {
-                secret: {
-                  secretName: sshSecretName || `${getName(updatedVM)}-ssh-key-${getRandomChars()}`,
-                },
-              },
-              propagationMethod: {
-                configDrive: {},
-              },
-            },
-          },
-        ];
-      }
-    });
+    const vmToCreate = generateVM(instanceTypeVMState, vmNamespaceTarget, startVM);
 
     return k8sCreate({
       data: vmToCreate,
       model: VirtualMachineModel,
     })
       .then((createdVM) => {
-        if (!isEmpty(sshSecretKey)) {
-          createVmSSHSecret(createdVM, sshSecretKey, sshSecretName);
+        if (createNewSecret) {
+          createVmSSHSecret(createdVM, sshPubKey, sshSecretName);
         }
         history.push(getResourceUrl({ model: VirtualMachineModel, resource: vmToCreate }));
       })
@@ -155,6 +119,23 @@ const CreateVMFooter: FC = () => {
                 variant={ButtonVariant.primary}
               >
                 {t('Create VirtualMachine')}
+              </Button>
+            </SplitItem>
+            <SplitItem>
+              <Button
+                variant={ButtonVariant.secondary}
+                icon={<EyeIcon />}
+                isDisabled={isEmpty(selectedBootableVolume) || !hasNameAndInstanceType}
+                onClick={() =>
+                  createModal((props) => (
+                    <YamlAndCLIViewerModal
+                      vm={generateVM(instanceTypeVMState, vmNamespaceTarget, startVM)}
+                      {...props}
+                    />
+                  ))
+                }
+              >
+                YAML & CLI
               </Button>
             </SplitItem>
             <SplitItem>
