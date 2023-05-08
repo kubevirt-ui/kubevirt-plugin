@@ -41,7 +41,7 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
   };
 });
 
-jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => ({
+jest.mock('@kubevirt-hooks/resources/template/hooks/useVmTemplateSource', () => ({
   useVmTemplateSource: () => ({
     isBootSourceAvailable: true,
     loaded: true,

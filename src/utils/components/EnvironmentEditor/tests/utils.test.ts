@@ -9,7 +9,7 @@ const env2Name = 'test-2';
 const env2Serial = '4321';
 const env2Disk = 'disk2';
 
-describe('utils tests', () => {
+describe('hooks tests', () => {
   describe('areEnvironmentsChanged tests', () => {
     it('shuffle Envs', () => {
       const initialEnvironments: EnvironmentVariable[] = [

@@ -9,8 +9,7 @@ import {
   K8sIoApiCoreV1PreferredSchedulingTerm,
   K8sIoApiCoreV1WeightedPodAffinityTerm,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { get, has, intersectionWith, isEmpty } from '@kubevirt-utils/utils/utils';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 
 import { AffinityCondition, AffinityLabel, AffinityRowData, AffinityType } from './types';
@@ -220,27 +219,6 @@ export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
   return affinity;
 };
 
-export const has = (object, key) => {
-  const keyParts = key.split('.');
-
-  return (
-    !!object &&
-    (keyParts.length > 1
-      ? has(object[key.split('.')[0]], keyParts.slice(1).join('.'))
-      : Object.prototype.hasOwnProperty.call(object, key))
-  );
-};
-
-export const get = (obj, path, defaultValue = undefined) => {
-  const travel = (regexp) =>
-    String.prototype.split
-      .call(path, regexp)
-      .filter(Boolean)
-      .reduce((res, key) => (res !== null && res !== undefined ? res[key] : res), obj);
-  const result = travel(/[,[\]]+?/) || travel(/[,[\].]+?/);
-  return result === undefined || result === obj ? defaultValue : result;
-};
-
 export const withOperatorPredicate = <T extends AffinityLabel = AffinityLabel>(
   store: any,
   label: T,
@@ -261,18 +239,6 @@ export const withOperatorPredicate = <T extends AffinityLabel = AffinityLabel>(
         ? values?.some((singleValue) => get(store, key) === singleValue)
         : get(store, key) === '';
   }
-};
-
-// this will create a union array from 2 arrays of objects
-export const unionWith = (objects: any[], others: any[]) => {
-  return objects.concat(
-    others.filter((other) => objects.every((object) => !isEqualObject(object, other))),
-  );
-};
-
-// this will create a intersection array from 2 arrays of objects
-export const intersectionWith = (objects: any[], others: any[]) => {
-  return objects.filter((object) => others.some((other) => isEqualObject(object, other)));
 };
 
 export const getAvailableAffinityID = (affinities: AffinityRowData[]) => {

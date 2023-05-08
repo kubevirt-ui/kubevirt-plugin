@@ -1,5 +1,6 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1MigrationConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { K8sResourceCondition } from '@kubevirt-utils/types/k8sTypes';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export type Descriptor<T = any> = {
@@ -148,14 +149,6 @@ export enum K8sResourceConditionStatus {
   False = 'False',
   Unknown = 'Unknown',
 }
-
-export type K8sResourceCondition = {
-  type: string;
-  status: keyof typeof K8sResourceConditionStatus;
-  lastTransitionTime?: string;
-  reason?: string;
-  message?: string;
-};
 
 export enum SubscriptionState {
   SubscriptionStateNone = '',

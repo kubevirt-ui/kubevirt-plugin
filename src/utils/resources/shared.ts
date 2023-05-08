@@ -184,6 +184,15 @@ export const getAPIVersionForModel = (model: K8sModel): string =>
   !model?.apiGroup ? model.apiVersion : `${model.apiGroup}/${model.apiVersion}`;
 
 /**
+ * Provides apiVersion for a k8s resource.
+ * @param resource K8sResourceCommon
+ * @returns The apiVersion for the resource, i.e. `group/version`
+ */
+export const getAPIVersionForResource = <A extends K8sResourceCommon = K8sResourceCommon>(
+  resource: A,
+) => resource?.apiVersion as K8sResourceCommon['apiVersion'];
+
+/**
  * Get vm printable status
  * @date 7/6/2022 - 11:23:32 AM
  *

@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { K8sResourceCondition } from '@kubevirt-utils/types/k8sTypes';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ConditionsTableRow } from './components/ConditionsTableRow';
@@ -10,14 +11,6 @@ export enum K8sResourceConditionStatus {
   False = 'False',
   Unknown = 'Unknown',
 }
-
-export type K8sResourceCondition = {
-  type: string;
-  status: keyof typeof K8sResourceConditionStatus;
-  lastTransitionTime?: string;
-  reason?: string;
-  message?: string;
-};
 
 export type ConditionsProps = {
   conditions: K8sResourceCondition[];

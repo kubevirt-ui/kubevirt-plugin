@@ -14,7 +14,7 @@ const template = getMockTemplate();
 const someExternalSecretName = 'some-external-secret';
 
 const sshkey = 'testtest';
-describe('sshkey-utils tests', () => {
+describe('sshkey-hooks tests', () => {
   describe('changeSSHKeySecret test ', () => {
     it('add ssh key and change it to existing secret', async () => {
       const templateWithSecret = (await changeSSHKeySecret(
