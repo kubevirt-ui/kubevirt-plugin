@@ -1,47 +1,49 @@
 import React, { Dispatch, FC, SetStateAction, useCallback } from 'react';
 
-import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+import {
+  SecretSelectionOption,
+  SSHSecretDetails,
+} from '@kubevirt-utils/components/SSHSecretSection/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Split, SplitItem } from '@patternfly/react-core';
 
 type SecretSelectionRadioGroupProps = {
   selectedOption: SecretSelectionOption;
   setSelectedOption: Dispatch<SetStateAction<SecretSelectionOption>>;
+  setSSHCredentials: Dispatch<SetStateAction<SSHSecretDetails>>;
 };
 
 const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
   selectedOption,
   setSelectedOption,
+  setSSHCredentials,
 }) => {
-  const { setInstanceTypeVMState } = useInstanceTypeVMStore();
-
   // Inputs should not persist between changes of secretSelectionOption
   const onSelectSecretOption = useCallback(
     (secretOption: SecretSelectionOption) => {
       setSelectedOption((prevSecretOption) => {
         if (prevSecretOption !== secretOption) {
-          setInstanceTypeVMState({
-            type: instanceTypeActionType.setSSHCredentials,
-            payload: { sshSecretName: '', sshSecretKey: '' },
-          });
+          setSSHCredentials({ sshSecretName: '', sshSecretKey: '' });
         }
 
         return secretOption;
       });
     },
-    [setInstanceTypeVMState, setSelectedOption],
+    [setSelectedOption, setSSHCredentials],
   );
+
   return (
-    <Split hasGutter>
+    <Split className="ssh-secret-section__radio-group" hasGutter>
       <SplitItem>
         <Radio
           isChecked={selectedOption === SecretSelectionOption.none}
           id={SecretSelectionOption.none}
           name="ssh-secret-selection"
           label={t('None')}
-          onClick={() => onSelectSecretOption(SecretSelectionOption.none)}
+          onClick={() => {
+            onSelectSecretOption(SecretSelectionOption.none);
+            setSSHCredentials({ sshSecretName: '', sshSecretKey: '' });
+          }}
         />
       </SplitItem>
       <SplitItem>

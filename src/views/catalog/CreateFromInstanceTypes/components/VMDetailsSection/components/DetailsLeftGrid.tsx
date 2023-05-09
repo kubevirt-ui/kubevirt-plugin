@@ -8,10 +8,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { DescriptionList, TextInput } from '@patternfly/react-core';
 import VirtualMachineDescriptionItem from '@virtualmachines/details/tabs/details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
-import {
-  getCPUAndMemoryFromDefaultInstanceType,
-  getOSFromDefaultPreference,
-} from '../../../utils/utils';
+import { getCPUAndMemoryFromDefaultInstanceType, getOSFromDefaultPreference } from '../utils/utils';
 
 const DetailsLeftGrid: FC = () => {
   const { t } = useKubevirtTranslation();
