@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
@@ -38,7 +38,7 @@ type WizardOverviewGridProps = {
   updateVM: UpdateValidatedVM;
 };
 
-const WizardOverviewGrid: React.FC<WizardOverviewGridProps> = ({ vm, tabsData, updateVM }) => {
+const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ vm, tabsData, updateVM }) => {
   const history = useHistory();
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
@@ -171,7 +171,7 @@ const WizardOverviewGrid: React.FC<WizardOverviewGridProps> = ({ vm, tabsData, u
                 />
               ))
             }
-            description={getBootloaderTitleFromVM(vm, t)}
+            description={getBootloaderTitleFromVM(vm)}
           />
 
           <WizardDescriptionItem

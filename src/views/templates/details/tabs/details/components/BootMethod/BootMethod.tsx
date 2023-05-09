@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -22,15 +22,14 @@ type BootMethodProps = {
   template: V1Template;
 };
 
-const BootMethod: React.FC<BootMethodProps> = ({ template }) => {
+const BootMethod: FC<BootMethodProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(
     getTemplateVirtualMachineObject(template),
-    t,
   );
-  const onSubmit = React.useCallback(
+  const onSubmit = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
         model: TemplateModel,
