@@ -54,7 +54,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   }, [instanceTypesAndPreferencesData]);
 
   const { activeColumns, columnLayout } = useBootVolumeColumns(!displayShowAllButton);
-  const filters = useBootVolumeFilters(`osName${!displayShowAllButton && '-modal'}`);
+  const filters = useBootVolumeFilters(!displayShowAllButton);
 
   const [unfilteredData, data, onFilterChange] = useListPageFilter(bootableVolumes, filters);
 

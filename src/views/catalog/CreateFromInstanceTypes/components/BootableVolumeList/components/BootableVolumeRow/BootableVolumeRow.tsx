@@ -1,7 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
-import { getBootableVolumeGroupVersionKind } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { getTemplateOSIcon as getOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
@@ -15,7 +14,6 @@ import {
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Text, TextVariants } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 
@@ -52,7 +50,6 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       onClick={() => setSelectedBootableVolume(bootableVolume)}
     >
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
-        <ResourceIcon groupVersionKind={getBootableVolumeGroupVersionKind(bootableVolume)} />
         <img src={getOSIcon(preference)} alt="os-icon" className="vm-catalog-row-icon" />
         <Text component={TextVariants.small}>{bootVolumeName}</Text>
         {isDataSourceCloning(bootableVolume as V1beta1DataSource) && (
