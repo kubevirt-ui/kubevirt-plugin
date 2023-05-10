@@ -11,6 +11,7 @@ import {
   UseBootableVolumesValues,
   UseInstanceTypeAndPreferencesValues,
 } from '../utils/types';
+import { getRandomVMName } from '../utils/utils';
 
 export const useInstanceTypeVMInitialStore = create<InstanceTypeVMStore>()((set, get) => {
   return {
@@ -37,6 +38,13 @@ export const useInstanceTypeVMInitialStore = create<InstanceTypeVMStore>()((set,
       ),
     setActiveNamespace: (namespace: string) => set({ activeNamespace: namespace }),
     setVMNamespaceTarget: (namespace: string) => set({ vmNamespaceTarget: namespace }),
-    resetInstanceTypeVMState: () => set(instanceTypeVMStoreInitialState),
+    resetInstanceTypeVMState: () =>
+      set({
+        ...instanceTypeVMStoreInitialState,
+        instanceTypeVMState: {
+          ...instanceTypeVMStoreInitialState.instanceTypeVMState,
+          vmName: getRandomVMName(),
+        },
+      }),
   };
 });

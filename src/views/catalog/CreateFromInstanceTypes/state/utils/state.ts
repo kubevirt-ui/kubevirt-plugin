@@ -1,5 +1,3 @@
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
-
 import { initialInstanceTypeState } from '../../utils/constants';
 
 import {
@@ -8,14 +6,12 @@ import {
   UseBootableVolumesValues,
   UseInstanceTypeAndPreferencesValues,
 } from './types';
+import { getRandomVMName } from './utils';
 
 const instanceTypeVMInitialState: InstanceTypeVMState = {
   selectedBootableVolume: null,
   selectedInstanceType: initialInstanceTypeState,
-  vmName: uniqueNamesGenerator({
-    dictionaries: [adjectives, animals],
-    separator: '-',
-  }),
+  vmName: getRandomVMName(),
   sshSecretCredentials: {
     sshSecretName: '',
     sshSecretKey: '',

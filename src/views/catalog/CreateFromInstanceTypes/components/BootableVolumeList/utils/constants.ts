@@ -1,3 +1,4 @@
+import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { PerPageOptions } from '@patternfly/react-core';
 
 export const paginationDefaultValuesForm = [
@@ -10,13 +11,6 @@ export const paginationDefaultValuesModal: PerPageOptions[] = [
   { title: '30', value: 30 },
   { title: '50', value: 50 },
 ];
-
-export type PaginationState = {
-  page: number;
-  perPage: number;
-  startIndex: number;
-  endIndex: number;
-};
 
 export const paginationInitialStateForm: PaginationState = {
   page: 1,

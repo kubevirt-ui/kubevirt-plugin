@@ -1,11 +1,7 @@
 import { useState } from 'react';
 
-import { paginationInitialState, PaginationState } from '@virtualmachines/utils';
-
-type UsePagination = () => [
-  pagination: PaginationState,
-  onPaginationChange: (newPagination: PaginationState) => void,
-];
+import { paginationInitialState } from './utils/constants';
+import { PaginationState, UsePagination } from './utils/types';
 
 const usePagination: UsePagination = () => {
   const [pagination, setPagination] = useState<PaginationState>(paginationInitialState);
@@ -17,7 +13,7 @@ const usePagination: UsePagination = () => {
     }));
   };
 
-  return [pagination, onPaginationChange];
+  return { pagination, onPaginationChange };
 };
 
 export default usePagination;

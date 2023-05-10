@@ -7,11 +7,10 @@ import {
   V1alpha1PersistentVolumeClaim,
   V1alpha2VirtualMachineClusterPreference,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base';
-
-import { PaginationState } from '../utils/constants';
 
 type UseBootVolumeSortColumns = (
   unsortedData: BootableVolume[],

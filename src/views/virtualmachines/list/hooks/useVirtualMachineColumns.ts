@@ -4,6 +4,7 @@ import { NodeModel, VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/con
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import { columnSorting } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
   K8sVerb,
@@ -11,8 +12,6 @@ import {
   useAccessReview,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
-
-import { columnSorting } from './utils/utils';
 
 const useVirtualMachineColumns = (
   namespace: string,

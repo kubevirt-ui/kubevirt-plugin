@@ -10,6 +10,10 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
+import {
+  paginationDefaultValues,
+  paginationInitialState,
+} from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -21,11 +25,7 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
-import {
-  OBJECTS_FETCHING_LIMIT,
-  paginationDefaultValues,
-  paginationInitialState,
-} from '@virtualmachines/utils';
+import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { useVMListFilters } from '../utils';
 
@@ -34,6 +34,7 @@ import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow'
 import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 
+import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
 
 type VirtualMachinesListProps = {
@@ -98,7 +99,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
         {!isEmpty(vms) && <VirtualMachinesCreateButton namespace={namespace} />}
       </ListPageHeader>
       <ListPageBody>
-        <div className="VirtualMachineList--filters__main">
+        <div className="list-managment-group">
           <ListPageFilter
             data={unfilteredData}
             loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded}
@@ -125,7 +126,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
           />
           {!isEmpty(vms) && (
             <Pagination
-              className="VirtualMachineList--filters__main-pagination"
+              className="list-managment-group__pagination"
               itemCount={data?.length}
               page={pagination?.page}
               perPage={pagination?.perPage}

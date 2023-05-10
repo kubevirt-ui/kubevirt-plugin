@@ -2,8 +2,9 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import usePagination from '@kubevirt-utils/hooks/usePagination';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
+import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { columnSorting, isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   ListPageFilter,
@@ -11,8 +12,6 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem, Pagination, Title } from '@patternfly/react-core';
 import { TableComposable, Th, Thead, Tr } from '@patternfly/react-table';
-import { columnSorting } from '@virtualmachines/list/hooks/utils/utils';
-import { paginationDefaultValues } from '@virtualmachines/utils';
 
 import useDiagnosticConditionsTableColumns from '../hooks/useDiagnosticConditionsTableColumns';
 import useDiagnosticFilter from '../hooks/useDiagnosticFilter';
@@ -34,7 +33,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
   });
 
   const [columns, activeColumns, sorting] = useDiagnosticConditionsTableColumns();
-  const [pagination, onPaginationChange] = usePagination();
+  const { pagination, onPaginationChange } = usePagination();
   const sortedData = useMemo(
     () => columnSorting(conditions, sorting?.direction, pagination, sorting?.column),
     [conditions, sorting, pagination],
