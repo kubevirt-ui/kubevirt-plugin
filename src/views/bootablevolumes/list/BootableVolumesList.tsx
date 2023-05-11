@@ -4,6 +4,10 @@ import AddBootableVolumeButton from '@catalog/CreateFromInstanceTypes/components
 import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  paginationDefaultValues,
+  paginationInitialState,
+} from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { DataSourceModelGroupVersionKind, DataSourceModelRef } from '@kubevirt-utils/models';
 import { getAvailableOrCloningDataSources } from '@kubevirt-utils/resources/shared';
 import {
@@ -15,14 +19,13 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Pagination, Stack, StackItem } from '@patternfly/react-core';
-import { paginationDefaultValues, paginationInitialState } from '@virtualmachines/utils';
 
 import BootableVolumesRow from './components/BootableVolumesRow';
 import useBootableVolumes from './hooks/useBootableVolumes';
 import useBootableVolumesColumns from './hooks/useBootableVolumesColumns';
 import useBootableVolumesFilters from './hooks/useBootableVolumesFilters';
 
-import './BootableVolumesList.scss';
+import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const BootableVolumesList: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -54,7 +57,7 @@ const BootableVolumesList: FC = () => {
         <Stack hasGutter>
           <StackItem>{t('View and manage available bootable volumes.')}</StackItem>
 
-          <StackItem className="BootableVolumesList--filters__main">
+          <StackItem className="list-managment-group">
             <ListPageFilter
               data={data}
               loaded={loadedDataSources}
@@ -80,7 +83,7 @@ const BootableVolumesList: FC = () => {
               }}
             />
             <Pagination
-              className="BootableVolumesList--filters__main-pagination"
+              className="list-managment-group__pagination"
               itemCount={filteredData?.length}
               page={pagination?.page}
               perPage={pagination?.perPage}

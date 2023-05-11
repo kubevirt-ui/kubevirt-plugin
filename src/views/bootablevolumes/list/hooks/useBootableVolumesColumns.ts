@@ -5,9 +5,9 @@ import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import { columnSorting } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon, TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
-import { columnSorting } from '@virtualmachines/list/hooks/utils/utils';
 
 import { getDataSourcePreferenceLabelValue, getPreferenceReadableOS } from '../../utils/utils';
 
