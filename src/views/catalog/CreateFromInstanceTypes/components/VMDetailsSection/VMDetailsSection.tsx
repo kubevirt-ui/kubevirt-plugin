@@ -1,28 +1,24 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 
-import SSHSecretSection from '@kubevirt-utils/components/SSHSecretSection/SSHSecretSection';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ExpandableSection } from '@patternfly/react-core';
+import { Grid, GridItem } from '@patternfly/react-core';
 
-import VMDetailsBody from './components/VMDetailsBody/VMDetailsBody';
+import DetailsLeftGrid from './components/DetailsLeftGrid';
+import DetailsRightGrid from './components/DetailsRightGrid';
 
 import './VMDetailsSection.scss';
 
 const VMDetailsSection: FC = () => {
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState<boolean>(false);
-
   return (
-    <div className="instancetypes-vm-details-section">
-      <ExpandableSection
-        toggleText={t('Advanced settings')}
-        data-test-id="expandable-advanced-section"
-        onToggle={() => setAdvancedSectionOpen(!advancedSectionOpen)}
-        isExpanded={advancedSectionOpen}
-        isIndented
-      >
-        <SSHSecretSection />
-      </ExpandableSection>
-      <VMDetailsBody />
+    <div className="instancetypes-vm-details-section instancetypes-vm-details-body">
+      <Grid hasGutter>
+        <GridItem span={3}>
+          <DetailsLeftGrid />
+        </GridItem>
+        <GridItem span={1}>{/* Spacer */}</GridItem>
+        <GridItem span={3}>
+          <DetailsRightGrid />
+        </GridItem>
+      </Grid>
     </div>
   );
 };

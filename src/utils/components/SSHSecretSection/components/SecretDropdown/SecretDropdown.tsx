@@ -1,7 +1,5 @@
-import React, { FC, ReactElement, useState } from 'react';
+import React, { Dispatch, FC, ReactElement, SetStateAction, useState } from 'react';
 
-import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -10,19 +8,24 @@ import { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import Loading from '../../../Loading/Loading';
+import { SSHSecretDetails } from '../../utils/types';
 import { decodeSecret } from '../../utils/utils';
 
 type SecretDropdownProps = {
   secretsResourceData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
+  sshSecretName: string;
+  setSSHCredentials: Dispatch<SetStateAction<SSHSecretDetails>>;
   id?: string;
 };
 
-const SecretDropdown: FC<SecretDropdownProps> = ({ secretsResourceData, id }) => {
+const SecretDropdown: FC<SecretDropdownProps> = ({
+  secretsResourceData,
+  sshSecretName,
+  setSSHCredentials,
+  id,
+}) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
-
-  const { instanceTypeVMState, setInstanceTypeVMState } = useInstanceTypeVMStore();
-  const sshSecretName = instanceTypeVMState?.sshSecretCredentials?.sshSecretName;
 
   const [allSecrets = [], secretsLoaded, secretsError] = secretsResourceData;
   const sshKeySecrets = allSecrets
@@ -30,10 +33,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({ secretsResourceData, id }) =>
     ?.sort((a, b) => a?.metadata?.name.localeCompare(b?.metadata?.name));
 
   const onSelect = (_, newSecretName: string) => {
-    setInstanceTypeVMState({
-      type: instanceTypeActionType.setSSHCredentials,
-      payload: { sshSecretName: newSecretName, sshSecretKey: '' },
-    });
+    setSSHCredentials({ sshSecretName: newSecretName, sshSecretKey: '' });
     setIsOpen(false);
   };
 
@@ -66,6 +66,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({ secretsResourceData, id }) =>
       placeholderText={t('--- Select secret ---')}
       maxHeight={400}
       id={id || 'select-secret'}
+      menuAppendTo="parent"
     >
       {sshKeySecrets?.map((secret) => {
         const name = getName(secret);
