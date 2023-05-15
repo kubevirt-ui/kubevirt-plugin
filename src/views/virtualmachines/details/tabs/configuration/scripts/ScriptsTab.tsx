@@ -11,6 +11,7 @@ import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/Cloudi
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { VMAuthorizedSSHKeyModal } from '@kubevirt-utils/components/VMAuthorizedSSHKeyModal/VMAuthorizedSSHKeyModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
@@ -30,8 +31,6 @@ import {
   Text,
   TextVariants,
 } from '@patternfly/react-core';
-
-import VirtualMachineDescriptionItem from '../../details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 import './scripts-tab.scss';
 

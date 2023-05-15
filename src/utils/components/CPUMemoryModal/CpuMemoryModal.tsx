@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -38,7 +38,7 @@ type CPUMemoryModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, onSubmit, vmi }) => {
+const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, onSubmit, vmi }) => {
   const { t } = useKubevirtTranslation();
   const {
     data: templateDefaultsData,
@@ -49,17 +49,17 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
     vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'] ||
       COMMON_TEMPLATE_DEFAULT_NAMESPACE,
   );
-  const [updateInProcess, setUpdateInProcess] = React.useState<boolean>(false);
-  const [updateError, setUpdateError] = React.useState<string>();
+  const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
+  const [updateError, setUpdateError] = useState<string>();
 
-  const [memory, setMemory] = React.useState<number>();
-  const [cpuCores, setCpuCores] = React.useState<number>();
-  const [memoryUnit, setMemoryUnit] = React.useState<string>();
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
+  const [memory, setMemory] = useState<number>();
+  const [cpuCores, setCpuCores] = useState<number>();
+  const [memoryUnit, setMemoryUnit] = useState<string>();
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
 
-  const updatedVirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, ['spec.template.spec.domain.resources', 'spec.template.spec.domain.cpu']);
       vmDraft.spec.template.spec.domain.resources.requests = {
@@ -71,7 +71,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
     return updatedVM;
   }, [vm, memory, cpuCores, memoryUnit]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (vm?.metadata) {
       const requests = vm?.spec?.template?.spec?.domain?.resources?.requests as {
         [key: string]: string;
@@ -150,7 +150,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
           <NumberInput
             value={cpuCores}
             onMinus={() => setCpuCores((cpus) => +cpus - 1)}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               const newNumber = +e?.target?.value;
               setCpuCores((cpus) => (newNumber > 0 ? newNumber : cpus));
             }}
@@ -166,7 +166,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
           <NumberInput
             value={memory}
             onMinus={() => setMemory((mem) => +mem - 1)}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               const newNumber = +e?.target?.value;
               setMemory((mem) => (newNumber > 0 ? newNumber : mem));
             }}
@@ -177,7 +177,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, on
 
           <Dropdown
             className="input-memory--dropdown"
-            onSelect={(e: React.ChangeEvent<HTMLInputElement>) => {
+            onSelect={(e: ChangeEvent<HTMLInputElement>) => {
               setMemoryUnit(e?.target?.value);
               setIsDropdownOpen(false);
             }}

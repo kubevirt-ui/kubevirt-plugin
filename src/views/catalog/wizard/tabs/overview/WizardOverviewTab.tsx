@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { WizardTab } from '@catalog/wizard/tabs';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';

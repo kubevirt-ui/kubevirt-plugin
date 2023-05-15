@@ -7,6 +7,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
+import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
@@ -18,6 +19,7 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview, getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
@@ -39,9 +41,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
-import CPUMemory from '../../CPUMemory/CPUMemory';
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
-import VirtualMachineDescriptionItem from '../../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import VirtualMachineLabels from '../../VirtualMachineLabels/VirtualMachineLabels';
 
 type VirtualMachineDetailsLeftGridProps = {

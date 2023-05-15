@@ -2,6 +2,7 @@ import React, { FC, useMemo } from 'react';
 
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
@@ -29,9 +30,7 @@ import {
   SplitItem,
 } from '@patternfly/react-core';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
-
-import { printableVMStatus } from '../../../../../utils';
-import CPUMemory from '../../../details/components/CPUMemory/CPUMemory';
+import { printableVMStatus } from '@virtualmachines/utils';
 
 import MigrationProgressPopover from './components/MigrationProgressPopover/MigrationProgressPopover';
 import StatusPopoverButton from './components/StatusPopoverButton/StatusPopoverButton';

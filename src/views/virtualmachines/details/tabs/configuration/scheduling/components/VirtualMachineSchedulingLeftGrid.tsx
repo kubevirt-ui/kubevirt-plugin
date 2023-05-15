@@ -10,12 +10,12 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
-import VirtualMachineDescriptionItem from '@virtualmachines/details/tabs/details/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 import Affinity from './Affinity';
 import Descheduler from './Descheduler';
