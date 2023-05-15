@@ -14,7 +14,7 @@ export const TEMPLATE_DATA_SOURCE_NAMESPACE_PARAMETER = 'DATA_SOURCE_NAMESPACE';
 export const LABEL_USED_TEMPLATE_NAME = 'vm.kubevirt.io/template';
 export const LABEL_USED_TEMPLATE_NAMESPACE = 'vm.kubevirt.io/template.namespace';
 export const TEMPLATE_VERSION_LABEL = 'vm.kubevirt.io/template.version';
-export const TEMPLATE_APP_NAME_LABEL = 'app.kubernetes.io/name';
+export const APP_NAME_LABEL = 'app.kubernetes.io/name';
 export const CUSTOM_TEMPLATES = 'custom-templates';
 
 export const DATA_SOURCE_CRONJOB_LABEL = 'cdi.kubevirt.io/dataImportCron';
