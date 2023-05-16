@@ -54,12 +54,7 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
 
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
-  const { projects, pvcs, loaded } = useCloneVMResources(vm);
-
-  const projectNames = React.useMemo(
-    () => (projects || [])?.map((project) => project.metadata.name),
-    [projects],
-  );
+  const { projectNames, pvcs, loaded } = useCloneVMResources(vm);
 
   const clonedVirtualMachine = React.useMemo(() => {
     const clonedVM = produceCleanClonedVM(vm, (draftVM) => {
