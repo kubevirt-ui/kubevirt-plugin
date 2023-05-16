@@ -7,6 +7,8 @@ import {
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Split, SplitItem } from '@patternfly/react-core';
 
+import { initialSSHCredentials } from '../utils/constants';
+
 type SecretSelectionRadioGroupProps = {
   selectedOption: SecretSelectionOption;
   setSelectedOption: Dispatch<SetStateAction<SecretSelectionOption>>;
@@ -23,7 +25,7 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
     (secretOption: SecretSelectionOption) => {
       setSelectedOption((prevSecretOption) => {
         if (prevSecretOption !== secretOption) {
-          setSSHCredentials({ sshSecretName: '', sshSecretKey: '' });
+          setSSHCredentials(initialSSHCredentials);
         }
 
         return secretOption;
@@ -42,7 +44,7 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
           label={t('None')}
           onClick={() => {
             onSelectSecretOption(SecretSelectionOption.none);
-            setSSHCredentials({ sshSecretName: '', sshSecretKey: '' });
+            setSSHCredentials(initialSSHCredentials);
           }}
         />
       </SplitItem>

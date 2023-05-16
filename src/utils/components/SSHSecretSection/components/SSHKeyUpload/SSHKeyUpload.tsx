@@ -36,10 +36,14 @@ const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, sshCredentials, setSSHCr
         id={'ssh-key-upload'}
         className="ssh-key-upload__file-upload"
         type="text"
-        value={sshCredentials?.sshSecretKey}
+        value={sshCredentials?.sshPubKey}
         onChange={(sshPublicKey: string) => {
           setIsValidKey(validateSSHPublicKey(sshPublicKey));
-          setSSHCredentials({ ...sshCredentials, sshSecretKey: sshPublicKey?.trim() });
+          setSSHCredentials({
+            ...sshCredentials,
+            sshPubKey: sshPublicKey?.trim(),
+            createNewSecret: true,
+          });
         }}
         onReadStarted={() => setIsLoading(true)}
         onReadFinished={() => setIsLoading(false)}
@@ -71,7 +75,11 @@ const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, sshCredentials, setSSHCr
           isRequired
           onChange={(secretName: string) => {
             setIsValidName(validateSecretName(secretName, secrets));
-            setSSHCredentials({ ...sshCredentials, sshSecretName: secretName });
+            setSSHCredentials({
+              ...sshCredentials,
+              sshSecretName: secretName,
+              createNewSecret: true,
+            });
           }}
         />
       </FormGroup>

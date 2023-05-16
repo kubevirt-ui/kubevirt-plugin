@@ -2,6 +2,7 @@ import React, { Dispatch, FC, ReactElement, SetStateAction, useState } from 'rea
 
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 import { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
@@ -9,7 +10,6 @@ import { Alert, AlertVariant, Select, SelectOption, SelectVariant } from '@patte
 
 import Loading from '../../../Loading/Loading';
 import { SSHSecretDetails } from '../../utils/types';
-import { decodeSecret } from '../../utils/utils';
 
 type SecretDropdownProps = {
   secretsResourceData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
@@ -33,7 +33,10 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
     ?.sort((a, b) => a?.metadata?.name.localeCompare(b?.metadata?.name));
 
   const onSelect = (_, newSecretName: string) => {
-    setSSHCredentials({ sshSecretName: newSecretName, sshSecretKey: '' });
+    const sshPubKey = decodeSecret(
+      sshKeySecrets.find((secret) => getName(secret) === newSecretName),
+    );
+    setSSHCredentials({ sshSecretName: newSecretName, sshPubKey, createNewSecret: false });
     setIsOpen(false);
   };
 

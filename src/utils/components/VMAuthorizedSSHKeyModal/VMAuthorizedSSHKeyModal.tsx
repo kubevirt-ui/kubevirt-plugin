@@ -6,6 +6,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import { ModalPendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -21,7 +22,7 @@ import {
 } from '@patternfly/react-core';
 
 import SelectSecret from './SelectSecret';
-import { attachVMSecret, changeVMSecret, decodeSecret, detachVMSecret } from './utils';
+import { attachVMSecret, changeVMSecret, detachVMSecret } from './utils';
 
 import './vm-auth-ssh-key-modal.scss';
 

@@ -25,9 +25,6 @@ const produceAndUpdate = (
   });
 };
 
-export const decodeSecret = (secret: IoK8sApiCoreV1Secret): string =>
-  secret?.data ? atob(secret?.data?.key || Object.values(secret?.data)?.[0] || '') : '';
-
 export const changeVMSecret = async (
   vm: V1VirtualMachine,
   vmOldSecret: IoK8sApiCoreV1Secret,
