@@ -740,7 +740,7 @@
   "Persistent Volume Claim creation": "Persistent Volume Claim creation",
   "Persistent Volume Claim has been created and your data source is now being uploaded to it. Once the uploading is completed the Persistent Volume Claim will become available": "Persistent Volume Claim has been created and your data source is now being uploaded to it. Once the uploading is completed the Persistent Volume Claim will become available",
   "Persistent Volume Claim Name": "Persistent Volume Claim Name",
-  "Persistent Volume Claim size": "Persistent Volume Claim size",
+  "PersistentVolumeClaim size": "PersistentVolumeClaim size",
   "pick an operating system": "pick an operating system",
   "Please <2>try again</2>.": "Please <2>try again</2>.",
   "Please do not close this window, you can keep navigating the app freely.": "Please do not close this window, you can keep navigating the app freely.",

@@ -1,5 +1,7 @@
 import React, { FC, useCallback, useMemo } from 'react';
 
+import { bytesFromQuantity } from '@catalog/utils/quantity';
+
 import { useProjectsAndPVCs } from '../../hooks/useProjectsAndPVCs';
 
 import DiskSourcePVCSelectName from './DiskSourcePVCSelectName';
@@ -36,7 +38,7 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
       selectPVCName(selection);
       const selectedPVC = pvcs?.find((pvc) => pvc?.metadata?.name === selection);
       const selectedPVCSize = selectedPVC?.spec?.resources?.requests?.storage;
-      setDiskSize && setDiskSize(selectedPVCSize);
+      setDiskSize && setDiskSize(bytesFromQuantity(selectedPVCSize)?.join(''));
     },
     [selectPVCName, pvcs, setDiskSize],
   );
