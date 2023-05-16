@@ -1,4 +1,4 @@
-import { V1Disk, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1AccessCredential, V1Disk, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 
 import { VM_WORKLOAD_ANNOTATION } from './annotations';
@@ -136,3 +136,20 @@ export const getMachineType = (vm: V1VirtualMachine): string =>
  */
 export const getWorkload = (vm: V1VirtualMachine): string =>
   getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION);
+
+/**
+ * A selector that returns the VM accessCredentials array
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns {V1AccessCredential[]} an array of access credential object
+ */
+export const getAccessCredentials = (vm: V1VirtualMachine): V1AccessCredential[] =>
+  vm?.spec?.template?.spec?.accessCredentials;
+
+/**
+ * A selector that finds the SSH secret name of the VM
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns {string} the name of secret resource
+ */
+export const getVMSSHSecretName = (vm: V1VirtualMachine): string =>
+  getAccessCredentials(vm)?.find((ac) => ac?.sshPublicKey?.source?.secret?.secretName)?.sshPublicKey
+    ?.source?.secret?.secretName;

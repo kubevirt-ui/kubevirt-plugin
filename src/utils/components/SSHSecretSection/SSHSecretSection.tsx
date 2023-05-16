@@ -17,17 +17,13 @@ import './SSHSecretSection.scss';
 
 type SSHSecretSectionProps = {
   namespace: string;
-  sshSecretCredentials: SSHSecretDetails;
-  setSSHSecretCredentials: Dispatch<SetStateAction<SSHSecretDetails>>;
+  sshDetails: SSHSecretDetails;
+  setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
 };
 
-const SSHSecretSection: FC<SSHSecretSectionProps> = ({
-  namespace,
-  sshSecretCredentials,
-  setSSHSecretCredentials,
-}) => {
+const SSHSecretSection: FC<SSHSecretSectionProps> = ({ namespace, sshDetails, setSSHDetails }) => {
   const [secretSelectionOption, setSecretSelectionOption] = useState<SecretSelectionOption>(
-    SecretSelectionOption.none,
+    sshDetails.secretOption,
   );
 
   const [secrets, ...loadedAndErrorData] = useK8sWatchResource<IoK8sApiCoreV1Secret[]>({
@@ -44,23 +40,19 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({
         <SecretSelectionRadioGroup
           selectedOption={secretSelectionOption}
           setSelectedOption={setSecretSelectionOption}
-          setSSHCredentials={setSSHSecretCredentials}
+          setSSHDetails={setSSHDetails}
         />
       </GridItem>
       <GridItem span={12} className="ssh-secret-section__body">
         {secretSelectionOption === SecretSelectionOption.useExisting && (
           <SecretDropdown
             secretsResourceData={[secrets, ...loadedAndErrorData]}
-            setSSHCredentials={setSSHSecretCredentials}
-            sshSecretName={sshSecretCredentials?.sshSecretName}
+            setSSHDetails={setSSHDetails}
+            sshSecretName={sshDetails?.sshSecretName}
           />
         )}
         {secretSelectionOption === SecretSelectionOption.addNew && (
-          <SSHKeyUpload
-            secrets={secrets}
-            sshCredentials={sshSecretCredentials}
-            setSSHCredentials={setSSHSecretCredentials}
-          />
+          <SSHKeyUpload secrets={secrets} sshDetails={sshDetails} setSSHDetails={setSSHDetails} />
         )}
       </GridItem>
     </Grid>
