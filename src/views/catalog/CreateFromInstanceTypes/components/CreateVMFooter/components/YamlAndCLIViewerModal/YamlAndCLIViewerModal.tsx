@@ -1,4 +1,4 @@
-import React, { FC, KeyboardEvent, MouseEvent as ME, Suspense, useState } from 'react';
+import React, { FC, Suspense, useState } from 'react';
 import { dump } from 'js-yaml';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
@@ -26,7 +26,7 @@ const YamlAndCLIViewerModal: FC<YamlAndCLIViewerModalProps> = ({ vm, isOpen, onC
   const { instanceTypeVMState } = useInstanceTypeVMStore();
   const { selectedBootableVolume, vmName, sshSecretCredentials } = instanceTypeVMState;
 
-  const handleTabClick = (event: ME<any> | KeyboardEvent | MouseEvent, tabIndex: TAB) => {
+  const handleTabClick = (_, tabIndex: TAB) => {
     setActiveTabKey(tabIndex);
   };
 

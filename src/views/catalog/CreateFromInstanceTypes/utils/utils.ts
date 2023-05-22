@@ -1,4 +1,3 @@
-import produce from 'immer';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import DataSourceModel, {
@@ -8,6 +7,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
@@ -133,36 +133,7 @@ export const generateVM = (
     },
   };
 
-  const vmToCreate = produce(emptyVM, (draftVM) => {
-    if (sshSecretName) {
-      const cloudInitNoCloudVolume = emptyVM.spec.template.spec.volumes?.find(
-        (v) => v.cloudInitNoCloud,
-      );
-      if (cloudInitNoCloudVolume) {
-        draftVM.spec.template.spec.volumes = emptyVM.spec.template.spec.volumes.filter(
-          (v) => !v.cloudInitNoCloud,
-        );
-        draftVM.spec.template.spec.volumes.push({
-          name: cloudInitNoCloudVolume.name,
-          cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
-        });
-      }
-      draftVM.spec.template.spec.accessCredentials = [
-        {
-          sshPublicKey: {
-            source: {
-              secret: {
-                secretName: sshSecretName || `${vmName}-ssh-key-${getRandomChars()}`,
-              },
-            },
-            propagationMethod: {
-              configDrive: {},
-            },
-          },
-        },
-      ];
-    }
-  });
+  const vmToCreate = addSecretToVM(emptyVM, sshSecretName);
 
   return vmToCreate;
 };

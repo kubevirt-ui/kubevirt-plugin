@@ -9,19 +9,19 @@ import { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import Loading from '../../../Loading/Loading';
-import { SSHSecretDetails } from '../../utils/types';
+import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
 
 type SecretDropdownProps = {
   secretsResourceData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
   sshSecretName: string;
-  setSSHCredentials: Dispatch<SetStateAction<SSHSecretDetails>>;
+  setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   id?: string;
 };
 
 const SecretDropdown: FC<SecretDropdownProps> = ({
   secretsResourceData,
   sshSecretName,
-  setSSHCredentials,
+  setSSHDetails,
   id,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -36,7 +36,11 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
     const sshPubKey = decodeSecret(
       sshKeySecrets.find((secret) => getName(secret) === newSecretName),
     );
-    setSSHCredentials({ sshSecretName: newSecretName, sshPubKey, createNewSecret: false });
+    setSSHDetails({
+      sshSecretName: newSecretName,
+      sshPubKey,
+      secretOption: SecretSelectionOption.useExisting,
+    });
     setIsOpen(false);
   };
 

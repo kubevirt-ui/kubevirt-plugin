@@ -1,18 +1,8 @@
-import { produceVMSSHKey, WizardVMContextType } from '@catalog/utils/WizardVMContext';
+import { WizardVMContextType } from '@catalog/utils/WizardVMContext';
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
-
-export const generateSSHKeySecret = (secretName: string, namespace: string, sshKey: string) => ({
-  kind: SecretModel.kind,
-  apiVersion: SecretModel.apiVersion,
-  metadata: {
-    name: secretName,
-    namespace: namespace,
-  },
-  data: { key: btoa(sshKey) },
-});
+import { generateSSHKeySecret } from '@kubevirt-utils/resources/secret/utils';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
 export const removeSSHKeyObject = (
   updateTabsData: WizardVMContextType['updateTabsData'],
@@ -20,43 +10,19 @@ export const removeSSHKeyObject = (
 ) =>
   updateTabsData((tabsDraft) => {
     tabsDraft.additionalObjects = (tabsDraft?.additionalObjects || []).filter(
-      (object) =>
-        !(object?.kind === SecretModel.kind && object?.metadata?.name === oldSSHServiceName),
+      (object) => !(object?.kind === SecretModel.kind && getName(object) === oldSSHServiceName),
     );
-  });
-
-export const changeSecretKey = (
-  updateTabsData: WizardVMContextType['updateTabsData'],
-  sshkey: string,
-  oldSSHServiceName: string,
-) =>
-  updateTabsData((draftTabs) => {
-    const secretObject = draftTabs?.additionalObjects?.find(
-      (object) => object?.kind === SecretModel.kind && object?.metadata?.name === oldSSHServiceName,
-    ) as IoK8sApiCoreV1Secret;
-
-    secretObject.data.key = btoa(sshkey);
   });
 
 export const updateSSHKeyObject = (
   vm: V1VirtualMachine,
-  updateVM: WizardVMContextType['updateVM'],
   updateTabsData: WizardVMContextType['updateTabsData'],
   sshkey: string,
+  secretName: string,
 ) => {
-  // secret name must be under 51 chars, or machine will fail starting. substring vm name to 37.
-  const sshSecretName = `${vm?.metadata?.name.substring(0, 37)}-sshkey-${getRandomChars()}`;
-
   updateTabsData((draftTabs) => {
     if (!draftTabs.additionalObjects) draftTabs.additionalObjects = [];
 
-    draftTabs.additionalObjects.push(
-      generateSSHKeySecret(sshSecretName, vm?.metadata?.namespace, sshkey),
-    );
-  });
-
-  return updateVM((vmDraft) => {
-    const produced = produceVMSSHKey(vmDraft, sshSecretName);
-    vmDraft.spec = produced.spec;
+    draftTabs.additionalObjects.push(generateSSHKeySecret(secretName, getNamespace(vm), sshkey));
   });
 };

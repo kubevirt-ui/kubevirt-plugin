@@ -11,11 +11,13 @@ import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/Cloudi
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import VMSSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/VMSSHSecretModal';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
-import { VMAuthorizedSSHKeyModal } from '@kubevirt-utils/components/VMAuthorizedSSHKeyModal/VMAuthorizedSSHKeyModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { getAccessCredentials } from '@kubevirt-utils/resources/vm';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   k8sUpdate,
   K8sVerb,
@@ -52,8 +54,6 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
     namespace: vm?.metadata?.namespace,
     isList: false,
   });
-
-  const hasSSHKey = vm?.spec?.template?.spec?.accessCredentials?.length > 0;
 
   const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -104,7 +104,9 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
                       <Text component={TextVariants.p}>Store the key in a project secret.</Text>
                     </Trans>
                   </div>
-                  <span>{hasSSHKey ? t('Available') : t('Not available')}</span>
+                  <span>
+                    {!isEmpty(getAccessCredentials(vm)) ? t('Available') : t('Not available')}
+                  </span>
                 </Stack>
               }
               descriptionHeader={t('Authorized SSH key')}
@@ -113,13 +115,8 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               data-test-id="authorized-ssh-key-button"
               showEditOnTitle
               onEditClick={() =>
-                createModal(({ isOpen, onClose }) => (
-                  <VMAuthorizedSSHKeyModal
-                    vm={resource}
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    vmi={vmi}
-                  />
+                createModal((modalProps) => (
+                  <VMSSHSecretModal {...modalProps} vm={vm} updateVM={onSubmit} />
                 ))
               }
             />

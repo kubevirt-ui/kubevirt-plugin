@@ -13,6 +13,7 @@ import { DescriptionList } from '@patternfly/react-core';
 const DetailsRightGrid: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
   const { vmNamespaceTarget, instanceTypeVMState, setInstanceTypeVMState, activeNamespace } =
     useInstanceTypeVMStore();
   const { pvcSource, sshSecretCredentials } = instanceTypeVMState;
@@ -25,6 +26,7 @@ const DetailsRightGrid: FC = () => {
       type: instanceTypeActionType.setSSHCredentials,
       payload: credentials,
     });
+
     return Promise.resolve();
   };
 
@@ -47,8 +49,13 @@ const DetailsRightGrid: FC = () => {
         descriptionHeader={t('SSH key name')}
         isEdit
         onEditClick={() =>
-          createModal((props) => (
-            <SSHSecretModal {...props} namespace={activeNamespace} onSubmit={setSSHCredentials} />
+          createModal((modalProps) => (
+            <SSHSecretModal
+              {...modalProps}
+              initialSSHSecretDetails={sshSecretCredentials}
+              onSubmit={setSSHCredentials}
+              namespace={activeNamespace}
+            />
           ))
         }
       />

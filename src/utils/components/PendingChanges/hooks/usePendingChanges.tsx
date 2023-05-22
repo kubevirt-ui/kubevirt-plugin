@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
@@ -19,9 +19,9 @@ import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
+import VMSSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/VMSSHSecretModal';
 import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
-import { VMAuthorizedSSHKeyModal } from '@kubevirt-utils/components/VMAuthorizedSSHKeyModal/VMAuthorizedSSHKeyModal';
 import {
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,
@@ -376,7 +376,7 @@ export const usePendingChanges = (
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
         createModal(({ isOpen, onClose }) => (
-          <VMAuthorizedSSHKeyModal vm={vm} isOpen={isOpen} onClose={onClose} vmi={vmi} />
+          <VMSSHSecretModal vm={vm} isOpen={isOpen} onClose={onClose} updateVM={onSubmit} />
         ));
       },
     },

@@ -70,35 +70,3 @@ export const produceVMSysprep = (vm: V1VirtualMachine, sysprepName?: string) => 
     }
   });
 };
-
-export const produceVMSSHKey = (vm: V1VirtualMachine, secretName?: string) => {
-  return produce(vm, (vmDraft) => {
-    const cloudInitNoCloudVolume = vmDraft.spec.template.spec.volumes.find(
-      (v) => v.cloudInitNoCloud,
-    );
-    if (cloudInitNoCloudVolume) {
-      vmDraft.spec.template.spec.volumes = [
-        {
-          name: cloudInitNoCloudVolume.name,
-          cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
-        },
-        ...vmDraft.spec.template.spec.volumes.filter((v) => !v.cloudInitNoCloud),
-      ];
-    }
-
-    vmDraft.spec.template.spec.accessCredentials = [
-      {
-        sshPublicKey: {
-          source: {
-            secret: {
-              secretName: secretName || `${vmDraft.metadata.name}-ssh-key`,
-            },
-          },
-          propagationMethod: {
-            configDrive: {},
-          },
-        },
-      },
-    ];
-  });
-};
