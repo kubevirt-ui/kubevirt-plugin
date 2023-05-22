@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { TFunction } from 'i18next';
 
 import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -10,6 +9,7 @@ import {
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
@@ -18,8 +18,15 @@ import { isLiveMigratable, printableVMStatus } from '../utils';
 
 import CloneVMModal from './components/CloneVMModal/CloneVMModal';
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
-import StopVMModal from './components/StopVMModal/StopVMModal';
-import { cancelMigration, migrateVM, pauseVM, restartVM, startVM, unpauseVM } from './actions';
+import {
+  cancelMigration,
+  migrateVM,
+  pauseVM,
+  restartVM,
+  startVM,
+  stopVM,
+  unpauseVM,
+} from './actions';
 
 const {
   Stopped,
@@ -34,7 +41,7 @@ const {
 } = printableVMStatus;
 
 export const VirtualMachineActionFactory = {
-  start: (vm: V1VirtualMachine, t: TFunction): Action => {
+  start: (vm: V1VirtualMachine): Action => {
     return {
       id: 'vm-action-start',
       disabled: [
@@ -51,25 +58,31 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
-  stop: (
-    vm: V1VirtualMachine,
-    createModal: (modal: ModalComponent) => void,
-    t: TFunction,
-  ): Action => {
+  stop: (vm: V1VirtualMachine): Action => {
     return {
       id: 'vm-action-stop',
       disabled: [Stopping, Terminating, Stopped, Unknown].includes(vm?.status?.printableStatus),
       label: t('Stop'),
-
+      cta: () => stopVM(vm),
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+    };
+  },
+  forceStop: (vm: V1VirtualMachine): Action => {
+    return {
+      id: 'vm-action-force-stop',
+      disabled: [Terminating, Provisioning, Migrating, Stopped, Unknown].includes(
+        vm?.status?.printableStatus,
+      ),
+      label: t('Force stop'),
       cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <StopVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
-        )),
+        stopVM(vm, {
+          gracePeriod: 0,
+        }),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
 
-  restart: (vm: V1VirtualMachine, t: TFunction): Action => {
+  restart: (vm: V1VirtualMachine): Action => {
     return {
       id: 'vm-action-restart',
       disabled: [Stopping, Terminating, Provisioning, Migrating, Stopped, Unknown].includes(
@@ -80,7 +93,7 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
-  pause: (vm: V1VirtualMachine, t: TFunction): Action => {
+  pause: (vm: V1VirtualMachine): Action => {
     return {
       id: 'vm-action-pause',
       disabled: vm?.status?.printableStatus !== Running,
@@ -89,7 +102,7 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
-  unpause: (vm: V1VirtualMachine, t: TFunction): Action => {
+  unpause: (vm: V1VirtualMachine): Action => {
     return {
       id: 'vm-action-unpause',
       disabled: vm?.status?.printableStatus !== Paused,
@@ -98,7 +111,7 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
-  migrate: (vm: V1VirtualMachine, isSingleNodeCluster: boolean, t: TFunction): Action => {
+  migrate: (vm: V1VirtualMachine, isSingleNodeCluster: boolean): Action => {
     return {
       id: 'vm-action-migrate',
       disabled: !isLiveMigratable(vm, isSingleNodeCluster),
@@ -117,7 +130,6 @@ export const VirtualMachineActionFactory = {
     vm: V1VirtualMachine,
     vmim: V1VirtualMachineInstanceMigration,
     isSingleNodeCluster: boolean,
-    t: TFunction,
   ): Action => {
     return {
       id: 'vm-action-cancel-migrate',
@@ -133,11 +145,7 @@ export const VirtualMachineActionFactory = {
       description: !!vmim?.metadata?.deletionTimestamp && t('Canceling ongoing migration'),
     };
   },
-  clone: (
-    vm: V1VirtualMachine,
-    createModal: (modal: ModalComponent) => void,
-    t: TFunction,
-  ): Action => {
+  clone: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
       id: 'vm-action-clone',
       disabled: ![Stopped, Paused, Running].includes(vm?.status?.printableStatus),
@@ -163,7 +171,7 @@ export const VirtualMachineActionFactory = {
   //       ),
   //   };
   // },
-  copySSHCommand: (vm: V1VirtualMachine, command: string, t: TFunction): Action => {
+  copySSHCommand: (vm: V1VirtualMachine, command: string): Action => {
     return {
       id: 'vm-action-copy-ssh',
       label: t('Copy SSH command'),
@@ -173,11 +181,7 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     };
   },
-  editLabels: (
-    vm: V1VirtualMachine,
-    createModal: (modal: ModalComponent) => void,
-    t: TFunction,
-  ): Action => {
+  editLabels: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
       id: 'vm-action-edit-labels',
       disabled: false,
@@ -206,11 +210,7 @@ export const VirtualMachineActionFactory = {
         )),
     };
   },
-  editAnnotations: (
-    vm: V1VirtualMachine,
-    createModal: (modal: ModalComponent) => void,
-    t: TFunction,
-  ): Action => {
+  editAnnotations: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
       id: 'vm-action-edit-annotations',
       disabled: false,
@@ -239,11 +239,7 @@ export const VirtualMachineActionFactory = {
         )),
     };
   },
-  delete: (
-    vm: V1VirtualMachine,
-    createModal: (modal: ModalComponent) => void,
-    t: TFunction,
-  ): Action => {
+  delete: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
       id: 'vm-action-delete',
       disabled: false,
