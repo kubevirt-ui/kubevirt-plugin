@@ -6,7 +6,6 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
@@ -26,7 +25,6 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
   vmim,
   isSingleNodeCluster,
 ) => {
-  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const userName = getCloudInitCredentials(vm)?.users?.[0]?.name;
   const virtctlCommand = getConsoleVirtctlCommand(
@@ -38,37 +36,41 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
   const actions: Action[] = React.useMemo(() => {
     const printableStatus = vm?.status?.printableStatus;
-    const { Stopped, Paused, Migrating } = printableVMStatus;
+    const { Paused, Migrating } = printableVMStatus;
 
-    const startOrStop =
-      printableStatus === Stopped
-        ? VirtualMachineActionFactory.start(vm, t)
-        : VirtualMachineActionFactory.stop(vm, createModal, t);
+    const startOrStop = ((printableStatusMachine) => {
+      const map = {
+        Stopping: VirtualMachineActionFactory.forceStop(vm),
+        Stopped: VirtualMachineActionFactory.start(vm),
+        default: VirtualMachineActionFactory.stop(vm),
+      };
+      return map[printableStatusMachine] || map.default;
+    })(printableStatus);
 
     const migrateOrCancelMigration =
       printableStatus === Migrating ||
       (vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase))
-        ? VirtualMachineActionFactory.cancelMigration(vm, vmim, isSingleNodeCluster, t)
-        : VirtualMachineActionFactory.migrate(vm, isSingleNodeCluster, t);
+        ? VirtualMachineActionFactory.cancelMigration(vm, vmim, isSingleNodeCluster)
+        : VirtualMachineActionFactory.migrate(vm, isSingleNodeCluster);
 
     const pauseOrUnpause =
       printableStatus === Paused
-        ? VirtualMachineActionFactory.unpause(vm, t)
-        : VirtualMachineActionFactory.pause(vm, t);
+        ? VirtualMachineActionFactory.unpause(vm)
+        : VirtualMachineActionFactory.pause(vm);
 
     return [
       startOrStop,
-      VirtualMachineActionFactory.restart(vm, t),
+      VirtualMachineActionFactory.restart(vm),
       pauseOrUnpause,
-      VirtualMachineActionFactory.clone(vm, createModal, t),
+      VirtualMachineActionFactory.clone(vm, createModal),
       migrateOrCancelMigration,
       // VirtualMachineActionFactory.openConsole(vm),
-      VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand, t),
-      VirtualMachineActionFactory.editLabels(vm, createModal, t),
-      VirtualMachineActionFactory.editAnnotations(vm, createModal, t),
-      VirtualMachineActionFactory.delete(vm, createModal, t),
+      VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand),
+      VirtualMachineActionFactory.editLabels(vm, createModal),
+      VirtualMachineActionFactory.editAnnotations(vm, createModal),
+      VirtualMachineActionFactory.delete(vm, createModal),
     ];
-  }, [vm, t, vmim, isSingleNodeCluster, createModal, virtctlCommand]);
+  }, [vm, vmim, isSingleNodeCluster, createModal, virtctlCommand]);
 
   return React.useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };
