@@ -31,6 +31,7 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({ isOpen, onC
       onSubmit={onSave as () => Promise<void>}
       headerText={t('Available volumes')}
       modalVariant={ModalVariant.large}
+      submitBtnText={t('Select')}
     >
       <BootableVolumeList selectedBootableVolumeState={selectedBootableVolumeState} />
     </TabModal>
