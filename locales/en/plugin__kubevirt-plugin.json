@@ -859,6 +859,7 @@
   "See alerts for virtualization health and VMs": "See alerts for virtualization health and VMs",
   "See only virtualization health alerts": "See only virtualization health alerts",
   "See the <2>catalog tab</2> to quickly create a VirtualMachine from the available Templates.": "See the <2>catalog tab</2> to quickly create a VirtualMachine from the available Templates.",
+  "Select": "Select",
   "Select {{optionLabelText}}": "Select {{optionLabelText}}",
   "Select a resource": "Select a resource",
   "Select an available secret": "Select an available secret",
