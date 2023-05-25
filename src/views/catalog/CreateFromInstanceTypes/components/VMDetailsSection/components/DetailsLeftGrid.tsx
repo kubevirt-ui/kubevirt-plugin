@@ -16,14 +16,13 @@ const DetailsLeftGrid: FC = () => {
     useInstanceTypeVMStore();
   const { vmName, selectedBootableVolume, selectedInstanceType } = instanceTypeVMState;
   const { preferences, instanceTypes } = instanceTypesAndPreferencesData;
-  const { name } = selectedInstanceType;
 
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
   const instanceTypesMap = useMemo(() => convertResourceArrayToMap(instanceTypes), [instanceTypes]);
 
   const operatingSystem = getOSFromDefaultPreference(selectedBootableVolume, preferencesMap);
-  const cpuMemoryString = !isEmpty(instanceTypesMap?.[name])
-    ? getCPUAndMemoryFromDefaultInstanceType(instanceTypesMap[name])
+  const cpuMemoryString = !isEmpty(instanceTypesMap?.[selectedInstanceType])
+    ? getCPUAndMemoryFromDefaultInstanceType(instanceTypesMap[selectedInstanceType])
     : null;
 
   return (
@@ -48,7 +47,10 @@ const DetailsLeftGrid: FC = () => {
         descriptionData={operatingSystem}
         descriptionHeader={t('Operating system')}
       />
-      <VirtualMachineDescriptionItem descriptionData={name} descriptionHeader={t('InstanceType')} />
+      <VirtualMachineDescriptionItem
+        descriptionData={selectedInstanceType}
+        descriptionHeader={t('InstanceType')}
+      />
       <VirtualMachineDescriptionItem
         descriptionData={cpuMemoryString}
         descriptionHeader={t('CPU | Memory')}

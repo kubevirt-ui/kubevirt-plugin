@@ -38,7 +38,7 @@ export const getInstanceTypeMenuItems = (
 
   return instanceTypes.reduce((acc, it) => {
     if (getLabel(it, APP_NAME_LABEL) !== COMMON_INSTANCETYPES) {
-      acc.userProvided.items.push(getName(it));
+      !acc.userProvided.items.includes(getName(it)) && acc.userProvided.items.push(getName(it));
       return acc;
     }
 

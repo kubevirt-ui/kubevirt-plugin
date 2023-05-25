@@ -12,25 +12,13 @@ import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-u
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { InstanceTypeSize } from '../components/SelectInstanceTypeSection/utils/types';
-import { categoryNamePrefixMatcher } from '../components/SelectInstanceTypeSection/utils/utils';
 import { InstanceTypeVMState } from '../state/utils/types';
 
 import { DEFAULT_INSTANCETYPE_LABEL, DEFAULT_PREFERENCE_LABEL } from './constants';
-import { BootableVolume, InstanceTypeState } from './types';
+import { BootableVolume } from './types';
 
 const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
-
-export const getInstanceTypeState = (defaultInstanceTypeName: string): InstanceTypeState => {
-  const [prefix, size] = defaultInstanceTypeName?.split('.');
-  const category = categoryNamePrefixMatcher[prefix];
-  return {
-    category,
-    size: size as InstanceTypeSize,
-    name: defaultInstanceTypeName,
-  };
-};
 
 export const generateVM = (
   instanceTypeState: InstanceTypeVMState,
@@ -96,13 +84,11 @@ export const generateVM = (
         },
       },
       instancetype: {
-        // inferFromVolume: `${virtualmachineName}-disk`,
         name:
-          selectedInstanceType?.name ||
+          selectedInstanceType ||
           selectedBootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
       },
       preference: {
-        // inferFromVolume: `${virtualmachineName}-disk`,
         name: selectedBootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
       },
       dataVolumeTemplates: [
@@ -151,7 +137,7 @@ export const getBootableVolumePVCSource = (
   pvcSources: {
     [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
   },
-) => {
+): IoK8sApiCoreV1PersistentVolumeClaim | null => {
   if (isEmpty(bootableVolume)) return null;
   return isBootableVolumePVCKind(bootableVolume)
     ? bootableVolume

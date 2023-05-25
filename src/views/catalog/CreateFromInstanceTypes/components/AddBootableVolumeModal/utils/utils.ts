@@ -1,11 +1,7 @@
 import produce from 'immer';
 
-import {
-  DEFAULT_INSTANCETYPE_LABEL,
-  initialInstanceTypeState,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { BootableVolume, InstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/types';
-import { getInstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/utils';
+import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -80,9 +76,5 @@ export const createDataSource =
     onSelectVolume?.(newDataSource);
   };
 
-export const getInstanceTypeFromVolume = (bootableVolume: BootableVolume): InstanceTypeState => {
-  const defaultInstanceTypeName = bootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL];
-  return defaultInstanceTypeName
-    ? getInstanceTypeState(defaultInstanceTypeName)
-    : initialInstanceTypeState;
-};
+export const getInstanceTypeFromVolume = (bootableVolume: BootableVolume): string =>
+  bootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL] ?? '';

@@ -1,22 +1,7 @@
-import { TFunction } from 'i18next';
-
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { CubesIcon, PuzzlePieceIcon, ServerGroupIcon, StarIcon } from '@patternfly/react-icons';
 
-import {
-  CategoryDetailsMap,
-  InstanceTypeCategory,
-  InstanceTypeSize,
-  InstanceTypeSizeDetails,
-} from './types';
-
-export const categoryNamePrefixMatcher = {
-  n1: InstanceTypeCategory.GeneralPurpose,
-  cx1: InstanceTypeCategory.ComputeIntensive,
-  m1: InstanceTypeCategory.MemoryIntensive,
-  gn1: InstanceTypeCategory.GpuResourcesAttached,
-};
+import { CategoryDetailsMap, InstanceTypeCategory } from './types';
 
 export const categoryDetailsMap: CategoryDetailsMap = {
   [InstanceTypeCategory.GeneralPurpose]: {
@@ -182,31 +167,3 @@ export const categoryDetailsMap: CategoryDetailsMap = {
     ],
   },
 };
-
-export const getInstancetype = (name: InstanceTypeSize, instanceTypes: InstanceTypeSizeDetails[]) =>
-  instanceTypes?.find((instanceType) => instanceType?.name === name);
-
-export const getInstancetypeString = (category: InstanceTypeCategory, size: InstanceTypeSize) => {
-  if (!category || !size) return null;
-
-  const categoryDetails = categoryDetailsMap[category];
-  return `${categoryDetails?.prefix}.${size}`;
-};
-
-export const getInstancetypeDetails = (
-  category: InstanceTypeCategory,
-  size: InstanceTypeSize,
-): InstanceTypeSizeDetails => {
-  if (!category) return null;
-
-  const categoryInstancetypes = categoryDetailsMap[category]?.instanceTypes;
-  return categoryInstancetypes?.find((instancetype) => instancetype?.name === size);
-};
-
-export const getCPUMemoryString = (resources: InstanceTypeSizeDetails, tFunc: TFunction) =>
-  resources
-    ? tFunc('{{count}} cpus | {{memory}} Memory', {
-        count: resources?.cpus,
-        memory: readableSizeUnit(resources?.memory),
-      })
-    : null;

@@ -27,7 +27,7 @@ type UseBootVolumeSortColumns = (
 };
 
 const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
-  unsortedData,
+  unsortedData = [],
   preferences,
   pvcSources,
   pagination,
@@ -70,10 +70,9 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
     columnIndex,
   });
 
-  const sortedData = (unsortedData || [])
-    ?.slice(pagination.startIndex, pagination.endIndex)
-    ?.sort(sortVolumes);
-
+  const sortedData = unsortedData
+    .sort(sortVolumes)
+    .slice(pagination.startIndex, pagination.endIndex);
   return { sortedData, getSortType };
 };
 
