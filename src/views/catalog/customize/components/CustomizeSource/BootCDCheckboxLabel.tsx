@@ -1,12 +1,12 @@
 import * as React from 'react';
 
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Flex, FlexItem, FormGroup, Popover } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 type BootCDCheckboxProps = {
-  cdSource: V1beta1DataVolumeSpec | undefined;
+  cdSource: V1beta1DataVolumeSpec | V1ContainerDiskSource | undefined;
   onChange: (checked: boolean, event: React.FormEvent<HTMLInputElement>) => void;
 };
 
