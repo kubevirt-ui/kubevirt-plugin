@@ -40,7 +40,7 @@ export const getUtilizationQueries: GetUtilizationQueries = ({
   return {
     [VMQueries.CPU_USAGE]: `sum(rate(container_cpu_usage_seconds_total{pod='${launcherPodName}',namespace='${namespace}',container="compute"}[${duration}])) BY (pod, namespace)`,
     [VMQueries.CPU_REQUESTED]: `sum(kube_pod_resource_request{resource='cpu',pod='${launcherPodName}',namespace='${namespace}'}) BY (name, namespace)`,
-    [VMQueries.MEMORY_USAGE]: `sum(rate(kubevirt_vmi_memory_used_bytes{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
+    [VMQueries.MEMORY_USAGE]: `avg(avg_over_time(kubevirt_vmi_memory_used_bytes{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.NETWORK_IN_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.NETWORK_OUT_USAGE]: `sum(rate(kubevirt_vmi_network_transmit_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.NETWORK_IN_BY_INTERFACE_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace, interface)`,
