@@ -1,16 +1,15 @@
 .VirtualMachineConfigurationTab {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+
   &--main {
     margin: var(--pf-global--spacer--sm);
+    width: fit-content;
+    min-width: max-content;
   }
-  &--tab-nav {
-    height: 100%;
 
-    section {
-      height: 100%;
-    }
-
-    span.pf-c-tabs__item-text {
-      font-size: 1rem;
-    }
+  &--content {
+    width: 100%;
   }
 }
