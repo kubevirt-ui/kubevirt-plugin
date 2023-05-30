@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
+import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vCPUCount } from '@kubevirt-utils/resources/template/utils';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
@@ -15,7 +16,7 @@ type TolerationsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const CPUMemory: React.FC<TolerationsProps> = ({ vmi }) => {
+const CPUMemory: FC<TolerationsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const cpu = vCPUCount(vmi?.spec?.domain?.cpu);
 
@@ -30,7 +31,12 @@ const CPUMemory: React.FC<TolerationsProps> = ({ vmi }) => {
           hasAutoWidth
           maxWidth="30rem"
           headerContent={t('CPU | Memory')}
-          bodyContent={<CPUDescription cpu={vmi?.spec?.domain?.cpu} />}
+          bodyContent={
+            <CPUDescription
+              cpu={vmi?.spec?.domain?.cpu}
+              helperTextResource={CpuMemHelperTextResources.VMI}
+            />
+          }
         >
           <DescriptionListTermHelpTextButton>{t('CPU | Memory')}</DescriptionListTermHelpTextButton>
         </Popover>

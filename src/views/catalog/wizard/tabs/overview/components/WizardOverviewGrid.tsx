@@ -5,6 +5,7 @@ import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { TabsData } from '@catalog/utils/WizardVMContext/utils/tabs-data';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
+import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
@@ -131,7 +132,12 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ vm, tabsData, updateV
             testId="wizard-overview-cpu-memory"
             helperPopover={{
               header: t('CPU | Memory'),
-              content: <CPUDescription cpu={vm?.spec?.template?.spec?.domain?.cpu} />,
+              content: (
+                <CPUDescription
+                  cpu={vm?.spec?.template?.spec?.domain?.cpu}
+                  helperTextResource={CpuMemHelperTextResources.FutureVM}
+                />
+              ),
             }}
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (

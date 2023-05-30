@@ -8,6 +8,8 @@ import { WizardOverviewNetworksTable } from '@catalog/wizard/tabs/overview/compo
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AdditionalResources from '@kubevirt-utils/components/AdditionalResources/AdditionalResources';
+import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
+import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
@@ -158,6 +160,13 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
                       <VirtualMachineDescriptionItem
                         descriptionData={<CPUMemory vm={updatedVM} />}
                         descriptionHeader={t('CPU | Memory')}
+                        isPopover
+                        bodyContent={
+                          <CPUDescription
+                            cpu={vmObject?.spec?.template?.spec?.domain?.cpu}
+                            helperTextResource={CpuMemHelperTextResources.FutureVM}
+                          />
+                        }
                         isEdit
                         onEditClick={() =>
                           createModal(({ isOpen, onClose }) => (
