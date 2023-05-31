@@ -1,6 +1,6 @@
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
-import { isBootableVolumePVCKind } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { encodeKeyForVirtctlCommand } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 

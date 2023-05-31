@@ -1,16 +1,17 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
-import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-utils/models';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, PopoverPosition, Title } from '@patternfly/react-core';
-
-import { AddBootableVolumeButtonProps } from '../AddBootableVolumeButton/AddBootableVolumeButton';
 
 import FormSelectionRadio from './components/FormSelectionRadio/FormSelectionRadio';
 import VolumeDestination from './components/VolumeDestination/VolumeDestination';
@@ -22,22 +23,30 @@ import {
   initialBootableVolumeState,
   RADIO_FORM_SELECTION,
 } from './utils/constants';
-import { createDataSource } from './utils/utils';
+import { createBootableVolume } from './utils/utils';
 
 import './AddBootableVolumeModal.scss';
 
 type AddBootableVolumeModalProps = {
   isOpen: boolean;
   onClose: () => void;
-} & AddBootableVolumeButtonProps;
+  onCreateVolume?: (source: BootableVolume) => void;
+};
 
 const cloneExistingPVC = true; // we want to clone the existing PVC by default, may change in the future versions
 
-const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({ isOpen, onClose }) => {
+const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
+  isOpen,
+  onClose,
+  onCreateVolume,
+}) => {
   const { t } = useKubevirtTranslation();
 
-  const { instanceTypesAndPreferencesData, onSelectVolume } = useInstanceTypeVMStore();
-  const { preferences } = instanceTypesAndPreferencesData;
+  const [preferences] = useK8sWatchResource<V1alpha2VirtualMachineClusterPreference[]>({
+    groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
+    isList: true,
+  });
+
   const preferencesNames = useMemo(() => preferences.map(getName), [preferences]);
   const [formSelection, setFormSelection] = useState<RADIO_FORM_SELECTION>(
     RADIO_FORM_SELECTION.UPLOAD_IMAGE,
@@ -66,12 +75,12 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({ isOpen, onClo
   return (
     <TabModal
       obj={emptyDataSource}
-      onSubmit={createDataSource(
+      onSubmit={createBootableVolume(
         bootableVolume,
         uploadData,
         isUploadForm,
         cloneExistingPVC,
-        onSelectVolume,
+        onCreateVolume,
       )}
       headerText={t('Add volume')}
       isOpen={isOpen}

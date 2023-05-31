@@ -1,11 +1,11 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { getTemplateOSIcon as getOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import {

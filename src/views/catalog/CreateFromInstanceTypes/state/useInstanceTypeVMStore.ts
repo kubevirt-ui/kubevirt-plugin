@@ -1,25 +1,18 @@
 import { useEffect } from 'react';
 
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import {
-  DEFAULT_NAMESPACE,
-  KUBEVIRT_OS_IMAGES_NS,
-  OPENSHIFT_OS_IMAGES_NS,
-} from '@kubevirt-utils/constants/constants';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { isUpstream } from '@kubevirt-utils/utils/utils';
+import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
-import useBootableVolumes from './hooks/useBootableVolumes';
 import useInstanceTypesAndPreferences from './hooks/useInstanceTypesAndPreferences';
 import { useInstanceTypeVMInitialStore } from './hooks/useInstanceTypeVMInitialStore';
 
 export const useInstanceTypeVMStore = () => {
   const store = useInstanceTypeVMInitialStore();
 
-  const bootableVolumesData = useBootableVolumes(
-    isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS,
-  );
+  const bootableVolumesData = useBootableVolumes();
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences();
   const [activeNamespace] = useActiveNamespace();
 

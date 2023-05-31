@@ -1,9 +1,9 @@
 import produce from 'immer';
 import { create } from 'zustand';
 
-import { getInstanceTypeFromVolume } from '@catalog/CreateFromInstanceTypes/components/AddBootableVolumeModal/utils/utils';
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
-import { getBootableVolumePVCSource } from '@catalog/CreateFromInstanceTypes/utils/utils';
+import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
+import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 
 import { instanceTypeVMStoreInitialState } from '../utils/state';
 import {

@@ -1,22 +1,17 @@
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
-import DataSourceModel, {
-  DataSourceModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
-import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
-import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
+import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
 import { InstanceTypeVMState } from '../state/utils/types';
 
 import { DEFAULT_INSTANCETYPE_LABEL, DEFAULT_PREFERENCE_LABEL } from './constants';
-import { BootableVolume } from './types';
 
 const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
@@ -132,26 +127,4 @@ export const generateVM = (
   };
 
   return sshSecretName ? addSecretToVM(emptyVM, sshSecretName) : emptyVM;
-};
-
-export const isBootableVolumePVCKind = (bootableVolume: BootableVolume): boolean =>
-  bootableVolume?.kind !== DataSourceModel.kind;
-
-export const getBootableVolumeGroupVersionKind = (bootableVolume: BootableVolume) =>
-  isBootableVolumePVCKind(bootableVolume)
-    ? modelToGroupVersionKind(PersistentVolumeClaimModel)
-    : DataSourceModelGroupVersionKind;
-
-export const getBootableVolumePVCSource = (
-  bootableVolume: BootableVolume,
-  pvcSources: {
-    [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
-  },
-): IoK8sApiCoreV1PersistentVolumeClaim | null => {
-  if (isEmpty(bootableVolume)) return null;
-  return isBootableVolumePVCKind(bootableVolume)
-    ? bootableVolume
-    : pvcSources?.[(bootableVolume as V1beta1DataSource)?.spec?.source?.pvc?.namespace]?.[
-        (bootableVolume as V1beta1DataSource)?.spec?.source?.pvc?.name
-      ];
 };

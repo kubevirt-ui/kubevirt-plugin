@@ -1,9 +1,9 @@
 import React, { FC, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { ModalVariant } from '@patternfly/react-core';
 
 import BootableVolumeList from '../../BootableVolumeList';

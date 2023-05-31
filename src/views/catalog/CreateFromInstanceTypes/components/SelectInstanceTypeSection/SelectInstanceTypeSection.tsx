@@ -1,10 +1,9 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { Grid, GridItem, Tab, Tabs } from '@patternfly/react-core';
-
-import { getInstanceTypeMenuItems } from '../AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 
 import RedHatSeriesMenuCard from './components/RedHatSeriesMenuCard/RedHatSeriesMenuCard';
 import UsersInstanceTypesList from './components/UsersInstanceTypeList/UsersInstanceTypeList';

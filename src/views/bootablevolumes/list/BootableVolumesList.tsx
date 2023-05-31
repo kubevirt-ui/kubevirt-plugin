@@ -1,26 +1,32 @@
 import React, { FC, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
-import AddBootableVolumeButton from '@catalog/CreateFromInstanceTypes/components/AddBootableVolumeButton/AddBootableVolumeButton';
-import useBootableVolumes from '@catalog/CreateFromInstanceTypes/state/hooks/useBootableVolumes';
-import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
+import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { DataSourceModelRef } from '@kubevirt-utils/models';
+import {
+  DataSourceModelRef,
+  VirtualMachineClusterPreferenceModelGroupVersionKind,
+} from '@kubevirt-utils/models';
+import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import {
   K8sResourceCommon,
   ListPageBody,
+  ListPageCreateDropdown,
   ListPageFilter,
   ListPageHeader,
+  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
-import { ButtonVariant, Pagination, Stack, StackItem } from '@patternfly/react-core';
+import { Pagination, Stack, StackItem } from '@patternfly/react-core';
 
 import BootableVolumesRow from './components/BootableVolumesRow';
 import useBootableVolumesColumns from './hooks/useBootableVolumesColumns';
@@ -28,13 +34,21 @@ import useBootableVolumesFilters from './hooks/useBootableVolumesFilters';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const BootableVolumesList: FC = () => {
+type BootableVolumesListProps = {
+  namespace: string;
+};
+
+const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace] = useActiveNamespace();
-  const { bootableVolumes, loaded, loadError } = useBootableVolumes(
-    activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace,
-  );
-  const { preferences } = useInstanceTypesAndPreferences();
+  const history = useHistory();
+  const { createModal } = useModal();
+  const { bootableVolumes, loaded, loadError } = useBootableVolumes(namespace);
+
+  const [preferences] = useK8sWatchResource<V1alpha2VirtualMachineClusterPreference[]>({
+    groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
+    isList: true,
+  });
+
   const [data, filteredData, onFilterChange] = useListPageFilter(
     bootableVolumes,
     useBootableVolumesFilters(),
@@ -51,10 +65,23 @@ const BootableVolumesList: FC = () => {
     }));
   };
 
+  const createItems = {
+    form: t('With form'),
+    yaml: t('With YAML'),
+  };
+
+  const onCreate = (type: string) => {
+    return type === 'form'
+      ? createModal((props) => <AddBootableVolumeModal {...props} />)
+      : history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/~new`);
+  };
+
   return (
     <>
-      <ListPageHeader title={t('Bootable volumes')} badge={<DeveloperPreviewLabel />}>
-        <AddBootableVolumeButton buttonVariant={ButtonVariant.primary} />
+      <ListPageHeader title={t('Bootable resources')} badge={<DeveloperPreviewLabel />}>
+        <ListPageCreateDropdown items={createItems} onClick={onCreate}>
+          {t('Add bootable resource')}
+        </ListPageCreateDropdown>
       </ListPageHeader>
 
       <ListPageBody>
@@ -81,7 +108,7 @@ const BootableVolumesList: FC = () => {
                   title,
                   additional,
                 })),
-                id: DataSourceModelRef,
+                id: 'bootable-volumes-list',
                 selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
                 type: t('DataSource'),
               }}

@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import {
   DataSourceModelGroupVersionKind,
   modelToGroupVersionKind,
@@ -10,6 +9,7 @@ import {
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   convertResourceArrayToMap,
   getReadyOrCloningOrUploadingDataSources,
@@ -17,9 +17,14 @@ import {
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { UseBootableVolumesValues } from '../utils/types';
-
-type UseBootableVolumes = (namespace?: string) => UseBootableVolumesValues;
+type UseBootableVolumes = (namespace?: string) => {
+  bootableVolumes: BootableVolume[];
+  loaded: boolean;
+  loadError?: any;
+  pvcSources: {
+    [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
+  };
+};
 
 const useBootableVolumes: UseBootableVolumes = (namespace) => {
   const [dataSources, loadedDataSources, loadErrorDataSources] = useK8sWatchResource<

@@ -1,10 +1,10 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import { COMMON_INSTANCETYPES } from '@catalog/CreateFromInstanceTypes/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { COMMON_INSTANCETYPES } from '@kubevirt-utils/resources/bootableresources/constants';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { APP_NAME_LABEL } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';

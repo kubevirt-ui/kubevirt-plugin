@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
-import { getBootableVolumePVCSource } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import {
   V1alpha1PersistentVolumeClaim,
   V1alpha2VirtualMachineClusterPreference,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base';
