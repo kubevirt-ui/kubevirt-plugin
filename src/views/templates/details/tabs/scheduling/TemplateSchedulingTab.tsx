@@ -1,11 +1,12 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { Grid, GridItem, PageSection } from '@patternfly/react-core';
+import { Flex, Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -21,10 +22,11 @@ type TemplateSchedulingTabProps = RouteComponentProps<{
   obj?: V1Template;
 };
 
-const TemplateSchedulingTab: React.FC<TemplateSchedulingTabProps> = ({ obj: template }) => {
+const TemplateSchedulingTab: FC<TemplateSchedulingTabProps> = ({ obj: template }) => {
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
+  const { t } = useKubevirtTranslation();
 
-  const onSubmitTemplate = React.useCallback(
+  const onSubmitTemplate = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
         model: TemplateModel,
@@ -40,13 +42,16 @@ const TemplateSchedulingTab: React.FC<TemplateSchedulingTabProps> = ({ obj: temp
       <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
         {(resource) => (
           <>
-            <SidebarEditorSwitch />
+            <Flex className="template-scheduling-tab__flex">
+              <Title headingLevel="h2">{t('Scheduling and resource requirements')}</Title>
+              <SidebarEditorSwitch />
+            </Flex>
             <Grid className="margin-top">
-              <GridItem span={5} className="margin-top-grid-item">
+              <GridItem span={5}>
                 <TemplateSchedulingLeftGrid template={resource} editable={isTemplateEditable} />
               </GridItem>
               <GridItem lg={1}></GridItem>
-              <GridItem span={5} className="margin-top-grid-item">
+              <GridItem span={5}>
                 <TemplateSchedulingRightGrid template={resource} editable={isTemplateEditable} />
               </GridItem>
             </Grid>

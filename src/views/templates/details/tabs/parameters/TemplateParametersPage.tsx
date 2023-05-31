@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { FC, MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { useImmer } from 'use-immer';
 
@@ -14,8 +14,10 @@ import {
   AlertVariant,
   Button,
   Divider,
+  Flex,
   Form,
   PageSection,
+  Title,
 } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
@@ -31,7 +33,7 @@ type TemplateParametersPageProps = RouteComponentProps<{
   obj?: V1Template;
 };
 
-const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: template }) => {
+const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template }) => {
   const [editableTemplate, setEditableTemplate] = useImmer(template);
 
   useEffect(() => setEditableTemplate(template), [setEditableTemplate, template]);
@@ -39,9 +41,9 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
   const { t } = useKubevirtTranslation();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const history = useHistory();
-  const [error, setError] = React.useState();
-  const [success, setSuccess] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = useState();
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const onParameterChange = (parameter: TemplateParameter) => {
     setEditableTemplate(({ parameters: draftParameters }) => {
@@ -54,11 +56,11 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
 
   const isSaveDisabled = isEqualObject(template.parameters, parameters);
 
-  const goBack = React.useCallback(() => {
+  const goBack = useCallback(() => {
     history.goBack();
   }, [history]);
 
-  const onSave: React.MouseEventHandler<HTMLButtonElement> = async (event) => {
+  const onSave: MouseEventHandler<HTMLButtonElement> = async (event) => {
     event.preventDefault();
     setLoading(true);
     try {
@@ -81,7 +83,10 @@ const TemplateParametersPage: React.FC<TemplateParametersPageProps> = ({ obj: te
         onChange={(newTemplate) => setEditableTemplate(newTemplate)}
       >
         <Form className="template-parameters-page__form">
-          <SidebarEditorSwitch />
+          <Flex className="template-parameters-page__flex">
+            <Title headingLevel="h2">{t('Parameters')}</Title>
+            <SidebarEditorSwitch />
+          </Flex>
           {parameters.map((parameter, index) => (
             <>
               <ParameterEditor

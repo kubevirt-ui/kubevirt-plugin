@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -7,7 +7,7 @@ import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEdito
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Flex, FlexItem } from '@patternfly/react-core';
+import { Button, Flex, FlexItem, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -24,13 +24,13 @@ type TemplateNetworkProps = RouteComponentProps<{
   obj: V1Template;
 };
 
-const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
+const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const actionText = t('Add network interface');
 
-  const onSubmitTemplate = React.useCallback(
+  const onSubmitTemplate = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
         model: TemplateModel,
@@ -47,26 +47,30 @@ const TemplateNetwork: React.FC<TemplateNetworkProps> = ({ obj: template }) => {
         <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
           <Flex className="list-page-create-button-margin">
             <FlexItem>
-              <Button
-                isDisabled={!isTemplateEditable}
-                onClick={() =>
-                  createModal(({ isOpen, onClose }) => (
-                    <TemplatesNetworkInterfaceModal
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      headerText={actionText}
-                      template={template}
-                    />
-                  ))
-                }
-              >
-                {actionText}
-              </Button>
+              <Title headingLevel="h2">{t('Network interfaces')}</Title>
             </FlexItem>
             <FlexItem>
               <SidebarEditorSwitch />
             </FlexItem>
           </Flex>
+
+          <Button
+            className="template-network-tab__button"
+            isDisabled={!isTemplateEditable}
+            onClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <TemplatesNetworkInterfaceModal
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  headerText={actionText}
+                  template={template}
+                />
+              ))
+            }
+          >
+            {actionText}
+          </Button>
+
           <NetworkInterfaceList template={template} />
         </SidebarEditor>
       </ListPageBody>

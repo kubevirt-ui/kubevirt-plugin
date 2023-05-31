@@ -69,7 +69,7 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
     <div className="template-disks-page">
       <ListPageBody>
         <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
-          <Flex>
+          <Flex className="list-page-create-button-margin">
             <FlexItem>
               <DiskListTitle />
             </FlexItem>

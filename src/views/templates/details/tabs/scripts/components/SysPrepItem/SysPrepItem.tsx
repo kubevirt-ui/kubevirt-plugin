@@ -25,6 +25,7 @@ import {
   DescriptionListTermHelpText,
   Flex,
   FlexItem,
+  Title,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -95,8 +96,9 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
         <DescriptionListTermHelpText>
           <Flex className="vm-description-item__title">
             <FlexItem>
-              {t('Sysprep')}
-              {<WindowsLabel />}
+              <Title headingLevel="h2">
+                {t('Sysprep')} {<WindowsLabel />}
+              </Title>
             </FlexItem>
             <FlexItem>
               <Button

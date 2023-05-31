@@ -1,11 +1,12 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { Grid, GridItem, PageSection } from '@patternfly/react-core';
+import { Flex, Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
 import TemplateDetailsLeftGrid from './components/TemplateDetailsLeftGrid';
 import TemplateDetailsRightGrid from './components/TemplateDetailsRightGrid';
@@ -26,8 +27,10 @@ type TemplateDetailsPageProps = RouteComponentProps<{
   obj?: V1Template;
 };
 
-const TemplateDetailsPage: React.FC<TemplateDetailsPageProps> = ({ obj: template }) => {
-  const onSubmitTemplate = React.useCallback(
+const TemplateDetailsPage: FC<TemplateDetailsPageProps> = ({ obj: template }) => {
+  const { t } = useKubevirtTranslation();
+
+  const onSubmitTemplate = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
         model: TemplateModel,
@@ -43,13 +46,16 @@ const TemplateDetailsPage: React.FC<TemplateDetailsPageProps> = ({ obj: template
       <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
         {(resource) => (
           <>
-            <SidebarEditorSwitch />
+            <Flex className="template-details-page__flex">
+              <Title headingLevel="h2">{t('Template details')}</Title>
+              <SidebarEditorSwitch />
+            </Flex>
             <Grid className="margin-top">
-              <GridItem span={5} className="margin-top-grid-item">
+              <GridItem span={5}>
                 <TemplateDetailsLeftGrid template={resource} />
               </GridItem>
               <GridItem lg={1}></GridItem>
-              <GridItem span={5} className="margin-top-grid-item">
+              <GridItem span={5}>
                 <TemplateDetailsRightGrid template={resource} />
               </GridItem>
             </Grid>

@@ -11,3 +11,9 @@
   justify-content: space-between;
   flex: 1;
 }
+
+.template-details-page {
+  &__flex {
+    align-items: center;
+  }
+}
