@@ -10,6 +10,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { InstanceTypeVMState } from '../state/utils/types';
@@ -19,6 +20,13 @@ import { BootableVolume } from './types';
 
 const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
+
+const getCloudInitUserNameByOS = (selectedPreferenceName: string): string => {
+  const [osPrefix] = selectedPreferenceName.split('.');
+  if (osPrefix.startsWith(OS_NAME_TYPES.rhel)) return 'cloud-user';
+  if (osPrefix.startsWith(OS_NAME_TYPES.centos)) return 'centos';
+  return 'fedora';
+};
 
 export const generateVM = (
   instanceTypeState: InstanceTypeVMState,
@@ -39,6 +47,8 @@ export const generateVM = (
     name: getName(selectedBootableVolume),
     namespace: getNamespace(selectedBootableVolume),
   };
+
+  const selectedPreference = selectedBootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL];
 
   const emptyVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
@@ -76,7 +86,9 @@ export const generateVM = (
             },
             {
               cloudInitNoCloud: {
-                userData: `#cloud-config\nuser: fedora\npassword: ${generateCloudInitPassword()}\nchpasswd: { expire: False }`,
+                userData: `#cloud-config\nuser: ${getCloudInitUserNameByOS(
+                  selectedPreference,
+                )}\npassword: ${generateCloudInitPassword()}\nchpasswd: { expire: False }`,
               },
               name: 'cloudinitdisk',
             },
@@ -89,7 +101,7 @@ export const generateVM = (
           selectedBootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
       },
       preference: {
-        name: selectedBootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
+        name: selectedPreference,
       },
       dataVolumeTemplates: [
         {
