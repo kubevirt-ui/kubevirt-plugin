@@ -4,6 +4,7 @@ import VirtualMachineClusterPreferenceModel, {
   VirtualMachineClusterPreferenceModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterPreferenceModel';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import CloneResourceModal from '@kubevirt-utils/components/CloneResourceModal/CloneResourceModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,7 +25,23 @@ const useClusterPreferenceActionsProvider: UseClusterPreferenceActionsProvider =
   const actions: Action[] = useMemo(() => {
     return [
       {
-        id: 'preference-action-delete',
+        id: 'preference-clone-action',
+        disabled: false,
+        label: t('Clone'),
+        cta: () =>
+          createModal((modalProps) => {
+            return (
+              <CloneResourceModal
+                {...modalProps}
+                object={preference}
+                model={VirtualMachineClusterPreferenceModel}
+              />
+            );
+          }),
+        accessReview: asAccessReview(VirtualMachineClusterPreferenceModel, preference, 'create'),
+      },
+      {
+        id: 'preference-delete-action',
         disabled: false,
         label: t('Delete'),
         cta: () =>

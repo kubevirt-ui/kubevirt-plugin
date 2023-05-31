@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -18,7 +19,9 @@ const ClusterPreferenceRow: FC<RowProps<V1alpha2VirtualMachineClusterPreference>
       <ResourceLink
         groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
         name={preference?.metadata?.name}
+        inline
       />
+      <RedHatLabel obj={preference} />
     </TableData>
     <TableData id="vendor" activeColumnIDs={activeColumnIDs}>
       {getLabel(preference, VENDOR_LABEL, NO_DATA_DASH)}

@@ -224,6 +224,7 @@
   "Click Connect to open serial console.": "Click Connect to open serial console.",
   "Click Connect to open the VNC console.": "Click Connect to open the VNC console.",
   "Clone": "Clone",
+  "Clone {{kind}}": "Clone {{kind}}",
   "Clone a VirtualMachine": "Clone a VirtualMachine",
   "Clone existing PVC": "Clone existing PVC",
   "Clone in progress": "Clone in progress",

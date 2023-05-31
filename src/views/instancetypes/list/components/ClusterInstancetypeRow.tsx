@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha2VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -19,7 +20,9 @@ const ClusterInstancetypeRow: FC<RowProps<V1alpha2VirtualMachineClusterInstancet
       <ResourceLink
         groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
         name={it?.metadata?.name}
+        inline
       />
+      <RedHatLabel obj={it} />
     </TableData>
     <TableData id="cpu" activeColumnIDs={activeColumnIDs}>
       {it?.spec?.cpu?.guest}
