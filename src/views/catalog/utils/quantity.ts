@@ -1,13 +1,22 @@
 import byteSize, { ByteSizeResult } from 'byte-size';
 
-import { customUnits, multipliers, toIECUnit } from '@kubevirt-utils/utils/units';
+import { binaryUnits, customUnits, multipliers, toIECUnit } from '@kubevirt-utils/utils/units';
 
-export const bytesToIECBytes = (bytes: number, precision: number): ByteSizeResult => {
+export const bytesToIECBytes = (
+  bytes: number,
+  precision: number,
+  customizedUnits = customUnits,
+): ByteSizeResult => {
   return byteSize(bytes, {
     precision,
-    customUnits,
+    customUnits: customizedUnits,
     units: 'IS',
   });
+};
+
+export const bytesToDiskSize = (size: string) => {
+  const bytesizeresult = bytesToIECBytes(parseFloat(size), 0, binaryUnits);
+  return [bytesizeresult.value, bytesizeresult.unit].join('');
 };
 
 export const bytesFromQuantity = (
