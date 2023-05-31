@@ -1,27 +1,27 @@
 import React from 'react';
 
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 
+import { BootableResource } from '../../utils/types';
 import DeleteBootableVolumesModal from '../components/DeleteBootableVolumesModal';
 import EditBootableVolumesModal from '../components/EditBootableVolumesModal';
 
 type BootableVolumesActionsProps = (
-  dataSource: V1beta1DataSource,
+  source: BootableResource,
   preferences: V1alpha2VirtualMachineClusterPreference[],
 ) => [actions: Action[]];
 
-const useBootableVolumesActions: BootableVolumesActionsProps = (dataSource, preferences) => {
+const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferences) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
   const [canUpdateDataSource] = useAccessReview(
-    asAccessReview(DataSourceModel, dataSource, 'update' as K8sVerb) || {},
+    asAccessReview(DataSourceModel, source, 'update' as K8sVerb) || {},
   );
 
   const actions = [
@@ -33,7 +33,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (dataSource, pref
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <EditBootableVolumesModal
-            dataSource={dataSource}
+            source={source}
             isOpen={isOpen}
             onClose={onClose}
             preferences={preferences}
@@ -47,7 +47,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (dataSource, pref
       description: t('Only the bootable metadata will be deleted'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
-          <DeleteBootableVolumesModal dataSource={dataSource} isOpen={isOpen} onClose={onClose} />
+          <DeleteBootableVolumesModal source={source} isOpen={isOpen} onClose={onClose} />
         )),
     },
   ];

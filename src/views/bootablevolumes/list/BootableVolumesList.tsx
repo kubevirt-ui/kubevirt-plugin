@@ -1,15 +1,16 @@
 import React, { FC, useState } from 'react';
 
 import AddBootableVolumeButton from '@catalog/CreateFromInstanceTypes/components/AddBootableVolumeButton/AddBootableVolumeButton';
+import useBootableVolumes from '@catalog/CreateFromInstanceTypes/state/hooks/useBootableVolumes';
 import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { DataSourceModelGroupVersionKind, DataSourceModelRef } from '@kubevirt-utils/models';
-import { getAvailableOrCloningDataSources } from '@kubevirt-utils/resources/shared';
+import { DataSourceModelRef } from '@kubevirt-utils/models';
 import {
   K8sResourceCommon,
   ListPageBody,
@@ -18,10 +19,10 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { ButtonVariant, Pagination, Stack, StackItem } from '@patternfly/react-core';
 
 import BootableVolumesRow from './components/BootableVolumesRow';
-import useBootableVolumes from './hooks/useBootableVolumes';
 import useBootableVolumesColumns from './hooks/useBootableVolumesColumns';
 import useBootableVolumesFilters from './hooks/useBootableVolumesFilters';
 
@@ -29,10 +30,13 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const BootableVolumesList: FC = () => {
   const { t } = useKubevirtTranslation();
-  const [dataSources, loadedDataSources, loadErrorDataSources] = useBootableVolumes();
+  const [activeNamespace] = useActiveNamespace();
+  const { bootableVolumes, loaded, loadError } = useBootableVolumes(
+    activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace,
+  );
   const { preferences } = useInstanceTypesAndPreferences();
   const [data, filteredData, onFilterChange] = useListPageFilter(
-    getAvailableOrCloningDataSources(dataSources),
+    bootableVolumes,
     useBootableVolumesFilters(),
   );
   const [pagination, setPagination] = useState(paginationInitialState);
@@ -60,7 +64,7 @@ const BootableVolumesList: FC = () => {
           <StackItem className="list-managment-group">
             <ListPageFilter
               data={data}
-              loaded={loadedDataSources}
+              loaded={loaded}
               rowFilters={useBootableVolumesFilters()}
               onFilterChange={(...args) => {
                 onFilterChange(...args);
@@ -101,12 +105,11 @@ const BootableVolumesList: FC = () => {
           <VirtualizedTable<K8sResourceCommon>
             data={filteredData}
             unfilteredData={data}
-            loaded={loadedDataSources}
-            loadError={loadErrorDataSources}
+            loaded={loaded}
+            loadError={loadError}
             columns={activeColumns}
             Row={BootableVolumesRow}
             rowData={{
-              groupVersionKind: DataSourceModelGroupVersionKind,
               preferences,
             }}
           />

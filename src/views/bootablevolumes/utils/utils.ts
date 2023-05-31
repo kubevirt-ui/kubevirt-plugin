@@ -2,24 +2,25 @@ import {
   DEFAULT_INSTANCETYPE_LABEL,
   DEFAULT_PREFERENCE_LABEL,
 } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
+import { isBootableVolumePVCKind } from '@catalog/CreateFromInstanceTypes/utils/utils';
+import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ANNOTATIONS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
-import { BootableVolumeMetadata } from './types';
+import { BootableResource, BootableVolumeMetadata } from './types';
 
-export const getDataSourcePreferenceLabelValue = (
-  obj: V1beta1DataSource | K8sResourceCommon,
-): string => obj?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL] || '';
+export const getSourcePreferenceLabelValue = (obj: BootableVolume): string =>
+  obj?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL] || '';
 
 export const getPreferenceReadableOS = (
-  obj: V1beta1DataSource | K8sResourceCommon,
+  obj: BootableVolume,
   preferences: V1alpha2VirtualMachineClusterPreference[],
 ): string => {
-  const preferenceLabelValue = getDataSourcePreferenceLabelValue(obj); // preference name
+  const preferenceLabelValue = getSourcePreferenceLabelValue(obj); // preference name
   const preferenceObject = preferences?.find(
     (preference) => preference?.metadata?.name === preferenceLabelValue,
   );
@@ -27,8 +28,8 @@ export const getPreferenceReadableOS = (
   return preferenceObject?.metadata?.annotations?.[ANNOTATIONS.displayName] || NO_DATA_DASH;
 };
 
-export const getPreferenceOSType = (obj: V1beta1DataSource): OS_NAME_TYPES => {
-  const preferenceLabelValue = getDataSourcePreferenceLabelValue(obj);
+export const getPreferenceOSType = (obj: BootableVolume): OS_NAME_TYPES => {
+  const preferenceLabelValue = getSourcePreferenceLabelValue(obj);
 
   return (
     Object.values(OS_NAME_TYPES).find((osName) => preferenceLabelValue?.includes(osName)) ??
@@ -36,7 +37,7 @@ export const getPreferenceOSType = (obj: V1beta1DataSource): OS_NAME_TYPES => {
   );
 };
 
-export const deleteBootableVolumeMetadata = (obj: V1beta1DataSource) => {
+export const deleteBootableVolumeMetadata = (obj: BootableResource) => {
   // labels object without default preference and instancetype labels
   const originalLabelsObject = Object.keys(obj?.metadata?.labels)
     .filter((key) => ![DEFAULT_PREFERENCE_LABEL, DEFAULT_INSTANCETYPE_LABEL].includes(key))
@@ -56,7 +57,7 @@ export const deleteBootableVolumeMetadata = (obj: V1beta1DataSource) => {
 
   return async () => {
     await k8sPatch({
-      model: DataSourceModel,
+      model: isBootableVolumePVCKind(obj) ? PersistentVolumeClaimModel : DataSourceModel,
       resource: obj,
       data: [
         {
@@ -75,7 +76,7 @@ export const deleteBootableVolumeMetadata = (obj: V1beta1DataSource) => {
 };
 
 export const changeBootableVolumeMetadata =
-  (obj: V1beta1DataSource, metadata: BootableVolumeMetadata) => async () => {
+  (obj: BootableResource, metadata: BootableVolumeMetadata) => async () => {
     const initialMetadata = {
       labels: obj?.metadata?.labels,
       annotations: obj?.metadata?.annotations,
@@ -83,7 +84,7 @@ export const changeBootableVolumeMetadata =
 
     initialMetadata !== metadata &&
       (await k8sPatch({
-        model: DataSourceModel,
+        model: isBootableVolumePVCKind(obj) ? PersistentVolumeClaimModel : DataSourceModel,
         resource: obj,
         data: [
           {

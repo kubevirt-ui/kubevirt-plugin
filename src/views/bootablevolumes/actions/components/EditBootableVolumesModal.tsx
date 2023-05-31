@@ -11,7 +11,6 @@ import {
   DEFAULT_PREFERENCE_LABEL,
 } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -33,18 +32,18 @@ import {
   TextArea,
 } from '@patternfly/react-core';
 
-import { BootableVolumeMetadata } from '../../utils/types';
+import { BootableResource, BootableVolumeMetadata } from '../../utils/types';
 import { changeBootableVolumeMetadata } from '../../utils/utils';
 
 type EditBootableVolumesModalProps = {
-  dataSource: V1beta1DataSource;
+  source: BootableResource;
   isOpen: boolean;
   onClose: () => void;
   preferences: V1alpha2VirtualMachineClusterPreference[];
 };
 
 const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
-  dataSource,
+  source,
   isOpen,
   onClose,
   preferences,
@@ -57,19 +56,18 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
   );
 
   const initialParams = useMemo(() => {
-    const instanceTypeLabel =
-      dataSource?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL]?.split('.');
+    const instanceTypeLabel = source?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL]?.split('.');
     const initialCategory = Object.entries(categoryDetailsMap).find(
       (category) => category[1].prefix === instanceTypeLabel?.[0],
     );
 
     return {
-      preference: dataSource?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
+      preference: source?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
       instanceType: initialCategory,
       size: initialCategory && instanceTypeLabel?.[1],
-      description: dataSource?.metadata?.annotations?.[ANNOTATIONS.description],
+      description: source?.metadata?.annotations?.[ANNOTATIONS.description],
     };
-  }, [dataSource]);
+  }, [source]);
 
   const [preference, setPreference] = useState<string>(initialParams.preference);
   const [isInstanceTypeOpen, setIsInstanceTypeOpen] = useState(false);
@@ -115,22 +113,22 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
 
     const metadata: BootableVolumeMetadata = {
       labels: {
-        ...dataSource?.metadata?.labels,
+        ...source?.metadata?.labels,
         ...preferenceLabel,
         ...instanceLabel,
       },
       annotations: {
-        ...dataSource?.metadata?.annotations,
+        ...source?.metadata?.annotations,
         ...descriptionAnnotation,
       },
     };
 
-    return changeBootableVolumeMetadata(dataSource, metadata);
-  }, [dataSource, description, instanceType, preference, size]);
+    return changeBootableVolumeMetadata(source, metadata);
+  }, [source, description, instanceType, preference, size]);
 
   return (
     <TabModal<K8sResourceCommon>
-      obj={dataSource}
+      obj={source}
       isOpen={isOpen}
       onClose={onClose}
       headerText={t('Edit volume metadata')}
