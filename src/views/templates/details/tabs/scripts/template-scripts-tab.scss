@@ -1,3 +1,7 @@
 .template-scripts-tab__description-list {
-    max-width: 700px;
+  max-width: 700px;
+
+  .pf-l-flex {
+    align-items: center;
+  }
 }

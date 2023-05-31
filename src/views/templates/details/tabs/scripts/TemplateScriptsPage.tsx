@@ -25,6 +25,7 @@ import {
   Flex,
   FlexItem,
   PageSection,
+  Title,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -70,13 +71,14 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
   return (
     <PageSection>
       <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
-        <SidebarEditorSwitch />
-        <DescriptionList className="template-scripts-tab__description-list margin-top">
+        <DescriptionList className="template-scripts-tab__description-list">
           <DescriptionListGroup>
             <DescriptionListTerm>
               <DescriptionListTermHelpText>
                 <Flex className="vm-description-item__title">
-                  <FlexItem>{t('Cloud-init')}</FlexItem>
+                  <FlexItem>
+                    <Title headingLevel="h2">{t('Cloud-init')}</Title>
+                  </FlexItem>
                   <FlexItem>
                     <Button
                       type="button"
@@ -97,6 +99,9 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                       {t('Edit')}
                       <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
                     </Button>
+                  </FlexItem>
+                  <FlexItem>
+                    <SidebarEditorSwitch />
                   </FlexItem>
                 </Flex>
               </DescriptionListTermHelpText>

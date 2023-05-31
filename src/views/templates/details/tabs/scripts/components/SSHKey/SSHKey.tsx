@@ -30,6 +30,7 @@ import {
   Stack,
   Text,
   TextVariants,
+  Title,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -117,8 +118,9 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
         <DescriptionListTermHelpText>
           <Flex className="vm-description-item__title">
             <FlexItem>
-              {t('Authorized SSH key')}
-              {<LinuxLabel />}
+              <Title headingLevel="h2">
+                {t('Authorized SSH key')} {<LinuxLabel />}
+              </Title>
             </FlexItem>
             <FlexItem>
               <Button
