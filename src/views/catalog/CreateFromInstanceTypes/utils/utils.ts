@@ -133,9 +133,7 @@ export const generateVM = (
     },
   };
 
-  const vmToCreate = addSecretToVM(emptyVM, sshSecretName);
-
-  return vmToCreate;
+  return sshSecretName ? addSecretToVM(emptyVM, sshSecretName) : emptyVM;
 };
 
 export const isBootableVolumePVCKind = (bootableVolume: BootableVolume): boolean =>
