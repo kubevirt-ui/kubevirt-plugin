@@ -4,10 +4,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
+import ClusterTab from './ClusterTab/ClusterTab';
 import GeneralTab from './GeneralTab/GeneralTab';
-import LiveMigrationTab from './LiveMigrationTab/LiveMigrationTab';
 import PermissionsTab from './PermissionsTab/PermissionsTab';
-import TemplatesProjectTab from './TemplatesProjectTab/TemplatesProjectTab';
 
 import './settings-tab.scss';
 
@@ -34,17 +33,12 @@ const SettingsTab: React.FC = () => {
               <GeneralTab />
             </div>
           </Tab>
-          <Tab eventKey={1} title={<TabTitleText>{t('Live migration')}</TabTitleText>}>
+          <Tab eventKey={1} title={<TabTitleText>{t('Cluster settings')}</TabTitleText>}>
             <div className="settings-tab__content">
-              <LiveMigrationTab />
+              <ClusterTab />
             </div>
           </Tab>
-          <Tab eventKey={2} title={<TabTitleText>{t('Template project')}</TabTitleText>}>
-            <div className="settings-tab__content">
-              <TemplatesProjectTab />
-            </div>
-          </Tab>
-          <Tab eventKey={3} title={<TabTitleText>{t('User permissions')}</TabTitleText>}>
+          <Tab eventKey={2} title={<TabTitleText>{t('User permissions')}</TabTitleText>}>
             <div className="settings-tab__content">
               <PermissionsTab />
             </div>

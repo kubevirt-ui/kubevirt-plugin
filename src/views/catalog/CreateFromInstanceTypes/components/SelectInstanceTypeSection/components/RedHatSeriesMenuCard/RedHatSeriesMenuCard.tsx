@@ -69,31 +69,32 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
       isVisible={isMenuExpanded}
       popperMatchesTriggerWidth={false}
       trigger={
-        <MenuToggle
-          id="series-card-toggle"
-          onClick={(event) => onMenuToggle(event, seriesName)}
-          isExpanded={isMenuExpanded}
-          variant="plain"
-          className={classNames(
-            'instance-type-series-menu-card__toggle-container',
-            isSelectedMenu && 'selected',
-          )}
-        >
-          <Card className="instance-type-series-menu-card__toggle-card">
-            <div className="instance-type-series-menu-card__card-icon">
-              <Icon />
-            </div>
-            <CardBody>
-              <div className="instance-type-series-menu-card__card-title">{seriesTitle}</div>
-              <div className="instance-type-series-menu-card__card-toggle-text">
-                {seriesLabel || classAnnotation} <AngleDownIcon />
+        <div className="instance-type-series-menu-card">
+          <MenuToggle
+            onClick={(event) => onMenuToggle(event, seriesName)}
+            isExpanded={isMenuExpanded}
+            variant="plain"
+            className={classNames(
+              'instance-type-series-menu-card__toggle-container',
+              isSelectedMenu && 'selected',
+            )}
+          >
+            <Card className="instance-type-series-menu-card__toggle-card">
+              <div className="instance-type-series-menu-card__card-icon">
+                <Icon />
               </div>
-            </CardBody>
-            <CardFooter className="instance-type-series-menu-card__card-footer">
-              {isSelectedMenu && selectedITLabel}
-            </CardFooter>
-          </Card>
-        </MenuToggle>
+              <CardBody>
+                <div className="instance-type-series-menu-card__card-title">{seriesTitle}</div>
+                <div className="instance-type-series-menu-card__card-toggle-text">
+                  {seriesLabel || classAnnotation} <AngleDownIcon />
+                </div>
+              </CardBody>
+              <CardFooter className="instance-type-series-menu-card__card-footer">
+                {isSelectedMenu && selectedITLabel}
+              </CardFooter>
+            </Card>
+          </MenuToggle>
+        </div>
       }
       popper={
         <Menu ref={menuRef} id={seriesName} activeMenu={activeMenu}>

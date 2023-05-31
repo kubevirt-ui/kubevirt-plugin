@@ -2,9 +2,11 @@ import React, { FC, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromInstanceType';
+import EnableInstanceTypeTechPreviewModal from '@catalog/EnableInstanceTypeTechPreviewModal/EnableInstanceTypeTechPreviewModal';
 import TemplatesCatalog from '@catalog/templatescatalog/TemplatesCatalog';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem, Tab, Tabs, Title } from '@patternfly/react-core';
 import { CatalogIcon, ImageIcon } from '@patternfly/react-icons';
 
@@ -19,8 +21,9 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
   match,
 }) => {
   const { t } = useKubevirtTranslation();
+
   const [currentTab, setCurrentTab] = useState<CREATE_VM_TAB>(
-    location.pathname.includes(CREATE_VM_TAB.INSTANCE_TYPES)
+    location.pathname.endsWith(CREATE_VM_TAB.INSTANCE_TYPES)
       ? CREATE_VM_TAB.INSTANCE_TYPES
       : CREATE_VM_TAB.CATALOG,
   );
@@ -59,6 +62,15 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
           title={<CreateVMTabTitle Icon={ImageIcon} titleText={t('InstanceTypes')} badge />}
         >
           <CreateFromInstanceType />
+          {currentTab === CREATE_VM_TAB.INSTANCE_TYPES && (
+            <EnableInstanceTypeTechPreviewModal
+              goBack={() => {
+                const previousURL: string = (history.location.state as any)?.previousURL;
+                history.goBack();
+                isEmpty(previousURL) && setCurrentTab(CREATE_VM_TAB.CATALOG);
+              }}
+            />
+          )}
         </Tab>
       </Tabs>
     </div>

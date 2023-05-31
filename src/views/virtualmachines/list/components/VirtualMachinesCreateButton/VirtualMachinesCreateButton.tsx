@@ -29,10 +29,13 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
     yaml: t('From YAML'),
   };
 
-  const catalogURL = useMemo(
-    () => `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`,
-    [namespace],
-  );
+  const { catalogURL, vmListPageURL } = useMemo(() => {
+    const baseURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}`;
+    return {
+      catalogURL: `${baseURL}/templatescatalog`,
+      vmListPageURL: `${baseURL}/${VirtualMachineModelRef}`,
+    };
+  }, [namespace]);
 
   const onCreate = useCallback(
     (type: string) => {
@@ -40,14 +43,15 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
         case 'catalog':
           return history.push(catalogURL);
         case 'volume':
-          return history.push(`${catalogURL}/instanceTypes`);
+          return history.push({
+            pathname: `${catalogURL}/instanceTypes`,
+            state: { previousURL: vmListPageURL },
+          });
         default:
-          return history.push(
-            `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${VirtualMachineModelRef}/~new`,
-          );
+          return history.push(`${vmListPageURL}/~new`);
       }
     },
-    [catalogURL, history, namespace],
+    [catalogURL, history, vmListPageURL],
   );
 
   return (
