@@ -2,13 +2,15 @@ import { ComponentClass } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  CubesIcon,
   MemoryIcon,
+  MicrochipIcon,
+  ModuleIcon,
   NetworkIcon,
-  PuzzlePieceIcon,
   RedhatIcon,
+  RegistryIcon,
   ServerGroupIcon,
-  StarIcon,
+  ServerIcon,
+  TrendUpIcon,
   UserIcon,
 } from '@patternfly/react-icons';
 
@@ -38,31 +40,53 @@ export const initialMenuItems: InstanceTypesMenuItemsData = {
 };
 
 export const instanceTypeSeriesNameMapper: {
-  [key: string]: { Icon: ComponentClass; seriesLabel: string };
+  [key: string]: { Icon: ComponentClass; seriesLabel: string; seriesTitle: string };
 } = {
   c1: {
     Icon: ServerGroupIcon,
-    seriesLabel: t('C Series'),
+    seriesLabel: t('C series'),
+    // sizes: ['medium', 'large', '2xlarge', '4xlarge', '8xlarge'],
+    seriesTitle: t('General purpose applications'),
   },
   co1: {
-    Icon: CubesIcon,
-    seriesLabel: t('CO Series'),
+    Icon: ModuleIcon,
+    seriesLabel: t('CO series'),
+    // sizes: ['medium', 'large', '2xlarge', '4xlarge', '8xlarge'],
+    seriesTitle: t('Oversubscribed resources'),
   },
   cx1: {
-    Icon: PuzzlePieceIcon, // ask Yifat what's the correct icon
-    seriesLabel: t('CX Series'),
+    Icon: RegistryIcon,
+    seriesLabel: t('CX series'),
+    // sizes: ['medium', 'large', '2xlarge', '4xlarge', '8xlarge'],
+    seriesTitle: t('Compute-intensive applications'),
   },
   gn1: {
-    Icon: StarIcon,
-    seriesLabel: t('GN Series'),
+    Icon: MicrochipIcon,
+    seriesLabel: t('GN series'),
+    // sizes: ['xlarge', '2xlarge', '4xlarge', '8xlarge'],
+    seriesTitle: t('Attached NVIDIA GPU resources'),
   },
   m1: {
     Icon: MemoryIcon,
-    seriesLabel: t('M Series'),
+    seriesLabel: t('M series'),
+    // sizes: ['large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
+    seriesTitle: t('Memory-intensive applications'),
   },
   n1: {
     Icon: NetworkIcon,
-    seriesLabel: t('N Series'),
+    seriesLabel: t('N series'),
+    // sizes: ['large', 'xlarge', '2xlarge'],
+    seriesTitle: t('Network-intensive applications'),
+  },
+  highperformance: {
+    Icon: TrendUpIcon,
+    seriesLabel: t('HP series'),
+    seriesTitle: t('High-performance applications'),
+  },
+  server: {
+    Icon: ServerIcon,
+    seriesLabel: t('S series'),
+    seriesTitle: t('Server dedicated applications'),
   },
 };
 

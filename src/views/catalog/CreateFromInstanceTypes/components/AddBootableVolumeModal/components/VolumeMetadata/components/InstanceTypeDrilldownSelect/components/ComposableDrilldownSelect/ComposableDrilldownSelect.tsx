@@ -8,9 +8,8 @@ import React, {
   useState,
 } from 'react';
 
+import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { Menu, MenuContent, MenuList, MenuToggle, Popper } from '@patternfly/react-core';
-
-import { useClickOutside } from './hooks/useClickOutside';
 
 type MenuHeightsType = {
   [id: string]: number;

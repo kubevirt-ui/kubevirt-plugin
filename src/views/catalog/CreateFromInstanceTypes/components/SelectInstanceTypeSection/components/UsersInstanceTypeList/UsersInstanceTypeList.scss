@@ -1,0 +1,10 @@
+.instance-type-list {
+  &__action-list {
+    margin: var(--pf-global--spacer--md) 0 var(--pf-global--spacer--sm);
+    justify-content: space-between;
+  }
+
+  &__search {
+    width: 350px;
+  }
+}

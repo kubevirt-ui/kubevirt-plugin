@@ -1,46 +1,58 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { Grid, GridItem } from '@patternfly/react-core';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { Grid, GridItem, Tab, Tabs } from '@patternfly/react-core';
 
-import CategoryCard from './components/category-card/components/CategoryCard/CategoryCard';
-import CustomMenu from './components/category-card/components/InstanceTypesMenu/components/CustomMenu';
-import { InstanceTypeCategory, InstanceTypeSize } from './utils/types';
-import { categoryDetailsMap } from './utils/utils';
+import { getInstanceTypeMenuItems } from '../AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 
-import './SelectInstanceTypeSection.scss';
+import RedHatSeriesMenuCard from './components/RedHatSeriesMenuCard/RedHatSeriesMenuCard';
+import UsersInstanceTypesList from './components/UsersInstanceTypeList/UsersInstanceTypeList';
+import useInstanceTypeCardMenuSection from './hooks/useInstanceTypeCardMenuSection';
+import { TabKey } from './utils/constants';
 
 const SelectInstanceTypeSection: FC = () => {
-  const { instanceTypeVMState, setInstanceTypeVMState } = useInstanceTypeVMStore();
-  const { selectedInstanceType } = instanceTypeVMState;
-  const handleSelect = (category: InstanceTypeCategory, size: InstanceTypeSize) => {
-    setInstanceTypeVMState({
-      type: instanceTypeActionType.setSelectedInstanceType,
-      payload: {
-        category,
-        size,
-        name: `${categoryDetailsMap[category]?.prefix}.${size}`,
-      },
-    });
+  const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);
+
+  const {
+    instanceTypesAndPreferencesData: { instanceTypes, loaded },
+    instanceTypeVMState: { selectedInstanceType },
+  } = useInstanceTypeVMStore();
+  const menuItems = useMemo(() => getInstanceTypeMenuItems(instanceTypes), [instanceTypes]);
+
+  const menuProps = useInstanceTypeCardMenuSection();
+
+  useEffect(() => {
+    // This effect is meant to focus the tab an IT was defined as default by the selected volume
+    const tabToSwitch = menuItems.userProvided.items.includes(selectedInstanceType)
+      ? TabKey.Users
+      : TabKey.RedHat;
+    setActiveTabKey(tabToSwitch);
+  }, [menuItems.userProvided.items, selectedInstanceType]);
+
+  if (!loaded) return <Loading />;
+
+  const handleTabClick = (_, tabIndex: TabKey) => {
+    setActiveTabKey(tabIndex);
   };
 
   return (
-    <Grid hasGutter span={3} className="categories-card">
-      {Object.keys(InstanceTypeCategory)?.map((instanceType) => (
-        <GridItem key={instanceType} className="categories-card__grid-item">
-          <CustomMenu
-            toggleComponent={CategoryCard}
-            onSelect={handleSelect}
-            customData={{
-              category: instanceType,
-              selectedCategory: selectedInstanceType?.category,
-              selectedSize: selectedInstanceType?.size,
-            }}
-          />
-        </GridItem>
-      ))}
-    </Grid>
+    <>
+      <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
+        <Tab eventKey={TabKey.RedHat} title={menuItems.redHatProvided.label}>
+          <Grid span={2} hasGutter>
+            {menuItems.redHatProvided.items.map((rhSeriesItem) => (
+              <GridItem key={rhSeriesItem?.seriesName}>
+                <RedHatSeriesMenuCard rhSeriesItem={rhSeriesItem} {...menuProps} />
+              </GridItem>
+            ))}
+          </Grid>
+        </Tab>
+        <Tab eventKey={TabKey.Users} title={menuItems.userProvided.label}>
+          <UsersInstanceTypesList />
+        </Tab>
+      </Tabs>
+    </>
   );
 };
 

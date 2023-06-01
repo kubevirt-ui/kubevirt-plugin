@@ -1,6 +1,6 @@
 import { Dispatch } from 'react';
 
-import { BootableVolume, InstanceTypeState } from '@catalog/CreateFromInstanceTypes/utils/types';
+import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1alpha2VirtualMachineClusterInstancetype,
@@ -26,7 +26,7 @@ export type UseBootableVolumesValues = {
 
 export type InstanceTypeVMState = {
   selectedBootableVolume: BootableVolume;
-  selectedInstanceType: InstanceTypeState;
+  selectedInstanceType: string;
   vmName: string;
   sshSecretCredentials: SSHSecretDetails;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
@@ -42,7 +42,7 @@ export enum instanceTypeActionType {
 
 type InstanceTypeAction = {
   type: string;
-  payload: BootableVolume | InstanceTypeState | string | SSHSecretDetails;
+  payload: BootableVolume | string | SSHSecretDetails;
 };
 
 export type InstanceTypeVMStoreState = {

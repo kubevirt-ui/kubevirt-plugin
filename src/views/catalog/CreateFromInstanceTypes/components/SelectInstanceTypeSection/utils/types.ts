@@ -1,4 +1,6 @@
-export type InstanceTypeSize = 'medium' | 'large' | 'xlarge' | '2xlarge' | '4xlarge' | '8xlarge';
+import { MutableRefObject } from 'react';
+
+type InstanceTypeSize = 'medium' | 'large' | 'xlarge' | '2xlarge' | '4xlarge' | '8xlarge';
 
 export enum InstanceTypeCategory {
   GeneralPurpose = 'GeneralPurpose',
@@ -14,12 +16,6 @@ export type InstanceTypeSizeDetails = {
   memory: string;
 };
 
-export type CategoryCustomData = {
-  category: InstanceTypeCategory;
-  selectedCategory: InstanceTypeCategory;
-  selectedSize: InstanceTypeSize;
-};
-
 export type CategoryDetails = {
   title: string;
   Icon: any;
@@ -30,3 +26,10 @@ export type CategoryDetails = {
 };
 
 export type CategoryDetailsMap = { [key in InstanceTypeCategory]: CategoryDetails };
+
+export type UseInstanceTypeCardMenuSectionValues = {
+  activeMenu: string;
+  menuRef: MutableRefObject<HTMLDivElement>;
+  onMenuToggle: (event?: React.MouseEvent, menuID?: string) => void;
+  onMenuSelect: (itName: string) => void;
+};

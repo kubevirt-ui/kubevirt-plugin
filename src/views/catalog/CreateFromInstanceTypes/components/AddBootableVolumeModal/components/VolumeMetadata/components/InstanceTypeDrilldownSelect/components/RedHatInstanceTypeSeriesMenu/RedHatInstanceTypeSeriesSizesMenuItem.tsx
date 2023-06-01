@@ -25,18 +25,19 @@ const RedHatInstanceTypeSeriesSizesMenuItems: FC<RedHatInstanceTypeSeriesSizesMe
     <>
       {sizes.map(({ sizeLabel, cpus, memory }) => {
         const itName = `${seriesName}.${sizeLabel}`;
+        const itLabel = t('{{sizeLabel}}: {{cpus}} CPUs, {{memory}} Memory', {
+          sizeLabel,
+          cpus,
+          memory: readableSizeUnit(memory),
+        });
         return (
           <MenuItem
             key={itName}
             itemId={itName}
             onClick={() => setSelected(itName)}
             isSelected={selected === itName}
-            description={t('{{cpus}} CPUs, {{memory}} Memory', {
-              cpus,
-              memory: readableSizeUnit(memory),
-            })}
           >
-            {sizeLabel}
+            {itLabel}
           </MenuItem>
         );
       })}

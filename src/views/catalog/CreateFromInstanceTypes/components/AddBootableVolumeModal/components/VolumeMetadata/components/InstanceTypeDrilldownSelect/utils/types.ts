@@ -12,14 +12,14 @@ export type RedHatInstanceTypeSeries = {
   sizes: InstanceTypeSize[];
 };
 
-type RedHatInstanceType = {
+export type RedHatInstanceType = {
   label: string;
   id: string;
   Icon: ComponentClass;
   items: RedHatInstanceTypeSeries[];
 };
 
-type UserInstanceType = {
+export type UserInstanceType = {
   label: string;
   id: string;
   Icon: ComponentClass;
