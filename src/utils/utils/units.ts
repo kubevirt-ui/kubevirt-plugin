@@ -33,6 +33,16 @@ export const customUnits = {
   ],
 };
 
+export const binaryUnits = {
+  IS: [
+    { from: 0, to: multipliers.Ki, unit: 'B' },
+    { from: multipliers.Ki, to: multipliers.Mi, unit: 'Ki', long: 'thousand' },
+    { from: multipliers.Mi, to: multipliers.Gi, unit: 'Mi', long: 'million' },
+    { from: multipliers.Gi, to: multipliers.Ti, unit: 'Gi', long: 'billion' },
+    { from: multipliers.Ti, unit: 'Ti', long: 'billion' },
+  ],
+};
+
 /**
  * A function to return unit for disk size/memory with 'B' suffix.
  * @param {BinaryUnit | string} unit - unit
