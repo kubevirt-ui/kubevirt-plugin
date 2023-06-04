@@ -38,23 +38,21 @@ const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = 
   }, [history.location.pathname]);
 
   return (
-    <Tabs
-      activeKey={activeTabKey}
-      hasBorderBottom={false}
-      className="VirtualMachineConfigurationTab--main"
-    >
-      {tabs.map(({ title, Component, name }) => (
-        <Tab
-          key={name}
-          className="VirtualMachineConfigurationTab--tab-nav"
-          eventKey={name}
-          onClick={() => redirectTab(name)}
-          title={<TabTitleText>{title}</TabTitleText>}
-        >
-          {activeTabKey === name && <Component {...props} />}
-        </Tab>
-      ))}
-    </Tabs>
+    <div className="VirtualMachineConfigurationTab">
+      <Tabs activeKey={activeTabKey} isVertical className="VirtualMachineConfigurationTab--main">
+        {tabs.map(({ title, Component, name }) => (
+          <Tab
+            key={name}
+            className="VirtualMachineConfigurationTab--content"
+            eventKey={name}
+            onClick={() => redirectTab(name)}
+            title={<TabTitleText>{title}</TabTitleText>}
+          >
+            {activeTabKey === name && <Component {...props} />}
+          </Tab>
+        ))}
+      </Tabs>
+    </div>
   );
 };
 
