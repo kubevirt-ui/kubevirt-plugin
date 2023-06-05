@@ -9,7 +9,7 @@ import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Label, Split, SplitItem } from '@patternfly/react-core';
+import { Label } from '@patternfly/react-core';
 import { TableText, WrapModifier } from '@patternfly/react-table';
 
 import BootableVolumesActions from '../../actions/BootableVolumesActions';
@@ -29,19 +29,14 @@ const BootableVolumesRow: FC<
   return (
     <>
       <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-20">
-        <Split hasGutter>
-          <SplitItem>
-            <ResourceLink
-              groupVersionKind={getBootableVolumeGroupVersionKind(obj)}
-              name={obj?.metadata?.name}
-            />
-          </SplitItem>
-          {obj.kind === DataSourceModel.kind && isDataSourceCloning(obj as V1beta1DataSource) && (
-            <SplitItem>
-              <Label>{t('Clone in progress')}</Label>
-            </SplitItem>
-          )}
-        </Split>
+        <ResourceLink
+          groupVersionKind={getBootableVolumeGroupVersionKind(obj)}
+          name={obj?.metadata?.name}
+          inline
+        />
+        {obj.kind === DataSourceModel.kind && isDataSourceCloning(obj as V1beta1DataSource) && (
+          <Label>{t('Clone in progress')}</Label>
+        )}
       </TableData>
       <TableData id="namespace" activeColumnIDs={activeColumnIDs} className="pf-m-width-20">
         <ResourceLink kind="Namespace" name={obj?.metadata?.namespace} />
