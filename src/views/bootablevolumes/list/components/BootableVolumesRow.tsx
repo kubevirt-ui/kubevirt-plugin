@@ -32,6 +32,7 @@ const BootableVolumesRow: FC<
         <ResourceLink
           groupVersionKind={getBootableVolumeGroupVersionKind(obj)}
           name={obj?.metadata?.name}
+          namespace={obj?.metadata?.namespace}
           inline
         />
         {obj.kind === DataSourceModel.kind && isDataSourceCloning(obj as V1beta1DataSource) && (
