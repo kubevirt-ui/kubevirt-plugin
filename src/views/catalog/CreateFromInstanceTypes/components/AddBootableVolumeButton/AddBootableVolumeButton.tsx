@@ -23,14 +23,14 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ buttonVaria
     namespace: isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS,
     group: DataSourceModel.apiGroup,
   });
-  const { instanceTypesAndPreferencesData, onSelectVolume } = useInstanceTypeVMStore();
+  const { instanceTypesAndPreferencesData, onSelectCreatedVolume } = useInstanceTypeVMStore();
   const { loadError } = instanceTypesAndPreferencesData;
 
   return (
     <Button
       onClick={() =>
         createModal((props) => (
-          <AddBootableVolumeModal onCreateVolume={onSelectVolume} {...props} />
+          <AddBootableVolumeModal onCreateVolume={onSelectCreatedVolume} {...props} />
         ))
       }
       variant={buttonVariant || ButtonVariant.secondary}

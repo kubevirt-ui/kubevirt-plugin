@@ -25,7 +25,7 @@ export const useInstanceTypeVMInitialStore = create<InstanceTypeVMStore>()((set,
     setBootableVolumesData: (data: UseBootableVolumesValues) => set({ bootableVolumesData: data }),
     setInstanceTypesAndPreferencesData: (data: UseInstanceTypeAndPreferencesValues) =>
       set({ instanceTypesAndPreferencesData: data }),
-    onSelectVolume: (selectedVolume: BootableVolume) =>
+    onSelectCreatedVolume: (selectedVolume: BootableVolume) =>
       set(
         produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
           instanceTypeVMState.selectedBootableVolume = selectedVolume;

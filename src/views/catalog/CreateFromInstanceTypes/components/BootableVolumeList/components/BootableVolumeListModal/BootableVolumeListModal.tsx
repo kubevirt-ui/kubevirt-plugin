@@ -16,12 +16,12 @@ type BootableVolumeListModalProps = {
 const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({ isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
 
-  const { onSelectVolume, instanceTypeVMState } = useInstanceTypeVMStore();
+  const { onSelectCreatedVolume, instanceTypeVMState } = useInstanceTypeVMStore();
   const { selectedBootableVolume } = instanceTypeVMState;
   const selectedBootableVolumeState = useState<BootableVolume>(selectedBootableVolume);
 
   const onSave = () => {
-    onSelectVolume(selectedBootableVolumeState[0]);
+    onSelectCreatedVolume(selectedBootableVolumeState[0]);
     onClose();
   };
   return (

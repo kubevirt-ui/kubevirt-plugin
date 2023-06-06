@@ -41,7 +41,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const {
     instanceTypeVMState,
     bootableVolumesData,
-    onSelectVolume,
+    onSelectCreatedVolume,
     instanceTypesAndPreferencesData,
   } = useInstanceTypeVMStore();
 
@@ -159,7 +159,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               rowData={{
                 bootableVolumeSelectedState: !displayShowAllButton
                   ? selectedBootableVolumeState
-                  : [selectedBootableVolume, onSelectVolume],
+                  : [selectedBootableVolume, onSelectCreatedVolume],
                 preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
                 pvcSource: getBootableVolumePVCSource(bs, pvcSources),
               }}

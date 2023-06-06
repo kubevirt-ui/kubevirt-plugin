@@ -20,14 +20,14 @@ import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin
 type UseBootableVolumes = (namespace?: string) => {
   bootableVolumes: BootableVolume[];
   loaded: boolean;
-  loadError?: any;
+  error?: any;
   pvcSources: {
     [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
   };
 };
 
 const useBootableVolumes: UseBootableVolumes = (namespace) => {
-  const [dataSources, loadedDataSources, loadErrorDataSources] = useK8sWatchResource<
+  const [dataSources, loadedDataSources, dataSourcesError] = useK8sWatchResource<
     V1beta1DataSource[]
   >({
     groupVersionKind: DataSourceModelGroupVersionKind,
@@ -47,14 +47,11 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     namespace,
   });
 
-  const loadError = useMemo(
-    () => loadErrorDataSources || loadErrorPVCs,
-    [loadErrorDataSources, loadErrorPVCs],
-  );
+  const error = useMemo(() => dataSourcesError || loadErrorPVCs, [dataSourcesError, loadErrorPVCs]);
 
   const loaded = useMemo(
-    () => (loadError ? true : loadedDataSources && loadedPVCs),
-    [loadError, loadedDataSources, loadedPVCs],
+    () => (error ? true : loadedDataSources && loadedPVCs),
+    [error, loadedDataSources, loadedPVCs],
   );
 
   const readyOrCloningDataSources = useMemo(
@@ -96,7 +93,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   return {
     bootableVolumes,
     loaded,
-    loadError,
+    error,
     pvcSources,
   };
 };

@@ -57,7 +57,7 @@ type InstanceTypeVMStoreActions = {
   setInstanceTypeVMState: Dispatch<InstanceTypeAction>;
   setBootableVolumesData: Dispatch<UseBootableVolumesValues>;
   setInstanceTypesAndPreferencesData: Dispatch<UseInstanceTypeAndPreferencesValues>;
-  onSelectVolume: (selectedVolume: BootableVolume) => void;
+  onSelectCreatedVolume: (selectedVolume: BootableVolume) => void;
   setActiveNamespace: Dispatch<string>;
   setVMNamespaceTarget: Dispatch<string>;
   resetInstanceTypeVMState: () => void;

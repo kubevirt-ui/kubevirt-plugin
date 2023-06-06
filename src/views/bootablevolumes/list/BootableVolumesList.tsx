@@ -42,7 +42,7 @@ const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const { createModal } = useModal();
-  const { bootableVolumes, loaded, loadError } = useBootableVolumes(namespace);
+  const { bootableVolumes, loaded, error } = useBootableVolumes(namespace);
 
   const [preferences] = useK8sWatchResource<V1alpha2VirtualMachineClusterPreference[]>({
     groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
@@ -133,7 +133,7 @@ const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
             data={filteredData}
             unfilteredData={data}
             loaded={loaded}
-            loadError={loadError}
+            loadError={error}
             columns={activeColumns}
             Row={BootableVolumesRow}
             rowData={{
