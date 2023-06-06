@@ -48,9 +48,9 @@ const WelcomeModal: FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
               <Title headingLevel="h1">OpenShift Virtualization</Title>
 
               <Text className="text-muted WelcomeModal__text" component={TextVariants.p}>
-                OpenShift Virtualization allows you to run and manage virtualized workloads
-                alongside container workloads. You can use it to manage both Linux and Windows
-                virtual machines.
+                Use OpenShift Virtualization to run and manage virtualized workloads alongside
+                container workloads. You can use it to manage both Linux and Windows virtual
+                machines.
               </Text>
 
               <Title headingLevel="h3">What do you want to do next?</Title>
