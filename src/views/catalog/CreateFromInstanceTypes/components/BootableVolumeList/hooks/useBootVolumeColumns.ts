@@ -1,7 +1,7 @@
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 

@@ -1,12 +1,12 @@
 import { Dispatch } from 'react';
 
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1alpha2VirtualMachineClusterInstancetype,
   V1alpha2VirtualMachineClusterPreference,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 
 export type UseInstanceTypeAndPreferencesValues = {
   preferences: V1alpha2VirtualMachineClusterPreference[];
@@ -57,7 +57,7 @@ type InstanceTypeVMStoreActions = {
   setInstanceTypeVMState: Dispatch<InstanceTypeAction>;
   setBootableVolumesData: Dispatch<UseBootableVolumesValues>;
   setInstanceTypesAndPreferencesData: Dispatch<UseInstanceTypeAndPreferencesValues>;
-  onSelectVolume: (selectedVolume: BootableVolume) => void;
+  onSelectCreatedVolume: (selectedVolume: BootableVolume) => void;
   setActiveNamespace: Dispatch<string>;
   setVMNamespaceTarget: Dispatch<string>;
   resetInstanceTypeVMState: () => void;

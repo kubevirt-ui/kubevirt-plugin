@@ -1,7 +1,7 @@
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
 import { getItemNameWithOther } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';

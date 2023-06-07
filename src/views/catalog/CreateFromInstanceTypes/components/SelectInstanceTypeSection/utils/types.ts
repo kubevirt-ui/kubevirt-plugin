@@ -1,6 +1,6 @@
 import { MutableRefObject } from 'react';
 
-type InstanceTypeSize = 'medium' | 'large' | 'xlarge' | '2xlarge' | '4xlarge' | '8xlarge';
+export type InstanceTypeSize = 'medium' | 'large' | 'xlarge' | '2xlarge' | '4xlarge' | '8xlarge';
 
 export enum InstanceTypeCategory {
   GeneralPurpose = 'GeneralPurpose',

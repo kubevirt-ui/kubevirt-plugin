@@ -1,5 +1,5 @@
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 
 import { DEFAULT_PREFERENCE_LABEL } from '../../../utils/constants';

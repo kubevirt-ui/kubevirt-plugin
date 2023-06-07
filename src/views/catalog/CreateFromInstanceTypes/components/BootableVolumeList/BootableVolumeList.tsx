@@ -1,10 +1,10 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { BootableVolume } from '@catalog/CreateFromInstanceTypes/utils/types';
-import { getBootableVolumePVCSource } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { convertResourceArrayToMap, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
@@ -41,7 +41,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const {
     instanceTypeVMState,
     bootableVolumesData,
-    onSelectVolume,
+    onSelectCreatedVolume,
     instanceTypesAndPreferencesData,
   } = useInstanceTypeVMStore();
 
@@ -159,7 +159,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               rowData={{
                 bootableVolumeSelectedState: !displayShowAllButton
                   ? selectedBootableVolumeState
-                  : [selectedBootableVolume, onSelectVolume],
+                  : [selectedBootableVolume, onSelectCreatedVolume],
                 preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
                 pvcSource: getBootableVolumePVCSource(bs, pvcSources),
               }}
