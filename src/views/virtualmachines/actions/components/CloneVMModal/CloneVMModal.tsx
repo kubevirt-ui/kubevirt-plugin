@@ -87,21 +87,25 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
       await stopVM(vm);
     }
 
-    const cloneRevisionInstanceType = await cloneControllerRevision(
-      updatedVM?.spec?.instancetype?.revisionName,
-      updatedVM.metadata.namespace,
-      vm.metadata.namespace,
-    );
-    const cloneRevisionPreference = await cloneControllerRevision(
-      updatedVM?.spec?.preference?.revisionName,
-      updatedVM.metadata.namespace,
-      vm.metadata.namespace,
-    );
+    const [cloneRevisionInstanceType, cloneRevisionPreference] = await Promise.all([
+      cloneControllerRevision(
+        updatedVM?.spec?.instancetype?.revisionName,
+        updatedVM.metadata.namespace,
+        vm.metadata.namespace,
+      ),
+      cloneControllerRevision(
+        updatedVM?.spec?.preference?.revisionName,
+        updatedVM.metadata.namespace,
+        vm.metadata.namespace,
+      ),
+    ]);
 
     const createdVM = await k8sCreate({ model: VirtualMachineModel, data: updatedVM });
 
-    await updateControllerRevisionOwnerReference(cloneRevisionInstanceType, createdVM);
-    await updateControllerRevisionOwnerReference(cloneRevisionPreference, createdVM);
+    await Promise.all([
+      updateControllerRevisionOwnerReference(cloneRevisionInstanceType, createdVM),
+      updateControllerRevisionOwnerReference(cloneRevisionPreference, createdVM),
+    ]);
 
     history.push(
       `/k8s/ns/${updatedVM.metadata.namespace}/${VirtualMachineModelRef}/${updatedVM.metadata.name}`,
