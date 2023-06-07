@@ -7,7 +7,6 @@ import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitl
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { replaceTemplateVM } from '@kubevirt-utils/resources/template';
 import {
@@ -17,7 +16,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Flex, FlexItem } from '@patternfly/react-core';
+import { Button } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -69,14 +68,7 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
     <div className="template-disks-page">
       <ListPageBody>
         <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
-          <Flex className="list-page-create-button-margin">
-            <FlexItem>
-              <DiskListTitle />
-            </FlexItem>
-            <FlexItem>
-              <SidebarEditorSwitch />
-            </FlexItem>
-          </Flex>
+          <DiskListTitle />
 
           <Button
             className="template-disks-page__button"

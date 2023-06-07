@@ -10,8 +10,6 @@ import { getTemplateProviderName } from '@kubevirt-utils/resources/template';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
-import './template-header-alert.scss';
-
 type CommonTemplateAlertProps = {
   template: V1Template;
 };

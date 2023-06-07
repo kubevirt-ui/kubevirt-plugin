@@ -2,10 +2,20 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
-import { Breadcrumb, BreadcrumbItem, Button, Label, Title } from '@patternfly/react-core';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  Button,
+  Label,
+  Split,
+  SplitItem,
+  Title,
+} from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from './hooks/useIsTemplateEditable';
 import CommonTemplateAlert from './CommonTemplateAlert';
@@ -22,8 +32,12 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
   const lastNamespacePath = useLastNamespacePath();
   const { isCommonTemplate, hasEditPermission } = useEditTemplateAccessReview(template);
 
+  const isSidebarEditorDisplayed = !history.location.pathname.includes(
+    `/templates/${template?.metadata?.name}/${VirtualMachineDetailsTab.YAML}`,
+  );
+
   return (
-    <div className="pf-c-page__main-breadcrumb">
+    <div className="pf-c-page__main-breadcrumb TemplatePageTitle">
       <Breadcrumb>
         <BreadcrumbItem>
           <Button
@@ -45,7 +59,16 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
             {isDeprecatedTemplate(template) && <Label isCompact>{t('Deprecated')}</Label>}
           </span>
         </span>
-        <TemplateActions template={template} />
+        <Split hasGutter>
+          {isSidebarEditorDisplayed && (
+            <SplitItem>
+              <SidebarEditorSwitch />
+            </SplitItem>
+          )}
+          <SplitItem>
+            <TemplateActions template={template} />
+          </SplitItem>
+        </Split>
       </Title>
       {isCommonTemplate && <CommonTemplateAlert template={template} />}
       {!isCommonTemplate && !hasEditPermission && <NoPermissionTemplateAlert />}

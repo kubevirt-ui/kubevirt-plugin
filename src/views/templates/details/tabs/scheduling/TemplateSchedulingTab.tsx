@@ -3,10 +3,9 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
+import { Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -42,10 +41,7 @@ const TemplateSchedulingTab: FC<TemplateSchedulingTabProps> = ({ obj: template }
       <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
         {(resource) => (
           <>
-            <Flex className="template-scheduling-tab__flex">
-              <Title headingLevel="h2">{t('Scheduling and resource requirements')}</Title>
-              <SidebarEditorSwitch />
-            </Flex>
+            <Title headingLevel="h2">{t('Scheduling and resource requirements')}</Title>
             <Grid className="margin-top">
               <GridItem span={5}>
                 <TemplateSchedulingLeftGrid template={resource} editable={isTemplateEditable} />
