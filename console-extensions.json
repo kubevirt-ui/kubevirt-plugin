@@ -445,9 +445,6 @@
         "data-quickstart-id": "qs-nav-virtualmachineclusterinstancetypes",
         "data-test-id": "virtualmachineclusterinstancetypes-nav-item"
       }
-    },
-    "flags": {
-      "required": ["CAN_LIST_NS"]
     }
   },
   {
@@ -476,9 +473,6 @@
         "data-quickstart-id": "qs-nav-virtualmachineclusterpreferences",
         "data-test-id": "virtualmachineclusterpreferences-nav-item"
       }
-    },
-    "flags": {
-      "required": ["CAN_LIST_NS"]
     }
   },
   {
