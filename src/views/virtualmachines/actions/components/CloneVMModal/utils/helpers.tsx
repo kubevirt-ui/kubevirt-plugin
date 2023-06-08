@@ -199,7 +199,9 @@ export const cloneControllerRevision = async (
   revisionName: string,
   destinationNamespace: string,
   originNamespace: string,
-) => {
+): Promise<IoK8sApiAppsV1ControllerRevision | null> => {
+  if (!revisionName) return null;
+
   const destNamespaceCR = await getControllerIfExist(revisionName, destinationNamespace);
 
   if (destNamespaceCR) return destNamespaceCR;
@@ -227,7 +229,9 @@ export const cloneControllerRevision = async (
 export const updateControllerRevisionOwnerReference = (
   controllerRevision: IoK8sApiAppsV1ControllerRevision,
   vm: V1VirtualMachine,
-): Promise<IoK8sApiAppsV1ControllerRevision> => {
+): Promise<IoK8sApiAppsV1ControllerRevision | null> => {
+  if (!controllerRevision) return Promise.resolve(null);
+
   const controllerRevisionWithOwner = produce(controllerRevision, (draftController) => {
     if (!draftController.metadata.ownerReferences) draftController.metadata.ownerReferences = [];
 
