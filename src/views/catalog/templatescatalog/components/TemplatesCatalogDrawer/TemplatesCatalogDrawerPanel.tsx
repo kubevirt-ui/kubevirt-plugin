@@ -175,6 +175,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
                               isOpen={isOpen}
                               onClose={onClose}
                               onSubmit={updateVMCPUMemory(ns, updateVM, setUpdatedVM)}
+                              templateNamespace={template?.metadata?.namespace}
                             />
                           ))
                         }
