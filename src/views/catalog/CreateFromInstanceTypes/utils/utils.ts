@@ -6,6 +6,7 @@ import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
 import { InstanceTypeSize } from '../components/SelectInstanceTypeSection/utils/types';
@@ -19,6 +20,13 @@ import {
 
 const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
+
+const getCloudInitUserNameByOS = (selectedPreferenceName: string): string => {
+  const osPrefix = selectedPreferenceName?.split('.');
+  if (osPrefix?.[0].startsWith(OS_NAME_TYPES.rhel)) return 'cloud-user';
+  if (osPrefix?.[0].startsWith(OS_NAME_TYPES.centos)) return 'centos';
+  return 'fedora';
+};
 
 export const getInstanceTypeState = (defaultInstanceTypeName: string): InstanceTypeState => {
   const [prefix, size] = defaultInstanceTypeName?.split('.');
@@ -46,6 +54,10 @@ export const generateVM = (
 
   const targetNamespace =
     activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : DEFAULT_NAMESPACE;
+
+  const selectedPreference = dataSource?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL];
+
+  const cloudInitUserName = getCloudInitUserNameByOS(selectedPreference);
 
   const emptyVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
@@ -83,7 +95,7 @@ export const generateVM = (
             },
             {
               cloudInitNoCloud: {
-                userData: `#cloud-config\nuser: fedora\npassword: ${generateCloudInitPassword()}\nchpasswd: { expire: False }`,
+                userData: `#cloud-config\nuser: ${cloudInitUserName}\npassword: ${generateCloudInitPassword()}\nchpasswd: { expire: False }`,
               },
               name: 'cloudinitdisk',
             },
@@ -91,12 +103,10 @@ export const generateVM = (
         },
       },
       instancetype: {
-        // inferFromVolume: `${virtualmachineName}-disk`,
         name: instanceTypeName || dataSource?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
       },
       preference: {
-        // inferFromVolume: `${virtualmachineName}-disk`,
-        name: dataSource?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
+        name: selectedPreference,
       },
       dataVolumeTemplates: [
         {
