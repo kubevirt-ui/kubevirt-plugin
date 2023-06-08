@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
@@ -42,10 +41,7 @@ const ClusterPreferenceList: FC<ClusterPreferenceListProps> = ({ kind }) => {
 
   return (
     <>
-      <ListPageHeader
-        title={t('VirtualMachineClusterPreferences')}
-        badge={<DeveloperPreviewLabel />}
-      >
+      <ListPageHeader title={t('VirtualMachineClusterPreferences')}>
         <ListPageCreate createAccessReview={{ groupVersionKind: kind }} groupVersionKind={kind}>
           {t('Create')}
         </ListPageCreate>

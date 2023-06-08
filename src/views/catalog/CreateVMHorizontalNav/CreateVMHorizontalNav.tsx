@@ -56,7 +56,7 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
         </Tab>
         <Tab
           eventKey={CREATE_VM_TAB.INSTANCE_TYPES}
-          title={<CreateVMTabTitle Icon={ImageIcon} titleText={t('InstanceTypes')} badge />}
+          title={<CreateVMTabTitle Icon={ImageIcon} titleText={t('InstanceTypes')} />}
         >
           <CreateFromInstanceType />
         </Tab>

@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
-import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -78,7 +77,7 @@ const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
 
   return (
     <>
-      <ListPageHeader title={t('Bootable resources')} badge={<DeveloperPreviewLabel />}>
+      <ListPageHeader title={t('Bootable resources')}>
         <ListPageCreateDropdown items={createItems} onClick={onCreate}>
           {t('Add bootable resource')}
         </ListPageCreateDropdown>
