@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 import { useVirtualMachineTemplatesCPUMemory } from 'src/views/templates/list/hooks/useVirtualMachineTemplatesCPUMemory';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
+import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';
@@ -25,13 +26,13 @@ type CPUMemoryProps = {
   template: V1Template;
 };
 
-const CPUMemory: React.FC<CPUMemoryProps> = ({ template }) => {
+const CPUMemory: FC<CPUMemoryProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const CPUMemData = useVirtualMachineTemplatesCPUMemory(template);
   const { createModal } = useModal();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
-  const onSubmitCPU = React.useCallback(
+  const onSubmitCPU = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
         model: TemplateModel,
@@ -62,6 +63,7 @@ const CPUMemory: React.FC<CPUMemoryProps> = ({ template }) => {
           bodyContent={
             <CPUDescription
               cpu={getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.cpu}
+              helperTextResource={CpuMemHelperTextResources.Template}
             />
           }
         >
