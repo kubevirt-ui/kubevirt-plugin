@@ -7,7 +7,6 @@ import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescri
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
@@ -99,9 +98,6 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                       {t('Edit')}
                       <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
                     </Button>
-                  </FlexItem>
-                  <FlexItem>
-                    <SidebarEditorSwitch />
                   </FlexItem>
                 </Flex>
               </DescriptionListTermHelpText>

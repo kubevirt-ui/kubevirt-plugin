@@ -4,10 +4,9 @@ import { RouteComponentProps } from 'react-router-dom';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Flex, FlexItem, Title } from '@patternfly/react-core';
+import { Button, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -45,14 +44,9 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
     <div className="template-network-tab">
       <ListPageBody>
         <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
-          <Flex className="list-page-create-button-margin">
-            <FlexItem>
-              <Title headingLevel="h2">{t('Network interfaces')}</Title>
-            </FlexItem>
-            <FlexItem>
-              <SidebarEditorSwitch />
-            </FlexItem>
-          </Flex>
+          <Title headingLevel="h2" className="list-page-create-button-margin">
+            {t('Network interfaces')}
+          </Title>
 
           <Button
             className="template-network-tab__button"

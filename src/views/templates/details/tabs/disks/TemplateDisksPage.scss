@@ -6,19 +6,14 @@
   }
 
   .pf-c-sidebar__panel {
-    padding-top: var(--pf-global--spacer--md);
+    padding-top: var(--pf-global--spacer--lg);
   }
 
   &__button {
     margin: 0 0 0.5rem 0;
   }
 
-  .pf-l-flex {
-    align-items: center;
-  }
-
   .disk-list-title {
-    margin-right: 0;
-    margin-top: 0;
+    margin: 1.5rem 0 1rem 0;
   }
 }

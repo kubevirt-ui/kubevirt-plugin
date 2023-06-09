@@ -5,7 +5,6 @@ import { useImmer } from 'use-immer';
 import { TemplateModel, TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -14,7 +13,6 @@ import {
   AlertVariant,
   Button,
   Divider,
-  Flex,
   Form,
   PageSection,
   Title,
@@ -83,10 +81,8 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
         onChange={(newTemplate) => setEditableTemplate(newTemplate)}
       >
         <Form className="template-parameters-page__form">
-          <Flex className="template-parameters-page__flex">
-            <Title headingLevel="h2">{t('Parameters')}</Title>
-            <SidebarEditorSwitch />
-          </Flex>
+          <Title headingLevel="h2">{t('Parameters')}</Title>
+
           {parameters.map((parameter, index) => (
             <>
               <ParameterEditor
