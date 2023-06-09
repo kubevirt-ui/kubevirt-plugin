@@ -2,6 +2,7 @@ import React, { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
@@ -26,7 +27,6 @@ import { checkCPUMemoryChanged } from '../PendingChanges/utils/helpers';
 
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
 import { getCPUcores, getMemorySize, memorySizesTypes } from './utils/CpuMemoryUtils';
-import { COMMON_TEMPLATE_DEFAULT_NAMESPACE } from './constants';
 
 import './cpu-memory-modal.scss';
 
@@ -36,9 +36,17 @@ type CPUMemoryModalProps = {
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vmi?: V1VirtualMachineInstance;
+  templateNamespace?: string;
 };
 
-const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, onSubmit, vmi }) => {
+const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
+  vm,
+  isOpen,
+  onClose,
+  onSubmit,
+  vmi,
+  templateNamespace = DEFAULT_NAMESPACE,
+}) => {
   const { t } = useKubevirtTranslation();
   const {
     data: templateDefaultsData,
@@ -46,8 +54,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ vm, isOpen, onClose, onSubmit
     error: defaultLoadError,
   } = useTemplateDefaultCpuMemory(
     vm?.metadata?.labels?.['vm.kubevirt.io/template'],
-    vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'] ||
-      COMMON_TEMPLATE_DEFAULT_NAMESPACE,
+    vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'] || templateNamespace,
   );
   const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
   const [updateError, setUpdateError] = useState<string>();
