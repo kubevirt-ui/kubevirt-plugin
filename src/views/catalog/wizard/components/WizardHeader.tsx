@@ -2,12 +2,15 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
+import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Breadcrumb,
   BreadcrumbItem,
   Button,
+  Split,
   Text,
   TextVariants,
   Title,
@@ -25,8 +28,12 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
   const onBreadcrumbClick = (url: string) =>
     confirm(t('Are you sure you want to leave this page?')) && history.push(url);
 
+  const isSidebarEditorDisplayed = !history.location.pathname.includes(
+    `/templatescatalog/review/${VirtualMachineDetailsTab.YAML}`,
+  );
+
   return (
-    <div className="pf-c-page__main-breadcrumb">
+    <div className="pf-c-page__main-breadcrumb wizard-header">
       <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
         <BreadcrumbItem>
           <Button
@@ -56,7 +63,10 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
         </BreadcrumbItem>
         <BreadcrumbItem>{t('Review')}</BreadcrumbItem>
       </Breadcrumb>
-      <Title headingLevel="h1">{t('Review and create VirtualMachine')}</Title>
+      <Split hasGutter>
+        <Title headingLevel="h1">{t('Review and create VirtualMachine')}</Title>
+        {isSidebarEditorDisplayed && <SidebarEditorSwitch />}
+      </Split>
       <Text component={TextVariants.small} data-test="wizard title help">
         {t('Template: {{templateDisplayName}}', { templateDisplayName })}
       </Text>

@@ -1,13 +1,12 @@
 .wizard-metadata-tab {
 
-    .wizard-description-item__title {
-        justify-content: space-between;
-        flex: 1;
-      }
+  .wizard-description-item__title {
+    justify-content: space-between;
+    flex: 1;
+  }
 
-    &__description-list {
-        max-width: 700px;
-        margin-top: var(--pf-global--spacer--md);
-    }
-      
+  &__description-list {
+    max-width: 700px;
+    margin-top: var(--pf-global--spacer--md);
+  }    
 }

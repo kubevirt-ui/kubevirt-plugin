@@ -3,7 +3,6 @@ import * as React from 'react';
 import { WizardTab } from '@catalog/wizard/tabs';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { PageSection } from '@patternfly/react-core';
 
@@ -19,12 +18,7 @@ const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
         onResourceUpdate={updateVM}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.SCHEDULING_TAB}
       >
-        {(resource) => (
-          <>
-            <SidebarEditorSwitch />
-            <WizardSchedulingGrid vm={resource} updateVM={updateVM} />
-          </>
-        )}
+        {(resource) => <WizardSchedulingGrid vm={resource} updateVM={updateVM} />}
       </SidebarEditor>
     </PageSection>
   );

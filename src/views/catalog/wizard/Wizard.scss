@@ -31,3 +31,9 @@
   background: var(--pf-c-page__main-section--m-light--BackgroundColor);
   z-index: 1000;
 }
+
+.wizard-header {
+  .pf-l-split {
+    justify-content: space-between;
+  }
+}

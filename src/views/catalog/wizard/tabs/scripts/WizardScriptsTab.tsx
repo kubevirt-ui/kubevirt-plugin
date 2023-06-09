@@ -7,7 +7,6 @@ import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescri
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
@@ -33,7 +32,6 @@ const WizardScriptsTab: WizardTab = ({ vm, updateVM }) => {
         onResourceUpdate={(newVM) => updateVM(newVM)}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.SCRIPTS_TAB}
       >
-        <SidebarEditorSwitch />
         <DescriptionList className="wizard-scripts-tab__description-list">
           <DescriptionListDescription>
             <AlertScripts />

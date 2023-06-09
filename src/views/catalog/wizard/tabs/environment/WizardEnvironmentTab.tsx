@@ -17,12 +17,7 @@ const WizardEnvironmentTab: WizardTab = ({ vm, updateVM, setDisableVmCreate }) =
 
   return (
     <PageSection className="wizard-environment-tab">
-      <EnvironmentForm
-        vm={vm}
-        onEditChange={setDisableVmCreate}
-        updateVM={updateVM}
-        displayYAMLSwitcher
-      />
+      <EnvironmentForm vm={vm} onEditChange={setDisableVmCreate} updateVM={updateVM} />
     </PageSection>
   );
 };
