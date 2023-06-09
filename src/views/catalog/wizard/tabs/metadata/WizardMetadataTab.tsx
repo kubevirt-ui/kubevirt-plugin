@@ -5,7 +5,6 @@ import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/An
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { DescriptionList, PageSection, pluralize } from '@patternfly/react-core';
@@ -29,7 +28,6 @@ const WizardMetadataTab: WizardTab = ({ vm, updateVM, loaded }) => {
       >
         {(resource) => (
           <>
-            <SidebarEditorSwitch />
             <DescriptionList className="wizard-metadata-tab__description-list">
               <WizardDescriptionItem
                 title={t('Labels')}

@@ -5,7 +5,6 @@ import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitl
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -42,14 +41,7 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsD
           onResourceUpdate={(newVM) => updateVM(newVM)}
           pathsToHighlight={PATHS_TO_HIGHLIGHT.DISKS_TAB}
         >
-          <Flex>
-            <FlexItem>
-              <DiskListTitle />
-            </FlexItem>
-            <FlexItem>
-              <SidebarEditorSwitch />
-            </FlexItem>
-          </Flex>
+          <DiskListTitle />
 
           <ListPageCreateButton
             className="wizard-disk-tab__list-page-create-button"

@@ -22,15 +22,9 @@ type EnvironmentFormProps = {
   vm: V1VirtualMachine;
   onEditChange?: (edited: boolean) => void;
   updateVM: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  displayYAMLSwitcher?: boolean;
 };
 
-const EnvironmentForm: FC<EnvironmentFormProps> = ({
-  vm,
-  onEditChange,
-  updateVM,
-  displayYAMLSwitcher,
-}) => {
+const EnvironmentForm: FC<EnvironmentFormProps> = ({ vm, onEditChange, updateVM }) => {
   const [temporaryVM, setTemporaryVM] = useImmer(vm);
 
   const { t } = useKubevirtTranslation();
@@ -64,7 +58,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({
     [environments],
   );
 
-  if (!loaded) return <EnvironmentFormSkeleton displayYAMLSwitcher={displayYAMLSwitcher} />;
+  if (!loaded) return <EnvironmentFormSkeleton />;
 
   return (
     <SidebarEditor<V1VirtualMachine>
@@ -72,7 +66,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({
       onChange={setTemporaryVM}
       pathsToHighlight={PATHS_TO_HIGHLIGHT.ENV_TAB}
     >
-      <EnvironmentFormTitle displayYAMLSwitcher={displayYAMLSwitcher} />
+      <EnvironmentFormTitle />
       <Form className="environment-form__form">
         {environments.length !== 0 && (
           <div className="row pairs-list__heading">
