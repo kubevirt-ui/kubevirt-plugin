@@ -11,19 +11,19 @@ import { FormGroup, Radio } from '@patternfly/react-core';
 
 type UploadPVCFormModeVolumeModeVolumeModeProps = {
   accessMode: AccessMode;
+  loaded: boolean;
   onChange: (volumeMode: string) => void;
   provisioner: string;
   storageClass: string;
-  loaded: boolean;
   volumeMode: string;
 };
 
 const UploadPVCFormModeVolumeMode: React.FC<UploadPVCFormModeVolumeModeVolumeModeProps> = ({
   accessMode,
+  loaded,
   onChange,
   provisioner,
   storageClass,
-  loaded,
   volumeMode,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -34,27 +34,27 @@ const UploadPVCFormModeVolumeMode: React.FC<UploadPVCFormModeVolumeModeVolumeMod
   );
 
   return (
-    <FormGroup fieldId="volume-mode" label={t('Volume mode')} isRequired>
+    <FormGroup fieldId="volume-mode" isRequired label={t('Volume mode')}>
       {allowedVolumeModes?.length === 1 ? (
         <>
           {allowedVolumeModes?.[0]}
 
-          <Trans t={t} ns="plugin__kubevirt-plugin">
+          <Trans ns="plugin__kubevirt-plugin" t={t}>
             Only {{ volumeMode }} volume mode is available for {{ storageClass }} with{' '}
             {{ accessMode }} access mode
           </Trans>
         </>
       ) : (
-        getVolumeModeRadioOptions(t).map(({ value, label }) => (
+        getVolumeModeRadioOptions(t).map(({ label, value }) => (
           <Radio
-            value={value}
-            label={label}
-            id={value}
-            key={value}
-            onChange={(_, event) => onChange(event?.currentTarget?.value)}
             checked={value === volumeMode}
-            name="volumeMode"
+            id={value}
             isDisabled={!allowedVolumeModes?.includes(value)}
+            key={value}
+            label={label}
+            name="volumeMode"
+            onChange={(_, event) => onChange(event?.currentTarget?.value)}
+            value={value}
           />
         ))
       )}

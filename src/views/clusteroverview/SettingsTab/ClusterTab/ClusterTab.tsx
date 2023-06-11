@@ -18,10 +18,10 @@ const ClusterTab: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const {
-    featureEnabled: instanceTypesEnabled,
-    toggleFeature: toggleInstanceTypesFeature,
     canEdit,
+    featureEnabled: instanceTypesEnabled,
     loading,
+    toggleFeature: toggleInstanceTypesFeature,
   } = usePreviewFeatures(INSTANCE_TYPE_ENABLED);
 
   const [isChecked, setIsChecked] = useState(false);
@@ -46,14 +46,14 @@ const ClusterTab: FC = () => {
       <ExpandSection toggleText={t('Preview features')}>
         {!loading ? (
           <Checkbox
-            id="tp-instance-type"
-            isChecked={isChecked}
             onClick={(event) => {
               toggleInstanceTypesFeature(event.currentTarget.checked);
               setIsChecked(event.currentTarget.checked);
             }}
-            label={t('Enable create VirtualMachine from InstanceType')}
+            id="tp-instance-type"
+            isChecked={isChecked}
             isDisabled={!canEdit}
+            label={t('Enable create VirtualMachine from InstanceType')}
           />
         ) : (
           <Loading />

@@ -11,19 +11,19 @@ import {
 import { MigrationPolicyConfigurationOption } from '../../utils/constants';
 
 type MigrationPolicyConfigurationDropdownProps = {
-  state: InitialMigrationPolicyState | EditMigrationPolicyInitialState;
-  setState: React.Dispatch<
-    React.SetStateAction<InitialMigrationPolicyState | EditMigrationPolicyInitialState>
-  >;
-  options: MigrationPolicyConfigurationOption;
   isDisabled: boolean;
+  options: MigrationPolicyConfigurationOption;
+  setState: React.Dispatch<
+    React.SetStateAction<EditMigrationPolicyInitialState | InitialMigrationPolicyState>
+  >;
+  state: EditMigrationPolicyInitialState | InitialMigrationPolicyState;
 };
 
 const MigrationPolicyConfigurationDropdown: React.FC<MigrationPolicyConfigurationDropdownProps> = ({
-  state,
-  setState,
-  options,
   isDisabled,
+  options,
+  setState,
+  state,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -34,26 +34,26 @@ const MigrationPolicyConfigurationDropdown: React.FC<MigrationPolicyConfiguratio
   };
   return (
     <Dropdown
-      menuAppendTo="parent"
-      className="migration-policy__form-config-dropdown"
-      data-test-id="migration-policies-configurations"
-      isOpen={isOpen}
+      dropdownItems={Object.entries(options).map(([key, { defaultValue, description, label }]) => (
+        <DropdownItem
+          data-test-id={key}
+          description={description}
+          isDisabled={key in state}
+          key={key}
+          onClick={() => handleOptionClick(key, defaultValue)}
+        >
+          {label}
+        </DropdownItem>
+      ))}
       toggle={
         <DropdownToggle isDisabled={isDisabled} onToggle={setIsOpen}>
           {t('Add configuration')}
         </DropdownToggle>
       }
-      dropdownItems={Object.entries(options).map(([key, { label, description, defaultValue }]) => (
-        <DropdownItem
-          data-test-id={key}
-          key={key}
-          onClick={() => handleOptionClick(key, defaultValue)}
-          isDisabled={key in state}
-          description={description}
-        >
-          {label}
-        </DropdownItem>
-      ))}
+      className="migration-policy__form-config-dropdown"
+      data-test-id="migration-policies-configurations"
+      isOpen={isOpen}
+      menuAppendTo="parent"
     />
   );
 };

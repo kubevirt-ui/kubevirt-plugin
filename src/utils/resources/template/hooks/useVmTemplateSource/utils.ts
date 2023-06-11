@@ -25,22 +25,22 @@ import { BOOT_SOURCE } from '../../utils/constants';
 import { getTemplateVirtualMachineObject } from '../../utils/selectors';
 
 export type TemplateBootSource = {
-  type: BOOT_SOURCE;
   source: {
-    sourceRef?: V1beta1DataVolumeSourceRef;
-    pvc?: V1beta1DataVolumeSourcePVC;
-    http?: V1beta1DataVolumeSourceHTTP;
-    registry?: V1beta1DataVolumeSourceRegistry;
     containerDisk?: V1ContainerDiskSource;
+    http?: V1beta1DataVolumeSourceHTTP;
+    pvc?: V1beta1DataVolumeSourcePVC;
+    registry?: V1beta1DataVolumeSourceRegistry;
+    sourceRef?: V1beta1DataVolumeSourceRef;
   };
   sourceValue?: {
-    sourceRef?: V1alpha1PersistentVolumeClaim;
-    pvc?: V1alpha1PersistentVolumeClaim;
-    http?: V1beta1DataVolumeSourceHTTP;
-    registry?: V1beta1DataVolumeSourceRegistry;
     containerDisk?: V1ContainerDiskSource;
+    http?: V1beta1DataVolumeSourceHTTP;
+    pvc?: V1alpha1PersistentVolumeClaim;
+    registry?: V1beta1DataVolumeSourceRegistry;
+    sourceRef?: V1alpha1PersistentVolumeClaim;
   };
   storageClassName?: string;
+  type: BOOT_SOURCE;
 };
 
 /**
@@ -120,11 +120,11 @@ export const isDataSourceCloning = (dataSource: V1beta1DataSource): boolean =>
       c.type === 'Ready' &&
       c.status === 'False' &&
       [
-        'CloneScheduled',
         'CloneInProgress',
-        'SnapshotForSmartCloneInProgress',
+        'CloneScheduled',
         'Pending',
         'PVCBound',
+        'SnapshotForSmartCloneInProgress',
       ].includes(c?.reason),
   );
 

@@ -8,14 +8,14 @@ const FilesystemListTitle = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <Title headingLevel="h2" className="title">
+    <Title className="title" headingLevel="h2">
       {t('File systems')}{' '}
       <HelpTextIcon
         bodyContent={t(
           'The following information regarding how the disks are partitioned is provided by the guest agent.',
         )}
-        position={PopoverPosition.right}
         helpIconClassName="title-help-text-icon"
+        position={PopoverPosition.right}
       />
     </Title>
   );

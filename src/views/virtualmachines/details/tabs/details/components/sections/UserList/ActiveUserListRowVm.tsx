@@ -11,20 +11,20 @@ import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 type ActiveUserListRowProps = RowProps<V1VirtualMachineInstanceGuestOSUser, { kind: string }>;
 
-const ActiveUserListRowVm: React.FC<ActiveUserListRowProps> = ({ obj, activeColumnIDs }) => {
+const ActiveUserListRowVm: React.FC<ActiveUserListRowProps> = ({ activeColumnIDs, obj }) => {
   const time = obj?.loginTime * MILLISECONDS_TO_SECONDS_MULTIPLIER;
   return (
     <>
-      <TableData id="userName" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="userName">
         {obj?.userName || NO_DATA_DASH}
       </TableData>
-      <TableData id="domain" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="domain">
         {obj?.domain || NO_DATA_DASH}
       </TableData>
-      <TableData id="loginTime" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="loginTime">
         <Timestamp timestamp={time} />
       </TableData>
-      <TableData id="elapsedTime" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="elapsedTime">
         {fromNow(new Date(time), new Date())}
       </TableData>
     </>

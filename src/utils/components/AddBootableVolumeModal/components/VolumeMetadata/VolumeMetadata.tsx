@@ -15,25 +15,25 @@ import PreferenceSelect from './components/PreferenceSelect/PreferenceSelect';
 
 type VolumeMetadataProps = {
   bootableVolume: AddBootableVolumeState;
-  setBootableVolumeField: (key: string, fieldKey?: string) => (value: string) => void;
   preferencesNames: string[];
+  setBootableVolumeField: (key: string, fieldKey?: string) => (value: string) => void;
 };
 
 const VolumeMetadata: FC<VolumeMetadataProps> = ({
   bootableVolume,
-  setBootableVolumeField,
   preferencesNames,
+  setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const { labels, annotations } = bootableVolume || {};
+  const { annotations, labels } = bootableVolume || {};
 
   return (
     <>
       <PreferenceSelect
+        preferencesNames={preferencesNames}
         selectedPreference={labels?.[DEFAULT_PREFERENCE_LABEL]}
         setBootableVolumeField={setBootableVolumeField}
-        preferencesNames={preferencesNames}
       />
 
       <InstanceTypeDrilldownSelect
@@ -43,8 +43,8 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
       <FormGroup label={t('Description')}>
         <TextInput
           id="description"
-          value={annotations?.description}
           onChange={setBootableVolumeField('annotations', ANNOTATIONS.description)}
+          value={annotations?.description}
         />
       </FormGroup>
     </>

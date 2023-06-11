@@ -9,7 +9,7 @@ const VirtualMachineConsolePageTitle = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <Title headingLevel="h2" className="virtual-machine-console-page-title">
+    <Title className="virtual-machine-console-page-title" headingLevel="h2">
       {t('Console')}
     </Title>
   );

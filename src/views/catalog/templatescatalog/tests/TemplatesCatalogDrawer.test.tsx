@@ -17,12 +17,12 @@ const mockHistoryPush = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: jest.fn(() => ({
-    ns: DEFAULT_NAMESPACE,
-  })),
   useHistory: () => ({
     push: mockHistoryPush,
   }),
+  useParams: jest.fn(() => ({
+    ns: DEFAULT_NAMESPACE,
+  })),
 }));
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
@@ -30,24 +30,23 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => {
   const processedTemplate = require('./mocks').containerTemplateMock;
   return {
     k8sCreate: jest.fn().mockResolvedValue(processedTemplate),
-    useK8sWatchResource: jest.fn(() => [[], true]),
+    useAccessReview: jest.fn().mockReturnValue([true, false]),
     useK8sModels: jest.fn(() => [
       {
         [`${VirtualMachineModelRef}`]: VirtualMachineModel,
       },
       true,
     ]),
-    useAccessReview: jest.fn().mockReturnValue([true, false]),
+    useK8sWatchResource: jest.fn(() => [[], true]),
   };
 });
 
 jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => ({
   useVmTemplateSource: () => ({
+    error: null,
     isBootSourceAvailable: true,
     loaded: true,
-    error: null,
     templateBootSource: {
-      type: BOOT_SOURCE.REGISTRY,
       source: {
         registry: {
           url: 'node:16',
@@ -58,6 +57,7 @@ jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => 
           url: 'node:16',
         },
       },
+      type: BOOT_SOURCE.REGISTRY,
     },
   }),
 }));
@@ -71,10 +71,10 @@ const renderWithWizardContext = ({ children }) => (
 test('TemplatesCatalogDrawer', async () => {
   const handleClose = jest.fn();
 
-  const { getByText, getAllByText, getByTestId } = render(
+  const { getAllByText, getByTestId, getByText } = render(
     <TemplatesCatalogDrawer
-      namespace={DEFAULT_NAMESPACE}
       isOpen
+      namespace={DEFAULT_NAMESPACE}
       onClose={handleClose}
       template={containerTemplateMock}
     />,

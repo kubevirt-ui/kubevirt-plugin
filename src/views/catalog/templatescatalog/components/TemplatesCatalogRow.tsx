@@ -26,20 +26,20 @@ export const TemplatesCatalogRow: React.FC<
   RowProps<
     V1Template,
     {
-      onTemplateClick: (template: V1Template) => void;
-      availableTemplatesUID: Set<string>;
       availableDatasources: Record<string, V1beta1DataSource>;
+      availableTemplatesUID: Set<string>;
+      onTemplateClick: (template: V1Template) => void;
     }
   >
 > = React.memo(
   ({
-    obj,
     activeColumnIDs,
-    rowData: { onTemplateClick, availableTemplatesUID, availableDatasources },
+    obj,
+    rowData: { availableDatasources, availableTemplatesUID, onTemplateClick },
   }) => {
     const { t } = useKubevirtTranslation();
     const bootSource = getTemplateBootSourceType(obj);
-    const { memory, cpuCount } = getTemplateFlavorData(obj);
+    const { cpuCount, memory } = getTemplateFlavorData(obj);
     const workload = getTemplateWorkload(obj);
     const dataSource =
       availableDatasources[
@@ -48,9 +48,9 @@ export const TemplatesCatalogRow: React.FC<
 
     return (
       <>
-        <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-40">
-          <img src={getTemplateOSIcon(obj)} alt="" className="vm-catalog-row-icon" />
-          <Button variant="link" isInline onClick={() => onTemplateClick(obj)}>
+        <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-40" id="name">
+          <img alt="" className="vm-catalog-row-icon" src={getTemplateOSIcon(obj)} />
+          <Button isInline onClick={() => onTemplateClick(obj)} variant="link">
             {getTemplateName(obj)}{' '}
             {!isEmpty(getAnnotation(obj, ANNOTATIONS.displayName)) && (
               <Label isCompact variant="outline">
@@ -59,16 +59,16 @@ export const TemplatesCatalogRow: React.FC<
             )}
           </Button>
         </TableData>
-        <TableData id="workload" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
+        <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id="workload">
           {WORKLOADS_LABELS?.[workload]}
         </TableData>
-        <TableData id="source" activeColumnIDs={activeColumnIDs}>
+        <TableData activeColumnIDs={activeColumnIDs} id="source">
           <TemplateRowAvailableSource
-            source={getVMBootSourceLabel(bootSource?.type, dataSource)}
             isBootSourceAvailable={availableTemplatesUID.has(obj.metadata.uid)}
+            source={getVMBootSourceLabel(bootSource?.type, dataSource)}
           />
         </TableData>
-        <TableData id="cpu" activeColumnIDs={activeColumnIDs} className="pf-m-width-20">
+        <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="cpu">
           {t('CPU')} {cpuCount} | {t('Memory')} {readableSizeUnit(memory)}
         </TableData>
       </>

@@ -4,30 +4,30 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 type VirtualMachineInstancePageNetworkTabRowProps = {
-  obj: any;
   activeColumnIDs: Set<string>;
+  obj: any;
 };
 
 const VirtualMachineInstancePageNetworkTabRow: React.FC<
   VirtualMachineInstancePageNetworkTabRowProps
-> = ({ obj: { iface, network }, activeColumnIDs }) => {
+> = ({ activeColumnIDs, obj: { iface, network } }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="name">
         {network?.name}
       </TableData>
-      <TableData id="model" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="model">
         {iface?.model || '-'}
       </TableData>
-      <TableData id="network" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="network">
         {network?.pod ? t('Pod networking') : network?.multus?.networkName || '-'}
       </TableData>
-      <TableData id="type" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="type">
         {iface?.masquerade ? t('masquerade') : '-'}
       </TableData>
-      <TableData id="macAddress" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="macAddress">
         {iface?.macAddress}
       </TableData>
     </>

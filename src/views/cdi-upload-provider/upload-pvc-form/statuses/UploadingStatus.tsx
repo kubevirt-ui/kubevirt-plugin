@@ -20,9 +20,9 @@ import { UploadingStatusProps } from '../../utils/types';
 import { getProgressVariant } from '../../utils/utils';
 
 const UploadingStatus: React.FC<UploadingStatusProps> = ({
-  upload,
-  onSuccessClick,
   onCancelClick,
+  onSuccessClick,
+  upload,
 }) => {
   const { t } = useKubevirtTranslation();
   return (
@@ -38,8 +38,8 @@ const UploadingStatus: React.FC<UploadingStatusProps> = ({
               <Alert
                 className="kv--create-upload__alert"
                 isInline
-                variant={AlertVariant.warning}
                 title={t('Please don’t close this browser tab')}
+                variant={AlertVariant.warning}
               >
                 {t('Closing it will cause the upload to fail. You may still navigate the console.')}
               </Alert>
@@ -56,7 +56,7 @@ const UploadingStatus: React.FC<UploadingStatusProps> = ({
         </Stack>
       </EmptyStateBody>
       {onSuccessClick && (
-        <Button id="cdi-upload-primary-pvc" variant="primary" onClick={onSuccessClick}>
+        <Button id="cdi-upload-primary-pvc" onClick={onSuccessClick} variant="primary">
           {t('View Persistent Volume Claim details')}
         </Button>
       )}

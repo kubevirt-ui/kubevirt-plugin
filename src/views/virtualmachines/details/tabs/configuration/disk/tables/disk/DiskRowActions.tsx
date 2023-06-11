@@ -18,16 +18,16 @@ import { getEditDiskStates } from './utils/getEditDiskStates';
 import { isHotplugVolume } from './utils/helpers';
 
 type DiskRowActionsProps = {
-  vm: V1VirtualMachine;
   diskName: string;
   pvcResourceExists: boolean;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const DiskRowActions: React.FC<DiskRowActionsProps> = ({
-  vm,
   diskName,
   pvcResourceExists,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -38,7 +38,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
   const isEditDisabled = isVMRunning || pvcResourceExists;
 
-  const { initialDiskState, initialDiskSourceState } =
+  const { initialDiskSourceState, initialDiskState } =
     !isEditDisabled && getEditDiskStates(vm, diskName, vmi);
   const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
   const volume = volumes?.find(({ name }) => name === diskName);
@@ -59,22 +59,22 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
 
   const onSubmit = (updatedVM) =>
     k8sUpdate({
-      model: VirtualMachineModel,
       data: updatedVM,
-      ns: updatedVM?.metadata?.namespace,
+      model: VirtualMachineModel,
       name: updatedVM?.metadata?.name,
+      ns: updatedVM?.metadata?.namespace,
     });
 
   const createEditDiskModal = () =>
     createModal(({ isOpen, onClose }) => (
       <EditDiskModal
-        vm={vm}
+        headerText={t('Edit disk')}
+        initialDiskSourceState={initialDiskSourceState}
+        initialDiskState={initialDiskState}
         isOpen={isOpen}
         onClose={onClose}
-        headerText={t('Edit disk')}
         onSubmit={onSubmit}
-        initialDiskState={initialDiskState}
-        initialDiskSourceState={initialDiskSourceState}
+        vm={vm}
       />
     ));
 
@@ -94,22 +94,22 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
 
   const items = [
     <DropdownItem
-      onClick={() => onModalOpen(createEditDiskModal)}
-      key="disk-edit"
-      isDisabled={isEditDisabled}
       description={disabledEditText}
+      isDisabled={isEditDisabled}
+      key="disk-edit"
+      onClick={() => onModalOpen(createEditDiskModal)}
     >
       {editBtnText}
     </DropdownItem>,
     <DropdownItem
-      onClick={() => onModalOpen(createDeleteDiskModal)}
-      key="disk-delete"
-      isDisabled={!isHotplug && isVMRunning}
       description={
         !isHotplug && isVMRunning
           ? t('Can detach only hotplug volumes while VirtualMachine is Running')
           : null
       }
+      isDisabled={!isHotplug && isVMRunning}
+      key="disk-delete"
+      onClick={() => onModalOpen(createDeleteDiskModal)}
     >
       {deleteBtnText}
     </DropdownItem>,
@@ -118,9 +118,9 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
   if (isHotplug) {
     items.push(
       <DropdownItem
-        onClick={() => onModalOpen(makePersistent)}
-        key="make-persistent"
         description={t('Will make disk persistent on next reboot')}
+        key="make-persistent"
+        onClick={() => onModalOpen(makePersistent)}
       >
         {removeHotplugBtnText}
       </DropdownItem>,
@@ -129,13 +129,13 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
   return (
     <>
       <Dropdown
-        menuAppendTo={getContentScrollableElement}
-        onSelect={() => setIsDropdownOpen(false)}
-        toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-6" />}
+        dropdownItems={items}
         isOpen={isDropdownOpen}
         isPlain
-        dropdownItems={items}
+        menuAppendTo={getContentScrollableElement}
+        onSelect={() => setIsDropdownOpen(false)}
         position={DropdownPosition.right}
+        toggle={<KebabToggle id="toggle-id-6" onToggle={setIsDropdownOpen} />}
       />
     </>
   );

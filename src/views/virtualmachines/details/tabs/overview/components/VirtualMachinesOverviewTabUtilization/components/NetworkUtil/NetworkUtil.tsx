@@ -21,36 +21,36 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration } = useDuration();
   const queries = React.useMemo(
-    () => getUtilizationQueries({ obj: vmi, duration }),
+    () => getUtilizationQueries({ duration, obj: vmi }),
     [vmi, duration],
   );
   const interfacesNames = useMemo(() => vmi?.spec?.domain?.devices?.interfaces, [vmi]);
   const [networkIn] = usePrometheusPoll({
-    query: queries?.NETWORK_IN_USAGE,
     endpoint: PrometheusEndpoint?.QUERY,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.NETWORK_IN_USAGE,
   });
 
   const [networkTotal] = usePrometheusPoll({
-    query: queries?.NETWORK_TOTAL_BY_INTERFACE_USAGE,
     endpoint: PrometheusEndpoint?.QUERY,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.NETWORK_TOTAL_BY_INTERFACE_USAGE,
   });
 
   const [networkOut] = usePrometheusPoll({
-    query: queries?.NETWORK_OUT_USAGE,
     endpoint: PrometheusEndpoint?.QUERY,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.NETWORK_OUT_USAGE,
   });
   const networkInterfaceTotal = Number(networkTotal?.data?.result?.[0]?.value?.[1])?.toFixed(2);
   const networkInData = +networkIn?.data?.result?.[0]?.value?.[1];
   const networkOutData = +networkOut?.data?.result?.[0]?.value?.[1];
   const totalTransferred = xbytes(networkInData + networkOutData || 0, {
-    iec: true,
     fixed: 0,
+    iec: true,
   });
   const isReady = !isEmpty(networkInData) || !isEmpty(networkOutData);
 
@@ -65,7 +65,7 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
                 <Text component={TextVariants.h3}>{t('Network transfer breakdown')}</Text>
                 <Text component={TextVariants.h6}>{t('Top consumer')}</Text>
                 {interfacesNames?.map((networkInterface) => (
-                  <div key={networkInterface?.name} className="network-popover">
+                  <div className="network-popover" key={networkInterface?.name}>
                     <Link
                       to={`${getResourceUrl({
                         model: VirtualMachineModel,
@@ -102,7 +102,7 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
             position="bottom"
           >
             <div>
-              <Button variant={ButtonVariant.link} isInline>
+              <Button isInline variant={ButtonVariant.link}>
                 {t('Breakdown by network')}
               </Button>
             </div>

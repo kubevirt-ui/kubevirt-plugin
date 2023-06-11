@@ -31,7 +31,7 @@ const AffinityExpressionRow: React.FC<AffinityExpressionRowProps> = ({
   rowID = 'affinity',
 }) => {
   const { t } = useKubevirtTranslation();
-  const { id, key, values = [], operator } = expression;
+  const { id, key, operator, values = [] } = expression;
   const enableValueField = operator !== Operator.Exists && operator !== Operator.DoesNotExist;
   const [isOperatorExpended, setIsOperatorExpended] = React.useState(false);
   const [isValuesExpanded, setIsValuesExpanded] = React.useState(false);
@@ -54,22 +54,22 @@ const AffinityExpressionRow: React.FC<AffinityExpressionRowProps> = ({
       <GridItem span={4}>
         <TextInput
           id={`${rowID}-${id}-key-input`}
-          placeholder={t('key')}
           isRequired
+          onChange={(newKey) => onChange({ ...expression, key: newKey })}
+          placeholder={t('key')}
           type="text"
           value={key}
-          onChange={(newKey) => onChange({ ...expression, key: newKey })}
         />
       </GridItem>
       <GridItem span={2}>
         <Select
-          menuAppendTo="parent"
           id={`${rowID}-${id}-effect-select`}
-          value={operator}
           isOpen={isOperatorExpended}
-          onToggle={setIsOperatorExpended}
+          menuAppendTo="parent"
           onSelect={onSelectOperator}
+          onToggle={setIsOperatorExpended}
           selections={operator}
+          value={operator}
         >
           {[Operator.Exists, Operator.DoesNotExist, Operator.In, Operator.NotIn].map(
             (operatorOption) => (
@@ -81,17 +81,17 @@ const AffinityExpressionRow: React.FC<AffinityExpressionRowProps> = ({
       <GridItem span={5}>
         <Select
           className="affinity-edit-row__values-chips"
-          menuAppendTo="parent"
-          isDisabled={!enableValueField}
-          variant={SelectVariant.typeaheadMulti}
-          isOpen={isValuesExpanded}
           isCreatable
-          typeAheadAriaLabel={t('Enter value')}
-          onToggle={setIsValuesExpanded}
+          isDisabled={!enableValueField}
+          isOpen={isValuesExpanded}
+          menuAppendTo="parent"
           onClear={() => onChange({ ...expression, values: [] })}
           onSelect={onSelectValues}
-          selections={enableValueField ? values : []}
+          onToggle={setIsValuesExpanded}
           placeholderText={enableValueField ? t('Enter value') : ''}
+          selections={enableValueField ? values : []}
+          typeAheadAriaLabel={t('Enter value')}
+          variant={SelectVariant.typeaheadMulti}
         >
           {values?.map((option) => (
             <SelectOption isDisabled={false} key={option} value={option} />

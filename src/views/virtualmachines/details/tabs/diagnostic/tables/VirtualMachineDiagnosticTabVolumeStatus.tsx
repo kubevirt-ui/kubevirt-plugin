@@ -27,7 +27,7 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
   });
 
   const { columns, sorting } = useDiagnosticVolumeStatusTableColumns();
-  const { pagination, onPaginationChange } = usePagination();
+  const { onPaginationChange, pagination } = usePagination();
   const sortedData = useMemo(
     () => columnSorting(volumeSnapshotStatuses, sorting?.direction, pagination, sorting?.column),
     [volumeSnapshotStatuses, sorting, pagination],
@@ -37,7 +37,7 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
     () =>
       volumeSnapshotStatuses.forEach(({ id }) => {
         setExpend((expendObj) => {
-          return { ids: new Set(expendObj?.ids).add(id), expended: new Set() };
+          return { expended: new Set(), ids: new Set(expendObj?.ids).add(id) };
         });
       }),
     [volumeSnapshotStatuses],
@@ -48,7 +48,7 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
       <ListPageBody>
         <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
           <FlexItem>
-            <Title headingLevel="h2" className="VirtualMachineDiagnosticTab--header">
+            <Title className="VirtualMachineDiagnosticTab--header" headingLevel="h2">
               {t('Volume snapshot status')}{' '}
               <HelpTextIcon
                 bodyContent={t(
@@ -60,16 +60,16 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
           </FlexItem>
           <FlexItem>
             <Pagination
+              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                onPaginationChange({ endIndex, page, perPage, startIndex })
+              }
+              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                onPaginationChange({ endIndex, page, perPage, startIndex })
+              }
+              defaultToFullPage
               itemCount={sortedData?.length}
               page={pagination?.page}
               perPage={pagination?.perPage}
-              defaultToFullPage
-              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                onPaginationChange({ page, perPage, startIndex, endIndex })
-              }
-              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                onPaginationChange({ page, perPage, startIndex, endIndex })
-              }
               perPageOptions={paginationDefaultValues}
             />
           </FlexItem>
@@ -85,15 +85,15 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
                 collapseAllAriaLabel: '',
                 onToggle: (_, __, isOpen) => {
                   setExpend((expendObj) => ({
-                    ids: new Set(expendObj?.ids),
                     expended: new Set(!isOpen ? [] : expendObj.ids),
+                    ids: new Set(expendObj?.ids),
                   }));
                 },
               }}
             />
-            {columns?.map(({ title, cell: { sort } }, index) => {
+            {columns?.map(({ cell: { sort }, title }, index) => {
               return (
-                <Th sort={sort(index)} key={title}>
+                <Th key={title} sort={sort(index)}>
                   {title}
                 </Th>
               );
@@ -102,12 +102,12 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
         </Thead>
         {sortedData.map((row, index) => (
           <VirtualMachineDiagnosticTabRow
-            obj={row}
-            key={row?.metadata?.name}
-            index={index}
-            expend={expend}
-            setExpend={setExpend}
             activeColumns={columns}
+            expend={expend}
+            index={index}
+            key={row?.metadata?.name}
+            obj={row}
+            setExpend={setExpend}
           />
         ))}
       </TableComposable>

@@ -76,9 +76,9 @@ export const getTemplateToVMCountMap = (loaded, vms, templates) => {
   for (const key of templateToVMCountMap.keys()) {
     const templateChartData = templateToVMCountMap.get(key);
     const additionalData = {
-      percentage: Math.round((templateChartData.vmCount / numVMs) * 100),
       color: colorListIter.next().value,
       namespace: getTemplateNS(key, templates),
+      percentage: Math.round((templateChartData.vmCount / numVMs) * 100),
     };
     templateToVMCountMap.set(key, { ...templateChartData, ...additionalData });
   }
@@ -90,9 +90,9 @@ export const getChartData = (templateToVMCountMap) => {
   const chartData = [];
   templateToVMCountMap.forEach((data, templateName) => {
     chartData.push({
+      fill: data.color,
       x: templateName,
       y: data.percentage,
-      fill: data.color,
     });
   });
   return chartData;
@@ -102,10 +102,10 @@ export const getLegendItems = (templateToVMCountMap): RunningVMsChartLegendLabel
   const legendItems = [];
   templateToVMCountMap.forEach((data, templateName) => {
     legendItems.push({
-      name: templateName,
-      vmCount: data.vmCount,
       color: data.color,
+      name: templateName,
       namespace: data.namespace,
+      vmCount: data.vmCount,
     });
   });
   return legendItems;

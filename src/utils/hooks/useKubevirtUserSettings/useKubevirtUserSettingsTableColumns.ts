@@ -6,7 +6,7 @@ import { useUserSettings } from '@openshift-console/dynamic-plugin-sdk-internal'
 
 import useKubevirtUserSettings from './useKubevirtUserSettings';
 
-const useKubevirtUserSettingsTableColumns = <T>({ columns, columnManagementID }) => {
+const useKubevirtUserSettingsTableColumns = <T>({ columnManagementID, columns }) => {
   const updateOnceFromUserSetting = useRef(null);
   const [userColumns, setUserColumns] = useKubevirtUserSettings('columns');
   const [localStorageSettings, setLocalSotrageSettings] = useUserSettings<{
@@ -14,8 +14,8 @@ const useKubevirtUserSettingsTableColumns = <T>({ columns, columnManagementID })
   }>('console.tableColumns');
 
   const [activeColumns] = useActiveColumns<T>({
-    columns,
     columnManagementID,
+    columns,
     showNamespaceOverride: false,
   });
 

@@ -23,7 +23,7 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
+const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const workload = getWorkloadProfile(template);
@@ -36,8 +36,6 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ template, editabl
     const workloadPath = `/objects/${vmObjectIndex}/spec/template/metadata/annotations/vm.kubevirt.io~1workload`;
 
     return k8sPatch({
-      model: TemplateModel,
-      resource: template,
       data: [
         {
           op: hasWorkload ? 'replace' : 'add',
@@ -54,6 +52,8 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ template, editabl
           value: 'true',
         },
       ],
+      model: TemplateModel,
+      resource: template,
     });
   };
 
@@ -72,7 +72,7 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ template, editabl
       <DescriptionListTerm>{t('Workload profile')}</DescriptionListTerm>
       <DescriptionListDescription>
         {t(workload)}
-        <Button type="button" isInline onClick={onEditClick} isDisabled={!editable} variant="link">
+        <Button isDisabled={!editable} isInline onClick={onEditClick} type="button" variant="link">
           <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
         </Button>
       </DescriptionListDescription>

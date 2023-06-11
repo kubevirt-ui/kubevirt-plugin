@@ -13,7 +13,7 @@ import { migrationsConfigTooltipFields } from './utils';
 
 type TooltipFieldObject = { label: string; value: string };
 
-type TooltipObject = { mpConfig: TooltipFieldObject[]; defaultConfig: TooltipFieldObject[] };
+type TooltipObject = { defaultConfig: TooltipFieldObject[]; mpConfig: TooltipFieldObject[] };
 
 type MigrationPolicyTooltipProps = {
   obj: MigrationTableDataLayout;
@@ -22,7 +22,7 @@ type MigrationPolicyTooltipProps = {
 const MigrationPolicyTooltip: React.FC<MigrationPolicyTooltipProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
 
-  const { mpConfig, defaultConfig } = useMemo<TooltipObject>(() => {
+  const { defaultConfig, mpConfig } = useMemo<TooltipObject>(() => {
     const mpSpec = obj?.mpObj?.spec;
     const defaultConfigurations = obj?.migrationsDefaultConfigurations;
     return migrationsConfigTooltipFields.reduce(
@@ -47,8 +47,8 @@ const MigrationPolicyTooltip: React.FC<MigrationPolicyTooltipProps> = ({ obj }) 
         return acc;
       },
       {
-        mpConfig: [],
         defaultConfig: [],
+        mpConfig: [],
       },
     );
   }, [obj]);

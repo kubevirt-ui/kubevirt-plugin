@@ -40,7 +40,7 @@ export const getPreferenceOSType = (obj: BootableVolume): OS_NAME_TYPES => {
 export const deleteBootableVolumeMetadata = (obj: BootableResource) => {
   // labels object without default preference and instancetype labels
   const originalLabelsObject = Object.keys(obj?.metadata?.labels)
-    .filter((key) => ![DEFAULT_PREFERENCE_LABEL, DEFAULT_INSTANCETYPE_LABEL].includes(key))
+    .filter((key) => ![DEFAULT_INSTANCETYPE_LABEL, DEFAULT_PREFERENCE_LABEL].includes(key))
     .reduce((acc, key) => {
       return Object.assign(acc, {
         [key]: obj?.metadata?.labels?.[key],
@@ -57,8 +57,6 @@ export const deleteBootableVolumeMetadata = (obj: BootableResource) => {
 
   return async () => {
     await k8sPatch({
-      model: isBootableVolumePVCKind(obj) ? PersistentVolumeClaimModel : DataSourceModel,
-      resource: obj,
       data: [
         {
           op: 'replace',
@@ -71,6 +69,8 @@ export const deleteBootableVolumeMetadata = (obj: BootableResource) => {
           value: annotationsWithoutDescription,
         },
       ],
+      model: isBootableVolumePVCKind(obj) ? PersistentVolumeClaimModel : DataSourceModel,
+      resource: obj,
     });
   };
 };
@@ -78,14 +78,12 @@ export const deleteBootableVolumeMetadata = (obj: BootableResource) => {
 export const changeBootableVolumeMetadata =
   (obj: BootableResource, metadata: BootableVolumeMetadata) => async () => {
     const initialMetadata = {
-      labels: obj?.metadata?.labels,
       annotations: obj?.metadata?.annotations,
+      labels: obj?.metadata?.labels,
     };
 
     initialMetadata !== metadata &&
       (await k8sPatch({
-        model: isBootableVolumePVCKind(obj) ? PersistentVolumeClaimModel : DataSourceModel,
-        resource: obj,
         data: [
           {
             op: 'replace',
@@ -98,5 +96,7 @@ export const changeBootableVolumeMetadata =
             value: metadata.annotations,
           },
         ],
+        model: isBootableVolumePVCKind(obj) ? PersistentVolumeClaimModel : DataSourceModel,
+        resource: obj,
       }));
   };

@@ -7,8 +7,8 @@ import { useDashboardResources } from '@openshift-console/dynamic-plugin-sdk-int
 import useDashboardActivities from './useDashboardActivities';
 
 export type WatchPrometheusQueryProps = {
-  query: string;
   namespace?: string;
+  query: string;
   timespan?: number;
 };
 
@@ -39,11 +39,11 @@ const useDashboardPrometheusActivities = () => {
           );
           return {
             // TODO Fix typing
-            // skipcq: JS-0349
-            loader: (a as any)?.properties.loader,
             // loader: (a as DashboardsOverviewPrometheusActivity)?.properties.loader,
             component: (a as ResolvedExtension<DynamicDashboardsOverviewPrometheusActivity>)
               ?.properties.component,
+            // skipcq: JS-0349
+            loader: (a as any)?.properties.loader,
             results: queryResults,
           };
         }),
@@ -63,8 +63,8 @@ const useDashboardPrometheusActivities = () => {
 
   return {
     prometheusActivities: allPrometheusActivities,
-    prometheusResults,
     prometheusQueriesLoaded,
+    prometheusResults,
   };
 };
 

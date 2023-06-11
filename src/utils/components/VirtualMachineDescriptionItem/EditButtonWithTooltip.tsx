@@ -5,27 +5,27 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 type EditButtonWithTooltipProps = PropsWithChildren<{
   isEditable: boolean;
-  tooltipContent: ReactNode;
   onEditClick: () => void;
   testId: string;
+  tooltipContent: ReactNode;
 }>;
 
 const EditButtonWithTooltip: FC<EditButtonWithTooltipProps> = ({
+  children,
   isEditable,
   onEditClick,
-  children,
-  tooltipContent,
   testId,
+  tooltipContent,
 }) => {
   const EditButton = () => (
     <Button
-      type="button"
-      isInline
-      variant="link"
-      isDisabled={!isEditable}
-      onClick={onEditClick}
-      data-test-id={testId}
       className="edit-button-on-content"
+      data-test-id={testId}
+      isDisabled={!isEditable}
+      isInline
+      onClick={onEditClick}
+      type="button"
+      variant="link"
     >
       <Flex spaceItems={{ default: 'spaceItemsNone' }}>
         <FlexItem>{children}</FlexItem>

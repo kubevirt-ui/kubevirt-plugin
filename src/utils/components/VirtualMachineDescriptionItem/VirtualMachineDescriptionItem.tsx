@@ -18,37 +18,37 @@ import EditButtonWithTooltip from './EditButtonWithTooltip';
 import './VirtualMachineDescriptionItem.scss';
 
 type VirtualMachineDescriptionItemProps = {
+  bodyContent?: ReactNode;
+  breadcrumb?: string;
+  'data-test-id'?: string;
   descriptionData: any;
   descriptionHeader?: string;
-  bodyContent?: ReactNode;
-  moreInfoURL?: string;
-  isPopover?: boolean;
-  breadcrumb?: string;
-  isEdit?: boolean;
-  onEditClick?: () => void;
-  isDisabled?: boolean;
-  showEditOnTitle?: boolean;
   editOnTitleJustify?: boolean;
+  isDisabled?: boolean;
+  isEdit?: boolean;
+  isPopover?: boolean;
   label?: ReactNode;
-  'data-test-id'?: string;
   messageOnDisabled?: string;
+  moreInfoURL?: string;
+  onEditClick?: () => void;
+  showEditOnTitle?: boolean;
 };
 
 const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
+  bodyContent,
+  breadcrumb,
+  'data-test-id': testId,
   descriptionData,
   descriptionHeader,
-  bodyContent,
-  moreInfoURL,
-  isPopover,
-  breadcrumb,
-  isEdit,
-  onEditClick,
-  isDisabled,
-  showEditOnTitle,
   editOnTitleJustify = false,
+  isDisabled,
+  isEdit,
+  isPopover,
   label,
-  'data-test-id': testId,
   messageOnDisabled,
+  moreInfoURL,
+  onEditClick,
+  showEditOnTitle,
 }) => {
   const { t } = useKubevirtTranslation();
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
@@ -68,30 +68,30 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
         <Flex
-          className="vm-description-item__title"
           justifyContent={{
             default: editOnTitleJustify ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
           }}
+          className="vm-description-item__title"
         >
           <FlexItem>
             <DescriptionItemHeader
-              isPopover={isPopover}
               bodyContent={bodyContent}
-              moreInfoURL={moreInfoURL}
               breadcrumb={breadcrumb}
               descriptionHeader={descriptionHeader}
+              isPopover={isPopover}
               label={label}
+              moreInfoURL={moreInfoURL}
             />
           </FlexItem>
           {isEdit && showEditOnTitle && (
             <FlexItem>
               <Button
-                type="button"
-                isInline
-                isDisabled={isDisabled}
-                onClick={onEditClick}
-                variant="link"
                 data-test-id={`${testId}-edit`}
+                isDisabled={isDisabled}
+                isInline
+                onClick={onEditClick}
+                type="button"
+                variant="link"
               >
                 {t('Edit')}
                 <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />

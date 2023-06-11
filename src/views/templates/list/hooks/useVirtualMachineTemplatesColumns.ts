@@ -11,49 +11,49 @@ const useVirtualMachineTemplatesColumns = (
 
   const columns = [
     {
-      title: t('Name'),
       id: 'name',
-      transforms: [sortable],
-      sort: 'metadata.name',
       props: { className: 'pf-m-width-30' },
+      sort: 'metadata.name',
+      title: t('Name'),
+      transforms: [sortable],
     },
     ...(!namespace
       ? [
           {
-            title: t('Namespace'),
             id: 'namespace',
-            transforms: [sortable],
             sort: 'metadata.namespace',
+            title: t('Namespace'),
+            transforms: [sortable],
           },
         ]
       : []),
     {
-      title: t('Workload profile'),
       id: 'workload',
-      transforms: [sortable],
-      sort: 'objects[0].spec.template.metadata.annotations.["vm.kubevirt.io/workload"]',
       props: { className: 'pf-m-width-15' },
+      sort: 'objects[0].spec.template.metadata.annotations.["vm.kubevirt.io/workload"]',
+      title: t('Workload profile'),
+      transforms: [sortable],
     },
     {
-      title: t('Boot source'),
       id: 'availability',
       props: { className: 'pf-m-width-30' },
+      title: t('Boot source'),
     },
     {
-      title: t('CPU | Memory'),
-      id: 'cpu',
       additional: true,
+      id: 'cpu',
+      title: t('CPU | Memory'),
     },
     {
-      title: '',
       id: '',
       props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+      title: '',
     },
   ];
 
   const [activeColumns] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
-    columns,
     columnManagementID: modelToRef(TemplateModel),
+    columns,
   });
 
   return [columns, activeColumns];

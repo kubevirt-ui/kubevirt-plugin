@@ -5,8 +5,8 @@ import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynam
 export const useProjectNames = (): string[] => {
   const [projects] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    namespaced: false,
     isList: true,
+    namespaced: false,
   });
   const projectNames = (projects || []).map((project) => project.metadata.name);
 

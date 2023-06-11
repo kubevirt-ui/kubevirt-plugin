@@ -46,10 +46,10 @@ export const produceUpdatedMigrationPolicy = (
     (mpDraft: V1alpha1MigrationPolicy) => {
       const {
         allowAutoConverge,
+        allowPostCopy,
         bandwidthPerMigration,
         completionTimeoutPerGiB,
         migrationPolicyName,
-        allowPostCopy,
       } = state || {};
 
       mpDraft.metadata.name = migrationPolicyName;

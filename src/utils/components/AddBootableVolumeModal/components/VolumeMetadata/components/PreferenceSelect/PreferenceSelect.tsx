@@ -10,15 +10,15 @@ import { FormGroup, PopoverPosition } from '@patternfly/react-core';
 import FilterSelect from '../../../FilterSelect/FilterSelect';
 
 type PreferenceSelectProps = {
+  preferencesNames: string[];
   selectedPreference: string;
   setBootableVolumeField: (key: string, fieldKey?: string) => (value: string) => void;
-  preferencesNames: string[];
 };
 
 const PreferenceSelect: FC<PreferenceSelectProps> = ({
+  preferencesNames,
   selectedPreference,
   setBootableVolumeField,
-  preferencesNames,
 }) => {
   const { t } = useKubevirtTranslation();
   return (
@@ -47,11 +47,11 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
       isRequired
     >
       <FilterSelect
-        selected={selectedPreference}
-        setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
-        options={preferencesNames?.sort((a, b) => a.localeCompare(b))}
         groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
         optionLabelText={t('preference')}
+        options={preferencesNames?.sort((a, b) => a.localeCompare(b))}
+        selected={selectedPreference}
+        setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
       />
     </FormGroup>
   );

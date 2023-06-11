@@ -22,8 +22,8 @@ const useVirtualMachineColumns = (
 
   const [canGetNode] = useAccessReview({
     namespace: namespace,
-    verb: 'get' as K8sVerb,
     resource: NodeModel.plural,
+    verb: 'get' as K8sVerb,
   });
 
   const sorting = useCallback(
@@ -34,69 +34,69 @@ const useVirtualMachineColumns = (
   const columns: TableColumn<K8sResourceCommon>[] = useMemo(
     () => [
       {
-        title: t('Name'),
         id: 'name',
-        transforms: [sortable],
-        sort: (_, direction) => sorting(direction, 'metadata.name'),
         props: { className: 'pf-m-width-15' },
+        sort: (_, direction) => sorting(direction, 'metadata.name'),
+        title: t('Name'),
+        transforms: [sortable],
       },
       ...(!namespace
         ? [
             {
-              title: t('Namespace'),
               id: 'namespace',
-              transforms: [sortable],
-              sort: (_, direction) => sorting(direction, 'metadata.namespace'),
               props: { className: 'pf-m-width-10' },
+              sort: (_, direction) => sorting(direction, 'metadata.namespace'),
+              title: t('Namespace'),
+              transforms: [sortable],
             },
           ]
         : []),
       {
-        title: t('Status'),
         id: 'status',
-        transforms: [sortable],
-        sort: (_, direction) => sorting(direction, 'status.printableStatus'),
         props: { className: 'pf-m-width-15' },
+        sort: (_, direction) => sorting(direction, 'status.printableStatus'),
+        title: t('Status'),
+        transforms: [sortable],
       },
       {
-        title: t('Conditions'),
         id: 'conditions',
         props: { className: 'pf-m-width-20' },
+        title: t('Conditions'),
       },
       ...(canGetNode
         ? [
             {
-              title: t('Node'),
               id: 'node',
               props: { className: 'pf-m-width-15' },
+              title: t('Node'),
             },
           ]
         : []),
       {
-        title: t('Created'),
-        id: 'created',
-        transforms: [sortable],
         additional: true,
-        sort: (_, direction) => sorting(direction, 'metadata.creationTimestamp'),
+        id: 'created',
         props: { className: 'pf-m-width-15' },
+        sort: (_, direction) => sorting(direction, 'metadata.creationTimestamp'),
+        title: t('Created'),
+        transforms: [sortable],
       },
       {
-        title: t('IP address'),
         id: 'ip-address',
         props: { className: 'pf-m-width-10' },
+        title: t('IP address'),
       },
       {
-        title: '',
         id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        title: '',
       },
     ],
     [canGetNode, namespace, sorting, t],
   );
 
   const [activeColumns] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
-    columns: canGetNode ? columns : columns.filter((column) => column.id !== 'node'),
     columnManagementID: VirtualMachineModelRef,
+    columns: canGetNode ? columns : columns.filter((column) => column.id !== 'node'),
   });
 
   return [columns, activeColumns];

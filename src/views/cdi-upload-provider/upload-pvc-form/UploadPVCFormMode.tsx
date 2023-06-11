@@ -7,13 +7,13 @@ import UploadPVCFormAccessMode from './UploadPVCFormAccessMode';
 import UploadPVCFormModeVolumeMode from './UploadPVCFormVolumeMode';
 
 const UploadPVCFormMode = ({
-  applySP,
   accessMode,
-  volumeMode,
-  setVolumeMode,
+  applySP,
   setAccessMode,
+  setVolumeMode,
   storageClasses,
   storageClassName,
+  volumeMode,
 }) => {
   const { t } = useKubevirtTranslation();
   const provisioner =
@@ -29,20 +29,20 @@ const UploadPVCFormMode = ({
     <div data-test="sp-no-default-settings">
       <div className="form-group">
         <UploadPVCFormAccessMode
-          onChange={(aMode) => setAccessMode(aMode)}
-          provisioner={provisioner}
-          loaded
           availableAccessModes={initialAccessModes}
           initialAccessMode={storageClassName ? accessMode : undefined}
+          loaded
+          onChange={(aMode) => setAccessMode(aMode)}
+          provisioner={provisioner}
         />
       </div>
       <div className="form-group">
         <UploadPVCFormModeVolumeMode
+          accessMode={accessMode}
+          loaded
           onChange={(vMode) => setVolumeMode(vMode)}
           provisioner={provisioner}
-          accessMode={accessMode}
           storageClass={storageClassName}
-          loaded
           volumeMode={storageClassName ? volumeMode : undefined}
         />
       </div>

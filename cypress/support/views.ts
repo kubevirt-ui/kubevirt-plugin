@@ -1,5 +1,8 @@
 export const submitButton = 'button[type=submit]';
 export const masthead = {
+  clickMastheadLink: (path: string) => {
+    return cy.byTestID(path).click();
+  },
   username: {
     shouldBeVisible: () =>
       cy
@@ -9,8 +12,5 @@ export const masthead = {
       cy
         .byTestID(Cypress.env('BRIDGE_KUBEADMIN_PASSWORD') ? 'user-dropdown' : 'username')
         .should('have.text', text),
-  },
-  clickMastheadLink: (path: string) => {
-    return cy.byTestID(path).click();
   },
 };

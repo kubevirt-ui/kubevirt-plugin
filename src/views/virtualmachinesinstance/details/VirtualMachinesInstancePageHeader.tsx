@@ -25,7 +25,7 @@ const VirtualMachinesInstancePageHeader: React.FC<VirtualMachinesInstancePageHea
         <h1 className="co-resource-item__resource-name">
           <span className={`co-m-resource-icon co-m-resource-icon--lg`}>{t('VMI')}</span>
           {vmi?.metadata?.name}{' '}
-          <Label isCompact icon={<IconComponent />}>
+          <Label icon={<IconComponent />} isCompact>
             {status}
           </Label>
         </h1>

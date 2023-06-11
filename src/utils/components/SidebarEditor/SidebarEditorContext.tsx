@@ -1,16 +1,16 @@
 import React, { createContext, FC, useState } from 'react';
 
 export type SidebarEditorContextType = {
-  showEditor: boolean;
-  setEditorVisible?: (editorVisible: boolean) => void;
-  showSwitch: boolean;
   isEditable?: boolean;
+  setEditorVisible?: (editorVisible: boolean) => void;
+  showEditor: boolean;
+  showSwitch: boolean;
 };
 
 export const SidebarEditorContext = createContext<SidebarEditorContextType>({
+  isEditable: true,
   showEditor: false,
   showSwitch: false,
-  isEditable: true,
 });
 
 export type SidebarEditorProviderType = {
@@ -25,7 +25,7 @@ export const SidebarEditorProvider: FC<SidebarEditorProviderType> = ({
 
   return (
     <SidebarEditorContext.Provider
-      value={{ showEditor, setEditorVisible: setShowEditor, showSwitch: true, isEditable }}
+      value={{ isEditable, setEditorVisible: setShowEditor, showEditor, showSwitch: true }}
     >
       {children}
     </SidebarEditorContext.Provider>

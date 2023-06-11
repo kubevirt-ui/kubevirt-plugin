@@ -9,19 +9,19 @@ import { SSHSecretDetails } from './utils/types';
 import SSHSecretSection from './SSHSecretSection';
 
 type SSHSecretModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
   initialSSHSecretDetails: SSHSecretDetails;
-  onSubmit: (sshDetails: SSHSecretDetails) => Promise<void | any>;
+  isOpen: boolean;
   namespace: string;
+  onClose: () => void;
+  onSubmit: (sshDetails: SSHSecretDetails) => Promise<any | void>;
 };
 
 const SSHSecretModal: FC<SSHSecretModalProps> = ({
-  onSubmit,
-  onClose,
-  isOpen,
   initialSSHSecretDetails,
+  isOpen,
   namespace,
+  onClose,
+  onSubmit,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -29,16 +29,16 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
 
   return (
     <TabModal
+      headerText={t('Authorized SSH key')}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => onSubmit(sshDetails)}
-      headerText={t('Authorized SSH key')}
     >
       <MutedTextSpan text={t('SSH key is saved in the project as a secret')} />
       <SSHSecretSection
         namespace={namespace}
-        sshDetails={sshDetails}
         setSSHDetails={setSSHDetails}
+        sshDetails={sshDetails}
       />
     </TabModal>
   );

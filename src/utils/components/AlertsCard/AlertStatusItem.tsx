@@ -15,7 +15,7 @@ type AlertStatusItemProps = {
 
 const AlertStatusItem: React.FC<AlertStatusItemProps> = ({ alertDetails, alertType }) => {
   const { t } = useKubevirtTranslation();
-  const { alertName, description, link, time, isVMAlert } = alertDetails;
+  const { alertName, description, isVMAlert, link, time } = alertDetails;
   const Icon = alertIcon[alertType];
 
   return (
@@ -32,7 +32,7 @@ const AlertStatusItem: React.FC<AlertStatusItemProps> = ({ alertDetails, alertTy
                   {t('VM')}
                 </span>
               )}
-              <Timestamp timestamp={time} className="alert-item__timestamp" hideIcon />
+              <Timestamp className="alert-item__timestamp" hideIcon timestamp={time} />
             </span>
           </div>
           <div className="alert-name">{alertName}</div>

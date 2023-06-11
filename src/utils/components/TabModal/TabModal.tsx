@@ -18,19 +18,19 @@ import {
 import './TabModal.scss';
 
 type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
-  isOpen: boolean;
-  obj?: T;
-  onSubmit: (obj: T) => Promise<T | T[] | void>;
-  onClose: () => Promise<void> | void;
-  headerText: string;
   children: ReactNode;
+  headerText: string;
   isDisabled?: boolean;
-  submitBtnText?: string;
-  modalVariant?: ModalVariant;
-  positionTop?: boolean;
-  submitBtnVariant?: ButtonVariant;
+  isOpen: boolean;
   modalError?: any;
-  titleIconVariant?: 'success' | 'danger' | 'warning' | 'info' | 'default' | ComponentType<any>;
+  modalVariant?: ModalVariant;
+  obj?: T;
+  onClose: () => Promise<void> | void;
+  onSubmit: (obj: T) => Promise<T | T[] | void>;
+  positionTop?: boolean;
+  submitBtnText?: string;
+  submitBtnVariant?: ButtonVariant;
+  titleIconVariant?: 'danger' | 'default' | 'info' | 'success' | 'warning' | ComponentType<any>;
 };
 
 export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(
@@ -39,19 +39,19 @@ export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(
 
 const TabModal: TabModalFC = memo(
   ({
-    obj,
-    onSubmit,
-    isOpen,
-    onClose,
-    headerText,
     children,
+    headerText,
     isDisabled,
-    submitBtnText,
+    isOpen,
+    modalError,
     modalVariant,
+    obj,
+    onClose,
+    onSubmit,
     positionTop = true,
+    submitBtnText,
     submitBtnVariant,
     titleIconVariant,
-    modalError,
   }) => {
     const { t } = useKubevirtTranslation();
 
@@ -85,22 +85,16 @@ const TabModal: TabModalFC = memo(
 
     return (
       <Modal
-        variant={modalVariant ?? 'small'}
-        position={positionTop ? 'top' : undefined}
-        className="ocs-modal"
-        onClose={closeModal}
-        title={headerText}
-        titleIconVariant={titleIconVariant}
         footer={
           <Stack className="kv-tabmodal-footer" hasGutter>
             {error && (
               <StackItem>
-                <Alert isInline variant={AlertVariant.danger} title={t('An error occurred')}>
+                <Alert isInline title={t('An error occurred')} variant={AlertVariant.danger}>
                   <Stack hasGutter>
                     <StackItem>{error.message}</StackItem>
                     {error?.href && (
                       <StackItem>
-                        <a href={error.href} target="_blank" rel="noreferrer">
+                        <a href={error.href} rel="noreferrer" target="_blank">
                           {error.href}
                         </a>
                       </StackItem>
@@ -113,9 +107,9 @@ const TabModal: TabModalFC = memo(
               <ActionList>
                 <ActionListItem>
                   <Button
-                    onClick={handleSubmit}
                     isDisabled={isDisabled || isSubmitting}
                     isLoading={isSubmitting}
+                    onClick={handleSubmit}
                     variant={submitBtnVariant ?? 'primary'}
                   >
                     {submitBtnText || t('Save')}
@@ -130,8 +124,14 @@ const TabModal: TabModalFC = memo(
             </StackItem>
           </Stack>
         }
-        isOpen={isOpen}
+        className="ocs-modal"
         id="tab-modal"
+        isOpen={isOpen}
+        onClose={closeModal}
+        position={positionTop ? 'top' : undefined}
+        title={headerText}
+        titleIconVariant={titleIconVariant}
+        variant={modalVariant ?? 'small'}
       >
         {children}
       </Modal>

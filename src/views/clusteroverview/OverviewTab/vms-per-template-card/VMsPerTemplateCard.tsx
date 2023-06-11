@@ -15,7 +15,7 @@ import './VMsPerTemplateCard.scss';
 
 const VMsPerTemplateCard = () => {
   const { t } = useKubevirtTranslation();
-  const { loaded, vms, templates } = useVMsPerTemplateResources();
+  const { loaded, templates, vms } = useVMsPerTemplateResources();
 
   const templateToVMCountMap = useMemo(
     () => getTemplateToVMCountMap(loaded, vms, templates),
@@ -29,26 +29,26 @@ const VMsPerTemplateCard = () => {
   const RunningVMsChart = (
     <div>
       <ChartDonut
-        ariaDesc={t('VirtualMachines per template')}
-        ariaTitle={t('VirtualMachines per template donut chart')}
-        data={chartData}
-        height={150}
-        labels={({ datum }) => `${datum.x}: ${datum.y}%`}
-        legendPosition="bottom"
         padding={{
           bottom: 20,
           left: 20,
           right: 20,
           top: 20,
         }}
-        subTitle={t('VMs')}
-        title={numVMs?.toString()}
-        width={300}
         style={{
           data: {
             fill: ({ datum }) => datum.fill,
           },
         }}
+        ariaDesc={t('VirtualMachines per template')}
+        ariaTitle={t('VirtualMachines per template donut chart')}
+        data={chartData}
+        height={150}
+        labels={({ datum }) => `${datum.x}: ${datum.y}%`}
+        legendPosition="bottom"
+        subTitle={t('VMs')}
+        title={numVMs?.toString()}
+        width={300}
       />
     </div>
   );

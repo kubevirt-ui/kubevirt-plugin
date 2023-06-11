@@ -37,17 +37,17 @@ const VirtualMachinesOverviewTabInterfaces = ({ vm }) => {
         <Divider />
         <CardBody isFilled>
           <VirtualizedTable<InterfacesData>
-            data={data}
-            unfilteredData={data}
-            loaded
-            loadError={false}
-            columns={columns}
-            Row={VirtualMachinesOverviewTabNetworkInterfacesRow}
             NoDataEmptyMsg={() => (
               <div className="pf-u-text-align-center no-data-empty-message">
                 {t('No network interfaces found')}
               </div>
             )}
+            columns={columns}
+            data={data}
+            loaded
+            loadError={false}
+            Row={VirtualMachinesOverviewTabNetworkInterfacesRow}
+            unfilteredData={data}
           />
         </CardBody>
       </Card>

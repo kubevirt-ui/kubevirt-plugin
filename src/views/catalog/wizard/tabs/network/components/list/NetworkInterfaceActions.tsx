@@ -28,7 +28,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   nicPresentation,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { vm, updateVM } = useWizardVMContext();
+  const { updateVM, vm } = useWizardVMContext();
   const { createModal } = useModal();
 
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
@@ -39,11 +39,11 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <WizardEditNetworkInterfaceModal
-        vm={vm}
-        updateVM={updateVM}
         isOpen={isOpen}
-        onClose={onClose}
         nicPresentation={nicPresentation}
+        onClose={onClose}
+        updateVM={updateVM}
+        vm={vm}
       />
     ));
 
@@ -64,11 +64,11 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
-        isOpen={isOpen}
-        onClose={onClose}
-        obj={vm}
-        onSubmit={onDelete}
         headerText={label}
+        isOpen={isOpen}
+        obj={vm}
+        onClose={onClose}
+        onSubmit={onDelete}
         submitBtnText={submitBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
@@ -81,10 +81,10 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   };
 
   const items = [
-    <DropdownItem onClick={onEditModalOpen} key="network-interface-edit">
+    <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
       {editBtnText}
     </DropdownItem>,
-    <DropdownItem onClick={onDeleteModalToggle} key="network-interface-delete">
+    <DropdownItem key="network-interface-delete" onClick={onDeleteModalToggle}>
       {submitBtnText}
     </DropdownItem>,
   ];
@@ -92,13 +92,13 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   return (
     <>
       <Dropdown
-        menuAppendTo={getContentScrollableElement}
-        onSelect={() => setIsDropdownOpen(false)}
-        toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-6" />}
+        dropdownItems={items}
         isOpen={isDropdownOpen}
         isPlain
-        dropdownItems={items}
+        menuAppendTo={getContentScrollableElement}
+        onSelect={() => setIsDropdownOpen(false)}
         position={DropdownPosition.right}
+        toggle={<KebabToggle id="toggle-id-6" onToggle={setIsDropdownOpen} />}
       />
     </>
   );

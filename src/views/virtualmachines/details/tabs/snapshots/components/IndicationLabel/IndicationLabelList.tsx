@@ -14,8 +14,8 @@ const IndicationLabelList = ({ snapshot }) => {
     <LabelGroup>
       {indications.map((indication) => (
         <IndicationLabel
-          key={`${snapshot?.metadata?.name}-${indication}`}
           indication={indication}
+          key={`${snapshot?.metadata?.name}-${indication}`}
         />
       ))}
     </LabelGroup>

@@ -11,19 +11,19 @@ import VirtualMachineDetailsRightGrid from '../grid/rightGrid/VirtualMachineDeta
 import './VirtualMachinesDetailsSection.scss';
 
 type DetailsSectionProps = {
-  vm: V1VirtualMachine;
   pathname: string;
+  vm: V1VirtualMachine;
 };
 
-const DetailsSection: FC<DetailsSectionProps> = ({ vm, pathname }) => {
+const DetailsSection: FC<DetailsSectionProps> = ({ pathname, vm }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <div className="VirtualMachinesDetailsSection">
-      <a href={`${pathname}#details`} className="link-icon">
+      <a className="link-icon" href={`${pathname}#details`}>
         <LinkIcon size="sm" />
       </a>
-      <Title headingLevel="h2" className="co-section-heading">
+      <Title className="co-section-heading" headingLevel="h2">
         <Flex>
           <FlexItem>{t('VirtualMachine details')} </FlexItem>
         </Flex>

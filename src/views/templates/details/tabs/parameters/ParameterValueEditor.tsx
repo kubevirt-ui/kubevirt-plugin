@@ -8,15 +8,15 @@ import { PARAMETER_VALUE_TYPES } from './constants';
 import { getValueTypeFromParameter } from './utils';
 
 type ParameterValueEditorProps = {
-  parameter: TemplateParameter;
-  onChange: (parameter: TemplateParameter) => void;
   isEditDisabled?: boolean;
+  onChange: (parameter: TemplateParameter) => void;
+  parameter: TemplateParameter;
 };
 
 const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
-  parameter,
-  onChange,
   isEditDisabled,
+  onChange,
+  parameter,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { t } = useKubevirtTranslation();
@@ -49,16 +49,16 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
     <>
       <FormGroup fieldId={`${parameter.name}-value-type`} label={t('Default value type')}>
         <Select
-          isOpen={isOpen}
-          onToggle={setIsOpen}
-          onSelect={handleChange}
-          variant={SelectVariant.single}
-          selections={valueType}
           isDisabled={isEditDisabled}
+          isOpen={isOpen}
+          onSelect={handleChange}
+          onToggle={setIsOpen}
+          selections={valueType}
+          variant={SelectVariant.single}
         >
           <SelectOption
-            value={PARAMETER_VALUE_TYPES.GENERATED}
             description={t('Value generated using an expression')}
+            value={PARAMETER_VALUE_TYPES.GENERATED}
           >
             <span data-test-id={PARAMETER_VALUE_TYPES.GENERATED}>
               {t('Generated (expression)')}
@@ -66,13 +66,13 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
           </SelectOption>
 
           <SelectOption
-            value={PARAMETER_VALUE_TYPES.VALUE}
             description={t('Default value for this parameter')}
+            value={PARAMETER_VALUE_TYPES.VALUE}
           >
             <span data-test-id={PARAMETER_VALUE_TYPES.VALUE}>{t('Value')}</span>
           </SelectOption>
 
-          <SelectOption value={PARAMETER_VALUE_TYPES.NONE} description={t('No default value')}>
+          <SelectOption description={t('No default value')} value={PARAMETER_VALUE_TYPES.NONE}>
             <span data-test-id={PARAMETER_VALUE_TYPES.NONE}>{t('None')}</span>
           </SelectOption>
         </Select>
@@ -80,30 +80,30 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
 
       {valueType === PARAMETER_VALUE_TYPES.VALUE && (
         <FormGroup
+          className="form-group-indented"
           fieldId={`${parameter.name}-value`}
           label={t('Value')}
-          className="form-group-indented"
         >
           <TextInput
             id={`${parameter.name}-value`}
-            value={parameter.value}
-            onChange={(value) => onChange({ ...parameter, value })}
             isDisabled={isEditDisabled}
+            onChange={(value) => onChange({ ...parameter, value })}
+            value={parameter.value}
           />
         </FormGroup>
       )}
 
       {valueType === PARAMETER_VALUE_TYPES.GENERATED && (
         <FormGroup
+          className="form-group-indented"
           fieldId={`${parameter.name}-generated`}
           label={t('From')}
-          className="form-group-indented"
         >
           <TextInput
             id={`${parameter.name}-generated`}
-            value={parameter.from}
-            onChange={(expression) => onChange({ ...parameter, from: expression })}
             isDisabled={isEditDisabled}
+            onChange={(expression) => onChange({ ...parameter, from: expression })}
+            value={parameter.from}
           />
         </FormGroup>
       )}

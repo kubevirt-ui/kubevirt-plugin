@@ -9,7 +9,7 @@ type TemplateNameTableDataProps = {
   value: string;
 };
 
-const TemplateNameTableData: React.FC<TemplateNameTableDataProps> = ({ value, children }) => {
+const TemplateNameTableData: React.FC<TemplateNameTableDataProps> = ({ children, value }) => {
   const { t } = useKubevirtTranslation();
   return (
     <div className="template-value">

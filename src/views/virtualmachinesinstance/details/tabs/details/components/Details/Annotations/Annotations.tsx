@@ -29,9 +29,6 @@ const Annotations: React.FC<AnnotationsProps> = ({ vmi }) => {
     <>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('Annotations')}
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
               Annotations is an unstructured key value map stored with a resource that may be set by
@@ -50,18 +47,18 @@ const Annotations: React.FC<AnnotationsProps> = ({ vmi }) => {
               </Breadcrumb>
             </Trans>
           }
+          hasAutoWidth
+          headerContent={t('Annotations')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('Annotations')}</DescriptionListTermHelpTextButton>
         </Popover>
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
         <Button
-          variant="link"
-          isInline
           icon={
             <PencilAltIcon className="co-icon-space-l co-icon-space-r pf-c-button-icon--plain" />
           }
-          iconPosition={'right'}
           onClick={() =>
             createModal((props) => (
               <AnnotationsModal
@@ -69,8 +66,6 @@ const Annotations: React.FC<AnnotationsProps> = ({ vmi }) => {
                 {...props}
                 onSubmit={(annotations) =>
                   k8sPatch({
-                    model: VirtualMachineInstanceModel,
-                    resource: vmi,
                     data: [
                       {
                         op: 'replace',
@@ -78,11 +73,16 @@ const Annotations: React.FC<AnnotationsProps> = ({ vmi }) => {
                         value: annotations,
                       },
                     ],
+                    model: VirtualMachineInstanceModel,
+                    resource: vmi,
                   })
                 }
               />
             ))
           }
+          iconPosition={'right'}
+          isInline
+          variant="link"
         >
           {t('{{count}} Annotations', {
             count: Object.keys(vmi?.metadata?.annotations || {}).length,

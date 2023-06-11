@@ -1,5 +1,5 @@
 export enum PARAMETER_VALUE_TYPES {
   GENERATED = 'GENERATED',
-  VALUE = 'VALUE',
   NONE = 'NONE',
+  VALUE = 'VALUE',
 }

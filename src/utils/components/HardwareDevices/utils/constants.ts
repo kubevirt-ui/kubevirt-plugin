@@ -4,7 +4,7 @@ export enum HARDWARE_DEVICE_TYPE {
 }
 
 export type HardwareDeviceModalRow = {
-  name: string;
-  deviceName: string;
   deviceIndex: number;
+  deviceName: string;
+  name: string;
 };

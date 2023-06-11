@@ -7,13 +7,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 
 type VirtualMachinesCreateButtonProps = {
-  namespace: string;
   buttonText?: string;
+  namespace: string;
 };
 
 const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
-  namespace,
   buttonText,
+  namespace,
 }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
@@ -47,9 +47,9 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
 
   return (
     <ListPageCreateDropdown
+      createAccessReview={{ groupVersionKind: VirtualMachineModelRef, namespace }}
       items={createItems}
       onClick={onCreate}
-      createAccessReview={{ groupVersionKind: VirtualMachineModelRef, namespace }}
     >
       {buttonText || t('Create')}
     </ListPageCreateDropdown>

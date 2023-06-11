@@ -14,7 +14,7 @@ const DetailsRightGrid: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const { vmNamespaceTarget, instanceTypeVMState, setInstanceTypeVMState, activeNamespace } =
+  const { activeNamespace, instanceTypeVMState, setInstanceTypeVMState, vmNamespaceTarget } =
     useInstanceTypeVMStore();
   const { pvcSource, sshSecretCredentials } = instanceTypeVMState;
 
@@ -23,8 +23,8 @@ const DetailsRightGrid: FC = () => {
 
   const setSSHCredentials = (credentials: SSHSecretDetails) => {
     setInstanceTypeVMState({
-      type: instanceTypeActionType.setSSHCredentials,
       payload: credentials,
+      type: instanceTypeActionType.setSSHCredentials,
     });
 
     return Promise.resolve();
@@ -45,19 +45,19 @@ const DetailsRightGrid: FC = () => {
         descriptionHeader={t('Storage class')}
       />
       <VirtualMachineDescriptionItem
-        descriptionData={sshSecretCredentials?.sshSecretName || t('Not configured')}
-        descriptionHeader={t('SSH key name')}
-        isEdit
         onEditClick={() =>
           createModal((modalProps) => (
             <SSHSecretModal
               {...modalProps}
               initialSSHSecretDetails={sshSecretCredentials}
-              onSubmit={setSSHCredentials}
               namespace={activeNamespace}
+              onSubmit={setSSHCredentials}
             />
           ))
         }
+        descriptionData={sshSecretCredentials?.sshSecretName || t('Not configured')}
+        descriptionHeader={t('SSH key name')}
+        isEdit
       />
     </DescriptionList>
   );

@@ -12,45 +12,45 @@ import {
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseEnvironmentsResourcesType = {
-  secrets: IoK8sApiCoreV1Secret[];
   configMaps: IoK8sApiCoreV1ConfigMap[];
-  serviceAccounts: IoK8sApiCoreV1ServiceAccount[];
-  loaded: boolean;
   error: any;
+  loaded: boolean;
+  secrets: IoK8sApiCoreV1Secret[];
+  serviceAccounts: IoK8sApiCoreV1ServiceAccount[];
 };
 
 const useEnvironmentsResources = (namespace: string): UseEnvironmentsResourcesType => {
   const [secrets, secretsLoaded, secretsError] = useK8sWatchResource<IoK8sApiCoreV1Secret[]>({
     groupVersionKind: modelToGroupVersionKind(SecretModel),
-    namespaced: true,
     isList: true,
     namespace,
+    namespaced: true,
   });
 
   const [configMaps, configMapsLoaded, configMapsError] = useK8sWatchResource<
     IoK8sApiCoreV1ConfigMap[]
   >({
     groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-    namespaced: true,
     isList: true,
     namespace,
+    namespaced: true,
   });
 
   const [serviceAccounts, serviceAccountsLoaded, serviceAccountsError] = useK8sWatchResource<
     IoK8sApiCoreV1ServiceAccount[]
   >({
     groupVersionKind: modelToGroupVersionKind(ServiceAccountModel),
-    namespaced: true,
     isList: true,
     namespace,
+    namespaced: true,
   });
 
   return {
-    secrets,
     configMaps,
-    serviceAccounts,
-    loaded: serviceAccountsLoaded && configMapsLoaded && secretsLoaded,
     error: secretsError || configMapsError || serviceAccountsError,
+    loaded: serviceAccountsLoaded && configMapsLoaded && secretsLoaded,
+    secrets,
+    serviceAccounts,
   };
 };
 

@@ -30,8 +30,8 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`;
 
   const [vmis, loaded, loadError] = useK8sWatchResource<V1VirtualMachineInstance[]>({
-    kind,
     isList: true,
+    kind,
     namespace,
   });
   const [data, filteredData, onFilterChange] = useListPageFilter(vmis, filters);
@@ -44,18 +44,18 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
         <ListPageFilter
           data={data}
           loaded={loaded}
-          rowFilters={filters}
           onFilterChange={onFilterChange}
+          rowFilters={filters}
         />
         <VirtualizedTable<K8sResourceCommon>
+          columns={columns}
           data={filteredData}
-          unfilteredData={data}
+          EmptyMsg={() => <VirtualMachineInstanceEmptyState catalogURL={catalogURL} />}
           loaded={loaded}
           loadError={loadError}
-          columns={columns}
           Row={VirtualMachinesInstancesRow}
           rowData={{ kind }}
-          EmptyMsg={() => <VirtualMachineInstanceEmptyState catalogURL={catalogURL} />}
+          unfilteredData={data}
         />
       </ListPageBody>
     </>

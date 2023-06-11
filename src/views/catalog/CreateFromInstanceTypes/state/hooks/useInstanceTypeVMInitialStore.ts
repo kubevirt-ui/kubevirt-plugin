@@ -16,15 +16,6 @@ import { getRandomVMName } from '../utils/utils';
 export const useInstanceTypeVMInitialStore = create<InstanceTypeVMStore>()((set, get) => {
   return {
     ...instanceTypeVMStoreInitialState,
-    setInstanceTypeVMState: ({ type, payload }) =>
-      set(
-        produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
-          instanceTypeVMState[type] = payload;
-        }),
-      ),
-    setBootableVolumesData: (data: UseBootableVolumesValues) => set({ bootableVolumesData: data }),
-    setInstanceTypesAndPreferencesData: (data: UseInstanceTypeAndPreferencesValues) =>
-      set({ instanceTypesAndPreferencesData: data }),
     onSelectCreatedVolume: (selectedVolume: BootableVolume) =>
       set(
         produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
@@ -36,8 +27,6 @@ export const useInstanceTypeVMInitialStore = create<InstanceTypeVMStore>()((set,
           instanceTypeVMState.selectedInstanceType = getInstanceTypeFromVolume(selectedVolume);
         }),
       ),
-    setActiveNamespace: (namespace: string) => set({ activeNamespace: namespace }),
-    setVMNamespaceTarget: (namespace: string) => set({ vmNamespaceTarget: namespace }),
     resetInstanceTypeVMState: () =>
       set({
         ...instanceTypeVMStoreInitialState,
@@ -46,5 +35,16 @@ export const useInstanceTypeVMInitialStore = create<InstanceTypeVMStore>()((set,
           vmName: getRandomVMName(),
         },
       }),
+    setActiveNamespace: (namespace: string) => set({ activeNamespace: namespace }),
+    setBootableVolumesData: (data: UseBootableVolumesValues) => set({ bootableVolumesData: data }),
+    setInstanceTypesAndPreferencesData: (data: UseInstanceTypeAndPreferencesValues) =>
+      set({ instanceTypesAndPreferencesData: data }),
+    setInstanceTypeVMState: ({ payload, type }) =>
+      set(
+        produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
+          instanceTypeVMState[type] = payload;
+        }),
+      ),
+    setVMNamespaceTarget: (namespace: string) => set({ vmNamespaceTarget: namespace }),
   };
 });

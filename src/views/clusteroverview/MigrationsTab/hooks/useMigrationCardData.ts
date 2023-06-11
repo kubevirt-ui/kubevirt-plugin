@@ -29,13 +29,13 @@ import {
 } from '../components/MigrationsTable/utils/utils';
 
 export type UseMigrationCardDataAndFiltersValues = {
-  vmims: V1VirtualMachineInstanceMigration[];
+  filters: RowFilter<any>[];
   loaded: boolean;
   loadErrors: any;
-  filters: RowFilter<any>[];
-  migrationsTableUnfilteredData: MigrationTableDataLayout[];
   migrationsTableFilteredData: MigrationTableDataLayout[];
+  migrationsTableUnfilteredData: MigrationTableDataLayout[];
   onFilterChange: OnFilterChange;
+  vmims: V1VirtualMachineInstanceMigration[];
 };
 
 type UseMigrationCardDataAndFilters = (duration: string) => UseMigrationCardDataAndFiltersValues;
@@ -80,13 +80,13 @@ const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration
   const [unfilteredData, data, onFilterChange] = useListPageFilter(migrationsData, filters);
 
   return {
-    vmims,
+    filters,
     loaded: vmimsLoaded && vmisLoaded,
     loadErrors: vmimsErrors || vmisErrors,
-    filters,
-    migrationsTableUnfilteredData: unfilteredData,
     migrationsTableFilteredData: data,
+    migrationsTableUnfilteredData: unfilteredData,
     onFilterChange,
+    vmims,
   };
 };
 

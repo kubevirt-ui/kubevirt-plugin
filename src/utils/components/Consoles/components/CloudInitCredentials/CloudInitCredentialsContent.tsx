@@ -20,20 +20,20 @@ const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm 
     return <>{t('No credentials, see operating system documentation for the default username.')}</>;
   }
 
-  const { usernames, passwords } = users.reduce(
+  const { passwords, usernames } = users.reduce(
     (acc, user) => ({
-      usernames: (
-        <>
-          {acc.usernames} <InlineCodeClipboardCopy clipboardText={user.name} />
-        </>
-      ),
       passwords: (
         <>
           {acc.passwords} <InlineCodeClipboardCopy clipboardText={user.password} />
         </>
       ),
+      usernames: (
+        <>
+          {acc.usernames} <InlineCodeClipboardCopy clipboardText={user.name} />
+        </>
+      ),
     }),
-    { usernames: <></>, passwords: <></> },
+    { passwords: <></>, usernames: <></> },
   );
   return (
     <Stack>

@@ -20,18 +20,18 @@ export const CUSTOM_TEMPLATES = 'custom-templates';
 export const DATA_SOURCE_CRONJOB_LABEL = 'cdi.kubevirt.io/dataImportCron';
 
 export enum OS_NAME_TYPES {
-  rhel = 'rhel',
-  fedora = 'fedora',
   centos = 'centos',
-  windows = 'windows',
+  fedora = 'fedora',
   other = 'other',
+  rhel = 'rhel',
+  windows = 'windows',
 }
 
 export enum FLAVORS {
-  tiny = 'tiny',
-  small = 'small',
-  medium = 'medium',
   large = 'large',
+  medium = 'medium',
+  small = 'small',
+  tiny = 'tiny',
 }
 
 export enum SUPPORT_TYPES {
@@ -41,8 +41,8 @@ export enum SUPPORT_TYPES {
 
 export enum WORKLOADS {
   desktop = 'desktop',
-  server = 'server',
   highperformance = 'highperformance',
+  server = 'server',
 }
 
 // t('Desktop')
@@ -50,22 +50,22 @@ export enum WORKLOADS {
 // t('High performance')
 export const WORKLOADS_LABELS = {
   [WORKLOADS.desktop]: 'Desktop',
-  [WORKLOADS.server]: 'Server',
   [WORKLOADS.highperformance]: 'High performance',
+  [WORKLOADS.server]: 'Server',
 };
 
 export const WORKLOADS_DESCRIPTIONS = {
   [WORKLOADS.desktop]: t('Small scale consumption, recommended for using the graphical console'),
-  [WORKLOADS.server]: t('Balances performance, compatible with a broad range of workloads'),
   [WORKLOADS.highperformance]: t('Optimized for High resource consumption workloads'),
+  [WORKLOADS.server]: t('Balances performance, compatible with a broad range of workloads'),
 };
 
 export const OS_NAME_LABELS = {
-  [OS_NAME_TYPES.rhel]: 'RHEL',
-  [OS_NAME_TYPES.fedora]: 'Fedora',
   [OS_NAME_TYPES.centos]: 'CentOS',
-  [OS_NAME_TYPES.windows]: 'Windows',
+  [OS_NAME_TYPES.fedora]: 'Fedora',
   [OS_NAME_TYPES.other]: 'Other',
+  [OS_NAME_TYPES.rhel]: 'RHEL',
+  [OS_NAME_TYPES.windows]: 'Windows',
 };
 
 export const OS_NAMES = [
@@ -92,13 +92,13 @@ export const OS_NAMES = [
 ];
 
 export enum BOOT_SOURCE {
-  PVC = 'PVC',
+  CONTAINER_DISK = 'CONTAINER_DISK',
   DATA_SOURCE = 'DATA_SOURCE',
   DATA_SOURCE_AUTO_IMPORT = 'DATA_SOURCE_AUTO_IMPORT',
-  URL = 'URL',
-  REGISTRY = 'REGISTRY',
-  CONTAINER_DISK = 'CONTAINER_DISK',
   NONE = 'NONE',
+  PVC = 'PVC',
+  REGISTRY = 'REGISTRY',
+  URL = 'URL',
 }
 
 // t('PVC')
@@ -109,21 +109,21 @@ export enum BOOT_SOURCE {
 // t('No boot source')
 
 export const BOOT_SOURCE_LABELS = {
-  [BOOT_SOURCE.PVC]: 'PVC',
+  [BOOT_SOURCE.CONTAINER_DISK]: 'Container disk',
   [BOOT_SOURCE.DATA_SOURCE]: 'PVC',
   [BOOT_SOURCE.DATA_SOURCE_AUTO_IMPORT]: 'PVC (auto import)',
-  [BOOT_SOURCE.URL]: 'URL',
-  [BOOT_SOURCE.REGISTRY]: 'Registry',
-  [BOOT_SOURCE.CONTAINER_DISK]: 'Container disk',
   [BOOT_SOURCE.NONE]: 'No boot source',
+  [BOOT_SOURCE.PVC]: 'PVC',
+  [BOOT_SOURCE.REGISTRY]: 'Registry',
+  [BOOT_SOURCE.URL]: 'URL',
 };
 
 export const OS_IMAGE_LINKS = {
-  [OS_NAME_TYPES.rhel]: 'https://access.redhat.com/downloads/content/479/ver=/rhel---8/',
-  [OS_NAME_TYPES.fedora]: 'https://alt.fedoraproject.org/cloud/',
   [OS_NAME_TYPES.centos]: 'https://cloud.centos.org/centos/',
-  [OS_NAME_TYPES.windows]: 'https://www.microsoft.com/en-us/software-download/windows10ISO',
+  [OS_NAME_TYPES.fedora]: 'https://alt.fedoraproject.org/cloud/',
   [OS_NAME_TYPES.other]: 'https://alt.fedoraproject.org/cloud/',
+  [OS_NAME_TYPES.rhel]: 'https://access.redhat.com/downloads/content/479/ver=/rhel---8/',
+  [OS_NAME_TYPES.windows]: 'https://www.microsoft.com/en-us/software-download/windows10ISO',
 };
 
 export const GENERATE_VM_PRETTY_NAME_ANNOTATION =

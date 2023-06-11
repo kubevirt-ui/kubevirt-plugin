@@ -28,17 +28,28 @@ const useResourcesQuantities: UseResourcesQuantities = () => {
   );
 
   const watchedResources = {
+    nads: {
+      groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
+      isList: true,
+      namespace,
+      namespaced: !!namespace,
+    },
+    nodes: {
+      groupVersionKind: modelToGroupVersionKind(NodeModel),
+      isList: true,
+      namespaced: false,
+    },
     vms: {
       groupVersionKind: VirtualMachineModelGroupVersionKind,
-      namespaced: !!namespace,
-      namespace,
       isList: true,
+      namespace,
+      namespaced: !!namespace,
     },
     vmTemplates: {
       groupVersionKind: modelToGroupVersionKind(TemplateModel),
-      namespaced: !!namespace,
-      namespace,
       isList: true,
+      namespace,
+      namespaced: !!namespace,
       selector: {
         matchExpressions: [
           {
@@ -47,17 +58,6 @@ const useResourcesQuantities: UseResourcesQuantities = () => {
           },
         ],
       },
-    },
-    nodes: {
-      groupVersionKind: modelToGroupVersionKind(NodeModel),
-      namespaced: false,
-      isList: true,
-    },
-    nads: {
-      groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
-      namespaced: !!namespace,
-      namespace,
-      isList: true,
     },
   };
 

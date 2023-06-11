@@ -27,16 +27,16 @@ const StatusCardStoragePopover: React.FC<StatusCardStoragePopoverProps> = ({
       <StackItem>
         <StatusPopupSection firstColumn={t('Storage operator')} secondColumn={t('Status')}>
           <StatusPopupItem
+            icon={healthStateMapping[lsoState.state].icon}
             key="lso"
             value={lsoState.message}
-            icon={healthStateMapping[lsoState.state].icon}
           >
             {t('Local storage (LSO)')}
           </StatusPopupItem>
           <StatusPopupItem
+            icon={healthStateMapping[odfState.state].icon}
             key="odf"
             value={odfState.message}
-            icon={healthStateMapping[odfState.state].icon}
           >
             {t('OpenShift Data Foundation (ODF)')}
           </StatusPopupItem>

@@ -5,13 +5,13 @@ import {
 import { InProgressIcon, PausedIcon, SyncAltIcon } from '@patternfly/react-icons';
 
 export const iconMapper = {
-  Pending: InProgressIcon,
-  Scheduling: InProgressIcon,
-  Scheduled: InProgressIcon,
-  PreparingTarget: InProgressIcon,
-  TargetReady: InProgressIcon,
-  Paused: PausedIcon,
-  Running: SyncAltIcon,
-  Succeeded: GreenCheckCircleIcon,
   Failed: RedExclamationCircleIcon,
+  Paused: PausedIcon,
+  Pending: InProgressIcon,
+  PreparingTarget: InProgressIcon,
+  Running: SyncAltIcon,
+  Scheduled: InProgressIcon,
+  Scheduling: InProgressIcon,
+  Succeeded: GreenCheckCircleIcon,
+  TargetReady: InProgressIcon,
 };

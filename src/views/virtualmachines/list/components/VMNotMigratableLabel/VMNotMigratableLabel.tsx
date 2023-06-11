@@ -20,7 +20,7 @@ const VMNotMigratableLabel: React.FC<VMNotMigratableLabelProps> = ({ vm }) => {
 
   return isVMrunning && !isMigratable ? (
     <SplitItem>
-      <Label isCompact variant="outline" key="not-migratable" className="migratable-label">
+      <Label className="migratable-label" isCompact key="not-migratable" variant="outline">
         {t('Not migratable')}
       </Label>
     </SplitItem>

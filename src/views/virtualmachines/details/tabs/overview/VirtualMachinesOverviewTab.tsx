@@ -21,7 +21,7 @@ const VirtualMachinesOverviewTab: React.FC<VirtualMachinesOverviewTabProps> = ({
   const vmAlerts = useVMAlerts(vm);
 
   return (
-    <Grid hasGutter className="co-dashboard-body">
+    <Grid className="co-dashboard-body" hasGutter>
       <GridItem span={8}>
         <Grid hasGutter>
           <GridItem>

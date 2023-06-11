@@ -1,8 +1,8 @@
 import { AffinityCondition, AffinityType } from '../../../utils/types';
 
 export const AFFINITY_CONDITION_LABELS = {
-  [AffinityCondition.required]: 'Required during scheduling',
   [AffinityCondition.preferred]: 'Preferred during scheduling',
+  [AffinityCondition.required]: 'Required during scheduling',
 };
 
 export const AFFINITY_TYPE_LABLES = {

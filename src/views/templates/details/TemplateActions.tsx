@@ -36,20 +36,20 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({ template }) => {
 
   return (
     <Dropdown
-      menuAppendTo={getContentScrollableElement}
-      isOpen={isDropDownOpen}
-      position={DropdownPosition.right}
-      toggle={<DropdownToggle onToggle={onDropDownToggle}>{t('Actions')}</DropdownToggle>}
       dropdownItems={filteredActions?.map((action) => (
         <DropdownItem
+          description={action?.disabled && action?.description}
+          isDisabled={action?.disabled}
           key={action?.id}
           onClick={() => handleClick(action)}
-          isDisabled={action?.disabled}
-          description={action?.disabled && action?.description}
         >
           {action?.label}
         </DropdownItem>
       ))}
+      isOpen={isDropDownOpen}
+      menuAppendTo={getContentScrollableElement}
+      position={DropdownPosition.right}
+      toggle={<DropdownToggle onToggle={onDropDownToggle}>{t('Actions')}</DropdownToggle>}
     />
   );
 };

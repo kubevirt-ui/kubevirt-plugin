@@ -25,14 +25,14 @@ const AffinityConditionSelect: React.FC<AffinityConditionSelectProps> = ({
     setIsOpen(false);
   };
   return (
-    <FormGroup fieldId="condition" label={t('Condition')} isRequired>
+    <FormGroup fieldId="condition" isRequired label={t('Condition')}>
       <Select
-        menuAppendTo="parent"
         isOpen={isOpen}
-        onToggle={setIsOpen}
+        menuAppendTo="parent"
         onSelect={handleChange}
-        variant={SelectVariant.single}
+        onToggle={setIsOpen}
         selections={focusedAffinity?.condition}
+        variant={SelectVariant.single}
       >
         {Object.entries(AFFINITY_CONDITION_LABELS).map(([key, value]) => (
           <SelectOption key={key} value={key}>

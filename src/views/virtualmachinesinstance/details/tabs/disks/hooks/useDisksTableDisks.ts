@@ -17,10 +17,10 @@ const useDisksTableDisks: UseDisksTableDisks = (vmi) => {
   const vmiVolumes = vmi?.spec?.volumes;
 
   const [pvcs, loaded, loadingError] = useK8sWatchResource<K8sResourceCommon[]>({
-    kind: PersistentVolumeClaimModel.kind,
     isList: true,
-    namespaced: true,
+    kind: PersistentVolumeClaimModel.kind,
     namespace: vmi?.metadata?.namespace,
+    namespaced: true,
   });
 
   const disks = React.useMemo(() => {

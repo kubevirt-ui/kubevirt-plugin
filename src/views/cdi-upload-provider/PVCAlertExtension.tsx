@@ -25,8 +25,8 @@ const PVCAlertExtension: React.FC<PVCAlertExtension> = ({ pvc }) => {
     <Alert
       className="co-m-form-row"
       isInline
-      variant={AlertVariant.warning}
       title={t("Please don't close this browser tab")}
+      variant={AlertVariant.warning}
     >
       {t('Closing it will cause the upload to fail. You may still navigate the console.')}
     </Alert>

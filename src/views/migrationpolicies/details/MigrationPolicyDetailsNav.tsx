@@ -16,9 +16,9 @@ const MigrationPolicyDetailsNav: React.FC<MigrationPolicyDetailsNavProps> = ({
   namespace,
 }) => {
   const [mp] = useK8sWatchResource<V1alpha1MigrationPolicy>({
+    groupVersionKind: MigrationPolicyModelGroupVersionKind,
     name,
     namespace,
-    groupVersionKind: MigrationPolicyModelGroupVersionKind,
   });
   const pages = useMigrationPolicyTabs();
   return (

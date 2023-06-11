@@ -5,11 +5,11 @@ import { EmptyState, EmptyStateIcon, Title, TitleSizes } from '@patternfly/react
 import { VirtualMachineIcon } from '@patternfly/react-icons';
 
 type EmptyStateNoVMsProps = {
-  titleSize: TitleSizes;
   className?: string;
+  titleSize: TitleSizes;
 };
 
-const EmptyStateNoVMs: React.FC<EmptyStateNoVMsProps> = ({ titleSize, className }) => {
+const EmptyStateNoVMs: React.FC<EmptyStateNoVMsProps> = ({ className, titleSize }) => {
   const { t } = useKubevirtTranslation();
 
   return (

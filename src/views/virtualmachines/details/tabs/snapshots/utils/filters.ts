@@ -4,9 +4,6 @@ import { snapshotStatuses } from './consts';
 
 export const filters: RowFilter[] = [
   {
-    filterGroupName: 'Status',
-    type: 'status-phase',
-    reducer: (obj) => obj?.status?.phase,
     filter: (statuses, obj) => {
       const status = obj?.status?.phase;
       return (
@@ -15,9 +12,12 @@ export const filters: RowFilter[] = [
         !statuses?.all?.find((item) => item === status)
       );
     },
+    filterGroupName: 'Status',
     items: Object.keys(snapshotStatuses).map((status) => ({
       id: snapshotStatuses[status],
       title: snapshotStatuses[status],
     })),
+    reducer: (obj) => obj?.status?.phase,
+    type: 'status-phase',
   },
 ];

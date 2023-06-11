@@ -11,20 +11,20 @@ import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesA
 import { getChangedEvictionStrategy } from '../PendingChanges/utils/helpers';
 
 type EvictionStrategyModalProps = {
-  vm: V1VirtualMachine;
+  headerText: string;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  headerText: string;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
-  vm,
+  headerText,
   isOpen,
   onClose,
   onSubmit,
-  headerText,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -45,11 +45,11 @@ const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
   }, [vm, checked]);
   return (
     <TabModal
-      obj={updatedVirtualMachine}
+      headerText={headerText}
       isOpen={isOpen}
+      obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={headerText}
     >
       <Form>
         {vmi && (
@@ -58,17 +58,17 @@ const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
           />
         )}
         <FormGroup
-          fieldId="eviction-strategy"
           helperText={t(
             'EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.',
           )}
+          fieldId="eviction-strategy"
           isInline
         >
           <Checkbox
             id="eviction-strategy"
             isChecked={checked}
-            onChange={setChecked}
             label={t('LiveMigrate')}
+            onChange={setChecked}
           />
         </FormGroup>
       </Form>

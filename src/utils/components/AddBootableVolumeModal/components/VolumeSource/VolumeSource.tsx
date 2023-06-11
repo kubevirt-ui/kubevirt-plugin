@@ -14,36 +14,32 @@ import { AddBootableVolumeState } from '../../utils/constants';
 
 type VolumeSourceProps = {
   bootableVolume: AddBootableVolumeState;
+  isUploadForm: boolean;
   setBootableVolumeField: (key: string, fieldKey?: string) => (value: string) => void;
   upload: DataUpload;
-  isUploadForm: boolean;
 };
 
 const VolumeSource: FC<VolumeSourceProps> = ({
   bootableVolume,
+  isUploadForm,
   setBootableVolumeField,
   upload,
-  isUploadForm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { uploadFile, uploadFilename, pvcName, pvcNamespace } = bootableVolume || {};
+  const { pvcName, pvcNamespace, uploadFile, uploadFilename } = bootableVolume || {};
 
   return isUploadForm ? (
     <DiskSourceUploadPVC
+      label={t('Upload PVC image')}
       relevantUpload={upload}
-      uploadFile={uploadFile}
-      uploadFileName={uploadFilename}
       setUploadFile={setBootableVolumeField('uploadFile')}
       setUploadFileName={setBootableVolumeField('uploadFilename')}
-      label={t('Upload PVC image')}
+      uploadFile={uploadFile}
+      uploadFileName={uploadFilename}
     />
   ) : (
     <>
       <DiskSourcePVCSelect
-        pvcNameSelected={pvcName}
-        pvcNamespaceSelected={pvcNamespace}
-        selectPVCName={setBootableVolumeField('pvcName')}
-        selectPVCNamespace={setBootableVolumeField('pvcNamespace')}
         setDiskSize={(newSize) =>
           setBootableVolumeField('size')(
             hasSizeUnit(newSize)
@@ -51,6 +47,10 @@ const VolumeSource: FC<VolumeSourceProps> = ({
               : removeByteSuffix(xbytes(Number(newSize), { iec: true, space: false })),
           )
         }
+        pvcNameSelected={pvcName}
+        pvcNamespaceSelected={pvcNamespace}
+        selectPVCName={setBootableVolumeField('pvcName')}
+        selectPVCNamespace={setBootableVolumeField('pvcNamespace')}
       />
       <Split hasGutter>
         <SplitItem>

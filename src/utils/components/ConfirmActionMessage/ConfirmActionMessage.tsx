@@ -5,11 +5,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 type ConfirmActionMessageProps = {
-  obj: K8sResourceCommon | { metadata: { name: string; namespace: string } };
   action?: string;
+  obj: { metadata: { name: string; namespace: string } } | K8sResourceCommon;
 };
 
-const ConfirmActionMessage: React.FC<ConfirmActionMessageProps> = ({ obj, action = 'delete' }) => {
+const ConfirmActionMessage: React.FC<ConfirmActionMessageProps> = ({ action = 'delete', obj }) => {
   const { t } = useKubevirtTranslation();
   const objNamespace = obj?.metadata?.namespace;
 

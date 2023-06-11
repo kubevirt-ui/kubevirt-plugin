@@ -49,8 +49,8 @@ export const getEmptyVMSnapshotResource = (
     apiVersion: `${VirtualMachineSnapshotModel.apiGroup}/${VirtualMachineSnapshotModel.apiVersion}`,
     kind: VirtualMachineSnapshotModel.kind,
     metadata: {
-      namespace: vm?.metadata?.namespace,
       name: '',
+      namespace: vm?.metadata?.namespace,
     },
     spec: {
       source: {

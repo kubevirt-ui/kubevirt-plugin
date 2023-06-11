@@ -16,22 +16,22 @@ type MenuHeightsType = {
 };
 
 type ComposableDrilldownMenuProps = {
-  toggleLabel: ReactNode | string;
-  isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
-  scrollableMenuIDs?: string[];
-  isScrollable?: boolean;
   id?: string;
+  isOpen: boolean;
+  isScrollable?: boolean;
+  scrollableMenuIDs?: string[];
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  toggleLabel: ReactNode | string;
 };
 
 const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
   children,
-  toggleLabel,
-  isOpen,
-  setIsOpen,
-  scrollableMenuIDs = [],
-  isScrollable = false,
   id = 'rootMenu',
+  isOpen,
+  isScrollable = false,
+  scrollableMenuIDs = [],
+  setIsOpen,
+  toggleLabel,
 }) => {
   const [activeMenu, setActiveMenu] = useState<string>(id);
   const [menuDrilledIn, setMenuDrilledIn] = useState<string[]>([]);
@@ -77,32 +77,32 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
 
   return (
     <Popper
-      trigger={
-        <MenuToggle isFullWidth onClick={onToggleClick} isExpanded={isOpen}>
-          {toggleLabel}
-        </MenuToggle>
-      }
       popper={
         <Menu
-          id={id}
-          ref={ref}
+          activeMenu={activeMenu}
           containsDrilldown
           drilldownItemPath={drilldownPath}
           drilledInMenus={menuDrilledIn}
-          activeMenu={activeMenu}
+          id={id}
+          isScrollable={isScrollable || scrollableMenuIDs.includes(activeMenu)}
           onDrillIn={drillIn}
           onDrillOut={drillOut}
           onGetMenuHeight={setHeight}
-          isScrollable={isScrollable || scrollableMenuIDs.includes(activeMenu)}
+          ref={ref}
         >
           <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
             <MenuList>{children}</MenuList>
           </MenuContent>
         </Menu>
       }
+      trigger={
+        <MenuToggle isExpanded={isOpen} isFullWidth onClick={onToggleClick}>
+          {toggleLabel}
+        </MenuToggle>
+      }
       appendTo={document.getElementById('tab-modal')}
-      isVisible={isOpen}
       direction="up"
+      isVisible={isOpen}
       popperMatchesTriggerWidth
     />
   );

@@ -9,25 +9,25 @@ import SelectSysprep from './SelectSysprep';
 import Sysprep from './Sysprep';
 
 export const SysprepModal: React.FC<{
-  isOpen: boolean;
   autoUnattend: string;
-  unattend: string;
-  onSysprepCreation?: (unattended: string, autoUnattend: string) => void | Promise<void>;
-  onClose: () => void;
   enableCreation?: boolean;
-  onSysprepSelected?: (sysprepName: string) => void | Promise<void>;
-  sysprepSelected?: string;
+  isOpen: boolean;
   namespace: string;
+  onClose: () => void;
+  onSysprepCreation?: (unattended: string, autoUnattend: string) => Promise<void> | void;
+  onSysprepSelected?: (sysprepName: string) => Promise<void> | void;
+  sysprepSelected?: string;
+  unattend: string;
 }> = ({
-  isOpen,
-  onClose,
   autoUnattend: initialAutoUnattend,
-  unattend: initialUnattend,
-  onSysprepCreation,
   enableCreation = true,
+  isOpen,
+  namespace,
+  onClose,
+  onSysprepCreation,
   onSysprepSelected,
   sysprepSelected,
-  namespace,
+  unattend: initialUnattend,
 }) => {
   const { t } = useKubevirtTranslation();
   const [autoUnattend, setAutoUnattend] = React.useState(initialAutoUnattend);
@@ -46,17 +46,17 @@ export const SysprepModal: React.FC<{
   if (!enableCreation) {
     return (
       <TabModal
-        onSubmit={() => submitHandler()}
+        headerText={t('Sysprep')}
         isOpen={isOpen}
         onClose={onClose}
-        headerText={t('Sysprep')}
+        onSubmit={() => submitHandler()}
       >
         <div className="kv-sysprep-modal">
           <FormGroup fieldId="select-sysprep" label={t('Attach existing sysprep')}>
             <SelectSysprep
-              selectedSysprepName={selectedSysprepName}
-              onSelectSysprep={setSelectedSysprepName}
               namespace={namespace}
+              onSelectSysprep={setSelectedSysprepName}
+              selectedSysprepName={selectedSysprepName}
             />
           </FormGroup>
         </div>
@@ -66,38 +66,38 @@ export const SysprepModal: React.FC<{
 
   return (
     <TabModal
-      onSubmit={() => submitHandler()}
-      isOpen={isOpen}
-      onClose={onClose}
       headerText={t('Sysprep')}
+      isOpen={isOpen}
       modalVariant={ModalVariant.medium}
+      onClose={onClose}
+      onSubmit={() => submitHandler()}
     >
       <div className="kv-sysprep-modal">
         <ExpandableSection
-          onToggle={setCreationSection}
-          toggleText={t('Create new sysprep')}
           data-test-id="expandable-new-sysprep-section"
           isExpanded={creationSectionOpen}
           isIndented
+          onToggle={setCreationSection}
+          toggleText={t('Create new sysprep')}
         >
           <Sysprep
             autoUnattend={autoUnattend}
             onAutoUnattendChange={setAutoUnattend}
-            unattend={unattend}
             onUnattendChange={setUnattend}
+            unattend={unattend}
           />
         </ExpandableSection>
         <ExpandableSection
-          onToggle={() => setCreationSection(!creationSectionOpen)}
-          toggleText={t('Attach existing sysprep')}
           data-test-id="expandable-new-sysprep-section"
           isExpanded={!creationSectionOpen}
           isIndented
+          onToggle={() => setCreationSection(!creationSectionOpen)}
+          toggleText={t('Attach existing sysprep')}
         >
           <SelectSysprep
-            selectedSysprepName={selectedSysprepName}
-            onSelectSysprep={setSelectedSysprepName}
             namespace={namespace}
+            onSelectSysprep={setSelectedSysprepName}
+            selectedSysprepName={selectedSysprepName}
           />
         </ExpandableSection>
       </div>

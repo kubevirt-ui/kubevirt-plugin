@@ -31,27 +31,27 @@ import { getCPUcores, getMemorySize, memorySizesTypes } from './utils/CpuMemoryU
 import './cpu-memory-modal.scss';
 
 type CPUMemoryModalProps = {
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  vmi?: V1VirtualMachineInstance;
   templateNamespace?: string;
+  vm: V1VirtualMachine;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
-  vm,
   isOpen,
   onClose,
   onSubmit,
-  vmi,
   templateNamespace = DEFAULT_NAMESPACE,
+  vm,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
     data: templateDefaultsData,
-    loaded: defaultsLoaded,
     error: defaultLoadError,
+    loaded: defaultsLoaded,
   } = useTemplateDefaultCpuMemory(
     vm?.metadata?.labels?.['vm.kubevirt.io/template'],
     vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'] || templateNamespace,
@@ -107,24 +107,17 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
 
   return (
     <Modal
-      title={t('Edit CPU | Memory')}
-      isOpen={isOpen}
-      className="cpu-memory-modal"
-      variant={ModalVariant.small}
-      onClose={onClose}
       actions={[
         <Button
-          key="confirm"
-          variant={ButtonVariant.primary}
-          onClick={handleSubmit}
           isDisabled={updateInProcess}
           isLoading={updateInProcess}
+          key="confirm"
+          onClick={handleSubmit}
+          variant={ButtonVariant.primary}
         >
           {t('Save')}
         </Button>,
         <Button
-          key="default"
-          variant={ButtonVariant.secondary}
           isDisabled={
             !templateName ||
             !defaultsLoaded ||
@@ -132,19 +125,26 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
             !templateDefaultsData?.defaultMemory ||
             defaultLoadError
           }
-          isLoading={templateName && !defaultsLoaded}
           onClick={() => {
             setCpuCores(templateDefaultsData?.defaultCpu);
             setMemory(templateDefaultsData?.defaultMemory?.size);
             setMemoryUnit(templateDefaultsData?.defaultMemory?.unit);
           }}
+          isLoading={templateName && !defaultsLoaded}
+          key="default"
+          variant={ButtonVariant.secondary}
         >
           {t('Restore template settings')}
         </Button>,
-        <Button key="cancel" variant="link" onClick={onClose}>
+        <Button key="cancel" onClick={onClose} variant="link">
           {t('Cancel')}
         </Button>,
       ]}
+      className="cpu-memory-modal"
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('Edit CPU | Memory')}
+      variant={ModalVariant.small}
     >
       {vmi && (
         <ModalPendingChangesAlert isChanged={checkCPUMemoryChanged(updatedVirtualMachine, vmi)} />
@@ -155,15 +155,15 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
             {t('CPU cores')}
           </Title>
           <NumberInput
-            value={cpuCores}
-            onMinus={() => setCpuCores((cpus) => +cpus - 1)}
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               const newNumber = +e?.target?.value;
               setCpuCores((cpus) => (newNumber > 0 ? newNumber : cpus));
             }}
-            onPlus={() => setCpuCores((cpus) => +cpus + 1)}
             inputName="cpu-input"
             min={1}
+            onMinus={() => setCpuCores((cpus) => +cpus - 1)}
+            onPlus={() => setCpuCores((cpus) => +cpus + 1)}
+            value={cpuCores}
           />
         </div>
         <div className="input-memory">
@@ -171,19 +171,25 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
             {t('Memory')}
           </Title>
           <NumberInput
-            value={memory}
-            onMinus={() => setMemory((mem) => +mem - 1)}
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               const newNumber = +e?.target?.value;
               setMemory((mem) => (newNumber > 0 ? newNumber : mem));
             }}
-            onPlus={() => setMemory((mem) => +mem + 1)}
             inputName="memory-input"
             min={1}
+            onMinus={() => setMemory((mem) => +mem - 1)}
+            onPlus={() => setMemory((mem) => +mem + 1)}
+            value={memory}
           />
 
           <Dropdown
-            className="input-memory--dropdown"
+            dropdownItems={memorySizesTypes.map((value) => {
+              return (
+                <DropdownItem component="button" key={value} value={value}>
+                  {toIECUnit(value)}
+                </DropdownItem>
+              );
+            })}
             onSelect={(e: ChangeEvent<HTMLInputElement>) => {
               setMemoryUnit(e?.target?.value);
               setIsDropdownOpen(false);
@@ -193,19 +199,13 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
                 {toIECUnit(memoryUnit)}
               </DropdownToggle>
             }
+            className="input-memory--dropdown"
             isOpen={isDropdownOpen}
-            dropdownItems={memorySizesTypes.map((value) => {
-              return (
-                <DropdownItem key={value} value={value} component="button">
-                  {toIECUnit(value)}
-                </DropdownItem>
-              );
-            })}
           />
         </div>
       </div>
       {updateError && (
-        <Alert variant="danger" isInline title={t('Error')}>
+        <Alert isInline title={t('Error')} variant="danger">
           {updateError}
         </Alert>
       )}

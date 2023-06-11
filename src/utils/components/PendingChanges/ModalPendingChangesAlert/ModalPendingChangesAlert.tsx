@@ -19,9 +19,9 @@ export const ModalPendingChangesAlert: React.FC<ModalPendingChangesAlertProps> =
       );
   return (
     <PendingChangesAlert
-      warningMsg={modalMsg}
       isWarning={isChanged}
       title={t('Restart required to apply changes')}
+      warningMsg={modalMsg}
     />
   );
 };

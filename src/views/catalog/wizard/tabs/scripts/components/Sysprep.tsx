@@ -27,7 +27,7 @@ const Sysprep: React.FC = () => {
   const { t } = useKubevirtTranslation();
 
   const { createModal } = useModal();
-  const { vm, updateVM, tabsData, updateTabsData } = useWizardVMContext();
+  const { tabsData, updateTabsData, updateVM, vm } = useWizardVMContext();
 
   const currentSysprepVolume = getVolumes(vm)?.find((volume) => volume?.sysprep?.configMap?.name);
   const currentVMSysprepName = currentSysprepVolume?.sysprep?.configMap?.name;
@@ -38,7 +38,7 @@ const Sysprep: React.FC = () => {
     filterSysprepByName,
   ) as IoK8sApiCoreV1ConfigMap;
 
-  const { [UNATTEND]: unattend, [AUTOUNATTEND]: autoUnattend } = sysPrepObject?.data || {};
+  const { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend } = sysPrepObject?.data || {};
   const selectedSysprep = !sysPrepObject && currentVMSysprepName;
 
   const onSysprepSelected = (newSysprep: string) => {
@@ -82,9 +82,6 @@ const Sysprep: React.FC = () => {
 
   return (
     <WizardDescriptionItem
-      testId="wizard-sysprep"
-      title={t('Sysprep')}
-      label={<WindowsLabel />}
       description={
         <SysprepDescription
           hasAutoUnattend={!!autoUnattend}
@@ -92,21 +89,24 @@ const Sysprep: React.FC = () => {
           selectedSysprepName={selectedSysprep}
         />
       }
-      isEdit
-      showEditOnTitle
       onEditClick={() =>
         createModal((modalProps) => (
           <SysprepModal
             {...modalProps}
-            namespace={vm?.metadata?.namespace}
-            unattend={unattend}
             autoUnattend={autoUnattend}
+            namespace={vm?.metadata?.namespace}
             onSysprepCreation={onSysprepCreation}
             onSysprepSelected={onSysprepSelected}
             sysprepSelected={selectedSysprep}
+            unattend={unattend}
           />
         ))
       }
+      isEdit
+      label={<WindowsLabel />}
+      showEditOnTitle
+      testId="wizard-sysprep"
+      title={t('Sysprep')}
     />
   );
 };

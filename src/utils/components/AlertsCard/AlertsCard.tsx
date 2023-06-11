@@ -32,15 +32,15 @@ import {
 import './AlertsCard.scss';
 
 type AlertsCardProps = {
-  sortedAlerts: SimplifiedAlerts;
-  isOverviewPage?: boolean;
   className?: string;
+  isOverviewPage?: boolean;
+  sortedAlerts: SimplifiedAlerts;
 };
 
 const AlertsCard: React.FC<AlertsCardProps> = ({
-  sortedAlerts,
-  isOverviewPage = false,
   className,
+  isOverviewPage = false,
+  sortedAlerts,
 }) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
@@ -74,42 +74,42 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
             )}
             {isAdmin ? (
               <FormPFSelect
+                isDisabled={!isAdmin}
+                onSelect={(e, value) => setAlertScope(value)}
+                selections={alertScope}
                 toggleId="overview-alerts-card"
                 variant={SelectVariant.single}
-                selections={alertScope}
-                onSelect={(e, value) => setAlertScope(value)}
-                isDisabled={!isAdmin}
               >
                 {alertScopeOptions().map((scope) => (
                   <SelectOption
+                    description={scope.description}
                     key={scope.key}
                     value={scope.value}
-                    description={scope.description}
                   />
                 ))}
               </FormPFSelect>
             ) : (
               <Popover
-                className="alerts-card__nonadmin-popover"
                 aria-label="Only VM-related alerts notification"
-                position={PopoverPosition.top}
+                bodyContent={<div>{t('Only VM-related alerts in your project will be shown')}</div>}
+                className="alerts-card__nonadmin-popover"
                 enableFlip={false}
                 hasAutoWidth
                 maxWidth="250px"
-                bodyContent={<div>{t('Only VM-related alerts in your project will be shown')}</div>}
+                position={PopoverPosition.top}
               >
                 <FormPFSelect
+                  isDisabled={!isAdmin}
+                  onSelect={(e, value) => setAlertScope(value)}
+                  selections={alertScope}
                   toggleId="overview-alerts-card"
                   variant={SelectVariant.single}
-                  selections={alertScope}
-                  onSelect={(e, value) => setAlertScope(value)}
-                  isDisabled={!isAdmin}
                 >
                   {alertScopeOptions().map((scope) => (
                     <SelectOption
+                      description={scope.description}
                       key={scope.key}
                       value={scope.value}
-                      description={scope.description}
                     />
                   ))}
                 </FormPFSelect>

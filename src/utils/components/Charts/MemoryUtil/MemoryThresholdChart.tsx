@@ -36,8 +36,8 @@ type MemoryThresholdChartProps = {
 
 const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
-  const queries = useMemo(() => getUtilizationQueries({ obj: vmi, duration }), [vmi, duration]);
-  const { ref, width, height } = useResponsiveCharts();
+  const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
+  const { height, ref, width } = useResponsiveCharts();
 
   const requests = vmi?.spec?.domain?.resources?.requests as {
     [key: string]: string;
@@ -45,10 +45,10 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const memory = getMemorySize(requests?.memory);
 
   const [data] = usePrometheusPoll({
-    query: queries?.MEMORY_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.MEMORY_USAGE,
     timespan,
   });
 
@@ -56,13 +56,13 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const memoryAvailableBytes = xbytes.parseSize(`${memory?.size} ${memory?.unit}B`);
 
   const chartData = prometheusMemoryData?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: 'Memory used' };
+    return { name: 'Memory used', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const thresholdLine = new Array(chartData?.length || 0).fill(0).map((_, index) => ({
+    name: 'Memory available',
     x: chartData?.[index]?.x,
     y: memoryAvailableBytes,
-    name: 'Memory available',
   }));
 
   const isReady = !isEmpty(chartData) || !isEmpty(thresholdLine);
@@ -72,63 +72,63 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queriesToLink(queries?.MEMORY_USAGE)}>
           <Chart
-            height={height}
-            width={width}
-            padding={{ top: 35, bottom: 35, left: 55, right: 35 }}
-            scale={{ x: 'time', y: 'linear' }}
-            domain={{
-              x: [currentTime - timespan, currentTime],
-            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
                   return `${datum?.name}: ${xbytes(datum?.y, {
-                    iec: true,
                     fixed: 2,
+                    iec: true,
                   })}`;
                 }}
                 constrainToVisibleArea
               />
             }
+            domain={{
+              x: [currentTime - timespan, currentTime],
+            }}
+            height={height}
+            padding={{ bottom: 35, left: 55, right: 35, top: 35 }}
+            scale={{ x: 'time', y: 'linear' }}
+            width={width}
           >
             <ChartAxis
-              dependentAxis
-              tickCount={2}
-              tickValues={[0, thresholdLine?.[0]?.y]}
-              tickFormat={formatMemoryYTick(thresholdLine?.[0]?.y, 0)}
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
+              dependentAxis
+              tickCount={2}
+              tickFormat={formatMemoryYTick(thresholdLine?.[0]?.y, 0)}
+              tickValues={[0, thresholdLine?.[0]?.y]}
             />
             <ChartAxis
-              tickFormat={tickFormat(duration, currentTime)}
-              tickCount={TICKS_COUNT}
               style={{
-                ticks: { stroke: 'transparent' },
                 tickLabels: { padding: 2 },
+                ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}
+              tickCount={TICKS_COUNT}
+              tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
-                data={chartData}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
+                data={chartData}
               />
             </ChartGroup>
             <ChartThreshold
-              data={thresholdLine}
               style={{
                 data: {
                   stroke: chart_color_orange_300.value,
                   strokeDasharray: 10,
                 },
               }}
+              data={thresholdLine}
             />
           </Chart>
         </Link>

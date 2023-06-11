@@ -4,9 +4,9 @@ import DefaultStorageClassAlert from './DefaultStorageClassAlert';
 import StorageClassSelect from './StorageClassSelect';
 
 export type AlertedStorageClassSelectProps = {
-  storageClass: string;
   setStorageClassName: Dispatch<SetStateAction<string>>;
   setStorageClassProvisioner?: Dispatch<SetStateAction<string>>;
+  storageClass: string;
 };
 
 const AlertedStorageClassSelect: FC<AlertedStorageClassSelectProps> = (props) => {

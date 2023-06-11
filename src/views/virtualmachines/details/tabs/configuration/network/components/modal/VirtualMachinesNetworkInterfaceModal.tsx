@@ -19,22 +19,22 @@ import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 type VirtualMachinesNetworkInterfaceModalProps = {
-  vm: V1VirtualMachine;
+  headerText: string;
   isOpen: boolean;
   onClose: () => void;
-  headerText: string;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceModalProps> = ({
-  vm,
+  headerText,
   isOpen,
   onClose,
-  headerText,
+  vm,
   vmi,
 }) => {
   const onSubmit = useCallback(
-    ({ nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType }) =>
+    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
       () => {
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface(
@@ -49,10 +49,10 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
         const updatedVM = updateVMNetworkInterface(vm, updatedNetworks, updatedInterfaces);
 
         return k8sUpdate({
-          model: VirtualMachineModel,
           data: updatedVM,
-          ns: updatedVM.metadata.namespace,
+          model: VirtualMachineModel,
           name: updatedVM.metadata.name,
+          ns: updatedVM.metadata.namespace,
         });
       },
     [vm],
@@ -60,12 +60,12 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
 
   return (
     <NetworkInterfaceModal
+      Header={vmi && <ModalPendingChangesAlert isChanged={getChangedNics(vm, vmi)?.length > 0} />}
+      headerText={headerText}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={headerText}
-      vm={vm}
       onSubmit={onSubmit}
-      Header={vmi && <ModalPendingChangesAlert isChanged={getChangedNics(vm, vmi)?.length > 0} />}
+      vm={vm}
     />
   );
 };

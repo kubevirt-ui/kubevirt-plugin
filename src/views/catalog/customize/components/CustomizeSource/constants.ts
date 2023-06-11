@@ -8,11 +8,11 @@ export const CONTAINER_DISK_SOURCE_NAME = 'container-disk';
 export const PVC_EPHEMERAL_SOURCE_NAME = 'pvc';
 
 export type SOURCE_OPTIONS_IDS =
-  | typeof DEFAULT_SOURCE
-  | typeof PVC_SOURCE_NAME
-  | typeof HTTP_SOURCE_NAME
-  | typeof REGISTRY_SOURCE_NAME
   | typeof BLANK_SOURCE_NAME
-  | typeof UPLOAD_SOURCE_NAME
   | typeof CONTAINER_DISK_SOURCE_NAME
-  | typeof PVC_EPHEMERAL_SOURCE_NAME;
+  | typeof DEFAULT_SOURCE
+  | typeof HTTP_SOURCE_NAME
+  | typeof PVC_EPHEMERAL_SOURCE_NAME
+  | typeof PVC_SOURCE_NAME
+  | typeof REGISTRY_SOURCE_NAME
+  | typeof UPLOAD_SOURCE_NAME;

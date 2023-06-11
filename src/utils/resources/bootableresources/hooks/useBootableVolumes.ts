@@ -19,8 +19,8 @@ import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin
 
 type UseBootableVolumes = (namespace?: string) => {
   bootableVolumes: BootableVolume[];
-  loaded: boolean;
   error?: any;
+  loaded: boolean;
   pvcSources: {
     [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
   };
@@ -92,8 +92,8 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
 
   return {
     bootableVolumes,
-    loaded,
     error,
+    loaded,
     pvcSources,
   };
 };

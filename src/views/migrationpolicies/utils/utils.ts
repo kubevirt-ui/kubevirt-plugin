@@ -6,7 +6,7 @@ import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 
 export const getBooleanText = (value: boolean): string => (value ? t('Yes') : t('No'));
 
-export const getBandwidthPerMigrationText = (bandwidth: string | number): string => {
+export const getBandwidthPerMigrationText = (bandwidth: number | string): string => {
   if (typeof bandwidth === 'string') return readableSizeUnit(bandwidth);
   return `${bandwidth}`;
 };

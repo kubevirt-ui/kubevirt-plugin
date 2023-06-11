@@ -30,31 +30,31 @@ const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pa
   const columns: TableColumn<V1alpha2VirtualMachineClusterInstancetype>[] = useMemo(
     () => [
       {
-        title: t('Name'),
         id: 'name',
-        transforms: [sortable],
         sort: (_, direction) => sorting(direction, 'metadata.name'),
+        title: t('Name'),
+        transforms: [sortable],
       },
       {
-        title: t('CPU'),
         id: 'cpu',
-        transforms: [sortable],
         sort: (_, direction) => sorting(direction, 'spec.cpu.guest'),
-      },
-      {
-        title: t('Memory'),
-        id: 'memory',
+        title: t('CPU'),
         transforms: [sortable],
+      },
+      {
+        id: 'memory',
         sort: (_, direction) => sorting(direction, 'spec.memory.guest'),
+        title: t('Memory'),
+        transforms: [sortable],
       },
       {
-        title: t('Vendor'),
         id: 'vendor',
+        title: t('Vendor'),
       },
       {
-        title: '',
         id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        title: '',
       },
     ],
     [t, sorting],
@@ -62,8 +62,8 @@ const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pa
 
   const [activeColumns] =
     useKubevirtUserSettingsTableColumns<V1alpha2VirtualMachineClusterInstancetype>({
-      columns,
       columnManagementID: VirtualMachineClusterInstancetypeModelRef,
+      columns,
     });
 
   return [columns, activeColumns];

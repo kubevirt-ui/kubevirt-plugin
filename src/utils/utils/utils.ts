@@ -4,14 +4,14 @@ import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugi
 import { ItemsToFilterProps } from './types';
 
 export const isEmpty = (obj) =>
-  [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
+  [Array, Object].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
 
 export const get = (obj: unknown, path: string | string[], defaultValue = undefined) => {
   const travel = (regexp: RegExp) =>
     String.prototype.split
       .call(path, regexp)
       .filter(Boolean)
-      .reduce((res: { [x: string]: any }, key: string | number) => {
+      .reduce((res: { [x: string]: any }, key: number | string) => {
         return res !== null && res !== undefined ? res[key] : res;
       }, obj);
   const result = travel(/[,[\]]+?/) || travel(/[,[\].]+?/);
@@ -98,10 +98,10 @@ export const columnSorting = <T>(
   pagination: { [key: string]: any },
   path: string,
 ) => {
-  const { startIndex, endIndex } = pagination;
+  const { endIndex, startIndex } = pagination;
   const predicate = (a: T, b: T) => {
     const { first, second } =
-      direction === 'asc' ? { first: a, second: b } : { second: a, first: b };
+      direction === 'asc' ? { first: a, second: b } : { first: b, second: a };
     return getValueByPath(first, path)
       ?.toString()
       ?.localeCompare(getValueByPath(second, path)?.toString(), undefined, {

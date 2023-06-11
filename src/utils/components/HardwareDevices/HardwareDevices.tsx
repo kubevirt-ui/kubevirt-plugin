@@ -18,19 +18,19 @@ import HardwareDevicesTable from './HardwareDevicesTable';
 import HardwareDeviceTitle from './HardwareDeviceTitle';
 
 type HardwareDevicesProps = {
-  vm: V1VirtualMachine;
-  onSubmit?: (vm: V1VirtualMachine) => Promise<void | V1VirtualMachine>;
   canEdit?: boolean;
   hideEdit?: boolean;
+  onSubmit?: (vm: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const HardwareDevices: FC<HardwareDevicesProps> = ({
-  vm,
-  vmi,
-  onSubmit,
   canEdit = true,
   hideEdit = false,
+  onSubmit,
+  vm,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -41,14 +41,14 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
   const onEditGPU = () => {
     createModal(({ isOpen, onClose }) => (
       <HardwareDevicesModal
-        vm={vm}
+        btnText={t('Add GPU device')}
+        headerText={t('GPU devices')}
+        initialDevices={gpus}
         isOpen={isOpen}
         onClose={onClose}
-        headerText={t('GPU devices')}
         onSubmit={onSubmit}
-        initialDevices={gpus}
-        btnText={t('Add GPU device')}
         type={HARDWARE_DEVICE_TYPE.GPUS}
+        vm={vm}
         vmi={vmi}
       />
     ));
@@ -57,14 +57,14 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
   const onEditHostDevices = () => {
     createModal(({ isOpen, onClose }) => (
       <HardwareDevicesModal
-        vm={vm}
+        btnText={t('Add Host device')}
+        headerText={t('Host devices')}
+        initialDevices={hostDevices}
         isOpen={isOpen}
         onClose={onClose}
-        headerText={t('Host devices')}
         onSubmit={onSubmit}
-        initialDevices={hostDevices}
-        btnText={t('Add Host device')}
         type={HARDWARE_DEVICE_TYPE.HOST_DEVICES}
+        vm={vm}
         vmi={vmi}
       />
     ));
@@ -74,10 +74,10 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
     <DescriptionList>
       <DescriptionListGroup>
         <HardwareDeviceTitle
-          title={t('GPU devices')}
-          onClick={onEditGPU}
           canEdit={canEdit}
           hideEdit={hideEdit}
+          onClick={onEditGPU}
+          title={t('GPU devices')}
         />
         <DescriptionListDescription>
           <HardwareDevicesTable devices={gpus} />
@@ -86,10 +86,10 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
 
       <DescriptionListGroup>
         <HardwareDeviceTitle
-          title={t('Host devices')}
-          onClick={onEditHostDevices}
           canEdit={canEdit}
           hideEdit={hideEdit}
+          onClick={onEditHostDevices}
+          title={t('Host devices')}
         />
         <DescriptionListDescription>
           <HardwareDevicesTable devices={hostDevices} />
@@ -97,7 +97,7 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
       </DescriptionListGroup>
       {canEdit && !hideEdit && (
         <DescriptionListGroup>
-          <HardwareDevicesHeadlessMode vm={vm} vmi={vmi} onSubmit={onSubmit} />
+          <HardwareDevicesHeadlessMode onSubmit={onSubmit} vm={vm} vmi={vmi} />
         </DescriptionListGroup>
       )}
     </DescriptionList>

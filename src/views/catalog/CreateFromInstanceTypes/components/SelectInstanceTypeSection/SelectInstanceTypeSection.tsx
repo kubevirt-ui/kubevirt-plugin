@@ -39,7 +39,7 @@ const SelectInstanceTypeSection: FC = () => {
     <>
       <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
         <Tab eventKey={TabKey.RedHat} title={menuItems.redHatProvided.label}>
-          <Grid span={2} hasGutter>
+          <Grid hasGutter span={2}>
             {menuItems.redHatProvided.items.map((rhSeriesItem) => (
               <GridItem key={rhSeriesItem?.seriesName}>
                 <RedHatSeriesMenuCard rhSeriesItem={rhSeriesItem} {...menuProps} />

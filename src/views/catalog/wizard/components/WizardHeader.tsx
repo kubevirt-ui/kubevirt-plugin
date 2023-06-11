@@ -37,19 +37,17 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
       <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
         <BreadcrumbItem>
           <Button
-            variant="link"
-            isInline
             onClick={() =>
               onBreadcrumbClick(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`)
             }
+            isInline
+            variant="link"
           >
             {t('Catalog')}
           </Button>
         </BreadcrumbItem>
         <BreadcrumbItem>
           <Button
-            variant="link"
-            isInline
             onClick={() =>
               onBreadcrumbClick(
                 `/k8s/ns/${
@@ -57,6 +55,8 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
                 }/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
               )
             }
+            isInline
+            variant="link"
           >
             {t('Customize')}
           </Button>

@@ -6,8 +6,8 @@ export const paginationDefaultValues = [
 ];
 
 export const paginationInitialState: PaginationState = {
+  endIndex: 5,
   page: 1,
   perPage: 5,
   startIndex: 0,
-  endIndex: 5,
 };

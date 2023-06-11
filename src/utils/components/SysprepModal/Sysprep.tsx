@@ -11,21 +11,21 @@ import './sysprep.scss';
 type SysprepProps = {
   autoUnattend: string;
   onAutoUnattendChange: (value: string) => void;
-  unattend: string;
   onUnattendChange: (value: string) => void;
+  unattend: string;
 };
 
 const Sysprep: React.FC<SysprepProps> = ({
   autoUnattend,
   onAutoUnattendChange,
-  unattend,
   onUnattendChange,
+  unattend,
 }) => {
   return (
     <Form className="kv-sysprep--main">
       <SysprepInfo />
-      <SysprepAutounattend value={autoUnattend} onChange={onAutoUnattendChange} />
-      <SysprepUnattend value={unattend} onChange={onUnattendChange} />
+      <SysprepAutounattend onChange={onAutoUnattendChange} value={autoUnattend} />
+      <SysprepUnattend onChange={onUnattendChange} value={unattend} />
     </Form>
   );
 };

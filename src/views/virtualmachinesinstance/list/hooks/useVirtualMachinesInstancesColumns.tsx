@@ -8,62 +8,62 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
-const useVirtualMachinesInstancesColumns = (): { title: string; id: string }[] => {
+const useVirtualMachinesInstancesColumns = (): { id: string; title: string }[] => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<K8sResourceCommon>[] = React.useMemo(
     () => [
       {
-        title: t('Name'),
         id: 'name',
-        transforms: [sortable],
         sort: 'metadata.name',
+        title: t('Name'),
+        transforms: [sortable],
       },
       {
-        title: t('Namespace'),
         id: 'namespace',
-        transforms: [sortable],
         sort: 'metadata.namespace',
+        title: t('Namespace'),
+        transforms: [sortable],
       },
       {
-        title: t('Status'),
         id: 'status',
-        transforms: [sortable],
         sort: 'status.phase',
+        title: t('Status'),
+        transforms: [sortable],
       },
       {
-        title: t('Conditions'),
         id: 'conditions',
+        title: t('Conditions'),
       },
       {
-        title: t('Created'),
         id: 'created',
-        transforms: [sortable],
         sort: 'metadata.creationTimestamp',
+        title: t('Created'),
+        transforms: [sortable],
       },
       {
-        title: t('Node'),
         id: 'node',
-        transforms: [sortable],
         sort: 'metadata.creationTimestamp',
+        title: t('Node'),
+        transforms: [sortable],
       },
       {
-        title: t('IP address'),
         id: 'ipAddress',
+        title: t('IP address'),
       },
       {
-        title: '',
         id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        title: '',
       },
     ],
     [t],
   );
 
   const [activeColumns] = useActiveColumns<K8sResourceCommon>({
+    columnManagementID: '',
     columns,
     showNamespaceOverride: false,
-    columnManagementID: '',
   });
 
   return activeColumns;

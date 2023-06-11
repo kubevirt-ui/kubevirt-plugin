@@ -70,7 +70,7 @@ const TemplatesProjectTab = () => {
   }, [hyperConvergeData, selectedProject]);
 
   const onSelect = (
-    _event: React.MouseEvent<Element, MouseEvent> | React.ChangeEvent<Element>,
+    _event: React.ChangeEvent<Element> | React.MouseEvent<Element, MouseEvent>,
     value: string,
   ) => {
     setIsOpen(false);
@@ -87,15 +87,15 @@ const TemplatesProjectTab = () => {
     const filteredProjects = projects.filter((project) => project?.metadata?.name?.includes(value));
     return filteredProjects?.map((project) => (
       <SelectOption key={project?.metadata?.name} value={project?.metadata?.name}>
-        <ResourceLink kind={ProjectModel.kind} name={project?.metadata?.name} linkTo={false} />
+        <ResourceLink kind={ProjectModel.kind} linkTo={false} name={project?.metadata?.name} />
       </SelectOption>
     ));
   };
 
   return (
     <div className="templates-project-tab__main">
-      <Text component={TextVariants.small} className="templates-project-tab__main--help">
-        <Trans t={t} ns="plugin__kubevirt-plugin">
+      <Text className="templates-project-tab__main--help" component={TextVariants.small}>
+        <Trans ns="plugin__kubevirt-plugin" t={t}>
           Set the project to nest Red Hat templates in. If a project is not selected, the settings
           defaults to &apos;openshift&apos;.
           <br />
@@ -103,27 +103,13 @@ const TemplatesProjectTab = () => {
           Templates kebab actions.
         </Trans>
       </Text>
-      <Text component={TextVariants.h6} className="templates-project-tab__main--field-title">
+      <Text className="templates-project-tab__main--field-title" component={TextVariants.h6}>
         {t('Project')}
       </Text>
       {projectsLoaded && hyperLoaded ? (
         <Select
-          id="project"
-          isOpen={isOpen}
-          isDisabled={loading}
-          toggleIcon={loading && <Spinner isSVG size="sm" />}
-          onToggle={setIsOpen}
-          onSelect={onSelect}
-          variant={SelectVariant.single}
-          onFilter={onFilter}
-          hasInlineFilter
-          selections={selectedProject}
-          maxHeight={400}
-          width={300}
-          inlineFilterPlaceholderText={t('Search project')}
           footer={
             <Button
-              variant={ButtonVariant.secondary}
               onClick={() =>
                 createModal((props) => (
                   <CreateProjectModal
@@ -134,17 +120,31 @@ const TemplatesProjectTab = () => {
                   />
                 ))
               }
+              variant={ButtonVariant.secondary}
             >
               {t('Create project')}
             </Button>
           }
+          hasInlineFilter
+          id="project"
+          inlineFilterPlaceholderText={t('Search project')}
+          isDisabled={loading}
+          isOpen={isOpen}
+          maxHeight={400}
+          onFilter={onFilter}
+          onSelect={onSelect}
+          onToggle={setIsOpen}
+          selections={selectedProject}
+          toggleIcon={loading && <Spinner isSVG size="sm" />}
+          variant={SelectVariant.single}
+          width={300}
         >
           {projects?.map((project) => (
             <SelectOption key={project?.metadata?.name} value={project?.metadata?.name}>
               <ResourceLink
                 kind={ProjectModel.kind}
-                name={project?.metadata?.name}
                 linkTo={false}
+                name={project?.metadata?.name}
               />
             </SelectOption>
           ))}
@@ -154,10 +154,10 @@ const TemplatesProjectTab = () => {
       )}
       {(error || projectsLoadingError || hyperLoadingError) && (
         <Alert
-          title={t('Error')}
-          isInline
-          variant={AlertVariant.danger}
           className="templates-project-tab__main--error"
+          isInline
+          title={t('Error')}
+          variant={AlertVariant.danger}
         >
           {error || projectsLoadingError || hyperLoadingError}
         </Alert>

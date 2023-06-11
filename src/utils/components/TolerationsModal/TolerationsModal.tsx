@@ -28,22 +28,22 @@ import TolerationListHeaders from './TolerationListHeaders';
 import TolerationModalDescriptionText from './TolerationModalDescriptionText';
 
 type TolerationsModalProps = {
-  vm?: V1VirtualMachine;
+  isOpen: boolean;
   nodes?: IoK8sApiCoreV1Node[];
   nodesLoaded?: boolean;
-  isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm?: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const TolerationsModal: React.FC<TolerationsModalProps> = ({
-  vm,
+  isOpen,
   nodes,
   nodesLoaded,
-  isOpen,
   onClose,
   onSubmit,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -61,7 +61,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
   const qualifiedNodes = getNodeTaintQualifier(nodes, nodesLoaded, tolerationsLabels);
 
   const onSelectorLabelAdd = () =>
-    onTolerationAdd({ id: null, key: '', value: '', effect: TOLERATIONS_EFFECTS[0] });
+    onTolerationAdd({ effect: TOLERATIONS_EFFECTS[0], id: null, key: '', value: '' });
 
   const updatedVirtualMachine = React.useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
@@ -83,12 +83,12 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
 
   return (
     <TabModal
-      obj={updatedVirtualMachine}
+      headerText={t('Tolerations')}
       isOpen={isOpen}
+      modalVariant={ModalVariant.medium}
+      obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Tolerations')}
-      modalVariant={ModalVariant.medium}
     >
       <Stack hasGutter>
         <StackItem>
@@ -104,11 +104,11 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
         <StackItem>
           <Form>
             <LabelsList
+              addRowText={t('Add toleration')}
+              emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
               isEmpty={tolerationLabelsEmpty}
               model={!isEmpty(nodes) && NodeModel}
               onLabelAdd={onSelectorLabelAdd}
-              addRowText={t('Add toleration')}
-              emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
             >
               {!tolerationLabelsEmpty && (
                 <>
@@ -126,8 +126,8 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
             </LabelsList>
             {!tolerationLabelsEmpty && nodesLoaded && (
               <NodeCheckerAlert
-                qualifiedNodes={tolerationsLabels?.length === 0 ? nodes : qualifiedNodes}
                 nodesLoaded={nodesLoaded}
+                qualifiedNodes={tolerationsLabels?.length === 0 ? nodes : qualifiedNodes}
               />
             )}
           </Form>

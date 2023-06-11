@@ -1,8 +1,8 @@
 export enum ConsoleState {
-  'connecting' = 'connecting',
   'connected' = 'connected',
-  'disconnecting' = 'disconnecting',
+  'connecting' = 'connecting',
   'disconnected' = 'disconnected',
+  'disconnecting' = 'disconnecting',
   'loading' = 'loading',
 }
 

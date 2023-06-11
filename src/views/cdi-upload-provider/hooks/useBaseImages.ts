@@ -26,8 +26,8 @@ const useBaseImages = (commonTemplates: V1Template[]): BaseImages => {
           ...acc,
           [ns]: {
             groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-            namespace: ns,
             isList: true,
+            namespace: ns,
           } as WatchK8sResource,
         }),
         {},

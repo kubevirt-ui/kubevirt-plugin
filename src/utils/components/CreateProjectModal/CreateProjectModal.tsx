@@ -20,15 +20,15 @@ import ExternalLink from '../ExternalLink/ExternalLink';
 import TabModal from '../TabModal/TabModal';
 
 type CreateProjectModalProps = {
+  createdProject?: (value: K8sResourceCommon) => void;
   isOpen: boolean;
   onClose: () => void;
-  createdProject?: (value: K8sResourceCommon) => void;
 };
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
+  createdProject,
   isOpen,
   onClose,
-  createdProject,
 }) => {
   const { t } = useKubevirtTranslation();
   const [name, setName] = useState<string>();
@@ -36,19 +36,19 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   const [displayName, setDisplayName] = useState<string>();
 
   return (
-    <TabModal<K8sResourceCommon & { displayName: string; description: string }>
-      obj={{ displayName, description, metadata: { name } }}
-      isOpen={isOpen}
-      onClose={onClose}
+    <TabModal<K8sResourceCommon & { description: string; displayName: string }>
       onSubmit={(data) =>
         k8sCreate({
-          model: ProjectRequestModel,
           data,
+          model: ProjectRequestModel,
         }).then((value) => createdProject(value))
       }
       headerText={t('Create project')}
-      submitBtnText={t('Create')}
       isDisabled={isEmpty(name)}
+      isOpen={isOpen}
+      obj={{ description, displayName, metadata: { name } }}
+      onClose={onClose}
+      submitBtnText={t('Create')}
     >
       <Text>
         {t('An OpenShift project is an alternative representation of a Kubernetes namespace.')}
@@ -61,11 +61,10 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       <br />
       <Form>
         <FormGroup
-          label={t('Name')}
           labelIcon={
             <Popover
               bodyContent={
-                <Trans t={t} ns="plugin__kubevirt-plugin">
+                <Trans ns="plugin__kubevirt-plugin" t={t}>
                   A Project name must consist of lower case alphanumeric characters or &apos;, and
                   must start and end with an alphanumeric character (e.g. &apos;my-name&apos; or
                   &apos;123-abc&apos;). You must create a Namespace to be able to create projects
@@ -79,34 +78,35 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               </Button>
             </Popover>
           }
-          isRequired
           fieldId="project-name"
+          isRequired
+          label={t('Name')}
         >
           <TextInput
-            isRequired
-            type="text"
             id="project-name"
+            isRequired
             name="project-name"
-            value={name}
             onChange={(value) => setName(value)}
+            type="text"
+            value={name}
           />
         </FormGroup>
-        <FormGroup label="Display name" fieldId="display-name">
+        <FormGroup fieldId="display-name" label="Display name">
           <TextInput
-            type="text"
             id="display-name"
             name="display-name"
-            value={displayName}
             onChange={(value) => setDisplayName(value)}
+            type="text"
+            value={displayName}
           />
         </FormGroup>
-        <FormGroup label="Description" fieldId="description">
+        <FormGroup fieldId="description" label="Description">
           <TextInput
-            type="text"
             id="description"
             name="description"
-            value={description}
             onChange={(value) => setDescription(value)}
+            type="text"
+            value={description}
           />
         </FormGroup>
       </Form>

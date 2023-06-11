@@ -37,16 +37,16 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
   link,
 }) => {
   const { currentTime, duration, timespan } = useDuration();
-  const { ref, width, height } = useResponsiveCharts();
+  const { height, ref, width } = useResponsiveCharts();
 
   const chartData =
     !isEmpty(data) &&
     data?.map((obj) => {
       return (obj?.values || [])?.map(([x, y]) => {
         return {
+          name: obj?.metric?.interface,
           x: new Date(x * MILLISECONDS_MULTIPLIER),
           y: Number(y),
-          name: obj?.metric?.interface,
         };
       });
     });
@@ -65,63 +65,63 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
       <div className="util-threshold-chart" ref={ref}>
         <Link to={link}>
           <Chart
-            height={height}
-            width={width}
-            padding={{ top: 30, bottom: 60, left: 70, right: 60 }}
-            scale={{ x: 'time', y: 'linear' }}
-            themeColor={ChartThemeColor.multiUnordered}
-            domain={{
-              x: [currentTime - timespan, currentTime],
-              y: [0, getNetworkTickValues(Ymax + 1)?.length],
-            }}
             containerComponent={
               <CursorVoronoiContainer
-                cursorDimension="x"
-                labels={({ datum }) => {
-                  return `${xbytes(datum?.y, {
-                    iec: true,
-                    fixed: 2,
-                  })}ps`;
-                }}
                 labelComponent={
                   <ChartLegendTooltip
-                    legendData={legendData}
                     title={(datum) =>
                       datum?.x?.getHours() + ':' + String(datum?.x?.getMinutes())?.padStart(2, '0')
                     }
+                    legendData={legendData}
                   />
                 }
+                labels={({ datum }) => {
+                  return `${xbytes(datum?.y, {
+                    fixed: 2,
+                    iec: true,
+                  })}ps`;
+                }}
+                cursorDimension="x"
                 mouseFollowTooltips
                 voronoiDimension="x"
               />
             }
+            domain={{
+              x: [currentTime - timespan, currentTime],
+              y: [0, getNetworkTickValues(Ymax + 1)?.length],
+            }}
+            height={height}
+            padding={{ bottom: 60, left: 70, right: 60, top: 30 }}
+            scale={{ x: 'time', y: 'linear' }}
+            themeColor={ChartThemeColor.multiUnordered}
+            width={width}
           >
             <ChartAxis
-              dependentAxis
-              tickFormat={formatNetworkYTick}
-              tickValues={getNetworkTickValues(Ymax)}
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
+              dependentAxis
+              tickFormat={formatNetworkYTick}
+              tickValues={getNetworkTickValues(Ymax)}
             />
             <ChartAxis
-              tickFormat={tickFormat(duration, currentTime)}
-              tickCount={TICKS_COUNT}
               style={{
-                ticks: { stroke: 'transparent' },
                 tickLabels: { padding: 2 },
+                ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}
+              tickCount={TICKS_COUNT}
+              tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               {isReady &&
                 chartData?.map((newChartdata) => (
                   <ChartLine
+                    data={newChartdata}
                     key={newChartdata?.[0]?.name}
                     name={newChartdata?.[0]?.name}
-                    data={newChartdata}
                     themeColor={ChartThemeColor.multiUnordered}
                   />
                 ))}

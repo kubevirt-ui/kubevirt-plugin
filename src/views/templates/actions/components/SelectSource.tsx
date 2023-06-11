@@ -16,23 +16,23 @@ import {
 } from './utils';
 
 type SelectSourceProps = {
-  source: V1beta1DataVolumeSpec;
-  onSourceChange: (customSource: V1beta1DataVolumeSpec) => void;
-  sourceLabel: React.ReactNode;
-  initialVolumeQuantity?: string;
-  withSize?: boolean;
-  sourceOptions: SOURCE_OPTIONS_IDS[];
   httpSourceHelperText?: string;
+  initialVolumeQuantity?: string;
+  onSourceChange: (customSource: V1beta1DataVolumeSpec) => void;
+  source: V1beta1DataVolumeSpec;
+  sourceLabel: React.ReactNode;
+  sourceOptions: SOURCE_OPTIONS_IDS[];
+  withSize?: boolean;
 };
 
 export const SelectSource: React.FC<SelectSourceProps> = ({
-  source,
-  onSourceChange,
-  initialVolumeQuantity = '30Gi',
-  withSize = false,
-  sourceOptions,
-  sourceLabel,
   httpSourceHelperText,
+  initialVolumeQuantity = '30Gi',
+  onSourceChange,
+  source,
+  sourceLabel,
+  sourceOptions,
+  withSize = false,
 }) => {
   const { t } = useKubevirtTranslation();
   const selectedSourceType = getSourceTypeFromDataVolumeSpec(source);
@@ -92,30 +92,26 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   return (
     <>
       <SelectSourceOption
-        onSelectSource={(newSourceType) => onSourceSelected(newSourceType)}
-        selectedSource={selectedSourceType}
         label={sourceLabel}
+        onSelectSource={(newSourceType) => onSourceSelected(newSourceType)}
         options={sourceOptions}
+        selectedSource={selectedSourceType}
       />
 
       {selectedSourceType === SOURCE_TYPES.pvcSource && (
         <PersistentVolumeClaimSelect
-          pvcNameSelected={pvcNameSelected}
-          projectSelected={pvcNamespaceSelected}
           selectPVC={(newPVCNamespace, newPVCName) =>
             onSourceChange(
               getPVCSource(newPVCName, newPVCNamespace, withSize ? volumeQuantity : null),
             )
           }
+          projectSelected={pvcNamespaceSelected}
+          pvcNameSelected={pvcNameSelected}
         />
       )}
 
       {selectedSourceType === SOURCE_TYPES.registrySource && (
         <FormGroup
-          label={t('Container Image')}
-          fieldId={`disk-source-required-${selectedSourceType}`}
-          isRequired
-          className="disk-source-form-group"
           helperText={
             <>
               {t('Example: {{exampleURL}}', {
@@ -123,39 +119,43 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
               })}
             </>
           }
+          className="disk-source-form-group"
+          fieldId={`disk-source-required-${selectedSourceType}`}
+          isRequired
+          label={t('Container Image')}
         >
           <TextInput
-            value={containerImage}
-            type="text"
-            onChange={onContainerChange}
             aria-label={t('Container Image')}
+            onChange={onContainerChange}
+            type="text"
+            value={containerImage}
           />
         </FormGroup>
       )}
 
       {selectedSourceType === SOURCE_TYPES.httpSource && (
         <FormGroup
-          label={t('Image URL')}
-          fieldId={`disk-source-required-${selectedSourceType}`}
-          isRequired
           className="disk-source-form-group"
+          fieldId={`disk-source-required-${selectedSourceType}`}
           helperText={httpSourceHelperText}
+          isRequired
+          label={t('Image URL')}
         >
           <TextInput
-            value={httpURL}
-            type="text"
-            onChange={onURLChange}
             aria-label={t('Image URL')}
+            onChange={onURLChange}
+            type="text"
             validated={!httpURL ? ValidatedOptions.error : ValidatedOptions.default}
+            value={httpURL}
           />
         </FormGroup>
       )}
 
       {withSize && selectedSourceType !== SOURCE_TYPES.defaultSource && (
         <CapacityInput
-          size={volumeQuantity}
-          onChange={(newVolume) => onSourceSelected(selectedSourceType, newVolume)}
           label={t('Disk size')}
+          onChange={(newVolume) => onSourceSelected(selectedSourceType, newVolume)}
+          size={volumeQuantity}
         />
       )}
     </>

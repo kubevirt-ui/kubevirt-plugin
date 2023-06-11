@@ -12,27 +12,27 @@ import './TemplatesCatalogFiltersGroup.scss';
 
 export const TemplatesCatalogFiltersGroup: React.FC<{
   defaultExpanded?: boolean;
+  filters: {
+    count?: number;
+    label?: string;
+    value: string;
+  }[];
   groupKey: string;
   groupLabel?: string;
-  pickedFilters: Set<string>;
-  filters: {
-    value: string;
-    label?: string;
-    count?: number;
-  }[];
   onFilterClick: (type: string, value: string) => void;
+  pickedFilters: Set<string>;
 }> = React.memo(
-  ({ defaultExpanded = true, groupKey, groupLabel, pickedFilters, filters, onFilterClick }) => {
+  ({ defaultExpanded = true, filters, groupKey, groupLabel, onFilterClick, pickedFilters }) => {
     const [isExpanded, setIsExpanded] = React.useState(defaultExpanded);
 
     const memoFilters = React.useMemo(
       () =>
-        filters.map(({ count, value, label }) => (
+        filters.map(({ count, label, value }) => (
           <FilterSidePanelCategoryItem
-            key={`${groupKey}-${label}`}
-            data-test-id={`${groupKey}-${label}`}
-            count={count}
             checked={pickedFilters?.has(value)}
+            count={count}
+            data-test-id={`${groupKey}-${label}`}
+            key={`${groupKey}-${label}`}
             onClick={() => onFilterClick(groupKey, value)}
           >
             {label ?? value}

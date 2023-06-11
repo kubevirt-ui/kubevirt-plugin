@@ -37,8 +37,8 @@ import {
 import './scripts-tab.scss';
 
 type VirtualMachineScriptPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1VirtualMachine;
 };
@@ -50,18 +50,18 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
   const [canUpdateVM] = useAccessReview(accessReview || {});
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+    isList: false,
     name: vm?.metadata?.name,
     namespace: vm?.metadata?.namespace,
-    isList: false,
   });
 
   const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
-        model: VirtualMachineModel,
         data: updatedVM,
-        ns: updatedVM?.metadata?.namespace,
+        model: VirtualMachineModel,
         name: updatedVM?.metadata?.name,
+        ns: updatedVM?.metadata?.namespace,
       }),
     [],
   );
@@ -69,9 +69,9 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
   return (
     <PageSection>
       <SidebarEditor
-        resource={vm}
         onResourceUpdate={onSubmit}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.SCRIPTS_TAB}
+        resource={vm}
       >
         {(resource) => (
           <DescriptionList className="vm-scripts-tab">
@@ -79,28 +79,28 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               <AlertScripts />
             </DescriptionListDescription>
             <VirtualMachineDescriptionItem
-              descriptionData={<CloudInitDescription vm={resource} />}
-              descriptionHeader={t('Cloud-init')}
-              isEdit={canUpdateVM}
-              showEditOnTitle
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <CloudinitModal
-                    vm={resource}
                     isOpen={isOpen}
                     onClose={onClose}
                     onSubmit={onSubmit}
+                    vm={resource}
                     vmi={vmi}
                   />
                 ))
               }
+              descriptionData={<CloudInitDescription vm={resource} />}
+              descriptionHeader={t('Cloud-init')}
+              isEdit={canUpdateVM}
+              showEditOnTitle
             />
             <Divider />
             <VirtualMachineDescriptionItem
               descriptionData={
                 <Stack hasGutter>
                   <div data-test="ssh-popover">
-                    <Trans t={t} ns="plugin__kubevirt-plugin">
+                    <Trans ns="plugin__kubevirt-plugin" t={t}>
                       <Text component={TextVariants.p}>Store the key in a project secret.</Text>
                     </Trans>
                   </div>
@@ -109,16 +109,16 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
                   </span>
                 </Stack>
               }
+              onEditClick={() =>
+                createModal((modalProps) => (
+                  <VMSSHSecretModal {...modalProps} updateVM={onSubmit} vm={vm} />
+                ))
+              }
+              data-test-id="authorized-ssh-key-button"
               descriptionHeader={t('Authorized SSH key')}
               isEdit={canUpdateVM}
               label={<LinuxLabel />}
-              data-test-id="authorized-ssh-key-button"
               showEditOnTitle
-              onEditClick={() =>
-                createModal((modalProps) => (
-                  <VMSSHSecretModal {...modalProps} vm={vm} updateVM={onSubmit} />
-                ))
-              }
             />
           </DescriptionList>
         )}

@@ -36,7 +36,7 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { vmi, pods } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
   return (
@@ -45,13 +45,13 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
         <CardTitle className="text-muted">
           <DescriptionListTermHelpText>
             <Popover
-              position={PopoverPosition?.right}
               bodyContent={
-                <Trans t={t} ns="plugin__kubevirt-plugin">
+                <Trans ns="plugin__kubevirt-plugin" t={t}>
                   <div>Donuts chart represent current values.</div>
                   <div>Sparkline charts represent data over time</div>
                 </Trans>
               }
+              position={PopoverPosition?.right}
             >
               <DescriptionListTermHelpTextButton>
                 {t('Utilization')}
@@ -65,7 +65,7 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
         <ComponentReady isReady={isVMRunning} text={t('VirtualMachine is not running')}>
           <Grid>
             <GridItem span={3}>
-              <CPUUtil vmi={vmi} pods={pods} />
+              <CPUUtil pods={pods} vmi={vmi} />
             </GridItem>
             <GridItem span={3}>
               <MemoryUtil vmi={vmi} />
@@ -76,7 +76,7 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
             <GridItem span={3}>
               <NetworkUtil vmi={vmi} />
             </GridItem>
-            <UtilizationThresholdCharts vmi={vmi} pods={pods} />
+            <UtilizationThresholdCharts pods={pods} vmi={vmi} />
           </Grid>
         </ComponentReady>
       </CardBody>

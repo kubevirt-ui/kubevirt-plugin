@@ -21,7 +21,7 @@ const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
   });
 
   const vmAlerts = React.useMemo(() => {
-    const data = { critical: [], warning: [], info: [] };
+    const data = { critical: [], info: [], warning: [] };
     const vmName = vm?.metadata?.name;
     return (
       (query as PrometheusRulesResponse)?.data?.groups?.reduce((acc, ruleGroup) => {
@@ -42,15 +42,15 @@ const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
                 acc[alert?.labels?.severity] = [
                   ...(acc?.[alert?.labels?.severity] || []),
                   {
-                    time: alert?.activeAt,
                     alertName: alert?.labels?.alertname,
                     description: alert?.annotations?.summary,
+                    isVMAlert: true,
+                    key: createAlertKey(alert?.activeAt, alert?.labels),
                     link: `${MONITORING_URL_BASE}/${generateAlertId(
                       ruleGroup,
                       rule,
                     )}?${labelsToParams(alert?.labels)}`,
-                    key: createAlertKey(alert?.activeAt, alert?.labels),
-                    isVMAlert: true,
+                    time: alert?.activeAt,
                   },
                 ];
               }

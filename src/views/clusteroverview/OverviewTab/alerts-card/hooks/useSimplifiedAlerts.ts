@@ -17,18 +17,18 @@ const useSimplifiedAlerts: UseSimplifiedAlerts = () => {
   const [alerts] = useKubevirtAlerts();
 
   return React.useMemo(() => {
-    const data = { critical: [], warning: [], info: [] };
+    const data = { critical: [], info: [], warning: [] };
     return (
       alerts.reduce((acc, alert) => {
         acc[alert?.labels?.severity] = [
           ...(acc?.[alert?.labels?.severity] || []),
           {
-            time: alert?.activeAt,
             alertName: alert?.labels?.alertname,
             description: alert?.annotations?.description || alert?.annotations?.summary,
-            link: getAlertURL(alert),
-            key: createAlertKey(alert?.activeAt, alert?.labels),
             isVMAlert: alert?.labels?.name || alert?.labels?.vmName,
+            key: createAlertKey(alert?.activeAt, alert?.labels),
+            link: getAlertURL(alert),
+            time: alert?.activeAt,
           },
         ];
         return acc;

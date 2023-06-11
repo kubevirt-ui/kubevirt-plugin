@@ -35,10 +35,10 @@ const CPUMemory: FC<CPUMemoryProps> = ({ template }) => {
   const onSubmitCPU = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       }),
     [],
   );
@@ -46,10 +46,10 @@ const CPUMemory: FC<CPUMemoryProps> = ({ template }) => {
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <CPUMemoryModal
-        template={template}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onSubmitCPU}
+        template={template}
       />
     ));
 
@@ -57,25 +57,25 @@ const CPUMemory: FC<CPUMemoryProps> = ({ template }) => {
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('CPU | Memory')}
           bodyContent={
             <CPUDescription
               cpu={getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.cpu}
               helperTextResource={CpuMemHelperTextResources.Template}
             />
           }
+          hasAutoWidth
+          headerContent={t('CPU | Memory')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('CPU | Memory')}</DescriptionListTermHelpTextButton>
         </Popover>
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
         <Button
-          type="button"
+          isDisabled={!isTemplateEditable}
           isInline
           onClick={onEditClick}
-          isDisabled={!isTemplateEditable}
+          type="button"
           variant="link"
         >
           {CPUMemData}

@@ -42,8 +42,8 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
   };
   const updateFromYAML = (yaml: string) => {
     const cloudData = load(yaml) as {
-      userData?: string;
       networkData?: string;
+      userData?: string;
     };
 
     setUserData(convertYAMLUserDataObject(cloudData?.userData));
@@ -60,20 +60,20 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
 
   const cloudInitVolume: V1Volume = React.useMemo(() => {
     const cloudInitNoBlanks = deleteObjBlankValues({
-      userData: convertUserDataObjectToYAML(userData, shouldAddHeader),
       networkData: enableNetworkData ? convertNetworkDataObjectToYAML(networkData) : null,
+      userData: convertUserDataObjectToYAML(userData, shouldAddHeader),
     });
 
     if (cloudInitVol?.cloudInitConfigDrive) {
       return {
-        name: 'cloudinitdisk',
         cloudInitConfigDrive: cloudInitNoBlanks,
+        name: 'cloudinitdisk',
       };
     }
 
     return {
-      name: 'cloudinitdisk',
       cloudInitNoCloud: cloudInitNoBlanks,
+      name: 'cloudinitdisk',
     };
   }, [userData, shouldAddHeader, networkData, cloudInitVol, enableNetworkData]);
 
@@ -89,10 +89,10 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
         // cloudinitdisk deleted or doesn't exist, we need to re-create it
         if (!cloudInitDisk) {
           vmDraft.spec.template.spec.domain.devices.disks.push({
-            name: cloudInitDiskName,
             disk: {
               bus: 'virtio',
             },
+            name: cloudInitDiskName,
           });
         }
 
@@ -105,28 +105,28 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
   );
 
   return {
-    userData,
+    cloudInitVolume,
     enableNetworkData,
     networkData,
-    cloudInitVolume,
+    setEnableNetworkData,
     updatedVM,
 
+    updateFromYAML,
+    updateNetworkField,
     // methods
     updateUserField,
-    updateNetworkField,
-    updateFromYAML,
-    setEnableNetworkData,
+    userData,
   };
 };
 
 type UseCloudInitValues = {
-  userData: CloudInitUserData;
+  cloudInitVolume: V1Volume;
   enableNetworkData: boolean;
   networkData: CloudInitNetworkData;
-  cloudInitVolume: V1Volume;
-  updatedVM: V1VirtualMachine;
-  updateUserField: (key: keyof CloudInitUserData, value: string) => void;
-  updateNetworkField: (key: keyof CloudInitNetworkData, value: string) => void;
-  updateFromYAML: (yaml: string) => void;
   setEnableNetworkData: (enableNetwork: boolean) => void;
+  updatedVM: V1VirtualMachine;
+  updateFromYAML: (yaml: string) => void;
+  updateNetworkField: (key: keyof CloudInitNetworkData, value: string) => void;
+  updateUserField: (key: keyof CloudInitUserData, value: string) => void;
+  userData: CloudInitUserData;
 };

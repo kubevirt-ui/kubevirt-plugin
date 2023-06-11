@@ -18,61 +18,61 @@ import { TemplatesCatalogFiltersGroup } from './TemplatesCatalogFiltersGroup';
 
 export const TemplatesCatalogFilters: React.FC<{
   filters: TemplateFilters;
-  onFilterChange: (type: CATALOG_FILTERS, value: string | boolean) => void;
+  onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
 }> = React.memo(({ filters, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <div className="co-catalog-page__tabs">
       <TemplatesCatalogProjectsDropdown
-        selectedProject={filters.namespace}
         onChange={(project) => onFilterChange(CATALOG_FILTERS.NAMESPACE, project)}
+        selectedProject={filters.namespace}
       />
 
       <VerticalTabs>
         <VerticalTabsTab
+          active={!filters?.onlyDefault}
           data-test-id="catalog-template-filter-all-items"
           id={'all-templates'}
-          title={t('All Items')}
           onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_DEFAULT, false)}
-          active={!filters?.onlyDefault}
+          title={t('All Items')}
         />
         <VerticalTabsTab
+          active={filters?.onlyDefault}
           data-test-id="catalog-template-filter-default-templates"
           id={'default-templates'}
-          title={t('Default Templates')}
           onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_DEFAULT, true)}
-          active={filters?.onlyDefault}
+          title={t('Default Templates')}
         />
       </VerticalTabs>
       <FilterSidePanel className="co-catalog-page__tabs" id="vm-catalog-filter-panel">
         <TemplatesCatalogFiltersGroup
-          groupKey={'boot-source-available'}
-          pickedFilters={new Set(filters?.onlyAvailable ? ['only-available'] : [])}
           onFilterClick={() =>
             onFilterChange(CATALOG_FILTERS.ONLY_AVAILABLE, !filters?.onlyAvailable)
           }
           filters={[{ label: t('Boot source available'), value: 'only-available' }]}
+          groupKey={'boot-source-available'}
+          pickedFilters={new Set(filters?.onlyAvailable ? ['only-available'] : [])}
         />
         <TemplatesCatalogFiltersGroup
-          groupKey="osName"
-          groupLabel={t('Operating system')}
-          pickedFilters={filters.osName}
-          onFilterClick={onFilterChange}
           filters={Object.values(OS_NAME_TYPES).map((v) => ({
             label: OS_NAME_LABELS?.[v],
             value: v,
           }))}
+          groupKey="osName"
+          groupLabel={t('Operating system')}
+          onFilterClick={onFilterChange}
+          pickedFilters={filters.osName}
         />
         <TemplatesCatalogFiltersGroup
-          groupKey="workload"
-          groupLabel={t('Workload')}
-          pickedFilters={filters.workload}
-          onFilterClick={onFilterChange}
           filters={Object.values(WORKLOADS).map((v) => ({
             label: WORKLOADS_LABELS?.[v],
             value: v,
           }))}
+          groupKey="workload"
+          groupLabel={t('Workload')}
+          onFilterClick={onFilterChange}
+          pickedFilters={filters.workload}
         />
       </FilterSidePanel>
     </div>

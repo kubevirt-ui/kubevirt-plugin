@@ -31,19 +31,19 @@ const WelcomeModal: FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <Modal
-      variant={ModalVariant.large}
-      onClose={onClose}
-      isOpen={isOpen}
       aria-label={t('Welcome modal')}
+      isOpen={isOpen}
+      onClose={onClose}
+      variant={ModalVariant.large}
     >
-      <Grid hasGutter className="WelcomeModal__grid">
+      <Grid className="WelcomeModal__grid" hasGutter>
         <GridItem span={4}>
-          <img src={openCulture} className="WelcomeModal__image" />
+          <img className="WelcomeModal__image" src={openCulture} />
         </GridItem>
 
         <GridItem span={8}>
           <Stack>
-            <Trans t={t} ns="plugin__kubevirt-plugin">
+            <Trans ns="plugin__kubevirt-plugin" t={t}>
               <Title headingLevel="h2">Welcome to</Title>
               <Title headingLevel="h1">OpenShift Virtualization</Title>
 
@@ -58,13 +58,13 @@ const WelcomeModal: FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
               <WelcomeButtons onClose={onClose} />
 
               <Checkbox
-                className="WelcomeModal__checkbox"
-                id="welcome-modal-checkbox"
-                label={'Do not show this again'}
-                isChecked={quickStarts?.dontShowWelcomeModal}
                 onChange={(value) =>
                   setQuickStarts({ ...quickStarts, dontShowWelcomeModal: value })
                 }
+                className="WelcomeModal__checkbox"
+                id="welcome-modal-checkbox"
+                isChecked={quickStarts?.dontShowWelcomeModal}
+                label={'Do not show this again'}
               />
             </Trans>
           </Stack>

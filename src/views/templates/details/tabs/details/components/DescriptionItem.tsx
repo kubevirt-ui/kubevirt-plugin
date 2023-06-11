@@ -10,16 +10,16 @@ import {
 } from '@patternfly/react-core';
 
 type DescriptionProps = {
+  content: JSX.Element | string;
+  popoverContent?: JSX.Element | string;
   title: string;
-  content: string | JSX.Element;
-  popoverContent?: string | JSX.Element;
 };
 
-const DescriptionItem: React.FC<DescriptionProps> = ({ title, content, popoverContent }) => (
+const DescriptionItem: React.FC<DescriptionProps> = ({ content, popoverContent, title }) => (
   <DescriptionListGroup>
     {popoverContent ? (
       <DescriptionListTermHelpText>
-        <Popover hasAutoWidth maxWidth="30rem" headerContent={title} bodyContent={popoverContent}>
+        <Popover bodyContent={popoverContent} hasAutoWidth headerContent={title} maxWidth="30rem">
           <DescriptionListTermHelpTextButton>{title}</DescriptionListTermHelpTextButton>
         </Popover>
       </DescriptionListTermHelpText>

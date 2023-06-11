@@ -12,15 +12,15 @@ import {
 import { filter } from './utils';
 
 type PersistentVolumeSelectProjectProps = {
+  onChange: (newProject: string) => void;
   projectsName: string[];
   selectedProject: string;
-  onChange: (newProject: string) => void;
 };
 
 export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProjectProps> = ({
-  selectedProject,
-  projectsName,
   onChange,
+  projectsName,
+  selectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isNamespacePVCOpen, setNamespaceOpen] = React.useState(false);
@@ -37,27 +37,27 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
 
   return (
     <FormGroup
-      label={t('PVC project')}
+      className="pvc-selection-formgroup"
       fieldId={fieldId}
+      helperText={t('Location of the existing PVC')}
       id={fieldId}
       isRequired
-      className="pvc-selection-formgroup"
-      helperText={t('Location of the existing PVC')}
+      label={t('PVC project')}
     >
       <Select
-        aria-labelledby={fieldId}
-        isOpen={isNamespacePVCOpen}
-        onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
-        onSelect={onSelect}
-        variant={SelectVariant.single}
-        onFilter={filter(projectsName)}
-        hasInlineFilter
-        selections={selectedProject}
-        placeholderText={t('--- Select PVC project ---')}
-        validated={!selectedProject ? ValidatedOptions.error : ValidatedOptions.default}
         aria-invalid={!selectedProject ? true : false}
+        aria-labelledby={fieldId}
+        hasInlineFilter
+        isOpen={isNamespacePVCOpen}
         maxHeight={400}
         menuAppendTo="parent"
+        onFilter={filter(projectsName)}
+        onSelect={onSelect}
+        onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
+        placeholderText={t('--- Select PVC project ---')}
+        selections={selectedProject}
+        validated={!selectedProject ? ValidatedOptions.error : ValidatedOptions.default}
+        variant={SelectVariant.single}
       >
         {projectsName.map((projectName) => (
           <SelectOption key={projectName} value={projectName}>

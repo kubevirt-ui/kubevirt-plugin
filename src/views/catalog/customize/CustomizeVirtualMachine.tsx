@@ -30,9 +30,9 @@ const CustomizeVirtualMachine: FC = () => {
   const [template, loaded, error] = useK8sWatchResource<V1Template>({
     groupVersionKind: modelToGroupVersionKind(TemplateModel),
     isList: false,
-    namespaced: true,
     name,
     namespace: templateNamespace,
+    namespaced: true,
   });
 
   const [templateWithGeneratedValues, processError] = useVMTemplateGeneratedParams(
@@ -65,8 +65,8 @@ const CustomizeVirtualMachine: FC = () => {
           <div className="col-md-5 col-md-pull-7">
             {template && (
               <Form
-                template={templateWithGeneratedValues}
                 isBootSourceAvailable={isBootSourceAvailable}
+                template={templateWithGeneratedValues}
               />
             )}
           </div>

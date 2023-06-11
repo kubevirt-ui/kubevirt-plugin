@@ -8,8 +8,8 @@ export const bytesToIECBytes = (
   customizedUnits = customUnits,
 ): ByteSizeResult => {
   return byteSize(bytes, {
-    precision,
     customUnits: customizedUnits,
+    precision,
     units: 'IS',
   });
 };
@@ -20,7 +20,7 @@ export const bytesToDiskSize = (size: string) => {
 };
 
 export const bytesFromQuantity = (
-  quantity: string | number,
+  quantity: number | string,
   precision = 0,
 ): [value: number, unit: string] => {
   let byteSizeResult: ByteSizeResult = undefined;

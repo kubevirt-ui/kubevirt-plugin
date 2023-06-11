@@ -7,17 +7,17 @@ import { SidebarEditorContext } from './SidebarEditorContext';
 
 const SidebarEditorSwitch: FC = memo(() => {
   const { t } = useKubevirtTranslation();
-  const { showEditor, setEditorVisible, showSwitch } = useContext(SidebarEditorContext);
+  const { setEditorVisible, showEditor, showSwitch } = useContext(SidebarEditorContext);
 
   if (!showSwitch) return null;
 
   return (
     <Switch
-      id="sidebar-editor-switch"
-      label={t('YAML')}
-      isChecked={showEditor}
-      onChange={setEditorVisible}
       className="regular-font-weight"
+      id="sidebar-editor-switch"
+      isChecked={showEditor}
+      label={t('YAML')}
+      onChange={setEditorVisible}
     />
   );
 });

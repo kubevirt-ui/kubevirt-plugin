@@ -21,23 +21,23 @@ const ResourcesInventoryCard: React.FC = () => {
   const [activeNamespace] = useActiveNamespace();
 
   return (
-    <div data-test-id="resources-inventory-card" className="resources-inventory-card">
-      <Grid hasGutter className="resources-inventory-card__grid">
+    <div className="resources-inventory-card" data-test-id="resources-inventory-card">
+      <Grid className="resources-inventory-card__grid" hasGutter>
         <GridItem>
           <Card className="resources-inventory-card__grid-item">
             <ResourceInventoryItem
-              quantity={vms}
               label={t('VirtualMachines')}
-              path={getResourceUrl({ model: VirtualMachineModel, activeNamespace })}
+              path={getResourceUrl({ activeNamespace, model: VirtualMachineModel })}
+              quantity={vms}
             />
           </Card>
         </GridItem>
         <GridItem>
           <Card className="resources-inventory-card__grid-item">
             <ResourceInventoryItem
-              quantity={vmTemplates}
               label={t('Templates')}
-              path={getResourceUrl({ model: TemplateModel, activeNamespace })}
+              path={getResourceUrl({ activeNamespace, model: TemplateModel })}
+              quantity={vmTemplates}
             />
           </Card>
         </GridItem>
@@ -45,9 +45,9 @@ const ResourcesInventoryCard: React.FC = () => {
           <GridItem>
             <Card className="resources-inventory-card__grid-item">
               <ResourceInventoryItem
-                quantity={nodes}
                 label={t('Nodes')}
                 path={getResourceUrl({ model: NodeModel })}
+                quantity={nodes}
               />
             </Card>
           </GridItem>
@@ -55,9 +55,9 @@ const ResourcesInventoryCard: React.FC = () => {
         <GridItem>
           <Card className="resources-inventory-card__grid-item">
             <ResourceInventoryItem
-              quantity={nads}
               label={t('Networks')}
-              path={getResourceUrl({ model: NetworkAttachmentDefinitionModel, activeNamespace })}
+              path={getResourceUrl({ activeNamespace, model: NetworkAttachmentDefinitionModel })}
+              quantity={nads}
             />
           </Card>
         </GridItem>

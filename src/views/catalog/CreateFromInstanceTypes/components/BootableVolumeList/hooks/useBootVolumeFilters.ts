@@ -13,21 +13,19 @@ const useBootVolumeFilters = (isModal: boolean): RowFilter<BootableVolume>[] => 
 
   return [
     {
-      filterGroupName: t('Operating system'),
-      type: `osName${isModal && '-modal'}`,
-      reducer: (obj) => getItemNameWithOther(getBootVolumeOS(obj), OS_NAMES),
       filter: (availableOsNames, obj) =>
         availableOsNames?.selected?.length === 0 ||
         availableOsNames?.selected?.includes(getItemNameWithOther(getBootVolumeOS(obj), OS_NAMES)),
+      filterGroupName: t('Operating system'),
       items: OS_NAMES,
+      reducer: (obj) => getItemNameWithOther(getBootVolumeOS(obj), OS_NAMES),
+      type: `osName${isModal && '-modal'}`,
     },
     {
-      filterGroupName: t('Resource'),
-      type: `resourceKind${isModal && '-modal'}`,
-      reducer: (obj) => obj?.kind,
       filter: (availableResourceNames, obj) =>
         availableResourceNames?.selected?.length === 0 ||
         availableResourceNames?.selected?.includes(obj?.kind),
+      filterGroupName: t('Resource'),
       items: [
         {
           id: PersistentVolumeClaimModel.kind,
@@ -38,6 +36,8 @@ const useBootVolumeFilters = (isModal: boolean): RowFilter<BootableVolume>[] => 
           title: 'DS',
         },
       ],
+      reducer: (obj) => obj?.kind,
+      type: `resourceKind${isModal && '-modal'}`,
     },
   ];
 };

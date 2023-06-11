@@ -27,19 +27,19 @@ import { safeLoad } from './utils';
 import './sidebar-editor.scss';
 
 type SidebarEditorProps<Resource> = {
-  resource: Resource;
-  onResourceUpdate?: (newResource: Resource) => Promise<Resource | void>;
-  children: ReactNode | ReactNode[] | ((resource: Resource) => ReactNode);
+  children: ((resource: Resource) => ReactNode) | ReactNode | ReactNode[];
   onChange?: (resource: Resource) => void;
+  onResourceUpdate?: (newResource: Resource) => Promise<Resource | void>;
   pathsToHighlight?: string[];
+  resource: Resource;
 };
 
 const SidebarEditor = <Resource extends K8sResourceCommon>({
   children,
-  resource,
-  onResourceUpdate,
   onChange,
+  onResourceUpdate,
   pathsToHighlight = PATHS_TO_HIGHLIGHT.DEFAULT,
+  resource,
 }: SidebarEditorProps<Resource>): JSX.Element => {
   const [editableYAML, setEditableYAML] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,12 +47,12 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
   const [success, setSuccess] = useState(false);
 
   const resourceYAML = useMemo(() => {
-    const yaml = dump(resource, { skipInvalid: true, forceQuotes: true });
+    const yaml = dump(resource, { forceQuotes: true, skipInvalid: true });
     setEditableYAML(yaml);
     return yaml;
   }, [resource]);
 
-  const { showEditor, isEditable } = useContext(SidebarEditorContext);
+  const { isEditable, showEditor } = useContext(SidebarEditorContext);
   const editedResource = safeLoad<Resource>(editableYAML);
   const editorRef = useEditorHighlighter(editableYAML, pathsToHighlight, showEditor);
 
@@ -82,25 +82,25 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
   };
 
   return (
-    <Sidebar isPanelRight hasGutter hasNoBackground className="sidebar-editor">
+    <Sidebar className="sidebar-editor" hasGutter hasNoBackground isPanelRight>
       <SidebarContent>
         {children instanceof Function ? children(editedResource ?? resource) : children}
       </SidebarContent>
       {showEditor && (
         <SidebarPanel
-          width={{ default: 'width_33', lg: 'width_50', xl: 'width_50' }}
           className="sidebar-editor__panel"
+          width={{ default: 'width_33', lg: 'width_50', xl: 'width_50' }}
         >
           <Stack hasGutter>
             <StackItem isFilled>
               <Suspense fallback={<Loading />}>
                 <YAMLEditor
-                  value={editableYAML}
                   minHeight="300px"
                   onChange={changeResource}
                   onSave={() => onUpdate(editedResource)}
                   options={{ readOnly: !isEditable }}
                   ref={editorRef}
+                  value={editableYAML}
                 />
               </Suspense>
             </StackItem>
@@ -108,9 +108,9 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
               <StackItem>
                 {success && (
                   <Alert
+                    actionClose={<AlertActionCloseButton onClose={() => setSuccess(false)} />}
                     title="Success"
                     variant={AlertVariant.success}
-                    actionClose={<AlertActionCloseButton onClose={() => setSuccess(false)} />}
                   ></Alert>
                 )}
                 {error && (
@@ -125,19 +125,19 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
                 <Flex>
                   <FlexItem>
                     <Button
-                      variant={ButtonVariant.primary}
-                      onClick={() => onUpdate(editedResource)}
-                      isLoading={loading}
                       className="save-button"
+                      isLoading={loading}
+                      onClick={() => onUpdate(editedResource)}
+                      variant={ButtonVariant.primary}
                     >
                       Save
                     </Button>
                   </FlexItem>
                   <FlexItem>
                     <Button
-                      variant={ButtonVariant.secondary}
-                      onClick={onReload}
                       className="reload-button"
+                      onClick={onReload}
+                      variant={ButtonVariant.secondary}
                     >
                       Reload
                     </Button>

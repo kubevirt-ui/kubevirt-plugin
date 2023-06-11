@@ -29,18 +29,18 @@ const DisksTable: FC<DisksTableProps> = ({ vmi }) => {
       <DiskListTitle />
       <ListPageFilter
         data={data}
-        loaded={loaded}
-        rowFilters={filters}
-        onFilterChange={onFilterChange}
         hideLabelFilter
+        loaded={loaded}
+        onFilterChange={onFilterChange}
+        rowFilters={filters}
       />
       <VirtualizedTable
+        columns={columns}
         data={filteredData}
-        unfilteredData={disks}
         loaded={loaded}
         loadError={loadingError}
-        columns={columns}
         Row={DisksTableRow}
+        unfilteredData={disks}
       />
     </ListPageBody>
   );

@@ -29,10 +29,10 @@ const CreateFromInstanceType: FC = () => {
           <Card>
             <List className="create-vm-instance-type-section__list" isPlain>
               <SectionListItem
+                headerAction={<AddBootableVolumeButton />}
                 headerText={t('Select volume to boot from')}
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_VOLUME}
                 sectionState={sectionState}
-                headerAction={<AddBootableVolumeButton />}
               >
                 <BootableVolumeList displayShowAllButton />
               </SectionListItem>

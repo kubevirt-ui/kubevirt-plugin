@@ -10,25 +10,25 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 import DeschedulerModal from './DeschedulerModal';
 
 type DeschedulerModalButtonProps = {
-  template: V1Template;
   editable: boolean;
+  template: V1Template;
 };
 
-const DeschedulerModalButton: React.FC<DeschedulerModalButtonProps> = ({ template, editable }) => {
+const DeschedulerModalButton: React.FC<DeschedulerModalButtonProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
 
   return (
     <Button
-      isInline
-      isDisabled={!editable}
       onClick={() =>
         createModal(({ isOpen, onClose }) => (
-          <DeschedulerModal template={template} isOpen={isOpen} onClose={onClose} />
+          <DeschedulerModal isOpen={isOpen} onClose={onClose} template={template} />
         ))
       }
-      variant="link"
       iconPosition={'right'}
+      isDisabled={!editable}
+      isInline
+      variant="link"
     >
       {isDeschedulerOn(template) ? t('ON') : t('OFF')}
       {editable && <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />}

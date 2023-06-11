@@ -13,8 +13,6 @@ export const updateVolumeResources = (
       (resourceRef) => !compareOwnerReferences(resourceRef, vmOwnerRef),
     );
     return k8sPatch({
-      model: model,
-      resource,
       data: [
         {
           op: 'replace',
@@ -22,6 +20,8 @@ export const updateVolumeResources = (
           value: resourceFilteredOwnerReference,
         },
       ],
+      model: model,
+      resource,
     });
   });
 };

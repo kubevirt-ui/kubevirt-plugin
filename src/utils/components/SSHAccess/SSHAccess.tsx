@@ -10,23 +10,23 @@ import SSHCommand from './components/SSHCommand';
 
 type SSHAccessProps = {
   sshService: IoK8sApiCoreV1Service;
-  vmi: V1VirtualMachineInstance;
-  vm: V1VirtualMachine;
   sshServiceLoaded?: boolean;
+  vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
-const SSHAccess: React.FC<SSHAccessProps> = ({ sshService, sshServiceLoaded, vmi, vm }) => {
+const SSHAccess: React.FC<SSHAccessProps> = ({ sshService, sshServiceLoaded, vm, vmi }) => {
   const userData = getCloudInitCredentials(vm);
   const userName = userData?.users?.[0]?.name;
 
   return (
     <DescriptionList>
       <ConsoleOverVirtctl
+        userName={userName}
         vmName={vm?.metadata?.name}
         vmNamespace={vm?.metadata?.namespace}
-        userName={userName}
       />
-      <SSHCommand vmi={vmi} vm={vm} sshService={sshService} sshServiceLoaded={sshServiceLoaded} />
+      <SSHCommand sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
     </DescriptionList>
   );
 };

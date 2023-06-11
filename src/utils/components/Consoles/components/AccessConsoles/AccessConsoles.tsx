@@ -18,21 +18,21 @@ import './access-consoles.scss';
 
 export const AccessConsoles: React.FC<AccessConsolesProps> = ({
   children,
+  preselectedType = null,
+  textDesktopViewerConsole = 'Desktop viewer',
   textSelectConsoleType = 'Select console type',
   textSerialConsole = 'Serial console',
   textVncConsole = 'VNC console',
-  textDesktopViewerConsole = 'Desktop viewer',
-  preselectedType = null,
 }) => {
   const typeMap = {
+    [DESKTOP_VIEWER_CONSOLE_TYPE]: textDesktopViewerConsole,
     [SERIAL_CONSOLE_TYPE]: textSerialConsole,
     [VNC_CONSOLE_TYPE]: textVncConsole,
-    [DESKTOP_VIEWER_CONSOLE_TYPE]: textDesktopViewerConsole,
   };
 
   const [type, setType] = React.useState(
     preselectedType !== NONE_TYPE
-      ? ({ value: preselectedType, toString: () => typeMap[preselectedType] } as SelectOptionObject)
+      ? ({ toString: () => typeMap[preselectedType], value: preselectedType } as SelectOptionObject)
       : null,
   );
 
@@ -44,9 +44,9 @@ export const AccessConsoles: React.FC<AccessConsolesProps> = ({
       const childType = typeMap[typeText] || typeText;
       return (
         <SelectOption
-          key={childType}
           id={childType}
-          value={{ value: childType, toString: () => childType } as SelectOptionObject}
+          key={childType}
+          value={{ toString: () => childType, value: childType } as SelectOptionObject}
         />
       );
     },
@@ -57,19 +57,19 @@ export const AccessConsoles: React.FC<AccessConsolesProps> = ({
       {React.Children.toArray(children).length > 1 && (
         <div className={css(styles.consoleActions, 'pf-u-w-0', 'access-consoles')}>
           <Select
-            aria-label={textSelectConsoleType}
-            placeholderText={textSelectConsoleType}
-            toggleId="pf-c-console__type-selector"
-            variant={SelectVariant.single}
             onSelect={(_, selection) => {
               setType(selection as SelectOptionObject);
               setIsOpen(false);
             }}
-            selections={type}
-            isOpen={isOpen}
             onToggle={(open: boolean) => {
               setIsOpen(open);
             }}
+            aria-label={textSelectConsoleType}
+            isOpen={isOpen}
+            placeholderText={textSelectConsoleType}
+            selections={type}
+            toggleId="pf-c-console__type-selector"
+            variant={SelectVariant.single}
           >
             {selectOptions}
           </Select>

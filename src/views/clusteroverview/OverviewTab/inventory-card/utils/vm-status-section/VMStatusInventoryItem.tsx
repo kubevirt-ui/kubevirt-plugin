@@ -8,11 +8,11 @@ import { getVMStatusIcon } from '../utils';
 import './VMStatusInventoryItem.scss';
 
 export type VMStatusInventoryItemProps = {
-  status: string;
   count: number;
+  status: string;
 };
 
-const VMStatusInventoryItem: React.FC<VMStatusInventoryItemProps> = ({ status, count }) => {
+const VMStatusInventoryItem: React.FC<VMStatusInventoryItemProps> = ({ count, status }) => {
   const Icon = getVMStatusIcon(status);
   const to = `/k8s/all-namespaces/${VirtualMachineModelRef}?rowFilter-status=${status}`;
 

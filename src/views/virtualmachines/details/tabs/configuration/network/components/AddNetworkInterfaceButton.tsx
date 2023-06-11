@@ -20,18 +20,18 @@ const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({ vm }) =
 
   return (
     <ListPageCreateButton
-      className="add-network-interface-button"
       onClick={() =>
         createModal(({ isOpen, onClose }) => (
           <VirtualMachinesNetworkInterfaceModal
-            vm={vm}
+            headerText={actionText}
             isOpen={isOpen}
             onClose={onClose}
-            headerText={actionText}
+            vm={vm}
             vmi={vmi}
           />
         ))
       }
+      className="add-network-interface-button"
     >
       {actionText}
     </ListPageCreateButton>

@@ -18,13 +18,13 @@ import {
 const generateRandomString = () => Math.random().toString(36).substring(2, 7);
 
 export enum VMActionType {
+  AddVolume = 'addvolume',
+  Pause = 'pause',
+  RemoveVolume = 'removevolume',
+  Restart = 'restart',
   Start = 'start',
   Stop = 'stop',
-  Restart = 'restart',
-  Pause = 'pause',
   Unpause = 'unpause',
-  AddVolume = 'addvolume',
-  RemoveVolume = 'removevolume',
 }
 
 export const VMActionRequest = async (
@@ -52,8 +52,8 @@ export const VMActionRequest = async (
     const url = `/api/kubernetes/apis/subresources.${model.apiGroup}/${model.apiVersion}/namespaces/${namespace}/${model.plural}/${name}/${action}`;
 
     const response = await consoleFetch(url, {
-      method: 'PUT',
       body: body ? JSON.stringify(body) : undefined,
+      method: 'PUT',
     });
 
     return response.text();
@@ -90,8 +90,8 @@ export const migrateVM = async (vm: V1VirtualMachine) => {
     },
   };
   await k8sCreate({
-    model: VirtualMachineInstanceMigrationModel,
     data: migrationData,
+    model: VirtualMachineInstanceMigrationModel,
     ns: namespace,
   });
 };

@@ -1,19 +1,13 @@
 import * as React from 'react';
 
 export type ModalComponentProps = {
+  appendTo: () => HTMLElement;
   isOpen: boolean;
   onClose: () => void;
-  appendTo: () => HTMLElement;
 };
 export type ModalComponent = React.ComponentType<ModalComponentProps>;
 
 export type ModalContextType = {
-  /** the modal component to render */
-  modal?: ModalComponent;
-  /** whether the modal is open */
-  isOpen?: boolean;
-  /** callback to close the modal */
-  onClose?: () => void;
   /** receives a modal component as an argument and injects it to the dom, the component callback will receive the following parameters,
    * isOpen: open state of the modal
    * onClose: callback to close the modal
@@ -27,6 +21,12 @@ export type ModalContextType = {
    *
    */
   createModal?: (modal: ModalComponent) => void;
+  /** whether the modal is open */
+  isOpen?: boolean;
+  /** the modal component to render */
+  modal?: ModalComponent;
+  /** callback to close the modal */
+  onClose?: () => void;
 };
 
 export const ModalContext = React.createContext<ModalContextType>({});
@@ -55,19 +55,19 @@ export const useModalValue = (): ModalContextType => {
     setModal(undefined);
   };
 
-  return { modal, isOpen, createModal, onClose };
+  return { createModal, isOpen, modal, onClose };
 };
 
-export const ModalProvider: React.FC<{ value: ModalContextType }> = ({ value = {}, children }) => {
-  const { modal: Modal, isOpen, onClose } = value;
+export const ModalProvider: React.FC<{ value: ModalContextType }> = ({ children, value = {} }) => {
+  const { isOpen, modal: Modal, onClose } = value;
 
   return (
     <ModalContext.Provider value={value}>
       {Modal && isOpen && (
         <Modal
+          appendTo={() => document.querySelector('#modal-container')}
           isOpen
           onClose={onClose}
-          appendTo={() => document.querySelector('#modal-container')}
         />
       )}
       {children}

@@ -35,16 +35,16 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
   const { t } = useKubevirtTranslation();
   const { currentTime, duration, timespan } = useDuration();
   const queries = React.useMemo(
-    () => getUtilizationQueries({ obj: vmi, duration }),
+    () => getUtilizationQueries({ duration, obj: vmi }),
     [vmi, duration],
   );
-  const { ref, width, height } = useResponsiveCharts();
+  const { height, ref, width } = useResponsiveCharts();
 
   const [data] = usePrometheusPoll({
-    query: queries?.STORAGE_IOPS_TOTAL,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.STORAGE_IOPS_TOTAL,
     timespan,
   });
 
@@ -60,48 +60,48 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queriesToLink(queries?.STORAGE_IOPS_TOTAL)}>
           <Chart
-            height={height}
-            width={width}
-            padding={{ top: 35, bottom: 35, left: 80, right: 35 }}
-            scale={{ x: 'time', y: 'linear' }}
+            containerComponent={
+              <ChartVoronoiContainer
+                constrainToVisibleArea
+                labels={({ datum }) => t('IOPS total: {{input}}', { input: datum?.y?.toFixed(2) })}
+              />
+            }
             domain={{
               x: [currentTime - timespan, currentTime],
               y: [0, yMax],
             }}
-            containerComponent={
-              <ChartVoronoiContainer
-                labels={({ datum }) => t('IOPS total: {{input}}', { input: datum?.y?.toFixed(2) })}
-                constrainToVisibleArea
-              />
-            }
+            height={height}
+            padding={{ bottom: 35, left: 80, right: 35, top: 35 }}
+            scale={{ x: 'time', y: 'linear' }}
+            width={width}
           >
             <ChartAxis
-              dependentAxis
-              tickValues={[0, yMax]}
-              tickFormat={(tick: number) => `${tick === 0 ? tick : tick?.toFixed(2)} IOPS`}
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
+              dependentAxis
+              tickFormat={(tick: number) => `${tick === 0 ? tick : tick?.toFixed(2)} IOPS`}
+              tickValues={[0, yMax]}
             />
             <ChartAxis
-              tickFormat={tickFormat(duration, currentTime)}
-              tickCount={TICKS_COUNT}
               style={{
-                ticks: { stroke: 'transparent' },
                 tickLabels: { padding: 2 },
+                ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}
+              tickCount={TICKS_COUNT}
+              tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
-                data={chartData}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
+                data={chartData}
               />
             </ChartGroup>
           </Chart>

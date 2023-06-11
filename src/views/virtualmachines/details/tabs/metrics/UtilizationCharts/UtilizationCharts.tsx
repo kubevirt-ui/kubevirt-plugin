@@ -8,11 +8,11 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-core';
 
 type UtilizationChartsProps = {
-  vmi: V1VirtualMachineInstance;
   pods: K8sResourceCommon[];
+  vmi: V1VirtualMachineInstance;
 };
 
-const UtilizationCharts: FC<UtilizationChartsProps> = ({ vmi, pods }) => {
+const UtilizationCharts: FC<UtilizationChartsProps> = ({ pods, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -29,7 +29,7 @@ const UtilizationCharts: FC<UtilizationChartsProps> = ({ vmi, pods }) => {
         <Card>
           <CardTitle>{t('CPU')}</CardTitle>
           <CardBody>
-            <CPUThresholdChart vmi={vmi} pods={pods} />
+            <CPUThresholdChart pods={pods} vmi={vmi} />
           </CardBody>
         </Card>
       </GridItem>

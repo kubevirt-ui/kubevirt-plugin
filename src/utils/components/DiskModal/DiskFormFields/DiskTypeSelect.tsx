@@ -24,7 +24,7 @@ const DiskTypeSelect: React.FC<DiskTypeSelectProps> = ({
 
   const onSelectDiskSource = React.useCallback(
     (event: React.MouseEvent<Element, MouseEvent>, selection: string) => {
-      dispatchDiskState({ type: diskReducerActions.SET_DISK_TYPE, payload: selection });
+      dispatchDiskState({ payload: selection, type: diskReducerActions.SET_DISK_TYPE });
       setIsOpen(false);
     },
     [dispatchDiskState],
@@ -32,24 +32,24 @@ const DiskTypeSelect: React.FC<DiskTypeSelectProps> = ({
   return (
     <FormGroup
       fieldId="disk-source-type-select"
-      label={t('Type')}
       helperText={t('Hot plug is enabled only for "Disk" type')}
+      label={t('Type')}
     >
       <div data-test-id="disk-type-select">
         <Select
-          menuAppendTo="parent"
           isOpen={isOpen}
-          onToggle={setIsOpen}
+          menuAppendTo="parent"
           onSelect={onSelectDiskSource}
-          variant={SelectVariant.single}
+          onToggle={setIsOpen}
           selections={diskType}
+          variant={SelectVariant.single}
         >
           {typeOptions.map((type) => (
             <SelectOption
+              data-test-id={`disk-type-select-${type}`}
+              isDisabled={isVMRunning && type !== diskTypes.disk}
               key={type}
               value={type}
-              isDisabled={isVMRunning && type !== diskTypes.disk}
-              data-test-id={`disk-type-select-${type}`}
             >
               {diskTypesLabels[type]}
             </SelectOption>

@@ -55,16 +55,16 @@ const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm }) => {
 
   return (
     <>
-      <ListPageFilter data={data} loaded rowFilters={filters} onFilterChange={onFilterChange} />
+      <ListPageFilter data={data} loaded onFilterChange={onFilterChange} rowFilters={filters} />
       <VirtualizedTable
+        columns={columns}
         data={filteredData}
-        unfilteredData={data}
+        EmptyMsg={() => <AutoAttachedNetworkEmptyState isAutoAttached={autoattachPodInterface} />}
         loaded={!isEmpty(vm)}
         loadError={false}
-        columns={columns}
         Row={NetworkInterfaceRow}
         rowData={{ vm }}
-        EmptyMsg={() => <AutoAttachedNetworkEmptyState isAutoAttached={autoattachPodInterface} />}
+        unfilteredData={data}
       />
     </>
   );

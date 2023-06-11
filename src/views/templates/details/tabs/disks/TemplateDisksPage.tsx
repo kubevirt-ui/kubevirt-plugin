@@ -29,8 +29,8 @@ import { getTemplateVMWithNamespace } from './utils';
 import './TemplateDisksPage.scss';
 
 type TemplateDisksPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj: V1Template;
 };
@@ -49,10 +49,10 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
   const onSubmitTemplate = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       }),
     [],
   );
@@ -67,43 +67,43 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
   return (
     <div className="template-disks-page">
       <ListPageBody>
-        <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
+        <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
           <DiskListTitle />
 
           <Button
-            className="template-disks-page__button"
-            isDisabled={!isTemplateEditable}
             onClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <DiskModal
-                  vm={vm}
+                  createOwnerReference={false}
+                  headerText={t('Add disk')}
                   isOpen={isOpen}
                   onClose={onClose}
                   onSubmit={onUpdate}
-                  headerText={t('Add disk')}
-                  createOwnerReference={false}
+                  vm={vm}
                 />
               ))
             }
+            className="template-disks-page__button"
+            isDisabled={!isTemplateEditable}
           >
             {t('Add disk')}
           </Button>
 
           <ListPageFilter
             data={data}
-            loaded={disksLoaded}
-            rowFilters={filters}
-            onFilterChange={onFilterChange}
             hideLabelFilter
+            loaded={disksLoaded}
+            onFilterChange={onFilterChange}
+            rowFilters={filters}
           />
           <VirtualizedTable
+            columns={columns}
             data={filteredData}
-            unfilteredData={data}
             loaded={disksLoaded}
             loadError={undefined}
-            columns={columns}
             Row={DiskRow}
-            rowData={{ vm, onUpdate, actionsDisabled: !isTemplateEditable }}
+            rowData={{ actionsDisabled: !isTemplateEditable, onUpdate, vm }}
+            unfilteredData={data}
           />
         </SidebarEditor>
       </ListPageBody>

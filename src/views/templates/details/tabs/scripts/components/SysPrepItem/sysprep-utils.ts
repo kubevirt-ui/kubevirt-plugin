@@ -82,10 +82,10 @@ export const updateTemplateWithSysprep = async (
   const updatedTemplate = replaceTemplateVM(template, newVM);
 
   await k8sUpdate({
-    model: TemplateModel,
     data: updatedTemplate,
-    ns: template?.metadata?.namespace,
+    model: TemplateModel,
     name: template?.metadata?.name,
+    ns: template?.metadata?.namespace,
   });
 };
 
@@ -105,6 +105,6 @@ export const updateSysprepObject = (
     });
   } else {
     const data = { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend };
-    return generateNewSysprepConfig({ vm, data });
+    return generateNewSysprepConfig({ data, vm });
   }
 };

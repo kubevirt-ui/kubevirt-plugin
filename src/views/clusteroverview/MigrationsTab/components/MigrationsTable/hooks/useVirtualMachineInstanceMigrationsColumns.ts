@@ -18,69 +18,69 @@ const useVirtualMachineInstanceMigrationsColumns = (): [
   const { t } = useKubevirtTranslation();
 
   const [canGetNode] = useAccessReview({
-    verb: 'get' as K8sVerb,
     resource: NodeModel.plural,
+    verb: 'get' as K8sVerb,
   });
 
   const columns: TableColumn<MigrationTableDataLayout>[] = React.useMemo(
     () => [
       {
-        title: t('VirtualMachine name'),
         id: 'vm-name',
-        transforms: [sortable],
         sort: 'vmim.spec.vmiName',
+        title: t('VirtualMachine name'),
+        transforms: [sortable],
       },
       {
-        title: t('Status'),
         id: 'status',
-        transforms: [sortable],
         sort: 'vmim.status.phase',
+        title: t('Status'),
+        transforms: [sortable],
       },
       {
-        title: t('Source'),
         id: 'source',
-        transforms: [sortable],
         sort: 'vmiObj.status.migrationState.sourceNode',
+        title: t('Source'),
+        transforms: [sortable],
       },
       {
-        title: t('Target'),
         id: 'target',
-        transforms: [sortable],
         sort: 'vmiObj.status.migrationState.targetNode',
+        title: t('Target'),
+        transforms: [sortable],
       },
       {
-        title: t('MigrationPolicy'),
         id: 'migration-policy',
-        transforms: [sortable],
         sort: 'vmiObj.status.migrationState.migrationPolicyName',
+        title: t('MigrationPolicy'),
+        transforms: [sortable],
       },
       {
-        title: t('VirtualMachineInstanceMigration name'),
         id: 'vmim-name',
-        transforms: [sortable],
         sort: 'vmim.metadata.name',
-      },
-      {
-        title: t('Created'),
-        id: 'created',
-        additional: true,
+        title: t('VirtualMachineInstanceMigration name'),
         transforms: [sortable],
-        sort: 'vmim.metadata.creationTimestamp',
       },
       {
-        title: '',
+        additional: true,
+        id: 'created',
+        sort: 'vmim.metadata.creationTimestamp',
+        title: t('Created'),
+        transforms: [sortable],
+      },
+      {
         id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        title: '',
       },
     ],
     [t],
   );
 
   const [activeColumns] = useKubevirtUserSettingsTableColumns<MigrationTableDataLayout>({
+    columnManagementID: VirtualMachineInstanceMigrationModelRef,
     columns: canGetNode
       ? columns
       : columns.filter((column) => column.id !== 'source' && column.id !== 'target'),
-    columnManagementID: VirtualMachineInstanceMigrationModelRef,
   });
 
   return [columns, activeColumns];

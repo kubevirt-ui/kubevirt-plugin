@@ -8,20 +8,20 @@ import SubscriptionStateUpgradeAvailable from './SubscriptionStates/Subscription
 import SubscriptionStateUpgradePending from './SubscriptionStates/SubscriptionStateUpgradePending';
 
 type SubscriptionStatusType = {
-  subscription: SubscriptionKind;
   operatorLink: string;
+  subscription: SubscriptionKind;
 };
 
-const SubscriptionStatus: React.FC<SubscriptionStatusType> = ({ subscription, operatorLink }) => {
+const SubscriptionStatus: React.FC<SubscriptionStatusType> = ({ operatorLink, subscription }) => {
   const Component = {
+    default: <SubscriptionStateDefault subscription={subscription} />,
+    [SubscriptionState.SubscriptionStateAtLatest]: <SubscriptionStateAtLatest />,
     [SubscriptionState.SubscriptionStateUpgradeAvailable]: (
       <SubscriptionStateUpgradeAvailable operatorLink={operatorLink} />
     ),
     [SubscriptionState.SubscriptionStateUpgradePending]: (
-      <SubscriptionStateUpgradePending subscription={subscription} operatorLink={operatorLink} />
+      <SubscriptionStateUpgradePending operatorLink={operatorLink} subscription={subscription} />
     ),
-    [SubscriptionState.SubscriptionStateAtLatest]: <SubscriptionStateAtLatest />,
-    default: <SubscriptionStateDefault subscription={subscription} />,
   };
 
   return Component[subscription?.status?.state || 'default'];

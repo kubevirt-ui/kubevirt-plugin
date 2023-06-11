@@ -167,12 +167,12 @@ export const getTemplateOperatingSystems = (templates: V1Template[]) => {
       const dv = dvTemplates?.find((dvt) => dvt?.metadata?.name === VM_TEMPLATE_NAME_PARAMETER);
 
       return {
-        id: osId,
-        name: getAnnotation(template, nameAnnotation),
         baseImageName: getPVCName(template),
         baseImageNamespace: getPVCNamespace(template),
         baseImageRecomendedSize: dv && stringValueUnitSplit(getDataVolumeStorageSize(dv)),
+        id: osId,
         isSourceRef: !!dv?.spec?.sourceRef,
+        name: getAnnotation(template, nameAnnotation),
       };
     }),
   );

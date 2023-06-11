@@ -14,7 +14,7 @@ import {
 export const TemplatesCatalogEmptyState: React.FC<{
   bootSourcesLoaded: boolean;
   onClearFilters: () => void;
-}> = React.memo(({ onClearFilters, bootSourcesLoaded }) => {
+}> = React.memo(({ bootSourcesLoaded, onClearFilters }) => {
   const { t } = useKubevirtTranslation();
 
   if (!bootSourcesLoaded) {
@@ -39,7 +39,7 @@ export const TemplatesCatalogEmptyState: React.FC<{
         {t('No Template items are being shown due to the filters being applied.')}
       </EmptyStateBody>
       <EmptyStateSecondaryActions>
-        <Button variant="link" onClick={() => onClearFilters()}>
+        <Button onClick={() => onClearFilters()} variant="link">
           {t('Clear All Filters')}
         </Button>
       </EmptyStateSecondaryActions>

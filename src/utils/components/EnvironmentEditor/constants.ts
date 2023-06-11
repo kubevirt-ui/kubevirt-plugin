@@ -1,18 +1,18 @@
 export enum EnvironmentKind {
+  configMap = 'configMap',
   secret = 'secret',
   serviceAccount = 'serviceAccount',
-  configMap = 'configMap',
 }
 
 export type EnvironmentVariable = {
+  diskName: string;
+  kind: EnvironmentKind;
   name: string;
   serial: string;
-  kind: EnvironmentKind;
-  diskName: string;
 };
 
 export const MapKindToAbbr = {
-  [EnvironmentKind.secret]: 'S',
   [EnvironmentKind.configMap]: 'CM',
+  [EnvironmentKind.secret]: 'S',
   [EnvironmentKind.serviceAccount]: 'SA',
 };

@@ -15,10 +15,10 @@ export const CustomizeError = () => {
         <Trans>
           Please{' '}
           <Button
-            type="button"
-            onClick={window.location.reload.bind(window.location)}
-            variant="link"
             isInline
+            onClick={window.location.reload.bind(window.location)}
+            type="button"
+            variant="link"
           >
             try again
           </Button>

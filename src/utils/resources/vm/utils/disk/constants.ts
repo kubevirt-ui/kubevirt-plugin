@@ -6,35 +6,35 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export type DiskRawData = {
-  disk: V1Disk;
-  volume: V1Volume;
-  pvc?: V1alpha1PersistentVolumeClaim;
   dataVolumeTemplate?: V1DataVolumeTemplateSpec;
+  disk: V1Disk;
+  pvc?: V1alpha1PersistentVolumeClaim;
+  volume: V1Volume;
 };
 
 export type DiskRowDataLayout = {
-  name: string;
-  source: string;
-  size: string;
   drive: string;
   interface: string;
-  storageClass: string;
-  metadata: { name: string };
-  namespace?: string;
   isBootDisk: boolean;
   isEnvDisk: boolean;
+  metadata: { name: string };
+  name: string;
+  namespace?: string;
+  size: string;
+  source: string;
+  storageClass: string;
 };
 
 export const diskTypes = {
-  disk: 'disk',
   cdrom: 'cdrom',
+  disk: 'disk',
   floppy: 'floppy',
   lun: 'lun',
 };
 
 export const diskTypesLabels = {
-  disk: 'Disk',
   cdrom: 'CD-ROM',
+  disk: 'Disk',
   floppy: 'Floppy',
   lun: 'LUN',
 };

@@ -29,14 +29,14 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ vm }) => {
   const columns = useNetworkColumns(filteredData);
   return (
     <>
-      <ListPageFilter data={data} loaded rowFilters={filters} onFilterChange={onFilterChange} />
+      <ListPageFilter data={data} loaded onFilterChange={onFilterChange} rowFilters={filters} />
       <VirtualizedTable
+        columns={columns}
         data={filteredData}
-        unfilteredData={data}
         loaded
         loadError={false}
-        columns={columns}
         Row={NetworkInterfaceRow}
+        unfilteredData={data}
       />
     </>
   );

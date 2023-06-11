@@ -22,9 +22,9 @@ const MigrationPoliciesCreateButton: FC<MigrationPoliciesCreateButtonProps> = ({
 
   return (
     <ListPageCreateDropdown
+      createAccessReview={{ groupVersionKind: kind }}
       items={createItems}
       onClick={onCreate}
-      createAccessReview={{ groupVersionKind: kind }}
     >
       {t('Create MigrationPolicy')}
     </ListPageCreateDropdown>

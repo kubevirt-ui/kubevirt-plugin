@@ -11,8 +11,8 @@ type DescriptionInputProps = {
 const DescriptionInput: React.FC<DescriptionInputProps> = ({ description, setDescription }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <FormGroup label={t('Description')} fieldId="description">
-      <TextArea type="text" value={description} onChange={setDescription} id="description" />
+    <FormGroup fieldId="description" label={t('Description')}>
+      <TextArea id="description" onChange={setDescription} type="text" value={description} />
     </FormGroup>
   );
 };

@@ -34,12 +34,12 @@ import { WizardOverviewDisksTable } from './WizardOverviewDisksTable/WizardOverv
 import { WizardOverviewNetworksTable } from './WizardOverviewNetworksTable/WizardOverviewNetworksTable';
 
 type WizardOverviewGridProps = {
-  vm: V1VirtualMachine;
   tabsData: TabsData;
   updateVM: UpdateValidatedVM;
+  vm: V1VirtualMachine;
 };
 
-const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ vm, tabsData, updateVM }) => {
+const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, vm }) => {
   const history = useHistory();
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
@@ -70,37 +70,34 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ vm, tabsData, updateV
   };
 
   return (
-    <Grid hasGutter className="wizard-overview-tab__grid">
-      <GridItem span={6} rowSpan={4}>
+    <Grid className="wizard-overview-tab__grid" hasGutter>
+      <GridItem rowSpan={4} span={6}>
         <DescriptionList>
           <WizardDescriptionItem
-            title={t('Name')}
             description={vm.metadata.name}
+            helperPopover={{ content: t('Name of the VirtualMachine'), header: t('Name') }}
             testId="wizard-overview-name"
-            helperPopover={{ header: t('Name'), content: t('Name of the VirtualMachine') }}
+            title={t('Name')}
           />
 
           <WizardDescriptionItem
-            title={t('Namespace')}
-            testId="wizard-overview-namespace"
-            description={vm.metadata.namespace}
             helperPopover={{
-              header: t('Namespace'),
               content: t('Namespace of the VirtualMachine'),
+              header: t('Namespace'),
             }}
+            description={vm.metadata.namespace}
+            testId="wizard-overview-namespace"
+            title={t('Namespace')}
           />
 
           <WizardDescriptionItem
-            title={t('Description')}
-            description={description}
-            isEdit
-            testId="wizard-overview-description"
+            helperPopover={{
+              content: t('Description of the VirtualMachine'),
+              header: t('Description'),
+            }}
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <DescriptionModal
-                  obj={vm}
-                  isOpen={isOpen}
-                  onClose={onClose}
                   onSubmit={(updatedDescription) => {
                     return updateVM((vmDraft) => {
                       if (updatedDescription) {
@@ -110,98 +107,98 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ vm, tabsData, updateV
                       }
                     });
                   }}
+                  isOpen={isOpen}
+                  obj={vm}
+                  onClose={onClose}
                 />
               ))
             }
-            helperPopover={{
-              header: t('Description'),
-              content: t('Description of the VirtualMachine'),
-            }}
+            description={description}
+            isEdit
+            testId="wizard-overview-description"
+            title={t('Description')}
           />
 
           <WizardDescriptionItem
-            title={t('Operating system')}
             description={displayName}
             testId="wizard-overview-operating-system"
+            title={t('Operating system')}
           />
 
           <WizardDescriptionItem
-            className="wizard-overview-description-left-column"
-            title={t('CPU | Memory')}
-            isEdit
-            testId="wizard-overview-cpu-memory"
+            description={t('{{cpuCount}} CPU | {{memory}} Memory', {
+              cpuCount,
+              memory: readableSizeUnit(memory),
+            })}
             helperPopover={{
-              header: t('CPU | Memory'),
               content: (
                 <CPUDescription
                   cpu={vm?.spec?.template?.spec?.domain?.cpu}
                   helperTextResource={CpuMemHelperTextResources.FutureVM}
                 />
               ),
+              header: t('CPU | Memory'),
             }}
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
-                <CPUMemoryModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
+                <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={updateVM} vm={vm} />
               ))
             }
-            description={t('{{cpuCount}} CPU | {{memory}} Memory', {
-              cpuCount,
-              memory: readableSizeUnit(memory),
-            })}
+            className="wizard-overview-description-left-column"
+            isEdit
+            testId="wizard-overview-cpu-memory"
+            title={t('CPU | Memory')}
           />
 
           <WizardDescriptionItem
-            className="wizard-overview-description-left-column"
-            title={t('Machine type')}
-            testId="wizard-overview-machine-type"
-            description={getMachineType(vm)}
             helperPopover={{
-              header: t('Machine type'),
               content: t(
                 'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
               ),
+              header: t('Machine type'),
             }}
+            className="wizard-overview-description-left-column"
+            description={getMachineType(vm)}
+            testId="wizard-overview-machine-type"
+            title={t('Machine type')}
           />
 
           <WizardDescriptionItem
-            title={t('Boot mode')}
-            isEdit
-            testId="wizard-overview-boot-method"
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <FirmwareBootloaderModal
-                  vm={vm}
                   isOpen={isOpen}
                   onClose={onClose}
                   onSubmit={updateVM}
+                  vm={vm}
                 />
               ))
             }
             description={getBootloaderTitleFromVM(vm)}
+            isEdit
+            testId="wizard-overview-boot-method"
+            title={t('Boot mode')}
           />
 
           <WizardDescriptionItem
-            title={t('Start in pause mode')}
-            description={startStrategy ? t('ON') : t('OFF')}
-            isEdit
-            testId="start-in-pause-mode"
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <StartPauseModal
-                  vm={vm}
+                  headerText={t('Start in pause mode')}
                   isOpen={isOpen}
                   onClose={onClose}
                   onSubmit={updateVM}
-                  headerText={t('Start in pause mode')}
+                  vm={vm}
                 />
               ))
             }
+            description={startStrategy ? t('ON') : t('OFF')}
+            isEdit
+            testId="start-in-pause-mode"
+            title={t('Start in pause mode')}
           />
 
           <WizardDescriptionItem
-            className="wizard-overview-description-left-column"
-            title={t('Workload profile')}
-            isEdit
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <WorkloadProfileModal
@@ -212,54 +209,57 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ vm, tabsData, updateV
                 />
               ))
             }
+            className="wizard-overview-description-left-column"
             description={WORKLOADS_LABELS?.[workloadAnnotation] ?? t('Other')}
+            isEdit
             testId="wizard-overview-workload-profile"
+            title={t('Workload profile')}
           />
         </DescriptionList>
       </GridItem>
-      <GridItem span={6} rowSpan={4}>
+      <GridItem rowSpan={4} span={6}>
         <DescriptionList>
           <WizardDescriptionItem
-            title={t('Network interfaces')}
-            count={networks?.length}
+            description={
+              <WizardOverviewNetworksTable
+                interfaces={interfaces}
+                isInlineGrid
+                networks={networks}
+              />
+            }
             onTitleClick={() =>
               history.push(`/k8s/ns/${ns}/templatescatalog/review/network-interfaces`)
             }
-            description={
-              <WizardOverviewNetworksTable
-                isInlineGrid
-                networks={networks}
-                interfaces={interfaces}
-              />
-            }
+            count={networks?.length}
             testId="wizard-overview-network-interfaces"
+            title={t('Network interfaces')}
           />
 
           <WizardDescriptionItem
-            title={t('Disks')}
             count={disks?.length}
-            testId="wizard-overview-disks"
-            onTitleClick={() => history.push(`/k8s/ns/${ns}/templatescatalog/review/disks`)}
             description={<WizardOverviewDisksTable isInlineGrid vm={vm} />}
+            onTitleClick={() => history.push(`/k8s/ns/${ns}/templatescatalog/review/disks`)}
+            testId="wizard-overview-disks"
+            title={t('Disks')}
           />
 
           <WizardDescriptionItem
             count={nDevices}
-            description={<HardwareDevices vm={vm} onSubmit={updateVM} />}
-            title={t('Hardware devices')}
+            description={<HardwareDevices onSubmit={updateVM} vm={vm} />}
             testId="wizard-overview-hardware-devices"
+            title={t('Hardware devices')}
           />
 
           <WizardDescriptionItem
-            title={t('Hostname')}
+            onEditClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <HostnameModal isOpen={isOpen} onClose={onClose} onSubmit={updateVM} vm={vm} />
+              ))
+            }
             description={hostname || vmName}
             isEdit
             testId="wizard-overview-hostname"
-            onEditClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <HostnameModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
-              ))
-            }
+            title={t('Hostname')}
           />
         </DescriptionList>
       </GridItem>

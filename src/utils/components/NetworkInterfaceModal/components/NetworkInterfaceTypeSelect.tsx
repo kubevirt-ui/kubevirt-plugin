@@ -8,14 +8,14 @@ import { networkNameStartWithPod } from '../utils/helpers';
 
 type NetworkInterfaceTypeSelectProps = {
   interfaceType: string;
-  setInterfaceType: Dispatch<SetStateAction<string>>;
   networkName: string | undefined;
+  setInterfaceType: Dispatch<SetStateAction<string>>;
 };
 
 const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
   interfaceType,
-  setInterfaceType,
   networkName,
+  setInterfaceType,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -23,32 +23,32 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const interfaceTypeOptions = {
-    masquerade: {
-      id: interfaceTypeTypes.MASQUERADE,
-      name: t('Masquerade'),
-      description: t(
-        'Put the VirtualMachine behind a NAT Proxy for high compability with different network providers. The VirtualMachines IP will differ from the IP seen on the pod network',
-      ),
-      // in case of pod network, networkName is undefined
-      allowOption: isPodNetworkName,
-    },
     bridge: {
-      id: interfaceTypeTypes.BRIDGE,
-      name: t('Bridge'),
+      // in case of NAD network, networkName should be a string
+      allowOption: !isPodNetworkName,
       description: t(
         'The VirtualMachine will be bridged to the selected network, ideal for L2 devices',
       ),
-      // in case of NAD network, networkName should be a string
-      allowOption: !isPodNetworkName,
+      id: interfaceTypeTypes.BRIDGE,
+      name: t('Bridge'),
+    },
+    masquerade: {
+      // in case of pod network, networkName is undefined
+      allowOption: isPodNetworkName,
+      description: t(
+        'Put the VirtualMachine behind a NAT Proxy for high compability with different network providers. The VirtualMachines IP will differ from the IP seen on the pod network',
+      ),
+      id: interfaceTypeTypes.MASQUERADE,
+      name: t('Masquerade'),
     },
     sriov: {
-      id: interfaceTypeTypes.SRIOV,
-      name: t('SR-IOV'),
+      // in case of NAD network, networkName should be a string
+      allowOption: !isPodNetworkName,
       description: t(
         'Attach a virtual function network device to the VirtualMachine for high performance',
       ),
-      // in case of NAD network, networkName should be a string
-      allowOption: !isPodNetworkName,
+      id: interfaceTypeTypes.SRIOV,
+      name: t('SR-IOV'),
     },
   };
 
@@ -59,24 +59,24 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
   };
 
   return (
-    <FormGroup label={t('Type')} fieldId="type">
+    <FormGroup fieldId="type" label={t('Type')}>
       <div data-test-id="network-interface-type-select">
         <Select
-          menuAppendTo="parent"
           isOpen={isOpen}
-          onToggle={setIsOpen}
+          menuAppendTo="parent"
           onSelect={handleChange}
-          variant={SelectVariant.single}
+          onToggle={setIsOpen}
           selections={interfaceType}
+          variant={SelectVariant.single}
         >
           {Object.values(interfaceTypeOptions)
             ?.filter(({ allowOption }) => allowOption)
-            ?.map(({ id, name, description }) => (
+            ?.map(({ description, id, name }) => (
               <SelectOption
+                data-test-id={`network-interface-type-select-${id}`}
+                description={description}
                 key={id}
                 value={id}
-                description={description}
-                data-test-id={`network-interface-type-select-${id}`}
               >
                 {name}
               </SelectOption>

@@ -43,11 +43,17 @@ const DataImportCronActions: React.FC<DataImportCronActionProps> = ({
 
   return (
     <Dropdown
-      menuAppendTo={getContentScrollableElement}
-      data-test-id="data-import-cron-actions"
-      isPlain={isKebabToggle}
-      isOpen={isOpen}
-      position={DropdownPosition.right}
+      dropdownItems={actions?.map((action) => (
+        <DropdownItem
+          data-test-id={action?.id}
+          description={action?.description}
+          isDisabled={action?.disabled}
+          key={action?.id}
+          onClick={() => handleClick(action)}
+        >
+          {action?.label}
+        </DropdownItem>
+      ))}
       toggle={
         isKebabToggle ? (
           <KebabToggle onToggle={onDropDownToggle} />
@@ -55,17 +61,11 @@ const DataImportCronActions: React.FC<DataImportCronActionProps> = ({
           <DropdownToggle onToggle={onDropDownToggle}>{t('Actions')}</DropdownToggle>
         )
       }
-      dropdownItems={actions?.map((action) => (
-        <DropdownItem
-          data-test-id={action?.id}
-          key={action?.id}
-          onClick={() => handleClick(action)}
-          isDisabled={action?.disabled}
-          description={action?.description}
-        >
-          {action?.label}
-        </DropdownItem>
-      ))}
+      data-test-id="data-import-cron-actions"
+      isOpen={isOpen}
+      isPlain={isKebabToggle}
+      menuAppendTo={getContentScrollableElement}
+      position={DropdownPosition.right}
     />
   );
 };

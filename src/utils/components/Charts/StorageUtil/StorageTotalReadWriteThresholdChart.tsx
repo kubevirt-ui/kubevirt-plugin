@@ -39,17 +39,17 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
   const { t } = useKubevirtTranslation();
   const { currentTime, duration, timespan } = useDuration();
   const queries = React.useMemo(
-    () => getUtilizationQueries({ obj: vmi, duration }),
+    () => getUtilizationQueries({ duration, obj: vmi }),
     [vmi, duration],
   );
 
-  const { ref, width, height } = useResponsiveCharts();
+  const { height, ref, width } = useResponsiveCharts();
 
   const [data] = usePrometheusPoll({
-    query: queries?.FILESYSTEM_TOTAL_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.FILESYSTEM_TOTAL_USAGE,
     timespan,
   });
 
@@ -65,52 +65,52 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queriesToLink(queries?.FILESYSTEM_TOTAL_USAGE)}>
           <Chart
-            height={height}
-            width={width}
-            padding={{ top: 35, bottom: 35, left: 80, right: 35 }}
-            scale={{ x: 'time', y: 'linear' }}
-            domain={{
-              x: [currentTime - timespan, currentTime],
-              y: [0, yMax],
-            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) =>
                   t('Data transfer: {{input}}', {
-                    input: xbytes(datum?.y, { iec: true, fixed: 2 }),
+                    input: xbytes(datum?.y, { fixed: 2, iec: true }),
                   })
                 }
                 constrainToVisibleArea
               />
             }
+            domain={{
+              x: [currentTime - timespan, currentTime],
+              y: [0, yMax],
+            }}
+            height={height}
+            padding={{ bottom: 35, left: 80, right: 35, top: 35 }}
+            scale={{ x: 'time', y: 'linear' }}
+            width={width}
           >
             <ChartAxis
-              dependentAxis
-              tickValues={[0, yMax]}
-              tickFormat={formatMemoryYTick(yMax, 2)}
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
+              dependentAxis
+              tickFormat={formatMemoryYTick(yMax, 2)}
+              tickValues={[0, yMax]}
             />
             <ChartAxis
-              tickFormat={tickFormat(duration, currentTime)}
-              tickCount={TICKS_COUNT}
               style={{
-                ticks: { stroke: 'transparent' },
                 tickLabels: { padding: 2 },
+                ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}
+              tickCount={TICKS_COUNT}
+              tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
-                data={chartData}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
+                data={chartData}
               />
             </ChartGroup>
           </Chart>

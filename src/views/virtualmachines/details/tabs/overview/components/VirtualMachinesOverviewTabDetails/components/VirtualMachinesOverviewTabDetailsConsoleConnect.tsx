@@ -17,7 +17,7 @@ const VirtualMachinesOverviewTabDetailsConsoleConnect: React.FC<
 
   return (
     <div className={cn('vnc-grey-background', isDisabled && 'disabled')}>
-      {!isDisabled && <PlayIcon size="md" onClick={connect} />}
+      {!isDisabled && <PlayIcon onClick={connect} size="md" />}
       {isHeadlessMode && t('Console is disabled in headless mode')}
     </div>
   );

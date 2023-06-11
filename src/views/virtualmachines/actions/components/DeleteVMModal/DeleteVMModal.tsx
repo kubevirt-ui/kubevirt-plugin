@@ -21,12 +21,12 @@ import useDeleteVMResources from './hooks/useDeleteVMResources';
 import { DEFAULT_GRACE_PERIOD } from './constants';
 
 type DeleteVMModalProps = {
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
+  vm: V1VirtualMachine;
 };
 
-const DeleteVMModal: FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
+const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const [deleteOwnedResource, setDeleteOwnedResource] = useState<boolean>(true);
@@ -34,7 +34,7 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
   const [gracePeriodSeconds, setGracePeriodSeconds] = useState<number>(
     vm?.spec?.template?.spec?.terminationGracePeriodSeconds || DEFAULT_GRACE_PERIOD,
   );
-  const { dataVolumes, pvcs, snapshots, loaded } = useDeleteVMResources(vm);
+  const { dataVolumes, loaded, pvcs, snapshots } = useDeleteVMResources(vm);
   const lastNamespacePath = useLastNamespacePath();
 
   const onDelete = async (updatedVM: V1VirtualMachine) => {
@@ -42,14 +42,14 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
       const vmOwnerRef = buildOwnerReference(updatedVM);
 
       await k8sPatch({
-        model: VirtualMachineModel,
-        resource: updatedVM,
         data: [
           {
             op: 'remove',
             path: '/spec/dataVolumeTemplates',
           },
         ],
+        model: VirtualMachineModel,
+        resource: updatedVM,
       });
 
       const pvcPromises = (pvcs || [])?.map((pvc) => {
@@ -57,8 +57,6 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
           (pvcRef) => !compareOwnerReferences(pvcRef, vmOwnerRef),
         );
         return k8sPatch({
-          model: PersistentVolumeClaimModel,
-          resource: pvc,
           data: [
             {
               op: 'replace',
@@ -66,6 +64,8 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
               value: pvcFilteredOwnerReference,
             },
           ],
+          model: PersistentVolumeClaimModel,
+          resource: pvc,
         });
       });
 
@@ -74,8 +74,6 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
           (dvRef) => !compareOwnerReferences(dvRef, vmOwnerRef),
         );
         return k8sPatch({
-          model: DataVolumeModel,
-          resource: dv,
           data: [
             {
               op: 'replace',
@@ -83,6 +81,8 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
               value: dvFilteredOwnerReference,
             },
           ],
+          model: DataVolumeModel,
+          resource: dv,
         });
       });
 
@@ -90,22 +90,22 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
     }
 
     await k8sDelete({
+      json: gracePeriodCheckbox
+        ? { apiVersion: 'v1', gracePeriodSeconds, kind: 'DeleteOptions' }
+        : null,
       model: VirtualMachineModel,
       resource: updatedVM,
-      json: gracePeriodCheckbox
-        ? { kind: 'DeleteOptions', apiVersion: 'v1', gracePeriodSeconds }
-        : null,
     });
     history.push(`/k8s/${lastNamespacePath}/${VirtualMachineModelRef}`);
   };
 
   return (
     <TabModal<V1VirtualMachine>
-      onClose={onClose}
+      headerText={t('Delete VirtualMachine?')}
       isOpen={isOpen}
       obj={vm}
+      onClose={onClose}
       onSubmit={onDelete}
-      headerText={t('Delete VirtualMachine?')}
       submitBtnText={t('Delete')}
       submitBtnVariant={ButtonVariant.danger}
     >
@@ -114,18 +114,18 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ vm, isOpen, onClose }) => {
           <ConfirmActionMessage obj={vm} />
         </StackItem>
         <GracePeriodInput
+          gracePeriodSeconds={gracePeriodSeconds}
           isChecked={gracePeriodCheckbox}
           onCheckboxChange={setGracePeriodCheckbox}
-          gracePeriodSeconds={gracePeriodSeconds}
           setGracePeriodSeconds={setGracePeriodSeconds}
         />
         <DeleteOwnedResourcesMessage
-          deleteOwnedResource={deleteOwnedResource}
-          setDeleteOwnedResource={setDeleteOwnedResource}
           dataVolumes={dataVolumes}
-          pvcs={pvcs}
-          snapshots={snapshots}
+          deleteOwnedResource={deleteOwnedResource}
           loaded={loaded}
+          pvcs={pvcs}
+          setDeleteOwnedResource={setDeleteOwnedResource}
+          snapshots={snapshots}
         />
       </Stack>
     </TabModal>

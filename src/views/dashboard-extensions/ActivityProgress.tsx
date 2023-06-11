@@ -3,17 +3,17 @@ import React from 'react';
 import { Progress, ProgressSize } from '@patternfly/react-core';
 
 type ActivityProgressProps = {
-  title: string;
   progress: number;
+  title: string;
 };
 
-const ActivityProgress: React.FC<ActivityProgressProps> = ({ title, progress, children }) => (
+const ActivityProgress: React.FC<ActivityProgressProps> = ({ children, progress, title }) => (
   <>
     <Progress
-      value={progress}
-      title={title}
-      size={ProgressSize.sm}
       className="co-activity-item__progress"
+      size={ProgressSize.sm}
+      title={title}
+      value={progress}
     />
     <div>{children}</div>
   </>

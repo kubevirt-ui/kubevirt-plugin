@@ -57,9 +57,9 @@ export const createInterface = (
   interfaceType: string,
 ): V1Interface => {
   return {
-    name: nicName,
-    model: interfaceModel,
-    macAddress: interfaceMACAddress,
     [interfaceType]: {},
+    macAddress: interfaceMACAddress,
+    model: interfaceModel,
+    name: nicName,
   };
 };

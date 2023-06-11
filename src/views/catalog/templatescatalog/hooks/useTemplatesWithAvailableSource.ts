@@ -13,17 +13,17 @@ import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/ho
 import { useAvailableDataSourcesAndPVCs } from './useAvailableDataSourcesAndPVCs';
 
 type useTemplatesWithAvailableSourceProps = {
+  namespace?: string;
   onlyAvailable: boolean;
   onlyDefault: boolean;
-  namespace?: string;
 };
 
 export const useTemplatesWithAvailableSource = ({
+  namespace,
   onlyAvailable,
   onlyDefault,
-  namespace,
 }: useTemplatesWithAvailableSourceProps): useTemplatesWithAvailableSourceValues => {
-  const { templates, loaded, loadError } = useVmTemplates(namespace);
+  const { loaded, loadError, templates } = useVmTemplates(namespace);
   const {
     availableDatasources,
     availablePVCs,
@@ -76,20 +76,20 @@ export const useTemplatesWithAvailableSource = ({
   );
 
   return {
-    templates: filteredTemplates,
-    availableTemplatesUID,
     availableDatasources,
-    loaded,
+    availableTemplatesUID,
     bootSourcesLoaded,
     error: loadError,
+    loaded,
+    templates: filteredTemplates,
   };
 };
 
 type useTemplatesWithAvailableSourceValues = {
-  templates: V1Template[];
-  availableTemplatesUID: Set<string>;
   availableDatasources: Record<string, V1beta1DataSource>;
-  loaded: boolean;
+  availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
   error: any;
+  loaded: boolean;
+  templates: V1Template[];
 };

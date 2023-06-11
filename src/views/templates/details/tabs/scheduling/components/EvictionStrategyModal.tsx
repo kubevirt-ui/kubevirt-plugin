@@ -9,17 +9,17 @@ import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/templ
 import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
 
 type EvictionStrategyModalProps = {
-  template: V1Template;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1Template) => Promise<V1Template | void>;
+  template: V1Template;
 };
 
 const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
-  template,
   isOpen,
   onClose,
   onSubmit,
+  template,
 }) => {
   const { t } = useKubevirtTranslation();
   const [checked, setChecked] = React.useState<boolean>(!!getEvictionStrategy(template));
@@ -35,25 +35,25 @@ const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
 
   return (
     <TabModal
-      obj={updatedTemplate}
+      headerText={t('Eviction strategy')}
       isOpen={isOpen}
+      obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Eviction strategy')}
     >
       <Form>
         <FormGroup
-          fieldId="eviction-strategy"
           helperText={t(
             'EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.',
           )}
+          fieldId="eviction-strategy"
           isInline
         >
           <Checkbox
             id="eviction-strategy"
             isChecked={checked}
-            onChange={setChecked}
             label={'LiveMigrate'}
+            onChange={setChecked}
           />
         </FormGroup>
       </Form>

@@ -16,8 +16,8 @@ import 'src/utils/styles/ListPageCreateButton.scss';
 import './network-interface-list-page.scss';
 
 type NetworkInterfaceListPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1VirtualMachine;
 };
@@ -28,10 +28,10 @@ const NetworkInterfaceListPage: FC<NetworkInterfaceListPageProps> = ({ obj: vm }
   const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
-        model: VirtualMachineModel,
         data: updatedVM,
-        ns: updatedVM?.metadata?.namespace,
+        model: VirtualMachineModel,
         name: updatedVM?.metadata?.name,
+        ns: updatedVM?.metadata?.namespace,
       }),
     [],
   );
@@ -40,11 +40,11 @@ const NetworkInterfaceListPage: FC<NetworkInterfaceListPageProps> = ({ obj: vm }
     <div className="network-interface-list-page">
       <ListPageBody>
         <SidebarEditor
-          resource={vm}
           onResourceUpdate={onSubmit}
           pathsToHighlight={PATHS_TO_HIGHLIGHT.NETWORK_TAB}
+          resource={vm}
         >
-          <Title headingLevel="h2" className="network-interface-list-page__title">
+          <Title className="network-interface-list-page__title" headingLevel="h2">
             {t('Network interfaces')}
           </Title>
           <AddNetworkInterfaceButton vm={vm} />

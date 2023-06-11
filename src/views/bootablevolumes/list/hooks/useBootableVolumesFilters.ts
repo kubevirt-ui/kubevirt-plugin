@@ -11,12 +11,12 @@ const useBootableVolumesFilters = (): RowFilter<BootableResource>[] => {
 
   return [
     {
-      filterGroupName: t('Operating system'),
-      type: 'osName',
-      reducer: (obj) => getItemNameWithOther(getPreferenceOSType(obj), OS_NAMES),
       filter: (availableOsNames, obj) =>
         includeFilter(availableOsNames, OS_NAMES, getPreferenceOSType(obj)),
+      filterGroupName: t('Operating system'),
       items: OS_NAMES,
+      reducer: (obj) => getItemNameWithOther(getPreferenceOSType(obj), OS_NAMES),
+      type: 'osName',
     },
   ];
 };

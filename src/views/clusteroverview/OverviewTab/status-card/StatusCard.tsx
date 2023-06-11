@@ -46,20 +46,20 @@ const StatusCard = () => {
       subsystem?.properties?.title === VIRTUALIZATION
     ) {
       virtStatusItems.push({
-        title: t('Virtualization'),
         Component: <URLHealthItem subsystem={subsystem.properties} />,
+        title: t('Virtualization'),
       });
     }
   });
 
   virtStatusItems.push({
-    title: t('Networking'),
     Component: <NetworkingHealthItem nac={clusterNAC} />,
+    title: t('Networking'),
   });
 
   virtStatusItems.push({
-    title: t('Storage'),
     Component: <StorageHealthItem />,
+    title: t('Storage'),
   });
 
   return (

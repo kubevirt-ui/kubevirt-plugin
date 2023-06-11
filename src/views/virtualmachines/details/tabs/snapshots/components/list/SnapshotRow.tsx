@@ -17,38 +17,38 @@ import SnapshotActionsMenu from './SnapshotActionsMenu';
 const SnapshotRow: React.FC<
   RowProps<
     V1alpha1VirtualMachineSnapshot,
-    { restores: Map<string, V1alpha1VirtualMachineRestore>; isVMRunning: boolean }
+    { isVMRunning: boolean; restores: Map<string, V1alpha1VirtualMachineRestore> }
   >
-> = ({ obj: snapshot, activeColumnIDs, rowData: { restores, isVMRunning } }) => {
+> = ({ activeColumnIDs, obj: snapshot, rowData: { isVMRunning, restores } }) => {
   const relevantRestore: V1alpha1VirtualMachineRestore = restores?.[snapshot?.metadata?.name];
   const isRestoreDisabled = isVMRunning || snapshot?.status?.phase !== snapshotStatuses.Succeeded;
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="name">
         <ResourceLink
           groupVersionKind={VirtualMachineSnapshotModelGroupVersionKind}
           name={snapshot?.metadata?.name}
           namespace={snapshot?.metadata?.namespace}
         />
       </TableData>
-      <TableData id="created" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="created">
         <Timestamp timestamp={snapshot?.metadata?.creationTimestamp} />
       </TableData>
-      <TableData id="status" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="status">
         <SnapshotStatusIcon phase={snapshot?.status?.phase} />
       </TableData>
-      <TableData id="last-restored" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="last-restored">
         <Timestamp timestamp={relevantRestore?.status?.restoreTime} />
       </TableData>
-      <TableData id="indications" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="indications">
         <IndicationLabelList snapshot={snapshot} />
       </TableData>
       <TableData
-        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
+        id=""
       >
-        <SnapshotActionsMenu snapshot={snapshot} isRestoreDisabled={isRestoreDisabled} />
+        <SnapshotActionsMenu isRestoreDisabled={isRestoreDisabled} snapshot={snapshot} />
       </TableData>
     </>
   );

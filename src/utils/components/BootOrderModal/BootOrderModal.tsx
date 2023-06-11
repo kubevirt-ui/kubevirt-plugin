@@ -20,12 +20,12 @@ import { BootOrderModalBody } from './BootOrderModalBody';
 import './boot-order.scss';
 
 export const BootOrderModal: React.FC<{
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
-}> = ({ vm, onSubmit, isOpen, onClose, vmi }) => {
+}> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const transformedDevices = transformDevices(getDisks(vm), getInterfaces(vm));
 
@@ -50,19 +50,19 @@ export const BootOrderModal: React.FC<{
 
   return (
     <TabModal
-      onSubmit={() => onSubmit(updatedVirtualMachine)}
+      headerText={t('VirtualMachine boot order')}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={t('VirtualMachine boot order')}
+      onSubmit={() => onSubmit(updatedVirtualMachine)}
     >
       {vmi && (
         <ModalPendingChangesAlert isChanged={checkBootOrderChanged(updatedVirtualMachine, vmi)} />
       )}
       <BootOrderModalBody
-        devices={devices}
-        onChange={setDevices}
-        isEditMode={isEditMode}
         changeEditMode={(v) => setIsEditMode(v)}
+        devices={devices}
+        isEditMode={isEditMode}
+        onChange={setDevices}
       />
     </TabModal>
   );

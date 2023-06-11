@@ -8,8 +8,8 @@ type UseDiagnosticSort = () => {
   getSorting: GetSorting;
   sort: {
     column: string;
-    sortIndex: number;
     direction: 'asc' | 'desc';
+    sortIndex: number;
   };
 };
 
@@ -19,29 +19,29 @@ const useDiagnosticSort: UseDiagnosticSort = () => {
   const [activeSortColumn, setActiveSortColumn] = useState<string>('reason');
 
   const getSorting: GetSorting = (column, columnIndex) => ({
-    sortBy: {
-      index: activeSortIndex,
-      direction: activeSortDirection,
-      defaultDirection: 'asc',
-    },
+    columnIndex,
     onSort: (_, index, direction) => {
       setActiveSortIndex(index);
       setActiveSortColumn(column);
       setActiveSortDirection(direction);
     },
-    columnIndex,
+    sortBy: {
+      defaultDirection: 'asc',
+      direction: activeSortDirection,
+      index: activeSortIndex,
+    },
   });
 
   const sort = useMemo(
     () => ({
       column: activeSortColumn,
-      sortIndex: activeSortIndex,
       direction: activeSortDirection,
+      sortIndex: activeSortIndex,
     }),
     [activeSortColumn, activeSortDirection, activeSortIndex],
   );
 
-  return { sort, getSorting };
+  return { getSorting, sort };
 };
 
 export default useDiagnosticSort;

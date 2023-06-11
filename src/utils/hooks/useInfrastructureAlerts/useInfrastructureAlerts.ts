@@ -10,12 +10,12 @@ import {
 import { isKubeVirtAlert } from '@kubevirt-utils/utils/prometheus';
 import { Alert } from '@openshift-console/dynamic-plugin-sdk';
 
-export type AlertsByHealthImpact = { critical: Alert[]; warning: Alert[]; none: Alert[] };
+export type AlertsByHealthImpact = { critical: Alert[]; none: Alert[]; warning: Alert[] };
 
 type UseInfrastructureAlerts = () => {
   alerts: AlertsByHealthImpact;
-  numberOfAlerts: number;
   loaded: boolean;
+  numberOfAlerts: number;
 };
 
 const useInfrastructureAlerts: UseInfrastructureAlerts = () => {
@@ -34,8 +34,8 @@ const useInfrastructureAlerts: UseInfrastructureAlerts = () => {
 
   return {
     alerts: alertsByHealthImpact,
-    numberOfAlerts: getNumberOfAlerts(alertsByHealthImpact) || 0,
     loaded,
+    numberOfAlerts: getNumberOfAlerts(alertsByHealthImpact) || 0,
   };
 };
 

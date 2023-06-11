@@ -18,14 +18,14 @@ import {
 } from './utils/utils';
 
 type MigrationPolicyEditModalProps = {
-  mp: V1alpha1MigrationPolicy;
   isOpen: boolean;
+  mp: V1alpha1MigrationPolicy;
   onClose: () => void;
 };
 
 const MigrationPolicyEditModal: React.FC<MigrationPolicyEditModalProps> = ({
-  mp,
   isOpen,
+  mp,
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -53,7 +53,7 @@ const MigrationPolicyEditModal: React.FC<MigrationPolicyEditModalProps> = ({
 
   const onSubmit = (updatedMP: V1alpha1MigrationPolicy) => {
     if (updatedMP?.metadata?.name !== mp?.metadata?.name) {
-      return k8sCreate({ model: MigrationPolicyModel, data: updatedMP }).then(() => {
+      return k8sCreate({ data: updatedMP, model: MigrationPolicyModel }).then(() => {
         return k8sDelete({ model: MigrationPolicyModel, resource: mp }).then(() => {
           if (lastPolicyPathElement === mp?.metadata?.name) {
             // if we were on MigrationPolicy details page, stay there and just update the data
@@ -65,35 +65,35 @@ const MigrationPolicyEditModal: React.FC<MigrationPolicyEditModalProps> = ({
       });
     }
     return k8sUpdate({
-      model: MigrationPolicyModel,
       data: updatedMP,
+      model: MigrationPolicyModel,
     });
   };
 
   return (
     <TabModal
-      obj={updatedMigrationPolicy}
-      isOpen={isOpen}
-      onClose={onClose}
       headerText={t('Edit MigrationPolicy')}
+      isOpen={isOpen}
+      obj={updatedMigrationPolicy}
+      onClose={onClose}
       onSubmit={onSubmit}
     >
       <Form>
         <FormGroup
           fieldId="migration-policy-name"
-          label={t('MigrationPolicy name')}
-          isRequired
           helperText={t('Unique name of the MigrationPolicy')}
+          isRequired
+          label={t('MigrationPolicy name')}
         >
           <TextInput
-            value={state?.migrationPolicyName}
             onChange={setStateField('migrationPolicyName')}
+            value={state?.migrationPolicyName}
           />
         </FormGroup>
         <MigrationPolicyConfigurations
-          state={state}
           setState={setState}
           setStateField={setStateField}
+          state={state}
         />
       </Form>
     </TabModal>

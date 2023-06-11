@@ -34,9 +34,6 @@ const Labels: React.FC<LabelsProps> = ({ vmi }) => {
     <>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('Labels')}
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
               Map of string keys and values that can be used to organize and categorize (scope and
@@ -54,6 +51,9 @@ const Labels: React.FC<LabelsProps> = ({ vmi }) => {
               </Breadcrumb>
             </Trans>
           }
+          hasAutoWidth
+          headerContent={t('Labels')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('Labels')}</DescriptionListTermHelpTextButton>
         </Popover>
@@ -61,11 +61,13 @@ const Labels: React.FC<LabelsProps> = ({ vmi }) => {
       <DescriptionListDescription className="Labels--container">
         <LabelGroup>
           {Object.entries(vmi?.metadata?.labels || {})?.map(([key, value]) => (
-            <Label color="blue" variant="outline" key={key}>{`${key}=${value}`}</Label>
+            <Label color="blue" key={key} variant="outline">{`${key}=${value}`}</Label>
           ))}
         </LabelGroup>
         <Button
-          isInline
+          icon={
+            <PencilAltIcon className="co-icon-space-l co-icon-space-r pf-c-button-icon--plain" />
+          }
           onClick={() =>
             createModal((props) => (
               <LabelsModal
@@ -73,8 +75,6 @@ const Labels: React.FC<LabelsProps> = ({ vmi }) => {
                 {...props}
                 onLabelsSubmit={(labels) =>
                   k8sPatch({
-                    model: VirtualMachineInstanceModel,
-                    resource: vmi,
                     data: [
                       {
                         op: 'replace',
@@ -82,16 +82,16 @@ const Labels: React.FC<LabelsProps> = ({ vmi }) => {
                         value: labels,
                       },
                     ],
+                    model: VirtualMachineInstanceModel,
+                    resource: vmi,
                   })
                 }
               />
             ))
           }
-          variant="link"
-          icon={
-            <PencilAltIcon className="co-icon-space-l co-icon-space-r pf-c-button-icon--plain" />
-          }
           iconPosition={'right'}
+          isInline
+          variant="link"
         ></Button>
       </DescriptionListDescription>
     </>

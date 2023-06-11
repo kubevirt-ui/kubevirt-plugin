@@ -21,32 +21,32 @@ import { getLinkComponent } from './utils';
 import './GettingStartedSectionContents.scss';
 
 type GettingStartedSectionContentsProps = {
-  id: string;
-  icon?: React.ReactElement;
-  title: string;
-  titleColor?: string;
   description?: string;
+  icon?: React.ReactElement;
+  id: string;
   links: GettingStartedLink[];
   moreLink?: GettingStartedLink;
+  title: string;
+  titleColor?: string;
 };
 
 const GettingStartedSectionContents: React.FC<GettingStartedSectionContentsProps> = ({
-  id,
-  icon,
-  title,
-  titleColor,
   description,
+  icon,
+  id,
   links,
   moreLink,
+  title,
+  titleColor,
 }) => {
   return (
     <Flex
-      direction={{ default: 'column' }}
-      grow={{ default: 'grow' }}
       className="getting-started-section-contents"
       data-test={`card ${id}`}
+      direction={{ default: 'column' }}
+      grow={{ default: 'grow' }}
     >
-      <Title headingLevel="h3" size={TitleSizes.md} style={{ color: titleColor }} data-test="title">
+      <Title data-test="title" headingLevel="h3" size={TitleSizes.md} style={{ color: titleColor }}>
         {icon ? <span className="getting-started-section-contents__title-icon">{icon}</span> : null}
         {title}
       </Title>
@@ -59,7 +59,7 @@ const GettingStartedSectionContents: React.FC<GettingStartedSectionContentsProps
 
       <Flex direction={{ default: 'column' }} grow={{ default: 'grow' }}>
         {links?.length > 0 ? (
-          <SimpleList isControlled={false} className="getting-started-section-contents__list">
+          <SimpleList className="getting-started-section-contents__list" isControlled={false}>
             {links.map((link) => {
               const handleClick = link.onClick;
               return link.loading ? (
@@ -69,21 +69,21 @@ const GettingStartedSectionContents: React.FC<GettingStartedSectionContentsProps
               ) : (
                 <span key={link.id}>
                   <SimpleListItem
-                    component={getLinkComponent(link)}
-                    componentClassName={link.external ? 'co-external-link' : 'co-goto-arrow'}
                     componentProps={
                       link.external
                         ? {
-                            href: link.href,
-                            target: '_blank',
-                            rel: 'noopener noreferrer',
                             'data-test': `item ${link.id}`,
+                            href: link.href,
+                            rel: 'noopener noreferrer',
+                            target: '_blank',
                           }
                         : {
-                            to: link.href,
                             'data-test': `item ${link.id}`,
+                            to: link.href,
                           }
                     }
+                    component={getLinkComponent(link)}
+                    componentClassName={link.external ? 'co-external-link' : 'co-goto-arrow'}
                     href={link.href}
                     onClick={handleClick}
                   >

@@ -13,15 +13,15 @@ import TemplateDetailsRightGrid from './components/TemplateDetailsRightGrid';
 import './TemplateDetailsPage.scss';
 
 export type TemplateDetailsGridProps = {
-  template: V1Template;
   editable?: boolean;
+  template: V1Template;
 };
 
 export type LabelsAnnotationsType = { [key: string]: string };
 
 type TemplateDetailsPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1Template;
 };
@@ -32,17 +32,17 @@ const TemplateDetailsPage: FC<TemplateDetailsPageProps> = ({ obj: template }) =>
   const onSubmitTemplate = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       }),
     [],
   );
 
   return (
     <PageSection>
-      <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
+      <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
         {(resource) => (
           <>
             <Title headingLevel="h2">{t('Template details')}</Title>

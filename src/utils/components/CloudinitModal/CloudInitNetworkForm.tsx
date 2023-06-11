@@ -8,15 +8,15 @@ import { CloudInitNetworkData } from './utils/cloudinit-utils';
 type CloudinitNetworkFormProps = {
   enableNetworkData: boolean;
   networkData: CloudInitNetworkData;
-  updateNetworkField: (key: keyof CloudInitNetworkData, value: string | string[]) => void;
   setEnableNetworkData: (value: boolean) => void;
+  updateNetworkField: (key: keyof CloudInitNetworkData, value: string | string[]) => void;
 };
 
 export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
-  networkData,
-  updateNetworkField,
   enableNetworkData,
+  networkData,
   setEnableNetworkData,
+  updateNetworkField,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -28,50 +28,50 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
 
       <FormGroup fieldId="custom-network-checkbox">
         <Checkbox
-          id="custom-network-checkbox"
-          label={t('Add network data')}
           description={t('check this option to add network data section to the cloud-init script.')}
+          id="custom-network-checkbox"
           isChecked={enableNetworkData}
+          label={t('Add network data')}
           onChange={setEnableNetworkData}
         />
       </FormGroup>
       {enableNetworkData && (
         <>
           <FormGroup
-            label={t('Ethernet name')}
-            fieldId={'ethernet-name'}
             className="kv-cloudint-advanced-tab--validation-text"
+            fieldId={'ethernet-name'}
+            label={t('Ethernet name')}
           >
             <TextInput
-              value={networkData?.name || ''}
-              type="text"
               id={'ethernet-name'}
               onChange={(v) => updateNetworkField('name', v)}
+              type="text"
+              value={networkData?.name || ''}
             />
           </FormGroup>
           <FormGroup
-            label={t('IP addresses')}
-            fieldId={'address'}
             className="kv-cloudint-advanced-tab--validation-text"
+            fieldId={'address'}
             helperText={t('Use commas to separate between IP addresses')}
+            label={t('IP addresses')}
           >
             <TextInput
-              value={networkData?.address}
-              type="text"
               id={'address'}
               onChange={(v) => updateNetworkField('address', v)}
+              type="text"
+              value={networkData?.address}
             />
           </FormGroup>
           <FormGroup
-            label={t('Gateway address')}
-            fieldId={'gateway'}
             className="kv-cloudint-advanced-tab--validation-text"
+            fieldId={'gateway'}
+            label={t('Gateway address')}
           >
             <TextInput
-              value={networkData?.gateway || ''}
-              type="text"
               id={'gateway'}
               onChange={(v) => updateNetworkField('gateway', v)}
+              type="text"
+              value={networkData?.gateway || ''}
             />
           </FormGroup>
         </>

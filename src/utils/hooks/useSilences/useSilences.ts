@@ -9,9 +9,9 @@ import { Silence } from '@openshift-console/dynamic-plugin-sdk';
 import { useURLPoll } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 type UseSilences = () => {
-  silences: Silence[];
   loaded: boolean;
   loadError: any;
+  silences: Silence[];
 };
 
 const useSilences: UseSilences = () => {
@@ -37,7 +37,7 @@ const useSilences: UseSilences = () => {
     });
   }, [response]);
 
-  return { silences: silencesWithAlertName, loaded: !loading, loadError };
+  return { loaded: !loading, loadError, silences: silencesWithAlertName };
 };
 
 export default useSilences;

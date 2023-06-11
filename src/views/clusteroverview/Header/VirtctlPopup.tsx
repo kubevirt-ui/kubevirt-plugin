@@ -47,14 +47,14 @@ const VirtctlPopup: React.FC = () => {
 
   return (
     <Popover
-      position={PopoverPosition.left}
-      headerContent={<>{t('Download the virtctl command-line utility')}</>}
       bodyContent={bodyContent}
+      headerContent={<>{t('Download the virtctl command-line utility')}</>}
       maxWidth="350px"
+      position={PopoverPosition.left}
     >
       <Button
-        id="virtctl-download-links"
         className="pf-m-link--align-left virtctl-popup__button"
+        id="virtctl-download-links"
         variant="link"
       >
         {t('Download virtctl')}

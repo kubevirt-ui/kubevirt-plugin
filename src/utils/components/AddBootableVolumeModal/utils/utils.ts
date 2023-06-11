@@ -13,21 +13,21 @@ import { AddBootableVolumeState, emptySourceDataVolume } from './constants';
 export const createBootableVolume =
   (
     bootableVolume: AddBootableVolumeState,
-    uploadData: ({ file, dataVolume }: UploadDataProps) => Promise<void>,
+    uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
     isUploadForm: boolean,
     cloneExistingPVC: boolean,
     onCreateVolume: (createdVolume: BootableVolume) => void,
   ) =>
   async (dataSource: V1beta1DataSource) => {
     const {
-      bootableVolumeName,
-      size,
       annotations,
+      bootableVolumeName,
       labels,
       pvcName,
       pvcNamespace,
-      uploadFile,
+      size,
       storageClassName,
+      uploadFile,
     } = bootableVolume || {};
     const draftDataSource = produce(dataSource, (draftDS) => {
       draftDS.metadata.name = bootableVolumeName;
@@ -39,7 +39,7 @@ export const createBootableVolume =
       const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
         draftDS.spec.source = { pvc: { name: pvcName, namespace: pvcNamespace } };
       });
-      return k8sCreate({ model: DataSourceModel, data: dataSourceToCreate });
+      return k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
     }
 
     const bootableVolumeToCreate = produce(emptySourceDataVolume, (draftBootableVolume) => {
@@ -57,10 +57,10 @@ export const createBootableVolume =
 
     isUploadForm
       ? await uploadData({
-          file: uploadFile as File,
           dataVolume: bootableVolumeToCreate,
+          file: uploadFile as File,
         })
-      : await k8sCreate({ model: DataVolumeModel, data: bootableVolumeToCreate });
+      : await k8sCreate({ data: bootableVolumeToCreate, model: DataVolumeModel });
 
     const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
       draftDS.spec.source = {
@@ -71,7 +71,7 @@ export const createBootableVolume =
       };
     });
 
-    const newDataSource = await k8sCreate({ model: DataSourceModel, data: dataSourceToCreate });
+    const newDataSource = await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
 
     onCreateVolume?.(newDataSource);
   };

@@ -14,37 +14,37 @@ export type NetworkInterfaceRowProps = {
 };
 
 const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation, { vm: V1VirtualMachine }>> = ({
-  obj: { iface, network },
   activeColumnIDs,
+  obj: { iface, network },
   rowData: { vm },
 }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="name">
         {network.name}
       </TableData>
-      <TableData id="model" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="model">
         {iface.model || NO_DATA_DASH}
       </TableData>
-      <TableData id="network" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="network">
         {network.pod ? t('Pod networking') : network.multus?.networkName || NO_DATA_DASH}
       </TableData>
-      <TableData id="type" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="type">
         {getPrintableNetworkInterfaceType(iface)}
       </TableData>
-      <TableData id="macAddress" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="macAddress">
         {iface.macAddress || NO_DATA_DASH}
       </TableData>
       <TableData
-        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
+        id=""
       >
         <NetworkInterfaceActions
-          vm={vm}
           nicName={network.name}
           nicPresentation={{ iface, network }}
+          vm={vm}
         />
       </TableData>
     </>

@@ -43,8 +43,8 @@ const VirtualMachinesOverviewTabSnapshotsRow: React.FC<
 
   const dropdownItems = [
     <DropdownItem
-      key="restore"
       isDisabled={vm?.status?.printableStatus !== printableVMStatus.Stopped}
+      key="restore"
       onClick={() => createModal((props) => <RestoreModal snapshot={snapshot} {...props} />)}
     >
       {t('Restore')}
@@ -71,10 +71,8 @@ const VirtualMachinesOverviewTabSnapshotsRow: React.FC<
         <Icon />
         <DescriptionListTermHelpText>
           <Popover
-            position={PopoverPosition.left}
-            headerContent={snapshot?.metadata?.name}
             bodyContent={
-              <DescriptionList isHorizontal columnModifier={{ default: '2Col' }}>
+              <DescriptionList columnModifier={{ default: '2Col' }} isHorizontal>
                 <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
                 <DescriptionListDescription>
                   <Icon />
@@ -88,6 +86,8 @@ const VirtualMachinesOverviewTabSnapshotsRow: React.FC<
                 </DescriptionListDescription>
               </DescriptionList>
             }
+            headerContent={snapshot?.metadata?.name}
+            position={PopoverPosition.left}
           >
             <DescriptionListTermHelpTextButton className="icon-spacer__offset">
               {snapshot?.metadata?.name}
@@ -97,12 +97,12 @@ const VirtualMachinesOverviewTabSnapshotsRow: React.FC<
         <span className="text-muted timestamp">{`(${timestamp})`}</span>
       </div>
       <Dropdown
-        onSelect={() => setIsKebabOpen(false)}
-        toggle={<KebabToggle onToggle={(isOpen) => setIsKebabOpen(isOpen)} />}
+        dropdownItems={dropdownItems}
         isOpen={isKebabOpen}
         isPlain
-        dropdownItems={dropdownItems}
+        onSelect={() => setIsKebabOpen(false)}
         position="right"
+        toggle={<KebabToggle onToggle={(isOpen) => setIsKebabOpen(isOpen)} />}
       />
     </div>
   );

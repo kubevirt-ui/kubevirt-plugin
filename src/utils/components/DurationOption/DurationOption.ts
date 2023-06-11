@@ -16,81 +16,24 @@ export const TWO_DAYS = 2 * ONE_DAY;
 export const ONE_WEEK = 7 * ONE_DAY;
 
 const mapperDuration = {
-  '5m': FIVE_MIN,
+  '12h': TWELVE_HOURS,
   '15m': FIFTEEN_MIN,
-  '30m': THIRTY_MIN,
+  '1d': ONE_DAY,
   '1h': ONE_HOUR,
+  '1w': ONE_WEEK,
+  '2d': TWO_DAYS,
+  '30m': THIRTY_MIN,
   '3h': THREE_HOURS,
   '4h': FOUR_HOURS,
+  '5m': FIVE_MIN,
   '6h': SIX_HOURS,
-  '12h': TWELVE_HOURS,
-  '1d': ONE_DAY,
-  '2d': TWO_DAYS,
-  '1w': ONE_WEEK,
 };
 
 const getDurationMilliseconds = (duration) => mapperDuration?.[duration] || mapperDuration?.['5m'];
 
 class DurationOption extends DropdownEnum<string> {
-  protected readonly millisecondsTime: number;
-
-  constructor(value: string, { dropdownLabel }) {
-    super(value, { dropdownLabel });
-    this.millisecondsTime = getDurationMilliseconds(value);
-  }
-
-  static readonly FIVE_MIN = new DurationOption('5m', {
-    dropdownLabel: 'Last 5 minutes',
-  });
-
-  static readonly FIFTEEN_MIN = new DurationOption('15m', {
-    dropdownLabel: 'Last 15 minutes',
-  });
-
-  static readonly THIRTY_MIN = new DurationOption('30m', {
-    dropdownLabel: 'Last 30 minutes',
-  });
-
-  static readonly ONE_HOUR = new DurationOption('1h', {
-    dropdownLabel: 'Last 1 hour',
-  });
-
-  static readonly THREE_HOURS = new DurationOption('3h', {
-    dropdownLabel: 'Last 3 hours',
-  });
-
-  static readonly SIX_HOURS = new DurationOption('6h', {
-    dropdownLabel: 'Last 6 hours',
-  });
-
-  static readonly TWELVE_HOURS = new DurationOption('12h', {
-    dropdownLabel: 'Last 12 hours',
-  });
-
-  static readonly ONE_DAY = new DurationOption('1d', {
-    dropdownLabel: 'Last 1 day',
-  });
-
-  static readonly TWO_DAYS = new DurationOption('2d', {
-    dropdownLabel: 'Last 2 day',
-  });
-
-  static readonly ONE_WEEK = new DurationOption('1w', {
-    dropdownLabel: 'Last 1 week',
-  });
-
   private static readonly ALL = Object.freeze(
     ObjectEnum.getAllClassEnumProperties<DurationOption>(DurationOption),
-  );
-
-  static getAll = () => DurationOption.ALL;
-
-  private static readonly stringMapper = DurationOption.ALL.reduce(
-    (accumulator, durationOption: DurationOption) => ({
-      ...accumulator,
-      [durationOption.value]: durationOption,
-    }),
-    {},
   );
 
   private static readonly dropdownLabelMapper = DurationOption.ALL.reduce(
@@ -101,13 +44,70 @@ class DurationOption extends DropdownEnum<string> {
     {},
   );
 
-  static getMilliseconds = (duration: string): number =>
-    DurationOption.stringMapper?.[duration]?.millisecondsTime;
+  static readonly FIFTEEN_MIN = new DurationOption('15m', {
+    dropdownLabel: 'Last 15 minutes',
+  });
 
-  static fromString = (source: string): DurationOption => DurationOption.stringMapper[source];
+  static readonly FIVE_MIN = new DurationOption('5m', {
+    dropdownLabel: 'Last 5 minutes',
+  });
 
   static fromDropdownLabel = (dropdownLabel: string): DurationOption =>
     DurationOption.dropdownLabelMapper[dropdownLabel];
+
+  static fromString = (source: string): DurationOption => DurationOption.stringMapper[source];
+
+  static getAll = () => DurationOption.ALL;
+
+  static getMilliseconds = (duration: string): number =>
+    DurationOption.stringMapper?.[duration]?.millisecondsTime;
+
+  static readonly ONE_DAY = new DurationOption('1d', {
+    dropdownLabel: 'Last 1 day',
+  });
+
+  static readonly ONE_HOUR = new DurationOption('1h', {
+    dropdownLabel: 'Last 1 hour',
+  });
+
+  static readonly ONE_WEEK = new DurationOption('1w', {
+    dropdownLabel: 'Last 1 week',
+  });
+
+  static readonly SIX_HOURS = new DurationOption('6h', {
+    dropdownLabel: 'Last 6 hours',
+  });
+
+  private static readonly stringMapper = DurationOption.ALL.reduce(
+    (accumulator, durationOption: DurationOption) => ({
+      ...accumulator,
+      [durationOption.value]: durationOption,
+    }),
+    {},
+  );
+
+  static readonly THIRTY_MIN = new DurationOption('30m', {
+    dropdownLabel: 'Last 30 minutes',
+  });
+
+  static readonly THREE_HOURS = new DurationOption('3h', {
+    dropdownLabel: 'Last 3 hours',
+  });
+
+  static readonly TWELVE_HOURS = new DurationOption('12h', {
+    dropdownLabel: 'Last 12 hours',
+  });
+
+  static readonly TWO_DAYS = new DurationOption('2d', {
+    dropdownLabel: 'Last 2 day',
+  });
+
+  protected readonly millisecondsTime: number;
+
+  constructor(value: string, { dropdownLabel }) {
+    super(value, { dropdownLabel });
+    this.millisecondsTime = getDurationMilliseconds(value);
+  }
 }
 
 export default DurationOption;

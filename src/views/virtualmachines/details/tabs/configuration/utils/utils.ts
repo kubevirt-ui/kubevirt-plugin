@@ -12,29 +12,29 @@ import ScriptsTab from '../scripts/ScriptsTab';
 
 export const tabs = [
   {
-    title: VirtualMachineDetailsTabLabel.Scheduling,
     Component: VirtualMachineSchedulingPage,
     name: VirtualMachineDetailsTab.Scheduling,
+    title: VirtualMachineDetailsTabLabel.Scheduling,
   },
   {
-    title: VirtualMachineDetailsTabLabel.Environment,
     Component: VirtualMachineEnvironmentPage,
     name: VirtualMachineDetailsTab.Environment,
+    title: VirtualMachineDetailsTabLabel.Environment,
   },
   {
-    title: VirtualMachineDetailsTabLabel.NetworkInterfaces,
     Component: NetworkInterfaceListPage,
     name: NETWORK,
+    title: VirtualMachineDetailsTabLabel.NetworkInterfaces,
   },
   {
-    title: VirtualMachineDetailsTabLabel.Disks,
     Component: DiskListPage,
     name: VirtualMachineDetailsTab.Disks,
+    title: VirtualMachineDetailsTabLabel.Disks,
   },
   {
-    title: VirtualMachineDetailsTabLabel.Scripts,
     Component: ScriptsTab,
     name: VirtualMachineDetailsTab.Scripts,
+    title: VirtualMachineDetailsTabLabel.Scripts,
   },
 ];
 

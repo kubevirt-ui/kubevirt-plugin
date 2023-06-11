@@ -60,7 +60,7 @@ export const createDataVolume = (
 
 const getRootDiskDataVolumeTemplate = (
   template: V1Template,
-): V1DataVolumeTemplateSpec | undefined => {
+): undefined | V1DataVolumeTemplateSpec => {
   const vm = getTemplateVirtualMachineObject(template);
 
   const rootVolume = getVolumes(vm)?.find((volume) => volume.name === 'rootdisk');
@@ -72,7 +72,7 @@ const getRootDiskDataVolumeTemplate = (
 
 export const getBootDataSource = async (
   template: V1Template,
-): Promise<V1beta1DataSource | undefined> => {
+): Promise<undefined | V1beta1DataSource> => {
   const templateWithDefaultParameters = poorManProcess(template);
   const dataVolume = getRootDiskDataVolumeTemplate(templateWithDefaultParameters);
 
@@ -89,7 +89,7 @@ export const getBootDataSource = async (
 export const getDataSourceDataVolume = async (
   dataSourcePVCName: string,
   dataSourcePVCNamespace: string,
-): Promise<V1beta1DataVolume | undefined> => {
+): Promise<undefined | V1beta1DataVolume> => {
   let dataVolume: V1beta1DataVolume = null;
 
   try {
@@ -145,8 +145,8 @@ export const editBootSource = async (
   }
 
   await k8sCreate<V1beta1DataVolume>({
-    model: DataVolumeModel,
     data: createDataVolume(dataSourcePVCName, dataSourcePVCNamespace, bootSource),
+    model: DataVolumeModel,
   });
 };
 

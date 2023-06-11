@@ -28,25 +28,25 @@ const YamlAndCLIEditor: FC<YamlAndCLIEditorProps> = ({ code, minHeight }) => {
   };
   return (
     <YAMLEditor
-      value={code}
-      minHeight={minHeight}
-      showShortcuts
       toolbarLinks={[
-        <Tooltip key="download" content={t('Download')}>
+        <Tooltip content={t('Download')} key="download">
           <Button onClick={handleDownload} variant="secondary">
             <DownloadIcon />
           </Button>
         </Tooltip>,
         <Tooltip
-          key="copy"
           content={copySuccess ? t('Successfully copied to clipboard!') : t('Copy to clipboard')}
+          key="copy"
         >
           <Button onClick={handleCopy} variant="secondary">
             <CopyIcon />
           </Button>
         </Tooltip>,
       ]}
+      minHeight={minHeight}
       options={{ readOnly: true }}
+      showShortcuts
+      value={code}
     />
   );
 };

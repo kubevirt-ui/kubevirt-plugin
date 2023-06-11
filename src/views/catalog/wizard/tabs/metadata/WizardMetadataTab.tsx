@@ -15,78 +15,78 @@ import WizardMetadataLabels from './components/WizardMetadataLabels';
 
 import './wizard-metadata-tab.scss';
 
-const WizardMetadataTab: WizardTab = ({ vm, updateVM, loaded }) => {
+const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
   return (
     <PageSection className="wizard-metadata-tab">
       <SidebarEditor
-        resource={vm}
         onResourceUpdate={(newVM) => updateVM(newVM)}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.DETAILS_TAB}
+        resource={vm}
       >
         {(resource) => (
           <>
             <DescriptionList className="wizard-metadata-tab__description-list">
               <WizardDescriptionItem
-                title={t('Labels')}
-                description={<WizardMetadataLabels labels={resource?.metadata?.labels} />}
-                isDisabled={!loaded}
-                isEdit
+                helperPopover={{
+                  content: t(
+                    'Map of string keys and values that can be used to organize and categorize (scope and select) objects',
+                  ),
+                  header: t('Labels'),
+                }}
                 onEditClick={() =>
                   createModal(({ isOpen, onClose }) => (
                     <LabelsModal
-                      obj={vm}
                       onLabelsSubmit={(updatedLabels) =>
                         updateVM((vmDraft) => {
                           vmDraft.metadata.labels = updatedLabels;
                         })
                       }
                       isOpen={isOpen}
+                      obj={vm}
                       onClose={onClose}
                     />
                   ))
                 }
-                testId="wizard-metadata-labels"
+                description={<WizardMetadataLabels labels={resource?.metadata?.labels} />}
+                isDisabled={!loaded}
+                isEdit
                 showEditOnTitle
-                helperPopover={{
-                  header: t('Labels'),
-                  content: t(
-                    'Map of string keys and values that can be used to organize and categorize (scope and select) objects',
-                  ),
-                }}
+                testId="wizard-metadata-labels"
+                title={t('Labels')}
               />
 
               <WizardDescriptionItem
-                title={t('Annotations')}
                 description={pluralize(
                   Object.values(resource?.metadata?.annotations || {})?.length,
                   'annotation',
                 )}
-                isDisabled={!loaded}
-                isEdit
+                helperPopover={{
+                  content: t(
+                    'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects',
+                  ),
+                  header: t('Annotations'),
+                }}
                 onEditClick={() =>
                   createModal(({ isOpen, onClose }) => (
                     <AnnotationsModal
-                      obj={vm}
                       onSubmit={(updatedAnnotations) =>
                         updateVM((vmDraft) => {
                           vmDraft.metadata.annotations = updatedAnnotations;
                         })
                       }
                       isOpen={isOpen}
+                      obj={vm}
                       onClose={onClose}
                     />
                   ))
                 }
+                isDisabled={!loaded}
+                isEdit
                 testId="wizard-metadata-annotations"
-                helperPopover={{
-                  header: t('Annotations'),
-                  content: t(
-                    'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects',
-                  ),
-                }}
+                title={t('Annotations')}
               />
             </DescriptionList>
           </>

@@ -25,31 +25,31 @@ import EnvironmentSelectOption from './EnvironmentSelectOption';
 import './EnvironmentEditor.scss';
 
 type EnvironmentEditorProps = {
-  secrets: IoK8sApiCoreV1Secret[];
   configMaps: IoK8sApiCoreV1ConfigMap[];
-  serviceAccounts: IoK8sApiCoreV1ServiceAccount[];
-  environmentName?: string;
-  serial?: string;
-  kind?: EnvironmentKind;
   diskName: string;
+  environmentName?: string;
+  environmentNamesSelected: string[];
   id: number;
+  kind?: EnvironmentKind;
   onChange: (diskName: string, name: string, serial: string, kind: EnvironmentKind) => void;
   onRemove?: (diskName: string) => void;
-  environmentNamesSelected: string[];
+  secrets: IoK8sApiCoreV1Secret[];
+  serial?: string;
+  serviceAccounts: IoK8sApiCoreV1ServiceAccount[];
 };
 
 const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
-  secrets,
   configMaps,
-  serviceAccounts,
-  environmentName,
-  serial,
-  kind,
   diskName,
+  environmentName,
+  environmentNamesSelected,
+  id,
+  kind,
   onChange,
   onRemove,
-  id,
-  environmentNamesSelected,
+  secrets,
+  serial,
+  serviceAccounts,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setOpen] = React.useState(false);
@@ -60,10 +60,10 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
         ?.filter((secret) => secret.metadata.name.includes(value))
         ?.map((secret) => (
           <EnvironmentSelectOption
+            isDisabled={environmentNamesSelected?.includes(secret.metadata.name)}
             key={secret.metadata.name}
             kind={EnvironmentKind.secret}
             name={secret.metadata.name}
-            isDisabled={environmentNamesSelected?.includes(secret.metadata.name)}
           />
         ));
 
@@ -71,10 +71,10 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
         ?.filter((configMap) => configMap.metadata.name.includes(value))
         ?.map((configMap) => (
           <EnvironmentSelectOption
+            isDisabled={environmentNamesSelected?.includes(configMap.metadata.name)}
             key={configMap.metadata.name}
             kind={EnvironmentKind.configMap}
             name={configMap.metadata.name}
-            isDisabled={environmentNamesSelected?.includes(configMap.metadata.name)}
           />
         ));
 
@@ -82,10 +82,10 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
         ?.filter((serviceAccount) => serviceAccount.metadata.name.includes(value))
         ?.map((serviceAccount) => (
           <EnvironmentSelectOption
+            isDisabled={environmentNamesSelected?.includes(serviceAccount.metadata.name)}
             key={serviceAccount.metadata.name}
             kind={EnvironmentKind.serviceAccount}
             name={serviceAccount.metadata.name}
-            isDisabled={environmentNamesSelected?.includes(serviceAccount.metadata.name)}
           />
         ));
 
@@ -98,20 +98,10 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
     <div className="row pairs-list__row">
       <div className="col-xs-5 pairs-list__value-pair-field">
         <Select
-          menuAppendTo="parent"
-          aria-labelledby="environment-name-header"
-          isOpen={isOpen}
-          onToggle={(isExpanded) => setOpen(isExpanded)}
           onSelect={(event, selection: EnvironmentOption) => {
             onChange(diskName, selection.getName(), serial, selection.getKind());
             setOpen(false);
           }}
-          variant={SelectVariant.single}
-          selections={new EnvironmentOption(environmentName, kind)}
-          placeholderText={t('Select a resource')}
-          maxHeight={400}
-          onFilter={onFilter}
-          hasInlineFilter
           toggleIcon={
             kind ? (
               <span className={`co-m-resource-icon co-m-resource-${kind}`}>
@@ -119,36 +109,46 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
               </span>
             ) : null
           }
+          aria-labelledby="environment-name-header"
+          hasInlineFilter
+          isOpen={isOpen}
+          maxHeight={400}
+          menuAppendTo="parent"
+          onFilter={onFilter}
+          onToggle={(isExpanded) => setOpen(isExpanded)}
+          placeholderText={t('Select a resource')}
+          selections={new EnvironmentOption(environmentName, kind)}
+          variant={SelectVariant.single}
         >
-          <SelectGroup label={t('Secrets')} key="group1">
+          <SelectGroup key="group1" label={t('Secrets')}>
             {secrets.map((secret) => (
               <EnvironmentSelectOption
+                isDisabled={environmentNamesSelected?.includes(secret.metadata.name)}
                 key={secret.metadata.name}
                 kind={EnvironmentKind.secret}
                 name={secret.metadata.name}
-                isDisabled={environmentNamesSelected?.includes(secret.metadata.name)}
               />
             ))}
           </SelectGroup>
           <Divider key="divider1" />
-          <SelectGroup label={t('Config Maps')} key="group2">
+          <SelectGroup key="group2" label={t('Config Maps')}>
             {configMaps.map((configMap) => (
               <EnvironmentSelectOption
+                isDisabled={environmentNamesSelected?.includes(configMap.metadata.name)}
                 key={configMap.metadata.name}
                 kind={EnvironmentKind.configMap}
                 name={configMap.metadata.name}
-                isDisabled={environmentNamesSelected?.includes(configMap.metadata.name)}
               />
             ))}
           </SelectGroup>
           <Divider key="divider2" />
-          <SelectGroup label={t('Service Accounts')} key="group3">
+          <SelectGroup key="group3" label={t('Service Accounts')}>
             {serviceAccounts.map((serviceAccount) => (
               <EnvironmentSelectOption
+                isDisabled={environmentNamesSelected?.includes(serviceAccount.metadata.name)}
                 key={serviceAccount.metadata.name}
                 kind={EnvironmentKind.serviceAccount}
                 name={serviceAccount.metadata.name}
-                isDisabled={environmentNamesSelected?.includes(serviceAccount.metadata.name)}
               />
             ))}
           </SelectGroup>
@@ -157,20 +157,20 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
 
       <div className="col-xs-5 pairs-list__name-field">
         <TextInput
+          aria-labelledby="environment-serial-header"
           id={`${id}-serial`}
+          onChange={(value) => onChange(diskName, environmentName, value, kind)}
           type="text"
           value={serial}
-          onChange={(value) => onChange(diskName, environmentName, value, kind)}
-          aria-labelledby="environment-serial-header"
         />
       </div>
       <div className="col-xs-1 pairs-list__action">
         <Tooltip content={t('Remove')}>
           <Button
-            type="button"
-            data-test-id="pairs-list__delete-from-btn"
             className="pairs-list__span-btns"
+            data-test-id="pairs-list__delete-from-btn"
             onClick={() => onRemove(diskName)}
+            type="button"
             variant="plain"
           >
             <MinusCircleIcon className="pairs-list__side-btn pairs-list__delete-icon" />

@@ -13,13 +13,13 @@ const UploadPVCFormPVCNamespace: React.FC<UploadPVCFormPVCNamespaceProps> = ({ n
       </label>
       <div className="form-group">
         <input
-          disabled
-          className="pf-c-form-control"
-          type="text"
           aria-describedby="pvc-namespace-help"
+          className="pf-c-form-control"
+          disabled
           id="pvc-namespace"
-          value={namespace || ''}
           required
+          type="text"
+          value={namespace || ''}
         />
         <p className="help-block" id="pvc-namespace-help">
           {t('A unique namespace for the storage claim within the project')}

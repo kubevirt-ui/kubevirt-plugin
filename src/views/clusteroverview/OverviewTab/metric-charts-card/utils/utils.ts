@@ -7,8 +7,8 @@ import { METRICS } from './constants';
 export const getCurrentValue = (chartData: ChartData) => chartData?.[chartData?.length - 1]?.y;
 
 export const labelUnits: { [key: string]: string } = {
-  [METRICS.VM]: t('VMs'),
   [METRICS.VCPU_USAGE]: t('vCPU'),
+  [METRICS.VM]: t('VMs'),
 };
 
 export const hasUnit = (metric: string): boolean =>

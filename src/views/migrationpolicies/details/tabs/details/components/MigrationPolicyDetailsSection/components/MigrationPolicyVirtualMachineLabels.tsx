@@ -35,37 +35,37 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
       <DescriptionListTermHelpText className="migration-policy-description-item-header">
         {t('VirtualMachine labels')}
         <Button
-          isInline
-          variant={ButtonVariant.link}
-          className="migration-policy-description-item-header--action-button"
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <LabelsModal
-                obj={mp}
-                isOpen={isOpen}
-                onClose={onClose}
-                initialLabels={mpVirtualMachineSelector}
                 onLabelsSubmit={(labels) =>
                   k8sUpdate({
-                    model: MigrationPolicyModel,
                     data: ensureMigrationPolicyMatchLabels(
                       mp,
                       labels,
                       'virtualMachineInstanceSelector',
                     ),
+                    model: MigrationPolicyModel,
                   })
                 }
+                initialLabels={mpVirtualMachineSelector}
+                isOpen={isOpen}
+                obj={mp}
+                onClose={onClose}
               />
             ))
           }
+          className="migration-policy-description-item-header--action-button"
+          isInline
+          variant={ButtonVariant.link}
         >
           {t('Edit')}
         </Button>
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
         {!isEmpty(mpVirtualMachineSelector) && (
-          <LabelGroup isEditable className="migration-policy-selectors-group">
-            <MigrationPolicySelectorList selector={mpVirtualMachineSelector} isVMILabel />
+          <LabelGroup className="migration-policy-selectors-group" isEditable>
+            <MigrationPolicySelectorList isVMILabel selector={mpVirtualMachineSelector} />
           </LabelGroup>
         )}
       </DescriptionListDescription>

@@ -10,8 +10,8 @@ export const paginationDefaultValues: PerPageOptions[] = [
 ];
 
 export const paginationInitialState: PaginationState = {
+  endIndex: 15,
   page: 1,
   perPage: 15,
   startIndex: 0,
-  endIndex: 15,
 };

@@ -15,7 +15,7 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import AffinityRulesModal from './AffinityRulesModal';
 
-const AffinityRules: React.FC<TemplateSchedulingGridProps> = ({ template, editable, onSubmit }) => {
+const AffinityRules: React.FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const rulesCount = t('{{count}} Affinity rules', {
@@ -25,10 +25,10 @@ const AffinityRules: React.FC<TemplateSchedulingGridProps> = ({ template, editab
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <AffinityRulesModal
-        template={template}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onSubmit}
+        template={template}
       />
     ));
 
@@ -37,12 +37,12 @@ const AffinityRules: React.FC<TemplateSchedulingGridProps> = ({ template, editab
       <DescriptionListTerm>{t('Affinity rules')}</DescriptionListTerm>
       <DescriptionListDescription>
         <Button
-          type="button"
-          isInline
-          onClick={onEditClick}
-          variant="link"
           data-test-id="affinity-rules"
           isDisabled={!editable}
+          isInline
+          onClick={onEditClick}
+          type="button"
+          variant="link"
         >
           {rulesCount}
           <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />

@@ -6,26 +6,26 @@ import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 import { getBooleanText } from '../../../../utils/utils';
 
 type YesNoDropdownProps = {
-  state: boolean;
   setState: React.Dispatch<React.SetStateAction<boolean>>;
+  state: boolean;
 };
 
-const YesNoDropdown: React.FC<YesNoDropdownProps> = ({ state, setState }) => {
+const YesNoDropdown: React.FC<YesNoDropdownProps> = ({ setState, state }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <Select
-      menuAppendTo="parent"
-      onToggle={setIsOpen}
       isOpen={isOpen}
-      variant={SelectVariant.single}
-      selections={getBooleanText(state)}
-      width={141}
+      menuAppendTo="parent"
       onSelect={() => setIsOpen(false)}
+      onToggle={setIsOpen}
+      selections={getBooleanText(state)}
+      variant={SelectVariant.single}
+      width={141}
     >
-      <SelectOption key="yes-opt" value={t('Yes')} onClick={() => setState(true)} />
-      <SelectOption key="no-opt" value={t('No')} onClick={() => setState(false)} />
+      <SelectOption key="yes-opt" onClick={() => setState(true)} value={t('Yes')} />
+      <SelectOption key="no-opt" onClick={() => setState(false)} value={t('No')} />
     </Select>
   );
 };

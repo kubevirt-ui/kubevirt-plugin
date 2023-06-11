@@ -29,35 +29,35 @@ import './vnc-console.scss';
 const { connected, connecting, disconnected } = ConsoleState;
 
 export const VncConsole: FC<VncConsoleProps> = ({
-  children,
-  host,
-  port = '80',
-  path = '',
-  encrypt = false,
-  resizeSession = true,
-  scaleViewport = false,
-  viewOnly = false,
-  shared = false,
-  credentials,
-  repeaterID = '',
-  vncLogging = 'warn',
-  consoleContainerId,
-  showAccessControls = true,
   additionalButtons = [] as ReactNode[],
+  autoConnect = true,
+  children,
+  consoleContainerId,
+  credentials,
+  CustomConnectComponent,
+  CustomDisabledComponent,
+  disabled,
+  encrypt = false,
+  hasGPU,
+  host,
   onDisconnected,
   onInitFailed,
   onSecurityFailure,
+  path = '',
+  port = '80',
+  repeaterID = '',
+  resizeSession = true,
+  scaleViewport = false,
+  shared = false,
+  showAccessControls = true,
   textConnect,
   textConnecting,
-  textDisconnected,
-  textDisconnect,
-  textSendShortcut,
   textCtrlAltDel,
-  autoConnect = true,
-  CustomConnectComponent,
-  CustomDisabledComponent,
-  hasGPU,
-  disabled,
+  textDisconnect,
+  textDisconnected,
+  textSendShortcut,
+  viewOnly = false,
+  vncLogging = 'warn',
 }) => {
   const { t } = useKubevirtTranslation();
   const [rfb, setRfb] = useState<any>();
@@ -82,9 +82,9 @@ export const VncConsole: FC<VncConsoleProps> = ({
 
   const options = useMemo(
     () => ({
+      credentials,
       repeaterID,
       shared,
-      credentials,
     }),
     [repeaterID, shared, credentials],
   );
@@ -188,23 +188,23 @@ export const VncConsole: FC<VncConsoleProps> = ({
         <VncConsoleActions
           customButtons={[
             {
-              text: textCtrlAltDel || 'Ctrl + Alt + Delete',
               onClick: () => rfb?.sendCtrlAltDel(),
+              text: textCtrlAltDel || 'Ctrl + Alt + Delete',
             },
             {
-              text: 'Ctrl + Alt + 1',
               onClick: () => rfb?.sendCtrlAlt1(),
+              text: 'Ctrl + Alt + 1',
             },
             {
-              text: 'Ctrl + Alt + 2',
               onClick: () => rfb?.sendCtrlAlt2(),
+              text: 'Ctrl + Alt + 2',
             },
           ]}
-          textSendShortcut={textSendShortcut}
-          textDisconnect={textDisconnect}
-          onDisconnect={() => rfb?.disconnect()}
           additionalButtons={additionalButtons}
+          onDisconnect={() => rfb?.disconnect()}
           onInjectTextFromClipboard={() => rfb?.sendPasteCMD()}
+          textDisconnect={textDisconnect}
+          textSendShortcut={textSendShortcut}
         />
       )}
       <div className={css(styles.consoleVnc)}>
@@ -217,7 +217,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
               <EmptyStateBody>
                 {textDisconnected || t('Click Connect to open the VNC console.')}
               </EmptyStateBody>
-              <Button variant="primary" onClick={connect}>
+              <Button onClick={connect} variant="primary">
                 {textConnect || t('Connect')}
               </Button>
             </EmptyState>
@@ -229,26 +229,26 @@ export const VncConsole: FC<VncConsoleProps> = ({
         {hasGPU && status === connected && (
           <div className="vnc-screen-tabs">
             <Tabs
-              activeKey={activeTabKey}
               style={{
                 width: staticRenderLocaitonRef?.current?.lastElementChild?.lastElementChild?.width,
               }}
+              activeKey={activeTabKey}
             >
               <Tab
-                eventKey={0}
-                title={<TabTitleText>{t('Screen 1')}</TabTitleText>}
                 onClick={() => {
                   rfb?.sendCtrlAlt1();
                   setActiveTabKey(0);
                 }}
+                eventKey={0}
+                title={<TabTitleText>{t('Screen 1')}</TabTitleText>}
               />
               <Tab
-                eventKey={1}
-                title={<TabTitleText>{t('Screen 2')}</TabTitleText>}
                 onClick={() => {
                   rfb?.sendCtrlAlt2();
                   setActiveTabKey(1);
                 }}
+                eventKey={1}
+                title={<TabTitleText>{t('Screen 2')}</TabTitleText>}
               />
             </Tabs>
           </div>

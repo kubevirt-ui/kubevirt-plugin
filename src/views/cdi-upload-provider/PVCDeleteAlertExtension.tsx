@@ -19,10 +19,10 @@ import { Alert, AlertVariant } from '@patternfly/react-core';
 import useBaseImages from './hooks/useBaseImages';
 
 const templatesResource: WatchK8sResource = {
-  isList: true,
-  optional: true,
   groupVersionKind: modelToGroupVersionKind(TemplateModel),
+  isList: true,
   namespace: TEMPLATE_VM_COMMON_NAMESPACE,
+  optional: true,
   selector: {
     matchLabels: { [TEMPLATE_TYPE_LABEL]: TEMPLATE_TYPE_BASE },
   },
@@ -39,8 +39,8 @@ const PVCDeleteAlertExtension: React.FC<{ pvc: V1alpha1PersistentVolumeClaim }> 
   );
 
   return (
-    <Alert isInline variant={AlertVariant.warning} title="PVC Delete">
-      <Trans t={t} ns="plugin__kubevirt-plugin">
+    <Alert isInline title="PVC Delete" variant={AlertVariant.warning}>
+      <Trans ns="plugin__kubevirt-plugin" t={t}>
         <p>
           Deleting this PVC will also delete{' '}
           <strong className="co-break-word">{pvc?.metadata?.name}</strong> Data Volume

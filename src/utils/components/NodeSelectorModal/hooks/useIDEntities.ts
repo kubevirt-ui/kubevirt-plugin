@@ -6,11 +6,11 @@ type UseIDEntitiesProps = <T extends IDEntity = IDEntity>(
   initialEntities: T[],
 ) => {
   entities: T[];
-  setEntities: React.Dispatch<React.SetStateAction<T[]>>;
+  initialEntitiesChanged: boolean;
   onEntityAdd: (newEntity: T) => void;
   onEntityChange: (updatedEntity: T) => void;
   onEntityDelete: (idToDelete: number) => void;
-  initialEntitiesChanged: boolean;
+  setEntities: React.Dispatch<React.SetStateAction<T[]>>;
 };
 
 export const useIDEntities: UseIDEntitiesProps = <T extends IDEntity = IDEntity>(
@@ -53,10 +53,10 @@ export const useIDEntities: UseIDEntitiesProps = <T extends IDEntity = IDEntity>
 
   return {
     entities,
-    setEntities,
+    initialEntitiesChanged,
     onEntityAdd,
     onEntityChange,
     onEntityDelete,
-    initialEntitiesChanged,
+    setEntities,
   };
 };

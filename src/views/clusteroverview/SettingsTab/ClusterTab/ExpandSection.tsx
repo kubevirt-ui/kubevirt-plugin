@@ -6,11 +6,11 @@ type ExpandSectionProps = {
   toggleText: string;
 };
 
-const ExpandSection: FC<ExpandSectionProps> = ({ toggleText, children }) => {
+const ExpandSection: FC<ExpandSectionProps> = ({ children, toggleText }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <ExpandableSection toggleText={toggleText} isExpanded={isExpanded} onToggle={setIsExpanded}>
+    <ExpandableSection isExpanded={isExpanded} onToggle={setIsExpanded} toggleText={toggleText}>
       {children}
     </ExpandableSection>
   );

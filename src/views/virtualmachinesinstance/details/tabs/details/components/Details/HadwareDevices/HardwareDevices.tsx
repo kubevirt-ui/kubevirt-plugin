@@ -20,14 +20,14 @@ const HardwareDevices: React.FC<HardwareDevices> = ({ devices }) => {
   return (
     <DescriptionList>
       <DescriptionListGroup>
-        <HardwareDeviceTitle title={t('GPU devices')} canEdit={false} />
+        <HardwareDeviceTitle canEdit={false} title={t('GPU devices')} />
         <DescriptionListDescription>
           <HardwareDevicesTable devices={devices?.gpus} />
         </DescriptionListDescription>
       </DescriptionListGroup>
 
       <DescriptionListGroup>
-        <HardwareDeviceTitle title={t('Host devices')} canEdit={false} />
+        <HardwareDeviceTitle canEdit={false} title={t('Host devices')} />
         <DescriptionListDescription>
           <HardwareDevicesTable devices={devices?.hostDevices} />
         </DescriptionListDescription>

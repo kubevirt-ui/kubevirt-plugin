@@ -14,7 +14,7 @@ const NetworkingHealthItem = ({ nac }) => {
   const message = availableCondition?.message;
   const state = status ? HealthState.OK : HealthState.NOT_AVAILABLE;
 
-  return <HealthItem title={t('Networking')} state={state} details={message} />;
+  return <HealthItem details={message} state={state} title={t('Networking')} />;
 };
 
 export default NetworkingHealthItem;

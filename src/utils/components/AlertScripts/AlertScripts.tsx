@@ -7,10 +7,10 @@ const AlertScripts: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Alert
-      className="scripts-alert"
       title={t(
         'Cloud-init and SSH key configurations will be applied to the VirtualMachine only at the first boot.',
       )}
+      className="scripts-alert"
       isInline
       variant={AlertVariant.warning}
     >

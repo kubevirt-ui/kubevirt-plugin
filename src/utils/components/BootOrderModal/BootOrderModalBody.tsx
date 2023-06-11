@@ -26,11 +26,11 @@ import { BootOrderEmptyState } from './BootOrderEmptyState';
 import DeviceTypeIcon from './DeviceTypeIcon';
 
 export const BootOrderModalBody: React.FC<{
-  devices: BootableDeviceType[];
-  onChange: (disks: BootableDeviceType[]) => void;
-  isEditMode: boolean;
   changeEditMode: (isEditMode: boolean) => void;
-}> = ({ devices, isEditMode, onChange, changeEditMode }) => {
+  devices: BootableDeviceType[];
+  isEditMode: boolean;
+  onChange: (disks: BootableDeviceType[]) => void;
+}> = ({ changeEditMode, devices, isEditMode, onChange }) => {
   const { t } = useKubevirtTranslation();
 
   const reorder = (
@@ -76,16 +76,16 @@ export const BootOrderModalBody: React.FC<{
     <>
       {showEmpty ? (
         <BootOrderEmptyState
-          title={t('No resource selected')}
           message={t(
             'VirtualMachine will attempt to boot from disks by order of apearance in YAML file',
           )}
-          addItemMessage={t('Add source')}
-          addItemDisabledMessage={t('All sources selected')}
-          addItemIsDisabled={devices.length === 0}
           onClick={() => {
             changeEditMode(true);
           }}
+          addItemDisabledMessage={t('All sources selected')}
+          addItemIsDisabled={devices.length === 0}
+          addItemMessage={t('Add source')}
+          title={t('No resource selected')}
         />
       ) : (
         <>
@@ -93,14 +93,14 @@ export const BootOrderModalBody: React.FC<{
             <Droppable hasNoWrapper>
               <DataList aria-label="draggable data list example">
                 {devices.map(({ type, value }, index) => (
-                  <Draggable key={value.name} hasNoWrapper>
+                  <Draggable hasNoWrapper key={value.name}>
                     <DataListItem aria-labelledby={value.name} ref={React.createRef()}>
                       <DataListItemRow>
                         <DataListControl>
                           <DataListDragButton
+                            aria-describedby="Press space or enter to begin dragging, and use the arrow keys to navigate up or down. Press enter to confirm the drag, or any other key to cancel the drag operation."
                             aria-label="Reorder"
                             aria-labelledby={value.name}
-                            aria-describedby="Press space or enter to begin dragging, and use the arrow keys to navigate up or down. Press enter to confirm the drag, or any other key to cancel the drag operation."
                             aria-pressed="false"
                           />
                         </DataListControl>
@@ -118,10 +118,10 @@ export const BootOrderModalBody: React.FC<{
                                 <SplitItem>
                                   {index !== devices.length - 1 && (
                                     <Button
+                                      className="kubevirt-boot-order__delete-btn"
                                       id={`${value.name}-delete-btn`}
                                       onClick={() => onDelete(value.name)}
                                       variant="link"
-                                      className="kubevirt-boot-order__delete-btn"
                                     >
                                       <MinusCircleIcon />
                                     </Button>

@@ -15,14 +15,14 @@ import DedicatedResources from './DedicatedResources';
 import EvictionStrategy from './EvictionStrategy';
 
 type VirtualMachineSchedulingRightGridProps = {
-  vm: V1VirtualMachine;
   canUpdateVM: boolean;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightGridProps> = ({
-  vm,
   canUpdateVM,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -31,10 +31,10 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
-        model: VirtualMachineModel,
         data: updatedVM,
-        ns: updatedVM?.metadata?.namespace,
+        model: VirtualMachineModel,
         name: updatedVM?.metadata?.name,
+        ns: updatedVM?.metadata?.namespace,
       }),
     [],
   );
@@ -43,44 +43,44 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
     <GridItem span={5}>
       <DescriptionList>
         <VirtualMachineDescriptionItem
-          descriptionData={<DedicatedResources vm={vm} />}
-          descriptionHeader={t('Dedicated resources')}
-          isEdit={canUpdateVM}
-          isDisabled={!isEmpty(vm?.spec?.instancetype)}
           messageOnDisabled={t(
             'Can not configure dedicated resources if the VirtualMachine is created from InstanceType',
           )}
-          data-test-id="dedicated-resources"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DedicatedResourcesModal
-                vm={vm}
+                headerText={t('Dedicated resources')}
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                headerText={t('Dedicated resources')}
+                vm={vm}
                 vmi={vmi}
               />
             ))
           }
+          data-test-id="dedicated-resources"
+          descriptionData={<DedicatedResources vm={vm} />}
+          descriptionHeader={t('Dedicated resources')}
+          isDisabled={!isEmpty(vm?.spec?.instancetype)}
+          isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<EvictionStrategy vm={vm} />}
-          descriptionHeader={t('Eviction strategy')}
-          isEdit={canUpdateVM}
-          data-test-id="eviction-strategy"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <EvictionStrategyModal
-                vm={vm}
+                headerText={t('Eviction strategy')}
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                headerText={t('Eviction strategy')}
+                vm={vm}
                 vmi={vmi}
               />
             ))
           }
+          data-test-id="eviction-strategy"
+          descriptionData={<EvictionStrategy vm={vm} />}
+          descriptionHeader={t('Eviction strategy')}
+          isEdit={canUpdateVM}
         />
       </DescriptionList>
     </GridItem>

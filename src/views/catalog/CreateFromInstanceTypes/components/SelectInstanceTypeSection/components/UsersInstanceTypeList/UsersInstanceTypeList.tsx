@@ -31,12 +31,12 @@ const UsersInstanceTypesList: FC = () => {
   const [searchInput, setSearchInput] = useState('');
   const [pagination, setPagination] = useState(paginationInitialState);
 
-  const onPaginationChange = ({ page, perPage, startIndex, endIndex }) => {
+  const onPaginationChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination({
+      endIndex,
       page,
       perPage,
       startIndex,
-      endIndex,
     });
   };
 
@@ -64,28 +64,28 @@ const UsersInstanceTypesList: FC = () => {
         <ActionList className="instance-type-list__action-list">
           <ActionListItem>
             <SearchInput
-              value={searchInput}
               aria-label="Filter menu items"
-              type="search"
+              className="instance-type-list__search"
               onChange={(_, value) => setSearchInput(value)}
               placeholder={t('Search by name...')}
-              className="instance-type-list__search"
+              type="search"
+              value={searchInput}
             />
           </ActionListItem>
           <ActionListItem>
             <Pagination
-              itemCount={filteredItems?.length}
+              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                onPaginationChange({ endIndex, page, perPage, startIndex })
+              }
+              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                onPaginationChange({ endIndex, page, perPage, startIndex })
+              }
               className="list-managment-group__pagination"
+              isCompact
+              itemCount={filteredItems?.length}
               page={pagination?.page}
               perPage={pagination?.perPage}
-              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                onPaginationChange({ page, perPage, startIndex, endIndex })
-              }
-              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                onPaginationChange({ page, perPage, startIndex, endIndex })
-              }
               perPageOptions={paginationDefaultValues}
-              isCompact
             />
           </ActionListItem>
         </ActionList>
@@ -108,16 +108,16 @@ const UsersInstanceTypesList: FC = () => {
               const itName = getName(instanceType);
               return (
                 <Tr
-                  key={itName}
                   onRowClick={() =>
                     setInstanceTypeVMState({
-                      type: instanceTypeActionType.setSelectedInstanceType,
                       payload: itName,
+                      type: instanceTypeActionType.setSelectedInstanceType,
                     })
                   }
-                  isSelectable
                   isHoverable
                   isRowSelected={selectedInstanceType === itName}
+                  isSelectable
+                  key={itName}
                 >
                   <Td>
                     <ResourceLink

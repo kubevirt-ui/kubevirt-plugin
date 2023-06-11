@@ -37,13 +37,13 @@ const TopologyKeyInput: React.FC<TopologyKeyInputProps> = ({
   return (
     <FormGroup
       fieldId="topology-key"
-      label={t('Topology key')}
-      isRequired
       helperText={t('Topology key must not be empty')}
       helperTextInvalid={t('Topology key must not be empty')}
+      isRequired
+      label={t('Topology key')}
       validated={error ? ValidatedOptions.error : ValidatedOptions.default}
     >
-      <TextInput type="text" value={topologyKey} onChange={onChange} />
+      <TextInput onChange={onChange} type="text" value={topologyKey} />
     </FormGroup>
   );
 };

@@ -15,34 +15,34 @@ import { ButtonVariant } from '@patternfly/react-core';
 import ConfirmActionMessage from '../ConfirmActionMessage/ConfirmActionMessage';
 
 type DeleteModalProps = {
+  bodyText?: ReactNode | string;
+  headerText?: string;
   isOpen: boolean;
   obj: K8sResourceCommon;
-  onDeleteSubmit: () => Promise<void | K8sResourceCommon>;
   onClose: () => void;
-  headerText?: string;
-  bodyText?: string | ReactNode;
+  onDeleteSubmit: () => Promise<K8sResourceCommon | void>;
   redirectUrl?: string;
 };
 
 const DeleteModal: FC<DeleteModalProps> = memo(
-  ({ isOpen, obj, onDeleteSubmit, onClose, headerText, bodyText, redirectUrl }) => {
+  ({ bodyText, headerText, isOpen, obj, onClose, onDeleteSubmit, redirectUrl }) => {
     const { t } = useKubevirtTranslation();
     const history = useHistory();
 
     const [model] = useK8sModel(getGroupVersionKindForResource(obj));
     const [lastNamespace] = useLastNamespace();
-    const url = redirectUrl || getResourceUrl({ model, activeNamespace: lastNamespace });
+    const url = redirectUrl || getResourceUrl({ activeNamespace: lastNamespace, model });
 
     return (
       <TabModal<K8sResourceCommon>
-        obj={obj}
-        headerText={headerText || t('Delete Resource?')}
         onSubmit={() => {
           return onDeleteSubmit().then(() => {
             history.push(url);
           });
         }}
+        headerText={headerText || t('Delete Resource?')}
         isOpen={isOpen}
+        obj={obj}
         onClose={onClose}
         submitBtnText={t('Delete')}
         submitBtnVariant={ButtonVariant.danger}

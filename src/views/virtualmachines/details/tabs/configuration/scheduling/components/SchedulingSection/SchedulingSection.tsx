@@ -24,17 +24,17 @@ import VirtualMachineSchedulingRightGrid from '../VirtualMachineSchedulingRightG
 import './SchedulingSection.scss';
 
 type SchedulingSectionProps = {
-  vm: V1VirtualMachine;
   pathname: string;
+  vm: V1VirtualMachine;
 };
 
-const SchedulingSection: FC<SchedulingSectionProps> = ({ vm, pathname }) => {
+const SchedulingSection: FC<SchedulingSectionProps> = ({ pathname, vm }) => {
   const { t } = useKubevirtTranslation();
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+    isList: false,
     name: vm?.metadata?.name,
     namespace: vm?.metadata?.namespace,
-    isList: false,
   });
   const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
@@ -45,22 +45,22 @@ const SchedulingSection: FC<SchedulingSectionProps> = ({ vm, pathname }) => {
 
   return (
     <div className="vm-scheduling-section">
-      <a href={`${pathname}#scheduling`} className="link-icon">
+      <a className="link-icon" href={`${pathname}#scheduling`}>
         <LinkIcon size="sm" />
       </a>
-      <Title headingLevel="h2" className="co-section-heading">
+      <Title className="co-section-heading" headingLevel="h2">
         {t('Scheduling and resource requirements')}
       </Title>
       <Grid hasGutter>
         <VirtualMachineSchedulingLeftGrid
-          vm={vm}
+          canUpdateVM={canUpdateVM}
           nodes={nodes}
           nodesLoaded={nodesLoaded}
-          canUpdateVM={canUpdateVM}
+          vm={vm}
           vmi={vmi}
         />
         <GridItem span={1}>{/* Spacer */}</GridItem>
-        <VirtualMachineSchedulingRightGrid vm={vm} canUpdateVM={canUpdateVM} vmi={vmi} />
+        <VirtualMachineSchedulingRightGrid canUpdateVM={canUpdateVM} vm={vm} vmi={vmi} />
       </Grid>
     </div>
   );

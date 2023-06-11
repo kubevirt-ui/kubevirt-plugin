@@ -6,6 +6,6 @@ import { HardwareDeviceModalRow } from './constants';
 export const getInitialDevices = (
   initialDevices: V1GPU[] | V1HostDevice[],
 ): HardwareDeviceModalRow[] =>
-  (!isEmpty(initialDevices) ? initialDevices : [{ name: '', deviceName: '' }]).map(
+  (!isEmpty(initialDevices) ? initialDevices : [{ deviceName: '', name: '' }]).map(
     (device, deviceIndex) => ({ ...device, deviceIndex }),
   );

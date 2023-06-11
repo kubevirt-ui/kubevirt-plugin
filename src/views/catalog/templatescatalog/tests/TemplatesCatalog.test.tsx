@@ -11,11 +11,11 @@ import { containerTemplateMock, urlTemplateMock } from './mocks';
 
 jest.mock('../hooks/useTemplatesWithAvailableSource', () => ({
   useTemplatesWithAvailableSource: () => ({
-    templates: [urlTemplateMock, containerTemplateMock],
-    availableTemplatesUID: new Set(['url-template-uid', 'container-template-uid']),
     availableDatasources: {},
-    loaded: true,
+    availableTemplatesUID: new Set(['url-template-uid', 'container-template-uid']),
     bootSourcesLoaded: true,
+    loaded: true,
+    templates: [urlTemplateMock, containerTemplateMock],
   }),
 }));
 
@@ -27,11 +27,10 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
 
 jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => ({
   useVmTemplateSource: () => ({
+    error: null,
     isBootSourceAvailable: true,
     loaded: true,
-    error: null,
     templateBootSource: {
-      type: BOOT_SOURCE.REGISTRY,
       source: {
         registry: {
           url: 'node:16',
@@ -42,6 +41,7 @@ jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => 
           url: 'node:16',
         },
       },
+      type: BOOT_SOURCE.REGISTRY,
     },
   }),
 }));
@@ -49,16 +49,16 @@ jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => 
 afterEach(cleanup);
 
 test('TemplatesCatalog', async () => {
-  const { getByTestId, queryByTestId, getByText } = render(
+  const { getByTestId, getByText, queryByTestId } = render(
     <TemplatesCatalog
-      history={{} as any}
-      location={{} as any}
       match={{
         isExact: false,
+        params: { ns: DEFAULT_NAMESPACE },
         path: '/templatescatalog',
         url: '/templatescatalog',
-        params: { ns: DEFAULT_NAMESPACE },
       }}
+      history={{} as any}
+      location={{} as any}
     />,
   );
 

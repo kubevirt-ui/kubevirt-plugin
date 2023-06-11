@@ -22,21 +22,21 @@ import './SerialConsole.scss';
 const { connected, disconnected, loading } = ConsoleState;
 
 const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
-  onConnect,
-  onDisconnect,
-  onTitleChanged = () => null,
-  onData,
   cols,
-  rows,
   fontFamily,
   fontSize,
+  innerRef,
+  onConnect,
+  onData,
+  onDisconnect,
+  onTitleChanged = () => null,
+  rows,
   status = loading,
   textConnect,
   textDisconnect,
-  textReset,
   textDisconnected,
   textLoading,
-  innerRef,
+  textReset,
 }) => {
   const { t } = useKubevirtTranslation();
   React.useEffect(() => {
@@ -77,13 +77,13 @@ const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
     case connected:
       terminal = (
         <XTerm
-          innerRef={innerRef}
           cols={cols}
-          rows={rows}
           fontFamily={fontFamily}
           fontSize={fontSize}
-          onTitleChanged={onTitleChanged}
+          innerRef={innerRef}
           onData={onData}
+          onTitleChanged={onTitleChanged}
+          rows={rows}
         />
       );
       break;
@@ -106,15 +106,15 @@ const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
   return (
     <>
       <Button
-        // Using VNC styles to avoid code dupe for paste button
-        className={classNames('paste-from-clipboard-btn', stylesVNC.consoleActionsVnc)}
-        variant={ButtonVariant.link}
-        onClick={onClipboardPaste}
         icon={
           <span>
             <PasteIcon /> {t('Paste')}
           </span>
         }
+        // Using VNC styles to avoid code dupe for paste button
+        className={classNames('paste-from-clipboard-btn', stylesVNC.consoleActionsVnc)}
+        onClick={onClipboardPaste}
+        variant={ButtonVariant.link}
       />
       {status !== disconnected && (
         <SerialConsoleActions

@@ -17,7 +17,7 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import NodeSelectorModal from './NodeSelectorModal';
 
-const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ template, editable, onSubmit }) => {
+const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const nodeSelector = getNodeSelector(template);
@@ -34,10 +34,10 @@ const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ template, editabl
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <NodeSelectorModal
-        template={template}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onSubmit}
+        template={template}
       />
     ));
 
@@ -46,12 +46,12 @@ const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ template, editabl
       <DescriptionListTerm>{t('Node selector')}</DescriptionListTerm>
       <DescriptionListDescription>
         <Button
-          type="button"
+          data-test-id="node-selector"
+          isDisabled={!editable}
           isInline
           onClick={onEditClick}
-          isDisabled={!editable}
+          type="button"
           variant="link"
-          data-test-id="node-selector"
         >
           {nodeSelectorLabels}
           <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />

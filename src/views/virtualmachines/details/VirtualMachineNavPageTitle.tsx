@@ -19,19 +19,19 @@ import { vmTabsWithYAML } from './utils/constants';
 import VirtualMachinePendingChangesAlert from './VirtualMachinePendingChangesAlert';
 
 type VirtualMachineNavPageTitleProps = {
-  vm: V1VirtualMachine;
   name: string;
+  vm: V1VirtualMachine;
 };
 
-const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ vm, name }) => {
+const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name, vm }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
 
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+    isList: false,
     name: vm?.metadata?.name,
     namespace: vm?.metadata?.namespace,
-    isList: false,
   });
   const vmim = useVirtualMachineInstanceMigration(vm);
   const [isSingleNodeCluster] = useSingleNodeCluster();
@@ -51,7 +51,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ vm, n
             <SplitItem>
               <span className="co-m-resource-icon co-m-resource-icon--lg">{t('VM')}</span>
               {name}{' '}
-              <Label isCompact icon={<StatusIcon />} className="vm-resource-label">
+              <Label className="vm-resource-label" icon={<StatusIcon />} isCompact>
                 {vm?.status?.printableStatus}
               </Label>
             </SplitItem>
@@ -65,7 +65,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ vm, n
             </SplitItem>
           )}
           <SplitItem>
-            <VirtualMachineActions vm={vm} vmim={vmim} isSingleNodeCluster={isSingleNodeCluster} />
+            <VirtualMachineActions isSingleNodeCluster={isSingleNodeCluster} vm={vm} vmim={vmim} />
           </SplitItem>
         </Split>
       </span>

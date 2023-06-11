@@ -37,13 +37,13 @@ const PrefferedAffinityWeightInput: React.FC<PrefferedAffinityWeightInputProps> 
   return (
     <FormGroup
       fieldId="weight"
-      label={t('Weight')}
-      isRequired
       helperText={t('Weight must be a number between 1-100')}
       helperTextInvalid={t('Weight must be a number between 1-100')}
+      isRequired
+      label={t('Weight')}
       validated={error ? ValidatedOptions.error : ValidatedOptions.default}
     >
-      <TextInput type="number" value={weight} onChange={onChange} />
+      <TextInput onChange={onChange} type="number" value={weight} />
     </FormGroup>
   );
 };

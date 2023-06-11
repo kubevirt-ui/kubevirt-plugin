@@ -44,10 +44,10 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <TemplatesEditNetworkInterfaceModal
-        template={template}
         isOpen={isOpen}
-        onClose={onClose}
         nicPresentation={nicPresentation}
+        onClose={onClose}
+        template={template}
       />
     ));
 
@@ -65,21 +65,21 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
     });
 
     return await k8sUpdate({
-      model: TemplateModel,
       data: updatedTemplate,
-      ns: updatedTemplate?.metadata?.namespace,
+      model: TemplateModel,
       name: updatedTemplate?.metadata?.name,
+      ns: updatedTemplate?.metadata?.namespace,
     });
   }, [nicName, template]);
 
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1Template>
-        isOpen={isOpen}
-        onClose={onClose}
-        obj={template}
-        onSubmit={onDelete}
         headerText={label}
+        isOpen={isOpen}
+        obj={template}
+        onClose={onClose}
+        onSubmit={onDelete}
         submitBtnText={submitBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
@@ -92,28 +92,28 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   };
 
   const items = [
-    <DropdownItem onClick={onEditModalOpen} key="network-interface-edit">
+    <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
       {editBtnText}
     </DropdownItem>,
-    <DropdownItem onClick={onDeleteModalToggle} key="network-interface-delete">
+    <DropdownItem key="network-interface-delete" onClick={onDeleteModalToggle}>
       {submitBtnText}
     </DropdownItem>,
   ];
 
   return (
     <Dropdown
-      menuAppendTo={getContentScrollableElement}
-      onSelect={() => setIsDropdownOpen(false)}
       toggle={
         <KebabToggle
-          onToggle={setIsDropdownOpen}
           id="toggle-id-6"
           isDisabled={!isTemplateEditable}
+          onToggle={setIsDropdownOpen}
         />
       }
+      dropdownItems={items}
       isOpen={isDropdownOpen}
       isPlain
-      dropdownItems={items}
+      menuAppendTo={getContentScrollableElement}
+      onSelect={() => setIsDropdownOpen(false)}
       position={DropdownPosition.right}
     />
   );

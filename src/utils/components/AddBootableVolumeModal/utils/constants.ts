@@ -14,39 +14,39 @@ export enum RADIO_FORM_SELECTION {
 }
 
 export type AddBootableVolumeState = {
+  annotations: { [key: string]: string };
   bootableVolumeName: string;
+  labels: { [key: string]: string };
   pvcName: string;
   pvcNamespace: string;
-  uploadFile: File | string;
-  uploadFilename: string;
   size: string;
-  labels: { [key: string]: string };
-  annotations: { [key: string]: string };
   storageClassName: string;
   storageClassProvisioner: string;
+  uploadFile: File | string;
+  uploadFilename: string;
 };
 export const initialBootableVolumeState: AddBootableVolumeState = {
+  annotations: {},
   bootableVolumeName: null,
+  labels: {},
   pvcName: null,
   pvcNamespace: null,
-  uploadFile: null,
-  uploadFilename: null,
   size: DEFAULT_DISK_SIZE,
-  labels: {},
-  annotations: {},
   storageClassName: null,
   storageClassProvisioner: null,
+  uploadFile: null,
+  uploadFilename: null,
 };
 
 export const emptySourceDataVolume: V1beta1DataVolume = {
   apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
   kind: DataVolumeModel.kind,
   metadata: {
-    name: '',
-    namespace: OPENSHIFT_OS_IMAGES_NS,
     annotations: {
       [CDI_BIND_REQUESTED_ANNOTATION]: 'true',
     },
+    name: '',
+    namespace: OPENSHIFT_OS_IMAGES_NS,
   },
   spec: {
     storage: {

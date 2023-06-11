@@ -17,7 +17,7 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-const Description: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
+const Description: React.FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const templateDescription = template?.metadata?.annotations?.description || (
@@ -37,18 +37,18 @@ const Description: React.FC<TemplateDetailsGridProps> = ({ template, editable })
     });
 
     return k8sUpdate({
-      model: TemplateModel,
       data: updatedTemplate,
-      ns: updatedTemplate?.metadata?.namespace,
+      model: TemplateModel,
       name: updatedTemplate?.metadata?.name,
+      ns: updatedTemplate?.metadata?.namespace,
     });
   };
 
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <DescriptionModal
-        obj={template}
         isOpen={isOpen}
+        obj={template}
         onClose={onClose}
         onSubmit={updateDescription}
       />
@@ -59,7 +59,7 @@ const Description: React.FC<TemplateDetailsGridProps> = ({ template, editable })
       <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
       <DescriptionListDescription>
         {templateDescription}
-        <Button type="button" isInline onClick={onEditClick} isDisabled={!editable} variant="link">
+        <Button isDisabled={!editable} isInline onClick={onEditClick} type="button" variant="link">
           <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
         </Button>
       </DescriptionListDescription>

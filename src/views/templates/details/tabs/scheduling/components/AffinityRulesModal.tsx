@@ -24,17 +24,17 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { ModalVariant } from '@patternfly/react-core';
 
 type AffinityModalProps = {
-  template: V1Template;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedTemplate: V1Template) => Promise<V1Template | void>;
+  template: V1Template;
 };
 
 const AffinityRulesModal: React.FC<AffinityModalProps> = ({
-  template,
   isOpen,
   onClose,
   onSubmit,
+  template,
 }) => {
   const { t } = useKubevirtTranslation();
   const [affinities, setAffinities] = React.useState<AffinityRowData[]>(
@@ -110,34 +110,34 @@ const AffinityRulesModal: React.FC<AffinityModalProps> = ({
   ) : (
     <AffinityList
       affinities={affinities}
-      onAffinityClickAdd={onAffinityClickAdd}
-      qualifiedNodes={qualifiedRequiredNodes}
-      prefferedQualifiedNodes={qualifiedPreferredNodes}
       nodesLoaded={nodesLoaded}
-      onEdit={onAffinityClickEdit}
+      onAffinityClickAdd={onAffinityClickAdd}
       onDelete={onAffinityDelete}
+      onEdit={onAffinityClickEdit}
+      prefferedQualifiedNodes={qualifiedPreferredNodes}
+      qualifiedNodes={qualifiedRequiredNodes}
     />
   );
 
   return isEditing ? (
     <AffinityEditModal
+      focusedAffinity={focusedAffinity}
+      isOpen={isOpen}
       nodes={nodes}
       nodesLoaded={nodesLoaded}
-      isOpen={isOpen}
       onCancel={onCancel}
       onSubmit={onSaveAffinity}
-      focusedAffinity={focusedAffinity}
       setFocusedAffinity={setFocusedAffinity}
       title={isCreating ? t('Add affinity rule') : t('Edit affinity rule')}
     />
   ) : (
     <TabModal
-      isOpen={isOpen}
-      onClose={onClose}
-      obj={updatedTemplate}
-      onSubmit={onSubmit}
       headerText={t('Affinity rules')}
+      isOpen={isOpen}
       modalVariant={ModalVariant.medium}
+      obj={updatedTemplate}
+      onClose={onClose}
+      onSubmit={onSubmit}
       submitBtnText={t('Apply rules')}
     >
       {list}

@@ -15,34 +15,33 @@ export const useDataSourcesColumns = (namespace: string) => {
   const columns: TableColumn<V1beta1DataSource>[] = React.useMemo(
     () => [
       {
-        title: t('Name'),
         id: 'name',
-        transforms: [sortable],
-        sort: 'metadata.name',
         props: { className: 'pf-m-width-15' },
+        sort: 'metadata.name',
+        title: t('Name'),
+        transforms: [sortable],
       },
       ...(!namespace
         ? [
             {
-              title: t('Namespace'),
               id: 'namespace',
-              transforms: [sortable],
-              sort: 'metadata.namespace',
               props: { className: 'pf-m-width-10' },
+              sort: 'metadata.namespace',
+              title: t('Namespace'),
+              transforms: [sortable],
             },
           ]
         : []),
       {
-        title: t('Created'),
         id: 'created',
-        transforms: [sortable],
-        sort: 'metadata.creationTimestamp',
         props: { className: 'pf-m-width-15' },
+        sort: 'metadata.creationTimestamp',
+        title: t('Created'),
+        transforms: [sortable],
       },
       {
-        title: t('Updated'),
         id: 'updated',
-        transforms: [sortable],
+        props: { className: 'pf-m-width-15' },
         sort: (dataSources, dir) => {
           return dataSources.sort((a, b) => {
             const aUpdated = getDataSourceLastUpdated(a);
@@ -55,13 +54,13 @@ export const useDataSourcesColumns = (namespace: string) => {
             }
           });
         },
-        props: { className: 'pf-m-width-15' },
+        title: t('Updated'),
+        transforms: [sortable],
       },
       {
-        title: t('Auto update'),
-        id: 'import-cron',
-        transforms: [sortable],
         additional: true,
+        id: 'import-cron',
+        props: { className: 'pf-m-width-10' },
         sort: (dataSources, dir) =>
           // sort by boolean, if cron is available or not
           dataSources.sort(
@@ -69,20 +68,21 @@ export const useDataSourcesColumns = (namespace: string) => {
               Number(!!getDataSourceCronJob(dir === 'asc' ? b : a)) -
               Number(!!getDataSourceCronJob(dir === 'asc' ? a : b)),
           ),
-        props: { className: 'pf-m-width-10' },
+        title: t('Auto update'),
+        transforms: [sortable],
       },
       {
-        title: '',
         id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        title: '',
       },
     ],
     [t, namespace],
   );
 
   const [activeColumns] = useKubevirtUserSettingsTableColumns<V1beta1DataSource>({
-    columns,
     columnManagementID: DataSourceModelRef,
+    columns,
   });
 
   return [columns, activeColumns];

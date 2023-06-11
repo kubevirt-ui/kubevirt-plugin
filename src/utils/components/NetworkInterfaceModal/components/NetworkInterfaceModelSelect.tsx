@@ -18,19 +18,19 @@ const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const interfaceModelOptions = {
-    virtio: {
-      id: interfaceModelType.VIRTIO,
-      name: t('virtio'),
-      description: t(
-        'Optimized for best performance. Supported by most Linux distributions. Windows requires additional drivers to use this model',
-      ),
-    },
     e1000e: {
-      id: interfaceModelType.E1000E,
-      name: t('e1000e'),
       description: t(
         'Supported by most operating systems including Windows out of the box. Offers lower performance compared to virtio.',
       ),
+      id: interfaceModelType.E1000E,
+      name: t('e1000e'),
+    },
+    virtio: {
+      description: t(
+        'Optimized for best performance. Supported by most Linux distributions. Windows requires additional drivers to use this model',
+      ),
+      id: interfaceModelType.VIRTIO,
+      name: t('virtio'),
     },
   };
 
@@ -41,22 +41,22 @@ const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
   };
 
   return (
-    <FormGroup label={t('Model')} fieldId="model">
+    <FormGroup fieldId="model" label={t('Model')}>
       <div data-test-id="model-select">
         <Select
-          menuAppendTo="parent"
           isOpen={isOpen}
-          onToggle={setIsOpen}
+          menuAppendTo="parent"
           onSelect={handleChange}
-          variant={SelectVariant.single}
+          onToggle={setIsOpen}
           selections={interfaceModel}
+          variant={SelectVariant.single}
         >
-          {Object.values(interfaceModelOptions)?.map(({ id, name, description }) => (
+          {Object.values(interfaceModelOptions)?.map(({ description, id, name }) => (
             <SelectOption
+              data-test-id={`model-select-${id}`}
+              description={description}
               key={id}
               value={id}
-              description={description}
-              data-test-id={`model-select-${id}`}
             >
               {name}
             </SelectOption>

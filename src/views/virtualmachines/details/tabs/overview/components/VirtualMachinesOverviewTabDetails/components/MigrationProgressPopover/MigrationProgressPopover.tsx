@@ -18,7 +18,7 @@ import { getMigrationPhaseIcon } from './utils';
 type MigrationProgressPopoverProps = React.PropsWithChildren<{
   vmi: V1VirtualMachineInstance;
 }>;
-const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ vmi, children }) => {
+const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ children, vmi }) => {
   const { t } = useKubevirtTranslation();
   const vmim = useVirtualMachineInstanceMigration(vmi);
   const Icon = getMigrationPhaseIcon(vmim?.status?.phase);
@@ -45,8 +45,6 @@ const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ vmi
   }, [vmi?.status?.migrationState?.endTimestamp, vmi?.status?.migrationState?.startTimestamp]);
   return (
     <Popover
-      position={PopoverPosition.right}
-      headerContent={'VirtualMachine migration'}
       bodyContent={
         <Stack hasGutter>
           <StackItem>
@@ -65,8 +63,8 @@ const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ vmi
             <Trans ns="plugin__kubevirt-plugin">
               <b>Elapsed time</b>{' '}
               {t('{{minutes}}{{seconds}} seconds', {
-                seconds,
                 minutes: minutes ? `${minutes} minutes, ` : null,
+                seconds,
               })}
             </Trans>
           </StackItem>
@@ -95,6 +93,8 @@ const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ vmi
           </StackItem>
         </Stack>
       }
+      headerContent={'VirtualMachine migration'}
+      position={PopoverPosition.right}
     >
       <>{children}</>
     </Popover>

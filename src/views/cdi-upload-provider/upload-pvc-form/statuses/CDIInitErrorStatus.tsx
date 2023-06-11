@@ -23,18 +23,18 @@ import { ErrorCircleOIcon } from '@patternfly/react-icons';
 import { resourcePath } from '../../utils/utils';
 
 type CDIInitErrorStatus = {
+  namespace: string;
   onErrorClick: () => void;
   pvcName: string;
-  namespace: string;
 };
 
-const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ onErrorClick, pvcName, namespace }) => {
+const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, pvcName }) => {
   const { t } = useKubevirtTranslation();
   const [shouldKillDv, setShouldKillDv] = useState<boolean>(true);
   const [pod, podLoaded, podError] = useK8sWatchResource<K8sResourceCommon>({
     groupVersionKind: modelToGroupVersionKind(PodModel),
-    namespace,
     name: `cdi-upload-${pvcName}`,
+    namespace,
   });
 
   const history = useHistory();
@@ -46,7 +46,7 @@ const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ onErrorClick, pvcNam
 
   return (
     <>
-      <EmptyStateIcon icon={ErrorCircleOIcon} color="#cf1010" />
+      <EmptyStateIcon color="#cf1010" icon={ErrorCircleOIcon} />
       <Title headingLevel="h4" size="lg">
         {t('CDI Error: Could not initiate Data Volume')}
       </Title>
@@ -61,10 +61,10 @@ const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ onErrorClick, pvcNam
             <Split>
               <SplitItem isFilled />
               <Checkbox
+                aria-label="kill datavolume checkbox"
+                data-checked-state={shouldKillDv}
                 id="approve-checkbox"
                 isChecked={shouldKillDv}
-                data-checked-state={shouldKillDv}
-                aria-label="kill datavolume checkbox"
                 label={t('Delete Data Volume: {{pvcName}}', { pvcName })}
                 onChange={(checked) => setShouldKillDv(checked)}
               />
@@ -73,16 +73,16 @@ const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ onErrorClick, pvcNam
           </StackItem>
         </Stack>
       </EmptyStateBody>
-      <Button id="cdi-upload-error-btn" variant="primary" onClick={onClick}>
+      <Button id="cdi-upload-error-btn" onClick={onClick} variant="primary">
         {shouldKillDv ? t('Back to form (Deletes DataVolume)') : t('Back to form')}
       </Button>
       {podLoaded && !podError && pod && (
         <EmptyStateSecondaryActions>
           <Button
-            id="cdi-upload-check-logs"
             onClick={() =>
               history.push(`${resourcePath(PodModel, pod?.metadata?.name, namespace)}/logs`)
             }
+            id="cdi-upload-check-logs"
             variant={ButtonVariant.link}
           >
             {t('Check logs')}

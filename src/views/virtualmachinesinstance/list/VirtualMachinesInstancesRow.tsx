@@ -14,35 +14,35 @@ import VirtualMachinesInstancesStatus from '../components/VirtualMachinesInstanc
 type VirtualMachinesInstancesRowProps = RowProps<V1VirtualMachineInstance, { kind: string }>;
 
 const VirtualMachinesInstancesRow: React.FC<VirtualMachinesInstancesRowProps> = ({
-  obj,
   activeColumnIDs,
+  obj,
   rowData: { kind },
 }) => {
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="name">
         <ResourceLink kind={kind} name={obj.metadata.name} namespace={obj.metadata.namespace} />
       </TableData>
-      <TableData id="namespace" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="namespace">
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
       </TableData>
-      <TableData id="status" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="status">
         <VirtualMachinesInstancesStatus status={obj?.status?.phase} />
       </TableData>
-      <TableData id="conditions" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="conditions">
         <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
       </TableData>
-      <TableData id="created" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="created">
         <GlobeAmericasIcon />{' '}
         {format(new Date(obj?.metadata?.creationTimestamp), 'MMM dd, yyyy, h:mm a')}
       </TableData>
-      <TableData id="node" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="node">
         <ResourceLink kind={NodeModel.kind} name={obj.status.nodeName} />
       </TableData>
-      <TableData id="ipAddress" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="ipAddress">
         <VirtualMachinesInstancesIP vmi={obj} />
       </TableData>
-      <TableData id="" activeColumnIDs={activeColumnIDs} className="pf-c-table__action">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-c-table__action" id="">
         <VirtualMachinesInsanceActions vmi={obj} />
       </TableData>
     </>

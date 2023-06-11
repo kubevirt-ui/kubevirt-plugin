@@ -22,17 +22,17 @@ export const ExpandableOptionsFields: React.FC<ExpandableOptionsFieldsProps> = (
 
   return (
     <ExpandableSection
-      toggleText={t('Optional parameters')}
       data-test-id="expandable-optional-section"
-      onToggle={() => setOptionalFieldsExpanded(!optionalFieldsExpanded)}
       isExpanded={optionalFieldsExpanded}
       isIndented
+      onToggle={() => setOptionalFieldsExpanded(!optionalFieldsExpanded)}
+      toggleText={t('Optional parameters')}
     >
       {optionalFields?.map((field) => (
         <FieldGroup
-          key={field.name}
-          field={field}
           className="expandable-section-content-margin-top"
+          field={field}
+          key={field.name}
         />
       ))}
     </ExpandableSection>

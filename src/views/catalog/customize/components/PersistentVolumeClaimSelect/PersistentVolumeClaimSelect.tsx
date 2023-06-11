@@ -7,21 +7,21 @@ import { useProjectsAndPVCs } from './utils';
 import './PersistentVolumeClaimSelect.scss';
 
 type PersistentVolumeClaimSelectProps = {
-  pvcNameSelected: string;
+  'data-test-id': string;
   projectSelected: string;
+  pvcNameSelected: string;
   selectNamespace: (namespace: string) => void;
   selectPVCName: (pvcName: string) => void;
-  'data-test-id': string;
 };
 
 export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectProps> = ({
-  pvcNameSelected,
-  projectSelected,
-  selectPVCName,
-  selectNamespace,
   'data-test-id': testId,
+  projectSelected,
+  pvcNameSelected,
+  selectNamespace,
+  selectPVCName,
 }) => {
-  const { projectsNames, filteredPVCNames, projectsLoaded, pvcsLoaded } =
+  const { filteredPVCNames, projectsLoaded, projectsNames, pvcsLoaded } =
     useProjectsAndPVCs(projectSelected);
 
   const onSelectProject = React.useCallback(
@@ -42,19 +42,19 @@ export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectPr
   return (
     <div>
       <PersistentVolumeSelectProject
-        projectsName={projectsNames}
-        selectedProject={projectSelected}
-        onChange={onSelectProject}
         data-test-id={`${testId}-project-select`}
         loaded={projectsLoaded}
+        onChange={onSelectProject}
+        projectsName={projectsNames}
+        selectedProject={projectSelected}
       />
       <PersistentVolumeSelectName
-        onChange={onPVCSelected}
-        pvcNameSelected={pvcNameSelected}
-        pvcNames={filteredPVCNames}
-        isDisabled={!projectSelected}
         data-test-id={`${testId}-pvc-name-select`}
+        isDisabled={!projectSelected}
         loaded={pvcsLoaded}
+        onChange={onPVCSelected}
+        pvcNames={filteredPVCNames}
+        pvcNameSelected={pvcNameSelected}
       />
     </div>
   );

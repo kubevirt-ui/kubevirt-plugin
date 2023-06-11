@@ -30,29 +30,29 @@ import {
 import './CustomizeSource.scss';
 
 export type CustomizeSourceProps = {
-  diskSource: V1beta1DataVolumeSpec;
-  setDiskSource: (customSource: V1beta1DataVolumeSpec | undefined) => void;
-  withDrivers: boolean;
-  setDrivers: (withDrivers: boolean) => void;
-  cdSource: V1beta1DataVolumeSpec | V1ContainerDiskSource | undefined;
-  setCDSource: (cdSource: V1beta1DataVolumeSpec | V1ContainerDiskSource | undefined) => void;
-  template: V1Template;
-  diskUpload?: DataUpload;
+  cdSource: undefined | V1beta1DataVolumeSpec | V1ContainerDiskSource;
   cdUpload?: DataUpload;
+  diskSource: V1beta1DataVolumeSpec;
+  diskUpload?: DataUpload;
   isBootSourceAvailable?: boolean;
+  setCDSource: (cdSource: undefined | V1beta1DataVolumeSpec | V1ContainerDiskSource) => void;
+  setDiskSource: (customSource: undefined | V1beta1DataVolumeSpec) => void;
+  setDrivers: (withDrivers: boolean) => void;
+  template: V1Template;
+  withDrivers: boolean;
 };
 
 export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
-  diskSource,
-  setDiskSource,
-  withDrivers,
-  setDrivers,
   cdSource,
-  setCDSource,
-  template,
-  diskUpload,
   cdUpload,
+  diskSource,
+  diskUpload,
   isBootSourceAvailable,
+  setCDSource,
+  setDiskSource,
+  setDrivers,
+  template,
+  withDrivers,
 }) => {
   const { t } = useKubevirtTranslation();
   const onCDCheckboxChange = React.useCallback(() => {
@@ -69,33 +69,29 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
 
   return (
     <div className="customize-source">
-      <BootCDCheckbox onChange={onCDCheckboxChange} cdSource={cdSource} />
+      <BootCDCheckbox cdSource={cdSource} onChange={onCDCheckboxChange} />
 
       {cdSource && (
         <SelectSource
-          selectedSource={cdSource}
-          onSourceChange={setCDSource}
-          sourceLabel={t('CD source')}
-          sourcePopOver={<SelectCDSourcePopOver />}
           sourceOptions={[
             HTTP_SOURCE_NAME,
             PVC_SOURCE_NAME,
             CONTAINER_DISK_SOURCE_NAME,
             UPLOAD_SOURCE_NAME,
           ]}
-          httpSourceHelperURL={httpSourceHelperURL}
-          registrySourceHelperText={registrySourceHelperText}
           data-test-id="cd-boot-source"
+          httpSourceHelperURL={httpSourceHelperURL}
+          onSourceChange={setCDSource}
+          registrySourceHelperText={registrySourceHelperText}
           relevantUpload={cdUpload}
+          selectedSource={cdSource}
+          sourceLabel={t('CD source')}
+          sourcePopOver={<SelectCDSourcePopOver />}
         />
       )}
 
       {cdSource && <Divider className="divider" />}
       <SelectSource
-        initialVolumeQuantity={getTemplateStorageQuantity(template) || '30Gi'}
-        onSourceChange={setDiskSource}
-        selectedSource={diskSource}
-        withSize
         sourceOptions={
           isBootSourceAvailable
             ? [
@@ -114,22 +110,26 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
                 BLANK_SOURCE_NAME,
               ]
         }
-        sourceLabel={t('Disk source')}
-        sourcePopOver={<SelectDiskSourcePopOver />}
-        httpSourceHelperURL={httpSourceHelperURL}
-        registrySourceHelperText={registrySourceHelperText}
-        relevantUpload={diskUpload}
         data-test-id="disk-boot-source"
         defaultsAsBlank={Boolean(cdSource)}
+        httpSourceHelperURL={httpSourceHelperURL}
+        initialVolumeQuantity={getTemplateStorageQuantity(template) || '30Gi'}
+        onSourceChange={setDiskSource}
+        registrySourceHelperText={registrySourceHelperText}
+        relevantUpload={diskUpload}
+        selectedSource={diskSource}
+        sourceLabel={t('Disk source')}
+        sourcePopOver={<SelectDiskSourcePopOver />}
+        withSize
       />
       <Divider className="divider" />
-      <FormGroup label={t('Drivers')} fieldId="customize-cdrom-drivers">
+      <FormGroup fieldId="customize-cdrom-drivers" label={t('Drivers')}>
         <Checkbox
-          isChecked={withDrivers}
-          onChange={setDrivers}
-          label={t('Mount Windows drivers disk')}
-          id="cdrom-drivers"
           data-test-id="cdrom-drivers"
+          id="cdrom-drivers"
+          isChecked={withDrivers}
+          label={t('Mount Windows drivers disk')}
+          onChange={setDrivers}
         />
       </FormGroup>
     </div>

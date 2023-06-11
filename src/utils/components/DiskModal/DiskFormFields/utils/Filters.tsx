@@ -34,12 +34,12 @@ export const getSCSelectOptions = (
     const optionDescription = `${defaultSC}${descriptionAnnotation}${sc?.provisioner}${scType}`;
     return (
       <SelectOption
+        data-test-id={`storage-class-${scName}`}
+        description={optionDescription}
         key={scName}
         value={scName}
-        description={optionDescription}
-        data-test-id={`storage-class-${scName}`}
       >
-        <ResourceLink kind={StorageClassModel.kind} name={scName} linkTo={false} />
+        <ResourceLink kind={StorageClassModel.kind} linkTo={false} name={scName} />
       </SelectOption>
     );
   });

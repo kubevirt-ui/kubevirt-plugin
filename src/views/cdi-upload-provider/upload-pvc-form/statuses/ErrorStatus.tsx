@@ -13,12 +13,12 @@ const ErrorStatus: React.FC<ErrorStatusProps> = ({ error, onErrorClick }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>
-      <EmptyStateIcon icon={ErrorCircleOIcon} color="#cf1010" />
+      <EmptyStateIcon color="#cf1010" icon={ErrorCircleOIcon} />
       <Title headingLevel="h4" size="lg">
         {t('Error uploading data')}
       </Title>
       <EmptyStateBody>{error}</EmptyStateBody>
-      <Button id="cdi-upload-error-btn" variant="primary" onClick={onErrorClick}>
+      <Button id="cdi-upload-error-btn" onClick={onErrorClick} variant="primary">
         {error ? t('Back to form') : t('View PersistentVolumeClaim details')}
       </Button>
     </>

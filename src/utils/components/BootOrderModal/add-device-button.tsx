@@ -4,10 +4,10 @@ import { Button, Text, TextVariants } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 export const AddDeviceButton: React.FC<AddDeviceButtonType> = ({
-  id,
-  message,
   disabledMessage,
+  id,
   isDisabled,
+  message,
   onClick,
 }) =>
   isDisabled ? (
@@ -15,19 +15,19 @@ export const AddDeviceButton: React.FC<AddDeviceButtonType> = ({
   ) : (
     <Button
       className="pf-m-link--align-left"
-      id={id}
-      variant="link"
-      onClick={onClick}
       icon={<PlusCircleIcon />}
+      id={id}
+      onClick={onClick}
+      variant="link"
     >
       {message}
     </Button>
   );
 
 export type AddDeviceButtonType = {
-  id: string;
-  message: string;
   disabledMessage: string;
+  id: string;
   isDisabled: boolean;
+  message: string;
   onClick: () => void;
 };

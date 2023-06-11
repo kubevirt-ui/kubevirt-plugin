@@ -17,8 +17,8 @@ import {
  * @enum {number}
  */
 export enum AffinityCondition {
-  required = 'requiredDuringSchedulingIgnoredDuringExecution',
   preferred = 'preferredDuringSchedulingIgnoredDuringExecution',
+  required = 'requiredDuringSchedulingIgnoredDuringExecution',
 }
 
 /**
@@ -30,7 +30,7 @@ export enum AffinityCondition {
  */
 const getNodeAffinity = (
   nodeAffinity: K8sIoApiCoreV1NodeAffinity,
-): (K8sIoApiCoreV1PreferredSchedulingTerm | K8sIoApiCoreV1NodeSelectorTerm)[] => {
+): (K8sIoApiCoreV1NodeSelectorTerm | K8sIoApiCoreV1PreferredSchedulingTerm)[] => {
   return [
     ...(nodeAffinity?.[AffinityCondition.preferred] || []),
     ...(nodeAffinity?.[AffinityCondition.required]?.nodeSelectorTerms || []),
@@ -46,7 +46,7 @@ const getNodeAffinity = (
  */
 const getPodAffinity = (
   podAffinity: K8sIoApiCoreV1PodAffinity | K8sIoApiCoreV1PodAntiAffinity,
-): (K8sIoApiCoreV1WeightedPodAffinityTerm | K8sIoApiCoreV1PodAffinityTerm)[] => {
+): (K8sIoApiCoreV1PodAffinityTerm | K8sIoApiCoreV1WeightedPodAffinityTerm)[] => {
   return [
     ...(podAffinity?.[AffinityCondition.preferred] || []),
     ...(podAffinity?.[AffinityCondition.required] || []),
@@ -68,10 +68,10 @@ const getPodAffinity = (
 export const getAffinityRules = (
   affinity: K8sIoApiCoreV1Affinity,
 ): (
-  | K8sIoApiCoreV1PreferredSchedulingTerm
   | K8sIoApiCoreV1NodeSelectorTerm
-  | K8sIoApiCoreV1WeightedPodAffinityTerm
   | K8sIoApiCoreV1PodAffinityTerm
+  | K8sIoApiCoreV1PreferredSchedulingTerm
+  | K8sIoApiCoreV1WeightedPodAffinityTerm
 )[] => {
   const nodeAffinity = getNodeAffinity(affinity?.nodeAffinity);
   const podAffinity = getPodAffinity(affinity?.podAffinity);

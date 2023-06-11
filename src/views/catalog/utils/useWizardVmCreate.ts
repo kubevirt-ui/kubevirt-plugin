@@ -9,23 +9,23 @@ import { createMultipleResources } from './utils';
 import { useWizardVMContext } from './WizardVMContext';
 
 type CreateVMArguments = {
-  startVM: boolean;
   onFullfilled: (vm: V1VirtualMachine) => void;
+  startVM: boolean;
 };
 
 type UseWizardVmCreateValues = {
-  createVM: ({ startVM, onFullfilled }: CreateVMArguments) => Promise<void>;
-  loaded: boolean;
+  createVM: ({ onFullfilled, startVM }: CreateVMArguments) => Promise<void>;
   error: any;
+  loaded: boolean;
 };
 
 export const useWizardVmCreate = (): UseWizardVmCreateValues => {
-  const { vm, tabsData } = useWizardVMContext();
+  const { tabsData, vm } = useWizardVMContext();
   const [models] = useK8sModels();
   const [loaded, setLoaded] = useState<boolean>(true);
   const [error, setError] = useState<any>();
 
-  const createVM = async ({ startVM, onFullfilled }: CreateVMArguments) => {
+  const createVM = async ({ onFullfilled, startVM }: CreateVMArguments) => {
     try {
       setLoaded(false);
       setError(undefined);
@@ -35,7 +35,7 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
       });
 
       const createdObjects = await createMultipleResources(
-        [vmToCrete, ...(tabsData?.additionalObjects as K8sResourceCommon[] | [])],
+        [vmToCrete, ...(tabsData?.additionalObjects as [] | K8sResourceCommon[])],
         models,
         vmToCrete.metadata.namespace,
       );
@@ -61,7 +61,7 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
 
   return {
     createVM,
-    loaded,
     error,
+    loaded,
   };
 };

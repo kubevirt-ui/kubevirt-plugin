@@ -2,7 +2,7 @@ import { HCOHealthStatus } from '@kubevirt-utils/extensions/dashboard/types';
 import { HealthState, PrometheusHealthHandler } from '@openshift-console/dynamic-plugin-sdk';
 
 export const getKubevirtHealthState: PrometheusHealthHandler = (responses) => {
-  const { response, error } = responses?.[0];
+  const { error, response } = responses?.[0];
 
   if (error) {
     return { state: HealthState.NOT_AVAILABLE };

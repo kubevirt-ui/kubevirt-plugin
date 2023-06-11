@@ -56,14 +56,14 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
       <ComposableDrilldownSelect
         id={MENUS.root}
         isOpen={isOpen}
-        setIsOpen={setIsOpen}
         scrollableMenuIDs={[MENUS.userProvided]}
+        setIsOpen={setIsOpen}
         toggleLabel={<SelectInstanceTypeToggle selected={selected} />}
       >
         <DrilldownMenuItem {...menuItems.redHatProvided}>
           <RedHatInstanceTypeSeriesMenu
-            series={menuItems.redHatProvided.items}
             selected={selected}
+            series={menuItems.redHatProvided.items}
             setSelected={onSelect}
           />
         </DrilldownMenuItem>

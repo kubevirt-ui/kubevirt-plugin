@@ -15,9 +15,9 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 import EvictionStrategyModal from './EvictionStrategyModal';
 
 const EvictionStrategy: React.FC<TemplateSchedulingGridProps> = ({
-  template,
   editable,
   onSubmit,
+  template,
 }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
@@ -26,10 +26,10 @@ const EvictionStrategy: React.FC<TemplateSchedulingGridProps> = ({
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <EvictionStrategyModal
-        template={template}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onSubmit}
+        template={template}
       />
     ));
 
@@ -38,12 +38,12 @@ const EvictionStrategy: React.FC<TemplateSchedulingGridProps> = ({
       <DescriptionListTerm>{t('Eviction strategy')}</DescriptionListTerm>
       <DescriptionListDescription>
         <Button
-          type="button"
-          isInline
-          onClick={onEditClick}
-          variant="link"
           data-test-id="eviction-strategy"
           isDisabled={!editable}
+          isInline
+          onClick={onEditClick}
+          type="button"
+          variant="link"
         >
           {strategy}
           <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />

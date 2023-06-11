@@ -27,8 +27,8 @@ export const getVMBootSourceType = (vm: V1VirtualMachine): TemplateBootSource =>
 
     if (sourceRef?.kind === DataSourceModel.kind) {
       return {
-        type: BOOT_SOURCE.DATA_SOURCE,
         source: { sourceRef },
+        type: BOOT_SOURCE.DATA_SOURCE,
       };
     }
   }
@@ -38,43 +38,43 @@ export const getVMBootSourceType = (vm: V1VirtualMachine): TemplateBootSource =>
 
     if (source?.http) {
       return {
-        type: BOOT_SOURCE.URL,
         source: { http: source?.http },
+        type: BOOT_SOURCE.URL,
       };
     }
     if (source?.registry) {
       return {
-        type: BOOT_SOURCE.REGISTRY,
         source: { registry: source?.registry },
+        type: BOOT_SOURCE.REGISTRY,
       };
     }
     if (source?.pvc) {
       return {
-        type: BOOT_SOURCE.PVC,
         source: { pvc: source?.pvc },
+        type: BOOT_SOURCE.PVC,
       };
     }
   }
 
   if (volume?.containerDisk) {
     return {
-      type: BOOT_SOURCE.CONTAINER_DISK,
       source: {
         containerDisk: volume?.containerDisk,
       },
+      type: BOOT_SOURCE.CONTAINER_DISK,
     };
   }
 
   if (volume?.persistentVolumeClaim) {
     return {
-      type: BOOT_SOURCE.PVC,
       source: {
         pvc: { name: volume?.persistentVolumeClaim.claimName, namespace: vm?.metadata?.namespace },
       },
+      type: BOOT_SOURCE.PVC,
     };
   }
 
-  return { type: BOOT_SOURCE.NONE, source: {} };
+  return { source: {}, type: BOOT_SOURCE.NONE };
 };
 
 /**

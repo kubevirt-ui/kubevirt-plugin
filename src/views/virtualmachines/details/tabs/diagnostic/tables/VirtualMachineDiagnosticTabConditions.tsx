@@ -33,7 +33,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
   });
 
   const [columns, activeColumns, sorting] = useDiagnosticConditionsTableColumns();
-  const { pagination, onPaginationChange } = usePagination();
+  const { onPaginationChange, pagination } = usePagination();
   const sortedData = useMemo(
     () => columnSorting(conditions, sorting?.direction, pagination, sorting?.column),
     [conditions, sorting, pagination],
@@ -45,7 +45,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
     () =>
       sortedData.forEach(({ id }) => {
         setExpend((expendObj) => {
-          return { ids: new Set(expendObj?.ids).add(id), expended: new Set() };
+          return { expended: new Set(), ids: new Set(expendObj?.ids).add(id) };
         });
       }),
     [sortedData],
@@ -54,7 +54,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
   return (
     <>
       <ListPageBody>
-        <Title headingLevel="h2" className="VirtualMachineDiagnosticTab--header">
+        <Title className="VirtualMachineDiagnosticTab--header" headingLevel="h2">
           {t('Status conditions')}{' '}
           <HelpTextIcon
             bodyContent={t(
@@ -67,20 +67,6 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
         <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
           <FlexItem>
             <ListPageFilter
-              data={unfilteredData}
-              loaded={!isEmpty(unfilteredData)}
-              rowFilters={filters}
-              nameFilterPlaceholder={t('Search by reason...')}
-              hideLabelFilter
-              onFilterChange={(...args) => {
-                onFilterChange(...args);
-                onPaginationChange({
-                  page: 1,
-                  startIndex: 0,
-                  endIndex: pagination?.perPage,
-                  perPage: pagination?.perPage,
-                });
-              }}
               columnLayout={{
                 columns: columns?.map(({ id, title }) => ({
                   id,
@@ -91,20 +77,34 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
 
                 type: t('VirtualMachine'),
               }}
+              onFilterChange={(...args) => {
+                onFilterChange(...args);
+                onPaginationChange({
+                  endIndex: pagination?.perPage,
+                  page: 1,
+                  perPage: pagination?.perPage,
+                  startIndex: 0,
+                });
+              }}
+              data={unfilteredData}
+              hideLabelFilter
+              loaded={!isEmpty(unfilteredData)}
+              nameFilterPlaceholder={t('Search by reason...')}
+              rowFilters={filters}
             />
           </FlexItem>
           <FlexItem>
             <Pagination
+              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                onPaginationChange({ endIndex, page, perPage, startIndex })
+              }
+              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                onPaginationChange({ endIndex, page, perPage, startIndex })
+              }
+              defaultToFullPage
               itemCount={filteredData?.length}
               page={pagination?.page}
               perPage={pagination?.perPage}
-              defaultToFullPage
-              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                onPaginationChange({ page, perPage, startIndex, endIndex })
-              }
-              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                onPaginationChange({ page, perPage, startIndex, endIndex })
-              }
               perPageOptions={paginationDefaultValues}
             />
           </FlexItem>
@@ -120,15 +120,15 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
                 collapseAllAriaLabel: '',
                 onToggle: (_, __, isOpen) => {
                   setExpend((expendObj) => ({
-                    ids: new Set(expendObj?.ids),
                     expended: new Set(!isOpen ? [] : expendObj.ids),
+                    ids: new Set(expendObj?.ids),
                   }));
                 },
               }}
             />
-            {activeColumns?.map(({ title, cell: { sort } }, index) => {
+            {activeColumns?.map(({ cell: { sort }, title }, index) => {
               return (
-                <Th sort={sort(index)} key={title}>
+                <Th key={title} sort={sort(index)}>
                   {title}
                 </Th>
               );
@@ -137,12 +137,12 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
         </Thead>
         {filteredData.map((row, index) => (
           <VirtualMachineDiagnosticTabRow
-            obj={row}
-            key={row?.metadata?.name}
-            index={index}
-            expend={expend}
-            setExpend={setExpend}
             activeColumns={activeColumns}
+            expend={expend}
+            index={index}
+            key={row?.metadata?.name}
+            obj={row}
+            setExpend={setExpend}
           />
         ))}
       </TableComposable>

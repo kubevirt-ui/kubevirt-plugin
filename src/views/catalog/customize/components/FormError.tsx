@@ -16,12 +16,12 @@ export const FormError: React.FC<FormErrorProps> = ({ error }) => {
 
   return (
     <StackItem>
-      <Alert variant="danger" title={t('Create VirtualMachine error')} isInline>
+      <Alert isInline title={t('Create VirtualMachine error')} variant="danger">
         <Stack hasGutter>
           <StackItem>{error.message}</StackItem>
           {error?.href && (
             <StackItem>
-              <a href={error.href} target="_blank" rel="noreferrer">
+              <a href={error.href} rel="noreferrer" target="_blank">
                 {error.href}
               </a>
             </StackItem>

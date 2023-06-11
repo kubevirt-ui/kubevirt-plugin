@@ -9,11 +9,11 @@ export const safeLoad = <Resource>(value: string): Resource | undefined => {
   }
 };
 
-export type LineRange = { start: number; end: number };
+export type LineRange = { end: number; start: number };
 
 const getLineFromPath = (resourceYAML: string, path): LineRange => {
   const yamlLines = resourceYAML.split('\n');
-  const range = { start: 0, end: yamlLines.length - 1 };
+  const range = { end: yamlLines.length - 1, start: 0 };
 
   const properties = path.split('.');
 
@@ -60,12 +60,12 @@ export const getLinesToHighlight = (
     .filter((highlightLine) => !!highlightLine);
 
 export const createSelection = (range: LineRange) => ({
-  startLineNumber: range.start,
-  startColumn: 0,
-  endLineNumber: range.end + 1,
   endColumn: 0,
-  selectionStartLineNumber: range.start,
-  selectionStartColumn: 0,
-  positionLineNumber: range.end + 1,
+  endLineNumber: range.end + 1,
   positionColumn: 0,
+  positionLineNumber: range.end + 1,
+  selectionStartColumn: 0,
+  selectionStartLineNumber: range.start,
+  startColumn: 0,
+  startLineNumber: range.start,
 });

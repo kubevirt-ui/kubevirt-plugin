@@ -25,10 +25,10 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const history = useHistory();
   const { t } = useKubevirtTranslation();
   const {
-    tabsData,
-    updateTabsData,
     disableVmCreate,
     loaded: vmContextLoaded,
+    tabsData,
+    updateTabsData,
   } = useWizardVMContext();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVmCreate();
@@ -40,11 +40,11 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
 
   const onCreate = () =>
     createVM({
-      startVM,
       onFullfilled: (createdVM) => {
         clearSessionStorageVM();
         history.push(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
       },
+      startVM,
     });
 
   const onSubmit = () => {
@@ -54,8 +54,8 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
 
     createModal(({ isOpen, onClose }) => (
       <WizardNoBootModal
-        namespace={namespace}
         isOpen={isOpen}
+        namespace={namespace}
         onClose={onClose}
         onSubmit={onCreate}
       />
@@ -82,16 +82,16 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
         <StackItem>
           <Checkbox
             id="start-after-create-checkbox"
-            isDisabled={!loaded || disableVmCreate || !isBootSourceAvailable}
             isChecked={startVM}
-            onChange={onChangeStartVM}
+            isDisabled={!loaded || disableVmCreate || !isBootSourceAvailable}
             label={t('Start this VirtualMachine after creation')}
+            onChange={onChangeStartVM}
           />
         </StackItem>
         <StackItem />
         {error && (
           <StackItem>
-            <Alert variant="danger" title={t('Create VirtualMachine error')} isInline>
+            <Alert isInline title={t('Create VirtualMachine error')} variant="danger">
               {error.message}
             </Alert>
           </StackItem>
@@ -102,15 +102,14 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
               <Button
                 isDisabled={!loaded || disableVmCreate}
                 isLoading={!vmCreateLoaded}
-                variant="primary"
                 onClick={onSubmit}
+                variant="primary"
               >
                 {t('Create VirtualMachine')}
               </Button>
             </SplitItem>
             <SplitItem>
               <Button
-                variant="secondary"
                 onClick={() => {
                   if (confirm(t('Are you sure you want to go back?'))) {
                     clearSessionStorageVM();
@@ -119,6 +118,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
                     );
                   }
                 }}
+                variant="secondary"
               >
                 {t('Back')}
               </Button>
@@ -126,13 +126,13 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
 
             <SplitItem>
               <Button
-                variant="link"
                 onClick={() => {
                   if (confirm(t('Are you sure you want to cancel?'))) {
                     clearSessionStorageVM();
                     history.push(`/k8s/ns/${namespace}/templatescatalog`);
                   }
                 }}
+                variant="link"
               >
                 {t('Cancel')}
               </Button>

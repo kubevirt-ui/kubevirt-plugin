@@ -20,8 +20,8 @@ function useEventListener<
   KH extends keyof HTMLElementEventMap,
   T extends HTMLElement | void = void,
 >(
-  eventName: KW | KH,
-  handler: (event: WindowEventMap[KW] | HTMLElementEventMap[KH] | Event) => void,
+  eventName: KH | KW,
+  handler: (event: Event | HTMLElementEventMap[KH] | WindowEventMap[KW]) => void,
   element?: RefObject<T>,
 ): void {
   // Create a ref that stores handler

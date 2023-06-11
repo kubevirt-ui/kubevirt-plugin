@@ -31,8 +31,8 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
 
   const [projects, loaded] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    namespaced: false,
     isList: true,
+    namespaced: false,
   });
 
   // Bug fix: BZ: https://bugzilla.redhat.com/show_bug.cgi?id=2081295
@@ -43,16 +43,16 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
 
   const [allTemplates, allTemplatesLoaded, allTemplatesError] = useK8sWatchResource<V1Template[]>({
     groupVersionKind: TemplateModelGroupVersionKind,
+    isList: true,
     selector: {
       matchExpressions: [
         {
-          operator: Operator.In,
           key: TEMPLATE_TYPE_LABEL,
+          operator: Operator.In,
           values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
         },
       ],
     },
-    isList: true,
   });
 
   // user has limited access, so we can only get templates from allowed namespaces
@@ -63,17 +63,17 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
             name,
             {
               groupVersionKind: TemplateModelGroupVersionKind,
+              isList: true,
               namespace: name,
               selector: {
                 matchExpressions: [
                   {
-                    operator: Operator.In,
                     key: TEMPLATE_TYPE_LABEL,
+                    operator: Operator.In,
                     values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
                   },
                 ],
               },
-              isList: true,
             },
           ])
         : [],
@@ -109,14 +109,14 @@ export const useVmTemplates = (namespace?: string): useVmTemplatesValues => {
   );
 
   return {
-    templates: memoizedTemplates,
     loaded: isAdmin ? allTemplatesLoaded : allowedTemplatesloaded,
     loadError: isAdmin ? allTemplatesError : allowedTemplatesError,
+    templates: memoizedTemplates,
   };
 };
 
 type useVmTemplatesValues = {
-  templates: V1Template[];
   loaded: boolean;
   loadError: any;
+  templates: V1Template[];
 };

@@ -9,18 +9,18 @@ import {
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 type useProjectsAndPVCsReturnType = {
+  error: Error;
+  projectsLoaded: boolean;
   projectsNames: string[];
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  projectsLoaded: boolean;
   pvcsLoaded: boolean;
-  error: Error;
 };
 
 export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsReturnType => {
   const [projects, projectsLoaded, projectsErrors] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    namespaced: false,
     isList: true,
+    namespaced: false,
   });
 
   const projectsNames = useMemo(
@@ -31,9 +31,9 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
   const pvcWathcResource = projectSelected
     ? {
         groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-        namespaced: true,
         isList: true,
         namespace: projectSelected,
+        namespaced: true,
       }
     : null;
 
@@ -46,10 +46,10 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
   );
 
   return {
+    error: projectsErrors || pvcsErrors,
+    projectsLoaded,
     projectsNames,
     pvcs,
-    projectsLoaded,
     pvcsLoaded,
-    error: projectsErrors || pvcsErrors,
   };
 };

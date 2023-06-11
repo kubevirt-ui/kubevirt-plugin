@@ -1,9 +1,9 @@
 import { PrometheusRule } from '@openshift-console/dynamic-plugin-sdk';
 
 export type Group = {
-  rules: PrometheusRule[];
   file: string;
   name: string;
+  rules: PrometheusRule[];
 };
 
 export type PrometheusRulesResponse = {

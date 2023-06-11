@@ -8,9 +8,9 @@ import { DiagnosticSort } from '../utils/types';
 import useDiagnosticSort from './useDiagnosticSort';
 
 type DiagnosticColumn = {
-  title: string;
   id: string;
   sort: (columnIndex: any) => ThSortType;
+  title: string;
 };
 
 type UseDiagnosticConditionsTableColumns = () => [
@@ -25,31 +25,31 @@ const useDiagnosticConditionsTableColumns: UseDiagnosticConditionsTableColumns =
 
   const columns: TableColumn<DiagnosticColumn>[] = [
     {
-      title: t('Type'),
-      id: 'type',
       cell: { sort: (columnIndex) => getSorting('type', columnIndex) },
+      id: 'type',
+      title: t('Type'),
     },
     {
-      title: t('Status'),
-      id: 'status',
       cell: { sort: (columnIndex) => getSorting('status', columnIndex) },
+      id: 'status',
+      title: t('Status'),
     },
     {
-      title: t('Reason'),
-      id: 'reason',
       cell: { sort: (columnIndex) => getSorting('reason', columnIndex) },
+      id: 'reason',
+      title: t('Reason'),
     },
     {
-      title: t('Message'),
+      cell: { sort: (columnIndex) => getSorting('message', columnIndex) },
       id: 'message',
 
-      cell: { sort: (columnIndex) => getSorting('message', columnIndex) },
+      title: t('Message'),
     },
   ];
 
   const [activeColumns] = useKubevirtUserSettingsTableColumns<DiagnosticColumn>({
-    columns,
     columnManagementID: 'diagnostic-tab-status',
+    columns,
   });
 
   return [columns, activeColumns, sort];

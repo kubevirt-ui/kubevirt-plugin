@@ -18,17 +18,17 @@ import { diskReducerActions, DiskReducerActionType } from '../../state/actions';
 import './BootSourceCheckbox.scss';
 
 type BootSourceCheckboxProps = {
-  isBootSource: boolean;
   dispatchDiskState: React.Dispatch<DiskReducerActionType>;
-  isDisabled?: boolean;
   initialBootDiskName?: string;
+  isBootSource: boolean;
+  isDisabled?: boolean;
 };
 
 const BootSourceCheckbox: React.FC<BootSourceCheckboxProps> = ({
-  isBootSource,
   dispatchDiskState,
-  isDisabled,
   initialBootDiskName,
+  isBootSource,
+  isDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
   const showOverrideAlert = !isDisabled && isBootSource;
@@ -36,15 +36,15 @@ const BootSourceCheckbox: React.FC<BootSourceCheckboxProps> = ({
   return (
     <FormGroup fieldId="enable-bootsource">
       <Stack hasGutter>
-        <Split hasGutter className="enable-bootsource-checkbox">
+        <Split className="enable-bootsource-checkbox" hasGutter>
           <Checkbox
-            id="enable-bootsource"
-            label={t('Use this disk as a boot source')}
-            isChecked={isBootSource}
             onChange={(checked) =>
-              dispatchDiskState({ type: diskReducerActions.SET_BOOT_SOURCE, payload: checked })
+              dispatchDiskState({ payload: checked, type: diskReducerActions.SET_BOOT_SOURCE })
             }
+            id="enable-bootsource"
+            isChecked={isBootSource}
             isDisabled={isDisabled}
+            label={t('Use this disk as a boot source')}
           />
           <Popover
             bodyContent={
@@ -61,7 +61,7 @@ const BootSourceCheckbox: React.FC<BootSourceCheckboxProps> = ({
         </Split>
 
         {showOverrideAlert && (
-          <Alert isInline variant={AlertVariant.warning} title={t('Warning')}>
+          <Alert isInline title={t('Warning')} variant={AlertVariant.warning}>
             {t(
               'Only one disk can be bootable at a time. The bootable flag will be removed from "{{initialBootDiskName}}" and placed on this disk.',
               { initialBootDiskName },

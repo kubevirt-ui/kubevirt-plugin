@@ -43,11 +43,11 @@ export const _CloudInitEditor: React.FC<CloudInitEditorProps> = ({ cloudInitVolu
       </div>
       {saved && (
         <Alert
-          isInline
-          className="co-alert"
-          variant="success"
-          title={t('Saved')}
           actionClose={<AlertActionCloseButton onClose={() => setSaved(false)} />}
+          className="co-alert"
+          isInline
+          title={t('Saved')}
+          variant="success"
         />
       )}
       <Divider />

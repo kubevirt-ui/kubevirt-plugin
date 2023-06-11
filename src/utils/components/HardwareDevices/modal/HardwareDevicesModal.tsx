@@ -25,26 +25,26 @@ import HardwareDeviceModalDescription from './HardwareDeviceModalDescription';
 import '../hardware-devices-table.scss';
 
 type HardwareDevicesModalProps = {
-  vm: V1VirtualMachine;
+  btnText: string;
+  headerText: string;
+  initialDevices: V1GPU[] | V1HostDevice[];
   isOpen: boolean;
   onClose: () => void;
-  headerText: string;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  initialDevices: V1GPU[] | V1HostDevice[];
-  btnText: string;
   type: HARDWARE_DEVICE_TYPE.GPUS | HARDWARE_DEVICE_TYPE.HOST_DEVICES;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
-  vm,
+  btnText,
+  headerText,
+  initialDevices,
   isOpen,
   onClose,
-  headerText,
   onSubmit,
-  initialDevices,
-  btnText,
   type,
+  vm,
   vmi,
 }) => {
   const [devices, setDevices] = React.useState<HardwareDeviceModalRow[]>(
@@ -55,7 +55,7 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
   const onAddDevice = () => {
     setDevices((listDevices) => [
       ...listDevices,
-      { name: '', deviceName: '', deviceIndex: devices.length },
+      { deviceIndex: devices.length, deviceName: '', name: '' },
     ]);
   };
 
@@ -81,12 +81,12 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
     devices?.some((device) => isEmpty(device.name) || isEmpty(device.deviceName));
   return (
     <TabModal
-      obj={updatedVM}
-      onSubmit={onSubmit}
-      isOpen={isOpen}
-      onClose={onClose}
       headerText={headerText}
       isDisabled={disableSubmit}
+      isOpen={isOpen}
+      obj={updatedVM}
+      onClose={onClose}
+      onSubmit={onSubmit}
     >
       {vmi && (
         <ModalPendingChangesAlert
@@ -95,12 +95,10 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
       )}
       <Form>
         <HardwareDeviceModalDescription type={type} />
-        {devices.map(({ name, deviceName, deviceIndex }) => (
+        {devices.map(({ deviceIndex, deviceName, name }) => (
           <Grid hasGutter key={deviceIndex}>
             <GridItem span={5}>
               <NameFormField
-                name={name}
-                index={deviceIndex}
                 setName={(newName: string) => {
                   setDevices((prevDevices) => {
                     const newDevices = [...prevDevices];
@@ -108,12 +106,12 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
                     return newDevices;
                   });
                 }}
+                index={deviceIndex}
+                name={name}
               />
             </GridItem>
             <GridItem span={5}>
               <DeviceNameSelect
-                index={deviceIndex}
-                deviceName={deviceName}
                 setDeviceName={(newDeviceName: string) => {
                   setDevices((prevDevices) => {
                     const newDevices = [...prevDevices];
@@ -124,10 +122,12 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
                     return newDevices;
                   });
                 }}
+                deviceName={deviceName}
+                index={deviceIndex}
                 permittedHostDevices={permittedHostDevices}
               />
             </GridItem>
-            <GridItem span={2} className="hardware-devices-form-button">
+            <GridItem className="hardware-devices-form-button" span={2}>
               <Button onClick={() => onDelete(deviceIndex)} variant={ButtonVariant.plain}>
                 <MinusCircleIcon />
               </Button>
@@ -136,10 +136,10 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
         ))}
         <FormGroup fieldId="add-button">
           <Button
-            variant="link"
+            className="pf-m-link--align-left"
             icon={<PlusCircleIcon />}
             onClick={onAddDevice}
-            className="pf-m-link--align-left"
+            variant="link"
           >
             {btnText}
           </Button>

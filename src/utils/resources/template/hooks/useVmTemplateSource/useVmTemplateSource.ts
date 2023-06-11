@@ -32,7 +32,6 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
       if (pvc) {
         setIsBootSourceAvailable(true);
         setTemplateBootSource({
-          type: BOOT_SOURCE.PVC,
           source: {
             pvc: {
               name,
@@ -41,6 +40,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
           },
           sourceValue: { pvc },
           storageClassName: pvc?.spec?.storageClassName,
+          type: BOOT_SOURCE.PVC,
         });
       }
     } catch (e) {
@@ -62,11 +62,11 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
           dataSource?.spec?.source?.pvc?.namespace,
         );
         setTemplateBootSource({
-          type: BOOT_SOURCE.DATA_SOURCE,
           source: {
             pvc: dataSource?.spec?.source?.pvc,
           },
           storageClassName: pvc?.spec?.storageClassName,
+          type: BOOT_SOURCE.DATA_SOURCE,
         });
       }
     } catch (e) {
@@ -94,11 +94,11 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
       case BOOT_SOURCE.URL:
         {
           setTemplateBootSource({
-            type: bootSource.type,
             source: bootSource.source,
             sourceValue: {
               http: bootSource?.source?.http,
             },
+            type: bootSource.type,
           });
           setIsBootSourceAvailable(true);
           setLoaded(true);
@@ -108,11 +108,11 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
       case BOOT_SOURCE.REGISTRY:
         {
           setTemplateBootSource({
-            type: bootSource.type,
             source: bootSource.source,
             sourceValue: {
               registry: bootSource?.source?.registry,
             },
+            type: bootSource.type,
           });
           setIsBootSourceAvailable(true);
           setLoaded(true);
@@ -121,11 +121,11 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
       case BOOT_SOURCE.CONTAINER_DISK:
         {
           setTemplateBootSource({
-            type: bootSource.type,
             source: bootSource.source,
             sourceValue: {
               containerDisk: bootSource?.source?.containerDisk,
             },
+            type: bootSource.type,
           });
           setIsBootSourceAvailable(true);
           setLoaded(true);
@@ -142,16 +142,16 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
   }, [bootSource]);
 
   return {
-    templateBootSource,
+    error,
     isBootSourceAvailable,
     loaded,
-    error,
+    templateBootSource,
   };
 };
 
 type useVmTemplateSourceValue = {
-  templateBootSource: TemplateBootSource;
+  error: any;
   isBootSourceAvailable: boolean;
   loaded: boolean;
-  error: any;
+  templateBootSource: TemplateBootSource;
 };

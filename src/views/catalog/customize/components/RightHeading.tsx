@@ -28,7 +28,7 @@ export const RightHeader: React.FC<RightHeadingProps> = ({ template }) => {
       <div>
         <Flex>
           <FlexItem>
-            <img src={icon} alt="os-icon" />
+            <img alt="os-icon" src={icon} />
           </FlexItem>
 
           <FlexItem>
@@ -38,13 +38,13 @@ export const RightHeader: React.FC<RightHeadingProps> = ({ template }) => {
         {documentationLink && (
           <div>
             <Button
-              variant="link"
-              icon={<ExternalLinkAltIcon />}
-              href={documentationLink}
-              target="_blank"
-              component="a"
-              iconPosition="right"
               className="pf-u-pl-0"
+              component="a"
+              href={documentationLink}
+              icon={<ExternalLinkAltIcon />}
+              iconPosition="right"
+              target="_blank"
+              variant="link"
             >
               {t('View documentation')}
             </Button>

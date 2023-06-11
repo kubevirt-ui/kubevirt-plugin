@@ -15,19 +15,19 @@ type VirtualMachinesInstancePageDetailsTabProps = RouteComponentProps & {
 };
 const VirtualMachinesInstancePageDetailsTab: React.FC<
   VirtualMachinesInstancePageDetailsTabProps
-> = ({ obj: vmi, location }) => {
+> = ({ location, obj: vmi }) => {
   return (
     <div className="VirtualMachinesInstanceDetailsTab">
       <PageSection>
-        <Details vmi={vmi} pathname={location?.pathname} />
+        <Details pathname={location?.pathname} vmi={vmi} />
       </PageSection>
       <Divider />
       <PageSection>
-        <Services vmi={vmi} pathname={location?.pathname} />
+        <Services pathname={location?.pathname} vmi={vmi} />
       </PageSection>
       <Divider />
       <PageSection>
-        <ActiveUserList vmi={vmi} pathname={location?.pathname} />
+        <ActiveUserList pathname={location?.pathname} vmi={vmi} />
       </PageSection>
     </div>
   );

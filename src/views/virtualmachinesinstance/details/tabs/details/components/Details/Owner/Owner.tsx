@@ -15,19 +15,16 @@ import {
 } from '@patternfly/react-core';
 
 type OwnerProps = {
-  ownerReferences: K8sIoApimachineryPkgApisMetaV1OwnerReference[];
   namespace: string;
+  ownerReferences: K8sIoApimachineryPkgApisMetaV1OwnerReference[];
 };
 
-const Owner: React.FC<OwnerProps> = ({ ownerReferences, namespace }) => {
+const Owner: React.FC<OwnerProps> = ({ namespace, ownerReferences }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('Owner')}
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
               List of objects depended by this object. If ALL objects in the list have been deleted,
@@ -41,6 +38,9 @@ const Owner: React.FC<OwnerProps> = ({ ownerReferences, namespace }) => {
               </Breadcrumb>
             </Trans>
           }
+          hasAutoWidth
+          headerContent={t('Owner')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('Owner')}</DescriptionListTermHelpTextButton>
         </Popover>
@@ -48,9 +48,9 @@ const Owner: React.FC<OwnerProps> = ({ ownerReferences, namespace }) => {
       <DescriptionListDescription>
         {(ownerReferences || [])?.map((ownerRef: OwnerReference) => (
           <ResourceLink
+            groupVersionKind={VirtualMachineModelGroupVersionKind}
             key={ownerRef?.uid}
             name={ownerRef?.name}
-            groupVersionKind={VirtualMachineModelGroupVersionKind}
             namespace={namespace}
           />
         ))}

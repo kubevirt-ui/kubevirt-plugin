@@ -9,21 +9,21 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
+      byButtonText(selector: string): Chainable;
+      byLegacyTestID(selector: string): Chainable;
+      byTestActionID(selector: string): Chainable;
       byTestID(
         selector: string,
         options?: Partial<Loggable & Timeoutable & Withinable & Shadow>,
       ): Chainable;
-      byTestActionID(selector: string): Chainable;
-      byLegacyTestID(selector: string): Chainable;
       byTestOperandLink(selector: string): Chainable;
-      byTestRows(selector: string): Chainable;
-      clickNavLink(path: [string, string?]): Chainable;
-      clickVirtLink(path: string): void;
       byTestOperatorRow(
         selector: string,
         options?: Partial<Loggable & Timeoutable & Withinable & Shadow>,
       ): Chainable;
-      byButtonText(selector: string): Chainable;
+      byTestRows(selector: string): Chainable;
+      clickNavLink(path: [string, string?]): Chainable;
+      clickVirtLink(path: string): void;
     }
   }
 }

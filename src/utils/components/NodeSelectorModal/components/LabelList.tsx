@@ -6,21 +6,21 @@ import { Button, Grid, Split, SplitItem } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, PlusCircleIcon } from '@patternfly/react-icons';
 
 type LabelsListProps = {
+  addRowText?: string;
   children: React.ReactNode;
+  emptyStateAddRowText?: string;
   isEmpty: boolean;
   model?: K8sModel;
-  addRowText?: string;
-  emptyStateAddRowText?: string;
   onLabelAdd: () => void;
 };
 
 const LabelsList: React.FC<LabelsListProps> = ({
-  isEmpty,
-  onLabelAdd,
-  model,
-  children,
   addRowText = null,
+  children,
   emptyStateAddRowText = null,
+  isEmpty,
+  model,
+  onLabelAdd,
 }) => {
   const { t } = useKubevirtTranslation();
   const addRowTxt = addRowText || t('Add Label');
@@ -32,10 +32,10 @@ const LabelsList: React.FC<LabelsListProps> = ({
         <SplitItem>
           <Button
             className="pf-m-link--align-left"
-            id="vm-labels-list-add-btn"
-            variant="link"
-            onClick={() => onLabelAdd()}
             icon={<PlusCircleIcon />}
+            id="vm-labels-list-add-btn"
+            onClick={() => onLabelAdd()}
+            variant="link"
           >
             {isEmpty ? emptyStateAddRowTxt : addRowTxt}
           </Button>
@@ -44,14 +44,14 @@ const LabelsList: React.FC<LabelsListProps> = ({
         <SplitItem>
           {model && (
             <Button
+              className="pf-m-link--align-right"
               component="a"
               href={`/k8s/cluster/${model.plural}`}
-              target="_blank"
-              className="pf-m-link--align-right"
-              id="explore-nodes-btn"
-              variant="link"
               icon={<ExternalLinkAltIcon />}
               iconPosition="right"
+              id="explore-nodes-btn"
+              target="_blank"
+              variant="link"
             >
               {t('Explore {{kind}} list', { kind: model.kind })}
             </Button>

@@ -21,9 +21,9 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
     case DEFAULT_SOURCE:
       return (
         <SelectOption
-          value={DEFAULT_SOURCE}
-          key={DEFAULT_SOURCE}
           description={t('Use the default Template disk source')}
+          key={DEFAULT_SOURCE}
+          value={DEFAULT_SOURCE}
         >
           <span data-test-id={DEFAULT_SOURCE}>{t('Template default')}</span>
         </SelectOption>
@@ -31,11 +31,11 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
     case PVC_SOURCE_NAME:
       return (
         <SelectOption
-          value={PVC_SOURCE_NAME}
-          key={PVC_SOURCE_NAME}
           description={t(
             'Select an existing persistent volume claim already available on the cluster and clone it.',
           )}
+          key={PVC_SOURCE_NAME}
+          value={PVC_SOURCE_NAME}
         >
           <span data-test-id={PVC_SOURCE_NAME}>{t('PVC (clone PVC)')}</span>
         </SelectOption>
@@ -43,9 +43,9 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
     case HTTP_SOURCE_NAME:
       return (
         <SelectOption
-          value={HTTP_SOURCE_NAME}
-          key={HTTP_SOURCE_NAME}
           description={t('Import content via URL (HTTP or HTTPS endpoint).')}
+          key={HTTP_SOURCE_NAME}
+          value={HTTP_SOURCE_NAME}
         >
           <span data-test-id={HTTP_SOURCE_NAME}>{t('URL (creates PVC)')}</span>
         </SelectOption>
@@ -53,9 +53,9 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
     case REGISTRY_SOURCE_NAME:
       return (
         <SelectOption
-          value={REGISTRY_SOURCE_NAME}
-          key={REGISTRY_SOURCE_NAME}
           description={t('Import content via container registry.')}
+          key={REGISTRY_SOURCE_NAME}
+          value={REGISTRY_SOURCE_NAME}
         >
           <span data-test-id={REGISTRY_SOURCE_NAME}>{t('Registry (creates PVC)')}</span>
         </SelectOption>
@@ -63,9 +63,9 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
     case CONTAINER_DISK_SOURCE_NAME:
       return (
         <SelectOption
-          value={REGISTRY_SOURCE_NAME}
-          key={REGISTRY_SOURCE_NAME}
           description={t('Import content via container registry.')}
+          key={REGISTRY_SOURCE_NAME}
+          value={REGISTRY_SOURCE_NAME}
         >
           <span data-test-id={REGISTRY_SOURCE_NAME}>{t('Registry (ContainerDisk)')}</span>
         </SelectOption>
@@ -73,9 +73,9 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
     case UPLOAD_SOURCE_NAME:
       return (
         <SelectOption
-          value={UPLOAD_SOURCE_NAME}
-          key={UPLOAD_SOURCE_NAME}
           description={t('Upload a new file to a PVC. A new PVC will be created.')}
+          key={UPLOAD_SOURCE_NAME}
+          value={UPLOAD_SOURCE_NAME}
         >
           {t('Upload (Upload a new file to a PVC)')}
         </SelectOption>
@@ -83,9 +83,9 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
     case BLANK_SOURCE_NAME:
       return (
         <SelectOption
-          value={BLANK_SOURCE_NAME}
-          key={BLANK_SOURCE_NAME}
           description={t('Create a new blank PVC')}
+          key={BLANK_SOURCE_NAME}
+          value={BLANK_SOURCE_NAME}
         >
           <span data-test-id={BLANK_SOURCE_NAME}>{t('Blank')}</span>
         </SelectOption>
@@ -96,21 +96,21 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
 };
 
 type SelectSourceOptionProps = {
-  label: React.ReactNode | string;
-  popOver?: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
-  onSelectSource: (selection: SOURCE_OPTIONS_IDS) => void;
-  selectedSource: SOURCE_OPTIONS_IDS;
-  options: SOURCE_OPTIONS_IDS[];
   'data-test-id': string;
+  label: React.ReactNode | string;
+  onSelectSource: (selection: SOURCE_OPTIONS_IDS) => void;
+  options: SOURCE_OPTIONS_IDS[];
+  popOver?: React.ReactElement<any, React.JSXElementConstructor<any> | string>;
+  selectedSource: SOURCE_OPTIONS_IDS;
 };
 
 const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
-  label,
-  popOver,
-  onSelectSource,
-  selectedSource,
-  options,
   'data-test-id': testId,
+  label,
+  onSelectSource,
+  options,
+  popOver,
+  selectedSource,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { ns } = useParams<{ ns: string }>();
@@ -126,23 +126,23 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
 
   return (
     <FormGroup
-      label={label}
-      labelIcon={popOver}
+      className="disk-source-form-group select-source-option"
       fieldId={testId}
       isRequired
-      className="disk-source-form-group select-source-option"
+      label={label}
+      labelIcon={popOver}
     >
       <div data-test-id={testId}>
         <Select
-          toggleId={`${testId}-toggle`}
+          data-test-id={testId}
           id={testId}
           isOpen={isOpen}
-          onToggle={setIsOpen}
-          onSelect={onSelect}
-          variant={SelectVariant.single}
-          selections={selectedSource}
           maxHeight={400}
-          data-test-id={testId}
+          onSelect={onSelect}
+          onToggle={setIsOpen}
+          selections={selectedSource}
+          toggleId={`${testId}-toggle`}
+          variant={SelectVariant.single}
         >
           {options.map((option) => getSourceOption(option, ns, t))}
         </Select>

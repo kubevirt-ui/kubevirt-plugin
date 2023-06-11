@@ -7,8 +7,8 @@ import DrilldownMenuItem from '../DrilldownMenuItem/DrilldownMenuItem';
 import RedHatInstanceTypeSeriesSizesMenuItems from './RedHatInstanceTypeSeriesSizesMenuItem';
 
 type RedHatInstanceTypeSeriesMenuProps = {
-  series: RedHatInstanceTypeSeries[];
   selected: string;
+  series: RedHatInstanceTypeSeries[];
   setSelected: Dispatch<SetStateAction<string>>;
 };
 
@@ -22,10 +22,10 @@ const RedHatInstanceTypeSeriesMenu: FC<RedHatInstanceTypeSeriesMenuProps> = ({
         const { Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
         return (
           <DrilldownMenuItem
-            key={seriesName}
-            id={seriesName}
-            label={seriesLabel || classAnnotation}
             Icon={Icon && Icon}
+            id={seriesName}
+            key={seriesName}
+            label={seriesLabel || classAnnotation}
           >
             <RedHatInstanceTypeSeriesSizesMenuItems
               seriesName={seriesName}

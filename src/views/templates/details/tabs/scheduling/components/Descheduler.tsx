@@ -34,9 +34,6 @@ const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('Descheduler')}
           bodyContent={
             <>
               {t(
@@ -44,19 +41,22 @@ const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
               )}
               <div className="margin-top">
                 <Button
-                  variant="link"
-                  icon={<ExternalLinkAltIcon />}
-                  href={DESCHEDULER_URL}
-                  target="_blank"
-                  component="a"
-                  iconPosition="right"
                   className="no-left-padding"
+                  component="a"
+                  href={DESCHEDULER_URL}
+                  icon={<ExternalLinkAltIcon />}
+                  iconPosition="right"
+                  target="_blank"
+                  variant="link"
                 >
                   {t('Learn more')}
                 </Button>
               </div>
             </>
           }
+          hasAutoWidth
+          headerContent={t('Descheduler')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('Descheduler')}</DescriptionListTermHelpTextButton>
         </Popover>
@@ -73,7 +73,7 @@ const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
             <MutedTextSpan text={isDeschedulerOn(template) ? t('ON') : t('OFF')} />
           </Tooltip>
         ) : (
-          <DeschedulerModalButton template={template} editable={isEditable} />
+          <DeschedulerModalButton editable={isEditable} template={template} />
         )}
       </DescriptionListDescription>
     </DescriptionListGroup>

@@ -44,11 +44,11 @@ import Timezone from './Timezone/Timezone';
 import WorkloadProfile from './WorkloadProfile/WorkloadProfile';
 
 type DetailsProps = {
-  vmi: V1VirtualMachineInstance;
   pathname: string;
+  vmi: V1VirtualMachineInstance;
 };
 
-const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
+const Details: React.FC<DetailsProps> = ({ pathname, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [guestAgentData, loadedGuestAgent] = useGuestOS(vmi);
   const [vm] = useK8sWatchResource<V1VirtualMachine>({
@@ -60,10 +60,10 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
 
   return (
     <div>
-      <a href={`${pathname}#details`} className="link-icon">
+      <a className="link-icon" href={`${pathname}#details`}>
         <LinkIcon size="sm" />
       </a>
-      <Title headingLevel="h2" className="co-section-heading">
+      <Title className="co-section-heading" headingLevel="h2">
         {t('VirtualMachineInstance Details')}
       </Title>
       <Grid hasGutter>
@@ -86,9 +86,9 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
             </DescriptionListGroup>
             <DescriptionListGroup>
               <OperatingSystem
-                vmi={vmi}
                 guestAgentData={guestAgentData}
                 loadedGuestAgent={loadedGuestAgent}
+                vmi={vmi}
               />
             </DescriptionListGroup>
             <DescriptionListGroup>
@@ -97,12 +97,12 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
             <DescriptionListGroup>
               <DescriptionListTermHelpText>
                 <Popover
-                  hasAutoWidth
-                  maxWidth="30rem"
-                  headerContent={t('Machine type')}
                   bodyContent={t(
                     'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
                   )}
+                  hasAutoWidth
+                  headerContent={t('Machine type')}
+                  maxWidth="30rem"
                 >
                   <DescriptionListTermHelpTextButton>
                     {t('Machine type')}
@@ -180,10 +180,10 @@ const Details: React.FC<DetailsProps> = ({ vmi, pathname }) => {
             </DescriptionListGroup>
             <DescriptionListGroup>
               <SSHDetails
-                vmi={vmi}
-                vm={vm}
                 sshService={sshService}
                 sshServiceLoaded={sshServiceLoaded}
+                vm={vm}
+                vmi={vmi}
               />
             </DescriptionListGroup>
             <DescriptionListGroup>

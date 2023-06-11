@@ -9,31 +9,31 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList } from '@patternfly/react-core';
 
 export type TemplateSchedulingGridProps = {
-  template: V1Template;
   editable: boolean;
   onSubmit?: (updatedTemplate: V1Template) => Promise<V1Template | void>;
+  template: V1Template;
 };
 
 const TemplateSchedulingLeftGrid: React.FC<TemplateSchedulingGridProps> = ({
-  template,
   editable,
+  template,
 }) => {
   const onSubmit = React.useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       }),
     [],
   );
 
   return (
     <DescriptionList>
-      <NodeSelector template={template} editable={editable} onSubmit={onSubmit} />
-      <Tolerations template={template} editable={editable} onSubmit={onSubmit} />
-      <AffinityRules template={template} editable={editable} onSubmit={onSubmit} />
+      <NodeSelector editable={editable} onSubmit={onSubmit} template={template} />
+      <Tolerations editable={editable} onSubmit={onSubmit} template={template} />
+      <AffinityRules editable={editable} onSubmit={onSubmit} template={template} />
       <Descheduler template={template} />
     </DescriptionList>
   );

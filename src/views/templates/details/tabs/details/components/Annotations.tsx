@@ -20,7 +20,7 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { LabelsAnnotationsType, TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-const Annotations: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
+const Annotations: React.FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const annotationsCount = Object.keys(template?.metadata?.annotations || {}).length;
@@ -30,8 +30,6 @@ const Annotations: React.FC<TemplateDetailsGridProps> = ({ template, editable })
 
   const onAnnotationsSubmit = (updatedAnnotations: LabelsAnnotationsType) =>
     k8sPatch({
-      model: TemplateModel,
-      resource: template,
       data: [
         {
           op: 'replace',
@@ -39,13 +37,15 @@ const Annotations: React.FC<TemplateDetailsGridProps> = ({ template, editable })
           value: updatedAnnotations,
         },
       ],
+      model: TemplateModel,
+      resource: template,
     });
 
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <AnnotationsModal
-        obj={template}
         isOpen={isOpen}
+        obj={template}
         onClose={onClose}
         onSubmit={onAnnotationsSubmit}
       />
@@ -55,9 +55,6 @@ const Annotations: React.FC<TemplateDetailsGridProps> = ({ template, editable })
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('Annotations')}
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
               Annotations is an unstructured key value map stored with a resource that may be set by
@@ -73,13 +70,16 @@ const Annotations: React.FC<TemplateDetailsGridProps> = ({ template, editable })
               </Breadcrumb>
             </Trans>
           }
+          hasAutoWidth
+          headerContent={t('Annotations')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('Annotations')}</DescriptionListTermHelpTextButton>
         </Popover>
       </DescriptionListTermHelpText>
 
       <DescriptionListDescription>
-        <Button type="button" isInline onClick={onEditClick} isDisabled={!editable} variant="link">
+        <Button isDisabled={!editable} isInline onClick={onEditClick} type="button" variant="link">
           {annotationsText}
           <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
         </Button>

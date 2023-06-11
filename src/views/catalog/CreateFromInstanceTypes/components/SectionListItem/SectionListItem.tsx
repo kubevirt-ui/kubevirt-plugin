@@ -6,24 +6,24 @@ import { ListItem, Split, SplitItem } from '@patternfly/react-core';
 import { INSTANCE_TYPES_SECTIONS } from '../../utils/constants';
 
 type SectionListItemProps = {
-  sectionKey: INSTANCE_TYPES_SECTIONS;
-  headerText: string;
-  sectionState: [INSTANCE_TYPES_SECTIONS, Dispatch<SetStateAction<INSTANCE_TYPES_SECTIONS>>];
   headerAction?: ReactNode;
+  headerText: string;
+  sectionKey: INSTANCE_TYPES_SECTIONS;
+  sectionState: [INSTANCE_TYPES_SECTIONS, Dispatch<SetStateAction<INSTANCE_TYPES_SECTIONS>>];
 };
 
 const SectionListItem: FC<SectionListItemProps> = ({
-  sectionKey,
-  headerText,
-  sectionState: [currentSection, setCurrentSection],
-  headerAction,
   children,
+  headerAction,
+  headerText,
+  sectionKey,
+  sectionState: [currentSection, setCurrentSection],
 }) => {
   const currentSectionClass = currentSection === sectionKey && 'current';
   return (
     <ListItem
-      onClick={() => setCurrentSection(sectionKey)}
       className="create-vm-instance-type-section"
+      onClick={() => setCurrentSection(sectionKey)}
     >
       <Split className="create-vm-instance-type-section__add-volume-btn">
         <SplitItem

@@ -8,16 +8,16 @@ import { validateMACAddress } from '../utils/mac-validation';
 
 type NetworkInterfaceMacAddressInputProps = {
   interfaceMACAddress: string;
+  isDisabled: boolean;
   setInterfaceMACAddress: Dispatch<SetStateAction<string>>;
   setIsError: Dispatch<SetStateAction<boolean>>;
-  isDisabled: boolean;
 };
 
 const NetworkInterfaceMacAddressInput: FC<NetworkInterfaceMacAddressInputProps> = ({
   interfaceMACAddress,
+  isDisabled,
   setInterfaceMACAddress,
   setIsError,
-  isDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -33,18 +33,18 @@ const NetworkInterfaceMacAddressInput: FC<NetworkInterfaceMacAddressInputProps> 
 
   return (
     <FormGroup
-      label={t('MAC address')}
       fieldId="mac-address"
       helperTextInvalid={nameError}
       helperTextInvalidIcon={nameError && <RedExclamationCircleIcon title={t('Error')} />}
+      label={t('MAC address')}
       validated={nameError ? ValidatedOptions.error : ValidatedOptions.default}
     >
       <TextInput
-        type="text"
-        value={interfaceMACAddress}
-        onChange={handleNameChange}
         id="mac-address"
         isDisabled={isDisabled}
+        onChange={handleNameChange}
+        type="text"
+        value={interfaceMACAddress}
       />
     </FormGroup>
   );

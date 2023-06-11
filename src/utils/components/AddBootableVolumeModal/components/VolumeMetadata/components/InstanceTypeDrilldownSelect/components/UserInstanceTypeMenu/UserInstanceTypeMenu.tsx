@@ -33,24 +33,24 @@ const UserInstanceTypeMenu: FC<UserInstanceTypeMenuProps> = ({ items, selected, 
       {items.length > 5 && (
         <MenuInput>
           <SearchInput
-            value={searchInput}
             aria-label="Filter menu items"
-            type="search"
             onChange={(_, value) => setSearchInput(value)}
+            type="search"
+            value={searchInput}
           />
         </MenuInput>
       )}
       {filteredItems.map((userITName) => (
         <MenuItem
-          key={userITName}
-          itemId={userITName}
-          onClick={() => setSelected(userITName)}
-          isSelected={selected === userITName}
           icon={
             <ResourceIcon
               groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
             />
           }
+          isSelected={selected === userITName}
+          itemId={userITName}
+          key={userITName}
+          onClick={() => setSelected(userITName)}
         >
           {userITName}
         </MenuItem>

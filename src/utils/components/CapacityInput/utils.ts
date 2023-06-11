@@ -1,6 +1,6 @@
 export enum CAPACITY_UNITS {
-  MiB = 'MiB',
   GiB = 'GiB',
+  MiB = 'MiB',
   TiB = 'TiB',
 }
 

@@ -9,8 +9,8 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
 test('getResourceUrl', () => {
   const resource = {
     metadata: {
-      namespace: 'kube',
       name: 'vm',
+      namespace: 'kube',
     },
   };
 
@@ -24,8 +24,8 @@ test('getResourceUrl', () => {
   expect(nullUrl).toBe(null);
 
   const urlWithNamespace = getResourceUrl({
-    model: VirtualMachineModel,
     activeNamespace: DEFAULT_NAMESPACE,
+    model: VirtualMachineModel,
   });
   expect(urlWithNamespace).toBe(`/k8s/ns/${DEFAULT_NAMESPACE}/kubevirt.io~v1~VirtualMachine/`);
 });

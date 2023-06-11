@@ -47,7 +47,7 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
   return (
     <div className="alerts-card__drawer">
       {alertsQuantity > 0 ? (
-        <Accordion isBordered asDefinitionList>
+        <Accordion asDefinitionList isBordered>
           <AccordionItem>
             <AccordionToggle
               onClick={() => {
@@ -56,9 +56,9 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                   return !title;
                 });
               }}
-              isExpanded={titleOpen}
-              id="toggle-main"
               className="alerts-card__toggle--main"
+              id="toggle-main"
+              isExpanded={titleOpen}
             >
               <Flex>
                 {Object.keys(sortedAlerts)?.map((alertType) => {
@@ -69,9 +69,6 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                   }
                   return (
                     <Button
-                      variant={ButtonVariant.plain}
-                      className="pf-m-link--align-left"
-                      key={alertType}
                       onClick={(e) => {
                         setAlertTypeOpen((prevAlertOpen) =>
                           titleOpen && prevAlertOpen === alertType
@@ -83,12 +80,15 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                         );
                         e?.stopPropagation();
                       }}
+                      className="pf-m-link--align-left"
+                      key={alertType}
+                      variant={ButtonVariant.plain}
                     >
                       <Label
-                        key={alertType}
+                        className="alerts-label"
                         color={labelColor[alertType]}
                         icon={labelIcon[alertType]}
-                        className="alerts-label"
+                        key={alertType}
                       >
                         {numAlerts || 0}
                       </Label>
@@ -101,11 +101,11 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
             <AccordionContent id="toggle-main" isHidden={!titleOpen}>
               {Object.entries(sortedAlerts)?.map(([alertType, alerts]) => (
                 <AlertsCardAccordionItem
-                  key={alertType}
                   alertOpen={alertTypeOpen}
-                  alertType={AlertType[alertType]}
                   alerts={alerts}
+                  alertType={AlertType[alertType]}
                   handleDrawerToggleClick={handleDrawerToggleClick}
+                  key={alertType}
                 />
               ))}
             </AccordionContent>

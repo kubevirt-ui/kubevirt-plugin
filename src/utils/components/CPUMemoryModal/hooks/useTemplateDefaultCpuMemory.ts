@@ -10,11 +10,11 @@ type UseTemplateDefaultCpuMemory = (
   templateNamespace: string,
 ) => {
   data: {
-    defaultMemory: { size: number; unit: string };
     defaultCpu: number;
+    defaultMemory: { size: number; unit: string };
   };
-  loaded: boolean;
   error: any;
+  loaded: boolean;
 };
 
 const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (
@@ -45,11 +45,11 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (
 
   return {
     data: {
-      defaultMemory,
       defaultCpu,
+      defaultMemory,
     },
-    loaded,
     error,
+    loaded,
   };
 };
 

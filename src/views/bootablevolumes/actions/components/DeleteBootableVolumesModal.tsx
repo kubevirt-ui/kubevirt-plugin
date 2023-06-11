@@ -9,32 +9,32 @@ import { BootableResource } from '../../utils/types';
 import { deleteBootableVolumeMetadata } from '../../utils/utils';
 
 type DeleteBootableVolumesModalProps = {
-  source: BootableResource;
   isOpen: boolean;
   onClose: () => void;
+  source: BootableResource;
 };
 
 const DeleteBootableVolumesModal: FC<DeleteBootableVolumesModalProps> = ({
-  source,
   isOpen,
   onClose,
+  source,
 }) => {
   const { t } = useKubevirtTranslation();
   const lastNamespacePath = useLastNamespacePath();
 
   return (
     <DeleteModal
-      obj={source}
-      isOpen={isOpen}
-      onClose={onClose}
-      headerText={t('Delete volume metadata?')}
-      onDeleteSubmit={deleteBootableVolumeMetadata(source)}
       bodyText={
         <Trans t={t}>
           Deleting the metadata will mark this volume as non-bootable and remove it from the
           bootable volumes list. The volume will still be available in the cluster.
         </Trans>
       }
+      headerText={t('Delete volume metadata?')}
+      isOpen={isOpen}
+      obj={source}
+      onClose={onClose}
+      onDeleteSubmit={deleteBootableVolumeMetadata(source)}
       redirectUrl={`/k8s/${lastNamespacePath}/bootablevolumes`}
     />
   );

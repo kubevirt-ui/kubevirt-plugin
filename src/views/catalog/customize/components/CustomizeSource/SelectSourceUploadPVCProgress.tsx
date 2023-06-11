@@ -23,10 +23,10 @@ export const SelectSourceUploadPVCProgress: React.FC<{ upload: DataUpload }> = (
       <Stack hasGutter>
         <StackItem>
           <Progress
-            value={upload?.progress}
-            title={uploadStatusLabels(t)?.[upload?.uploadStatus]}
-            variant={uploadStatusToProgressVariant[upload?.uploadStatus]}
             measureLocation={ProgressMeasureLocation.inside}
+            title={uploadStatusLabels(t)?.[upload?.uploadStatus]}
+            value={upload?.progress}
+            variant={uploadStatusToProgressVariant[upload?.uploadStatus]}
           />
         </StackItem>
         <StackItem>
@@ -36,9 +36,9 @@ export const SelectSourceUploadPVCProgress: React.FC<{ upload: DataUpload }> = (
               upload?.uploadStatus === UPLOAD_STATUS.ERROR ||
               upload?.uploadStatus === UPLOAD_STATUS.SUCCESS
             }
-            variant="link"
             isInline
             onClick={() => upload?.cancelUpload()}
+            variant="link"
           >
             {t('Cancel upload')}
           </Button>

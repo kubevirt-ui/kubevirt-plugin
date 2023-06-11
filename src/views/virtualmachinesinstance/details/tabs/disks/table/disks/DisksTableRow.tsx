@@ -13,20 +13,20 @@ import {
 } from '../../utils/virtualMachinesInstancePageDisksTabUtils';
 
 type DiskTableRowProps = {
-  obj: DiskPresentation;
   activeColumnIDs: Set<string>;
+  obj: DiskPresentation;
 };
 
-const DisksTableRow: React.FC<DiskTableRowProps> = ({ obj, activeColumnIDs }) => {
+const DisksTableRow: React.FC<DiskTableRowProps> = ({ activeColumnIDs, obj }) => {
   const convertedSize = convertBytes(Number(obj?.size));
   const size = obj?.size && convertedSize?.unit && `${convertedSize.value} ${convertedSize.unit}`;
   const defaultSize = obj?.size || '-';
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="name">
         {obj?.name}
       </TableData>
-      <TableData id="source" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="source">
         {obj?.namespace ? (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
@@ -37,16 +37,16 @@ const DisksTableRow: React.FC<DiskTableRowProps> = ({ obj, activeColumnIDs }) =>
           obj?.source
         )}
       </TableData>
-      <TableData id="size" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="size">
         {size || defaultSize}
       </TableData>
-      <TableData id="drive" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="drive">
         {obj?.drive}
       </TableData>
-      <TableData id="interface" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="interface">
         {obj?.interface}
       </TableData>
-      <TableData id="storageClass" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="storageClass">
         {obj?.storageClass}
       </TableData>
     </>

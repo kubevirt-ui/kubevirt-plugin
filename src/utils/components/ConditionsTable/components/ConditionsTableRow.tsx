@@ -6,24 +6,24 @@ import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { K8sResourceCondition } from '../ConditionsTable';
 
 export const ConditionsTableRow: React.FC<RowProps<K8sResourceCondition>> = ({
-  obj,
   activeColumnIDs,
+  obj,
 }) => {
   return (
     <>
-      <TableData id="type" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="type">
         {obj.type}
       </TableData>
-      <TableData id="status" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="status">
         {obj.status}
       </TableData>
-      <TableData id="updated" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="updated">
         <Timestamp timestamp={obj.lastTransitionTime} />
       </TableData>
-      <TableData id="reason" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="reason">
         {obj.reason}
       </TableData>
-      <TableData id="message" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="message">
         {obj?.message}
       </TableData>
     </>

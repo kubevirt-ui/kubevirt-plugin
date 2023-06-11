@@ -40,34 +40,27 @@ const statusFilterItems = [
 ];
 
 const useStatusFilter = (): RowFilter => ({
-  filterGroupName: t('Status'),
-  type: 'status',
-  isMatch: (obj, filterStatus) => {
-    return (
-      filterStatus === obj?.status?.printableStatus ||
-      (filterStatus === ErrorStatus.id && isErrorPrintableStatus(obj?.status?.printableStatus))
-    );
-  },
   filter: (statuses, obj) => {
     const status = obj?.status?.printableStatus;
     const isError = statuses.selected.includes(ErrorStatus.id) && isErrorPrintableStatus(status);
 
     return statuses.selected?.length === 0 || statuses.selected?.includes(status) || isError;
   },
+  filterGroupName: t('Status'),
+  isMatch: (obj, filterStatus) => {
+    return (
+      filterStatus === obj?.status?.printableStatus ||
+      (filterStatus === ErrorStatus.id && isErrorPrintableStatus(obj?.status?.printableStatus))
+    );
+  },
   items: statusFilterItems,
+  type: 'status',
 });
 
 const useLiveMigratableFilter = (): RowFilter => {
   const [isSingleNodeCluster] = useSingleNodeCluster();
 
   return {
-    filterGroupName: t('Live migratable'),
-    type: 'live-migratable',
-    items: [
-      { id: 'migratable', title: t('Migratable') },
-      { id: 'notMigratable', title: t('Not migratable') },
-    ],
-    reducer: (obj) => (isLiveMigratable(obj, isSingleNodeCluster) ? 'migratable' : 'notMigratable'),
     filter: (selectedItems, obj) => {
       const isMigratable = isLiveMigratable(obj, isSingleNodeCluster);
       return (
@@ -76,6 +69,13 @@ const useLiveMigratableFilter = (): RowFilter => {
         (selectedItems?.selected?.includes('notMigratable') && !isMigratable)
       );
     },
+    filterGroupName: t('Live migratable'),
+    items: [
+      { id: 'migratable', title: t('Migratable') },
+      { id: 'notMigratable', title: t('Not migratable') },
+    ],
+    reducer: (obj) => (isLiveMigratable(obj, isSingleNodeCluster) ? 'migratable' : 'notMigratable'),
+    type: 'live-migratable',
   };
 };
 
@@ -95,9 +95,6 @@ const useTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
   );
 
   return {
-    filterGroupName: t('Template'),
-    type: 'template',
-    reducer: (obj) => obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? noTemplate,
     filter: (selectedTemplates, obj) => {
       const templateName = obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? noTemplate;
       return (
@@ -105,7 +102,10 @@ const useTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
         selectedTemplates.selected?.includes(templateName)
       );
     },
+    filterGroupName: t('Template'),
     items: templates,
+    reducer: (obj) => obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? noTemplate,
+    type: 'template',
   };
 };
 
@@ -122,16 +122,16 @@ const useOSFilter = (): RowFilter => {
   }, []);
 
   return {
-    filterGroupName: t('Operating system'),
-    type: 'os',
-    reducer: getOSName,
     filter: (selectedOS, obj) => {
       return selectedOS.selected?.length === 0 || selectedOS.selected?.includes(getOSName(obj));
     },
+    filterGroupName: t('Operating system'),
     items: Object.values(OS_NAME_LABELS).map((osName) => ({
       id: osName,
       title: osName,
     })),
+    reducer: getOSName,
+    type: 'os',
   };
 };
 
@@ -146,16 +146,16 @@ const useNodesFilter = (vmiMapper: VmiMapper): RowFilter => {
   }, [vmiMapper]);
 
   return {
-    filterGroupName: 'Node',
-    type: 'node',
-    reducer: (obj) =>
-      vmiMapper?.mapper?.[obj?.metadata?.namespace]?.[obj?.metadata?.name]?.status?.nodeName,
     filter: (selectedNodes, obj) => {
       const nodeName =
         vmiMapper?.mapper?.[obj?.metadata?.namespace]?.[obj?.metadata?.name]?.status?.nodeName;
       return selectedNodes.selected?.length === 0 || selectedNodes.selected?.includes(nodeName);
     },
+    filterGroupName: 'Node',
     items: sortedNodeNamesItems,
+    reducer: (obj) =>
+      vmiMapper?.mapper?.[obj?.metadata?.namespace]?.[obj?.metadata?.name]?.status?.nodeName,
+    type: 'node',
   };
 };
 

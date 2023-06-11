@@ -9,8 +9,8 @@ import { AffinityLabel } from '../../../../utils/types';
 import AffinityEditRow from './AffinityEditRow';
 
 type AffinityExpressionListProps = {
-  expressions: AffinityLabel[];
   addRowText: string;
+  expressions: AffinityLabel[];
   onAdd: () => void;
   onChange: (aff: AffinityLabel) => void;
   onDelete: (id: any) => void;
@@ -18,8 +18,8 @@ type AffinityExpressionListProps = {
 };
 
 const AffinityEditList: React.FC<AffinityExpressionListProps> = ({
-  expressions,
   addRowText,
+  expressions,
   onAdd,
   onChange,
   onDelete,
@@ -29,10 +29,10 @@ const AffinityEditList: React.FC<AffinityExpressionListProps> = ({
 
   return (
     <LabelsList
-      isEmpty={expressions?.length === 0}
-      onLabelAdd={onAdd}
       addRowText={addRowText}
       emptyStateAddRowText={addRowText}
+      isEmpty={expressions?.length === 0}
+      onLabelAdd={onAdd}
     >
       {expressions.length > 0 && (
         <>
@@ -47,8 +47,8 @@ const AffinityEditList: React.FC<AffinityExpressionListProps> = ({
           </GridItem>
           {expressions.map((expression) => (
             <AffinityEditRow
-              key={expression.id}
               expression={expression}
+              key={expression.id}
               onChange={onChange}
               onDelete={onDelete}
               rowID={rowID}

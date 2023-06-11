@@ -12,9 +12,9 @@ import DataImportCronPageTitle from './DataImportCronPageTitle';
 import DataImportCronYAMLPage from './DataImportCronYamlPage';
 
 type DataImportCronPageProps = {
+  kind: string;
   name: string;
   namespace: string;
-  kind: string;
 };
 
 const DataImportCronNavPage: React.FC<DataImportCronPageProps> = ({ name, namespace }) => {
@@ -28,14 +28,14 @@ const DataImportCronNavPage: React.FC<DataImportCronPageProps> = ({ name, namesp
   const pages = React.useMemo(
     () => [
       {
+        component: DataImportCronDetailsPage,
         href: '',
         name: t('Details'),
-        component: DataImportCronDetailsPage,
       },
       {
+        component: DataImportCronYAMLPage,
         href: 'yaml',
         name: t('YAML'),
-        component: DataImportCronYAMLPage,
       },
     ],
     [t],
@@ -43,7 +43,7 @@ const DataImportCronNavPage: React.FC<DataImportCronPageProps> = ({ name, namesp
 
   return (
     <>
-      <DataImportCronPageTitle dataImportCron={dataImportCron} namespace={namespace} name={name} />
+      <DataImportCronPageTitle dataImportCron={dataImportCron} name={name} namespace={namespace} />
       {loaded ? (
         <HorizontalNav pages={pages} resource={dataImportCron} />
       ) : (

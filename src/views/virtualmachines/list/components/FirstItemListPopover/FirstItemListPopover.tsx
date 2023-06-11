@@ -12,17 +12,17 @@ import {
 } from '@patternfly/react-core';
 
 type FirstItemListPopoverProps = {
-  items: string[];
-  headerContent?: React.ReactNode | string;
   className?: string;
+  headerContent?: React.ReactNode | string;
   includeCopyFirstItem?: boolean;
+  items: string[];
 };
 
 const FirstItemListPopover: React.FC<FirstItemListPopoverProps> = ({
-  items,
-  headerContent,
   className,
+  headerContent,
   includeCopyFirstItem,
+  items,
 }) => {
   const { t } = useKubevirtTranslation();
   return (
@@ -30,10 +30,10 @@ const FirstItemListPopover: React.FC<FirstItemListPopoverProps> = ({
       <div>
         {items?.[0] && includeCopyFirstItem ? (
           <ClipboardCopy
-            variant={ClipboardCopyVariant.inlineCompact}
-            isCode
             clickTip={t('Copied')}
             hoverTip={t('Copy to clipboard')}
+            isCode
+            variant={ClipboardCopyVariant.inlineCompact}
           >
             {items?.[0]}
           </ClipboardCopy>
@@ -43,12 +43,12 @@ const FirstItemListPopover: React.FC<FirstItemListPopoverProps> = ({
       </div>
       {items?.length > 1 && (
         <Popover
-          headerContent={headerContent}
           bodyContent={items.map((item) => (
             <div key={item}>{item}</div>
           ))}
-          position={PopoverPosition.top}
           hasAutoWidth
+          headerContent={headerContent}
+          position={PopoverPosition.top}
         >
           <Button variant={ButtonVariant.link}>{`+${items.length - 1} more`}</Button>
         </Popover>
@@ -58,8 +58,8 @@ const FirstItemListPopover: React.FC<FirstItemListPopoverProps> = ({
 };
 
 FirstItemListPopover.defaultProps = {
-  headerContent: '',
   className: '',
+  headerContent: '',
 };
 
 export default FirstItemListPopover;

@@ -31,39 +31,39 @@ import {
 } from './utils';
 
 export type SelectSourceProps = {
+  'data-test-id': string;
+  defaultsAsBlank?: boolean;
+  httpSourceHelperURL?: string;
+  initialVolumeQuantity?: string;
   onSourceChange: (customSource: V1beta1DataVolumeSpec | V1ContainerDiskSource) => void;
+  registrySourceHelperText?: string;
+  relevantUpload?: DataUpload;
   selectedSource?: V1beta1DataVolumeSpec | V1ContainerDiskSource;
   sourceLabel: React.ReactNode | string;
-  sourcePopOver?: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
-  initialVolumeQuantity?: string;
-  withSize?: boolean;
   sourceOptions: SOURCE_OPTIONS_IDS[];
-  httpSourceHelperURL?: string;
-  registrySourceHelperText?: string;
-  'data-test-id': string;
-  relevantUpload?: DataUpload;
-  defaultsAsBlank?: boolean;
+  sourcePopOver?: React.ReactElement<any, React.JSXElementConstructor<any> | string>;
+  withSize?: boolean;
 };
 
 export const SelectSource: React.FC<SelectSourceProps> = ({
-  onSourceChange,
-  initialVolumeQuantity = '30Gi',
-  withSize = false,
-  sourceOptions,
-  sourceLabel,
-  sourcePopOver,
-  httpSourceHelperURL,
-  registrySourceHelperText,
   'data-test-id': testId,
-  relevantUpload,
   defaultsAsBlank,
+  httpSourceHelperURL,
+  initialVolumeQuantity = '30Gi',
+  onSourceChange,
+  registrySourceHelperText,
+  relevantUpload,
+  sourceLabel,
+  sourceOptions,
+  sourcePopOver,
+  withSize = false,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
-    register,
-    watch,
     control,
     formState: { errors },
+    register,
+    watch,
   } = useFormContext();
   const httpURL = watch(`${testId}-httpURL`);
   const containerImage = watch(`${testId}-containerImage`);
@@ -134,35 +134,31 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   return (
     <>
       <SelectSourceOption
-        onSelectSource={setSourceType}
-        selectedSource={selectedSourceType}
-        label={sourceLabel}
-        popOver={sourcePopOver}
-        options={sourceOptions}
         data-test-id={testId}
+        label={sourceLabel}
+        onSelectSource={setSourceType}
+        options={sourceOptions}
+        popOver={sourcePopOver}
+        selectedSource={selectedSourceType}
       />
 
       {selectedSourceType === PVC_SOURCE_NAME && (
         <PersistentVolumeClaimSelect
-          pvcNameSelected={pvcNameSelected}
+          data-test-id={`${testId}-pvc-select`}
           projectSelected={pvcNamespaceSelected}
+          pvcNameSelected={pvcNameSelected}
           selectNamespace={selectPVCNamespace}
           selectPVCName={selectPVCName}
-          data-test-id={`${testId}-pvc-select`}
         />
       )}
 
       {selectedSourceType === HTTP_SOURCE_NAME && (
         <FormGroup
-          label={t('Image URL')}
-          fieldId={`${testId}-${selectedSourceType}`}
-          isRequired
-          className="disk-source-form-group"
           helperText={
             httpSourceHelperURL && (
               <>
                 {t('Enter URL to download. for example: ')}
-                <a href={httpSourceHelperURL} target="_blank" rel="noreferrer">
+                <a href={httpSourceHelperURL} rel="noreferrer" target="_blank">
                   {httpSourceHelperURL}
                 </a>
               </>
@@ -171,18 +167,22 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           validated={
             errors?.[`${testId}-httpURL`] ? ValidatedOptions.error : ValidatedOptions.default
           }
+          className="disk-source-form-group"
+          fieldId={`${testId}-${selectedSourceType}`}
           helperTextInvalid={t('This field is required')}
           helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
+          isRequired
+          label={t('Image URL')}
         >
           <FormTextInput
             {...register(`${testId}-httpURL`, { required: true })}
-            id={`${testId}-${selectedSourceType}`}
-            type="text"
-            aria-label={t('Image URL')}
-            data-test-id={`${testId}-http-source-input`}
             validated={
               errors?.[`${testId}-httpURL`] ? ValidatedOptions.error : ValidatedOptions.default
             }
+            aria-label={t('Image URL')}
+            data-test-id={`${testId}-http-source-input`}
+            id={`${testId}-${selectedSourceType}`}
+            type="text"
           />
         </FormGroup>
       )}
@@ -190,38 +190,38 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
       {selectedSourceType === UPLOAD_SOURCE_NAME && (
         <>
           <FormGroup
-            label={t('Upload data')}
-            fieldId={`${testId}-${selectedSourceType}`}
-            isRequired
-            className="disk-source-form-group"
             validated={
               errors?.[`${testId}-uploadFile`] ? ValidatedOptions.error : ValidatedOptions.default
             }
+            className="disk-source-form-group"
+            fieldId={`${testId}-${selectedSourceType}`}
             helperTextInvalid={t('This field is required')}
             helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
+            isRequired
+            label={t('Upload data')}
           >
             <Stack hasGutter>
               <StackItem>
                 <Controller
-                  name={`${testId}-uploadFile`}
-                  control={control}
-                  shouldUnregister
-                  rules={{ required: true }}
-                  render={({ field: { value: fileValue, onChange }, fieldState: { error } }) => (
+                  render={({ field: { onChange, value: fileValue }, fieldState: { error } }) => (
                     <FileUpload
-                      name={`${testId}-uploadFile`}
-                      id="simple-file"
-                      value={fileValue?.value}
-                      filename={fileValue?.filename}
-                      data-test-id="disk-source-upload-pvc-file"
-                      filenamePlaceholder={t('Drag and drop an image or upload one')}
                       onChange={(value, filename) => {
-                        onChange({ value, filename });
+                        onChange({ filename, value });
                       }}
+                      data-test-id="disk-source-upload-pvc-file"
+                      filename={fileValue?.filename}
+                      filenamePlaceholder={t('Drag and drop an image or upload one')}
+                      id="simple-file"
+                      name={`${testId}-uploadFile`}
                       onClearClick={() => onChange(undefined)}
                       validated={error ? ValidatedOptions.error : ValidatedOptions.default}
+                      value={fileValue?.value}
                     />
                   )}
+                  control={control}
+                  name={`${testId}-uploadFile`}
+                  rules={{ required: true }}
+                  shouldUnregister
                 />
               </StackItem>
               <StackItem>
@@ -232,36 +232,36 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
         </>
       )}
 
-      {[REGISTRY_SOURCE_NAME, CONTAINER_DISK_SOURCE_NAME].includes(selectedSourceType) && (
+      {[CONTAINER_DISK_SOURCE_NAME, REGISTRY_SOURCE_NAME].includes(selectedSourceType) && (
         <FormGroup
-          label={t('Container Image')}
-          fieldId={`${testId}-${selectedSourceType}`}
-          isRequired
-          className="disk-source-form-group"
-          helperText={registrySourceHelperText}
           validated={
             errors?.[`${testId}-containerImage`] ? ValidatedOptions.error : ValidatedOptions.default
           }
+          className="disk-source-form-group"
+          fieldId={`${testId}-${selectedSourceType}`}
+          helperText={registrySourceHelperText}
           helperTextInvalid={t('This field is required')}
           helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
+          isRequired
+          label={t('Container Image')}
         >
           <FormTextInput
             {...register(`${testId}-containerImage`, { required: true })}
-            id={`${testId}-${selectedSourceType}`}
-            type="text"
-            aria-label={t('Container Image')}
-            data-test-id={`${testId}-container-source-input`}
             validated={
               errors?.[`${testId}-containerImage`]
                 ? ValidatedOptions.error
                 : ValidatedOptions.default
             }
+            aria-label={t('Container Image')}
+            data-test-id={`${testId}-container-source-input`}
+            id={`${testId}-${selectedSourceType}`}
+            type="text"
           />
         </FormGroup>
       )}
 
       {showSizeInput && selectedSourceType !== DEFAULT_SOURCE && (
-        <CapacityInput size={volumeQuantity} onChange={setVolumeQuantity} label={t('Disk size')} />
+        <CapacityInput label={t('Disk size')} onChange={setVolumeQuantity} size={volumeQuantity} />
       )}
     </>
   );

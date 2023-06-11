@@ -9,8 +9,8 @@ describe('Test for offensive language', () => {
          ':(exclude)../deploy-kubevirt-gating.sh'\
          ':(exclude)../README.md'`,
         {
-          timeout: 10000,
           failOnNonZeroExit: false,
+          timeout: 10000,
         },
       )
         .its('stdout')

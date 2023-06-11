@@ -6,35 +6,35 @@ const useSnapshotColumns = () => {
 
   const columns = [
     {
-      title: t('Name'),
       id: 'name',
-      transforms: [sortable],
       sort: 'metadata.name',
+      title: t('Name'),
+      transforms: [sortable],
     },
     {
-      title: t('Created'),
       id: 'created',
-      transforms: [sortable],
       sort: 'metadata.creationTimestamp',
-    },
-    {
-      title: t('Status'),
-      id: 'status',
+      title: t('Created'),
       transforms: [sortable],
+    },
+    {
+      id: 'status',
       sort: 'status.readyToUse',
+      title: t('Status'),
+      transforms: [sortable],
     },
     {
-      title: t('Last restored'),
       id: 'last-restored',
+      title: t('Last restored'),
     },
     {
-      title: t('Indications'),
       id: 'indications',
+      title: t('Indications'),
     },
     {
-      title: '',
       id: '',
       props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+      title: '',
     },
   ];
 

@@ -29,16 +29,16 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
       <Grid hasGutter span={12}>
         <GridItem span={6}>
           <StorageClassSelect
-            storageClass={storageClassName}
-            setStorageClassName={setBootableVolumeField('storageClassName')}
             setShowSCAlert={setShowSCAlert}
+            setStorageClassName={setBootableVolumeField('storageClassName')}
+            storageClass={storageClassName}
           />
         </GridItem>
         <GridItem span={6}>
           <CapacityInput
-            size={size}
-            onChange={setBootableVolumeField('size')}
             label={t('Disk size')}
+            onChange={setBootableVolumeField('size')}
+            size={size}
           />
         </GridItem>
         {showSCAlert && (
@@ -48,19 +48,19 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
         )}
       </Grid>
 
-      <FormGroup label={t('Volume name')} isRequired>
+      <FormGroup isRequired label={t('Volume name')}>
         <TextInput
           id="name"
+          onChange={setBootableVolumeField('bootableVolumeName')}
           type="text"
           value={bootableVolumeName}
-          onChange={setBootableVolumeField('bootableVolumeName')}
         />
       </FormGroup>
       <FormGroup label={t('Destination project')}>
         <TextInput
           id="destination-project"
-          type="text"
           isDisabled
+          type="text"
           value={isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS}
         />
       </FormGroup>

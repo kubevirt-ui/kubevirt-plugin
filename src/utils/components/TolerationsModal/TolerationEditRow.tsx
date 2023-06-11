@@ -20,39 +20,39 @@ type TolerationEditRowProps = {
 };
 
 const TolerationEditRow: React.FC<TolerationEditRowProps> = ({ label, onChange, onDelete }) => {
-  const { id, key, value, effect } = label;
+  const { effect, id, key, value } = label;
   const { t } = useKubevirtTranslation();
   return (
     <>
       <GridItem span={4}>
         <TextInput
           id={`toleration-${id}-key-input`}
-          placeholder={t('Taint key')}
           isRequired
+          onChange={(newKey) => onChange({ ...label, key: newKey })}
+          placeholder={t('Taint key')}
           type="text"
           value={key}
-          onChange={(newKey) => onChange({ ...label, key: newKey })}
         />
       </GridItem>
       <GridItem span={4}>
         <TextInput
           id={`toleration-${id}-value-input`}
-          placeholder={t('Taint value')}
           isRequired
+          onChange={(newValue) => onChange({ ...label, value: newValue })}
+          placeholder={t('Taint value')}
           type="text"
           value={value}
-          onChange={(newValue) => onChange({ ...label, value: newValue })}
         />
       </GridItem>
       <GridItem span={3}>
         <FormSelect
           id={`toleration-${id}-effect-select`}
           isRequired
-          value={effect}
           onChange={(newEffect) => onChange({ ...label, effect: newEffect })}
+          value={effect}
         >
           {TOLERATIONS_EFFECTS.map((effectOption) => (
-            <FormSelectOption key={effectOption} value={effectOption} label={effectOption} />
+            <FormSelectOption key={effectOption} label={effectOption} value={effectOption} />
           ))}
         </FormSelect>
       </GridItem>

@@ -5,59 +5,59 @@ import { interfaceTypes, sourceTypes } from '../DiskFormFields/utils/constants';
 export const DEFAULT_DISK_SIZE = '30Gi';
 
 export type DiskFormState = {
-  diskName: string;
-  diskSource: string;
-  diskSize: string;
-  diskType: string;
-  diskInterface: string;
-  storageClass: string;
-  applyStorageProfileSettings: boolean;
-  storageProfileSettingsCheckboxDisabled: boolean;
   accessMode: string;
-  volumeMode: string;
-  storageClassProvisioner: string;
-  enablePreallocation: boolean;
+  applyStorageProfileSettings: boolean;
   asBootSource: boolean;
+  diskInterface: string;
+  diskName: string;
+  diskSize: string;
+  diskSource: string;
+  diskType: string;
+  enablePreallocation: boolean;
+  storageClass: string;
+  storageClassProvisioner: string;
+  storageProfileSettingsCheckboxDisabled: boolean;
+  volumeMode: string;
 };
 
 export const initialStateDiskForm: DiskFormState = {
-  diskName: null,
-  diskSource: sourceTypes.BLANK,
-  diskSize: DEFAULT_DISK_SIZE,
-  diskType: diskTypes.disk,
-  diskInterface: interfaceTypes.VIRTIO,
-  storageClass: null,
-  applyStorageProfileSettings: true,
-  storageProfileSettingsCheckboxDisabled: true,
   accessMode: null,
-  volumeMode: null,
-  storageClassProvisioner: null,
-  enablePreallocation: false,
+  applyStorageProfileSettings: true,
   asBootSource: false,
+  diskInterface: interfaceTypes.VIRTIO,
+  diskName: null,
+  diskSize: DEFAULT_DISK_SIZE,
+  diskSource: sourceTypes.BLANK,
+  diskType: diskTypes.disk,
+  enablePreallocation: false,
+  storageClass: null,
+  storageClassProvisioner: null,
+  storageProfileSettingsCheckboxDisabled: true,
+  volumeMode: null,
 };
 
 export type DiskSourceState = {
-  urlSource: string;
-  pvcSourceName: string;
-  pvcCloneSourceName: string;
-  pvcCloneSourceNamespace: string;
-  uploadFile: File | string;
-  uploadFilename: string;
-  registrySource: string;
-  ephemeralSource: string;
   dataSourceName: string;
   dataSourceNamespace: string;
+  ephemeralSource: string;
+  pvcCloneSourceName: string;
+  pvcCloneSourceNamespace: string;
+  pvcSourceName: string;
+  registrySource: string;
+  uploadFile: File | string;
+  uploadFilename: string;
+  urlSource: string;
 };
 
 export const initialStateDiskSource: DiskSourceState = {
-  urlSource: null,
-  pvcSourceName: null,
-  pvcCloneSourceName: null,
-  pvcCloneSourceNamespace: null,
-  uploadFile: null,
-  uploadFilename: null,
-  registrySource: null,
-  ephemeralSource: null,
   dataSourceName: null,
   dataSourceNamespace: null,
+  ephemeralSource: null,
+  pvcCloneSourceName: null,
+  pvcCloneSourceNamespace: null,
+  pvcSourceName: null,
+  registrySource: null,
+  uploadFile: null,
+  uploadFilename: null,
+  urlSource: null,
 };

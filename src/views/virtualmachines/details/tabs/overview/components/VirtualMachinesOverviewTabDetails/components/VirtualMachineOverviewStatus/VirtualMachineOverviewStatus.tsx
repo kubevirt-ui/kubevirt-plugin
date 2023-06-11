@@ -19,10 +19,10 @@ const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({
   return (
     <>
       <Popover
-        headerContent={vmPrintableStatus}
         bodyContent={t('VirtualMachine is currently {{status}}', {
           status: vmPrintableStatus,
         })}
+        headerContent={vmPrintableStatus}
         position={PopoverPosition.right}
       >
         <StatusPopoverButton vmPrintableStatus={vmPrintableStatus} />
