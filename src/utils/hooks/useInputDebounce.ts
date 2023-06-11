@@ -12,14 +12,14 @@ import useEventListener from './useEventListener';
  */
 export const useInputDebounce = ({
   delay,
+  initialValue,
   onChange,
   updateURLParam,
-  initialValue,
 }: {
   delay: number;
+  initialValue?: string;
   onChange?: (value: string) => void;
   updateURLParam?: string;
-  initialValue?: string;
 }) => {
   let typingTimer: null | ReturnType<typeof setTimeout> = null;
 
@@ -69,7 +69,7 @@ export const useInputDebounce = ({
 
   return {
     inputRef,
-    value,
     resetValue,
+    value,
   };
 };

@@ -28,35 +28,35 @@ type NetworkThresholdChartProps = {
 const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
   const queries = React.useMemo(
-    () => getUtilizationQueries({ obj: vmi, duration }),
+    () => getUtilizationQueries({ duration, obj: vmi }),
     [vmi, duration],
   );
-  const { ref, width, height } = useResponsiveCharts();
+  const { height, ref, width } = useResponsiveCharts();
 
   const [networkIn] = usePrometheusPoll({
-    query: queries?.NETWORK_IN_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.NETWORK_IN_USAGE,
     timespan,
   });
 
   const [networkOut] = usePrometheusPoll({
-    query: queries?.NETWORK_OUT_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.NETWORK_OUT_USAGE,
     timespan,
   });
 
   const networkInData = networkIn?.data?.result?.[0]?.values;
   const networkOutData = networkOut?.data?.result?.[0]?.values;
   const chartDataIn = networkInData?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: 'Network In' };
+    return { name: 'Network In', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const chartDataOut = networkOutData?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: 'Network Out' };
+    return { name: 'Network Out', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const isReady = !isEmpty(chartDataOut) || !isEmpty(chartDataIn);
@@ -66,46 +66,46 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) =>
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queriesToLink([queries?.NETWORK_IN_USAGE, queries?.NETWORK_OUT_USAGE])}>
           <Chart
-            height={height}
-            width={width}
-            padding={35}
-            scale={{ x: 'time', y: 'linear' }}
-            domain={{
-              x: [currentTime - timespan, currentTime],
-            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
-                  return `${datum?.name}: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
+                  return `${datum?.name}: ${xbytes(datum?.y, { fixed: 2, iec: true })}`;
                 }}
                 constrainToVisibleArea
               />
             }
+            domain={{
+              x: [currentTime - timespan, currentTime],
+            }}
+            height={height}
+            padding={35}
+            scale={{ x: 'time', y: 'linear' }}
+            width={width}
           >
             <ChartAxis
-              tickFormat={tickFormat(duration, currentTime)}
-              tickCount={TICKS_COUNT}
               style={{
                 ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}
+              tickCount={TICKS_COUNT}
+              tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
-                data={chartDataOut}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
+                data={chartDataOut}
               />
               <ChartArea
-                data={chartDataIn}
                 style={{
                   data: {
                     stroke: chart_color_blue_400.value,
                   },
                 }}
+                data={chartDataIn}
               />
             </ChartGroup>
           </Chart>

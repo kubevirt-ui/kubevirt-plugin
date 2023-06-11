@@ -8,21 +8,21 @@ const wp = require('@cypress/webpack-preprocessor');
 module.exports = (on, config) => {
   const options = {
     webpackOptions: {
-      resolve: {
-        extensions: ['.ts', '.js'],
-      },
       module: {
         rules: [
           {
+            exclude: /node_modules/,
             test: /\.ts$/,
             use: 'ts-loader',
-            exclude: /node_modules/,
           },
         ],
       },
       output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'cypress-dist'),
+      },
+      resolve: {
+        extensions: ['.ts', '.js'],
       },
     },
   };

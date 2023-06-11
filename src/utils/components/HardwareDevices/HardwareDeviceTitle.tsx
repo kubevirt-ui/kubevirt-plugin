@@ -5,17 +5,17 @@ import { Button, DescriptionListTerm } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 type HardwareDeviceTitleProps = {
-  title: string;
   canEdit: boolean;
   hideEdit?: boolean;
   onClick?: () => void;
+  title: string;
 };
 
 const HardwareDeviceTitle: FC<HardwareDeviceTitleProps> = ({
-  title,
   canEdit,
   hideEdit = false,
   onClick,
+  title,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -24,15 +24,15 @@ const HardwareDeviceTitle: FC<HardwareDeviceTitleProps> = ({
   return (
     <DescriptionListTerm>
       <Button
-        isInline
-        variant="link"
-        onClick={onClick}
-        isDisabled={!canEdit}
         className="pf-m-link--align-left"
+        isDisabled={!canEdit}
+        isInline
         isLarge
+        onClick={onClick}
+        variant="link"
       >
         {title}
-        <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" alt={t('Edit')} />
+        <PencilAltIcon alt={t('Edit')} className="co-icon-space-l pf-c-button-icon--plain" />
       </Button>
     </DescriptionListTerm>
   );

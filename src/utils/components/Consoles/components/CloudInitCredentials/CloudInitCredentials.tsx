@@ -26,8 +26,8 @@ const CloudInitCredentials: React.FC<CloudInitCredentialsProps> = ({ vm }) => {
       <AccordionItem>
         <AccordionToggle
           id="consoles-accordion-toggle"
-          onClick={() => setShowCredentials(!showCredentials)}
           isExpanded={showCredentials}
+          onClick={() => setShowCredentials(!showCredentials)}
         >
           {t('Guest login credentials')}
         </AccordionToggle>

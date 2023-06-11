@@ -9,7 +9,7 @@ import './labels.scss';
 const WindowsLabel: FC = () => {
   const { t } = useTranslation();
   return (
-    <Label variant="outline" className="os-label" icon={<WindowsIcon />}>
+    <Label className="os-label" icon={<WindowsIcon />} variant="outline">
       {t('Windows only')}
     </Label>
   );

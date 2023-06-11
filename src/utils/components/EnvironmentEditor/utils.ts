@@ -20,13 +20,13 @@ export const getVMEnvironmentsVariables = (vm: V1VirtualMachine): EnvironmentVar
 
     if (envDisk)
       acc.push({
+        diskName: volume.name,
+        kind: getKindFromEnvVolume(volume),
         name:
           volume?.configMap?.name ||
           volume?.secret?.secretName ||
           volume?.serviceAccount?.serviceAccountName,
         serial: envDisk?.serial,
-        kind: getKindFromEnvVolume(volume),
-        diskName: volume.name,
       });
 
     return acc;
@@ -41,10 +41,10 @@ export const getRandomSerial = (len = 6): string => {
 };
 
 const getConfigMapVolume = (diskName: string, name: string): V1Volume => ({
-  name: diskName,
   configMap: {
     name,
   },
+  name: diskName,
 });
 
 const getSecretVolume = (diskName: string, secretName: string): V1Volume => ({
@@ -84,8 +84,10 @@ export const areEnvironmentsChanged = (
 };
 
 export class EnvironmentOption implements SelectOptionObject {
-  private name: string;
   private kind: EnvironmentKind;
+  private name: string;
+
+  toString = (): string => this.name;
 
   constructor(name: string, kind: EnvironmentKind) {
     this.name = name;
@@ -99,6 +101,4 @@ export class EnvironmentOption implements SelectOptionObject {
   getName() {
     return this.name;
   }
-
-  toString = (): string => this.name;
 }

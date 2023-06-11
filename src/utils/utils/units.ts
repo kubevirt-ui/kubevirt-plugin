@@ -1,8 +1,8 @@
 export enum BinaryUnit {
   B = 'B',
+  Gi = 'Gi',
   Ki = 'Ki',
   Mi = 'Mi',
-  Gi = 'Gi',
   Ti = 'Ti',
 }
 
@@ -26,20 +26,20 @@ multipliers.Z = multipliers.E * 1000;
 export const customUnits = {
   IS: [
     { from: 0, to: multipliers.Ki, unit: 'B' },
-    { from: multipliers.Ki, to: multipliers.Mi, unit: 'KiB', long: 'thousand' },
-    { from: multipliers.Mi, to: multipliers.Gi, unit: 'MiB', long: 'million' },
-    { from: multipliers.Gi, to: multipliers.Ti, unit: 'GiB', long: 'billion' },
-    { from: multipliers.Ti, unit: 'TiB', long: 'billion' },
+    { from: multipliers.Ki, long: 'thousand', to: multipliers.Mi, unit: 'KiB' },
+    { from: multipliers.Mi, long: 'million', to: multipliers.Gi, unit: 'MiB' },
+    { from: multipliers.Gi, long: 'billion', to: multipliers.Ti, unit: 'GiB' },
+    { from: multipliers.Ti, long: 'billion', unit: 'TiB' },
   ],
 };
 
 export const binaryUnits = {
   IS: [
     { from: 0, to: multipliers.Ki, unit: 'B' },
-    { from: multipliers.Ki, to: multipliers.Mi, unit: 'Ki', long: 'thousand' },
-    { from: multipliers.Mi, to: multipliers.Gi, unit: 'Mi', long: 'million' },
-    { from: multipliers.Gi, to: multipliers.Ti, unit: 'Gi', long: 'billion' },
-    { from: multipliers.Ti, unit: 'Ti', long: 'billion' },
+    { from: multipliers.Ki, long: 'thousand', to: multipliers.Mi, unit: 'Ki' },
+    { from: multipliers.Mi, long: 'million', to: multipliers.Gi, unit: 'Mi' },
+    { from: multipliers.Gi, long: 'billion', to: multipliers.Ti, unit: 'Gi' },
+    { from: multipliers.Ti, long: 'billion', unit: 'Ti' },
   ],
 };
 

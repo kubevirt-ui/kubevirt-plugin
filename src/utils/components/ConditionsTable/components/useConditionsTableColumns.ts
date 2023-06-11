@@ -9,32 +9,32 @@ const useConditionsTableColumns = () => {
 
   const columns: TableColumn<K8sResourceCondition>[] = [
     {
-      title: t('Type'),
       id: 'type',
-      transforms: [sortable],
       sort: 'type',
+      title: t('Type'),
+      transforms: [sortable],
     },
     {
-      title: t('Status'),
       id: 'status',
-      transforms: [sortable],
       sort: 'status',
+      title: t('Status'),
+      transforms: [sortable],
     },
     {
-      title: t('Updated'),
       id: 'updated',
-      transforms: [sortable],
       sort: 'lastTransitionTime',
-    },
-    {
-      title: t('Reason'),
-      id: 'reason',
+      title: t('Updated'),
       transforms: [sortable],
-      sort: 'interface',
     },
     {
-      title: t('Message'),
+      id: 'reason',
+      sort: 'interface',
+      title: t('Reason'),
+      transforms: [sortable],
+    },
+    {
       id: 'message',
+      title: t('Message'),
     },
   ];
 

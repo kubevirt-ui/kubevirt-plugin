@@ -5,6 +5,8 @@ export const exampleVirtualMachineWithEnvironments: V1VirtualMachine = {
   kind: 'VirtualMachine',
   metadata: {
     annotations: {
+      description: 'VM example',
+      'name.os.template.kubevirt.io/rhel8.5': 'Red Hat Enterprise Linux 8.0 or higher',
       'vm.kubevirt.io/validations': `[
           {    
             "name": "minimal-required-memory",    
@@ -14,18 +16,16 @@ export const exampleVirtualMachineWithEnvironments: V1VirtualMachine = {
             "min": 1610612736  
           }
         ]`,
-      'name.os.template.kubevirt.io/rhel8.5': 'Red Hat Enterprise Linux 8.0 or higher',
-      description: 'VM example',
     },
     labels: {
       app: 'vm-example',
+      'flavor.template.kubevirt.io/tiny': 'true',
+      'os.template.kubevirt.io/rhel8.5': 'true',
       'vm.kubevirt.io/template': 'rhel8-server-tiny',
+      'vm.kubevirt.io/template.namespace': 'openshift',
       'vm.kubevirt.io/template.revision': '1',
       'vm.kubevirt.io/template.version': 'v0.19.1',
-      'os.template.kubevirt.io/rhel8.5': 'true',
-      'flavor.template.kubevirt.io/tiny': 'true',
       'workload.template.kubevirt.io/server': 'true',
-      'vm.kubevirt.io/template.namespace': 'openshift',
     },
     name: 'vm-example',
     namespace: 'default',
@@ -40,11 +40,11 @@ export const exampleVirtualMachineWithEnvironments: V1VirtualMachine = {
           'vm.kubevirt.io/workload': 'server',
         },
         labels: {
+          'flavor.template.kubevirt.io/tiny': 'true',
           'kubevirt.io/domain': 'vm-example',
           'kubevirt.io/size': 'tiny',
-          'vm.kubevirt.io/name': 'vm-example',
           'os.template.kubevirt.io/rhel8.5': 'true',
-          'flavor.template.kubevirt.io/tiny': 'true',
+          'vm.kubevirt.io/name': 'vm-example',
           'workload.template.kubevirt.io/server': 'true',
         },
       },

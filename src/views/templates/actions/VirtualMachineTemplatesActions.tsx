@@ -30,21 +30,21 @@ const VirtualMachineTemplatesActions: React.FC<VirtualMachineTemplatesActionsPro
   return (
     // TODO: use LazyActionMenu when fixed
     <Dropdown
-      menuAppendTo={getContentScrollableElement}
-      isPlain
-      isOpen={isOpen}
-      position={DropdownPosition.right}
-      toggle={<KebabToggle onToggle={onDropDownToggle} />}
       dropdownItems={actions?.map((action) => (
         <DropdownItem
+          description={action?.disabled && action?.description}
+          isDisabled={action?.disabled}
           key={action?.id}
           onClick={() => handleClick(action)}
-          isDisabled={action?.disabled}
-          description={action?.disabled && action?.description}
         >
           {action?.label}
         </DropdownItem>
       ))}
+      isOpen={isOpen}
+      isPlain
+      menuAppendTo={getContentScrollableElement}
+      position={DropdownPosition.right}
+      toggle={<KebabToggle onToggle={onDropDownToggle} />}
     />
   );
 };

@@ -16,19 +16,19 @@ import { GettingStartedLink } from '../utils/types';
 import { orderQuickStarts } from './utils';
 
 interface QuickStartsSectionProps {
-  featured?: string[];
-  title?: string;
-  description?: string;
-  filter?: (QuickStart) => boolean;
   allQuickStartStates?: AllQuickStartStates;
+  description?: string;
+  featured?: string[];
+  filter?: (QuickStart) => boolean;
   setActiveQuickStart?: (quickStartId: string, totalTasks?: number) => void;
+  title?: string;
 }
 
 const QuickStartsSection: React.FC<QuickStartsSectionProps> = ({
-  featured,
-  title,
   description,
+  featured,
   filter,
+  title,
 }) => {
   const { t } = useKubevirtTranslation();
   const { allQuickStartStates, setActiveQuickStart } =
@@ -52,10 +52,10 @@ const QuickStartsSection: React.FC<QuickStartsSectionProps> = ({
         const links: GettingStartedLink[] = loaded
           ? slicedQuickStarts.map((quickStart: QuickStart) => ({
               id: quickStart.metadata.name,
-              title: quickStart.spec.displayName,
               onClick: () => {
                 setActiveQuickStart(quickStart.metadata.name, quickStart.spec.tasks.length);
               },
+              title: quickStart.spec.displayName,
             }))
           : featured?.map((name) => ({
               id: name,
@@ -63,25 +63,25 @@ const QuickStartsSection: React.FC<QuickStartsSectionProps> = ({
             }));
 
         const moreLink: GettingStartedLink = {
+          href: '/quickstart',
           id: 'all-quick-starts',
           title: t('View all quick starts'),
-          href: '/quickstart',
         };
 
         return (
           <GettingStartedSectionContents
-            id="quick-start"
-            icon={<RouteIcon color="var(--co-global--palette--purple-600)" aria-hidden="true" />}
-            title={title || t('Build with guided documentation')}
-            titleColor={'var(--co-global--palette--purple-700)'}
             description={
               description ||
               t(
                 'Follow guided documentation to build applications and familiarize yourself with key features.',
               )
             }
+            icon={<RouteIcon aria-hidden="true" color="var(--co-global--palette--purple-600)" />}
+            id="quick-start"
             links={links}
             moreLink={moreLink}
+            title={title || t('Build with guided documentation')}
+            titleColor={'var(--co-global--palette--purple-700)'}
           />
         );
       }}

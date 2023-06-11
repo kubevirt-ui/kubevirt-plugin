@@ -1,13 +1,13 @@
 import * as React from 'react';
 
 type FeatureHighlightsTitleProps = {
-  title: string;
   readTime: string;
+  title: string;
 };
 
 const FeatureHighlightsTitle: React.FC<FeatureHighlightsTitleProps> = ({
-  title,
   readTime,
+  title,
 }): React.ReactElement => (
   <span>
     {title} &#8226;{' '}

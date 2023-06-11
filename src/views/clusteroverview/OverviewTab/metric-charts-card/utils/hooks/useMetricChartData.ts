@@ -35,9 +35,9 @@ const useMetricChartData: UseMetricChartData = (metric) => {
 
   const [queryData] = usePrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY_RANGE,
-    query: getMetricQuery(metric, activeNamespace),
-    namespace: activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace,
     endTime: currentTime,
+    namespace: activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace,
+    query: getMetricQuery(metric, activeNamespace),
     timespan,
   });
 

@@ -9,31 +9,31 @@ import {
 } from '@patternfly/react-core';
 
 type MigrationPolicyDescriptionItemProps = {
-  title: string;
-  description?: React.ReactNode;
-  isPopover?: boolean;
-  popoverContent?: React.ReactNode;
-  moreInfoURL?: string;
   breadcrumb?: string;
+  description?: React.ReactNode;
   hasAutoWidth?: boolean;
+  isPopover?: boolean;
+  moreInfoURL?: string;
+  popoverContent?: React.ReactNode;
+  title: string;
 };
 
 const MigrationPolicyDescriptionItem: React.FC<MigrationPolicyDescriptionItemProps> = ({
-  title,
+  breadcrumb,
   description,
   isPopover,
-  popoverContent,
   moreInfoURL,
-  breadcrumb,
+  popoverContent,
+  title,
 }) => (
   <DescriptionListGroup>
     <DescriptionListTermHelpText>
       <DescriptionItemHeader
-        isPopover={isPopover}
         bodyContent={popoverContent}
-        moreInfoURL={moreInfoURL}
         breadcrumb={breadcrumb}
         descriptionHeader={title}
+        isPopover={isPopover}
+        moreInfoURL={moreInfoURL}
       />
     </DescriptionListTermHelpText>
     <DescriptionListDescription>{description || NO_DATA_DASH}</DescriptionListDescription>

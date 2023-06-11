@@ -13,18 +13,18 @@ import { TAB } from './utils/constants';
 import { getCreateVMVirtctlCommand } from './utils/utils';
 
 type YamlAndCLIViewerModalProps = {
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
+  vm: V1VirtualMachine;
 };
 
-const YamlAndCLIViewerModal: FC<YamlAndCLIViewerModalProps> = ({ vm, isOpen, onClose }) => {
+const YamlAndCLIViewerModal: FC<YamlAndCLIViewerModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
 
   const [activeTabKey, setActiveTabKey] = useState<TAB>(TAB.YAML);
 
   const { instanceTypeVMState } = useInstanceTypeVMStore();
-  const { selectedBootableVolume, vmName, sshSecretCredentials } = instanceTypeVMState;
+  const { selectedBootableVolume, sshSecretCredentials, vmName } = instanceTypeVMState;
 
   const handleTabClick = (_, tabIndex: TAB) => {
     setActiveTabKey(tabIndex);
@@ -32,10 +32,10 @@ const YamlAndCLIViewerModal: FC<YamlAndCLIViewerModalProps> = ({ vm, isOpen, onC
 
   return (
     <Modal
-      title={`${activeTabKey} for ${vmName}`}
-      variant={ModalVariant.large}
       isOpen={isOpen}
       onClose={onClose}
+      title={`${activeTabKey} for ${vmName}`}
+      variant={ModalVariant.large}
     >
       <Suspense fallback={<Loading />}>
         <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>

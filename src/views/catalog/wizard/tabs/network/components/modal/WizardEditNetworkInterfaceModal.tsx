@@ -11,24 +11,24 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 
 type WizardEditNetworkInterfaceModalProps = {
-  vm: V1VirtualMachine;
-  updateVM: UpdateValidatedVM;
   isOpen: boolean;
-  onClose: () => void;
   nicPresentation: NetworkPresentation;
+  onClose: () => void;
+  updateVM: UpdateValidatedVM;
+  vm: V1VirtualMachine;
 };
 
 const WizardEditNetworkInterfaceModal: FC<WizardEditNetworkInterfaceModalProps> = ({
-  vm,
-  updateVM,
   isOpen,
-  onClose,
   nicPresentation,
+  onClose,
+  updateVM,
+  vm,
 }) => {
   const { t } = useKubevirtTranslation();
 
   const onSubmit =
-    ({ nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType }) =>
+    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
     (currentVM) => {
       const resultNetwork = createNetwork(nicName, networkName);
       const resultInterface = createInterface(
@@ -59,12 +59,12 @@ const WizardEditNetworkInterfaceModal: FC<WizardEditNetworkInterfaceModalProps> 
 
   return (
     <NetworkInterfaceModal
-      vm={vm}
       headerText={t('Edit network interface')}
-      onSubmit={onSubmit}
-      nicPresentation={nicPresentation}
       isOpen={isOpen}
+      nicPresentation={nicPresentation}
       onClose={onClose}
+      onSubmit={onSubmit}
+      vm={vm}
     />
   );
 };

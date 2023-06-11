@@ -11,17 +11,17 @@ import { GridItem } from '@patternfly/react-core';
 import TimeDropdown from './TimeDropdown';
 
 type UtilizationThresholdChartsProps = {
-  vmi: V1VirtualMachineInstance;
   pods: K8sResourceCommon[];
+  vmi: V1VirtualMachineInstance;
 };
-const UtilizationThresholdCharts: React.FC<UtilizationThresholdChartsProps> = ({ vmi, pods }) => {
+const UtilizationThresholdCharts: React.FC<UtilizationThresholdChartsProps> = ({ pods, vmi }) => {
   return (
     <>
       <GridItem span={12}>
         <TimeDropdown />
       </GridItem>
       <GridItem span={3}>
-        <CPUThresholdChart vmi={vmi} pods={pods} />
+        <CPUThresholdChart pods={pods} vmi={vmi} />
       </GridItem>
       <GridItem span={3}>
         <MemoryThresholdChart vmi={vmi} />

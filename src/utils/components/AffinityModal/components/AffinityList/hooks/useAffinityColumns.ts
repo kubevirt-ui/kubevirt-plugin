@@ -12,31 +12,31 @@ const useAffinityColumns = () => {
   const columns: TableColumn<AffinityRowData>[] = React.useMemo(
     () => [
       {
-        title: t('Type'),
         id: 'type',
-        transforms: [sortable],
         sort: 'type',
+        title: t('Type'),
+        transforms: [sortable],
       },
       {
-        title: t('Condition'),
         id: 'condition',
-        transforms: [sortable],
         sort: 'condition',
-      },
-      {
-        title: t('Weight'),
-        id: 'weight',
+        title: t('Condition'),
         transforms: [sortable],
+      },
+      {
+        id: 'weight',
         sort: 'weight',
+        title: t('Weight'),
+        transforms: [sortable],
       },
       {
-        title: t('Terms'),
         id: 'terms',
+        title: t('Terms'),
       },
       {
-        title: '',
         id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        title: '',
       },
     ],
     [t],

@@ -13,26 +13,26 @@ import {
 
 // https://github.com/kubevirt/api/blob/9689e71fe2bed9e7da5f165760bbbf6981cc1087/core/v1/types.go#L1277
 export const printableVMStatus = {
-  Stopped: 'Stopped',
-  Provisioning: 'Provisioning',
-  Starting: 'Starting',
-  Running: 'Running',
+  Migrating: 'Migrating',
   Paused: 'Paused',
+  Provisioning: 'Provisioning',
+  Running: 'Running',
+  Starting: 'Starting',
+  Stopped: 'Stopped',
   Stopping: 'Stopping',
   Terminating: 'Terminating',
-  Migrating: 'Migrating',
-  WaitingForVolumeBinding: 'WaitingForVolumeBinding',
   Unknown: 'Unknown',
+  WaitingForVolumeBinding: 'WaitingForVolumeBinding',
 };
 
 export const errorPrintableVMStatus = {
   CrashLoopBackOff: 'CrashLoopBackOff',
-  ErrorUnschedulable: 'ErrorUnschedulable',
-  ErrImagePull: 'ErrImagePull',
-  ImagePullBackOff: 'ImagePullBackOff',
-  ErrorPvcNotFound: 'ErrorPvcNotFound',
-  ErrorDataVolumeNotFound: 'ErrorDataVolumeNotFound',
   DataVolumeError: 'DataVolumeError',
+  ErrImagePull: 'ErrImagePull',
+  ErrorDataVolumeNotFound: 'ErrorDataVolumeNotFound',
+  ErrorPvcNotFound: 'ErrorPvcNotFound',
+  ErrorUnschedulable: 'ErrorUnschedulable',
+  ImagePullBackOff: 'ImagePullBackOff',
 };
 
 export const isErrorPrintableStatus = (printableStatus: string) =>

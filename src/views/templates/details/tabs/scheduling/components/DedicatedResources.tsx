@@ -15,9 +15,9 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 import DedicatedResourcesModal from './DedicatedResourcesModal';
 
 const DedicatedResources: React.FC<TemplateSchedulingGridProps> = ({
-  template,
   editable,
   onSubmit,
+  template,
 }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
@@ -28,10 +28,10 @@ const DedicatedResources: React.FC<TemplateSchedulingGridProps> = ({
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <DedicatedResourcesModal
-        template={template}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onSubmit}
+        template={template}
       />
     ));
 
@@ -40,12 +40,12 @@ const DedicatedResources: React.FC<TemplateSchedulingGridProps> = ({
       <DescriptionListTerm>{t('Dedicated resources')}</DescriptionListTerm>
       <DescriptionListDescription>
         <Button
-          type="button"
-          isInline
-          onClick={onEditClick}
-          variant="link"
           data-test-id="dedicated-resources"
           isDisabled={!editable}
+          isInline
+          onClick={onEditClick}
+          type="button"
+          variant="link"
         >
           {dedicatedResourcesText}
           <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />

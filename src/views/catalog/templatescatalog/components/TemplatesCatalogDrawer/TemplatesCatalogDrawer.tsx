@@ -13,45 +13,45 @@ import { TemplatesCatalogDrawerPanel } from './TemplatesCatalogDrawerPanel';
 import './TemplateCatalogDrawer.scss';
 
 type TemplatesCatalogDrawerProps = {
-  namespace: string;
-  template: V1Template | undefined;
   isOpen: boolean;
+  namespace: string;
   onClose: () => void;
+  template: undefined | V1Template;
 };
 
 export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({
-  namespace,
-  template,
   isOpen,
+  namespace,
   onClose,
+  template,
 }) => {
   const templateName = getTemplateName(template);
   const osIcon = getTemplateOSIcon(template);
 
   return (
     <Modal
-      aria-label="Template drawer"
-      className="ocs-modal co-catalog-page__overlay co-catalog-page__overlay--right template-catalog-drawer"
-      isOpen={isOpen}
-      onClose={onClose}
-      disableFocusTrap
-      header={
-        <CatalogItemHeader
-          className="co-catalog-page__overlay-header"
-          title={templateName}
-          vendor={template?.metadata?.name}
-          iconImg={osIcon}
-        />
-      }
       footer={
         template && (
           <TemplatesCatalogDrawerFooter
             namespace={namespace}
-            template={template}
             onCancel={onClose}
+            template={template}
           />
         )
       }
+      header={
+        <CatalogItemHeader
+          className="co-catalog-page__overlay-header"
+          iconImg={osIcon}
+          title={templateName}
+          vendor={template?.metadata?.name}
+        />
+      }
+      aria-label="Template drawer"
+      className="ocs-modal co-catalog-page__overlay co-catalog-page__overlay--right template-catalog-drawer"
+      disableFocusTrap
+      isOpen={isOpen}
+      onClose={onClose}
     >
       <TemplatesCatalogDrawerPanel template={template} />
     </Modal>

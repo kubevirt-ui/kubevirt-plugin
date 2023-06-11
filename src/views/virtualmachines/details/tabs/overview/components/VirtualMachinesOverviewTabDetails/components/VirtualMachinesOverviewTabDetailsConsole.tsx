@@ -29,10 +29,10 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
   const isHeadlessMode = isHeadlessModeVMI(vmi);
   const isVMRunning = vmi?.status?.phase === vmiStatuses.Running;
   const [canConnectConsole] = useAccessReview({
-    resource: 'virtualmachineinstances/vnc',
     group: 'subresources.kubevirt.io',
-    namespace: vmi?.metadata?.namespace,
     name: vmi?.metadata?.name,
+    namespace: vmi?.metadata?.namespace,
+    resource: 'virtualmachineinstances/vnc',
     verb: 'get',
   });
   return (
@@ -40,14 +40,14 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
       {isVMRunning && !isHeadlessMode && canConnectConsole ? (
         <>
           <VncConsole
-            type={VNC_CONSOLE_TYPE}
+            CustomConnectComponent={VirtualMachinesOverviewTabDetailsConsoleConnect}
             encrypt={isEncrypted}
             host={window.location.hostname}
-            port={window.location.port || (isEncrypted ? SECURE : INSECURE)}
             path={`api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`}
+            port={window.location.port || (isEncrypted ? SECURE : INSECURE)}
             scaleViewport
             showAccessControls={false}
-            CustomConnectComponent={VirtualMachinesOverviewTabDetailsConsoleConnect}
+            type={VNC_CONSOLE_TYPE}
           />
         </>
       ) : (
@@ -60,12 +60,12 @@ const VirtualMachinesOverviewTabDetailsConsole: React.FC<
       )}
       <div className="link">
         <Button
-          isDisabled={!isVMRunning || isHeadlessMode || !canConnectConsole}
           onClick={() =>
             window.open(
               `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
             )
           }
+          isDisabled={!isVMRunning || isHeadlessMode || !canConnectConsole}
           variant="link"
         >
           {t('Open web console')}

@@ -10,19 +10,19 @@ const useHardwareDevicesColumns = () => {
   const columns: TableColumn<V1GPU | V1HostDevice>[] = React.useMemo(
     () => [
       {
-        title: t('Name'),
         id: 'name',
         props: { className: 'pf-m-width-20' },
+        title: t('Name'),
       },
       {
-        title: t('Device name'),
         id: 'deviceName',
         props: { className: 'pf-m-width-30' },
+        title: t('Device name'),
       },
       {
-        title: '',
         id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        title: '',
       },
     ],
     [t],

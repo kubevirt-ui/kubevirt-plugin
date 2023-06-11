@@ -10,42 +10,42 @@ import { NODE_PORTS_LINK } from '../utils/constants';
 import { createRDPService } from '../utils/utils';
 
 type RDPServiceModalProps = {
-  vmi: V1VirtualMachineInstance;
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
+  vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
-const RDPServiceModal: React.FC<RDPServiceModalProps> = ({ vmi, vm, isOpen, onClose }) => {
+const RDPServiceModal: React.FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [isChecked, setChecked] = React.useState<boolean>(false);
 
   return (
     <TabModal
-      isOpen={isOpen}
+      headerText={t('RDP Service')}
       isDisabled={!isChecked}
+      isOpen={isOpen}
+      modalVariant={ModalVariant.medium}
       onClose={onClose}
       onSubmit={() => createRDPService(vm, vmi)}
-      headerText={t('RDP Service')}
-      modalVariant={ModalVariant.medium}
     >
       <Stack hasGutter>
         <StackItem>
           <Checkbox
-            id="rdp-service-checkbox"
             className="kv-rdp-service-checkbox--main"
-            label={t('Expose RDP Service')}
-            isChecked={isChecked}
             data-checked-state={isChecked}
+            id="rdp-service-checkbox"
+            isChecked={isChecked}
+            label={t('Expose RDP Service')}
             onChange={setChecked}
           />
         </StackItem>
         <StackItem>
-          <Alert variant="info" isInline title={t('Node port')}>
+          <Alert isInline title={t('Node port')} variant="info">
             <div>
               {t('RDP Service is using a node port. Node port requires additional port resources.')}
               <div>
-                <ExternalLink text={t('Learn more')} href={NODE_PORTS_LINK} />
+                <ExternalLink href={NODE_PORTS_LINK} text={t('Learn more')} />
               </div>
             </div>
           </Alert>

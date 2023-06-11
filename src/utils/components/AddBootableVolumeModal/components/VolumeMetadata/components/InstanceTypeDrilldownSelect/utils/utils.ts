@@ -16,15 +16,15 @@ const getRedHatInstanceTypeSeriesAndSize = (
   const memory = readableSizeUnit(instanceType?.spec?.memory?.guest);
 
   const size: InstanceTypeSize = {
-    sizeLabel,
     cpus,
     memory,
+    sizeLabel,
   };
 
   return {
     redHatITSeries: {
-      seriesName,
       classAnnotation: getAnnotation(instanceType, INSTANCETYPE_CLASS_ANNOTATION, seriesName),
+      seriesName,
       sizes: [size],
     },
     size,

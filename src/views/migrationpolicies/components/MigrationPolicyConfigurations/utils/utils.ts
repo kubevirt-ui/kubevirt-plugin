@@ -10,26 +10,26 @@ import { MigrationPolicyConfigurationOption } from './constants';
 export const getMigrationPolicyConfigurationOptions = (): MigrationPolicyConfigurationOption => {
   return {
     allowAutoConverge: {
-      label: t('Auto converge'),
       component: YesNoDropdown,
       defaultValue: false,
+      label: t('Auto converge'),
     },
     allowPostCopy: {
-      label: t('Post-copy'),
       component: YesNoDropdown,
       defaultValue: false,
-    },
-    completionTimeoutPerGiB: {
-      label: t('Completion timeout'),
-      description: t('(In seconds)'),
-      component: CompletionTimeout,
-      defaultValue: 0,
+      label: t('Post-copy'),
     },
     bandwidthPerMigration: {
-      label: t('Bandwidth per migration'),
-      description: t('To gain unlimited bandwidth, set to 0'),
       component: BandwidthInput,
-      defaultValue: { value: 0, unit: BinaryUnit.Mi },
+      defaultValue: { unit: BinaryUnit.Mi, value: 0 },
+      description: t('To gain unlimited bandwidth, set to 0'),
+      label: t('Bandwidth per migration'),
+    },
+    completionTimeoutPerGiB: {
+      component: CompletionTimeout,
+      defaultValue: 0,
+      description: t('(In seconds)'),
+      label: t('Completion timeout'),
     },
   };
 };

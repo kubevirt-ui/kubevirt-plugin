@@ -42,8 +42,8 @@ export const cloneStorage = async (template: V1Template, pvcName: string, namesp
   const rootDiskDataVolumeTemplate = getBootSourceDataVolumeTemplate(template);
   const dataVolume = produceDataVolume(pvcName, namespace, rootDiskDataVolumeTemplate?.spec);
   await k8sCreate({
-    model: DataVolumeModel,
     data: dataVolume,
+    model: DataVolumeModel,
     ns: namespace,
   });
 };

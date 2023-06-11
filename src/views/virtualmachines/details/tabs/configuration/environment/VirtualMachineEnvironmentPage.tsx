@@ -9,8 +9,8 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, PageSection } from '@patternfly/react-core';
 
 type VirtualMachineEnvironmentPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1VirtualMachine;
 };
@@ -20,10 +20,10 @@ const VirtualMachineEnvironmentPage: React.FC<VirtualMachineEnvironmentPageProps
 }) => {
   const updateVM = (updatedVM: V1VirtualMachine) =>
     k8sUpdate({
-      model: VirtualMachineModel,
       data: updatedVM,
-      ns: updatedVM.metadata.namespace,
+      model: VirtualMachineModel,
       name: updatedVM.metadata.name,
+      ns: updatedVM.metadata.namespace,
     });
 
   if (!vm)
@@ -35,7 +35,7 @@ const VirtualMachineEnvironmentPage: React.FC<VirtualMachineEnvironmentPageProps
 
   return (
     <PageSection>
-      <EnvironmentForm vm={vm} updateVM={updateVM} />
+      <EnvironmentForm updateVM={updateVM} vm={vm} />
     </PageSection>
   );
 };

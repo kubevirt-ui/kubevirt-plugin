@@ -16,25 +16,25 @@ export type ClusterServiceVersionKind = {
   apiVersion: 'operators.coreos.com/v1alpha1';
   kind: 'ClusterServiceVersion';
   spec: {
-    install: {
-      strategy: 'Deployment';
-      spec: {
-        permissions: {
-          serviceAccountName: string;
-          rules: { apiGroups: string[]; resources: string[]; verbs: string[] }[];
-        }[];
-        deployments: { name: string; spec: any }[];
-      };
-    };
-    customresourcedefinitions?: { owned?: CRDDescription[]; required?: CRDDescription[] };
     apiservicedefinitions?: { owned?: APIServiceDefinition[]; required?: APIServiceDefinition[] };
-    replaces?: string;
-    installModes: { type: InstallModeType; supported: boolean }[];
-    displayName?: string;
+    customresourcedefinitions?: { owned?: CRDDescription[]; required?: CRDDescription[] };
     description?: string;
-    provider?: { name: string };
-    version?: string;
+    displayName?: string;
     icon?: ClusterServiceVersionIcon[];
+    install: {
+      spec: {
+        deployments: { name: string; spec: any }[];
+        permissions: {
+          rules: { apiGroups: string[]; resources: string[]; verbs: string[] }[];
+          serviceAccountName: string;
+        }[];
+      };
+      strategy: 'Deployment';
+    };
+    installModes: { supported: boolean; type: InstallModeType }[];
+    provider?: { name: string };
+    replaces?: string;
+    version?: string;
   };
   status?: {
     phase: ClusterServiceVersionPhase;
@@ -43,4 +43,4 @@ export type ClusterServiceVersionKind = {
   };
 } & K8sResourceCommon;
 
-export type VirtStatusItems = { title: string; Component: React.ReactNode }[];
+export type VirtStatusItems = { Component: React.ReactNode; title: string }[];

@@ -14,19 +14,19 @@ import MigrationPolicyConfigurationDropdown from './compnents/MigrationPolicyCon
 import { getMigrationPolicyConfigurationOptions } from './utils/utils';
 
 type MigrationPolicyConfigurationsProps = {
-  state: InitialMigrationPolicyState | EditMigrationPolicyInitialState;
   setState: React.Dispatch<
-    React.SetStateAction<InitialMigrationPolicyState | EditMigrationPolicyInitialState>
+    React.SetStateAction<EditMigrationPolicyInitialState | InitialMigrationPolicyState>
   >;
   setStateField: (
     field: string,
   ) => React.Dispatch<React.SetStateAction<MigrationPolicyStateDispatch>>;
+  state: EditMigrationPolicyInitialState | InitialMigrationPolicyState;
 };
 
 const MigrationPolicyConfigurations: React.FC<MigrationPolicyConfigurationsProps> = ({
-  state,
   setState,
   setStateField,
+  state,
 }) => {
   const options = getMigrationPolicyConfigurationOptions();
   const configKeys = Object.values(migrationPolicySpecKeys);
@@ -35,26 +35,26 @@ const MigrationPolicyConfigurations: React.FC<MigrationPolicyConfigurationsProps
   return (
     <>
       <MigrationPolicyConfigurationDropdown
-        state={state}
-        setState={setState}
-        options={options}
         isDisabled={hasAllConfigSelected}
+        options={options}
+        setState={setState}
+        state={state}
       />
       {hasConfigSelected && (
         <Form isHorizontal>
           {Object.entries(options).map(
-            ([key, { label, component: Component }]) =>
+            ([key, { component: Component, label }]) =>
               key in state && (
                 <FormGroup
-                  hasNoPaddingTop
                   data-test-id={`${key}-selected`}
-                  key={key}
                   fieldId={key}
+                  hasNoPaddingTop
+                  key={key}
                   label={label}
                 >
                   <Split>
                     <SplitItem>
-                      <Component state={state?.[key]} setState={setStateField(key)} />
+                      <Component setState={setStateField(key)} state={state?.[key]} />
                     </SplitItem>
                     <SplitItem>
                       <Button
@@ -65,8 +65,8 @@ const MigrationPolicyConfigurations: React.FC<MigrationPolicyConfigurationsProps
                             return newState;
                           })
                         }
-                        variant={ButtonVariant.plain}
                         isInline
+                        variant={ButtonVariant.plain}
                       >
                         <MinusCircleIcon />
                       </Button>

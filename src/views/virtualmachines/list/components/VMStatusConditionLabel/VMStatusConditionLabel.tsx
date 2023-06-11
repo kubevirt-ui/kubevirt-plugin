@@ -7,17 +7,17 @@ export const VMStatusConditionLabel: React.FC<V1VirtualMachineCondition> = React
   (condition) => {
     return (
       <Popover
-        position={PopoverPosition.top}
         aria-label="Condition Popover"
         bodyContent={() => <div>{condition?.message ?? condition?.reason}</div>}
+        position={PopoverPosition.top}
       >
         <Label
-          color="grey"
-          isTruncated
-          href="#"
           onClick={(e) => {
             e.preventDefault();
           }}
+          color="grey"
+          href="#"
+          isTruncated
         >
           {condition?.type}={condition?.status}
         </Label>

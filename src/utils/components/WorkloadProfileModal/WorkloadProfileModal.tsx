@@ -14,7 +14,7 @@ type WorkloadProfileModalProps = {
   initialWorkload: string;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (workload: string) => Promise<void | K8sResourceCommon>;
+  onSubmit: (workload: string) => Promise<K8sResourceCommon | void>;
 };
 
 const WorkloadProfileModal: React.FC<WorkloadProfileModalProps> = React.memo(
@@ -41,12 +41,12 @@ const WorkloadProfileModal: React.FC<WorkloadProfileModalProps> = React.memo(
             <Select
               isOpen={isDropdownOpen}
               menuAppendTo="parent"
-              onToggle={setIsDropdownOpen}
               onSelect={handleChange}
+              onToggle={setIsDropdownOpen}
               selections={workload}
             >
               {Object.entries(WORKLOADS_LABELS).map(([key, value]) => (
-                <SelectOption key={key} value={key} description={t(WORKLOADS_DESCRIPTIONS[key])}>
+                <SelectOption description={t(WORKLOADS_DESCRIPTIONS[key])} key={key} value={key}>
                   {t(value)}
                 </SelectOption>
               ))}

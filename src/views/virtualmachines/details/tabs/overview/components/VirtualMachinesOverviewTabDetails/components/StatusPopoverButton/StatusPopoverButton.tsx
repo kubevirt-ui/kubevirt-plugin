@@ -15,7 +15,7 @@ const StatusPopoverButton: FC<StatusPopoverButtonProps> = ({ vmPrintableStatus }
   return (
     <span>
       <Icon />{' '}
-      <Button variant={ButtonVariant.link} isInline>
+      <Button isInline variant={ButtonVariant.link}>
         {vmPrintableStatus}
       </Button>
     </span>

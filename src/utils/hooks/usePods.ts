@@ -18,8 +18,8 @@ type UsePods = (namespace: string) => [K8sResourceCommon[], boolean, any];
 export const usePods: UsePods = (namespace) => {
   const [pods, podsLoaded, podsError] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(PodModel),
-    namespace: namespace,
     isList: true,
+    namespace: namespace,
   });
 
   return [pods, podsLoaded, podsError];

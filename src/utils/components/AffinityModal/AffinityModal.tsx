@@ -26,22 +26,22 @@ import {
 import { AffinityRowData } from './utils/types';
 
 type AffinityModalProps = {
-  vm: V1VirtualMachine;
+  isOpen: boolean;
   nodes: IoK8sApiCoreV1Node[];
   nodesLoaded: boolean;
-  isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const AffinityModal: React.FC<AffinityModalProps> = ({
-  vm,
+  isOpen,
   nodes,
   nodesLoaded,
-  isOpen,
   onClose,
   onSubmit,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -117,34 +117,34 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
   ) : (
     <AffinityList
       affinities={affinities}
-      onAffinityClickAdd={onAffinityClickAdd}
-      qualifiedNodes={qualifiedRequiredNodes}
-      prefferedQualifiedNodes={qualifiedPreferredNodes}
       nodesLoaded={nodesLoaded}
-      onEdit={onAffinityClickEdit}
+      onAffinityClickAdd={onAffinityClickAdd}
       onDelete={onAffinityDelete}
+      onEdit={onAffinityClickEdit}
+      prefferedQualifiedNodes={qualifiedPreferredNodes}
+      qualifiedNodes={qualifiedRequiredNodes}
     />
   );
 
   return isEditing ? (
     <AffinityEditModal
+      focusedAffinity={focusedAffinity}
+      isOpen={isOpen}
       nodes={nodes}
       nodesLoaded={nodesLoaded}
-      isOpen={isOpen}
       onCancel={onCancel}
       onSubmit={onSaveAffinity}
-      focusedAffinity={focusedAffinity}
       setFocusedAffinity={setFocusedAffinity}
       title={isCreating ? t('Add affinity rule') : t('Edit affinity rule')}
     />
   ) : (
     <TabModal
-      isOpen={isOpen}
-      onClose={onClose}
-      obj={updatedVirtualMachine}
-      onSubmit={onSubmit}
       headerText={t('Affinity rules')}
+      isOpen={isOpen}
       modalVariant={ModalVariant.medium}
+      obj={updatedVirtualMachine}
+      onClose={onClose}
+      onSubmit={onSubmit}
       submitBtnText={t('Apply rules')}
     >
       {vmi && (

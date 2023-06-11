@@ -63,13 +63,13 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
       externalSysprepSelected
         ? {
             groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-            namespace,
             name: externalSysprepSelected,
+            namespace,
           }
         : null,
     );
 
-  const { [UNATTEND]: unattend, [AUTOUNATTEND]: autoUnattend } =
+  const { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend } =
     externalSysprepConfig?.data || sysPrepObject?.data || {};
 
   const onSysprepSelected = async (newSysprepName: string) => {
@@ -102,22 +102,22 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
             </FlexItem>
             <FlexItem>
               <Button
-                type="button"
-                isDisabled={!isTemplateEditable}
-                isInline
                 onClick={() =>
                   createModal((modalProps) => (
                     <SysprepModal
                       {...modalProps}
-                      namespace={vm?.metadata?.namespace || DEFAULT_NAMESPACE}
-                      unattend={unattend}
                       autoUnattend={autoUnattend}
+                      namespace={vm?.metadata?.namespace || DEFAULT_NAMESPACE}
+                      onSysprepCreation={onSysprepCreation}
                       onSysprepSelected={onSysprepSelected}
                       sysprepSelected={externalSysprepSelected}
-                      onSysprepCreation={onSysprepCreation}
+                      unattend={unattend}
                     />
                   ))
                 }
+                isDisabled={!isTemplateEditable}
+                isInline
+                type="button"
                 variant="link"
               >
                 {t('Edit')}
@@ -129,10 +129,10 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
       </DescriptionListTerm>
       <DescriptionListDescription>
         <SysprepDescription
+          error={sysprepLoadError}
           hasAutoUnattend={!!autoUnattend}
           hasUnattend={!!unattend}
           loaded={sysprepLoaded}
-          error={sysprepLoadError}
         />
       </DescriptionListDescription>
     </DescriptionListGroup>

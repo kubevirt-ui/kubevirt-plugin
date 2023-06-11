@@ -12,19 +12,19 @@ import { FormGroup, Select, SelectOption, SelectVariant, Truncate } from '@patte
 import { FilterPVCSelect } from '../../utils/Filters';
 
 type DiskSourcePVCSelectNameProps = {
-  pvcNameSelected: string;
-  pvcNames: string[];
-  onChange: React.Dispatch<React.SetStateAction<string>>;
-  pvcsLoaded: boolean;
   isDisabled?: boolean;
+  onChange: React.Dispatch<React.SetStateAction<string>>;
+  pvcNames: string[];
+  pvcNameSelected: string;
+  pvcsLoaded: boolean;
 };
 
 const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
-  pvcNameSelected,
-  pvcNames,
-  onChange,
-  pvcsLoaded,
   isDisabled,
+  onChange,
+  pvcNames,
+  pvcNameSelected,
+  pvcsLoaded,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setSelectOpen] = React.useState(false);
@@ -40,21 +40,21 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
   const fieldId = 'pvc-name-select';
 
   return (
-    <FormGroup label={t('PVC name')} fieldId={fieldId} id={fieldId} isRequired>
+    <FormGroup fieldId={fieldId} id={fieldId} isRequired label={t('PVC name')}>
       {pvcsLoaded ? (
         <Select
-          menuAppendTo="parent"
           aria-labelledby={fieldId}
-          isOpen={isOpen}
-          onToggle={() => setSelectOpen(!isOpen)}
-          onSelect={onSelect}
-          variant={SelectVariant.single}
           hasInlineFilter
-          selections={pvcNameSelected}
-          onFilter={FilterPVCSelect(pvcNames)}
-          placeholderText={t('--- Select PVC name ---')}
           isDisabled={isDisabled}
+          isOpen={isOpen}
           maxHeight={400}
+          menuAppendTo="parent"
+          onFilter={FilterPVCSelect(pvcNames)}
+          onSelect={onSelect}
+          onToggle={() => setSelectOpen(!isOpen)}
+          placeholderText={t('--- Select PVC name ---')}
+          selections={pvcNameSelected}
+          variant={SelectVariant.single}
         >
           {pvcNames.map((name) => (
             <SelectOption key={name} value={name}>

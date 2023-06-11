@@ -24,8 +24,8 @@ type MigrationPoliciesListProps = {
 const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
   const [mps, loaded, loadError] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
-    kind,
     isList: true,
+    kind,
     namespaced: false,
   });
 
@@ -40,28 +40,28 @@ const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) =
 
       <ListPageBody>
         <ListPageFilter
-          data={unfilteredData}
-          loaded={loaded}
-          onFilterChange={onFilterChange}
           columnLayout={{
-            columns: columns?.map(({ id, title, additional }) => ({
+            columns: columns?.map(({ additional, id, title }) => ({
+              additional,
               id,
               title,
-              additional,
             })),
             id: kind,
             selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
             type: t('MigrationPolicy'),
           }}
+          data={unfilteredData}
+          loaded={loaded}
+          onFilterChange={onFilterChange}
         />
         <VirtualizedTable<V1alpha1MigrationPolicy>
+          columns={activeColumns}
           data={data}
-          unfilteredData={unfilteredData}
+          EmptyMsg={() => <MigrationPoliciesEmptyState kind={kind} />}
           loaded={loaded}
           loadError={loadError}
-          columns={activeColumns}
           Row={MigrationPoliciesRow}
-          EmptyMsg={() => <MigrationPoliciesEmptyState kind={kind} />}
+          unfilteredData={unfilteredData}
         />
       </ListPageBody>
     </>

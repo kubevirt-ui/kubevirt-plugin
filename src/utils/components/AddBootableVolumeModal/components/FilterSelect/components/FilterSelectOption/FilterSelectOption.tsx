@@ -5,20 +5,20 @@ import { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk-inter
 import { SelectOption } from '@patternfly/react-core';
 
 type FilterSelectOptionProps = {
+  groupVersionKind: K8sGroupVersionKind;
   optionLabel: string;
   optionName: string;
-  groupVersionKind: K8sGroupVersionKind;
 };
 
 const FilterSelectOption: FC<FilterSelectOptionProps> = ({
+  groupVersionKind,
   optionLabel,
   optionName,
-  groupVersionKind,
 }) => (
   <SelectOption
+    data-test-id={`${optionLabel}-select-option-${optionName}`}
     key={optionName}
     value={optionName}
-    data-test-id={`${optionLabel}-select-option-${optionName}`}
   >
     <ResourceLink groupVersionKind={groupVersionKind} linkTo={false} name={optionName} />
   </SelectOption>

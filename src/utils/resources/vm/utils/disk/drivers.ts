@@ -62,17 +62,17 @@ export const mountWinDriversToVM = async (vm: V1VirtualMachine): Promise<V1Virtu
     if (!draftVM.spec.template.spec.volumes) draftVM.spec.template.spec.volumes = [];
 
     draftVM.spec.template.spec.domain.devices.disks.push({
-      name: WINDOWS_DRIVERS_DISK,
       cdrom: {
         bus: 'sata',
       },
+      name: WINDOWS_DRIVERS_DISK,
     });
 
     draftVM.spec.template.spec.volumes.push({
-      name: WINDOWS_DRIVERS_DISK,
       containerDisk: {
         image: driversImage,
       },
+      name: WINDOWS_DRIVERS_DISK,
     });
   });
 };

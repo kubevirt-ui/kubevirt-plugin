@@ -28,13 +28,13 @@ const MigrationPoliciesEmptyState: FC<MigrationPoliciesEmptyStateProps> = ({ kin
   return (
     <EmptyState variant={EmptyStateVariant.xs}>
       <EmptyStateIcon
-        icon={() => <img src={migrationPoliciesEmptyState} className="emptyStateImg" />}
+        icon={() => <img className="emptyStateImg" src={migrationPoliciesEmptyState} />}
       />
       <Title headingLevel="h4" size="lg">
         {t('No MigrationPolicies are defined yet')}
       </Title>
       <EmptyStateBody>
-        <Trans t={t} ns="plugin__kubevirt-plugin">
+        <Trans ns="plugin__kubevirt-plugin" t={t}>
           Click <b>Create MigrationPolicy</b> to create your first policy
         </Trans>
       </EmptyStateBody>

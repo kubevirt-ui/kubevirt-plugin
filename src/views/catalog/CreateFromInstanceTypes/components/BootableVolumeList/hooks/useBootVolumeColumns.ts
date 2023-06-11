@@ -6,9 +6,9 @@ import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 
 type UseBootVolumesColumns = (isModal: boolean) => {
-  columns: TableColumn<BootableVolume>[];
   activeColumns: TableColumn<BootableVolume>[];
   columnLayout: ColumnLayout | null;
+  columns: TableColumn<BootableVolume>[];
 };
 
 const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
@@ -16,44 +16,44 @@ const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
 
   const columns: TableColumn<BootableVolume>[] = [
     {
-      title: t('Volume name'),
       id: 'name',
+      title: t('Volume name'),
     },
     {
-      title: t('Operating system'),
       id: 'operating-system',
+      title: t('Operating system'),
     },
     {
-      title: t('Storage class'),
       id: 'storage-class',
+      title: t('Storage class'),
     },
     {
-      title: t('Size'),
       id: 'size',
+      title: t('Size'),
     },
     {
-      title: t('Description'),
       id: 'description',
+      title: t('Description'),
     },
   ];
 
   const [activeColumns] = useKubevirtUserSettingsTableColumns<BootableVolume>({
-    columns,
     columnManagementID: DataSourceModelRef,
+    columns,
   });
 
   const columnLayout: ColumnLayout = {
-    columns: columns?.map(({ id, title, additional }) => ({
+    columns: columns?.map(({ additional, id, title }) => ({
+      additional,
       id,
       title,
-      additional,
     })),
     id: DataSourceModelRef,
     selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
     type: t('Bootable volumes'),
   };
 
-  return { columns, activeColumns, columnLayout: isModal ? null : columnLayout };
+  return { activeColumns, columnLayout: isModal ? null : columnLayout, columns };
 };
 
 export default useBootVolumeColumns;

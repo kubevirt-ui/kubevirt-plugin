@@ -25,8 +25,8 @@ const useNonAdminResourcesInventoryCard = () => {
     ...allowedTemplateResources,
     nodes: {
       groupVersionKind: modelToGroupVersionKind(NodeModel),
-      namespaced: false,
       isList: true,
+      namespaced: false,
     },
     ...allowedNADResources,
   };
@@ -35,10 +35,20 @@ const useNonAdminResourcesInventoryCard = () => {
 
 const useAdminResourcesInventoryCard = () => {
   return {
+    nads: {
+      groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
+      isList: true,
+      namespaced: false,
+    },
+    nodes: {
+      groupVersionKind: modelToGroupVersionKind(NodeModel),
+      isList: true,
+      namespaced: false,
+    },
     vms: {
       groupVersionKind: VirtualMachineModelGroupVersionKind,
-      namespaced: true,
       isList: true,
+      namespaced: true,
     },
     vmTemplates: {
       groupVersionKind: modelToGroupVersionKind(TemplateModel),
@@ -51,16 +61,6 @@ const useAdminResourcesInventoryCard = () => {
           },
         ],
       },
-    },
-    nodes: {
-      groupVersionKind: modelToGroupVersionKind(NodeModel),
-      namespaced: false,
-      isList: true,
-    },
-    nads: {
-      groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
-      namespaced: false,
-      isList: true,
     },
   };
 };

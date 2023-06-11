@@ -13,15 +13,15 @@ export const paginationDefaultValuesModal: PerPageOptions[] = [
 ];
 
 export const paginationInitialStateForm: PaginationState = {
+  endIndex: 8,
   page: 1,
   perPage: 8,
   startIndex: 0,
-  endIndex: 8,
 };
 
 export const paginationInitialStateModal: PaginationState = {
+  endIndex: 16,
   page: 1,
   perPage: 16,
   startIndex: 0,
-  endIndex: 16,
 };

@@ -9,7 +9,7 @@ import './OverviewAlertsCard.scss';
 const OverviewAlertsCard = () => {
   const alerts = useSimplifiedAlerts();
 
-  return <AlertsCard sortedAlerts={alerts} isOverviewPage className="overview-alerts-card" />;
+  return <AlertsCard className="overview-alerts-card" isOverviewPage sortedAlerts={alerts} />;
 };
 
 export default OverviewAlertsCard;

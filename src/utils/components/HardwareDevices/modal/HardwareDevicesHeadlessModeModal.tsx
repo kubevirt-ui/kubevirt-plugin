@@ -10,18 +10,18 @@ import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
 
 type HardwareDevicesHeadlessModeModalProps = {
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const HardwareDevicesHeadlessModeModal: React.FC<HardwareDevicesHeadlessModeModalProps> = ({
-  vm,
   isOpen,
   onClose,
   onSubmit,
+  vm,
   vmi,
 }) => {
   const devices = vm?.spec?.template?.spec?.domain?.devices;
@@ -46,11 +46,11 @@ const HardwareDevicesHeadlessModeModal: React.FC<HardwareDevicesHeadlessModeModa
   }, [vm, checked]);
   return (
     <TabModal
-      obj={updatedVirtualMachine}
+      headerText={'Headless mode'}
       isOpen={isOpen}
+      obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={'Headless mode'}
     >
       <Form>
         {vmi && (
@@ -59,17 +59,17 @@ const HardwareDevicesHeadlessModeModal: React.FC<HardwareDevicesHeadlessModeModa
           />
         )}
         <FormGroup
-          fieldId="headless-mode-modal"
           helperText={t(
             'Applying the headless mode to this Virtual Machine will cause the VNC not be available if checked.',
           )}
+          fieldId="headless-mode-modal"
           isInline
         >
           <Checkbox
             id="headless-mode-checkbox"
             isChecked={checked}
-            onChange={setChecked}
             label={t('Enable headless mode')}
+            onChange={setChecked}
           />
         </FormGroup>
       </Form>

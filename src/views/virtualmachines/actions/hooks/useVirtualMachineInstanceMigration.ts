@@ -6,8 +6,8 @@ const useVirtualMachineInstanceMigration = (resource: K8sResourceCommon) => {
   const [vmims] = useK8sWatchResource<V1VirtualMachineInstanceMigration[]>({
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
-    namespace: resource?.metadata?.namespace,
     name: `${resource?.metadata?.name}-migration`,
+    namespace: resource?.metadata?.namespace,
   });
 
   // since migration objects are kepts until VMI is deleted

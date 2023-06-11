@@ -34,19 +34,19 @@ import {
 } from '@patternfly/react-core';
 
 type TemplatesCatalogDrawerCreateFormProps = {
-  namespace: string;
-  template: V1Template;
   canQuickCreate: boolean;
-  isBootSourceAvailable: boolean;
-  onCancel: () => void;
   initialVMName?: string;
+  isBootSourceAvailable: boolean;
+  namespace: string;
+  onCancel: () => void;
+  template: V1Template;
 };
 
 export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFormProps> = memo(
-  ({ namespace, template, canQuickCreate, isBootSourceAvailable, onCancel, initialVMName }) => {
+  ({ canQuickCreate, initialVMName, isBootSourceAvailable, namespace, onCancel, template }) => {
     const history = useHistory();
     const { t } = useKubevirtTranslation();
-    const { vm, updateTabsData } = useWizardVMContext();
+    const { updateTabsData, vm } = useWizardVMContext();
 
     const [vmName, setVMName] = useState(initialVMName || '');
     const [startVM, setStartVM] = useState(true);
@@ -85,9 +85,9 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
       });
 
       quickCreateVM({
-        template: templateToProcess,
         models,
         overrides: { name: vmName, namespace, startVM },
+        template: templateToProcess,
       })
         .then((quickCreatedVM) => {
           setIsQuickCreating(false);
@@ -126,19 +126,19 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                 <Split hasGutter>
                   <SplitItem>
                     <FormGroup
-                      label={t('VirtualMachine name')}
-                      isRequired
                       className="template-catalog-drawer-form-name"
                       fieldId="vm-name-field"
+                      isRequired
+                      label={t('VirtualMachine name')}
                     >
                       <TextInput
-                        isRequired
-                        type="text"
-                        data-test-id="template-catalog-vm-name-input"
-                        name="vmname"
                         aria-label="virtualmachine name"
-                        value={vmName}
+                        data-test-id="template-catalog-vm-name-input"
+                        isRequired
+                        name="vmname"
                         onChange={setVMName}
+                        type="text"
+                        value={vmName}
                       />
                     </FormGroup>
                   </SplitItem>
@@ -157,8 +157,8 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                 <Checkbox
                   id="start-after-create-checkbox"
                   isChecked={startVM}
-                  onChange={onChangeStartVM}
                   label={t('Start this VirtualMachine after creation')}
+                  onChange={onChangeStartVM}
                 />
               </StackItem>
             </>
@@ -172,7 +172,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
           <StackItem />
           {quickCreateError && (
             <StackItem>
-              <Alert variant={AlertVariant.danger} title={t('Quick create error')} isInline>
+              <Alert isInline title={t('Quick create error')} variant={AlertVariant.danger}>
                 {quickCreateError?.message}
               </Alert>
             </StackItem>
@@ -183,10 +183,6 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
               {canQuickCreate && (
                 <SplitItem>
                   <Button
-                    data-test-id="quick-create-vm-btn"
-                    type="submit"
-                    form="quick-create-form"
-                    isLoading={isQuickCreating || modelsLoading}
                     isDisabled={
                       !isBootSourceAvailable || isQuickCreating || !vmName || isEmpty(models)
                     }
@@ -194,6 +190,10 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                       e.preventDefault();
                       onQuickCreate();
                     }}
+                    data-test-id="quick-create-vm-btn"
+                    form="quick-create-form"
+                    isLoading={isQuickCreating || modelsLoading}
+                    type="submit"
                   >
                     {t('Quick create VirtualMachine')}
                   </Button>
@@ -202,14 +202,14 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
               <SplitItem>
                 <Button
                   data-test-id="customize-vm-btn"
-                  variant={canQuickCreate ? ButtonVariant.secondary : ButtonVariant.primary}
-                  onClick={onCustomize}
                   isDisabled={!processedTemplateAccessReview}
+                  onClick={onCustomize}
+                  variant={canQuickCreate ? ButtonVariant.secondary : ButtonVariant.primary}
                 >
                   {t('Customize VirtualMachine')}
                 </Button>
               </SplitItem>
-              <Button variant={ButtonVariant.link} onClick={() => onCancel()}>
+              <Button onClick={() => onCancel()} variant={ButtonVariant.link}>
                 {t('Cancel')}
               </Button>
             </Split>

@@ -48,9 +48,9 @@ export const useAvailableDataSourcesAndPVCs = (
           const ds = bootSource?.source?.sourceRef;
           acc.uniqueDataSources[`${ds?.namespace}-${ds?.name}`] = {
             groupVersionKind: getGroupVersionKindForModel(DataSourceModel),
+            isList: false,
             name: ds?.name,
             namespace: ds?.namespace,
-            isList: false,
           };
         }
 
@@ -58,9 +58,9 @@ export const useAvailableDataSourcesAndPVCs = (
           const pvc = bootSource?.source?.pvc;
           acc.uniquePVCs[`${pvc?.namespace}-${pvc?.name}`] = {
             groupVersionKind: getGroupVersionKindForModel(PersistentVolumeClaimModel),
+            isList: false,
             name: pvc?.name,
             namespace: pvc?.namespace,
-            isList: false,
           };
         }
 
@@ -110,5 +110,5 @@ export const useAvailableDataSourcesAndPVCs = (
     ),
   );
 
-  return { availableDatasources, cloneInProgressDatasources, availablePVCs, loaded };
+  return { availableDatasources, availablePVCs, cloneInProgressDatasources, loaded };
 };

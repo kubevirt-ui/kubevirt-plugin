@@ -46,12 +46,12 @@ export const filterTemplates = (templates: V1Template[]): TemplateItem[] => {
   const userTemplateItems: TemplateItem[] = templates
     .filter((t) => !isCommonTemplate(t) && !isDeprecatedTemplate(t))
     .map((t) => ({
+      isCommon: false,
       metadata: {
         name: t.metadata.name,
-        uid: t.metadata.uid,
         namespace: t.metadata.namespace,
+        uid: t.metadata.uid,
       },
-      isCommon: false,
       variants: [t],
     }));
 
@@ -64,8 +64,8 @@ export const filterTemplates = (templates: V1Template[]): TemplateItem[] => {
         if (isRecommended) {
           acc[name].metadata = {
             name: t.metadata.name,
-            uid: t.metadata.uid,
             namespace: t.metadata.namespace,
+            uid: t.metadata.uid,
           };
           acc[name].variants.unshift(t);
         } else {
@@ -73,12 +73,12 @@ export const filterTemplates = (templates: V1Template[]): TemplateItem[] => {
         }
       } else {
         acc[name] = {
+          isCommon: true,
           metadata: {
             name: t.metadata.name,
-            uid: t.metadata.uid,
             namespace: t.metadata.namespace,
+            uid: t.metadata.uid,
           },
-          isCommon: true,
           variants: [t],
         };
       }
@@ -96,9 +96,9 @@ export const filterTemplates = (templates: V1Template[]): TemplateItem[] => {
 };
 
 export const flattenTemplates: Flatten<
-  { vmTemplates: V1Template[]; vms: V1VirtualMachine[] },
+  { vms: V1VirtualMachine[]; vmTemplates: V1Template[] },
   VirtualMachineTemplateBundle[]
-> = ({ vmTemplates, vms }) => {
+> = ({ vms, vmTemplates }) => {
   const templates = getLoadedData<V1Template[]>(vmTemplates, []);
   return [
     ...getLoadedData<V1VirtualMachine[]>(vms, []).map((vm) => {
@@ -110,15 +110,15 @@ export const flattenTemplates: Flatten<
       }
       return {
         customizeTemplate: {
-          vm,
           template,
+          vm,
         },
         metadata: vm.metadata,
       };
     }),
     ...filterTemplates([...templates]).map((template) => ({
-      template,
       metadata: template.variants[0].metadata,
+      template,
     })),
   ].filter((template) => template);
 };

@@ -1,7 +1,7 @@
 export type Debounce = {
   func: (any) => any;
-  wait: number;
   immediate: boolean;
+  wait: number;
 };
 
 /**

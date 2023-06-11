@@ -7,17 +7,17 @@ import { GlobeAmericasIcon } from '@patternfly/react-icons';
 import { isValid, timestampFor, utcDateTimeFormatter } from './utils/datetime';
 
 export type TimestampProps = {
-  timestamp: string | number;
-  omitSuffix?: boolean;
   className?: string;
   hideIcon?: boolean;
+  omitSuffix?: boolean;
+  timestamp: number | string;
 };
 
 const Timestamp: React.FC<TimestampProps> = ({
-  timestamp,
-  omitSuffix,
   className,
   hideIcon = false,
+  omitSuffix,
+  timestamp,
 }) => {
   // Check for null. If props.timestamp is null, it returns incorrect date and time of Wed Dec 31 1969 19:00:00 GMT-0500 (Eastern Standard Time)
   if (!timestamp || !isValid(new Date(timestamp))) {

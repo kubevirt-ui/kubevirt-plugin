@@ -6,17 +6,17 @@ import { ConditionsTableRow } from './components/ConditionsTableRow';
 import useConditionsTableColumns from './components/useConditionsTableColumns';
 
 export enum K8sResourceConditionStatus {
-  True = 'True',
   False = 'False',
+  True = 'True',
   Unknown = 'Unknown',
 }
 
 export type K8sResourceCondition = {
-  type: string;
-  status: keyof typeof K8sResourceConditionStatus;
   lastTransitionTime?: string;
-  reason?: string;
   message?: string;
+  reason?: string;
+  status: keyof typeof K8sResourceConditionStatus;
+  type: string;
 };
 
 export type ConditionsProps = {
@@ -29,12 +29,12 @@ export const ConditionsTable: React.FC<ConditionsProps> = ({ conditions }) => {
 
   return (
     <VirtualizedTable<K8sResourceCondition>
+      columns={columns}
       data={mutatedConditions}
-      unfilteredData={mutatedConditions}
       loaded
       loadError={null}
-      columns={columns}
       Row={ConditionsTableRow}
+      unfilteredData={mutatedConditions}
     />
   );
 };

@@ -14,22 +14,22 @@ import useAffinityColumns from './hooks/useAffinityColumns';
 
 type AffinityListProps = {
   affinities: AffinityRowData[];
-  onAffinityClickAdd: () => void;
-  qualifiedNodes: IoK8sApiCoreV1Node[];
-  prefferedQualifiedNodes: IoK8sApiCoreV1Node[];
   nodesLoaded: boolean;
-  onEdit: (affinity: AffinityRowData) => void;
+  onAffinityClickAdd: () => void;
   onDelete: (affinity: AffinityRowData) => void;
+  onEdit: (affinity: AffinityRowData) => void;
+  prefferedQualifiedNodes: IoK8sApiCoreV1Node[];
+  qualifiedNodes: IoK8sApiCoreV1Node[];
 };
 
 const AffinityList: React.FC<AffinityListProps> = ({
   affinities,
-  onAffinityClickAdd,
-  qualifiedNodes,
-  prefferedQualifiedNodes,
   nodesLoaded,
-  onEdit,
+  onAffinityClickAdd,
   onDelete,
+  onEdit,
+  prefferedQualifiedNodes,
+  qualifiedNodes,
 }) => {
   const columns = useAffinityColumns();
   return (
@@ -39,13 +39,13 @@ const AffinityList: React.FC<AffinityListProps> = ({
       </StackItem>
       <StackItem>
         <VirtualizedTable<AffinityRowData>
+          columns={columns}
           data={affinities || []}
-          unfilteredData={affinities || []}
           loaded
           loadError={false}
-          columns={columns}
           Row={AffinityRow}
-          rowData={{ onEdit, onDelete }}
+          rowData={{ onDelete, onEdit }}
+          unfilteredData={affinities || []}
         />
       </StackItem>
       <StackItem>
@@ -54,9 +54,9 @@ const AffinityList: React.FC<AffinityListProps> = ({
       <StackItem>
         {affinities?.some((affinity) => affinity?.type === AffinityType.node) && nodesLoaded && (
           <NodeCheckerAlert
-            qualifiedNodes={qualifiedNodes}
-            prefferedQualifiedNodes={prefferedQualifiedNodes}
             nodesLoaded={nodesLoaded}
+            prefferedQualifiedNodes={prefferedQualifiedNodes}
+            qualifiedNodes={qualifiedNodes}
           />
         )}
       </StackItem>

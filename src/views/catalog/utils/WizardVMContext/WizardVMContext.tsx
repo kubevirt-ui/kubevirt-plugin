@@ -9,43 +9,43 @@ import { UpdateValidatedVM, useValidatedVM } from './useValidatedVm';
 import { useWizardVMEffects } from './useWizardVMEffects';
 
 export type WizardVMContextType = {
-  /** the vm used for the wizard */
-  vm?: V1VirtualMachine;
+  /** is the virtual machine creation disabled */
+  disableVmCreate?: boolean;
+  /** error state of the vm context */
+  error?: any;
+  /** loaded state of the vm context */
+  loaded?: boolean;
+  /** Set the isCreatedDisabled variable */
+  setDisableVmCreate?: React.Dispatch<React.SetStateAction<boolean>>;
+  /** additional tabs data, not related to the vm */
+  tabsData?: TabsData;
+  /** update tabs data */
+  updateTabsData?: Updater<TabsData>;
   /**
    * update the VirtualMachine used for the wizard
    * @param vm V1VirtualMachine
    */
   updateVM?: UpdateValidatedVM;
-  /** loaded state of the vm context */
-  loaded?: boolean;
-  /** error state of the vm context */
-  error?: any;
-  /** additional tabs data, not related to the vm */
-  tabsData?: TabsData;
-  /** update tabs data */
-  updateTabsData?: Updater<TabsData>;
-  /** is the virtual machine creation disabled */
-  disableVmCreate?: boolean;
-  /** Set the isCreatedDisabled variable */
-  setDisableVmCreate?: React.Dispatch<React.SetStateAction<boolean>>;
+  /** the vm used for the wizard */
+  vm?: V1VirtualMachine;
 };
 
 export const useWizardVM = (): WizardVMContextType => {
-  const { vm, updateVM, loaded, error } = useValidatedVM(getSessionStorageVM());
+  const { error, loaded, updateVM, vm } = useValidatedVM(getSessionStorageVM());
   const [tabsData, updateTabsData] = useImmer<TabsData>(getSessionStorageTabsData());
   const [disableVmCreate, setDisableVmCreate] = React.useState(false);
 
   useWizardVMEffects(vm, tabsData);
 
   return {
-    vm,
-    updateVM,
-    loaded,
+    disableVmCreate,
     error,
+    loaded,
+    setDisableVmCreate,
     tabsData,
     updateTabsData,
-    disableVmCreate,
-    setDisableVmCreate,
+    updateVM,
+    vm,
   };
 };
 

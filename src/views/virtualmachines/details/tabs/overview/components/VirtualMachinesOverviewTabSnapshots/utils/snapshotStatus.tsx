@@ -8,10 +8,10 @@ import {
 } from '@patternfly/react-icons';
 
 export const snapshotStatuses = {
+  Error: 'Error',
+  Failed: 'Failed',
   Succeeded: 'Succeeded',
   Unknown: 'Unknown',
-  Failed: 'Failed',
-  Error: 'Error',
 };
 
 const iconHandler = {
@@ -23,10 +23,10 @@ const iconHandler = {
 };
 
 const iconMapper: { [key: string]: any } = {
-  succeeded: () => <CheckCircleIcon color="green" />,
-  unknown: UnknownIcon,
   error: ExclamationCircleIcon,
   failed: ExclamationCircleIcon,
+  succeeded: () => <CheckCircleIcon color="green" />,
+  unknown: UnknownIcon,
 };
 
 export const icon = new Proxy<typeof iconMapper>(iconMapper, iconHandler);

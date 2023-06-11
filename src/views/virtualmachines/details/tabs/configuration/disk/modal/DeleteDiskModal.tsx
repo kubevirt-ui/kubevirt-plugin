@@ -20,24 +20,24 @@ import { ButtonVariant, Checkbox, Stack, StackItem } from '@patternfly/react-cor
 import useVolumeOwnedResource from './hooks/useVolumeOwnedResource';
 
 type DeleteDiskModalProps = {
-  vm: V1VirtualMachine;
-  volume: V1Volume;
   isOpen: boolean;
   onClose: () => void;
+  vm: V1VirtualMachine;
+  volume: V1Volume;
 };
 
-const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, onClose }) => {
+const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ isOpen, onClose, vm, volume }) => {
   const { t } = useKubevirtTranslation();
   const [deleteOwnedResource, setDeleteOwnedResource] = React.useState(false);
 
   const diskName = volume?.name;
 
   const {
-    volumeResource,
-    loaded,
     error: loadingError,
-    volumeResourceName,
+    loaded,
+    volumeResource,
     volumeResourceModel,
+    volumeResourceName,
   } = useVolumeOwnedResource(vm, volume);
 
   const updatedVirtualMachine = React.useMemo(() => {
@@ -60,10 +60,10 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
       vm?.status?.printableStatus === printableVMStatus.Running
         ? getRemoveHotplugPromise(vm, diskName)
         : k8sUpdate({
-            model: VirtualMachineModel,
             data: updatedVM,
-            ns: updatedVM?.metadata?.namespace,
+            model: VirtualMachineModel,
             name: updatedVM?.metadata?.name,
+            ns: updatedVM?.metadata?.namespace,
           });
 
     return deletePromise.then(() => {
@@ -71,10 +71,10 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
         if (deleteOwnedResource) {
           // we need to delete the owned resource
           return k8sDelete({
-            model: volumeResourceModel,
-            resource: volumeResource,
             json: undefined,
+            model: volumeResourceModel,
             requestInit: undefined,
+            resource: volumeResource,
           });
         }
         // we don't need to delete the owned resource
@@ -88,10 +88,10 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
         const updatedResourceVolume = { ...volumeResource };
         updatedResourceVolume.metadata.ownerReferences = updatedVolumeOwnerReferences;
         return k8sUpdate({
-          model: volumeResourceModel,
           data: updatedResourceVolume,
-          ns: updatedResourceVolume?.metadata?.namespace,
+          model: volumeResourceModel,
           name: updatedResourceVolume?.metadata?.name,
+          ns: updatedResourceVolume?.metadata?.namespace,
         });
       }
     });
@@ -99,14 +99,14 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
 
   return (
     <TabModal<K8sResourceCommon>
-      onClose={onClose}
-      isOpen={isOpen}
-      obj={updatedVirtualMachine}
-      onSubmit={onSubmit}
       headerText={t('Detach disk?')}
+      isOpen={isOpen}
+      modalError={loadingError}
+      obj={updatedVirtualMachine}
+      onClose={onClose}
+      onSubmit={onSubmit}
       submitBtnText={t('Detach')}
       submitBtnVariant={ButtonVariant.danger}
-      modalError={loadingError}
     >
       <Stack hasGutter>
         <StackItem>
@@ -121,14 +121,14 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ vm, volume, isOpen, o
           <StackItem>
             {volumeResource && (
               <Checkbox
-                id="delete-owned-resource"
                 label={t('Delete {{volumeResourceName}} {{modelLabel}}', {
-                  volumeResourceName,
                   modelLabel:
                     volumeResourceModel === DataVolumeModel
                       ? `${volumeResourceModel.label} and PVC`
                       : volumeResourceModel.label,
+                  volumeResourceName,
                 })}
+                id="delete-owned-resource"
                 isChecked={deleteOwnedResource}
                 onChange={setDeleteOwnedResource}
               />

@@ -3,13 +3,13 @@ import * as React from 'react';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 
-const VirtualMachinesOverviewTabHardwareDevicesRow = ({ obj, activeColumnIDs }) => {
+const VirtualMachinesOverviewTabHardwareDevicesRow = ({ activeColumnIDs, obj }) => {
   return (
     <>
-      <TableData id="resourceName" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="resourceName">
         {obj?.name || NO_DATA_DASH}
       </TableData>
-      <TableData id="hardwareName" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="hardwareName">
         {obj?.deviceName || NO_DATA_DASH}
       </TableData>
     </>

@@ -24,7 +24,7 @@ const KubevirtHealthPopup: FC = () => {
 
   return (
     <Grid className="kv-health-popup">
-      <GridItem span={12} className="kv-health-popup__description">
+      <GridItem className="kv-health-popup__description" span={12}>
         {descriptionText}
       </GridItem>
       <GridItem span={4}>

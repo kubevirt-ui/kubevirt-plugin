@@ -20,14 +20,14 @@ import { isDataImportCronAutoUpdated, isDataResourceOwnedBySSP } from '../../../
 import './DataImportCronManageDetails.scss';
 
 type DataImportCronManageDetailsProps = {
-  dataSource: V1beta1DataSource;
   dataImportCron: V1beta1DataImportCron;
+  dataSource: V1beta1DataSource;
   onEditClick: () => void;
 };
 
 export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsProps> = ({
-  dataSource,
   dataImportCron,
+  dataSource,
   onEditClick,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -39,11 +39,6 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
 
   return (
     <DescriptionItem
-      descriptionHeader={t('Automatic update and scheduling')}
-      data-test-id="dataimportcron-manage-details"
-      isEdit={!isOwnedBySSP}
-      showEditOnTitle
-      onEditClick={onEditClick}
       descriptionData={
         <DescriptionList className="kv-dataimportcron-managed-details">
           <DescriptionListGroup>
@@ -70,10 +65,10 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
                   <DescriptionListTerm>{t('Cron expression')}</DescriptionListTerm>
                   <DescriptionListDescription>
                     <ClipboardCopy
-                      isReadOnly
-                      data-test="cron-copy-command"
                       clickTip={t('Copied')}
+                      data-test="cron-copy-command"
                       hoverTip={t('Copy to clipboard')}
+                      isReadOnly
                     >
                       {dataImportCron?.spec?.schedule}
                     </ClipboardCopy>
@@ -84,6 +79,11 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
           </DescriptionListGroup>
         </DescriptionList>
       }
+      data-test-id="dataimportcron-manage-details"
+      descriptionHeader={t('Automatic update and scheduling')}
+      isEdit={!isOwnedBySSP}
+      onEditClick={onEditClick}
+      showEditOnTitle
     />
   );
 };

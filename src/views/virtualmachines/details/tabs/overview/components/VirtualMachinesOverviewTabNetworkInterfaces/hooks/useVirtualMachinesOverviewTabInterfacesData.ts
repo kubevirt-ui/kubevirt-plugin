@@ -27,8 +27,8 @@ const useVirtualMachinesOverviewTabInterfacesData: UseVirtualMachinesOverviewTab
     const ipAddresses = interfacesIPs.find((iIP) => iIP.name === iface.name)?.ipAddresses;
     return {
       iface,
-      network,
       ipAddresses,
+      network,
     };
   });
 

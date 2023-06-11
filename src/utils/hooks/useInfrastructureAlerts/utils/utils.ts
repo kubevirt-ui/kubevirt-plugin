@@ -25,7 +25,7 @@ export const sortAlertsByHealthImpact = (alerts: Alert[]) =>
       if (healthImpact) acc[healthImpact]?.push(alert);
       return acc;
     },
-    { critical: [], warning: [], none: [] },
+    { critical: [], none: [], warning: [] },
   );
 
 export const getNumberOfAlerts = (alerts: AlertsByHealthImpact) =>

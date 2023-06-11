@@ -18,54 +18,54 @@ const VirtualMachineTemplatesRow: React.FC<
   RowProps<
     V1Template,
     {
-      availableTemplatesUID: Set<string>;
       availableDatasources: Record<string, V1beta1DataSource>;
+      availableTemplatesUID: Set<string>;
       cloneInProgressDatasources: Record<string, V1beta1DataSource>;
     }
   >
 > = ({
-  obj,
   activeColumnIDs,
-  rowData: { availableDatasources, cloneInProgressDatasources, availableTemplatesUID },
+  obj,
+  rowData: { availableDatasources, availableTemplatesUID, cloneInProgressDatasources },
 }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
 
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-30" id="name">
         <ResourceLink
-          kind={TemplateModel.kind}
-          name={obj.metadata.name}
-          namespace={obj.metadata.namespace}
           onClick={() =>
             history.push(`/k8s/ns/${obj.metadata.namespace}/templates/${obj.metadata.name}`)
           }
+          kind={TemplateModel.kind}
+          name={obj.metadata.name}
+          namespace={obj.metadata.namespace}
         />
 
         {isDeprecatedTemplate(obj) && <Label isCompact>{t('Deprecated')}</Label>}
       </TableData>
-      <TableData id="namespace" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="namespace">
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
       </TableData>
-      <TableData id="workload" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="workload">
         {t(getWorkloadProfile(obj))}
       </TableData>
-      <TableData id="availability" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-30" id="availability">
         <VirtualMachineTemplatesSource
-          template={obj}
           availableDatasources={availableDatasources}
-          cloneInProgressDatasources={cloneInProgressDatasources}
           availableTemplatesUID={availableTemplatesUID}
+          cloneInProgressDatasources={cloneInProgressDatasources}
+          template={obj}
         />
       </TableData>
-      <TableData id="cpu" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="cpu">
         {useVirtualMachineTemplatesCPUMemory(obj)}
       </TableData>
       <TableData
-        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
+        id=""
       >
         <VirtualMachineTemplatesActions template={obj} />
       </TableData>

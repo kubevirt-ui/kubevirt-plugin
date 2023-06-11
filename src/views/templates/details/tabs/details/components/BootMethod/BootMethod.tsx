@@ -32,10 +32,10 @@ const BootMethod: FC<BootMethodProps> = ({ template }) => {
   const onSubmit = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       }),
     [],
   );
@@ -43,10 +43,10 @@ const BootMethod: FC<BootMethodProps> = ({ template }) => {
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <TemplateBootloaderModal
-        template={template}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onSubmit}
+        template={template}
       />
     ));
 
@@ -55,10 +55,10 @@ const BootMethod: FC<BootMethodProps> = ({ template }) => {
       <DescriptionListTerm>{t('Boot mode')}</DescriptionListTerm>
       <DescriptionListDescription>
         <Button
-          type="button"
+          isDisabled={!isTemplateEditable}
           isInline
           onClick={onEditClick}
-          isDisabled={!isTemplateEditable}
+          type="button"
           variant="link"
         >
           {firmwareBootloaderTitle}

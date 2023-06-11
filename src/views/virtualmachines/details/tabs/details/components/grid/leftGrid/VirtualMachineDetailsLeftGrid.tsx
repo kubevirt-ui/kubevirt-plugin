@@ -64,10 +64,10 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
   const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
-        model: VirtualMachineModel,
         data: updatedVM,
-        ns: updatedVM?.metadata?.namespace,
+        model: VirtualMachineModel,
         name: updatedVM?.metadata?.name,
+        ns: updatedVM?.metadata?.namespace,
       }),
     [],
   );
@@ -85,10 +85,10 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
       return vmDraft;
     });
     return k8sUpdate({
-      model: VirtualMachineModel,
       data: updatedVM,
-      ns: updatedVM?.metadata?.namespace,
+      model: VirtualMachineModel,
       name: updatedVM?.metadata?.name,
+      ns: updatedVM?.metadata?.namespace,
     });
   };
 
@@ -98,51 +98,38 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
     <GridItem span={5}>
       <DescriptionList>
         <VirtualMachineDescriptionItem
-          descriptionData={vm?.metadata?.name}
-          descriptionHeader={t('Name')}
-          isPopover
           // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L96
           bodyContent={t(
             'Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. ',
           )}
-          moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
           breadcrumb="VirtualMachine.metadata.name"
           data-test-id={`${vm?.metadata?.name}-name`}
+          descriptionData={vm?.metadata?.name}
+          descriptionHeader={t('Name')}
+          isPopover
+          moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<ResourceLink kind="Namespace" name={vm?.metadata?.namespace} />}
-          descriptionHeader={t('Namespace')}
-          isPopover
           // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L102-L104
           bodyContent={t(
             'Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated. ',
           )}
-          moreInfoURL="http://kubernetes.io/docs/user-guide/namespaces"
           breadcrumb="VirtualMachine.metadata.namespace"
+          descriptionData={<ResourceLink kind="Namespace" name={vm?.metadata?.namespace} />}
+          descriptionHeader={t('Namespace')}
+          isPopover
+          moreInfoURL="http://kubernetes.io/docs/user-guide/namespaces"
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<VirtualMachineLabels labels={vm?.metadata?.labels} />}
-          descriptionHeader={t('Labels')}
-          isPopover
           // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L84
           bodyContent={t(
             'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ',
           )}
-          moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
-          breadcrumb="VirtualMachine.metadata.labels"
-          isEdit
-          showEditOnTitle
-          editOnTitleJustify
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <LabelsModal
-                obj={vm}
-                isOpen={isOpen}
-                onClose={onClose}
                 onLabelsSubmit={(labels) =>
                   k8sPatch({
-                    model: VirtualMachineModel,
-                    resource: vm,
                     data: [
                       {
                         op: 'replace',
@@ -150,34 +137,36 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
                         value: labels,
                       },
                     ],
+                    model: VirtualMachineModel,
+                    resource: vm,
                   })
                 }
+                isOpen={isOpen}
+                obj={vm}
+                onClose={onClose}
               />
             ))
           }
+          breadcrumb="VirtualMachine.metadata.labels"
           data-test-id={`${vm?.metadata?.name}-labels`}
+          descriptionData={<VirtualMachineLabels labels={vm?.metadata?.labels} />}
+          descriptionHeader={t('Labels')}
+          editOnTitleJustify
+          isEdit
+          isPopover
+          moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
+          showEditOnTitle
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<VirtualMachineAnnotations annotations={vm?.metadata?.annotations} />}
-          descriptionHeader={t('Annotations')}
-          isPopover
           // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L32
           bodyContent={t(
             'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. ',
           )}
-          moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
-          breadcrumb="VirtualMachine.metadata.annotations"
-          isEdit
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <AnnotationsModal
-                obj={vm}
-                isOpen={isOpen}
-                onClose={onClose}
                 onSubmit={(updatedAnnotations) =>
                   k8sPatch({
-                    model: VirtualMachineModel,
-                    resource: vm,
                     data: [
                       {
                         op: 'replace',
@@ -185,27 +174,38 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
                         value: updatedAnnotations,
                       },
                     ],
+                    model: VirtualMachineModel,
+                    resource: vm,
                   })
                 }
+                isOpen={isOpen}
+                obj={vm}
+                onClose={onClose}
               />
             ))
           }
+          breadcrumb="VirtualMachine.metadata.annotations"
+          descriptionData={<VirtualMachineAnnotations annotations={vm?.metadata?.annotations} />}
+          descriptionHeader={t('Annotations')}
+          isEdit
+          isPopover
+          moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
         />
         <VirtualMachineDescriptionItem
-          descriptionData={getAnnotation(vm, DESCRIPTION_ANNOTATION) || None}
-          descriptionHeader={t('Description')}
-          isEdit
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DescriptionModal
-                obj={vm}
                 isOpen={isOpen}
+                obj={vm}
                 onClose={onClose}
                 onSubmit={updateDescription}
               />
             ))
           }
           data-test-id={`${vm?.metadata?.name}-description`}
+          descriptionData={getAnnotation(vm, DESCRIPTION_ANNOTATION) || None}
+          descriptionHeader={t('Description')}
+          isEdit
         />
         <VirtualMachineDescriptionItem
           descriptionData={
@@ -213,45 +213,45 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
               !isEmpty(guestAgentData) &&
               getOsNameFromGuestAgent(guestAgentData)) || <GuestAgentIsRequiredText vmi={vmi} />
           }
-          isPopover
+          data-test-id={`${vm?.metadata?.name}-os`}
           // body-content text copied from:
           descriptionHeader={t('Operating system')}
-          data-test-id={`${vm?.metadata?.name}-os`}
+          isPopover
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<CPUMemory vm={vm} />}
-          descriptionHeader={t('CPU | Memory')}
-          isEdit={canUpdateVM}
-          isDisabled={!!vm?.spec?.instancetype}
-          messageOnDisabled={t(
-            'CPU and Memory can not be edited if the VirtualMachine is created from InstanceType',
-          )}
-          isPopover
           bodyContent={
             vm?.spec?.instancetype ? null : (
               <CPUDescription cpu={vm?.spec?.template?.spec?.domain?.cpu} />
             )
           }
+          messageOnDisabled={t(
+            'CPU and Memory can not be edited if the VirtualMachine is created from InstanceType',
+          )}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <CPUMemoryModal
-                vm={vm}
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vm={vm}
                 vmi={vmi}
               />
             ))
           }
           data-test-id={`${vm?.metadata?.name}-cpu-memory`}
+          descriptionData={<CPUMemory vm={vm} />}
+          descriptionHeader={t('CPU | Memory')}
+          isDisabled={!!vm?.spec?.instancetype}
+          isEdit={canUpdateVM}
+          isPopover
         />
         <VirtualMachineDescriptionItem
-          descriptionData={getMachineType(vm) || NO_DATA_DASH}
-          descriptionHeader={t('Machine type')}
-          isPopover
           bodyContent={t(
             'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
           )}
+          descriptionData={getMachineType(vm) || NO_DATA_DASH}
+          descriptionHeader={t('Machine type')}
+          isPopover
         />
         <VirtualMachineDescriptionItem
           descriptionData={
@@ -261,66 +261,66 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
               firmwareBootloaderTitle
             )
           }
-          descriptionHeader={t('Boot mode')}
-          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <FirmwareBootloaderModal
-                vm={vm}
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vm={vm}
                 vmi={vmi}
               />
             ))
           }
           data-test-id={`${vm?.metadata?.name}-boot-method`}
+          descriptionHeader={t('Boot mode')}
+          isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={vm?.spec?.template?.spec?.startStrategy ? t('ON') : t('OFF')}
-          descriptionHeader={t('Start in pause mode')}
-          isEdit={canUpdateVM}
-          data-test-id="start-pause-mode"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <StartPauseModal
-                vm={vm}
+                headerText={t('Start in pause mode')}
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                headerText={t('Start in pause mode')}
+                vm={vm}
                 vmi={vmi}
               />
             ))
           }
+          data-test-id="start-pause-mode"
+          descriptionData={vm?.spec?.template?.spec?.startStrategy ? t('ON') : t('OFF')}
+          descriptionHeader={t('Start in pause mode')}
+          isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
           descriptionData={
             templateName ? (
               <ResourceLink
-                groupVersionKind={modelToGroupVersionKind(TemplateModel)}
-                name={templateName}
-                namespace={templateNamespace}
                 onClick={() =>
                   history.push(`/k8s/ns/${templateNamespace}/templates/${templateName}`)
                 }
+                groupVersionKind={modelToGroupVersionKind(TemplateModel)}
+                name={templateName}
+                namespace={templateNamespace}
               />
             ) : (
               None
             )
           }
-          descriptionHeader={t('Template')}
           data-test-id={`${vm?.metadata?.name}-template`}
+          descriptionHeader={t('Template')}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<Timestamp timestamp={vm?.metadata?.creationTimestamp} />}
-          descriptionHeader={t('Created at')}
-          isPopover
           // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L84
           bodyContent={t(
             'Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.',
           )}
           breadcrumb="VirtualMachine.metadata.creationTimestamp"
+          descriptionData={<Timestamp timestamp={vm?.metadata?.creationTimestamp} />}
+          descriptionHeader={t('Created at')}
+          isPopover
         />
         <OwnerDetailsItem obj={vm} />
       </DescriptionList>

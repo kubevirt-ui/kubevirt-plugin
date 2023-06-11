@@ -5,8 +5,13 @@ const useDiagnosticFilter = (): RowFilter[] => {
   const { t } = useKubevirtTranslation();
 
   const categoryFilter = {
+    filter: (selectedItems, obj) => {
+      return (
+        selectedItems?.selected?.length === 0 ||
+        selectedItems?.selected?.includes(obj?.metadata?.type)
+      );
+    },
     filterGroupName: t('Category'),
-    type: 'category',
     items: [
       { id: 'VirtualMachines', title: t('VirtualMachines') },
       { id: 'Network', title: t('Network') },
@@ -16,17 +21,17 @@ const useDiagnosticFilter = (): RowFilter[] => {
       if (obj?.metadata?.type) return obj?.metadata?.type;
       return 'Network';
     },
-    filter: (selectedItems, obj) => {
-      return (
-        selectedItems?.selected?.length === 0 ||
-        selectedItems?.selected?.includes(obj?.metadata?.type)
-      );
-    },
+    type: 'category',
   };
 
   const conditionsFilter = {
+    filter: (selectedItems, obj) => {
+      return (
+        selectedItems?.selected?.length === 0 ||
+        selectedItems?.selected?.includes(obj?.metadata?.condition)
+      );
+    },
     filterGroupName: t('Conditions'),
-    type: 'conditions',
     items: [
       { id: 'Error', title: t('Error') },
       { id: 'Other', title: t('Other') },
@@ -35,12 +40,7 @@ const useDiagnosticFilter = (): RowFilter[] => {
       if (obj?.status === 'False') return 'Error';
       return 'Other';
     },
-    filter: (selectedItems, obj) => {
-      return (
-        selectedItems?.selected?.length === 0 ||
-        selectedItems?.selected?.includes(obj?.metadata?.condition)
-      );
-    },
+    type: 'conditions',
   };
 
   return [categoryFilter, conditionsFilter];

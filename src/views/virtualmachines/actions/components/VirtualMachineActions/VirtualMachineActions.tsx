@@ -12,17 +12,17 @@ import { Dropdown, DropdownPosition, DropdownToggle, KebabToggle } from '@patter
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 
 type VirtualMachinesInstanceActionsProps = {
-  vm: V1VirtualMachine;
   isKebabToggle?: boolean;
-  vmim: V1VirtualMachineInstanceMigration;
   isSingleNodeCluster: boolean;
+  vm: V1VirtualMachine;
+  vmim: V1VirtualMachineInstanceMigration;
 };
 
 const VirtualMachineActions: React.FC<VirtualMachinesInstanceActionsProps> = ({
-  vm,
-  vmim,
   isKebabToggle,
   isSingleNodeCluster,
+  vm,
+  vmim,
 }) => {
   const { t } = useKubevirtTranslation();
   // TODO: use LazyActionMenu when fixed
@@ -38,11 +38,9 @@ const VirtualMachineActions: React.FC<VirtualMachinesInstanceActionsProps> = ({
 
   return (
     <Dropdown
-      menuAppendTo={getContentScrollableElement}
-      data-test-id="virtual-machine-actions"
-      isPlain={isKebabToggle}
-      isOpen={isOpen}
-      position={DropdownPosition.right}
+      dropdownItems={actions?.map((action) => (
+        <ActionDropdownItem action={action} key={action?.id} setIsOpen={setIsOpen} />
+      ))}
       toggle={
         isKebabToggle ? (
           <KebabToggle onToggle={setIsOpen} />
@@ -50,9 +48,11 @@ const VirtualMachineActions: React.FC<VirtualMachinesInstanceActionsProps> = ({
           <DropdownToggle onToggle={setIsOpen}>{t('Actions')}</DropdownToggle>
         )
       }
-      dropdownItems={actions?.map((action) => (
-        <ActionDropdownItem key={action?.id} action={action} setIsOpen={setIsOpen} />
-      ))}
+      data-test-id="virtual-machine-actions"
+      isOpen={isOpen}
+      isPlain={isKebabToggle}
+      menuAppendTo={getContentScrollableElement}
+      position={DropdownPosition.right}
     />
   );
 };

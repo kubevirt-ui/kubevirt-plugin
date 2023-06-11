@@ -21,9 +21,9 @@ type UseNetworkData = (
   nic: string,
 ) => {
   data: {
-    total: PrometheusResult[];
     in: PrometheusResult[];
     out: PrometheusResult[];
+    total: PrometheusResult[];
   };
   links: { [key: string]: string };
 };
@@ -31,61 +31,57 @@ type UseNetworkData = (
 const useNetworkData: UseNetworkData = (vmi, nic) => {
   const { currentTime, duration, timespan } = useDuration();
   const queries = useMemo(
-    () => getUtilizationQueries({ obj: vmi, duration, nic }),
+    () => getUtilizationQueries({ duration, nic, obj: vmi }),
     [vmi, duration, nic],
   );
   const isAllNetwork = nic === ALL_NETWORKS;
 
   const [networkByNICTotal] = usePrometheusPoll({
-    query: queries?.NETWORK_TOTAL_BY_INTERFACE_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.NETWORK_TOTAL_BY_INTERFACE_USAGE,
     timespan,
   });
   const [networkByNICIn] = usePrometheusPoll({
-    query: queries?.NETWORK_IN_BY_INTERFACE_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.NETWORK_IN_BY_INTERFACE_USAGE,
     timespan,
   });
   const [networkByNICOut] = usePrometheusPoll({
-    query: queries?.NETWORK_OUT_BY_INTERFACE_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.NETWORK_OUT_BY_INTERFACE_USAGE,
     timespan,
   });
   const [networkTotal] = usePrometheusPoll({
-    query: isAllNetwork && queries?.NETWORK_TOTAL_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: isAllNetwork && queries?.NETWORK_TOTAL_USAGE,
     timespan,
   });
 
   const [networkIn] = usePrometheusPoll({
-    query: isAllNetwork && queries?.NETWORK_IN_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: isAllNetwork && queries?.NETWORK_IN_USAGE,
     timespan,
   });
 
   const [networkOut] = usePrometheusPoll({
-    query: isAllNetwork && queries?.NETWORK_OUT_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: isAllNetwork && queries?.NETWORK_OUT_USAGE,
     timespan,
   });
   return {
     data: {
-      total: [
-        ...getPrometheusDataByNic(networkByNICTotal, nic),
-        ...(isAllNetwork ? getPrometheusDataAllNics(networkTotal) : []),
-      ],
       in: [
         ...getPrometheusDataByNic(networkByNICIn, nic),
         ...(isAllNetwork ? getPrometheusDataAllNics(networkIn) : []),
@@ -93,6 +89,10 @@ const useNetworkData: UseNetworkData = (vmi, nic) => {
       out: [
         ...getPrometheusDataByNic(networkByNICOut, nic),
         ...(isAllNetwork ? getPrometheusDataAllNics(networkOut) : []),
+      ],
+      total: [
+        ...getPrometheusDataByNic(networkByNICTotal, nic),
+        ...(isAllNetwork ? getPrometheusDataAllNics(networkTotal) : []),
       ],
     },
     links: {

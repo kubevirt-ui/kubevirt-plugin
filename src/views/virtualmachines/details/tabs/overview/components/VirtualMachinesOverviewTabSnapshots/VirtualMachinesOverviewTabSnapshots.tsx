@@ -50,8 +50,8 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
 
           <Button
             isInline
-            variant={ButtonVariant.link}
             onClick={() => createModal((props) => <SnapshotModal vm={vm} {...props} />)}
+            variant={ButtonVariant.link}
           >
             {t('Take snapshot')}
           </Button>
@@ -73,7 +73,7 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
         {!isEmpty(snapshots) && (
           <CardFooter>
             <Link to={snapshotsTabLink}>
-              <Label variant="outline" color="blue">
+              <Label color="blue" variant="outline">
                 {t('View More')}
               </Label>
             </Link>

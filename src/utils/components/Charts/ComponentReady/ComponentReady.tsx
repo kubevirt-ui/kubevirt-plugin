@@ -7,11 +7,11 @@ import { Bullseye } from '@patternfly/react-core';
 
 type ComponentReadyProps = React.PropsWithChildren<{
   isReady: boolean;
-  text?: string;
   spinner?: boolean;
+  text?: string;
 }>;
 
-const ComponentReady: React.FC<ComponentReadyProps> = ({ isReady, children, text, spinner }) => {
+const ComponentReady: React.FC<ComponentReadyProps> = ({ children, isReady, spinner, text }) => {
   const { t } = useKubevirtTranslation();
   return isReady ? (
     <>{children}</>

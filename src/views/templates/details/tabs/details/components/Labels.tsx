@@ -24,15 +24,13 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { LabelsAnnotationsType, TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-const Labels: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
+const Labels: React.FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const labels = template?.metadata?.labels;
 
   const onLabelsSubmit = (templateLabels: LabelsAnnotationsType) =>
     k8sPatch({
-      model: TemplateModel,
-      resource: template,
       data: [
         {
           op: 'replace',
@@ -40,13 +38,15 @@ const Labels: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
           value: templateLabels,
         },
       ],
+      model: TemplateModel,
+      resource: template,
     });
 
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <LabelsModal
-        obj={template}
         isOpen={isOpen}
+        obj={template}
         onClose={onClose}
         onLabelsSubmit={onLabelsSubmit}
       />
@@ -58,9 +58,6 @@ const Labels: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
         <Flex className="title-edit-item-space">
           <FlexItem>
             <Popover
-              hasAutoWidth
-              maxWidth="30rem"
-              headerContent={t('Labels')}
               bodyContent={
                 <Trans ns="plugin__kubevirt-plugin">
                   Map of string keys and values that can be used to organize and categorize (scope
@@ -76,16 +73,19 @@ const Labels: React.FC<TemplateDetailsGridProps> = ({ template, editable }) => {
                   </Breadcrumb>
                 </Trans>
               }
+              hasAutoWidth
+              headerContent={t('Labels')}
+              maxWidth="30rem"
             >
               <DescriptionListTermHelpTextButton>{t('Labels')}</DescriptionListTermHelpTextButton>
             </Popover>
           </FlexItem>
           <FlexItem>
             <Button
-              type="button"
+              isDisabled={!editable}
               isInline
               onClick={onEditClick}
-              isDisabled={!editable}
+              type="button"
               variant="link"
             >
               {t('Edit')}

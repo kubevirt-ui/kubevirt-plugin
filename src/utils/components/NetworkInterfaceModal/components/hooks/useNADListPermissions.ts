@@ -12,26 +12,26 @@ type UseNADListPermissions = () => NADListPermissionsMap;
 const useNADListPermissions: UseNADListPermissions = () => {
   const [canListDefaultNSNads] = useAccessReview({
     namespace: DEFAULT_NAMESPACE,
-    verb: 'list' as K8sVerb,
     resource: NetworkAttachmentDefinitionModel.plural,
+    verb: 'list' as K8sVerb,
   });
 
   const [canListOpenShiftSRIOVNetworkOperatorNamespaceNADs] = useAccessReview({
     namespace: OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
-    verb: 'list' as K8sVerb,
     resource: NetworkAttachmentDefinitionModel.plural,
+    verb: 'list' as K8sVerb,
   });
 
   const [canListOpenShiftMultusNamespaceNADs] = useAccessReview({
     namespace: OPENSHIFT_MULTUS_NS,
-    verb: 'list' as K8sVerb,
     resource: NetworkAttachmentDefinitionModel.plural,
+    verb: 'list' as K8sVerb,
   });
 
   return {
     default: canListDefaultNSNads,
-    OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS: canListOpenShiftSRIOVNetworkOperatorNamespaceNADs,
     OPENSHIFT_MULTUS_NS: canListOpenShiftMultusNamespaceNADs,
+    OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS: canListOpenShiftSRIOVNetworkOperatorNamespaceNADs,
   };
 };
 

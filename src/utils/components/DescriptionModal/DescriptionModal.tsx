@@ -7,10 +7,10 @@ import { TextArea } from '@patternfly/react-core';
 import TabModal from '../TabModal/TabModal';
 
 type DescriptionModalProps = {
-  obj: K8sResourceCommon;
-  onSubmit: (description: string) => Promise<void | K8sResourceCommon>;
   isOpen: boolean;
+  obj: K8sResourceCommon;
   onClose: () => void;
+  onSubmit: (description: string) => Promise<K8sResourceCommon | void>;
 };
 
 export const DescriptionModal: React.FC<DescriptionModalProps> = React.memo(
@@ -26,19 +26,19 @@ export const DescriptionModal: React.FC<DescriptionModalProps> = React.memo(
 
     return (
       <TabModal
-        obj={obj}
-        onSubmit={() => onSubmit(description)}
-        isOpen={isOpen}
-        onClose={onClose}
         headerText={t('Description')}
+        isOpen={isOpen}
+        obj={obj}
+        onClose={onClose}
+        onSubmit={() => onSubmit(description)}
       >
         <TextArea
+          aria-label={t('description text area')}
           autoFocus
           defaultValue={obj?.metadata?.annotations?.description}
-          value={description}
           onChange={setDescription}
           resizeOrientation="vertical"
-          aria-label={t('description text area')}
+          value={description}
         />
       </TabModal>
     );

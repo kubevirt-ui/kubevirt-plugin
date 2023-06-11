@@ -6,15 +6,15 @@ import { getDataSourceCronJob } from '../utils';
 
 export const getDataImportCronFilter = (): RowFilter<V1beta1DataSource>[] => [
   {
-    filterGroupName: t('Source'),
-    type: 'data-cron-available',
-    reducer: (obj) => (getDataSourceCronJob(obj) ? 'available' : ''),
     filter: ({ selected }, obj) => selected?.length === 0 || Boolean(getDataSourceCronJob(obj)),
+    filterGroupName: t('Source'),
     items: [
       {
         id: 'available',
         title: t('DataImportCron available'),
       },
     ],
+    reducer: (obj) => (getDataSourceCronJob(obj) ? 'available' : ''),
+    type: 'data-cron-available',
   },
 ];

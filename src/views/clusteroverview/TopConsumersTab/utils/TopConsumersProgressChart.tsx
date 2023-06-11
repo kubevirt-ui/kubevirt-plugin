@@ -5,29 +5,29 @@ import { Progress, ProgressMeasureLocation, ProgressSize } from '@patternfly/rea
 import './TopConsumersProgressChart.scss';
 
 type TopConsumersProgressChartProps = {
+  labelUnit: string;
+  labelValue: number;
+  maxValue: number;
   title: string;
   value: number;
-  labelValue: number;
-  labelUnit: string;
-  maxValue: number;
 };
 
 const TopConsumersProgressChart: React.FC<TopConsumersProgressChartProps> = ({
+  labelUnit,
+  labelValue,
+  maxValue,
   title,
   value,
-  labelValue,
-  labelUnit,
-  maxValue,
 }) => (
   <>
     <div className="kv-top-consumers-card__progress-chart--title">{title}</div>
     <Progress
-      value={value}
-      size={ProgressSize.sm}
-      max={maxValue}
-      label={`${labelValue} ${labelUnit}`}
-      measureLocation={ProgressMeasureLocation.outside}
       aria-label="kv-top-consumers-card-chart"
+      label={`${labelValue} ${labelUnit}`}
+      max={maxValue}
+      measureLocation={ProgressMeasureLocation.outside}
+      size={ProgressSize.sm}
+      value={value}
     />
   </>
 );

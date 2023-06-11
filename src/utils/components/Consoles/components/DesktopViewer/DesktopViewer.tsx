@@ -52,13 +52,9 @@ const DesktopViewer: React.FC<DesktopViewerProps> = ({ vm, vmi }) => {
 
   return (
     <>
-      <Form isHorizontal className="kv-vm-consoles__rdp-actions">
+      <Form className="kv-vm-consoles__rdp-actions" isHorizontal>
         <FormGroup fieldId="network-dropdown" label={t('Network interface')}>
           <Dropdown
-            id="network-dropdown"
-            onSelect={() => setIsDropdownOpen(false)}
-            isOpen={isDropdownOpen}
-            dropdownItems={networkItems}
             toggle={
               <DropdownToggle
                 id="pf-c-console__actions-desktop-toggle-id"
@@ -67,19 +63,23 @@ const DesktopViewer: React.FC<DesktopViewerProps> = ({ vm, vmi }) => {
                 {selectedNetwork?.name}
               </DropdownToggle>
             }
+            dropdownItems={networkItems}
+            id="network-dropdown"
+            isOpen={isDropdownOpen}
+            onSelect={() => setIsDropdownOpen(false)}
             title={t('--- Select network interface ---')}
           />
         </FormGroup>
       </Form>
       {networkType === 'POD' && (
         <RDPConnector
-          rdpServiceAddressPort={rdpServiceAddressPort}
           isLoading={!podsLoaded || !servicesLoaded}
+          rdpServiceAddressPort={rdpServiceAddressPort}
           vm={vm}
           vmi={vmi}
         />
       )}
-      {networkType === 'MULTUS' && <MultusNetwork vmi={vmi} selectedNetwork={selectedNetwork} />}
+      {networkType === 'MULTUS' && <MultusNetwork selectedNetwork={selectedNetwork} vmi={vmi} />}
     </>
   );
 };

@@ -15,51 +15,51 @@ import {
 } from '../../../utils/utils';
 
 const MigrationPoliciesRow: React.FC<RowProps<V1alpha1MigrationPolicy>> = ({
-  obj: mp,
   activeColumnIDs,
+  obj: mp,
 }) => (
   <>
-    <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
+    <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="name">
       <ResourceLink
         groupVersionKind={MigrationPolicyModelGroupVersionKind}
         name={mp?.metadata?.name}
       />
     </TableData>
-    <TableData id="bandwidth" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
+    <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id="bandwidth">
       {migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION in mp?.spec
         ? getBandwidthPerMigrationText(mp?.spec?.bandwidthPerMigration)
         : NO_DATA_DASH}
     </TableData>
-    <TableData id="auto-converge" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
+    <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id="auto-converge">
       {migrationPolicySpecKeys.ALLOW_AUTO_CONVERGE in mp?.spec
         ? getBooleanText(mp?.spec?.allowAutoConverge)
         : NO_DATA_DASH}
     </TableData>
-    <TableData id="post-copy" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
+    <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id="post-copy">
       {migrationPolicySpecKeys.ALLOW_POST_COPY in mp?.spec
         ? getBooleanText(mp?.spec?.allowPostCopy)
         : NO_DATA_DASH}
     </TableData>
-    <TableData id="completion-timeout" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
+    <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id="completion-timeout">
       {migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB in mp?.spec
         ? getCompletionTimeoutText(mp?.spec?.completionTimeoutPerGiB)
         : NO_DATA_DASH}
     </TableData>
-    <TableData id="project-labels" activeColumnIDs={activeColumnIDs}>
+    <TableData activeColumnIDs={activeColumnIDs} id="project-labels">
       <MigrationPolicySelectorList selector={mp?.spec?.selectors?.namespaceSelector} />
     </TableData>
-    <TableData id="vm-labels" activeColumnIDs={activeColumnIDs}>
+    <TableData activeColumnIDs={activeColumnIDs} id="vm-labels">
       <MigrationPolicySelectorList
-        selector={mp?.spec?.selectors?.virtualMachineInstanceSelector}
         isVMILabel
+        selector={mp?.spec?.selectors?.virtualMachineInstanceSelector}
       />
     </TableData>
     <TableData
-      id=""
       activeColumnIDs={activeColumnIDs}
       className="dropdown-kebab-pf pf-c-table__action"
+      id=""
     >
-      <MigrationPoliciesActions mp={mp} isKebabToggle />
+      <MigrationPoliciesActions isKebabToggle mp={mp} />
     </TableData>
   </>
 );

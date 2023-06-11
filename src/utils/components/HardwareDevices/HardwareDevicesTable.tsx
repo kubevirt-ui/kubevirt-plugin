@@ -23,7 +23,7 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
   if (!devices?.length) return <span className="text-muted">{t('Not available')}</span>;
 
   return (
-    <DescriptionList columnModifier={{ default: '2Col' }} className="hardware-devices-table">
+    <DescriptionList className="hardware-devices-table" columnModifier={{ default: '2Col' }}>
       <DescriptionListGroup>
         <DescriptionListTerm>{t('Resource name')}</DescriptionListTerm>
         <DescriptionListDescription>
@@ -38,7 +38,7 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
         <DescriptionListTerm>{t('Hardware device name')}</DescriptionListTerm>
         <DescriptionListDescription>
           <Stack>
-            {devices.map((device: { name: string; deviceName: string; index: number }) => (
+            {devices.map((device: { deviceName: string; index: number; name: string }) => (
               <StackItem key={`${device?.name}-${device?.deviceName}`}>
                 {device.deviceName}
               </StackItem>

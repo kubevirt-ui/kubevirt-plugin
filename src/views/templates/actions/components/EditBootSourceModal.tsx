@@ -24,16 +24,16 @@ import { getDataVolumeSpec } from './utils';
 import './EditBootSourceModal.scss';
 
 type EditBootSourceModalProps = {
+  dataSource: V1beta1DataSource;
   isOpen: boolean;
   obj: V1Template;
-  dataSource: V1beta1DataSource;
   onClose: () => void;
 };
 
 const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
+  dataSource,
   isOpen,
   obj,
-  dataSource,
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -58,32 +58,32 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
   return (
     <>
       <TabModal<K8sResourceCommon>
-        obj={obj}
         headerText={t('Edit boot source reference')}
-        onSubmit={onSubmit}
         isOpen={isOpen}
+        obj={obj}
         onClose={onClose}
+        onSubmit={onSubmit}
       >
-        <Alert isInline className="margin-bottom-md" variant="warning" title={t('Warning')}>
+        <Alert className="margin-bottom-md" isInline title={t('Warning')} variant="warning">
           <Trans ns="plugin__kubevirt-plugin">
             Editing the DataSource will affect{' '}
-            <Button variant="link" isInline ref={popoverRef}>
+            <Button isInline ref={popoverRef} variant="link">
               all templates
             </Button>{' '}
             that are currently using this DataSource.
           </Trans>
         </Alert>
         <Popover
-          headerContent={t('Affected templates')}
           bodyContent={(affectedTemplates || []).map((template) => (
             <ResourceLink
-              key={template.metadata.uid}
               groupVersionKind={modelToGroupVersionKind(TemplateModel)}
+              key={template.metadata.uid}
+              linkTo={false}
               name={template.metadata.name}
               namespace={template.metadata.namespace}
-              linkTo={false}
             />
           ))}
+          headerContent={t('Affected templates')}
           reference={popoverRef}
         />
 
@@ -93,14 +93,14 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
               <SelectSourceSkeleton />
             ) : (
               <SelectSource
-                source={bootSource}
-                onSourceChange={setBootSource}
-                sourceLabel={t('Boot source type')}
                 sourceOptions={[
                   SOURCE_TYPES.pvcSource,
                   SOURCE_TYPES.registrySource,
                   SOURCE_TYPES.httpSource,
                 ]}
+                onSourceChange={setBootSource}
+                source={bootSource}
+                sourceLabel={t('Boot source type')}
                 withSize
               />
             )}

@@ -10,15 +10,15 @@ import WizardSchedulingGrid from './components/WizardSchedulingGrid';
 
 import './wizard-scheduling-tab.scss';
 
-const WizardSchedulingTab: WizardTab = ({ vm, updateVM }) => {
+const WizardSchedulingTab: WizardTab = ({ updateVM, vm }) => {
   return (
     <PageSection>
       <SidebarEditor<V1VirtualMachine>
-        resource={vm}
         onResourceUpdate={updateVM}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.SCHEDULING_TAB}
+        resource={vm}
       >
-        {(resource) => <WizardSchedulingGrid vm={resource} updateVM={updateVM} />}
+        {(resource) => <WizardSchedulingGrid updateVM={updateVM} vm={resource} />}
       </SidebarEditor>
     </PageSection>
   );

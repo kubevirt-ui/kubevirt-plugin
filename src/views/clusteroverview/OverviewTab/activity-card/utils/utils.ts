@@ -10,7 +10,7 @@ export const eventTypes = [
 
 export const asUniqueResource = (
   resource: FirehoseResource,
-  prefix: string | number,
+  prefix: number | string,
 ): FirehoseResource => ({
   ...resource,
   prop: `${prefix}-${resource.prop}`,

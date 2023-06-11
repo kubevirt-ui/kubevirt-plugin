@@ -29,20 +29,20 @@ import { getPaginationFromVolumeIndex } from './utils/utils';
 import './BootableVolumeList.scss';
 
 type BootableVolumeListProps = {
-  selectedBootableVolumeState?: [BootableVolume, (selectedVolume: BootableVolume) => void];
   displayShowAllButton?: boolean;
+  selectedBootableVolumeState?: [BootableVolume, (selectedVolume: BootableVolume) => void];
 };
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
-  selectedBootableVolumeState,
   displayShowAllButton = false,
+  selectedBootableVolumeState,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
-    instanceTypeVMState,
     bootableVolumesData,
-    onSelectCreatedVolume,
     instanceTypesAndPreferencesData,
+    instanceTypeVMState,
+    onSelectCreatedVolume,
   } = useInstanceTypeVMStore();
 
   const { selectedBootableVolume } = instanceTypeVMState;
@@ -62,18 +62,18 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal,
   );
 
-  const { sortedData, getSortType } = useBootVolumeSortColumns(
+  const { getSortType, sortedData } = useBootVolumeSortColumns(
     data,
     preferencesMap,
     pvcSources,
     pagination,
   );
-  const onPageChange = ({ page, perPage, startIndex, endIndex }) => {
+  const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({
+      endIndex,
       page,
       perPage,
       startIndex,
-      endIndex,
     }));
   };
 
@@ -92,50 +92,50 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
         <SplitItem>
           <FormGroup label={t('Volumes project')}>
             <TextInput
-              className="bootable-volume-list-bar__volume-namespace"
-              value={OPENSHIFT_OS_IMAGES_NS}
-              isDisabled
               aria-label="bootable volume list"
+              className="bootable-volume-list-bar__volume-namespace"
+              isDisabled
+              value={OPENSHIFT_OS_IMAGES_NS}
             />
           </FormGroup>
         </SplitItem>
         <SplitItem className="bootable-volume-list-bar__filter">
           <ListPageFilter
-            hideLabelFilter
-            hideNameLabelFilters={!displayShowAllButton}
             onFilterChange={(...args) => {
               onFilterChange(...args);
               setPagination((prevPagination) => ({
                 ...prevPagination,
+                endIndex: prevPagination?.perPage,
                 page: 1,
                 startIndex: 0,
-                endIndex: prevPagination?.perPage,
               }));
             }}
-            loaded={Boolean(loaded)}
+            columnLayout={columnLayout}
             data={unfilteredData}
+            hideLabelFilter
+            hideNameLabelFilters={!displayShowAllButton}
+            loaded={Boolean(loaded)}
             // nameFilter={!displayShowAllButton && "modal-name"} can remove comment once this merged https://github.com/openshift/console/pull/12438 and build into new SDK version
             rowFilters={filters}
-            columnLayout={columnLayout}
           />
         </SplitItem>
         <SplitItem isFilled />
         <SplitItem className="bootable-volume-list-bar__pagination">
           <Pagination
-            itemCount={data?.length}
-            page={pagination?.page}
-            perPage={pagination?.perPage}
-            defaultToFullPage
-            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-              onPageChange({ page, perPage, startIndex, endIndex })
-            }
             onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-              onPageChange({ page, perPage, startIndex, endIndex })
+              onPageChange({ endIndex, page, perPage, startIndex })
+            }
+            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+              onPageChange({ endIndex, page, perPage, startIndex })
             }
             perPageOptions={
               displayShowAllButton ? paginationDefaultValuesForm : paginationDefaultValuesModal
             }
+            defaultToFullPage
             isCompact={displayShowAllButton}
+            itemCount={data?.length}
+            page={pagination?.page}
+            perPage={pagination?.perPage}
           />
         </SplitItem>
         {displayShowAllButton && <ShowAllBootableVolumesButton />}
@@ -144,7 +144,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
         <Thead>
           <Tr>
             {activeColumns.map((col, columnIndex) => (
-              <Th sort={getSortType(columnIndex)} key={col?.id} id={col?.id}>
+              <Th id={col?.id} key={col?.id} sort={getSortType(columnIndex)}>
                 {col?.title}
               </Th>
             ))}
@@ -153,9 +153,6 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
         <Tbody>
           {sortedData?.map((bs) => (
             <BootableVolumeRow
-              key={getName(bs)}
-              bootableVolume={bs}
-              activeColumnIDs={activeColumns?.map((col) => col?.id)}
               rowData={{
                 bootableVolumeSelectedState: !displayShowAllButton
                   ? selectedBootableVolumeState
@@ -163,6 +160,9 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                 preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
                 pvcSource: getBootableVolumePVCSource(bs, pvcSources),
               }}
+              activeColumnIDs={activeColumns?.map((col) => col?.id)}
+              bootableVolume={bs}
+              key={getName(bs)}
             />
           ))}
         </Tbody>

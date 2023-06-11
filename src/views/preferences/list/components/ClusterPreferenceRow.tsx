@@ -11,27 +11,27 @@ import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-pl
 import ClusterPreferenceActions from '../../actions/ClusterPreferenceActions';
 
 const ClusterPreferenceRow: FC<RowProps<V1alpha2VirtualMachineClusterPreference>> = ({
-  obj: preference,
   activeColumnIDs,
+  obj: preference,
 }) => (
   <>
-    <TableData id="name" activeColumnIDs={activeColumnIDs}>
+    <TableData activeColumnIDs={activeColumnIDs} id="name">
       <ResourceLink
         groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
-        name={preference?.metadata?.name}
         inline
+        name={preference?.metadata?.name}
       />
       <RedHatLabel obj={preference} />
     </TableData>
-    <TableData id="vendor" activeColumnIDs={activeColumnIDs}>
+    <TableData activeColumnIDs={activeColumnIDs} id="vendor">
       {getLabel(preference, VENDOR_LABEL, NO_DATA_DASH)}
     </TableData>
     <TableData
-      id=""
       activeColumnIDs={activeColumnIDs}
       className="dropdown-kebab-pf pf-c-table__action"
+      id=""
     >
-      <ClusterPreferenceActions preference={preference} isKebabToggle />
+      <ClusterPreferenceActions isKebabToggle preference={preference} />
     </TableData>
   </>
 );

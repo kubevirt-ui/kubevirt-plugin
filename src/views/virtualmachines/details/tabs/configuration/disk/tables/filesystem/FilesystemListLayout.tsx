@@ -10,11 +10,11 @@ import FilesystemListTitle from './FilesystemListTitle';
 import FilesystemRow from './FilesystemRow';
 
 type FileSystemListLayoutProps = {
-  vmi: V1VirtualMachineInstance;
   noDataEmptyMsg?: any;
+  vmi: V1VirtualMachineInstance;
 };
 
-const FileSystemListLayout: React.FC<FileSystemListLayoutProps> = ({ vmi, noDataEmptyMsg }) => {
+const FileSystemListLayout: React.FC<FileSystemListLayoutProps> = ({ noDataEmptyMsg, vmi }) => {
   const [data, loaded] = useGuestOS(vmi);
   const columns = useFilesystemListColumns();
   const fileSystems = data?.fsInfo?.disks || [];
@@ -23,13 +23,13 @@ const FileSystemListLayout: React.FC<FileSystemListLayoutProps> = ({ vmi, noData
     <ListPageBody>
       <FilesystemListTitle />
       <VirtualizedTable
+        columns={columns}
         data={fileSystems}
-        unfilteredData={fileSystems}
         loaded={loaded}
         loadError={null}
-        columns={columns}
-        Row={FilesystemRow}
         NoDataEmptyMsg={noDataEmptyMsg}
+        Row={FilesystemRow}
+        unfilteredData={fileSystems}
       />
     </ListPageBody>
   );

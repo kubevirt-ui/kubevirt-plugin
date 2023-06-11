@@ -12,8 +12,8 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-intern
 
 type UseVMsPerTemplateResources = () => {
   loaded: boolean;
-  vms: K8sResourceCommon[];
   templates: K8sResourceCommon[];
+  vms: K8sResourceCommon[];
 };
 
 const useVMsPerTemplateResources: UseVMsPerTemplateResources = () => {
@@ -24,17 +24,11 @@ const useVMsPerTemplateResources: UseVMsPerTemplateResources = () => {
   );
 
   const watchedResources = {
-    vms: {
-      groupVersionKind: VirtualMachineModelGroupVersionKind,
-      isList: true,
-      namespaced: !!namespace,
-      namespace,
-    },
     templates: {
       groupVersionKind: modelToGroupVersionKind(TemplateModel),
       isList: true,
-      namespaced: !!namespace,
       namespace,
+      namespaced: !!namespace,
       selector: {
         matchExpressions: [
           {
@@ -44,6 +38,12 @@ const useVMsPerTemplateResources: UseVMsPerTemplateResources = () => {
         ],
       },
     },
+    vms: {
+      groupVersionKind: VirtualMachineModelGroupVersionKind,
+      isList: true,
+      namespace,
+      namespaced: !!namespace,
+    },
   };
 
   const resourceData = useK8sWatchResources<{ [key: string]: K8sResourceCommon[] }>(
@@ -52,9 +52,9 @@ const useVMsPerTemplateResources: UseVMsPerTemplateResources = () => {
 
   return useMemo(() => {
     return {
+      loaded: resourceData?.templates?.loaded && resourceData?.vms?.loaded,
       templates: resourceData?.templates?.data,
       vms: resourceData?.vms?.data,
-      loaded: resourceData?.templates?.loaded && resourceData?.vms?.loaded,
     };
   }, [resourceData]);
 };

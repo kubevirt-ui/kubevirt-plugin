@@ -23,27 +23,27 @@ import { CloudinitNetworkForm } from './CloudInitNetworkForm';
 
 type CloudinitFormProps = {
   cloudInitVolume: V1Volume;
-  showEditor: boolean;
-  userData: CloudInitUserData;
-  networkData: CloudInitNetworkData;
   enableNetworkData: boolean;
-  updateUserField: (key: keyof CloudInitUserData, value: string) => void;
-  updateNetworkField: (key: keyof CloudInitNetworkData, value: string) => void;
+  networkData: CloudInitNetworkData;
   onEditorSave: (yaml: string) => void;
   setEnableNetworkData: (value: boolean) => void;
   setSubmitDisabled: (value: boolean) => void;
+  showEditor: boolean;
+  updateNetworkField: (key: keyof CloudInitNetworkData, value: string) => void;
+  updateUserField: (key: keyof CloudInitUserData, value: string) => void;
+  userData: CloudInitUserData;
 };
 const CloudinitForm: React.FC<CloudinitFormProps> = ({
   cloudInitVolume,
-  userData,
-  networkData,
-  updateUserField,
-  updateNetworkField,
-  onEditorSave,
-  showEditor,
   enableNetworkData,
+  networkData,
+  onEditorSave,
   setEnableNetworkData,
   setSubmitDisabled,
+  showEditor,
+  updateNetworkField,
+  updateUserField,
+  userData,
 }) => {
   const { t } = useKubevirtTranslation();
   const [passwordHidden, setPasswordHidden] = React.useState<boolean>(true);
@@ -63,64 +63,64 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
       ) : (
         <Form>
           <FormGroup
-            label={t('User')}
-            fieldId={'cloudinit-user'}
             className="kv-cloudint-advanced-tab--validation-text"
+            fieldId={'cloudinit-user'}
             isRequired
+            label={t('User')}
             required
           >
             <TextInput
-              type="text"
-              id={'cloudinit-user'}
-              value={userData?.user || ''}
               onChange={(v) => {
                 setSubmitDisabled(isEmpty(v));
                 updateUserField('user', v);
               }}
+              id={'cloudinit-user'}
+              type="text"
+              value={userData?.user || ''}
             />
           </FormGroup>
           <FormGroup
-            label={t('Password')}
-            fieldId={'cloudinit-password'}
-            className="kv-cloudint-advanced-tab--validation-text"
             helperText={
-              <Trans t={t} ns="plugin__kubevirt-plugin">
+              <Trans ns="plugin__kubevirt-plugin" t={t}>
                 Password for this username -{' '}
                 <Button
-                  variant={ButtonVariant.link}
-                  isInline
                   onClick={() =>
                     updateUserField(
                       'password',
                       new RandExp(/[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}/).gen(),
                     )
                   }
+                  isInline
+                  variant={ButtonVariant.link}
                 >
                   generate password
                 </Button>
               </Trans>
             }
+            className="kv-cloudint-advanced-tab--validation-text"
+            fieldId={'cloudinit-password'}
+            label={t('Password')}
           >
             <InputGroup>
               <TextInput
-                type={passwordHidden ? 'password' : 'text'}
                 id="cloudinit-password"
-                value={userData?.password || ''}
                 onChange={(v) => updateUserField('password', v)}
+                type={passwordHidden ? 'password' : 'text'}
+                value={userData?.password || ''}
               />
               <Button
-                variant={ButtonVariant.link}
                 onClick={() => setPasswordHidden(!passwordHidden)}
+                variant={ButtonVariant.link}
               >
                 {passwordHidden ? <EyeIcon /> : <EyeSlashIcon />}
               </Button>
             </InputGroup>
           </FormGroup>
           <CloudinitNetworkForm
-            networkData={networkData}
-            updateNetworkField={updateNetworkField}
             enableNetworkData={enableNetworkData}
+            networkData={networkData}
             setEnableNetworkData={setEnableNetworkData}
+            updateNetworkField={updateNetworkField}
           />
         </Form>
       )}

@@ -7,37 +7,37 @@ import { FileUpload, FormGroup } from '@patternfly/react-core';
 import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
 
 type DiskSourceUploadPVCProps = {
-  relevantUpload: DataUpload;
-  uploadFileName: string;
-  uploadFile: File | string;
-  setUploadFileName: (name: string) => void;
-  setUploadFile: (file: File | string) => void;
   label?: string;
+  relevantUpload: DataUpload;
+  setUploadFile: (file: File | string) => void;
+  setUploadFileName: (name: string) => void;
+  uploadFile: File | string;
+  uploadFileName: string;
 };
 
 const DiskSourceUploadPVC: React.FC<DiskSourceUploadPVCProps> = ({
+  label,
   relevantUpload,
-  uploadFile,
-  uploadFileName,
   setUploadFile,
   setUploadFileName,
-  label,
+  uploadFile,
+  uploadFileName,
 }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <>
-      <FormGroup label={label || t('Upload data')} fieldId="disk-source-upload" isRequired>
+      <FormGroup fieldId="disk-source-upload" isRequired label={label || t('Upload data')}>
         <FileUpload
-          id="simple-file"
-          data-test-id="disk-source-upload-pvc-file"
-          value={uploadFile}
-          filename={uploadFileName}
-          filenamePlaceholder={t('Drag and drop an image or upload one')}
           onChange={(value, filename) => {
             setUploadFile(value);
             setUploadFileName(filename);
           }}
+          data-test-id="disk-source-upload-pvc-file"
+          filename={uploadFileName}
+          filenamePlaceholder={t('Drag and drop an image or upload one')}
+          id="simple-file"
+          value={uploadFile}
         />
       </FormGroup>
       {relevantUpload && <DiskSourceUploadPVCProgress upload={relevantUpload} />}

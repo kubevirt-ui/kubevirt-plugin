@@ -12,18 +12,18 @@ import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesA
 import { getChangedDescheduler } from '../PendingChanges/utils/helpers';
 
 type DeschedulerModalProps = {
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const DeschedulerModal: React.FC<DeschedulerModalProps> = ({
-  vm,
   isOpen,
   onClose,
   onSubmit,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -47,11 +47,11 @@ const DeschedulerModal: React.FC<DeschedulerModalProps> = ({
 
   return (
     <TabModal
-      obj={updatedVirtualMachine}
+      headerText={t('Descheduler settings')}
       isOpen={isOpen}
+      obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Descheduler settings')}
     >
       <Form>
         {vmi && (
@@ -61,15 +61,15 @@ const DeschedulerModal: React.FC<DeschedulerModalProps> = ({
         )}
         <FormGroup fieldId="descheduler">
           <Checkbox
+            description={t('Allow the Descheduler to evict the VirtualMachine via live migration')}
             id="descheduler"
             isChecked={checked}
-            onChange={setChecked}
             label={t('Enable Descheduler')}
-            description={t('Allow the Descheduler to evict the VirtualMachine via live migration')}
+            onChange={setChecked}
           />
         </FormGroup>
         {checked && (
-          <Alert isInline variant={AlertVariant.info} title={t('Active Descheduler')}>
+          <Alert isInline title={t('Active Descheduler')} variant={AlertVariant.info}>
             {t(
               'This VirtualMachine is subject to the Descheduler profiles configured for eviction.',
             )}

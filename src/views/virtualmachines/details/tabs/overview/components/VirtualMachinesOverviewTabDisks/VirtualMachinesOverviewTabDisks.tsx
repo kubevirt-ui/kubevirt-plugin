@@ -36,12 +36,12 @@ const VirtualMachinesOverviewTabDisks = ({ vm }) => {
         <Divider />
         <CardBody isFilled>
           <VirtualizedTable<DiskRowDataLayout>
+            columns={columns}
             data={disks}
-            unfilteredData={disks}
             loaded={loaded}
             loadError={loadedError}
-            columns={columns}
             Row={VirtualMachinesOverviewTabDisksRow}
+            unfilteredData={disks}
           />
         </CardBody>
       </Card>

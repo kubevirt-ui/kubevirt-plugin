@@ -33,21 +33,20 @@ export const createMultipleResources = async (
   );
 
   const vmCreated = await k8sCreate<V1VirtualMachine>({
-    model: VirtualMachineModel,
     data: vm as V1VirtualMachine,
+    model: VirtualMachineModel,
   });
 
   try {
     const otherResourcesCreated = await Promise.all(
       otherResources.map((resource) => {
-        const { group, version, kind } = getGroupVersionKindForResource(resource);
+        const { group, kind, version } = getGroupVersionKindForResource(resource);
 
         const ref = [group || 'core', version, kind].join('~');
 
         const model = models[ref] || models[resource.kind];
 
         return k8sCreate<K8sResourceCommon>({
-          model: model,
           data: produce(resource, (draftObject) => {
             ensurePath(draftObject, 'metadata');
 
@@ -63,6 +62,7 @@ export const createMultipleResources = async (
               buildOwnerReference(vmCreated, { blockOwnerDeletion: false }),
             );
           }),
+          model: model,
         });
       }),
     );

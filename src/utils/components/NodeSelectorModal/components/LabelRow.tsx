@@ -19,35 +19,35 @@ const LabelRow: React.FC<LabelRowProps> = ({ label, onChange, onDelete }) => {
   return (
     <>
       <GridItem span={6}>
-        <FormGroup label={t('Key')} fieldId={`label-${id}-key-input`}>
+        <FormGroup fieldId={`label-${id}-key-input`} label={t('Key')}>
           <TextInput
+            aria-label={t('selector key')}
             id={`label-${id}-key-input`}
-            placeholder={t('Key')}
             isRequired
+            onChange={(newKey) => onChange({ ...label, key: newKey })}
+            placeholder={t('Key')}
             type="text"
             value={key}
-            onChange={(newKey) => onChange({ ...label, key: newKey })}
-            aria-label={t('selector key')}
           />
         </FormGroup>
       </GridItem>
       <GridItem span={5}>
-        <FormGroup label={t('Value')} fieldId={`label-${id}-value-input`}>
+        <FormGroup fieldId={`label-${id}-value-input`} label={t('Value')}>
           <TextInput
+            aria-label={t('selector value')}
             id={`label-${id}-value-input`}
-            placeholder={t('Value')}
             isRequired
+            onChange={(newValue) => onChange({ ...label, value: newValue })}
+            placeholder={t('Value')}
             type="text"
             value={value}
-            onChange={(newValue) => onChange({ ...label, value: newValue })}
-            aria-label={t('selector value')}
           />
         </FormGroup>
       </GridItem>
       <PlainIconButton
         fieldId={`label-${id}-delete-btn`}
-        onClick={() => onDelete(id)}
         icon={<MinusCircleIcon />}
+        onClick={() => onDelete(id)}
       />
     </>
   );

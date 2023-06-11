@@ -43,7 +43,7 @@ const UploadPVCPopover: React.FC<PVCUploadStatusProps> = ({ pvc, title }) => {
       upload={upload}
     />
   ) : (
-    <UploadPVCPopoverProgressStatus title={title || t('Uploading')} onCancelClick={onCancelClick} />
+    <UploadPVCPopoverProgressStatus onCancelClick={onCancelClick} title={title || t('Uploading')} />
   );
 };
 

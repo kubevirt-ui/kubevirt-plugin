@@ -48,11 +48,11 @@ export const convertYAMLToNetworkDataObject = (networkData: string): CloudInitNe
     const networkToEdit = networkObj?.network?.config?.[0];
 
     return {
-      name: networkToEdit?.name,
       address: Array.isArray(networkToEdit?.subnets?.[0]?.address)
         ? networkToEdit?.subnets?.[0]?.address?.join(',')
         : networkToEdit?.subnets?.[0]?.address,
       gateway: networkToEdit?.subnets?.[0]?.gateway,
+      name: networkToEdit?.name,
     };
   } catch (e) {
     console.error(e);
@@ -67,20 +67,20 @@ export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData
       hasValue &&
       dump({
         network: {
-          version: '1',
           config: [
             {
-              type: 'physical',
               name: networkData?.name,
               subnets: [
                 {
-                  type: 'static',
                   address: networkData?.address?.replace(/\s/g, '').split(','),
                   gateway: networkData?.gateway,
+                  type: 'static',
                 },
               ],
+              type: 'physical',
             },
           ],
+          version: '1',
         },
       })
     );
@@ -93,34 +93,34 @@ export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData
 export const createDefaultCloudInitYAML = () =>
   convertUserDataObjectToYAML(
     {
-      user: '',
-      password: '',
       hostname: '',
+      password: '',
+      user: '',
     },
     true,
   );
 
 export type CloudInitUserData = {
-  user: string;
-  password: string;
-  hostname: string;
   chpasswd?: { expire?: boolean };
+  hostname: string;
+  password: string;
+  user: string;
 };
 
 export type CloudInitNetworkData = {
-  name: string;
   address: string;
   gateway: string;
+  name: string;
 };
 
 type CloudInitNetwork = {
   network: {
-    version: string;
     config: {
-      type: string;
-      name: string;
       mac_address?: string;
-      subnets: { type: string; address: string[]; gateway: string }[];
+      name: string;
+      subnets: { address: string[]; gateway: string; type: string }[];
+      type: string;
     }[];
+    version: string;
   };
 };

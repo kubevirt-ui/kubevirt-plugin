@@ -20,16 +20,16 @@ import { getProgressVariant } from '../utils/utils';
 
 type UploadPVCPopoverUploadStatusProps = {
   error: { message: string };
+  onCancelClick: () => void;
   onErrorDeleteSource: () => void;
   upload: DataUpload;
-  onCancelClick: () => void;
 };
 
 const UploadPVCPopoverUploadStatus: React.FC<UploadPVCPopoverUploadStatusProps> = ({
   error,
+  onCancelClick,
   onErrorDeleteSource,
   upload,
-  onCancelClick,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -37,28 +37,28 @@ const UploadPVCPopoverUploadStatus: React.FC<UploadPVCPopoverUploadStatusProps> 
     switch (status) {
       case UPLOAD_STATUS.ERROR:
         return {
-          title: t('Upload error'),
           body: error?.message,
           icon: <ErrorCircleOIcon className="co-icon-and-text__icon" color={dangerColor?.value} />,
+          title: t('Upload error'),
         };
       case UPLOAD_STATUS.CANCELED:
         return {
-          title: error ? t('Cancel error') : t('Upload canceled'),
           body: error ? error?.message : t('Removing Resources'),
           icon: (
             <BanIcon className="co-icon-and-text__icon" color={error ? dangerColor?.value : ''} />
           ),
+          title: error ? t('Cancel error') : t('Upload canceled'),
         };
       case UPLOAD_STATUS.UPLOADING:
         return {
-          title: t('Uploading'),
           body: t('Please do not close this window, you can keep navigating the app freely.'),
           icon: <InProgressIcon className="co-icon-and-text__icon" />,
+          title: t('Uploading'),
         };
       case UPLOAD_STATUS.SUCCESS:
         return {
-          title: t('Upload finished'),
           icon: <InProgressIcon className="co-icon-and-text__icon" />,
+          title: t('Upload finished'),
         };
       default:
         return null;
@@ -68,30 +68,28 @@ const UploadPVCPopoverUploadStatus: React.FC<UploadPVCPopoverUploadStatusProps> 
   const uploadPopoverBody = getPopoverBody(upload?.uploadStatus);
   return (
     <Popover
-      headerContent={<div>{uploadPopoverBody?.title}</div>}
-      position={PopoverPosition.bottom}
       bodyContent={
         <Stack hasGutter>
           <StackItem>
             {upload?.uploadStatus === UPLOAD_STATUS.CANCELED && (
-              <Spinner size="md" className="co-icon-and-text__icon" />
+              <Spinner className="co-icon-and-text__icon" size="md" />
             )}
             {uploadPopoverBody?.body}
           </StackItem>
           <StackItem>
             <Progress
-              value={upload?.progress}
               title={upload?.fileName}
+              value={upload?.progress}
               variant={getProgressVariant(upload?.uploadStatus)}
             />
           </StackItem>
           {upload?.uploadStatus === UPLOAD_STATUS.UPLOADING && (
             <StackItem>
               <Button
-                id="cdi-upload-cancel-btn"
                 className="pf-m-link--align-left"
-                variant="link"
+                id="cdi-upload-cancel-btn"
                 onMouseUp={onCancelClick}
+                variant="link"
               >
                 {t('Cancel upload')}
               </Button>
@@ -100,11 +98,11 @@ const UploadPVCPopoverUploadStatus: React.FC<UploadPVCPopoverUploadStatusProps> 
           {upload?.uploadStatus === UPLOAD_STATUS.ERROR && (
             <StackItem>
               <Button
-                id="cdi-upload-delete-btn"
                 className="pf-m-link--align-left"
-                variant="link"
-                onMouseUp={onErrorDeleteSource}
+                id="cdi-upload-delete-btn"
                 isDanger
+                onMouseUp={onErrorDeleteSource}
+                variant="link"
               >
                 {t('Delete source')}
               </Button>
@@ -112,10 +110,12 @@ const UploadPVCPopoverUploadStatus: React.FC<UploadPVCPopoverUploadStatusProps> 
           )}
         </Stack>
       }
+      headerContent={<div>{uploadPopoverBody?.title}</div>}
+      position={PopoverPosition.bottom}
     >
       <Button
-        id="cdi-upload-popover-btn"
         className="pf-m-link--align-left"
+        id="cdi-upload-popover-btn"
         variant={ButtonVariant.link}
       >
         {uploadPopoverBody?.icon}

@@ -16,36 +16,36 @@ import useActiveUsersColumns from './hooks/useActiveUsersColumns';
 import ActiveUserListRow from './ActiveUserListRow';
 
 type ActiveUserListProps = {
-  vmi: V1VirtualMachineInstance;
   pathname: string;
+  vmi: V1VirtualMachineInstance;
 };
 
-const ActiveUserList: React.FC<ActiveUserListProps> = ({ vmi, pathname }) => {
+const ActiveUserList: React.FC<ActiveUserListProps> = ({ pathname, vmi }) => {
   const { t } = useKubevirtTranslation();
   const columns = useActiveUsersColumns();
   const [{ userList = [] }, loaded, , isGuestAgentConnected] = useGuestOS(vmi);
 
   return (
     <div>
-      <a href={`${pathname}#logged-in-users`} className="link-icon">
+      <a className="link-icon" href={`${pathname}#logged-in-users`}>
         <LinkIcon size="sm" />
       </a>
-      <Title headingLevel="h2" className="co-section-heading">
+      <Title className="co-section-heading" headingLevel="h2">
         {t('Active users')}
       </Title>
       {isGuestAgentConnected ? (
         <VirtualizedTable<V1VirtualMachineInstanceGuestOSUser>
-          data={userList}
-          unfilteredData={userList}
-          loaded={loaded}
-          loadError={false}
-          columns={columns}
-          Row={ActiveUserListRow}
           NoDataEmptyMsg={() => (
             <Bullseye>
               <MutedTextSpan text={t('No active users')} />
             </Bullseye>
           )}
+          columns={columns}
+          data={userList}
+          loaded={loaded}
+          loadError={false}
+          Row={ActiveUserListRow}
+          unfilteredData={userList}
         />
       ) : (
         <Bullseye>

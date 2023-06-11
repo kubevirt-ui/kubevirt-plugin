@@ -22,12 +22,12 @@ const FileSystemTable: FC<FileSystemTableProps> = ({ vmi }) => {
     <ListPageBody>
       <FileSystemTableTitle />
       <VirtualizedTable
+        columns={columns}
         data={fileSystems}
-        unfilteredData={fileSystems}
         loaded={loaded}
         loadError={loadingError}
-        columns={columns}
         Row={FileSystemTableRow}
+        unfilteredData={fileSystems}
       />
     </ListPageBody>
   );

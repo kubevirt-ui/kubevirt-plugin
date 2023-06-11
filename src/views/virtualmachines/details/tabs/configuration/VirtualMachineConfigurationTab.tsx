@@ -10,8 +10,8 @@ import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/ut
 import './virtual-machine-configuration-tab.scss';
 
 type VirtualMachineConfigurationTabProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1VirtualMachine;
 };
@@ -19,7 +19,7 @@ type VirtualMachineConfigurationTabProps = RouteComponentProps<{
 const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = (props) => {
   const { history } = props;
 
-  const [activeTabKey, setActiveTabKey] = useState<string | number>(
+  const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Scheduling,
   );
 
@@ -39,12 +39,12 @@ const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = 
 
   return (
     <div className="VirtualMachineConfigurationTab">
-      <Tabs activeKey={activeTabKey} isVertical className="VirtualMachineConfigurationTab--main">
-        {tabs.map(({ title, Component, name }) => (
+      <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
+        {tabs.map(({ Component, name, title }) => (
           <Tab
-            key={name}
             className="VirtualMachineConfigurationTab--content"
             eventKey={name}
+            key={name}
             onClick={() => redirectTab(name)}
             title={<TabTitleText>{title}</TabTitleText>}
           >

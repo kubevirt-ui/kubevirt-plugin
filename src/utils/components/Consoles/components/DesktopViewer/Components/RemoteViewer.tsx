@@ -17,17 +17,17 @@ import { downloadFile, generateDescriptorFile } from '../utils/utils';
 import MoreInformationDefault from './MoreInformationDefault';
 
 const RemoteViewer: React.FC<RemoteViewerProps> = ({
-  onGenerate = generateDescriptorFile,
   onDownload = downloadFile,
-  spice = null,
-  vnc = null,
+  onGenerate = generateDescriptorFile,
   rdp = null,
-  textConnectWithRemoteViewer,
+  spice = null,
   textConnectWithRDP,
+  textConnectWithRemoteViewer,
   textMoreInfo,
   textMoreInfoContent,
   textMoreRDPInfo,
   textMoreRDPInfoContent,
+  vnc = null,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isExpandedDefault, setIsExpandedDefault] = React.useState<boolean>(false);
@@ -57,34 +57,34 @@ const RemoteViewer: React.FC<RemoteViewerProps> = ({
       <div className="pf-c-console__remote-viewer-launch">
         <Button
           className="pf-c-console__remote-viewer-launch-vv"
-          onClick={onClickVV}
           isDisabled={!console}
+          onClick={onClickVV}
         >
           {textConnectWithRemoteViewer || t('Launch Remote Viewer')}
         </Button>
         {!!rdp && (
-          <Button onClick={onClickRDP} className="pf-c-console__remote-viewer-launch-rdp">
+          <Button className="pf-c-console__remote-viewer-launch-rdp" onClick={onClickRDP}>
             {textConnectWithRDP || t('Launch Remote Desktop')}
           </Button>
         )}
       </div>
       {!!console && (
         <ExpandableSection
-          toggleText={textMoreInfo || t('Remote Viewer Details')}
           isExpanded={isExpandedDefault}
           onToggle={(isExpanded) => setIsExpandedDefault(isExpanded)}
+          toggleText={textMoreInfo || t('Remote Viewer Details')}
         >
           <MoreInformationDefault textMoreInfoContent={textMoreInfoContent} />
         </ExpandableSection>
       )}
       {!!rdp && (
         <ExpandableSection
-          toggleText={textMoreRDPInfo || t('Remote Desktop Details')}
           isExpanded={isExpandedRDP}
           onToggle={(isExpanded) => setIsExpandedRDP(isExpanded)}
+          toggleText={textMoreRDPInfo || t('Remote Desktop Details')}
         >
           {textMoreRDPInfoContent ?? (
-            <Trans t={t} ns="plugin__kubevirt-plugin">
+            <Trans ns="plugin__kubevirt-plugin" t={t}>
               <p>
                 Clicking &quot;Launch Remote Desktop&quot; will download an .rdp file and launch{' '}
                 <i>Remote Desktop Viewer</i>.

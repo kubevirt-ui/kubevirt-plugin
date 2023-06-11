@@ -26,14 +26,14 @@ export const SysprepDescription: React.FC<{
         <SysprepInfo />
       </StackItem>
       <StackItem>
-        <DescriptionList isCompact columnModifier={{ lg: '1Col', xl: '2Col' }}>
+        <DescriptionList columnModifier={{ lg: '1Col', xl: '2Col' }} isCompact>
           {selectedSysprepName ? (
             <DescriptionListGroup>
               <DescriptionListTerm>{t('Selected sysprep')}</DescriptionListTerm>
               <DescriptionListDescription>
                 <ResourceLink
-                  linkTo={false}
                   kind={ConfigMapModel.kind}
+                  linkTo={false}
                   name={selectedSysprepName}
                 />
               </DescriptionListDescription>

@@ -14,11 +14,11 @@ const getIdAnnotations = (annotations: { [key: string]: string }) =>
   Object.fromEntries(Object.entries(annotations).map(([key, value], i) => [i, { key, value }]));
 
 export const AnnotationsModal: React.FC<{
-  obj: K8sResourceCommon;
-  onSubmit: (annotations: { [key: string]: string }) => Promise<void | K8sResourceCommon>;
   isOpen: boolean;
+  obj: K8sResourceCommon;
   onClose: () => void;
-}> = ({ obj, isOpen, onSubmit, onClose }) => {
+  onSubmit: (annotations: { [key: string]: string }) => Promise<K8sResourceCommon | void>;
+}> = ({ isOpen, obj, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
 
   const [annotations, setAnnotations] = React.useState<{
@@ -69,17 +69,15 @@ export const AnnotationsModal: React.FC<{
 
   return (
     <TabModal<K8sResourceCommon>
-      obj={obj}
       headerText={t('Edit annotations')}
-      onSubmit={onAnnotationsSubmit}
       isOpen={isOpen}
+      obj={obj}
       onClose={onClose}
+      onSubmit={onAnnotationsSubmit}
     >
       <Grid hasGutter>
         {Object.entries(annotations || {}).map(([id, { key, value }]) => (
           <AnnotationsModalRow
-            key={id}
-            annotation={{ key, value }}
             onChange={(annotation) =>
               setAnnotations({
                 ...annotations,
@@ -91,15 +89,17 @@ export const AnnotationsModal: React.FC<{
                 Object.fromEntries(Object.entries(annotations).filter(([k]) => k !== id)),
               )
             }
+            annotation={{ key, value }}
+            key={id}
           />
         ))}
         <div className="co-toolbar__group co-toolbar__group--left">
           <Button
-            isSmall
             className="pf-m-link--align-left"
-            variant="link"
-            onClick={() => onAnnotationAdd()}
             icon={<PlusCircleIcon />}
+            isSmall
+            onClick={() => onAnnotationAdd()}
+            variant="link"
           >
             {t('Add more')}
           </Button>

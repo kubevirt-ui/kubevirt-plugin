@@ -21,32 +21,32 @@ import Sysprep from './components/Sysprep';
 
 import './WizardScriptsTab.scss';
 
-const WizardScriptsTab: WizardTab = ({ vm, updateVM }) => {
+const WizardScriptsTab: WizardTab = ({ updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
   return (
     <PageSection className="wizard-scripts-tab">
       <SidebarEditor
-        resource={vm}
         onResourceUpdate={(newVM) => updateVM(newVM)}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.SCRIPTS_TAB}
+        resource={vm}
       >
         <DescriptionList className="wizard-scripts-tab__description-list">
           <DescriptionListDescription>
             <AlertScripts />
           </DescriptionListDescription>
           <WizardDescriptionItem
-            testId="wizard-cloudinit"
-            title={t('Cloud-init')}
+            onEditClick={() =>
+              createModal((modalProps) => (
+                <CloudinitModal {...modalProps} onSubmit={updateVM} vm={vm} />
+              ))
+            }
             description={<CloudInitDescription vm={vm} />}
             isEdit
             showEditOnTitle
-            onEditClick={() =>
-              createModal((modalProps) => (
-                <CloudinitModal {...modalProps} vm={vm} onSubmit={updateVM} />
-              ))
-            }
+            testId="wizard-cloudinit"
+            title={t('Cloud-init')}
           />
           <Divider />
           <SSHKey />

@@ -13,54 +13,54 @@ const FeatureHighlightsSection: React.FC = () => {
   const { t } = useKubevirtTranslation();
 
   const moreLink: GettingStartedLink = {
+    external: true,
+    href: 'https://cloud.redhat.com/learn/topics/virtualization/',
     id: 'openshift-virtualization-feature-highlights',
     title: t('Visit the blog'),
-    href: 'https://cloud.redhat.com/learn/topics/virtualization/',
-    external: true,
   };
 
   const links: GettingStartedLink[] = [
     {
+      external: true,
+      href: 'https://www.openshift.com/blog/automatic-installation-of-a-windows-vm-using-openshift-virtualization',
       id: 'item1',
       title: (
         <FeatureHighlightsTitle
-          title={t('Automatic Windows VirtualMachine installation')}
           readTime={t('8 min')}
+          title={t('Automatic Windows VirtualMachine installation')}
         />
       ),
-      href: 'https://www.openshift.com/blog/automatic-installation-of-a-windows-vm-using-openshift-virtualization',
-      external: true,
     },
     {
+      external: true,
+      href: 'https://www.openshift.com/blog/whats-new-in-openshift-virtualization-4.10',
       id: 'item2',
       title: (
         <FeatureHighlightsTitle
-          title={t('OpenShift Virtualization 4.10 Highlights')}
           readTime={t('5 min')}
+          title={t('OpenShift Virtualization 4.10 Highlights')}
         />
       ),
-      href: 'https://www.openshift.com/blog/whats-new-in-openshift-virtualization-4.10',
-      external: true,
     },
   ];
 
   return (
     <GettingStartedSectionContents
-      id="feature-highlights"
-      icon={
-        <i
-          className="fas fa-blog"
-          color="var(--pf-global--primary-color--100)"
-          aria-hidden="true"
-        />
-      }
-      title={t('Feature highlights')}
-      titleColor={'var(--co-global--palette--blue-400)'}
       description={t(
         'Read about the latest information and key virtualization features on the Virtualization highlights.',
       )}
+      icon={
+        <i
+          aria-hidden="true"
+          className="fas fa-blog"
+          color="var(--pf-global--primary-color--100)"
+        />
+      }
+      id="feature-highlights"
       links={links}
       moreLink={moreLink}
+      title={t('Feature highlights')}
+      titleColor={'var(--co-global--palette--blue-400)'}
     />
   );
 };

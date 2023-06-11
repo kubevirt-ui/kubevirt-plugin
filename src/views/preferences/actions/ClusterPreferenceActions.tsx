@@ -9,13 +9,13 @@ import { Dropdown, DropdownPosition, DropdownToggle, KebabToggle } from '@patter
 import useClusterPreferenceActionsProvider from './hooks/useClusterPreferenceActionsProvider';
 
 type ClusterPreferenceActionsProps = {
-  preference: V1alpha2VirtualMachineClusterPreference;
   isKebabToggle?: boolean;
+  preference: V1alpha2VirtualMachineClusterPreference;
 };
 
 const ClusterPreferenceActions: FC<ClusterPreferenceActionsProps> = ({
-  preference,
   isKebabToggle,
+  preference,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -23,11 +23,9 @@ const ClusterPreferenceActions: FC<ClusterPreferenceActionsProps> = ({
 
   return (
     <Dropdown
-      menuAppendTo={getContentScrollableElement}
-      data-test-id="virtual-machine-cluster-preference-actions"
-      isPlain={isKebabToggle}
-      isOpen={isOpen}
-      position={DropdownPosition.right}
+      dropdownItems={actions?.map((action) => (
+        <ActionDropdownItem action={action} key={action?.id} setIsOpen={setIsOpen} />
+      ))}
       toggle={
         isKebabToggle ? (
           <KebabToggle onToggle={setIsOpen} />
@@ -35,9 +33,11 @@ const ClusterPreferenceActions: FC<ClusterPreferenceActionsProps> = ({
           <DropdownToggle onToggle={setIsOpen}>{t('Actions')}</DropdownToggle>
         )
       }
-      dropdownItems={actions?.map((action) => (
-        <ActionDropdownItem key={action?.id} action={action} setIsOpen={setIsOpen} />
-      ))}
+      data-test-id="virtual-machine-cluster-preference-actions"
+      isOpen={isOpen}
+      isPlain={isKebabToggle}
+      menuAppendTo={getContentScrollableElement}
+      position={DropdownPosition.right}
     />
   );
 };

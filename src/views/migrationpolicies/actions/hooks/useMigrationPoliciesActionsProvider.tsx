@@ -25,30 +25,30 @@ const useMigrationPoliciesActionsProvider: UseMigrationPoliciesActionsProvider =
   const actions: Action[] = useMemo(() => {
     return [
       {
-        id: 'mp-action-edit',
-        disabled: false,
-        label: t('Edit'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
-            <MigrationPolicyEditModal isOpen={isOpen} onClose={onClose} mp={mp} />
+            <MigrationPolicyEditModal isOpen={isOpen} mp={mp} onClose={onClose} />
           )),
+        disabled: false,
+        id: 'mp-action-edit',
+        label: t('Edit'),
       },
       {
-        id: 'mp-action-delete',
-        disabled: false,
-        label: t('Delete'),
         cta: () =>
           createModal(({ isOpen, onClose }) => {
             return (
               <DeleteModal
-                isOpen={isOpen}
-                onClose={onClose}
-                obj={mp}
-                onDeleteSubmit={() => k8sDelete({ model: MigrationPolicyModel, resource: mp })}
                 headerText={t('Delete MigrationPolicy?')}
+                isOpen={isOpen}
+                obj={mp}
+                onClose={onClose}
+                onDeleteSubmit={() => k8sDelete({ model: MigrationPolicyModel, resource: mp })}
               />
             );
           }),
+        disabled: false,
+        id: 'mp-action-delete',
+        label: t('Delete'),
       },
     ];
   }, [createModal, mp, t]);

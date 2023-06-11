@@ -15,11 +15,11 @@ export const CustomizeVirtualMachineHeader: React.FC<{ namespace: string }> = Re
         <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
           <BreadcrumbItem>
             <Button
-              variant="link"
-              isInline
               onClick={() =>
                 history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`)
               }
+              isInline
+              variant="link"
             >
               {t('Catalog')}
             </Button>

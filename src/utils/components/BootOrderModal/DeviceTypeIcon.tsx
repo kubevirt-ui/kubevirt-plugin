@@ -8,8 +8,8 @@ type DeviceTypeIconProps = {
 };
 
 const DeviceTypeIconMapping = {
-  NIC: NetworkIcon,
   DISK: VolumeIcon,
+  NIC: NetworkIcon,
 } as const;
 
 const DeviceTypeIcon: React.FC<DeviceTypeIconProps> = ({ type }) => {

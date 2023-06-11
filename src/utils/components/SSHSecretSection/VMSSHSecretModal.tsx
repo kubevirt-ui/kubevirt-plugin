@@ -16,13 +16,13 @@ import { addSecretToVM, createVmSSHSecret, detachVMSecret } from './utils/utils'
 import SSHSecretModal from './SSHSecretModal';
 
 type VMSSHSecretModalProps = {
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   updateVM: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm: V1VirtualMachine;
 };
 
-const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({ vm, isOpen, onClose, updateVM }) => {
+const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({ isOpen, onClose, updateVM, vm }) => {
   const namespace = useMemo(() => getNamespace(vm), [vm]);
   const hasSSHKey = useMemo(() => !isEmpty(getAccessCredentials(vm)), [vm]);
   const secretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
@@ -31,8 +31,8 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({ vm, isOpen, onClose, upda
     hasSSHKey && {
       groupVersionKind: modelToGroupVersionKind(SecretModel),
       isList: false,
-      namespace,
       name: secretName,
+      namespace,
     },
   );
 
@@ -76,11 +76,11 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({ vm, isOpen, onClose, upda
 
   return (
     <SSHSecretModal
-      isOpen={isOpen}
-      onClose={onClose}
       initialSSHSecretDetails={initialSSHDetails}
-      onSubmit={onSubmit}
+      isOpen={isOpen}
       namespace={namespace}
+      onClose={onClose}
+      onSubmit={onSubmit}
     />
   );
 };

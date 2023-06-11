@@ -13,17 +13,17 @@ import { DOC_URL_ENABLING_USER_CLONE_PERMISSIONS } from '../utils/constants';
 
 type ProjectSelectInputProps = {
   project: string;
-  setProject: React.Dispatch<React.SetStateAction<string>>;
   projectNames: string[];
   projectsLoaded: boolean;
+  setProject: React.Dispatch<React.SetStateAction<string>>;
   vmNamespace: string;
 };
 
 const ProjectSelectInput: React.FC<ProjectSelectInputProps> = ({
   project,
-  setProject,
   projectNames,
   projectsLoaded,
+  setProject,
   vmNamespace,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -45,39 +45,39 @@ const ProjectSelectInput: React.FC<ProjectSelectInputProps> = ({
 
   return (
     <FormGroup
-      label={t('Namespace')}
-      fieldId="namespace"
-      isRequired
       helperText={
         vmNamespace !== project && (
           <Trans ns="plugin__kubevirt-plugin" t={t}>
             Make sure to have clone permissions in the destination namespace.{' '}
             <a
               href={DOC_URL_ENABLING_USER_CLONE_PERMISSIONS}
-              target="_blank"
               rel="noopener noreferrer"
+              target="_blank"
             >
               Learn more <ExternalLinkAltIcon />
             </a>
           </Trans>
         )
       }
+      fieldId="namespace"
+      isRequired
+      label={t('Namespace')}
     >
       <Select
-        menuAppendTo="parent"
+        hasInlineFilter
         id="namespace"
         isOpen={isOpen}
-        onToggle={setIsOpen}
-        onSelect={onSelect}
-        variant={SelectVariant.single}
-        onFilter={FilterProjectsSelect(projectNames)}
-        hasInlineFilter
-        selections={project}
         maxHeight={400}
+        menuAppendTo="parent"
+        onFilter={FilterProjectsSelect(projectNames)}
+        onSelect={onSelect}
+        onToggle={setIsOpen}
+        selections={project}
+        variant={SelectVariant.single}
       >
         {projectNames?.map((projectName) => (
           <SelectOption key={projectName} value={projectName}>
-            <ResourceLink kind={ProjectModel.kind} name={projectName} linkTo={false} />
+            <ResourceLink kind={ProjectModel.kind} linkTo={false} name={projectName} />
           </SelectOption>
         ))}
       </Select>

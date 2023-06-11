@@ -11,12 +11,12 @@ import DataSourcePageTitle from './DataSourcePageTitle';
 import DataSourceYAMLPage from './DataSourceYamlPage';
 
 type DataSourcePageProps = {
+  kind: string;
   name: string;
   namespace: string;
-  kind: string;
 };
 
-const DataSourceNavPage: React.FC<DataSourcePageProps> = ({ name, namespace, kind }) => {
+const DataSourceNavPage: React.FC<DataSourcePageProps> = ({ kind, name, namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dataSource, loaded] = useK8sWatchResource<V1beta1DataSource>({
     kind,
@@ -27,14 +27,14 @@ const DataSourceNavPage: React.FC<DataSourcePageProps> = ({ name, namespace, kin
   const pages = React.useMemo(
     () => [
       {
+        component: DataSourceDetailsPage,
         href: '',
         name: t('Details'),
-        component: DataSourceDetailsPage,
       },
       {
+        component: DataSourceYAMLPage,
         href: 'yaml',
         name: t('YAML'),
-        component: DataSourceYAMLPage,
       },
     ],
     [t],
@@ -42,7 +42,7 @@ const DataSourceNavPage: React.FC<DataSourcePageProps> = ({ name, namespace, kin
 
   return (
     <>
-      <DataSourcePageTitle dataSource={dataSource} namespace={namespace} name={name} />
+      <DataSourcePageTitle dataSource={dataSource} name={name} namespace={namespace} />
       {loaded ? (
         <HorizontalNav pages={pages} resource={dataSource} />
       ) : (

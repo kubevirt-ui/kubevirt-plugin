@@ -8,25 +8,25 @@ import { ChartDataObject } from '../constants';
 
 type MigrationsUtilizationChartProps = {
   chartData: ChartDataObject[];
-  labels: any;
-  title: string;
-  tickFormat?: any[] | ((tick: any, index: number, ticks: any[]) => string | number);
-  tickValues?: any[];
   domain?: {
     x: [number, number];
     y: [number, number];
   };
+  labels: any;
+  tickFormat?: ((tick: any, index: number, ticks: any[]) => number | string) | any[];
+  tickValues?: any[];
+  title: string;
 };
 
 const MigrationsUtilizationChart: FC<MigrationsUtilizationChartProps> = ({
   chartData,
+  domain = null,
   labels,
-  title,
   tickFormat = (y) => y,
   tickValues = null,
-  domain = null,
+  title,
 }) => {
-  const { width, height } = useResponsiveCharts();
+  const { height, width } = useResponsiveCharts();
   const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
 
   return (
@@ -36,28 +36,28 @@ const MigrationsUtilizationChart: FC<MigrationsUtilizationChartProps> = ({
       </div>
       <div>
         <Chart
-          height={height}
-          width={width}
-          padding={{ top: 40, left: 80, bottom: 40, right: 0 }}
-          scale={{ x: 'time', y: 'linear' }}
-          domain={domain}
           containerComponent={
             <CursorVoronoiContainer
               activateData={false}
               cursorDimension="x"
+              key={title}
               labels={labels}
               mouseFollowTooltips
               voronoiDimension="x"
-              key={title}
             />
           }
+          domain={domain}
+          height={height}
+          padding={{ bottom: 40, left: 80, right: 0, top: 40 }}
+          scale={{ x: 'time', y: 'linear' }}
+          width={width}
         >
           <ChartAxis
-            dependentAxis
             axisComponent={<></>}
+            dependentAxis
             showGrid
-            tickValues={tickValues}
             tickFormat={tickFormat}
+            tickValues={tickValues}
           />
           <ChartLine data={chartData} />
         </Chart>

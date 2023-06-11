@@ -4,8 +4,8 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
-      selectProject(name: string): void;
       newProject(name: string): void;
+      selectProject(name: string): void;
       selectTestProject(): void;
       switchProject(name: string): void;
     }

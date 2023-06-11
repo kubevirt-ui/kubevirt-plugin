@@ -23,9 +23,6 @@ const Name: React.FC<NameProps> = ({ name }) => {
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('Name')}
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
               Name must be unique within a namespace. Is required when creating resources, although
@@ -42,6 +39,9 @@ const Name: React.FC<NameProps> = ({ name }) => {
               </Breadcrumb>
             </Trans>
           }
+          hasAutoWidth
+          headerContent={t('Name')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('Name')}</DescriptionListTermHelpTextButton>
         </Popover>

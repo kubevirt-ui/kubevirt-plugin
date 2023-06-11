@@ -9,8 +9,8 @@ import FileSystemTable from './table/file-system/FileSystemTable';
 import './VirtualMachinesInstancePageDisksTab.scss';
 
 type VirtualMachinesInstancePageDisksTabProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj: V1VirtualMachineInstance;
 };

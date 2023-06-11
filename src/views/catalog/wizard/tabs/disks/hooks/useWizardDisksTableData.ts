@@ -31,10 +31,10 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
   const vmDataVolumeTemplates = getDataVolumeTemplates(vm);
 
   const [pvcs, loaded, loadingError] = useK8sWatchResource<K8sResourceCommon[]>({
-    kind: PersistentVolumeClaimModel.kind,
     isList: true,
-    namespaced: true,
+    kind: PersistentVolumeClaimModel.kind,
     namespace: vm?.metadata?.namespace,
+    namespaced: true,
   });
 
   const disks = React.useMemo(() => {
@@ -48,7 +48,7 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
       const dataVolumeTemplate = vmDataVolumeTemplates?.find(
         ({ metadata }) => metadata?.name === volume?.dataVolume?.name,
       );
-      return { disk, pvc, volume, dataVolumeTemplate };
+      return { dataVolumeTemplate, disk, pvc, volume };
     });
 
     return (diskDevices || []).map((device) => {
@@ -77,19 +77,19 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
         '-';
 
       return {
-        name: device?.disk?.name,
-        source: source(),
-        size: size ? bytesFromQuantity(size, 2).join('') : '-',
-        storageClass,
-        interface: getPrintableDiskInterface(device?.disk),
         drive: getPrintableDiskDrive(device?.disk),
-        metadata: { name: device?.disk?.name },
-        namespace: device?.pvc?.metadata?.namespace,
+        interface: getPrintableDiskInterface(device?.disk),
         isBootDisk: device?.disk?.name === getBootDisk(vm)?.name,
         isEnvDisk:
           !!device?.volume?.configMap ||
           !!device?.volume?.secret ||
           !!device?.volume?.serviceAccount,
+        metadata: { name: device?.disk?.name },
+        name: device?.disk?.name,
+        namespace: device?.pvc?.metadata?.namespace,
+        size: size ? bytesFromQuantity(size, 2).join('') : '-',
+        source: source(),
+        storageClass,
       };
     });
   }, [pvcs, t, vm, vmDataVolumeTemplates, vmDisks, vmVolumes]);

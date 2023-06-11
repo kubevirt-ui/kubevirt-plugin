@@ -8,14 +8,14 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 export type UpdateValidatedVM = (
-  updateVM: V1VirtualMachine | ((vmDraft: WritableDraft<V1VirtualMachine>) => void),
+  updateVM: ((vmDraft: WritableDraft<V1VirtualMachine>) => void) | V1VirtualMachine,
 ) => Promise<void>;
 
 type UseValidatedVMValues = {
-  vm: V1VirtualMachine;
-  updateVM: UpdateValidatedVM;
-  loaded: boolean;
   error: any;
+  loaded: boolean;
+  updateVM: UpdateValidatedVM;
+  vm: V1VirtualMachine;
 };
 
 export const useValidatedVM = (initialVM: V1VirtualMachine): UseValidatedVMValues => {
@@ -24,15 +24,15 @@ export const useValidatedVM = (initialVM: V1VirtualMachine): UseValidatedVMValue
   const [error, setError] = React.useState<any>();
 
   const updateVM = (
-    updatedVM: V1VirtualMachine | ((vmDraft: WritableDraft<V1VirtualMachine>) => void),
+    updatedVM: ((vmDraft: WritableDraft<V1VirtualMachine>) => void) | V1VirtualMachine,
   ) => {
     setLoaded(false);
     setError(undefined);
 
     // validate the updated vm with the backend (dry run)
     return k8sCreate<V1VirtualMachine>({
-      model: VirtualMachineModel,
       data: typeof updatedVM === 'function' ? produce(vm, updatedVM) : updatedVM,
+      model: VirtualMachineModel,
       queryParams: {
         dryRun: 'All',
         fieldManager: 'kubectl-create',
@@ -47,9 +47,9 @@ export const useValidatedVM = (initialVM: V1VirtualMachine): UseValidatedVMValue
   };
 
   return {
-    vm,
-    updateVM,
-    loaded,
     error,
+    loaded,
+    updateVM,
+    vm,
   };
 };

@@ -18,7 +18,7 @@ const VirtualMachinePageEventsTab: FC<VirtualMachinePageEventsTabProps> = ({ obj
 
   return (
     <>
-      <Title headingLevel="h2" className="virtual-machine-page-events-tab__title">
+      <Title className="virtual-machine-page-events-tab__title" headingLevel="h2">
         {t('Events')}
       </Title>
       <Suspense

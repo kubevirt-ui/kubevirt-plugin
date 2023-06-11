@@ -14,9 +14,9 @@ type UseMigrationChartsData = (
   timespan: number,
 ) => {
   bandwidthConsumed: ChartDataObject[];
-  migrationsCount: ChartDataObject[];
   maxBandwidthConsumed: number;
   maxMigrationCount: number;
+  migrationsCount: ChartDataObject[];
 };
 
 export const useMigrationChartsData: UseMigrationChartsData = (duration, currentTime, timespan) => {
@@ -28,15 +28,15 @@ export const useMigrationChartsData: UseMigrationChartsData = (duration, current
   );
 
   const [migrationsBandwidthConsumed] = usePrometheusPoll({
-    query: `sum${baseQuery}`,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
+    query: `sum${baseQuery}`,
     timespan,
   });
   const [proccessedMigrationsCount] = usePrometheusPoll({
-    query: `count${baseQuery}`,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
+    query: `count${baseQuery}`,
     timespan,
   });
 
@@ -52,9 +52,9 @@ export const useMigrationChartsData: UseMigrationChartsData = (duration, current
 
   return {
     bandwidthConsumed,
-    migrationsCount,
     maxBandwidthConsumed: Math.max(...(bandwidthConsumed || []).map((o) => o.y)),
     maxMigrationCount: Math.max(...(migrationsCount || []).map((o) => o.y)),
+    migrationsCount,
   };
 };
 

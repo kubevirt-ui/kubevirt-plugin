@@ -12,12 +12,12 @@ import {
 
 // Display and empty with a Call to add new source if no sources are defined.
 export const BootOrderEmptyState: React.FC<BootOrderEmptyProps> = ({
-  title,
-  message,
-  addItemMessage,
-  addItemIsDisabled,
   addItemDisabledMessage,
+  addItemIsDisabled,
+  addItemMessage,
+  message,
   onClick,
+  title,
 }) => (
   <EmptyState variant={EmptyStateVariant.full}>
     <Title headingLevel="h5" size="lg">
@@ -26,21 +26,21 @@ export const BootOrderEmptyState: React.FC<BootOrderEmptyProps> = ({
     <EmptyStateBody>{message}</EmptyStateBody>
     <EmptyStateSecondaryActions>
       {!addItemIsDisabled ? (
-        <Button variant="secondary" onClick={onClick}>
+        <Button onClick={onClick} variant="secondary">
           {addItemMessage}
         </Button>
       ) : (
-        <Alert variant="info" title={addItemDisabledMessage} />
+        <Alert title={addItemDisabledMessage} variant="info" />
       )}
     </EmptyStateSecondaryActions>
   </EmptyState>
 );
 
 export type BootOrderEmptyProps = {
-  title: string;
-  message: string;
-  addItemMessage: string;
-  addItemIsDisabled: boolean;
   addItemDisabledMessage?: string;
+  addItemIsDisabled: boolean;
+  addItemMessage: string;
+  message: string;
   onClick: () => void;
+  title: string;
 };

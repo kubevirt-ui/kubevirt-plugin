@@ -9,13 +9,13 @@ import { SubscriptionKind } from '../../../../utils/types';
 import { upgradeRequiresApproval } from '../utils/utils';
 
 type SubscriptionStateUpgradePendingProps = {
-  subscription: SubscriptionKind;
   operatorLink: string;
+  subscription: SubscriptionKind;
 };
 
 const SubscriptionStateUpgradePending: React.FC<SubscriptionStateUpgradePendingProps> = ({
-  subscription,
   operatorLink,
+  subscription,
 }) => {
   const { t } = useKubevirtTranslation();
 

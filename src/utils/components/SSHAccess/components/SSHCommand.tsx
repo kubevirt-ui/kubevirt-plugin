@@ -22,17 +22,17 @@ import { createSSHService, deleteSSHService } from '../utils';
 import SSHServiceSelect from './SSHServiceSelect';
 
 type SSHCommandProps = {
-  vmi: V1VirtualMachineInstance;
-  vm: V1VirtualMachine;
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded?: boolean;
+  vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
 const SSHCommand: React.FC<SSHCommandProps> = ({
-  vmi,
-  vm,
   sshService: initialSSHService,
   sshServiceLoaded,
+  vm,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const [sshService, setSSHService] = useState<IoK8sApiCoreV1Service | null>();
@@ -76,19 +76,19 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
             <>
               <StackItem>
                 <SSHServiceSelect
+                  onSSHChange={onSSHChange}
                   sshService={sshService}
                   sshServiceLoaded={sshServiceLoaded}
-                  onSSHChange={onSSHChange}
                 />
               </StackItem>
 
               {sshServiceRunning && (
                 <StackItem>
                   <ClipboardCopy
-                    isReadOnly
-                    data-test="ssh-command-copy"
                     clickTip={t('Copied')}
+                    data-test="ssh-command-copy"
                     hoverTip={t('Copy to clipboard')}
+                    isReadOnly
                   >
                     {command}
                   </ClipboardCopy>
@@ -100,7 +100,7 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
           )}
           {error && (
             <StackItem>
-              <Alert variant={AlertVariant.danger} title={t('Error')} isInline>
+              <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
                 {error?.message}
               </Alert>
             </StackItem>

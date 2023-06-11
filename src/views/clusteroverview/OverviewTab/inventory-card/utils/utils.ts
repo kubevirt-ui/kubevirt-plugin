@@ -20,7 +20,7 @@ export const getOSImagesNS = (): string =>
 export const getTemplates = (resources) => {
   const vmTemplates = resources?.vmTemplates as WatchK8sResultsObject<V1Template[]>;
   const vms = resources?.vms as WatchK8sResultsObject<V1VirtualMachine[]>;
-  return flattenTemplates({ vmTemplates, vms }) || [];
+  return flattenTemplates({ vms, vmTemplates }) || [];
 };
 
 export const getVMStatusCounts = (vms) => {
@@ -35,22 +35,22 @@ export const getVMStatusCounts = (vms) => {
 };
 
 export const iconMap = {
-  Running: SyncAltIcon,
-  Paused: PausedIcon,
-  Stopped: OffIcon,
-  Starting: InProgressIcon,
-  Migrating: InProgressIcon,
-  Stopping: InProgressIcon,
-  Deleting: InProgressIcon,
-  Provisioning: InProgressIcon,
-  Terminating: InProgressIcon,
   CrashLoopBackOff: RedExclamationCircleIcon,
-  ErrorUnschedulable: RedExclamationCircleIcon,
-  ErrImagePull: RedExclamationCircleIcon,
-  ImagePullBackOff: RedExclamationCircleIcon,
-  ErrorPvcNotFound: RedExclamationCircleIcon,
-  ErrorDataVolumeNotFound: RedExclamationCircleIcon,
   DataVolumeError: RedExclamationCircleIcon,
+  Deleting: InProgressIcon,
+  ErrImagePull: RedExclamationCircleIcon,
+  ErrorDataVolumeNotFound: RedExclamationCircleIcon,
+  ErrorPvcNotFound: RedExclamationCircleIcon,
+  ErrorUnschedulable: RedExclamationCircleIcon,
+  ImagePullBackOff: RedExclamationCircleIcon,
+  Migrating: InProgressIcon,
+  Paused: PausedIcon,
+  Provisioning: InProgressIcon,
+  Running: SyncAltIcon,
+  Starting: InProgressIcon,
+  Stopped: OffIcon,
+  Stopping: InProgressIcon,
+  Terminating: InProgressIcon,
   Unknown: YellowExclamationTriangleIcon,
 };
 

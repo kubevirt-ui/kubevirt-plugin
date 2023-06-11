@@ -4,22 +4,22 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
 type NameFormFieldProps = {
+  isDisabled?: boolean;
   objName: string;
   setObjName: Dispatch<SetStateAction<string>>;
-  isDisabled?: boolean;
 };
 
-const NameFormField: FC<NameFormFieldProps> = ({ objName, setObjName, isDisabled }) => {
+const NameFormField: FC<NameFormFieldProps> = ({ isDisabled, objName, setObjName }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <FormGroup label={t('Name')} fieldId="name" isRequired>
+    <FormGroup fieldId="name" isRequired label={t('Name')}>
       <TextInput
-        type="text"
-        value={objName}
-        onChange={setObjName}
         id="name"
         isDisabled={isDisabled}
+        onChange={setObjName}
+        type="text"
+        value={objName}
       />
     </FormGroup>
   );

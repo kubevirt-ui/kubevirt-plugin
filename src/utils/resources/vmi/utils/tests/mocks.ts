@@ -4,23 +4,23 @@ import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export const serviceWithUndefinedSelectors: IoK8sApiCoreV1Service = {
-  kind: 'Service',
   apiVersion: 'v1',
+  kind: 'Service',
   metadata: {
-    name: 'openshift',
-    namespace: 'default',
-    uid: '7e5f09e1-ef35-455b-ac57-e7fa5c96b45d',
-    resourceVersion: '10124',
     creationTimestamp: '2022-05-25T02:58:54Z',
     managedFields: [
       {
+        apiVersion: 'v1',
+        fieldsType: 'FieldsV1',
         manager: 'dns-operator',
         operation: 'Update',
-        apiVersion: 'v1',
         time: '2022-05-25T02:58:54Z',
-        fieldsType: 'FieldsV1',
       },
     ],
+    name: 'openshift',
+    namespace: 'default',
+    resourceVersion: '10124',
+    uid: '7e5f09e1-ef35-455b-ac57-e7fa5c96b45d',
   },
   spec: {
     externalName: 'kubernetes.default.svc.cluster.local',
@@ -55,27 +55,27 @@ export const serviceWithMatchingSelectors: IoK8sApiCoreV1Service = produce(
 );
 
 export const vmiMock: V1VirtualMachineInstance = {
-  kind: 'VirtualMachineInstance',
   apiVersion: 'v1',
+  kind: 'VirtualMachineInstance',
   metadata: {
-    name: 'fedora-proposed-rodent',
-    namespace: 'default',
-    uid: '7e5f09e1-ef35-455b-ac57-e7fa5c96b45d',
-    resourceVersion: '10124',
     creationTimestamp: '2022-05-25T02:58:54Z',
     labels: {
       'vm.kubevirt.io/name': 'fedora-proposed-rodent',
     },
+    name: 'fedora-proposed-rodent',
+    namespace: 'default',
+    resourceVersion: '10124',
+    uid: '7e5f09e1-ef35-455b-ac57-e7fa5c96b45d',
   },
   spec: {
     domain: {
-      devices: {
-        disks: [],
-      },
       cpu: {
         cores: 1,
         sockets: 1,
         threads: 1,
+      },
+      devices: {
+        disks: [],
       },
     },
   },

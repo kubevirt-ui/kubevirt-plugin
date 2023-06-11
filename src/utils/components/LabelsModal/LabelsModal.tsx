@@ -12,26 +12,26 @@ import { isLabelValid, labelsArrayToObject, labelsToArray } from './utils';
 import './LabelsModal.scss';
 
 type LabelsModalProps = {
-  isOpen: boolean;
-  obj: K8sResourceCommon;
-  labelClassName?: string;
-  onLabelsSubmit: (labels: { [key: string]: string }) => Promise<void | K8sResourceCommon>;
-  onClose: () => void;
   initialLabels?: {
     [key: string]: string;
   };
+  isOpen: boolean;
+  labelClassName?: string;
   modalDescriptionText?: string;
+  obj: K8sResourceCommon;
+  onClose: () => void;
+  onLabelsSubmit: (labels: { [key: string]: string }) => Promise<K8sResourceCommon | void>;
 };
 
 export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
   ({
-    isOpen,
-    obj,
-    labelClassName,
-    onLabelsSubmit,
-    onClose,
     initialLabels,
+    isOpen,
+    labelClassName,
     modalDescriptionText,
+    obj,
+    onClose,
+    onLabelsSubmit,
   }) => {
     const { t } = useKubevirtTranslation();
     const [inputValue, setInputValue] = React.useState('');
@@ -81,13 +81,13 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
       setInputValue('');
     };
 
-    const renderTag = ({ tag, key, onRemove, getTagDisplayValue }) => {
+    const renderTag = ({ getTagDisplayValue, key, onRemove, tag }) => {
       return (
         <PFLabel
           className={'co-label tag-item-content'.concat(labelClassName || '')}
+          isTruncated
           key={key}
           onClose={() => onRemove(key)}
-          isTruncated
         >
           {getTagDisplayValue(tag)}
         </PFLabel>
@@ -97,12 +97,12 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
     const inputProps = {
       autoFocus: true,
       className: 'input'.concat(isInputValid ? '' : ' invalid-tag'),
+      ['data-test']: 'tags-input',
+      id: 'tags-input',
       onChange: onInputChange,
       placeholder: labels.length === 0 ? 'app=frontend' : '',
       spellCheck: 'false',
       value: inputValue,
-      id: 'tags-input',
-      ['data-test']: 'tags-input',
     };
 
     // Keys that add tags: Enter
@@ -112,11 +112,11 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
 
     return (
       <TabModal
-        obj={obj}
         headerText={t('Edit labels')}
-        onSubmit={() => onLabelsSubmit(labelsArrayToObject(labels))}
         isOpen={isOpen}
+        obj={obj}
         onClose={onClose}
+        onSubmit={() => onLabelsSubmit(labelsArrayToObject(labels))}
       >
         <Stack hasGutter>
           <StackItem>
@@ -129,14 +129,14 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
             <div className="kv-labels-modal-body">
               <tags-input>
                 <TagsInput
-                  className="tags"
-                  value={labels}
                   addKeys={addKeys}
-                  removeKeys={removeKeys}
-                  inputProps={inputProps}
-                  renderTag={renderTag}
-                  onChange={handleLabelsChange}
                   addOnBlur
+                  className="tags"
+                  inputProps={inputProps}
+                  onChange={handleLabelsChange}
+                  removeKeys={removeKeys}
+                  renderTag={renderTag}
+                  value={labels}
                 />
               </tags-input>
             </div>

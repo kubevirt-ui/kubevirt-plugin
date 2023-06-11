@@ -10,13 +10,13 @@ const TemplateExpandableDescription: FC<{ description: string }> = ({ descriptio
   return (
     <Stack className="template-catalog-drawer-description">
       <StackItem>
-        <ExpandableSection isExpanded isDetached contentId="expandable-content">
+        <ExpandableSection contentId="expandable-content" isDetached isExpanded>
           {isExpanded ? description : description.slice(0, 120).concat('...')}
         </ExpandableSection>
       </StackItem>
       {description.length > 120 && (
         <StackItem>
-          <Button isInline variant="link" onClick={() => setIsExpanded(!isExpanded)}>
+          <Button isInline onClick={() => setIsExpanded(!isExpanded)} variant="link">
             {isExpanded ? t('Collapse') : t('Read more')}
           </Button>
         </StackItem>

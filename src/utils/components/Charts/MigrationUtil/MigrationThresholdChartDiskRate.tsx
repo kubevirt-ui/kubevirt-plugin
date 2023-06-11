@@ -39,20 +39,20 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
 }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration, timespan } = useDuration();
-  const queries = useMemo(() => getUtilizationQueries({ obj: vmi, duration }), [vmi, duration]);
-  const { ref, width, height } = useResponsiveCharts();
+  const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
+  const { height, ref, width } = useResponsiveCharts();
 
   const [diskRate] = usePrometheusPoll({
-    query: queries?.MIGRATION_DISK_TRANSFER_RATE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.MIGRATION_DISK_TRANSFER_RATE,
     timespan,
   });
   const dataProcessed = useMemo(() => getPrometheusData(diskRate), [diskRate]);
 
   const chartDataProcessed = dataProcessed?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: t('Data Processed') };
+    return { name: t('Data Processed'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const isReady = !isEmpty(chartDataProcessed);
@@ -63,50 +63,50 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queriesToLink(queries.MIGRATION_DISK_TRANSFER_RATE)}>
           <Chart
-            height={height}
-            width={width}
-            padding={35}
-            scale={{ x: 'time', y: 'linear' }}
-            domain={{
-              x: [currentTime - timespan, currentTime],
-              y: [0, yMax],
-            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
-                  return `${datum?.name}: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
+                  return `${datum?.name}: ${xbytes(datum?.y, { fixed: 2, iec: true })}`;
                 }}
                 constrainToVisibleArea
               />
             }
+            domain={{
+              x: [currentTime - timespan, currentTime],
+              y: [0, yMax],
+            }}
+            height={height}
+            padding={35}
+            scale={{ x: 'time', y: 'linear' }}
+            width={width}
           >
             <ChartAxis
-              dependentAxis
-              tickValues={[0, yMax]}
-              tickFormat={formatMemoryYTick(yMax, 2)}
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
+              dependentAxis
+              tickFormat={formatMemoryYTick(yMax, 2)}
+              tickValues={[0, yMax]}
             />
             <ChartAxis
-              tickFormat={tickFormat(duration, currentTime)}
-              tickCount={TICKS_COUNT}
               style={{
-                ticks: { stroke: 'transparent' },
                 tickLabels: { padding: 2 },
+                ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}
+              tickCount={TICKS_COUNT}
+              tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
-                data={chartDataProcessed}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
+                data={chartDataProcessed}
               />
             </ChartGroup>
           </Chart>

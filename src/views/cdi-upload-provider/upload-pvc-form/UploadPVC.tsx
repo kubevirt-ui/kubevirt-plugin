@@ -51,10 +51,10 @@ type UploadPVCPageProps = {
 };
 
 const templatesResource: WatchK8sResource = {
-  isList: true,
-  optional: true,
   groupVersionKind: modelToGroupVersionKind(TemplateModel),
+  isList: true,
   namespace: TEMPLATE_VM_COMMON_NAMESPACE,
+  optional: true,
   selector: {
     matchLabels: { [TEMPLATE_TYPE_LABEL]: TEMPLATE_TYPE_BASE },
   },
@@ -83,9 +83,9 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
 
     return goldenNamespaces.map((ns) => ({
       group: DataVolumeModel.apiGroup,
+      namespace: ns,
       resource: DataVolumeModel.plural,
       verb: 'create' as K8sVerb,
-      namespace: ns,
     }));
   }, [commonTemplates]);
 
@@ -101,7 +101,7 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
   );
 
   const [goldenPvcs, loadedPvcs, errorPvcs] = useBaseImages(allowedTemplates);
-  const { uploads, uploadData, uploadProxyURL } = useContext(CDIUploadContext);
+  const { uploadData, uploadProxyURL, uploads } = useContext(CDIUploadContext);
   const [scAllowed, scAllowedLoading] = useAccessReview({
     group: StorageClassModel.apiGroup,
     resource: StorageClassModel.plural,
@@ -152,9 +152,9 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
           setIsAllocating(false);
           uploadData({
             file: fileValue,
-            token,
-            pvcName: getName(dvObj),
             namespace,
+            pvcName: getName(dvObj),
+            token,
           });
         })
         .catch((err) => {
@@ -194,17 +194,17 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
         </h1>
         <form className="co-m-pane__body-group" onSubmit={save}>
           <UploadPVCForm
-            onChange={setDvObj}
-            ns={initialNamespace}
-            fileValue={fileValue}
-            fileName={fileName}
-            handleFileChange={handleFileChange}
-            setIsFileRejected={setIsFileRejected}
             commonTemplates={allowedTemplates}
+            fileName={fileName}
+            fileValue={fileValue}
             goldenPvcs={goldenPvcs}
-            osParam={osParam}
+            handleFileChange={handleFileChange}
             isLoading={!loadedTemplates}
+            ns={initialNamespace}
+            onChange={setDvObj}
+            osParam={osParam}
             setDisableFormSubmit={setDisableFormSubmit}
+            setIsFileRejected={setIsFileRejected}
             storageClasses={storageClasses}
           />
           <UploadPVCButtonBar
@@ -216,11 +216,11 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
               !loadedPvcs ||
               isCheckingCertificate
             }
-            uploadProxyURL={uploadProxyURL}
             errorMessage={error}
+            uploadProxyURL={uploadProxyURL}
           >
             {isFileRejected && (
-              <Alert variant="warning" isInline title={t('File type extension')}>
+              <Alert isInline title={t('File type extension')} variant="warning">
                 <p>
                   {t(
                     'Based on the file extension it seems like you are trying to upload a file which is not supported ({{fileNameExtText}}).',
@@ -229,16 +229,16 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
                 </p>
                 <p>
                   <ExternalLink
-                    text={t('Learn more about supported formats')}
                     href={CDI_UPLOAD_SUPPORTED_TYPES_URL}
+                    text={t('Learn more about supported formats')}
                   />
                 </p>
               </Alert>
             )}
             <ActionGroup className="pf-c-form">
               <Button
-                isDisabled={disableFormSubmit || isCheckingCertificate}
                 id="save-changes"
+                isDisabled={disableFormSubmit || isCheckingCertificate}
                 type="submit"
                 variant={ButtonVariant.primary}
               >
@@ -252,13 +252,6 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
         </form>
       </div>
       <UploadPVCFormStatus
-        upload={uploads?.find(
-          (upl) => upl?.pvcName === getName(dvObj) && upl?.namespace === namespace,
-        )}
-        dataVolume={dvObj}
-        isSubmitting={isSubmitting}
-        isAllocating={isAllocating}
-        allocateError={error}
         onErrorClick={() => {
           setIsSubmitting(false);
           setError('');
@@ -266,6 +259,13 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
         onSuccessClick={() =>
           history.push(resourcePath(PersistentVolumeClaimModel, getName(dvObj), namespace))
         }
+        upload={uploads?.find(
+          (upl) => upl?.pvcName === getName(dvObj) && upl?.namespace === namespace,
+        )}
+        allocateError={error}
+        dataVolume={dvObj}
+        isAllocating={isAllocating}
+        isSubmitting={isSubmitting}
         onCancelClick={() => history.push(resourcePath(PersistentVolumeClaimModel))}
       />
     </>

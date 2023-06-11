@@ -25,28 +25,28 @@ import { INSTALLATION_CDROM_NAME } from '../../constants';
 import { getUploadDataVolume, processTemplate } from '../../utils';
 
 type useCustomizeFormSubmitType = {
-  onSubmit: (_data: any, event: { target: HTMLFormElement }) => Promise<void>;
+  cdUpload?: DataUpload;
+  diskUpload?: DataUpload;
+  error: any;
+  loaded: boolean;
   onCancel: () => Promise<{
     metadata: {
       name: string;
       namespace: string;
     };
   }>;
-  diskUpload?: DataUpload;
-  cdUpload?: DataUpload;
-  loaded: boolean;
-  error: any;
+  onSubmit: (_data: any, event: { target: HTMLFormElement }) => Promise<void>;
 };
 
 export const useCustomizeFormSubmit = ({
+  cdSource,
+  diskSource,
   template,
   withWindowsDrivers,
-  diskSource,
-  cdSource,
 }: {
-  template: V1Template;
-  diskSource?: V1beta1DataVolumeSpec;
   cdSource?: V1beta1DataVolumeSpec | V1ContainerDiskSource;
+  diskSource?: V1beta1DataVolumeSpec;
+  template: V1Template;
   withWindowsDrivers?: boolean;
 }): useCustomizeFormSubmitType => {
   const { ns } = useParams<{ ns: string }>();
@@ -54,7 +54,7 @@ export const useCustomizeFormSubmit = ({
   const [templateLoaded, setTemplateLoaded] = useState(true);
   const [templateError, setTemplateError] = useState<any>();
 
-  const { vm, updateVM, tabsData, updateTabsData, loaded: vmLoaded } = useWizardVMContext();
+  const { loaded: vmLoaded, tabsData, updateTabsData, updateVM, vm } = useWizardVMContext();
 
   const { upload: diskUpload, uploadData: uploadDiskData } = useCDIUpload();
   const { upload: cdUpload, uploadData: uploadCDData } = useCDIUpload();
@@ -68,9 +68,9 @@ export const useCustomizeFormSubmit = ({
     try {
       const formData = new FormData(event.target);
       const processedTemplate = await processTemplate({
-        template,
-        namespace: ns || DEFAULT_NAMESPACE,
         formData,
+        namespace: ns || DEFAULT_NAMESPACE,
+        template,
         withWindowsDrivers,
       });
 
@@ -155,14 +155,14 @@ export const useCustomizeFormSubmit = ({
       await Promise.all(
         [
           {
-            file: diskUploadFile,
-            upload: () => uploadDiskData({ file: diskUploadFile?.value, dataVolume: diskUploadDV }),
             dataVolume: diskUploadDV,
+            file: diskUploadFile,
+            upload: () => uploadDiskData({ dataVolume: diskUploadDV, file: diskUploadFile?.value }),
           },
           {
-            file: cdUploadFile,
-            upload: () => uploadCDData({ file: cdUploadFile?.value, dataVolume: cdUploadDV }),
             dataVolume: cdUploadDV,
+            file: cdUploadFile,
+            upload: () => uploadCDData({ dataVolume: cdUploadDV, file: cdUploadFile?.value }),
           },
         ]
           .filter((u) => u.file)
@@ -202,14 +202,14 @@ export const useCustomizeFormSubmit = ({
   }, [diskSource?.source]);
 
   return {
-    onSubmit,
+    cdUpload,
+    diskUpload,
+    error: templateError,
+    loaded: templateLoaded && vmLoaded,
     onCancel: async () => {
       await diskUpload?.cancelUpload();
       return cdUpload?.cancelUpload();
     },
-    loaded: templateLoaded && vmLoaded,
-    error: templateError,
-    diskUpload,
-    cdUpload,
+    onSubmit,
   };
 };

@@ -16,14 +16,14 @@ const timeFormatterOptions: Intl.DateTimeFormatOptions = {
 };
 
 const dateFormatterNoYearOptions: Intl.DateTimeFormatOptions = {
-  month: 'short',
   day: 'numeric',
+  month: 'short',
 };
 const dateTimeFormatterOptions: Intl.DateTimeFormatOptions = {
-  month: 'short',
   day: 'numeric',
   hour: 'numeric',
   minute: 'numeric',
+  month: 'short',
   year: 'numeric',
 };
 const utcDateTimeFormatterOptions: Intl.DateTimeFormatOptions = {
@@ -56,7 +56,7 @@ const getDuration = (ms: number) => {
 export const isValid = (dateTime: Date): boolean =>
   dateTime instanceof Date && !isNaN(dateTime.valueOf());
 
-export const fromNow = (dateTime: string | Date, now?: Date, options?) => {
+export const fromNow = (dateTime: Date | string, now?: Date, options?) => {
   // Check for null. If dateTime is null, it returns incorrect date Jan 1 1970.
   if (!dateTime) {
     return '-';
@@ -83,12 +83,12 @@ export const fromNow = (dateTime: string | Date, now?: Date, options?) => {
 
   if (options?.omitSuffix) {
     if (days) {
-      return { value: days, time: DAY };
+      return { time: DAY, value: days };
     }
     if (hours) {
-      return { value: hours, time: HOUR };
+      return { time: HOUR, value: hours };
     }
-    return { value: minutes, time: MINTUE };
+    return { time: MINTUE, value: minutes };
   }
 
   // Fallback to normal date/time formatting if Intl.RelativeTimeFormat is not

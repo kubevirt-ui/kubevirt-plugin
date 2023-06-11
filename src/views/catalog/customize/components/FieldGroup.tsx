@@ -6,14 +6,14 @@ import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk/
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 type FieldGroupProps = {
+  className?: string;
   field: TemplateParameter;
   showError?: boolean;
-  className?: string;
 };
 
-export const FieldGroup: React.FC<FieldGroupProps> = ({ field, showError, className }) => {
+export const FieldGroup: React.FC<FieldGroupProps> = ({ className, field, showError }) => {
   const { t } = useKubevirtTranslation();
-  const { name, description, displayName, required, value: initialValue } = field;
+  const { description, displayName, name, required, value: initialValue } = field;
   const [value, setValue] = React.useState(initialValue || '');
 
   const validated = showError && !value ? ValidatedOptions.error : ValidatedOptions.default;
@@ -22,24 +22,24 @@ export const FieldGroup: React.FC<FieldGroupProps> = ({ field, showError, classN
 
   return (
     <FormGroup
-      label={displayName || name}
+      className={className}
       fieldId={fieldId}
-      isRequired={required}
       helperText={description}
       helperTextInvalid={t('This field is required')}
       helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
+      isRequired={required}
+      label={displayName || name}
       validated={validated}
-      className={className}
     >
       <TextInput
         data-test-id={fieldId}
-        isRequired={required}
-        type="text"
         id={fieldId}
+        isRequired={required}
         name={name}
-        value={value}
         onChange={(newValue) => setValue(newValue)}
+        type="text"
         validated={validated}
+        value={value}
       />
     </FormGroup>
   );

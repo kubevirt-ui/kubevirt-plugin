@@ -12,20 +12,20 @@ import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesA
 import { getChangedStartStrategy } from '../PendingChanges/utils/helpers';
 
 type StartPauseModalProps = {
-  vm: V1VirtualMachine;
+  headerText: string;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  headerText: string;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const StartPauseModal: React.FC<StartPauseModalProps> = ({
-  vm,
+  headerText,
   isOpen,
   onClose,
   onSubmit,
-  headerText,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -40,11 +40,11 @@ const StartPauseModal: React.FC<StartPauseModalProps> = ({
   }, [vm, checked]);
   return (
     <TabModal
-      obj={updatedVirtualMachine}
+      headerText={headerText}
       isOpen={isOpen}
+      obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={headerText}
     >
       <Form>
         {vmi && (
@@ -53,17 +53,17 @@ const StartPauseModal: React.FC<StartPauseModalProps> = ({
           />
         )}
         <FormGroup
-          fieldId="start-pause-mode"
           helperText={t(
             'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
           )}
+          fieldId="start-pause-mode"
           isInline
         >
           <Checkbox
             id="start-pause-mode"
             isChecked={checked}
-            onChange={setChecked}
             label={t('Start this VirtualMachine in pause mode')}
+            onChange={setChecked}
           />
         </FormGroup>
       </Form>

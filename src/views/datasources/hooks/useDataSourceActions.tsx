@@ -48,19 +48,11 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
   const actions = React.useMemo(
     () => [
       {
-        id: 'datasource-action-edit-labels',
-        disabled: false,
-        label: t('Edit labels'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <LabelsModal
-              obj={dataSource}
-              isOpen={isOpen}
-              onClose={onClose}
               onLabelsSubmit={(labels) =>
                 k8sPatch({
-                  model: DataSourceModel,
-                  resource: dataSource,
                   data: [
                     {
                       op: 'replace',
@@ -68,25 +60,25 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
                       value: labels,
                     },
                   ],
+                  model: DataSourceModel,
+                  resource: dataSource,
                 })
               }
+              isOpen={isOpen}
+              obj={dataSource}
+              onClose={onClose}
             />
           )),
+        disabled: false,
+        id: 'datasource-action-edit-labels',
+        label: t('Edit labels'),
       },
       {
-        id: 'datasource-action-edit-annotations',
-        disabled: false,
-        label: t('Edit annotations'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <AnnotationsModal
-              obj={dataSource}
-              isOpen={isOpen}
-              onClose={onClose}
               onSubmit={(updatedAnnotations) =>
                 k8sPatch({
-                  model: DataSourceModel,
-                  resource: dataSource,
                   data: [
                     {
                       op: 'replace',
@@ -94,21 +86,24 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
                       value: updatedAnnotations,
                     },
                   ],
+                  model: DataSourceModel,
+                  resource: dataSource,
                 })
               }
+              isOpen={isOpen}
+              obj={dataSource}
+              onClose={onClose}
             />
           )),
+        disabled: false,
+        id: 'datasource-action-edit-annotations',
+        label: t('Edit annotations'),
       },
       {
-        id: 'datasource-action-delete',
-        label: t('Delete'),
+        accessReview: asAccessReview(DataSourceModel, dataSource, 'delete'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <DeleteModal
-              obj={dataSource}
-              isOpen={isOpen}
-              onClose={onClose}
-              headerText={t('Delete DataSource?')}
               onDeleteSubmit={async () => {
                 try {
                   await k8sDelete({
@@ -124,11 +119,30 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
                   });
                 }
               }}
+              headerText={t('Delete DataSource?')}
+              isOpen={isOpen}
+              obj={dataSource}
+              onClose={onClose}
             />
           )),
-        accessReview: asAccessReview(DataSourceModel, dataSource, 'delete'),
+        id: 'datasource-action-delete',
+        label: t('Delete'),
       },
       {
+        cta: () =>
+          createModal(({ isOpen, onClose }) => (
+            <DataImportCronManageModal
+              onClose={() => {
+                onClose();
+                setDataImportCron(undefined);
+              }}
+              dataImportCron={dataImportCron}
+              dataSource={dataSource}
+              isOpen={isOpen}
+            />
+          )),
+        description: isOwnedBySSP && t('Red Hat DataSources cannot be edited'),
+        disabled: !dataImportCron || isOwnedBySSP || isLoading,
         id: 'datasource-action-manage-source',
         label: (
           <Split hasGutter>
@@ -140,20 +154,6 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
             )}
           </Split>
         ),
-        description: isOwnedBySSP && t('Red Hat DataSources cannot be edited'),
-        disabled: !dataImportCron || isOwnedBySSP || isLoading,
-        cta: () =>
-          createModal(({ isOpen, onClose }) => (
-            <DataImportCronManageModal
-              dataImportCron={dataImportCron}
-              dataSource={dataSource}
-              isOpen={isOpen}
-              onClose={() => {
-                onClose();
-                setDataImportCron(undefined);
-              }}
-            />
-          )),
       },
     ],
     [t, dataSource, isLoading, dataImportCron, isOwnedBySSP, createModal],

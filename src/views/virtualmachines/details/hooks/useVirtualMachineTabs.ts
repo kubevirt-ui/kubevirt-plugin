@@ -20,74 +20,74 @@ export const useVirtualMachineTabs = () => {
 
   return [
     {
+      component: VirtualMachinesOverviewTab,
       href: VirtualMachineDetailsTab.Overview,
       name: t(VirtualMachineDetailsTabLabel.Overview),
-      component: VirtualMachinesOverviewTab,
     },
     {
+      component: VirtualMachineDetailsPage,
       href: VirtualMachineDetailsTab.Details,
       name: t(VirtualMachineDetailsTabLabel.Details),
-      component: VirtualMachineDetailsPage,
     },
     {
+      component: VirtualMachineMetricsTab,
       href: VirtualMachineDetailsTab.Metrics,
       name: t(VirtualMachineDetailsTabLabel.Metrics),
-      component: VirtualMachineMetricsTab,
     },
     {
+      component: VirtualMachineYAMLPage,
       href: VirtualMachineDetailsTab.YAML,
       name: t(VirtualMachineDetailsTabLabel.YAML),
-      component: VirtualMachineYAMLPage,
     },
     {
+      component: VirtualMachineConfigurationTab,
       href: VirtualMachineDetailsTab.Configurations,
       name: t(VirtualMachineDetailsTabLabel.Configuration),
-      component: VirtualMachineConfigurationTab,
     },
     {
+      component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Disks}`,
       name: 'hide',
-      component: VirtualMachineConfigurationTab,
     },
     {
+      component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Environment}`,
       name: 'hide',
-      component: VirtualMachineConfigurationTab,
     },
     {
+      component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${NETWORK}`,
       name: 'hide',
-      component: VirtualMachineConfigurationTab,
     },
     {
+      component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scheduling}`,
       name: 'hide',
-      component: VirtualMachineConfigurationTab,
     },
     {
+      component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scripts}`,
       name: 'hide',
-      component: VirtualMachineConfigurationTab,
     },
     {
+      component: VirtualMachinePageEventsTab,
       href: VirtualMachineDetailsTab.Events,
       name: t(VirtualMachineDetailsTabLabel.Events),
-      component: VirtualMachinePageEventsTab,
     },
     {
+      component: VirtualMachineConsolePage,
       href: VirtualMachineDetailsTab.Console,
       name: t(VirtualMachineDetailsTabLabel.Console),
-      component: VirtualMachineConsolePage,
     },
     {
+      component: SnapshotListPage,
       href: VirtualMachineDetailsTab.Snapshots,
       name: t(VirtualMachineDetailsTabLabel.Snapshots),
-      component: SnapshotListPage,
     },
     {
+      component: VirtualMachineDiagnosticTab,
       href: VirtualMachineDetailsTab.Diagnostics,
       name: t(VirtualMachineDetailsTabLabel.Diagnostics),
-      component: VirtualMachineDiagnosticTab,
     },
   ];
 };

@@ -15,20 +15,20 @@ const generateMigrationPolicyName = (): string => {
 };
 
 export type InitialMigrationPolicyState = {
-  migrationPolicyName: string;
-  vmiSelectorMatchLabel: { [key: string]: string };
-  namespaceSelectorMatchLabel: { [key: string]: string };
-  description?: string;
   allowAutoConverge?: boolean;
   allowPostCopy?: boolean;
+  bandwidthPerMigration?: { unit: BinaryUnit; value: number };
   completionTimeoutPerGiB?: number;
-  bandwidthPerMigration?: { value: number; unit: BinaryUnit };
+  description?: string;
+  migrationPolicyName: string;
+  namespaceSelectorMatchLabel: { [key: string]: string };
+  vmiSelectorMatchLabel: { [key: string]: string };
 };
 
 export const initialMigrationPolicyState: InitialMigrationPolicyState = {
   migrationPolicyName: generateMigrationPolicyName(),
-  vmiSelectorMatchLabel: {},
   namespaceSelectorMatchLabel: {},
+  vmiSelectorMatchLabel: {},
 };
 
 export const produceMigrationPolicy = (state: InitialMigrationPolicyState) =>
@@ -37,12 +37,12 @@ export const produceMigrationPolicy = (state: InitialMigrationPolicyState) =>
     (mpDraft: V1alpha1MigrationPolicy) => {
       const {
         allowAutoConverge,
+        allowPostCopy,
         bandwidthPerMigration,
         completionTimeoutPerGiB,
         description,
         migrationPolicyName,
         namespaceSelectorMatchLabel,
-        allowPostCopy,
         vmiSelectorMatchLabel,
       } = state || {};
 

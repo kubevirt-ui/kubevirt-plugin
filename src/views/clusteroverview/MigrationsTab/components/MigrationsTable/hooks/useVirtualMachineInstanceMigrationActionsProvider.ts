@@ -28,12 +28,12 @@ const useVirtualMachineInstanceMigrationActionsProvider: UseVirtualMachineInstan
     const actions: Action[] = React.useMemo(() => {
       return [
         {
-          id: 'vmim-action-cancel-migrate',
-          disabled:
-            !vmim || [vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase),
-          label: t('Cancel migration'),
           cta: () => cancelMigration(vmim),
           description: cancelMigrationDescription(),
+          disabled:
+            !vmim || [vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase),
+          id: 'vmim-action-cancel-migrate',
+          label: t('Cancel migration'),
         },
       ];
     }, [vmim, t, cancelMigrationDescription]);

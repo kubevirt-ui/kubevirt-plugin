@@ -8,19 +8,19 @@ import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/reac
 import { FilterPVCSelect as FilterDataSourcesSelect } from '../../utils/Filters';
 
 type DiskSourcePVCSelectNameProps = {
-  dataSourceNameSelected: string;
   dataSourceNames: string[];
-  onChange: React.Dispatch<React.SetStateAction<string>>;
+  dataSourceNameSelected: string;
   dataSourcesLoaded: boolean;
   isDisabled?: boolean;
+  onChange: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
-  dataSourceNameSelected,
   dataSourceNames,
-  onChange,
+  dataSourceNameSelected,
   dataSourcesLoaded,
   isDisabled,
+  onChange,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -37,21 +37,21 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
   const dsLabel = DataSourceModel.label;
 
   return (
-    <FormGroup label={t('{{dsLabel}} name', { dsLabel })} fieldId={fieldId} id={fieldId} isRequired>
+    <FormGroup fieldId={fieldId} id={fieldId} isRequired label={t('{{dsLabel}} name', { dsLabel })}>
       {dataSourcesLoaded || isDisabled ? (
         <Select
-          menuAppendTo="parent"
           aria-labelledby={fieldId}
-          isOpen={isOpen}
-          onToggle={setIsOpen}
-          onSelect={onSelect}
-          variant={SelectVariant.single}
           hasInlineFilter
-          selections={dataSourceNameSelected}
-          onFilter={FilterDataSourcesSelect(dataSourceNames)}
-          placeholderText={t('--- Select {{ dsLabel }} name ---', { dsLabel })}
           isDisabled={isDisabled}
+          isOpen={isOpen}
           maxHeight={400}
+          menuAppendTo="parent"
+          onFilter={FilterDataSourcesSelect(dataSourceNames)}
+          onSelect={onSelect}
+          onToggle={setIsOpen}
+          placeholderText={t('--- Select {{ dsLabel }} name ---', { dsLabel })}
+          selections={dataSourceNameSelected}
+          variant={SelectVariant.single}
         >
           {dataSourceNames.map((name) => (
             <SelectOption key={name} value={name} />

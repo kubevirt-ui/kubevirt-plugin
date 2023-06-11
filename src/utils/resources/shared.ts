@@ -46,9 +46,9 @@ export const getLabel = (entity: K8sResourceCommon, label: string, defaultValue?
   entity?.metadata?.labels?.[label] ?? defaultValue;
 
 type ResourceUrlProps = {
+  activeNamespace?: string;
   model: K8sModel;
   resource?: K8sResourceCommon;
-  activeNamespace?: string;
 };
 
 /**
@@ -57,7 +57,7 @@ type ResourceUrlProps = {
  * @returns {string} the URL for the resource
  */
 export const getResourceUrl = (urlProps: ResourceUrlProps): string => {
-  const { model, resource, activeNamespace } = urlProps;
+  const { activeNamespace, model, resource } = urlProps;
 
   if (!model) return null;
   const { crd, namespaced, plural } = model;
@@ -118,11 +118,11 @@ export const buildOwnerReference = (
   opts: { blockOwnerDeletion?: boolean; controller?: boolean } = { blockOwnerDeletion: true },
 ): OwnerReference => ({
   apiVersion: owner?.apiVersion,
+  blockOwnerDeletion: opts && opts.blockOwnerDeletion,
+  controller: opts && opts.controller,
   kind: owner?.kind,
   name: owner?.metadata?.name,
   uid: owner?.metadata?.uid,
-  blockOwnerDeletion: opts && opts.blockOwnerDeletion,
-  controller: opts && opts.controller,
 });
 
 /**
@@ -167,11 +167,11 @@ export const asAccessReview = (
   }
   return {
     group: model.apiGroup,
-    resource: model.plural,
     name: obj?.metadata?.name,
     namespace: obj?.metadata?.namespace,
-    verb,
+    resource: model.plural,
     subresource,
+    verb,
   };
 };
 
@@ -206,9 +206,9 @@ export const getAllowedResources = (projectNames: string[], model: K8sModel) => 
       `${projName}/${model.plural}`,
       {
         groupVersionKind: modelToGroupVersionKind(model),
-        namespaced: true,
-        namespace: projName,
         isList: true,
+        namespace: projName,
+        namespaced: true,
       },
     ]),
   );
@@ -263,16 +263,16 @@ export const getAllowedTemplateResources = (projectNames: string[]) => {
       `${projName}/${TemplateModel.plural}`,
       {
         groupVersionKind: TemplateModelGroupVersionKind,
+        isList: true,
         namespace: projName,
         selector: {
           matchExpressions: [
             {
-              operator: Operator.Exists,
               key: TEMPLATE_TYPE_LABEL,
+              operator: Operator.Exists,
             },
           ],
         },
-        isList: true,
       },
     ]),
   );

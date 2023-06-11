@@ -11,8 +11,8 @@ type UseDataVolumeConvertedVolumeNames = (vmVolumes: V1Volume[]) => {
 const useDataVolumeConvertedVolumeNames: UseDataVolumeConvertedVolumeNames = (vmVolumes) => {
   const [cdiConfig] = useK8sWatchResource<V1beta1CDIConfig>({
     groupVersionKind: CDIConfigModelGroupVersionKind,
-    namespaced: false,
     isList: false,
+    namespaced: false,
   });
 
   const isDataVolumeGarbageCollector = cdiConfig?.spec?.dataVolumeTTLSeconds !== -1;

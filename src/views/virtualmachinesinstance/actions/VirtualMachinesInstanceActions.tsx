@@ -10,9 +10,9 @@ type VirtualMachinesInsanceActionsProps = { vmi: V1VirtualMachineInstance };
 const VirtualMachinesInsanceActions: React.FC<VirtualMachinesInsanceActionsProps> = ({ vmi }) => {
   return (
     <LazyActionMenu
-      variant={ActionMenuVariant.KEBAB}
-      key={vmi?.metadata?.name}
       context={{ [VirtualMachineInstanceModelRef]: vmi }}
+      key={vmi?.metadata?.name}
+      variant={ActionMenuVariant.KEBAB}
     />
   );
 };

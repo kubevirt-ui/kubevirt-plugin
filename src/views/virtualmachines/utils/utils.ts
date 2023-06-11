@@ -6,5 +6,5 @@ export const isLiveMigratable = (vm: V1VirtualMachine, isSingleNodeCluster: bool
   !isSingleNodeCluster &&
   vm?.status?.printableStatus === printableVMStatus.Running &&
   !!vm?.status?.conditions?.find(
-    ({ type, status }) => type === 'LiveMigratable' && status === 'True',
+    ({ status, type }) => type === 'LiveMigratable' && status === 'True',
   );

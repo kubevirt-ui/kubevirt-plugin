@@ -21,15 +21,15 @@ type VirtualMachineMetricsTabProps = RouteComponentProps & {
   obj: V1VirtualMachine;
 };
 
-const VirtualMachineMetricsTab: FC<VirtualMachineMetricsTabProps> = ({ obj: vm, location }) => {
+const VirtualMachineMetricsTab: FC<VirtualMachineMetricsTabProps> = ({ location, obj: vm }) => {
   const { t } = useKubevirtTranslation();
-  const { vmi, pods, loaded } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { loaded, pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
 
   const [expended, setExpended] = useState<{ [key in MetricsTabExpendedSections]: boolean }>({
-    [MetricsTabExpendedSections.utilization]: true,
-    [MetricsTabExpendedSections.storage]: true,
-    [MetricsTabExpendedSections.network]: true,
     [MetricsTabExpendedSections.migration]: true,
+    [MetricsTabExpendedSections.network]: true,
+    [MetricsTabExpendedSections.storage]: true,
+    [MetricsTabExpendedSections.utilization]: true,
   });
 
   const onToggle = (value) => () =>
@@ -47,41 +47,41 @@ const VirtualMachineMetricsTab: FC<VirtualMachineMetricsTabProps> = ({ obj: vm, 
 
   return (
     <div className="virtual-machine-metrics-tab__main">
-      <Title headingLevel="h2" className="title">
+      <Title className="title" headingLevel="h2">
         {t('Metrics')}
       </Title>
       <TimeRange />
       <Overview className="virtual-machine-metrics-tab__charts">
         <ExpandableSection
-          toggleText={t('Utilization')}
-          onToggle={onToggle(MetricsTabExpendedSections.utilization)}
-          isExpanded={expended?.[MetricsTabExpendedSections.utilization]}
           id={MetricsTabExpendedSections.utilization}
+          isExpanded={expended?.[MetricsTabExpendedSections.utilization]}
+          onToggle={onToggle(MetricsTabExpendedSections.utilization)}
+          toggleText={t('Utilization')}
         >
-          <UtilizationCharts vmi={vmi} pods={pods} />
+          <UtilizationCharts pods={pods} vmi={vmi} />
         </ExpandableSection>
 
         <ExpandableSection
-          toggleText={t('Storage')}
-          onToggle={onToggle(MetricsTabExpendedSections.storage)}
-          isExpanded={expended?.[MetricsTabExpendedSections.storage]}
           id={MetricsTabExpendedSections.storage}
+          isExpanded={expended?.[MetricsTabExpendedSections.storage]}
+          onToggle={onToggle(MetricsTabExpendedSections.storage)}
+          toggleText={t('Storage')}
         >
           <StorageCharts vmi={vmi} />
         </ExpandableSection>
         <ExpandableSection
-          toggleText={t('Network')}
-          onToggle={onToggle(MetricsTabExpendedSections.network)}
-          isExpanded={expended?.[MetricsTabExpendedSections.network]}
           id={MetricsTabExpendedSections.network}
+          isExpanded={expended?.[MetricsTabExpendedSections.network]}
+          onToggle={onToggle(MetricsTabExpendedSections.network)}
+          toggleText={t('Network')}
         >
           <NetworkCharts vmi={vmi} />
         </ExpandableSection>
         <ExpandableSection
-          toggleText={t('Migration')}
-          onToggle={onToggle(MetricsTabExpendedSections.migration)}
-          isExpanded={expended?.[MetricsTabExpendedSections.migration]}
           id={MetricsTabExpendedSections.migration}
+          isExpanded={expended?.[MetricsTabExpendedSections.migration]}
+          onToggle={onToggle(MetricsTabExpendedSections.migration)}
+          toggleText={t('Migration')}
         >
           <MigrationCharts vmi={vmi} />
         </ExpandableSection>

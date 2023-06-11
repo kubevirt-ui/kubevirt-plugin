@@ -1,21 +1,21 @@
 export const tabList = '.pf-c-tabs__list > li';
 
 export enum tabs {
-  Overview = 'horizontal-link-Overview',
-  Details = 'horizontal-link-Details',
-  Metrics = 'horizontal-link-Metrics',
-  YAML = 'horizontal-link-YAML',
   Configuration = 'horizontal-link-Configuration',
-  Scheduling = 'horizontal-link-Scheduling',
+  Console = 'horizontal-link-Console',
+  Details = 'horizontal-link-Details',
+  Diagnostics = 'horizontal-link-Diagnostics',
+  Disks = 'horizontal-link-Disks',
   Environment = 'horizontal-link-Environment',
   Events = 'horizontal-link-Events',
-  Console = 'horizontal-link-Console',
+  Metrics = 'horizontal-link-Metrics',
   NetworkInterfaces = 'horizontal-link-Network interfaces',
-  Disks = 'horizontal-link-Disks',
+  Overview = 'horizontal-link-Overview',
+  Parameters = 'horizontal-link-Parameters',
+  Scheduling = 'horizontal-link-Scheduling',
   Scripts = 'horizontal-link-Scripts',
   Snapshots = 'horizontal-link-Snapshots',
-  Parameters = 'horizontal-link-Parameters',
-  Diagnostics = 'horizontal-link-Diagnostics',
+  YAML = 'horizontal-link-YAML',
 }
 
 export const navigateToTab = (tab: string) => {
@@ -24,24 +24,21 @@ export const navigateToTab = (tab: string) => {
 };
 
 export const tab = {
-  navigateToOverview: () => {
-    navigateToTab(tabs.Overview);
+  navigateToConfiguration: () => {
+    navigateToTab(tabs.Configuration);
+  },
+  navigateToConsole: () => {
+    navigateToTab(tabs.Console);
   },
   navigateToDetails: () => {
     navigateToTab(tabs.Details);
   },
-  navigateToMetrics: () => {
-    navigateToTab(tabs.Metrics);
+  navigateToDiagnostics: () => {
+    navigateToTab(tabs.Diagnostics);
   },
-  navigateToYAML: () => {
-    navigateToTab(tabs.YAML);
-  },
-  navigateToConfiguration: () => {
-    navigateToTab(tabs.Configuration);
-  },
-  navigateToScheduling: () => {
+  navigateToDisks: () => {
     cy.byLegacyTestID(tabs.Configuration).click();
-    cy.get(tabList).eq(0).click();
+    cy.get(tabList).eq(3).click();
   },
   navigateToEnvironment: () => {
     cy.byLegacyTestID(tabs.Configuration).click();
@@ -50,16 +47,22 @@ export const tab = {
   navigateToEvents: () => {
     navigateToTab(tabs.Events);
   },
-  navigateToConsole: () => {
-    navigateToTab(tabs.Console);
+  navigateToMetrics: () => {
+    navigateToTab(tabs.Metrics);
   },
   navigateToNetworks: () => {
     cy.byLegacyTestID(tabs.Configuration).click();
     cy.get(tabList).eq(2).click();
   },
-  navigateToDisks: () => {
+  navigateToOverview: () => {
+    navigateToTab(tabs.Overview);
+  },
+  navigateToParameters: () => {
+    navigateToTab(tabs.Parameters);
+  },
+  navigateToScheduling: () => {
     cy.byLegacyTestID(tabs.Configuration).click();
-    cy.get(tabList).eq(3).click();
+    cy.get(tabList).eq(0).click();
   },
   navigateToScripts: () => {
     cy.byLegacyTestID(tabs.Configuration).click();
@@ -68,23 +71,20 @@ export const tab = {
   navigateToSnapshots: () => {
     navigateToTab(tabs.Snapshots);
   },
-  navigateToParameters: () => {
-    navigateToTab(tabs.Parameters);
+  navigateToTDisks: () => {
+    navigateToTab(tabs.Disks);
   },
-  navigateToDiagnostics: () => {
-    navigateToTab(tabs.Diagnostics);
+  navigateToTNetworks: () => {
+    navigateToTab(tabs.NetworkInterfaces);
   },
   // navigate template's tabs
   navigateToTScheduling: () => {
     navigateToTab(tabs.Scheduling);
   },
-  navigateToTNetworks: () => {
-    navigateToTab(tabs.NetworkInterfaces);
-  },
-  navigateToTDisks: () => {
-    navigateToTab(tabs.Disks);
-  },
   navigateToTScripts: () => {
     navigateToTab(tabs.Scripts);
+  },
+  navigateToYAML: () => {
+    navigateToTab(tabs.YAML);
   },
 };

@@ -14,24 +14,24 @@ import {
 import './AlertsCard.scss';
 
 type AlertsCardAccordionItemProps = {
+  alertOpen: AlertType;
   alerts: any;
   alertType: AlertType;
   handleDrawerToggleClick: (alertType: AlertType) => void;
-  alertOpen: AlertType;
 };
 
 const AlertsCardAccordionItem: React.FC<AlertsCardAccordionItemProps> = ({
-  alerts,
-  handleDrawerToggleClick,
   alertOpen,
+  alerts,
   alertType,
+  handleDrawerToggleClick,
 }) => {
   const { t } = useKubevirtTranslation();
 
   const alertTitle = {
-    [AlertType.warning]: t('Warnings'),
     [AlertType.critical]: t('Critical'),
     [AlertType.info]: t('Info'),
+    [AlertType.warning]: t('Warnings'),
   };
 
   return (
@@ -40,18 +40,18 @@ const AlertsCardAccordionItem: React.FC<AlertsCardAccordionItemProps> = ({
         onClick={() => {
           handleDrawerToggleClick(alertType);
         }}
-        isExpanded={alertOpen === alertType}
-        id={alertType}
         className="alerts-card__toggle--item"
+        id={alertType}
+        isExpanded={alertOpen === alertType}
       >
         <div className="subtitle">
           <span className="subtitle-name">{alertTitle?.[alertType]}</span>
-          <Label isCompact className="subtitle-label">
+          <Label className="subtitle-label" isCompact>
             {alerts?.length || 0}
           </Label>
         </div>
       </AccordionToggle>
-      <AccordionContent id={alertType} key={alertType} isHidden={alertOpen !== alertType}>
+      <AccordionContent id={alertType} isHidden={alertOpen !== alertType} key={alertType}>
         <Divider />
         {alerts?.map((alert) => (
           <div className="content" key={alert?.key}>

@@ -4,14 +4,14 @@ import { V1alpha1PersistentVolumeClaim, V1Disk } from '@kubevirt-ui/kubevirt-api
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 export type DiskPresentation = {
-  name: string;
-  metadata: { [key: string]: any };
-  interface: string;
   drive: string;
+  interface: string;
+  metadata: { [key: string]: any };
+  name: string;
+  namespace?: string;
+  size?: string;
   source: string;
   storageClass?: string;
-  size?: string;
-  namespace?: string;
 };
 
 export type FileSystemPresentation = {
@@ -25,8 +25,8 @@ export type FileSystemPresentation = {
 export type DiskRaw = V1Disk & { pvc?: V1alpha1PersistentVolumeClaim };
 
 export const diskTypes = {
-  disk: 'Disk',
   cdrom: 'CD-ROM',
+  disk: 'Disk',
   floppy: 'Floppy',
   LUN: 'LUN',
 };
@@ -46,23 +46,20 @@ export const convertBytes = (bytes: number) =>
 export const diskStructureCreator = (disks: DiskRaw[]): DiskPresentation[] => {
   return disks?.map((device) => {
     return {
-      name: device?.name,
-      metadata: { name: device?.name },
-      interface: device?.[findDrive(device)]?.bus,
       drive: findDrive(device),
+      interface: device?.[findDrive(device)]?.bus,
+      metadata: { name: device?.name },
+      name: device?.name,
+      namespace: device?.pvc?.metadata?.namespace,
+      size: device?.pvc?.spec?.resources?.requests?.storage,
       source: device?.pvc?.metadata?.name || 'Other',
       storageClass: device?.pvc?.spec?.storageClassName || '-',
-      size: device?.pvc?.spec?.resources?.requests?.storage,
-      namespace: device?.pvc?.metadata?.namespace,
     };
   });
 };
 
 export const filters: RowFilter[] = [
   {
-    filterGroupName: 'Disk Type',
-    type: 'disk-type',
-    reducer: (obj) => obj?.drive,
     filter: (drives, obj) => {
       const status = obj?.drive;
       return (
@@ -71,9 +68,12 @@ export const filters: RowFilter[] = [
         !drives?.all?.find((s) => s === status)
       );
     },
+    filterGroupName: 'Disk Type',
     items: Object.keys(diskTypes).map((type) => ({
       id: type,
       title: diskTypes[type],
     })),
+    reducer: (obj) => obj?.drive,
+    type: 'disk-type',
   },
 ];

@@ -3,14 +3,14 @@ import { createContext } from 'react';
 import { DataUpload, UploadDataProps } from './types';
 
 export type CDIUploadContextProps = {
-  uploads: DataUpload[];
-  uploadData: ({ file, token, pvcName, namespace }: UploadDataProps) => void;
+  uploadData: ({ file, namespace, pvcName, token }: UploadDataProps) => void;
   uploadProxyURL?: string;
+  uploads: DataUpload[];
 };
 
 export const CDIUploadContext = createContext<CDIUploadContextProps>({
-  uploads: [],
   uploadData: () => null,
+  uploads: [],
 });
 
 export const CDIUploadProvider = CDIUploadContext.Provider;

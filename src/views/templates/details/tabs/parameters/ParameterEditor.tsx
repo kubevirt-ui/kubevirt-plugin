@@ -7,51 +7,51 @@ import { Checkbox, ExpandableSection, FormGroup, TextInput } from '@patternfly/r
 import ParameterValueEditor from './ParameterValueEditor';
 
 type ParameterEditorProps = {
-  parameter: TemplateParameter;
-  onChange: (parameter: TemplateParameter) => void;
   isEditDisabled?: boolean;
+  onChange: (parameter: TemplateParameter) => void;
+  parameter: TemplateParameter;
 };
 
 const ParameterEditor: React.FC<ParameterEditorProps> = ({
-  parameter,
-  onChange,
   isEditDisabled,
+  onChange,
+  parameter,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isExpanded, setExpanded] = React.useState(true);
 
   return (
     <ExpandableSection
-      isExpanded={isExpanded}
-      isIndented
-      onToggle={setExpanded}
       toggleContent={
         <>
           <strong>{t('Name')} </strong> {parameter.name}
         </>
       }
+      isExpanded={isExpanded}
+      isIndented
+      onToggle={setExpanded}
     >
       <FormGroup fieldId={`${parameter.name}-required`}>
         <Checkbox
-          label={t('Required')}
-          isChecked={parameter.required}
-          onChange={(required) => onChange({ ...parameter, required })}
           id={`${parameter.name}-required`}
+          isChecked={parameter.required}
           isDisabled={isEditDisabled}
+          label={t('Required')}
+          onChange={(required) => onChange({ ...parameter, required })}
         />
       </FormGroup>
       <FormGroup fieldId={`${parameter.name}-description`} label={t('Description')}>
         <TextInput
           id={`${parameter.name}-description`}
-          value={parameter.description}
-          onChange={(description) => onChange({ ...parameter, description })}
           isDisabled={isEditDisabled}
+          onChange={(description) => onChange({ ...parameter, description })}
+          value={parameter.description}
         />
       </FormGroup>
       <ParameterValueEditor
-        parameter={parameter}
-        onChange={onChange}
         isEditDisabled={isEditDisabled}
+        onChange={onChange}
+        parameter={parameter}
       />
     </ExpandableSection>
   );

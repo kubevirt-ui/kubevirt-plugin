@@ -26,7 +26,9 @@ const DataSourceImportCronDescription: React.FC<DataSourceImportCronDescriptionP
 
   return (
     <DescriptionItem
-      descriptionHeader={t('DataImportCron')}
+      bodyContent={t(
+        'The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.',
+      )}
       descriptionData={
         <ResourceLink
           groupVersionKind={DataImportCronModelGroupVersionKind}
@@ -34,10 +36,8 @@ const DataSourceImportCronDescription: React.FC<DataSourceImportCronDescriptionP
           namespace={dataImportCron?.metadata?.namespace}
         />
       }
+      descriptionHeader={t('DataImportCron')}
       isPopover
-      bodyContent={t(
-        'The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.',
-      )}
     />
   );
 };

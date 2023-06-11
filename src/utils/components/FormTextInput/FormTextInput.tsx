@@ -13,7 +13,7 @@ export const FormTextInput = forwardRef<HTMLInputElement, FormTextInputProps>(
   ({ onChange, ...props }, ref) => {
     const onChangeForward: TextInputProps['onChange'] = (_, event) => onChange?.(event);
 
-    return <TextInput {...props} ref={ref} onChange={onChangeForward} />;
+    return <TextInput {...props} onChange={onChangeForward} ref={ref} />;
   },
 );
 

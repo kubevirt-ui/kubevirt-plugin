@@ -17,7 +17,7 @@ const useBootableVolumesColumns = (
   preferences: V1alpha2VirtualMachineClusterPreference[],
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[]] => {
   const { t } = useKubevirtTranslation();
-  const { startIndex, endIndex } = pagination;
+  const { endIndex, startIndex } = pagination;
 
   const sorting = useCallback(
     (direction, path) => columnSorting(data, direction, pagination, path),
@@ -27,23 +27,22 @@ const useBootableVolumesColumns = (
   const columns: TableColumn<K8sResourceCommon>[] = useMemo(
     () => [
       {
-        title: t('Name'),
         id: 'name',
-        transforms: [sortable],
+        props: { className: 'pf-m-width-20' },
         sort: (_, direction) => sorting(direction, 'metadata.name'),
-        props: { className: 'pf-m-width-20' },
+        title: t('Name'),
+        transforms: [sortable],
       },
       {
-        title: t('Namespace'),
         id: 'namespace',
-        transforms: [sortable],
-        sort: (_, direction) => sorting(direction, 'metadata.namespace'),
         props: { className: 'pf-m-width-20' },
+        sort: (_, direction) => sorting(direction, 'metadata.namespace'),
+        title: t('Namespace'),
+        transforms: [sortable],
       },
       {
-        title: t('Operating system'),
         id: 'os',
-        transforms: [sortable],
+        props: { className: 'pf-m-width-15' },
         sort: (sources, direction) => {
           return sources
             .sort((a, b) => {
@@ -58,19 +57,19 @@ const useBootableVolumesColumns = (
             })
             ?.slice(startIndex, endIndex);
         },
-        props: { className: 'pf-m-width-15' },
+        title: t('Operating system'),
+        transforms: [sortable],
       },
       {
-        title: t('Description'),
         id: 'description',
-        transforms: [sortable],
-        sort: (_, direction) => sorting(direction, 'metadata.annotations.description'),
         props: { className: 'pf-m-width-15' },
+        sort: (_, direction) => sorting(direction, 'metadata.annotations.description'),
+        title: t('Description'),
+        transforms: [sortable],
       },
       {
-        title: t('Preference'),
         id: 'preference',
-        transforms: [sortable],
+        props: { className: 'pf-m-width-15' },
         sort: (sources, direction) => {
           return sources
             .sort((a, b) => {
@@ -85,20 +84,21 @@ const useBootableVolumesColumns = (
             })
             ?.slice(startIndex, endIndex);
         },
-        props: { className: 'pf-m-width-15' },
+        title: t('Preference'),
+        transforms: [sortable],
       },
       {
-        title: '',
         id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        title: '',
       },
     ],
     [t, sorting, startIndex, endIndex, preferences],
   );
 
   const [activeColumns] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
-    columns,
     columnManagementID: DataSourceModelRef,
+    columns,
   });
 
   return [columns, activeColumns];

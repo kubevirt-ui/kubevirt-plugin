@@ -10,9 +10,6 @@ const useNetworkRowFilters = (): RowFilter[] => {
   const filters: RowFilter[] = React.useMemo(
     () => [
       {
-        filterGroupName: t('Interface Type'),
-        type: 'interface-type',
-        reducer: (obj) => getNetworkInterfaceType(obj?.iface),
         filter: (interfaces, obj) => {
           const drive = getNetworkInterfaceType(obj?.iface);
           return (
@@ -21,10 +18,13 @@ const useNetworkRowFilters = (): RowFilter[] => {
             !interfaces?.all?.find((item) => item === drive)
           );
         },
+        filterGroupName: t('Interface Type'),
         items: Object.keys(interfacesTypes).map((type) => ({
           id: type,
           title: interfacesTypes[type],
         })),
+        reducer: (obj) => getNetworkInterfaceType(obj?.iface),
+        type: 'interface-type',
       },
     ],
     [t],

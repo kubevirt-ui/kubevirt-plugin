@@ -11,17 +11,17 @@ export type HardwareDeviceRowProps = {
 
 const HardwareDeviceRow: React.FC<
   RowProps<V1GPU | V1HostDevice, { handleRemoveDevice: (device: V1GPU | V1HostDevice) => void }>
-> = ({ obj: device, activeColumnIDs, rowData: { handleRemoveDevice } }) => {
+> = ({ activeColumnIDs, obj: device, rowData: { handleRemoveDevice } }) => {
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-20">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
         {device.name}
       </TableData>
-      <TableData id="deviceName" activeColumnIDs={activeColumnIDs} className="pf-m-width-30">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-30" id="deviceName">
         {device.deviceName}
       </TableData>
-      <TableData id="" activeColumnIDs={activeColumnIDs} className="pf-c-table__action">
-        <Button variant="plain" onClick={() => handleRemoveDevice(device)}>
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-c-table__action" id="">
+        <Button onClick={() => handleRemoveDevice(device)} variant="plain">
           <MinusCircleIcon />
         </Button>
       </TableData>

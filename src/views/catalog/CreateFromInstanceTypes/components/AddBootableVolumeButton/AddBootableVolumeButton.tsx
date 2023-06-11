@@ -18,10 +18,10 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ buttonVaria
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [canCreateVolume] = useAccessReview({
+    group: DataSourceModel.apiGroup,
+    namespace: isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS,
     resource: DataSourceModel.plural,
     verb: 'create' as K8sVerb,
-    namespace: isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS,
-    group: DataSourceModel.apiGroup,
   });
   const { instanceTypesAndPreferencesData, onSelectCreatedVolume } = useInstanceTypeVMStore();
   const { loadError } = instanceTypesAndPreferencesData;
@@ -33,8 +33,8 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ buttonVaria
           <AddBootableVolumeModal onCreateVolume={onSelectCreatedVolume} {...props} />
         ))
       }
-      variant={buttonVariant || ButtonVariant.secondary}
       isDisabled={loadError || !canCreateVolume}
+      variant={buttonVariant || ButtonVariant.secondary}
     >
       {t('Add volume')}
     </Button>

@@ -59,9 +59,9 @@ const SerialConsoleConnector: React.FC<SerialConsoleConnectorProps> = ({ vmi }) 
       host: `${isConnectionEncrypted() ? WSS : WS}://${window.location.hostname}:${
         window.location.port || (isConnectionEncrypted() ? SECURE : INSECURE)
       }`,
+      jsonParse: false,
       path: `/api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/console`,
       reconnect: false,
-      jsonParse: false,
       subprotocols: ['plain.kubevirt.io'],
     };
 

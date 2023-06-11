@@ -14,23 +14,23 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { produceTemplateNetwork } from '../../utils';
 
 type TemplatesEditNetworkInterfaceModalProps = {
-  template: V1Template;
   isOpen: boolean;
-  onClose: () => void;
   nicPresentation: NetworkPresentation;
+  onClose: () => void;
+  template: V1Template;
 };
 
 const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalProps> = ({
-  template,
   isOpen,
-  onClose,
   nicPresentation,
+  onClose,
+  template,
 }) => {
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
 
   const onSubmit =
-    ({ nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType }) =>
+    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
     () => {
       const resultNetwork = createNetwork(nicName, networkName);
       const resultInterface = createInterface(
@@ -57,22 +57,22 @@ const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalP
       });
 
       return k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       });
     };
 
   return (
     <NetworkInterfaceModal
-      vm={vm}
       headerText={t('Edit network interface')}
-      onSubmit={onSubmit}
-      nicPresentation={nicPresentation}
       isOpen={isOpen}
-      onClose={onClose}
       namespace={template?.metadata?.namespace}
+      nicPresentation={nicPresentation}
+      onClose={onClose}
+      onSubmit={onSubmit}
+      vm={vm}
     />
   );
 };

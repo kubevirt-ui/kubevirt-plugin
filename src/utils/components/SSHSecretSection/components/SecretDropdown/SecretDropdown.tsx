@@ -12,17 +12,17 @@ import Loading from '../../../Loading/Loading';
 import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
 
 type SecretDropdownProps = {
-  secretsResourceData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
-  sshSecretName: string;
-  setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   id?: string;
+  secretsResourceData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
+  setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
+  sshSecretName: string;
 };
 
 const SecretDropdown: FC<SecretDropdownProps> = ({
-  secretsResourceData,
-  sshSecretName,
-  setSSHDetails,
   id,
+  secretsResourceData,
+  setSSHDetails,
+  sshSecretName,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -37,9 +37,9 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
       sshKeySecrets.find((secret) => getName(secret) === newSecretName),
     );
     setSSHDetails({
-      sshSecretName: newSecretName,
-      sshPubKey,
       secretOption: SecretSelectionOption.useExisting,
+      sshPubKey,
+      sshSecretName: newSecretName,
     });
     setIsOpen(false);
   };
@@ -56,24 +56,24 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
 
   if (secretsError)
     return (
-      <Alert title={t('Error')} isInline variant={AlertVariant.danger}>
+      <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
         {secretsError?.message}
       </Alert>
     );
 
   return (
     <Select
-      isOpen={isOpen}
-      onToggle={() => setIsOpen(!isOpen)}
-      onSelect={onSelect}
-      variant={SelectVariant.single}
-      onFilter={filterSecrets}
       hasInlineFilter
-      selections={sshSecretName}
-      placeholderText={t('--- Select secret ---')}
-      maxHeight={400}
       id={id || 'select-secret'}
+      isOpen={isOpen}
+      maxHeight={400}
       menuAppendTo="parent"
+      onFilter={filterSecrets}
+      onSelect={onSelect}
+      onToggle={() => setIsOpen(!isOpen)}
+      placeholderText={t('--- Select secret ---')}
+      selections={sshSecretName}
+      variant={SelectVariant.single}
     >
       {sshKeySecrets?.map((secret) => {
         const name = getName(secret);

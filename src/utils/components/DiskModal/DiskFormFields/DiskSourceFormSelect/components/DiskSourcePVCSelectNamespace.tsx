@@ -9,19 +9,19 @@ import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/reac
 import { FilterPVCSelect } from '../../utils/Filters';
 
 type DiskSourcePVCSelectNamespaceProps = {
-  projectsName: string[];
-  selectedProject: string;
+  isDisabled?: boolean;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   projectsLoaded: boolean;
-  isDisabled?: boolean;
+  projectsName: string[];
+  selectedProject: string;
 };
 
 const DiskSourcePVCSelectNamespace: React.FC<DiskSourcePVCSelectNamespaceProps> = ({
-  selectedProject,
-  projectsName,
+  isDisabled,
   onChange,
   projectsLoaded,
-  isDisabled,
+  projectsName,
+  selectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isNamespacePVCOpen, setNamespaceOpen] = React.useState(false);
@@ -38,31 +38,31 @@ const DiskSourcePVCSelectNamespace: React.FC<DiskSourcePVCSelectNamespaceProps> 
 
   return (
     <FormGroup
-      label={t('PVC project')}
+      className="pvc-selection-formgroup"
       fieldId={fieldId}
+      helperText={t('Location of the existing PVC')}
       id={fieldId}
       isRequired
-      className="pvc-selection-formgroup"
-      helperText={t('Location of the existing PVC')}
+      label={t('PVC project')}
     >
       {projectsLoaded ? (
         <Select
-          menuAppendTo="parent"
           aria-labelledby={fieldId}
-          isOpen={isNamespacePVCOpen}
-          onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
-          onSelect={onSelect}
-          variant={SelectVariant.single}
-          onFilter={FilterPVCSelect(projectsName)}
           hasInlineFilter
-          selections={selectedProject}
-          placeholderText={t('--- Select PVC project ---')}
           isDisabled={isDisabled}
+          isOpen={isNamespacePVCOpen}
           maxHeight={400}
+          menuAppendTo="parent"
+          onFilter={FilterPVCSelect(projectsName)}
+          onSelect={onSelect}
+          onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
+          placeholderText={t('--- Select PVC project ---')}
+          selections={selectedProject}
+          variant={SelectVariant.single}
         >
           {projectsName.map((projectName) => (
             <SelectOption key={projectName} value={projectName}>
-              <ResourceLink kind={ProjectModel.kind} name={projectName} linkTo={false} />
+              <ResourceLink kind={ProjectModel.kind} linkTo={false} name={projectName} />
             </SelectOption>
           ))}
         </Select>

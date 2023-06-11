@@ -8,16 +8,16 @@ import {
 } from '@patternfly/react-icons';
 
 export const vmiStatuses = {
-  Stopped: 'Stopped',
+  Failed: 'Failed',
   Migrating: 'Migrating',
-  Provisioning: 'Provisioning',
-  Starting: 'Starting',
-  Running: 'Running',
   Paused: 'Paused',
+  Provisioning: 'Provisioning',
+  Running: 'Running',
+  Starting: 'Starting',
+  Stopped: 'Stopped',
   Stopping: 'Stopping',
   Terminating: 'Terminating',
   Unknown: 'Unknown',
-  Failed: 'Failed',
 };
 
 export const osNames = ['centos', 'fedora', 'windows', 'rhel', 'other'];
@@ -31,12 +31,12 @@ const iconHandler = {
 };
 
 const iconMapper: { [key: string]: React.ComponentClass<any, any> } = {
-  running: SyncAltIcon,
-  paused: PausedIcon,
-  unknown: UnknownIcon,
   error: ExclamationCircleIcon,
   failed: ExclamationCircleIcon,
+  paused: PausedIcon,
+  running: SyncAltIcon,
   stopped: OffIcon,
+  unknown: UnknownIcon,
 };
 
 export const icon = new Proxy<typeof iconMapper>(iconMapper, iconHandler);

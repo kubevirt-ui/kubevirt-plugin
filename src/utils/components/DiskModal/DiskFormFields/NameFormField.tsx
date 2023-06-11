@@ -8,17 +8,17 @@ import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 import { generateDiskName } from './utils/helpers';
 
 type NameFormFieldProps = {
-  objName: string;
   dispatchDiskState: React.Dispatch<DiskReducerActionType>;
+  objName: string;
 };
 
-const NameFormField: React.FC<NameFormFieldProps> = ({ objName, dispatchDiskState }) => {
+const NameFormField: React.FC<NameFormFieldProps> = ({ dispatchDiskState, objName }) => {
   const { t } = useKubevirtTranslation();
 
   const handleChange = React.useCallback(
     (value: string, event: React.FormEvent<HTMLInputElement>) => {
       event.preventDefault();
-      dispatchDiskState({ type: diskReducerActions.SET_DISK_NAME, payload: value });
+      dispatchDiskState({ payload: value, type: diskReducerActions.SET_DISK_NAME });
     },
     [dispatchDiskState],
   );
@@ -26,13 +26,13 @@ const NameFormField: React.FC<NameFormFieldProps> = ({ objName, dispatchDiskStat
   React.useEffect(() => {
     // explicit check for null to check if the field is empty by initialState
     if (objName === null) {
-      dispatchDiskState({ type: diskReducerActions.SET_DISK_NAME, payload: generateDiskName() });
+      dispatchDiskState({ payload: generateDiskName(), type: diskReducerActions.SET_DISK_NAME });
     }
   }, [dispatchDiskState, objName]);
 
   return (
-    <FormGroup label={t('Name')} fieldId="name" isRequired>
-      <TextInput id="name" type="text" value={objName} onChange={handleChange} />
+    <FormGroup fieldId="name" isRequired label={t('Name')}>
+      <TextInput id="name" onChange={handleChange} type="text" value={objName} />
     </FormGroup>
   );
 };

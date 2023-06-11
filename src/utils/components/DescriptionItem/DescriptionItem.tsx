@@ -17,31 +17,31 @@ import { DescriptionItemHeader } from './DescriptionItemHeader';
 import './DescriptionItem.scss';
 
 type DescriptionItemProps = {
+  bodyContent?: React.ReactNode;
+  breadcrumb?: string;
+  'data-test-id'?: string;
   descriptionData: React.ReactNode;
   descriptionHeader?: string;
-  bodyContent?: React.ReactNode;
-  moreInfoURL?: string;
-  isPopover?: boolean;
-  breadcrumb?: string;
-  isEdit?: boolean;
-  onEditClick?: () => void;
   isDisabled?: boolean;
+  isEdit?: boolean;
+  isPopover?: boolean;
+  moreInfoURL?: string;
+  onEditClick?: () => void;
   showEditOnTitle?: boolean;
-  'data-test-id'?: string;
 };
 
 const DescriptionItem: React.FC<DescriptionItemProps> = ({
+  bodyContent,
+  breadcrumb,
+  'data-test-id': testId,
   descriptionData,
   descriptionHeader,
-  bodyContent,
-  moreInfoURL,
-  isPopover,
-  breadcrumb,
-  isEdit,
-  onEditClick,
   isDisabled,
+  isEdit,
+  isPopover,
+  moreInfoURL,
+  onEditClick,
   showEditOnTitle,
-  'data-test-id': testId,
 }) => {
   const { t } = useKubevirtTranslation();
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
@@ -53,23 +53,23 @@ const DescriptionItem: React.FC<DescriptionItemProps> = ({
           <FlexItem>
             {
               <DescriptionItemHeader
-                isPopover={isPopover}
                 bodyContent={bodyContent}
-                moreInfoURL={moreInfoURL}
                 breadcrumb={breadcrumb}
                 descriptionHeader={descriptionHeader}
+                isPopover={isPopover}
+                moreInfoURL={moreInfoURL}
               />
             }
           </FlexItem>
           {isEdit && showEditOnTitle && (
             <FlexItem>
               <Button
-                type="button"
-                isInline
-                isDisabled={isDisabled}
-                onClick={onEditClick}
-                variant="link"
                 data-test-id={`${testId}-edit`}
+                isDisabled={isDisabled}
+                isInline
+                onClick={onEditClick}
+                type="button"
+                variant="link"
               >
                 {t('Edit')}
                 <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
@@ -80,12 +80,12 @@ const DescriptionItem: React.FC<DescriptionItemProps> = ({
       </DescriptionListTermHelpText>
       {isEdit && !showEditOnTitle ? (
         <Button
-          type="button"
-          isInline
-          isDisabled={isDisabled}
-          onClick={onEditClick}
-          variant="link"
           data-test-id={testId}
+          isDisabled={isDisabled}
+          isInline
+          onClick={onEditClick}
+          type="button"
+          variant="link"
         >
           <Flex spaceItems={{ default: 'spaceItemsNone' }}>
             <FlexItem>{descriptionData ?? NotAvailable}</FlexItem>

@@ -36,13 +36,13 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
   const actions: Action[] = React.useMemo(() => {
     const printableStatus = vm?.status?.printableStatus;
-    const { Paused, Migrating } = printableVMStatus;
+    const { Migrating, Paused } = printableVMStatus;
 
     const startOrStop = ((printableStatusMachine) => {
       const map = {
-        Stopping: VirtualMachineActionFactory.forceStop(vm),
-        Stopped: VirtualMachineActionFactory.start(vm),
         default: VirtualMachineActionFactory.stop(vm),
+        Stopped: VirtualMachineActionFactory.start(vm),
+        Stopping: VirtualMachineActionFactory.forceStop(vm),
       };
       return map[printableStatusMachine] || map.default;
     })(printableStatus);

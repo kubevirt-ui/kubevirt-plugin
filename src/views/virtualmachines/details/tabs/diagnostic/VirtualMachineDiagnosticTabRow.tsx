@@ -8,7 +8,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableRowContent, Tbody, Td, Tr } from '@patternfly/react-table';
 
-const VirtualMachineDiagnosticTabRow = ({ obj, index, expend, setExpend, activeColumns }) => {
+const VirtualMachineDiagnosticTabRow = ({ activeColumns, expend, index, obj, setExpend }) => {
   const isExpanded = expend?.expended.has(obj?.id) && obj?.message;
   const activeColumnsObj = new Set<string>(activeColumns.map(({ id }) => id));
 
@@ -18,20 +18,20 @@ const VirtualMachineDiagnosticTabRow = ({ obj, index, expend, setExpend, activeC
         <Td
           expand={
             obj?.message && {
-              rowIndex: index,
+              expandId: `message-${index}`,
               isExpanded,
               onToggle: () =>
                 setExpend((expendObj) => {
                   isExpanded ? expendObj.expended.delete(obj?.id) : expendObj.expended.add(obj?.id);
-                  return { ids: new Set(expendObj.ids), expended: new Set(expendObj.expended) };
+                  return { expended: new Set(expendObj.expended), ids: new Set(expendObj.ids) };
                 }),
-              expandId: `message-${index}`,
+              rowIndex: index,
             }
           }
         />
         {[...activeColumnsObj]?.map((column) => {
           return (
-            <Td key={column} id={column}>
+            <Td id={column} key={column}>
               {obj?.[column]?.toString() || NO_DATA_DASH}
             </Td>
           );

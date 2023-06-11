@@ -6,17 +6,17 @@ import { EnvironmentKind, MapKindToAbbr } from '../constants';
 import { EnvironmentOption } from '../utils';
 
 type EnvironmentSelectOptionProps = {
+  isDisabled?: boolean;
   kind: EnvironmentKind;
   name: string;
-  isDisabled?: boolean;
 };
 
 const EnvironmentSelectOption: React.FC<EnvironmentSelectOptionProps> = ({
-  name,
-  kind,
   isDisabled,
+  kind,
+  name,
 }) => (
-  <SelectOption value={new EnvironmentOption(name, kind)} isDisabled={isDisabled}>
+  <SelectOption isDisabled={isDisabled} value={new EnvironmentOption(name, kind)}>
     <span className="sr-only">{kind}</span>
     <span className={`co-m-resource-icon co-m-resource-${kind}`}>{MapKindToAbbr[kind]}</span>
     {name}

@@ -20,8 +20,8 @@ import {
 const resource: WatchK8sResource = {
   groupVersionKind: modelToGroupVersionKind(CDIConfigModel),
   isList: false,
-  namespaced: false,
   name: 'config',
+  namespaced: false,
 };
 
 export const useCDIUpload = (): UseCDIUploadValues => {
@@ -30,21 +30,21 @@ export const useCDIUpload = (): UseCDIUploadValues => {
   const [upload, setUpload] = React.useState<DataUpload>();
   const uploadProxyURL = getUploadProxyURL(cdiConfig);
 
-  const uploadData = async ({ file, dataVolume }: UploadDataProps) => {
+  const uploadData = async ({ dataVolume, file }: UploadDataProps) => {
     const { CancelToken } = axios;
     const cancelSource = CancelToken.source();
     const noRouteFound = configError || !configLoaded || !uploadProxyURL;
 
     const newUpload: DataUpload = {
-      pvcName: dataVolume.metadata.name,
-      namespace: dataVolume.metadata.namespace,
-      progress: 0,
-      fileName: file?.name,
       cancelUpload: () => {
         cancelSource.cancel();
         setUpload({ ...newUpload, uploadStatus: UPLOAD_STATUS.CANCELED });
         return killUploadPVC(dataVolume.metadata.name, dataVolume.metadata.namespace);
       },
+      fileName: file?.name,
+      namespace: dataVolume.metadata.namespace,
+      progress: 0,
+      pvcName: dataVolume.metadata.name,
       uploadError: noRouteFound && {
         message: t('No Upload URL found {{configError}}', { configError }),
       },
@@ -63,8 +63,8 @@ export const useCDIUpload = (): UseCDIUploadValues => {
     } catch (catchError) {
       if (catchError?.response?.data === undefined) {
         return Promise.reject({
-          message: t('Invalid certificate, please visit the following URL and approve it'),
           href: getUploadURL(uploadProxyURL),
+          message: t('Invalid certificate, please visit the following URL and approve it'),
         });
       }
     }
@@ -87,21 +87,21 @@ export const useCDIUpload = (): UseCDIUploadValues => {
       form.append('file', file);
 
       await axios({
-        method: 'POST',
-        url: getUploadURL(uploadProxyURL),
-        data: form,
         cancelToken: cancelSource.token,
+        data: form,
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
+        method: 'POST',
         onUploadProgress: (e) => {
           setUpload({
             ...newUpload,
-            uploadStatus: UPLOAD_STATUS.UPLOADING,
             progress: Math.floor((e.loaded / file.size) * 100),
+            uploadStatus: UPLOAD_STATUS.UPLOADING,
           });
         },
+        url: getUploadURL(uploadProxyURL),
       });
 
       // finished uploading
@@ -116,8 +116,8 @@ export const useCDIUpload = (): UseCDIUploadValues => {
 
       setUpload({
         ...newUpload,
-        uploadStatus: isCanceled ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR,
         uploadError: !isCanceled && { message: `${e?.message}: ${e?.response?.data}` },
+        uploadStatus: isCanceled ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR,
       });
       return Promise.reject(isCanceled ? { message: t('Upload cancelled') } : e);
     }
@@ -130,26 +130,26 @@ export const useCDIUpload = (): UseCDIUploadValues => {
 };
 
 export type DataUpload = {
-  pvcName: string;
-  namespace: string;
-  fileName?: string;
-  progress?: number;
-  uploadStatus?: UPLOAD_STATUS;
-  uploadError?: any;
   cancelUpload?: () => Promise<{
     metadata: {
       name: string;
       namespace: string;
     };
   }>;
+  fileName?: string;
+  namespace: string;
+  progress?: number;
+  pvcName: string;
+  uploadError?: any;
+  uploadStatus?: UPLOAD_STATUS;
 };
 
 export type UseCDIUploadValues = {
   upload: DataUpload;
-  uploadData: ({ file, dataVolume }: UploadDataProps) => Promise<void>;
+  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
 };
 
 export type UploadDataProps = {
-  file: File;
   dataVolume: V1beta1DataVolume;
+  file: File;
 };

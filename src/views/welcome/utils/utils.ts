@@ -10,10 +10,10 @@ export const welcomeModalButtons = (ns: string): WelcomeModalButtonsData[] => {
 
   return [
     {
-      name: t('Create VirtualMachine'),
-      variant: ButtonVariant.primary,
-      url: `/k8s/${namespace}/templatescatalog`,
       className: 'WelcomeModal__button',
+      name: t('Create VirtualMachine'),
+      url: `/k8s/${namespace}/templatescatalog`,
+      variant: ButtonVariant.primary,
     },
     {
       name: t('Create a virtual machine from a template (Quick start)'),

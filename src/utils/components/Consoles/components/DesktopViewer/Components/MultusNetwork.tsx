@@ -9,13 +9,13 @@ import { MultusNetworkProps } from '../utils/types';
 
 import RDP from './RDP';
 
-const MultusNetwork: React.FC<MultusNetworkProps> = ({ vmi, selectedNetwork }) => {
+const MultusNetwork: React.FC<MultusNetworkProps> = ({ selectedNetwork, vmi }) => {
   const { t } = useKubevirtTranslation();
   const guestAgent = isGuestAgentConnected(vmi);
 
   if (!guestAgent) {
     return (
-      <Alert variant="warning" isInline title={t('Missing guest agent')}>
+      <Alert isInline title={t('Missing guest agent')} variant="warning">
         {t('Guest agent is not installed on VirtualMachine')}
       </Alert>
     );
@@ -23,7 +23,7 @@ const MultusNetwork: React.FC<MultusNetworkProps> = ({ vmi, selectedNetwork }) =
 
   if (!selectedNetwork || !selectedNetwork?.ip) {
     return (
-      <Alert variant="warning" isInline title={t('Networks misconfigured')}>{`${t(
+      <Alert isInline title={t('Networks misconfigured')} variant="warning">{`${t(
         'No IP address is reported for network interface',
       )} ${selectedNetwork?.name || ''}`}</Alert>
     );

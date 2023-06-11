@@ -8,8 +8,8 @@ const EnvironmentFormSkeleton: FC = memo(() => (
   <Stack hasGutter>
     <EnvironmentFormTitle />
     <StackItem />
-    <Skeleton width="80%" height="40px" />
-    <Skeleton width="40%" height="30px" />
+    <Skeleton height="40px" width="80%" />
+    <Skeleton height="30px" width="40%" />
   </Stack>
 ));
 EnvironmentFormSkeleton.displayName = 'EnvironmentFormSkeleton';

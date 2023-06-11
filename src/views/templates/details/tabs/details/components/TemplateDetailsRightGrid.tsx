@@ -31,10 +31,10 @@ const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template
 
   const onSubmit = async (updatedVM: V1VirtualMachine) => {
     await k8sUpdate({
-      model: TemplateModel,
       data: replaceTemplateVM(template, updatedVM),
-      ns: template?.metadata?.namespace,
+      model: TemplateModel,
       name: template?.metadata?.name,
+      ns: template?.metadata?.namespace,
     });
   };
 
@@ -42,20 +42,20 @@ const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template
     <DescriptionList>
       <BootOrderItem template={template} />
       <BootSource template={template} />
-      <DescriptionItem title={t('Provider')} content={providerContent} />
+      <DescriptionItem content={providerContent} title={t('Provider')} />
       <DescriptionItem
-        title={t('Support')}
         content={getTemplateSupportLevel(template) || NO_DATA_DASH}
+        title={t('Support')}
       />
       <DescriptionItem
-        title={t('Hardware devices')}
         content={
           <HardwareDevices
-            vm={getTemplateVirtualMachineObject(template)}
             canEdit={isTemplateEditable}
             onSubmit={onSubmit}
+            vm={getTemplateVirtualMachineObject(template)}
           />
         }
+        title={t('Hardware devices')}
       />
       <AdditionalResources template={template} />
     </DescriptionList>

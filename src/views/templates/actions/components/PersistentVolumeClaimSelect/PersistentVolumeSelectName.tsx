@@ -14,18 +14,18 @@ import { filter } from './utils';
 
 type PersistentVolumeSelectNameProps = {
   isDisabled: boolean;
-  pvcNameSelected: string;
-  pvcNames: string[];
-  onChange: (newPVCName: string) => void;
   isLoading?: boolean;
+  onChange: (newPVCName: string) => void;
+  pvcNames: string[];
+  pvcNameSelected: string;
 };
 
 export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProps> = ({
   isDisabled,
-  pvcNameSelected,
-  pvcNames,
-  onChange,
   isLoading,
+  onChange,
+  pvcNames,
+  pvcNameSelected,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setSelectOpen] = React.useState(false);
@@ -44,7 +44,7 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
     return (
       <>
         <br />
-        <Skeleton fontSize="lg" className="pvc-selection-formgroup" />
+        <Skeleton className="pvc-selection-formgroup" fontSize="lg" />
         <br />
       </>
     );
@@ -52,26 +52,26 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
 
   return (
     <FormGroup
-      label={t('PVC name')}
+      className="pvc-selection-formgroup"
       fieldId={fieldId}
       id={fieldId}
       isRequired
-      className="pvc-selection-formgroup"
+      label={t('PVC name')}
     >
       <Select
-        aria-labelledby={fieldId}
-        isOpen={isOpen}
-        onToggle={() => setSelectOpen(!isOpen)}
-        onSelect={onSelect}
-        variant={SelectVariant.typeahead}
-        selections={pvcNameSelected}
-        onFilter={filter(pvcNames)}
-        placeholderText={t('--- Select PVC name ---')}
-        isDisabled={isDisabled}
-        validated={!pvcNameSelected ? ValidatedOptions.error : ValidatedOptions.default}
         aria-invalid={!pvcNameSelected ? true : false}
+        aria-labelledby={fieldId}
+        isDisabled={isDisabled}
+        isOpen={isOpen}
         maxHeight={400}
         menuAppendTo="parent"
+        onFilter={filter(pvcNames)}
+        onSelect={onSelect}
+        onToggle={() => setSelectOpen(!isOpen)}
+        placeholderText={t('--- Select PVC name ---')}
+        selections={pvcNameSelected}
+        validated={!pvcNameSelected ? ValidatedOptions.error : ValidatedOptions.default}
+        variant={SelectVariant.typeahead}
       >
         {pvcNames.map((name) => (
           <SelectOption key={name} value={name} />

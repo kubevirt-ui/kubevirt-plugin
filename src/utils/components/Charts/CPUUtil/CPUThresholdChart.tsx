@@ -28,32 +28,32 @@ import { getUtilizationQueries } from '../utils/queries';
 import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
 
 type CPUThresholdChartProps = {
-  vmi: V1VirtualMachineInstance;
   pods: K8sResourceCommon[];
+  vmi: V1VirtualMachineInstance;
 };
 
-const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
+const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
   const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
   const { currentTime, duration, timespan } = useDuration();
-  const { ref, width, height } = useResponsiveCharts();
+  const { height, ref, width } = useResponsiveCharts();
   const queries = useMemo(
-    () => getUtilizationQueries({ obj: vmi, duration, launcherPodName: vmiPod?.metadata?.name }),
+    () => getUtilizationQueries({ duration, launcherPodName: vmiPod?.metadata?.name, obj: vmi }),
     [vmi, vmiPod, duration],
   );
 
   const [dataCPURequested] = usePrometheusPoll({
-    query: queries.CPU_REQUESTED,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries.CPU_REQUESTED,
     timespan,
   });
 
   const [dataCPUUsage] = usePrometheusPoll({
-    query: queries?.CPU_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.CPU_USAGE,
     timespan,
   });
 
@@ -61,11 +61,11 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
   const cpuRequested = dataCPURequested?.data?.result?.[0]?.values;
 
   const chartData = cpuUsage?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: 'CPU usage' };
+    return { name: 'CPU usage', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const thresholdData = cpuRequested?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: 'CPU requested' };
+    return { name: 'CPU requested', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const isReady = !isEmpty(chartData) && !isEmpty(thresholdData);
@@ -75,13 +75,6 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queriesToLink(queries?.CPU_USAGE)}>
           <Chart
-            height={height}
-            width={width}
-            padding={{ top: 35, bottom: 35, left: 70, right: 35 }}
-            scale={{ x: 'time', y: 'linear' }}
-            domain={{
-              x: [currentTime - timespan, currentTime],
-            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
@@ -90,45 +83,52 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi, pods }) => {
                 constrainToVisibleArea
               />
             }
+            domain={{
+              x: [currentTime - timespan, currentTime],
+            }}
+            height={height}
+            padding={{ bottom: 35, left: 70, right: 35, top: 35 }}
+            scale={{ x: 'time', y: 'linear' }}
+            width={width}
           >
             <ChartAxis
-              dependentAxis
-              tickCount={2}
-              tickValues={[0, thresholdData?.[0]?.y]}
-              tickFormat={(tick: number) => `${tick === 0 ? tick : tick?.toFixed(2)} s`}
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
+              dependentAxis
+              tickCount={2}
+              tickFormat={(tick: number) => `${tick === 0 ? tick : tick?.toFixed(2)} s`}
+              tickValues={[0, thresholdData?.[0]?.y]}
             />
             <ChartAxis
-              tickFormat={tickFormat(duration, currentTime)}
-              tickCount={TICKS_COUNT}
               style={{
-                ticks: { stroke: 'transparent' },
                 tickLabels: { padding: 2 },
+                ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}
+              tickCount={TICKS_COUNT}
+              tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
-                data={chartData}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
+                data={chartData}
               />
             </ChartGroup>
             <ChartThreshold
-              data={thresholdData}
               style={{
                 data: {
                   stroke: chart_color_orange_300.value,
                   strokeDasharray: 10,
                 },
               }}
+              data={thresholdData}
             />
           </Chart>
         </Link>

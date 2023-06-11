@@ -33,24 +33,24 @@ const CreateVMFooter: FC = () => {
   const history = useHistory();
   const [startVM, setStartVM] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<Error | any>(null);
+  const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();
 
-  const { instanceTypeVMState, activeNamespace, vmNamespaceTarget } = useInstanceTypeVMStore();
-  const { sshSecretCredentials, selectedBootableVolume, vmName, selectedInstanceType } =
+  const { activeNamespace, instanceTypeVMState, vmNamespaceTarget } = useInstanceTypeVMStore();
+  const { selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
     instanceTypeVMState;
-  const { sshSecretName, sshPubKey, secretOption } = sshSecretCredentials;
+  const { secretOption, sshPubKey, sshSecretName } = sshSecretCredentials;
 
   const onCancel = useCallback(
-    () => history.push(getResourceUrl({ model: VirtualMachineModel, activeNamespace })),
+    () => history.push(getResourceUrl({ activeNamespace, model: VirtualMachineModel })),
     [activeNamespace, history],
   );
 
   const [canCreateVM] = useAccessReview({
+    group: VirtualMachineModel.apiGroup,
+    namespace: vmNamespaceTarget,
     resource: VirtualMachineModel.plural,
     verb: 'create' as K8sVerb,
-    namespace: vmNamespaceTarget,
-    group: VirtualMachineModel.apiGroup,
   });
 
   const hasNameAndInstanceType = useMemo(
@@ -83,12 +83,12 @@ const CreateVMFooter: FC = () => {
       <Stack hasGutter>
         {error && (
           <StackItem>
-            <Alert isInline variant={AlertVariant.danger} title={t('An error occurred')}>
+            <Alert isInline title={t('An error occurred')} variant={AlertVariant.danger}>
               <Stack hasGutter>
                 <StackItem>{error.message}</StackItem>
                 {error?.href && (
                   <StackItem>
-                    <a href={error.href} target="_blank" rel="noreferrer">
+                    <a href={error.href} rel="noreferrer" target="_blank">
                       {error.href}
                     </a>
                   </StackItem>
@@ -101,21 +101,21 @@ const CreateVMFooter: FC = () => {
           <Checkbox
             id="start-after-create-checkbox"
             isChecked={startVM}
-            onChange={setStartVM}
             label={t('Start this VirtualMachine after creation')}
+            onChange={setStartVM}
           />
         </StackItem>
         <StackItem>
           <Split hasGutter>
             <SplitItem>
               <Button
-                isLoading={isSubmitting}
                 isDisabled={
                   isSubmitting ||
                   isEmpty(selectedBootableVolume) ||
                   !canCreateVM ||
                   !hasNameAndInstanceType
                 }
+                isLoading={isSubmitting}
                 onClick={handleSubmit}
                 variant={ButtonVariant.primary}
               >
@@ -124,9 +124,6 @@ const CreateVMFooter: FC = () => {
             </SplitItem>
             <SplitItem>
               <Button
-                variant={ButtonVariant.secondary}
-                icon={<EyeIcon />}
-                isDisabled={isEmpty(selectedBootableVolume) || !hasNameAndInstanceType}
                 onClick={() =>
                   createModal((props) => (
                     <YamlAndCLIViewerModal
@@ -135,6 +132,9 @@ const CreateVMFooter: FC = () => {
                     />
                   ))
                 }
+                icon={<EyeIcon />}
+                isDisabled={isEmpty(selectedBootableVolume) || !hasNameAndInstanceType}
+                variant={ButtonVariant.secondary}
               >
                 YAML & CLI
               </Button>

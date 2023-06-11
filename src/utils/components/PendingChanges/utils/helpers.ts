@@ -407,10 +407,10 @@ export const getPendingChangesByTab = (pendingChanges: PendingChange[]) => {
 
   return {
     pendingChangesDetailsTab,
-    pendingChangesSchedulingTab,
+    pendingChangesDisksTab,
     pendingChangesEnvTab,
     pendingChangesNICsTab,
+    pendingChangesSchedulingTab,
     pendingChangesScriptsTab,
-    pendingChangesDisksTab,
   };
 };

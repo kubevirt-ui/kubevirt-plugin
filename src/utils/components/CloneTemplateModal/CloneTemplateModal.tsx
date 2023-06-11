@@ -57,16 +57,16 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
       draftTemplate.metadata = {
         annotations: {
           ...draftTemplate?.metadata?.annotations,
-          [LABELS.provider]: templateProvider,
-          [ANNOTATIONS.providerDisplayName]: templateProvider,
           [ANNOTATIONS.displayName]: templateDisplayName,
+          [ANNOTATIONS.providerDisplayName]: templateProvider,
+          [LABELS.provider]: templateProvider,
         },
         labels: {
           ...draftTemplate?.metadata?.labels,
-          [LABELS.type]: TEMPLATE_TYPE_VM,
           [APP_NAME_LABEL]: CUSTOM_TEMPLATES,
           [LABELS.name]: obj?.metadata?.name,
           [LABELS.namespace]: obj?.metadata?.namespace,
+          [LABELS.type]: TEMPLATE_TYPE_VM,
         },
         name: templateName,
         namespace: selectedProject,
@@ -88,8 +88,8 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
       });
     }
     const clonedTemplate = await k8sCreate<V1Template>({
-      model: TemplateModel,
       data: templateToCreate,
+      model: TemplateModel,
     });
 
     if (onTemplateCloned) onTemplateCloned(clonedTemplate);
@@ -98,49 +98,49 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
   return (
     <>
       <TabModal<K8sResourceCommon>
-        obj={obj}
         headerText={t('Clone template')}
-        onSubmit={onSubmit}
         isOpen={isOpen}
+        obj={obj}
         onClose={onClose}
+        onSubmit={onSubmit}
         submitBtnText={t('Clone')}
         submitBtnVariant={ButtonVariant.primary}
       >
         <Form className="clone-template-modal">
-          <FormGroup label={t('Template name')} fieldId="name" isRequired>
-            <TextInput id="name" type="text" value={templateName} onChange={setTemplateName} />
+          <FormGroup fieldId="name" isRequired label={t('Template name')}>
+            <TextInput id="name" onChange={setTemplateName} type="text" value={templateName} />
           </FormGroup>
 
           <FormGroup
-            label={t('Template project')}
             fieldId="namespace"
             helperText={t('Project name to clone the template to')}
+            label={t('Template project')}
           >
             <SelectProject
+              id="namespace"
               selectedProject={selectedProject}
               setSelectedProject={setSelectedProject}
-              id="namespace"
             />
           </FormGroup>
-          <FormGroup label={t('Template display name')} fieldId="display-name">
+          <FormGroup fieldId="display-name" label={t('Template display name')}>
             <TextInput
               id="display-name"
+              onChange={setTemplateDisplayName}
               type="text"
               value={templateDisplayName}
-              onChange={setTemplateDisplayName}
             />
           </FormGroup>
 
           <FormGroup
-            label={t('Template provider')}
             fieldId="provider"
             helperText={t('Example: your company name')}
+            label={t('Template provider')}
           >
             <TextInput
               id="provider"
+              onChange={setTemplateProvider}
               type="text"
               value={templateProvider}
-              onChange={setTemplateProvider}
             />
           </FormGroup>
           {clonableStorage && (
@@ -148,12 +148,12 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
           )}
           {isCloneStorageEnabled && (
             <FormGroup
-              label={t('Name of the template new disk')}
-              fieldId="pvc-name"
               className="pvc-name-form-group"
+              fieldId="pvc-name"
               isRequired
+              label={t('Name of the template new disk')}
             >
-              <TextInput id="pvc-name" type="text" value={pvcName} onChange={setPVCName} />
+              <TextInput id="pvc-name" onChange={setPVCName} type="text" value={pvcName} />
             </FormGroup>
           )}
         </Form>

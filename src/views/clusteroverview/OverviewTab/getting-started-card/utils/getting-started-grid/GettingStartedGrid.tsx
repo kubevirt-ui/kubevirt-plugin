@@ -19,11 +19,11 @@ import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 import './GettingStartedGrid.scss';
 
 type GettingStartedGridProps = {
-  onHide?: () => void;
   children?: React.ReactNode[];
+  onHide?: () => void;
 };
 
-export const GettingStartedGrid: React.FC<GettingStartedGridProps> = ({ onHide, children }) => {
+export const GettingStartedGrid: React.FC<GettingStartedGridProps> = ({ children, onHide }) => {
   const { t } = useKubevirtTranslation();
   const [menuIsOpen, setMenuIsOpen] = React.useState(false);
   const onToggle = () => setMenuIsOpen((open) => !open);
@@ -33,13 +33,13 @@ export const GettingStartedGrid: React.FC<GettingStartedGridProps> = ({ onHide, 
   if (onHide) {
     actionDropdownItem.push(
       <DropdownItem
-        key="action"
-        component="button"
         description={t(
           'You can always bring these getting started resources back into view by clicking Show getting started resources in the page heading.',
         )}
-        onClick={onHide}
+        component="button"
         data-test="hide"
+        key="action"
+        onClick={onHide}
       >
         {t('Hide from view')}
       </DropdownItem>,
@@ -57,13 +57,13 @@ export const GettingStartedGrid: React.FC<GettingStartedGridProps> = ({ onHide, 
     <Card className="kv-getting-started-grid" data-test="getting-started">
       <CardHeader className="kv-getting-started-grid__header">
         <CardTitle>
-          <Title headingLevel="h2" size={TitleSizes.lg} data-test="title">
+          <Title data-test="title" headingLevel="h2" size={TitleSizes.lg}>
             {title}{' '}
             <Popover bodyContent={titleTooltip}>
               <span
-                role="button"
                 aria-label={t('More info')}
                 className="kv-getting-started-grid__tooltip-icon"
+                role="button"
               >
                 <OutlinedQuestionCircleIcon />
               </span>
@@ -73,12 +73,12 @@ export const GettingStartedGrid: React.FC<GettingStartedGridProps> = ({ onHide, 
         {actionDropdownItem.length > 0 ? (
           <CardActions>
             <Dropdown
+              className="ocs-getting-started-grid__action-dropdown"
+              dropdownItems={actionDropdownItem}
               isOpen={menuIsOpen}
               isPlain
-              toggle={<KebabToggle onToggle={onToggle} data-test="actions" />}
               position="right"
-              dropdownItems={actionDropdownItem}
-              className="ocs-getting-started-grid__action-dropdown"
+              toggle={<KebabToggle data-test="actions" onToggle={onToggle} />}
             />
           </CardActions>
         ) : null}

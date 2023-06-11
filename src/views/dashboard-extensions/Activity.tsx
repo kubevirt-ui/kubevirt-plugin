@@ -18,11 +18,11 @@ import { diskImportKindMapping, VIRTUALMACHINES_TEMPLATES_BASE_URL } from './uti
 export const DiskImportActivity: FC<
   K8sActivityProps<
     K8sResourceCommon & {
+      data?: { [key: string]: any };
       spec?: {
         [key: string]: any;
       };
       status?: { [key: string]: any };
-      data?: { [key: string]: any };
     }
   >
 > = ({ resource }) => {
@@ -34,10 +34,10 @@ export const DiskImportActivity: FC<
       <>
         <ResourceIcon groupVersionKind={getGroupVersionKindForModel(TemplateModel)} />
         <Link
-          to={`/k8s/ns/${resource?.metadata?.namespace}/${VIRTUALMACHINES_TEMPLATES_BASE_URL}/${name}`}
-          title={uid}
-          data-test-id={name}
           className="co-resource-item__resource-name"
+          data-test-id={name}
+          title={uid}
+          to={`/k8s/ns/${resource?.metadata?.namespace}/${VIRTUALMACHINES_TEMPLATES_BASE_URL}/${name}`}
         >
           {name}
         </Link>
@@ -58,7 +58,7 @@ export const DiskImportActivity: FC<
       {ownerLink}
     </>
   ) : (
-    <ActivityProgress title={title} progress={progress}>
+    <ActivityProgress progress={progress} title={title}>
       {ownerLink}
     </ActivityProgress>
   );

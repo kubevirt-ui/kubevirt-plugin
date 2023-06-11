@@ -13,7 +13,7 @@ const HardwareDeviceModalDescription: React.FC<HardwareDevicesModalProps> = ({ t
   const { t } = useKubevirtTranslation();
 
   return (
-    <Trans t={t} ns="plugin__kubevirt-plugin">
+    <Trans ns="plugin__kubevirt-plugin" t={t}>
       <Text className="text-muted" component={TextVariants.p}>
         Enter a name for the device to be assigned and select it from the dropdown menu. Click{' '}
         <b> Save</b>.<br /> Click{' '}

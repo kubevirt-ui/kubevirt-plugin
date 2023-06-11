@@ -50,17 +50,17 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
   const [vms, loaded, loadError] = useKubevirtWatchResource({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
-    namespaced: true,
-    namespace,
     limit: OBJECTS_FETCHING_LIMIT,
+    namespace,
+    namespaced: true,
   });
 
   const [vmis, vmiLoaded] = useKubevirtWatchResource({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: true,
-    namespaced: true,
-    namespace,
     limit: OBJECTS_FETCHING_LIMIT,
+    namespace,
+    namespaced: true,
   });
 
   const [isSingleNodeCluster, isSingleNodeLoaded] = useSingleNodeCluster();
@@ -68,12 +68,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
   const [vmims, vmimsLoaded] = useKubevirtWatchResource({
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
-    namespaced: true,
-    namespace,
     limit: OBJECTS_FETCHING_LIMIT,
+    namespace,
+    namespaced: true,
   });
 
-  const { vmiMapper, vmimMapper, filters } = useVMListFilters(vmis, vms, vmims);
+  const { filters, vmiMapper, vmimMapper } = useVMListFilters(vmis, vms, vmims);
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
@@ -82,12 +82,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     V1VirtualMachine
   >(vms, filters);
 
-  const onPageChange = ({ page, perPage, startIndex, endIndex }) => {
+  const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({
+      endIndex,
       page,
       perPage,
       startIndex,
-      endIndex,
     }));
   };
 
@@ -101,62 +101,62 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
       <ListPageBody>
         <div className="list-managment-group">
           <ListPageFilter
-            data={unfilteredData}
-            loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded}
-            rowFilters={filters}
-            onFilterChange={(...args) => {
-              onFilterChange(...args);
-              setPagination((prevPagination) => ({
-                ...prevPagination,
-                page: 1,
-                startIndex: 0,
-                endIndex: prevPagination?.perPage,
-              }));
-            }}
             columnLayout={{
-              columns: columns?.map(({ id, title, additional }) => ({
+              columns: columns?.map(({ additional, id, title }) => ({
+                additional,
                 id,
                 title,
-                additional,
               })),
               id: VirtualMachineModelRef,
               selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
               type: t('VirtualMachine'),
             }}
+            onFilterChange={(...args) => {
+              onFilterChange(...args);
+              setPagination((prevPagination) => ({
+                ...prevPagination,
+                endIndex: prevPagination?.perPage,
+                page: 1,
+                startIndex: 0,
+              }));
+            }}
+            data={unfilteredData}
+            loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded}
+            rowFilters={filters}
           />
           {!isEmpty(vms) && (
             <Pagination
+              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                onPageChange({ endIndex, page, perPage, startIndex })
+              }
+              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                onPageChange({ endIndex, page, perPage, startIndex })
+              }
               className="list-managment-group__pagination"
+              defaultToFullPage
               itemCount={data?.length}
               page={pagination?.page}
               perPage={pagination?.perPage}
-              defaultToFullPage
-              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                onPageChange({ page, perPage, startIndex, endIndex })
-              }
-              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                onPageChange({ page, perPage, startIndex, endIndex })
-              }
               perPageOptions={paginationDefaultValues}
             />
           )}
         </div>
         <VirtualizedTable<K8sResourceCommon>
-          data={data}
-          unfilteredData={unfilteredData}
-          loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded}
-          columns={activeColumns}
-          loadError={loadError}
-          Row={VirtualMachineRow}
-          rowData={{
-            kind,
-            getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
-            getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
-            isSingleNodeCluster,
-          }}
           NoDataEmptyMsg={() => (
             <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
           )}
+          rowData={{
+            getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
+            getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
+            isSingleNodeCluster,
+            kind,
+          }}
+          columns={activeColumns}
+          data={data}
+          loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded}
+          loadError={loadError}
+          Row={VirtualMachineRow}
+          unfilteredData={unfilteredData}
         />
       </ListPageBody>
     </>

@@ -25,9 +25,6 @@ const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ obj }) => {
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('Owner')}
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
               <div>
@@ -43,6 +40,9 @@ const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ obj }) => {
               </Breadcrumb>
             </Trans>
           }
+          hasAutoWidth
+          headerContent={t('Owner')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('Owner')}</DescriptionListTermHelpTextButton>
         </Popover>

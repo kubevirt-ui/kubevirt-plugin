@@ -8,14 +8,14 @@ export const useMigrationPolicyTabs = () => {
 
   return [
     {
+      component: MigrationPolicyDetailsPage,
       href: '',
       name: t('Details'),
-      component: MigrationPolicyDetailsPage,
     },
     {
+      component: MigrationPolicyYAMLPage,
       href: 'yaml',
       name: t('YAML'),
-      component: MigrationPolicyYAMLPage,
     },
   ];
 };

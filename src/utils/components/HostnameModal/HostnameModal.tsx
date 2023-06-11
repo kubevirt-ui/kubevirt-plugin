@@ -11,14 +11,14 @@ import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesA
 import { getChangedHostname } from '../PendingChanges/utils/helpers';
 
 type HostnameModalProps = {
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const HostnameModal: React.FC<HostnameModalProps> = ({ vm, isOpen, onClose, onSubmit, vmi }) => {
+const HostnameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [newHostname, setHostname] = useState<string>(vm?.spec?.template?.spec?.hostname);
 
@@ -31,22 +31,22 @@ const HostnameModal: React.FC<HostnameModalProps> = ({ vm, isOpen, onClose, onSu
   }, [vm, newHostname]);
   return (
     <TabModal
-      obj={updatedVirtualMachine}
+      headerText={t('Edit hostname')}
       isOpen={isOpen}
+      obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Edit hostname')}
     >
       <Form>
         {vmi && (
           <ModalPendingChangesAlert isChanged={getChangedHostname(updatedVirtualMachine, vmi)} />
         )}
         <FormGroup
-          label={t('Hostname')}
           fieldId="hostname"
           helperText={t('Please provide hostname.')}
+          label={t('Hostname')}
         >
-          <TextInput value={newHostname} type="text" id="hostname" onChange={setHostname} />
+          <TextInput id="hostname" onChange={setHostname} type="text" value={newHostname} />
         </FormGroup>
       </Form>
     </TabModal>

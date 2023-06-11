@@ -30,8 +30,8 @@ type UseEditDiskStates = (
   diskName: string,
   vmi?: V1VirtualMachineInstance,
 ) => {
-  initialDiskState: DiskFormState;
   initialDiskSourceState: DiskSourceState;
+  initialDiskState: DiskFormState;
 };
 
 const getSourceFromDataVolume = (dataVolume: V1DataVolumeTemplateSpec): string => {
@@ -65,12 +65,12 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
   const disk = getDisks(vm)?.find(({ name }) => name === diskName);
 
   const {
-    diskSource,
-    diskSize,
-    isBootDisk: asBootSource,
     accessMode,
-    volumeMode,
     applyStorageProfileSettings,
+    diskSize,
+    diskSource,
+    isBootDisk: asBootSource,
+    volumeMode,
   } = React.useMemo(() => {
     const dataVolumeTemplates = getDataVolumeTemplates(vm);
 
@@ -90,7 +90,7 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
 
     if (volumeSource === sourceTypes.EPHEMERAL) {
       initialDiskSourceState.ephemeralSource = volume.containerDisk?.image;
-      return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC, isBootDisk };
+      return { diskSize: DYNAMIC, diskSource: sourceTypes.EPHEMERAL, isBootDisk };
     }
 
     if (volumeSource === volumeTypes.PERSISTENT_VOLUME_CLAIM) {
@@ -114,36 +114,36 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
         !dataVolumeTemplate?.spec?.storage?.accessModes &&
         !dataVolumeTemplate?.spec?.storage?.volumeMode;
       return {
-        isBootDisk,
-        diskSource: getSourceFromDataVolume(dataVolumeTemplate),
+        accessMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.accessModes?.[0] : null,
+        applyStorageProfileSettings: applySPSettings,
         diskSize:
           dataVolumeTemplate.spec?.storage?.resources?.requests?.storage ||
           dataVolumeTemplate.spec?.pvc?.resources?.requests?.storage ||
           '',
-        accessMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.accessModes?.[0] : null,
+        diskSource: getSourceFromDataVolume(dataVolumeTemplate),
+        isBootDisk,
         volumeMode: !applySPSettings ? dataVolumeTemplate?.spec?.storage?.volumeMode : null,
-        applyStorageProfileSettings: applySPSettings,
       };
     }
 
-    return { diskSource: OTHER, diskSize: null, isBootDisk };
+    return { diskSize: null, diskSource: OTHER, isBootDisk };
   }, [initialDiskSourceState, vm, diskName]);
 
   const initialDiskState: DiskFormState = {
+    accessMode,
+    applyStorageProfileSettings: applyStorageProfileSettings ?? true,
+    asBootSource,
+    diskInterface: getDiskInterface(disk),
     diskName,
     diskSize,
-    diskType: diskTypes[getDiskDrive(disk)],
     diskSource,
+    diskType: diskTypes[getDiskDrive(disk)],
     enablePreallocation: false,
     storageClass: null,
-    volumeMode,
-    accessMode,
-    diskInterface: getDiskInterface(disk),
-    applyStorageProfileSettings: applyStorageProfileSettings ?? true,
     storageClassProvisioner: null,
     storageProfileSettingsCheckboxDisabled: false,
-    asBootSource,
+    volumeMode,
   };
 
-  return { initialDiskState, initialDiskSourceState };
+  return { initialDiskSourceState, initialDiskState };
 };

@@ -19,26 +19,26 @@ import ExclamationTriangleIcon from '@patternfly/react-icons/dist/js/icons/excla
 
 export const labelColor = {
   [AlertType.critical]: 'red',
-  [AlertType.warning]: 'orange',
   [AlertType.info]: 'blue',
+  [AlertType.warning]: 'orange',
 };
 
 export const labelIcon = {
   [AlertType.critical]: <ExclamationCircleIcon />,
-  [AlertType.warning]: <ExclamationTriangleIcon />,
   [AlertType.info]: <ExclamationCircleIcon />,
+  [AlertType.warning]: <ExclamationTriangleIcon />,
 };
 
 export const labelText = {
   [AlertType.critical]: t('Critical'),
-  [AlertType.warning]: t('Warning'),
   [AlertType.info]: t('Info'),
+  [AlertType.warning]: t('Warning'),
 };
 
 export const alertIcon = {
   [AlertType.critical]: () => <RedExclamationCircleIcon title="Critical" />,
-  [AlertType.warning]: () => <YellowExclamationTriangleIcon title="Warning" />,
   [AlertType.info]: () => <BlueInfoCircleIcon title="Information" />,
+  [AlertType.warning]: () => <YellowExclamationTriangleIcon title="Warning" />,
 };
 
 export const removeVMAlerts = (sortedAlerts: SimplifiedAlerts) =>
@@ -48,7 +48,7 @@ export const removeVMAlerts = (sortedAlerts: SimplifiedAlerts) =>
 
       return acc;
     },
-    { critical: [], warning: [], info: [] },
+    { critical: [], info: [], warning: [] },
   );
 
 export const createAlertKey = (activeAt: string, labels: PrometheusLabels) =>
@@ -58,13 +58,13 @@ export const createAlertKey = (activeAt: string, labels: PrometheusLabels) =>
 
 export const alertScopeOptions = () => [
   {
+    description: t('See only virtualization health alerts'),
     key: VIRTUALIZATION_ONLY_ALERTS,
     value: t('Show virtualization health alerts'),
-    description: t('See only virtualization health alerts'),
   },
   {
+    description: t('See alerts for virtualization health and VMs'),
     key: ALL_ALERTS,
     value: t('Show all alerts'),
-    description: t('See alerts for virtualization health and VMs'),
   },
 ];

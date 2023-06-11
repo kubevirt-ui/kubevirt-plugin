@@ -1,15 +1,15 @@
 const userSettingsInitialState: UserSettingsState = {
-  ssh: {},
+  cards: {},
   columns: {},
   quickStart: {},
-  cards: {},
+  ssh: {},
 };
 
 export type UserSettingsState = {
-  ssh: SSHUserSettings;
+  cards: CardsUserSettings;
   columns: ColumnsUserSettings;
   quickStart: QuickStartUserSettings;
-  cards: CardsUserSettings;
+  ssh: SSHUserSettings;
 };
 
 type SSHUserSettings = {

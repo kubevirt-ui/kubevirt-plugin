@@ -34,30 +34,30 @@ type UploadToken = K8sResourceCommon & {
 
 export enum UPLOAD_STATUS {
   ALLOCATING = 'ALLOCATING',
-  UPLOADING = 'UPLOADING',
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR',
   CANCELED = 'CANCELED',
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS',
+  UPLOADING = 'UPLOADING',
 }
 
 export const uploadStatusLabels = (t: TFunction) => ({
   [UPLOAD_STATUS.ALLOCATING]: t('Allocating resources, please wait for upload to start.'),
-  [UPLOAD_STATUS.UPLOADING]: t('Uploading'),
-  [UPLOAD_STATUS.SUCCESS]: t('Success'),
-  [UPLOAD_STATUS.ERROR]: t('Error'),
   [UPLOAD_STATUS.CANCELED]: t('Canceled'),
+  [UPLOAD_STATUS.ERROR]: t('Error'),
+  [UPLOAD_STATUS.SUCCESS]: t('Success'),
+  [UPLOAD_STATUS.UPLOADING]: t('Uploading'),
 });
 
 export const uploadStatusToProgressVariant = {
-  [UPLOAD_STATUS.SUCCESS]: ProgressVariant.success,
-  [UPLOAD_STATUS.ERROR]: ProgressVariant.danger,
   [UPLOAD_STATUS.CANCELED]: ProgressVariant.warning,
+  [UPLOAD_STATUS.ERROR]: ProgressVariant.danger,
+  [UPLOAD_STATUS.SUCCESS]: ProgressVariant.success,
 };
 
 const PVC_STATUS_DELAY = 2 * 1000;
 const DV_UPLOAD_STATES = {
-  SCHEDULED: 'UploadScheduled',
   READY: 'UploadReady',
+  SCHEDULED: 'UploadScheduled',
 };
 
 export class PVCInitError extends Error {
@@ -107,8 +107,8 @@ const createUploadToken = async (pvcName: string, namespace: string): Promise<st
 
   try {
     const resource = await k8sCreate<UploadToken>({
-      model: UploadTokenRequestModel,
       data: tokenRequest,
+      model: UploadTokenRequestModel,
     });
     return resource?.status?.token;
   } catch (error) {
@@ -128,7 +128,7 @@ export const createUploadPVC = async (dataVolume: V1beta1DataVolume) => {
   });
 
   try {
-    const dv = await k8sCreate({ model: DataVolumeModel, data: updatedDataVolume });
+    const dv = await k8sCreate({ data: updatedDataVolume, model: DataVolumeModel });
     await waitForUploadReady(dv);
     const token = await createUploadToken(dvName, namespace);
 
@@ -155,8 +155,6 @@ export const addUploadDataVolumeOwnerReference = (
   return getPVC(dataVolume?.metadata?.name, dataVolume?.metadata?.namespace)
     .then((pvc) =>
       k8sPatch({
-        model: PersistentVolumeClaimModel,
-        resource: pvc,
         data: [
           {
             op: 'replace',
@@ -167,6 +165,8 @@ export const addUploadDataVolumeOwnerReference = (
             ],
           },
         ],
+        model: PersistentVolumeClaimModel,
+        resource: pvc,
       }),
     )
     .catch(() => Promise.resolve());

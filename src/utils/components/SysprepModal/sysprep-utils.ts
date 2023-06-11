@@ -14,18 +14,18 @@ export type SysprepData = { autounattend?: string; unattended?: string };
 export const sysprepDisk = () => ({ cdrom: { bus: 'sata' }, name: SYSPREP });
 
 export const sysprepVolume = (sysprepName: string) => ({
+  name: SYSPREP,
   sysprep: {
     configMap: { name: sysprepName },
   },
-  name: SYSPREP,
 });
 
 export const addSysprepConfig = (vm: V1VirtualMachine, newSysprepName: string) => {
   getVolumes(vm).push({
+    name: SYSPREP,
     sysprep: {
       configMap: { name: newSysprepName },
     },
-    name: SYSPREP,
   });
   getDisks(vm).push(sysprepDisk());
 };
@@ -40,20 +40,21 @@ export const removeSysprepConfig = (vm: V1VirtualMachine, sysprepVolumeName: str
 };
 
 type GenerateNewSysprepConfigInputType = {
-  vm: V1VirtualMachine;
   data: IoK8sApiCoreV1ConfigMap['data'];
   sysprepName?: string;
+  vm: V1VirtualMachine;
   withOwnerReference?: boolean;
 };
 
 export const generateNewSysprepConfig = ({
-  vm,
   data,
   sysprepName,
+  vm,
   withOwnerReference = false,
 }: GenerateNewSysprepConfigInputType): IoK8sApiCoreV1ConfigMap => ({
-  kind: ConfigMapModel.kind,
   apiVersion: ConfigMapModel.apiVersion,
+  data,
+  kind: ConfigMapModel.kind,
   metadata: {
     name: sysprepName || `sysprep-config-${vm?.metadata?.name}-${getRandomChars()}`,
     namespace: vm?.metadata?.namespace,
@@ -61,5 +62,4 @@ export const generateNewSysprepConfig = ({
       ? [buildOwnerReference(vm, { blockOwnerDeletion: false })]
       : null,
   },
-  data,
 });

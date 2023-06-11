@@ -7,11 +7,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Button, Stack, StackItem } from '@patternfly/react-core';
 
 export const WizardNoBootModal: React.VFC<{
-  namespace: string;
-  onSubmit: () => Promise<void>;
   isOpen: boolean;
+  namespace: string;
   onClose: () => void;
-}> = ({ namespace, isOpen, onClose, onSubmit }) => {
+  onSubmit: () => Promise<void>;
+}> = ({ isOpen, namespace, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
 
@@ -22,12 +22,12 @@ export const WizardNoBootModal: React.VFC<{
 
   return (
     <TabModal
-      obj={null}
       headerText={t('No available boot source')}
-      positionTop={false}
       isOpen={isOpen}
+      obj={null}
       onClose={onClose}
       onSubmit={onSubmit}
+      positionTop={false}
       submitBtnText={t('Create with no available boot source')}
       titleIconVariant="warning"
     >
@@ -42,7 +42,7 @@ export const WizardNoBootModal: React.VFC<{
         <StackItem>
           <Trans ns="plugin__kubevirt-plugin">
             You can select the boot source in the{' '}
-            <Button variant="link" isInline onClick={goToDisksTab}>
+            <Button isInline onClick={goToDisksTab} variant="link">
               Disks
             </Button>{' '}
             tab.

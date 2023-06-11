@@ -1,13 +1,13 @@
 export type PaginationState = {
+  endIndex: number;
   page: number;
   perPage: number;
   startIndex: number;
-  endIndex: number;
 };
 
 export type UsePaginationValues = {
-  pagination: PaginationState;
   onPaginationChange: (newPagination: PaginationState) => void;
+  pagination: PaginationState;
 };
 
 export type UsePagination = () => UsePaginationValues;

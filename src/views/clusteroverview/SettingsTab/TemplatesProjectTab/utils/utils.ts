@@ -14,7 +14,7 @@ export const getCurrentTemplatesNamespaceFromHCO = (hyperConverged: HyperConverg
 
 export const updateHCOCommonTemplatesNamespace = async (
   hyperConverged: HyperConverged,
-  newNamespace: number | string | null,
+  newNamespace: null | number | string,
   handelError: (value: string) => void,
   handleLoading: (value: boolean) => void,
 ) => {
@@ -23,8 +23,6 @@ export const updateHCOCommonTemplatesNamespace = async (
     handleLoading(true);
     try {
       await k8sPatch<HyperConverged>({
-        model: HyperConvergedModel,
-        resource: hyperConverged,
         data: [
           {
             op: 'replace',
@@ -32,6 +30,8 @@ export const updateHCOCommonTemplatesNamespace = async (
             value: newNamespace === OPENSHIFT ? null : newNamespace,
           },
         ],
+        model: HyperConvergedModel,
+        resource: hyperConverged,
       });
 
       const templates = await k8sGet<TemplateList>({

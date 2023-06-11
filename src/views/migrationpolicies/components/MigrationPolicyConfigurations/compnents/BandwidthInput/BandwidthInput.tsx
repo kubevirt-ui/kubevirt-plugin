@@ -14,27 +14,27 @@ import {
 import { fromIECUnit } from '../../../MigrationPolicyEditModal/utils/utils';
 
 type BandwidthInputProps = {
-  state: {
-    value: number;
-    unit: BinaryUnit;
-  };
   setState: React.Dispatch<
     React.SetStateAction<{
-      value: number;
       unit: BinaryUnit;
+      value: number;
     }>
   >;
+  state: {
+    unit: BinaryUnit;
+    value: number;
+  };
 };
 
 const unitOptions = [BinaryUnit.Ki, BinaryUnit.Mi, BinaryUnit.Gi];
 
-const BandwidthInput: React.FC<BandwidthInputProps> = ({ state, setState }) => {
+const BandwidthInput: React.FC<BandwidthInputProps> = ({ setState, state }) => {
   const { t } = useKubevirtTranslation();
   const [isQuantitySelectOpen, setIsQuantitySelectOpen] = useState<boolean>(false);
 
   const onSelectUnit = useCallback(
     (
-      event: React.MouseEvent<Element, MouseEvent> | React.ChangeEvent<Element>,
+      event: React.ChangeEvent<Element> | React.MouseEvent<Element, MouseEvent>,
       newUnit: BinaryUnit,
     ) => {
       setState((prev) => ({ ...prev, unit: fromIECUnit(newUnit) }));
@@ -47,26 +47,26 @@ const BandwidthInput: React.FC<BandwidthInputProps> = ({ state, setState }) => {
     <Split hasGutter>
       <SplitItem>
         <NumberInput
-          min={0}
-          value={state?.value}
-          onMinus={() => setState((prev) => ({ ...prev, value: --prev.value }))}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             +event.target.value >= 0 &&
             setState((prev) => ({ ...prev, value: +event.target.value }))
           }
-          onPlus={() => setState((prev) => ({ ...prev, value: prev?.value + 1 || 1 }))}
+          min={0}
           minusBtnAriaLabel={t('Decrement')}
+          onMinus={() => setState((prev) => ({ ...prev, value: --prev.value }))}
+          onPlus={() => setState((prev) => ({ ...prev, value: prev?.value + 1 || 1 }))}
           plusBtnAriaLabel={t('Increment')}
+          value={state?.value}
         />
       </SplitItem>
       <SplitItem>
         <Select
-          menuAppendTo="parent"
           isOpen={isQuantitySelectOpen}
-          onToggle={setIsQuantitySelectOpen}
+          menuAppendTo="parent"
           onSelect={onSelectUnit}
-          variant={SelectVariant.single}
+          onToggle={setIsQuantitySelectOpen}
           selections={toIECUnit(state?.unit)}
+          variant={SelectVariant.single}
         >
           {unitOptions.map((unitOption) => (
             <SelectOption key={unitOption} value={toIECUnit(unitOption)} />

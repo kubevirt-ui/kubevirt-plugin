@@ -32,13 +32,13 @@ const CommonTemplateAlert: React.FC<CommonTemplateAlertProps> = ({ template }) =
 
   return (
     <Alert
-      className="alert-margin-top-bottom template-header-alert"
-      isInline
-      variant={AlertVariant.info}
       title={t('Templates provided by {{providerName}} are not editable.', {
         providerName,
       })}
+      className="alert-margin-top-bottom template-header-alert"
       data-test="common-template-alert"
+      isInline
+      variant={AlertVariant.info}
     >
       <Trans ns="plugin__kubevirt-plugin">
         {{ osName }} VirtualMachine can not be edited because it is provided by OpenShift
@@ -50,8 +50,8 @@ const CommonTemplateAlert: React.FC<CommonTemplateAlertProps> = ({ template }) =
             onClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <CloneTemplateModal
-                  obj={template}
                   isOpen={isOpen}
+                  obj={template}
                   onClose={onClose}
                   onTemplateCloned={goToTemplatePage}
                 />

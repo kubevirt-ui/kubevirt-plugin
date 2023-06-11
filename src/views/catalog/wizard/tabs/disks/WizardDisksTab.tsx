@@ -25,7 +25,7 @@ import useWizardDisksTableData from './hooks/useWizardDisksTableData';
 
 import './wizard-disk-tab.scss';
 
-const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsData }) => {
+const WizardDisksTab: WizardTab = ({ loaded, tabsData, updateTabsData, updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
@@ -37,24 +37,16 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsD
     <div className="wizard-disk-tab">
       <ListPageBody>
         <SidebarEditor
-          resource={vm}
           onResourceUpdate={(newVM) => updateVM(newVM)}
           pathsToHighlight={PATHS_TO_HIGHLIGHT.DISKS_TAB}
+          resource={vm}
         >
           <DiskListTitle />
 
           <ListPageCreateButton
-            className="wizard-disk-tab__list-page-create-button"
-            isDisabled={!loaded}
             onClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <DiskModal
-                  vm={vm}
-                  isOpen={isOpen}
-                  onClose={onClose}
-                  onSubmit={updateVM}
-                  headerText={t('Add disk')}
-                  createOwnerReference={false}
                   onUploadedDataVolume={(dataVolume) =>
                     updateTabsData((draft) => {
                       ensurePath(draft, 'disks.dataVolumesToAddOwnerRef');
@@ -66,9 +58,17 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsD
                       }
                     })
                   }
+                  createOwnerReference={false}
+                  headerText={t('Add disk')}
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  onSubmit={updateVM}
+                  vm={vm}
                 />
               ))
             }
+            className="wizard-disk-tab__list-page-create-button"
+            isDisabled={!loaded}
           >
             {t('Add disk')}
           </ListPageCreateButton>
@@ -77,23 +77,23 @@ const WizardDisksTab: WizardTab = ({ vm, loaded, updateVM, tabsData, updateTabsD
             <FlexItem>
               <ListPageFilter
                 data={data}
-                loaded={disksLoaded}
-                rowFilters={filters}
-                onFilterChange={onFilterChange}
                 hideLabelFilter
+                loaded={disksLoaded}
+                onFilterChange={onFilterChange}
+                rowFilters={filters}
               />
             </FlexItem>
             <FlexItem>
-              <WindowsDrivers vm={vm} updateVM={updateVM} />
+              <WindowsDrivers updateVM={updateVM} vm={vm} />
             </FlexItem>
           </Flex>
           <VirtualizedTable
+            columns={columns}
             data={filteredData}
-            unfilteredData={data}
             loaded={disksLoaded}
             loadError={undefined}
-            columns={columns}
             Row={DiskRow}
+            unfilteredData={data}
           />
         </SidebarEditor>
       </ListPageBody>

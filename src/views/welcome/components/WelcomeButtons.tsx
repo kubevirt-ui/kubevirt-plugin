@@ -19,12 +19,12 @@ const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
       {welcomeModalButtons(ns).map((modalButton: WelcomeModalButtonsData) => (
         <StackItem key={modalButton.name}>
           <Button
-            variant={modalButton?.variant || ButtonVariant.link}
             onClick={() => {
               history.push(modalButton.url);
               onClose();
             }}
             className={modalButton?.className || 'WelcomeModal__button-link'}
+            variant={modalButton?.variant || ButtonVariant.link}
           >
             {modalButton.name}
           </Button>

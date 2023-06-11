@@ -13,29 +13,29 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { getVmRestoreSnapshotName, getVmRestoreTime } from '../utils/selectors';
 
 export type UseSnapshotData = {
-  snapshots: V1alpha1VirtualMachineSnapshot[];
-  restoresMap: any;
-  loaded: boolean;
   error: any;
+  loaded: boolean;
+  restoresMap: any;
+  snapshots: V1alpha1VirtualMachineSnapshot[];
 };
 
 const useSnapshotData = (vmName: string, namespace: string): UseSnapshotData => {
   const [snapshots, snapshotsLoaded, snapshotsError] = useK8sWatchResource<
     V1alpha1VirtualMachineSnapshot[]
   >({
-    isList: true,
     groupVersionKind: VirtualMachineSnapshotModelGroupVersionKind,
-    namespaced: true,
+    isList: true,
     namespace,
+    namespaced: true,
   });
 
   const [restores, restoresLoaded, restoresError] = useK8sWatchResource<
     V1alpha1VirtualMachineRestore[]
   >({
-    isList: true,
     groupVersionKind: VirtualMachineRestoreModelGroupVersionKind,
-    namespaced: true,
+    isList: true,
     namespace,
+    namespaced: true,
   });
 
   const loaded = React.useMemo(
@@ -65,10 +65,10 @@ const useSnapshotData = (vmName: string, namespace: string): UseSnapshotData => 
   }, [restores]);
 
   return {
-    snapshots: snapshots?.filter((snapshot) => snapshot?.spec?.source?.name === vmName),
-    restoresMap,
-    loaded,
     error,
+    loaded,
+    restoresMap,
+    snapshots: snapshots?.filter((snapshot) => snapshot?.spec?.source?.name === vmName),
   };
 };
 

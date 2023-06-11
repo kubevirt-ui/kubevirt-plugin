@@ -15,23 +15,23 @@ import { k8sCreate, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { createMultipleResources } from './utils';
 
 type QuickCreateVMType = (inputs: {
-  template: V1Template;
   models: { [key: string]: K8sModel };
   overrides: {
-    namespace: string;
     name: string;
+    namespace: string;
     startVM: boolean;
   };
+  template: V1Template;
 }) => Promise<V1VirtualMachine>;
 
 export const quickCreateVM: QuickCreateVMType = async ({
-  template,
   models,
-  overrides: { namespace = DEFAULT_NAMESPACE, name, startVM },
+  overrides: { name, namespace = DEFAULT_NAMESPACE, startVM },
+  template,
 }) => {
   const processedTemplate = await k8sCreate<V1Template>({
-    model: ProcessedTemplatesModel,
     data: { ...template, metadata: { ...template?.metadata, namespace } },
+    model: ProcessedTemplatesModel,
     ns: namespace,
     queryParams: {
       dryRun: 'All',

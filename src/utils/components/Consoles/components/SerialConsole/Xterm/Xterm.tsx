@@ -8,20 +8,20 @@ import { onFocusIn, onFocusOut, XTermProps } from './utils/Xterm';
 
 export const XTerm: React.FunctionComponent<XTermProps> = ({
   cols = 80,
-  rows = 25,
   fontFamily,
   fontSize,
-  onTitleChanged,
-  onData,
   innerRef,
+  onData,
+  onTitleChanged,
+  rows = 25,
 }) => {
   const [terminal] = React.useState<Terminal>(
     new Terminal({
       cols,
-      rows,
       cursorBlink: true,
       fontFamily,
       fontSize,
+      rows,
       screenReaderMode: true,
     }),
   );
@@ -35,16 +35,6 @@ export const XTerm: React.FunctionComponent<XTermProps> = ({
       }
     },
     /**
-     * Backend sent data.
-     *
-     * @param {string} data String content to be writen into the terminall
-     */
-    onDataReceived: (data: string) => {
-      if (terminal) {
-        terminal?.write(data);
-      }
-    },
-    /**
      * Backend closed connection.
      *
      * @param {string} reason String error to be written into the terminall
@@ -53,6 +43,16 @@ export const XTerm: React.FunctionComponent<XTermProps> = ({
       if (terminal) {
         terminal?.write(`\x1b[31m${reason || 'disconnected'}\x1b[m\r\n`);
         terminal?.refresh(terminal.rows, terminal.rows); // start to end row
+      }
+    },
+    /**
+     * Backend sent data.
+     *
+     * @param {string} data String content to be writen into the terminall
+     */
+    onDataReceived: (data: string) => {
+      if (terminal) {
+        terminal?.write(data);
       }
     },
   }));
@@ -76,11 +76,11 @@ export const XTerm: React.FunctionComponent<XTermProps> = ({
 
   return (
     <div
-      ref={ref}
       className="pf-c-console__xterm"
-      role="list"
-      onFocus={onFocusIn}
       onBlur={onFocusOut}
+      onFocus={onFocusIn}
+      ref={ref}
+      role="list"
     />
   );
 };

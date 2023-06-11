@@ -14,16 +14,16 @@ import {
 
 type DeviceNameSelectProps = {
   deviceName: string;
-  setDeviceName: (resourceName: string) => void;
-  permittedHostDevices: V1PermittedHostDevices;
   index: number;
+  permittedHostDevices: V1PermittedHostDevices;
+  setDeviceName: (resourceName: string) => void;
 };
 
 const DeviceNameSelect: React.FC<DeviceNameSelectProps> = ({
   deviceName,
-  setDeviceName,
-  permittedHostDevices,
   index,
+  permittedHostDevices,
+  setDeviceName,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isSelectOpen, setIsSelectOpen] = React.useState<boolean>(false);
@@ -35,20 +35,20 @@ const DeviceNameSelect: React.FC<DeviceNameSelectProps> = ({
 
   return (
     <GridItem span={5}>
-      <FormGroup label={!index && t('Device name')} fieldId="deviceName" isRequired>
+      <FormGroup fieldId="deviceName" isRequired label={!index && t('Device name')}>
         <Select
-          menuAppendTo={() => document.getElementById('tab-modal')}
           id="deviceName"
           isOpen={isSelectOpen}
-          onToggle={setIsSelectOpen}
+          menuAppendTo={() => document.getElementById('tab-modal')}
           onSelect={onSelect}
-          variant={SelectVariant.single}
+          onToggle={setIsSelectOpen}
           selections={deviceName}
+          variant={SelectVariant.single}
         >
           <SelectGroup
             hidden={isEmpty(permittedHostDevices?.mediatedDevices)}
-            label={t('Mediated devices')}
             key="mediated"
+            label={t('Mediated devices')}
           >
             {permittedHostDevices?.mediatedDevices?.map(({ resourceName }) => (
               <SelectOption key={resourceName} value={resourceName}>
@@ -58,8 +58,8 @@ const DeviceNameSelect: React.FC<DeviceNameSelectProps> = ({
           </SelectGroup>
           <SelectGroup
             hidden={isEmpty(permittedHostDevices?.pciHostDevices)}
-            label={t('PCI host devices')}
             key="pciHost"
+            label={t('PCI host devices')}
           >
             {permittedHostDevices?.pciHostDevices?.map(({ resourceName }) => (
               <SelectOption key={resourceName} value={resourceName}>
@@ -72,8 +72,8 @@ const DeviceNameSelect: React.FC<DeviceNameSelectProps> = ({
               !isEmpty(permittedHostDevices?.mediatedDevices) ||
               !isEmpty(permittedHostDevices?.pciHostDevices)
             }
-            label={t('No host devices exists')}
             key="noDevices"
+            label={t('No host devices exists')}
           />
         </Select>
       </FormGroup>

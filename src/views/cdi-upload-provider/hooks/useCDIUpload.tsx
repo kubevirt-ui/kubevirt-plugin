@@ -10,10 +10,10 @@ import { CDIUploadContextProps } from '../utils/context';
 import { DataUpload, UploadDataProps } from '../utils/types';
 
 const resource: WatchK8sResource = {
-  kind: CDIConfigModelRef,
   isList: false,
-  namespaced: false,
+  kind: CDIConfigModelRef,
   name: 'config',
+  namespaced: false,
 };
 
 const useCDIUpload = (): CDIUploadContextProps => {
@@ -37,17 +37,17 @@ const useCDIUpload = (): CDIUploadContextProps => {
     }
   };
 
-  const uploadData = ({ file, token, pvcName, namespace }: UploadDataProps) => {
+  const uploadData = ({ file, namespace, pvcName, token }: UploadDataProps) => {
     const { CancelToken } = axios;
     const cancelSource = CancelToken.source();
     const noRouteFound = configError || !configLoaded || !uploadProxyURL;
 
     const newUpload: DataUpload = {
-      pvcName,
+      cancelUpload: cancelSource.cancel,
+      fileName: file?.name,
       namespace,
       progress: 0,
-      fileName: file?.name,
-      cancelUpload: cancelSource.cancel,
+      pvcName,
       uploadError: noRouteFound && { message: `No Upload URL found ${configError}` },
       uploadStatus: noRouteFound ? UPLOAD_STATUS.ERROR : UPLOAD_STATUS.UPLOADING,
     };
@@ -61,14 +61,13 @@ const useCDIUpload = (): CDIUploadContextProps => {
     form.append('file', file);
     try {
       axios({
-        method: 'POST',
-        url: CDI_UPLOAD_URL_BUILDER(uploadProxyURL),
-        data: form,
         cancelToken: cancelSource.token,
+        data: form,
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
+        method: 'POST',
         onUploadProgress: (e) => {
           const progress = Math.floor((e.loaded / file.size) * 100);
           updateUpload({
@@ -77,6 +76,7 @@ const useCDIUpload = (): CDIUploadContextProps => {
             ...(progress === 100 && { uploadStatus: UPLOAD_STATUS.SUCCESS }),
           });
         },
+        url: CDI_UPLOAD_URL_BUILDER(uploadProxyURL),
       });
     } catch (err) {
       const isCancel = axios.isCancel(err);
@@ -98,9 +98,9 @@ const useCDIUpload = (): CDIUploadContextProps => {
   }, [uploads]);
 
   return {
-    uploads,
     uploadData,
     uploadProxyURL,
+    uploads,
   };
 };
 

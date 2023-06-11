@@ -16,7 +16,7 @@ type BootableVolumeListModalProps = {
 const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({ isOpen, onClose }) => {
   const { t } = useKubevirtTranslation();
 
-  const { onSelectCreatedVolume, instanceTypeVMState } = useInstanceTypeVMStore();
+  const { instanceTypeVMState, onSelectCreatedVolume } = useInstanceTypeVMStore();
   const { selectedBootableVolume } = instanceTypeVMState;
   const selectedBootableVolumeState = useState<BootableVolume>(selectedBootableVolume);
 
@@ -26,11 +26,11 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({ isOpen, onC
   };
   return (
     <TabModal
+      headerText={t('Available volumes')}
       isOpen={isOpen}
+      modalVariant={ModalVariant.large}
       onClose={onClose}
       onSubmit={onSave as () => Promise<void>}
-      headerText={t('Available volumes')}
-      modalVariant={ModalVariant.large}
       submitBtnText={t('Select')}
     >
       <BootableVolumeList selectedBootableVolumeState={selectedBootableVolumeState} />

@@ -25,10 +25,10 @@ export const addInstallationCDRom = (
 
   if ((cdSource as V1ContainerDiskSource)?.image) {
     cdVolume = {
-      name: INSTALLATION_CDROM_NAME,
       containerDisk: {
         image: removeDockerPrefix((cdSource as V1ContainerDiskSource).image),
       },
+      name: INSTALLATION_CDROM_NAME,
     };
   }
 
@@ -36,17 +36,17 @@ export const addInstallationCDRom = (
 
   if (cdDataVolumeSource?.registry) {
     cdVolume = {
-      name: INSTALLATION_CDROM_NAME,
       containerDisk: {
         image: removeDockerPrefix(cdDataVolumeSource?.registry.url),
       },
+      name: INSTALLATION_CDROM_NAME,
     };
   } else if (cdDataVolumeSource?.http || cdDataVolumeSource?.pvc) {
     cdVolume = {
-      name: INSTALLATION_CDROM_NAME,
       dataVolume: {
         name: dataVolumeName,
       },
+      name: INSTALLATION_CDROM_NAME,
     };
 
     cdDataVolumeTemplate = {

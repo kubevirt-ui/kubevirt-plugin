@@ -38,7 +38,7 @@ const MigrationsTab: React.FC = () => {
 
   const migrationCardDataAndFilters = useMigrationCardDataAndFilters(duration);
 
-  const { vmims, onFilterChange } = migrationCardDataAndFilters || {};
+  const { onFilterChange, vmims } = migrationCardDataAndFilters || {};
 
   const filteredVMIMS = getFilteredDurationVMIMS(vmims, duration);
 
@@ -67,7 +67,7 @@ const MigrationsTab: React.FC = () => {
                   </CardActions>
                 </CardHeader>
                 <CardBody className="kv-monitoring-card__body">
-                  <MigrationsChartDonut vmims={filteredVMIMS} onFilterChange={onFilterChange} />
+                  <MigrationsChartDonut onFilterChange={onFilterChange} vmims={filteredVMIMS} />
                 </CardBody>
               </GridItem>
               <GridItem span={6}>

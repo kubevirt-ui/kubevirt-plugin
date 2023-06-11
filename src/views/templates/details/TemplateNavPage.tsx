@@ -18,20 +18,20 @@ import TemplatePageTitle from './TemplatePageTitle';
 import './TemplateNavPage.scss';
 
 export type TemplateNavPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }>;
 
 const TemplateNavPage: React.FC<TemplateNavPageProps> = ({
   match: {
-    params: { ns: namespace, name },
+    params: { name, ns: namespace },
   },
 }) => {
   const [template, loaded] = useK8sWatchResource<V1Template>({
     groupVersionKind: modelToGroupVersionKind(TemplateModel),
+    isList: false,
     name,
     namespace,
-    isList: false,
     namespaced: true,
   });
   const pages = useVirtualMachineTabs();

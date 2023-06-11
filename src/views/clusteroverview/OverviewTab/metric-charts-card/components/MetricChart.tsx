@@ -18,9 +18,9 @@ import { formatPopoverLabel, getLabelUnit } from '../utils/utils';
 
 import './MetricChart.scss';
 
-const MetricChart: React.FC<MetricChartProps> = ({ metricChartData, metric }) => {
+const MetricChart: React.FC<MetricChartProps> = ({ metric, metricChartData }) => {
   const { chartData, domain, unit } = metricChartData;
-  const { ref, width, height } = useResponsiveCharts();
+  const { height, ref, width } = useResponsiveCharts();
   const displayUnit = getLabelUnit(metric, unit);
   const [xAxisTicks, xAxisTickFormat] = useXAxisTicks(chartData);
   const [yAxisTickValues, yAxisTickFormat] = useYAxisTicks(metricChartData);
@@ -28,44 +28,44 @@ const MetricChart: React.FC<MetricChartProps> = ({ metricChartData, metric }) =>
   return (
     <div className="overview-metric-chart" ref={ref}>
       <Chart
-        height={height}
-        width={width}
-        padding={{ top: 35, bottom: 35, left: 100, right: 10 }}
-        scale={{ x: 'time', y: 'linear' }}
-        domain={domain}
         containerComponent={
-          <ChartVoronoiContainer labels={formatPopoverLabel(displayUnit)} constrainToVisibleArea />
+          <ChartVoronoiContainer constrainToVisibleArea labels={formatPopoverLabel(displayUnit)} />
         }
+        domain={domain}
+        height={height}
+        padding={{ bottom: 35, left: 100, right: 10, top: 35 }}
+        scale={{ x: 'time', y: 'linear' }}
+        width={width}
       >
         <ChartAxis
-          dependentAxis
-          tickValues={yAxisTickValues}
-          tickFormat={yAxisTickFormat(metric, unit)}
           style={{
             grid: {
               stroke: chart_color_black_200.value,
             },
           }}
           axisComponent={<></>}
+          dependentAxis
+          tickFormat={yAxisTickFormat(metric, unit)}
+          tickValues={yAxisTickValues}
         />
         <ChartAxis
-          tickValues={xAxisTicks}
-          tickFormat={xAxisTickFormat}
-          fixLabelOverlap
           style={{
             axis: {
               stroke: chart_color_black_200.value,
             },
           }}
+          fixLabelOverlap
+          tickFormat={xAxisTickFormat}
+          tickValues={xAxisTicks}
         />
         <ChartGroup>
           <ChartArea
-            data={chartData}
             style={{
               data: {
                 stroke: chart_color_blue_100.value,
               },
             }}
+            data={chartData}
           />
         </ChartGroup>
       </Chart>

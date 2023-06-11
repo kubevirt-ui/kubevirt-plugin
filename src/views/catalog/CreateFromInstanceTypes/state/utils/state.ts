@@ -9,17 +9,17 @@ import {
 import { getRandomVMName } from './utils';
 
 const instanceTypeVMInitialState: InstanceTypeVMState = {
+  pvcSource: null,
   selectedBootableVolume: null,
   selectedInstanceType: '',
-  vmName: getRandomVMName(),
   sshSecretCredentials: initialSSHCredentials,
-  pvcSource: null,
+  vmName: getRandomVMName(),
 };
 
 export const instanceTypeVMStoreInitialState: InstanceTypeVMStoreState = {
-  instanceTypeVMState: instanceTypeVMInitialState,
+  activeNamespace: '',
   bootableVolumesData: {} as UseBootableVolumesValues,
   instanceTypesAndPreferencesData: {} as UseInstanceTypeAndPreferencesValues,
-  activeNamespace: '',
+  instanceTypeVMState: instanceTypeVMInitialState,
   vmNamespaceTarget: '',
 };

@@ -26,11 +26,11 @@ import {
 } from './constants';
 
 type UsePreviewFeatures = (featureName: string) => {
-  featureEnabled: boolean;
-  toggleFeature: (val: boolean) => void;
   canEdit: boolean;
-  loading: boolean;
   error: Error;
+  featureEnabled: boolean;
+  loading: boolean;
+  toggleFeature: (val: boolean) => void;
 };
 
 export const usePreviewFeatures: UsePreviewFeatures = (featureName) => {
@@ -40,8 +40,8 @@ export const usePreviewFeatures: UsePreviewFeatures = (featureName) => {
     {
       groupVersionKind: getGroupVersionKindForModel(ConfigMapModel),
       isList: false,
-      namespace: DEFAULT_NAMESPACE,
       name: PREVIEW_FEATURES_CONFIG_MAP_NAME,
+      namespace: DEFAULT_NAMESPACE,
     },
   );
 
@@ -61,18 +61,18 @@ export const usePreviewFeatures: UsePreviewFeatures = (featureName) => {
 
       const createResources = async () => {
         await k8sCreate<IoK8sApiCoreV1ConfigMap>({
-          model: ConfigMapModel,
           data: previewFeaturesConfigMapInitialState,
+          model: ConfigMapModel,
         });
 
         await k8sCreate<IoK8sApiRbacV1Role>({
-          model: RoleModel,
           data: previewFeaturesRole,
+          model: RoleModel,
         });
 
         await k8sCreate<IoK8sApiRbacV1RoleBinding>({
-          model: RoleBindingModel,
           data: previewFeaturesRoleBinding,
+          model: RoleBindingModel,
         });
       };
 
@@ -96,8 +96,8 @@ export const usePreviewFeatures: UsePreviewFeatures = (featureName) => {
 
     try {
       k8sUpdate({
-        model: ConfigMapModel,
         data: updatedConfigMap,
+        model: ConfigMapModel,
       });
       setError(null);
     } catch (updateError) {
@@ -106,10 +106,10 @@ export const usePreviewFeatures: UsePreviewFeatures = (featureName) => {
   };
 
   return {
-    featureEnabled,
-    toggleFeature,
     canEdit: isAdmin,
-    loading,
     error,
+    featureEnabled,
+    loading,
+    toggleFeature,
   };
 };

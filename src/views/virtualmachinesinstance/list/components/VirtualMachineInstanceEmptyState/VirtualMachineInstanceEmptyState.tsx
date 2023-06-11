@@ -32,26 +32,26 @@ const VirtualMachineInstanceEmptyState: React.FC<VirtualMachineInstanceEmptyStat
         {t('No VirtualMachinesInstances found')}
       </Title>
       <EmptyStateBody>
-        <Trans t={t} ns="plugin__kubevirt-plugin">
+        <Trans ns="plugin__kubevirt-plugin" t={t}>
           See the{' '}
-          <Button variant={ButtonVariant.link} onClick={() => history.push(catalogURL)} isInline>
+          <Button isInline onClick={() => history.push(catalogURL)} variant={ButtonVariant.link}>
             catalog tab
           </Button>{' '}
           to quickly create a VirtualMachine from the available Templates.
         </Trans>
       </EmptyStateBody>
       <EmptyStatePrimary>
-        <Button variant={ButtonVariant.primary} onClick={() => history.push(catalogURL)}>
+        <Button onClick={() => history.push(catalogURL)} variant={ButtonVariant.primary}>
           {t('Create VirtualMachine')}
         </Button>
       </EmptyStatePrimary>
       <EmptyStateSecondaryActions>
         <Button
-          variant={ButtonVariant.secondary}
           onClick={() =>
             history.push({ pathname: '/quickstart', search: '?keyword=virtual+machine' })
           }
           icon={<RocketIcon />}
+          variant={ButtonVariant.secondary}
         >
           {t('Learn how to use VirtualMachines')}
         </Button>

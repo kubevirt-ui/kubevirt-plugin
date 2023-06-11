@@ -26,7 +26,7 @@ const VMStatusSection: React.FC<VMStatusSectionProps> = ({ vms, vmsLoaded }) => 
     const count = value as number;
     statusItems.push(
       <FlexItem key={key}>
-        <VMStatusInventoryItem status={status} count={count} />
+        <VMStatusInventoryItem count={count} status={status} />
       </FlexItem>,
     );
   }
@@ -42,12 +42,12 @@ const VMStatusSection: React.FC<VMStatusSectionProps> = ({ vms, vmsLoaded }) => 
     return <EmptyStateNoVMs titleSize={TitleSizes.md} />;
   } else {
     return (
-      <Grid hasGutter className="kv-inventory-card__statuses-grid">
+      <Grid className="kv-inventory-card__statuses-grid" hasGutter>
         <GridItem
-          span={6}
           className={classNames({
             'kv-inventory-card__statuses-grid--left-col': numStatuses >= 2,
           })}
+          span={6}
         >
           <Flex direction={{ default: 'column' }}>{leftColumnStatusItems}</Flex>
         </GridItem>

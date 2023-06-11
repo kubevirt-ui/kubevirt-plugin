@@ -16,11 +16,11 @@ const VirtualMachineInstanceBreadcrumb: React.FC = React.memo(() => {
       <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
         <BreadcrumbItem>
           <Button
-            variant="link"
-            isInline
             onClick={() =>
               history.push(`/k8s/${lastNamespacePath}/${VirtualMachineInstanceModelRef}`)
             }
+            isInline
+            variant="link"
           >
             {t('VirtualMachineInstances')}
           </Button>

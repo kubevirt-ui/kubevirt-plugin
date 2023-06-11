@@ -1,6 +1,6 @@
 import { MetricChartData } from './useMetricChartData';
 
-export type ChartPoint = { x: Date; y: number; name?: string };
+export type ChartPoint = { name?: string; x: Date; y: number };
 
 export type ChartData = ChartPoint[];
 

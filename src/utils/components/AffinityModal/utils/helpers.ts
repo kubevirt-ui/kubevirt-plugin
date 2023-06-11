@@ -23,20 +23,20 @@ const getNodeAffinityRows = (nodeAffinity: K8sIoApiCoreV1NodeAffinity): Affinity
   const preferredTerms = nodeAffinity?.preferredDuringSchedulingIgnoredDuringExecution || [];
 
   const required = requiredTerms.map(({ matchExpressions, matchFields }, i) => ({
-    id: `node-required-${i}`,
-    type: AffinityType.node,
     condition: AffinityCondition.required,
     expressions: setIDsToEntity(matchExpressions),
     fields: setIDsToEntity(matchFields),
+    id: `node-required-${i}`,
+    type: AffinityType.node,
   }));
 
   const preferred = preferredTerms.map(({ preference, weight }, i) => ({
-    id: `node-preferred-${i}`,
-    weight,
-    type: AffinityType.node,
     condition: AffinityCondition.preferred,
     expressions: setIDsToEntity(preference.matchExpressions),
     fields: setIDsToEntity(preference.matchFields),
+    id: `node-preferred-${i}`,
+    type: AffinityType.node,
+    weight,
   }));
 
   return [...required, ...preferred] as AffinityRowData[];
@@ -50,22 +50,22 @@ const getPodLikeAffinityRows = (
   const preferredTerms = podLikeAffinity?.preferredDuringSchedulingIgnoredDuringExecution || [];
 
   const required = requiredTerms?.map((podAffinityTerm, i) => ({
-    id: isAnti ? `pod-anti-required-${i}` : `pod-required-${i}`,
-    type: isAnti ? AffinityType.podAnti : AffinityType.pod,
     condition: AffinityCondition.required,
     expressions: setIDsToEntity(podAffinityTerm?.labelSelector?.matchExpressions),
+    id: isAnti ? `pod-anti-required-${i}` : `pod-required-${i}`,
     namespaces: podAffinityTerm?.namespaces,
     topologyKey: podAffinityTerm?.topologyKey,
+    type: isAnti ? AffinityType.podAnti : AffinityType.pod,
   }));
 
   const preferred = preferredTerms?.map(({ podAffinityTerm, weight }, i) => ({
-    id: isAnti ? `pod-anti-preferred-${i}` : `pod-preferred-${i}`,
-    type: isAnti ? AffinityType.podAnti : AffinityType.pod,
     condition: AffinityCondition.preferred,
-    weight,
     expressions: setIDsToEntity(podAffinityTerm?.labelSelector?.matchExpressions),
+    id: isAnti ? `pod-anti-preferred-${i}` : `pod-preferred-${i}`,
     namespaces: podAffinityTerm?.namespaces,
     topologyKey: podAffinityTerm?.topologyKey,
+    type: isAnti ? AffinityType.podAnti : AffinityType.pod,
+    weight,
   }));
 
   return [...required, ...preferred] as AffinityRowData[];
@@ -96,15 +96,15 @@ const getRequiredNodeTermFromRowData = ({
 });
 
 const getPreferredNodeTermFromRowData = ({
-  weight,
   expressions,
   fields,
-}: AffinityRowData): K8sIoApiCoreV1PreferredSchedulingTerm => ({
   weight,
+}: AffinityRowData): K8sIoApiCoreV1PreferredSchedulingTerm => ({
   preference: {
     matchExpressions: flattenExpressions(expressions),
     matchFields: flattenExpressions(fields),
   },
+  weight,
 });
 
 const getRequiredPodTermFromRowData = ({
@@ -118,17 +118,17 @@ const getRequiredPodTermFromRowData = ({
 });
 
 const getPreferredPodTermFromRowData = ({
-  weight,
   expressions,
   topologyKey,
-}: AffinityRowData): K8sIoApiCoreV1WeightedPodAffinityTerm => ({
   weight,
+}: AffinityRowData): K8sIoApiCoreV1WeightedPodAffinityTerm => ({
   podAffinityTerm: {
     labelSelector: {
       matchExpressions: flattenExpressions(expressions),
     },
     topologyKey,
   },
+  weight,
 });
 
 export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
@@ -138,7 +138,7 @@ export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
 
   const pickRows = (rowType, rowCondition, mapper) =>
     affinityRows
-      .filter(({ type, condition }) => type === rowType && condition === rowCondition)
+      .filter(({ condition, type }) => type === rowType && condition === rowCondition)
       .map((rowData) => mapper(rowData));
 
   const affinity = {} as K8sIoApiCoreV1Affinity;
@@ -245,7 +245,7 @@ export const withOperatorPredicate = <T extends AffinityLabel = AffinityLabel>(
   store: any,
   label: T,
 ) => {
-  const { key, values, operator } = label;
+  const { key, operator, values } = label;
 
   switch (operator) {
     case 'Exists':
@@ -286,20 +286,20 @@ export const getAvailableAffinityID = (affinities: AffinityRowData[]) => {
 
 export const isTermsInvalid = (terms: AffinityLabel[]) =>
   terms?.some(
-    ({ key, values, operator }) =>
+    ({ key, operator, values }) =>
       !key || ((operator === Operator.In || operator === Operator.NotIn) && values?.length === 0),
   );
 
 export const getIntersectedQualifiedNodes = ({
-  expressions,
-  fields,
   expressionNodes,
+  expressions,
   fieldNodes,
+  fields,
 }: {
-  expressions: AffinityLabel[];
-  fields: AffinityLabel[];
   expressionNodes: IoK8sApiCoreV1Node[];
+  expressions: AffinityLabel[];
   fieldNodes: IoK8sApiCoreV1Node[];
+  fields: AffinityLabel[];
 }) => {
   if (expressions.length > 0 && fields.length > 0) {
     return intersectionWith(expressionNodes, fieldNodes);

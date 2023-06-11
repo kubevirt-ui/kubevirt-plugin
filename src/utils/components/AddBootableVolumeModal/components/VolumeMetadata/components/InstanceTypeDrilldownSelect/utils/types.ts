@@ -1,29 +1,29 @@
 import { ComponentClass } from 'react';
 
 export type InstanceTypeSize = {
-  sizeLabel: string;
   cpus: number;
   memory: string;
+  sizeLabel: string;
 };
 
 export type RedHatInstanceTypeSeries = {
-  seriesName: string;
   classAnnotation: string;
+  seriesName: string;
   sizes: InstanceTypeSize[];
 };
 
 export type RedHatInstanceType = {
-  label: string;
-  id: string;
   Icon: ComponentClass;
+  id: string;
   items: RedHatInstanceTypeSeries[];
+  label: string;
 };
 
 export type UserInstanceType = {
-  label: string;
-  id: string;
   Icon: ComponentClass;
+  id: string;
   items: string[];
+  label: string;
 };
 
 export type InstanceTypesMenuItemsData = {

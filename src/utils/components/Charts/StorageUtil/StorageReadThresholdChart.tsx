@@ -28,16 +28,16 @@ const GIB_IN_BYTES = 1024;
 const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
   const queries = React.useMemo(
-    () => getUtilizationQueries({ obj: vmi, duration }),
+    () => getUtilizationQueries({ duration, obj: vmi }),
     [vmi, duration],
   );
-  const { ref, width, height } = useResponsiveCharts();
+  const { height, ref, width } = useResponsiveCharts();
 
   const [data] = usePrometheusPoll({
-    query: queries?.FILESYSTEM_READ_USAGE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.FILESYSTEM_READ_USAGE,
     timespan,
   });
 
@@ -51,38 +51,38 @@ const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }
     <ComponentReady isReady={!isEmpty(chartData)}>
       <div className="util-threshold-chart" ref={ref}>
         <Chart
-          height={height}
-          width={width}
-          padding={35}
-          scale={{ x: 'time', y: 'linear' }}
-          domain={{
-            x: [currentTime - timespan, currentTime],
-          }}
           containerComponent={
             <ChartVoronoiContainer
               labels={({ datum }) => {
-                return `Data read: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
+                return `Data read: ${xbytes(datum?.y, { fixed: 2, iec: true })}`;
               }}
               constrainToVisibleArea
             />
           }
+          domain={{
+            x: [currentTime - timespan, currentTime],
+          }}
+          height={height}
+          padding={35}
+          scale={{ x: 'time', y: 'linear' }}
+          width={width}
         >
           <ChartAxis
-            tickFormat={tickFormat(duration, currentTime)}
-            tickCount={TICKS_COUNT}
             style={{
               ticks: { stroke: 'transparent' },
             }}
             axisComponent={<></>}
+            tickCount={TICKS_COUNT}
+            tickFormat={tickFormat(duration, currentTime)}
           />
           <ChartGroup>
             <ChartArea
-              data={chartData}
               style={{
                 data: {
                   stroke: chart_color_blue_300.value,
                 },
               }}
+              data={chartData}
             />
           </ChartGroup>
         </Chart>

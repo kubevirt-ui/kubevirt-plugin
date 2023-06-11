@@ -17,9 +17,9 @@ const RecentEvent: React.FC = () => {
 
   const filteredEvents = events?.filter((e) => eventTypes.includes(e.involvedObject.kind)) || [];
   const wrappedFilteredEvents: FirehoseResult<EventKind[]> = {
+    data: filteredEvents,
     loaded,
     loadError,
-    data: filteredEvents,
   };
 
   return <RecentEventsBody events={wrappedFilteredEvents} moreLink={VIEW_EVENTS_PATH} />;

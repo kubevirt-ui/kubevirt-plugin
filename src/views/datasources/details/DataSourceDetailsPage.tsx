@@ -12,8 +12,8 @@ import { Divider, PageSection, Title } from '@patternfly/react-core';
 import { DataSourceDetailsGrid } from './components/DataSourceDetailsGrid.tsx/DataSourceDetailsGrid';
 
 type DataSourceDetailsPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1beta1DataSource;
 };
@@ -24,14 +24,14 @@ const DataSourceDetailsPage: React.FC<DataSourceDetailsPageProps> = ({ obj: data
   return (
     <div>
       <PageSection>
-        <Title headingLevel="h2" className="co-section-heading">
+        <Title className="co-section-heading" headingLevel="h2">
           {t('DataSource details')}
         </Title>
         <DataSourceDetailsGrid dataSource={dataSource} />
       </PageSection>
       <Divider />
       <PageSection>
-        <Title headingLevel="h2" className="co-section-heading">
+        <Title className="co-section-heading" headingLevel="h2">
           {t('Conditions')}
         </Title>
         <ConditionsTable conditions={dataSource?.status?.conditions as K8sResourceCondition[]} />

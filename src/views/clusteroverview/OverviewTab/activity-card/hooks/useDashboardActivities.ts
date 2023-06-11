@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {
-  DashboardsOverviewPrometheusActivity as DynamicDashboardsOverviewPrometheusActivity,
+  DashboardsOverviewPrometheusActivity,
   DashboardsOverviewResourceActivity,
   DashboardsOverviewResourceActivity as DynamicDashboardsOverviewResourceActivity,
   isDashboardsOverviewPrometheusActivity as isDynamicDashboardsOverviewPrometheusActivity,
@@ -31,14 +31,13 @@ const useDashboardActivities = () => {
     [dynamicResourceActivityExtensions, models],
   );
 
-  const [dynamicPrometheusActivities] =
-    useResolvedExtensions<DynamicDashboardsOverviewPrometheusActivity>(
-      isDynamicDashboardsOverviewPrometheusActivity,
-    );
+  const [dynamicPrometheusActivities] = useResolvedExtensions<DashboardsOverviewPrometheusActivity>(
+    isDynamicDashboardsOverviewPrometheusActivity,
+  );
 
   return {
-    resourceActivities,
     prometheusActivities: dynamicPrometheusActivities,
+    resourceActivities,
   };
 };
 

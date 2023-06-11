@@ -27,7 +27,7 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
 > = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const columns = useHardwareDevicesColumns();
-  const [activeTabKey, setActiveTabKey] = React.useState<string | number>(0);
+  const [activeTabKey, setActiveTabKey] = React.useState<number | string>(0);
   const hostDevices = getHostDevices(vm);
   const hostDevicesCount = hostDevices?.length;
   const gpus = getGPUDevices(vm);
@@ -35,7 +35,7 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
 
   const handleTabClick = (
     _: React.MouseEvent<HTMLElement, MouseEvent>,
-    tabIndex: string | number,
+    tabIndex: number | string,
   ) => {
     setActiveTabKey(tabIndex);
   };
@@ -54,29 +54,29 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
               title={<TabTitleText>{t('GPU devices ({{gpusCount}})', { gpusCount })}</TabTitleText>}
             >
               <VirtualizedTable<V1GPU>
+                columns={columns}
                 data={gpus}
-                unfilteredData={gpus}
                 loaded
                 loadError={false}
-                columns={columns}
                 Row={VirtualMachinesOverviewTabHardwareDevicesRow}
+                unfilteredData={gpus}
               />
             </Tab>
             <Tab
-              eventKey={1}
               title={
                 <TabTitleText>
                   {t('Host devices ({{hostDevicesCount}})', { hostDevicesCount })}
                 </TabTitleText>
               }
+              eventKey={1}
             >
               <VirtualizedTable<V1HostDevice>
+                columns={columns}
                 data={hostDevices}
-                unfilteredData={hostDevices}
                 loaded
                 loadError={false}
-                columns={columns}
                 Row={VirtualMachinesOverviewTabHardwareDevicesRow}
+                unfilteredData={hostDevices}
               />
             </Tab>
           </Tabs>

@@ -11,7 +11,7 @@ import {
 type UseActiveNamespacePathType = () => string;
 
 const buildNSPath = (namespace: string): string =>
-  [ALL_NAMESPACES_ACTIVE_KEY, ALL_NAMESPACES].includes(namespace)
+  [ALL_NAMESPACES, ALL_NAMESPACES_ACTIVE_KEY].includes(namespace)
     ? ALL_NAMESPACES
     : `ns/${namespace}`;
 

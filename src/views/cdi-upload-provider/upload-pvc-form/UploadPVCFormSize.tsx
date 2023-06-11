@@ -6,37 +6,37 @@ import { Dropdown, DropdownItem, DropdownToggle, NumberInput } from '@patternfly
 import { dropdownUnits } from '../utils/consts';
 
 const UploadPVCFormSize = ({
-  requestSizeValue,
   requestSizeUnit,
-  setRequestSizeValue,
+  requestSizeValue,
   setRequestSizeUnit,
+  setRequestSizeValue,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const handleRequestSizeInputChange = (obj: { value: number; unit: string }) => {
+  const handleRequestSizeInputChange = (obj: { unit: string; value: number }) => {
     setRequestSizeValue(obj?.value);
     setRequestSizeUnit(obj?.unit);
   };
 
   const onValueChange: React.ReactEventHandler<HTMLInputElement> = (event) => {
     handleRequestSizeInputChange({
-      value: Number(event?.currentTarget?.value),
       unit: requestSizeUnit,
+      value: Number(event?.currentTarget?.value),
     });
   };
 
   const changeValueBy = (changeBy: number) => {
     // When default defaultRequestSizeValue is not set, value becomes NaN and increment decrement buttons of NumberSpinner don't work.
     const newValue = Number.isFinite(requestSizeValue) ? requestSizeValue + changeBy : 0 + changeBy;
-    handleRequestSizeInputChange({ value: newValue, unit: requestSizeUnit });
+    handleRequestSizeInputChange({ unit: requestSizeUnit, value: newValue });
   };
 
   const onUnitChange = (newUnit: React.ChangeEvent<HTMLInputElement>) => {
     setIsOpen((open) => !open);
     handleRequestSizeInputChange({
-      value: requestSizeValue,
       unit: newUnit?.target?.innerHTML?.slice(0, -1),
+      value: requestSizeValue,
     });
   };
 
@@ -48,20 +48,22 @@ const UploadPVCFormSize = ({
       <div className="pf-c-input-group">
         <div className="co-m-number-spinner">
           <NumberInput
-            min={1}
-            value={requestSizeValue}
             id={'request-size-input'}
-            required
-            name={`requestSizeValue`}
-            onMinus={() => changeValueBy(-1)}
-            onChange={onValueChange}
-            onPlus={() => changeValueBy(1)}
+            min={1}
             minusBtnAriaLabel={t('Decrement')}
+            name={`requestSizeValue`}
+            onChange={onValueChange}
+            onMinus={() => changeValueBy(-1)}
+            onPlus={() => changeValueBy(1)}
             plusBtnAriaLabel={t('Increment')}
+            required
+            value={requestSizeValue}
           />
         </div>
         <Dropdown
-          isOpen={isOpen}
+          dropdownItems={Object.values(dropdownUnits)?.map((unit) => (
+            <DropdownItem key={unit}>{unit}</DropdownItem>
+          ))}
           toggle={
             <DropdownToggle
               id="pf-c-console__actions-vnc-toggle-id"
@@ -70,11 +72,9 @@ const UploadPVCFormSize = ({
               {dropdownUnits?.[requestSizeUnit]}
             </DropdownToggle>
           }
-          name={`requestSizeValueUnit`}
           className="request-size-input__unit"
-          dropdownItems={Object.values(dropdownUnits)?.map((unit) => (
-            <DropdownItem key={unit}>{unit}</DropdownItem>
-          ))}
+          isOpen={isOpen}
+          name={`requestSizeValueUnit`}
           onSelect={onUnitChange}
         />
       </div>

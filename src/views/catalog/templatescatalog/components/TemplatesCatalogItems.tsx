@@ -12,23 +12,23 @@ import { TemplatesCatalogRow } from './TemplatesCatalogRow';
 import { TemplateTile } from './TemplatesCatalogTile';
 
 type TemplatesCatalogItemsProps = {
-  templates: V1Template[];
-  availableTemplatesUID: Set<string>;
   availableDatasources: Record<string, V1beta1DataSource>;
+  availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
   filters: TemplateFilters;
-  onTemplateClick: (template: V1Template) => void;
   loaded: boolean;
+  onTemplateClick: (template: V1Template) => void;
+  templates: V1Template[];
 };
 
 export const TemplatesCatalogItems: VFC<TemplatesCatalogItemsProps> = ({
-  templates,
-  availableTemplatesUID,
   availableDatasources,
+  availableTemplatesUID,
   bootSourcesLoaded,
   filters,
-  onTemplateClick,
   loaded,
+  onTemplateClick,
+  templates,
 }) => {
   const columns = useTemplatesCatalogColumns();
 
@@ -43,26 +43,26 @@ export const TemplatesCatalogItems: VFC<TemplatesCatalogItemsProps> = ({
   return filters?.isList ? (
     <div className="vm-catalog-table-container">
       <VirtualizedTable
+        columns={columns}
         data={templates}
-        unfilteredData={templates}
         loaded={loaded && bootSourcesLoaded}
         loadError={null}
-        columns={columns}
         Row={TemplatesCatalogRow}
-        rowData={{ onTemplateClick, availableTemplatesUID, availableDatasources }}
+        rowData={{ availableDatasources, availableTemplatesUID, onTemplateClick }}
+        unfilteredData={templates}
       />
     </div>
   ) : (
     <StackItem className="co-catalog-page__grid vm-catalog-grid-container">
-      <Gallery hasGutter className="vm-catalog-grid" id="vm-catalog-grid">
+      <Gallery className="vm-catalog-grid" hasGutter id="vm-catalog-grid">
         {sortedTemplates.map((template) => (
           <TemplateTile
-            key={template?.metadata?.uid}
-            template={template}
-            onClick={onTemplateClick}
-            availableTemplatesUID={availableTemplatesUID}
             availableDatasources={availableDatasources}
+            availableTemplatesUID={availableTemplatesUID}
             bootSourcesLoaded={bootSourcesLoaded}
+            key={template?.metadata?.uid}
+            onClick={onTemplateClick}
+            template={template}
           />
         ))}
       </Gallery>

@@ -17,10 +17,10 @@ import useDataVolumeConvertedVolumeNames from './useDataVolumeConvertedVolumeNam
 
 type UseDeleteVMResources = (vm: V1VirtualMachine) => {
   dataVolumes: V1beta1DataVolume[];
+  error: any;
+  loaded: boolean;
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
   snapshots: V1alpha1VirtualMachineSnapshot[];
-  loaded: boolean;
-  error: any;
 };
 
 const useDeleteVMResources: UseDeleteVMResources = (vm) => {
@@ -29,10 +29,10 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
   const [dataVolumes, dataVolumesLoaded, dataVolumesLoadError] = useK8sWatchResource<
     V1beta1DataVolume[]
   >({
-    isList: true,
     groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
-    namespaced: true,
+    isList: true,
     namespace,
+    namespaced: true,
   });
 
   const filteredDataVolumes = dataVolumes?.filter((dv) =>
@@ -42,10 +42,10 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
   const [pvcs, pvcsLoaded, pvcsLoadError] = useK8sWatchResource<
     IoK8sApiCoreV1PersistentVolumeClaim[]
   >({
-    isList: true,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-    namespaced: true,
+    isList: true,
     namespace,
+    namespaced: true,
   });
 
   const filteredPvcs = pvcs?.filter((pvc) => pvcVolumesNames?.includes(pvc?.metadata?.name));
@@ -53,22 +53,22 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
   const [snapshots, snapshotsLoaded, snapshotsLoadError] = useK8sWatchResource<
     V1alpha1VirtualMachineSnapshot[]
   >({
-    isList: true,
     groupVersionKind: modelToGroupVersionKind(VirtualMachineSnapshotModel),
-    namespaced: true,
+    isList: true,
     namespace,
+    namespaced: true,
   });
 
   return {
     dataVolumes: filteredDataVolumes,
+    error: snapshotsLoadError || dataVolumesLoadError || pvcsLoadError,
+    loaded: snapshotsLoaded && dataVolumesLoaded && pvcsLoaded,
     pvcs: filteredPvcs,
     snapshots: snapshots?.filter(
       (snapshot) =>
         snapshot?.metadata?.ownerReferences?.some((ref) => ref?.name === vm?.metadata?.name) ||
         snapshot?.spec?.source?.name === vm?.metadata?.name,
     ),
-    loaded: snapshotsLoaded && dataVolumesLoaded && pvcsLoaded,
-    error: snapshotsLoadError || dataVolumesLoadError || pvcsLoadError,
   };
 };
 

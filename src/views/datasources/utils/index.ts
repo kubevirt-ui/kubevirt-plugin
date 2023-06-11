@@ -28,7 +28,7 @@ export const isDataImportCronAutoUpdated = (
 };
 
 export const isDataResourceOwnedBySSP = (
-  dataResource: V1beta1DataSource | V1beta1DataImportCron,
+  dataResource: V1beta1DataImportCron | V1beta1DataSource,
 ) => {
   return (
     dataResource?.metadata?.annotations?.[DATA_SOURCE_PRIMARY_RESOURCE_LABEL] ===

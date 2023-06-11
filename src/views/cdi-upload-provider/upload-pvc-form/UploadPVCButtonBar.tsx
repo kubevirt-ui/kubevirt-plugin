@@ -13,8 +13,8 @@ type UploadPVCButtonBarProps = {
   className?: string;
   errorMessage?: string;
   infoMessage?: string;
-  successMessage?: string;
   inProgress?: boolean;
+  successMessage?: string;
   uploadProxyURL?: string;
 };
 
@@ -23,24 +23,24 @@ const UploadPVCButtonBar: React.FC<UploadPVCButtonBarProps> = ({
   className,
   errorMessage,
   infoMessage,
-  successMessage,
   inProgress,
+  successMessage,
   uploadProxyURL,
 }) => {
   return (
     <div className={classNames(className, 'co-m-btn-bar')}>
       <AlertGroup
-        isLiveRegion
-        aria-live="polite"
         aria-atomic="false"
+        aria-live="polite"
         aria-relevant="additions text"
+        isLiveRegion
       >
         {successMessage && (
           <Alert
-            isInline
             className="co-alert"
-            variant={AlertVariant.success}
+            isInline
             title={successMessage}
+            variant={AlertVariant.success}
           />
         )}
         {errorMessage && (
@@ -49,7 +49,7 @@ const UploadPVCButtonBar: React.FC<UploadPVCButtonBarProps> = ({
         {injectDisabled(children, inProgress)}
         {inProgress && <Loading />}
         {infoMessage && (
-          <Alert isInline className="co-alert" variant={AlertVariant.info} title={infoMessage} />
+          <Alert className="co-alert" isInline title={infoMessage} variant={AlertVariant.info} />
         )}
       </AlertGroup>
     </div>

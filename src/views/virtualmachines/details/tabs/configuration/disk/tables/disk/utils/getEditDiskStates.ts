@@ -25,8 +25,8 @@ type UseEditDiskStates = (
   diskName: string,
   vmi?: V1VirtualMachineInstance,
 ) => {
-  initialDiskState: DiskFormState;
   initialDiskSourceState: DiskSourceState;
+  initialDiskState: DiskFormState;
 };
 
 export const getEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
@@ -58,28 +58,28 @@ export const getEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
 
     if (volumeSource === sourceTypes.EPHEMERAL) {
       initialDiskSourceState.ephemeralSource = volume.containerDisk?.image;
-      return { diskSource: sourceTypes.EPHEMERAL, diskSize: DYNAMIC, isBootDisk };
+      return { diskSize: DYNAMIC, diskSource: sourceTypes.EPHEMERAL, isBootDisk };
     }
-    return { isBootDisk, diskSource: OTHER, diskSize: null };
+    return { diskSize: null, diskSource: OTHER, isBootDisk };
   };
 
-  const { diskSource, diskSize, isBootDisk: asBootSource } = getDiskDetails();
+  const { diskSize, diskSource, isBootDisk: asBootSource } = getDiskDetails();
 
   const initialDiskState: DiskFormState = {
+    accessMode: null,
+    applyStorageProfileSettings: true,
+    asBootSource,
+    diskInterface: isEmpty(disk) ? interfaceTypes.VIRTIO : getDiskInterface(disk),
     diskName,
     diskSize,
-    diskType: isEmpty(disk) ? diskTypes.disk : diskTypes[getDiskDrive(disk)],
     diskSource,
+    diskType: isEmpty(disk) ? diskTypes.disk : diskTypes[getDiskDrive(disk)],
     enablePreallocation: false,
     storageClass: null,
-    volumeMode: null,
-    accessMode: null,
-    diskInterface: isEmpty(disk) ? interfaceTypes.VIRTIO : getDiskInterface(disk),
-    applyStorageProfileSettings: true,
     storageClassProvisioner: null,
     storageProfileSettingsCheckboxDisabled: false,
-    asBootSource,
+    volumeMode: null,
   };
 
-  return { initialDiskState, initialDiskSourceState: initialStateDiskSource };
+  return { initialDiskSourceState: initialStateDiskSource, initialDiskState };
 };

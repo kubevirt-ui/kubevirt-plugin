@@ -28,8 +28,8 @@ import { ClusterServiceVersionKind } from './types';
 
 export const NetworkAddonsConfigResource: WatchK8sResource = {
   groupVersionKind: modelToGroupVersionKind(NetworkAddonsConfigModel),
-  namespaced: false,
   isList: true,
+  namespaced: false,
 };
 
 export const getClusterNAC = (nacList) => nacList?.find((nac) => nac?.metadata?.name === CLUSTER);
@@ -58,18 +58,18 @@ const getHealthStatusFromCSV = (csv: ClusterServiceVersionKind, t: TFunction) =>
   switch (csvStatus) {
     case ClusterServiceVersionPhase.CSVPhaseSucceeded:
       return {
-        state: HealthState.OK,
         message: t('Available'),
+        state: HealthState.OK,
       };
     case ClusterServiceVersionPhase.CSVPhaseFailed:
       return {
-        state: HealthState.ERROR,
         message: t('Error'),
+        state: HealthState.ERROR,
       };
     default:
       return {
-        state: HealthState.NOT_AVAILABLE,
         message: t('Not available'),
+        state: HealthState.NOT_AVAILABLE,
       };
   }
 };
@@ -79,7 +79,7 @@ export const getStorageOperatorHealthStatus = (operatorCSV, loaded, loadErrors, 
     return { state: HealthState.LOADING };
   }
   if (!isEmpty(loadErrors) || !operatorCSV) {
-    return { state: HealthState.NOT_AVAILABLE, message: t('Not available') };
+    return { message: t('Not available'), state: HealthState.NOT_AVAILABLE };
   }
   return getHealthStatusFromCSV(operatorCSV, t);
 };
@@ -101,57 +101,57 @@ export const getOverallStorageStatus = (lsoState, odfState, loaded, loadErrors) 
 };
 
 export const healthStateMapping: { [key in HealthState]: HealthStateMappingValues } = {
-  [HealthState.OK]: {
-    priority: 0,
-    health: HealthState.OK,
-    icon: <GreenCheckCircleIcon title="Healthy" />,
-  },
-  [HealthState.UNKNOWN]: {
-    priority: 1,
-    health: HealthState.UNKNOWN,
-    icon: <GrayUnknownIcon title="Unknown" />,
-  },
-  [HealthState.PROGRESS]: {
-    priority: 2,
-    health: HealthState.PROGRESS,
-    icon: <InProgressIcon title="In progress" />,
-  },
-  [HealthState.UPDATING]: {
-    priority: 3,
-    health: HealthState.UPDATING,
-    icon: <BlueSyncIcon title="Updating" />,
-  },
-  [HealthState.UPGRADABLE]: {
-    priority: 4,
-    health: HealthState.UPGRADABLE,
-    icon: <BlueArrowCircleUpIcon title="Upgrade available" />,
-  },
-  [HealthState.WARNING]: {
-    priority: 5,
-    health: HealthState.WARNING,
-    icon: <YellowExclamationTriangleIcon title="Warning" />,
-  },
   [HealthState.ERROR]: {
-    priority: 6,
     health: HealthState.ERROR,
     icon: <RedExclamationCircleIcon title="Error" />,
+    priority: 6,
   },
   [HealthState.LOADING]: {
-    priority: 7,
     health: HealthState.LOADING,
     icon: <div className="skeleton-health" />,
+    priority: 7,
   },
   [HealthState.NOT_AVAILABLE]: {
-    priority: 8,
     health: HealthState.NOT_AVAILABLE,
     icon: <GrayUnknownIcon title="Not available" />,
+    priority: 8,
+  },
+  [HealthState.OK]: {
+    health: HealthState.OK,
+    icon: <GreenCheckCircleIcon title="Healthy" />,
+    priority: 0,
+  },
+  [HealthState.PROGRESS]: {
+    health: HealthState.PROGRESS,
+    icon: <InProgressIcon title="In progress" />,
+    priority: 2,
+  },
+  [HealthState.UNKNOWN]: {
+    health: HealthState.UNKNOWN,
+    icon: <GrayUnknownIcon title="Unknown" />,
+    priority: 1,
+  },
+  [HealthState.UPDATING]: {
+    health: HealthState.UPDATING,
+    icon: <BlueSyncIcon title="Updating" />,
+    priority: 3,
+  },
+  [HealthState.UPGRADABLE]: {
+    health: HealthState.UPGRADABLE,
+    icon: <BlueArrowCircleUpIcon title="Upgrade available" />,
+    priority: 4,
+  },
+  [HealthState.WARNING]: {
+    health: HealthState.WARNING,
+    icon: <YellowExclamationTriangleIcon title="Warning" />,
+    priority: 5,
   },
 };
 
 export type HealthStateMappingValues = {
+  health: HealthState;
   icon: React.ReactNode;
   priority: number;
-  health: HealthState;
 };
 
 export type MonitoringResource = {
@@ -162,10 +162,10 @@ export type MonitoringResource = {
 };
 
 export const AlertResource: MonitoringResource = {
+  abbr: 'AL',
   kind: 'Alert',
   label: 'Alert',
   plural: '/monitoring/alerts',
-  abbr: 'AL',
 };
 
 export const labelsToParams = (labels: PrometheusLabels) =>

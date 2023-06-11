@@ -15,19 +15,19 @@ const FormSelectionRadio: FC<FormSelectionRadioProps> = ({ formSelection, setFor
     <Split hasGutter>
       <SplitItem>
         <Radio
-          isChecked={formSelection === RADIO_FORM_SELECTION.UPLOAD_IMAGE}
           id={RADIO_FORM_SELECTION.UPLOAD_IMAGE}
-          name="form-selection"
+          isChecked={formSelection === RADIO_FORM_SELECTION.UPLOAD_IMAGE}
           label={t('Upload volume')}
+          name="form-selection"
           onClick={() => setFormSelection(RADIO_FORM_SELECTION.UPLOAD_IMAGE)}
         />
       </SplitItem>
       <SplitItem>
         <Radio
-          isChecked={formSelection === RADIO_FORM_SELECTION.USE_EXISTING_PVC}
           id={RADIO_FORM_SELECTION.USE_EXISTING_PVC}
-          name="form-selection"
+          isChecked={formSelection === RADIO_FORM_SELECTION.USE_EXISTING_PVC}
           label={t('Use existing volume')}
+          name="form-selection"
           onClick={() => setFormSelection(RADIO_FORM_SELECTION.USE_EXISTING_PVC)}
         />
       </SplitItem>

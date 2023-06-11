@@ -11,13 +11,13 @@ import { K8sResourceCommon, k8sUpdate } from '@openshift-console/dynamic-plugin-
 import { Stack, StackItem } from '@patternfly/react-core';
 
 type MakePersistentModalProps = {
-  vm: V1VirtualMachine;
-  volume: V1Volume;
   isOpen: boolean;
   onClose: () => void;
+  vm: V1VirtualMachine;
+  volume: V1Volume;
 };
 
-const MakePersistentModal: FC<MakePersistentModalProps> = ({ vm, volume, isOpen, onClose }) => {
+const MakePersistentModal: FC<MakePersistentModalProps> = ({ isOpen, onClose, vm, volume }) => {
   const { t } = useKubevirtTranslation();
 
   const updatedVirtualMachine = useMemo(() => {
@@ -41,18 +41,18 @@ const MakePersistentModal: FC<MakePersistentModalProps> = ({ vm, volume, isOpen,
 
   return (
     <TabModal<K8sResourceCommon>
-      onClose={onClose}
-      isOpen={isOpen}
-      obj={updatedVirtualMachine}
       onSubmit={() =>
         k8sUpdate({
-          model: VirtualMachineModel,
           data: updatedVirtualMachine,
-          ns: updatedVirtualMachine?.metadata?.namespace,
+          model: VirtualMachineModel,
           name: updatedVirtualMachine?.metadata?.name,
+          ns: updatedVirtualMachine?.metadata?.namespace,
         })
       }
       headerText={t('Make persistent?')}
+      isOpen={isOpen}
+      obj={updatedVirtualMachine}
+      onClose={onClose}
     >
       <Stack hasGutter>
         <StackItem>

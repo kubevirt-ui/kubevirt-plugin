@@ -4,28 +4,28 @@ import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 type FilesystemRowProps = {
-  obj: any;
   activeColumnIDs: Set<string>;
+  obj: any;
 };
 
-const FilesystemRow: React.FC<FilesystemRowProps> = ({ obj, activeColumnIDs }) => {
+const FilesystemRow: React.FC<FilesystemRowProps> = ({ activeColumnIDs, obj }) => {
   const totalBytes = formatBytes(String(obj?.totalBytes));
   const usedBytes = formatBytes(String(obj?.usedBytes));
   return (
     <>
-      <TableData id="diskName" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="diskName">
         {obj?.diskName}
       </TableData>
-      <TableData id="fileSystemType" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="fileSystemType">
         {obj?.fileSystemType}
       </TableData>
-      <TableData id="mountPoint" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="mountPoint">
         {obj?.mountPoint}
       </TableData>
-      <TableData id="totalBytes" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="totalBytes">
         {totalBytes}
       </TableData>
-      <TableData id="usedBytes" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="usedBytes">
         {usedBytes}
       </TableData>
     </>

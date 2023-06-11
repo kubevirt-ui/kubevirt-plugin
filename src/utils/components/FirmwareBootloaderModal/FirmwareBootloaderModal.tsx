@@ -13,18 +13,18 @@ import { BootloaderOptionValue } from './utils/types';
 import { getBootloaderFromVM, updatedVMBootMode } from './utils/utils';
 
 type FirmwareBootloaderModalProps = {
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
-  vm,
   isOpen,
   onClose,
   onSubmit,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -45,11 +45,11 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
 
   return (
     <TabModal
-      onSubmit={onSubmit}
-      isOpen={isOpen}
-      onClose={onClose}
       headerText={t('Boot mode')}
+      isOpen={isOpen}
       obj={updatedVirtualMachine}
+      onClose={onClose}
+      onSubmit={onSubmit}
     >
       <Form>
         {vmi && (
@@ -57,15 +57,15 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
         )}
         <FormGroup fieldId="firmware-bootloader" label={t('Boot mode')}>
           <Select
-            menuAppendTo="parent"
             isOpen={isDropdownOpen}
-            onToggle={setIsDropdownOpen}
+            menuAppendTo="parent"
             onSelect={handleChange}
-            variant={SelectVariant.single}
+            onToggle={setIsDropdownOpen}
             selections={selectedFirmwareBootloader}
+            variant={SelectVariant.single}
           >
-            {bootloaderOptions.map(({ value, title, description }) => (
-              <SelectOption key={value} value={value} description={description}>
+            {bootloaderOptions.map(({ description, title, value }) => (
+              <SelectOption description={description} key={value} value={value}>
                 {title}
               </SelectOption>
             ))}

@@ -6,12 +6,12 @@ import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { Label } from '@patternfly/react-core';
 
 type HotplugLabelProps = {
-  vm: V1VirtualMachine;
   diskName: string;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-export const HotplugLabel: React.FC<HotplugLabelProps> = ({ vm, diskName, vmi }) => {
+export const HotplugLabel: React.FC<HotplugLabelProps> = ({ diskName, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const hotplugText = React.useMemo(() => {
@@ -38,7 +38,7 @@ export const HotplugLabel: React.FC<HotplugLabelProps> = ({ vm, diskName, vmi })
   }
 
   return (
-    <Label variant="filled" color="purple">
+    <Label color="purple" variant="filled">
       {hotplugText}
     </Label>
   );

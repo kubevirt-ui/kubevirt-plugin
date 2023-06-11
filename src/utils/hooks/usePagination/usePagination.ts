@@ -13,7 +13,7 @@ const usePagination: UsePagination = () => {
     }));
   };
 
-  return { pagination, onPaginationChange };
+  return { onPaginationChange, pagination };
 };
 
 export default usePagination;

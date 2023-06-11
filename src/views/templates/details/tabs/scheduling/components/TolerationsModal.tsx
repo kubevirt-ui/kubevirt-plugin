@@ -24,17 +24,17 @@ import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin
 import { Form, ModalVariant } from '@patternfly/react-core';
 
 type TolerationsModalProps = {
-  template: V1Template;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedTemplate: V1Template) => Promise<V1Template | void>;
+  template: V1Template;
 };
 
 const TolerationsModal: React.FC<TolerationsModalProps> = ({
-  template,
   isOpen,
   onClose,
   onSubmit,
+  template,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -53,7 +53,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
   const qualifiedNodes = getNodeTaintQualifier(nodes, nodesLoaded, tolerationsLabels);
 
   const onSelectorLabelAdd = () =>
-    onTolerationAdd({ id: null, key: '', value: '', effect: TOLERATIONS_EFFECTS[0] });
+    onTolerationAdd({ effect: TOLERATIONS_EFFECTS[0], id: null, key: '', value: '' });
 
   const updatedTemplate = React.useMemo(
     () =>
@@ -75,21 +75,21 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
 
   return (
     <TabModal
-      obj={updatedTemplate}
+      headerText={t('Tolerations')}
       isOpen={isOpen}
+      modalVariant={ModalVariant.medium}
+      obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Tolerations')}
-      modalVariant={ModalVariant.medium}
     >
       <TolerationModalDescriptionText />
       <Form>
         <LabelsList
+          addRowText={t('Add toleration')}
+          emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
           isEmpty={tolerationLabelsEmpty}
           model={!isEmpty(nodes) && NodeModel}
           onLabelAdd={onSelectorLabelAdd}
-          addRowText={t('Add toleration')}
-          emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
         >
           {!tolerationLabelsEmpty && (
             <>
@@ -107,8 +107,8 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
         </LabelsList>
         {!tolerationLabelsEmpty && nodesLoaded && (
           <NodeCheckerAlert
-            qualifiedNodes={tolerationsLabels?.length === 0 ? nodes : qualifiedNodes}
             nodesLoaded={nodesLoaded}
+            qualifiedNodes={tolerationsLabels?.length === 0 ? nodes : qualifiedNodes}
           />
         )}
       </Form>

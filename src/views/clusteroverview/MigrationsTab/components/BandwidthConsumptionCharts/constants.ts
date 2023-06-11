@@ -1,8 +1,8 @@
 export type ChartDataObject = {
+  idx: number;
+  name: string;
   x: Date;
   y: number;
-  name: string;
-  idx: number;
 };
 
 export const GRID_LINES = 3;

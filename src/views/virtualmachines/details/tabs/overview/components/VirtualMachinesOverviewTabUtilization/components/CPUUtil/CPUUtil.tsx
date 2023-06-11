@@ -14,31 +14,31 @@ import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type CPUUtilProps = {
-  vmi: V1VirtualMachineInstance;
   pods: K8sResourceCommon[];
+  vmi: V1VirtualMachineInstance;
 };
 
-const CPUUtil: FC<CPUUtilProps> = ({ vmi, pods }) => {
+const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
   const { t } = useKubevirtTranslation();
   const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
   const { currentTime, duration } = useDuration();
   const queries = useMemo(
-    () => getUtilizationQueries({ obj: vmi, duration, launcherPodName: vmiPod?.metadata?.name }),
+    () => getUtilizationQueries({ duration, launcherPodName: vmiPod?.metadata?.name, obj: vmi }),
     [vmi, vmiPod, duration],
   );
 
   const [dataCPURequested] = usePrometheusPoll({
-    query: queries.CPU_REQUESTED,
     endpoint: PrometheusEndpoint?.QUERY,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries.CPU_REQUESTED,
   });
 
   const [dataCPUUsage] = usePrometheusPoll({
-    query: queries?.CPU_USAGE,
     endpoint: PrometheusEndpoint?.QUERY,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.CPU_USAGE,
   });
 
   const cpuUsage = +dataCPUUsage?.data?.result?.[0]?.value?.[1];
@@ -61,17 +61,17 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi, pods }) => {
       <div className="util-chart">
         <ComponentReady isReady={isReady}>
           <ChartDonutUtilization
-            constrainToVisibleArea
-            animate
             data={{
               x: t('CPU used'),
               y: (averageCPUUsage > 100 ? 100 : averageCPUUsage) || 0,
             }}
+            animate
+            constrainToVisibleArea
             labels={({ datum }) => (datum.x ? `${datum.x}: ${(cpuUsage || 0)?.toFixed(2)}s` : null)}
+            style={{ labels: { fontSize: 20 } }}
             subTitle={t('Used')}
             subTitleComponent={<ChartLabel y={135} />}
             title={`${averageCPUUsage.toFixed(2) || 0}%`}
-            style={{ labels: { fontSize: 20 } }}
           />
         </ComponentReady>
       </div>

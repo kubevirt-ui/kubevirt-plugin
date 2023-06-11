@@ -17,27 +17,27 @@ const VirtualMachineRunningRow: React.FC<
   RowProps<
     V1VirtualMachine,
     {
+      isSingleNodeCluster: boolean;
       kind: string;
       vmi: V1VirtualMachineInstance;
       vmim: V1VirtualMachineInstanceMigration;
-      isSingleNodeCluster: boolean;
     }
   >
-> = ({ obj, activeColumnIDs, rowData: { kind, vmi, vmim, isSingleNodeCluster } }) => {
+> = ({ activeColumnIDs, obj, rowData: { isSingleNodeCluster, kind, vmi, vmim } }) => {
   const { t } = useKubevirtTranslation();
 
   const ipAddressess = vmi && getVMIIPAddresses(vmi);
   return (
     <VirtualMachineRowLayout
-      obj={obj}
-      activeColumnIDs={activeColumnIDs}
       rowData={{
+        ips: <FirstItemListPopover headerContent={t('IP addresses')} items={ipAddressess} />,
+        isSingleNodeCluster,
         kind,
         node: <ResourceLink kind="Node" name={vmi?.status?.nodeName} />,
-        ips: <FirstItemListPopover items={ipAddressess} headerContent={t('IP addresses')} />,
         vmim,
-        isSingleNodeCluster,
       }}
+      activeColumnIDs={activeColumnIDs}
+      obj={obj}
     />
   );
 };

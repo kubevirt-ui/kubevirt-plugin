@@ -30,17 +30,17 @@ import './general-tab.scss';
 const GeneralTab = () => {
   const { t } = useKubevirtTranslation();
   const {
-    version,
-    updateChannel,
-    operatorLink,
-    kubevirtSubscription,
     catalogSourceMissing,
+    kubevirtSubscription,
     loaded,
     loadErrors,
+    operatorLink,
+    updateChannel,
+    version,
   } = useKubevirtCSVDetails();
 
   return (
-    <Split hasGutter className="general-tab">
+    <Split className="general-tab" hasGutter>
       <SplitItem>
         <OverviewDetailItem isLoading={!loaded} title={t('Installed version')}>
           {version}
@@ -52,7 +52,7 @@ const GeneralTab = () => {
           {catalogSourceMissing ? (
             <SourceMissingStatus />
           ) : (
-            <SubscriptionStatus subscription={kubevirtSubscription} operatorLink={operatorLink} />
+            <SubscriptionStatus operatorLink={operatorLink} subscription={kubevirtSubscription} />
           )}
         </OverviewDetailItem>
       </SplitItem>
@@ -62,8 +62,8 @@ const GeneralTab = () => {
           <DescriptionListGroup>
             <DescriptionListTermHelpText>
               <Popover
-                position={PopoverPosition.right}
                 bodyContent={t('The channel to track and receive the updates from.')}
+                position={PopoverPosition.right}
               >
                 <DescriptionListTermHelpTextButton>
                   {t('Channel')}
@@ -82,10 +82,10 @@ const GeneralTab = () => {
       </SplitItem>
       {!isEmpty(loadErrors) && loaded && (
         <Alert
-          variant={AlertVariant.danger}
+          className="live-migration-tab--error"
           isInline
           title={t('Error')}
-          className="live-migration-tab--error"
+          variant={AlertVariant.danger}
         >
           {loadErrors.toString()}
         </Alert>

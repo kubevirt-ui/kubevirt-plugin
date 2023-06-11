@@ -19,13 +19,13 @@ const CloudInitInfoHelper = () => {
         <div className="text-muted">
           {t('The cloud-init service is enabled by default in Fedora and RHEL images.')}{' '}
           <Button
-            isSmall
-            isInline
-            variant="link"
             icon={<ExternalLinkSquareAltIcon />}
             iconPosition="right"
+            isInline
+            isSmall
+            variant="link"
           >
-            <a href={CLOUD_INIT_DOC_LINK} target="_blank" rel="noopener noreferrer">
+            <a href={CLOUD_INIT_DOC_LINK} rel="noopener noreferrer" target="_blank">
               {t('Learn more')}
             </a>
           </Button>

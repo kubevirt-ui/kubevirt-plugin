@@ -19,7 +19,7 @@ const GettingStartedMoreLinkContent: React.FC<GettingStartedMoreLinkContentProps
   if (moreLink?.onClick) {
     const handleClick = moreLink.onClick;
     return (
-      <Button onClick={handleClick} isInline variant="link" data-test={`item ${moreLink.id}`}>
+      <Button data-test={`item ${moreLink.id}`} isInline onClick={handleClick} variant="link">
         {moreLink.title}
       </Button>
     );
@@ -28,11 +28,11 @@ const GettingStartedMoreLinkContent: React.FC<GettingStartedMoreLinkContentProps
   if (moreLink?.external) {
     return (
       <a
-        href={moreLink.href}
-        target="_blank"
         className="co-external-link"
-        rel="noopener noreferrer"
         data-test={`item ${moreLink.id}`}
+        href={moreLink.href}
+        rel="noopener noreferrer"
+        target="_blank"
       >
         {moreLink.title}
       </a>
@@ -40,7 +40,7 @@ const GettingStartedMoreLinkContent: React.FC<GettingStartedMoreLinkContentProps
   }
 
   return (
-    <Link to={moreLink.href} data-test={`item ${moreLink.id}`}>
+    <Link data-test={`item ${moreLink.id}`} to={moreLink.href}>
       {moreLink.title}
     </Link>
   );

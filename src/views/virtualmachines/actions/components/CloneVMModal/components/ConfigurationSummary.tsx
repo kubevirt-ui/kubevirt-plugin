@@ -22,11 +22,11 @@ import { FormGroup, TextListItem, TextListItemVariants } from '@patternfly/react
 import { getClonedDisksSummary } from '../utils/helpers';
 
 type ConfigurationSummaryProps = {
-  vm: V1VirtualMachine;
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
+  vm: V1VirtualMachine;
 };
 
-const ConfigurationSummary: React.FC<ConfigurationSummaryProps> = ({ vm, pvcs }) => {
+const ConfigurationSummary: React.FC<ConfigurationSummaryProps> = ({ pvcs, vm }) => {
   const { t } = useKubevirtTranslation();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const [guestAgentData] = useGuestOS(vmi);
@@ -35,7 +35,7 @@ const ConfigurationSummary: React.FC<ConfigurationSummaryProps> = ({ vm, pvcs })
   );
 
   return (
-    <FormGroup hasNoPaddingTop label={t('Configuration')} fieldId="configuration">
+    <FormGroup fieldId="configuration" hasNoPaddingTop label={t('Configuration')}>
       <TextListItem className="text-muted" component={TextListItemVariants.dt}>
         {t('Operating system')}
       </TextListItem>
@@ -60,7 +60,7 @@ const ConfigurationSummary: React.FC<ConfigurationSummaryProps> = ({ vm, pvcs })
         {t('NICs')}
       </TextListItem>
       <TextListItem component={TextListItemVariants.dd}>
-        {(getInterfaces(vm) || [])?.map(({ name, model }) => (
+        {(getInterfaces(vm) || [])?.map(({ model, name }) => (
           <div key={name}>{model ? `${name} - ${model}` : name}</div>
         ))}
       </TextListItem>

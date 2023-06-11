@@ -16,62 +16,62 @@ const useMigrationPoliciesListColumns = (): [
   const columns: TableColumn<V1alpha1MigrationPolicy>[] = React.useMemo(
     () => [
       {
-        title: t('Name'),
         id: 'name',
-        transforms: [sortable],
-        sort: 'metadata.name',
         props: { className: 'pf-m-width-15' },
+        sort: 'metadata.name',
+        title: t('Name'),
+        transforms: [sortable],
       },
       {
-        title: t('Bandwidth'),
         id: 'bandwidth',
-        transforms: [sortable],
+        props: { className: 'pf-m-width-10' },
         sort: 'spec.bandwidthPerMigration',
-        props: { className: 'pf-m-width-10' },
+        title: t('Bandwidth'),
+        transforms: [sortable],
       },
       {
-        title: t('Auto converge'),
         id: 'auto-converge',
-        transforms: [sortable],
+        props: { className: 'pf-m-width-10' },
         sort: 'spec.allowAutoConverge',
-        props: { className: 'pf-m-width-10' },
+        title: t('Auto converge'),
+        transforms: [sortable],
       },
       {
-        title: t('Post copy'),
         id: 'post-copy',
-        transforms: [sortable],
+        props: { className: 'pf-m-width-10' },
         sort: 'spec.allowPostCopy',
-        props: { className: 'pf-m-width-10' },
-      },
-      {
-        title: t('Completion timeout'),
-        id: 'completion-timeout',
+        title: t('Post copy'),
         transforms: [sortable],
-        sort: 'spec.completionTimeoutPerGiB',
-        props: { className: 'pf-m-width-10' },
       },
       {
-        title: t('Project labels'),
+        id: 'completion-timeout',
+        props: { className: 'pf-m-width-10' },
+        sort: 'spec.completionTimeoutPerGiB',
+        title: t('Completion timeout'),
+        transforms: [sortable],
+      },
+      {
         additional: true,
         id: 'project-labels',
+        title: t('Project labels'),
       },
       {
-        title: t('VirtualMachine labels'),
         additional: true,
         id: 'vm-labels',
+        title: t('VirtualMachine labels'),
       },
       {
-        title: '',
         id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        title: '',
       },
     ],
     [t],
   );
 
   const [activeColumns] = useKubevirtUserSettingsTableColumns<V1alpha1MigrationPolicy>({
-    columns,
     columnManagementID: MigrationPolicyModelRef,
+    columns,
   });
 
   return [columns, activeColumns];

@@ -7,12 +7,12 @@ import { FormGroup, TextInput } from '@patternfly/react-core';
 import { OS_REGISTERY_LINKS } from '../../utils/constants';
 
 type DiskSourceUrlInputProps = {
-  url: string;
   onChange: (value: string) => void;
   os: string;
+  url: string;
 };
 
-const DiskSourceContainer: React.FC<DiskSourceUrlInputProps> = ({ url, onChange, os }) => {
+const DiskSourceContainer: React.FC<DiskSourceUrlInputProps> = ({ onChange, os, url }) => {
   const { t } = useKubevirtTranslation();
   const isUpstream = (window as any).SERVER_FLAGS.branding === 'okd';
   const isRHELOS = os?.includes(OS_NAME_TYPES.rhel);
@@ -30,16 +30,16 @@ const DiskSourceContainer: React.FC<DiskSourceUrlInputProps> = ({ url, onChange,
           {exampleURL}
         </>
       }
-      label={t('Container')}
       fieldId="disk-source-container"
       isRequired
+      label={t('Container')}
     >
       <TextInput
+        data-test-id="disk-source-container"
         id="disk-source-container"
+        onChange={onChange}
         type="text"
         value={url}
-        onChange={onChange}
-        data-test-id="disk-source-container"
       />
     </FormGroup>
   );

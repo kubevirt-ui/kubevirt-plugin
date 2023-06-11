@@ -31,8 +31,8 @@ const useKubevirtUserSettingsTopConsumerCards: UseKubevirtUserSettingsTopConsume
       if (!cards?.[TOP_CONSUMERS_CARD]) {
         setTopConsumerSettingsLocalStorage(
           JSON.stringify({
-            [TOP_CONSUMERS_NUM_ITEMS_KEY]: SHOW_TOP_5_ITEMS,
             [TOP_CONSUMERS_DURATION_KEY]: DurationOption.THIRTY_MIN.toString(),
+            [TOP_CONSUMERS_NUM_ITEMS_KEY]: SHOW_TOP_5_ITEMS,
             ...initialTopConsumerCardSettings,
           }),
         );

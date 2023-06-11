@@ -30,8 +30,8 @@ const PermissionsTab = () => {
       </Flex>
       <Divider className="permissions-tab--main__divider" />
       {!isLoading ? (
-        capabilitiesData?.map(({ taskName, allowed }) => (
-          <Flex key={taskName} className="permissions-tab--main__row">
+        capabilitiesData?.map(({ allowed, taskName }) => (
+          <Flex className="permissions-tab--main__row" key={taskName}>
             <FlexItem>{taskName}</FlexItem>
             <FlexItem align={{ default: 'alignRight' }}>
               {allowed ? <GreenCheckCircleIcon /> : <YellowExclamationTriangleIcon />}

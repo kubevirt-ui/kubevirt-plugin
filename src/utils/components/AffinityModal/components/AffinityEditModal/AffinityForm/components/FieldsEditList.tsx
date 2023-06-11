@@ -11,39 +11,39 @@ import AffinityEditList from './AffinityEditList';
 import ErrorHelperText from './ErrorHelperText';
 
 type FieldsEditListProps = {
-  fields: useIDEntitiesValue;
-  label: string;
-  helperText: React.ReactNode;
   errorHelperText: React.ReactNode;
+  fields: useIDEntitiesValue;
+  helperText: React.ReactNode;
+  label: string;
 };
 
 const FieldsEditList: React.FC<FieldsEditListProps> = ({
-  fields,
-  label,
-  helperText,
   errorHelperText,
+  fields,
+  helperText,
+  label,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
     entities: affinityFields,
+    initialEntitiesChanged: affinityFieldsChanged,
     onEntityAdd: onFieldAdd,
     onEntityChange: onFieldChange,
     onEntityDelete: onFieldDelete,
-    initialEntitiesChanged: affinityFieldsChanged,
   } = fields || {};
 
   return (
     <>
       <FormGroup
-        label={label}
-        helperText={helperText}
         fieldId="field-selector"
+        helperText={helperText}
         isHelperTextBeforeField
+        label={label}
       />
       <AffinityEditList
-        expressions={affinityFields}
         addRowText={t('Add field')}
-        onAdd={() => onFieldAdd({ id: null, key: '', values: [], operator: Operator.In })}
+        expressions={affinityFields}
+        onAdd={() => onFieldAdd({ id: null, key: '', operator: Operator.In, values: [] })}
         onChange={onFieldChange}
         onDelete={onFieldDelete}
         rowID="field"

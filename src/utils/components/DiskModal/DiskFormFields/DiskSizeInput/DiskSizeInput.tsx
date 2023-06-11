@@ -15,12 +15,12 @@ type DiskSizeInputProps = {
 
 const DiskSizeInput: React.FC<DiskSizeInputProps> = ({ diskState, dispatchDiskState }) => {
   const { t } = useKubevirtTranslation();
-  const { diskSource, diskSize } = diskState || {};
+  const { diskSize, diskSource } = diskState || {};
   const dynamicSize = t(DYNAMIC);
 
   const onChange = React.useCallback(
     (value: string) => {
-      dispatchDiskState({ type: diskReducerActions.SET_DISK_SIZE, payload: value });
+      dispatchDiskState({ payload: value, type: diskReducerActions.SET_DISK_SIZE });
     },
     [dispatchDiskState],
   );
@@ -32,13 +32,13 @@ const DiskSizeInput: React.FC<DiskSizeInputProps> = ({ diskState, dispatchDiskSt
   if (sourceTypes.EPHEMERAL === diskSource) {
     return (
       <FormGroup fieldId="ephemeral-disk-size" label="Size">
-        <TextInput id="ephemeral-disk-size" type="text" value={dynamicSize} isDisabled />
+        <TextInput id="ephemeral-disk-size" isDisabled type="text" value={dynamicSize} />
       </FormGroup>
     );
   }
 
   return (
-    <CapacityInput size={diskSize} onChange={onChange} label={t('PersistentVolumeClaim size')} />
+    <CapacityInput label={t('PersistentVolumeClaim size')} onChange={onChange} size={diskSize} />
   );
 };
 

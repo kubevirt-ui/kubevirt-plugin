@@ -20,8 +20,8 @@ const DurationDropdown: React.FC<DurationDropdownProps> = ({ selectedDuration, s
     <Select
       data-test-id="duration-select-dropdown"
       isOpen={isOpen}
-      onToggle={() => setIsOpen(!isOpen)}
       onSelect={onSelect}
+      onToggle={() => setIsOpen(!isOpen)}
       selections={DurationOption.fromString(selectedDuration)?.getDropdownLabel()}
       variant={SelectVariant.single}
     >

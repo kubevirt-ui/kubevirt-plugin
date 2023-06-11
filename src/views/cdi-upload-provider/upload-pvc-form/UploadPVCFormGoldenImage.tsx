@@ -12,31 +12,31 @@ import { OperatingSystemRecord } from '../utils/types';
 import UploadPVCFormPVCNamespace from './UploadPVCFormPVCNamespace';
 
 type UploadPVCFormGoldenImageProps = {
-  operatingSystems: OperatingSystemRecord[];
-  isLoading: boolean;
-  handleOs: (newOs: string) => void;
-  os: OperatingSystemRecord;
-  pvcSizeFromTemplate: boolean;
-  handlePvcSizeTemplate: (checked: boolean) => void;
-  mountAsCDROM: boolean;
-  handleCDROMChange: (checked: boolean) => void;
-  namespace: string;
-  osImageExists: boolean;
   goldenPvcs: V1alpha1PersistentVolumeClaim[];
+  handleCDROMChange: (checked: boolean) => void;
+  handleOs: (newOs: string) => void;
+  handlePvcSizeTemplate: (checked: boolean) => void;
+  isLoading: boolean;
+  mountAsCDROM: boolean;
+  namespace: string;
+  operatingSystems: OperatingSystemRecord[];
+  os: OperatingSystemRecord;
+  osImageExists: boolean;
+  pvcSizeFromTemplate: boolean;
 };
 
 const UploadPVCFormGoldenImage: React.FC<UploadPVCFormGoldenImageProps> = ({
-  operatingSystems,
-  isLoading,
-  handleOs,
-  os,
-  pvcSizeFromTemplate,
-  handlePvcSizeTemplate,
-  mountAsCDROM,
-  handleCDROMChange,
-  namespace,
-  osImageExists,
   goldenPvcs,
+  handleCDROMChange,
+  handleOs,
+  handlePvcSizeTemplate,
+  isLoading,
+  mountAsCDROM,
+  namespace,
+  operatingSystems,
+  os,
+  osImageExists,
+  pvcSizeFromTemplate,
 }) => {
   const { t } = useKubevirtTranslation();
   return (
@@ -48,17 +48,17 @@ const UploadPVCFormGoldenImage: React.FC<UploadPVCFormGoldenImageProps> = ({
         <FormSelect
           id="golden-os-select"
           isDisabled={isLoading}
+          isRequired
           onChange={handleOs}
           value={os?.id || ''}
-          isRequired
         >
           <FormSelectOption
             isDisabled={!!os}
             key="defaultValue"
-            value=""
             label={t('--- Pick an Operating system ---')}
+            value=""
           />
-          {operatingSystems.map(({ id, name, baseImageName, baseImageNamespace }) => {
+          {operatingSystems.map(({ baseImageName, baseImageNamespace, id, name }) => {
             const goldenPVC = goldenPvcs?.find(
               (pvc) => getName(pvc) === baseImageName && getNamespace(pvc) === baseImageNamespace,
             );
@@ -77,24 +77,24 @@ const UploadPVCFormGoldenImage: React.FC<UploadPVCFormGoldenImageProps> = ({
 
             const label = labelGoldenPVC || labelMissingBaseImageName || name || id;
 
-            return <FormSelectOption key={id} value={id} label={label} />;
+            return <FormSelectOption key={id} label={label} value={id} />;
           })}
         </FormSelect>
         {os && (
           <>
             <Checkbox
-              id="golden-os-checkbox-pvc-size-template"
               className="kv--create-upload__golden-switch"
-              isChecked={pvcSizeFromTemplate}
               data-checked-state={pvcSizeFromTemplate}
+              id="golden-os-checkbox-pvc-size-template"
+              isChecked={pvcSizeFromTemplate}
               label={t('Use template size PVC')}
               onChange={handlePvcSizeTemplate}
             />
             <Checkbox
-              id="golden-os-checkbox-cdrom-boot-source-template"
               className="kv--create-upload__golden-switch"
-              isChecked={!!mountAsCDROM}
               data-checked-state={!!mountAsCDROM}
+              id="golden-os-checkbox-cdrom-boot-source-template"
+              isChecked={!!mountAsCDROM}
               label={t('This is a CD-ROM boot source')}
               onChange={handleCDROMChange}
             />
@@ -103,7 +103,7 @@ const UploadPVCFormGoldenImage: React.FC<UploadPVCFormGoldenImageProps> = ({
       </div>
       {osImageExists && (
         <div className="form-group">
-          <Alert isInline variant="danger" title={t('Operating system source already defined')}>
+          <Alert isInline title={t('Operating system source already defined')} variant="danger">
             {t(
               'In order to add a new source for {{osName}} you will need to delete the following PVC:',
               { osName: os?.name },

@@ -7,10 +7,10 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk-interna
 import { TextArea } from '@patternfly/react-core';
 
 type DisplayNameModalProps = {
-  obj: K8sResourceCommon;
-  onSubmit: (displayName: string) => Promise<void | K8sResourceCommon>;
   isOpen: boolean;
+  obj: K8sResourceCommon;
   onClose: () => void;
+  onSubmit: (displayName: string) => Promise<K8sResourceCommon | void>;
 };
 
 const DisplayNameModal: React.FC<DisplayNameModalProps> = React.memo(
@@ -22,18 +22,18 @@ const DisplayNameModal: React.FC<DisplayNameModalProps> = React.memo(
 
     return (
       <TabModal
-        obj={obj}
-        onSubmit={() => onSubmit(displayName)}
-        isOpen={isOpen}
-        onClose={onClose}
         headerText={t('Edit Display name')}
+        isOpen={isOpen}
+        obj={obj}
+        onClose={onClose}
+        onSubmit={() => onSubmit(displayName)}
       >
         <TextArea
+          aria-label={t('display name text area')}
           autoFocus
-          value={displayName}
           onChange={setDisplayName}
           resizeOrientation="vertical"
-          aria-label={t('display name text area')}
+          value={displayName}
         />
       </TabModal>
     );

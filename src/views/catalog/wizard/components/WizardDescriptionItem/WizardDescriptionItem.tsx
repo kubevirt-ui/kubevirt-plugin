@@ -15,62 +15,62 @@ import {
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 type WizardDescriptionItemProps = {
-  /** title */
-  title: string;
-  /** description */
-  description?: ReactNode;
-  /** date-test-id of the description group */
-  testId?: string;
-  /** is the description group editable */
-  isEdit?: boolean;
-  /** show edit button besides title */
-  showEditOnTitle?: boolean;
-  /** onClick callback for the edit button */
-  onEditClick?: () => void;
-  /** disabled state of the description group */
-  isDisabled?: boolean;
-  /** count of items in the description list */
-  count?: number | string;
-  /** onClick callback for the title */
-  onTitleClick?: () => void;
-  /** helper popover. the popover will not be available if onTitleClick is present */
-  helperPopover?: {
-    header: ReactNode;
-    content: ReactNode;
-  };
   /** additional className */
   className?: string;
+  /** count of items in the description list */
+  count?: number | string;
+  /** description */
+  description?: ReactNode;
+  /** helper popover. the popover will not be available if onTitleClick is present */
+  helperPopover?: {
+    content: ReactNode;
+    header: ReactNode;
+  };
+  /** disabled state of the description group */
+  isDisabled?: boolean;
+  /** is the description group editable */
+  isEdit?: boolean;
   label?: ReactNode;
+  /** onClick callback for the edit button */
+  onEditClick?: () => void;
+  /** onClick callback for the title */
+  onTitleClick?: () => void;
+  /** show edit button besides title */
+  showEditOnTitle?: boolean;
+  /** date-test-id of the description group */
+  testId?: string;
+  /** title */
+  title: string;
 };
 
 export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
   ({
-    title,
+    className,
+    count,
     description,
+    helperPopover,
     isDisabled,
     isEdit,
-    showEditOnTitle,
-    helperPopover,
-    testId,
-    count,
-    className,
     label,
     onEditClick,
     onTitleClick,
+    showEditOnTitle,
+    testId,
+    title,
   }) => {
     const { t } = useKubevirtTranslation();
     const titleWithCount = title.concat(count ? ` (${count})` : '');
     const getItemHeader = () => {
       if (onTitleClick)
         return (
-          <Button isInline isDisabled={isDisabled} onClick={onTitleClick} variant="link">
+          <Button isDisabled={isDisabled} isInline onClick={onTitleClick} variant="link">
             <DescriptionListTerm>{titleWithCount}</DescriptionListTerm>
           </Button>
         );
 
       if (helperPopover) {
         return (
-          <Popover headerContent={helperPopover?.header} bodyContent={helperPopover?.content}>
+          <Popover bodyContent={helperPopover?.content} headerContent={helperPopover?.header}>
             <DescriptionListTermHelpTextButton> {title} </DescriptionListTermHelpTextButton>
           </Popover>
         );
@@ -95,10 +95,10 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
               <FlexItem>
                 <Button
                   data-test-id={`${testId}-edit`}
-                  type="button"
-                  isInline
                   isDisabled={isDisabled}
+                  isInline
                   onClick={onEditClick}
+                  type="button"
                   variant="link"
                 >
                   {t('Edit')}
@@ -112,10 +112,10 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
           <DescriptionListDescription>
             <Button
               data-test-id={`${testId}-edit`}
-              type="button"
-              isInline
               isDisabled={isDisabled}
+              isInline
               onClick={onEditClick}
+              type="button"
               variant="link"
             >
               {description ?? <span className="text-muted">{t('Not available')}</span>}

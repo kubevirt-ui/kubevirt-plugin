@@ -1,18 +1,18 @@
 import { BinaryUnit } from '@kubevirt-utils/utils/units';
 
 export type EditMigrationPolicyInitialState = {
-  migrationPolicyName: string;
   allowAutoConverge?: boolean;
   allowPostCopy?: boolean;
+  bandwidthPerMigration?: { unit: BinaryUnit; value: number };
   completionTimeoutPerGiB?: number;
-  bandwidthPerMigration?: { value: number; unit: BinaryUnit };
+  migrationPolicyName: string;
 };
 
 export type MigrationPolicyStateDispatch =
   | {
-      value: number;
       unit: BinaryUnit;
+      value: number;
     }
-  | number
   | boolean
+  | number
   | string;

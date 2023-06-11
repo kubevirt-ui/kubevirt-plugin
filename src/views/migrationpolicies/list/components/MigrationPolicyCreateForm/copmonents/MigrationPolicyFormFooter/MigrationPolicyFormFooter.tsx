@@ -37,7 +37,7 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
     setIsSubmitting(true);
     setError(undefined);
 
-    k8sCreate({ model: MigrationPolicyModel, data: migrationPolicy })
+    k8sCreate({ data: migrationPolicy, model: MigrationPolicyModel })
       .then(() => history.push(`${migrationPoliciesPageBaseURL}/${migrationPolicyName}`))
       .catch(setError)
       .finally(() => setIsSubmitting(false));
@@ -53,12 +53,12 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
     <Stack className="kv-tabmodal-footer" hasGutter>
       {error && (
         <StackItem>
-          <Alert isInline variant={AlertVariant.danger} title={t('An error occurred')}>
+          <Alert isInline title={t('An error occurred')} variant={AlertVariant.danger}>
             <Stack hasGutter>
               <StackItem>{error?.message}</StackItem>
               {error?.href && (
                 <StackItem>
-                  <a href={error.href} target="_blank" rel="noreferrer">
+                  <a href={error.href} rel="noreferrer" target="_blank">
                     {error.href}
                   </a>
                 </StackItem>
@@ -71,9 +71,9 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
         <ActionList>
           <ActionListItem>
             <Button
-              onClick={handleSubmit}
               isDisabled={isSubmitting}
               isLoading={isSubmitting}
+              onClick={handleSubmit}
               variant={ButtonVariant.primary}
             >
               {t('Create')}

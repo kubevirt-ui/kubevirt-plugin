@@ -9,24 +9,24 @@ import { DescriptionList } from '@patternfly/react-core';
 import { TemplateSchedulingGridProps } from './TemplateSchedulingLeftGrid';
 
 const TemplateSchedulingRightGrid: React.FC<TemplateSchedulingGridProps> = ({
-  template,
   editable,
+  template,
 }) => {
   const onSubmit = React.useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       }),
     [],
   );
 
   return (
     <DescriptionList>
-      <DedicatedResources template={template} editable={editable} onSubmit={onSubmit} />
-      <EvictionStrategy template={template} editable={editable} onSubmit={onSubmit} />
+      <DedicatedResources editable={editable} onSubmit={onSubmit} template={template} />
+      <EvictionStrategy editable={editable} onSubmit={onSubmit} template={template} />
     </DescriptionList>
   );
 };

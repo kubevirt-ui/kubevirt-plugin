@@ -33,10 +33,10 @@ const useInstanceTypesAndPreferences: UseInstanceTypeAndPreferences = () => {
 
   const errorState = !loaded || loadError || isEmpty(preferences) || isEmpty(instanceTypes);
   return {
-    preferences: errorState ? [] : preferences,
     instanceTypes: errorState ? [] : instanceTypes,
     loaded: loadError ? true : loaded,
     loadError,
+    preferences: errorState ? [] : preferences,
   };
 };
 

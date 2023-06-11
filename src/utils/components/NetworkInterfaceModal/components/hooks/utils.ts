@@ -13,15 +13,15 @@ const resources = {
     isList: true,
     namespace: DEFAULT_NAMESPACE,
   },
-  OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS: {
-    groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
-    isList: true,
-    namespace: OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
-  },
   OPENSHIFT_MULTUS_NS: {
     groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
     isList: true,
     namespace: OPENSHIFT_MULTUS_NS,
+  },
+  OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS: {
+    groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
+    isList: true,
+    namespace: OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
   },
 };
 

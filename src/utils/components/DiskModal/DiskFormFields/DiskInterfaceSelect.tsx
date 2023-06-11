@@ -30,15 +30,15 @@ const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
 
   const onSelect = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
     setIsOpen(false);
-    dispatchDiskState({ type: diskReducerActions.SET_DISK_INTERFACE, payload: value });
+    dispatchDiskState({ payload: value, type: diskReducerActions.SET_DISK_INTERFACE });
   };
 
   React.useEffect(() => {
     // only SCSI is supported for hotplug
     if (isVMRunning && diskInterface !== interfaceTypes.SCSI) {
       dispatchDiskState({
-        type: diskReducerActions.SET_DISK_INTERFACE,
         payload: interfaceTypes.SCSI,
+        type: diskReducerActions.SET_DISK_INTERFACE,
       });
     }
   }, [dispatchDiskState, isVMRunning, diskInterface]);
@@ -47,40 +47,40 @@ const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
     // virtio is not supported for CDROM
     if (isCDROMType && diskInterface === interfaceTypes.VIRTIO) {
       dispatchDiskState({
-        type: diskReducerActions.SET_DISK_INTERFACE,
         payload: interfaceTypes.SATA,
+        type: diskReducerActions.SET_DISK_INTERFACE,
       });
     }
   }, [diskInterface, dispatchDiskState, isCDROMType]);
   return (
     <>
       <FormGroup
-        label={t('Interface')}
         fieldId="disk-interface"
         helperText={t('Hot plug is enabled only for "SCSI" interface')}
         isRequired
+        label={t('Interface')}
       >
         <div data-test-id="disk-interface-select">
           <Select
-            menuAppendTo="parent"
-            isOpen={isOpen}
-            onToggle={setIsOpen}
-            onSelect={onSelect}
-            variant={SelectVariant.single}
-            selections={diskInterface}
             direction="up"
+            isOpen={isOpen}
+            menuAppendTo="parent"
+            onSelect={onSelect}
+            onToggle={setIsOpen}
+            selections={diskInterface}
+            variant={SelectVariant.single}
           >
-            {interfaceOptions.map(({ id, description, name }) => {
+            {interfaceOptions.map(({ description, id, name }) => {
               const isDisabled =
                 (isVMRunning && id !== interfaceTypes.SCSI) ||
                 (isCDROMType && id === interfaceTypes.VIRTIO);
               return (
                 <SelectOption
-                  key={id}
-                  value={id}
+                  data-test-id={`disk-interface-select-${id}`}
                   description={description}
                   isDisabled={isDisabled}
-                  data-test-id={`disk-interface-select-${id}`}
+                  key={id}
+                  value={id}
                 >
                   {name}
                 </SelectOption>

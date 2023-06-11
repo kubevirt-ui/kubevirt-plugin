@@ -28,13 +28,13 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
 }) => {
   const { t } = useKubevirtTranslation();
   const {
-    templates,
-    loaded,
-    error,
-    availableTemplatesUID,
     availableDatasources,
-    cloneInProgressDatasources,
+    availableTemplatesUID,
     bootSourcesLoaded,
+    cloneInProgressDatasources,
+    error,
+    loaded,
+    templates,
   } = useTemplatesWithAvailableSource({
     namespace,
     onlyAvailable: false,
@@ -63,36 +63,36 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
           </StackItem>
           <StackItem>
             <ListPageFilter
-              data={data}
-              loaded={templatesLoaded}
-              rowFilters={filters}
-              onFilterChange={onFilterChange}
               columnLayout={{
-                columns: columns?.map(({ id, title, additional }) => ({
+                columns: columns?.map(({ additional, id, title }) => ({
+                  additional,
                   id,
                   title,
-                  additional,
                 })),
                 id: modelToRef(TemplateModel),
                 selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
                 type: t('Template'),
               }}
+              data={data}
+              loaded={templatesLoaded}
+              onFilterChange={onFilterChange}
+              rowFilters={filters}
             />
             <VirtualizedTable<
               K8sResourceCommon,
               {
-                availableTemplatesUID: Set<string>;
                 availableDatasources: Record<string, V1beta1DataSource>;
+                availableTemplatesUID: Set<string>;
                 cloneInProgressDatasources: Record<string, V1beta1DataSource>;
               }
             >
+              columns={activeColumns}
               data={filteredData}
-              unfilteredData={data}
               loaded={templatesLoaded}
               loadError={error}
-              columns={activeColumns}
               Row={VirtualMachineTemplatesRow}
-              rowData={{ availableTemplatesUID, availableDatasources, cloneInProgressDatasources }}
+              rowData={{ availableDatasources, availableTemplatesUID, cloneInProgressDatasources }}
+              unfilteredData={data}
             />
           </StackItem>
         </Stack>

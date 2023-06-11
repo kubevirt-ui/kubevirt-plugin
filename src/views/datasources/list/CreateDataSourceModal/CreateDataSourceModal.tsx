@@ -13,11 +13,11 @@ import { CreateDataSourceForm } from './CreateDataSourceForm';
 import { createDataSourceWithImportCron, generateDataSourceName } from './utils';
 
 export type CreateDataSourceModalFormType = {
+  importsToKeep: number;
   name: string;
+  schedule: string;
   size: string;
   url: string;
-  importsToKeep: number;
-  schedule: string;
 };
 
 type CreateDataSourceModalProps = {
@@ -35,16 +35,16 @@ export const CreateDataSourceModal: React.FC<CreateDataSourceModalProps> = ({
   const history = useHistory();
 
   const {
-    register,
     formState: { errors },
+    handleSubmit,
+    register,
     setValue,
     watch,
-    handleSubmit,
   } = useForm<CreateDataSourceModalFormType>({
     defaultValues: {
+      importsToKeep: 3,
       name: generateDataSourceName(),
       size: '30Gi',
-      importsToKeep: 3,
     },
   });
   const importsToKeep = watch('importsToKeep');
@@ -55,8 +55,8 @@ export const CreateDataSourceModal: React.FC<CreateDataSourceModalProps> = ({
     (data) =>
       createDataSourceWithImportCron({
         ...data,
-        url: data?.url?.includes('docker://') ? data?.url : 'docker://' + data?.url,
         namespace: namespace || DEFAULT_NAMESPACE,
+        url: data?.url?.includes('docker://') ? data?.url : 'docker://' + data?.url,
       }).then(() =>
         history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/${name}`),
       ),
@@ -65,10 +65,10 @@ export const CreateDataSourceModal: React.FC<CreateDataSourceModalProps> = ({
 
   return (
     <TabModal
+      headerText={t('Create DataSource')}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => onSubmit()}
-      headerText={t('Create DataSource')}
     >
       <Stack hasGutter>
         <StackItem>
@@ -80,11 +80,11 @@ export const CreateDataSourceModal: React.FC<CreateDataSourceModalProps> = ({
         </StackItem>
         <StackItem>
           <CreateDataSourceForm
-            size={size}
-            importsToKeep={importsToKeep}
-            setValue={setValue}
-            register={register}
             errors={errors}
+            importsToKeep={importsToKeep}
+            register={register}
+            setValue={setValue}
+            size={size}
           />
         </StackItem>
       </Stack>

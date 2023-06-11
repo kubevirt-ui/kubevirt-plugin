@@ -10,10 +10,10 @@ export type MigrationTableDataLayout = {
   metadata: {
     name: string;
   };
+  migrationsDefaultConfigurations?: V1MigrationConfiguration;
+  mpObj?: V1alpha1MigrationPolicy;
   vmim: V1VirtualMachineInstanceMigration;
   vmiObj: V1VirtualMachineInstance;
-  mpObj?: V1alpha1MigrationPolicy;
-  migrationsDefaultConfigurations?: V1MigrationConfiguration;
 };
 export const getFilteredDurationVMIMS = (
   vmims: V1VirtualMachineInstanceMigration[],
@@ -53,10 +53,10 @@ export const getMigrationsTableData = (
 
     return {
       metadata: { name: vmim?.metadata?.name },
+      migrationsDefaultConfigurations,
+      mpObj,
       vmim,
       vmiObj,
-      mpObj,
-      migrationsDefaultConfigurations,
     };
   });
 

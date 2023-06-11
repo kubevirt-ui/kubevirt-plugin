@@ -29,7 +29,7 @@ export const CloudInitDescription: React.FC<{ vm: V1VirtualMachine }> = ({ vm })
         <CloudInitInfoHelper />
       </StackItem>
       <StackItem>
-        <DescriptionList isCompact columnModifier={{ lg: '1Col', xl: '3Col' }}>
+        <DescriptionList columnModifier={{ lg: '1Col', xl: '3Col' }} isCompact>
           <DescriptionListGroup>
             <DescriptionListTerm>{t('User')}</DescriptionListTerm>
             <DescriptionListDescription>{userData?.user || '-'}</DescriptionListDescription>

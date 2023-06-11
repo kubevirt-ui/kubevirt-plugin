@@ -105,10 +105,10 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
     });
 
     return k8sUpdate({
-      model: TemplateModel,
       data: newTemplate,
-      ns: getNamespace(newTemplate),
+      model: TemplateModel,
       name: getName(newTemplate),
+      ns: getNamespace(newTemplate),
     });
   };
 
@@ -124,19 +124,19 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
             </FlexItem>
             <FlexItem>
               <Button
-                type="button"
-                isInline
-                isDisabled={!isTemplateEditable}
                 onClick={() =>
                   createModal((modalProps) => (
                     <SSHSecretModal
                       {...modalProps}
                       initialSSHSecretDetails={initialSSHDetails}
-                      onSubmit={onSubmit}
                       namespace={getNamespace(template)}
+                      onSubmit={onSubmit}
                     />
                   ))
                 }
+                isDisabled={!isTemplateEditable}
+                isInline
+                type="button"
                 variant={ButtonVariant.link}
               >
                 {t('Edit')}

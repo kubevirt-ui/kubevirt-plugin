@@ -28,7 +28,7 @@ import { removeSSHKeyObject, updateSSHKeyObject } from './sshkey-utils';
 
 const SSHKey: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { vm, tabsData, updateVM, updateTabsData } = useWizardVMContext();
+  const { tabsData, updateTabsData, updateVM, vm } = useWizardVMContext();
   const { createModal } = useModal();
 
   const sshSecretToCreate: IoK8sApiCoreV1Secret = useMemo(
@@ -82,15 +82,10 @@ const SSHKey: FC = () => {
 
   return (
     <WizardDescriptionItem
-      testId="wizard-sshkey"
-      title={t('Authorized SSH key')}
-      isEdit
-      label={<LinuxLabel />}
-      showEditOnTitle
       description={
         <Stack hasGutter>
           <div data-test="ssh-popover">
-            <Trans t={t} ns="plugin__kubevirt-plugin">
+            <Trans ns="plugin__kubevirt-plugin" t={t}>
               <Text component={TextVariants.p}>Store the key in a project secret.</Text>
               <Text component={TextVariants.p}>
                 The key will be stored after the machine is created
@@ -105,11 +100,16 @@ const SSHKey: FC = () => {
           <SSHSecretModal
             {...modalProps}
             initialSSHSecretDetails={initialSSHDetails}
-            onSubmit={onSubmit}
             namespace={getNamespace(vm)}
+            onSubmit={onSubmit}
           />
         ))
       }
+      isEdit
+      label={<LinuxLabel />}
+      showEditOnTitle
+      testId="wizard-sshkey"
+      title={t('Authorized SSH key')}
     />
   );
 };

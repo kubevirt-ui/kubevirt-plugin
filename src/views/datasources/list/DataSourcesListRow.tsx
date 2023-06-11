@@ -11,8 +11,8 @@ import DataSourceActions from '../actions/DataSourceActions';
 import { getDataSourceCronJob, getDataSourceLastUpdated } from '../utils';
 
 export const DataSourcesListRow: React.FC<RowProps<V1beta1DataSource>> = ({
-  obj,
   activeColumnIDs,
+  obj,
 }) => {
   const { t } = useKubevirtTranslation();
   const importCron = getDataSourceCronJob(obj);
@@ -20,29 +20,29 @@ export const DataSourcesListRow: React.FC<RowProps<V1beta1DataSource>> = ({
 
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="name">
         <ResourceLink
           groupVersionKind={modelToGroupVersionKind(DataSourceModel)}
           name={obj.metadata.name}
           namespace={obj.metadata.namespace}
         />
       </TableData>
-      <TableData id="namespace" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id="namespace">
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
       </TableData>
-      <TableData id="created" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="created">
         <Timestamp timestamp={obj?.metadata?.creationTimestamp} />
       </TableData>
-      <TableData id="updated" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="updated">
         <Timestamp timestamp={lastUpdated} />
       </TableData>
-      <TableData id="import-cron" activeColumnIDs={activeColumnIDs} className="pf-m-width-10">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id="import-cron">
         {importCron ? t('Yes') : t('No')}
       </TableData>
       <TableData
-        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
+        id=""
       >
         <DataSourceActions dataSource={obj} isKebabToggle />
       </TableData>

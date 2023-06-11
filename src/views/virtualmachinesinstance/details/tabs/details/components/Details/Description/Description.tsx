@@ -25,7 +25,6 @@ const Description: React.FC<DescriptionProps> = ({ vmi }) => {
       <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
       <DescriptionListDescription>
         <Button
-          isInline
           onClick={() =>
             createModal((props) => (
               <DescriptionModal
@@ -33,8 +32,6 @@ const Description: React.FC<DescriptionProps> = ({ vmi }) => {
                 {...props}
                 onSubmit={(description) =>
                   k8sPatch({
-                    model: VirtualMachineInstanceModel,
-                    resource: vmi,
                     data: [
                       {
                         op: 'replace',
@@ -42,15 +39,18 @@ const Description: React.FC<DescriptionProps> = ({ vmi }) => {
                         value: description,
                       },
                     ],
+                    model: VirtualMachineInstanceModel,
+                    resource: vmi,
                   })
                 }
               />
             ))
           }
-          variant="link"
+          className="Description--edit-button"
           icon={<PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />}
           iconPosition={'right'}
-          className="Description--edit-button"
+          isInline
+          variant="link"
         >
           {vmi?.metadata?.annotations?.description ?? <MutedTextSpan text={t('Not available')} />}
         </Button>

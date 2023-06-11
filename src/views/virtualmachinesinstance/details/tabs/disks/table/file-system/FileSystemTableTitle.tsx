@@ -14,8 +14,8 @@ const FileSystemTableTitle = () => {
         bodyContent={t(
           'The following information regarding how the disks are partitioned is provided by the guest agent.',
         )}
-        position={PopoverPosition.right}
         helpIconClassName="title-help-text-icon"
+        position={PopoverPosition.right}
       />
     </Title>
   );

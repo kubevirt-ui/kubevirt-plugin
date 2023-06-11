@@ -40,8 +40,8 @@ export const getEmptyVMDataVolumeResource = (
     apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
     kind: DataVolumeModel.kind,
     metadata: {
-      namespace: vm?.metadata?.namespace,
       name: '',
+      namespace: vm?.metadata?.namespace,
       ...(createOwnerReference
         ? { ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })] }
         : {}),
@@ -81,18 +81,18 @@ export const produceVMDisks = (
 export const requiresDataVolume = (diskSource: string): boolean => {
   return [
     sourceTypes.BLANK,
-    sourceTypes.HTTP,
     sourceTypes.CLONE_PVC,
-    sourceTypes.REGISTRY,
     sourceTypes.DATA_SOURCE,
+    sourceTypes.HTTP,
+    sourceTypes.REGISTRY,
   ].includes(diskSource);
 };
 
 export const getDiskFromState = (diskState: DiskFormState): V1Disk => ({
-  name: diskState.diskName,
   [diskState.diskType]: {
     bus: diskState.diskInterface,
   },
+  name: diskState.diskName,
 });
 
 export const getVolumeFromState = (
@@ -126,17 +126,17 @@ export const getVolumeFromState = (
 };
 
 export const getDataVolumeFromState = ({
-  vm,
-  diskState,
-  diskSourceState,
-  resultVolume,
   createOwnerReference = true,
+  diskSourceState,
+  diskState,
+  resultVolume,
+  vm,
 }: {
-  vm: V1VirtualMachine;
-  diskState: DiskFormState;
-  diskSourceState: DiskSourceState;
-  resultVolume?: V1Volume;
   createOwnerReference?: boolean;
+  diskSourceState: DiskSourceState;
+  diskState: DiskFormState;
+  resultVolume?: V1Volume;
+  vm: V1VirtualMachine;
 }): V1beta1DataVolume => {
   const dataVolume = getEmptyVMDataVolumeResource(vm, createOwnerReference);
   const dvName =
@@ -215,7 +215,7 @@ export const getDataVolumeHotplugPromise = (
     },
   };
 
-  return k8sCreate({ model: DataVolumeModel, data: resultDataVolume }).then(() =>
+  return k8sCreate({ data: resultDataVolume, model: DataVolumeModel }).then(() =>
     addPersistentVolume(vm, bodyRequestAddVolume),
   ) as Promise<void>;
 };

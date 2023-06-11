@@ -22,17 +22,17 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form } from '@patternfly/react-core';
 
 type NodeSelectorModalProps = {
-  template: V1Template;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedTemplate: V1Template) => Promise<V1Template | void>;
+  template: V1Template;
 };
 
 const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
-  template,
   isOpen,
   onClose,
   onSubmit,
+  template,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -76,11 +76,11 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
 
   return (
     <TabModal
-      obj={updatedTemplate}
+      headerText={t('Node selector')}
       isOpen={isOpen}
+      obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Node selector')}
     >
       <Form>
         <LabelsList
@@ -103,8 +103,8 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
         </LabelsList>
         {!isEmpty(nodes) && (
           <NodeCheckerAlert
-            qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
             nodesLoaded={nodesLoaded}
+            qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
           />
         )}
       </Form>

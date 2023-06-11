@@ -17,27 +17,27 @@ import { HotplugLabel } from './HotplugLabel';
 
 const DiskRow: React.FC<
   RowProps<DiskRowDataLayout, { vm: V1VirtualMachine; vmi?: V1VirtualMachineInstance }>
-> = ({ obj, activeColumnIDs, rowData: { vm, vmi } }) => {
+> = ({ activeColumnIDs, obj, rowData: { vm, vmi } }) => {
   const { t } = useKubevirtTranslation();
   const isPVCSource = ![CONTAINER_EPHERMAL, OTHER].includes(obj?.source);
 
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="name">
         <Stack>
           <StackItem>
-            {obj?.name} <HotplugLabel vm={vm} diskName={obj?.name} vmi={vmi} />
+            {obj?.name} <HotplugLabel diskName={obj?.name} vm={vm} vmi={vmi} />
           </StackItem>
           {obj?.isBootDisk && (
             <StackItem>
-              <Label variant="filled" color="blue" className="disk-row-label-bootable">
+              <Label className="disk-row-label-bootable" color="blue" variant="filled">
                 {t('bootable')}
               </Label>
             </StackItem>
           )}
           {obj?.isEnvDisk && (
             <StackItem>
-              <Label variant="filled" color="blue">
+              <Label color="blue" variant="filled">
                 {t('environment disk')}
               </Label>
             </StackItem>
@@ -45,7 +45,7 @@ const DiskRow: React.FC<
         </Stack>
       </TableData>
 
-      <TableData id="source" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="source">
         {isPVCSource ? (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
@@ -56,24 +56,24 @@ const DiskRow: React.FC<
           obj?.source
         )}
       </TableData>
-      <TableData id="size" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="size">
         {readableSizeUnit(obj?.size)}
       </TableData>
-      <TableData id="drive" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="drive">
         {obj?.drive}
       </TableData>
-      <TableData id="interface" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="interface">
         {obj?.interface}
       </TableData>
-      <TableData id="storage-class" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="storage-class">
         {obj?.storageClass}
       </TableData>
       <TableData
-        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
+        id=""
       >
-        <DiskRowActions vm={vm} diskName={obj?.name} pvcResourceExists={isPVCSource} vmi={vmi} />
+        <DiskRowActions diskName={obj?.name} pvcResourceExists={isPVCSource} vm={vm} vmi={vmi} />
       </TableData>
     </>
   );

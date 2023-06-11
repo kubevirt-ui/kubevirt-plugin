@@ -18,7 +18,7 @@ const MoreInformationDefault: React.FC<MoreInformationDefaultProps> = ({ textMor
   return (
     <>
       {textMoreInfoContent || (
-        <Trans t={t} ns="plugin__kubevirt-plugin">
+        <Trans ns="plugin__kubevirt-plugin" t={t}>
           <p>
             Clicking &quot;Launch Remote Viewer&quot; will download a .vv file and launch{' '}
             <i>Remote Viewer</i>
@@ -40,8 +40,8 @@ const MoreInformationDefault: React.FC<MoreInformationDefaultProps> = ({ textMor
               {t('Download the MSI from ')}
               <a
                 href="https://virt-manager.org/download/"
-                target="_blank"
                 rel="noopener noreferrer"
+                target="_blank"
               >
                 virt-manager.org
               </a>

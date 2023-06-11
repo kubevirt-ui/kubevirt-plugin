@@ -28,15 +28,15 @@ const CPUMemory: FC<TolerationsProps> = ({ vmi }) => {
     <>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('CPU | Memory')}
           bodyContent={
             <CPUDescription
               cpu={vmi?.spec?.domain?.cpu}
               helperTextResource={CpuMemHelperTextResources.VMI}
             />
           }
+          hasAutoWidth
+          headerContent={t('CPU | Memory')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('CPU | Memory')}</DescriptionListTermHelpTextButton>
         </Popover>

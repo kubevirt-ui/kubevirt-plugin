@@ -19,32 +19,32 @@ export type NetworkAttachmentDefinitionKind = {
 } & K8sResourceKind;
 
 export type InventoryCardResources = {
+  nads: NetworkAttachmentDefinitionKind[];
+  nodes: IoK8sApiCoreV1Node[];
   vms: V1VirtualMachine[];
   vmTemplates: V1Template[];
-  nodes: IoK8sApiCoreV1Node[];
-  nads: NetworkAttachmentDefinitionKind[];
 };
 
 export type VMILikeEntityKind = V1VirtualMachine | V1VirtualMachineInstance;
-export type VMLikeEntityKind = V1VirtualMachine | V1Template;
-export type VMGenericLikeEntityKind = VMLikeEntityKind | VMILikeEntityKind;
+export type VMLikeEntityKind = V1Template | V1VirtualMachine;
+export type VMGenericLikeEntityKind = VMILikeEntityKind | VMLikeEntityKind;
 
 export type TemplateItem = {
+  isCommon: boolean;
   metadata: {
     name: string;
-    uid: string;
     namespace: string;
+    uid: string;
   };
-  isCommon: boolean;
   variants: V1Template[];
 };
 
 export type VirtualMachineTemplateBundle = {
-  template?: TemplateItem;
   customizeTemplate?: {
-    vm: V1VirtualMachine;
     template: V1Template;
+    vm: V1VirtualMachine;
   };
+  template?: TemplateItem;
 };
 
 export type Flatten<

@@ -25,33 +25,33 @@ import WorkloadExpressionDescriptionText from './components/WorkloadExpressionDe
 
 export type useIDEntitiesValue = {
   entities: AffinityLabel[];
-  setEntities: React.Dispatch<React.SetStateAction<AffinityLabel[]>>;
+  initialEntitiesChanged: boolean;
   onEntityAdd: (newEntity: AffinityLabel) => void;
   onEntityChange: (updatedEntity: AffinityLabel) => void;
   onEntityDelete: (idToDelete: number) => void;
-  initialEntitiesChanged: boolean;
+  setEntities: React.Dispatch<React.SetStateAction<AffinityLabel[]>>;
 };
 
 type AffinityFormProps = {
-  focusedAffinity: AffinityRowData;
-  setFocusedAffinity: React.Dispatch<React.SetStateAction<AffinityRowData>>;
-  setSubmitDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   expressions: useIDEntitiesValue;
   fields: useIDEntitiesValue;
-  qualifiedNodes: IoK8sApiCoreV1Node[];
-  nodesLoaded: boolean;
+  focusedAffinity: AffinityRowData;
   isSubmitDisabled: boolean;
+  nodesLoaded: boolean;
+  qualifiedNodes: IoK8sApiCoreV1Node[];
+  setFocusedAffinity: React.Dispatch<React.SetStateAction<AffinityRowData>>;
+  setSubmitDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const AffinityForm: React.FC<AffinityFormProps> = ({
-  focusedAffinity,
-  setFocusedAffinity,
-  setSubmitDisabled,
   expressions,
   fields,
-  qualifiedNodes,
-  nodesLoaded,
+  focusedAffinity,
   isSubmitDisabled,
+  nodesLoaded,
+  qualifiedNodes,
+  setFocusedAffinity,
+  setSubmitDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -96,28 +96,28 @@ const AffinityForm: React.FC<AffinityFormProps> = ({
       )}
       <Divider />
       <ExpressionEditList
-        expressions={expressions}
-        label={isNodeAffinity ? t('Node labels') : t('Workload labels')}
-        helperText={
-          isNodeAffinity ? <NodeExpressionDescriptionText /> : <WorkloadExpressionDescriptionText />
-        }
         errorHelperText={t('Missing fields in {{kind}} labels', {
           kind: isNodeAffinity ? 'Node' : 'Workload',
         })}
+        helperText={
+          isNodeAffinity ? <NodeExpressionDescriptionText /> : <WorkloadExpressionDescriptionText />
+        }
+        expressions={expressions}
+        label={isNodeAffinity ? t('Node labels') : t('Workload labels')}
       />
       {isNodeAffinity && (
         <>
           <Divider />
           <FieldsEditList
-            fields={fields}
-            label={t('Node fields')}
-            helperText={<NodeFieldsDescriptionText />}
             errorHelperText={t('Missing fields in Node fields')}
+            fields={fields}
+            helperText={<NodeFieldsDescriptionText />}
+            label={t('Node fields')}
           />
         </>
       )}
       {isNodeAffinity && nodesLoaded && !isSubmitDisabled && (
-        <NodeCheckerAlert qualifiedNodes={qualifiedNodes} nodesLoaded={nodesLoaded} />
+        <NodeCheckerAlert nodesLoaded={nodesLoaded} qualifiedNodes={qualifiedNodes} />
       )}
     </Form>
   );

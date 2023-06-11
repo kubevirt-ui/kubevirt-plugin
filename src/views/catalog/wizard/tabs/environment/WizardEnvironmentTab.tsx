@@ -7,7 +7,7 @@ import { Bullseye, PageSection } from '@patternfly/react-core';
 
 import './wizard-environment-tab.scss';
 
-const WizardEnvironmentTab: WizardTab = ({ vm, updateVM, setDisableVmCreate }) => {
+const WizardEnvironmentTab: WizardTab = ({ setDisableVmCreate, updateVM, vm }) => {
   if (!vm)
     return (
       <Bullseye>
@@ -17,7 +17,7 @@ const WizardEnvironmentTab: WizardTab = ({ vm, updateVM, setDisableVmCreate }) =
 
   return (
     <PageSection className="wizard-environment-tab">
-      <EnvironmentForm vm={vm} onEditChange={setDisableVmCreate} updateVM={updateVM} />
+      <EnvironmentForm onEditChange={setDisableVmCreate} updateVM={updateVM} vm={vm} />
     </PageSection>
   );
 };

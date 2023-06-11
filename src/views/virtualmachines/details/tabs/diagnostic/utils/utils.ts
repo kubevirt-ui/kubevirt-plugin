@@ -13,7 +13,7 @@ export const volumeSnapshotStatusesTransformer = (
   return volumeSnapshotStatuses.map((vss) => {
     const copyVSS: VirtualizationVolumeSnapshotStatus = {
       ...vss,
-      metadata: { type: 'Storage', condition: 'Other' },
+      metadata: { condition: 'Other', type: 'Storage' },
     };
     copyVSS.status = vss?.enabled;
     const index = vss?.reason?.indexOf(':');
@@ -42,9 +42,9 @@ export const conditionsTransformer = (
       ...condition,
       id,
       metadata: {
+        condition: condition?.status === 'False' ? 'Error' : 'Other',
         name: condition?.reason || condition?.type,
         type: 'VirtualMachines',
-        condition: condition?.status === 'False' ? 'Error' : 'Other',
       },
     };
     return copyConditions;

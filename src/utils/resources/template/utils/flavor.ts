@@ -13,8 +13,8 @@ import {
  */
 export const parseCPU = (cpu: V1CPU): V1CPU => {
   return {
-    sockets: cpu?.sockets || 1,
     cores: cpu?.cores || 1,
+    sockets: cpu?.sockets || 1,
     threads: cpu?.threads || 1,
   };
 };
@@ -35,8 +35,8 @@ export const vCPUCount = (cpu: V1CPU): number => {
 export const getFlavorData = (
   template: V1Template,
 ): {
-  flavor: string;
   cpuCount: number;
+  flavor: string;
   memory: string;
 } => {
   const cpu = getTemplateVirtualMachineCPU(template);
@@ -49,8 +49,8 @@ export const getFlavorData = (
   const flavor = getTemplateFlavor(template);
 
   return {
-    flavor,
     cpuCount,
+    flavor,
     memory,
   };
 };
@@ -84,8 +84,8 @@ export const getVmCPUMemory = (
 export const getTemplateFlavorData = (
   template: V1Template,
 ): {
-  flavor: string;
   cpuCount: number;
+  flavor: string;
   memory: string;
 } => {
   const flavor = getTemplateFlavor(template);

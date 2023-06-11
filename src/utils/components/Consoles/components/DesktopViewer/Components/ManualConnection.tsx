@@ -8,21 +8,21 @@ import { ManualConnectionProps } from '../utils/types';
 import Detail from './Detail';
 
 const ManualConnection: React.FunctionComponent<ManualConnectionProps> = ({
-  spice = null,
-  vnc = null,
   rdp = null,
+  spice = null,
+  textAddress,
+  textConnectWith,
   textManualConnection,
   textNoProtocol,
-  textConnectWith,
-  textAddress,
-  textSpiceAddress,
-  textVNCAddress,
-  textSpicePort,
-  textVNCPort,
-  textSpiceTlsPort,
-  textVNCTlsPort,
-  textRDPPort,
   textRdpAddress,
+  textRDPPort,
+  textSpiceAddress,
+  textSpicePort,
+  textSpiceTlsPort,
+  textVNCAddress,
+  textVNCPort,
+  textVNCTlsPort,
+  vnc = null,
 }) => {
   const { t } = useKubevirtTranslation();
   const msg =

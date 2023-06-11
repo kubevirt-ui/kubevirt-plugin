@@ -1,57 +1,57 @@
 import { NETWORK } from '@virtualmachines/utils';
 
 export enum VirtualMachineDetailsTab {
-  Overview = '',
+  Configurations = 'configurations',
+  Console = 'console',
   Details = 'details',
-  Metrics = 'metrics',
-  YAML = 'yaml',
-  Scheduling = 'scheduling',
+  Diagnostics = 'diagnostics',
+  Disks = 'disks',
   Environment = 'environment',
   Events = 'events',
-  Console = 'console',
+  Metrics = 'metrics',
   NetworkInterfaces = 'network-interfaces',
-  Disks = 'disks',
-  Snapshots = 'snapshots',
+  Overview = '',
+  Scheduling = 'scheduling',
   Scripts = 'scripts',
-  Diagnostics = 'diagnostics',
-  Configurations = 'configurations',
+  Snapshots = 'snapshots',
+  YAML = 'yaml',
 }
 
 export const VirtualMachineConfigurationTabInner = {
-  [VirtualMachineDetailsTab.Scripts]: VirtualMachineDetailsTab.Scripts,
   [VirtualMachineDetailsTab.Disks]: VirtualMachineDetailsTab.Disks,
-  [VirtualMachineDetailsTab.Scheduling]: VirtualMachineDetailsTab.Scheduling,
-  [VirtualMachineDetailsTab.NetworkInterfaces]: NETWORK,
   [VirtualMachineDetailsTab.Environment]: VirtualMachineDetailsTab.Environment,
+  [VirtualMachineDetailsTab.NetworkInterfaces]: NETWORK,
+  [VirtualMachineDetailsTab.Scheduling]: VirtualMachineDetailsTab.Scheduling,
+  [VirtualMachineDetailsTab.Scripts]: VirtualMachineDetailsTab.Scripts,
 };
 
 export enum VirtualMachineDetailsTabLabel {
-  // t('Overview')
-  Overview = 'Overview',
+  // t('Configuration')
+  Configuration = 'Configuration',
+  // t('Console')
+  Console = 'Console',
   // t('Details')
   Details = 'Details',
-  // t('Metrics')
-  Metrics = 'Metrics',
-  // t('YAML')
-  YAML = 'YAML',
-  // t('Scheduling')
-  Scheduling = 'Scheduling',
+  // t('Diagnostics')
+  Diagnostics = 'Diagnostics',
+  // t('Disks')
+  Disks = 'Disks',
   // t('Environment')
   Environment = 'Environment',
   // t('Events')
   Events = 'Events',
-  // t('Console')
-  Console = 'Console',
+  // t('Metrics')
+  Metrics = 'Metrics',
   // t('Network interfaces')
   NetworkInterfaces = 'Network interfaces',
-  // t('Disks')
-  Disks = 'Disks',
-  // t('Snapshots')
-  Snapshots = 'Snapshots',
+  // t('Overview')
+  Overview = 'Overview',
+  // t('Scheduling')
+  Scheduling = 'Scheduling',
   // t('Scripts')
   Scripts = 'Scripts',
-  // t('Diagnostics')
-  Diagnostics = 'Diagnostics',
-  // t('Configuration')
-  Configuration = 'Configuration',
+  // t('Snapshots')
+  Snapshots = 'Snapshots',
+  // t('YAML')
+  YAML = 'YAML',
 }

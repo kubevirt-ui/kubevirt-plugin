@@ -12,14 +12,14 @@ import {
 
 type ScriptsTabFooterProps = {
   isSaveDisabled?: boolean;
-  onSave: () => Promise<void>;
   onReload: () => void;
+  onSave: () => Promise<void>;
 };
 
 const ScriptsTabFooter: React.FC<ScriptsTabFooterProps> = ({
   isSaveDisabled,
-  onSave,
   onReload,
+  onSave,
 }) => {
   const { t } = useKubevirtTranslation();
   const [success, setSuccess] = React.useState(false);
@@ -49,22 +49,22 @@ const ScriptsTabFooter: React.FC<ScriptsTabFooterProps> = ({
       <StackItem>
         {apiError && (
           <Alert
-            isInline
-            className="co-alert co-alert--scrollable"
-            variant="danger"
-            title={t('An error occurred')}
             actionClose={<AlertActionCloseButton onClose={_closeError} />}
+            className="co-alert co-alert--scrollable"
+            isInline
+            title={t('An error occurred')}
+            variant="danger"
           >
             <div className="co-pre-line">{apiError?.message}</div>
           </Alert>
         )}
         {success && (
           <Alert
-            isInline
-            className="co-alert"
-            variant="success"
-            title={t('Success')}
             actionClose={<AlertActionCloseButton onClose={() => setSuccess(false)} />}
+            className="co-alert"
+            isInline
+            title={t('Success')}
+            variant="success"
           />
         )}
       </StackItem>
@@ -72,14 +72,14 @@ const ScriptsTabFooter: React.FC<ScriptsTabFooterProps> = ({
         <ActionGroup className="pf-c-form">
           <Button
             isDisabled={isSaveDisabled}
+            isLoading={loading}
+            onClick={_onSave}
             type="submit"
             variant="primary"
-            onClick={_onSave}
-            isLoading={loading}
           >
             {t('Save')}
           </Button>
-          <Button type="button" variant="secondary" onClick={onReload}>
+          <Button onClick={onReload} type="button" variant="secondary">
             {t('Reload')}
           </Button>
         </ActionGroup>

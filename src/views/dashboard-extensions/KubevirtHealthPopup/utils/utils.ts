@@ -3,6 +3,6 @@ export const ALERTS_BASE_PATH =
 
 export const alertTypeToColorMap = {
   critical: '#C9190B',
-  warning: '#F0AB00',
   info: '#2B9AF3',
+  warning: '#F0AB00',
 };

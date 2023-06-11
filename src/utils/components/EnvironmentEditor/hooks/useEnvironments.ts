@@ -15,17 +15,17 @@ import {
 } from '../utils';
 
 type UseEnvironmentsType = {
-  onEnvironmentRemove: (diskName: string) => void;
+  edited: boolean;
+  environments: EnvironmentVariable[];
+  error: Error;
+  onEnvironmentAdd: () => void;
   onEnvironmentChange: (
     value: string,
     serial: string,
     kind: EnvironmentKind,
     diskName: string,
   ) => void;
-  onEnvironmentAdd: () => void;
-  edited: boolean;
-  environments: EnvironmentVariable[];
-  error: Error;
+  onEnvironmentRemove: (diskName: string) => void;
   setError: (error: Error | undefined) => void;
 };
 
@@ -63,9 +63,9 @@ const useEnvironments = (
 
       const diskName = `environment-disk-${getRandomChars()}`;
       getDisks(draftVM).push({
+        disk: { bus: 'sata' },
         name: diskName,
         serial: getRandomSerial().toUpperCase(),
-        disk: { bus: 'sata' },
       });
       getVolumes(draftVM).push({
         name: diskName,
@@ -118,12 +118,12 @@ const useEnvironments = (
   );
 
   return {
-    onEnvironmentRemove,
-    onEnvironmentChange,
-    onEnvironmentAdd,
     edited,
     environments,
     error,
+    onEnvironmentAdd,
+    onEnvironmentChange,
+    onEnvironmentRemove,
     setError,
   };
 };

@@ -14,28 +14,28 @@ export const AnnotationsModalRow: React.FC<{
     <>
       <GridItem span={5}>
         <TextInput
+          aria-label={t('annotation key')}
           autoFocus
-          maxLength={255}
           className="annotation-form-input"
-          size={1}
-          placeholder={t('annotation key')}
           isRequired
+          maxLength={255}
+          onChange={(newKey) => onChange({ ...annotation, key: newKey })}
+          placeholder={t('annotation key')}
+          size={1}
           type="text"
           value={annotation.key}
-          onChange={(newKey) => onChange({ ...annotation, key: newKey })}
-          aria-label={t('annotation key')}
         />
       </GridItem>
       <GridItem span={5}>
         <TextInput
-          maxLength={255}
+          aria-label={t('annotation value')}
           className="annotation-form-input"
-          placeholder={t('annotation value')}
           isRequired
+          maxLength={255}
+          onChange={(newValue) => onChange({ ...annotation, value: newValue })}
+          placeholder={t('annotation value')}
           type="text"
           value={annotation.value}
-          onChange={(newValue) => onChange({ ...annotation, value: newValue })}
-          aria-label={t('annotation value')}
         />
       </GridItem>
       <GridItem span={2}>

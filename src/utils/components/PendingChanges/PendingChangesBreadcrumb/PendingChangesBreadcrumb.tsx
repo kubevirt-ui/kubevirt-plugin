@@ -19,7 +19,7 @@ const PendingChangesBreadcrumb: React.FC<PendingChangesBreadcrumbProps> = ({ pen
       <Breadcrumb>
         <BreadcrumbHeading>{pendingChanges?.[0]?.tabLabel}</BreadcrumbHeading>
         <BreadcrumbItem style={{ marginTop: 0 }}>
-          {pendingChanges?.map(({ label, handleAction }, index) => (
+          {pendingChanges?.map(({ handleAction, label }, index) => (
             <>
               {index !== 0 && <div style={{ marginRight: '8px' }}>,</div>}
               <a key={label} onClick={handleAction}>

@@ -8,11 +8,11 @@ import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-cor
 import useNetworkData from './hook/useNetworkData';
 
 type NetworkChartsByNICProps = {
-  vmi: V1VirtualMachineInstance;
   nic: string;
+  vmi: V1VirtualMachineInstance;
 };
 
-const NetworkChartsByNIC: FC<NetworkChartsByNICProps> = ({ vmi, nic }) => {
+const NetworkChartsByNIC: FC<NetworkChartsByNICProps> = ({ nic, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { data, links } = useNetworkData(vmi, nic);
 

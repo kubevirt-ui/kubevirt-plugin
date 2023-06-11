@@ -20,15 +20,15 @@ import { getChartTitle, getHumanizedValue, getValue } from './utils';
 import './TopConsumersChartList.scss';
 
 type TopConsumersChartListProps = {
+  localStorageData: TopConsumersData;
   metric: TopConsumerMetric;
   scope: TopConsumerScope;
-  localStorageData: TopConsumersData;
 };
 
 export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
+  localStorageData,
   metric,
   scope,
-  localStorageData,
 }) => {
   const { t } = useKubevirtTranslation();
   const duration = useMemo(
@@ -46,8 +46,8 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
 
   const [query] = usePrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY,
-    query: getTopConsumerQuery(metric?.getValue(), scope?.getValue(), numItemsToShow, duration),
     endTime: Date.now(),
+    query: getTopConsumerQuery(metric?.getValue(), scope?.getValue(), numItemsToShow, duration),
   });
   const numQueryResults = query?.data?.result?.length;
 
@@ -64,12 +64,12 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
 
       charts.push(
         <TopConsumersProgressChart
+          key={`chart-${metric?.getValue()}-${scope?.getValue()}-${i}`}
+          labelUnit={humanizedValue.unit}
+          labelValue={humanizedValue.value}
+          maxValue={max}
           title={title}
           value={rawValue}
-          labelValue={humanizedValue.value}
-          labelUnit={humanizedValue.unit}
-          maxValue={max}
-          key={`chart-${metric?.getValue()}-${scope?.getValue()}-${i}`}
         />,
       );
     }

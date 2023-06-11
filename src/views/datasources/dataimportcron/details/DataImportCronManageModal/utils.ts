@@ -13,18 +13,18 @@ import { k8sCreate, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugi
 export const CRON_DOC_URL = 'https://www.redhat.com/sysadmin/automate-linux-tasks-cron';
 
 export const onDataImportCronManageSubmit = async ({
-  data: { url, importsToKeep, schedule, allowAutoUpdate },
+  data: { allowAutoUpdate, importsToKeep, schedule, url },
   resources: { dataImportCron, dataSource },
 }: {
-  resources: {
-    dataSource: V1beta1DataSource;
-    dataImportCron: V1beta1DataImportCron;
-  };
   data: {
-    url: string;
+    allowAutoUpdate: boolean;
     importsToKeep: number;
     schedule: string;
-    allowAutoUpdate: boolean;
+    url: string;
+  };
+  resources: {
+    dataImportCron: V1beta1DataImportCron;
+    dataSource: V1beta1DataSource;
   };
 }) => {
   const updateDataSourceLabel = async (
@@ -39,8 +39,6 @@ export const onDataImportCronManageSubmit = async ({
       }
     });
     await k8sPatch({
-      model: DataSourceModel,
-      resource: dataSourceToUpdate,
       data: [
         {
           op: 'replace',
@@ -48,6 +46,8 @@ export const onDataImportCronManageSubmit = async ({
           value: updatedLabels,
         },
       ],
+      model: DataSourceModel,
+      resource: dataSourceToUpdate,
     });
   };
 
@@ -83,14 +83,14 @@ export const onDataImportCronManageSubmit = async ({
   // first we need to validate the changes with a dry run
   try {
     await k8sCreate<V1beta1DataImportCron>({
+      data: produce(updatedDataImportCron, (dic) => {
+        dic.metadata.name = `${dataImportCron?.metadata?.name}-dry-run`;
+      }),
       model: DataImportCronModel,
       queryParams: {
         dryRun: 'All',
         fieldManager: 'kubectl-create',
       },
-      data: produce(updatedDataImportCron, (dic) => {
-        dic.metadata.name = `${dataImportCron?.metadata?.name}-dry-run`;
-      }),
     });
   } catch (e) {
     return Promise.reject(e);
@@ -98,17 +98,17 @@ export const onDataImportCronManageSubmit = async ({
   try {
     await k8sDelete({
       model: DataImportCronModel,
-      resource: dataImportCron,
       name: dataImportCron?.metadata?.name,
       ns: dataImportCron?.metadata?.namespace,
+      resource: dataImportCron,
     });
     // we should not reject the promise if we failed to delete the DIC (it may not exist)
   } catch (e) {}
 
   try {
     return await k8sCreate<V1beta1DataImportCron>({
-      model: DataImportCronModel,
       data: updatedDataImportCron,
+      model: DataImportCronModel,
     });
   } catch (e) {
     return Promise.reject(e);

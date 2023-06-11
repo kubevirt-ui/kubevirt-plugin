@@ -1,18 +1,17 @@
 import { saveAs } from 'file-saver';
+
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { k8sCreate, k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-
-import { buildOwnerReference } from '../../../../../resources/shared';
-
 import {
   IoK8sApiCoreV1Pod,
   IoK8sApiCoreV1Service,
   IoK8sApiCoreV1ServicePort,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { k8sCreate, k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
+import { buildOwnerReference } from '../../../../../resources/shared';
 import { RDP_CONSOLE_TYPE, SPICE_CONSOLE_TYPE, VNC_CONSOLE_TYPE } from '../../utils/ConsoleConsts';
 
 import {
@@ -109,8 +108,8 @@ const generateVVFile = (
   type: string,
 ): { content: string; mimeType: string } => {
   const TYPES = {
-    [VNC_CONSOLE_TYPE]: 'vnc',
     [SPICE_CONSOLE_TYPE]: 'spice',
+    [VNC_CONSOLE_TYPE]: 'vnc',
   };
 
   const content =
@@ -201,9 +200,9 @@ export const getVmRdpNetworks = (
       }
       const network = networks?.find((n) => n?.name === i?.name);
       return {
+        ip,
         name: i?.name,
         type: network?.multus ? 'MULTUS' : 'POD',
-        ip,
       };
     });
 };
@@ -225,13 +224,11 @@ export const createRDPService = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
 ): Promise<K8sResourceCommon[]> => {
-  const { namespace, name } = vm?.metadata || {};
+  const { name, namespace } = vm?.metadata || {};
   const vmiLabels = vm?.spec?.template?.metadata?.labels;
   const labelSelector = vmiLabels?.[VMI_LABEL_AS_RDP_SERVICE_SELECTOR] || name;
 
   const vmPromise = k8sPatch<V1VirtualMachine>({
-    model: VirtualMachineModel,
-    resource: vm,
     data: [
       {
         op: 'add',
@@ -242,11 +239,11 @@ export const createRDPService = (
         value: labelSelector,
       },
     ],
+    model: VirtualMachineModel,
+    resource: vm,
   });
 
   const vmiPromise = k8sPatch<V1VirtualMachineInstance>({
-    model: VirtualMachineInstanceModel,
-    resource: vmi,
     data: [
       {
         op: 'add',
@@ -254,13 +251,14 @@ export const createRDPService = (
         value: labelSelector,
       },
     ],
+    model: VirtualMachineInstanceModel,
+    resource: vmi,
   });
 
   const servicePromise = k8sCreate({
-    model: ServiceModel,
     data: {
-      kind: ServiceModel.kind,
       apiVersion: ServiceModel.apiVersion,
+      kind: ServiceModel.kind,
       metadata: {
         name: `${vm?.metadata?.name}-rdp`,
         namespace: vm?.metadata?.namespace,
@@ -273,12 +271,13 @@ export const createRDPService = (
             targetPort: DEFAULT_RDP_PORT,
           },
         ],
-        type: 'NodePort',
         selector: {
           [VMI_LABEL_AS_RDP_SERVICE_SELECTOR]: labelSelector,
         },
+        type: 'NodePort',
       },
     },
+    model: ServiceModel,
     ns: namespace,
   });
 

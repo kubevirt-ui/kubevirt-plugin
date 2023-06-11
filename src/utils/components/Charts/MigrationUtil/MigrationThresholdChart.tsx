@@ -41,30 +41,30 @@ type MigrationThresholdChartProps = {
 const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration, timespan } = useDuration();
-  const queries = useMemo(() => getUtilizationQueries({ obj: vmi, duration }), [vmi, duration]);
-  const { ref, width, height } = useResponsiveCharts();
+  const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
+  const { height, ref, width } = useResponsiveCharts();
 
   const [migrationDataProcessed] = usePrometheusPoll({
-    query: queries?.MIGRATION_DATA_PROCESSED,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.MIGRATION_DATA_PROCESSED,
     timespan,
   });
 
   const [migrationDataRemaining] = usePrometheusPoll({
-    query: queries?.MIGRATION_DATA_REMAINING,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.MIGRATION_DATA_REMAINING,
     timespan,
   });
 
   const [migrationDataDirtyRate] = usePrometheusPoll({
-    query: queries?.MIGRATION_MEMORY_DIRTY_RATE,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.MIGRATION_MEMORY_DIRTY_RATE,
     timespan,
   });
 
@@ -82,15 +82,15 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
   );
 
   const chartDataProcessed = dataProcessed?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: t('Data Processed') };
+    return { name: t('Data Processed'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const chartDataRemaining = dataRemaining?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: t('Data Remaining') };
+    return { name: t('Data Remaining'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const chartDataDirtyRate = dataDirtyRate?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y), name: t('Memory Dirty Rate') };
+    return { name: t('Memory Dirty Rate'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const isReady =
@@ -108,73 +108,73 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
           ])}
         >
           <Chart
-            height={height}
-            width={width}
-            padding={{ top: 25, bottom: 55, left: 35, right: 35 }}
-            scale={{ x: 'time', y: 'linear' }}
-            domain={{
-              x: [currentTime - timespan, currentTime],
-              y: [0, yMax],
-            }}
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
-                  return `${datum?.name}: ${xbytes(datum?.y, { iec: true, fixed: 2 })}`;
+                  return `${datum?.name}: ${xbytes(datum?.y, { fixed: 2, iec: true })}`;
                 }}
                 constrainToVisibleArea
               />
             }
+            domain={{
+              x: [currentTime - timespan, currentTime],
+              y: [0, yMax],
+            }}
             legendData={[
               { name: t('Data Processed') },
               { name: t('Data Remaining'), symbol: { fill: chart_color_green_300.value } },
               { name: t('Memory Dirty Rate'), symbol: { fill: chart_color_orange_300.value } },
             ]}
+            height={height}
             legendOrientation={ChartLegendOrientation.horizontal}
             legendPosition={ChartLegendPosition.bottom}
+            padding={{ bottom: 55, left: 35, right: 35, top: 25 }}
+            scale={{ x: 'time', y: 'linear' }}
+            width={width}
           >
             <ChartAxis
-              dependentAxis
-              tickValues={[0, yMax]}
-              tickFormat={formatMemoryYTick(yMax, 2)}
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
+              dependentAxis
+              tickFormat={formatMemoryYTick(yMax, 2)}
+              tickValues={[0, yMax]}
             />
             <ChartAxis
-              tickFormat={tickFormat(duration, currentTime)}
-              tickCount={TICKS_COUNT}
               style={{
-                ticks: { stroke: 'transparent' },
                 tickLabels: { padding: 2 },
+                ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}
+              tickCount={TICKS_COUNT}
+              tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
-                data={chartDataProcessed}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
+                data={chartDataProcessed}
               />
               <ChartArea
-                data={chartDataRemaining}
                 style={{
                   data: {
                     stroke: chart_color_green_300.value,
                   },
                 }}
+                data={chartDataRemaining}
               />
               <ChartArea
-                data={chartDataDirtyRate}
                 style={{
                   data: {
                     stroke: chart_color_orange_300?.value,
                   },
                 }}
+                data={chartDataDirtyRate}
               />
             </ChartGroup>
           </Chart>

@@ -16,39 +16,39 @@ const useVirtualMachinesInstanceTabs = () => {
   const tabs = React.useMemo(
     () => [
       {
+        component: VirtualMachinesInstancePageDetailsTab,
         href: '',
         name: t('Details'),
-        component: VirtualMachinesInstancePageDetailsTab,
       },
       {
+        component: VirtualMachinesInstancePageYAMLTab,
         href: 'yaml',
         name: t('YAML'),
-        component: VirtualMachinesInstancePageYAMLTab,
       },
       {
+        component: VirtualMachinesInstancePageSchedulingTab,
         href: 'scheduling',
         name: t('Scheduling'),
-        component: VirtualMachinesInstancePageSchedulingTab,
       },
       {
+        component: VirtualMachinesInstancePageEventsTab,
         href: 'events',
         name: t('Events'),
-        component: VirtualMachinesInstancePageEventsTab,
       },
       {
+        component: VirtualMachinesInstancePageConsoleTab,
         href: 'console',
         name: t('Console'),
-        component: VirtualMachinesInstancePageConsoleTab,
       },
       {
+        component: VirtualMachinesInstancePageNetworkTab,
         href: 'network',
         name: t('Network interfaces'),
-        component: VirtualMachinesInstancePageNetworkTab,
       },
       {
+        component: VirtualMachinesInstancePageDisksTab,
         href: 'disks',
         name: t('Disks'),
-        component: VirtualMachinesInstancePageDisksTab,
       },
     ],
     [t],
