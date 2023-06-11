@@ -26,12 +26,12 @@ type DiskRowActionsProps = {
 
 const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const { t } = useKubevirtTranslation();
-  const { vm, updateVM, tabsData, updateTabsData } = useWizardVMContext();
+  const { tabsData, updateTabsData, updateVM, vm } = useWizardVMContext();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const deleteBtnText = t('Detach');
 
-  const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName);
+  const { initialDiskSourceState, initialDiskState } = useEditDiskStates(vm, diskName);
 
   const onDelete = React.useCallback(() => {
     const volumeToDelete = vm.spec.template.spec.volumes.find((volume) => volume.name === diskName);
@@ -70,17 +70,17 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
-        onClose={onClose}
+        headerText={t('Detach disk?')}
         isOpen={isOpen}
         obj={vm}
+        onClose={onClose}
         onSubmit={onDelete}
-        headerText={t('Detach disk?')}
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
         <ConfirmActionMessage
-          obj={{ metadata: { name: diskName, namespace: vm?.metadata?.namespace } }}
           action="detach"
+          obj={{ metadata: { name: diskName, namespace: vm?.metadata?.namespace } }}
         />
       </TabModal>
     ));
@@ -89,14 +89,6 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
   const onEditModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <EditDiskModal
-        vm={vm}
-        isOpen={isOpen}
-        onClose={onClose}
-        headerText={t('Edit disk')}
-        onSubmit={updateVM}
-        initialDiskState={initialDiskState}
-        initialDiskSourceState={initialDiskSourceState}
-        createOwnerReference={false}
         onUploadedDataVolume={(dataVolume) =>
           updateTabsData((draft) => {
             ensurePath(draft, 'disks.dataVolumesToAddOwnerRef');
@@ -108,26 +100,34 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
             }
           })
         }
+        createOwnerReference={false}
+        headerText={t('Edit disk')}
+        initialDiskSourceState={initialDiskSourceState}
+        initialDiskState={initialDiskState}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={updateVM}
+        vm={vm}
       />
     ));
   };
 
   return (
     <Dropdown
-      menuAppendTo={getContentScrollableElement}
-      onSelect={() => setIsDropdownOpen(false)}
-      toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-disk" />}
-      isOpen={isDropdownOpen}
-      isPlain
       dropdownItems={[
-        <DropdownItem onClick={onEditModalToggle} key="disk-edit">
+        <DropdownItem key="disk-edit" onClick={onEditModalToggle}>
           {t('Edit')}
         </DropdownItem>,
-        <DropdownItem onClick={onDeleteModalToggle} key="disk-delete">
+        <DropdownItem key="disk-delete" onClick={onDeleteModalToggle}>
           {deleteBtnText}
         </DropdownItem>,
       ]}
+      isOpen={isDropdownOpen}
+      isPlain
+      menuAppendTo={getContentScrollableElement}
+      onSelect={() => setIsDropdownOpen(false)}
       position={DropdownPosition.right}
+      toggle={<KebabToggle id="toggle-id-disk" onToggle={setIsDropdownOpen} />}
     />
   );
 };

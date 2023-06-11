@@ -11,7 +11,7 @@ export const setSessionStorageVM = (value: V1VirtualMachine) => {
   } catch (e) {}
 };
 
-export const getSessionStorageVM = (): V1VirtualMachine | undefined => {
+export const getSessionStorageVM = (): undefined | V1VirtualMachine => {
   try {
     const value = window.sessionStorage.getItem(VM_CACHE_KEY);
     return value ? JSON.parse(value) : undefined;

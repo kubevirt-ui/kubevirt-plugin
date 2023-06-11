@@ -35,28 +35,28 @@ const VirtualMachinesOverviewTabDetailsTitle: React.FC<
     <CardTitle className="text-muted card-title">
       <Link to={createURL('details', location?.pathname)}>{t('Details')}</Link>
       <Dropdown
-        onSelect={() => setIsDropdownOpen(false)}
-        toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-disk" />}
-        isOpen={isDropdownOpen}
-        isPlain
         dropdownItems={[
           <DropdownItem
-            onClick={() => virtctlCommand && navigator.clipboard.writeText(virtctlCommand)}
-            key="copy"
             description={t('SSH using virtctl')}
+            key="copy"
+            onClick={() => virtctlCommand && navigator.clipboard.writeText(virtctlCommand)}
           >
             {t('Copy SSH command')}{' '}
             <span className="text-muted">
               <CopyIcon />
             </span>
           </DropdownItem>,
-          <DropdownItem onClick={() => (isMachineStopped ? startVM(vm) : stopVM(vm))} key="stop">
+          <DropdownItem key="stop" onClick={() => (isMachineStopped ? startVM(vm) : stopVM(vm))}>
             {isMachineStopped ? t('Resume VirtualMachine') : t('Stop VirtualMachine')}
           </DropdownItem>,
-          <DropdownItem onClick={() => (isMachinePaused ? unpauseVM(vm) : pauseVM(vm))} key="pause">
+          <DropdownItem key="pause" onClick={() => (isMachinePaused ? unpauseVM(vm) : pauseVM(vm))}>
             {isMachinePaused ? t('Unpause VirtualMachine') : t('Pause VirtualMachine')}
           </DropdownItem>,
         ]}
+        isOpen={isDropdownOpen}
+        isPlain
+        onSelect={() => setIsDropdownOpen(false)}
+        toggle={<KebabToggle id="toggle-id-disk" onToggle={setIsDropdownOpen} />}
       />
     </CardTitle>
   );

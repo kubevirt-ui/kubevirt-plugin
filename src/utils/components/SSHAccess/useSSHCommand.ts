@@ -7,8 +7,8 @@ import { SERVICE_TYPES } from './constants';
 
 export type useSSHCommandResult = {
   command: string;
-  user: string;
   sshServiceRunning: boolean;
+  user: string;
 };
 
 // SSH over NodePort
@@ -36,8 +36,8 @@ const useSSHCommand = (
 
   return {
     command,
-    user,
     sshServiceRunning: Boolean(sshService),
+    user,
   };
 };
 

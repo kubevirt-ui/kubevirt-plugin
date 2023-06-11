@@ -4,9 +4,9 @@ import { MigrationPolicyStateDispatch } from '../../MigrationPolicyEditModal/uti
 
 export type MigrationPolicyConfigurationOption = {
   [key: string]: {
-    label: string;
     component: React.FC<any>;
     defaultValue: MigrationPolicyStateDispatch;
     description?: string;
+    label: string;
   };
 };

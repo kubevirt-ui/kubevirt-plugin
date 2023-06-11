@@ -15,13 +15,13 @@ const VirtualMachineTemplateSupport: React.FC = () => {
     <>
       {t('Supported operating systems are labeled below. ')}
       <Button
-        variant="link"
-        icon={<ExternalLinkAltIcon />}
-        href={SUPPORT_URL}
-        target="_blank"
-        component="a"
-        iconPosition="right"
         className="no-left-padding"
+        component="a"
+        href={SUPPORT_URL}
+        icon={<ExternalLinkAltIcon />}
+        iconPosition="right"
+        target="_blank"
+        variant="link"
       >
         {t('Learn more about Red Hat support')}
       </Button>

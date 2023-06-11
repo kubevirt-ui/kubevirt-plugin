@@ -35,32 +35,32 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
       <DescriptionListTermHelpText className="migration-policy-description-item-header">
         {t('Project labels')}
         <Button
-          isInline
-          variant={ButtonVariant.link}
-          className="migration-policy-description-item-header--action-button"
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <LabelsModal
-                obj={mp}
-                isOpen={isOpen}
-                onClose={onClose}
-                initialLabels={mpNamespaceSelector}
                 onLabelsSubmit={(labels) =>
                   k8sUpdate({
-                    model: MigrationPolicyModel,
                     data: ensureMigrationPolicyMatchLabels(mp, labels, 'namespaceSelector'),
+                    model: MigrationPolicyModel,
                   })
                 }
+                initialLabels={mpNamespaceSelector}
+                isOpen={isOpen}
+                obj={mp}
+                onClose={onClose}
               />
             ))
           }
+          className="migration-policy-description-item-header--action-button"
+          isInline
+          variant={ButtonVariant.link}
         >
           {t('Edit')}
         </Button>
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
         {!isEmpty(mpNamespaceSelector) && (
-          <LabelGroup isEditable className="migration-policy-selectors-group">
+          <LabelGroup className="migration-policy-selectors-group" isEditable>
             <MigrationPolicySelectorList selector={mpNamespaceSelector} />
           </LabelGroup>
         )}

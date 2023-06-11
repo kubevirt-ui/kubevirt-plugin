@@ -16,7 +16,7 @@ export const useProcessedTemplate = (
   template: V1Template,
   namespace: string = DEFAULT_NAMESPACE,
 ): [V1Template, boolean, any] => {
-  const [processedTemplate, setProcessedTemplate] = useState<V1Template | undefined>(undefined);
+  const [processedTemplate, setProcessedTemplate] = useState<undefined | V1Template>(undefined);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<any>();
   useEffect(() => {
@@ -25,12 +25,12 @@ export const useProcessedTemplate = (
     if (template) {
       const parameters = generateParamsWithPrettyName(template);
       k8sCreate<V1Template>({
-        model: ProcessedTemplatesModel,
         data: {
           ...template,
           metadata: { ...template?.metadata, namespace },
           parameters,
         },
+        model: ProcessedTemplatesModel,
         ns: namespace,
         queryParams: {
           dryRun: 'All',

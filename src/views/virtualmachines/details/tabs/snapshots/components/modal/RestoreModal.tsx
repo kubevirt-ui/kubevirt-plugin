@@ -12,12 +12,12 @@ import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { getVMRestoreSnapshotResource } from '../../utils/helpers';
 
 type DeleteResourceModalProps = {
-  snapshot: V1alpha1VirtualMachineSnapshot;
-  onClose: () => void;
   isOpen: boolean;
+  onClose: () => void;
+  snapshot: V1alpha1VirtualMachineSnapshot;
 };
 
-const RestoreModal: React.FC<DeleteResourceModalProps> = ({ snapshot, onClose, isOpen }) => {
+const RestoreModal: React.FC<DeleteResourceModalProps> = ({ isOpen, onClose, snapshot }) => {
   const { t } = useKubevirtTranslation();
 
   const resultRestore = React.useMemo(() => {
@@ -27,16 +27,16 @@ const RestoreModal: React.FC<DeleteResourceModalProps> = ({ snapshot, onClose, i
 
   return (
     <TabModal<V1alpha1VirtualMachineRestore>
-      isOpen={isOpen}
-      obj={resultRestore}
       onSubmit={(obj) =>
         k8sCreate({
-          model: VirtualMachineRestoreModel,
           data: obj,
+          model: VirtualMachineRestoreModel,
         })
       }
-      onClose={onClose}
       headerText={t('Restore snapshot')}
+      isOpen={isOpen}
+      obj={resultRestore}
+      onClose={onClose}
       submitBtnText={t('Restore')}
     >
       {t('Are you sure you want to restore {{name}}?', {

@@ -34,8 +34,8 @@ const FilesystemList: React.FC<FilesystemListProps> = ({ vm }) => {
 
   return (
     <FileSystemListLayout
-      vmi={isVMRunning ? vmi : null}
       noDataEmptyMsg={() => <Bullseye>{noDataEmptyMsg}</Bullseye>}
+      vmi={isVMRunning ? vmi : null}
     />
   );
 };

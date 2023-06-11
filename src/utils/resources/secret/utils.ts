@@ -25,10 +25,10 @@ ssh_authorized_keys:
 };
 
 export const generateSSHKeySecret = (name: string, namespace: string, sshKey: string) => ({
-  kind: SecretModel.kind,
   apiVersion: SecretModel.apiVersion,
-  metadata: { name, namespace },
   data: { key: encodeSecretKey(sshKey) },
+  kind: SecretModel.kind,
+  metadata: { name, namespace },
 });
 
 export const getInitialSSHDetails = (
@@ -38,13 +38,13 @@ export const getInitialSSHDetails = (
   !isEmpty(secretToCreate)
     ? {
         secretOption: SecretSelectionOption.addNew,
-        sshSecretName: getName(secretToCreate),
         sshPubKey: decodeSecret(secretToCreate),
+        sshSecretName: getName(secretToCreate),
       }
     : {
         secretOption: !isEmpty(sshSecretName)
           ? SecretSelectionOption.useExisting
           : SecretSelectionOption.none,
-        sshSecretName: sshSecretName || '',
         sshPubKey: '',
+        sshSecretName: sshSecretName || '',
       };

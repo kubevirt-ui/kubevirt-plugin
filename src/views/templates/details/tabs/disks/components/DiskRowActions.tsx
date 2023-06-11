@@ -20,18 +20,18 @@ import { useEditDiskStates } from '../hooks/useEditDiskState';
 
 type DiskRowActionsProps = {
   diskName: string;
-  vm: V1VirtualMachine;
-  onUpdate: (updatedVM: V1VirtualMachine) => Promise<void>;
   isDisabled?: boolean;
+  onUpdate: (updatedVM: V1VirtualMachine) => Promise<void>;
+  vm: V1VirtualMachine;
 };
 
-const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate, isDisabled }) => {
+const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdate, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const deleteBtnText = t('Detach');
 
-  const { initialDiskState, initialDiskSourceState } = useEditDiskStates(vm, diskName);
+  const { initialDiskSourceState, initialDiskState } = useEditDiskStates(vm, diskName);
 
   const onDelete = React.useCallback(() => {
     const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
@@ -58,17 +58,17 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate,
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
-        onClose={onClose}
+        headerText={t('Detach disk?')}
         isOpen={isOpen}
         obj={vm}
+        onClose={onClose}
         onSubmit={onDelete}
-        headerText={t('Detach disk?')}
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
         <ConfirmActionMessage
-          obj={{ metadata: { name: diskName, namespace: vm?.metadata?.namespace } }}
           action="detach"
+          obj={{ metadata: { name: diskName, namespace: vm?.metadata?.namespace } }}
         />
       </TabModal>
     ));
@@ -77,35 +77,35 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, vm, onUpdate,
   const onEditModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <EditDiskModal
-        vm={vm}
+        createOwnerReference={false}
+        headerText={t('Edit disk')}
+        initialDiskSourceState={initialDiskSourceState}
+        initialDiskState={initialDiskState}
         isOpen={isOpen}
         onClose={onClose}
-        headerText={t('Edit disk')}
         onSubmit={onUpdate}
-        initialDiskState={initialDiskState}
-        initialDiskSourceState={initialDiskSourceState}
-        createOwnerReference={false}
+        vm={vm}
       />
     ));
   };
 
   return (
     <Dropdown
-      menuAppendTo={getContentScrollableElement}
-      onSelect={() => setIsDropdownOpen(false)}
-      toggle={
-        <KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-disk" isDisabled={isDisabled} />
-      }
-      isOpen={isDropdownOpen}
-      isPlain
       dropdownItems={[
-        <DropdownItem onClick={onEditModalToggle} key="disk-edit">
+        <DropdownItem key="disk-edit" onClick={onEditModalToggle}>
           {t('Edit')}
         </DropdownItem>,
-        <DropdownItem onClick={onDeleteModalToggle} key="disk-delete">
+        <DropdownItem key="disk-delete" onClick={onDeleteModalToggle}>
           {deleteBtnText}
         </DropdownItem>,
       ]}
+      toggle={
+        <KebabToggle id="toggle-id-disk" isDisabled={isDisabled} onToggle={setIsDropdownOpen} />
+      }
+      isOpen={isDropdownOpen}
+      isPlain
+      menuAppendTo={getContentScrollableElement}
+      onSelect={() => setIsDropdownOpen(false)}
       position={DropdownPosition.right}
     />
   );

@@ -14,9 +14,9 @@ import { getVMBootSourceType } from '@kubevirt-utils/resources/vm/utils/source';
 import { useWizardVMContext } from './WizardVMContext';
 
 type UseWizardSourceAvailable = {
+  error: any;
   isBootSourceAvailable: boolean;
   loaded: boolean;
-  error: any;
 };
 
 export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
@@ -88,8 +88,8 @@ export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
   }, [bootSource]);
 
   return {
+    error,
     isBootSourceAvailable,
     loaded,
-    error,
   };
 };

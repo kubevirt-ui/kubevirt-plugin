@@ -8,21 +8,20 @@ import { Checkbox, FormGroup } from '@patternfly/react-core';
 import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 
 type EnablePreallocationCheckboxProps = {
-  enablePreallocation: boolean;
   dispatchDiskState: React.Dispatch<DiskReducerActionType>;
+  enablePreallocation: boolean;
   isDisabled: boolean;
 };
 
 const EnablePreallocationCheckbox: React.FC<EnablePreallocationCheckboxProps> = ({
-  enablePreallocation,
   dispatchDiskState,
+  enablePreallocation,
   isDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <FormGroup
-      fieldId="enable-preallocation"
       helperText={
         <>
           <Trans ns="plugin__kubevirt-plugin">
@@ -42,15 +41,16 @@ const EnablePreallocationCheckbox: React.FC<EnablePreallocationCheckboxProps> = 
           </Trans>
         </>
       }
+      fieldId="enable-preallocation"
     >
       <Checkbox
-        id="enable-preallocation"
-        label={t('Enable preallocation')}
-        isChecked={enablePreallocation}
         onChange={(checked) =>
-          dispatchDiskState({ type: diskReducerActions.SET_ENABLE_PREALLOCATION, payload: checked })
+          dispatchDiskState({ payload: checked, type: diskReducerActions.SET_ENABLE_PREALLOCATION })
         }
+        id="enable-preallocation"
+        isChecked={enablePreallocation}
         isDisabled={isDisabled}
+        label={t('Enable preallocation')}
       />
     </FormGroup>
   );

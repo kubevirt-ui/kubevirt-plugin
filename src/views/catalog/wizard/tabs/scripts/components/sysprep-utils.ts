@@ -35,7 +35,7 @@ export const pushSysprepObject = (
     if (!tabsDraft?.additionalObjects) tabsDraft.additionalObjects = [];
 
     tabsDraft.additionalObjects.push(
-      generateNewSysprepConfig({ vm, data: sysprepData, sysprepName }),
+      generateNewSysprepConfig({ data: sysprepData, sysprepName, vm }),
     );
   });
 };

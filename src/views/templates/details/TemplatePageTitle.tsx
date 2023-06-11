@@ -30,7 +30,7 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const lastNamespacePath = useLastNamespacePath();
-  const { isCommonTemplate, hasEditPermission } = useEditTemplateAccessReview(template);
+  const { hasEditPermission, isCommonTemplate } = useEditTemplateAccessReview(template);
 
   const isSidebarEditorDisplayed = !history.location.pathname.includes(
     `/templates/${template?.metadata?.name}/${VirtualMachineDetailsTab.YAML}`,
@@ -41,9 +41,9 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
       <Breadcrumb>
         <BreadcrumbItem>
           <Button
-            variant="link"
             isInline
             onClick={() => history.push(`/k8s/${lastNamespacePath}/templates`)}
+            variant="link"
           >
             {t('Templates')}
           </Button>

@@ -11,13 +11,13 @@ import { Stack, StackItem } from '@patternfly/react-core';
 import './ResourcesSection.scss';
 
 export type ResourcesSectionProps = {
+  isAdmin?: boolean;
   resources?: WatchK8sResults<{
     [key: string]: K8sResourceCommon[];
   }>;
-  isAdmin?: boolean;
 };
 
-const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources, isAdmin }) => {
+const ResourcesSection: React.FC<ResourcesSectionProps> = ({ isAdmin, resources }) => {
   const templates = React.useMemo(
     () => (isAdmin ? resources?.vmTemplates : getAllowedResourceData(resources, TemplateModel)),
     [resources, isAdmin],
@@ -35,48 +35,48 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ resources, isAdmin 
   );
 
   return (
-    <Stack hasGutter className="kv-inventory-card__resources--container">
+    <Stack className="kv-inventory-card__resources--container" hasGutter>
       <StackItem key={VirtualMachineModel.kind}>
         <ResourceInventoryItem
-          resources={vms?.data as K8sResourceCommon[]}
-          kind={VirtualMachineModel}
-          isLoading={vms?.loaded === false}
-          error={!!vms?.loadError}
           dataTest="kv-inventory-card--vms"
+          error={!!vms?.loadError}
+          isLoading={vms?.loaded === false}
+          kind={VirtualMachineModel}
+          resources={vms?.data as K8sResourceCommon[]}
           showLink={isAdmin}
         />
       </StackItem>
       <StackItem key={TemplateModel.kind}>
         <ResourceInventoryItem
-          resources={templates?.data}
-          kind={TemplateModel}
-          isLoading={templates?.loaded === false}
-          error={!!templates?.loadError}
-          dataTest="kv-inventory-card--vm-templates"
           basePath={`/k8s/all-namespaces/templates`}
+          dataTest="kv-inventory-card--vm-templates"
+          error={!!templates?.loadError}
+          isLoading={templates?.loaded === false}
+          kind={TemplateModel}
+          resources={templates?.data}
           showLink={isAdmin}
         />
       </StackItem>
       <StackItem key={NodeModel.kind}>
         <ResourceInventoryItem
-          resources={resources?.nodes?.data}
-          kind={NodeModel}
-          isLoading={resources?.nodes?.loaded === false}
-          error={!!resources?.nodes?.loadError}
           dataTest="kv-inventory-card--nodes"
+          error={!!resources?.nodes?.loadError}
+          isLoading={resources?.nodes?.loaded === false}
+          kind={NodeModel}
+          resources={resources?.nodes?.data}
           showLink={isAdmin}
         />
       </StackItem>
       <StackItem key={NetworkAttachmentDefinitionModel.kind}>
         <ResourceInventoryItem
-          resources={nads?.data}
+          dataTest="kv-inventory-card--nads"
+          error={!!nads?.loadError}
+          isLoading={nads?.loaded === false}
           kind={NetworkAttachmentDefinitionModel}
+          resources={nads?.data}
+          showLink={isAdmin}
           title="Network"
           titlePlural="Networks"
-          isLoading={nads?.loaded === false}
-          error={!!nads?.loadError}
-          dataTest="kv-inventory-card--nads"
-          showLink={isAdmin}
         />
       </StackItem>
     </Stack>

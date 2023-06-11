@@ -8,18 +8,18 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { FormGroup, Radio } from '@patternfly/react-core';
 
 type UploadPVCFormAccessModeProps = {
-  onChange: (accessMode: string) => void;
   availableAccessModes?: string[];
-  loaded: boolean;
-  provisioner: string;
   initialAccessMode?: string;
+  loaded: boolean;
+  onChange: (accessMode: string) => void;
+  provisioner: string;
 };
 const UploadPVCFormAccessMode: React.FC<UploadPVCFormAccessModeProps> = ({
-  onChange,
-  loaded,
-  provisioner,
   availableAccessModes = [],
   initialAccessMode,
+  loaded,
+  onChange,
+  provisioner,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -49,22 +49,22 @@ const UploadPVCFormAccessMode: React.FC<UploadPVCFormAccessModeProps> = ({
   }, [accessMode, allowedAccessModes, changeAccessMode]);
 
   return (
-    <FormGroup label={t('Access mode')} isRequired fieldId="access-mode">
+    <FormGroup fieldId="access-mode" isRequired label={t('Access mode')}>
       {loaded &&
         allowedAccessModes &&
-        getAccessModeRadioOptions(t).map(({ value, label }) => {
+        getAccessModeRadioOptions(t).map(({ label, value }) => {
           const disabled = !allowedAccessModes.includes(value);
           const checked = value === accessMode;
           return (
             <Radio
-              value={value}
-              label={label}
-              id={label}
-              key={value}
-              onChange={(_, event) => changeAccessMode(event?.currentTarget?.value)}
-              isDisabled={disabled}
               checked={checked}
+              id={label}
+              isDisabled={disabled}
+              key={value}
+              label={label}
               name="accessMode"
+              onChange={(_, event) => changeAccessMode(event?.currentTarget?.value)}
+              value={value}
             />
           );
         })}

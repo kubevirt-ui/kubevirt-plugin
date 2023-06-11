@@ -1,9 +1,9 @@
 export enum CATALOG_FILTERS {
-  ONLY_DEFAULT = 'onlyDefault',
-  ONLY_AVAILABLE = 'onlyAvailable',
-  NAMESPACE = 'namespace',
   IS_LIST = 'isList',
-  QUERY = 'query',
+  NAMESPACE = 'namespace',
+  ONLY_AVAILABLE = 'onlyAvailable',
+  ONLY_DEFAULT = 'onlyDefault',
   OS_NAME = 'osName',
+  QUERY = 'query',
   WORKLOAD = 'workload',
 }

@@ -31,11 +31,11 @@ const EnableInstanceTypeTechPreviewModal: FC<EnableInstanceTypeTechPreviewModalP
   const { t } = useKubevirtTranslation();
 
   const {
-    featureEnabled: instanceTypesEnabled,
-    toggleFeature: toggleInstanceTypesFeature,
     canEdit,
-    loading,
     error,
+    featureEnabled: instanceTypesEnabled,
+    loading,
+    toggleFeature: toggleInstanceTypesFeature,
   } = usePreviewFeatures(INSTANCE_TYPE_ENABLED);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -64,10 +64,10 @@ const EnableInstanceTypeTechPreviewModal: FC<EnableInstanceTypeTechPreviewModalP
       onClose={onClose}
       variant={ModalVariant.medium}
     >
-      <Trans t={t} ns="plugin__kubevirt-plugin">
+      <Trans ns="plugin__kubevirt-plugin" t={t}>
         <Stack hasGutter>
           <StackItem>
-            <Text component={TextVariants.p} className="pf-u-font-size-xl pf-u-danger-color-100">
+            <Text className="pf-u-font-size-xl pf-u-danger-color-100" component={TextVariants.p}>
               Creating VirtualMachines is easier than ever!
             </Text>
           </StackItem>
@@ -97,23 +97,23 @@ const EnableInstanceTypeTechPreviewModal: FC<EnableInstanceTypeTechPreviewModalP
           <Stack hasGutter>
             <StackItem>
               <Button
-                variant={ButtonVariant.link}
-                icon={<ExternalLinkAltIcon />}
-                //   href={}
-                target="_blank"
                 component="a"
+                icon={<ExternalLinkAltIcon />}
                 iconPosition="right"
                 isInline
+                //   href={}
+                target="_blank"
+                variant={ButtonVariant.link}
               >
                 {t('Learn more about InstanceTypes')}
               </Button>
             </StackItem>
             <StackItem>
               <Button
-                variant={ButtonVariant.link}
                 component="a"
                 href="/quickstart?quickstart=creating-virtual-machine-from-volume"
                 isInline
+                variant={ButtonVariant.link}
               >
                 {t('Quick start: Create a VirtualMachine from a volume')}
               </Button>
@@ -122,15 +122,15 @@ const EnableInstanceTypeTechPreviewModal: FC<EnableInstanceTypeTechPreviewModalP
             <StackItem>
               <Split hasGutter>
                 <Button
-                  variant={ButtonVariant.primary}
-                  isDisabled={!canEdit}
                   onClick={() => {
                     toggleInstanceTypesFeature(true);
                   }}
+                  isDisabled={!canEdit}
+                  variant={ButtonVariant.primary}
                 >
                   {t('Enable')}
                 </Button>
-                <Button variant={ButtonVariant.link} onClick={onClose}>
+                <Button onClick={onClose} variant={ButtonVariant.link}>
                   {t('Go to catalog')}
                 </Button>
               </Split>

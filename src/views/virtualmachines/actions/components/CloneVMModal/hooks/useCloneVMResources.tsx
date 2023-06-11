@@ -11,28 +11,28 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseCloneVMResources = (vm: V1VirtualMachine) => {
-  projects: K8sResourceCommon[];
-  projectNames: string[];
-  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  loaded: boolean;
   error: any;
+  loaded: boolean;
+  projectNames: string[];
+  projects: K8sResourceCommon[];
+  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
 };
 
 const useCloneVMResources: UseCloneVMResources = (vm: V1VirtualMachine) => {
   const [projects = [], projectsLoaded, projectsLoadError] = useK8sWatchResource<
     K8sResourceCommon[]
   >({
-    isList: true,
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    isList: true,
   });
 
   const [pvcs, pvcsLoaded, pvcsLoadError] = useK8sWatchResource<
     IoK8sApiCoreV1PersistentVolumeClaim[]
   >({
-    isList: true,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-    namespaced: true,
+    isList: true,
     namespace: vm?.metadata?.namespace,
+    namespaced: true,
   });
 
   const projectNames = useMemo(
@@ -41,11 +41,11 @@ const useCloneVMResources: UseCloneVMResources = (vm: V1VirtualMachine) => {
   );
 
   return {
-    projects,
-    projectNames,
-    pvcs,
-    loaded: projectsLoaded && pvcsLoaded,
     error: projectsLoadError || pvcsLoadError,
+    loaded: projectsLoaded && pvcsLoaded,
+    projectNames,
+    projects,
+    pvcs,
   };
 };
 

@@ -22,24 +22,24 @@ const ClusterOverviewPage: FC = () => {
 
   const overviewTabs: NavPage[] = [
     {
+      component: OverviewTab,
       href: '',
       name: t('Overview'),
-      component: OverviewTab,
     },
     {
+      component: TopConsumersTab,
       href: 'top-consumers',
       name: t('Top consumers'),
-      component: TopConsumersTab,
     },
     {
+      component: MigrationsTab,
       href: 'migrations',
       name: t('Migrations'),
-      component: MigrationsTab,
     },
     {
+      component: SettingsTab,
       href: 'settings',
       name: t('Settings'),
-      component: SettingsTab,
     },
   ];
 

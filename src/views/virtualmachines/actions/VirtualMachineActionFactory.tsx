@@ -29,132 +29,167 @@ import {
 } from './actions';
 
 const {
-  Stopped,
   Migrating,
-  Provisioning,
-  Starting,
-  Running,
   Paused,
+  Provisioning,
+  Running,
+  Starting,
+  Stopped,
   Stopping,
   Terminating,
   Unknown,
 } = printableVMStatus;
 
 export const VirtualMachineActionFactory = {
-  start: (vm: V1VirtualMachine): Action => {
-    return {
-      id: 'vm-action-start',
-      disabled: [
-        Starting,
-        Stopping,
-        Terminating,
-        Provisioning,
-        Migrating,
-        Running,
-        Unknown,
-      ].includes(vm?.status?.printableStatus),
-      label: t('Start'),
-      cta: () => startVM(vm),
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-    };
-  },
-  stop: (vm: V1VirtualMachine): Action => {
-    return {
-      id: 'vm-action-stop',
-      disabled: [Stopping, Terminating, Stopped, Unknown].includes(vm?.status?.printableStatus),
-      label: t('Stop'),
-      cta: () => stopVM(vm),
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-    };
-  },
-  forceStop: (vm: V1VirtualMachine): Action => {
-    return {
-      id: 'vm-action-force-stop',
-      disabled: [Terminating, Provisioning, Migrating, Stopped, Unknown].includes(
-        vm?.status?.printableStatus,
-      ),
-      label: t('Force stop'),
-      cta: () =>
-        stopVM(vm, {
-          gracePeriod: 0,
-        }),
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-    };
-  },
-
-  restart: (vm: V1VirtualMachine): Action => {
-    return {
-      id: 'vm-action-restart',
-      disabled: [Stopping, Terminating, Provisioning, Migrating, Stopped, Unknown].includes(
-        vm?.status?.printableStatus,
-      ),
-      label: t('Restart'),
-      cta: () => restartVM(vm),
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-    };
-  },
-  pause: (vm: V1VirtualMachine): Action => {
-    return {
-      id: 'vm-action-pause',
-      disabled: vm?.status?.printableStatus !== Running,
-      label: t('Pause'),
-      cta: () => pauseVM(vm),
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-    };
-  },
-  unpause: (vm: V1VirtualMachine): Action => {
-    return {
-      id: 'vm-action-unpause',
-      disabled: vm?.status?.printableStatus !== Paused,
-      label: t('Unpause'),
-      cta: () => unpauseVM(vm),
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-    };
-  },
-  migrate: (vm: V1VirtualMachine, isSingleNodeCluster: boolean): Action => {
-    return {
-      id: 'vm-action-migrate',
-      disabled: !isLiveMigratable(vm, isSingleNodeCluster),
-      label: t('Migrate'),
-      cta: () => migrateVM(vm),
-      accessReview: {
-        resource: VirtualMachineInstanceMigrationModel.plural,
-        namespace: vm?.metadata?.namespace,
-        verb: 'create',
-        group: VirtualMachineInstanceMigrationModel.apiGroup,
-      },
-      description: t('Migrate to a different Node'),
-    };
-  },
   cancelMigration: (
     vm: V1VirtualMachine,
     vmim: V1VirtualMachineInstanceMigration,
     isSingleNodeCluster: boolean,
   ): Action => {
     return {
-      id: 'vm-action-cancel-migrate',
-      disabled: isSingleNodeCluster || !vmim || !!vmim?.metadata?.deletionTimestamp,
-      label: t('Cancel migration'),
-      cta: () => cancelMigration(vmim),
       accessReview: {
-        resource: VirtualMachineInstanceMigrationModel.plural,
-        namespace: vm?.metadata?.namespace,
-        verb: 'delete',
         group: VirtualMachineInstanceMigrationModel.apiGroup,
+        namespace: vm?.metadata?.namespace,
+        resource: VirtualMachineInstanceMigrationModel.plural,
+        verb: 'delete',
       },
+      cta: () => cancelMigration(vmim),
       description: !!vmim?.metadata?.deletionTimestamp && t('Canceling ongoing migration'),
+      disabled: isSingleNodeCluster || !vmim || !!vmim?.metadata?.deletionTimestamp,
+      id: 'vm-action-cancel-migrate',
+      label: t('Cancel migration'),
     };
   },
   clone: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
-      id: 'vm-action-clone',
-      disabled: ![Stopped, Paused, Running].includes(vm?.status?.printableStatus),
-      label: t('Clone'),
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <CloneVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
         )),
+      disabled: ![Paused, Running, Stopped].includes(vm?.status?.printableStatus),
+      id: 'vm-action-clone',
+      label: t('Clone'),
+    };
+  },
+  // },
+  copySSHCommand: (vm: V1VirtualMachine, command: string): Action => {
+    return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      cta: () => command && navigator.clipboard.writeText(command),
+      description: t('SSH using virtctl'),
+      icon: <CopyIcon />,
+      id: 'vm-action-copy-ssh',
+      label: t('Copy SSH command'),
+    };
+  },
+
+  delete: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+    return {
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'delete'),
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <DeleteVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
+        )),
+      disabled: false,
+      id: 'vm-action-delete',
+      label: t('Delete'),
+    };
+  },
+  editAnnotations: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+    return {
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <AnnotationsModal
+            onSubmit={(updatedAnnotations) =>
+              k8sPatch({
+                data: [
+                  {
+                    op: 'replace',
+                    path: '/metadata/annotations',
+                    value: updatedAnnotations,
+                  },
+                ],
+                model: VirtualMachineModel,
+                resource: vm,
+              })
+            }
+            isOpen={isOpen}
+            obj={vm}
+            onClose={onClose}
+          />
+        )),
+      disabled: false,
+      id: 'vm-action-edit-annotations',
+      label: t('Edit annotations'),
+    };
+  },
+  editLabels: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+    return {
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <LabelsModal
+            onLabelsSubmit={(labels) =>
+              k8sPatch({
+                data: [
+                  {
+                    op: 'replace',
+                    path: '/metadata/labels',
+                    value: labels,
+                  },
+                ],
+                model: VirtualMachineModel,
+                resource: vm,
+              })
+            }
+            isOpen={isOpen}
+            obj={vm}
+            onClose={onClose}
+          />
+        )),
+      disabled: false,
+      id: 'vm-action-edit-labels',
+      label: t('Edit labels'),
+    };
+  },
+  forceStop: (vm: V1VirtualMachine): Action => {
+    return {
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      cta: () =>
+        stopVM(vm, {
+          gracePeriod: 0,
+        }),
+      disabled: [Migrating, Provisioning, Stopped, Terminating, Unknown].includes(
+        vm?.status?.printableStatus,
+      ),
+      id: 'vm-action-force-stop',
+      label: t('Force stop'),
+    };
+  },
+  migrate: (vm: V1VirtualMachine, isSingleNodeCluster: boolean): Action => {
+    return {
+      accessReview: {
+        group: VirtualMachineInstanceMigrationModel.apiGroup,
+        namespace: vm?.metadata?.namespace,
+        resource: VirtualMachineInstanceMigrationModel.plural,
+        verb: 'create',
+      },
+      cta: () => migrateVM(vm),
+      description: t('Migrate to a different Node'),
+      disabled: !isLiveMigratable(vm, isSingleNodeCluster),
+      id: 'vm-action-migrate',
+      label: t('Migrate'),
+    };
+  },
+  pause: (vm: V1VirtualMachine): Action => {
+    return {
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      cta: () => pauseVM(vm),
+      disabled: vm?.status?.printableStatus !== Running,
+      id: 'vm-action-pause',
+      label: t('Pause'),
     };
   },
   // console component is needed to allow openConsole action
@@ -170,85 +205,50 @@ export const VirtualMachineActionFactory = {
   //         'modal=yes,alwaysRaised=yes,location=yes,width=1024,height=768',
   //       ),
   //   };
-  // },
-  copySSHCommand: (vm: V1VirtualMachine, command: string): Action => {
+  restart: (vm: V1VirtualMachine): Action => {
     return {
-      id: 'vm-action-copy-ssh',
-      label: t('Copy SSH command'),
-      icon: <CopyIcon />,
-      description: t('SSH using virtctl'),
-      cta: () => command && navigator.clipboard.writeText(command),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      cta: () => restartVM(vm),
+      disabled: [Migrating, Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
+        vm?.status?.printableStatus,
+      ),
+      id: 'vm-action-restart',
+      label: t('Restart'),
     };
   },
-  editLabels: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+  start: (vm: V1VirtualMachine): Action => {
     return {
-      id: 'vm-action-edit-labels',
-      disabled: false,
-      label: t('Edit labels'),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <LabelsModal
-            obj={vm}
-            isOpen={isOpen}
-            onClose={onClose}
-            onLabelsSubmit={(labels) =>
-              k8sPatch({
-                model: VirtualMachineModel,
-                resource: vm,
-                data: [
-                  {
-                    op: 'replace',
-                    path: '/metadata/labels',
-                    value: labels,
-                  },
-                ],
-              })
-            }
-          />
-        )),
+      cta: () => startVM(vm),
+      disabled: [
+        Migrating,
+        Provisioning,
+        Running,
+        Starting,
+        Stopping,
+        Terminating,
+        Unknown,
+      ].includes(vm?.status?.printableStatus),
+      id: 'vm-action-start',
+      label: t('Start'),
     };
   },
-  editAnnotations: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+  stop: (vm: V1VirtualMachine): Action => {
     return {
-      id: 'vm-action-edit-annotations',
-      disabled: false,
-      label: t('Edit annotations'),
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <AnnotationsModal
-            obj={vm}
-            isOpen={isOpen}
-            onClose={onClose}
-            onSubmit={(updatedAnnotations) =>
-              k8sPatch({
-                model: VirtualMachineModel,
-                resource: vm,
-                data: [
-                  {
-                    op: 'replace',
-                    path: '/metadata/annotations',
-                    value: updatedAnnotations,
-                  },
-                ],
-              })
-            }
-          />
-        )),
+      cta: () => stopVM(vm),
+      disabled: [Stopped, Stopping, Terminating, Unknown].includes(vm?.status?.printableStatus),
+      id: 'vm-action-stop',
+      label: t('Stop'),
     };
   },
-  delete: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+  unpause: (vm: V1VirtualMachine): Action => {
     return {
-      id: 'vm-action-delete',
-      disabled: false,
-      label: t('Delete'),
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <DeleteVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
-        )),
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'delete'),
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      cta: () => unpauseVM(vm),
+      disabled: vm?.status?.printableStatus !== Paused,
+      id: 'vm-action-unpause',
+      label: t('Unpause'),
     };
   },
 };

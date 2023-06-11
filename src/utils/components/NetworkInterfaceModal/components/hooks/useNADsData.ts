@@ -7,9 +7,9 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseNADsData = (namespace: string) => {
-  nads: K8sResourceCommon[];
   loaded: boolean;
   loadError: string;
+  nads: K8sResourceCommon[];
 };
 
 const useNADsData: UseNADsData = (namespace) => {
@@ -31,7 +31,7 @@ const useNADsData: UseNADsData = (namespace) => {
         acc.loadError = isEmpty(nads?.loadError) ? acc.loadError : nads?.loadError;
         return acc;
       },
-      { nads: [], loaded: true, loadError: null },
+      { loaded: true, loadError: null, nads: [] },
     );
   }, [data]);
 

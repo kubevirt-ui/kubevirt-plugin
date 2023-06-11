@@ -12,7 +12,7 @@ const RunningVMsChartLegend = ({ legendItems }) => {
   const gridItems = [];
   legendItems.forEach((item: RunningVMsChartLegendLabelItem) => {
     const component = (
-      <GridItem span={6} key={item.name}>
+      <GridItem key={item.name} span={6}>
         <RunningVMsChartLegendLabel item={item} />
       </GridItem>
     );

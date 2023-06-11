@@ -17,11 +17,11 @@ import './SSHSecretSection.scss';
 
 type SSHSecretSectionProps = {
   namespace: string;
-  sshDetails: SSHSecretDetails;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
+  sshDetails: SSHSecretDetails;
 };
 
-const SSHSecretSection: FC<SSHSecretSectionProps> = ({ namespace, sshDetails, setSSHDetails }) => {
+const SSHSecretSection: FC<SSHSecretSectionProps> = ({ namespace, setSSHDetails, sshDetails }) => {
   const [secretSelectionOption, setSecretSelectionOption] = useState<SecretSelectionOption>(
     sshDetails.secretOption,
   );
@@ -43,7 +43,7 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({ namespace, sshDetails, se
           setSSHDetails={setSSHDetails}
         />
       </GridItem>
-      <GridItem span={12} className="ssh-secret-section__body">
+      <GridItem className="ssh-secret-section__body" span={12}>
         {secretSelectionOption === SecretSelectionOption.useExisting && (
           <SecretDropdown
             secretsResourceData={[secrets, ...loadedAndErrorData]}
@@ -52,7 +52,7 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({ namespace, sshDetails, se
           />
         )}
         {secretSelectionOption === SecretSelectionOption.addNew && (
-          <SSHKeyUpload secrets={secrets} sshDetails={sshDetails} setSSHDetails={setSSHDetails} />
+          <SSHKeyUpload secrets={secrets} setSSHDetails={setSSHDetails} sshDetails={sshDetails} />
         )}
       </GridItem>
     </Grid>

@@ -34,16 +34,12 @@ const NetworkCharts: FC<NetworkChartsProps> = ({ vmi }) => {
 
   return (
     <div>
-      <Title headingLevel="h4" className="networkcharts-by-nic--title">
+      <Title className="networkcharts-by-nic--title" headingLevel="h4">
         {t('Network interface:')}
       </Title>{' '}
       <Dropdown
-        className="network ul.pf-c-dropdown__menu"
-        isPlain
-        isText
         dropdownItems={interfacesNames?.map((nic) => (
           <DropdownItem
-            key={nic}
             onClick={(e) => {
               setSelectedNetwork(e?.currentTarget?.innerText);
               setIsDropdownOpen(false);
@@ -51,18 +47,22 @@ const NetworkCharts: FC<NetworkChartsProps> = ({ vmi }) => {
                 `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/metrics?network=${nic}`,
               );
             }}
+            key={nic}
           >
             {nic}
           </DropdownItem>
         ))}
-        isOpen={isDropdownOpen}
         toggle={
           <DropdownToggle onToggle={(toogle) => setIsDropdownOpen(toogle)}>
             {selectedNetwork}
           </DropdownToggle>
         }
+        className="network ul.pf-c-dropdown__menu"
+        isOpen={isDropdownOpen}
+        isPlain
+        isText
       ></Dropdown>
-      <NetworkChartsByNIC vmi={vmi} nic={selectedNetwork} />
+      <NetworkChartsByNIC nic={selectedNetwork} vmi={vmi} />
     </div>
   );
 };

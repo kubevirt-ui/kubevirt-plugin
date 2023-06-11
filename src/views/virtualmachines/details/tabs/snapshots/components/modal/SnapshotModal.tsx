@@ -26,12 +26,12 @@ import SnapshotDeadlineFormField from './SnapshotFormFields/SnapshotDeadlineForm
 import SnapshotSupportedVolumeList from './SnapshotFormFields/SnapshotSupportedVolumeList';
 
 type SnapshotModalProps = {
-  vm: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
+  vm: V1VirtualMachine;
 };
 
-const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, isOpen, onClose }) => {
+const SnapshotModal: React.FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
   const [snapshotName, setSnapshotName] = React.useState<string>(createSnapshotName());
   const [description, setDescription] = React.useState<string>(undefined);
@@ -61,28 +61,28 @@ const SnapshotModal: React.FC<SnapshotModalProps> = ({ vm, isOpen, onClose }) =>
 
   return (
     <TabModal<V1alpha1VirtualMachineSnapshot>
-      isOpen={isOpen}
-      obj={resultSnapshot}
       onSubmit={(obj) =>
         k8sCreate<V1alpha1VirtualMachineSnapshot>({
-          model: VirtualMachineSnapshotModel,
           data: obj,
+          model: VirtualMachineSnapshotModel,
         })
       }
-      onClose={onClose}
       headerText={t('Take snapshot')}
       isDisabled={isSubmitDisabled}
+      isOpen={isOpen}
+      obj={resultSnapshot}
+      onClose={onClose}
     >
       {
         <Form>
           <SupportedVolumesAlert
             isVMRunning={vm?.status?.printableStatus === printableVMStatus.Running}
           />
-          <FormGroup label={t('Name')} fieldId="name" isRequired>
-            <TextInput id="name" type="text" value={snapshotName} onChange={setSnapshotName} />
+          <FormGroup fieldId="name" isRequired label={t('Name')}>
+            <TextInput id="name" onChange={setSnapshotName} type="text" value={snapshotName} />
           </FormGroup>
-          <FormGroup label={t('Description')} fieldId="description">
-            <TextArea id="description" value={description} onChange={setDescription} />
+          <FormGroup fieldId="description" label={t('Description')}>
+            <TextArea id="description" onChange={setDescription} value={description} />
           </FormGroup>
           <SnapshotDeadlineFormField
             deadline={deadline}

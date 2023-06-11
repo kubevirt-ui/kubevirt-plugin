@@ -20,8 +20,8 @@ import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 import TableData from './TableData';
 
 type BootableVolumeRowProps = {
-  bootableVolume: BootableVolume;
   activeColumnIDs: string[];
+  bootableVolume: BootableVolume;
   rowData: {
     bootableVolumeSelectedState: [BootableVolume, Dispatch<SetStateAction<BootableVolume>>];
     preference: V1alpha2VirtualMachineClusterPreference;
@@ -30,8 +30,8 @@ type BootableVolumeRowProps = {
 };
 
 const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
-  bootableVolume,
   activeColumnIDs,
+  bootableVolume,
   rowData: {
     bootableVolumeSelectedState: [selectedBootableVolume, setSelectedBootableVolume],
     preference,
@@ -45,12 +45,12 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   return (
     <Tr
       isHoverable
-      isSelectable
       isRowSelected={getName(selectedBootableVolume) === bootVolumeName}
+      isSelectable
       onClick={() => setSelectedBootableVolume(bootableVolume)}
     >
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
-        <img src={getOSIcon(preference)} alt="os-icon" className="vm-catalog-row-icon" />
+        <img alt="os-icon" className="vm-catalog-row-icon" src={getOSIcon(preference)} />
         <Text component={TextVariants.small}>{bootVolumeName}</Text>
         {isDataSourceCloning(bootableVolume as V1beta1DataSource) && (
           <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>

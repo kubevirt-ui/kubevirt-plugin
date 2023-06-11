@@ -23,42 +23,42 @@ const BootableVolumesRow: FC<
       preferences: V1alpha2VirtualMachineClusterPreference[];
     }
   >
-> = ({ obj, activeColumnIDs, rowData: { preferences } }) => {
+> = ({ activeColumnIDs, obj, rowData: { preferences } }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs} className="pf-m-width-20">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
         <ResourceLink
           groupVersionKind={getBootableVolumeGroupVersionKind(obj)}
+          inline
           name={obj?.metadata?.name}
           namespace={obj?.metadata?.namespace}
-          inline
         />
         {obj.kind === DataSourceModel.kind && isDataSourceCloning(obj as V1beta1DataSource) && (
           <Label>{t('Clone in progress')}</Label>
         )}
       </TableData>
-      <TableData id="namespace" activeColumnIDs={activeColumnIDs} className="pf-m-width-20">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="namespace">
         <ResourceLink kind="Namespace" name={obj?.metadata?.namespace} />
       </TableData>
-      <TableData id="os" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="os">
         {getPreferenceReadableOS(obj, preferences)}
       </TableData>
-      <TableData id="description" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="description">
         <TableText wrapModifier={WrapModifier.truncate}>
           {obj?.metadata?.annotations?.[ANNOTATIONS.description] || NO_DATA_DASH}
         </TableText>
       </TableData>
-      <TableData id="preference" activeColumnIDs={activeColumnIDs} className="pf-m-width-15">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="preference">
         {getSourcePreferenceLabelValue(obj)}
       </TableData>
       <TableData
-        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
+        id=""
       >
-        <BootableVolumesActions source={obj} preferences={preferences} />
+        <BootableVolumesActions preferences={preferences} source={obj} />
       </TableData>
     </>
   );

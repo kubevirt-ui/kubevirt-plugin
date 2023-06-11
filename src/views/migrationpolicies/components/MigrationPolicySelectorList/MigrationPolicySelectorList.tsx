@@ -6,17 +6,17 @@ import { LabelGroup } from '@patternfly/react-core';
 import { MigrationPolicySelector } from './MigrationPolicySelector';
 
 type MigrationPolicySelectorListProps = {
-  selector: { [key: string]: string };
   isVMILabel?: boolean;
+  selector: { [key: string]: string };
 };
 
 export const MigrationPolicySelectorList: React.FC<MigrationPolicySelectorListProps> = memo(
-  ({ selector, isVMILabel }) => {
+  ({ isVMILabel, selector }) => {
     if (isEmpty(selector)) return null;
     return (
       <LabelGroup>
         {Object.entries(selector)?.map(([key, value]) => (
-          <MigrationPolicySelector key={key} matchKey={key} value={value} isVMILabel={isVMILabel} />
+          <MigrationPolicySelector isVMILabel={isVMILabel} key={key} matchKey={key} value={value} />
         ))}
       </LabelGroup>
     );

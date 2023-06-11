@@ -10,7 +10,7 @@ type VirtualMachineLabelsProps = {
 
 const VirtualMachineLabels: React.FC<VirtualMachineLabelsProps> = ({ labels }) => {
   return (
-    <LabelGroup numLabels={10} className="vm-labels-group">
+    <LabelGroup className="vm-labels-group" numLabels={10}>
       {Object.keys(labels || {})?.map((key) => {
         return <Label key={key}>{labels[key] ? `${key}=${labels[key]}` : key}</Label>;
       })}

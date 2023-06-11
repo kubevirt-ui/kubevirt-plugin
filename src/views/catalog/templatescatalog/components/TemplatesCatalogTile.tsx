@@ -17,16 +17,16 @@ import { Badge, Skeleton, Stack, StackItem } from '@patternfly/react-core';
 import { getTemplateOSIcon } from '../utils/os-icons';
 
 export type TemplateTileProps = {
-  template: V1Template;
-  availableTemplatesUID: Set<string>;
   availableDatasources: Record<string, V1beta1DataSource>;
+  availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
-  onClick: (template: V1Template) => void;
   isSelected?: boolean;
+  onClick: (template: V1Template) => void;
+  template: V1Template;
 };
 
 export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
-  ({ template, availableTemplatesUID, availableDatasources, bootSourcesLoaded, onClick }) => {
+  ({ availableDatasources, availableTemplatesUID, bootSourcesLoaded, onClick, template }) => {
     const { t } = useKubevirtTranslation();
 
     const workload = getTemplateWorkload(template);
@@ -37,7 +37,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
       availableDatasources[
         `${bootSource?.source?.sourceRef?.namespace}-${bootSource?.source?.sourceRef?.name}`
       ];
-    const { memory, cpuCount } = getTemplateFlavorData(template);
+    const { cpuCount, memory } = getTemplateFlavorData(template);
 
     const icon = React.useMemo(() => {
       return getTemplateOSIcon(template);
@@ -46,11 +46,14 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
 
     return (
       <CatalogTile
-        className="vm-catalog-grid-tile"
-        data-test-id={template.metadata.name}
+        badges={
+          bootSourcesLoaded
+            ? isBootSourceAvailable && [<Badge key="available-boot">{t('Source available')}</Badge>]
+            : [<Skeleton className="badgeload" height="18px" key="loading-sources" width="105px" />]
+        }
         icon={
           <div>
-            <img src={icon} alt="os-icon" />
+            <img alt="os-icon" src={icon} />
           </div>
         }
         title={
@@ -61,12 +64,9 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
             <StackItem className="text-secondary">{template.metadata.name}</StackItem>
           </Stack>
         }
+        className="vm-catalog-grid-tile"
+        data-test-id={template.metadata.name}
         onClick={() => onClick(template)}
-        badges={
-          bootSourcesLoaded
-            ? isBootSourceAvailable && [<Badge key="available-boot">{t('Source available')}</Badge>]
-            : [<Skeleton key="loading-sources" height="18px" width="105px" className="badgeload" />]
-        }
       >
         <Stack hasGutter>
           <StackItem>

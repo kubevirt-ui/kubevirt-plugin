@@ -3,9 +3,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getResizeObserver } from '@patternfly/react-charts';
 
 type UseResponsiveCharts = () => {
-  width: number;
   height: number;
   ref: (node: Element) => void;
+  width: number;
 };
 const useResponsiveCharts: UseResponsiveCharts = () => {
   const containerRef = useRef(null);
@@ -30,7 +30,7 @@ const useResponsiveCharts: UseResponsiveCharts = () => {
     };
   }, [listener]);
 
-  return { ref, width, height };
+  return { height, ref, width };
 };
 
 export default useResponsiveCharts;

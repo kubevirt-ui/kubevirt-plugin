@@ -23,17 +23,17 @@ const MigrationsTimeAxis: FC<MigrationsTimeAxisProps> = ({ domainX, timespan }) 
       </div>
       <div className="co-utilization-card__item-chart co-utilization-card__item-chart--times">
         <ChartAxis
-          containerComponent={<ChartContainer title={t('Time axis')} />}
-          scale={{ x: 'time' }}
-          orientation="top"
-          padding={{ top: 30, bottom: 0, left: 70, right: 0 }}
-          domain={{ x: domainX }}
-          tickValues={getTimeTickValues(domainX)}
-          tickFormat={(time) => formatTimestamp(timespan, time, true)}
-          fixLabelOverlap
-          width={width}
-          height={15}
           axisComponent={<></>}
+          containerComponent={<ChartContainer title={t('Time axis')} />}
+          domain={{ x: domainX }}
+          fixLabelOverlap
+          height={15}
+          orientation="top"
+          padding={{ bottom: 0, left: 70, right: 0, top: 30 }}
+          scale={{ x: 'time' }}
+          tickFormat={(time) => formatTimestamp(timespan, time, true)}
+          tickValues={getTimeTickValues(domainX)}
+          width={width}
         />
       </div>
     </div>

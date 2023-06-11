@@ -89,14 +89,14 @@ export const getTemplateNameParameterValue = (template: V1Template): string => {
 };
 
 export const processTemplate = async ({
-  template,
-  namespace = DEFAULT_NAMESPACE,
   formData,
+  namespace = DEFAULT_NAMESPACE,
+  template,
   withWindowsDrivers,
 }: {
-  template: V1Template;
-  namespace: string;
   formData: FormData;
+  namespace: string;
+  template: V1Template;
   withWindowsDrivers?: boolean;
 }): Promise<V1Template> => {
   const virtualMachineName = formData.get(NAME_INPUT_FIELD) as string;
@@ -124,8 +124,8 @@ export const processTemplate = async ({
   }
 
   return await k8sCreate<V1Template>({
-    model: ProcessedTemplatesModel,
     data: { ...templateToProcess, metadata: { ...template?.metadata, namespace } },
+    model: ProcessedTemplatesModel,
     queryParams: {
       dryRun: 'All',
     },
@@ -134,10 +134,10 @@ export const processTemplate = async ({
 
 export const getVirtualMachineNameField = (vmName: string): TemplateParameter => {
   return {
-    required: true,
-    name: NAME_INPUT_FIELD,
-    displayName: t('Name'),
     description: t('VirtualMachine name'),
+    displayName: t('Name'),
+    name: NAME_INPUT_FIELD,
+    required: true,
     value: vmName,
   };
 };

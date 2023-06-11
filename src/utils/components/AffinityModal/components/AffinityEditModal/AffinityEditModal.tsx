@@ -13,23 +13,23 @@ import { useNodeFieldQualifier } from './hooks/useNodeFieldQualifier';
 import { useNodeLabelQualifier } from './hooks/useNodeLabelQualifier';
 
 type AffinityEditModalProps = {
+  focusedAffinity: AffinityRowData;
+  isOpen: boolean;
   nodes: IoK8sApiCoreV1Node[];
   nodesLoaded: boolean;
-  isOpen: boolean;
   onCancel: () => void;
   onSubmit: (affinity: AffinityRowData) => void;
-  focusedAffinity: AffinityRowData;
   setFocusedAffinity: React.Dispatch<React.SetStateAction<AffinityRowData>>;
   title: string;
 };
 
 const AffinityEditModal: React.FC<AffinityEditModalProps> = ({
+  focusedAffinity,
+  isOpen,
   nodes,
   nodesLoaded,
-  isOpen,
   onCancel,
   onSubmit,
-  focusedAffinity,
   setFocusedAffinity,
   title,
 }) => {
@@ -43,16 +43,9 @@ const AffinityEditModal: React.FC<AffinityEditModalProps> = ({
   const qualifiedFieldNodes = useNodeFieldQualifier(nodes, nodesLoaded, fields?.entities);
   return (
     <Modal
-      variant={ModalVariant.medium}
-      className="ocs-modal co-catalog-page__overlay"
-      position="top"
-      isOpen={isOpen}
-      onClose={onCancel}
-      title={title}
       footer={
         <ActionGroup>
           <Button
-            isDisabled={isDisabled}
             onClick={() =>
               onSubmit({
                 ...focusedAffinity,
@@ -60,6 +53,7 @@ const AffinityEditModal: React.FC<AffinityEditModalProps> = ({
                 fields: fields?.entities,
               })
             }
+            isDisabled={isDisabled}
             variant={ButtonVariant.primary}
           >
             {t('Save affinity rule')}
@@ -69,21 +63,27 @@ const AffinityEditModal: React.FC<AffinityEditModalProps> = ({
           </Button>
         </ActionGroup>
       }
+      className="ocs-modal co-catalog-page__overlay"
+      isOpen={isOpen}
+      onClose={onCancel}
+      position="top"
+      title={title}
+      variant={ModalVariant.medium}
     >
       <AffinityForm
-        focusedAffinity={focusedAffinity}
-        setFocusedAffinity={setFocusedAffinity}
-        isSubmitDisabled={isDisabled}
-        setSubmitDisabled={setIsDisabled}
-        expressions={expressions}
-        fields={fields}
         qualifiedNodes={getIntersectedQualifiedNodes({
           expressionNodes: qualifiedExpressionNodes,
-          fieldNodes: qualifiedFieldNodes,
           expressions: expressions?.entities,
+          fieldNodes: qualifiedFieldNodes,
           fields: fields?.entities,
         })}
+        expressions={expressions}
+        fields={fields}
+        focusedAffinity={focusedAffinity}
+        isSubmitDisabled={isDisabled}
         nodesLoaded={nodesLoaded}
+        setFocusedAffinity={setFocusedAffinity}
+        setSubmitDisabled={setIsDisabled}
       />
     </Modal>
   );

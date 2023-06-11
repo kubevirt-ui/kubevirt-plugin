@@ -16,29 +16,29 @@ export type AffinityRowProps = {
 const AffinityRow: React.FC<
   RowProps<
     AffinityRowData,
-    { onEdit: (affinity: AffinityRowData) => void; onDelete: (affinity: AffinityRowData) => void }
+    { onDelete: (affinity: AffinityRowData) => void; onEdit: (affinity: AffinityRowData) => void }
   >
-> = ({ obj: affinity, activeColumnIDs, rowData: { onEdit, onDelete } }) => {
+> = ({ activeColumnIDs, obj: affinity, rowData: { onDelete, onEdit } }) => {
   const expressionsLabel =
     affinity?.expressions?.length > 0 && pluralize(affinity?.expressions?.length, 'Expression');
   const fieldsLabel =
     affinity?.fields?.length > 0 && pluralize(affinity?.fields.length, 'Node Field');
   return (
     <>
-      <TableData id="type" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="type">
         {AFFINITY_TYPE_LABLES[affinity?.type]}
       </TableData>
-      <TableData id="condition" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="condition">
         {AFFINITY_CONDITION_LABELS[affinity?.condition]}
       </TableData>
-      <TableData id="weight" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="weight">
         {affinity?.weight || NO_DATA_DASH}
       </TableData>
-      <TableData id="terms" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="terms">
         <div>{expressionsLabel}</div> <div>{fieldsLabel}</div>
       </TableData>
-      <TableData id="" activeColumnIDs={activeColumnIDs} className="pf-c-table__action">
-        <AffinityRowActionsDropdown affinity={affinity} onEdit={onEdit} onDelete={onDelete} />
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-c-table__action" id="">
+        <AffinityRowActionsDropdown affinity={affinity} onDelete={onDelete} onEdit={onEdit} />
       </TableData>
     </>
   );

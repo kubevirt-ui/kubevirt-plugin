@@ -34,10 +34,10 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
   const history = useHistory();
 
   const [dataSources, loaded, loadError] = useK8sWatchResource<V1beta1DataSource[]>({
-    kind,
     isList: true,
-    namespaced: true,
+    kind,
     namespace,
+    namespaced: true,
   });
   const [columns, activeColumns] = useDataSourcesColumns(namespace);
   const filters = getDataImportCronFilter();
@@ -57,37 +57,37 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
     <>
       <ListPageHeader title={t('DataSources')}>
         <ListPageCreateDropdown
+          createAccessReview={{ groupVersionKind: DataSourceModelRef, namespace: namespace }}
           items={createItems}
           onClick={onCreate}
-          createAccessReview={{ groupVersionKind: DataSourceModelRef, namespace: namespace }}
         >
           {t('Create DataSource')}
         </ListPageCreateDropdown>
       </ListPageHeader>
       <ListPageBody>
         <ListPageFilter
-          data={unfilteredData}
-          loaded={loaded}
-          rowFilters={filters}
-          onFilterChange={onFilterChange}
           columnLayout={{
-            columns: columns?.map(({ id, title, additional }) => ({
+            columns: columns?.map(({ additional, id, title }) => ({
+              additional,
               id,
               title,
-              additional,
             })),
             id: DataSourceModelRef,
             selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
             type: t('DataSource'),
           }}
+          data={unfilteredData}
+          loaded={loaded}
+          onFilterChange={onFilterChange}
+          rowFilters={filters}
         />
         <VirtualizedTable<V1beta1DataSource>
+          columns={activeColumns}
           data={data}
-          unfilteredData={unfilteredData}
           loaded={loaded}
           loadError={loadError}
-          columns={activeColumns}
           Row={DataSourcesListRow}
+          unfilteredData={unfilteredData}
         />
       </ListPageBody>
     </>

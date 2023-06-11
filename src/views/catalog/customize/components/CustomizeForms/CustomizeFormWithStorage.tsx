@@ -28,13 +28,13 @@ import { FormError } from '../FormError';
 import { useCustomizeFormSubmit } from './useCustomizeFormSubmit';
 
 type CustomizeFormWithStorageProps = {
-  template: V1Template;
   isBootSourceAvailable?: boolean;
+  template: V1Template;
 };
 
 const CustomizeFormWithStorage: FC<CustomizeFormWithStorageProps> = ({
-  template,
   isBootSourceAvailable,
+  template,
 }) => {
   const methods = useForm();
   const { params } = useURLParams();
@@ -62,10 +62,10 @@ const CustomizeFormWithStorage: FC<CustomizeFormWithStorageProps> = ({
     getTemplateOS(template) === OS_NAME_TYPES.windows,
   );
 
-  const { onSubmit, onCancel, diskUpload, cdUpload, loaded, error } = useCustomizeFormSubmit({
-    template: templateWithSources,
-    diskSource,
+  const { cdUpload, diskUpload, error, loaded, onCancel, onSubmit } = useCustomizeFormSubmit({
     cdSource,
+    diskSource,
+    template: templateWithSources,
     withWindowsDrivers: windowsDrivers,
   });
 
@@ -79,20 +79,20 @@ const CustomizeFormWithStorage: FC<CustomizeFormWithStorageProps> = ({
         <FieldGroup field={nameField} showError={error} />
 
         {requiredFields?.map((field) => (
-          <FieldGroup key={field.name} field={field} showError={error} />
+          <FieldGroup field={field} key={field.name} showError={error} />
         ))}
 
         <ExpandableCustomizeSourceSection
+          cdSource={cdSource}
+          cdUpload={cdUpload}
           diskSource={diskSource}
+          diskUpload={diskUpload}
           isBootSourceAvailable={isBootSourceAvailable}
+          setCDSource={setCDSource}
           setDiskSource={setDiskSource}
+          setDrivers={setWindowsDrivers}
           template={template}
           withDrivers={windowsDrivers}
-          setDrivers={setWindowsDrivers}
-          cdSource={cdSource}
-          setCDSource={setCDSource}
-          diskUpload={diskUpload}
-          cdUpload={cdUpload}
         />
 
         <ExpandableOptionsFields optionalFields={optionalFields} />

@@ -25,9 +25,9 @@ export const getPaginationFromVolumeIndex =
     const endIndex = page * perPage;
 
     return {
+      endIndex,
       page,
       perPage,
       startIndex,
-      endIndex,
     };
   };

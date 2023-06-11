@@ -47,16 +47,16 @@ const useDashboardK8sResources = () => {
               activity.properties.isActivity ? activity.properties.isActivity(r) : true,
             )
             .map((r) => ({
+              // loader: (a as DashboardsOverviewResourceActivity)?.properties?.loader,
+              component: (activity as ResolvedExtension<DynamicDashboardsOverviewResourceActivity>)
+                ?.properties?.component,
+              // skipcq: JS-0349
+              loader: (activity as any)?.properties?.loader,
+              // TODO Fix typing
               resource: r,
               timestamp: activity.properties.getTimestamp
                 ? activity.properties.getTimestamp(r)
                 : null,
-              // TODO Fix typing
-              // skipcq: JS-0349
-              loader: (activity as any)?.properties?.loader,
-              // loader: (a as DashboardsOverviewResourceActivity)?.properties?.loader,
-              component: (activity as ResolvedExtension<DynamicDashboardsOverviewResourceActivity>)
-                ?.properties?.component,
             }));
         })
         ?.reduce((a, b) => a.concat(b), []),

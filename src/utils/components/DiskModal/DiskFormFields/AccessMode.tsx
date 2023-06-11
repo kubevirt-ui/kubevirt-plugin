@@ -23,10 +23,10 @@ const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatchDiskState, s
 
   const {
     accessMode,
-    volumeMode,
-    storageProfileSettingsCheckboxDisabled,
     applyStorageProfileSettings,
     storageClassProvisioner,
+    storageProfileSettingsCheckboxDisabled,
+    volumeMode,
   } = diskState || {};
 
   const allowedAccessModes = React.useMemo(() => {
@@ -37,19 +37,19 @@ const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatchDiskState, s
     if (!storageProfileSettingsCheckboxDisabled) {
       if (applyStorageProfileSettings) {
         dispatchDiskState({
-          type: diskReducerActions.SET_ACCESS_MODE,
           payload: null,
+          type: diskReducerActions.SET_ACCESS_MODE,
         });
       } else if (spAccessMode && !accessMode) {
         dispatchDiskState({
-          type: diskReducerActions.SET_ACCESS_MODE,
           payload: spAccessMode,
+          type: diskReducerActions.SET_ACCESS_MODE,
         });
       }
     } else if (!allowedAccessModes?.includes(accessMode)) {
       dispatchDiskState({
-        type: diskReducerActions.SET_ACCESS_MODE,
         payload: allowedAccessModes[0],
+        type: diskReducerActions.SET_ACCESS_MODE,
       });
     }
   }, [
@@ -67,17 +67,17 @@ const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatchDiskState, s
 
   return (
     <FormGroup fieldId="access-mode" label={t('Access Mode')}>
-      {getAccessModeRadioOptions(t)?.map(({ value, label }) => (
+      {getAccessModeRadioOptions(t)?.map(({ label, value }) => (
         <Radio
-          name="accessMode"
+          onChange={() =>
+            dispatchDiskState({ payload: value, type: diskReducerActions.SET_ACCESS_MODE })
+          }
           id={value}
           isChecked={value === accessMode}
+          isDisabled={!allowedAccessModes?.includes(value)}
           key={value}
           label={label}
-          onChange={() =>
-            dispatchDiskState({ type: diskReducerActions.SET_ACCESS_MODE, payload: value })
-          }
-          isDisabled={!allowedAccessModes?.includes(value)}
+          name="accessMode"
         />
       ))}
     </FormGroup>

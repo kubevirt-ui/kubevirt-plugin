@@ -2,9 +2,9 @@ export const KUBEADMIN_USERNAME = 'kubeadmin';
 export const KUBEADMIN_IDP = 'kube:admin';
 
 export enum CLUSTER_STATUS {
-  READY = 'Ready',
-  PROGRESSING = 'Progressing',
   HEALTH_ERROR = 'HEALTH_ERR',
+  PROGRESSING = 'Progressing',
+  READY = 'Ready',
 }
 
 export const adminOnlyDescribe = Cypress.env('NON_PRIV') ? xdescribe : describe;
@@ -12,10 +12,10 @@ export const adminOnlyDescribe = Cypress.env('NON_PRIV') ? xdescribe : describe;
 export const TEST_NS = 'auto-test-ns';
 
 export enum VM_STATUS {
-  Starting = 'Starting',
-  Running = 'Running',
-  Stopped = 'Stopped',
   Provisioning = 'Provisioning',
+  Running = 'Running',
+  Starting = 'Starting',
+  Stopped = 'Stopped',
 }
 
 export enum ACTION_TIMEOUT {

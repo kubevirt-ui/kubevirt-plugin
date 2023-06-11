@@ -6,10 +6,10 @@ import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import './RunningVMsChartLegendLabel.scss';
 
 export type RunningVMsChartLegendLabelItem = {
-  name: string;
-  vmCount: number;
   color: string;
+  name: string;
   namespace: string;
+  vmCount: number;
 };
 
 type RunningVMsChartLegendLabelProps = {

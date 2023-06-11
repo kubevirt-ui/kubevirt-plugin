@@ -23,9 +23,9 @@ const CPUDescription: FC<CPUDescriptionProps> = ({
       <div>
         {helperTextResource}
         {t(' {{sockets}} sockets, {{threads}} threads, and {{cores}} cores.', {
+          cores,
           sockets,
           threads,
-          cores,
         })}
       </div>
     </>

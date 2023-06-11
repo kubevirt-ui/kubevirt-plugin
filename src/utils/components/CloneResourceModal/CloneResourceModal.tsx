@@ -10,17 +10,17 @@ import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 import TabModal from '../TabModal/TabModal';
 
 type CloneResourceModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
-  isOpen: boolean;
-  onClose: () => void;
-  object: T;
-  model: K8sModel;
   headerText?: string;
+  isOpen: boolean;
+  model: K8sModel;
+  object: T;
+  onClose: () => void;
 };
 
 const CloneResourceModal: FC<CloneResourceModalProps> = ({
-  object,
-  model,
   headerText,
+  model,
+  object,
   ...modalProps
 }) => {
   const { t } = useKubevirtTranslation();
@@ -33,8 +33,8 @@ const CloneResourceModal: FC<CloneResourceModalProps> = ({
     });
 
     return k8sCreate({
-      model,
       data: newObject,
+      model,
     });
   };
 
@@ -45,8 +45,8 @@ const CloneResourceModal: FC<CloneResourceModalProps> = ({
       onSubmit={onSubmit}
     >
       <Form>
-        <FormGroup label={t('Name')} isRequired>
-          <TextInput value={newName} onChange={setNewName} />
+        <FormGroup isRequired label={t('Name')}>
+          <TextInput onChange={setNewName} value={newName} />
         </FormGroup>
       </Form>
     </TabModal>

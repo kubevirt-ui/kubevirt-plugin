@@ -14,7 +14,7 @@ import { HelpIcon } from '@patternfly/react-icons';
 
 export const useVirtualMachineTemplatesCPUMemory = (
   template: V1Template,
-): string | React.ReactNode => {
+): React.ReactNode | string => {
   const { t } = useKubevirtTranslation();
   const cpu = getTemplateVirtualMachineCPU(template);
   const { memory } = getFlavorData(template);

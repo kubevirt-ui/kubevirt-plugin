@@ -9,9 +9,6 @@ const useDisksFilters = (): RowFilter[] => {
   const filters: RowFilter[] = React.useMemo(
     () => [
       {
-        filterGroupName: t('Disk Type'),
-        type: 'disk-type',
-        reducer: (obj) => obj?.drive,
         filter: (drives, obj) => {
           const drive = obj?.drive;
           return (
@@ -20,10 +17,13 @@ const useDisksFilters = (): RowFilter[] => {
             !drives?.all?.find((item) => item === drive)
           );
         },
+        filterGroupName: t('Disk Type'),
         items: Object.keys(diskTypesLabels).map((type) => ({
           id: diskTypesLabels[type],
           title: diskTypesLabels[type],
         })),
+        reducer: (obj) => obj?.drive,
+        type: 'disk-type',
       },
     ],
     [t],

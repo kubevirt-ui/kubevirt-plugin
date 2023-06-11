@@ -8,21 +8,21 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Bullseye, Checkbox, StackItem } from '@patternfly/react-core';
 
 type DeleteOwnedResourcesMessageProps = {
-  deleteOwnedResource: boolean;
-  setDeleteOwnedResource: React.Dispatch<React.SetStateAction<boolean>>;
   dataVolumes: V1beta1DataVolume[];
-  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  snapshots: V1alpha1VirtualMachineSnapshot[];
+  deleteOwnedResource: boolean;
   loaded: boolean;
+  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
+  setDeleteOwnedResource: React.Dispatch<React.SetStateAction<boolean>>;
+  snapshots: V1alpha1VirtualMachineSnapshot[];
 };
 
 const DeleteOwnedResourcesMessage: React.FC<DeleteOwnedResourcesMessageProps> = ({
-  deleteOwnedResource,
-  setDeleteOwnedResource,
   dataVolumes,
-  pvcs,
-  snapshots,
+  deleteOwnedResource,
   loaded,
+  pvcs,
+  setDeleteOwnedResource,
+  snapshots,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -51,8 +51,8 @@ const DeleteOwnedResourcesMessage: React.FC<DeleteOwnedResourcesMessageProps> = 
           <Checkbox
             id="delete-owned-resources"
             isChecked={deleteOwnedResource}
-            onChange={setDeleteOwnedResource}
             label={t('Delete disks ({{diskCount}}x)', { diskCount })}
+            onChange={setDeleteOwnedResource}
           />
         </StackItem>
       )}

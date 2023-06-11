@@ -5,21 +5,21 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 export const snapshotStatuses = {
-  InProgress: 'InProgress',
   Failed: 'Failed',
+  InProgress: 'InProgress',
   Succeeded: 'Succeeded',
 };
 
 export const iconMapper = {
-  InProgress: YellowExclamationTriangleIcon,
   Failed: RedExclamationCircleIcon,
+  InProgress: YellowExclamationTriangleIcon,
   Succeeded: GreenCheckCircleIcon,
 };
 
 // https://kubevirt.io/user-guide/operations/snapshot_restore_api/#snapshot-a-virtualmachine
 export enum deadlineUnits {
-  Miliseconds = 'ms',
-  Seconds = 's',
-  Minutes = 'm',
   Hours = 'h',
+  Miliseconds = 'ms',
+  Minutes = 'm',
+  Seconds = 's',
 }

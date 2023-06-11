@@ -14,8 +14,6 @@ export const HardwareDevicesPage: React.FC<any> = (props) => {
 
   const pages = [
     {
-      href: '',
-      name: t('PCI Host devices'),
       component: (pageProps) => (
         <div className="co-m-pane__body">
           <Bullseye>
@@ -23,13 +21,13 @@ export const HardwareDevicesPage: React.FC<any> = (props) => {
           </Bullseye>
         </div>
       ),
+      href: '',
+      name: t('PCI Host devices'),
       pageData: {
         devices: permittedHostDevices?.pciHostDevices,
       },
     },
     {
-      href: 'mediated',
-      name: t('Mediated devices'),
       component: (pageProps) => (
         <div className="co-m-pane__body">
           <Bullseye>
@@ -37,6 +35,8 @@ export const HardwareDevicesPage: React.FC<any> = (props) => {
           </Bullseye>
         </div>
       ),
+      href: 'mediated',
+      name: t('Mediated devices'),
       pageData: {
         devices: permittedHostDevices?.mediatedDevices,
       },
@@ -53,13 +53,13 @@ export const HardwareDevicesPage: React.FC<any> = (props) => {
               'Various types of hardware devices are assigned to virtual machines in the cluster',
             )}
           >
-            <Button variant="plain" aria-label="Action">
+            <Button aria-label="Action" variant="plain">
               <HelpIcon noVerticalAlign />
             </Button>
           </Popover>
         </h1>
       </div>
-      <HorizontalNav {...props} pages={pages} match={props.match} />
+      <HorizontalNav {...props} match={props.match} pages={pages} />
     </div>
   );
 };

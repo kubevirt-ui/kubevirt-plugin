@@ -22,41 +22,41 @@ import {
 } from './utils/helpers';
 
 type NetworkInterfaceModalOnSubmit = {
-  nicName: string;
-  networkName: string;
-  interfaceModel: string;
   interfaceMACAddress: string;
+  interfaceModel: string;
   interfaceType: string;
+  networkName: string;
+  nicName: string;
 };
 
 type NetworkInterfaceModalProps = {
-  vm: V1VirtualMachine;
-  isOpen: boolean;
-  onClose: () => void;
+  fixedName?: boolean;
   Header?: ReactNode;
   headerText: string;
+  isOpen: boolean;
   namespace?: string;
   nicPresentation?: NetworkPresentation;
-  fixedName?: boolean;
+  onClose: () => void;
   onSubmit: (
     args: NetworkInterfaceModalOnSubmit,
   ) => (
     obj: V1VirtualMachine,
-  ) => Promise<void | V1VirtualMachine | V1VirtualMachine[] | V1Template | V1Template[]>;
+  ) => Promise<V1Template | V1Template[] | V1VirtualMachine | V1VirtualMachine[] | void>;
+  vm: V1VirtualMachine;
 };
 
 const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
-  onSubmit,
-  vm,
-  isOpen,
-  onClose,
+  fixedName = false,
   Header,
   headerText,
+  isOpen,
   namespace,
-  nicPresentation = { network: null, iface: null },
-  fixedName = false,
+  nicPresentation = { iface: null, network: null },
+  onClose,
+  onSubmit,
+  vm,
 }) => {
-  const { network = null, iface = null } = nicPresentation;
+  const { iface = null, network = null } = nicPresentation;
   const [nicName, setNicName] = useState(network?.name || generateNicName());
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
   const [networkName, setNetworkName] = useState(getNetworkName(network));
@@ -70,45 +70,45 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const onSubmitModal = useCallback(() => {
     return (
       onSubmit &&
-      onSubmit({ nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType })
+      onSubmit({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName })
     );
   }, [nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType, onSubmit]);
 
   return (
     <TabModal<K8sResourceCommon>
-      obj={vm}
-      onSubmit={onSubmitModal()}
-      isOpen={isOpen}
-      onClose={onClose}
       headerText={headerText}
       isDisabled={submitDisabled}
+      isOpen={isOpen}
+      obj={vm}
+      onClose={onClose}
+      onSubmit={onSubmitModal()}
     >
       <Form>
         {Header}
-        <NameFormField objName={nicName} setObjName={setNicName} isDisabled={fixedName} />
+        <NameFormField isDisabled={fixedName} objName={nicName} setObjName={setNicName} />
         <NetworkInterfaceModelSelect
           interfaceModel={interfaceModel}
           setInterfaceModel={setInterfaceModel}
         />
         <NetworkInterfaceNetworkSelect
-          vm={vm}
-          networkName={networkName}
-          setNetworkName={setNetworkName}
-          setInterfaceType={setInterfaceType}
-          setSubmitDisabled={setSubmitDisabled}
-          namespace={namespace}
           isEditing={Boolean(network) && Boolean(iface)}
+          namespace={namespace}
+          networkName={networkName}
+          setInterfaceType={setInterfaceType}
+          setNetworkName={setNetworkName}
+          setSubmitDisabled={setSubmitDisabled}
+          vm={vm}
         />
         <NetworkInterfaceTypeSelect
           interfaceType={interfaceType}
-          setInterfaceType={setInterfaceType}
           networkName={networkName}
+          setInterfaceType={setInterfaceType}
         />
         <NetworkInterfaceMACAddressInput
           interfaceMACAddress={interfaceMACAddress}
+          isDisabled={!networkName || networkNameStartWithPod(networkName)}
           setInterfaceMACAddress={setInterfaceMACAddress}
           setIsError={setSubmitDisabled}
-          isDisabled={!networkName || networkNameStartWithPod(networkName)}
         />
       </Form>
     </TabModal>

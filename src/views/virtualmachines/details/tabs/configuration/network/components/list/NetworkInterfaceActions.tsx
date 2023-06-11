@@ -21,15 +21,15 @@ import {
 import VirtualMachinesEditNetworkInterfaceModal from '../modal/VirtualMachinesEditNetworkInterfaceModal';
 
 type NetworkInterfaceActionsProps = {
-  vm: V1VirtualMachine;
   nicName: string;
   nicPresentation: NetworkPresentation;
+  vm: V1VirtualMachine;
 };
 
 const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
-  vm,
   nicName,
   nicPresentation,
+  vm,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -48,10 +48,10 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <VirtualMachinesEditNetworkInterfaceModal
-        vm={vm}
         isOpen={isOpen}
-        onClose={onClose}
         nicPresentation={nicPresentation}
+        onClose={onClose}
+        vm={vm}
       />
     ));
     setIsDropdownOpen(false);
@@ -60,18 +60,18 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const onDeleteModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
-        isOpen={isOpen}
-        onClose={onClose}
-        obj={resultVirtualMachine}
         onSubmit={(obj) =>
           k8sUpdate({
-            model: VirtualMachineModel,
             data: obj,
-            ns: obj?.metadata?.namespace,
+            model: VirtualMachineModel,
             name: obj?.metadata?.name,
+            ns: obj?.metadata?.namespace,
           })
         }
         headerText={deleteModalHeader}
+        isOpen={isOpen}
+        obj={resultVirtualMachine}
+        onClose={onClose}
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
@@ -84,10 +84,10 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   };
 
   const items = [
-    <DropdownItem onClick={onEditModalOpen} key="network-interface-edit">
+    <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
       {editBtnText}
     </DropdownItem>,
-    <DropdownItem onClick={onDeleteModalOpen} key="network-interface-delete">
+    <DropdownItem key="network-interface-delete" onClick={onDeleteModalOpen}>
       {deleteBtnText}
     </DropdownItem>,
   ];
@@ -95,12 +95,12 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   return (
     <>
       <Dropdown
-        onSelect={() => setIsDropdownOpen(false)}
-        toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-6" />}
+        dropdownItems={items}
         isOpen={isDropdownOpen}
         isPlain
-        dropdownItems={items}
+        onSelect={() => setIsDropdownOpen(false)}
         position={DropdownPosition.right}
+        toggle={<KebabToggle id="toggle-id-6" onToggle={setIsDropdownOpen} />}
       />
     </>
   );

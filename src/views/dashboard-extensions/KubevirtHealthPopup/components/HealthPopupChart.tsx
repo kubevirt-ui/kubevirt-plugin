@@ -22,9 +22,9 @@ const HealthPopupChart: React.FC<HealthPopupChartProps> = ({ alerts }) => {
         const numAlertsForType: number = alerts[alertType]?.length;
         const percentage: number = Math.round((numAlertsForType / totalNumberAlerts) * 100);
         acc.push({
+          fill: alertTypeToColorMap[alertType],
           x: alertType,
           y: percentage,
-          fill: alertTypeToColorMap[alertType],
         });
         return acc;
       }, []),
@@ -34,14 +34,6 @@ const HealthPopupChart: React.FC<HealthPopupChartProps> = ({ alerts }) => {
   return (
     <div>
       <ChartDonut
-        title={totalNumberAlerts?.toString()}
-        subTitle={t('Alerts')}
-        ariaDesc={t('Virtualization Alerts')}
-        ariaTitle={t('Virtualization Alerts donut chart')}
-        height={200}
-        width={200}
-        data={chartData}
-        labels={({ datum }) => `${datum?.x}: ${datum?.y}%`}
         padding={{
           bottom: 0,
           left: 20,
@@ -53,6 +45,14 @@ const HealthPopupChart: React.FC<HealthPopupChartProps> = ({ alerts }) => {
             fill: ({ datum }) => datum?.fill,
           },
         }}
+        ariaDesc={t('Virtualization Alerts')}
+        ariaTitle={t('Virtualization Alerts donut chart')}
+        data={chartData}
+        height={200}
+        labels={({ datum }) => `${datum?.x}: ${datum?.y}%`}
+        subTitle={t('Alerts')}
+        title={totalNumberAlerts?.toString()}
+        width={200}
       />
     </div>
   );

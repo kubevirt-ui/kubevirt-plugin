@@ -44,27 +44,27 @@ import {
 } from './utils/helpers';
 
 type DiskModalProps = {
-  vm: V1VirtualMachine;
+  createOwnerReference?: boolean;
+  headerText: string;
+  initialDiskSourceState: DiskSourceState;
+  initialDiskState: DiskFormState;
   isOpen: boolean;
   onClose: () => void;
-  headerText: string;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
-  initialDiskState: DiskFormState;
-  initialDiskSourceState: DiskSourceState;
-  createOwnerReference?: boolean;
+  vm: V1VirtualMachine;
 };
 
 const EditDiskModal: React.FC<DiskModalProps> = ({
-  vm,
+  createOwnerReference = true,
+  headerText,
+  initialDiskSourceState,
+  initialDiskState,
   isOpen,
   onClose,
-  headerText,
   onSubmit,
   onUploadedDataVolume,
-  initialDiskState,
-  initialDiskSourceState,
-  createOwnerReference = true,
+  vm,
 }) => {
   const { upload, uploadData } = useCDIUpload();
   const [diskState, dispatchDiskState] = React.useReducer(diskReducer, initialDiskState);
@@ -91,17 +91,17 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     const resultVolume = updateVolume(vm, volumeToUpdate, diskState, diskSourceState);
 
     const resultDataVolume = getDataVolumeFromState({
-      vm,
-      diskState,
-      diskSourceState,
-      resultVolume,
       createOwnerReference,
+      diskSourceState,
+      diskState,
+      resultVolume,
+      vm,
     });
     if (diskState.diskSource === sourceTypes.UPLOAD) {
       if (onUploadedDataVolume) onUploadedDataVolume(resultDataVolume);
       return uploadData({
-        file: diskSourceState?.uploadFile as File,
         dataVolume: resultDataVolume,
+        file: diskSourceState?.uploadFile as File,
       });
     }
     return Promise.resolve();
@@ -128,11 +128,11 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     const resultDataVolume =
       sourceRequiresDataVolume &&
       getDataVolumeFromState({
-        vm,
-        diskState,
-        diskSourceState,
-        resultVolume,
         createOwnerReference,
+        diskSourceState,
+        diskState,
+        resultVolume,
+        vm,
       });
     const resultDataVolumeTemplate =
       sourceRequiresDataVolume && getDataVolumeTemplate(resultDataVolume);
@@ -188,9 +188,6 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
 
   return (
     <TabModal
-      obj={updatedVirtualMachine}
-      onSubmit={handleSubmit}
-      isOpen={isOpen}
       onClose={async () => {
         if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
           await upload?.cancelUpload();
@@ -198,53 +195,56 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
         onClose();
       }}
       headerText={headerText}
+      isOpen={isOpen}
+      obj={updatedVirtualMachine}
+      onSubmit={handleSubmit}
     >
       <Form>
         <BootSourceCheckbox
-          isDisabled={initialDiskState.asBootSource}
-          isBootSource={diskState.asBootSource}
+          dispatchDiskState={dispatchDiskState}
           initialBootDiskName={getBootDisk(vm)?.name}
-          dispatchDiskState={dispatchDiskState}
+          isBootSource={diskState.asBootSource}
+          isDisabled={initialDiskState.asBootSource}
         />
-        <NameFormField objName={diskState.diskName} dispatchDiskState={dispatchDiskState} />
+        <NameFormField dispatchDiskState={dispatchDiskState} objName={diskState.diskName} />
         <DiskSourceFormSelect
-          vm={vm}
-          diskState={diskState}
-          dispatchDiskState={dispatchDiskState}
           diskSourceState={diskSourceState}
+          diskState={diskState}
           dispatchDiskSourceState={dispatchDiskSourceState}
+          dispatchDiskState={dispatchDiskState}
           isVMRunning={false}
           relevantUpload={upload}
+          vm={vm}
         />
         <DiskSourceSizeInput diskState={diskState} dispatchDiskState={dispatchDiskState} />
         <DiskTypeSelect
-          isVMRunning={false}
           diskType={diskState.diskType}
           dispatchDiskState={dispatchDiskState}
+          isVMRunning={false}
         />
         <DiskInterfaceSelect
-          isVMRunning={false}
           diskState={diskState}
           dispatchDiskState={dispatchDiskState}
+          isVMRunning={false}
         />
         {(sourceRequiresDataVolume || diskState.diskSource === sourceTypes.UPLOAD) && (
           <>
             <AlertedStorageClassSelect
-              storageClass={diskState.storageClass}
               setStorageClassName={(scName) =>
-                dispatchDiskState({ type: diskReducerActions.SET_STORAGE_CLASS, payload: scName })
+                dispatchDiskState({ payload: scName, type: diskReducerActions.SET_STORAGE_CLASS })
               }
               setStorageClassProvisioner={(scProvisioner: string) =>
                 dispatchDiskState({
-                  type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER,
                   payload: scProvisioner,
+                  type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER,
                 })
               }
+              storageClass={diskState.storageClass}
             />
             <ApplyStorageProfileSettingsCheckbox
+              claimPropertySets={claimPropertySets}
               diskState={diskState}
               dispatchDiskState={dispatchDiskState}
-              claimPropertySets={claimPropertySets}
               loaded={storageProfileLoaded}
             />
             <AccessMode
@@ -258,9 +258,9 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
               spVolumeMode={claimPropertySets?.[0]?.volumeMode}
             />
             <EnablePreallocationCheckbox
-              isDisabled={!sourceRequiresDataVolume}
-              enablePreallocation={diskState.enablePreallocation}
               dispatchDiskState={dispatchDiskState}
+              enablePreallocation={diskState.enablePreallocation}
+              isDisabled={!sourceRequiresDataVolume}
             />
           </>
         )}

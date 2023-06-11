@@ -34,17 +34,17 @@ export const getDiskRowDataLayout = (
     const volumeSource = Object.keys(device?.volume).find((key) => key !== 'name');
 
     const diskRowDataObject: DiskRowDataLayout = {
-      name: device?.volume?.name,
-      interface: isEmpty(device?.disk) ? NO_DATA_DASH : getPrintableDiskInterface(device?.disk),
       drive: isEmpty(device?.disk) ? NO_DATA_DASH : getPrintableDiskDrive(device?.disk),
-      metadata: { name: device?.volume?.name },
-      namespace: device?.pvc?.metadata?.namespace,
-      source: t(OTHER),
-      size: NO_DATA_DASH,
-      storageClass: NO_DATA_DASH,
+      interface: isEmpty(device?.disk) ? NO_DATA_DASH : getPrintableDiskInterface(device?.disk),
       isBootDisk: device?.disk?.name === bootDisk?.name,
       isEnvDisk:
         !!device?.volume?.configMap || !!device?.volume?.secret || !!device?.volume?.serviceAccount,
+      metadata: { name: device?.volume?.name },
+      name: device?.volume?.name,
+      namespace: device?.pvc?.metadata?.namespace,
+      size: NO_DATA_DASH,
+      source: t(OTHER),
+      storageClass: NO_DATA_DASH,
     };
 
     if (device?.pvc) {

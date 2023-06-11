@@ -23,11 +23,11 @@ const VolumeMode: React.FC<VolumeModeProps> = ({ diskState, dispatchDiskState, s
   const { t } = useKubevirtTranslation();
 
   const {
-    volumeMode,
     accessMode,
-    storageProfileSettingsCheckboxDisabled,
     applyStorageProfileSettings,
     storageClassProvisioner,
+    storageProfileSettingsCheckboxDisabled,
+    volumeMode,
   } = diskState || {};
 
   const allowedVolumeModes = React.useMemo(
@@ -39,19 +39,19 @@ const VolumeMode: React.FC<VolumeModeProps> = ({ diskState, dispatchDiskState, s
     if (!storageProfileSettingsCheckboxDisabled) {
       if (applyStorageProfileSettings) {
         dispatchDiskState({
-          type: diskReducerActions.SET_VOLUME_MODE,
           payload: null,
+          type: diskReducerActions.SET_VOLUME_MODE,
         });
       } else if (spVolumeMode && !volumeMode) {
         dispatchDiskState({
-          type: diskReducerActions.SET_VOLUME_MODE,
           payload: spVolumeMode,
+          type: diskReducerActions.SET_VOLUME_MODE,
         });
       }
     } else if (!allowedVolumeModes?.includes(volumeMode as VolumeMode)) {
       dispatchDiskState({
-        type: diskReducerActions.SET_VOLUME_MODE,
         payload: allowedVolumeModes[0],
+        type: diskReducerActions.SET_VOLUME_MODE,
       });
     }
   }, [
@@ -69,17 +69,17 @@ const VolumeMode: React.FC<VolumeModeProps> = ({ diskState, dispatchDiskState, s
 
   return (
     <FormGroup fieldId="volume-mode" label={t('Volume Mode')}>
-      {getVolumeModeRadioOptions(t)?.map(({ value, label }) => (
+      {getVolumeModeRadioOptions(t)?.map(({ label, value }) => (
         <Radio
-          name="volumeMode"
+          onChange={() =>
+            dispatchDiskState({ payload: value, type: diskReducerActions.SET_VOLUME_MODE })
+          }
           id={value}
           isChecked={value === volumeMode}
+          isDisabled={!allowedVolumeModes?.includes(value)}
           key={value}
           label={label}
-          onChange={() =>
-            dispatchDiskState({ type: diskReducerActions.SET_VOLUME_MODE, payload: value })
-          }
-          isDisabled={!allowedVolumeModes?.includes(value)}
+          name="volumeMode"
         />
       ))}
     </FormGroup>

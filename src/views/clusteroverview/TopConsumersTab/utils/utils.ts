@@ -31,13 +31,13 @@ export const humanizeTopConsumerMetric = (value: number, metric: TopConsumerMetr
       humanizedValue = humanizeDecimalBytes(value);
       break;
     case TopConsumerMetric.STORAGE_IOPS:
-      humanizedValue = { value: value.toFixed(2), unit: STORAGE_IOPS_UNIT };
+      humanizedValue = { unit: STORAGE_IOPS_UNIT, value: value.toFixed(2) };
       break;
     default:
-      humanizedValue = { value, unit: '' };
+      humanizedValue = { unit: '', value };
   }
 
-  return { value: humanizedValue.value, unit: humanizedValue.unit };
+  return { unit: humanizedValue.unit, value: humanizedValue.value };
 };
 
 export const getHumanizedValue = (value, metric) => {
@@ -60,31 +60,31 @@ export const topAmountSelectOptions = (t: TFunction) => [
 ];
 
 export const initialTopConsumerCardSettings: {
-  [key: string]: { scope: TopConsumerScope; metric: TopConsumerMetric };
+  [key: string]: { metric: TopConsumerMetric; scope: TopConsumerScope };
 } = {
   'topConsumerCard-1-1': {
-    scope: TopConsumerScope.VM,
     metric: TopConsumerMetric.CPU,
+    scope: TopConsumerScope.VM,
   },
   'topConsumerCard-1-2': {
-    scope: TopConsumerScope.VM,
     metric: TopConsumerMetric.MEMORY,
+    scope: TopConsumerScope.VM,
   },
   'topConsumerCard-1-3': {
-    scope: TopConsumerScope.VM,
     metric: TopConsumerMetric.MEMORY_SWAP_TRAFFIC,
+    scope: TopConsumerScope.VM,
   },
   'topConsumerCard-2-1': {
-    scope: TopConsumerScope.VM,
     metric: TopConsumerMetric.VCPU_WAIT,
+    scope: TopConsumerScope.VM,
   },
   'topConsumerCard-2-2': {
-    scope: TopConsumerScope.VM,
     metric: TopConsumerMetric.STORAGE_THROUGHPUT,
+    scope: TopConsumerScope.VM,
   },
   'topConsumerCard-2-3': {
-    scope: TopConsumerScope.VM,
     metric: TopConsumerMetric.STORAGE_IOPS,
+    scope: TopConsumerScope.VM,
   },
 };
 

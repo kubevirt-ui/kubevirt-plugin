@@ -33,7 +33,7 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
   );
 
   const handleTabClick = (
-    event: React.MouseEvent<any> | React.KeyboardEvent | MouseEvent,
+    event: MouseEvent | React.KeyboardEvent | React.MouseEvent<any>,
     tabIndex: CREATE_VM_TAB,
   ) => {
     setCurrentTab(tabIndex);
@@ -43,19 +43,19 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
   return (
     <div className="create-vm-horizontal-nav">
       <div className="pf-c-page__main-breadcrumb">
-        <Stack hasGutter className="co-m-pane__heading">
+        <Stack className="co-m-pane__heading" hasGutter>
           <StackItem>
             <Title headingLevel="h1">{t('Create new VirtualMachine')}</Title>
           </StackItem>
           <StackItem>{t('Select an option to create a VirtualMachine from.')}</StackItem>
         </Stack>
       </div>
-      <Tabs usePageInsets activeKey={currentTab} onSelect={handleTabClick}>
+      <Tabs activeKey={currentTab} onSelect={handleTabClick} usePageInsets>
         <Tab
           eventKey={CREATE_VM_TAB.CATALOG}
           title={<CreateVMTabTitle Icon={CatalogIcon} titleText={t('Template catalog')} />}
         >
-          <TemplatesCatalog match={match} location={location} history={history} />
+          <TemplatesCatalog history={history} location={location} match={match} />
         </Tab>
         <Tab
           eventKey={CREATE_VM_TAB.INSTANCE_TYPES}

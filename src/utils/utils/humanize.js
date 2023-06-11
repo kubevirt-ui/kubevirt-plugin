@@ -4,50 +4,50 @@ export const units = {};
 export const validate = {};
 
 const TYPES = {
-  numeric: {
-    units: ['', 'k', 'm', 'b'],
-    space: false,
-    divisor: 1000,
-  },
-  decimalBytes: {
-    units: ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'],
-    space: true,
-    divisor: 1000,
-  },
-  decimalBytesWithoutB: {
-    units: ['', 'k', 'M', 'G', 'T', 'P', 'E'],
-    space: true,
-    divisor: 1000,
-  },
   binaryBytes: {
-    units: ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'],
-    space: true,
     divisor: 1024,
+    space: true,
+    units: ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'],
   },
   binaryBytesWithoutB: {
-    units: ['i', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei'],
-    space: true,
     divisor: 1024,
+    space: true,
+    units: ['i', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei'],
   },
-  SI: {
-    units: ['', 'k', 'M', 'G', 'T', 'P', 'E'],
-    space: false,
+  decimalBytes: {
     divisor: 1000,
+    space: true,
+    units: ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'],
   },
   decimalBytesPerSec: {
-    units: ['Bps', 'KBps', 'MBps', 'GBps', 'TBps', 'PBps', 'EBps'],
-    space: true,
     divisor: 1000,
+    space: true,
+    units: ['Bps', 'KBps', 'MBps', 'GBps', 'TBps', 'PBps', 'EBps'],
+  },
+  decimalBytesWithoutB: {
+    divisor: 1000,
+    space: true,
+    units: ['', 'k', 'M', 'G', 'T', 'P', 'E'],
+  },
+  numeric: {
+    divisor: 1000,
+    space: false,
+    units: ['', 'k', 'm', 'b'],
   },
   packetsPerSec: {
-    units: ['pps', 'kpps'],
-    space: true,
     divisor: 1000,
+    space: true,
+    units: ['pps', 'kpps'],
   },
   seconds: {
-    units: ['ns', 'μs', 'ms', 's'],
-    space: true,
     divisor: 1000,
+    space: true,
+    units: ['ns', 'μs', 'ms', 's'],
+  },
+  SI: {
+    divisor: 1000,
+    space: false,
+    units: ['', 'k', 'M', 'G', 'T', 'P', 'E'],
   },
 };
 
@@ -59,9 +59,9 @@ export const getType = (name) => {
   const type = TYPES[name];
   if (!isPlainObject(type)) {
     return {
-      units: [],
-      space: false,
       divisor: 1000,
+      space: false,
+      units: [],
     };
   }
   return type;
@@ -76,8 +76,8 @@ const convertBaseValueToUnits = (value, unitArray, divisor, initialUnit, preferr
     const unitIndex = units_.indexOf(preferredUnit);
     if (unitIndex !== -1) {
       return {
-        value: cleanValue / divisor ** unitIndex,
         unit: preferredUnit,
+        value: cleanValue / divisor ** unitIndex,
       };
     }
   }
@@ -87,12 +87,12 @@ const convertBaseValueToUnits = (value, unitArray, divisor, initialUnit, preferr
     cleanValue = cleanValue / divisor;
     unit = units_.shift();
   }
-  return { value: cleanValue, unit };
+  return { unit, value: cleanValue };
 };
 
 const convertValueWithUnitsToBaseValue = (value, unitArray, divisor) => {
   let cleanValue = value;
-  const defaultReturn = { value: cleanValue, unit: '' };
+  const defaultReturn = { unit: '', value: cleanValue };
   if (typeof cleanValue !== 'string') {
     return defaultReturn;
   }
@@ -125,7 +125,7 @@ const convertValueWithUnitsToBaseValue = (value, unitArray, divisor) => {
     unit = units_.shift();
   }
 
-  return { value: cleanValue, unit };
+  return { unit, value: cleanValue };
 };
 
 const getDefaultFractionDigits = (value) => {
@@ -415,8 +415,8 @@ export const secondsToNanoSeconds = (value) => {
 
 export const formatToFractionalDigits = (value, digits) =>
   Intl.NumberFormat(null, {
-    minimumFractionDigits: digits,
     maximumFractionDigits: digits,
+    minimumFractionDigits: digits,
   }).format(value);
 
 export const formatBytesAsMiB = (bytes) => {

@@ -9,22 +9,22 @@ import {
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 
 type WizardNetworkInterfaceModalProps = {
-  vm: V1VirtualMachine;
-  updateVM: UpdateValidatedVM;
+  headerText: string;
   isOpen: boolean;
   onClose: () => void;
-  headerText: string;
+  updateVM: UpdateValidatedVM;
+  vm: V1VirtualMachine;
 };
 
 const WizardNetworkInterfaceModal: FC<WizardNetworkInterfaceModalProps> = ({
-  vm,
-  updateVM,
+  headerText,
   isOpen,
   onClose,
-  headerText,
+  updateVM,
+  vm,
 }) => {
   const onSubmit = useCallback(
-    ({ nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType }) =>
+    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
       (currentVM: V1VirtualMachine) => {
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface(
@@ -46,11 +46,11 @@ const WizardNetworkInterfaceModal: FC<WizardNetworkInterfaceModalProps> = ({
 
   return (
     <NetworkInterfaceModal
-      vm={vm}
+      headerText={headerText}
       isOpen={isOpen}
       onClose={onClose}
-      headerText={headerText}
       onSubmit={onSubmit}
+      vm={vm}
     />
   );
 };

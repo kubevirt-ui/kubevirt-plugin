@@ -19,32 +19,32 @@ import useEnvironmentsResources from './hooks/useEnvironmentsResources';
 import './EnvironmentForm.scss';
 
 type EnvironmentFormProps = {
-  vm: V1VirtualMachine;
   onEditChange?: (edited: boolean) => void;
   updateVM: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm: V1VirtualMachine;
 };
 
-const EnvironmentForm: FC<EnvironmentFormProps> = ({ vm, onEditChange, updateVM }) => {
+const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm }) => {
   const [temporaryVM, setTemporaryVM] = useImmer(vm);
 
   const { t } = useKubevirtTranslation();
   const ns = vm?.metadata?.namespace;
 
   const {
-    secrets,
     configMaps,
-    serviceAccounts,
-    loaded,
     error: loadError,
+    loaded,
+    secrets,
+    serviceAccounts,
   } = useEnvironmentsResources(ns);
 
   const {
+    edited,
     environments,
+    error: formError,
     onEnvironmentAdd,
     onEnvironmentChange,
     onEnvironmentRemove,
-    edited,
-    error: formError,
     setError: setFormError,
   } = useEnvironments(temporaryVM, vm, setTemporaryVM, onEditChange);
 
@@ -62,9 +62,9 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ vm, onEditChange, updateVM 
 
   return (
     <SidebarEditor<V1VirtualMachine>
-      resource={temporaryVM}
       onChange={setTemporaryVM}
       pathsToHighlight={PATHS_TO_HIGHLIGHT.ENV_TAB}
+      resource={temporaryVM}
     >
       <EnvironmentFormTitle />
       <Form className="environment-form__form">
@@ -82,18 +82,18 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ vm, onEditChange, updateVM 
 
         {environments.map((environment, index) => (
           <EnvironmentEditor
-            key={environment.name}
-            environmentName={environment.name}
-            serial={environment?.serial}
-            kind={environment.kind}
-            diskName={environment.diskName}
-            secrets={secrets}
             configMaps={configMaps}
-            serviceAccounts={serviceAccounts}
+            diskName={environment.diskName}
+            environmentName={environment.name}
+            environmentNamesSelected={environmentNamesSelected}
+            id={index}
+            key={environment.name}
+            kind={environment.kind}
             onChange={onEnvironmentChange}
             onRemove={onEnvironmentRemove}
-            id={index}
-            environmentNamesSelected={environmentNamesSelected}
+            secrets={secrets}
+            serial={environment?.serial}
+            serviceAccounts={serviceAccounts}
           />
         ))}
 
@@ -111,15 +111,15 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ vm, onEditChange, updateVM 
         </div>
 
         <EnvironmentFormActions
-          error={loadError || formError}
-          onSave={() => updateVM(temporaryVM)}
           onReload={() =>
             setTemporaryVM((draftVM) => {
               draftVM.spec = vm.spec;
             })
           }
           closeError={() => setFormError(null)}
+          error={loadError || formError}
           isSaveDisabled={!edited || !environments.every((env) => env.name)}
+          onSave={() => updateVM(temporaryVM)}
         />
       </Form>
     </SidebarEditor>

@@ -24,7 +24,7 @@ const BandwidthConsumptionCharts: React.FC<BandwidthConsumptionChartsProps> = ({
   const domainX: [number, number] = [currentTime - timespan, currentTime];
   const { ref } = useResponsiveCharts();
 
-  const { bandwidthConsumed, migrationsCount, maxBandwidthConsumed, maxMigrationCount } =
+  const { bandwidthConsumed, maxBandwidthConsumed, maxMigrationCount, migrationsCount } =
     useMigrationChartsData(duration, currentTime, timespan);
 
   return (
@@ -33,26 +33,26 @@ const BandwidthConsumptionCharts: React.FC<BandwidthConsumptionChartsProps> = ({
         <Grid ref={ref}>
           <MigrationsTimeAxis domainX={domainX} timespan={timespan} />
           <MigrationsUtilizationChart
-            chartData={bandwidthConsumed}
-            tickValues={getTickValuesAxisY(maxBandwidthConsumed)}
-            tickFormat={(y) => xbytes(y, { iec: true, fixed: 0, prefixIndex: 3 })}
-            labels={getLabel(timespan, bandwidthConsumed, true)}
-            title={t('Network consumption')}
             domain={{
               x: domainX,
               y: getDomainY(maxBandwidthConsumed),
             }}
+            chartData={bandwidthConsumed}
+            labels={getLabel(timespan, bandwidthConsumed, true)}
+            tickFormat={(y) => xbytes(y, { fixed: 0, iec: true, prefixIndex: 3 })}
+            tickValues={getTickValuesAxisY(maxBandwidthConsumed)}
+            title={t('Network consumption')}
           />
           <Divider />
           <MigrationsUtilizationChart
-            chartData={migrationsCount}
-            tickValues={getTickValuesAxisY(maxMigrationCount, 1)}
-            labels={getLabel(timespan, migrationsCount)}
-            title={t('Running migrations')}
             domain={{
               x: domainX,
               y: getDomainY(maxMigrationCount, 1),
             }}
+            chartData={migrationsCount}
+            labels={getLabel(timespan, migrationsCount)}
+            tickValues={getTickValuesAxisY(maxMigrationCount, 1)}
+            title={t('Running migrations')}
           />
         </Grid>
       ) : (

@@ -25,11 +25,11 @@ const VirtualMachinePendingChangesAlert: React.FC<VirtualMachinePendingChangesAl
 
   const {
     pendingChangesDetailsTab,
-    pendingChangesSchedulingTab,
+    pendingChangesDisksTab,
     pendingChangesEnvTab,
     pendingChangesNICsTab,
+    pendingChangesSchedulingTab,
     pendingChangesScriptsTab,
-    pendingChangesDisksTab,
   } = getPendingChangesByTab(pendingChanges);
 
   const hasPendingChanges = pendingChanges?.some((change) => change?.hasPendingChange);

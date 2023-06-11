@@ -9,10 +9,10 @@ import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/ut
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 
 export type UseInstanceTypeAndPreferencesValues = {
-  preferences: V1alpha2VirtualMachineClusterPreference[];
   instanceTypes: V1alpha2VirtualMachineClusterInstancetype[];
   loaded: boolean;
   loadError: any;
+  preferences: V1alpha2VirtualMachineClusterPreference[];
 };
 
 export type UseBootableVolumesValues = {
@@ -25,42 +25,42 @@ export type UseBootableVolumesValues = {
 };
 
 export type InstanceTypeVMState = {
+  pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   selectedBootableVolume: BootableVolume;
   selectedInstanceType: string;
-  vmName: string;
   sshSecretCredentials: SSHSecretDetails;
-  pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
+  vmName: string;
 };
 
 export enum instanceTypeActionType {
+  setPVCSource = 'pvcSource',
   setSelectedBootableVolume = 'selectedBootableVolume',
   setSelectedInstanceType = 'selectedInstanceType',
-  setVMName = 'vmName',
   setSSHCredentials = 'sshSecretCredentials',
-  setPVCSource = 'pvcSource',
+  setVMName = 'vmName',
 }
 
 type InstanceTypeAction = {
+  payload: BootableVolume | SSHSecretDetails | string;
   type: string;
-  payload: BootableVolume | string | SSHSecretDetails;
 };
 
 export type InstanceTypeVMStoreState = {
-  instanceTypeVMState: InstanceTypeVMState;
+  activeNamespace: string;
   bootableVolumesData: UseBootableVolumesValues;
   instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
-  activeNamespace: string;
+  instanceTypeVMState: InstanceTypeVMState;
   vmNamespaceTarget: string;
 };
 
 type InstanceTypeVMStoreActions = {
-  setInstanceTypeVMState: Dispatch<InstanceTypeAction>;
+  onSelectCreatedVolume: (selectedVolume: BootableVolume) => void;
+  resetInstanceTypeVMState: () => void;
+  setActiveNamespace: Dispatch<string>;
   setBootableVolumesData: Dispatch<UseBootableVolumesValues>;
   setInstanceTypesAndPreferencesData: Dispatch<UseInstanceTypeAndPreferencesValues>;
-  onSelectCreatedVolume: (selectedVolume: BootableVolume) => void;
-  setActiveNamespace: Dispatch<string>;
+  setInstanceTypeVMState: Dispatch<InstanceTypeAction>;
   setVMNamespaceTarget: Dispatch<string>;
-  resetInstanceTypeVMState: () => void;
 };
 
 export type InstanceTypeVMStore = InstanceTypeVMStoreState & InstanceTypeVMStoreActions;

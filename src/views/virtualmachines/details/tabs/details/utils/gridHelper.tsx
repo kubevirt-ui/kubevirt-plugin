@@ -15,12 +15,12 @@ import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plug
 import FirstItemListPopover from '../../../../list/components/FirstItemListPopover/FirstItemListPopover';
 
 export type VirtualMachineDetailsRightGridLayoutPresentation = {
-  pod: React.ReactNode;
-  vmi: React.ReactNode;
-  ipAddress: React.ReactNode;
   hostname: React.ReactNode;
-  timezone: React.ReactNode;
+  ipAddress: React.ReactNode;
   node: React.ReactNode;
+  pod: React.ReactNode;
+  timezone: React.ReactNode;
+  vmi: React.ReactNode;
 };
 
 export const getStoppedVMRightGridPresentation = (
@@ -30,12 +30,12 @@ export const getStoppedVMRightGridPresentation = (
   const VirtualMachineIsNotRunning = <MutedTextSpan text={t('VirtualMachine is not running')} />;
 
   return {
-    pod: NotAvailable,
-    vmi: NotAvailable,
-    ipAddress: VirtualMachineIsNotRunning,
     hostname: NotAvailable,
-    timezone: VirtualMachineIsNotRunning,
+    ipAddress: VirtualMachineIsNotRunning,
     node: NotAvailable,
+    pod: NotAvailable,
+    timezone: VirtualMachineIsNotRunning,
+    vmi: NotAvailable,
   };
 };
 
@@ -53,6 +53,9 @@ export const getRunningVMRightGridPresentation = (
   const guestAgentIsRequiredText = <GuestAgentIsRequiredText vmi={vmi} />;
 
   return {
+    hostname: guestAgentIsRequired ? guestAgentIsRequiredText : guestAgentData?.hostname,
+    ipAddress: <FirstItemListPopover headerContent={'IP addresses'} items={ipAddresses} />,
+    node: <ResourceLink kind={NodeModel.kind} name={nodeName} />,
     pod: (
       <ResourceLink
         kind={PodModel.kind}
@@ -60,6 +63,9 @@ export const getRunningVMRightGridPresentation = (
         namespace={vmiPod?.metadata?.namespace}
       />
     ),
+    timezone: guestAgentIsRequired
+      ? guestAgentIsRequiredText
+      : guestAgentData?.timezone?.split(',')[0],
     vmi: (
       <ResourceLink
         kind={VirtualMachineInstanceModelRef}
@@ -67,11 +73,5 @@ export const getRunningVMRightGridPresentation = (
         namespace={vmi?.metadata?.namespace}
       />
     ),
-    ipAddress: <FirstItemListPopover items={ipAddresses} headerContent={'IP addresses'} />,
-    hostname: guestAgentIsRequired ? guestAgentIsRequiredText : guestAgentData?.hostname,
-    timezone: guestAgentIsRequired
-      ? guestAgentIsRequiredText
-      : guestAgentData?.timezone?.split(',')[0],
-    node: <ResourceLink kind={NodeModel.kind} name={nodeName} />,
   };
 };

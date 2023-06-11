@@ -15,14 +15,14 @@ import { FormError } from '../FormError';
 import { useCustomizeFormSubmit } from './useCustomizeFormSubmit';
 
 type CustomizeFormProps = {
-  template: V1Template;
   isBootSourceAvailable?: boolean;
+  template: V1Template;
 };
 
 export const CustomizeForm: FC<CustomizeFormProps> = ({ template }) => {
   const methods = useForm();
 
-  const { onSubmit, loaded, error } = useCustomizeFormSubmit({ template });
+  const { error, loaded, onSubmit } = useCustomizeFormSubmit({ template });
   const [requiredFields, optionalFields] = buildFields(template);
 
   const { params } = useURLParams();
@@ -35,7 +35,7 @@ export const CustomizeForm: FC<CustomizeFormProps> = ({ template }) => {
       <Form onSubmit={methods.handleSubmit(onSubmit)}>
         <FieldGroup field={nameField} showError={error} />
         {requiredFields?.map((field) => (
-          <FieldGroup key={field.name} field={field} showError={error} />
+          <FieldGroup field={field} key={field.name} showError={error} />
         ))}
 
         <ExpandableOptionsFields optionalFields={optionalFields} />

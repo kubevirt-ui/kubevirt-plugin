@@ -45,10 +45,10 @@ const URLHealthItem: React.FC<URLHealthItemProps> = ({ subsystem }) => {
 
   return (
     <HealthItem
-      title={subsystem.title}
-      state={healthState.state}
       details={healthState.message}
       popupTitle={subsystem.popupTitle}
+      state={healthState.state}
+      title={subsystem.title}
     >
       {subsystem?.popupComponent && <URLHealthItemPopup subsystem={subsystem} />}
     </HealthItem>

@@ -7,12 +7,12 @@ export type DropdownProps = {
 abstract class DropdownEnum<T> extends ObjectEnum<T> {
   protected readonly dropdownLabel: string;
 
+  getDropdownLabel = (): string => this.dropdownLabel;
+
   protected constructor(value: T, { dropdownLabel }) {
     super(value);
     this.dropdownLabel = dropdownLabel;
   }
-
-  getDropdownLabel = (): string => this.dropdownLabel;
 }
 
 export default DropdownEnum;

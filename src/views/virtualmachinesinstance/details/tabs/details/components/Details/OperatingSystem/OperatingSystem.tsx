@@ -11,15 +11,15 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { DescriptionListDescription, DescriptionListTerm } from '@patternfly/react-core';
 
 type OperatingSystemProps = {
-  vmi: V1VirtualMachineInstance;
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo;
   loadedGuestAgent: boolean;
+  vmi: V1VirtualMachineInstance;
 };
 
 const OperatingSystem: React.FC<OperatingSystemProps> = ({
-  vmi,
   guestAgentData,
   loadedGuestAgent,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   return (

@@ -10,7 +10,7 @@ import { Alert, AlertActionCloseButton, AlertVariant, Bullseye } from '@patternf
 
 import './WizardYAMLTab.scss';
 
-const WizardYAMLTab: WizardTab = ({ vm, updateVM, setDisableVmCreate }) => {
+const WizardYAMLTab: WizardTab = ({ setDisableVmCreate, updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const [error, setError] = React.useState<any>();
   const [success, setSuccess] = React.useState(false);
@@ -42,11 +42,11 @@ const WizardYAMLTab: WizardTab = ({ vm, updateVM, setDisableVmCreate }) => {
       {error && (
         <div className="wizard-yaml-alert">
           <Alert
-            isInline
-            variant={AlertVariant.danger}
             title={t(
               'An error occured, The VirtualMachine was not updated. Click "Reload" to go back to the last valid state',
             )}
+            isInline
+            variant={AlertVariant.danger}
           >
             {error.message}
           </Alert>
@@ -55,10 +55,10 @@ const WizardYAMLTab: WizardTab = ({ vm, updateVM, setDisableVmCreate }) => {
       {success && (
         <div className="wizard-yaml-alert">
           <Alert
-            isInline
-            variant={AlertVariant.success}
-            title={t('Success')}
             actionClose={<AlertActionCloseButton onClose={() => setSuccess(false)} />}
+            isInline
+            title={t('Success')}
+            variant={AlertVariant.success}
           >
             {t('VirtualMachine updated successfully')}
           </Alert>

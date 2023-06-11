@@ -30,15 +30,15 @@ export const FormActionGroup: React.FC<FormActionGroupProps> = ({ loading, onCan
   return (
     <ActionGroup>
       <Button
-        variant="primary"
-        type="submit"
+        data-test-id="customize-vm-submit-button"
         isDisabled={loading}
         isLoading={loading}
-        data-test-id="customize-vm-submit-button"
+        type="submit"
+        variant="primary"
       >
         {t('Next')}
       </Button>
-      <Button variant="link" onClick={handleCancel}>
+      <Button onClick={handleCancel} variant="link">
         {t('Cancel')}
       </Button>
     </ActionGroup>

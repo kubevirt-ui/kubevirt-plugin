@@ -13,19 +13,19 @@ import {
 import './EnvironmentFormActions.scss';
 
 type EnvironmentFormActionsProps = {
+  closeError: () => void;
   error?: any;
   isSaveDisabled?: boolean;
-  closeError: () => void;
-  onSave: () => void;
   onReload: () => void;
+  onSave: () => void;
 };
 
 const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
+  closeError,
   error,
   isSaveDisabled,
-  onSave,
   onReload,
-  closeError,
+  onSave,
 }) => {
   const { t } = useKubevirtTranslation();
   const [success, setSuccess] = React.useState(false);
@@ -58,22 +58,22 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
       <StackItem>
         {(error || apiError) && (
           <Alert
-            isInline
-            className="co-alert co-alert--scrollable"
-            variant="danger"
-            title={t('An error occurred')}
             actionClose={<AlertActionCloseButton onClose={closeAlert} />}
+            className="co-alert co-alert--scrollable"
+            isInline
+            title={t('An error occurred')}
+            variant="danger"
           >
             <div className="co-pre-line">{error?.message || apiError?.message}</div>
           </Alert>
         )}
         {success && (
           <Alert
-            isInline
-            className="co-alert"
-            variant="success"
-            title={t('Success')}
             actionClose={<AlertActionCloseButton onClose={() => setSuccess(false)} />}
+            className="co-alert"
+            isInline
+            title={t('Success')}
+            variant="success"
           />
         )}
       </StackItem>
@@ -81,14 +81,14 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
         <ActionGroup className="pf-c-form">
           <Button
             isDisabled={isSaveDisabled || loading}
+            isLoading={loading}
+            onClick={onSubmit}
             type="submit"
             variant="primary"
-            onClick={onSubmit}
-            isLoading={loading}
           >
             {t('Save')}
           </Button>
-          <Button type="button" variant="secondary" onClick={onReload}>
+          <Button onClick={onReload} type="button" variant="secondary">
             {t('Reload')}
           </Button>
         </ActionGroup>

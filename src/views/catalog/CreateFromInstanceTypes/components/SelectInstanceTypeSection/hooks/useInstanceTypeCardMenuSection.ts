@@ -21,13 +21,13 @@ const useInstanceTypeCardMenuSection = (): UseInstanceTypeCardMenuSectionValues 
     setActiveMenu(null);
 
     setInstanceTypeVMState({
-      type: instanceTypeActionType.setSelectedInstanceType,
       payload: itName,
+      type: instanceTypeActionType.setSelectedInstanceType,
     });
   };
 
   useClickOutside(menuRef, onMenuToggle);
-  return { activeMenu, menuRef, onMenuToggle, onMenuSelect };
+  return { activeMenu, menuRef, onMenuSelect, onMenuToggle };
 };
 
 export default useInstanceTypeCardMenuSection;

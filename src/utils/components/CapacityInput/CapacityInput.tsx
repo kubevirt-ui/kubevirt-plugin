@@ -16,12 +16,12 @@ import {
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 
 type CapacityInputProps = {
-  size: string;
-  onChange: (quantity: string) => void;
   label: string;
+  onChange: (quantity: string) => void;
+  size: string;
 };
 
-const CapacityInput: React.FC<CapacityInputProps> = ({ size, onChange, label }) => {
+const CapacityInput: React.FC<CapacityInputProps> = ({ label, onChange, size }) => {
   const { t } = useKubevirtTranslation();
   const [selectOpen, toggleSelect] = useState<boolean>(false);
   const [unitValue = ''] = size?.match(/[a-zA-Z]+/g) || [];
@@ -38,22 +38,18 @@ const CapacityInput: React.FC<CapacityInputProps> = ({ size, onChange, label }) 
 
   return (
     <FormGroup
-      label={label}
-      fieldId={`size-required`}
-      isRequired
-      validated={!value || value <= 0 ? ValidatedOptions.error : ValidatedOptions.default}
       helperTextInvalid={t('Size cannot be {{errorValue}}', {
         errorValue: value < 0 ? 'negative' : 'zero',
       })}
+      fieldId={`size-required`}
       helperTextInvalidIcon={<ExclamationCircleIcon color="red" title="Error" />}
+      isRequired
+      label={label}
+      validated={!value || value <= 0 ? ValidatedOptions.error : ValidatedOptions.default}
     >
       <Split hasGutter>
         <SplitItem>
           <NumberInput
-            min={1}
-            value={value}
-            max={Number.MAX_SAFE_INTEGER}
-            onMinus={() => onChange(`${Number(value) - 1}${removeByteSuffix(unit)}`)}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
               Number(event?.target?.value) <= Number.MAX_SAFE_INTEGER &&
               onChange(`${Number(event.target.value)}${removeByteSuffix(unit)}`)
@@ -62,18 +58,22 @@ const CapacityInput: React.FC<CapacityInputProps> = ({ size, onChange, label }) 
               Number(value) < Number.MAX_SAFE_INTEGER &&
               onChange(`${Number(value) + 1}${removeByteSuffix(unit)}`)
             }
+            max={Number.MAX_SAFE_INTEGER}
+            min={1}
             minusBtnAriaLabel={t('Decrement')}
+            onMinus={() => onChange(`${Number(value) - 1}${removeByteSuffix(unit)}`)}
             plusBtnAriaLabel={t('Increment')}
+            value={value}
           />
         </SplitItem>
         <SplitItem>
           <Select
-            menuAppendTo="parent"
             isOpen={selectOpen}
-            onToggle={toggleSelect}
+            menuAppendTo="parent"
             onSelect={onFormatChange}
-            variant={SelectVariant.single}
+            onToggle={toggleSelect}
             selections={unit}
+            variant={SelectVariant.single}
           >
             {unitOptions.map((formatOption) => (
               <SelectOption key={formatOption} value={formatOption} />

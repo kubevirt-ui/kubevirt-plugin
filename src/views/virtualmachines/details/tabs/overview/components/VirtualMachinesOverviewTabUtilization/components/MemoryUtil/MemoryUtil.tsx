@@ -18,7 +18,7 @@ type MemoryUtilProps = {
 const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration } = useDuration();
-  const queries = useMemo(() => getUtilizationQueries({ obj: vmi, duration }), [vmi, duration]);
+  const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
 
   const requests = vmi?.spec?.domain?.resources?.requests as {
     [key: string]: string;
@@ -26,10 +26,10 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const memory = getMemorySize(requests?.memory);
 
   const [data] = usePrometheusPoll({
-    query: queries?.MEMORY_USAGE,
     endpoint: PrometheusEndpoint?.QUERY,
-    namespace: vmi?.metadata?.namespace,
     endTime: currentTime,
+    namespace: vmi?.metadata?.namespace,
+    query: queries?.MEMORY_USAGE,
   });
 
   const memoryUsed = +data?.data?.result?.[0]?.value?.[1];
@@ -43,7 +43,7 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
         <div className="util-title">{t('Memory')}</div>
         <div className="util-summary" data-test-id="util-summary-memory">
           <div className="util-summary-value">
-            {xbytes(memoryUsed || 0, { iec: true, fixed: 0 })}
+            {xbytes(memoryUsed || 0, { fixed: 0, iec: true })}
           </div>
           <div className="util-summary-text text-muted">
             <div>{t('Used of ')}</div>
@@ -54,8 +54,6 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
       <div className="util-chart">
         <ComponentReady isReady={isReady}>
           <ChartDonutUtilization
-            constrainToVisibleArea
-            animate
             data={{
               x: t('Memory used'),
               y: Number(percentageMemoryUsed?.toFixed(2)),
@@ -63,10 +61,12 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
             labels={({ datum }) =>
               datum.x ? `${datum.x}: ${xbytes(memoryUsed || 0, { iec: true })}` : null
             }
+            animate
+            constrainToVisibleArea
+            style={{ labels: { fontSize: 20 } }}
             subTitle={t('Used')}
             subTitleComponent={<ChartLabel y={135} />}
             title={`${Number(percentageMemoryUsed?.toFixed(2))}%`}
-            style={{ labels: { fontSize: 20 } }}
           />
         </ComponentReady>
       </div>

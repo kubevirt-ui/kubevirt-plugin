@@ -22,15 +22,15 @@ import { useModal } from '../ModalProvider/ModalProvider';
 import HardwareDevicesHeadlessModeModal from './modal/HardwareDevicesHeadlessModeModal';
 
 type HardwareDevicesHeadlessModeProps = {
+  onSubmit: (vm: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
-  onSubmit: (vm: V1VirtualMachine) => Promise<void | V1VirtualMachine>;
 };
 
 const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({
+  onSubmit,
   vm,
   vmi,
-  onSubmit,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -39,9 +39,6 @@ const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({
     <>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('Headless mode')}
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
               Whether to attach the default graphics device or not. VNC will not be available if
@@ -55,6 +52,9 @@ const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({
               </Breadcrumb>
             </Trans>
           }
+          hasAutoWidth
+          headerContent={t('Headless mode')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>
             {t('Headless mode')}
@@ -63,21 +63,21 @@ const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
         <Button
-          type="button"
-          isInline
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <HardwareDevicesHeadlessModeModal
+                isOpen={isOpen}
+                onClose={onClose}
                 onSubmit={onSubmit}
                 vm={vm}
                 vmi={vmi}
-                isOpen={isOpen}
-                onClose={onClose}
               />
             ))
           }
-          variant={ButtonVariant.link}
           data-test-id={'hardware-devices-headless-mode'}
+          isInline
+          type="button"
+          variant={ButtonVariant.link}
         >
           <Flex spaceItems={{ default: 'spaceItemsNone' }}>
             <FlexItem>

@@ -22,9 +22,6 @@ const CreateAt: React.FC<CreateAtProps> = ({ timestamp }) => {
     <>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('Created at')}
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
               CreationTimestamp is a timestamp representing the server time when this object was
@@ -44,6 +41,9 @@ const CreateAt: React.FC<CreateAtProps> = ({ timestamp }) => {
               </Breadcrumb>
             </Trans>
           }
+          hasAutoWidth
+          headerContent={t('Created at')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('Created at')}</DescriptionListTermHelpTextButton>
         </Popover>

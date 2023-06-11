@@ -23,11 +23,11 @@ import SnapshotRow from './SnapshotRow';
 type SnapshotsListProps = UseSnapshotData & { isVMRunning?: boolean };
 
 const SnapshotsList: React.FC<SnapshotsListProps> = ({
-  snapshots,
-  restoresMap,
-  loaded,
   error,
   isVMRunning,
+  loaded,
+  restoresMap,
+  snapshots,
 }) => {
   const columns = useSnapshotColumns();
   const { t } = useKubevirtTranslation();
@@ -38,17 +38,10 @@ const SnapshotsList: React.FC<SnapshotsListProps> = ({
       <ListPageFilter
         data={data}
         loaded={loaded}
-        rowFilters={filters}
         onFilterChange={onFilterChange}
+        rowFilters={filters}
       />
       <VirtualizedTable
-        data={filteredData}
-        unfilteredData={data}
-        loaded={loaded}
-        loadError={error}
-        columns={columns}
-        Row={SnapshotRow}
-        rowData={{ restores: restoresMap, isVMRunning }}
         NoDataEmptyMsg={() => (
           <>
             <EmptyState variant={EmptyStateVariant.xs}>
@@ -57,6 +50,13 @@ const SnapshotsList: React.FC<SnapshotsListProps> = ({
             </EmptyState>
           </>
         )}
+        columns={columns}
+        data={filteredData}
+        loaded={loaded}
+        loadError={error}
+        Row={SnapshotRow}
+        rowData={{ isVMRunning, restores: restoresMap }}
+        unfilteredData={data}
       />
     </>
   );

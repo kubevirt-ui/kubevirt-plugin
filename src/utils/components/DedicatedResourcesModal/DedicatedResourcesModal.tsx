@@ -28,20 +28,20 @@ import { getChangedDedicatedResources } from '../PendingChanges/utils/helpers';
 import { cpuManagerLabel, cpuManagerLabelKey, cpuManagerLabelValue } from './utils/constants';
 
 type DedicatedResourcesModalProps = {
-  vm: V1VirtualMachine;
+  headerText: string;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  headerText: string;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
-  vm,
+  headerText,
   isOpen,
   onClose,
   onSubmit,
-  headerText,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -54,13 +54,13 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
     isList: true,
   });
 
-  const { qualifiedNodes, hasNodes } = React.useMemo(() => {
+  const { hasNodes, qualifiedNodes } = React.useMemo(() => {
     const filteredNodes = nodes?.filter(
       (node) => node?.metadata?.labels?.[cpuManagerLabelKey] === cpuManagerLabelValue,
     );
     return {
-      qualifiedNodes: filteredNodes,
       hasNodes: !!filteredNodes?.length,
+      qualifiedNodes: filteredNodes,
     };
   }, [nodes]);
 
@@ -73,11 +73,11 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
   }, [vm, checked]);
   return (
     <TabModal
-      obj={updatedVirtualMachine}
+      headerText={headerText}
       isOpen={isOpen}
+      obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={headerText}
     >
       <Form>
         {vmi && (
@@ -87,18 +87,14 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
         )}
         <FormGroup fieldId="dedicated-resources" isInline>
           <Checkbox
-            id="dedicated-resources"
-            isChecked={checked}
-            onChange={setChecked}
-            label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
             description={
               <>
                 {t('Available only on Nodes with labels')}{' '}
-                <Label variant="filled" color="purple">
+                <Label color="purple" variant="filled">
                   {!isEmpty(nodes) ? (
                     <Link
-                      to={`/search?kind=${NodeModel.kind}&q=${encodeURIComponent(cpuManagerLabel)}`}
                       target="_blank"
+                      to={`/search?kind=${NodeModel.kind}&q=${encodeURIComponent(cpuManagerLabel)}`}
                     >
                       {cpuManagerLabel}
                     </Link>
@@ -108,6 +104,10 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
                 </Label>
               </>
             }
+            id="dedicated-resources"
+            isChecked={checked}
+            label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
+            onChange={setChecked}
           />
         </FormGroup>
         <FormGroup fieldId="dedicated-resources-node">
@@ -122,27 +122,27 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
                       cpuManagerLabel,
                     })
               }
-              variant={hasNodes ? AlertVariant.success : AlertVariant.warning}
               isInline
+              variant={hasNodes ? AlertVariant.success : AlertVariant.warning}
             >
               {hasNodes ? (
                 <Popover
-                  headerContent={t('{{qualifiedNodesCount}} nodes found', {
-                    qualifiedNodesCount: qualifiedNodes?.length,
-                  })}
                   bodyContent={
                     <>
                       {qualifiedNodes?.map((node) => (
                         <ResourceLink
-                          key={node.metadata.uid}
                           groupVersionKind={modelToGroupVersionKind(NodeModel)}
+                          key={node.metadata.uid}
                           name={node.metadata.name}
                         />
                       ))}
                     </>
                   }
+                  headerContent={t('{{qualifiedNodesCount}} nodes found', {
+                    qualifiedNodesCount: qualifiedNodes?.length,
+                  })}
                 >
-                  <Button variant="link" isInline onClick={() => setChecked(false)}>
+                  <Button isInline onClick={() => setChecked(false)} variant="link">
                     {t('view {{qualifiedNodesCount}} matching nodes', {
                       qualifiedNodesCount: qualifiedNodes?.length,
                     })}

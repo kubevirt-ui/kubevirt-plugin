@@ -21,9 +21,9 @@ const VirtualMachineConsolePage: FC<VirtualMachineConsolePageProps> = ({ obj: vm
   const { t } = useKubevirtTranslation();
   const [vmi, vmiLoaded] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+    isList: false,
     name: vm?.metadata?.name,
     namespace: vm?.metadata?.namespace,
-    isList: false,
   });
 
   if (!vmi || vm?.status?.printableStatus === printableVMStatus.Stopped) {

@@ -30,13 +30,13 @@ import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
 import './cpu-memory-modal.scss';
 
 type CPUMemoryModalProps = {
-  template: V1Template;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVMTemplate: V1Template) => Promise<V1Template | void>;
+  template: V1Template;
 };
 
-const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClose, onSubmit }) => {
+const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
 
@@ -96,25 +96,25 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
 
   return (
     <Modal
-      title={t('Edit CPU | Memory')}
-      isOpen={isOpen}
-      className="cpu-memory-modal"
-      variant={ModalVariant.small}
-      onClose={onClose}
       actions={[
         <Button
-          key="confirm"
-          variant={ButtonVariant.primary}
-          onClick={handleSubmit}
           isDisabled={updateInProcess}
           isLoading={updateInProcess}
+          key="confirm"
+          onClick={handleSubmit}
+          variant={ButtonVariant.primary}
         >
           {t('Save')}
         </Button>,
-        <Button key="cancel" variant="link" onClick={onClose}>
+        <Button key="cancel" onClick={onClose} variant="link">
           {t('Cancel')}
         </Button>,
       ]}
+      className="cpu-memory-modal"
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('Edit CPU | Memory')}
+      variant={ModalVariant.small}
     >
       <div className="inputs">
         <div className="input-cpu">
@@ -122,16 +122,16 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
             {t('CPUs')}
           </Title>
           <NumberInput
-            isDisabled={!isTemplateEditable}
-            value={cpuCores}
-            onMinus={() => setCpuCores((cpus) => +cpus - 1)}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               const newNumber = +e?.target?.value;
               setCpuCores((cpus) => (newNumber > 0 ? newNumber : cpus));
             }}
-            onPlus={() => setCpuCores((cpus) => +cpus + 1)}
             inputName="cpu-input"
+            isDisabled={!isTemplateEditable}
             min={1}
+            onMinus={() => setCpuCores((cpus) => +cpus - 1)}
+            onPlus={() => setCpuCores((cpus) => +cpus + 1)}
+            value={cpuCores}
           />
         </div>
         <div className="input-memory">
@@ -139,21 +139,26 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
             {t('Memory')}
           </Title>
           <NumberInput
-            isDisabled={!isTemplateEditable}
-            value={memory}
-            onMinus={() => setMemory((mem) => +mem - 1)}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               const newNumber = +e?.target?.value;
               setMemory((mem) => (newNumber > 0 ? newNumber : mem));
             }}
-            onPlus={() => setMemory((mem) => +mem + 1)}
             inputName="memory-input"
+            isDisabled={!isTemplateEditable}
             min={1}
+            onMinus={() => setMemory((mem) => +mem - 1)}
+            onPlus={() => setMemory((mem) => +mem + 1)}
+            value={memory}
           />
 
           <Dropdown
-            selected
-            className="input-memory--dropdown"
+            dropdownItems={memorySizesTypes.map((value) => {
+              return (
+                <DropdownItem component="button" key={value} value={value}>
+                  {toIECUnit(value)}
+                </DropdownItem>
+              );
+            })}
             onSelect={(e: React.ChangeEvent<HTMLInputElement>) => {
               setMemoryUnit(e?.target?.value);
               setIsDropdownOpen(false);
@@ -163,19 +168,14 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ template, isOpen, onClo
                 {toIECUnit(memoryUnit)}
               </DropdownToggle>
             }
+            className="input-memory--dropdown"
             isOpen={isDropdownOpen}
-            dropdownItems={memorySizesTypes.map((value) => {
-              return (
-                <DropdownItem key={value} value={value} component="button">
-                  {toIECUnit(value)}
-                </DropdownItem>
-              );
-            })}
+            selected
           />
         </div>
       </div>
       {updateError && (
-        <Alert variant="danger" isInline title={t('Error')}>
+        <Alert isInline title={t('Error')} variant="danger">
           {updateError}
         </Alert>
       )}

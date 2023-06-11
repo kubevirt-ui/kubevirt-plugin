@@ -28,14 +28,14 @@ const BootOrderItem: React.FC<BootOrderProps> = ({ template }) => {
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="15rem"
-          position="right"
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
               You can edit the boot order in the <Link to={disksTabLink}>{t('Disks tab')}</Link>
             </Trans>
           }
+          hasAutoWidth
+          maxWidth="15rem"
+          position="right"
         >
           <DescriptionListTermHelpTextButton>{t('Boot order')}</DescriptionListTermHelpTextButton>
         </Popover>

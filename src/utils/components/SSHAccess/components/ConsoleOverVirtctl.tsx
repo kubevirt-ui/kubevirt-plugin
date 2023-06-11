@@ -13,26 +13,26 @@ import { HelpIcon } from '@patternfly/react-icons';
 import { getConsoleVirtctlCommand } from '../utils';
 
 type ConsoleOverVirtctlProps = {
+  userName?: string;
   vmName: string;
   vmNamespace: string;
-  userName?: string;
 };
 
 const ConsoleOverVirtctl: React.FC<ConsoleOverVirtctlProps> = ({
+  userName,
   vmName,
   vmNamespace,
-  userName,
 }) => {
   return (
     <DescriptionListGroup>
       <DescriptionListTerm className="pf-u-font-size-xs">
         {t('SSH using virtctl')}{' '}
         <Popover
-          aria-label={'Help'}
-          position="right"
           bodyContent={t(
             'SSH access using the virtctl command is possible only when the API server is reachable.',
           )}
+          aria-label={'Help'}
+          position="right"
         >
           <HelpIcon />
         </Popover>
@@ -40,10 +40,10 @@ const ConsoleOverVirtctl: React.FC<ConsoleOverVirtctlProps> = ({
 
       <DescriptionListDescription className="sshcommand-body">
         <ClipboardCopy
-          isReadOnly
-          data-test="ssh-over-virtctl"
           clickTip={t('Copied')}
+          data-test="ssh-over-virtctl"
           hoverTip={t('Copy to clipboard')}
+          isReadOnly
         >
           {getConsoleVirtctlCommand(userName, vmName, vmNamespace)}
         </ClipboardCopy>

@@ -21,7 +21,6 @@ const RestoreGettingStartedButton: React.FC = () => {
 
   return (
     <Label
-      color="purple"
       onClick={() => {
         setShowState(GETTING_STARTED_SHOW_STATE.SHOW);
       }}
@@ -30,8 +29,9 @@ const RestoreGettingStartedButton: React.FC = () => {
         event.stopPropagation();
         setShowState(GETTING_STARTED_SHOW_STATE.DISAPPEAR);
       }}
-      style={{ cursor: 'pointer' }}
+      color="purple"
       data-test="restore-getting-started"
+      style={{ cursor: 'pointer' }}
     >
       {t('Show getting started resources')}
     </Label>

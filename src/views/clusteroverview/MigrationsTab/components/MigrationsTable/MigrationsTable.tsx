@@ -23,11 +23,11 @@ const MigrationTable: React.FC<MigrationTableProps> = ({ tableData }) => {
   const { t } = useKubevirtTranslation();
 
   const {
+    filters,
     loaded,
     loadErrors,
-    filters,
-    migrationsTableUnfilteredData,
     migrationsTableFilteredData,
+    migrationsTableUnfilteredData,
     onFilterChange,
   } = tableData || {};
   const [columns, activeColumns] = useVirtualMachineInstanceMigrationsColumns();
@@ -35,33 +35,33 @@ const MigrationTable: React.FC<MigrationTableProps> = ({ tableData }) => {
     <>
       <ListPageBody>
         <ListPageFilter
-          data={migrationsTableUnfilteredData}
-          loaded={loaded}
-          rowFilters={filters}
-          onFilterChange={onFilterChange}
           columnLayout={{
-            columns: columns?.map(({ id, title, additional }) => ({
+            columns: columns?.map(({ additional, id, title }) => ({
+              additional,
               id,
               title,
-              additional,
             })),
             id: VirtualMachineInstanceMigrationModelRef,
             selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
             type: t('VirtualMachineInstanceMigration'),
           }}
+          data={migrationsTableUnfilteredData}
+          loaded={loaded}
+          onFilterChange={onFilterChange}
+          rowFilters={filters}
         />
         <VirtualizedTable<MigrationTableDataLayout>
-          data={migrationsTableFilteredData}
-          unfilteredData={migrationsTableUnfilteredData}
-          loaded={loaded}
-          loadError={loadErrors}
-          columns={activeColumns}
-          Row={MigrationsRow}
           EmptyMsg={() => (
             <Bullseye>
               <ListPageBody>{t('No migrations found')}</ListPageBody>
             </Bullseye>
           )}
+          columns={activeColumns}
+          data={migrationsTableFilteredData}
+          loaded={loaded}
+          loadError={loadErrors}
+          Row={MigrationsRow}
+          unfilteredData={migrationsTableUnfilteredData}
         />
       </ListPageBody>
     </>

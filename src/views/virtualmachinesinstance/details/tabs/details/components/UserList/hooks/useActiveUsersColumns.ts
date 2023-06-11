@@ -6,38 +6,38 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
-const useActiveUsersColumns = (): { title: string; id: string }[] => {
+const useActiveUsersColumns = (): { id: string; title: string }[] => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<K8sResourceCommon>[] = [
     {
-      title: t('User Name'),
       id: 'userName',
-      transforms: [sortable],
       sort: 'metadata.name',
+      title: t('User Name'),
+      transforms: [sortable],
     },
     {
-      title: t('Domain'),
       id: 'domain',
-      transforms: [sortable],
       sort: 'domain',
-    },
-    {
-      title: t('Time of login'),
-      id: 'loginTime',
+      title: t('Domain'),
       transforms: [sortable],
-      sort: 'loginTime',
     },
     {
-      title: t('Elapsed time since login'),
+      id: 'loginTime',
+      sort: 'loginTime',
+      title: t('Time of login'),
+      transforms: [sortable],
+    },
+    {
       id: 'elapsedTime',
+      title: t('Elapsed time since login'),
     },
   ];
 
   const [activeColumns] = useActiveColumns<K8sResourceCommon>({
+    columnManagementID: '',
     columns,
     showNamespaceOverride: false,
-    columnManagementID: '',
   });
 
   return activeColumns;

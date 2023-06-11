@@ -10,33 +10,33 @@ import { Popover, PopoverPosition } from '@patternfly/react-core';
 import { InterfacesData } from './utils/types';
 
 type VirtualMachinesOverviewTabNetworkInterfacesProps = {
-  obj: InterfacesData;
   activeColumnIDs: Set<string>;
+  obj: InterfacesData;
 };
 
 const VirtualMachinesOverviewTabInterfacesRow: React.FC<
   VirtualMachinesOverviewTabNetworkInterfacesProps
-> = ({ obj, activeColumnIDs }) => {
+> = ({ activeColumnIDs, obj }) => {
   const { t } = useKubevirtTranslation();
   const popoverFields = {
-    [t('Name')]: obj?.network?.name,
     [t('Model')]: obj?.iface?.model,
+    [t('Name')]: obj?.network?.name,
     [t('Network')]: obj?.network?.multus?.networkName || t('Pod networking'),
     [t('Type')]: getPrintableNetworkInterfaceType(obj?.iface),
   };
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="name">
         <div data-test-id={`network-interface-${obj?.network?.name}`}>
           <Popover
-            hasAutoWidth
-            position={PopoverPosition.left}
             bodyContent={Object.entries(popoverFields).map(([key, value]) => (
               <>
                 <div className="interface-row--title">{key}</div>
                 <div className="interface-row--value">{value || NO_DATA_DASH}</div>
               </>
             ))}
+            hasAutoWidth
+            position={PopoverPosition.left}
           >
             <div className="pf-c-description-list__text pf-m-help-text help">
               {obj?.iface?.name}
@@ -44,12 +44,12 @@ const VirtualMachinesOverviewTabInterfacesRow: React.FC<
           </Popover>
         </div>
       </TableData>
-      <TableData id="ip" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="ip">
         <div data-test-id={`network-interface-${obj?.ipAddresses}`}>
           <FirstItemListPopover
-            items={obj?.ipAddresses}
             headerContent={'IP addresses'}
             includeCopyFirstItem
+            items={obj?.ipAddresses}
           />
         </div>
       </TableData>

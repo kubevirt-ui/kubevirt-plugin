@@ -10,17 +10,17 @@ import { Badge, Label, Split, SplitItem } from '@patternfly/react-core';
 import './VirtualMachineTemplatesSource.scss';
 
 type VirtualMachineTemplatesSourceProps = {
-  template: V1Template;
   availableDatasources: Record<string, V1beta1DataSource>;
-  cloneInProgressDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
+  cloneInProgressDatasources: Record<string, V1beta1DataSource>;
+  template: V1Template;
 };
 
 const VirtualMachineTemplatesSource: React.FC<VirtualMachineTemplatesSourceProps> = ({
-  template,
   availableDatasources,
-  cloneInProgressDatasources,
   availableTemplatesUID,
+  cloneInProgressDatasources,
+  template,
 }) => {
   const { t } = useKubevirtTranslation();
   const bootSource = getTemplateBootSourceType(template);

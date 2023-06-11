@@ -104,308 +104,308 @@ export const usePendingChanges = (
 
   const onSubmit = (updatedVM: V1VirtualMachine) =>
     k8sUpdate({
-      model: VirtualMachineModel,
       data: updatedVM,
-      ns: updatedVM?.metadata?.namespace,
+      model: VirtualMachineModel,
       name: updatedVM?.metadata?.name,
+      ns: updatedVM?.metadata?.namespace,
     });
 
   return [
     {
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        createModal(({ isOpen, onClose }) => (
+          <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
+        ));
+      },
       hasPendingChange: cpuMemoryChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
       label: t('CPU | Memory'),
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
+    },
+    {
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
-          <CPUMemoryModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vmi={vmi} />
+          <BootOrderModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
         ));
       },
-    },
-    {
       hasPendingChange: bootOrderChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
       label: t('Boot disk'),
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
+    },
+    {
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
-          <BootOrderModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vmi={vmi} />
+          <HostnameModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
         ));
       },
-    },
-    {
       hasPendingChange: hostnameChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
       label: t('Hostname'),
-      handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
-        createModal(({ isOpen, onClose }) => (
-          <HostnameModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vmi={vmi} />
-        ));
-      },
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      hasPendingChange: bootModeChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
-      label: t('Boot mode'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <FirmwareBootloaderModal
-            vm={vm}
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={onSubmit}
+            vm={vm}
             vmi={vmi}
           />
         ));
       },
+      hasPendingChange: bootModeChanged,
+      label: t('Boot mode'),
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Environment));
+      },
       hasPendingChange: !isEmpty(modifiedEnvDisks),
-      tabLabel: VirtualMachineDetailsTabLabel.Environment,
       label:
         !isEmpty(modifiedEnvDisks) && modifiedEnvDisks?.length > 1
           ? modifiedEnvDisks.join(', ')
           : modifiedEnvDisks[0],
-      handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Environment));
-      },
+      tabLabel: VirtualMachineDetailsTabLabel.Environment,
     },
     {
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.NetworkInterfaces));
+      },
       hasPendingChange: !isEmpty(modifiedNics),
-      tabLabel: VirtualMachineDetailsTabLabel.NetworkInterfaces,
       label:
         !isEmpty(modifiedNics) && modifiedNics?.length > 1
           ? modifiedNics.join(', ')
           : modifiedNics[0],
-      handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.NetworkInterfaces));
-      },
+      tabLabel: VirtualMachineDetailsTabLabel.NetworkInterfaces,
     },
     {
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        createModal(({ isOpen, onClose }) => (
+          <HardwareDevicesModal
+            btnText={t('Add GPU device')}
+            headerText={t('GPU devices')}
+            initialDevices={getGPUDevices(vm)}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+            type={HARDWARE_DEVICE_TYPE.GPUS}
+            vm={vm}
+            vmi={vmi}
+          />
+        ));
+      },
       hasPendingChange: !isEmpty(modifiedGPUDevices),
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
       label:
         !isEmpty(modifiedGPUDevices) && modifiedGPUDevices?.length > 1
           ? modifiedGPUDevices.join(', ')
           : modifiedGPUDevices[0],
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
+    },
+    {
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesModal
-            vm={vm}
+            btnText={t('Add Host device')}
+            headerText={t('Host devices')}
+            initialDevices={getHostDevices(vm)}
             isOpen={isOpen}
             onClose={onClose}
-            headerText={t('GPU devices')}
             onSubmit={onSubmit}
-            initialDevices={getGPUDevices(vm)}
-            btnText={t('Add GPU device')}
-            type={HARDWARE_DEVICE_TYPE.GPUS}
+            type={HARDWARE_DEVICE_TYPE.HOST_DEVICES}
+            vm={vm}
             vmi={vmi}
           />
         ));
       },
-    },
-    {
       hasPendingChange: !isEmpty(modifiedHostDevices),
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
       label:
         !isEmpty(modifiedHostDevices) && modifiedHostDevices?.length > 1
           ? modifiedHostDevices.join(', ')
           : modifiedHostDevices[0],
-      handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
-        createModal(({ isOpen, onClose }) => (
-          <HardwareDevicesModal
-            vm={vm}
-            isOpen={isOpen}
-            onClose={onClose}
-            headerText={t('Host devices')}
-            onSubmit={onSubmit}
-            initialDevices={getHostDevices(vm)}
-            btnText={t('Add Host device')}
-            type={HARDWARE_DEVICE_TYPE.HOST_DEVICES}
-            vmi={vmi}
-          />
-        ));
-      },
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      hasPendingChange: dedicatedResourcesChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
-      label: t('Dedicated resources'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <DedicatedResourcesModal
-            vm={vm}
+            headerText={t('Dedicated resources')}
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={onSubmit}
-            headerText={t('Dedicated resources')}
+            vm={vm}
             vmi={vmi}
           />
         ));
       },
+      hasPendingChange: dedicatedResourcesChanged,
+      label: t('Dedicated resources'),
+      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      hasPendingChange: evictionStrategyChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
-      label: t('Eviction strategy'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <EvictionStrategyModal
-            vm={vm}
+            headerText={t('Eviction strategy')}
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={onSubmit}
-            headerText={t('Eviction strategy')}
+            vm={vm}
             vmi={vmi}
           />
         ));
       },
+      hasPendingChange: evictionStrategyChanged,
+      label: t('Eviction strategy'),
+      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      hasPendingChange: startStrategyChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
-      label: t('Start in pause mode'),
       handleAction: () => {
         createModal(({ isOpen, onClose }) => (
           <StartPauseModal
-            vm={vm}
+            headerText={t('Start in pause mode')}
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={onSubmit}
-            headerText={t('Start in pause mode')}
+            vm={vm}
             vmi={vmi}
           />
         ));
       },
+      hasPendingChange: startStrategyChanged,
+      label: t('Start in pause mode'),
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      hasPendingChange: nodeSelectorChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
-      label: t('Node selector'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <NodeSelectorModal
-            vm={vm}
+            isOpen={isOpen}
             nodes={nodes}
             nodesLoaded={nodesLoaded}
-            isOpen={isOpen}
             onClose={onClose}
             onSubmit={onSubmit}
+            vm={vm}
             vmi={vmi}
           />
         ));
       },
+      hasPendingChange: nodeSelectorChanged,
+      label: t('Node selector'),
+      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      hasPendingChange: cloudInitChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Scripts,
-      label: t('Cloud-init'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
         createModal(({ isOpen, onClose }) => (
-          <CloudinitModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vmi={vmi} />
+          <CloudinitModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
         ));
       },
+      hasPendingChange: cloudInitChanged,
+      label: t('Cloud-init'),
+      tabLabel: VirtualMachineDetailsTabLabel.Scripts,
     },
     {
-      hasPendingChange: tolerationsChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
-      label: t('Tolerations'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <TolerationsModal
-            vm={vm}
+            isOpen={isOpen}
             nodes={nodes}
             nodesLoaded={nodesLoaded}
-            isOpen={isOpen}
             onClose={onClose}
             onSubmit={onSubmit}
+            vm={vm}
             vmi={vmi}
           />
         ));
       },
+      hasPendingChange: tolerationsChanged,
+      label: t('Tolerations'),
+      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      hasPendingChange: affinityChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
-      label: t('Affinity rules'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <AffinityModal
-            vm={vm}
+            isOpen={isOpen}
             nodes={nodes}
             nodesLoaded={nodesLoaded}
-            isOpen={isOpen}
             onClose={onClose}
             onSubmit={onSubmit}
+            vm={vm}
             vmi={vmi}
           />
         ));
       },
+      hasPendingChange: affinityChanged,
+      label: t('Affinity rules'),
+      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      hasPendingChange: deschedulerChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
-      label: t('Descheduler'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <DeschedulerModal
-            vm={vm}
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={onSubmit}
+            vm={vm}
             vmi={vmi}
           />
         ));
       },
+      hasPendingChange: deschedulerChanged,
+      label: t('Descheduler'),
+      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      hasPendingChange: sshServiceChanged,
-      tabLabel: VirtualMachineDetailsTabLabel.Scripts,
-      label: t('Authorized SSH key'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
         createModal(({ isOpen, onClose }) => (
-          <VMSSHSecretModal vm={vm} isOpen={isOpen} onClose={onClose} updateVM={onSubmit} />
+          <VMSSHSecretModal isOpen={isOpen} onClose={onClose} updateVM={onSubmit} vm={vm} />
         ));
       },
+      hasPendingChange: sshServiceChanged,
+      label: t('Authorized SSH key'),
+      tabLabel: VirtualMachineDetailsTabLabel.Scripts,
     },
     {
-      hasPendingChange: !isEmpty(modifiedVolumesHotplug),
-      tabLabel: VirtualMachineDetailsTabLabel.Disks,
-      label: `${t('Make persistent disk')} - (${(modifiedVolumesHotplug || [])
-        .map((volume) => volume?.name)
-        .join(', ')})`,
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Disks));
       },
+      hasPendingChange: !isEmpty(modifiedVolumesHotplug),
+      label: `${t('Make persistent disk')} - (${(modifiedVolumesHotplug || [])
+        .map((volume) => volume?.name)
+        .join(', ')})`,
+      tabLabel: VirtualMachineDetailsTabLabel.Disks,
     },
     {
-      hasPendingChange: modifiedHedlessMode,
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
-      label: t('Headless mode'),
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesHeadlessModeModal
-            vm={vm}
             isOpen={isOpen}
             onClose={onClose}
-            vmi={vmi}
             onSubmit={onSubmit}
+            vm={vm}
+            vmi={vmi}
           />
         ));
       },
+      hasPendingChange: modifiedHedlessMode,
+      label: t('Headless mode'),
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
   ];
 };

@@ -26,36 +26,35 @@ const useClusterInstancetypeActionsProvider: UseClusterInstancetypeActionsProvid
   const actions: Action[] = useMemo(() => {
     return [
       {
-        id: 'instacetype-clone-action',
-        disabled: false,
-        label: t('Clone'),
-        cta: () =>
-          createModal((modalProps) => {
-            return (
-              <CloneResourceModal
-                {...modalProps}
-                object={instanceType}
-                model={VirtualMachineClusterInstancetypeModel}
-              />
-            );
-          }),
         accessReview: asAccessReview(
           VirtualMachineClusterInstancetypeModel,
           instanceType,
           'create',
         ),
+        cta: () =>
+          createModal((modalProps) => {
+            return (
+              <CloneResourceModal
+                {...modalProps}
+                model={VirtualMachineClusterInstancetypeModel}
+                object={instanceType}
+              />
+            );
+          }),
+        disabled: false,
+        id: 'instacetype-clone-action',
+        label: t('Clone'),
       },
       {
-        id: 'instacetype-delete-action',
-        disabled: false,
-        label: t('Delete'),
+        accessReview: asAccessReview(
+          VirtualMachineClusterInstancetypeModel,
+          instanceType,
+          'delete',
+        ),
         cta: () =>
           createModal(({ isOpen, onClose }) => {
             return (
               <DeleteModal
-                isOpen={isOpen}
-                onClose={onClose}
-                obj={instanceType}
                 onDeleteSubmit={() =>
                   k8sDelete({
                     model: VirtualMachineClusterInstancetypeModel,
@@ -63,14 +62,15 @@ const useClusterInstancetypeActionsProvider: UseClusterInstancetypeActionsProvid
                   })
                 }
                 headerText={t('Delete VirtualMachineClusterInstancetype?')}
+                isOpen={isOpen}
+                obj={instanceType}
+                onClose={onClose}
               />
             );
           }),
-        accessReview: asAccessReview(
-          VirtualMachineClusterInstancetypeModel,
-          instanceType,
-          'delete',
-        ),
+        disabled: false,
+        id: 'instacetype-delete-action',
+        label: t('Delete'),
       },
     ];
   }, [createModal, instanceType, t]);

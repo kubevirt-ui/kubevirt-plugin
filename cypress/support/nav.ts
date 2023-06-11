@@ -6,10 +6,10 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
-      visitOverview(): void;
       visitCatalog(): void;
-      visitVMs(): void;
+      visitOverview(): void;
       visitTemplates(): void;
+      visitVMs(): void;
     }
   }
 }

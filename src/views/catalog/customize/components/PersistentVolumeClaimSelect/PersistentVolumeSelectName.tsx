@@ -15,21 +15,21 @@ import {
 import { filter } from './utils';
 
 type PersistentVolumeSelectNameProps = {
-  isDisabled: boolean;
-  pvcNameSelected: string;
-  pvcNames: string[];
-  onChange: (newPVCName: string) => void;
-  loaded: boolean;
   'data-test-id': string;
+  isDisabled: boolean;
+  loaded: boolean;
+  onChange: (newPVCName: string) => void;
+  pvcNames: string[];
+  pvcNameSelected: string;
 };
 
 export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProps> = ({
-  isDisabled,
-  pvcNameSelected,
-  pvcNames,
-  onChange: onPvcNameChange,
-  loaded,
   'data-test-id': testId,
+  isDisabled,
+  loaded,
+  onChange: onPvcNameChange,
+  pvcNames,
+  pvcNameSelected,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -48,47 +48,47 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
 
   return (
     <FormGroup
-      label={t('PVC name')}
-      fieldId={testId}
-      id={testId}
-      isRequired
       className="pvc-selection-formgroup"
-      validated={errors?.['pvcName'] ? ValidatedOptions.error : ValidatedOptions.default}
+      fieldId={testId}
       helperTextInvalid={t('This field is required')}
       helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
+      id={testId}
+      isRequired
+      label={t('PVC name')}
+      validated={errors?.['pvcName'] ? ValidatedOptions.error : ValidatedOptions.default}
     >
       {loaded ? (
         <Controller
-          name="pvcName"
-          control={control}
-          rules={{ required: true }}
           render={({ field: { onChange }, fieldState: { error } }) => (
             <div data-test-id={`${testId}-dropdown`}>
               <Select
-                aria-labelledby={testId}
-                isOpen={isOpen}
-                onToggle={() => setSelectOpen(!isOpen)}
                 onSelect={(e, v) => {
                   onSelect(e, v);
                   onChange(v);
                 }}
-                variant={SelectVariant.typeahead}
-                selections={pvcNameSelected}
-                onFilter={filter(pvcNames)}
-                placeholderText={t('--- Select PVC name ---')}
-                isDisabled={isDisabled}
-                validated={error ? ValidatedOptions.error : ValidatedOptions.default}
                 aria-invalid={error ? true : false}
-                maxHeight={400}
+                aria-labelledby={testId}
                 data-test-id={`${testId}-dropdown`}
+                isDisabled={isDisabled}
+                isOpen={isOpen}
+                maxHeight={400}
+                onFilter={filter(pvcNames)}
+                onToggle={() => setSelectOpen(!isOpen)}
+                placeholderText={t('--- Select PVC name ---')}
+                selections={pvcNameSelected}
                 toggleId={`${testId}-toggle`}
+                validated={error ? ValidatedOptions.error : ValidatedOptions.default}
+                variant={SelectVariant.typeahead}
               >
                 {pvcNames.map((name) => (
-                  <SelectOption key={name} value={name} data-test-id={pvcNames} />
+                  <SelectOption data-test-id={pvcNames} key={name} value={name} />
                 ))}
               </Select>
             </div>
           )}
+          control={control}
+          name="pvcName"
+          rules={{ required: true }}
         />
       ) : (
         <Loading />

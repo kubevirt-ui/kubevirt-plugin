@@ -36,8 +36,8 @@ import SysPrepItem from './components/SysPrepItem/SysPrepItem';
 import './template-scripts-tab.scss';
 
 type TemplateScriptsPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj: V1Template;
 };
@@ -52,10 +52,10 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
   const onSubmitTemplate = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       }),
     [],
   );
@@ -69,7 +69,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
 
   return (
     <PageSection>
-      <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
+      <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
         <DescriptionList className="template-scripts-tab__description-list">
           <DescriptionListGroup>
             <DescriptionListTerm>
@@ -80,19 +80,19 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                   </FlexItem>
                   <FlexItem>
                     <Button
-                      type="button"
-                      isInline
-                      isDisabled={!isTemplateEditable}
                       onClick={() =>
                         createModal(({ isOpen, onClose }) => (
                           <CloudinitModal
-                            vm={vm}
                             isOpen={isOpen}
                             onClose={onClose}
                             onSubmit={onUpdate}
+                            vm={vm}
                           />
                         ))
                       }
+                      isDisabled={!isTemplateEditable}
+                      isInline
+                      type="button"
                       variant="link"
                     >
                       {t('Edit')}

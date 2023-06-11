@@ -51,9 +51,9 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const lastNamespacePath = useLastNamespacePath();
 
   const [canDeleteTemplate] = useAccessReview({
-    verb: 'delete',
-    resource: TemplateModel.plural,
     namespace: template?.metadata?.namespace,
+    resource: TemplateModel.plural,
+    verb: 'delete',
   });
 
   const [canWriteToDataSourceNs] = useAccessReview(
@@ -94,75 +94,64 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
 
   const actions = [
     {
-      id: EDIT_TEMPLATE_ID,
-      label: t('Edit'),
       cta: () =>
         // lead to the template details page
         history.push(`/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}`),
+      id: EDIT_TEMPLATE_ID,
+      label: t('Edit'),
     },
     {
-      id: 'clone-template',
-      label: t('Clone'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <CloneTemplateModal
-            obj={template}
             isOpen={isOpen}
+            obj={template}
             onClose={onClose}
             onTemplateCloned={goToTemplatePage}
           />
         )),
+      id: 'clone-template',
+      label: t('Clone'),
     },
     {
-      id: 'edit-boot-source',
-      label: t('Edit boot source'),
-      description:
-        (isCommonTemplate && t('Red Hat template cannot be edited')) ||
-        (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
-      disabled: isCommonTemplate || !hasEditPermission,
       cta: () =>
         history.push(
           `/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}/disks`,
         ),
+      description:
+        (isCommonTemplate && t('Red Hat template cannot be edited')) ||
+        (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
+      disabled: isCommonTemplate || !hasEditPermission,
+      id: 'edit-boot-source',
+      label: t('Edit boot source'),
     },
     {
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <EditBootSourceModal
+            dataSource={bootDataSource}
+            isOpen={isOpen}
+            obj={template}
+            onClose={onClose}
+          />
+        )),
+      description:
+        (!loadingBootSource || !canWriteToDataSourceNs) &&
+        getEditBootSourceRefDescription(t, bootDataSource, canWriteToDataSourceNs),
+      disabled: !editableBootSource || !canWriteToDataSourceNs,
       id: 'edit-boot-source-ref',
       label: (
         <>
           {t('Edit boot source reference')} {loadingBootSource && <Loading />}
         </>
       ),
-      description:
-        (!loadingBootSource || !canWriteToDataSourceNs) &&
-        getEditBootSourceRefDescription(t, bootDataSource, canWriteToDataSourceNs),
-      disabled: !editableBootSource || !canWriteToDataSourceNs,
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <EditBootSourceModal
-            obj={template}
-            isOpen={isOpen}
-            onClose={onClose}
-            dataSource={bootDataSource}
-          />
-        )),
     },
     {
-      id: 'edit-labels',
-      description:
-        (isCommonTemplate && t('Labels cannot be edited for Red Hat templates')) ||
-        (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
-      disabled: isCommonTemplate || !hasEditPermission,
-      label: t('Edit labels'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <LabelsModal
-            obj={template}
-            isOpen={isOpen}
-            onClose={onClose}
             onLabelsSubmit={(labels) =>
               k8sPatch({
-                model: TemplateModel,
-                resource: template,
                 data: [
                   {
                     op: 'replace',
@@ -170,28 +159,28 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
                     value: labels,
                   },
                 ],
+                model: TemplateModel,
+                resource: template,
               })
             }
+            isOpen={isOpen}
+            obj={template}
+            onClose={onClose}
           />
         )),
-    },
-    {
-      id: 'edit-annotations',
       description:
-        (isCommonTemplate && t('Annotations cannot be edited for Red Hat templates')) ||
+        (isCommonTemplate && t('Labels cannot be edited for Red Hat templates')) ||
         (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
       disabled: isCommonTemplate || !hasEditPermission,
-      label: t('Edit annotations'),
+      id: 'edit-labels',
+      label: t('Edit labels'),
+    },
+    {
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <AnnotationsModal
-            obj={template}
-            isOpen={isOpen}
-            onClose={onClose}
             onSubmit={(updatedAnnotations) =>
               k8sPatch({
-                model: TemplateModel,
-                resource: template,
                 data: [
                   {
                     op: 'replace',
@@ -199,28 +188,39 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
                     value: updatedAnnotations,
                   },
                 ],
+                model: TemplateModel,
+                resource: template,
               })
             }
+            isOpen={isOpen}
+            obj={template}
+            onClose={onClose}
           />
         )),
+      description:
+        (isCommonTemplate && t('Annotations cannot be edited for Red Hat templates')) ||
+        (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
+      disabled: isCommonTemplate || !hasEditPermission,
+      id: 'edit-annotations',
+      label: t('Edit annotations'),
     },
     {
-      id: 'delete-template',
-      label: t('Delete'),
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <DeleteModal
+            headerText={t('Delete VirtualMachine Template?')}
+            isOpen={isOpen}
+            obj={template}
+            onClose={onClose}
+            onDeleteSubmit={onDelete}
+          />
+        )),
       description:
         (isCommonTemplate && t('Red Hat template cannot be deleted')) ||
         (!canDeleteTemplate && t(NO_DELETE_TEMPLATE_PERMISSIONS)),
       disabled: isCommonTemplate || !canDeleteTemplate,
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <DeleteModal
-            obj={template}
-            isOpen={isOpen}
-            onClose={onClose}
-            headerText={t('Delete VirtualMachine Template?')}
-            onDeleteSubmit={onDelete}
-          />
-        )),
+      id: 'delete-template',
+      label: t('Delete'),
     },
   ];
 

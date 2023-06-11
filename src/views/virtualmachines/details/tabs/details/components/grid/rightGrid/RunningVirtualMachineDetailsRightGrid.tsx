@@ -17,7 +17,7 @@ const RunningVirtualMachineDetailsRightGrid: React.FC<VirtualMachineDetailsRight
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { vmi, pods } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const [guestAgentData] = useGuestOS(vmi);
 
   return (

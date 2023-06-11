@@ -5,8 +5,8 @@ import { Alert, AlertVariant } from '@patternfly/react-core';
 
 const DefaultStorageClassAlert: FC = () => (
   <Alert
-    title={t("Selected StorageClass is different from StorageClass of the template's boot source")}
     isInline
+    title={t("Selected StorageClass is different from StorageClass of the template's boot source")}
     variant={AlertVariant.info}
   >
     {t('It may take several minutes until the clone is done and the VirtualMachine is ready.')}

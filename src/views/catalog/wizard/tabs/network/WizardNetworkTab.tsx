@@ -13,7 +13,7 @@ import WizardNetworkInterfaceModal from './components/modal/WizardNetworkInterfa
 import 'src/utils/styles/ListPageCreateButton.scss';
 import './wizard-network-tab.scss';
 
-const WizardNetworkTab: WizardTab = ({ vm, updateVM }) => {
+const WizardNetworkTab: WizardTab = ({ updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -23,23 +23,23 @@ const WizardNetworkTab: WizardTab = ({ vm, updateVM }) => {
     <div className="wizard-network-tab">
       <ListPageBody>
         <SidebarEditor
-          resource={vm}
           onResourceUpdate={(newVM) => updateVM(newVM)}
           pathsToHighlight={PATHS_TO_HIGHLIGHT.NETWORK_TAB}
+          resource={vm}
         >
           <ListPageCreateButton
-            className="list-page-create-button-margin"
             onClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <WizardNetworkInterfaceModal
+                  headerText={actionText}
                   isOpen={isOpen}
                   onClose={onClose}
-                  headerText={actionText}
-                  vm={vm}
                   updateVM={updateVM}
+                  vm={vm}
                 />
               ))
             }
+            className="list-page-create-button-margin"
           >
             {actionText}
           </ListPageCreateButton>

@@ -14,13 +14,13 @@ import {
 import useVirtualMachineInstanceMigrationActionsProvider from './hooks/useVirtualMachineInstanceMigrationActionsProvider';
 
 type MigrationActionsDropdownProps = {
-  vmim: V1VirtualMachineInstanceMigration;
   isKebabToggle?: boolean;
+  vmim: V1VirtualMachineInstanceMigration;
 };
 
 const MigrationActionsDropdown: React.FC<MigrationActionsDropdownProps> = ({
-  vmim,
   isKebabToggle,
+  vmim,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -36,10 +36,17 @@ const MigrationActionsDropdown: React.FC<MigrationActionsDropdownProps> = ({
 
   return (
     <Dropdown
-      data-test-id="virtual-machine-instance-migration-actions"
-      isPlain={isKebabToggle}
-      isOpen={isOpen}
-      position={DropdownPosition.right}
+      dropdownItems={actions?.map((action) => (
+        <DropdownItem
+          data-test-id={action?.id}
+          description={action?.description}
+          isDisabled={action?.disabled}
+          key={action?.id}
+          onClick={() => handleClick(action)}
+        >
+          {action?.label}
+        </DropdownItem>
+      ))}
       toggle={
         isKebabToggle ? (
           <KebabToggle onToggle={setIsOpen} />
@@ -47,17 +54,10 @@ const MigrationActionsDropdown: React.FC<MigrationActionsDropdownProps> = ({
           <DropdownToggle onToggle={setIsOpen}>{t('Actions')}</DropdownToggle>
         )
       }
-      dropdownItems={actions?.map((action) => (
-        <DropdownItem
-          data-test-id={action?.id}
-          key={action?.id}
-          onClick={() => handleClick(action)}
-          isDisabled={action?.disabled}
-          description={action?.description}
-        >
-          {action?.label}
-        </DropdownItem>
-      ))}
+      data-test-id="virtual-machine-instance-migration-actions"
+      isOpen={isOpen}
+      isPlain={isKebabToggle}
+      position={DropdownPosition.right}
     />
   );
 };

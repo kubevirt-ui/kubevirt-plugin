@@ -15,7 +15,7 @@ export default (template: V1Template): [template: V1Template, error: Error] => {
   useEffect(() => {
     if (!template) return;
     const parameters = generateParamsWithPrettyName(template);
-    const { parametersToGenerate, excludedParameters } = parameters.reduce(
+    const { excludedParameters, parametersToGenerate } = parameters.reduce(
       (acc, parameter) => {
         if (parameter?.generate) {
           acc.parametersToGenerate.push(parameter);
@@ -25,18 +25,18 @@ export default (template: V1Template): [template: V1Template, error: Error] => {
         acc.excludedParameters.push(parameter);
         return acc;
       },
-      { parametersToGenerate: [], excludedParameters: [] },
+      { excludedParameters: [], parametersToGenerate: [] },
     );
 
     if (parametersToGenerate.length === 0) return setTemplateWithGeneratedValues(template);
 
     k8sCreate<V1Template>({
-      model: ProcessedTemplatesModel,
       data: {
         ...template,
-        parameters: parametersToGenerate,
         metadata: { ...template?.metadata, namespace },
+        parameters: parametersToGenerate,
       },
+      model: ProcessedTemplatesModel,
       ns: namespace,
       queryParams: {
         dryRun: 'All',

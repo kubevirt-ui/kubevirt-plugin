@@ -7,10 +7,10 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseVMIAndPodsForVMValues = {
-  vmi: V1VirtualMachineInstance;
-  pods: K8sResourceCommon[];
-  loaded: boolean;
   error: any;
+  loaded: boolean;
+  pods: K8sResourceCommon[];
+  vmi: V1VirtualMachineInstance;
 };
 
 export const useVMIAndPodsForVM = (
@@ -19,9 +19,9 @@ export const useVMIAndPodsForVM = (
 ): UseVMIAndPodsForVMValues => {
   const [vmi, vmiLoaded, vmiLoadError] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+    isList: false,
     name: vmName,
     namespace: vmNamespace,
-    isList: false,
   });
 
   const [pods, podsLoaded, podsLoadError] = useK8sWatchResource<K8sResourceCommon[]>({
@@ -34,9 +34,9 @@ export const useVMIAndPodsForVM = (
   const error = vmiLoadError || podsLoadError;
 
   return {
-    vmi: vmName === vmi?.metadata?.name && vmNamespace === vmi?.metadata?.namespace && vmi,
-    pods,
-    loaded,
     error,
+    loaded,
+    pods,
+    vmi: vmName === vmi?.metadata?.name && vmNamespace === vmi?.metadata?.namespace && vmi,
   };
 };

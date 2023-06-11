@@ -1,28 +1,28 @@
 import { MutableRefObject } from 'react';
 
-export type InstanceTypeSize = 'medium' | 'large' | 'xlarge' | '2xlarge' | '4xlarge' | '8xlarge';
+export type InstanceTypeSize = '2xlarge' | '4xlarge' | '8xlarge' | 'large' | 'medium' | 'xlarge';
 
 export enum InstanceTypeCategory {
-  GeneralPurpose = 'GeneralPurpose',
   ComputeIntensive = 'ComputeIntensive',
-  MemoryIntensive = 'MemoryIntensive',
+  GeneralPurpose = 'GeneralPurpose',
   GpuResourcesAttached = 'GpuResourcesAttached',
+  MemoryIntensive = 'MemoryIntensive',
 }
 
 export type InstanceTypeSizeDetails = {
-  name: InstanceTypeSize;
-  label: string;
   cpus: number;
+  label: string;
   memory: string;
+  name: InstanceTypeSize;
 };
 
 export type CategoryDetails = {
-  title: string;
   Icon: any;
+  instanceTypes: InstanceTypeSizeDetails[];
   prefix: string;
   prefixLabel: string;
   seriesLabel: string;
-  instanceTypes: InstanceTypeSizeDetails[];
+  title: string;
 };
 
 export type CategoryDetailsMap = { [key in InstanceTypeCategory]: CategoryDetails };
@@ -30,6 +30,6 @@ export type CategoryDetailsMap = { [key in InstanceTypeCategory]: CategoryDetail
 export type UseInstanceTypeCardMenuSectionValues = {
   activeMenu: string;
   menuRef: MutableRefObject<HTMLDivElement>;
-  onMenuToggle: (event?: React.MouseEvent, menuID?: string) => void;
   onMenuSelect: (itName: string) => void;
+  onMenuToggle: (event?: React.MouseEvent, menuID?: string) => void;
 };

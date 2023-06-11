@@ -39,7 +39,7 @@ const DataSourcePageTitle: React.FC<DataSourcePageTitleProps> = ({
         <span className="co-m-pane__heading">
           <h1 className="co-m-pane__name co-resource-item">
             <span className="co-m-resource-icon co-m-resource-icon--lg">{t('DS')}</span>
-            <span data-test-id="resource-title" className="co-resource-item__resource-name">
+            <span className="co-resource-item__resource-name" data-test-id="resource-title">
               {name ?? dataSource?.metadata?.name}{' '}
             </span>
             {isDataSourceReady(dataSource) && (

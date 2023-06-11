@@ -41,7 +41,7 @@ const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const { createModal } = useModal();
-  const { bootableVolumes, loaded, error } = useBootableVolumes(namespace);
+  const { bootableVolumes, error, loaded } = useBootableVolumes(namespace);
 
   const [preferences] = useK8sWatchResource<V1alpha2VirtualMachineClusterPreference[]>({
     groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
@@ -55,12 +55,12 @@ const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
   const [pagination, setPagination] = useState(paginationInitialState);
   const [columns, activeColumns] = useBootableVolumesColumns(pagination, filteredData, preferences);
 
-  const onPageChange = ({ page, perPage, startIndex, endIndex }) => {
+  const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({
+      endIndex,
       page,
       perPage,
       startIndex,
-      endIndex,
     }));
   };
 
@@ -89,55 +89,55 @@ const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
 
           <StackItem className="list-managment-group">
             <ListPageFilter
-              data={data}
-              loaded={loaded}
-              rowFilters={useBootableVolumesFilters()}
-              onFilterChange={(...args) => {
-                onFilterChange(...args);
-                setPagination((prevPagination) => ({
-                  ...prevPagination,
-                  page: 1,
-                  startIndex: 0,
-                  endIndex: prevPagination?.perPage,
-                }));
-              }}
               columnLayout={{
-                columns: columns?.map(({ id, title, additional }) => ({
+                columns: columns?.map(({ additional, id, title }) => ({
+                  additional,
                   id,
                   title,
-                  additional,
                 })),
                 id: 'bootable-volumes-list',
                 selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
                 type: t('DataSource'),
               }}
+              onFilterChange={(...args) => {
+                onFilterChange(...args);
+                setPagination((prevPagination) => ({
+                  ...prevPagination,
+                  endIndex: prevPagination?.perPage,
+                  page: 1,
+                  startIndex: 0,
+                }));
+              }}
+              data={data}
+              loaded={loaded}
+              rowFilters={useBootableVolumesFilters()}
             />
             <Pagination
+              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                onPageChange({ endIndex, page, perPage, startIndex })
+              }
+              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                onPageChange({ endIndex, page, perPage, startIndex })
+              }
               className="list-managment-group__pagination"
+              defaultToFullPage
               itemCount={filteredData?.length}
               page={pagination?.page}
               perPage={pagination?.perPage}
-              defaultToFullPage
-              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                onPageChange({ page, perPage, startIndex, endIndex })
-              }
-              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                onPageChange({ page, perPage, startIndex, endIndex })
-              }
               perPageOptions={paginationDefaultValues}
             />
           </StackItem>
 
           <VirtualizedTable<K8sResourceCommon>
-            data={filteredData}
-            unfilteredData={data}
-            loaded={loaded}
-            loadError={error}
-            columns={activeColumns}
-            Row={BootableVolumesRow}
             rowData={{
               preferences,
             }}
+            columns={activeColumns}
+            data={filteredData}
+            loaded={loaded}
+            loadError={error}
+            Row={BootableVolumesRow}
+            unfilteredData={data}
           />
         </Stack>
       </ListPageBody>

@@ -12,43 +12,43 @@ import '@patternfly/react-styles/css/components/Consoles/DesktopViewer.css';
 
 const RDP: React.FunctionComponent<RDPProps> = ({
   children = null,
+  rdp = null,
   spice = null,
   vnc = null,
-  rdp = null,
   ...props
 }) => (
   <div className={css(styles?.consoleDesktopViewer)}>
     <RemoteViewer
-      spice={spice}
-      vnc={vnc}
-      rdp={rdp}
-      onGenerate={props?.onGenerate}
       onDownload={props?.onDownload}
-      textConnectWithRemoteViewer={props?.textConnectWithRemoteViewer}
+      onGenerate={props?.onGenerate}
+      rdp={rdp}
+      spice={spice}
       textConnectWithRDP={props?.textConnectWithRDP}
+      textConnectWithRemoteViewer={props?.textConnectWithRemoteViewer}
       textMoreInfo={props?.textMoreInfo}
-      textMoreRDPInfo={props?.textMoreRDPInfo}
       textMoreInfoContent={props?.textMoreInfoContent}
+      textMoreRDPInfo={props?.textMoreRDPInfo}
       textMoreRDPInfoContent={props?.textMoreRDPInfoContent}
+      vnc={vnc}
     >
       {children}
     </RemoteViewer>
     <ManualConnection
-      spice={spice}
-      vnc={vnc}
       rdp={rdp}
+      spice={spice}
+      textAddress={props?.textAddress}
+      textConnectWith={props?.textConnectWith}
       textManualConnection={props?.textManualConnection}
       textNoProtocol={props?.textNoProtocol}
-      textConnectWith={props?.textConnectWith}
-      textAddress={props?.textAddress}
-      textSpiceAddress={props?.textSpiceAddress}
-      textVNCAddress={props?.textVNCAddress}
-      textSpicePort={props?.textSpicePort}
-      textVNCPort={props?.textVNCPort}
-      textSpiceTlsPort={props?.textSpiceTlsPort}
-      textVNCTlsPort={props?.textVNCTlsPort}
-      textRDPPort={props?.textRDPPort}
       textRdpAddress={props?.textRdpAddress}
+      textRDPPort={props?.textRDPPort}
+      textSpiceAddress={props?.textSpiceAddress}
+      textSpicePort={props?.textSpicePort}
+      textSpiceTlsPort={props?.textSpiceTlsPort}
+      textVNCAddress={props?.textVNCAddress}
+      textVNCPort={props?.textVNCPort}
+      textVNCTlsPort={props?.textVNCTlsPort}
+      vnc={vnc}
     />
   </div>
 );

@@ -15,12 +15,12 @@ import styles from '@patternfly/react-styles/css/components/Consoles/VncConsole'
 import { VncConsoleActionsProps } from './utils/VncConsoleTypes';
 
 export const VncConsoleActions: FC<VncConsoleActionsProps> = ({
-  textSendShortcut,
-  textDisconnect,
-  onDisconnect,
   additionalButtons = [],
   customButtons,
+  onDisconnect,
   onInjectTextFromClipboard,
+  textDisconnect,
+  textSendShortcut,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +30,11 @@ export const VncConsoleActions: FC<VncConsoleActionsProps> = ({
       <div className={css(styles.consoleActionsVnc)}>
         {additionalButtons}
         <Dropdown
-          onSelect={() => setIsOpen(false)}
+          dropdownItems={customButtons?.map(({ onClick, text }) => (
+            <DropdownItem key={text} onClick={onClick}>
+              {text}
+            </DropdownItem>
+          ))}
           toggle={
             <DropdownToggle
               id="pf-c-console__actions-vnc-toggle-id"
@@ -40,26 +44,22 @@ export const VncConsoleActions: FC<VncConsoleActionsProps> = ({
             </DropdownToggle>
           }
           isOpen={isOpen}
-          dropdownItems={customButtons?.map(({ onClick, text }) => (
-            <DropdownItem onClick={onClick} key={text}>
-              {text}
-            </DropdownItem>
-          ))}
+          onSelect={() => setIsOpen(false)}
         />
         <Button
-          variant={ButtonVariant.link}
-          onClick={onInjectTextFromClipboard}
           icon={
             <span>
               <PasteIcon /> {t('Paste')}
             </span>
           }
+          onClick={onInjectTextFromClipboard}
+          variant={ButtonVariant.link}
         />
       </div>
       <Button
-        variant={ButtonVariant.secondary}
-        onClick={onDisconnect}
         className="vnc-actions-disconnect-button"
+        onClick={onDisconnect}
+        variant={ButtonVariant.secondary}
       >
         {textDisconnect || t('Disconnect')}
       </Button>

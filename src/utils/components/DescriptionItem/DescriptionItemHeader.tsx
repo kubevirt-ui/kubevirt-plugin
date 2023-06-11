@@ -12,32 +12,29 @@ import {
 import './DescriptionItem.scss';
 
 type DescriptionItemHeaderProps = {
-  isPopover: boolean;
   bodyContent: ReactNode;
-  moreInfoURL?: string;
   breadcrumb?: string;
   descriptionHeader: string;
-  maxWidth?: string;
+  isPopover: boolean;
   label?: ReactNode;
+  maxWidth?: string;
+  moreInfoURL?: string;
 };
 
 export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
-  isPopover,
   bodyContent,
-  moreInfoURL,
   breadcrumb,
   descriptionHeader,
-  maxWidth,
+  isPopover,
   label,
+  maxWidth,
+  moreInfoURL,
 }) => {
   const { t } = useKubevirtTranslation();
 
   if (isPopover && bodyContent) {
     return (
       <Popover
-        hasAutoWidth
-        maxWidth={maxWidth || '30rem'}
-        headerContent={descriptionHeader}
         bodyContent={
           <>
             {bodyContent}
@@ -58,6 +55,9 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
             )}
           </>
         }
+        hasAutoWidth
+        headerContent={descriptionHeader}
+        maxWidth={maxWidth || '30rem'}
       >
         <DescriptionListTermHelpTextButton> {descriptionHeader} </DescriptionListTermHelpTextButton>
       </Popover>

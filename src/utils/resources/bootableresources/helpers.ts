@@ -24,7 +24,7 @@ export const getBootableVolumePVCSource = (
   pvcSources: {
     [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
   },
-): null | IoK8sApiCoreV1PersistentVolumeClaim => {
+): IoK8sApiCoreV1PersistentVolumeClaim | null => {
   if (isEmpty(bootableVolume)) return null;
 
   return isBootableVolumePVCKind(bootableVolume)

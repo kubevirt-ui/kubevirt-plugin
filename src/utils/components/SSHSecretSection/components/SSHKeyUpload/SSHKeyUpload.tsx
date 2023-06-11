@@ -20,11 +20,11 @@ import './SSHKeyUpload.scss';
 
 type SSHKeyUploadProps = {
   secrets: IoK8sApiCoreV1Secret[];
-  sshDetails: SSHSecretDetails;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
+  sshDetails: SSHSecretDetails;
 };
 
-const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, sshDetails, setSSHDetails }) => {
+const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetails }) => {
   const { t } = useKubevirtTranslation();
   const [nameErrorMessage, setNameErrorMessage] = useState<string>(null);
   const [isValidKey, setIsValidKey] = useState<boolean>(true);
@@ -33,24 +33,24 @@ const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, sshDetails, setSSHDetail
   return (
     <Form isHorizontal>
       <FileUpload
-        id="ssh-key-upload"
-        className="ssh-key-upload__file-upload"
-        type="text"
-        value={sshDetails?.sshPubKey}
         onChange={(sshPublicKey: string) => {
           setIsValidKey(validateSSHPublicKey(sshPublicKey));
           setSSHDetails({
             ...sshDetails,
-            sshPubKey: sshPublicKey?.trim(),
             secretOption: SecretSelectionOption.addNew,
+            sshPubKey: sshPublicKey?.trim(),
           });
         }}
-        onReadStarted={() => setIsLoading(true)}
-        onReadFinished={() => setIsLoading(false)}
-        isLoading={isLoading}
         allowEditingUploadedText
+        className="ssh-key-upload__file-upload"
+        id="ssh-key-upload"
+        isLoading={isLoading}
         isReadOnly={false}
+        onReadFinished={() => setIsLoading(false)}
+        onReadStarted={() => setIsLoading(true)}
+        type="text"
         validated={isValidKey ? ValidatedOptions.default : ValidatedOptions.error}
+        value={sshDetails?.sshPubKey}
       >
         {!isValidKey && (
           <HelperText>
@@ -60,28 +60,28 @@ const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, sshDetails, setSSHDetail
       </FileUpload>
       <FormGroup
         className="ssh-key-upload__form-group"
-        label={t('Secret name')}
         fieldId="new-secret-name"
+        helperTextInvalid={nameErrorMessage}
         isInline
         isRequired
+        label={t('Secret name')}
         validated={!nameErrorMessage ? ValidatedOptions.default : ValidatedOptions.error}
-        helperTextInvalid={nameErrorMessage}
       >
         <TextInput
-          type="text"
-          id="new-secret-name"
-          name="new-secret-name"
-          value={sshDetails?.sshSecretName}
-          isRequired
           onChange={(secretName: string) => {
             setNameErrorMessage(getSecretNameErrorMessage(secretName, secrets));
             setSSHDetails({
               ...sshDetails,
+              secretOption: SecretSelectionOption.addNew,
               // secret name must be under 51 chars, or machine will fail starting.
               sshSecretName: secretName.substring(0, 51),
-              secretOption: SecretSelectionOption.addNew,
             });
           }}
+          id="new-secret-name"
+          isRequired
+          name="new-secret-name"
+          type="text"
+          value={sshDetails?.sshSecretName}
         />
       </FormGroup>
     </Form>

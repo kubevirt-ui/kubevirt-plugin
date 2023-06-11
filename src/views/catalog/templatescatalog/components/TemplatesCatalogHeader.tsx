@@ -16,9 +16,9 @@ import { CATALOG_FILTERS } from '../utils/consts';
 
 export const TemplatesCatalogHeader: React.FC<{
   filters: TemplateFilters;
-  onFilterChange: (type: CATALOG_FILTERS, value: string | boolean) => void;
   itemCount: number;
-}> = React.memo(({ filters, onFilterChange, itemCount }) => {
+  onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
+}> = React.memo(({ filters, itemCount, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
   const [query, setQuery] = React.useState<string>(filters?.query || '');
 
@@ -45,12 +45,6 @@ export const TemplatesCatalogHeader: React.FC<{
       <div className="co-catalog-page__filter">
         <div>
           <SearchInput
-            className="co-catalog-page__input"
-            data-test="search-catalog"
-            id="filter-text-input"
-            type="text"
-            placeholder={t('Filter by keyword...')}
-            value={filters?.query}
             onChange={(_, val) => {
               setQuery(val);
             }}
@@ -59,6 +53,12 @@ export const TemplatesCatalogHeader: React.FC<{
               onFilterChange(CATALOG_FILTERS.QUERY, '');
             }}
             aria-label={t('Filter by keyword...')}
+            className="co-catalog-page__input"
+            data-test="search-catalog"
+            id="filter-text-input"
+            placeholder={t('Filter by keyword...')}
+            type="text"
+            value={filters?.query}
           />
         </div>
 
@@ -67,18 +67,18 @@ export const TemplatesCatalogHeader: React.FC<{
             <div className="co-catalog-page__num-items">{pluralize(itemCount, 'item')}</div>
           </SplitItem>
           <SplitItem>
-            <ToggleGroup isCompact aria-label="list-or-grid-toggle">
+            <ToggleGroup aria-label="list-or-grid-toggle" isCompact>
               <ToggleGroupItem
-                icon={<ListIcon />}
                 aria-label="template list button"
                 buttonId="template-list-btn"
+                icon={<ListIcon />}
                 isSelected={filters?.isList}
                 onChange={() => onFilterChange(CATALOG_FILTERS.IS_LIST, true)}
               />
               <ToggleGroupItem
-                icon={<ThIcon />}
                 aria-label="template grid button"
                 buttonId="template-grid-btn"
+                icon={<ThIcon />}
                 isSelected={!filters?.isList}
                 onChange={() => onFilterChange(CATALOG_FILTERS.IS_LIST, false)}
               />

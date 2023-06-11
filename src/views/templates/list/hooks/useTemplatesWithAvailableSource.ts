@@ -18,26 +18,26 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 type useTemplatesWithAvailableSourceProps = {
+  namespace?: string;
   onlyAvailable: boolean;
   onlyDefault: boolean;
-  namespace?: string;
 };
 
 export const useTemplatesWithAvailableSource = ({
+  namespace,
   onlyAvailable,
   onlyDefault,
-  namespace,
 }: useTemplatesWithAvailableSourceProps): useTemplatesWithAvailableSourceValues => {
   const [templates, loaded, loadError] = useK8sWatchResource<V1Template[]>({
     groupVersionKind: getGroupVersionKindForModel(TemplateModel),
-    namespace,
     isList: true,
+    namespace,
     namespaced: true,
     selector: {
       matchExpressions: [
         {
-          operator: Operator.In,
           key: TEMPLATE_TYPE_LABEL,
+          operator: Operator.In,
           values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
         },
       ],
@@ -45,8 +45,8 @@ export const useTemplatesWithAvailableSource = ({
   });
   const {
     availableDatasources,
-    cloneInProgressDatasources,
     availablePVCs,
+    cloneInProgressDatasources,
     loaded: bootSourcesLoaded,
   } = useAvailableDataSourcesAndPVCs(templates, loaded);
 
@@ -96,22 +96,22 @@ export const useTemplatesWithAvailableSource = ({
   );
 
   return {
-    templates: filteredTemplates,
-    availableTemplatesUID,
     availableDatasources,
-    cloneInProgressDatasources,
-    loaded,
+    availableTemplatesUID,
     bootSourcesLoaded,
+    cloneInProgressDatasources,
     error: loadError,
+    loaded,
+    templates: filteredTemplates,
   };
 };
 
 type useTemplatesWithAvailableSourceValues = {
-  templates: V1Template[];
-  availableTemplatesUID: Set<string>;
   availableDatasources: Record<string, V1beta1DataSource>;
-  cloneInProgressDatasources: Record<string, V1beta1DataSource>;
-  loaded: boolean;
+  availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
+  cloneInProgressDatasources: Record<string, V1beta1DataSource>;
   error: any;
+  loaded: boolean;
+  templates: V1Template[];
 };

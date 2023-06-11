@@ -1,17 +1,17 @@
 import * as React from 'react';
 
 export interface GettingStartedLink {
-  id: string;
-  loading?: boolean;
-  title?: string | React.ReactElement;
+  description?: string;
   external?: boolean;
   /** Default hyperlink location */
   href?: string;
+  id: string;
+  loading?: boolean;
   /** OnClick callback for the SimpleList item */
-  onClick?: (event: React.MouseEvent | React.ChangeEvent) => void;
-  description?: string;
+  onClick?: (event: React.ChangeEvent | React.MouseEvent) => void;
+  secondaryLinkExternal?: boolean;
   secondaryLinkHref?: string;
   secondaryLinkText?: string;
-  secondaryLinkExternal?: boolean;
   showSecondaryLink?: boolean;
+  title?: React.ReactElement | string;
 }

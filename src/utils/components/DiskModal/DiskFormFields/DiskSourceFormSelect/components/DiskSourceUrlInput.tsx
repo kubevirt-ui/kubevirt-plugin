@@ -11,12 +11,12 @@ import { HTTP_URL_PREFIX, HTTPS_URL_PREFIX } from '../utils/constants';
 
 const URLSourceHelperText: React.FC<{ os: OS_NAME_TYPES }> = ({ os }) => {
   const { t } = useKubevirtTranslation();
-  const { beforeLabelText, label, afterLabelText } = getURLSourceHelpertText(t, os);
+  const { afterLabelText, beforeLabelText, label } = getURLSourceHelpertText(t, os);
   return (
     <>
       {beforeLabelText}
       <strong>
-        <a href={OS_IMAGE_LINKS[os || OS_NAME_TYPES.fedora]} target="_blank" rel="noreferrer">
+        <a href={OS_IMAGE_LINKS[os || OS_NAME_TYPES.fedora]} rel="noreferrer" target="_blank">
           {label}
         </a>
       </strong>
@@ -26,12 +26,12 @@ const URLSourceHelperText: React.FC<{ os: OS_NAME_TYPES }> = ({ os }) => {
 };
 
 type DiskSourceUrlInputProps = {
-  url: string;
   onChange: (value: string) => void;
   os: string;
+  url: string;
 };
 
-const DiskSourceUrlInput: React.FC<DiskSourceUrlInputProps> = ({ url, onChange, os }) => {
+const DiskSourceUrlInput: React.FC<DiskSourceUrlInputProps> = ({ onChange, os, url }) => {
   const { t } = useKubevirtTranslation();
 
   const isValidURL = React.useMemo(() => {
@@ -44,20 +44,20 @@ const DiskSourceUrlInput: React.FC<DiskSourceUrlInputProps> = ({ url, onChange, 
 
   return (
     <FormGroup
-      helperText={<URLSourceHelperText os={OS_NAME_TYPES[getOSNameWithoutVersionNumber(os)]} />}
-      label={t('URL')}
       fieldId="disk-source-url"
-      isRequired
+      helperText={<URLSourceHelperText os={OS_NAME_TYPES[getOSNameWithoutVersionNumber(os)]} />}
       helperTextInvalid={!isValidURL && t('Invalid URL')}
       helperTextInvalidIcon={<ExclamationCircleIcon />}
+      isRequired
+      label={t('URL')}
       validated={isValidURL ? ValidatedOptions.default : ValidatedOptions.error}
     >
       <TextInput
         data-test-id="disk-source-url"
         id="disk-source-url"
+        onChange={onChange}
         type="text"
         value={url}
-        onChange={onChange}
       />
     </FormGroup>
   );

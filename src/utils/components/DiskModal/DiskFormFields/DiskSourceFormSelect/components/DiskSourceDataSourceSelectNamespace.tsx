@@ -10,19 +10,19 @@ import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/reac
 import { FilterPVCSelect as FilterProjectSelect } from '../../utils/Filters';
 
 type DiskSourceDataSourceSelectNamespaceProps = {
-  projectsNames: string[];
-  selectedProject: string;
+  isDisabled?: boolean;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   projectsLoaded: boolean;
-  isDisabled?: boolean;
+  projectsNames: string[];
+  selectedProject: string;
 };
 
 const DiskSourceDataSourceSelectNamespace: React.FC<DiskSourceDataSourceSelectNamespaceProps> = ({
-  selectedProject,
-  projectsNames,
+  isDisabled,
   onChange,
   projectsLoaded,
-  isDisabled,
+  projectsNames,
+  selectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -40,30 +40,30 @@ const DiskSourceDataSourceSelectNamespace: React.FC<DiskSourceDataSourceSelectNa
 
   return (
     <FormGroup
-      label={t('{{dsLabel}} project', { dsLabel })}
+      className="ds-selection-formgroup"
       fieldId={fieldId}
       id={fieldId}
       isRequired
-      className="ds-selection-formgroup"
+      label={t('{{dsLabel}} project', { dsLabel })}
     >
       {projectsLoaded ? (
         <Select
-          menuAppendTo="parent"
           aria-labelledby={fieldId}
-          isOpen={isOpen}
-          onToggle={setIsOpen}
-          onSelect={onSelect}
-          variant={SelectVariant.single}
-          onFilter={FilterProjectSelect(projectsNames)}
           hasInlineFilter
-          selections={selectedProject}
-          placeholderText={t('--- Select {{dsLabel}} project ---', { dsLabel })}
           isDisabled={isDisabled}
+          isOpen={isOpen}
           maxHeight={400}
+          menuAppendTo="parent"
+          onFilter={FilterProjectSelect(projectsNames)}
+          onSelect={onSelect}
+          onToggle={setIsOpen}
+          placeholderText={t('--- Select {{dsLabel}} project ---', { dsLabel })}
+          selections={selectedProject}
+          variant={SelectVariant.single}
         >
           {projectsNames.map((projectName) => (
             <SelectOption key={projectName} value={projectName}>
-              <ResourceLink kind={ProjectModel.kind} name={projectName} linkTo={false} />
+              <ResourceLink kind={ProjectModel.kind} linkTo={false} name={projectName} />
             </SelectOption>
           ))}
         </Select>

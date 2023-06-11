@@ -83,14 +83,14 @@ export const vm = {
       waitForStatus(VM_STATUS.Running);
     }
   },
-  testStatus: (vmName: string, status: string, waitTime = 60000) => {
-    getRow(vmName, () =>
-      cy.contains(vmView.vmStatusOnList, status, { timeout: waitTime }).should('be.exist'),
-    );
-  },
   createVMFromYAML: () => {
     cy.byButtonText('Create').click();
     cy.byButtonText('From YAML').click();
     cy.get(vmView.saveBtn).click();
+  },
+  testStatus: (vmName: string, status: string, waitTime = 60000) => {
+    getRow(vmName, () =>
+      cy.contains(vmView.vmStatusOnList, status, { timeout: waitTime }).should('be.exist'),
+    );
   },
 };

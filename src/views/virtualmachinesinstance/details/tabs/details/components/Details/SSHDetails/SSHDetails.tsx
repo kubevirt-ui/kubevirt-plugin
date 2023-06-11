@@ -7,13 +7,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { DescriptionListDescription, DescriptionListTerm } from '@patternfly/react-core';
 
 type SSHDetailsProps = {
-  vmi: V1VirtualMachineInstance;
-  vm: V1VirtualMachine;
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded: boolean;
+  vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
-const SSHDetails: React.FC<SSHDetailsProps> = ({ vmi, vm, sshService, sshServiceLoaded }) => {
+const SSHDetails: React.FC<SSHDetailsProps> = ({ sshService, sshServiceLoaded, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -21,7 +21,7 @@ const SSHDetails: React.FC<SSHDetailsProps> = ({ vmi, vm, sshService, sshService
       <DescriptionListTerm> {t('SSH access')}</DescriptionListTerm>
 
       <DescriptionListDescription className="SSHAccess--container">
-        <SSHAccess sshService={sshService} vmi={vmi} sshServiceLoaded={sshServiceLoaded} vm={vm} />
+        <SSHAccess sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
       </DescriptionListDescription>
     </>
   );

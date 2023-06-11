@@ -5,7 +5,7 @@ import { SyncAltIcon } from '@patternfly/react-icons';
 import { global_palette_blue_300 as blueInfoColor } from '@patternfly/react-tokens/dist/js/global_palette_blue_300';
 
 const BlueSyncIcon: React.FC<ColoredIconProps> = ({ className, title }) => (
-  <SyncAltIcon color={blueInfoColor.value} className={className} title={title} />
+  <SyncAltIcon className={className} color={blueInfoColor.value} title={title} />
 );
 
 export default BlueSyncIcon;

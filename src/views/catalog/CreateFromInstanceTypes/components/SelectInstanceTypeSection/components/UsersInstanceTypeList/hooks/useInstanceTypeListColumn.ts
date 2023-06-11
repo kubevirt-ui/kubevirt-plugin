@@ -21,25 +21,25 @@ type UseInstanceTypeListColumns = (
 const useInstanceTypeListColumns: UseInstanceTypeListColumns = (data, pagination) => {
   const { t } = useKubevirtTranslation();
 
-  const [activeSortIndex, setActiveSortIndex] = useState<number | null>(null);
+  const [activeSortIndex, setActiveSortIndex] = useState<null | number>(null);
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc' | null>(null);
 
   const columns: TableColumn<V1alpha2VirtualMachineClusterInstancetype>[] = useMemo(
     () => [
       {
-        title: t('Name'),
         id: 'name',
         sort: 'metadata.name',
+        title: t('Name'),
       },
       {
-        title: t('Created'),
         id: 'created',
         sort: 'metadata.creationTimestamp',
+        title: t('Created'),
       },
       {
-        title: t('Description'),
         id: 'description',
         sort: 'metadata.annotations.description',
+        title: t('Description'),
       },
     ],
     [t],
@@ -48,11 +48,11 @@ const useInstanceTypeListColumns: UseInstanceTypeListColumns = (data, pagination
   const getSortType = useCallback(
     (columnIndex: number): ThSortType => ({
       columnIndex,
-      sortBy: { index: activeSortIndex, direction: activeSortDirection },
       onSort: (_event, index, direction) => {
         setActiveSortIndex(index);
         setActiveSortDirection(direction);
       },
+      sortBy: { direction: activeSortDirection, index: activeSortIndex },
     }),
     [activeSortDirection, activeSortIndex],
   );

@@ -8,45 +8,45 @@ const useDiskColumns = () => {
 
   const columns: TableColumn<DiskRowDataLayout>[] = [
     {
-      title: t('Name'),
       id: 'name',
-      transforms: [sortable],
       sort: 'name',
+      title: t('Name'),
+      transforms: [sortable],
     },
     {
-      title: t('Source'),
       id: 'source',
-      transforms: [sortable],
       sort: 'source',
+      title: t('Source'),
+      transforms: [sortable],
     },
     {
-      title: t('Size'),
       id: 'size',
-      transforms: [sortable],
       sort: 'size',
+      title: t('Size'),
+      transforms: [sortable],
     },
     {
-      title: t('Drive'),
       id: 'drive',
-      transforms: [sortable],
       sort: 'drive',
+      title: t('Drive'),
+      transforms: [sortable],
     },
     {
-      title: t('Interface'),
       id: 'interface',
-      transforms: [sortable],
       sort: 'interface',
-    },
-    {
-      title: t('Storage class'),
-      id: 'storage-class',
+      title: t('Interface'),
       transforms: [sortable],
-      sort: 'storageClass',
     },
     {
-      title: '',
+      id: 'storage-class',
+      sort: 'storageClass',
+      title: t('Storage class'),
+      transforms: [sortable],
+    },
+    {
       id: '',
       props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+      title: '',
     },
   ];
 

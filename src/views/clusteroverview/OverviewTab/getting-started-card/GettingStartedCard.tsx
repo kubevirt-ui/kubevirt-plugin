@@ -28,12 +28,12 @@ const GettingStartedCard: React.FC = () => {
       <div className="kv-overview-getting-started-section">
         <GettingStartedGrid onHide={() => setShowState(GETTING_STARTED_SHOW_STATE.HIDE)}>
           <QuickStartsSection
-            featured={['explore-pipelines', 'connect-ext-net-to-vm', 'create-rhel-vm']}
-            title={t('Quick Starts')}
             description={t(
               'Learn how to create, import, and run virtual machines on OpenShift with step-by-step instructions and tasks.',
             )}
+            featured={['explore-pipelines', 'connect-ext-net-to-vm', 'create-rhel-vm']}
             filter={(qs) => ['explore-pipelines'].includes(qs.metadata.name)}
+            title={t('Quick Starts')}
           />
           <FeatureHighlightsSection />
           <RelatedOperatorsSection />

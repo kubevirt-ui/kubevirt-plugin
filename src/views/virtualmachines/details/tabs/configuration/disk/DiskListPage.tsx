@@ -13,8 +13,8 @@ import FilesystemList from './tables/filesystem/FilesystemList';
 import './disk-list-page.scss';
 
 type DiskListPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1VirtualMachine;
 };
@@ -23,10 +23,10 @@ const DiskListPage: FC<DiskListPageProps> = ({ obj }) => {
   const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
-        model: VirtualMachineModel,
         data: updatedVM,
-        ns: updatedVM?.metadata?.namespace,
+        model: VirtualMachineModel,
         name: updatedVM?.metadata?.name,
+        ns: updatedVM?.metadata?.namespace,
       }),
     [],
   );
@@ -34,9 +34,9 @@ const DiskListPage: FC<DiskListPageProps> = ({ obj }) => {
   return (
     <div className="disk-list-page">
       <SidebarEditor
-        resource={obj}
         onResourceUpdate={onSubmit}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.DISKS_TAB}
+        resource={obj}
       >
         <DiskList vm={obj} />
         <FilesystemList vm={obj} />

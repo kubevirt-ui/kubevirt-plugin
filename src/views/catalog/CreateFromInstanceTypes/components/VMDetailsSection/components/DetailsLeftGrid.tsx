@@ -12,10 +12,10 @@ import { getCPUAndMemoryFromDefaultInstanceType, getOSFromDefaultPreference } fr
 
 const DetailsLeftGrid: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { instanceTypeVMState, setInstanceTypeVMState, instanceTypesAndPreferencesData } =
+  const { instanceTypesAndPreferencesData, instanceTypeVMState, setInstanceTypeVMState } =
     useInstanceTypeVMStore();
-  const { vmName, selectedBootableVolume, selectedInstanceType } = instanceTypeVMState;
-  const { preferences, instanceTypes } = instanceTypesAndPreferencesData;
+  const { selectedBootableVolume, selectedInstanceType, vmName } = instanceTypeVMState;
+  const { instanceTypes, preferences } = instanceTypesAndPreferencesData;
 
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
   const instanceTypesMap = useMemo(() => convertResourceArrayToMap(instanceTypes), [instanceTypes]);
@@ -30,15 +30,15 @@ const DetailsLeftGrid: FC = () => {
       <VirtualMachineDescriptionItem
         descriptionData={
           <TextInput
-            isRequired
-            type="text"
-            data-test-id="instancetypes-vm-name-input"
-            name="vmname"
-            aria-label="instancetypes virtualmachine name"
-            value={vmName}
             onChange={(newVMName) =>
-              setInstanceTypeVMState({ type: instanceTypeActionType.setVMName, payload: newVMName })
+              setInstanceTypeVMState({ payload: newVMName, type: instanceTypeActionType.setVMName })
             }
+            aria-label="instancetypes virtualmachine name"
+            data-test-id="instancetypes-vm-name-input"
+            isRequired
+            name="vmname"
+            type="text"
+            value={vmName}
           />
         }
         descriptionHeader={t('Name')}

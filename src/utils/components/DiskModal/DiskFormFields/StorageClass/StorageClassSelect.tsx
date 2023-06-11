@@ -26,10 +26,10 @@ type StorageClassSelectProps = {
 } & AlertedStorageClassSelectProps;
 
 const StorageClassSelect: FC<StorageClassSelectProps> = ({
-  storageClass,
-  setStorageClassName,
   setShowSCAlert,
+  setStorageClassName,
   setStorageClassProvisioner,
+  storageClass,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -67,16 +67,16 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
         <div data-test-id="storage-class-select">
           {loaded ? (
             <Select
-              menuAppendTo="parent"
-              isOpen={isOpen}
-              onToggle={setIsOpen}
-              onSelect={onSelect}
-              variant={SelectVariant.single}
-              selections={storageClass}
-              onFilter={FilterSCSelect(storageClasses)}
               hasInlineFilter
+              isOpen={isOpen}
               maxHeight={200}
+              menuAppendTo="parent"
+              onFilter={FilterSCSelect(storageClasses)}
+              onSelect={onSelect}
+              onToggle={setIsOpen}
               placeholderText={t('Select StorageClass')}
+              selections={storageClass}
+              variant={SelectVariant.single}
             >
               {getSCSelectOptions(storageClasses)}
             </Select>

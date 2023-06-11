@@ -11,8 +11,8 @@ import VirtualMachineInstancePageNetworkTabRow from './VirtualMachineInstancePag
 import './virtual-machines-insance-page-network-tab.scss';
 
 type VirtualMachinesInstancePageNetworkTabProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj: V1VirtualMachineInstance;
 };
@@ -27,12 +27,12 @@ const VirtualMachinesInstancePageNetworkTab: React.FC<
     <div className="VirtualMachinesInstancePageNetworkTab">
       <ListPageBody>
         <VirtualizedTable
+          columns={columns}
           data={data}
-          unfilteredData={data}
           loaded={!!vmi}
           loadError={null}
-          columns={columns}
           Row={VirtualMachineInstancePageNetworkTabRow}
+          unfilteredData={data}
         />
       </ListPageBody>
     </div>

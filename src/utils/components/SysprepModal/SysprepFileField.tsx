@@ -5,36 +5,36 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { FileUpload, Text, TextVariants, ValidatedOptions } from '@patternfly/react-core';
 
 export type SysprepFile = {
-  isLoading: boolean;
   fileName: string;
+  isLoading: boolean;
   validated: ValidatedOptions;
   value: string;
 };
 
 type SysprepFileFieldProps = {
   id: string;
-  value?: string;
   onChange: (value: string) => void;
+  value?: string;
 };
 
-const SysprepFileField: React.FC<SysprepFileFieldProps> = ({ id, value, onChange }) => {
+const SysprepFileField: React.FC<SysprepFileFieldProps> = ({ id, onChange, value }) => {
   const { t } = useKubevirtTranslation();
   const [data, setData] = React.useState<SysprepFile>({
-    validated: ValidatedOptions.default,
     fileName: '',
-    value,
     isLoading: false,
+    validated: ValidatedOptions.default,
+    value,
   });
 
   const onFieldChange = (newValue: string, fileName: string) => {
     setData((currentSysprepFile) => ({
       ...currentSysprepFile,
+      fileName,
       validated:
         XMLValidator.validate(newValue) === true
           ? ValidatedOptions.default
           : ValidatedOptions.error,
       value: newValue,
-      fileName,
     }));
   };
 
@@ -47,29 +47,29 @@ const SysprepFileField: React.FC<SysprepFileFieldProps> = ({ id, value, onChange
   return (
     <>
       <FileUpload
-        id={`sysprep-${id}-input`}
-        data-test={`sysprep-${id.toLowerCase().replace('.', '-')}-input`}
-        type="text"
-        value={data.value}
-        filename={data.fileName}
-        onChange={onFieldChange}
-        onReadStarted={() =>
-          setData((currentData: SysprepFile) => ({ ...currentData, isLoading: true }))
-        }
         onReadFinished={() =>
           setData((currentData: SysprepFile) => ({ ...currentData, isLoading: false }))
         }
-        isLoading={data.isLoading}
+        onReadStarted={() =>
+          setData((currentData: SysprepFile) => ({ ...currentData, isLoading: true }))
+        }
         validated={
           data.validated !== ValidatedOptions.error
             ? ValidatedOptions.default
             : ValidatedOptions.error
         }
         allowEditingUploadedText
+        data-test={`sysprep-${id.toLowerCase().replace('.', '-')}-input`}
+        filename={data.fileName}
+        id={`sysprep-${id}-input`}
+        isLoading={data.isLoading}
         isReadOnly={false}
+        onChange={onFieldChange}
+        type="text"
+        value={data.value}
       />
       {data.validated === ValidatedOptions.error && (
-        <Text component={TextVariants.p} className="kv-sysprep--error">
+        <Text className="kv-sysprep--error" component={TextVariants.p}>
           {t('XML structure is not valid')}
         </Text>
       )}

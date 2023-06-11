@@ -1,16 +1,16 @@
 export enum AlertType {
   critical = 'critical',
-  warning = 'warning',
   info = 'info',
+  warning = 'warning',
 }
 
 export type SimplifiedAlert = {
-  time: string;
   alertName: string;
   description: string;
-  link: string;
-  key: string;
   isVMAlert: boolean;
+  key: string;
+  link: string;
+  time: string;
 };
 
 export type SimplifiedAlerts = {

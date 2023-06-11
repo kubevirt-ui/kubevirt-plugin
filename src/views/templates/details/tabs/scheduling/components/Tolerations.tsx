@@ -14,7 +14,7 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import TolerationsModal from './TolerationsModal';
 
-const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ template, editable, onSubmit }) => {
+const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const tolerationsCount = t('{{count}} Toleration rules', {
@@ -23,7 +23,7 @@ const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ template, editable
 
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
-      <TolerationsModal template={template} isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
+      <TolerationsModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} template={template} />
     ));
 
   return (
@@ -31,12 +31,12 @@ const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ template, editable
       <DescriptionListTerm>{t('Tolerations')}</DescriptionListTerm>
       <DescriptionListDescription>
         <Button
-          type="button"
-          isInline
-          onClick={onEditClick}
-          variant="link"
           data-test-id="tolerations"
           isDisabled={!editable}
+          isInline
+          onClick={onEditClick}
+          type="button"
+          variant="link"
         >
           {tolerationsCount}
           <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />

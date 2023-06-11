@@ -9,9 +9,9 @@ import SysprepFileField from '../SysprepFileField';
 import SysprepAutounattendHelperPopup from './SysprepAutounattendHelperPopup';
 
 const SysprepAutounattend: React.FC<{
-  value: string;
   onChange: (value: string) => void;
-}> = ({ value, onChange }) => {
+  value: string;
+}> = ({ onChange, value }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -20,7 +20,7 @@ const SysprepAutounattend: React.FC<{
         <Text component={TextVariants.h6}>{t('Autounattend.xml answer file')}</Text>
         <SysprepAutounattendHelperPopup />
       </div>
-      <SysprepFileField id={AUTOUNATTEND} value={value} onChange={onChange} />
+      <SysprepFileField id={AUTOUNATTEND} onChange={onChange} value={value} />
     </>
   );
 };

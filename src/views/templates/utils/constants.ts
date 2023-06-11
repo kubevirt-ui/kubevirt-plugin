@@ -1,7 +1,7 @@
 export const ANNOTATIONS = {
   displayName: 'openshift.io/display-name',
-  providerName: 'template.kubevirt.io/provider',
   providerDisplayName: 'openshift.io/provider-display-name',
+  providerName: 'template.kubevirt.io/provider',
 };
 
 export const DESCHEDULER_URL =
@@ -10,8 +10,8 @@ export const DESCHEDULER_URL =
 export const LABELS = {
   name: 'vm.kubevirt.io/template',
   namespace: 'vm.kubevirt.io/template.namespace',
-  type: 'template.kubevirt.io/type',
   provider: 'template.kubevirt.io/provider',
+  type: 'template.kubevirt.io/type',
 };
 
 export const SOURCE_TYPES = {

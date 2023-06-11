@@ -9,14 +9,14 @@ import WizardOverviewGrid from './components/WizardOverviewGrid';
 
 import './WizardOverviewTab.scss';
 
-const WizardOverviewTab: WizardTab = ({ vm, tabsData, updateVM }) => (
+const WizardOverviewTab: WizardTab = ({ tabsData, updateVM, vm }) => (
   <PageSection className="wizard-overview-tab">
     <SidebarEditor
-      resource={vm}
       onResourceUpdate={(newVM) => updateVM(newVM)}
       pathsToHighlight={PATHS_TO_HIGHLIGHT.DETAILS_TAB}
+      resource={vm}
     >
-      {(resource) => <WizardOverviewGrid vm={resource} tabsData={tabsData} updateVM={updateVM} />}
+      {(resource) => <WizardOverviewGrid tabsData={tabsData} updateVM={updateVM} vm={resource} />}
     </SidebarEditor>
   </PageSection>
 );

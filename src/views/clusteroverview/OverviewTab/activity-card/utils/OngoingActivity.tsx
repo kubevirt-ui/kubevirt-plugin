@@ -15,9 +15,9 @@ const OngoingActivity: React.FC = () => {
       <OngoingActivityBody
         loaded={k8sResourcesLoaded && prometheusQueriesLoaded}
         // TODO Fix typing
+        prometheusActivities={prometheusActivities}
         // skipcq: JS-0349
         resourceActivities={k8sResourceActivities as any}
-        prometheusActivities={prometheusActivities}
       />
     )
   );

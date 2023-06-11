@@ -27,11 +27,11 @@ import NodeSelector from './NodeSelector';
 import Tolerations from './Tolerations';
 
 type WizardSchedulingGridProps = {
-  vm: V1VirtualMachine;
   updateVM: UpdateValidatedVM;
+  vm: V1VirtualMachine;
 };
 
-const WizardSchedulingGrid: React.FC<WizardSchedulingGridProps> = ({ vm, updateVM }) => {
+const WizardSchedulingGrid: React.FC<WizardSchedulingGridProps> = ({ updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -45,116 +45,116 @@ const WizardSchedulingGrid: React.FC<WizardSchedulingGridProps> = ({ vm, updateV
   const isDeschedulerEditable = isAdmin && isDeschedulerInstalled;
 
   return (
-    <Grid hasGutter className="wizard-scheduling-tab__grid">
-      <GridItem span={6} rowSpan={4}>
+    <Grid className="wizard-scheduling-tab__grid" hasGutter>
+      <GridItem rowSpan={4} span={6}>
         <DescriptionList>
           <WizardDescriptionItem
-            title={t('Node selector')}
-            description={<NodeSelector vm={vm} />}
-            isEdit
-            testId="node-selector"
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <NodeSelectorModal
-                  vm={vm}
                   isOpen={isOpen}
-                  onClose={onClose}
-                  onSubmit={updateVM}
                   nodes={nodes}
                   nodesLoaded={nodesLoaded}
+                  onClose={onClose}
+                  onSubmit={updateVM}
+                  vm={vm}
                 />
               ))
             }
+            description={<NodeSelector vm={vm} />}
+            isEdit
+            testId="node-selector"
+            title={t('Node selector')}
           />
 
           <WizardDescriptionItem
-            description={<Tolerations vm={vm} />}
-            title={t('Tolerations')}
-            isEdit
-            testId="tolerations"
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <TolerationsModal
-                  vm={vm}
                   isOpen={isOpen}
-                  onClose={onClose}
-                  onSubmit={updateVM}
                   nodes={nodes}
                   nodesLoaded={nodesLoaded}
+                  onClose={onClose}
+                  onSubmit={updateVM}
+                  vm={vm}
                 />
               ))
             }
+            description={<Tolerations vm={vm} />}
+            isEdit
+            testId="tolerations"
+            title={t('Tolerations')}
           />
 
           <WizardDescriptionItem
-            title={t('Affinity rules')}
-            description={<Affinity vm={vm} />}
-            testId="affinity-rules"
-            isEdit
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <AffinityModal
-                  vm={vm}
                   isOpen={isOpen}
-                  onClose={onClose}
-                  onSubmit={updateVM}
                   nodes={nodes}
                   nodesLoaded={nodesLoaded}
+                  onClose={onClose}
+                  onSubmit={updateVM}
+                  vm={vm}
                 />
               ))
             }
+            description={<Affinity vm={vm} />}
+            isEdit
+            testId="affinity-rules"
+            title={t('Affinity rules')}
           />
 
           <WizardDescriptionItem
-            title={t('Descheduler')}
+            onEditClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <DeschedulerModal isOpen={isOpen} onClose={onClose} onSubmit={updateVM} vm={vm} />
+              ))
+            }
             description={<Descheduler vm={vm} />}
             isEdit={isDeschedulerEditable}
             testId="descheduler"
-            onEditClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <DeschedulerModal vm={vm} isOpen={isOpen} onClose={onClose} onSubmit={updateVM} />
-              ))
-            }
+            title={t('Descheduler')}
           />
         </DescriptionList>
       </GridItem>
 
-      <GridItem span={6} rowSpan={4}>
+      <GridItem rowSpan={4} span={6}>
         <DescriptionList>
           <WizardDescriptionItem
-            title={t('Dedicated resources')}
-            description={<DedicatedResources vm={vm} />}
-            isEdit
-            testId="dedicated-resources"
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <DedicatedResourcesModal
-                  vm={vm}
+                  headerText={t('Dedicated resources')}
                   isOpen={isOpen}
                   onClose={onClose}
                   onSubmit={updateVM}
-                  headerText={t('Dedicated resources')}
+                  vm={vm}
                 />
               ))
             }
+            description={<DedicatedResources vm={vm} />}
+            isEdit
+            testId="dedicated-resources"
+            title={t('Dedicated resources')}
           />
 
           <WizardDescriptionItem
-            title={t('Eviction strategy')}
-            description={<EvictionStrategy vm={vm} />}
-            isEdit
-            testId="eviction-strategy"
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <EvictionStrategyModal
-                  vm={vm}
+                  headerText={t('Eviction strategy')}
                   isOpen={isOpen}
                   onClose={onClose}
                   onSubmit={updateVM}
-                  headerText={t('Eviction strategy')}
+                  vm={vm}
                 />
               ))
             }
+            description={<EvictionStrategy vm={vm} />}
+            isEdit
+            testId="eviction-strategy"
+            title={t('Eviction strategy')}
           />
         </DescriptionList>
       </GridItem>

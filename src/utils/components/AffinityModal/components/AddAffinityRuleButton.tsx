@@ -5,21 +5,21 @@ import { Button, ButtonVariant } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 type AddAffinityRuleButtonProps = {
-  onAffinityClickAdd: () => void;
   isLinkButton?: boolean;
+  onAffinityClickAdd: () => void;
 };
 
 const AddAffinityRuleButton: React.FC<AddAffinityRuleButtonProps> = ({
-  onAffinityClickAdd,
   isLinkButton,
+  onAffinityClickAdd,
 }) => {
   const { t } = useKubevirtTranslation();
   return (
     <Button
-      icon={isLinkButton && <PlusCircleIcon />}
       className={isLinkButton ? 'pf-m-link--align-left' : ''}
-      variant={isLinkButton ? ButtonVariant.link : ButtonVariant.secondary}
+      icon={isLinkButton && <PlusCircleIcon />}
       onClick={onAffinityClickAdd}
+      variant={isLinkButton ? ButtonVariant.link : ButtonVariant.secondary}
     >
       {t('Add affinity rule')}
     </Button>

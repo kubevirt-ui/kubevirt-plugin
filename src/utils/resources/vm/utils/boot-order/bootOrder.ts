@@ -20,8 +20,8 @@ export type BootableDeviceType = {
  * @enum {number}
  */
 export enum DeviceType {
-  NIC = 'NIC',
   DISK = 'DISK',
+  NIC = 'NIC',
 }
 
 /**

@@ -22,9 +22,6 @@ const Namespace: React.FC<NamespaceProps> = ({ namespace }) => {
     <>
       <DescriptionListTermHelpText>
         <Popover
-          hasAutoWidth
-          maxWidth="30rem"
-          headerContent={t('Namespace')}
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
               Namespace defines the space within which each name must be unique. An empty namespace
@@ -44,6 +41,9 @@ const Namespace: React.FC<NamespaceProps> = ({ namespace }) => {
               </Breadcrumb>
             </Trans>
           }
+          hasAutoWidth
+          headerContent={t('Namespace')}
+          maxWidth="30rem"
         >
           <DescriptionListTermHelpTextButton>{t('Namespace')}</DescriptionListTermHelpTextButton>
         </Popover>

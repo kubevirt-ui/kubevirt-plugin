@@ -24,27 +24,27 @@ export const filter = (options: string[]) => {
 };
 
 type useProjectsAndPVCsReturnType = {
-  projectsNames: string[];
+  error: Error;
   filteredPVCNames: string[];
   projectsLoaded: boolean;
+  projectsNames: string[];
   pvcsLoaded: boolean;
-  error: Error;
 };
 
 export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsReturnType => {
   const [projects, projectsLoaded, projectsErrors] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    namespaced: false,
     isList: true,
+    namespaced: false,
   });
 
   const [pvcs, pvcsLoaded, pvcsErrors] = useK8sWatchResource<K8sResourceCommon[]>(
     projectSelected
       ? {
           groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-          namespaced: true,
-          namespace: projectSelected,
           isList: true,
+          namespace: projectSelected,
+          namespaced: true,
         }
       : null,
   );
@@ -59,10 +59,10 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
   const filteredPVCNames = useMemo(() => (pvcs || [])?.map((pvc) => pvc?.metadata?.name), [pvcs]);
 
   return {
-    projectsNames,
+    error: projectsErrors || pvcsErrors,
     filteredPVCNames,
     projectsLoaded,
+    projectsNames,
     pvcsLoaded,
-    error: projectsErrors || pvcsErrors,
   };
 };

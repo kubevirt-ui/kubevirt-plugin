@@ -36,23 +36,23 @@ const MigrationPolicyCreateForm: React.FC = () => {
         </FormGroup>
         <FormGroup
           fieldId="migration-policy-name"
-          label={t('MigrationPolicy name')}
-          isRequired
           helperText={t('Unique name of the MigrationPolicy')}
+          isRequired
+          label={t('MigrationPolicy name')}
         >
           <TextInput
-            value={state?.migrationPolicyName}
             onChange={setStateField('migrationPolicyName')}
+            value={state?.migrationPolicyName}
           />
         </FormGroup>
         <FormGroup fieldId="migration-policy-description" label={t('Description')}>
-          <TextInput value={state?.description} onChange={setStateField('description')} />
+          <TextInput onChange={setStateField('description')} value={state?.description} />
         </FormGroup>
         <h2>{t('Configurations')}</h2>
         <MigrationPolicyConfigurations
-          state={state}
           setState={setState}
           setStateField={setStateField}
+          state={state}
         />
         <h2>{t('Labels')}</h2>
         <FormGroup fieldId="migration-policy-project-selector" label={t('Project labels')}>
@@ -63,9 +63,9 @@ const MigrationPolicyCreateForm: React.FC = () => {
         </FormGroup>
         <FormGroup fieldId="migration-policy-vmi-selector" label={t('VirtualMachine labels')}>
           <SelectorLabelMatchGroup
+            isVMILabel
             labels={state?.vmiSelectorMatchLabel}
             setLabels={setStateField('vmiSelectorMatchLabel')}
-            isVMILabel
           />
         </FormGroup>
         <MigrationPolicyFormFooter migrationPolicy={migrationPolicy} />

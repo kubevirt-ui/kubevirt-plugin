@@ -14,17 +14,17 @@ import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/templ
 import { Form, FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 type TemplateBootloaderModalProps = {
-  template: V1Template;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1Template) => Promise<V1Template | void>;
+  template: V1Template;
 };
 
 const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
-  template,
   isOpen,
   onClose,
   onSubmit,
+  template,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -48,24 +48,24 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
 
   return (
     <TabModal
-      onSubmit={onSubmit}
-      isOpen={isOpen}
-      onClose={onClose}
       headerText={t('Boot mode')}
+      isOpen={isOpen}
       obj={updatedTemplate}
+      onClose={onClose}
+      onSubmit={onSubmit}
     >
       <Form>
         <FormGroup fieldId="template-firmware-bootloader" label={t('Boot mode')}>
           <Select
-            menuAppendTo="parent"
             isOpen={isDropdownOpen}
-            onToggle={setIsDropdownOpen}
+            menuAppendTo="parent"
             onSelect={handleChange}
-            variant={SelectVariant.single}
+            onToggle={setIsDropdownOpen}
             selections={selectedFirmwareBootloader}
+            variant={SelectVariant.single}
           >
-            {bootloaderOptions.map(({ value, title, description }) => (
-              <SelectOption key={value} value={value} description={description}>
+            {bootloaderOptions.map(({ description, title, value }) => (
+              <SelectOption description={description} key={value} value={value}>
                 {title}
               </SelectOption>
             ))}

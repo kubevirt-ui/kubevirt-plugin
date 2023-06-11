@@ -15,8 +15,8 @@ import TemplateSchedulingRightGrid from './components/TemplateSchedulingRightGri
 import './TemplateSchedulingTab.scss';
 
 type TemplateSchedulingTabProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1Template;
 };
@@ -28,27 +28,27 @@ const TemplateSchedulingTab: FC<TemplateSchedulingTabProps> = ({ obj: template }
   const onSubmitTemplate = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       }),
     [],
   );
 
   return (
     <PageSection>
-      <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
+      <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
         {(resource) => (
           <>
             <Title headingLevel="h2">{t('Scheduling and resource requirements')}</Title>
             <Grid className="margin-top">
               <GridItem span={5}>
-                <TemplateSchedulingLeftGrid template={resource} editable={isTemplateEditable} />
+                <TemplateSchedulingLeftGrid editable={isTemplateEditable} template={resource} />
               </GridItem>
               <GridItem lg={1}></GridItem>
               <GridItem span={5}>
-                <TemplateSchedulingRightGrid template={resource} editable={isTemplateEditable} />
+                <TemplateSchedulingRightGrid editable={isTemplateEditable} template={resource} />
               </GridItem>
             </Grid>
           </>

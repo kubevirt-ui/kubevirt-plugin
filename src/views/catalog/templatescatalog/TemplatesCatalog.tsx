@@ -22,10 +22,10 @@ const TemplatesCatalog: FC<RouteComponentProps<{ ns: string }>> = ({
     params: { ns: namespace },
   },
 }) => {
-  const [selectedTemplate, setSelectedTemplate] = useState<V1Template | undefined>(undefined);
+  const [selectedTemplate, setSelectedTemplate] = useState<undefined | V1Template>(undefined);
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
-  const { templates, availableTemplatesUID, loaded, bootSourcesLoaded, availableDatasources } =
+  const { availableDatasources, availableTemplatesUID, bootSourcesLoaded, loaded, templates } =
     useTemplatesWithAvailableSource({
       namespace: filters.namespace,
       onlyAvailable: filters.onlyAvailable,
@@ -38,7 +38,7 @@ const TemplatesCatalog: FC<RouteComponentProps<{ ns: string }>> = ({
   );
 
   return (
-    <Stack hasGutter className="vm-catalog">
+    <Stack className="vm-catalog" hasGutter>
       {loaded ? (
         <div className="co-catalog-page co-catalog-page--with-sidebar">
           <TemplatesCatalogFilters filters={filters} onFilterChange={onFilterChange} />
@@ -46,26 +46,26 @@ const TemplatesCatalog: FC<RouteComponentProps<{ ns: string }>> = ({
             <Toolbar inset={{ default: 'insetNone' }} isSticky>
               <ToolbarContent>
                 <TemplatesCatalogHeader
-                  itemCount={filteredTemplates.length}
                   filters={filters}
+                  itemCount={filteredTemplates.length}
                   onFilterChange={onFilterChange}
                 />
               </ToolbarContent>
             </Toolbar>
             {filteredTemplates?.length > 0 ? (
               <TemplatesCatalogItems
-                templates={filteredTemplates}
-                availableTemplatesUID={availableTemplatesUID}
                 availableDatasources={availableDatasources}
+                availableTemplatesUID={availableTemplatesUID}
                 bootSourcesLoaded={bootSourcesLoaded}
                 filters={filters}
-                onTemplateClick={setSelectedTemplate}
                 loaded={loaded}
+                onTemplateClick={setSelectedTemplate}
+                templates={filteredTemplates}
               />
             ) : (
               <TemplatesCatalogEmptyState
-                onClearFilters={clearAll}
                 bootSourcesLoaded={bootSourcesLoaded}
+                onClearFilters={clearAll}
               />
             )}
           </Stack>
@@ -74,10 +74,10 @@ const TemplatesCatalog: FC<RouteComponentProps<{ ns: string }>> = ({
         skeletonCatalog
       )}
       <TemplatesCatalogDrawer
-        namespace={namespace ?? DEFAULT_NAMESPACE}
         isOpen={!!selectedTemplate}
-        template={selectedTemplate}
+        namespace={namespace ?? DEFAULT_NAMESPACE}
         onClose={() => setSelectedTemplate(undefined)}
+        template={selectedTemplate}
       />
     </Stack>
   );

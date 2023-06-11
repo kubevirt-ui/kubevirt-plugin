@@ -15,16 +15,16 @@ import {
 } from '@patternfly/react-core';
 
 export const SysprepDescription: React.FC<{
+  error: Error;
   hasAutoUnattend: boolean;
   hasUnattend: boolean;
-  error: Error;
   loaded: boolean;
-}> = ({ hasAutoUnattend, hasUnattend, error, loaded }) => {
+}> = ({ error, hasAutoUnattend, hasUnattend, loaded }) => {
   const { t } = useKubevirtTranslation();
 
   if (error) {
     return (
-      <Alert variant={AlertVariant.danger} title={t('Error')} isInline>
+      <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
         {error?.message}
       </Alert>
     );
@@ -40,7 +40,7 @@ export const SysprepDescription: React.FC<{
         <SysprepInfo />
       </StackItem>
       <StackItem>
-        <DescriptionList isCompact columnModifier={{ lg: '1Col', xl: '2Col' }}>
+        <DescriptionList columnModifier={{ lg: '1Col', xl: '2Col' }} isCompact>
           <DescriptionListGroup>
             <DescriptionListTerm>{t('Autounattend.xml answer file')}</DescriptionListTerm>
             <DescriptionListDescription>

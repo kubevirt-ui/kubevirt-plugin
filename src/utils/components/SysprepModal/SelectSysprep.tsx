@@ -19,17 +19,17 @@ import Loading from '../Loading/Loading';
 import { AUTOUNATTEND, UNATTEND } from './sysprep-utils';
 
 type SelectSysprepProps = {
-  selectedSysprepName: string;
-  onSelectSysprep: (secretName: string) => void;
   id?: string;
   namespace: string;
+  onSelectSysprep: (secretName: string) => void;
+  selectedSysprepName: string;
 };
 
 const SelectSysprep: React.FC<SelectSysprepProps> = ({
-  selectedSysprepName,
-  onSelectSysprep,
   id,
   namespace,
+  onSelectSysprep,
+  selectedSysprepName,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isSecretSelectOpen, setSecretSelectOpen] = React.useState(false);
@@ -38,9 +38,9 @@ const SelectSysprep: React.FC<SelectSysprepProps> = ({
     IoK8sApiCoreV1Secret[]
   >({
     groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-    namespaced: true,
     isList: true,
     namespace,
+    namespaced: true,
   });
 
   const sysprepConfigMaps = configmaps?.filter(
@@ -57,7 +57,7 @@ const SelectSysprep: React.FC<SelectSysprepProps> = ({
 
     return filteredSecrets.map((sysprep) => (
       <SelectOption key={sysprep?.metadata?.name} value={sysprep?.metadata?.name}>
-        <ResourceLink kind={ConfigMapModel.kind} name={sysprep?.metadata?.name} linkTo={false} />
+        <ResourceLink kind={ConfigMapModel.kind} linkTo={false} name={sysprep?.metadata?.name} />
       </SelectOption>
     )) as React.ReactElement[];
   };
@@ -69,7 +69,7 @@ const SelectSysprep: React.FC<SelectSysprepProps> = ({
 
   if (configmapsError)
     return (
-      <Alert title={t('Error')} isInline variant={AlertVariant.danger}>
+      <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
         {configmapsError?.message}
       </Alert>
     );
@@ -78,24 +78,24 @@ const SelectSysprep: React.FC<SelectSysprepProps> = ({
     <>
       {configmapsLoaded ? (
         <Select
-          menuAppendTo="parent"
-          isOpen={isSecretSelectOpen}
-          onToggle={() => setSecretSelectOpen(!isSecretSelectOpen)}
-          onSelect={onSelect}
-          variant={SelectVariant.single}
-          onFilter={filterSecrets}
           hasInlineFilter
-          selections={selectedSysprepName}
-          placeholderText={t('--- Select sysprep ---')}
-          maxHeight={400}
           id={id || 'select-sysprep'}
+          isOpen={isSecretSelectOpen}
+          maxHeight={400}
+          menuAppendTo="parent"
+          onFilter={filterSecrets}
+          onSelect={onSelect}
+          onToggle={() => setSecretSelectOpen(!isSecretSelectOpen)}
+          placeholderText={t('--- Select sysprep ---')}
+          selections={selectedSysprepName}
+          variant={SelectVariant.single}
         >
           {sysprepConfigMaps?.map((sysprep) => (
             <SelectOption key={sysprep?.metadata?.name} value={sysprep?.metadata?.name}>
               <ResourceLink
                 kind={ConfigMapModel.kind}
-                name={sysprep?.metadata?.name}
                 linkTo={false}
+                name={sysprep?.metadata?.name}
               />
             </SelectOption>
           ))}
@@ -104,7 +104,7 @@ const SelectSysprep: React.FC<SelectSysprepProps> = ({
         <Loading />
       )}
       {selectedSysprepName && (
-        <Button variant={ButtonVariant.link} isDanger onClick={() => onSelectSysprep(undefined)}>
+        <Button isDanger onClick={() => onSelectSysprep(undefined)} variant={ButtonVariant.link}>
           {t('Detach sysprep')}
         </Button>
       )}

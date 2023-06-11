@@ -21,13 +21,13 @@ const MigrationChartLegend: React.FC<MigrationChartLegendProps> = ({
     <CardFooter>
       <Grid>
         {legendItems?.map((item) => {
-          const { x: status, y: statusCount, fill: color } = item || {};
+          const { fill: color, x: status, y: statusCount } = item || {};
           return (
-            <GridItem span={2} key={status}>
+            <GridItem key={status} span={2}>
               <i className="fas fa-square" style={{ color }} />{' '}
               <Link
                 onClick={() => {
-                  onFilterChange('status', { selected: [status], all: [status] });
+                  onFilterChange('status', { all: [status], selected: [status] });
                 }}
                 to={`?rowFilter-status=${status}`}
               >

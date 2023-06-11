@@ -46,25 +46,25 @@ const DiskList: FC<DiskListProps> = ({ vm }) => {
         <DiskListTitle />
 
         <ListPageCreateButton
-          className="disk-list-page__list-page-create-button"
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DiskModal
-                vm={vm}
-                isOpen={isOpen}
-                onClose={onClose}
-                headerText={headerText}
                 onSubmit={(obj) =>
                   k8sUpdate({
-                    model: VirtualMachineModel,
                     data: obj,
-                    ns: obj.metadata.namespace,
+                    model: VirtualMachineModel,
                     name: obj.metadata.name,
+                    ns: obj.metadata.namespace,
                   })
                 }
+                headerText={headerText}
+                isOpen={isOpen}
+                onClose={onClose}
+                vm={vm}
               />
             ))
           }
+          className="disk-list-page__list-page-create-button"
         >
           {t('Add disk')}
         </ListPageCreateButton>
@@ -73,35 +73,35 @@ const DiskList: FC<DiskListProps> = ({ vm }) => {
           <FlexItem>
             <ListPageFilter
               data={data}
-              loaded={loaded}
-              rowFilters={filters}
-              onFilterChange={onFilterChange}
               hideLabelFilter
+              loaded={loaded}
+              onFilterChange={onFilterChange}
+              rowFilters={filters}
             />
           </FlexItem>
 
           <FlexItem>
             <WindowsDrivers
-              vm={vm}
               updateVM={(newVM) =>
                 k8sUpdate({
-                  model: VirtualMachineModel,
                   data: newVM,
-                  ns: newVM?.metadata?.namespace,
+                  model: VirtualMachineModel,
                   name: newVM?.metadata?.name,
+                  ns: newVM?.metadata?.namespace,
                 })
               }
+              vm={vm}
             />
           </FlexItem>
         </Flex>
         <VirtualizedTable
+          columns={columns}
           data={filteredData}
-          unfilteredData={data}
           loaded={loaded}
           loadError={loadError}
-          columns={columns}
           Row={DiskRow}
           rowData={{ vm, vmi }}
+          unfilteredData={data}
         />
       </ListPageBody>
     </>

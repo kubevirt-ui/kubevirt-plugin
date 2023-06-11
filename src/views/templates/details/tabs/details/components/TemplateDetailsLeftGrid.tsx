@@ -33,19 +33,19 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
     <DescriptionList>
       <Name name={template?.metadata?.name} />
       <Namespace namespace={template?.metadata?.namespace} />
-      <Labels template={template} editable={isTemplateEditable} />
-      <Annotations template={template} editable={isTemplateEditable} />
-      <DisplayName template={template} editable={isTemplateEditable} />
-      <Description template={template} editable={isTemplateEditable} />
-      <DescriptionItem title={t('Operating system')} content={getOperatingSystemName(template)} />
-      <WorkloadProfile template={template} editable={isTemplateEditable} />
+      <Labels editable={isTemplateEditable} template={template} />
+      <Annotations editable={isTemplateEditable} template={template} />
+      <DisplayName editable={isTemplateEditable} template={template} />
+      <Description editable={isTemplateEditable} template={template} />
+      <DescriptionItem content={getOperatingSystemName(template)} title={t('Operating system')} />
+      <WorkloadProfile editable={isTemplateEditable} template={template} />
       <CPUMemory template={template} />
       <DescriptionItem
-        title={t('Machine type')}
-        content={machineType}
         popoverContent={t(
           'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
         )}
+        content={machineType}
+        title={t('Machine type')}
       />
       <BootMethod template={template} />
       <BaseTemplate template={template} />

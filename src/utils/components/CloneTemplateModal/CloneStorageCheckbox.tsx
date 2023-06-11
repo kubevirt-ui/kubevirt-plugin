@@ -17,15 +17,14 @@ const CloneStorageCheckbox: React.FC<CloneStorageCheckboxProps> = ({ isChecked, 
       <Flex alignItems={{ default: 'alignItemsCenter' }}>
         <FlexItem>
           <Checkbox
-            isChecked={isChecked}
-            onChange={onChange}
-            label={t("Copy template's boot source disk")}
             id="clone-storage"
+            isChecked={isChecked}
+            label={t("Copy template's boot source disk")}
+            onChange={onChange}
           />
         </FlexItem>
         <FlexItem>
           <Popover
-            aria-label={'Help'}
             bodyContent={() => (
               <div>
                 {t(
@@ -33,6 +32,7 @@ const CloneStorageCheckbox: React.FC<CloneStorageCheckboxProps> = ({ isChecked, 
                 )}
               </div>
             )}
+            aria-label={'Help'}
           >
             <HelpIcon />
           </Popover>

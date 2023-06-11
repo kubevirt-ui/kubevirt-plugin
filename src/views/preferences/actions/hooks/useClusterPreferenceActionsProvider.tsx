@@ -25,32 +25,27 @@ const useClusterPreferenceActionsProvider: UseClusterPreferenceActionsProvider =
   const actions: Action[] = useMemo(() => {
     return [
       {
-        id: 'preference-clone-action',
-        disabled: false,
-        label: t('Clone'),
+        accessReview: asAccessReview(VirtualMachineClusterPreferenceModel, preference, 'create'),
         cta: () =>
           createModal((modalProps) => {
             return (
               <CloneResourceModal
                 {...modalProps}
-                object={preference}
                 model={VirtualMachineClusterPreferenceModel}
+                object={preference}
               />
             );
           }),
-        accessReview: asAccessReview(VirtualMachineClusterPreferenceModel, preference, 'create'),
+        disabled: false,
+        id: 'preference-clone-action',
+        label: t('Clone'),
       },
       {
-        id: 'preference-delete-action',
-        disabled: false,
-        label: t('Delete'),
+        accessReview: asAccessReview(VirtualMachineClusterPreferenceModel, preference, 'delete'),
         cta: () =>
           createModal(({ isOpen, onClose }) => {
             return (
               <DeleteModal
-                isOpen={isOpen}
-                onClose={onClose}
-                obj={preference}
                 onDeleteSubmit={() =>
                   k8sDelete({
                     model: VirtualMachineClusterPreferenceModel,
@@ -58,10 +53,15 @@ const useClusterPreferenceActionsProvider: UseClusterPreferenceActionsProvider =
                   })
                 }
                 headerText={t('Delete VirtualMachineClusterPreference?')}
+                isOpen={isOpen}
+                obj={preference}
+                onClose={onClose}
               />
             );
           }),
-        accessReview: asAccessReview(VirtualMachineClusterPreferenceModel, preference, 'delete'),
+        disabled: false,
+        id: 'preference-delete-action',
+        label: t('Delete'),
       },
     ];
   }, [createModal, preference, t]);

@@ -8,22 +8,22 @@ import { ContextSelector, ContextSelectorItem, Text, TextVariants } from '@patte
 import './TemplatesCatalogProjectsDropdown.scss';
 
 type TemplatesCatalogProjectsDropdownProps = {
-  selectedProject: string;
   onChange: (project: string) => void;
+  selectedProject: string;
 };
 
 const ALL_PROJECTS_SELECTOR = 'All projects';
 
 export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdownProps> = memo(
-  ({ selectedProject, onChange }) => {
+  ({ onChange, selectedProject }) => {
     const { t } = useKubevirtTranslation();
     const [isOpen, setOpen] = useState(false);
     const [searchValue, setSearchValue] = useState('');
     const [filteredProjects, setFilteredProjects] = useState<K8sResourceCommon[]>([]);
     const [projects] = useK8sWatchResource<K8sResourceCommon[]>({
       groupVersionKind: modelToGroupVersionKind(ProjectModel),
-      namespaced: false,
       isList: true,
+      namespaced: false,
     });
 
     const onSelect = (event: any, value: string) => {
@@ -50,21 +50,21 @@ export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdo
 
     return (
       <div className="templates-catalog-project-dropdown">
-        <Text component={TextVariants.h6} className="templates-catalog-project-dropdown-label">
+        <Text className="templates-catalog-project-dropdown-label" component={TextVariants.h6}>
           {t('Template project')}
         </Text>
         <ContextSelector
           className=""
-          toggleText={selectedProject || ALL_PROJECTS_SELECTOR}
           isOpen={isOpen}
-          searchInputValue={searchValue}
-          onToggle={() => setOpen(!isOpen)}
-          onSelect={onSelect}
-          onSearchInputChange={onSearchInputChange}
-          screenReaderLabel="Selected Project:"
-          searchInputPlaceholder={t('Search')}
           isPlain
           isText
+          onSearchInputChange={onSearchInputChange}
+          onSelect={onSelect}
+          onToggle={() => setOpen(!isOpen)}
+          screenReaderLabel="Selected Project:"
+          searchInputPlaceholder={t('Search')}
+          searchInputValue={searchValue}
+          toggleText={selectedProject || ALL_PROJECTS_SELECTOR}
         >
           <>
             {!searchValue && (

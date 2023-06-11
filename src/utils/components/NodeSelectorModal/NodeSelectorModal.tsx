@@ -22,22 +22,22 @@ import { isEqualObject, nodeSelectorToIDLabels } from './utils/helpers';
 import { IDLabel } from './utils/types';
 
 type NodeSelectorModalProps = {
-  vm: V1VirtualMachine;
+  isOpen: boolean;
   nodes?: IoK8sApiCoreV1Node[];
   nodesLoaded?: boolean;
-  isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
-  vm,
+  isOpen,
   nodes,
   nodesLoaded,
-  isOpen,
   onClose,
   onSubmit,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -76,11 +76,11 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
 
   return (
     <TabModal
-      obj={updatedVirtualMachine}
+      headerText={t('Node selector')}
       isOpen={isOpen}
+      obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Node selector')}
     >
       <Form>
         {vmi && (
@@ -108,8 +108,8 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
         </LabelsList>
         {!isEmpty(nodes) && (
           <NodeCheckerAlert
-            qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
             nodesLoaded={nodesLoaded}
+            qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
           />
         )}
       </Form>

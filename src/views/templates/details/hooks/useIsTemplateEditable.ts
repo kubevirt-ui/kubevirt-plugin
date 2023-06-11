@@ -14,39 +14,39 @@ import { isCommonVMTemplate } from '../../utils/utils';
 const useEditTemplateAccessReview = (
   template: V1Template,
 ): {
-  isTemplateEditable: boolean;
   hasEditPermission: boolean;
   isCommonTemplate: boolean;
   isLoading: boolean;
+  isTemplateEditable: boolean;
 } => {
   const isCommonTemplate = isCommonVMTemplate(template);
   const [canUpdateTemplate, canUpdateLoading] = useAccessReview({
-    verb: 'update',
-    resource: TemplateModel.plural,
     namespace: template?.metadata?.namespace,
+    resource: TemplateModel.plural,
+    verb: 'update',
   });
 
   const [canPatchTemplate, canPatchLoading] = useAccessReview({
-    verb: 'patch',
-    resource: TemplateModel.plural,
     namespace: template?.metadata?.namespace,
+    resource: TemplateModel.plural,
+    verb: 'patch',
   });
 
   const hasEditPermission = canUpdateTemplate && canPatchTemplate;
 
   if (!template || canUpdateLoading || canPatchLoading)
     return {
-      isTemplateEditable: false,
       hasEditPermission: false,
       isCommonTemplate,
       isLoading: true,
+      isTemplateEditable: false,
     };
 
   return {
-    isTemplateEditable: !isCommonTemplate && hasEditPermission,
     hasEditPermission,
     isCommonTemplate,
     isLoading: canUpdateLoading || canPatchLoading,
+    isTemplateEditable: !isCommonTemplate && hasEditPermission,
   };
 };
 

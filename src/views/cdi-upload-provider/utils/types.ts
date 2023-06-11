@@ -5,34 +5,34 @@ import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import { UPLOAD_STATUS } from './consts';
 
 export type UploadingStatusProps = {
-  upload: DataUpload;
   dataVolume?: V1beta1DataVolume;
-  onSuccessClick?: () => void;
   onCancelClick?: () => void;
+  onSuccessClick?: () => void;
+  upload: DataUpload;
 };
 
 export type UploadDataProps = {
   file: File;
-  token: string;
-  pvcName: string;
   namespace: string;
+  pvcName: string;
+  token: string;
 };
 
 export type DataUpload = {
-  pvcName: string;
-  namespace: string;
-  fileName?: string;
-  progress?: number;
-  uploadStatus?: UPLOAD_STATUS;
-  uploadError?: any;
   cancelUpload?: Canceler;
+  fileName?: string;
+  namespace: string;
+  progress?: number;
+  pvcName: string;
+  uploadError?: any;
+  uploadStatus?: UPLOAD_STATUS;
 };
 
 export type OperatingSystemRecord = {
-  id: string;
-  name: string;
   baseImageName?: string;
   baseImageNamespace?: string;
   baseImageRecomendedSize?: any;
+  id: string;
   isSourceRef?: boolean;
+  name: string;
 };

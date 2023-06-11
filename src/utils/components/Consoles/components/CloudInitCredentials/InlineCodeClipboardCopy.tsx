@@ -9,10 +9,10 @@ const InlineCodeClipboardCopy: FC<{ clipboardText: string }> = ({ clipboardText 
   return (
     <>
       <ClipboardCopy
-        variant="inline-compact"
-        isCode
         clickTip={t('Copied')}
         hoverTip={t('Copy to clipboard')}
+        isCode
+        variant="inline-compact"
       >
         {clipboardText}
       </ClipboardCopy>{' '}

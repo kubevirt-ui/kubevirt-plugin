@@ -22,19 +22,19 @@ import { iconMapper } from './utils/statuses';
 import { MigrationTableDataLayout } from './utils/utils';
 import MigrationActionsDropdown from './MigrationActionsDropdown';
 
-const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, activeColumnIDs }) => {
+const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs, obj }) => {
   const StatusIcon = iconMapper?.[obj?.vmim?.status?.phase];
 
   return (
     <>
-      <TableData id="vm-name" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="vm-name">
         <ResourceLink
           groupVersionKind={VirtualMachineModelGroupVersionKind}
           name={obj?.vmiObj?.metadata?.name}
           namespace={obj?.vmiObj?.metadata?.namespace}
         />
       </TableData>
-      <TableData id="status" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="status">
         <Tooltip
           content={`${obj?.vmim?.status?.phase} ${
             obj?.vmiObj?.status?.migrationState?.endTimestamp || ''
@@ -44,10 +44,10 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, acti
             obj?.vmim?.status?.phase !== vmimStatuses.Succeeded
           }
         >
-          <GenericStatus title={obj?.vmim?.status?.phase} Icon={StatusIcon} />
+          <GenericStatus Icon={StatusIcon} title={obj?.vmim?.status?.phase} />
         </Tooltip>
       </TableData>
-      <TableData id="source" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="source">
         {obj?.vmiObj?.status?.migrationState?.sourceNode ? (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(NodeModel)}
@@ -57,7 +57,7 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, acti
           NO_DATA_DASH
         )}
       </TableData>
-      <TableData id="target" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="target">
         {obj?.vmiObj?.status?.migrationState?.targetNode ? (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(NodeModel)}
@@ -67,25 +67,25 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ obj, acti
           NO_DATA_DASH
         )}
       </TableData>
-      <TableData id="migration-policy" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="migration-policy">
         <MigrationPolicyTooltip obj={obj} />
       </TableData>
-      <TableData id="vmim-name" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="vmim-name">
         <ResourceLink
           groupVersionKind={VirtualMachineInstanceMigrationModelGroupVersionKind}
           name={obj?.vmim?.metadata?.name}
           namespace={obj?.vmim?.metadata?.namespace}
         />
       </TableData>
-      <TableData id="created" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="created">
         <Timestamp timestamp={obj?.vmim?.metadata?.creationTimestamp} />
       </TableData>
       <TableData
-        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
+        id=""
       >
-        <MigrationActionsDropdown vmim={obj?.vmim} isKebabToggle />
+        <MigrationActionsDropdown isKebabToggle vmim={obj?.vmim} />
       </TableData>
     </>
   );

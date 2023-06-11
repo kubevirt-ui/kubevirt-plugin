@@ -39,7 +39,6 @@ const Limits = ({ hyperConverge }) => {
           </Title>
           {!isNaN(migrationPerCluster) ? (
             <NumberInput
-              value={migrationPerCluster}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 Number(event.target.value) >= 0 &&
                   setMigrationPerCluster(() => {
@@ -51,7 +50,6 @@ const Limits = ({ hyperConverge }) => {
                     return Number(event.target.value);
                   });
               }}
-              min={0}
               onMinus={() =>
                 setMigrationPerCluster((newMigrationPerCluster) => {
                   updateValuesCluster(
@@ -73,9 +71,11 @@ const Limits = ({ hyperConverge }) => {
                 })
               }
               inputName={MIGRATION_PER_CLUSTER}
+              min={0}
+              value={migrationPerCluster}
             />
           ) : (
-            <Skeleton width={'140px'} height={'33px'} />
+            <Skeleton height={'33px'} width={'140px'} />
           )}
         </div>
         <div>
@@ -84,7 +84,6 @@ const Limits = ({ hyperConverge }) => {
           </Title>
           {!isNaN(migrationPerNode) ? (
             <NumberInput
-              value={migrationPerNode}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 Number(event.target.value) >= 0 &&
                 setMigrationPerNode(() => {
@@ -92,7 +91,6 @@ const Limits = ({ hyperConverge }) => {
                   return Number(event.target.value);
                 })
               }
-              min={0}
               onMinus={() =>
                 setMigrationPerNode((newMigrationPerNode) => {
                   updateValuesNode(hyperConverge, newMigrationPerNode - 1, MIGRATION_PER_NODE);
@@ -106,9 +104,11 @@ const Limits = ({ hyperConverge }) => {
                 })
               }
               inputName={MIGRATION_PER_NODE}
+              min={0}
+              value={migrationPerNode}
             />
           ) : (
-            <Skeleton width={'140px'} height={'33px'} />
+            <Skeleton height={'33px'} width={'140px'} />
           )}
         </div>
       </div>

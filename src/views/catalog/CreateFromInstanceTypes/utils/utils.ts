@@ -28,7 +28,7 @@ export const generateVM = (
   targetNamespace: string,
   startVM: boolean,
 ) => {
-  const { vmName, selectedInstanceType, selectedBootableVolume, pvcSource, sshSecretCredentials } =
+  const { pvcSource, selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
     instanceTypeState;
   const { sshSecretName } = sshSecretCredentials;
   const virtualmachineName =
@@ -53,6 +53,39 @@ export const generateVM = (
       namespace: targetNamespace,
     },
     spec: {
+      dataVolumeTemplates: [
+        {
+          metadata: {
+            name: `${virtualmachineName}-volume`,
+          },
+          spec: {
+            ...(isBootableVolumePVCKind(selectedBootableVolume)
+              ? {
+                  source: {
+                    pvc: { ...sourcePVC },
+                  },
+                }
+              : {
+                  sourceRef: {
+                    kind: DataSourceModel.kind,
+                    ...sourcePVC,
+                  },
+                }),
+            storage: {
+              resources: { requests: { storage: pvcSource?.spec?.resources?.requests?.storage } },
+              storageClassName: pvcSource?.spec?.storageClassName,
+            },
+          },
+        },
+      ],
+      instancetype: {
+        name:
+          selectedInstanceType ||
+          selectedBootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
+      },
+      preference: {
+        name: selectedPreference,
+      },
       running: startVM,
       template: {
         spec: {
@@ -90,39 +123,6 @@ export const generateVM = (
           ],
         },
       },
-      instancetype: {
-        name:
-          selectedInstanceType ||
-          selectedBootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
-      },
-      preference: {
-        name: selectedPreference,
-      },
-      dataVolumeTemplates: [
-        {
-          metadata: {
-            name: `${virtualmachineName}-volume`,
-          },
-          spec: {
-            ...(isBootableVolumePVCKind(selectedBootableVolume)
-              ? {
-                  source: {
-                    pvc: { ...sourcePVC },
-                  },
-                }
-              : {
-                  sourceRef: {
-                    kind: DataSourceModel.kind,
-                    ...sourcePVC,
-                  },
-                }),
-            storage: {
-              storageClassName: pvcSource?.spec?.storageClassName,
-              resources: { requests: { storage: pvcSource?.spec?.resources?.requests?.storage } },
-            },
-          },
-        },
-      ],
     },
   };
 

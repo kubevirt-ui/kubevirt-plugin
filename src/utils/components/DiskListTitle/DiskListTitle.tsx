@@ -10,14 +10,14 @@ const DiskListTitle = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <Title headingLevel="h2" className="disk-list-title">
+    <Title className="disk-list-title" headingLevel="h2">
       {t('Disks')}{' '}
       <HelpTextIcon
         bodyContent={t(
           'The following information is provided by the OpenShift Virtualization operator.',
         )}
-        position={PopoverPosition.right}
         helpIconClassName="title-help-text-icon"
+        position={PopoverPosition.right}
       />
     </Title>
   );

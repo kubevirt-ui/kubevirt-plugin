@@ -15,12 +15,19 @@ import './inventory.scss';
 
 export const getVMStatusGroups: StatusGroupMapper = (vms) => {
   const groups = {
-    [InventoryStatusGroup.NOT_MAPPED]: {
-      statusIDs: [VMStatusSimpleLabel.Running],
+    [InventoryStatusGroup.ERROR]: {
       count: 0,
       filterType: 'vm-status',
+      statusIDs: [StatusSimpleLabel.Error],
+    },
+    [InventoryStatusGroup.NOT_MAPPED]: {
+      count: 0,
+      filterType: 'vm-status',
+      statusIDs: [VMStatusSimpleLabel.Running],
     },
     [InventoryStatusGroup.PROGRESS]: {
+      count: 0,
+      filterType: 'vm-status',
       statusIDs: [
         StatusSimpleLabel.Importing,
         VMStatusSimpleLabel.Starting,
@@ -29,28 +36,21 @@ export const getVMStatusGroups: StatusGroupMapper = (vms) => {
         StatusSimpleLabel.Pending,
         VMStatusSimpleLabel.Deleting,
       ],
-      count: 0,
-      filterType: 'vm-status',
-    },
-    [InventoryStatusGroup.ERROR]: {
-      statusIDs: [StatusSimpleLabel.Error],
-      count: 0,
-      filterType: 'vm-status',
-    },
-    [InventoryStatusGroup.WARN]: {
-      statusIDs: [VMStatusSimpleLabel.Paused],
-      count: 0,
-      filterType: 'vm-status',
     },
     [InventoryStatusGroup.UNKNOWN]: {
-      statusIDs: [StatusSimpleLabel.Other],
       count: 0,
       filterType: 'vm-status',
+      statusIDs: [StatusSimpleLabel.Other],
+    },
+    [InventoryStatusGroup.WARN]: {
+      count: 0,
+      filterType: 'vm-status',
+      statusIDs: [VMStatusSimpleLabel.Paused],
     },
     'vm-stopped': {
-      statusIDs: [VMStatusSimpleLabel.Stopped],
       count: 0,
       filterType: 'vm-status',
+      statusIDs: [VMStatusSimpleLabel.Stopped],
     },
   };
 

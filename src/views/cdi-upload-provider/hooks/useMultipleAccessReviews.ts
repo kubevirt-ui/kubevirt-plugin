@@ -6,7 +6,7 @@ import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/r
 type UseMultipleAccessReviews = (
   multipleResourceAttributes: AccessReviewResourceAttributes[],
   impersonate?: ImpersonateKind,
-) => [{ resourceAttributes: AccessReviewResourceAttributes; allowed: boolean }[], boolean];
+) => [{ allowed: boolean; resourceAttributes: AccessReviewResourceAttributes }[], boolean];
 
 const useMultipleAccessReviews: UseMultipleAccessReviews = (
   multipleResourceAttributes,
@@ -24,8 +24,8 @@ const useMultipleAccessReviews: UseMultipleAccessReviews = (
       .then((values) => {
         setLoading(false);
         const updatedAllowedArr = values.map((result) => ({
-          resourceAttributes: result.spec.resourceAttributes,
           allowed: result.status.allowed,
+          resourceAttributes: result.spec.resourceAttributes,
         }));
         setAllowedResourceAttributes(updatedAllowedArr);
       })

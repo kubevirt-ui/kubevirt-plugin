@@ -9,7 +9,7 @@ import { ServicesList } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
-const Services = ({ vmi, pathname }) => {
+const Services = ({ pathname, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const [services, loaded] = useK8sWatchResource<IoK8sApiCoreV1Service[]>({
@@ -22,13 +22,13 @@ const Services = ({ vmi, pathname }) => {
 
   return (
     <div>
-      <a href={`${pathname}#services`} className="link-icon">
+      <a className="link-icon" href={`${pathname}#services`}>
         <LinkIcon size="sm" />
       </a>
-      <Title headingLevel="h2" className="co-section-heading">
+      <Title className="co-section-heading" headingLevel="h2">
         {t('Services')}
       </Title>
-      <ServicesList loaded={loaded} data={data || []} />
+      <ServicesList data={data || []} loaded={loaded} />
     </div>
   );
 };

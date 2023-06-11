@@ -8,15 +8,15 @@ import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 import { METALLB_GROUP, SERVICE_TYPES } from '../constants';
 
 type SSHServiceSelectProps = {
+  onSSHChange: (serviceType: SERVICE_TYPES) => void;
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded: boolean;
-  onSSHChange: (serviceType: SERVICE_TYPES) => void;
 };
 
 const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
+  onSSHChange,
   sshService,
   sshServiceLoaded,
-  onSSHChange,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -41,34 +41,34 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
 
   return (
     <Select
-      menuAppendTo="parent"
-      isOpen={isOpen}
-      onToggle={setIsOpen}
-      onSelect={handleChange}
-      variant={SelectVariant.single}
-      selections={sshServiceType}
       isDisabled={!sshServiceLoaded}
+      isOpen={isOpen}
+      menuAppendTo="parent"
+      onSelect={handleChange}
+      onToggle={setIsOpen}
+      selections={sshServiceType}
       toggleId="ssh-service-select"
+      variant={SelectVariant.single}
     >
-      <SelectOption value={SERVICE_TYPES.NONE} id={SERVICE_TYPES.NONE}>
+      <SelectOption id={SERVICE_TYPES.NONE} value={SERVICE_TYPES.NONE}>
         {t('None')}
       </SelectOption>
       <SelectOption
-        isDisabled={!hasSomeMetalCrd}
-        value={SERVICE_TYPES.LOAD_BALANCER}
-        id={SERVICE_TYPES.LOAD_BALANCER}
         description={t(
           'Assigns an external IP address to the VirtualMachine. This option requires a LoadBalancer Service backend',
         )}
+        id={SERVICE_TYPES.LOAD_BALANCER}
+        isDisabled={!hasSomeMetalCrd}
+        value={SERVICE_TYPES.LOAD_BALANCER}
       >
         {t('SSH over LoadBalancer')}
       </SelectOption>
       <SelectOption
-        value={SERVICE_TYPES.NODE_PORT}
-        id={SERVICE_TYPES.NODE_PORT}
         description={t(
           'Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.',
         )}
+        id={SERVICE_TYPES.NODE_PORT}
+        value={SERVICE_TYPES.NODE_PORT}
       >
         {t('SSH over NodePort')}
       </SelectOption>

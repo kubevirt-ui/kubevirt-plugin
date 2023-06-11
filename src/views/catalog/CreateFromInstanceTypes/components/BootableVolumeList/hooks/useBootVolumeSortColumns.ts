@@ -22,8 +22,8 @@ type UseBootVolumeSortColumns = (
   },
   pagination: PaginationState,
 ) => {
-  sortedData: BootableVolume[];
   getSortType: (columnIndex: number) => ThSortType;
+  sortedData: BootableVolume[];
 };
 
 const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
@@ -32,7 +32,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   pvcSources,
   pagination,
 ) => {
-  const [activeSortIndex, setActiveSortIndex] = useState<number | null>(null);
+  const [activeSortIndex, setActiveSortIndex] = useState<null | number>(null);
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc' | null>(null);
 
   const getSortableRowValues = (bootableVolume: BootableVolume): string[] => {
@@ -58,22 +58,22 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   };
 
   const getSortType = (columnIndex: number): ThSortType => ({
+    columnIndex,
+    onSort: (_event, index, direction) => {
+      setActiveSortIndex(index);
+      setActiveSortDirection(direction);
+    },
     sortBy: {
       defaultDirection: 'asc',
       direction: activeSortDirection,
       index: activeSortIndex,
     },
-    onSort: (_event, index, direction) => {
-      setActiveSortIndex(index);
-      setActiveSortDirection(direction);
-    },
-    columnIndex,
   });
 
   const sortedData = unsortedData
     .sort(sortVolumes)
     .slice(pagination.startIndex, pagination.endIndex);
-  return { sortedData, getSortType };
+  return { getSortType, sortedData };
 };
 
 export default useBootVolumeSortColumns;

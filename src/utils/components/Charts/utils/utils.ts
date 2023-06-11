@@ -17,7 +17,7 @@ export const SINGLE_VM_DURATION = 'SINGLE_VM_DURATION';
 export const TICKS_COUNT = 100;
 export const MILLISECONDS_MULTIPLIER = 1000;
 
-export const queriesToLink = (queries: string[] | string) => {
+export const queriesToLink = (queries: string | string[]) => {
   const queriesArray = Array.isArray(queries) ? queries : [queries];
   return queriesArray?.reduce(
     (acc, query, index) => acc.concat(`&query${index}=${encodeURIComponent(query)}`),
@@ -26,7 +26,7 @@ export const queriesToLink = (queries: string[] | string) => {
 };
 
 const isMultiDayDuration = (duration: string): boolean =>
-  [DurationOption.ONE_DAY, DurationOption.TWO_DAYS, DurationOption.ONE_WEEK].includes(
+  [DurationOption.ONE_DAY, DurationOption.ONE_WEEK, DurationOption.TWO_DAYS].includes(
     DurationOption.fromString(duration),
   );
 
@@ -73,7 +73,7 @@ export const getPrometheusDataAllNics = (response: PrometheusResponse): Promethe
 };
 
 export const findNetworkMaxYValue = (
-  chartData: { x: Date; y: number; name: string }[][],
+  chartData: { name: string; x: Date; y: number }[][],
 ): number => {
   const yValues =
     !isEmpty(chartData) &&
@@ -103,15 +103,15 @@ export const formatNetworkYTick = (tick: any, index: number, ticks: any[]) => {
 };
 
 export const formatMemoryYTick = (yMax: number, fixedDigits: number) => (tick: number) => {
-  const humanizedValue = xbytes(yMax, { iec: true, fixed: fixedDigits });
+  const humanizedValue = xbytes(yMax, { fixed: fixedDigits, iec: true });
   const unit = humanizedValue?.split(' ')?.[1];
   if (tick === 0 && unit) return `0 ${unit}`;
   return humanizedValue || '';
 };
 
 export const findMaxYValue = (
-  chartData: { x: Date; y: number; name?: string }[],
-): number | null => {
+  chartData: { name?: string; x: Date; y: number }[],
+): null | number => {
   const yValues = chartData?.map((point) => point?.y);
   return yValues ? Math.max(...yValues) : 0;
 };

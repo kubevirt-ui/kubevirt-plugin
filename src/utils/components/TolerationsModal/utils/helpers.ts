@@ -13,7 +13,7 @@ export const getNodeTaintQualifier = <T extends TolerationLabel = TolerationLabe
     const suitableNodes = (nodes || [])?.filter((node) => {
       const nodeTaints = node?.spec?.taints || [];
       // we check for every constraint if the node has the required taint
-      const isConstraintsExistInNodeTaints = filteredConstraints.every(({ key, value, effect }) =>
+      const isConstraintsExistInNodeTaints = filteredConstraints.every(({ effect, key, value }) =>
         nodeTaints.some((taint) => {
           // value is optional for node taints
           if (taint?.value && value) {

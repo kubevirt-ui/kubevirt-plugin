@@ -51,10 +51,10 @@ const TopConsumersTab: FC = () => {
             </div>
             <div className="kv-top-consumers-card__dropdown--num-items">
               <FormPFSelect
+                onSelect={(e, value) => onNumItemsSelect(value)}
+                selections={localStorageData?.[TOP_CONSUMERS_NUM_ITEMS_KEY]}
                 toggleId="kv-top-consumers-card-amount-select"
                 variant={SelectVariant.single}
-                selections={localStorageData?.[TOP_CONSUMERS_NUM_ITEMS_KEY]}
-                onSelect={(e, value) => onNumItemsSelect(value)}
               >
                 {topAmountSelectOptions(t).map((opt) => (
                   <SelectOption key={opt.key} value={opt.value} />
@@ -65,14 +65,14 @@ const TopConsumersTab: FC = () => {
         </CardHeader>
         <CardBody className="kv-top-consumers-card__body">
           <TopConsumersGridRow
-            rowNumber={1}
-            topGrid
             localStorageData={localStorageData}
+            rowNumber={1}
             setLocalStorageData={setLocalStorageData}
+            topGrid
           />
           <TopConsumersGridRow
-            rowNumber={2}
             localStorageData={localStorageData}
+            rowNumber={2}
             setLocalStorageData={setLocalStorageData}
           />
         </CardBody>

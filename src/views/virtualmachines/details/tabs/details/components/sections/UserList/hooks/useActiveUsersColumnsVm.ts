@@ -3,31 +3,31 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
-const useActiveUsersColumnsVm = (): { title: string; id: string }[] => {
+const useActiveUsersColumnsVm = (): { id: string; title: string }[] => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<V1VirtualMachineInstanceGuestOSUser>[] = [
     {
-      title: t('User Name'),
       id: 'userName',
-      transforms: [sortable],
       sort: 'metadata.name',
+      title: t('User Name'),
+      transforms: [sortable],
     },
     {
-      title: t('Domain'),
       id: 'domain',
-      transforms: [sortable],
       sort: 'domain',
-    },
-    {
-      title: t('Time of login'),
-      id: 'loginTime',
+      title: t('Domain'),
       transforms: [sortable],
-      sort: 'loginTime',
     },
     {
-      title: t('Elapsed time since login'),
+      id: 'loginTime',
+      sort: 'loginTime',
+      title: t('Time of login'),
+      transforms: [sortable],
+    },
+    {
       id: 'elapsedTime',
+      title: t('Elapsed time since login'),
     },
   ];
 

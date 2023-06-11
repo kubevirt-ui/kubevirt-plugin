@@ -15,17 +15,17 @@ const SettingsTab: React.FC = () => {
   return (
     <Overview>
       <Alert
-        variant="info"
-        isInline
         className="settings-tab__scope-message"
+        isInline
         title={t('All settings are effective across the entire cluster.')}
+        variant="info"
       />
       <Card className="settings-tab__card">
         <Tabs
           activeKey={activeTab}
-          onSelect={(_, activeKey) => setActiveTab(+activeKey)}
-          isVertical
           className="settings-tab__menu"
+          isVertical
+          onSelect={(_, activeKey) => setActiveTab(+activeKey)}
         >
           <Tab eventKey={0} title={<TabTitleText>{t('Cluster')}</TabTitleText>}>
             <div className="settings-tab__content">

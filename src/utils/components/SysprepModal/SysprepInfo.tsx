@@ -12,7 +12,7 @@ const SysprepInfo: React.FC = () => {
     <div data-test="sysprep-info">
       <Stack>
         <StackItem>
-          <Text component={TextVariants.p} className="kv-sysprep-info">
+          <Text className="kv-sysprep-info" component={TextVariants.p}>
             {t(
               'Sysprep is an automation tool for Windows that automates Windows setup, and custom software provisioning.',
             )}
@@ -23,13 +23,13 @@ const SysprepInfo: React.FC = () => {
             'An answer file is an XML-based file that contains setting definitions and values to use during Windows Setup',
           )}{' '}
           <Button
-            isSmall
-            isInline
-            variant="link"
             icon={<ExternalLinkSquareAltIcon />}
             iconPosition="right"
+            isInline
+            isSmall
+            variant="link"
           >
-            <a href={SYSPREP_DOC_URL} target="_blank" rel="noopener noreferrer">
+            <a href={SYSPREP_DOC_URL} rel="noopener noreferrer" target="_blank">
               {t('Learn more')}
             </a>
           </Button>

@@ -15,7 +15,6 @@ const UploadPVCErrorMessage: React.FC<UploadErrorMessageProps> = ({ message, upl
   const { t } = useKubevirtTranslation();
 
   const Error = {
-    [uploadErrorType.MISSING]: t('File input is missing'),
     [uploadErrorType.ALLOCATE]: t('Could not create persistent volume claim'),
     [uploadErrorType.CERT]: (
       <Trans ns="plugin__kubevirt-plugin" t={t}>
@@ -31,13 +30,14 @@ const UploadPVCErrorMessage: React.FC<UploadErrorMessageProps> = ({ message, upl
         )}
       </Trans>
     ),
+    [uploadErrorType.MISSING]: t('File input is missing'),
   };
   return (
     <Alert
-      isInline
       className="co-alert co-alert--scrollable"
-      variant="danger"
+      isInline
       title={t('An error occurred')}
+      variant="danger"
     >
       <div className="co-pre-line">{Error?.[message] || message}</div>
     </Alert>

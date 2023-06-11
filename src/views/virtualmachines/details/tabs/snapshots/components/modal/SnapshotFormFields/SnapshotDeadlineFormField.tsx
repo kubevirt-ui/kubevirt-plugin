@@ -16,16 +16,16 @@ import { validateSnapshotDeadline } from '../../../utils/helpers';
 
 type SnapshotDeadlineFormFieldProps = {
   deadline: string;
-  setDeadline: React.Dispatch<React.SetStateAction<string>>;
   deadlineUnit: string;
+  setDeadline: React.Dispatch<React.SetStateAction<string>>;
   setDeadlineUnit: React.Dispatch<React.SetStateAction<string>>;
   setIsError: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const SnapshotDeadlineFormField: React.FC<SnapshotDeadlineFormFieldProps> = ({
   deadline,
-  setDeadline,
   deadlineUnit,
+  setDeadline,
   setDeadlineUnit,
   setIsError,
 }) => {
@@ -51,20 +51,20 @@ const SnapshotDeadlineFormField: React.FC<SnapshotDeadlineFormFieldProps> = ({
 
   return (
     <FormGroup
-      label={t('Deadline')}
       fieldId="deadline"
       helperTextInvalid={deadlineError}
       helperTextInvalidIcon={deadlineError && <RedExclamationCircleIcon title="Error" />}
+      label={t('Deadline')}
       validated={deadlineError ? 'error' : 'default'}
     >
       <Grid hasGutter>
         <GridItem span={8}>
-          <TextInput type="text" value={deadline} onChange={handleDeadlineChange} id="deadline" />
+          <TextInput id="deadline" onChange={handleDeadlineChange} type="text" value={deadline} />
         </GridItem>
         <GridItem span={4}>
-          <FormSelect value={deadlineUnit} onChange={handleDeadlineUnitChange} id="deadline-unit">
+          <FormSelect id="deadline-unit" onChange={handleDeadlineUnitChange} value={deadlineUnit}>
             {Object.entries(deadlineUnits).map(([key, value]) => (
-              <FormSelectOption key={key} value={value} label={`${key} (${value})`} />
+              <FormSelectOption key={key} label={`${key} (${value})`} value={value} />
             ))}
           </FormSelect>
         </GridItem>

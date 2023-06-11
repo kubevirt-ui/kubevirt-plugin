@@ -12,7 +12,6 @@ const SysprepUnattendHelperPopup: React.FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Popover
-      aria-label={t('Help')}
       bodyContent={
         <div data-test="sysprep-unattend-popover">
           <Trans ns="plugin__kubevirt-plugin">
@@ -22,27 +21,28 @@ const SysprepUnattendHelperPopup: React.FC = () => {
               during windows setup/configuration.
             </Text>
             <Button
-              isSmall
-              isInline
-              variant="link"
               icon={<ExternalLinkSquareAltIcon />}
               iconPosition="right"
+              isInline
+              isSmall
+              variant="link"
             >
-              <a href={SYSPREP_DOC_URL} target="_blank" rel="noopener noreferrer">
+              <a href={SYSPREP_DOC_URL} rel="noopener noreferrer" target="_blank">
                 {t('Learn more')}
               </a>
             </Button>
           </Trans>
         </div>
       }
+      aria-label={t('Help')}
       hasAutoWidth
     >
       <Button
         aria-label={t('Help')}
-        variant="link"
-        isInline
         className="co-field-level-help"
         data-test-id="ssh-popover-button"
+        isInline
+        variant="link"
       >
         <OutlinedQuestionCircleIcon className="co-field-level-help__icon" />
       </Button>

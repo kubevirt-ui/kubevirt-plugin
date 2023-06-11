@@ -51,7 +51,7 @@ const InventoryCard: React.FC = () => {
             <div className="kv-inventory-card__item">
               <div className="kv-inventory-card__item-section kv-inventory-card__item--border-right">
                 <span className="kv-inventory-card__item-text">
-                  <ResourcesSection resources={resources} isAdmin={isAdmin} />
+                  <ResourcesSection isAdmin={isAdmin} resources={resources} />
                 </span>
               </div>
             </div>

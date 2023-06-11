@@ -9,23 +9,23 @@ import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 import Loading from '../Loading/Loading';
 
 type SelectProjectProps = {
-  setSelectedProject: (newProject: string) => void;
-  selectedProject: string;
   id?: string;
+  selectedProject: string;
+  setSelectedProject: (newProject: string) => void;
 };
 
 const SelectProject: React.FC<SelectProjectProps> = ({
-  setSelectedProject,
-  selectedProject,
   id,
+  selectedProject,
+  setSelectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isProjectSelectOpen, setProjectSelectOpen] = React.useState(false);
 
   const [projects, projectsLoaded] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    namespaced: false,
     isList: true,
+    namespaced: false,
   });
 
   const filterNamespaces = (_, value: string): React.ReactElement[] => {
@@ -50,21 +50,21 @@ const SelectProject: React.FC<SelectProjectProps> = ({
 
   return (
     <Select
-      menuAppendTo="parent"
-      isOpen={isProjectSelectOpen}
-      onToggle={() => setProjectSelectOpen(!isProjectSelectOpen)}
-      onSelect={onSelect}
-      variant={SelectVariant.single}
-      onFilter={filterNamespaces}
       hasInlineFilter
-      selections={selectedProject}
-      placeholderText={t('--- Select project ---')}
-      maxHeight={400}
       id={id}
+      isOpen={isProjectSelectOpen}
+      maxHeight={400}
+      menuAppendTo="parent"
+      onFilter={filterNamespaces}
+      onSelect={onSelect}
+      onToggle={() => setProjectSelectOpen(!isProjectSelectOpen)}
+      placeholderText={t('--- Select project ---')}
+      selections={selectedProject}
+      variant={SelectVariant.single}
     >
       {projects.map((project) => (
         <SelectOption key={project.metadata.name} value={project.metadata.name}>
-          <ResourceLink kind={ProjectModel.kind} name={project.metadata.name} linkTo={false} />
+          <ResourceLink kind={ProjectModel.kind} linkTo={false} name={project.metadata.name} />
         </SelectOption>
       ))}
     </Select>

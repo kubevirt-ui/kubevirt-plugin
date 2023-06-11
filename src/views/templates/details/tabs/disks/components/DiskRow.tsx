@@ -12,37 +12,37 @@ import { Flex, FlexItem, Label } from '@patternfly/react-core';
 import DiskRowActions from './DiskRowActions';
 
 type AdditionalRowData = {
-  vm: V1VirtualMachine;
-  onUpdate: (vm: V1VirtualMachine) => Promise<void>;
   actionsDisabled: boolean;
+  onUpdate: (vm: V1VirtualMachine) => Promise<void>;
+  vm: V1VirtualMachine;
 };
 
 const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
-  obj,
   activeColumnIDs,
-  rowData: { vm, onUpdate, actionsDisabled },
+  obj,
+  rowData: { actionsDisabled, onUpdate, vm },
 }) => {
   const { t } = useKubevirtTranslation();
-  const isPVCSource = !['URL', 'PVC (auto import)', 'Container (Ephemeral)', 'Other'].includes(
+  const isPVCSource = !['Container (Ephemeral)', 'Other', 'PVC (auto import)', 'URL'].includes(
     obj?.source,
   );
 
   return (
     <>
-      <TableData id="name" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="name">
         <TemplateValue value={obj?.name}>
           <Flex>
             <FlexItem>{obj?.name}</FlexItem>
             {obj?.isBootDisk && (
               <FlexItem>
-                <Label variant="filled" color="blue">
+                <Label color="blue" variant="filled">
                   {t('bootable')}
                 </Label>
               </FlexItem>
             )}
             {obj?.isEnvDisk && (
               <FlexItem>
-                <Label variant="filled" color="blue">
+                <Label color="blue" variant="filled">
                   {t('environment disk')}
                 </Label>
               </FlexItem>
@@ -50,7 +50,7 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
           </Flex>
         </TemplateValue>
       </TableData>
-      <TableData id="source" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="source">
         {isPVCSource ? (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
@@ -61,28 +61,28 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout, AdditionalRowData>> = ({
           <TemplateValue value={obj?.source} />
         )}
       </TableData>
-      <TableData id="size" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="size">
         <TemplateValue value={readableSizeUnit(obj?.size)} />
       </TableData>
-      <TableData id="drive" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="drive">
         <TemplateValue value={obj?.drive} />
       </TableData>
-      <TableData id="interface" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="interface">
         <TemplateValue value={obj?.interface} />
       </TableData>
-      <TableData id="storage-class" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="storage-class">
         <TemplateValue value={obj?.storageClass} />
       </TableData>
       <TableData
-        id=""
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-c-table__action"
+        id=""
       >
         <DiskRowActions
           diskName={obj?.name}
+          isDisabled={actionsDisabled}
           onUpdate={onUpdate}
           vm={vm}
-          isDisabled={actionsDisabled}
         />
       </TableData>
     </>

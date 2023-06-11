@@ -14,19 +14,19 @@ import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 type VirtualMachinesEditNetworkInterfaceModalProps = {
-  vm: V1VirtualMachine;
   isOpen: boolean;
-  onClose: () => void;
   nicPresentation: NetworkPresentation;
+  onClose: () => void;
+  vm: V1VirtualMachine;
 };
 
 const VirtualMachinesEditNetworkInterfaceModal: FC<
   VirtualMachinesEditNetworkInterfaceModalProps
-> = ({ vm, isOpen, onClose, nicPresentation }) => {
+> = ({ isOpen, nicPresentation, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
 
   const onSubmit = useCallback(
-    ({ nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType }) =>
+    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
       () => {
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface(
@@ -48,10 +48,10 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
         const updatedVM = updateVMNetworkInterface(vm, updatedNetworks, updatedInterfaces);
 
         return k8sUpdate({
-          model: VirtualMachineModel,
           data: updatedVM,
-          ns: updatedVM.metadata.namespace,
+          model: VirtualMachineModel,
           name: updatedVM.metadata.name,
+          ns: updatedVM.metadata.namespace,
         });
       },
     [vm, nicPresentation],
@@ -59,13 +59,13 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
 
   return (
     <NetworkInterfaceModal
-      vm={vm}
-      headerText={t('Edit network interface')}
-      onSubmit={onSubmit}
-      nicPresentation={nicPresentation}
-      isOpen={isOpen}
-      onClose={onClose}
       fixedName
+      headerText={t('Edit network interface')}
+      isOpen={isOpen}
+      nicPresentation={nicPresentation}
+      onClose={onClose}
+      onSubmit={onSubmit}
+      vm={vm}
     />
   );
 };

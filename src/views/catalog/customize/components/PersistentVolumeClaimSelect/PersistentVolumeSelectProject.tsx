@@ -15,19 +15,19 @@ import {
 import { filter } from './utils';
 
 type PersistentVolumeSelectProjectProps = {
+  'data-test-id': string;
+  loaded: boolean;
+  onChange: (newProject: string) => void;
   projectsName: string[];
   selectedProject: string;
-  onChange: (newProject: string) => void;
-  loaded: boolean;
-  'data-test-id': string;
 };
 
 export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProjectProps> = ({
-  selectedProject,
-  projectsName,
-  onChange: onProjectChange,
-  loaded,
   'data-test-id': testId,
+  loaded,
+  onChange: onProjectChange,
+  projectsName,
+  selectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -46,44 +46,41 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
 
   return (
     <FormGroup
-      label={t('PVC project')}
-      fieldId={testId}
-      id={testId}
-      isRequired
       className="pvc-selection-formgroup"
-      validated={errors?.['pvcNamespace'] ? ValidatedOptions.error : ValidatedOptions.default}
+      fieldId={testId}
+      helperText={t('Location of the existing PVC')}
       helperTextInvalid={t('This field is required')}
       helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
-      helperText={t('Location of the existing PVC')}
+      id={testId}
+      isRequired
+      label={t('PVC project')}
+      validated={errors?.['pvcNamespace'] ? ValidatedOptions.error : ValidatedOptions.default}
     >
       {loaded ? (
         <Controller
-          name="pvcNamespace"
-          control={control}
-          rules={{ required: true }}
           render={({ field: { onChange }, fieldState: { error } }) => (
             <div data-test-id={`${testId}-dropdown`}>
               <Select
-                aria-labelledby={testId}
-                isOpen={isNamespacePVCOpen}
-                onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
                 onSelect={(e, v) => {
                   onSelect(e, v);
                   onChange(v);
                 }}
-                variant={SelectVariant.single}
-                onFilter={filter(projectsName)}
-                hasInlineFilter
-                selections={selectedProject}
-                placeholderText={t('--- Select PVC project ---')}
-                validated={error ? ValidatedOptions.error : ValidatedOptions.default}
                 aria-invalid={error ? true : false}
-                maxHeight={400}
+                aria-labelledby={testId}
                 data-test-id={`${testId}-dropdown`}
+                hasInlineFilter
+                isOpen={isNamespacePVCOpen}
+                maxHeight={400}
+                onFilter={filter(projectsName)}
+                onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
+                placeholderText={t('--- Select PVC project ---')}
+                selections={selectedProject}
                 toggleId={`${testId}-toggle`}
+                validated={error ? ValidatedOptions.error : ValidatedOptions.default}
+                variant={SelectVariant.single}
               >
                 {projectsName.map((projectName) => (
-                  <SelectOption key={projectName} value={projectName} data-test-id={projectName}>
+                  <SelectOption data-test-id={projectName} key={projectName} value={projectName}>
                     <span className="sr-only">{t('project')}</span>
                     <span className="co-m-resource-icon co-m-resource-project">PR</span>{' '}
                     {projectName}
@@ -92,6 +89,9 @@ export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProje
               </Select>
             </div>
           )}
+          control={control}
+          name="pvcNamespace"
+          rules={{ required: true }}
         />
       ) : (
         <Loading />

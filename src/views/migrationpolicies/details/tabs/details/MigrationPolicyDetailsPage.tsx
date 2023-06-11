@@ -12,8 +12,8 @@ type MigrationPolicyDetailsPageProps = RouteComponentProps & {
   obj: V1alpha1MigrationPolicy;
 };
 const MigrationPolicyDetailsPage: React.FC<MigrationPolicyDetailsPageProps> = ({
-  obj: mp,
   location,
+  obj: mp,
 }) => {
   return (
     <div className="migration-policy-details-page">

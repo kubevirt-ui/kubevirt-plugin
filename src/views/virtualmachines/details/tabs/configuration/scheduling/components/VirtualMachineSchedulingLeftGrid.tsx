@@ -22,25 +22,25 @@ import Descheduler from './Descheduler';
 import NodeSelector from './NodeSelector';
 
 type VirtualMachineSchedulingLeftGridProps = {
-  vm: V1VirtualMachine;
+  canUpdateVM: boolean;
   nodes: IoK8sApiCoreV1Node[];
   nodesLoaded: boolean;
-  canUpdateVM: boolean;
+  vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGridProps> = ({
-  vm,
+  canUpdateVM,
   nodes,
   nodesLoaded,
-  canUpdateVM,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
   const isLiveMigratableNotFalse = !!vm?.status?.conditions?.find(
-    ({ type, status }) => type === 'LiveMigratable' && status !== 'False',
+    ({ status, type }) => type === 'LiveMigratable' && status !== 'False',
   );
 
   const isDeschedulerInstalled = useDeschedulerInstalled();
@@ -50,10 +50,10 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
   const onSubmit = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
-        model: VirtualMachineModel,
         data: updatedVM,
-        ns: updatedVM?.metadata?.namespace,
+        model: VirtualMachineModel,
         name: updatedVM?.metadata?.name,
+        ns: updatedVM?.metadata?.namespace,
       }),
     [],
   );
@@ -62,70 +62,65 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
     <GridItem span={5}>
       <DescriptionList>
         <VirtualMachineDescriptionItem
-          descriptionData={<NodeSelector vm={vm} />}
-          descriptionHeader={t('Node selector')}
-          isEdit={canUpdateVM}
-          data-test-id="node-selector"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <NodeSelectorModal
-                vm={vm}
+                isOpen={isOpen}
                 nodes={nodes}
                 nodesLoaded={nodesLoaded}
-                isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vm={vm}
                 vmi={vmi}
               />
             ))
           }
+          data-test-id="node-selector"
+          descriptionData={<NodeSelector vm={vm} />}
+          descriptionHeader={t('Node selector')}
+          isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<Tolerations vm={vm} />}
-          descriptionHeader={t('Tolerations')}
-          isEdit={canUpdateVM}
-          data-test-id="tolerations"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <TolerationsModal
-                vm={vm}
+                isOpen={isOpen}
                 nodes={nodes}
                 nodesLoaded={nodesLoaded}
-                isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vm={vm}
                 vmi={vmi}
               />
             ))
           }
+          data-test-id="tolerations"
+          descriptionData={<Tolerations vm={vm} />}
+          descriptionHeader={t('Tolerations')}
+          isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<Affinity vm={vm} />}
-          descriptionHeader={t('Affinity rules')}
-          isEdit={canUpdateVM}
-          data-test-id="affinity-rules"
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <AffinityModal
-                vm={vm}
+                isOpen={isOpen}
                 nodes={nodes}
                 nodesLoaded={nodesLoaded}
-                isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vm={vm}
                 vmi={vmi}
               />
             ))
           }
+          data-test-id="affinity-rules"
+          descriptionData={<Affinity vm={vm} />}
+          descriptionHeader={t('Affinity rules')}
+          isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<Descheduler vm={vm} />}
-          descriptionHeader={t('Descheduler')}
-          isEdit={isDeschedulerEditable}
-          data-test-id="descheduler"
-          isPopover
           bodyContent={
-            <Trans t={t} ns="plugin__kubevirt-plugin">
+            <Trans ns="plugin__kubevirt-plugin" t={t}>
               <p>
                 The descheduler can be used to evict a running pod to allow the pod to be
                 rescheduled onto a more suitable node.
@@ -137,14 +132,19 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <DeschedulerModal
-                vm={vm}
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vm={vm}
                 vmi={vmi}
               />
             ))
           }
+          data-test-id="descheduler"
+          descriptionData={<Descheduler vm={vm} />}
+          descriptionHeader={t('Descheduler')}
+          isEdit={isDeschedulerEditable}
+          isPopover
         />
       </DescriptionList>
     </GridItem>

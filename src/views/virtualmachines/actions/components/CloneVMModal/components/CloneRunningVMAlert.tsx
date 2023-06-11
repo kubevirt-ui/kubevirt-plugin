@@ -4,11 +4,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
 type CloneRunningVMAlertProps = {
-  vmName: string;
   isVMRunning: boolean;
+  vmName: string;
 };
 
-const CloneRunningVMAlert: React.FC<CloneRunningVMAlertProps> = ({ vmName, isVMRunning }) => {
+const CloneRunningVMAlert: React.FC<CloneRunningVMAlertProps> = ({ isVMRunning, vmName }) => {
   const { t } = useKubevirtTranslation();
   if (!isVMRunning) {
     return null;
@@ -21,8 +21,8 @@ const CloneRunningVMAlert: React.FC<CloneRunningVMAlertProps> = ({ vmName, isVMR
           vmName,
         },
       )}
-      variant={AlertVariant.warning}
       isInline
+      variant={AlertVariant.warning}
     />
   );
 };

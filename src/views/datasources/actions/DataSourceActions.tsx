@@ -45,13 +45,33 @@ const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKeba
 
   return (
     <Dropdown
-      menuAppendTo={getContentScrollableElement}
-      data-test-id="data-source-actions"
-      className="kubevirt-data-source-actions"
-      isGrouped
-      isPlain={isKebabToggle}
-      isOpen={isOpen}
-      position={DropdownPosition.right}
+      dropdownItems={[
+        <DropdownGroup key="datasource-actions" label={t('DataSource')}>
+          {dsActions?.map((action) => (
+            <DropdownItem
+              data-test-id={action?.id}
+              description={action?.description}
+              isDisabled={action?.disabled}
+              key={action?.id}
+              onClick={() => handleClick(action)}
+            >
+              {action?.label}
+            </DropdownItem>
+          ))}
+        </DropdownGroup>,
+        <DropdownSeparator key="dropdown separator" />,
+        <DropdownGroup key="datasource-manage" label={t('DataImportCron')}>
+          <DropdownItem
+            data-test-id="datasource-manage"
+            description={manageAction?.description}
+            isDisabled={manageAction?.disabled}
+            key="datasource-manage"
+            onClick={() => handleClick(manageAction)}
+          >
+            {manageAction?.label}
+          </DropdownItem>
+        </DropdownGroup>,
+      ]}
       toggle={
         isKebabToggle ? (
           <KebabToggle onToggle={onDropDownToggle} />
@@ -59,33 +79,13 @@ const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKeba
           <DropdownToggle onToggle={onDropDownToggle}>{t('Actions')}</DropdownToggle>
         )
       }
-      dropdownItems={[
-        <DropdownGroup label={t('DataSource')} key="datasource-actions">
-          {dsActions?.map((action) => (
-            <DropdownItem
-              data-test-id={action?.id}
-              key={action?.id}
-              onClick={() => handleClick(action)}
-              isDisabled={action?.disabled}
-              description={action?.description}
-            >
-              {action?.label}
-            </DropdownItem>
-          ))}
-        </DropdownGroup>,
-        <DropdownSeparator key="dropdown separator" />,
-        <DropdownGroup label={t('DataImportCron')} key="datasource-manage">
-          <DropdownItem
-            data-test-id="datasource-manage"
-            key="datasource-manage"
-            onClick={() => handleClick(manageAction)}
-            isDisabled={manageAction?.disabled}
-            description={manageAction?.description}
-          >
-            {manageAction?.label}
-          </DropdownItem>
-        </DropdownGroup>,
-      ]}
+      className="kubevirt-data-source-actions"
+      data-test-id="data-source-actions"
+      isGrouped
+      isOpen={isOpen}
+      isPlain={isKebabToggle}
+      menuAppendTo={getContentScrollableElement}
+      position={DropdownPosition.right}
     />
   );
 };

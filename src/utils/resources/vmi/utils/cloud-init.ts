@@ -4,9 +4,9 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { CLOUD_INIT_MISSING_USERNAME } from '@kubevirt-utils/components/Consoles/utils/constants';
 
 type CloudinitUserDataObject = {
-  user?: string;
-  password?: string;
   passwd?: { users: { name: string }[] };
+  password?: string;
+  user?: string;
 };
 
 export const getCloudInitCredentials = (

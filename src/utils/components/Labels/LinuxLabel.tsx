@@ -9,7 +9,7 @@ import './labels.scss';
 const LinuxLabel: FC = () => {
   const { t } = useTranslation();
   return (
-    <Label variant="outline" className="os-label" icon={<LinuxIcon />}>
+    <Label className="os-label" icon={<LinuxIcon />} variant="outline">
       {t('Linux only')}
     </Label>
   );

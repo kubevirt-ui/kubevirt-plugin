@@ -1,6 +1,8 @@
 import cloneDeepWith from 'lodash.clonedeepwith';
 
 export abstract class ObjectEnum<T> {
+  static getAll = () => Object.freeze([]);
+
   protected static getAllClassEnumProperties = <A extends ObjectEnum<any>>(Clazz: any) => {
     const usedValues = new Set();
     return Object.keys(Clazz)
@@ -15,7 +17,7 @@ export abstract class ObjectEnum<T> {
       }) as A[];
   };
 
-  static getAll = () => Object.freeze([]);
+  getValue = () => this.value;
 
   protected readonly value: T;
 
@@ -25,8 +27,6 @@ export abstract class ObjectEnum<T> {
     }
     this.value = value;
   }
-
-  getValue = () => this.value;
 
   toString() {
     if (this.value === null || this.value === undefined) {

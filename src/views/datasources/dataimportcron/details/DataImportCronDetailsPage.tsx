@@ -12,8 +12,8 @@ import { Divider, PageSection, Title } from '@patternfly/react-core';
 import { DataImportCronDetailsGrid } from './DataImportCronDetailsGrid';
 
 type DataImportCronDetailsPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1beta1DataImportCron;
 };
@@ -25,14 +25,14 @@ const DataImportCronDetailsPage: React.FC<DataImportCronDetailsPageProps> = ({
   return (
     <div>
       <PageSection>
-        <Title headingLevel="h2" className="co-section-heading">
+        <Title className="co-section-heading" headingLevel="h2">
           {t('DataImportCron details')}
         </Title>
         <DataImportCronDetailsGrid dataImportCron={dataImportCron} />
       </PageSection>
       <Divider />
       <PageSection>
-        <Title headingLevel="h2" className="co-section-heading">
+        <Title className="co-section-heading" headingLevel="h2">
           {t('Conditions')}
         </Title>
         <ConditionsTable

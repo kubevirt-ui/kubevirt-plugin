@@ -15,7 +15,7 @@ const RDPServiceNotConfigured: React.FC<RDPServiceNotConfiguredProps> = ({ vm, v
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   return (
-    <Trans t={t} ns="plugin__kubevirt-plugin">
+    <Trans ns="plugin__kubevirt-plugin" t={t}>
       <span>
         This is a Windows VirtualMachine but no Service for the RDP (Remote Desktop Protocol) can be
         found.
@@ -25,8 +25,8 @@ const RDPServiceNotConfigured: React.FC<RDPServiceNotConfiguredProps> = ({ vm, v
         For better experience accessing Windows console, it is recommended to use the RDP.
         <Button
           className="kv-create-rdp-service-button"
-          variant={ButtonVariant.secondary}
           onClick={() => createModal((props) => <RDPServiceModal vm={vm} vmi={vmi} {...props} />)}
+          variant={ButtonVariant.secondary}
         >
           Create RDP Service
         </Button>

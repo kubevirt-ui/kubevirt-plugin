@@ -17,16 +17,16 @@ import { HelpIcon } from '@patternfly/react-icons';
 import './grace-period-input.scss';
 
 interface GracePeriodInputProps {
+  gracePeriodSeconds: null | number;
   isChecked: boolean;
   onCheckboxChange: (checked: boolean) => void;
-  gracePeriodSeconds: number | null;
-  setGracePeriodSeconds: (newGracePeriod: number | null) => void;
+  setGracePeriodSeconds: (newGracePeriod: null | number) => void;
 }
 
 export const GracePeriodInput: FC<GracePeriodInputProps> = ({
+  gracePeriodSeconds,
   isChecked,
   onCheckboxChange,
-  gracePeriodSeconds,
   setGracePeriodSeconds,
 }) => {
   const { t } = useTranslation();
@@ -36,10 +36,10 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
       <Flex alignItems={{ default: 'alignItemsCenter' }} className="grace-period-input">
         <FlexItem>
           <Checkbox
-            onChange={onCheckboxChange}
-            isChecked={isChecked}
             id="grace-period-checkbox"
+            isChecked={isChecked}
             label={t('With grace period')}
+            onChange={onCheckboxChange}
           />
         </FlexItem>
         <FlexItem>
@@ -60,12 +60,12 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
           <FlexItem>
             <InputGroup>
               <TextInput
-                type="number"
-                value={gracePeriodSeconds}
-                onChange={(value) => setGracePeriodSeconds(isEmpty(value) ? null : parseInt(value))}
-                min={0}
                 aria-label={t('seconds')}
                 data-test="grace-period-seconds-input"
+                min={0}
+                onChange={(value) => setGracePeriodSeconds(isEmpty(value) ? null : parseInt(value))}
+                type="number"
+                value={gracePeriodSeconds}
               />
               <InputGroupText>{t('seconds')}</InputGroupText>
             </InputGroup>

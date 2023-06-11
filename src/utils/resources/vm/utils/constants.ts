@@ -3,6 +3,7 @@ export const NO_DATA_DASH = '-';
 export const MILLISECONDS_TO_SECONDS_MULTIPLIER = 1000;
 
 export const PATHS_TO_HIGHLIGHT = {
+  DEFAULT: ['spec.template.spec.domain.devices.disks', 'spec.template.spec.volumes'],
   DETAILS_TAB: [
     'spec.template.metadata.annotations',
     'spec.template.metadata.labels',
@@ -11,8 +12,8 @@ export const PATHS_TO_HIGHLIGHT = {
     'metadata.labels',
     'metadata.annotations',
   ],
-  ENV_TAB: ['spec.template.spec.domain.devices.disks', 'spec.template.spec.volumes'],
   DISKS_TAB: ['spec.template.spec.domain.devices.disks', 'spec.template.spec.volumes'],
+  ENV_TAB: ['spec.template.spec.domain.devices.disks', 'spec.template.spec.volumes'],
   NETWORK_TAB: ['spec.template.spec.networks', 'spec.template.spec.domain.devices.interfaces'],
   SCHEDULING_TAB: [
     'spec.template.spec.affinity',
@@ -21,5 +22,4 @@ export const PATHS_TO_HIGHLIGHT = {
     'spec.template.metadata.annotations',
   ],
   SCRIPTS_TAB: ['spec.template.spec.volumes', 'spec.template.spec.accessCredentials'],
-  DEFAULT: ['spec.template.spec.domain.devices.disks', 'spec.template.spec.volumes'],
 };

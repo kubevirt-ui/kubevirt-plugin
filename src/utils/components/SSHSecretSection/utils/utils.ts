@@ -36,17 +36,17 @@ export const getSecretNameErrorMessage = (
 
 export const createVmSSHSecret = (vm: V1VirtualMachine, sshKey: string, secretName?: string) =>
   k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
-    model: SecretModel,
     data: {
-      kind: SecretModel.kind,
       apiVersion: SecretModel.apiVersion,
+      data: { key: encodeSecretKey(sshKey) },
+      kind: SecretModel.kind,
       metadata: {
         name: secretName || `${getName(vm)}-ssh-key`,
         namespace: getNamespace(vm),
         ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
       },
-      data: { key: encodeSecretKey(sshKey) },
     },
+    model: SecretModel,
   });
 
 export const removeSecretToVM = (vm: V1VirtualMachine) =>
@@ -56,14 +56,14 @@ export const removeSecretToVM = (vm: V1VirtualMachine) =>
 
 export const detachVMSecret = async (vm: V1VirtualMachine, vmSecret: IoK8sApiCoreV1Secret) => {
   await k8sPatch({
-    model: VirtualMachineModel,
-    resource: vm,
     data: [
       {
         op: 'remove',
         path: '/spec/template/spec/accessCredentials',
       },
     ],
+    model: VirtualMachineModel,
+    resource: vm,
   });
 
   const updatedSecret = produce(vmSecret, (draftSecret) => {
@@ -74,8 +74,8 @@ export const detachVMSecret = async (vm: V1VirtualMachine, vmSecret: IoK8sApiCor
   });
 
   await k8sUpdate({
-    model: SecretModel,
     data: updatedSecret,
+    model: SecretModel,
   });
 };
 
@@ -86,21 +86,21 @@ export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string) =>
       vmDraft.spec.template.spec.volumes = [
         ...getVolumes(vm).filter((v) => !v.cloudInitNoCloud),
         {
-          name: cloudInitNoCloudVolume.name,
           cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
+          name: cloudInitNoCloudVolume.name,
         },
       ];
     }
     vmDraft.spec.template.spec.accessCredentials = [
       {
         sshPublicKey: {
+          propagationMethod: {
+            configDrive: {},
+          },
           source: {
             secret: {
               secretName: secretName || `${getName(vm)}-ssh-key`,
             },
-          },
-          propagationMethod: {
-            configDrive: {},
           },
         },
       },

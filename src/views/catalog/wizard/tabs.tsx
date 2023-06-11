@@ -25,43 +25,43 @@ const withWizardVMContext = (Tab: WizardTab) => (routeProps: TabRouteProps) => {
 
 export const wizardNavPages: NavPage[] = [
   {
+    component: withWizardVMContext(WizardOverviewTab),
     href: '',
     name: 'Overview',
-    component: withWizardVMContext(WizardOverviewTab),
   },
   {
+    component: withWizardVMContext(WizardYAMLTab),
     href: 'yaml',
     name: 'YAML',
-    component: withWizardVMContext(WizardYAMLTab),
   },
   {
+    component: withWizardVMContext(WizardSchedulingTab),
     href: 'scheduling',
     name: 'Scheduling',
-    component: withWizardVMContext(WizardSchedulingTab),
   },
   {
+    component: withWizardVMContext(WizardEnvironmentTab),
     href: 'environment',
     name: 'Environment',
-    component: withWizardVMContext(WizardEnvironmentTab),
   },
   {
+    component: withWizardVMContext(WizardNetworkTab),
     href: 'network-interfaces',
     name: 'Network interfaces',
-    component: withWizardVMContext(WizardNetworkTab),
   },
   {
+    component: withWizardVMContext(WizardDisksTab),
     href: 'disks',
     name: 'Disks',
-    component: withWizardVMContext(WizardDisksTab),
   },
   {
+    component: withWizardVMContext(WizardScriptsTab),
     href: 'scripts',
     name: 'Scripts',
-    component: withWizardVMContext(WizardScriptsTab),
   },
   {
+    component: withWizardVMContext(WizardMetadataTab),
     href: 'metadata',
     name: 'Metadata',
-    component: withWizardVMContext(WizardMetadataTab),
   },
 ];

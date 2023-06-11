@@ -17,25 +17,25 @@ import {
 import { InstanceTypesMenuItemsData } from './types';
 
 export const MENUS = {
-  root: 'root',
   redHatProvided: 'redHatProvided',
-  userProvided: 'userProvided',
+  root: 'root',
   series: 'series',
   sizes: 'sizes',
+  userProvided: 'userProvided',
 };
 
 export const initialMenuItems: InstanceTypesMenuItemsData = {
   redHatProvided: {
-    label: t('Red Hat provided'),
-    id: MENUS.redHatProvided,
     Icon: RedhatIcon,
+    id: MENUS.redHatProvided,
     items: [],
+    label: t('Red Hat provided'),
   },
   userProvided: {
-    label: t('User provided'),
-    id: MENUS.userProvided,
     Icon: UserIcon,
+    id: MENUS.userProvided,
     items: [],
+    label: t('User provided'),
   },
 };
 
@@ -66,6 +66,11 @@ export const instanceTypeSeriesNameMapper: {
     // sizes: ['xlarge', '2xlarge', '4xlarge', '8xlarge'],
     seriesTitle: t('Attached NVIDIA GPU resources'),
   },
+  highperformance: {
+    Icon: TrendUpIcon,
+    seriesLabel: t('HP series'),
+    seriesTitle: t('High-performance applications'),
+  },
   m1: {
     Icon: MemoryIcon,
     seriesLabel: t('M series'),
@@ -77,11 +82,6 @@ export const instanceTypeSeriesNameMapper: {
     seriesLabel: t('N series'),
     // sizes: ['large', 'xlarge', '2xlarge'],
     seriesTitle: t('Network-intensive applications'),
-  },
-  highperformance: {
-    Icon: TrendUpIcon,
-    seriesLabel: t('HP series'),
-    seriesTitle: t('High-performance applications'),
   },
   server: {
     Icon: ServerIcon,

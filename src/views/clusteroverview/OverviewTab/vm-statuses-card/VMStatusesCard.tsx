@@ -36,36 +36,36 @@ const VMStatusesCard: React.FC = () => {
   const { t } = useKubevirtTranslation();
   const [vms] = useK8sWatchResource<V1VirtualMachine[]>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
-    namespaced: Boolean(namespace),
-    namespace: namespace,
     isList: true,
+    namespace: namespace,
+    namespaced: Boolean(namespace),
   });
   const [showExtraStatuses, setShowExtraStatuses] = React.useState<boolean>(false);
 
-  const { primaryStatuses, additionalStatuses } = getVMStatuses(vms || []);
+  const { additionalStatuses, primaryStatuses } = getVMStatuses(vms || []);
 
   return (
-    <Card data-test-id="vm-statuses-card" className="vm-statuses-card">
+    <Card className="vm-statuses-card" data-test-id="vm-statuses-card">
       <CardHeader className="vm-statuses-card__header">
         <CardTitle>{t('VirtualMachine statuses')}</CardTitle>
       </CardHeader>
       <div className="vm-statuses-card__body">
         <Grid hasGutter>
-          <VMStatusItem status={ERROR} count={primaryStatuses.Error} namespace={activeNamespace} />
+          <VMStatusItem count={primaryStatuses.Error} namespace={activeNamespace} status={ERROR} />
           <VMStatusItem
-            status={VM_STATUS.Running}
             count={primaryStatuses.Running}
             namespace={activeNamespace}
+            status={VM_STATUS.Running}
           />
           <VMStatusItem
-            status={VM_STATUS.Paused}
             count={primaryStatuses.Paused}
             namespace={activeNamespace}
+            status={VM_STATUS.Paused}
           />
           <VMStatusItem
-            status={VM_STATUS.Migrating}
             count={primaryStatuses.Migrating}
             namespace={activeNamespace}
+            status={VM_STATUS.Migrating}
           />
         </Grid>
       </div>
@@ -74,26 +74,26 @@ const VMStatusesCard: React.FC = () => {
         <Accordion>
           <AccordionItem>
             <AccordionToggle
-              onClick={() => setShowExtraStatuses(!showExtraStatuses)}
-              isExpanded={showExtraStatuses}
-              id="status-accordion-toggle"
               className="vm-statuses-card__accordion-toggle"
+              id="status-accordion-toggle"
+              isExpanded={showExtraStatuses}
+              onClick={() => setShowExtraStatuses(!showExtraStatuses)}
             >
               <span className="vm-statuses-card__accordion-toggle--text">
                 {t('Additional statuses')}
               </span>
               <Label
+                className="vm-statuses-card__accordion-toggle--label"
                 isCompact
                 key="vm-status-accordion-toggle-label"
-                className="vm-statuses-card__accordion-toggle--label"
               >
                 {Object.keys(additionalStatuses).length}
               </Label>
             </AccordionToggle>
             <Divider />
             <AccordionContent
-              id="status-accordion-content"
               className="vm-statuses-card__accordion-content"
+              id="status-accordion-content"
               isHidden={!showExtraStatuses}
             >
               <Grid hasGutter>
@@ -101,10 +101,10 @@ const VMStatusesCard: React.FC = () => {
                   const count = additionalStatuses?.[state];
                   return (
                     <VMStatusItem
-                      key={state}
-                      status={state}
                       count={count}
+                      key={state}
                       namespace={activeNamespace}
+                      status={state}
                     />
                   );
                 })}

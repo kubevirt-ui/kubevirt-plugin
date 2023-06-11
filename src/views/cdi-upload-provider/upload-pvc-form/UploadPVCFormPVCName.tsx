@@ -3,17 +3,17 @@ import React, { ReactEventHandler } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type UploadPVCFormPVCNameProps = {
-  pvcName: string;
   handlePvcName: ReactEventHandler<HTMLInputElement>;
   isGolden: boolean;
   isLoading: boolean;
+  pvcName: string;
 };
 
 const UploadPVCFormPVCName: React.FC<UploadPVCFormPVCNameProps> = ({
-  pvcName,
   handlePvcName,
   isGolden,
   isLoading,
+  pvcName,
 }) => {
   const { t } = useKubevirtTranslation();
   return (
@@ -23,15 +23,15 @@ const UploadPVCFormPVCName: React.FC<UploadPVCFormPVCNameProps> = ({
       </label>
       <div className="form-group">
         <input
-          disabled={isGolden || isLoading}
+          aria-describedby="pvc-name-help"
           className="pf-c-form-control"
-          type="text"
+          disabled={isGolden || isLoading}
+          id="pvc-name"
           onChange={handlePvcName}
           placeholder={isGolden ? t('pick an operating system') : t('my-storage-claim')}
-          aria-describedby="pvc-name-help"
-          id="pvc-name"
-          value={pvcName || ''}
           required
+          type="text"
+          value={pvcName || ''}
         />
         <p className="help-block" id="pvc-name-help">
           {t('A unique name for the storage claim within the project')}

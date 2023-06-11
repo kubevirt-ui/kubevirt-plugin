@@ -9,17 +9,17 @@ import { ChartDonut } from '@patternfly/react-charts';
 import MigrationChartLegend from './MigrationChartLegend';
 
 type MigrationsChartDonutProps = {
-  vmims: V1VirtualMachineInstanceMigration[];
   onFilterChange: OnFilterChange;
+  vmims: V1VirtualMachineInstanceMigration[];
 };
 
 export type ChartDataItem = {
+  fill: any; // color to display in chart and legend
   x: string; // vmim status key
   y: number; // count of each status
-  fill: any; // color to display in chart and legend
 };
 
-const MigrationsChartDonut: React.FC<MigrationsChartDonutProps> = ({ vmims, onFilterChange }) => {
+const MigrationsChartDonut: React.FC<MigrationsChartDonutProps> = ({ onFilterChange, vmims }) => {
   const { t } = useKubevirtTranslation();
 
   if (!vmims?.length) return null;
@@ -36,31 +36,31 @@ const MigrationsChartDonut: React.FC<MigrationsChartDonutProps> = ({ vmims, onFi
 
   const chartData: ChartDataItem[] = Object.entries(vmimsStatusCountMap)?.map(
     ([status, statusCount]) => ({
+      fill: colorListIter.next().value,
       x: status,
       y: statusCount,
-      fill: colorListIter.next().value,
     }),
   );
 
   return (
     <>
       <ChartDonut
-        ariaDesc={t('Cluster scope migrations')}
-        ariaTitle={t('Migrations')}
-        data={chartData}
-        height={220}
-        labels={({ datum }) => `${datum.x}: ${datum.y}`}
-        legendPosition="bottom"
-        padding={20}
-        constrainToVisibleArea
-        subTitle={t('Migrations')}
-        title={vmims?.length.toString()}
-        width={600}
         style={{
           data: {
             fill: ({ datum }) => datum.fill,
           },
         }}
+        ariaDesc={t('Cluster scope migrations')}
+        ariaTitle={t('Migrations')}
+        constrainToVisibleArea
+        data={chartData}
+        height={220}
+        labels={({ datum }) => `${datum.x}: ${datum.y}`}
+        legendPosition="bottom"
+        padding={20}
+        subTitle={t('Migrations')}
+        title={vmims?.length.toString()}
+        width={600}
       />
       <MigrationChartLegend legendItems={chartData} onFilterChange={onFilterChange} />
     </>

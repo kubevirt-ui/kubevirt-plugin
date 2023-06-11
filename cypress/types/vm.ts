@@ -1,20 +1,20 @@
 export type Template = {
-  name?: string;
   metadataName?: string;
+  name?: string;
 };
 
 export type DiskSource = {
   name?: string;
-  selectorID?: string;
-  value?: string;
   pvcName?: string;
   pvcNS?: string;
+  selectorID?: string;
+  value?: string;
 };
 
 export type VirtualMachineData = {
+  diskSource?: DiskSource;
   name?: string;
   namespace?: string;
-  template?: Template;
-  diskSource?: DiskSource;
   startOnCreation?: boolean;
+  template?: Template;
 };

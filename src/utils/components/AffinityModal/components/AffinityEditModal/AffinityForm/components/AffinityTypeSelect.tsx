@@ -24,14 +24,14 @@ const AffinityTypeSelect: React.FC<AffinityTypeSelectProps> = ({
     setIsOpen(false);
   };
   return (
-    <FormGroup fieldId="type" label={t('Type')} isRequired>
+    <FormGroup fieldId="type" isRequired label={t('Type')}>
       <Select
-        menuAppendTo="parent"
         isOpen={isOpen}
-        onToggle={setIsOpen}
+        menuAppendTo="parent"
         onSelect={handleChange}
-        variant={SelectVariant.single}
+        onToggle={setIsOpen}
         selections={focusedAffinity?.type}
+        variant={SelectVariant.single}
       >
         {Object.entries(AFFINITY_TYPE_LABLES).map(([key, value]) => (
           <SelectOption key={key} value={key}>

@@ -6,11 +6,11 @@ import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 type useProjectsAndDataSourcesReturnType = {
-  projectsNames: string[];
   dataSources: V1beta1DataSource[];
-  projectsLoaded: boolean;
   dataSourcesLoaded: boolean;
   error: Error;
+  projectsLoaded: boolean;
+  projectsNames: string[];
 };
 
 export const useDataSourcesTypeResources = (
@@ -18,8 +18,8 @@ export const useDataSourcesTypeResources = (
 ): useProjectsAndDataSourcesReturnType => {
   const [projects, projectsLoaded, projectsErrors] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    namespaced: false,
     isList: true,
+    namespaced: false,
   });
 
   const projectsNames = useMemo(
@@ -30,9 +30,9 @@ export const useDataSourcesTypeResources = (
   const dataSourceWathcResource = projectSelected
     ? {
         groupVersionKind: modelToGroupVersionKind(DataSourceModel),
-        namespaced: true,
         isList: true,
         namespace: projectSelected,
+        namespaced: true,
       }
     : null;
 
@@ -45,10 +45,10 @@ export const useDataSourcesTypeResources = (
   );
 
   return {
-    projectsNames,
     dataSources,
-    projectsLoaded,
     dataSourcesLoaded,
     error: projectsErrors || dataSourcesError,
+    projectsLoaded,
+    projectsNames,
   };
 };

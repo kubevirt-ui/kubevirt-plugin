@@ -48,8 +48,8 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
     useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
       userName && {
         groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-        namespace: DEFAULT_NAMESPACE,
         name: userConfigMapName,
+        namespace: DEFAULT_NAMESPACE,
       },
     );
 
@@ -58,14 +58,14 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
       if (configMapError?.code === 404) {
         try {
           k8sCreate({
-            model: ConfigMapModel,
             data: {
+              data: { settings: JSON.stringify(userSettingsInitialState) },
               metadata: {
                 name: userConfigMapName,
                 namespace: DEFAULT_NAMESPACE,
               },
-              data: { settings: JSON.stringify(userSettingsInitialState) },
             },
+            model: ConfigMapModel,
           });
         } catch (e) {
           setError(e);
@@ -92,8 +92,6 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
     const updateResource = async (data: { [key: string]: any }) => {
       try {
         await k8sPatch({
-          model: ConfigMapModel,
-          resource: userConfigMap,
           data: [
             {
               op: 'replace',
@@ -101,6 +99,8 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
               value: { settings: JSON.stringify(data) },
             },
           ],
+          model: ConfigMapModel,
+          resource: userConfigMap,
         });
       } catch (e) {
         setError(e);

@@ -8,12 +8,12 @@ const useVirtualMachinesOverviewTabInterfacesColumns = () => {
 
   const columns: TableColumn<InterfacesData>[] = [
     {
-      title: t('Name'),
       id: 'name',
+      title: t('Name'),
     },
     {
-      title: t('IP address'),
       id: 'ip',
+      title: t('IP address'),
     },
   ];
 

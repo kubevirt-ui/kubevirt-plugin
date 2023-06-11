@@ -18,13 +18,13 @@ import {
 import RestoreModal from '../modal/RestoreModal';
 
 type SnapshotActionsMenuProps = {
-  snapshot: V1alpha1VirtualMachineSnapshot;
   isRestoreDisabled: boolean;
+  snapshot: V1alpha1VirtualMachineSnapshot;
 };
 
 const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
-  snapshot,
   isRestoreDisabled,
+  snapshot,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -33,7 +33,7 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
 
   const onRestoreModalToggle = React.useCallback(() => {
     createModal(({ isOpen, onClose }) => (
-      <RestoreModal snapshot={snapshot} isOpen={isOpen} onClose={onClose} />
+      <RestoreModal isOpen={isOpen} onClose={onClose} snapshot={snapshot} />
     ));
     setIsDropdownOpen(false);
   }, [createModal, snapshot]);
@@ -41,9 +41,6 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
   const onDeleteModalToggle = React.useCallback(() => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1alpha1VirtualMachineSnapshot>
-        isOpen={isOpen}
-        onClose={onClose}
-        obj={snapshot}
         onSubmit={(obj) =>
           k8sDelete({
             model: VirtualMachineSnapshotModel,
@@ -51,6 +48,9 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
           })
         }
         headerText={t('Delete VirtualMachineSnapshot?')}
+        isOpen={isOpen}
+        obj={snapshot}
+        onClose={onClose}
         submitBtnText={deleteLabel}
         submitBtnVariant={ButtonVariant.danger}
       >
@@ -63,13 +63,13 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
   const items = [
     <DropdownItem
       description={t('Restore is enabled only for offline VirtualMachine.')}
-      onClick={onRestoreModalToggle}
-      key="snapshot-resotre"
       isDisabled={isRestoreDisabled}
+      key="snapshot-resotre"
+      onClick={onRestoreModalToggle}
     >
       {t('Restore')}
     </DropdownItem>,
-    <DropdownItem onClick={onDeleteModalToggle} key="snapshot-delete">
+    <DropdownItem key="snapshot-delete" onClick={onDeleteModalToggle}>
       {deleteLabel}
     </DropdownItem>,
   ];
@@ -77,12 +77,12 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
   return (
     <>
       <Dropdown
-        onSelect={() => setIsDropdownOpen(false)}
-        toggle={<KebabToggle onToggle={setIsDropdownOpen} id="toggle-id-6" />}
+        dropdownItems={items}
         isOpen={isDropdownOpen}
         isPlain
-        dropdownItems={items}
+        onSelect={() => setIsDropdownOpen(false)}
         position={DropdownPosition.right}
+        toggle={<KebabToggle id="toggle-id-6" onToggle={setIsDropdownOpen} />}
       />
     </>
   );

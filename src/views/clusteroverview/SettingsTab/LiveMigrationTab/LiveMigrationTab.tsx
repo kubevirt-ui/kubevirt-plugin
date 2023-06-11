@@ -31,10 +31,10 @@ const LiveMigrationTab = () => {
       <Network hyperConverge={hyperConverge} />
       {hyperConvergeDataError && (
         <Alert
-          variant={AlertVariant.danger}
+          className="live-migration-tab--error"
           isInline
           title={t('Error')}
-          className="live-migration-tab--error"
+          variant={AlertVariant.danger}
         >
           {hyperConvergeDataError}
         </Alert>

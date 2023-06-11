@@ -51,7 +51,7 @@ export const generateVMName = (template: V1Template): string => {
 
 export const generateVMNamePrettyParam = (template: V1Template): TemplateParameter => {
   if (getAnnotation(template, GENERATE_VM_PRETTY_NAME_ANNOTATION)) {
-    return { name: 'NAME', description: 'VM name', value: generateVMName(template) };
+    return { description: 'VM name', name: 'NAME', value: generateVMName(template) };
   }
 };
 

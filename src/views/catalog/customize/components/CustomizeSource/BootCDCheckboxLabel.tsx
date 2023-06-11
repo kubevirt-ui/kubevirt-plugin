@@ -6,7 +6,7 @@ import { Checkbox, Flex, FlexItem, FormGroup, Popover } from '@patternfly/react-
 import { HelpIcon } from '@patternfly/react-icons';
 
 type BootCDCheckboxProps = {
-  cdSource: V1beta1DataVolumeSpec | V1ContainerDiskSource | undefined;
+  cdSource: undefined | V1beta1DataVolumeSpec | V1ContainerDiskSource;
   onChange: (checked: boolean, event: React.FormEvent<HTMLInputElement>) => void;
 };
 
@@ -14,20 +14,19 @@ const BootCDCheckbox: React.FC<BootCDCheckboxProps> = ({ cdSource, onChange }) =
   const { t } = useKubevirtTranslation();
 
   return (
-    <FormGroup fieldId="customize-boot-from-cd" className="disk-source-form-group">
+    <FormGroup className="disk-source-form-group" fieldId="customize-boot-from-cd">
       <Flex>
         <FlexItem>
           <Checkbox
-            isChecked={!!cdSource}
-            onChange={onChange}
-            label={t('Boot from CD')}
-            id="boot-cd"
             data-test-id="boot-cd"
+            id="boot-cd"
+            isChecked={!!cdSource}
+            label={t('Boot from CD')}
+            onChange={onChange}
           />
         </FlexItem>
         <FlexItem>
           <Popover
-            aria-label={'Help'}
             bodyContent={() => (
               <div>
                 {t(
@@ -35,6 +34,7 @@ const BootCDCheckbox: React.FC<BootCDCheckboxProps> = ({ cdSource, onChange }) =
                 )}
               </div>
             )}
+            aria-label={'Help'}
           >
             <HelpIcon />
           </Popover>

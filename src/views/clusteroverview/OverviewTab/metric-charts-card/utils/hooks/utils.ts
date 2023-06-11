@@ -23,10 +23,10 @@ export const getLargestValue = (data: PrometheusValue[]) => {
   }, -1);
 };
 
-export const findUnit = (metric: string, largestValue: number): string | null =>
+export const findUnit = (metric: string, largestValue: number): null | string =>
   hasUnit(metric) ? humanizeBinaryBytes(largestValue)?.unit : null;
 
-export const getHumanizedValue = (metric: string, value: number, unit: string): number | any =>
+export const getHumanizedValue = (metric: string, value: number, unit: string): any | number =>
   hasUnit(metric) ? humanizeBinaryBytes(value, null, unit)?.value : value;
 
 export const formatLargestValue = (metric: string, largestValue: number, unit: string): number =>
@@ -56,14 +56,14 @@ export const isSingleDayData = (chartData: ChartData): boolean =>
 // Get the index for the start and end of each day in the data
 export const getDayBoundaryIndexes = (
   chartData: ChartData,
-): { [key: string]: { start: number; end: number } } =>
+): { [key: string]: { end: number; start: number } } =>
   chartData.reduce(
     (acc, point, idx) => {
       const pointDay = getDay(point);
 
       if (!acc.hasOwnProperty(pointDay)) {
         // Add current day to acc if it hasn't been encountered yet
-        acc[pointDay] = { start: idx, end: -1 };
+        acc[pointDay] = { end: -1, start: idx };
         // Set the end value for the previous day to the previous index
         if (acc[getPrevDay(pointDay)]) {
           acc[getPrevDay(pointDay)]['end'] = idx - 1;
@@ -79,7 +79,7 @@ export const getDayBoundaryIndexes = (
       return acc;
     },
     // Start the acc with the first day in the data and set start index to 0
-    { [getDay(chartData[0])]: { start: 0, end: -1 } },
+    { [getDay(chartData[0])]: { end: -1, start: 0 } },
   );
 
 // Get the middle date for each day's data

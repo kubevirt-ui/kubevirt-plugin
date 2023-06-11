@@ -18,10 +18,10 @@ export const mapPrometheusValues = (
 ): ChartDataObject[] =>
   (prometheusValues || []).map(([x, y], idx) => {
     return {
+      idx,
+      name,
       x: new Date(x * MILLISECONDS_TO_SECONDS_MULTIPLIER),
       y: Number(y),
-      name,
-      idx,
     };
   });
 
@@ -41,8 +41,8 @@ export const getLabel =
     const data = chartData?.[datum?.idx];
     const dataYValue = formatIEC
       ? xbytes(data?.y, {
-          iec: true,
           fixed: 2,
+          iec: true,
           prefixIndex: 3,
         })
       : data?.y;

@@ -20,10 +20,10 @@ export const interfacesTypes = {
 };
 
 export const WizardOverviewNetworksTable: React.FC<{
-  networks: V1Network[];
   interfaces: V1Interface[];
   isInlineGrid?: boolean;
-}> = React.memo(({ networks = [], interfaces = [], isInlineGrid }) => {
+  networks: V1Network[];
+}> = React.memo(({ interfaces = [], isInlineGrid, networks = [] }) => {
   const { t } = useKubevirtTranslation();
   const networkData = getNetworkInterfaceRowData(networks, interfaces);
 

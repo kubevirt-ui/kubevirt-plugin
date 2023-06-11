@@ -24,16 +24,16 @@ const ERROR_STATUSES = [
 ];
 
 export const vmStatusIcon = {
-  Running: SyncAltIcon,
-  Paused: PausedIcon,
-  Stopped: Fragment,
-  Migrating: InProgressIcon,
-  Starting: Fragment,
-  Stopping: Fragment,
   Deleting: Fragment,
-  Provisioning: Fragment,
-  Terminating: Fragment,
   Error: RedExclamationCircleIcon,
+  Migrating: InProgressIcon,
+  Paused: PausedIcon,
+  Provisioning: Fragment,
+  Running: SyncAltIcon,
+  Starting: Fragment,
+  Stopped: Fragment,
+  Stopping: Fragment,
+  Terminating: Fragment,
 };
 
 const initializeStatusCountsObject = (): { [key in VM_STATUS]?: number } =>
@@ -43,8 +43,8 @@ const initializeStatusCountsObject = (): { [key in VM_STATUS]?: number } =>
   }, {});
 
 export type StatusCounts = {
-  primaryStatuses: { [key in VM_STATUS | 'Error']?: number };
   additionalStatuses: { [key in VM_STATUS]?: number };
+  primaryStatuses: { [key in 'Error' | VM_STATUS]?: number };
 };
 
 export const getVMStatuses = (vms: V1VirtualMachine[]): StatusCounts => {
@@ -67,7 +67,7 @@ export const getVMStatuses = (vms: V1VirtualMachine[]): StatusCounts => {
     return acc;
   }, {});
 
-  return { primaryStatuses, additionalStatuses: statusCounts };
+  return { additionalStatuses: statusCounts, primaryStatuses };
 };
 
 export const isAllNamespaces = (namespace: string) =>

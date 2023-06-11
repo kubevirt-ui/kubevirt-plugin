@@ -13,16 +13,16 @@ export type SerialConsoleActionsProps = React.HTMLProps<HTMLDivElement> & {
 };
 
 export const SerialConsoleActions: React.FunctionComponent<SerialConsoleActionsProps> = ({
-  textDisconnect = t('Disconnect'),
-  textReset = t('Reset'),
   onDisconnect,
   onReset,
+  textDisconnect = t('Disconnect'),
+  textReset = t('Reset'),
 }: SerialConsoleActionsProps) => (
   <div className={css(styles.consoleActionsSerial)}>
-    <Button variant="secondary" onClick={onDisconnect}>
+    <Button onClick={onDisconnect} variant="secondary">
       {textDisconnect}
     </Button>
-    <Button variant="secondary" onClick={onReset}>
+    <Button onClick={onReset} variant="secondary">
       {textReset}
     </Button>
   </div>

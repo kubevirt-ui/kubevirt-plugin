@@ -14,39 +14,39 @@ const useNetworkColumns = (data: NetworkPresentation[]) => {
   const columns: TableColumn<NetworkPresentation>[] = useMemo(
     () => [
       {
-        title: t('Name'),
         id: 'name',
-        transforms: [sortable],
         sort: 'network.name',
+        title: t('Name'),
+        transforms: [sortable],
       },
       {
-        title: t('Model'),
         id: 'model',
-        transforms: [sortable],
         sort: 'iface.model',
+        title: t('Model'),
+        transforms: [sortable],
       },
       {
-        title: t('Network'),
         id: 'network',
-        transforms: [sortable],
         sort: 'network.pod' || 'network.multus.networkName',
+        title: t('Network'),
+        transforms: [sortable],
       },
       {
-        title: t('Type'),
         id: 'type',
-        transforms: [sortable],
         sort: (_, direction) => sorting(direction),
-      },
-      {
-        title: t('MAC address'),
-        id: 'macAddress',
+        title: t('Type'),
         transforms: [sortable],
-        sort: 'iface.macAddress',
       },
       {
-        title: '',
+        id: 'macAddress',
+        sort: 'iface.macAddress',
+        title: t('MAC address'),
+        transforms: [sortable],
+      },
+      {
         id: '',
         props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        title: '',
       },
     ],
     [sorting, t],

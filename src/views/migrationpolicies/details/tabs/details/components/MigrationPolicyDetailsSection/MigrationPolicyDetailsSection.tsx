@@ -49,38 +49,38 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
 
   return (
     <div>
-      <a href={`${pathname}#details`} className="link-icon">
+      <a className="link-icon" href={`${pathname}#details`}>
         <LinkIcon size="sm" />
       </a>
-      <Title headingLevel="h2" className="kv-details-section-heading">
+      <Title className="kv-details-section-heading" headingLevel="h2">
         {t('MigrationPolicy details')}
       </Title>
       <Grid hasGutter>
         <GridItem span={5}>
           <DescriptionList>
             <MigrationPolicyDescriptionItem
-              title={t('Name')}
-              description={mp?.metadata?.name}
-              isPopover
               popoverContent={t(
                 'Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. ',
               )}
-              moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
               breadcrumb="MigrationPolicy.metadata.name"
+              description={mp?.metadata?.name}
+              isPopover
+              moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
+              title={t('Name')}
             />
             <MigrationPolicyDescriptionItem
-              title={t('Description')}
               description={mp?.metadata?.annotations?.description}
+              title={t('Description')}
             />
             <>
               <DescriptionListTerm>
                 <Button
-                  isInline
                   onClick={() =>
                     createModal(({ isOpen, onClose }) => (
-                      <MigrationPolicyEditModal isOpen={isOpen} onClose={onClose} mp={mp} />
+                      <MigrationPolicyEditModal isOpen={isOpen} mp={mp} onClose={onClose} />
                     ))
                   }
+                  isInline
                   variant={ButtonVariant.link}
                 >
                   <Flex spaceItems={{ default: 'spaceItemsNone' }}>
@@ -93,56 +93,56 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
               <DescriptionListDescription>
                 <DescriptionList>
                   <MigrationPolicyDescriptionItem
-                    title={t('Bandwidth per migration')}
                     description={
                       hasOwnPropertySpec(migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION)
                         ? getBandwidthPerMigrationText(mp?.spec?.bandwidthPerMigration)
                         : NO_DATA_DASH
                     }
-                    isPopover
                     popoverContent={t(
                       'BandwidthPerMigration limits the amount of network bandwith live migrations are allowed to use. The value is in quantity per second. Defaults to 0 (no limit). ',
                     )}
+                    isPopover
                     moreInfoURL="http://kubevirt.io/api-reference/main/definitions.html#_v1_migrationconfiguration"
+                    title={t('Bandwidth per migration')}
                   />
                   <MigrationPolicyDescriptionItem
-                    title={t('Auto converge')}
                     description={
                       hasOwnPropertySpec(migrationPolicySpecKeys.ALLOW_AUTO_CONVERGE)
                         ? getBooleanText(mp?.spec?.allowAutoConverge)
                         : NO_DATA_DASH
                     }
-                    isPopover
                     popoverContent={t(
                       'AllowAutoConverge allows the platform to compromise performance/availability of VMIs to guarantee successful VMI live migrations. Defaults to false. ',
                     )}
+                    isPopover
                     moreInfoURL="http://kubevirt.io/api-reference/main/definitions.html#_v1_migrationconfiguration"
+                    title={t('Auto converge')}
                   />
                   <MigrationPolicyDescriptionItem
-                    title={t('Post-copy')}
                     description={
                       hasOwnPropertySpec(migrationPolicySpecKeys.ALLOW_POST_COPY)
                         ? getBooleanText(mp?.spec?.allowPostCopy)
                         : NO_DATA_DASH
                     }
-                    isPopover
                     popoverContent={t(
                       'AllowPostCopy enables post-copy live migrations. Such migrations allow even the busiest VMIs to successfully live-migrate. However, events like a network failure can cause a VMI crash. If set to true, migrations will still start in pre-copy, but switch to post-copy when CompletionTimeoutPerGiB triggers. Defaults to false. ',
                     )}
+                    isPopover
                     moreInfoURL="http://kubevirt.io/api-reference/main/definitions.html#_v1_migrationconfiguration"
+                    title={t('Post-copy')}
                   />
                   <MigrationPolicyDescriptionItem
-                    title={t('Completion timeout')}
                     description={
                       hasOwnPropertySpec(migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB)
                         ? getCompletionTimeoutText(mp?.spec?.completionTimeoutPerGiB)
                         : NO_DATA_DASH
                     }
-                    isPopover
                     popoverContent={t(
                       'CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take. If a live-migration takes longer to migrate than this value multiplied by the size of the VMI, the migration will be cancelled, unless AllowPostCopy is true. Defaults to 800. ',
                     )}
+                    isPopover
                     moreInfoURL="http://kubevirt.io/api-reference/main/definitions.html#_v1_migrationconfiguration"
+                    title={t('Completion timeout')}
                   />
                 </DescriptionList>
               </DescriptionListDescription>
@@ -150,7 +150,6 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
 
             <Title headingLevel="h2">
               <Popover
-                headerContent={t('Labels')}
                 bodyContent={
                   <Trans ns="plugin__kubevirt-plugin">
                     Map of string keys and values that can be used to organize and categorize (scope
@@ -161,6 +160,7 @@ const MigrationPolicyDetailsSection: React.FC<MigrationPolicyDetailsSectionProps
                     </a>
                   </Trans>
                 }
+                headerContent={t('Labels')}
               >
                 <DescriptionListTermHelpTextButton>{t('Labels')}</DescriptionListTermHelpTextButton>
               </Popover>

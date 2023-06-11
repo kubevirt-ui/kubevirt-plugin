@@ -23,11 +23,11 @@ const mtvResources = {
   operators: {
     groupVersionKind: {
       group: 'packages.operators.coreos.com',
-      version: 'v1',
       kind: 'PackageManifest',
+      version: 'v1',
     },
-    namespaced: false,
     isList: true,
+    namespaced: false,
   },
   route: {
     groupVersionKind: modelToGroupVersionKind(RouteModel),
@@ -36,9 +36,9 @@ const mtvResources = {
 };
 
 type UseMTVResourcesType = () => {
+  mtvLink: string;
   mtvLoaded: boolean;
   mtvOperator: PackageManifestKind;
-  mtvLink: string;
 };
 
 const useMTVResources: UseMTVResourcesType = () => {
@@ -49,9 +49,9 @@ const useMTVResources: UseMTVResourcesType = () => {
   const mtvLink = getMTVLink(resources?.route?.data);
 
   return {
+    mtvLink,
     mtvLoaded: resourcesLoaded,
     mtvOperator,
-    mtvLink,
   };
 };
 

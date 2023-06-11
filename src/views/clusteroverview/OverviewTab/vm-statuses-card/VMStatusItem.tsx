@@ -10,19 +10,19 @@ import { isAllNamespaces, vmStatusIcon } from './utils/utils';
 import './VMStatusesCard.scss';
 
 type VMStatusItemProps = {
-  status: string;
   count: number;
   namespace?: string;
+  status: string;
 };
 
-const VMStatusItem: React.FC<VMStatusItemProps> = ({ status, count, namespace }) => {
+const VMStatusItem: React.FC<VMStatusItemProps> = ({ count, namespace, status }) => {
   const Icon = vmStatusIcon[status];
   const path = `/k8s/${
     isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`
   }/${VirtualMachineModelRef}?rowFilter-status=${status}`;
 
   return (
-    <GridItem span={3} className="vm-statuses-card__grid-item">
+    <GridItem className="vm-statuses-card__grid-item" span={3}>
       <div className="vm-statuses-card__status-item">
         <div className="vm-statuses-card__status-item--count">
           <span className="vm-statuses-card__status-item--icon">{Icon && <Icon />}</span>

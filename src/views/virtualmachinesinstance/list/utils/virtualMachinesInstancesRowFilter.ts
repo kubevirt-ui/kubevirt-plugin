@@ -7,9 +7,9 @@ import { VM_KUBEVIRT_OS_ANNOTATION } from './virtualMachinesInstancesConstants';
 const osTitles = {
   centos: 'CentOS',
   fedora: 'Fedora',
-  windows: 'Windows',
-  rhel: 'RHEL',
   other: 'Other',
+  rhel: 'RHEL',
+  windows: 'Windows',
 };
 
 const getOSName = (obj: V1VirtualMachineInstance): string | undefined => {
@@ -28,23 +28,23 @@ const includeFilter = (compareData: FilterValue, compareString: string) => {
 
 export const filters: RowFilter[] = [
   {
-    filterGroupName: 'Status',
-    type: 'vmi-status',
-    reducer: (obj) => obj?.status?.phase,
     filter: (statuses, obj) => includeFilter(statuses, obj?.status?.phase),
+    filterGroupName: 'Status',
     items: Object.keys(vmiStatuses).map((status) => ({
       id: status,
       title: status,
     })),
+    reducer: (obj) => obj?.status?.phase,
+    type: 'vmi-status',
   },
   {
-    filterGroupName: 'OS',
-    type: 'vmi-os',
-    reducer: (obj) => getOSName(obj),
     filter: (availableOSNames, obj) => includeFilter(availableOSNames, getOSName(obj)),
+    filterGroupName: 'OS',
     items: osNames.map((os) => ({
       id: os,
       title: osTitles[os] || osTitles.other,
     })),
+    reducer: (obj) => getOSName(obj),
+    type: 'vmi-os',
   },
 ];

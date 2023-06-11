@@ -23,11 +23,11 @@ const initialDataSource: V1beta1DataSource = {
   apiVersion: 'cdi.kubevirt.io/v1beta1',
   kind: DataSourceModel.kind,
   metadata: {
-    name: '',
-    namespace: '',
     labels: {
       [DATA_SOURCE_CRONJOB_LABEL]: '',
     },
+    name: '',
+    namespace: '',
   },
   spec: {
     source: {},
@@ -38,11 +38,11 @@ const initialDataImportCron: V1beta1DataImportCron = {
   apiVersion: 'cdi.kubevirt.io/v1beta1',
   kind: DataImportCronModel.kind,
   metadata: {
-    name: '',
-    namespace: '',
     annotations: {
       [CDI_BIND_REQUESTED_ANNOTATION]: 'true',
     },
+    name: '',
+    namespace: '',
   },
   spec: {
     managedDataSource: '',
@@ -54,19 +54,19 @@ const initialDataImportCron: V1beta1DataImportCron = {
 };
 
 export const createDataSourceWithImportCron = async ({
+  importsToKeep,
   name: dataSourceName,
   namespace,
+  schedule,
   size,
   url,
-  importsToKeep,
-  schedule,
 }: {
+  importsToKeep: number;
   name: string;
   namespace: string;
-  url: string;
-  size: string;
-  importsToKeep: number;
   schedule: string;
+  size: string;
+  url: string;
 }) => {
   const dataImportCronName = `${dataSourceName}-import-cron`;
   const dataImportCron = produce(initialDataImportCron, (draft) => {
@@ -74,9 +74,9 @@ export const createDataSourceWithImportCron = async ({
     draft.metadata.namespace = namespace;
     draft.spec = {
       garbageCollect: 'Outdated',
+      importsToKeep,
       managedDataSource: dataSourceName,
       schedule,
-      importsToKeep,
       template: {
         spec: {
           source: {
@@ -97,8 +97,8 @@ export const createDataSourceWithImportCron = async ({
   });
   // dry run to validate the DataImportCron
   await k8sCreate<V1beta1DataImportCron>({
-    model: DataImportCronModel,
     data: dataImportCron,
+    model: DataImportCronModel,
     queryParams: {
       dryRun: 'All',
       fieldManager: 'kubectl-create',
@@ -106,7 +106,6 @@ export const createDataSourceWithImportCron = async ({
   });
 
   const createdDataSource = await k8sCreate<V1beta1DataSource>({
-    model: DataSourceModel,
     data: produce(initialDataSource, (draft) => {
       draft.metadata.name = dataSourceName;
       draft.metadata.namespace = namespace;
@@ -115,14 +114,15 @@ export const createDataSourceWithImportCron = async ({
         [DATA_SOURCE_CRONJOB_LABEL]: dataImportCronName,
       };
     }),
+    model: DataSourceModel,
   });
 
   await k8sCreate<V1beta1DataImportCron>({
-    model: DataImportCronModel,
     data: produce(dataImportCron, (draft) => {
       draft.metadata.ownerReferences = [
         buildOwnerReference(createdDataSource, { blockOwnerDeletion: false }),
       ];
     }),
+    model: DataImportCronModel,
   });
 };

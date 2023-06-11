@@ -7,45 +7,33 @@ import { Select, SelectVariant } from '@patternfly/react-core';
 import FilterSelectOption from './components/FilterSelectOption/FilterSelectOption';
 
 type FilterSelectProps = {
-  selected: string;
-  setSelected: (val: string) => void;
-  options: string[];
   groupVersionKind: K8sGroupVersionKind;
   optionLabelText?: string;
+  options: string[];
+  selected: string;
+  setSelected: (val: string) => void;
 };
 
 const FilterSelect: FC<FilterSelectProps> = ({
-  selected,
-  setSelected,
-  options,
   groupVersionKind,
   optionLabelText = 'option',
+  options,
+  selected,
+  setSelected,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <Select
-      menuAppendTo="parent"
-      isOpen={isOpen}
-      onToggle={setIsOpen}
-      onSelect={(_, value: string) => {
-        setSelected(value);
-        setIsOpen(false);
-      }}
-      variant={SelectVariant.single}
-      selections={selected}
-      maxHeight={200}
-      placeholderText={t('Select {{optionLabelText}}', { optionLabelText })}
-      hasInlineFilter
       onFilter={(_, value: string) => {
         if (!value) {
           return options.map((option) => (
             <FilterSelectOption
+              groupVersionKind={groupVersionKind}
               key={option}
               optionLabel={optionLabelText}
               optionName={option}
-              groupVersionKind={groupVersionKind}
             />
           ));
         }
@@ -54,20 +42,32 @@ const FilterSelect: FC<FilterSelectProps> = ({
 
         return newOptions.map((option) => (
           <FilterSelectOption
+            groupVersionKind={groupVersionKind}
             key={option}
             optionLabel={optionLabelText}
             optionName={option}
-            groupVersionKind={groupVersionKind}
           />
         ));
       }}
+      onSelect={(_, value: string) => {
+        setSelected(value);
+        setIsOpen(false);
+      }}
+      hasInlineFilter
+      isOpen={isOpen}
+      maxHeight={200}
+      menuAppendTo="parent"
+      onToggle={setIsOpen}
+      placeholderText={t('Select {{optionLabelText}}', { optionLabelText })}
+      selections={selected}
+      variant={SelectVariant.single}
     >
       {options.map((option) => (
         <FilterSelectOption
+          groupVersionKind={groupVersionKind}
           key={option}
           optionLabel={optionLabelText}
           optionName={option}
-          groupVersionKind={groupVersionKind}
         />
       ))}
     </Select>

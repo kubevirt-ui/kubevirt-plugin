@@ -45,24 +45,24 @@ const Consoles: React.FC<ConsolesProps> = ({ vmi }) => {
       <StackItem>
         <AccessConsoles
           preselectedType={VNC_CONSOLE_TYPE}
+          textDesktopViewerConsole={t('Desktop viewer')}
           textSelectConsoleType={t('Select console type')}
           textSerialConsole={t('Serial console')}
           textVncConsole={t('VNC console')}
-          textDesktopViewerConsole={t('Desktop viewer')}
         >
           <VncConsole
-            type={VNC_CONSOLE_TYPE}
-            encrypt={isEncrypted}
-            disabled={isHeadlessMode}
             CustomDisabledComponent={t('Console is disabled in headless mode')}
-            host={window.location.hostname}
-            port={window.location.port || (isEncrypted ? SECURE : INSECURE)}
-            path={`api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`}
+            disabled={isHeadlessMode}
+            encrypt={isEncrypted}
             hasGPU={!isEmpty(gpus)}
+            host={window.location.hostname}
+            path={`api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`}
+            port={window.location.port || (isEncrypted ? SECURE : INSECURE)}
+            type={VNC_CONSOLE_TYPE}
           />
-          <SerialConsoleConnector vmi={vmi} type={SERIAL_CONSOLE_TYPE} />
+          <SerialConsoleConnector type={SERIAL_CONSOLE_TYPE} vmi={vmi} />
           {isWindowsMachine && loaded && (
-            <DesktopViewer vmi={vmi} vm={vm} type={DESKTOP_VIEWER_CONSOLE_TYPE} />
+            <DesktopViewer type={DESKTOP_VIEWER_CONSOLE_TYPE} vm={vm} vmi={vmi} />
           )}
         </AccessConsoles>
       </StackItem>

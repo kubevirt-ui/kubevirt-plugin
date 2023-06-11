@@ -1,10 +1,10 @@
 export const interfaceModelType = {
-  VIRTIO: 'virtio',
   E1000E: 'e1000e',
+  VIRTIO: 'virtio',
 };
 
 export const interfaceTypeTypes = {
-  MASQUERADE: 'masquerade',
   BRIDGE: 'bridge',
+  MASQUERADE: 'masquerade',
   SRIOV: 'sriov',
 };

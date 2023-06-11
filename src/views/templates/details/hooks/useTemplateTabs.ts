@@ -16,39 +16,39 @@ export const useVirtualMachineTabs = () => {
   const tabs = React.useMemo(
     () => [
       {
+        component: TemplateDetailsPage,
         href: '',
         name: t('Details'),
-        component: TemplateDetailsPage,
       },
       {
+        component: TemplateYAMLPage,
         href: 'yaml',
         name: 'YAML',
-        component: TemplateYAMLPage,
       },
       {
+        component: TemplateSchedulingTab,
         href: 'scheduling',
         name: t('Scheduling'),
-        component: TemplateSchedulingTab,
       },
       {
+        component: TemplateNetworkPage,
         href: 'network-interfaces',
         name: t('Network interfaces'),
-        component: TemplateNetworkPage,
       },
       {
+        component: TemplateDisksPage,
         href: 'disks',
         name: t('Disks'),
-        component: TemplateDisksPage,
       },
       {
+        component: TemplateScriptsPage,
         href: 'scripts',
         name: t('Scripts'),
-        component: TemplateScriptsPage,
       },
       {
+        component: TemplateParametersPage,
         href: 'parameters',
         name: t('Parameters'),
-        component: TemplateParametersPage,
       },
     ],
     [t],

@@ -16,16 +16,16 @@ import { CustomizeSource, CustomizeSourceProps } from './CustomizeSource';
 import './ExpandableCustomizeSourceSection.scss';
 
 export const ExpandableCustomizeSourceSection: FC<CustomizeSourceProps> = ({
+  cdSource,
+  cdUpload,
   diskSource,
+  diskUpload,
+  isBootSourceAvailable,
+  setCDSource,
   setDiskSource,
+  setDrivers,
   template,
   withDrivers,
-  setDrivers,
-  cdSource,
-  setCDSource,
-  diskUpload,
-  cdUpload,
-  isBootSourceAvailable,
 }) => {
   const { t } = useKubevirtTranslation();
   const [storageFieldsExpanded, setStorageFieldsExpanded] = useState<boolean>(
@@ -57,21 +57,21 @@ export const ExpandableCustomizeSourceSection: FC<CustomizeSourceProps> = ({
       <StackItem>
         <ExpandableSection
           data-test-id="expandable-storage-section"
-          isExpanded={storageFieldsExpanded}
           isDetached
+          isExpanded={storageFieldsExpanded}
           isIndented
         >
           <CustomizeSource
+            cdSource={cdSource}
+            cdUpload={cdUpload}
             diskSource={diskSource}
+            diskUpload={diskUpload}
+            isBootSourceAvailable={isBootSourceAvailable}
+            setCDSource={setCDSource}
             setDiskSource={setDiskSource}
+            setDrivers={setDrivers}
             template={template}
             withDrivers={withDrivers}
-            setDrivers={setDrivers}
-            cdSource={cdSource}
-            setCDSource={setCDSource}
-            diskUpload={diskUpload}
-            cdUpload={cdUpload}
-            isBootSourceAvailable={isBootSourceAvailable}
           />
         </ExpandableSection>
       </StackItem>

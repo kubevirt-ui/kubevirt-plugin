@@ -11,7 +11,7 @@ import './ChartsCard.scss';
 const ChartsCard: React.FC = () => {
   return (
     <div className="metric-charts-card">
-      <Grid hasGutter className="metric-charts-card__grid">
+      <Grid className="metric-charts-card__grid" hasGutter>
         {Object.values(METRICS)?.map((metric) => (
           <GridItem className="metric-charts-card__grid-item" key={metric}>
             <ChartCard metric={metric} />

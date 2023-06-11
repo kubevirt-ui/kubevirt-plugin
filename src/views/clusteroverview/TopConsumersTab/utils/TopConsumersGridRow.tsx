@@ -13,17 +13,17 @@ import { getTopConsumerCardID } from './utils';
 import './TopConsumersGridRow.scss';
 
 type TopConsumersGridRowProps = {
-  rowNumber: number;
-  topGrid?: boolean;
   localStorageData: TopConsumersData;
+  rowNumber: number;
   setLocalStorageData: SetTopConsumerData;
+  topGrid?: boolean;
 };
 
 const TopConsumersGridRow: FC<TopConsumersGridRowProps> = ({
-  rowNumber,
-  topGrid = false,
   localStorageData,
+  rowNumber,
   setLocalStorageData,
+  topGrid = false,
 }) => {
   const classes = classNames('kv-top-consumers-card__grid', {
     'kv-top-consumers-card__top-grid': topGrid,
@@ -34,11 +34,11 @@ const TopConsumersGridRow: FC<TopConsumersGridRowProps> = ({
       {Array.from({ length: 3 }, (_, i) => {
         const cardID = getTopConsumerCardID(rowNumber, i + 1);
         return (
-          <GridItem span={4} key={cardID} className="kv-top-consumers-card__card-grid-item">
+          <GridItem className="kv-top-consumers-card__card-grid-item" key={cardID} span={4}>
             <TopConsumerCard
+              cardID={cardID}
               localStorageData={localStorageData}
               setLocalStorageData={setLocalStorageData}
-              cardID={cardID}
             />
           </GridItem>
         );

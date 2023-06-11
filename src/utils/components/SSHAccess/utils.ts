@@ -17,8 +17,8 @@ import { buildOwnerReference } from './../../resources/shared';
 import { PORT, SERVICE_TYPES, SSH_PORT, VMI_LABEL_AS_SSH_SERVICE_SELECTOR } from './constants';
 
 const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES, sshLabel: string) => ({
-  kind: ServiceModel.kind,
   apiVersion: ServiceModel.apiVersion,
+  kind: ServiceModel.kind,
   metadata: {
     // max name length is 63 characters
     name: `${vm?.metadata?.name}-${type.toLowerCase()}-ssh-service`
@@ -34,19 +34,19 @@ const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES, sshLab
         targetPort: SSH_PORT,
       },
     ],
-    type,
     selector: {
       [VMI_LABEL_AS_SSH_SERVICE_SELECTOR]: sshLabel,
     },
+    type,
   },
 });
 
 export const deleteSSHService = (sshService: IoK8sApiCoreV1Service) =>
   k8sDelete<IoK8sApiCoreV1Service>({
     model: ServiceModel,
-    resource: sshService,
     name: sshService?.metadata?.name,
     ns: sshService?.metadata?.namespace,
+    resource: sshService,
   });
 
 export const addSSHSelectorLabelToVM = async (
@@ -68,16 +68,16 @@ export const addSSHSelectorLabelToVM = async (
     });
 
     await k8sUpdate<V1VirtualMachineInstance>({
-      model: VirtualMachineInstanceModel,
       data: vmiWithLabel,
+      model: VirtualMachineInstanceModel,
       name: vmiWithLabel?.metadata?.name,
       ns: vmiWithLabel?.metadata?.namespace,
     });
   }
 
   return k8sUpdate<V1VirtualMachine>({
-    model: VirtualMachineModel,
     data: vmWithLabel,
+    model: VirtualMachineModel,
     name: vmWithLabel?.metadata?.name,
     ns: vmWithLabel?.metadata?.namespace,
   });
@@ -88,7 +88,7 @@ export const createSSHService = async (
   vmi: V1VirtualMachineInstance,
   type: SERVICE_TYPES,
 ): Promise<K8sResourceCommon> => {
-  const { namespace, name } = vm?.metadata || {};
+  const { name, namespace } = vm?.metadata || {};
   const vmiLabels = vm?.spec?.template?.metadata?.labels;
   const labelSelector =
     vmiLabels?.[VMI_LABEL_AS_SSH_SERVICE_SELECTOR] || `${name}-${getRandomChars()}`;
@@ -100,8 +100,8 @@ export const createSSHService = async (
   const serviceResource = buildSSHServiceFromVM(vm, type, labelSelector);
 
   return k8sCreate({
-    model: ServiceModel,
     data: serviceResource,
+    model: ServiceModel,
     ns: namespace,
   });
 };

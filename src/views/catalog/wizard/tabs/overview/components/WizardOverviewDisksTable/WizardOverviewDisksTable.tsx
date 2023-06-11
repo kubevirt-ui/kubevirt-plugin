@@ -14,9 +14,9 @@ import {
 } from '@patternfly/react-core';
 
 export const WizardOverviewDisksTable: React.FC<{
-  vm: V1VirtualMachine;
   isInlineGrid?: boolean;
-}> = React.memo(({ vm, isInlineGrid }) => {
+  vm: V1VirtualMachine;
+}> = React.memo(({ isInlineGrid, vm }) => {
   const [disks] = useWizardDisksTableData(vm);
 
   const { t } = useKubevirtTranslation();

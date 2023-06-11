@@ -20,10 +20,10 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
   return (
     <DropdownItem
       data-test-id={`${action?.id}`}
+      description={action?.description}
+      isDisabled={action?.disabled || !actionAllowed}
       key={action?.id}
       onClick={handleClick}
-      isDisabled={action?.disabled || !actionAllowed}
-      description={action?.description}
     >
       {action?.label}
       {action?.icon && (

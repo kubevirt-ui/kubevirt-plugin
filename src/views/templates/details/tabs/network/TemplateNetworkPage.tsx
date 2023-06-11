@@ -17,8 +17,8 @@ import 'src/utils/styles/ListPageCreateButton.scss';
 import './template-network-tab.scss';
 
 type TemplateNetworkProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj: V1Template;
 };
@@ -32,10 +32,10 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
   const onSubmitTemplate = useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       }),
     [],
   );
@@ -43,24 +43,24 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
   return (
     <div className="template-network-tab">
       <ListPageBody>
-        <SidebarEditor<V1Template> resource={template} onResourceUpdate={onSubmitTemplate}>
-          <Title headingLevel="h2" className="list-page-create-button-margin">
+        <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
+          <Title className="list-page-create-button-margin" headingLevel="h2">
             {t('Network interfaces')}
           </Title>
 
           <Button
-            className="template-network-tab__button"
-            isDisabled={!isTemplateEditable}
             onClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <TemplatesNetworkInterfaceModal
+                  headerText={actionText}
                   isOpen={isOpen}
                   onClose={onClose}
-                  headerText={actionText}
                   template={template}
                 />
               ))
             }
+            className="template-network-tab__button"
+            isDisabled={!isTemplateEditable}
           >
             {actionText}
           </Button>

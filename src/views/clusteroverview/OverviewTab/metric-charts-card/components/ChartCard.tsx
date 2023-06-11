@@ -36,7 +36,7 @@ const ChartCard: React.FC<ChartCardProps> = ({ metric }) => {
             <span>
               <div className="metric-chart-card__chart--label">{chartLabel}</div>
               <div className="metric-chart-card__chart--chart">
-                <MetricChart metricChartData={metricChartData} metric={metric} />
+                <MetricChart metric={metric} metricChartData={metricChartData} />
               </div>
             </span>
           ) : (

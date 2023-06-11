@@ -7,20 +7,20 @@ const useVirtualMachinesOverviewTabDisksColumns = () => {
 
   const columns: TableColumn<DiskRowDataLayout>[] = [
     {
-      title: t('Name'),
       id: 'name',
+      title: t('Name'),
     },
     {
-      title: t('Drive'),
       id: 'drive',
+      title: t('Drive'),
     },
     {
-      title: t('Size'),
       id: 'size',
+      title: t('Size'),
     },
     {
-      title: t('Interface'),
       id: 'interface',
+      title: t('Interface'),
     },
   ];
 

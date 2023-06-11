@@ -7,35 +7,35 @@ import { MenuItem } from '@patternfly/react-core';
 import { InstanceTypeSize } from '../../utils/types';
 
 type RedHatInstanceTypeSeriesSizesMenuItemProps = {
-  seriesName: string;
-  sizes: InstanceTypeSize[];
   selected: string;
+  seriesName: string;
   setSelected: Dispatch<SetStateAction<string>>;
+  sizes: InstanceTypeSize[];
 };
 
 const RedHatInstanceTypeSeriesSizesMenuItems: FC<RedHatInstanceTypeSeriesSizesMenuItemProps> = ({
-  seriesName,
-  sizes,
   selected,
+  seriesName,
   setSelected,
+  sizes,
 }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <>
-      {sizes.map(({ sizeLabel, cpus, memory }) => {
+      {sizes.map(({ cpus, memory, sizeLabel }) => {
         const itName = `${seriesName}.${sizeLabel}`;
         const itLabel = t('{{sizeLabel}}: {{cpus}} CPUs, {{memory}} Memory', {
-          sizeLabel,
           cpus,
           memory: readableSizeUnit(memory),
+          sizeLabel,
         });
         return (
           <MenuItem
-            key={itName}
-            itemId={itName}
-            onClick={() => setSelected(itName)}
             isSelected={selected === itName}
+            itemId={itName}
+            key={itName}
+            onClick={() => setSelected(itName)}
           >
             {itLabel}
           </MenuItem>

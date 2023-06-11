@@ -20,15 +20,15 @@ import { CatalogSourceKind, ClusterServiceVersionKind, SubscriptionKind } from '
 import { buildUrlForCSVSubscription } from './../utils';
 
 type UseKubevirtCSVDetails = {
-  displayName: string;
-  provider: string;
-  version: string;
-  updateChannel: string;
-  operatorLink: string;
-  kubevirtSubscription: SubscriptionKind;
   catalogSourceMissing: boolean;
+  displayName: string;
+  kubevirtSubscription: SubscriptionKind;
   loaded: boolean;
   loadErrors: Error[];
+  operatorLink: string;
+  provider: string;
+  updateChannel: string;
+  version: string;
 };
 
 export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
@@ -69,11 +69,11 @@ export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
     [catalogSource, installedCSV?.metadata],
   );
 
-  const { displayName, version, provider } = useMemo(() => {
+  const { displayName, provider, version } = useMemo(() => {
     return {
       displayName: installedCSV?.spec?.displayName,
-      version: installedCSV?.spec?.version,
       provider: installedCSV?.spec?.provider?.name,
+      version: installedCSV?.spec?.version,
     };
   }, [installedCSV?.spec]);
 
@@ -88,14 +88,14 @@ export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
   );
 
   return {
-    displayName,
-    provider,
-    version,
-    updateChannel: subscription?.spec?.channel,
-    operatorLink,
-    kubevirtSubscription: subscription,
     catalogSourceMissing,
+    displayName,
+    kubevirtSubscription: subscription,
     loaded,
     loadErrors,
+    operatorLink,
+    provider,
+    updateChannel: subscription?.spec?.channel,
+    version,
   };
 };

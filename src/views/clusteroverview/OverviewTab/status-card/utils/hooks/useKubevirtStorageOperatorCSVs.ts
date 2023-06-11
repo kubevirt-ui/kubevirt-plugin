@@ -9,13 +9,13 @@ import { ClusterServiceVersionKind } from '../types';
 const watchedResources = {
   installedCSVs: {
     groupVersionKind: modelToGroupVersionKind(ClusterServiceVersionModel),
-    namespaced: true,
     isList: true,
+    namespaced: true,
   },
   subscriptions: {
     groupVersionKind: modelToGroupVersionKind(SubscriptionModel),
-    namespaced: false,
     isList: true,
+    namespaced: false,
   },
 };
 
@@ -50,10 +50,10 @@ const useKubevirtStorageOperatorCSVs = () => {
     : null;
 
   return {
-    lsoCSV,
-    odfCSV,
     loaded,
     loadErrors,
+    lsoCSV,
+    odfCSV,
   };
 };
 

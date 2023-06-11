@@ -38,45 +38,45 @@ const useVirtualMachineTemplatesFilters = (
 
   return [
     {
-      filterGroupName: t('Type'),
-      type: 'is-default-template',
-      reducer: (obj) => (isDefaultVariantTemplate(obj) ? 'is-default' : ''),
       filter: ({ selected }, obj) => selected?.length === 0 || isDefaultVariantTemplate(obj),
+      filterGroupName: t('Type'),
       items: [
         {
           id: 'is-default',
           title: t('Default Templates'),
         },
       ],
+      reducer: (obj) => (isDefaultVariantTemplate(obj) ? 'is-default' : ''),
+      type: 'is-default-template',
     },
     {
-      filterGroupName: t('Boot source'),
-      type: 'boot-source-available',
-      reducer: (obj) => (availableTemplatesUID.has(obj.metadata.uid) ? 'available' : ''),
       filter: ({ selected }, obj) =>
         selected?.length === 0 || availableTemplatesUID.has(obj.metadata.uid),
+      filterGroupName: t('Boot source'),
       items: [
         {
           id: 'available',
           title: t('Boot source available'),
         },
       ],
+      reducer: (obj) => (availableTemplatesUID.has(obj.metadata.uid) ? 'available' : ''),
+      type: 'boot-source-available',
     },
     {
-      filterGroupName: t('Template provider'),
-      type: 'template-provider',
-      reducer: (obj) => getItemNameWithOther(getTemplateProviderName(obj), providers),
       filter: (availableTemplateProviders, obj) =>
         includeFilter(availableTemplateProviders, providers, getTemplateProviderName(obj)),
+      filterGroupName: t('Template provider'),
       items: providers,
+      reducer: (obj) => getItemNameWithOther(getTemplateProviderName(obj), providers),
+      type: 'template-provider',
     },
     {
-      filterGroupName: t('Operating system'),
-      type: 'osName',
-      reducer: (obj) => getItemNameWithOther(getTemplateOS(obj), OS_NAMES),
       filter: (availableOsNames, obj) =>
         includeFilter(availableOsNames, OS_NAMES, getTemplateOS(obj)),
+      filterGroupName: t('Operating system'),
       items: OS_NAMES,
+      reducer: (obj) => getItemNameWithOther(getTemplateOS(obj), OS_NAMES),
+      type: 'osName',
     },
   ];
 };

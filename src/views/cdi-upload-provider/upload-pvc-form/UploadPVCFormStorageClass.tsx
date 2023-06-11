@@ -10,8 +10,8 @@ import { Checkbox, Select, SelectVariant, Stack, StackItem } from '@patternfly/r
 const UploadPVCFormStorageClass = ({
   applySP,
   setApplySP,
-  storageClasses,
   setStorageClassName,
+  storageClasses,
   storageClassName,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -22,35 +22,35 @@ const UploadPVCFormStorageClass = ({
       <StackItem>
         <label className="control-label co-required">{t('StorageClass')}</label>
         <Select
-          menuAppendTo="parent"
-          isOpen={isOpen}
-          onToggle={setIsOpen}
           onSelect={(e, sc) => {
             setStorageClassName(sc);
             setIsOpen(false);
           }}
-          variant={SelectVariant.single}
-          selections={storageClassName}
-          onFilter={FilterSCSelect(storageClasses)}
-          hasInlineFilter
-          maxHeight={200}
           direction="up"
+          hasInlineFilter
+          isOpen={isOpen}
+          maxHeight={200}
+          menuAppendTo="parent"
+          onFilter={FilterSCSelect(storageClasses)}
+          onToggle={setIsOpen}
+          selections={storageClassName}
+          variant={SelectVariant.single}
         >
           {getSCSelectOptions(storageClasses)}
         </Select>
       </StackItem>
       <StackItem>
         <Checkbox
-          id="apply-storage-provider"
           description={t(
             'Use optimized access mode & volume mode settings from StorageProfile resource.',
           )}
-          isChecked={applySP}
           data-checked-state={applySP}
-          onChange={() => setApplySP((value) => !value)}
+          data-test="apply-storage-provider"
+          id="apply-storage-provider"
+          isChecked={applySP}
           // isDisabled={!isSPSettingProvided}
           label={t('Apply optimized StorageProfile settings')}
-          data-test="apply-storage-provider"
+          onChange={() => setApplySP((value) => !value)}
         />
       </StackItem>
     </Stack>

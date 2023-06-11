@@ -17,9 +17,9 @@ export const VirtualMachineBreadcrumb: React.FC = React.memo(() => {
       <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
         <BreadcrumbItem>
           <Button
-            variant="link"
             isInline
             onClick={() => history.push(`/k8s/${namespacePath}/${VirtualMachineModelRef}`)}
+            variant="link"
           >
             {t('VirtualMachines')}
           </Button>

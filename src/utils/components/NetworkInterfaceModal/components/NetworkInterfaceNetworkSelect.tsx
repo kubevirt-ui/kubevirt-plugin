@@ -17,29 +17,29 @@ import { networkNameStartWithPod, podNetworkExists } from '../utils/helpers';
 import useNADsData from './hooks/useNADsData';
 
 type NetworkInterfaceNetworkSelectProps = {
-  vm: V1VirtualMachine;
-  networkName: string;
-  setNetworkName: Dispatch<React.SetStateAction<string>>;
-  setInterfaceType: Dispatch<React.SetStateAction<string>>;
-  setSubmitDisabled: Dispatch<React.SetStateAction<boolean>>;
-  isEditing?: boolean | undefined;
   editInitValueNetworkName?: string | undefined;
+  isEditing?: boolean | undefined;
   namespace?: string;
+  networkName: string;
+  setInterfaceType: Dispatch<React.SetStateAction<string>>;
+  setNetworkName: Dispatch<React.SetStateAction<string>>;
+  setSubmitDisabled: Dispatch<React.SetStateAction<boolean>>;
+  vm: V1VirtualMachine;
 };
 
 const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
-  vm,
-  networkName,
-  setNetworkName,
-  setInterfaceType,
-  setSubmitDisabled,
-  isEditing,
   editInitValueNetworkName,
+  isEditing,
   namespace,
+  networkName,
+  setInterfaceType,
+  setNetworkName,
+  setSubmitDisabled,
+  vm,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const { nads, loaded, loadError } = useNADsData(vm?.metadata?.namespace || namespace);
+  const { loaded, loadError, nads } = useNADsData(vm?.metadata?.namespace || namespace);
 
   const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
   const hasNads = useMemo(() => nads && nads.length > 0, [nads]);
@@ -107,31 +107,31 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
           'No NetworkAttachmentDefinitions available. Contact your system administrator for additional support.',
         )
       }
-      label={t('Network')}
-      fieldId="network-attachment-definition"
       validated={
         canCreateNetworkInterface || isEditing ? ValidatedOptions.default : ValidatedOptions.error
       }
+      fieldId="network-attachment-definition"
       isRequired
+      label={t('Network')}
     >
       <div data-test-id="network-attachment-definition-select">
         {hasPodNetwork && !loaded ? (
           <Loading />
         ) : (
           <Select
-            menuAppendTo="parent"
             isDisabled={!canCreateNetworkInterface}
-            onToggle={setIsOpen}
             isOpen={isOpen}
+            menuAppendTo="parent"
             onSelect={handleChange}
-            variant={SelectVariant.single}
+            onToggle={setIsOpen}
             selections={networkName}
+            variant={SelectVariant.single}
           >
             {networkOptions?.map(({ key, value }) => (
               <SelectOption
+                data-test-id={`network-attachment-definition-select-${key}`}
                 key={key}
                 value={value}
-                data-test-id={`network-attachment-definition-select-${key}`}
               />
             ))}
           </Select>

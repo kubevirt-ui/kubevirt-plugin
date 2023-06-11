@@ -94,21 +94,21 @@ const createDataVolumeTemplateFromPVC = (
       name: dvtName,
     },
     spec: {
+      source: {
+        pvc: {
+          name: pvcToClone?.metadata?.name,
+          namespace: pvcToClone?.metadata?.namespace,
+        },
+      },
       storage: {
         accessModes: pvcToClone?.spec?.accessModes,
-        volumeMode: pvcToClone?.spec?.volumeMode,
         resources: {
           requests: {
             storage: pvcToClone?.spec?.resources?.requests?.storage,
           },
         },
         storageClassName: pvcToClone?.spec?.storageClassName,
-      },
-      source: {
-        pvc: {
-          name: pvcToClone?.metadata?.name,
-          namespace: pvcToClone?.metadata?.namespace,
-        },
+        volumeMode: pvcToClone?.spec?.volumeMode,
       },
     },
   };
@@ -221,8 +221,8 @@ export const cloneControllerRevision = async (
   });
 
   return await k8sCreate<IoK8sApiAppsV1ControllerRevision>({
-    model: ControllerRevisionModel,
     data: controllerRevisionClone,
+    model: ControllerRevisionModel,
   });
 };
 
@@ -241,9 +241,9 @@ export const updateControllerRevisionOwnerReference = (
   });
 
   return k8sUpdate<IoK8sApiAppsV1ControllerRevision>({
-    model: ControllerRevisionModel,
     data: controllerRevisionWithOwner,
-    ns: controllerRevisionWithOwner?.metadata?.namespace,
+    model: ControllerRevisionModel,
     name: controllerRevisionWithOwner?.metadata?.name,
+    ns: controllerRevisionWithOwner?.metadata?.namespace,
   });
 };

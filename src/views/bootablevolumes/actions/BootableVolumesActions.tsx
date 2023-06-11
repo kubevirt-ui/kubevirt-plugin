@@ -10,11 +10,11 @@ import { BootableResource } from '../utils/types';
 import useBootableVolumesActions from './hooks/useBootableVolumesActions';
 
 type BootableVolumesActionsProps = {
-  source: BootableResource;
   preferences: V1alpha2VirtualMachineClusterPreference[];
+  source: BootableResource;
 };
 
-const BootableVolumesActions: FC<BootableVolumesActionsProps> = ({ source, preferences }) => {
+const BootableVolumesActions: FC<BootableVolumesActionsProps> = ({ preferences, source }) => {
   const [actions] = useBootableVolumesActions(source, preferences);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -27,21 +27,21 @@ const BootableVolumesActions: FC<BootableVolumesActionsProps> = ({ source, prefe
 
   return (
     <Dropdown
-      menuAppendTo={getContentScrollableElement}
-      isPlain
-      isOpen={isOpen}
-      position={DropdownPosition.right}
-      toggle={<KebabToggle onToggle={setIsOpen} />}
       dropdownItems={actions?.map((action) => (
         <DropdownItem
+          description={action?.description}
+          isDisabled={action?.disabled}
           key={action?.id}
           onClick={() => handleClick(action)}
-          isDisabled={action?.disabled}
-          description={action?.description}
         >
           {action?.label}
         </DropdownItem>
       ))}
+      isOpen={isOpen}
+      isPlain
+      menuAppendTo={getContentScrollableElement}
+      position={DropdownPosition.right}
+      toggle={<KebabToggle onToggle={setIsOpen} />}
     />
   );
 };

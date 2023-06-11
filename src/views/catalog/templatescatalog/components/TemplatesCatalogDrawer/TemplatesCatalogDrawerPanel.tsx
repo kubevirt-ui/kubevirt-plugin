@@ -80,8 +80,8 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
       setError(undefined);
 
       k8sCreate<V1Template>({
-        model: ProcessedTemplatesModel,
         data: template,
+        model: ProcessedTemplatesModel,
         queryParams: {
           dryRun: 'All',
         },
@@ -105,7 +105,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
       <div className="modal-body modal-body-border modal-body-content">
         <div className="modal-body-inner-shadow-covers">
           <div className="co-catalog-page__overlay-body">
-            <Stack hasGutter className="template-catalog-drawer-info">
+            <Stack className="template-catalog-drawer-info" hasGutter>
               <StackItem>
                 <Title headingLevel="h1" size="lg">
                   {t('Template info')}
@@ -137,13 +137,13 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
                         <DescriptionListDescription>
                           {documentationUrl ? (
                             <Button
-                              isSmall
-                              isInline
-                              variant="link"
                               icon={<ExternalLinkSquareAltIcon />}
                               iconPosition="right"
+                              isInline
+                              isSmall
+                              variant="link"
                             >
-                              <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
+                              <a href={documentationUrl} rel="noopener noreferrer" target="_blank">
                                 {t('Refer to documentation')}
                               </a>
                             </Button>
@@ -158,27 +158,27 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
                   <GridItem span={6}>
                     <DescriptionList>
                       <VirtualMachineDescriptionItem
-                        descriptionData={<CPUMemory vm={updatedVM} />}
-                        descriptionHeader={t('CPU | Memory')}
-                        isPopover
                         bodyContent={
                           <CPUDescription
                             cpu={vmObject?.spec?.template?.spec?.domain?.cpu}
                             helperTextResource={CpuMemHelperTextResources.FutureVM}
                           />
                         }
-                        isEdit
                         onEditClick={() =>
                           createModal(({ isOpen, onClose }) => (
                             <CPUMemoryModal
-                              vm={updatedVM}
                               isOpen={isOpen}
                               onClose={onClose}
                               onSubmit={updateVMCPUMemory(ns, updateVM, setUpdatedVM)}
                               templateNamespace={template?.metadata?.namespace}
+                              vm={updatedVM}
                             />
                           ))
                         }
+                        descriptionData={<CPUMemory vm={updatedVM} />}
+                        descriptionHeader={t('CPU | Memory')}
+                        isEdit
+                        isPopover
                       />
                       <DescriptionListGroup>
                         <DescriptionListTerm>
@@ -187,8 +187,8 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
                         </DescriptionListTerm>
                         <DescriptionListDescription>
                           <WizardOverviewNetworksTable
-                            networks={networks}
                             interfaces={interfaces}
+                            networks={networks}
                           />
                         </DescriptionListDescription>
                       </DescriptionListGroup>
@@ -216,7 +216,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
               </StackItem>
               {error && (
                 <StackItem>
-                  <Alert variant={AlertVariant.danger} title={t('Error')} isInline>
+                  <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
                     {error?.message}
                   </Alert>
                 </StackItem>

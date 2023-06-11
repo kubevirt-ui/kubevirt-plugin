@@ -11,8 +11,8 @@ import { PageSection } from '@patternfly/react-core';
 import SchedulingSection from './components/SchedulingSection/SchedulingSection';
 
 type VirtualMachineSchedulingPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1VirtualMachine;
 };
@@ -21,10 +21,10 @@ const VirtualMachineSchedulingPage: React.FC<VirtualMachineSchedulingPageProps> 
   const onChangeResource = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
-        model: VirtualMachineModel,
         data: updatedVM,
-        ns: updatedVM?.metadata?.namespace,
+        model: VirtualMachineModel,
         name: updatedVM?.metadata?.name,
+        ns: updatedVM?.metadata?.namespace,
       }),
     [],
   );
@@ -32,11 +32,11 @@ const VirtualMachineSchedulingPage: React.FC<VirtualMachineSchedulingPageProps> 
   return (
     <PageSection>
       <SidebarEditor
-        resource={vm}
         onResourceUpdate={onChangeResource}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.SCHEDULING_TAB}
+        resource={vm}
       >
-        {(resource) => <SchedulingSection vm={resource} pathname={location?.pathname} />}
+        {(resource) => <SchedulingSection pathname={location?.pathname} vm={resource} />}
       </SidebarEditor>
     </PageSection>
   );

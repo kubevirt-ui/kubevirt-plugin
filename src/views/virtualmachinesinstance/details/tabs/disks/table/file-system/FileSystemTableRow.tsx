@@ -5,29 +5,29 @@ import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { convertBytes } from '../../utils/virtualMachinesInstancePageDisksTabUtils';
 
 type FileSystemTableRowProps = {
-  obj: any;
   activeColumnIDs: Set<string>;
+  obj: any;
 };
 
-const FileSystemTableRow: React.FC<FileSystemTableRowProps> = ({ obj, activeColumnIDs }) => {
+const FileSystemTableRow: React.FC<FileSystemTableRowProps> = ({ activeColumnIDs, obj }) => {
   const totalBytes = convertBytes(obj?.totalBytes);
   const usedBytes = convertBytes(obj?.usedBytes);
 
   return (
     <>
-      <TableData id="diskName" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="diskName">
         {obj?.diskName}
       </TableData>
-      <TableData id="fileSystemType" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="fileSystemType">
         {obj?.fileSystemType}
       </TableData>
-      <TableData id="mountPoint" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="mountPoint">
         {obj?.mountPoint}
       </TableData>
-      <TableData id="totalBytes" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="totalBytes">
         {totalBytes.value} {totalBytes.unit}
       </TableData>
-      <TableData id="usedBytes" activeColumnIDs={activeColumnIDs}>
+      <TableData activeColumnIDs={activeColumnIDs} id="usedBytes">
         {usedBytes.value} {usedBytes.unit}
       </TableData>
     </>

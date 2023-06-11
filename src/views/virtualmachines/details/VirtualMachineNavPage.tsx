@@ -7,16 +7,16 @@ import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-p
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
 import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
 export type VirtualMachineDetailsPageProps = {
+  kind: string;
   name: string;
   namespace: string;
-  kind: string;
 };
 import './virtual-machine-page.scss';
 
 const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
+  kind,
   name,
   namespace,
-  kind,
 }) => {
   const [vm] = useK8sWatchResource<V1VirtualMachine>({
     kind,
@@ -26,7 +26,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   const pages = useVirtualMachineTabs();
   return (
     <SidebarEditorProvider>
-      <VirtualMachineNavPageTitle vm={vm} name={name} />
+      <VirtualMachineNavPageTitle name={name} vm={vm} />
       <div className="VirtualMachineNavPage--tabs__main">
         <HorizontalNav pages={pages} resource={vm} />
       </div>

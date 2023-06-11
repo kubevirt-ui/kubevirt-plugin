@@ -9,8 +9,8 @@ type UseStorageProfileClaimPropertySetsValue = {
     accessModes: string[];
     volumeMode?: string;
   }[];
-  loaded: boolean;
   error: any;
+  loaded: boolean;
 };
 
 const useStorageProfileClaimPropertySets = (
@@ -26,7 +26,7 @@ const useStorageProfileClaimPropertySets = (
 
   const { claimPropertySets } = storageProfile?.status || {};
 
-  return { claimPropertySets: errorState ? null : claimPropertySets, loaded, error };
+  return { claimPropertySets: errorState ? null : claimPropertySets, error, loaded };
 };
 
 export default useStorageProfileClaimPropertySets;

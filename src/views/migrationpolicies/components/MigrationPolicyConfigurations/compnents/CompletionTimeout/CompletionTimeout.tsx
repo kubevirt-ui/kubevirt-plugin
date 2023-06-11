@@ -4,29 +4,29 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NumberInput } from '@patternfly/react-core';
 
 type CompletionTimeoutProps = {
-  state: number;
   setState: React.Dispatch<React.SetStateAction<number>>;
+  state: number;
 };
 
 const CompletionTimeout: React.FC<CompletionTimeoutProps> = ({
-  state: completionTimeoutInGib,
   setState,
+  state: completionTimeoutInGib,
 }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <NumberInput
-      data-test-id="migration-policy-completion-timeout-input"
-      id="migration-policy-completion-timeout-input"
-      value={completionTimeoutInGib}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         +event?.target?.value >= 0 && setState(+event.target.value)
       }
-      onPlus={() => setState((prev) => (prev ? prev + 1 : 1))}
-      onMinus={() => setState((prev) => --prev)}
+      data-test-id="migration-policy-completion-timeout-input"
+      id="migration-policy-completion-timeout-input"
       min={0}
       minusBtnAriaLabel={t('Decrement')}
+      onMinus={() => setState((prev) => --prev)}
+      onPlus={() => setState((prev) => (prev ? prev + 1 : 1))}
       plusBtnAriaLabel={t('Increment')}
+      value={completionTimeoutInGib}
     />
   );
 };

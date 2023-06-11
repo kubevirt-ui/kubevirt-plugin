@@ -36,17 +36,17 @@ import { BootableResource, BootableVolumeMetadata } from '../../utils/types';
 import { changeBootableVolumeMetadata } from '../../utils/utils';
 
 type EditBootableVolumesModalProps = {
-  source: BootableResource;
   isOpen: boolean;
   onClose: () => void;
   preferences: V1alpha2VirtualMachineClusterPreference[];
+  source: BootableResource;
 };
 
 const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
-  source,
   isOpen,
   onClose,
   preferences,
+  source,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -62,10 +62,10 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
     );
 
     return {
-      preference: source?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
-      instanceType: initialCategory,
-      size: initialCategory && instanceTypeLabel?.[1],
       description: source?.metadata?.annotations?.[ANNOTATIONS.description],
+      instanceType: initialCategory,
+      preference: source?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
+      size: initialCategory && instanceTypeLabel?.[1],
     };
   }, [source]);
 
@@ -112,14 +112,14 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
       : { [ANNOTATIONS.description]: undefined }; // we do want undefined here to get the annotation removed from the resource, if description not provided
 
     const metadata: BootableVolumeMetadata = {
+      annotations: {
+        ...source?.metadata?.annotations,
+        ...descriptionAnnotation,
+      },
       labels: {
         ...source?.metadata?.labels,
         ...preferenceLabel,
         ...instanceLabel,
-      },
-      annotations: {
-        ...source?.metadata?.annotations,
-        ...descriptionAnnotation,
       },
     };
 
@@ -128,10 +128,10 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
 
   return (
     <TabModal<K8sResourceCommon>
-      obj={source}
-      isOpen={isOpen}
-      onClose={onClose}
       headerText={t('Edit volume metadata')}
+      isOpen={isOpen}
+      obj={source}
+      onClose={onClose}
       onSubmit={onSubmitVolumeParams()}
     >
       <Form>
@@ -160,11 +160,11 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
           isRequired
         >
           <FilterSelect
-            selected={preference}
-            setSelected={setPreference}
-            options={preferencesNames}
             groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
             optionLabelText={t('preference')}
+            options={preferencesNames}
+            selected={preference}
+            setSelected={setPreference}
           />
         </FormGroup>
         <Grid hasGutter>
@@ -181,22 +181,22 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
               }
             >
               <Select
-                menuAppendTo="parent"
                 isOpen={isInstanceTypeOpen}
-                onToggle={setIsInstanceTypeOpen}
+                menuAppendTo="parent"
                 onSelect={onInstanceTypeSelect}
-                variant={SelectVariant.single}
+                onToggle={setIsInstanceTypeOpen}
                 placeholderText={t('Select InstanceType')}
                 selections={instanceType}
+                variant={SelectVariant.single}
               >
                 {Object.keys(InstanceTypeCategory)?.map((instanceTypeCategory) => {
                   const { seriesLabel, title }: CategoryDetails =
                     categoryDetailsMap[instanceTypeCategory];
                   return (
                     <SelectOption
+                      description={title}
                       key={instanceTypeCategory}
                       value={instanceTypeCategory}
-                      description={title}
                     >
                       {seriesLabel}
                     </SelectOption>
@@ -208,22 +208,22 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
           <GridItem span={6}>
             <FormGroup label={t('Size')}>
               <Select
-                menuAppendTo="parent"
                 isOpen={isSizeOpen}
-                onToggle={setIsSizeOpen}
+                menuAppendTo="parent"
                 onSelect={onSizeSelect}
-                variant={SelectVariant.single}
+                onToggle={setIsSizeOpen}
                 placeholderText={t('Select size')}
                 selections={size}
+                variant={SelectVariant.single}
               >
-                {instanceTypes?.map(({ label, cpus, memory }) => (
+                {instanceTypes?.map(({ cpus, label, memory }) => (
                   <SelectOption
-                    key={label}
-                    value={label}
                     description={t('{{cpus}} CPUs, {{memory}} Memory', {
                       cpus,
                       memory: readableSizeUnit(memory),
                     })}
+                    key={label}
+                    value={label}
                   >
                     {label}
                   </SelectOption>
@@ -234,10 +234,10 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
         </Grid>
         <FormGroup label={t('Description')}>
           <TextArea
-            value={description}
+            aria-label={t('description text area')}
             onChange={setDescription}
             resizeOrientation="vertical"
-            aria-label={t('description text area')}
+            value={description}
           />
         </FormGroup>
       </Form>

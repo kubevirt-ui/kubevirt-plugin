@@ -10,7 +10,7 @@ const VirtualizationAlerts: React.FC = () => {
   return (
     <AlertsBody error={false}>
       {alerts.map((alert) => (
-        <AlertItem key={alert?.rule?.id} alert={alert} />
+        <AlertItem alert={alert} key={alert?.rule?.id} />
       ))}
     </AlertsBody>
   );

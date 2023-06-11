@@ -6,9 +6,9 @@ export const PersistentVolumeClainSelectSkeleton: React.FC = () => {
   return (
     <div>
       <br />
-      <Skeleton fontSize="lg" className="pvc-selection-formgroup" />
+      <Skeleton className="pvc-selection-formgroup" fontSize="lg" />
       <br />
-      <Skeleton fontSize="lg" className="pvc-selection-formgroup" />
+      <Skeleton className="pvc-selection-formgroup" fontSize="lg" />
       <br />
       <br />
     </div>

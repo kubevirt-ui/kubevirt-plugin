@@ -16,8 +16,8 @@ import useSnapshotData from './hooks/useSnapshotData';
 import './SnapshotListPage.scss';
 
 type SnapshotListPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1VirtualMachine;
 };
@@ -25,7 +25,7 @@ type SnapshotListPageProps = RouteComponentProps<{
 const SnapshotListPage: FC<SnapshotListPageProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { snapshots, restoresMap, loaded, error } = useSnapshotData(
+  const { error, loaded, restoresMap, snapshots } = useSnapshotData(
     vm?.metadata?.name,
     vm?.metadata?.namespace,
   );
@@ -33,25 +33,25 @@ const SnapshotListPage: FC<SnapshotListPageProps> = ({ obj: vm }) => {
   return (
     <>
       <ListPageBody>
-        <Title headingLevel="h2" className="snapshot-list-page__title">
+        <Title className="snapshot-list-page__title" headingLevel="h2">
           {t('Snapshots')}
         </Title>
         <ListPageCreateButton
-          className="list-page-create-button-margin"
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
-              <SnapshotModal vm={vm} isOpen={isOpen} onClose={onClose} />
+              <SnapshotModal isOpen={isOpen} onClose={onClose} vm={vm} />
             ))
           }
+          className="list-page-create-button-margin"
         >
           {t('Take snapshot')}
         </ListPageCreateButton>
         <SnapshotList
-          snapshots={snapshots}
-          restoresMap={restoresMap}
-          loaded={loaded}
           error={error}
           isVMRunning={vm?.status?.printableStatus !== printableVMStatus.Stopped}
+          loaded={loaded}
+          restoresMap={restoresMap}
+          snapshots={snapshots}
         />
       </ListPageBody>
     </>

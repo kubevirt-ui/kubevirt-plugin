@@ -9,11 +9,11 @@ import { Alert, AlertVariant, Checkbox, Flex, FlexItem } from '@patternfly/react
 import { removeWindowsDrivers, useDriversImage } from './utils';
 
 type WindowsDriversProps = {
+  updateVM: (vm: V1VirtualMachine) => Promise<V1VirtualMachine | void> | void;
   vm: V1VirtualMachine;
-  updateVM: (vm: V1VirtualMachine) => void | Promise<void | V1VirtualMachine>;
 };
 
-const WindowsDrivers: FC<WindowsDriversProps> = ({ vm, updateVM }) => {
+const WindowsDrivers: FC<WindowsDriversProps> = ({ updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const [error, setError] = useState<Error>(undefined);
   const [loading, setLoading] = useState(false);
@@ -50,20 +50,20 @@ const WindowsDrivers: FC<WindowsDriversProps> = ({ vm, updateVM }) => {
     <Flex>
       <FlexItem>
         <Checkbox
+          className="pf-u-mt-md pf-u-display-flex pf-u-align-items-center"
+          data-test-id="cdrom-drivers"
+          id="cdrom-drivers"
           isChecked={!!windowsDriver}
-          onChange={onChange}
           isDisabled={loading || driversImageLoading}
           label={t('Mount Windows drivers disk')}
-          id="cdrom-drivers"
-          data-test-id="cdrom-drivers"
-          className="pf-u-mt-md pf-u-display-flex pf-u-align-items-center"
+          onChange={onChange}
         />
         {loading && <Loading />}
       </FlexItem>
 
       {error && (
         <FlexItem>
-          <Alert variant={AlertVariant.danger} isInline title={t('Error')}>
+          <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
             {error.message}
           </Alert>
         </FlexItem>

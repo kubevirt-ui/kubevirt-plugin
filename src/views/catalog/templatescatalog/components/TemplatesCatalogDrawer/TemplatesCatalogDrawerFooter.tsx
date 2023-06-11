@@ -26,14 +26,14 @@ import { TemplatesCatalogDrawerFooterSkeleton } from './TemplatesCatalogDrawerFo
 
 type TemplateCatalogDrawerFooterProps = {
   namespace: string;
-  template: V1Template | undefined;
   onCancel: () => void;
+  template: undefined | V1Template;
 };
 
 export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterProps> = ({
   namespace,
-  template,
   onCancel,
+  template,
 }) => {
   const { t } = useKubevirtTranslation();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVmTemplateSource(template);
@@ -65,8 +65,8 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
               {canQuickCreate && (
                 <SplitItem className="template-catalog-drawer-footer-tooltip">
                   <Tooltip
-                    position={TooltipPosition.right}
                     content={<div>{t('This Template supports quick create VirtualMachine')}</div>}
+                    position={TooltipPosition.right}
                   >
                     <OutlinedQuestionCircleIcon />
                   </Tooltip>
@@ -75,12 +75,12 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
             </Split>
           </StackItem>
           <TemplatesCatalogDrawerCreateForm
-            namespace={namespace}
-            template={template}
             canQuickCreate={canQuickCreate}
             initialVMName={initialVMName}
             isBootSourceAvailable={isBootSourceAvailable}
+            namespace={namespace}
             onCancel={onCancel}
+            template={template}
           />
         </Stack>
       </div>

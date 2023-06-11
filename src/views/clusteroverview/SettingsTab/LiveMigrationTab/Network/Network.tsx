@@ -42,12 +42,11 @@ const Network = ({ hyperConverge }) => {
   return (
     <>
       <Text component={TextVariants.small}>{t('Set live migration network')}</Text>
-      <Title headingLevel="h6" size="md" className="live-migration-tab__network--title">
+      <Title className="live-migration-tab__network--title" headingLevel="h6" size="md">
         {t('Live migration network')}
       </Title>
       {!isEmpty(nads) && nadsLoading ? (
         <Select
-          variant={SelectVariant.single}
           onSelect={(_event: React.ChangeEvent<Element>, selectedValue: string) => {
             setIsSelectOpen(false);
             updateLiveMigrationConfig(
@@ -57,14 +56,15 @@ const Network = ({ hyperConverge }) => {
             );
             setSelectedNetwork(selectedValue);
           }}
-          selections={selectedNetwork}
-          onToggle={() => setIsSelectOpen(!isSelectOpen)}
-          isOpen={isSelectOpen}
           isGrouped
+          isOpen={isSelectOpen}
+          onToggle={() => setIsSelectOpen(!isSelectOpen)}
+          selections={selectedNetwork}
+          variant={SelectVariant.single}
           width={360}
         >
           <SelectOption key="primary" value={t('Primary live migration network')} />
-          <SelectGroup label={t('Secondary NAD networks')} key="nad">
+          <SelectGroup key="nad" label={t('Secondary NAD networks')}>
             {nads?.map((nad) => (
               <SelectOption key={nad?.metadata?.name} value={nad?.metadata?.name} />
             ))}
@@ -75,10 +75,10 @@ const Network = ({ hyperConverge }) => {
       )}
       {nadsError && (
         <Alert
-          variant={AlertVariant.danger}
+          className="live-migration-tab--error"
           isInline
           title={t('Error')}
-          className="live-migration-tab--error"
+          variant={AlertVariant.danger}
         >
           {nadsError?.message}
         </Alert>

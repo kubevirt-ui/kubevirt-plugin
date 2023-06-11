@@ -6,34 +6,34 @@ const useFilesystemTableColumns = () => {
 
   const columns = [
     {
-      title: t('Name'),
       id: 'diskName',
-      transforms: [sortable],
       sort: 'diskName',
+      title: t('Name'),
+      transforms: [sortable],
     },
     {
-      title: t('File system type'),
       id: 'fileSystemType',
-      transforms: [sortable],
       sort: 'fileSystemType',
+      title: t('File system type'),
+      transforms: [sortable],
     },
     {
-      title: t('Mount point'),
       id: 'mountPoint',
-      transforms: [sortable],
       sort: 'mountPoint',
+      title: t('Mount point'),
+      transforms: [sortable],
     },
     {
-      title: t('Total bytes'),
       id: 'totalBytes',
-      transforms: [sortable],
       sort: 'totalBytes',
+      title: t('Total bytes'),
+      transforms: [sortable],
     },
     {
-      title: t('Used bytes'),
       id: 'usedBytes',
-      transforms: [sortable],
       sort: 'usedBytes',
+      title: t('Used bytes'),
+      transforms: [sortable],
     },
   ];
 

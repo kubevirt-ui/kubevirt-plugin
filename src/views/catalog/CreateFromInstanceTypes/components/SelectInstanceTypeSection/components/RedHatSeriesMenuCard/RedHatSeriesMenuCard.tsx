@@ -28,11 +28,11 @@ type RedHatSeriesMenuCardProps = {
 } & UseInstanceTypeCardMenuSectionValues;
 
 const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
-  rhSeriesItem,
-  menuRef,
   activeMenu,
-  onMenuToggle,
+  menuRef,
   onMenuSelect,
+  onMenuToggle,
+  rhSeriesItem,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -55,29 +55,40 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
       (size) => `${seriesName}.${size.sizeLabel}` === selectedInstanceType,
     );
 
-    const { sizeLabel, cpus, memory } = itSize || {};
+    const { cpus, memory, sizeLabel } = itSize || {};
     return t('{{sizeLabel}}: {{cpus}} CPUs, {{memory}} Memory', {
-      sizeLabel,
       cpus,
       memory: readableSizeUnit(memory),
+      sizeLabel,
     });
   }, [selectedInstanceType, seriesName, sizes, t]);
 
   return (
     <Popper
-      direction="down"
-      isVisible={isMenuExpanded}
-      popperMatchesTriggerWidth={false}
+      popper={
+        <Menu activeMenu={activeMenu} id={seriesName} ref={menuRef}>
+          <MenuContent>
+            <MenuList>
+              <RedHatInstanceTypeSeriesSizesMenuItems
+                selected={selectedInstanceType}
+                seriesName={seriesName}
+                setSelected={onMenuSelect}
+                sizes={sizes}
+              />
+            </MenuList>
+          </MenuContent>
+        </Menu>
+      }
       trigger={
         <div className="instance-type-series-menu-card">
           <MenuToggle
-            onClick={(event) => onMenuToggle(event, seriesName)}
-            isExpanded={isMenuExpanded}
-            variant="plain"
             className={classNames(
               'instance-type-series-menu-card__toggle-container',
               isSelectedMenu && 'selected',
             )}
+            isExpanded={isMenuExpanded}
+            onClick={(event) => onMenuToggle(event, seriesName)}
+            variant="plain"
           >
             <Card className="instance-type-series-menu-card__toggle-card">
               <div className="instance-type-series-menu-card__card-icon">
@@ -96,20 +107,9 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
           </MenuToggle>
         </div>
       }
-      popper={
-        <Menu ref={menuRef} id={seriesName} activeMenu={activeMenu}>
-          <MenuContent>
-            <MenuList>
-              <RedHatInstanceTypeSeriesSizesMenuItems
-                sizes={sizes}
-                selected={selectedInstanceType}
-                seriesName={seriesName}
-                setSelected={onMenuSelect}
-              />
-            </MenuList>
-          </MenuContent>
-        </Menu>
-      }
+      direction="down"
+      isVisible={isMenuExpanded}
+      popperMatchesTriggerWidth={false}
     />
   );
 };

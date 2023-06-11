@@ -53,7 +53,7 @@ export const injectDisabled = (children, disabled) => {
 const unknownKinds = new Set();
 
 export const resourcePathFromModel = (model: K8sModel, name?: string, namespace?: string) => {
-  const { plural, namespaced, crd } = model;
+  const { crd, namespaced, plural } = model;
 
   let url = '/k8s/';
 
@@ -183,38 +183,38 @@ export const removeOSDups = (osArr: OperatingSystemRecord[]): OperatingSystemRec
 };
 
 export const updateDV = ({
-  pvcName,
-  namespace,
-  mountAsCDROM,
-  storageClassName,
   accessMode,
-  volumeMode,
-  requestSizeValue,
+  mountAsCDROM,
+  namespace,
+  pvcName,
   requestSizeUnit,
+  requestSizeValue,
+  storageClassName,
+  volumeMode,
 }): V1beta1DataVolume => {
   const obj: V1beta1DataVolume = {
     apiVersion: getKubevirtModelAvailableAPIVersion(DataVolumeModel),
     kind: DataVolumeModel.kind,
     metadata: {
-      name: pvcName,
-      namespace,
       labels: {
         [LABEL_CDROM_SOURCE]: mountAsCDROM?.toString(),
       },
+      name: pvcName,
+      namespace,
     },
     spec: {
       source: {
         upload: {},
       },
       storage: {
-        storageClassName,
         accessModes: [accessMode],
-        volumeMode,
         resources: {
           requests: {
             storage: `${requestSizeValue}${requestSizeUnit}`,
           },
         },
+        storageClassName,
+        volumeMode,
       },
     },
   };

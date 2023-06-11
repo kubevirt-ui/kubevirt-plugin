@@ -6,31 +6,31 @@ import { MinusCircleIcon } from '@patternfly/react-icons';
 
 export const AddDeviceFormSelect: React.FC<AddDeviceFormSelectProps> = ({
   id,
-  options,
   label,
   onAdd,
   onDelete,
+  options,
 }) => (
   <>
     <FormSelect
-      value=""
+      className="kubevirt-boot-order__add-device-select"
       id={id}
       onChange={onAdd}
-      className="kubevirt-boot-order__add-device-select"
+      value=""
     >
       <FormSelectOption label={label} value="" />
       {options.map((option) => (
         <FormSelectOption
+          key={option.value.name}
           label={`${option.value.name} (${option.typeLabel})`}
           value={option.value.name}
-          key={option.value.name}
         />
       ))}
     </FormSelect>
     <Button
+      className="kubevirt-boot-order__add-device-delete-btn"
       onClick={onDelete}
       variant="link"
-      className="kubevirt-boot-order__add-device-delete-btn"
     >
       <MinusCircleIcon />
     </Button>
@@ -39,9 +39,9 @@ export const AddDeviceFormSelect: React.FC<AddDeviceFormSelectProps> = ({
 
 export type AddDeviceFormSelectProps = {
   id: string;
-  options: BootableDeviceType[];
   label: string;
-  onDelete: () => void;
   /** onAdd moves items from the options list to the sources list, key = "<type>-<name>". */
   onAdd: (key: string) => void;
+  onDelete: () => void;
+  options: BootableDeviceType[];
 };

@@ -40,31 +40,31 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
     <Split className="ssh-secret-section__radio-group" hasGutter>
       <SplitItem>
         <Radio
-          isChecked={selectedOption === SecretSelectionOption.none}
-          id={SecretSelectionOption.none}
-          name="ssh-secret-selection"
-          label={t('None')}
           onClick={() => {
             onSelectSecretOption(SecretSelectionOption.none);
             setSSHDetails(initialSSHCredentials);
           }}
+          id={SecretSelectionOption.none}
+          isChecked={selectedOption === SecretSelectionOption.none}
+          label={t('None')}
+          name="ssh-secret-selection"
         />
       </SplitItem>
       <SplitItem>
         <Radio
-          isChecked={selectedOption === SecretSelectionOption.useExisting}
           id={SecretSelectionOption.useExisting}
-          name="ssh-secret-selection"
+          isChecked={selectedOption === SecretSelectionOption.useExisting}
           label={t('Use existing')}
+          name="ssh-secret-selection"
           onClick={() => onSelectSecretOption(SecretSelectionOption.useExisting)}
         />
       </SplitItem>
       <SplitItem>
         <Radio
-          isChecked={selectedOption === SecretSelectionOption.addNew}
           id={SecretSelectionOption.addNew}
-          name="ssh-secret-selection"
+          isChecked={selectedOption === SecretSelectionOption.addNew}
           label={t('Add new')}
+          name="ssh-secret-selection"
           onClick={() => onSelectSecretOption(SecretSelectionOption.addNew)}
         />
       </SplitItem>

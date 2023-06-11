@@ -14,12 +14,10 @@ export type HyperConvergedList = K8sResourceCommon & {
 
 export const updateLiveMigrationConfig = (
   hyperConverged: HyperConverged,
-  value: number | string | null,
+  value: null | number | string,
   name: string,
 ) =>
   k8sPatch({
-    model: HyperConvergedModel,
-    resource: hyperConverged,
     data: [
       {
         op: 'replace',
@@ -27,6 +25,8 @@ export const updateLiveMigrationConfig = (
         value,
       },
     ],
+    model: HyperConvergedModel,
+    resource: hyperConverged,
   });
 
 export const getLiveMigrationNetwork = (hyperConverged: HyperConverged) =>

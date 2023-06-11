@@ -6,34 +6,34 @@ export const useVirtualMachineInstanceNetworkTabColumns = () => {
 
   const columns = [
     {
-      title: t('Name'),
       id: 'name',
-      transforms: [sortable],
       sort: 'name',
+      title: t('Name'),
+      transforms: [sortable],
     },
     {
-      title: t('Model'),
       id: 'model',
-      transforms: [sortable],
       sort: 'model',
+      title: t('Model'),
+      transforms: [sortable],
     },
     {
-      title: t('Network'),
       id: 'network',
-      transforms: [sortable],
       sort: 'network',
+      title: t('Network'),
+      transforms: [sortable],
     },
     {
-      title: t('Type'),
       id: 'type',
-      transforms: [sortable],
       sort: 'type',
+      title: t('Type'),
+      transforms: [sortable],
     },
     {
-      title: t('MAC Address'),
       id: 'macAddress',
-      transforms: [sortable],
       sort: 'macAddress',
+      title: t('MAC Address'),
+      transforms: [sortable],
     },
   ];
 

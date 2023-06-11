@@ -11,7 +11,6 @@ export const SelectCDSourceLabel: React.FC = () => {
     <>
       {t('CD source')}{' '}
       <Popover
-        aria-label={'Help'}
         bodyContent={() => (
           <div>
             {t(
@@ -19,6 +18,7 @@ export const SelectCDSourceLabel: React.FC = () => {
             )}
           </div>
         )}
+        aria-label={'Help'}
       >
         <HelpIcon />
       </Popover>

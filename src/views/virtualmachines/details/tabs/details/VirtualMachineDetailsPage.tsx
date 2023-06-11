@@ -13,8 +13,8 @@ import ServicesSection from './components/sections/ServicesSection';
 import ActiveUserListSection from './components/sections/UserList/ActiveUserListSection';
 
 type VirtualMachineDetailsPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1VirtualMachine;
 };
@@ -23,10 +23,10 @@ const VirtualMachineDetailsPage: React.FC<VirtualMachineDetailsPageProps> = ({ o
   const onChangeResource = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
-        model: VirtualMachineModel,
         data: updatedVM,
-        ns: updatedVM?.metadata?.namespace,
+        model: VirtualMachineModel,
         name: updatedVM?.metadata?.name,
+        ns: updatedVM?.metadata?.namespace,
       }),
     [],
   );
@@ -35,20 +35,20 @@ const VirtualMachineDetailsPage: React.FC<VirtualMachineDetailsPageProps> = ({ o
     <div>
       <PageSection>
         <SidebarEditor
-          resource={vm}
           onResourceUpdate={onChangeResource}
           pathsToHighlight={PATHS_TO_HIGHLIGHT.DETAILS_TAB}
+          resource={vm}
         >
-          {(resource) => <DetailsSection vm={resource} pathname={location?.pathname} />}
+          {(resource) => <DetailsSection pathname={location?.pathname} vm={resource} />}
         </SidebarEditor>
       </PageSection>
       <Divider />
       <PageSection>
-        <ServicesSection vm={vm} pathname={location?.pathname} />
+        <ServicesSection pathname={location?.pathname} vm={vm} />
       </PageSection>
       <Divider />
       <PageSection>
-        <ActiveUserListSection vm={vm} pathname={location?.pathname} />
+        <ActiveUserListSection pathname={location?.pathname} vm={vm} />
       </PageSection>
     </div>
   );

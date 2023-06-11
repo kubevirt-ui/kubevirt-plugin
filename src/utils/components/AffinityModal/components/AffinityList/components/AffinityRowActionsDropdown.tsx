@@ -7,14 +7,14 @@ import { AffinityRowData } from '../../../utils/types';
 
 type AffinityRowActionsDropdownProps = {
   affinity: AffinityRowData;
-  onEdit: (affinity: AffinityRowData) => void;
   onDelete: (affinity: AffinityRowData) => void;
+  onEdit: (affinity: AffinityRowData) => void;
 };
 
 const AffinityRowActionsDropdown: React.FC<AffinityRowActionsDropdownProps> = ({
   affinity,
-  onEdit,
   onDelete,
+  onEdit,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -25,11 +25,6 @@ const AffinityRowActionsDropdown: React.FC<AffinityRowActionsDropdownProps> = ({
   };
   return (
     <Dropdown
-      menuAppendTo={document.getElementById('tab-modal')}
-      isOpen={isOpen}
-      toggle={<KebabToggle onToggle={setIsOpen} />}
-      isPlain
-      position={DropdownPosition.right}
       dropdownItems={[
         <DropdownItem key="edit" onClick={() => onEdit(affinity)}>
           {t('Edit')}
@@ -38,6 +33,11 @@ const AffinityRowActionsDropdown: React.FC<AffinityRowActionsDropdownProps> = ({
           {t('Delete')}
         </DropdownItem>,
       ]}
+      isOpen={isOpen}
+      isPlain
+      menuAppendTo={document.getElementById('tab-modal')}
+      position={DropdownPosition.right}
+      toggle={<KebabToggle onToggle={setIsOpen} />}
     />
   );
 };

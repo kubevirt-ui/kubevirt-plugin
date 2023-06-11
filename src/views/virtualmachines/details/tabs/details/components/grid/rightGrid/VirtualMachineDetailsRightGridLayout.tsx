@@ -43,17 +43,17 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
   const vmName = vm?.metadata?.name;
   const [canGetNode] = useAccessReview({
     namespace: vmi?.metadata?.namespace,
-    verb: 'get' as K8sVerb,
     resource: NodeModel.plural,
+    verb: 'get' as K8sVerb,
   });
 
   const onSubmit = React.useCallback(
     (obj: V1VirtualMachine) =>
       k8sUpdate({
-        model: VirtualMachineModel,
         data: obj,
-        ns: obj.metadata.namespace,
+        model: VirtualMachineModel,
         name: obj.metadata.name,
+        ns: obj.metadata.namespace,
       }),
     [],
   );
@@ -71,10 +71,10 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
     });
 
     return k8sUpdate({
-      model: VirtualMachineModel,
       data: updateVM,
-      ns: updateVM?.metadata?.namespace,
+      model: VirtualMachineModel,
       name: updateVM?.metadata?.name,
+      ns: updateVM?.metadata?.namespace,
     });
   };
 
@@ -82,56 +82,56 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
     <GridItem span={5}>
       <DescriptionList>
         <VirtualMachineDescriptionItem
+          data-test-id={`${vm?.metadata?.name}-status`}
           descriptionData={<VirtualMachineStatus vm={vm} />}
           descriptionHeader={t('Status')}
-          data-test-id={`${vm?.metadata?.name}-status`}
         />
         <VirtualMachineDescriptionItem
+          data-test-id={`${vm?.metadata?.name}-pod`}
           descriptionData={vmDetailsRightGridObj?.pod}
           descriptionHeader={t('Pod')}
-          data-test-id={`${vm?.metadata?.name}-pod`}
         />
         <VirtualMachineDescriptionItem
           descriptionData={vmDetailsRightGridObj?.vmi}
           descriptionHeader={t('VirtualMachineInstance')}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<BootOrderSummary vm={vm} />}
-          descriptionHeader={t('Boot order')}
-          isEdit
           onEditClick={() =>
             createModal((props) => (
-              <BootOrderModal {...props} vm={vm} onSubmit={onSubmit} vmi={vmi} />
+              <BootOrderModal {...props} onSubmit={onSubmit} vm={vm} vmi={vmi} />
             ))
           }
           data-test-id={`${vm?.metadata?.name}-boot-order`}
+          descriptionData={<BootOrderSummary vm={vm} />}
+          descriptionHeader={t('Boot order')}
+          isEdit
         />
         <VirtualMachineDescriptionItem
+          data-test-id={`${vm?.metadata?.name}-ip-address`}
           descriptionData={vmDetailsRightGridObj?.ipAddress}
           descriptionHeader={t('IP address')}
-          data-test-id={`${vm?.metadata?.name}-ip-address`}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={hostname || vmName}
-          descriptionHeader={t('Hostname')}
-          isEdit
-          data-test-id={`${vm?.metadata?.name}-hostname`}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <HostnameModal
-                vm={vm}
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                vm={vm}
                 vmi={vmi}
               />
             ))
           }
+          data-test-id={`${vm?.metadata?.name}-hostname`}
+          descriptionData={hostname || vmName}
+          descriptionHeader={t('Hostname')}
+          isEdit
         />
         <VirtualMachineDescriptionItem
+          data-test-id={`${vm?.metadata?.name}-timezone`}
           descriptionData={vmDetailsRightGridObj?.timezone}
           descriptionHeader={t('Time zone')}
-          data-test-id={`${vm?.metadata?.name}-timezone`}
         />
         {canGetNode && (
           <VirtualMachineDescriptionItem
@@ -147,7 +147,6 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
               <MutedTextSpan text={t('Not available')} />
             )
           }
-          isEdit
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <WorkloadProfileModal
@@ -158,24 +157,25 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
               />
             ))
           }
-          descriptionHeader={t('Workload profile')}
           data-test-id={`${vm?.metadata?.name}-workload-profile`}
+          descriptionHeader={t('Workload profile')}
+          isEdit
         />
         <VirtualMachineDescriptionItem
           descriptionData={
             <SSHAccess
               sshService={sshService}
-              vmi={vmi}
               sshServiceLoaded={sshServiceLoaded}
               vm={vm}
+              vmi={vmi}
             />
           }
+          data-test-id={`${vm?.metadata?.name}-ssh-access`}
           descriptionHeader={t('SSH access')}
           label={<LinuxLabel />}
-          data-test-id={`${vm?.metadata?.name}-ssh-access`}
         />
         <VirtualMachineDescriptionItem
-          descriptionData={<HardwareDevices vm={vm} canEdit onSubmit={onSubmit} vmi={vmi} />}
+          descriptionData={<HardwareDevices canEdit onSubmit={onSubmit} vm={vm} vmi={vmi} />}
           descriptionHeader={t('Hardware devices')}
         />
       </DescriptionList>

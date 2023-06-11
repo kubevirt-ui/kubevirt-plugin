@@ -10,7 +10,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useAccessReview, useFlag } from '@openshift-console/dynamic-plugin-sdk';
 
 export type UsePermissions = () => {
-  capabilitiesData: { taskName: string; isLoading: boolean; allowed: boolean }[];
+  capabilitiesData: { allowed: boolean; isLoading: boolean; taskName: string }[];
   isLoading: boolean;
 };
 
@@ -20,43 +20,43 @@ const usePermissions: UsePermissions = () => {
 
   const [canReadOpenshiftNs, canReadOpenshiftNsLoading] = useAccessReview({
     namespace: OPENSHIFT_NAMESPACE,
-    verb: 'get',
     resource: TemplateModel.plural,
+    verb: 'get',
   });
 
   const [canWriteToOpenshiftNs, canWriteToOpenshiftNsLoading] = useAccessReview({
     namespace: OPENSHIFT_NAMESPACE,
-    verb: 'create',
     resource: TemplateModel.plural,
+    verb: 'create',
   });
 
   const [canReadOpenshiftOsImgNs, canReadOpenshiftOsImgNsLoading] = useAccessReview({
     namespace: OPENSHIFT_OS_IMAGES_NS,
-    verb: 'get',
     resource: TemplateModel.plural,
+    verb: 'get',
   });
 
   const [canReadKvOsImgNs, canReadKvOsImgNsLoading] = useAccessReview({
     namespace: KUBEVIRT_OS_IMAGES_NS,
-    verb: 'get',
     resource: TemplateModel.plural,
+    verb: 'get',
   });
 
   const [canWriteToKvOsImgNs, canWriteToKvOsImgNsLoading] = useAccessReview({
     namespace: KUBEVIRT_OS_IMAGES_NS,
-    verb: 'create',
     resource: TemplateModel.plural,
+    verb: 'create',
   });
 
   const [canWriteToOpenshiftOsImgNs, canWriteToOpenshiftOsImgNsLoading] = useAccessReview({
     namespace: OPENSHIFT_OS_IMAGES_NS,
-    verb: 'create',
     resource: TemplateModel.plural,
+    verb: 'create',
   });
 
   const [canReadNads, canReadNadsLoading] = useAccessReview({
-    verb: 'get',
     resource: NetworkAttachmentDefinitionModel.plural,
+    verb: 'get',
   });
 
   const canReadOsImagesNs = canReadKvOsImgNs && canReadOpenshiftOsImgNs;
@@ -71,35 +71,35 @@ const usePermissions: UsePermissions = () => {
 
   const capabilitiesData = [
     {
+      allowed: basePermissionsAllowed,
+      isLoading: basePermissionsLoading,
       taskName: t('Access to public templates'),
-      isLoading: basePermissionsLoading,
-      allowed: basePermissionsAllowed,
     },
     {
+      allowed: basePermissionsAllowed,
+      isLoading: basePermissionsLoading,
       taskName: t('Access to public boot sources'),
-      isLoading: basePermissionsLoading,
-      allowed: basePermissionsAllowed,
     },
     {
-      taskName: t('Clone a VirtualMachine'),
-      isLoading: basePermissionsLoading,
       allowed: basePermissionsAllowed && cdiInstalled,
+      isLoading: basePermissionsLoading,
+      taskName: t('Clone a VirtualMachine'),
     },
     {
-      taskName: t('Attach VirtualMachine to multiple networks'),
-      isLoading: basePermissionsLoading && canReadNadsLoading,
       allowed: basePermissionsAllowed && canReadNads,
+      isLoading: basePermissionsLoading && canReadNadsLoading,
+      taskName: t('Attach VirtualMachine to multiple networks'),
     },
     {
-      taskName: t('Upload a base image from local disk'),
-      isLoading: basePermissionsLoading && canWriteToKvOsImgNsLoading,
       allowed: basePermissionsAllowed && canWriteToKvOsImgNs,
+      isLoading: basePermissionsLoading && canWriteToKvOsImgNsLoading,
+      taskName: t('Upload a base image from local disk'),
     },
     {
-      taskName: t('Share templates'),
+      allowed: basePermissionsAllowed && canWriteToOpenshiftNs && canWriteToOsImagesNs,
       isLoading:
         basePermissionsLoading && canWriteToOpenshiftNsLoading && canWriteToOsImagesNsLoading,
-      allowed: basePermissionsAllowed && canWriteToOpenshiftNs && canWriteToOsImagesNs,
+      taskName: t('Share templates'),
     },
   ];
 

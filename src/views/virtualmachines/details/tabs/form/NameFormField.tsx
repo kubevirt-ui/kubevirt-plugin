@@ -12,8 +12,8 @@ const NameFormField: React.FC<NameFormFieldProps> = ({ objName, setObjName }) =>
   const { t } = useKubevirtTranslation();
 
   return (
-    <FormGroup label={t('Name')} fieldId="name" isRequired>
-      <TextInput type="text" value={objName} onChange={setObjName} id="name" />
+    <FormGroup fieldId="name" isRequired label={t('Name')}>
+      <TextInput id="name" onChange={setObjName} type="text" value={objName} />
     </FormGroup>
   );
 };

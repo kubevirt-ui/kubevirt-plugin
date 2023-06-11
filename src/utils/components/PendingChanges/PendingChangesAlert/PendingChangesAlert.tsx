@@ -6,23 +6,23 @@ import { Alert, AlertVariant } from '@patternfly/react-core';
 import './PendingChangesAlert.scss';
 
 type PendingChangesAlertProps = {
-  warningMsg?: string;
   isWarning?: boolean;
   title?: string;
+  warningMsg?: string;
 };
 
 export const PendingChangesAlert: React.FC<PendingChangesAlertProps> = ({
-  warningMsg,
+  children,
   isWarning,
   title,
-  children,
+  warningMsg,
 }) => {
   const { t } = useKubevirtTranslation();
   return (
     <Alert
       className="pending-changes-alert"
-      title={title || t('Pending Changes')}
       isInline
+      title={title || t('Pending Changes')}
       variant={isWarning ? AlertVariant.warning : AlertVariant.info}
     >
       {warningMsg || children}

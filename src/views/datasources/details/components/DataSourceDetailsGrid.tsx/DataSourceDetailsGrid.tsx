@@ -34,29 +34,29 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
       <GridItem span={5}>
         <DescriptionList>
           <DescriptionItem
-            descriptionData={dataSource?.metadata?.name}
-            descriptionHeader={t('Name')}
-            isPopover
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L96
             bodyContent={t(
               'Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. ',
             )}
-            moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
             breadcrumb="DataSource.metadata.name"
             data-test-id={`${dataSource?.metadata?.name}-name`}
+            descriptionData={dataSource?.metadata?.name}
+            descriptionHeader={t('Name')}
+            isPopover
+            moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
           />
           <DescriptionItem
-            descriptionData={
-              <ResourceLink kind="Namespace" name={dataSource?.metadata?.namespace} />
-            }
-            descriptionHeader={t('Namespace')}
-            isPopover
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L102-L104
             bodyContent={t(
               'Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated. ',
             )}
-            moreInfoURL="http://kubernetes.io/docs/user-guide/namespaces"
+            descriptionData={
+              <ResourceLink kind="Namespace" name={dataSource?.metadata?.namespace} />
+            }
             breadcrumb="DataSource.metadata.namespace"
+            descriptionHeader={t('Namespace')}
+            isPopover
+            moreInfoURL="http://kubernetes.io/docs/user-guide/namespaces"
           />
           {dataImportCron && (
             <DataSourceImportCronDescription
@@ -66,7 +66,6 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
           )}
           {pvcSourceName && pvcSourceNamespace && (
             <DescriptionItem
-              descriptionHeader={t('Source')}
               descriptionData={
                 <ResourceLink
                   kind={PersistentVolumeClaimModel.kind}
@@ -74,30 +73,19 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
                   namespace={pvcSourceNamespace}
                 />
               }
+              descriptionHeader={t('Source')}
             />
           )}
           <DescriptionItem
-            descriptionData={<WizardMetadataLabels labels={dataSource?.metadata?.labels} />}
-            descriptionHeader={t('Labels')}
-            isPopover
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L84
             bodyContent={t(
               'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ',
             )}
-            moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
-            breadcrumb="DataSource.metadata.labels"
-            isEdit
-            showEditOnTitle
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <LabelsModal
-                  obj={dataSource}
-                  isOpen={isOpen}
-                  onClose={onClose}
                   onLabelsSubmit={(labels) =>
                     k8sPatch({
-                      model: DataSourceModel,
-                      resource: dataSource,
                       data: [
                         {
                           op: 'replace',
@@ -105,36 +93,38 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
                           value: labels,
                         },
                       ],
+                      model: DataSourceModel,
+                      resource: dataSource,
                     })
                   }
+                  isOpen={isOpen}
+                  obj={dataSource}
+                  onClose={onClose}
                 />
               ))
             }
+            breadcrumb="DataSource.metadata.labels"
             data-test-id={`${dataSource?.metadata?.name}-labels`}
+            descriptionData={<WizardMetadataLabels labels={dataSource?.metadata?.labels} />}
+            descriptionHeader={t('Labels')}
+            isEdit
+            isPopover
+            moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
+            showEditOnTitle
           />
           <DescriptionItem
-            descriptionData={
-              <DataSourceAnnotations annotations={dataSource?.metadata?.annotations} />
-            }
-            descriptionHeader={t('Annotations')}
-            isPopover
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L32
             bodyContent={t(
               'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. ',
             )}
-            moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
-            breadcrumb="DataSource.metadata.annotations"
-            isEdit
+            descriptionData={
+              <DataSourceAnnotations annotations={dataSource?.metadata?.annotations} />
+            }
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <AnnotationsModal
-                  obj={dataSource}
-                  isOpen={isOpen}
-                  onClose={onClose}
                   onSubmit={(updatedAnnotations) =>
                     k8sPatch({
-                      model: DataSourceModel,
-                      resource: dataSource,
                       data: [
                         {
                           op: 'replace',
@@ -142,21 +132,31 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
                           value: updatedAnnotations,
                         },
                       ],
+                      model: DataSourceModel,
+                      resource: dataSource,
                     })
                   }
+                  isOpen={isOpen}
+                  obj={dataSource}
+                  onClose={onClose}
                 />
               ))
             }
+            breadcrumb="DataSource.metadata.annotations"
+            descriptionHeader={t('Annotations')}
+            isEdit
+            isPopover
+            moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
           />
           <DescriptionItem
-            descriptionData={<Timestamp timestamp={dataSource?.metadata?.creationTimestamp} />}
-            descriptionHeader={t('Created at')}
-            isPopover
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L84
             bodyContent={t(
               'Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.',
             )}
             breadcrumb="DataSource.metadata.creationTimestamp"
+            descriptionData={<Timestamp timestamp={dataSource?.metadata?.creationTimestamp} />}
+            descriptionHeader={t('Created at')}
+            isPopover
           />
           <OwnerDetailsItem obj={dataSource} />
         </DescriptionList>

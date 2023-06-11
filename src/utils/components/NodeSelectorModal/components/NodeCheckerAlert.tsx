@@ -16,15 +16,15 @@ import {
 } from '@patternfly/react-core';
 
 type NodeCheckerAlertProps = {
-  qualifiedNodes: IoK8sApiCoreV1Node[];
-  prefferedQualifiedNodes?: IoK8sApiCoreV1Node[];
   nodesLoaded: boolean;
+  prefferedQualifiedNodes?: IoK8sApiCoreV1Node[];
+  qualifiedNodes: IoK8sApiCoreV1Node[];
 };
 
 const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
-  qualifiedNodes,
-  prefferedQualifiedNodes,
   nodesLoaded,
+  prefferedQualifiedNodes,
+  qualifiedNodes,
 }) => {
   const { t } = useKubevirtTranslation();
   if (!nodesLoaded) {
@@ -80,13 +80,6 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
     >
       {qualifiedNodesSize || prefferedQualifiedNodesSize ? (
         <Popover
-          headerContent={
-            <>
-              {t('{{qualifiedNodesCount}} matching Nodes found', {
-                qualifiedNodesCount: qualifiedNodesSize || prefferedQualifiedNodesSize,
-              })}
-            </>
-          }
           bodyContent={
             <>
               {nodes?.map((node) => {
@@ -109,8 +102,15 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
               })}
             </>
           }
+          headerContent={
+            <>
+              {t('{{qualifiedNodesCount}} matching Nodes found', {
+                qualifiedNodesCount: qualifiedNodesSize || prefferedQualifiedNodesSize,
+              })}
+            </>
+          }
         >
-          <Button variant="link" isInline>
+          <Button isInline variant="link">
             {t('View matching {{matchingNodeText}}', {
               matchingNodeText,
             })}

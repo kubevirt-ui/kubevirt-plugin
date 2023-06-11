@@ -3,123 +3,123 @@ import { V1MigrationConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export type Descriptor<T = any> = {
-  path: string;
-  displayName: string;
   description: string;
-  'x-descriptors'?: T[];
+  displayName: string;
+  path: string;
   value?: any;
+  'x-descriptors'?: T[];
 };
 
 export type CRDDescription = {
-  name: string;
-  version: string;
-  kind: string;
-  displayName: string;
   description?: string;
-  specDescriptors?: Descriptor[];
-  statusDescriptors?: Descriptor[];
+  displayName: string;
+  kind: string;
+  name: string;
   resources?: {
+    kind: string;
     name?: string;
     version: string;
-    kind: string;
   }[];
+  specDescriptors?: Descriptor[];
+  statusDescriptors?: Descriptor[];
+  version: string;
 };
 
 export type APIServiceDefinition = {
-  name: string;
-  group: string;
-  version: string;
-  kind: string;
-  deploymentName: string;
   containerPort: number;
-  displayName: string;
+  deploymentName: string;
   description?: string;
-  specDescriptors?: Descriptor[];
-  statusDescriptors?: Descriptor[];
+  displayName: string;
+  group: string;
+  kind: string;
+  name: string;
   resources?: {
+    kind: string;
     name?: string;
     version: string;
-    kind: string;
   }[];
+  specDescriptors?: Descriptor[];
+  statusDescriptors?: Descriptor[];
+  version: string;
 };
 
 export enum InstallModeType {
+  InstallModeTypeAllNamespaces = 'AllNamespaces',
+  InstallModeTypeMultiNamespace = 'MultiNamespace',
   InstallModeTypeOwnNamespace = 'OwnNamespace',
   InstallModeTypeSingleNamespace = 'SingleNamespace',
-  InstallModeTypeMultiNamespace = 'MultiNamespace',
-  InstallModeTypeAllNamespaces = 'AllNamespaces',
 }
 
 export type ClusterServiceVersionIcon = { base64data: string; mediatype: string };
 
 export enum ClusterServiceVersionPhase {
+  CSVPhaseDeleting = 'Deleting',
+  CSVPhaseFailed = 'Failed',
+  CSVPhaseInstalling = 'Installing',
+  CSVPhaseInstallReady = 'InstallReady',
   CSVPhaseNone = '',
   CSVPhasePending = 'Pending',
-  CSVPhaseInstallReady = 'InstallReady',
-  CSVPhaseInstalling = 'Installing',
-  CSVPhaseSucceeded = 'Succeeded',
-  CSVPhaseFailed = 'Failed',
-  CSVPhaseUnknown = 'Unknown',
   CSVPhaseReplacing = 'Replacing',
-  CSVPhaseDeleting = 'Deleting',
+  CSVPhaseSucceeded = 'Succeeded',
+  CSVPhaseUnknown = 'Unknown',
 }
 
 export enum CSVConditionReason {
-  CSVReasonRequirementsUnknown = 'RequirementsUnknown',
-  CSVReasonRequirementsNotMet = 'RequirementsNotMet',
-  CSVReasonRequirementsMet = 'AllRequirementsMet',
-  CSVReasonOwnerConflict = 'OwnerConflict',
-  CSVReasonComponentFailed = 'InstallComponentFailed',
-  CSVReasonInvalidStrategy = 'InvalidInstallStrategy',
-  CSVReasonWaiting = 'InstallWaiting',
-  CSVReasonInstallSuccessful = 'InstallSucceeded',
-  CSVReasonInstallCheckFailed = 'InstallCheckFailed',
-  CSVReasonComponentUnhealthy = 'ComponentUnhealthy',
   CSVReasonBeingReplaced = 'BeingReplaced',
-  CSVReasonReplaced = 'Replaced',
+  CSVReasonComponentFailed = 'InstallComponentFailed',
+  CSVReasonComponentUnhealthy = 'ComponentUnhealthy',
   CSVReasonCopied = 'Copied',
+  CSVReasonInstallCheckFailed = 'InstallCheckFailed',
+  CSVReasonInstallSuccessful = 'InstallSucceeded',
+  CSVReasonInvalidStrategy = 'InvalidInstallStrategy',
+  CSVReasonOwnerConflict = 'OwnerConflict',
+  CSVReasonReplaced = 'Replaced',
+  CSVReasonRequirementsMet = 'AllRequirementsMet',
+  CSVReasonRequirementsNotMet = 'RequirementsNotMet',
+  CSVReasonRequirementsUnknown = 'RequirementsUnknown',
+  CSVReasonWaiting = 'InstallWaiting',
 }
 
 export type RequirementStatus = {
   group: string;
-  version: string;
   kind: string;
   name: string;
   status: string;
   uuid?: string;
+  version: string;
 };
 
 export type K8sResourceKind = K8sResourceCommon & {
+  data?: { [key: string]: any };
   spec?: {
     [key: string]: any;
   };
   status?: { [key: string]: any };
-  data?: { [key: string]: any };
 };
 
 export type ClusterServiceVersionKind = {
   apiVersion: 'operators.coreos.com/v1alpha1';
   kind: 'ClusterServiceVersion';
   spec: {
-    install: {
-      strategy: 'Deployment';
-      spec: {
-        permissions: {
-          serviceAccountName: string;
-          rules: { apiGroups: string[]; resources: string[]; verbs: string[] }[];
-        }[];
-        deployments: { name: string; spec: any }[];
-      };
-    };
-    customresourcedefinitions?: { owned?: CRDDescription[]; required?: CRDDescription[] };
     apiservicedefinitions?: { owned?: APIServiceDefinition[]; required?: APIServiceDefinition[] };
-    replaces?: string;
-    installModes: { type: InstallModeType; supported: boolean }[];
-    displayName?: string;
+    customresourcedefinitions?: { owned?: CRDDescription[]; required?: CRDDescription[] };
     description?: string;
-    provider?: { name: string };
-    version?: string;
+    displayName?: string;
     icon?: ClusterServiceVersionIcon[];
+    install: {
+      spec: {
+        deployments: { name: string; spec: any }[];
+        permissions: {
+          rules: { apiGroups: string[]; resources: string[]; verbs: string[] }[];
+          serviceAccountName: string;
+        }[];
+      };
+      strategy: 'Deployment';
+    };
+    installModes: { supported: boolean; type: InstallModeType }[];
+    provider?: { name: string };
+    replaces?: string;
+    version?: string;
   };
   status?: {
     phase: ClusterServiceVersionPhase;
@@ -134,47 +134,47 @@ export enum InstallPlanApproval {
 }
 
 export type ObjectReference = {
-  kind?: string;
-  namespace?: string;
-  name?: string;
-  uid?: string;
   apiVersion?: string;
-  resourceVersion?: string;
   fieldPath?: string;
+  kind?: string;
+  name?: string;
+  namespace?: string;
+  resourceVersion?: string;
+  uid?: string;
 };
 
 export enum K8sResourceConditionStatus {
-  True = 'True',
   False = 'False',
+  True = 'True',
   Unknown = 'Unknown',
 }
 
 export type K8sResourceCondition = {
-  type: string;
-  status: keyof typeof K8sResourceConditionStatus;
   lastTransitionTime?: string;
-  reason?: string;
   message?: string;
+  reason?: string;
+  status: keyof typeof K8sResourceConditionStatus;
+  type: string;
 };
 
 export enum SubscriptionState {
-  SubscriptionStateNone = '',
+  SubscriptionStateAtLatest = 'AtLatestKnown',
   SubscriptionStateFailed = 'UpgradeFailed',
+  SubscriptionStateNone = '',
   SubscriptionStateUpgradeAvailable = 'UpgradeAvailable',
   SubscriptionStateUpgradePending = 'UpgradePending',
-  SubscriptionStateAtLatest = 'AtLatestKnown',
 }
 
 export type SubscriptionKind = {
   apiVersion: 'operators.coreos.com/v1alpha1';
   kind: 'Subscription';
   spec: {
-    source: string;
-    name: string;
     channel?: string;
-    startingCSV?: string;
-    sourceNamespace?: string;
     installPlanApproval?: InstallPlanApproval;
+    name: string;
+    source: string;
+    sourceNamespace?: string;
+    startingCSV?: string;
   };
   status?: {
     catalogHealth?: {
@@ -183,11 +183,11 @@ export type SubscriptionKind = {
       lastUpdated?: string;
     }[];
     conditions?: K8sResourceCondition[];
+    currentCSV?: string;
     installedCSV?: string;
     installPlanRef?: ObjectReference;
-    state?: SubscriptionState;
     lastUpdated?: string;
-    currentCSV?: string;
+    state?: SubscriptionState;
   };
 } & K8sResourceCommon;
 
@@ -195,22 +195,22 @@ export type CatalogSourceKind = {
   apiVersion: 'operators.coreos.com/v1alpha1';
   kind: 'CatalogSource';
   spec: {
-    name: string;
-    sourceType: 'internal' | 'grpc' | 'configMap';
     configMap?: string;
-    secrets?: string[];
-    displayName?: string;
     description?: string;
+    displayName?: string;
+    icon?: { data: string; mediatype: string };
+    name: string;
     publisher?: string;
-    icon?: { mediatype: string; data: string };
+    secrets?: string[];
+    sourceType: 'configMap' | 'grpc' | 'internal';
     updateStrategy?: { registryPoll: { interval: string } };
   };
 } & K8sResourceKind;
 
 export type HyperConverged = K8sResourceCommon & {
   spec: {
-    liveMigrationConfig: V1MigrationConfiguration;
     commonTemplatesNamespace?: string;
+    liveMigrationConfig: V1MigrationConfiguration;
   };
 };
 

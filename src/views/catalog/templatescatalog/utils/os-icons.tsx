@@ -12,16 +12,16 @@ const windows = require('./svg/windows.svg') as string;
 const linux = require('./svg/linux.svg') as string;
 
 const iconMap = {
-  'icon-linux': linux,
-  'icon-centos': centos,
-  'icon-fedora': fedora,
-  'icon-debian': debian,
   'icon-bsd': bsd,
-  'icon-windows': windows,
-  'icon-rhel': rhel,
+  'icon-centos': centos,
+  'icon-debian': debian,
+  'icon-fedora': fedora,
+  'icon-linux': linux,
   'icon-opensuse': opensuse,
-  'icon-ubuntu': ubuntu,
   'icon-other': linux,
+  'icon-rhel': rhel,
+  'icon-ubuntu': ubuntu,
+  'icon-windows': windows,
 };
 
 export const getTemplateOSIcon = (template: K8sResourceCommon): string => {

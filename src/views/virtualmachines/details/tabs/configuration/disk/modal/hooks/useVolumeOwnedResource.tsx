@@ -17,9 +17,9 @@ type UseVolumeOwnedResource = (
   vm: V1VirtualMachine,
   volume: V1Volume,
 ) => {
-  volumeResource: K8sResourceCommon;
-  loaded: boolean;
   error: Error;
+  loaded: boolean;
+  volumeResource: K8sResourceCommon;
   volumeResourceModel: K8sModel;
   volumeResourceName: string;
 };
@@ -27,8 +27,8 @@ type UseVolumeOwnedResource = (
 const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
   const [cdiConfig, isCdiConfigLoaded, isCdiConfigError] = useK8sWatchResource<V1beta1CDIConfig>({
     groupVersionKind: CDIConfigModelGroupVersionKind,
-    namespaced: false,
     isList: false,
+    namespaced: false,
   });
 
   const updatedVolume = volume.dataVolume ? convertDataVolumeToPVC(volume, cdiConfig) : volume;
@@ -36,18 +36,18 @@ const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
   const volumeResourceModel = mapVolumeTypeToK8sModel[volumeType];
   const volumeResourceName = getVolumeResourceName(volume);
   const watchVolumeResource = {
-    isList: false,
     groupVersionKind: volumeResourceModel && modelToGroupVersionKind(volumeResourceModel),
-    namespace: vm.metadata.namespace,
+    isList: false,
     name: volumeResourceName,
+    namespace: vm.metadata.namespace,
   };
   const [resource, loaded, error] = useK8sWatchResource<K8sResourceCommon>(watchVolumeResource);
 
   if (!volumeResourceModel || !volumeResourceName) {
     return {
-      volumeResource: null,
-      loaded: true,
       error: error || isCdiConfigError,
+      loaded: true,
+      volumeResource: null,
       volumeResourceModel: null,
       volumeResourceName: null,
     };
@@ -57,9 +57,9 @@ const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
     return compareOwnerReferences(ownerRef, vmOwnerRef);
   });
   return {
-    volumeResource: volumeResourceReference ? resource : null,
-    loaded: loaded && isCdiConfigLoaded,
     error: error || isCdiConfigError,
+    loaded: loaded && isCdiConfigLoaded,
+    volumeResource: volumeResourceReference ? resource : null,
     volumeResourceModel,
     volumeResourceName,
   };

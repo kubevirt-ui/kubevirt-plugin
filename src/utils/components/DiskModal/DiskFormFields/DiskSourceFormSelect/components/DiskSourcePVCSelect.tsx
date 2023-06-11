@@ -22,7 +22,7 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
   selectPVCNamespace,
   setDiskSize,
 }) => {
-  const { projectsNames, pvcs, projectsLoaded, pvcsLoaded } =
+  const { projectsLoaded, projectsNames, pvcs, pvcsLoaded } =
     useProjectsAndPVCs(pvcNamespaceSelected);
 
   const onSelectProject = useCallback(
@@ -51,17 +51,17 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
   return (
     <div>
       <DiskSourcePVCSelectNamespace
+        isDisabled={!selectPVCNamespace}
+        onChange={onSelectProject}
+        projectsLoaded={projectsLoaded}
         projectsName={projectsNames}
         selectedProject={pvcNamespaceSelected}
-        onChange={onSelectProject}
-        isDisabled={!selectPVCNamespace}
-        projectsLoaded={projectsLoaded}
       />
       <DiskSourcePVCSelectName
-        onChange={onPVCSelected}
-        pvcNameSelected={pvcNameSelected}
-        pvcNames={pvcNames}
         isDisabled={!pvcNamespaceSelected}
+        onChange={onPVCSelected}
+        pvcNames={pvcNames}
+        pvcNameSelected={pvcNameSelected}
         pvcsLoaded={pvcsLoaded}
       />
     </div>

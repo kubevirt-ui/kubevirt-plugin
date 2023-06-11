@@ -25,8 +25,8 @@ import ParameterEditor from './ParameterEditor';
 import './template-parameters-page.scss';
 
 type TemplateParametersPageProps = RouteComponentProps<{
-  ns: string;
   name: string;
+  ns: string;
 }> & {
   obj?: V1Template;
 };
@@ -63,8 +63,8 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
     setLoading(true);
     try {
       await k8sUpdate({
-        model: TemplateModel,
         data: editableTemplate,
+        model: TemplateModel,
       });
       setSuccess(true);
     } catch (apiError) {
@@ -77,8 +77,8 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
   return (
     <PageSection className="template-parameters-page">
       <SidebarEditor
-        resource={editableTemplate}
         onChange={(newTemplate) => setEditableTemplate(newTemplate)}
+        resource={editableTemplate}
       >
         <Form className="template-parameters-page__form">
           <Title headingLevel="h2">{t('Parameters')}</Title>
@@ -86,36 +86,36 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
           {parameters.map((parameter, index) => (
             <>
               <ParameterEditor
-                key={parameter.name}
-                parameter={parameter}
-                onChange={onParameterChange}
                 isEditDisabled={!isTemplateEditable}
+                key={parameter.name}
+                onChange={onParameterChange}
+                parameter={parameter}
               />
               {index !== parameters.length - 1 && <Divider />}
             </>
           ))}
           {error && (
-            <Alert variant={AlertVariant.danger} isInline title={t('Error')}>
+            <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
               {error}
             </Alert>
           )}
 
           {success && (
-            <Alert variant={AlertVariant.info} isInline title={t('Success')}>
+            <Alert isInline title={t('Success')} variant={AlertVariant.info}>
               {t('Parameters successfully edited')}
             </Alert>
           )}
           <ActionGroup className="pf-c-form">
             <Button
               isDisabled={isSaveDisabled}
+              isLoading={loading}
+              onClick={onSave}
               type="submit"
               variant="primary"
-              onClick={onSave}
-              isLoading={loading}
             >
               {t('Save')}
             </Button>
-            <Button type="button" variant="secondary" onClick={goBack}>
+            <Button onClick={goBack} type="button" variant="secondary">
               {t('Cancel')}
             </Button>
           </ActionGroup>

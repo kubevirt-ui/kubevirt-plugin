@@ -8,14 +8,14 @@ import { DiagnosticSort } from '../utils/types';
 import useDiagnosticSort from './useDiagnosticSort';
 
 type DiagnosticColumn = {
-  title: string;
   id: string;
   sort: (columnIndex: any) => ThSortType;
+  title: string;
 };
 
 type UseDiagnosticVolumeStatusTableColumns = () => {
-  columns: TableColumn<DiagnosticColumn>[];
   activeColumns: TableColumn<DiagnosticColumn>[];
+  columns: TableColumn<DiagnosticColumn>[];
   sorting: DiagnosticSort;
 };
 const useDiagnosticVolumeStatusTableColumns: UseDiagnosticVolumeStatusTableColumns = () => {
@@ -24,28 +24,28 @@ const useDiagnosticVolumeStatusTableColumns: UseDiagnosticVolumeStatusTableColum
 
   const columns: TableColumn<DiagnosticColumn>[] = [
     {
-      title: t('Name'),
-      id: 'name',
       cell: { sort: (columnIndex) => getSorting('name', columnIndex) },
+      id: 'name',
+      title: t('Name'),
     },
     {
-      title: t('Enabled'),
-      id: 'enabled',
       cell: { sort: (columnIndex) => getSorting('enabled', columnIndex) },
+      id: 'enabled',
+      title: t('Enabled'),
     },
     {
-      title: t('Reason'),
-      id: 'reason',
       cell: { sort: (columnIndex) => getSorting('reason', columnIndex) },
+      id: 'reason',
+      title: t('Reason'),
     },
   ];
 
   const [activeColumns] = useKubevirtUserSettingsTableColumns<DiagnosticColumn>({
-    columns,
     columnManagementID: 'diagnostic-tab-volume',
+    columns,
   });
 
-  return { columns, activeColumns, sorting: sort };
+  return { activeColumns, columns, sorting: sort };
 };
 
 export default useDiagnosticVolumeStatusTableColumns;

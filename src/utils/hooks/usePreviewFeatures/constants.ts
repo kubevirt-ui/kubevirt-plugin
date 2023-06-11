@@ -13,11 +13,11 @@ const PREVIEW_FEATURES_ROLE_NAME = 'kubevirt-ui-preview-features-reader';
 const PREVIEW_FEATURES_ROLE_BINDING_NAME = 'kubevirt-ui-preview-features-reader-binding';
 
 export const previewFeaturesConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
+  data: { [INSTANCE_TYPE_ENABLED]: 'false' },
   metadata: {
     name: PREVIEW_FEATURES_CONFIG_MAP_NAME,
     namespace: DEFAULT_NAMESPACE,
   },
-  data: { [INSTANCE_TYPE_ENABLED]: 'false' },
 };
 
 export const previewFeaturesRole: IoK8sApiRbacV1Role = {
@@ -28,8 +28,8 @@ export const previewFeaturesRole: IoK8sApiRbacV1Role = {
   rules: [
     {
       apiGroups: [''],
-      resources: [ConfigMapModel.plural],
       resourceNames: [PREVIEW_FEATURES_CONFIG_MAP_NAME],
+      resources: [ConfigMapModel.plural],
       verbs: ['list', 'get'],
     },
   ],
@@ -40,16 +40,16 @@ export const previewFeaturesRoleBinding: IoK8sApiRbacV1RoleBinding = {
     name: PREVIEW_FEATURES_ROLE_BINDING_NAME,
     namespace: DEFAULT_NAMESPACE,
   },
-  subjects: [
-    {
-      kind: GroupModel.kind,
-      name: 'system:authenticated',
-      apiGroup: RoleModel.apiGroup,
-    },
-  ],
   roleRef: {
+    apiGroup: RoleModel.apiGroup,
     kind: RoleModel.kind,
     name: PREVIEW_FEATURES_ROLE_NAME,
-    apiGroup: RoleModel.apiGroup,
   },
+  subjects: [
+    {
+      apiGroup: RoleModel.apiGroup,
+      kind: GroupModel.kind,
+      name: 'system:authenticated',
+    },
+  ],
 };

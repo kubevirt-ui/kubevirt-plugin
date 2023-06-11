@@ -17,11 +17,11 @@ import useActiveUsersColumnsVm from './hooks/useActiveUsersColumnsVm';
 import ActiveUserListRowVm from './ActiveUserListRowVm';
 
 type ActiveUserListProps = {
-  vm: V1VirtualMachine;
   pathname: string;
+  vm: V1VirtualMachine;
 };
 
-const ActiveUserListSection: React.FC<ActiveUserListProps> = ({ vm, pathname }) => {
+const ActiveUserListSection: React.FC<ActiveUserListProps> = ({ pathname, vm }) => {
   const { t } = useKubevirtTranslation();
   const columns = useActiveUsersColumnsVm();
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
@@ -30,17 +30,17 @@ const ActiveUserListSection: React.FC<ActiveUserListProps> = ({ vm, pathname }) 
   const bodyTable =
     vmi && isGuestAgentConnected(vmi) ? (
       <VirtualizedTable<V1VirtualMachineInstanceGuestOSUser>
-        data={userList}
-        unfilteredData={userList}
-        loaded={loaded}
-        loadError={loadError}
-        columns={columns}
-        Row={ActiveUserListRowVm}
         NoDataEmptyMsg={() => (
-          <div id="no-active-users-msg" className="pf-u-text-align-center">
+          <div className="pf-u-text-align-center" id="no-active-users-msg">
             {t('No active users')}
           </div>
         )}
+        columns={columns}
+        data={userList}
+        loaded={loaded}
+        loadError={loadError}
+        Row={ActiveUserListRowVm}
+        unfilteredData={userList}
       />
     ) : (
       <Bullseye>
@@ -52,10 +52,10 @@ const ActiveUserListSection: React.FC<ActiveUserListProps> = ({ vm, pathname }) 
 
   return (
     <div className="VirtualMachinesDetailsSection">
-      <a href={`${pathname}#logged-in-users`} className="link-icon">
+      <a className="link-icon" href={`${pathname}#logged-in-users`}>
         <LinkIcon size="sm" />
       </a>
-      <Title headingLevel="h2" className="co-section-heading">
+      <Title className="co-section-heading" headingLevel="h2">
         {t('Active users')}
       </Title>
       {bodyTable}

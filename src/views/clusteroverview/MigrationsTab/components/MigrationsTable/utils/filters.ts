@@ -5,18 +5,18 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 export const getStatusFilter = (): RowFilter[] => [
   {
-    filterGroupName: t('Status'),
-    type: 'status',
-    reducer: (obj) => obj?.vmim?.status?.phase,
     filter: (statuses, obj) => {
       const status = obj?.vmim?.status?.phase;
 
       return statuses?.selected?.length === 0 || statuses?.selected?.includes(status);
     },
+    filterGroupName: t('Status'),
     items: Object.keys(vmimStatuses).map((status) => ({
       id: status,
       title: status,
     })),
+    reducer: (obj) => obj?.vmim?.status?.phase,
+    type: 'status',
   },
 ];
 
@@ -31,9 +31,6 @@ export const getSourceNodeFilter = (vmis: V1VirtualMachineInstance[]): RowFilter
 
   return [
     {
-      filterGroupName: t('Source Node'),
-      type: 'source',
-      reducer: (obj) => `source-${obj?.vmiObj?.status?.migrationState?.sourceNode}`,
       filter: (selectedNodes, obj) => {
         const nodeName = obj?.vmiObj?.status?.migrationState?.sourceNode;
         return (
@@ -41,10 +38,13 @@ export const getSourceNodeFilter = (vmis: V1VirtualMachineInstance[]): RowFilter
           selectedNodes?.selected?.includes(`source-${nodeName}`)
         );
       },
+      filterGroupName: t('Source Node'),
       items: Array.from(nodes).map((nodeName) => ({
         id: `source-${nodeName}`,
         title: nodeName,
       })),
+      reducer: (obj) => `source-${obj?.vmiObj?.status?.migrationState?.sourceNode}`,
+      type: 'source',
     },
   ];
 };
@@ -60,11 +60,6 @@ export const getTargetNodeFilter = (vmis: V1VirtualMachineInstance[]): RowFilter
 
   return [
     {
-      filterGroupName: t('Target Node'),
-      type: 'target',
-      reducer: (obj) => {
-        return `target-${obj?.vmiObj?.status?.migrationState?.targetNode}`;
-      },
       filter: (selectedNodes, obj) => {
         const nodeName = obj?.vmiObj?.status?.migrationState?.targetNode;
         return (
@@ -72,10 +67,15 @@ export const getTargetNodeFilter = (vmis: V1VirtualMachineInstance[]): RowFilter
           selectedNodes?.selected?.includes(`target-${nodeName}`)
         );
       },
+      filterGroupName: t('Target Node'),
       items: Array.from(nodes).map((nodeName) => ({
         id: `target-${nodeName}`,
         title: nodeName,
       })),
+      reducer: (obj) => {
+        return `target-${obj?.vmiObj?.status?.migrationState?.targetNode}`;
+      },
+      type: 'target',
     },
   ];
 };

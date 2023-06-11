@@ -12,22 +12,22 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Checkbox, Form, FormGroup } from '@patternfly/react-core';
 
 type DeschedulerModalProps = {
-  template: V1Template;
   isOpen: boolean;
   onClose: () => void;
+  template: V1Template;
 };
 
-const DeschedulerModal: React.FC<DeschedulerModalProps> = ({ template, isOpen, onClose }) => {
+const DeschedulerModal: React.FC<DeschedulerModalProps> = ({ isOpen, onClose, template }) => {
   const { t } = useKubevirtTranslation();
   const [isOn, setOn] = React.useState<boolean>(isDeschedulerOn(template)); // the default is OFF, the admin has to opt-in this feature
 
   const onSubmit = React.useCallback(
     (updatedTemplate: V1Template) =>
       k8sUpdate({
-        model: TemplateModel,
         data: updatedTemplate,
-        ns: updatedTemplate?.metadata?.namespace,
+        model: TemplateModel,
         name: updatedTemplate?.metadata?.name,
+        ns: updatedTemplate?.metadata?.namespace,
       }),
     [],
   );
@@ -48,24 +48,24 @@ const DeschedulerModal: React.FC<DeschedulerModalProps> = ({ template, isOpen, o
 
   return (
     <TabModal
-      obj={updatedTemplate}
+      headerText={t('Descheduler settings')}
       isOpen={isOpen}
+      obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
-      headerText={t('Descheduler settings')}
     >
       <Form>
         <FormGroup fieldId="descheduler">
           <Checkbox
+            description={t('Allow the Descheduler to evict the VirtualMachine via live migration')}
             id="descheduler"
             isChecked={isOn}
-            onChange={setOn}
             label={t('Enable Descheduler')}
-            description={t('Allow the Descheduler to evict the VirtualMachine via live migration')}
+            onChange={setOn}
           />
         </FormGroup>
         {isOn && (
-          <Alert isInline variant={AlertVariant.info} title={t('Active Descheduler')}>
+          <Alert isInline title={t('Active Descheduler')} variant={AlertVariant.info}>
             {/* TODO fix the message */}
             {t(
               'This VirtualMachine is subject to the Descheduler profiles configured for eviction.',

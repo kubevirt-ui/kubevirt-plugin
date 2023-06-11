@@ -74,7 +74,12 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
 
   return (
     <TabModal
-      obj={emptyDataSource}
+      onClose={() => {
+        if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
+          upload.cancelUpload().catch(console.error);
+        }
+        onClose();
+      }}
       onSubmit={createBootableVolume(
         bootableVolume,
         uploadData,
@@ -83,15 +88,10 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         onCreateVolume,
       )}
       headerText={t('Add volume')}
-      isOpen={isOpen}
-      onClose={() => {
-        if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
-          upload.cancelUpload().catch(console.error);
-        }
-        onClose();
-      }}
-      submitBtnText={t('Save')}
       isDisabled={!labels?.[DEFAULT_PREFERENCE_LABEL]}
+      isOpen={isOpen}
+      obj={emptyDataSource}
+      submitBtnText={t('Save')}
     >
       {t('You can upload a new volume or use an existing PersistentVolumeClaim (PVC)')}
       <Form>
@@ -102,8 +102,8 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         <Title headingLevel="h5">{t('Source details')}</Title>
         <VolumeSource
           bootableVolume={bootableVolume}
-          setBootableVolumeField={setBootableVolumeField}
           isUploadForm={isUploadForm}
+          setBootableVolumeField={setBootableVolumeField}
           upload={upload}
         />
         <FormGroup>{/* Spacer */}</FormGroup>
@@ -117,14 +117,14 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           {t('Volume metadata')}{' '}
           <HelpTextIcon
             bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}
-            position={PopoverPosition.right}
             helpIconClassName="add-bootable-volume-modal__title-help-text-icon"
+            position={PopoverPosition.right}
           />
         </Title>
         <VolumeMetadata
           bootableVolume={bootableVolume}
-          setBootableVolumeField={setBootableVolumeField}
           preferencesNames={preferencesNames}
+          setBootableVolumeField={setBootableVolumeField}
         />
       </Form>
     </TabModal>

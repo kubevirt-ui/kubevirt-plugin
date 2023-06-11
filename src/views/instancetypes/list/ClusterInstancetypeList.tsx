@@ -35,7 +35,7 @@ const ClusterInstancetypeList: FC<ClusterInstancetypeListProps> = ({ kind }) => 
     namespaced: false,
   });
 
-  const { pagination, onPaginationChange } = usePagination();
+  const { onPaginationChange, pagination } = usePagination();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(instanceTypes);
   const [columns, activeColumns] = useClusterInstancetypeListColumns(pagination, data);
 
@@ -49,50 +49,50 @@ const ClusterInstancetypeList: FC<ClusterInstancetypeListProps> = ({ kind }) => 
       <ListPageBody>
         <div className="list-managment-group">
           <ListPageFilter
-            data={unfilteredData}
-            loaded={loaded}
-            onFilterChange={(...args) => {
-              onFilterChange(...args);
-              onPaginationChange({
-                page: 1,
-                startIndex: 0,
-                endIndex: pagination?.perPage,
-                perPage: pagination?.perPage,
-              });
-            }}
             columnLayout={{
-              columns: columns?.map(({ id, title, additional }) => ({
+              columns: columns?.map(({ additional, id, title }) => ({
+                additional,
                 id,
                 title,
-                additional,
               })),
               id: kind,
               selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
               type: '',
             }}
+            onFilterChange={(...args) => {
+              onFilterChange(...args);
+              onPaginationChange({
+                endIndex: pagination?.perPage,
+                page: 1,
+                perPage: pagination?.perPage,
+                startIndex: 0,
+              });
+            }}
+            data={unfilteredData}
+            loaded={loaded}
           />
           <Pagination
-            itemCount={data?.length}
+            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+              onPaginationChange({ endIndex, page, perPage, startIndex })
+            }
+            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+              onPaginationChange({ endIndex, page, perPage, startIndex })
+            }
             className="list-managment-group__pagination"
+            defaultToFullPage
+            itemCount={data?.length}
             page={pagination?.page}
             perPage={pagination?.perPage}
-            defaultToFullPage
-            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-              onPaginationChange({ page, perPage, startIndex, endIndex })
-            }
-            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-              onPaginationChange({ page, perPage, startIndex, endIndex })
-            }
             perPageOptions={paginationDefaultValues}
           />
         </div>
         <VirtualizedTable<V1alpha2VirtualMachineClusterInstancetype>
+          columns={activeColumns}
           data={data}
-          unfilteredData={unfilteredData}
           loaded={loaded}
           loadError={loadError}
-          columns={activeColumns}
           Row={ClusterInstancetypeRow}
+          unfilteredData={unfilteredData}
         />
       </ListPageBody>
     </>

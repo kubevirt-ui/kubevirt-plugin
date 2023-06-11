@@ -10,8 +10,8 @@ export type UseSSHServiceReturnType = [service: IoK8sApiCoreV1Service, loaded: b
 
 const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
   const watchServiceResources = {
-    kind: ServiceModel.kind,
     isList: true,
+    kind: ServiceModel.kind,
     namespace: vm?.metadata?.namespace,
   };
 

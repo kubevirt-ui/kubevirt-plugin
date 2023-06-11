@@ -9,19 +9,19 @@ import { extractKeyValueFromLabel, transformKeyValueToLabel } from './utils';
 import './SelectorLabelMatchGroup.scss';
 
 type SelectorLabelMatchGroupProps = {
+  isVMILabel?: boolean;
   labels: { [key: string]: string };
   setLabels?: React.Dispatch<
     React.SetStateAction<{
       [key: string]: string;
     }>
   >;
-  isVMILabel?: boolean;
 };
 
 const SelectorLabelMatchGroup: React.FC<SelectorLabelMatchGroupProps> = ({
+  isVMILabel,
   labels,
   setLabels,
-  isVMILabel,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -53,14 +53,14 @@ const SelectorLabelMatchGroup: React.FC<SelectorLabelMatchGroupProps> = ({
 
   return (
     <>
-      <LabelGroup numLabels={10} className="mp-match-label-group" isEditable>
+      <LabelGroup className="mp-match-label-group" isEditable numLabels={10}>
         {Object.keys(labels || {})?.map((key) => {
           return (
             <Label
               className={classNames({ 'kv-migration-policy__label-vm': isVMILabel })}
-              key={key}
               color={isVMILabel ? 'grey' : 'blue'}
               isEditable
+              key={key}
               onClose={onDeleteLabel(key)}
               onEditComplete={(_, val) => onEditLabel(key)(val)}
             >
@@ -70,9 +70,9 @@ const SelectorLabelMatchGroup: React.FC<SelectorLabelMatchGroupProps> = ({
         })}
         <Label
           color="blue"
-          variant="outline"
           isEditable
           onEditComplete={(_, val) => onAddLabel(val)}
+          variant="outline"
         >
           {t('Enter key=value')}
         </Label>

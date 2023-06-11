@@ -54,10 +54,10 @@ const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
   );
 
   const [pvcs, loaded, loadingError] = useK8sWatchResource<K8sResourceCommon[]>({
-    kind: PersistentVolumeClaimModel.kind,
     isList: true,
-    namespaced: true,
+    kind: PersistentVolumeClaimModel.kind,
     namespace: vm?.metadata?.namespace,
+    namespaced: true,
   });
 
   const disks = React.useMemo(() => {
@@ -68,7 +68,7 @@ const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
           metadata?.name === volume?.persistentVolumeClaim?.claimName ||
           metadata?.name === volume?.dataVolume?.name,
       );
-      return { disk, volume, pvc };
+      return { disk, pvc, volume };
     });
 
     return getDiskRowDataLayout(diskDevices, getBootDisk(vm), t);
