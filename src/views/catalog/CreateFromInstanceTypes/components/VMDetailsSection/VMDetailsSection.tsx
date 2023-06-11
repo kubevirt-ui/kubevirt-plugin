@@ -11,11 +11,11 @@ const VMDetailsSection: FC = () => {
   return (
     <div className="instancetypes-vm-details-section instancetypes-vm-details-body">
       <Grid hasGutter>
-        <GridItem span={3}>
+        <GridItem span={5}>
           <DetailsLeftGrid />
         </GridItem>
         <GridItem span={1}>{/* Spacer */}</GridItem>
-        <GridItem span={3}>
+        <GridItem span={5}>
           <DetailsRightGrid />
         </GridItem>
       </Grid>
