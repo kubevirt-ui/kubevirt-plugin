@@ -1,12 +1,11 @@
-import React, { ComponentClass, FC } from 'react';
+import React, { ComponentClass, FC, ReactNode } from 'react';
 
-import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
 import { TabTitleIcon, TabTitleText } from '@patternfly/react-core';
 
 type CreateVMTabTitleProps = {
   titleText: string;
   Icon: ComponentClass;
-  badge?: boolean;
+  badge?: ReactNode;
 };
 
 const CreateVMTabTitle: FC<CreateVMTabTitleProps> = ({ Icon, titleText, badge }) => (
@@ -15,7 +14,7 @@ const CreateVMTabTitle: FC<CreateVMTabTitleProps> = ({ Icon, titleText, badge })
       <Icon />
     </TabTitleIcon>
     <TabTitleText>{titleText}</TabTitleText>
-    {badge && <DeveloperPreviewLabel />}
+    {badge}
   </>
 );
 

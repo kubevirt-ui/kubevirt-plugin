@@ -2,7 +2,6 @@ import React, { FC, useCallback, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
@@ -21,11 +20,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
 
   const createItems = {
     catalog: t('From template'),
-    volume: (
-      <>
-        {t('From volume')} <DeveloperPreviewLabel />
-      </>
-    ),
+    volume: t('From volume'),
     yaml: t('From YAML'),
   };
 
