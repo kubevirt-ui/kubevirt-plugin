@@ -16,6 +16,8 @@ import {
   Popover,
   PopoverPosition,
   Skeleton,
+  Split,
+  SplitItem,
 } from '@patternfly/react-core';
 
 import { useKubevirtCSVDetails } from '../../utils/hooks/useKubevirtCSVDetails';
@@ -28,8 +30,6 @@ import './general-tab.scss';
 const GeneralTab = () => {
   const { t } = useKubevirtTranslation();
   const {
-    displayName,
-    provider,
     version,
     updateChannel,
     operatorLink,
@@ -40,46 +40,46 @@ const GeneralTab = () => {
   } = useKubevirtCSVDetails();
 
   return (
-    <>
-      <OverviewDetailItem isLoading={!loaded} title={t('Service name')}>
-        {displayName}
-      </OverviewDetailItem>
-      <Divider className="general-tab__divider" />
-      <OverviewDetailItem isLoading={!loaded} title={t('Provider')}>
-        {provider}
-      </OverviewDetailItem>
-      <Divider className="general-tab__divider" />
-      <OverviewDetailItem isLoading={!loaded} title={t('Installed version')}>
-        {version}
-      </OverviewDetailItem>
-      <Divider className="general-tab__divider" />
-      <OverviewDetailItem isLoading={!loaded} title={t('Update status')}>
-        {catalogSourceMissing ? (
-          <SourceMissingStatus />
-        ) : (
-          <SubscriptionStatus subscription={kubevirtSubscription} operatorLink={operatorLink} />
-        )}
-      </OverviewDetailItem>
-      <Divider className="general-tab__divider" />
-      <DescriptionList>
-        <DescriptionListGroup>
-          <DescriptionListTermHelpText>
-            <Popover
-              position={PopoverPosition.right}
-              bodyContent={t('The channel to track and receive the updates from.')}
-            >
-              <DescriptionListTermHelpTextButton>{t('Channel')}</DescriptionListTermHelpTextButton>
-            </Popover>
-          </DescriptionListTermHelpText>
-          <DescriptionListDescription>
-            {loaded ? (
-              <ExternalLink href={operatorLink}>{updateChannel}</ExternalLink>
-            ) : (
-              <Skeleton />
-            )}
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-      </DescriptionList>
+    <Split hasGutter className="general-tab">
+      <SplitItem>
+        <OverviewDetailItem isLoading={!loaded} title={t('Installed version')}>
+          {version}
+        </OverviewDetailItem>
+      </SplitItem>
+      <Divider className="general-tab__divider" orientation={{ default: 'vertical' }} />
+      <SplitItem>
+        <OverviewDetailItem isLoading={!loaded} title={t('Update status')}>
+          {catalogSourceMissing ? (
+            <SourceMissingStatus />
+          ) : (
+            <SubscriptionStatus subscription={kubevirtSubscription} operatorLink={operatorLink} />
+          )}
+        </OverviewDetailItem>
+      </SplitItem>
+      <Divider orientation={{ default: 'vertical' }} />
+      <SplitItem>
+        <DescriptionList>
+          <DescriptionListGroup>
+            <DescriptionListTermHelpText>
+              <Popover
+                position={PopoverPosition.right}
+                bodyContent={t('The channel to track and receive the updates from.')}
+              >
+                <DescriptionListTermHelpTextButton>
+                  {t('Channel')}
+                </DescriptionListTermHelpTextButton>
+              </Popover>
+            </DescriptionListTermHelpText>
+            <DescriptionListDescription>
+              {loaded ? (
+                <ExternalLink href={operatorLink}>{updateChannel}</ExternalLink>
+              ) : (
+                <Skeleton />
+              )}
+            </DescriptionListDescription>
+          </DescriptionListGroup>
+        </DescriptionList>
+      </SplitItem>
       {!isEmpty(loadErrors) && loaded && (
         <Alert
           variant={AlertVariant.danger}
@@ -90,7 +90,7 @@ const GeneralTab = () => {
           {loadErrors.toString()}
         </Alert>
       )}
-    </>
+    </Split>
   );
 };
 
