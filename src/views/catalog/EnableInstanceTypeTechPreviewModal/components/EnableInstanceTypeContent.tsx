@@ -11,7 +11,7 @@ const EnableInstanceTypeContent: FC = () => {
       <Stack hasGutter>
         <StackItem>
           <Text className="pf-u-font-size-xl pf-u-danger-color-100" component={TextVariants.p}>
-            Creating VirtualMachine is easier than ever!
+            Creating a VirtualMachine is easier than ever!
           </Text>
         </StackItem>
         <StackItem>
@@ -22,9 +22,9 @@ const EnableInstanceTypeContent: FC = () => {
               href="https://access.redhat.com/support/offerings/techpreview"
               target="_blank"
             >
-              Developer Preview feature
+              Technology Preview feature
             </Text>{' '}
-            provides a simple and quick way to create VirtualMachines.{' '}
+            provides a simple and quick way to create a VirtualMachine.{' '}
             <Text component={TextVariants.p}>
               You must have cluster admin permissions to enable this feature. You can disable it at
               any

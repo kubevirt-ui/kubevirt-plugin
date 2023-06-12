@@ -1,4 +1,4 @@
-import { SubscriptionKind, SubscriptionState } from '../../../../utils/types';
+import { SubscriptionKind, SubscriptionState } from '../../../../../../utils/types';
 
 const REQUIRES_APPROVAL = 'RequiresApproval';
 

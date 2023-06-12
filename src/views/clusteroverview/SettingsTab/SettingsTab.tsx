@@ -5,7 +5,7 @@ import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import ClusterTab from './ClusterTab/ClusterTab';
-import PermissionsTab from './PermissionsTab/PermissionsTab';
+import UserTab from './UserTab/UserTab';
 
 import './settings-tab.scss';
 
@@ -34,7 +34,7 @@ const SettingsTab: React.FC = () => {
           </Tab>
           <Tab eventKey={1} title={<TabTitleText>{t('User')}</TabTitleText>}>
             <div className="settings-tab__content">
-              <PermissionsTab />
+              <UserTab />
             </div>
           </Tab>
         </Tabs>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -7,15 +7,15 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider, Flex, FlexItem, Skeleton, Title } from '@patternfly/react-core';
 
+import ExpandSection from '../../../ExpandSection/ExpandSection';
+
 import usePermissions from './hooks/usePermissions';
 
-import './permissions-tab.scss';
-
-const PermissionsTab = () => {
+const TaskPermissionsSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const { capabilitiesData, isLoading } = usePermissions();
   return (
-    <div className="permissions-tab--main">
+    <ExpandSection className="permissions-tab--main" toggleText={t('Permissions')}>
       <Flex>
         <FlexItem>
           <Title headingLevel="h6" size="md">
@@ -41,8 +41,8 @@ const PermissionsTab = () => {
       ) : (
         <Skeleton />
       )}
-    </div>
+    </ExpandSection>
   );
 };
 
-export default PermissionsTab;
+export default TaskPermissionsSection;
