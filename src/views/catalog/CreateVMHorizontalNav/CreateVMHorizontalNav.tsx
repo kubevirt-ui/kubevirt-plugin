@@ -1,7 +1,8 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromInstanceType';
+import EnableInstanceTypeTechPreviewModal from '@catalog/EnableInstanceTypeTechPreviewModal/EnableInstanceTypeTechPreviewModal';
 import TemplatesCatalog from '@catalog/templatescatalog/TemplatesCatalog';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,9 +21,14 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [currentTab, setCurrentTab] = useState<CREATE_VM_TAB>(
-    location.pathname.includes(CREATE_VM_TAB.INSTANCE_TYPES)
+    location.pathname.endsWith(CREATE_VM_TAB.INSTANCE_TYPES)
       ? CREATE_VM_TAB.INSTANCE_TYPES
       : CREATE_VM_TAB.CATALOG,
+  );
+
+  const catalogURL = useMemo(
+    () => `/k8s/${match?.params?.ns ? `ns/${match?.params?.ns}` : ALL_NAMESPACES}/templatescatalog`,
+    [match],
   );
 
   const handleTabClick = (
@@ -30,11 +36,7 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
     tabIndex: CREATE_VM_TAB,
   ) => {
     setCurrentTab(tabIndex);
-    history.push(
-      `/k8s/${
-        match?.params?.ns ? `ns/${match?.params?.ns}` : ALL_NAMESPACES
-      }/templatescatalog${tabIndex}`,
-    );
+    history.push(`${catalogURL}${tabIndex}`);
   };
 
   return (
@@ -59,6 +61,14 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
           title={<CreateVMTabTitle Icon={ImageIcon} titleText={t('InstanceTypes')} badge />}
         >
           <CreateFromInstanceType />
+          {currentTab === CREATE_VM_TAB.INSTANCE_TYPES && (
+            <EnableInstanceTypeTechPreviewModal
+              navigateToCatalog={() => {
+                setCurrentTab(CREATE_VM_TAB.CATALOG);
+                history.push(catalogURL);
+              }}
+            />
+          )}
         </Tab>
       </Tabs>
     </div>
