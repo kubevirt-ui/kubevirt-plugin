@@ -6,6 +6,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 
+export const INSTANCE_TYPE_ENABLED = 'instanceTypesEnabled';
 export const PREVIEW_FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-preview-features';
 const PREVIEW_FEATURES_ROLE_NAME = 'kubevirt-ui-preview-features-reader';
 const PREVIEW_FEATURES_ROLE_BINDING_NAME = 'kubevirt-ui-preview-features-reader-binding';
@@ -15,7 +16,7 @@ export const previewFeaturesConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
     name: PREVIEW_FEATURES_CONFIG_MAP_NAME,
     namespace: DEFAULT_NAMESPACE,
   },
-  data: { instanceTypesEnabled: 'false' },
+  data: { [INSTANCE_TYPE_ENABLED]: 'false' },
 };
 
 export const previewFeaturesRole: IoK8sApiRbacV1Role = {

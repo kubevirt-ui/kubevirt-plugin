@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import produce from 'immer';
 
 import { ConfigMapModel, RoleBindingModel, RoleModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
@@ -7,12 +8,15 @@ import {
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   getGroupVersionKindForModel,
   k8sCreate,
-  k8sPatch,
+  k8sUpdate,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
+
+import { useIsAdmin } from '../useIsAdmin';
 
 import {
   PREVIEW_FEATURES_CONFIG_MAP_NAME,
@@ -21,7 +25,17 @@ import {
   previewFeaturesRoleBinding,
 } from './constants';
 
-export const usePreviewFeatures = () => {
+type UsePreviewFeatures = (featureName: string) => {
+  featureEnabled: boolean;
+  toggleFeature: (val: boolean) => void;
+  canEdit: boolean;
+  loading: boolean;
+  error: Error;
+};
+
+export const usePreviewFeatures: UsePreviewFeatures = (featureName) => {
+  const isAdmin = useIsAdmin();
+
   const [previewFeatureConfigMap, loaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
     {
       groupVersionKind: getGroupVersionKindForModel(ConfigMapModel),
@@ -31,13 +45,13 @@ export const usePreviewFeatures = () => {
     },
   );
 
-  const [instanceTypesEnabled, setInstanceTypesEnabled] = useState(false);
+  const [featureEnabled, setFeatureEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error>(null);
 
   useEffect(() => {
     if (loaded) {
-      setInstanceTypesEnabled(previewFeatureConfigMap?.data?.instanceTypesEnabled === 'true');
+      setFeatureEnabled(previewFeatureConfigMap?.data?.[featureName] === 'true');
       setLoading(false);
       return;
     }
@@ -72,20 +86,18 @@ export const usePreviewFeatures = () => {
 
       return;
     }
-  }, [loadError, previewFeatureConfigMap, loaded]);
+  }, [loadError, previewFeatureConfigMap, loaded, featureName]);
 
-  const toggleInstanceTypesFeature = (value: boolean) => {
+  const toggleFeature = (value: boolean) => {
+    const updatedConfigMap = produce(previewFeatureConfigMap, (draftCM) => {
+      if (isEmpty(draftCM?.data)) draftCM.data = {};
+      draftCM.data[featureName] = value.toString();
+    });
+
     try {
-      k8sPatch({
+      k8sUpdate({
         model: ConfigMapModel,
-        resource: previewFeatureConfigMap,
-        data: [
-          {
-            op: 'replace',
-            path: '/data',
-            value: { instanceTypesEnabled: value.toString() },
-          },
-        ],
+        data: updatedConfigMap,
       });
       setError(null);
     } catch (updateError) {
@@ -94,8 +106,9 @@ export const usePreviewFeatures = () => {
   };
 
   return {
-    instanceTypesEnabled,
-    toggleInstanceTypesFeature,
+    featureEnabled,
+    toggleFeature,
+    canEdit: isAdmin,
     loading,
     error,
   };

@@ -2,8 +2,8 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import instanceTypeTechPreviewModalImage from 'images/instance-type-tech-preview-modal-img.svg';
 
 import DeveloperPreviewLabel from '@kubevirt-utils/components/DeveloperPreviewLabel/DeveloperPreviewLabel';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { INSTANCE_TYPE_ENABLED } from '@kubevirt-utils/hooks/usePreviewFeatures/constants';
 import { usePreviewFeatures } from '@kubevirt-utils/hooks/usePreviewFeatures/usePreviewFeatures';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -30,9 +30,13 @@ const EnableInstanceTypeTechPreviewModal: FC<EnableInstanceTypeTechPreviewModalP
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const { instanceTypesEnabled, loading, toggleInstanceTypesFeature, error } = usePreviewFeatures();
-
-  const isAdmin = useIsAdmin();
+  const {
+    featureEnabled: instanceTypesEnabled,
+    loading,
+    toggleFeature: toggleInstanceTypesFeature,
+    error,
+    canEdit,
+  } = usePreviewFeatures(INSTANCE_TYPE_ENABLED);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -85,7 +89,7 @@ const EnableInstanceTypeTechPreviewModal: FC<EnableInstanceTypeTechPreviewModalP
               <Split hasGutter>
                 <Button
                   variant={ButtonVariant.primary}
-                  isDisabled={!isAdmin}
+                  isDisabled={!canEdit}
                   onClick={() => {
                     toggleInstanceTypesFeature(true);
                   }}
