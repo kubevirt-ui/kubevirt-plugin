@@ -8,7 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
-import { AddBootableVolumeState } from '../../utils/constants';
+import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
 
 import { InstanceTypeDrilldownSelect } from './components/InstanceTypeDrilldownSelect/InstanceTypeDrilldownSelect';
 import PreferenceSelect from './components/PreferenceSelect/PreferenceSelect';
@@ -16,7 +16,7 @@ import PreferenceSelect from './components/PreferenceSelect/PreferenceSelect';
 type VolumeMetadataProps = {
   bootableVolume: AddBootableVolumeState;
   preferencesNames: string[];
-  setBootableVolumeField: (key: string, fieldKey?: string) => (value: string) => void;
+  setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const VolumeMetadata: FC<VolumeMetadataProps> = ({

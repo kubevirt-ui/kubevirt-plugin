@@ -4,6 +4,8 @@ import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,35 +13,43 @@ import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, PopoverPosition, Title } from '@patternfly/react-core';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { Form, PopoverPosition, Title } from '@patternfly/react-core';
 
-import FormSelectionRadio from './components/FormSelectionRadio/FormSelectionRadio';
+import SourceTypeSelection from './components/SourceTypeSelection/SourceTypeSelection';
 import VolumeDestination from './components/VolumeDestination/VolumeDestination';
 import VolumeMetadata from './components/VolumeMetadata/VolumeMetadata';
 import VolumeSource from './components/VolumeSource/VolumeSource';
 import {
   AddBootableVolumeState,
+  DROPDOWN_FORM_SELECTION,
   emptyDataSource,
   initialBootableVolumeState,
-  RADIO_FORM_SELECTION,
+  SetBootableVolumeFieldType,
 } from './utils/constants';
 import { createBootableVolume } from './utils/utils';
 
 import './AddBootableVolumeModal.scss';
 
 type AddBootableVolumeModalProps = {
+  enforceNamespace?: string;
   isOpen: boolean;
   onClose: () => void;
   onCreateVolume?: (source: BootableVolume) => void;
 };
 
-const cloneExistingPVC = true; // we want to clone the existing PVC by default, may change in the future versions
-
 const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
+  enforceNamespace,
   isOpen,
   onClose,
   onCreateVolume,
 }) => {
+  const [activeNamespace] = useActiveNamespace();
+  const selectedNamespace =
+    activeNamespace === ALL_NAMESPACES_SESSION_KEY ? undefined : activeNamespace;
+
+  const namespace = enforceNamespace ?? selectedNamespace ?? DEFAULT_NAMESPACE;
+
   const { t } = useKubevirtTranslation();
 
   const [preferences] = useK8sWatchResource<V1alpha2VirtualMachineClusterPreference[]>({
@@ -48,8 +58,8 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   });
 
   const preferencesNames = useMemo(() => preferences.map(getName), [preferences]);
-  const [formSelection, setFormSelection] = useState<RADIO_FORM_SELECTION>(
-    RADIO_FORM_SELECTION.UPLOAD_IMAGE,
+  const [sourceType, setSourceType] = useState<DROPDOWN_FORM_SELECTION>(
+    DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE,
   );
   const { upload, uploadData } = useCDIUpload();
 
@@ -59,14 +69,12 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
 
   const { labels } = bootableVolume || {};
 
-  const isUploadForm = formSelection === RADIO_FORM_SELECTION.UPLOAD_IMAGE;
-
-  const setBootableVolumeField = useCallback(
-    (key: string, fieldKey?: string) => (value: string) =>
+  const setBootableVolumeField: SetBootableVolumeFieldType = useCallback(
+    (key, fieldKey) => (value) =>
       setBootableVolume((prevState) => ({
         ...prevState,
         ...(fieldKey
-          ? { [key]: { ...prevState[key], [fieldKey]: value } }
+          ? { [key]: { ...(prevState[key] as object), [fieldKey]: value } }
           : { ...prevState, [key]: value }),
       })),
     [],
@@ -80,40 +88,42 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         }
         onClose();
       }}
-      onSubmit={createBootableVolume(
+      onSubmit={createBootableVolume({
         bootableVolume,
-        uploadData,
-        isUploadForm,
-        cloneExistingPVC,
+        namespace,
         onCreateVolume,
-      )}
-      headerText={t('Add volume')}
+        sourceType,
+        uploadData,
+      })}
+      headerText={t('Add bootable resource')}
       isDisabled={!labels?.[DEFAULT_PREFERENCE_LABEL]}
       isOpen={isOpen}
       obj={emptyDataSource}
       submitBtnText={t('Save')}
     >
-      {t('You can upload a new volume or use an existing PersistentVolumeClaim (PVC)')}
-      <Form>
-        <FormGroup>{/* Spacer */}</FormGroup>
-        <FormGroup>
-          <FormSelectionRadio formSelection={formSelection} setFormSelection={setFormSelection} />
-        </FormGroup>
+      {t('Upload a new volume, or use an existing PersistentVolumeClaim (PVC) or DataSource.')}
+      <Form className="pf-u-mt-md">
+        <SourceTypeSelection formSelection={sourceType} setFormSelection={setSourceType} />
         <Title headingLevel="h5">{t('Source details')}</Title>
         <VolumeSource
           bootableVolume={bootableVolume}
-          isUploadForm={isUploadForm}
           setBootableVolumeField={setBootableVolumeField}
+          sourceType={sourceType}
           upload={upload}
         />
-        <FormGroup>{/* Spacer */}</FormGroup>
-        <Title headingLevel="h5">{t('Destination details')}</Title>
-        <VolumeDestination
-          bootableVolume={bootableVolume}
-          setBootableVolumeField={setBootableVolumeField}
-        />
-        <FormGroup>{/* Spacer */}</FormGroup>
-        <Title headingLevel="h5">
+        {sourceType !== DROPDOWN_FORM_SELECTION.USE_REGISTRY && (
+          <>
+            <Title className="pf-u-mt-md" headingLevel="h5">
+              {t('Destination details')}
+            </Title>
+            <VolumeDestination
+              bootableVolume={bootableVolume}
+              namespace={namespace}
+              setBootableVolumeField={setBootableVolumeField}
+            />
+          </>
+        )}
+        <Title className="pf-u-mt-md" headingLevel="h5">
           {t('Volume metadata')}{' '}
           <HelpTextIcon
             bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}

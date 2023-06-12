@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +13,7 @@ import FilterSelect from '../../../FilterSelect/FilterSelect';
 type PreferenceSelectProps = {
   preferencesNames: string[];
   selectedPreference: string;
-  setBootableVolumeField: (key: string, fieldKey?: string) => (value: string) => void;
+  setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const PreferenceSelect: FC<PreferenceSelectProps> = ({
