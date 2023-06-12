@@ -33,3 +33,10 @@ export const getBootableVolumePVCSource = (
         (bootableVolume as V1beta1DataSource)?.spec?.source?.pvc?.name
       ];
 };
+
+export const getInstanceTypePrefix = (instanceTypeNamePrefix: string): string => {
+  if (instanceTypeNamePrefix?.includes('.')) {
+    return instanceTypeNamePrefix?.split('.')?.[0];
+  }
+  return instanceTypeNamePrefix;
+};

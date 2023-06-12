@@ -7,6 +7,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
+import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
@@ -158,6 +159,38 @@ const useNodesFilter = (vmiMapper: VmiMapper): RowFilter => {
     type: 'node',
   };
 };
+const useInstanceTypesFilter = (vms: V1VirtualMachine[]): RowFilter => {
+  const noInstanceType = t('No InstanceType');
+  const instanceTypes = useMemo(
+    () =>
+      [
+        ...new Set(
+          (vms || []).map((vm) => {
+            const instanceTypeName = getInstanceTypePrefix(vm?.spec?.instancetype?.name);
+            return instanceTypeName ?? noInstanceType;
+          }),
+        ),
+      ].map((instanceType) => ({ id: instanceType, title: instanceType })),
+    [vms, noInstanceType],
+  );
+
+  return {
+    filter: (selectedInstanceTypes, obj) => {
+      const instanceTypeName = getInstanceTypePrefix(obj?.spec?.instancetype?.name);
+      return (
+        selectedInstanceTypes.selected?.length === 0 ||
+        selectedInstanceTypes.selected?.includes(instanceTypeName || noInstanceType)
+      );
+    },
+    filterGroupName: t('InstanceType'),
+    items: instanceTypes,
+    reducer: (obj) => {
+      const instanceTypeName = getInstanceTypePrefix(obj?.spec?.instancetype?.name);
+      return instanceTypeName ?? noInstanceType;
+    },
+    type: 'instanceType',
+  };
+};
 
 export const useVMListFilters = (
   vmis: V1VirtualMachineInstance[],
@@ -205,9 +238,17 @@ export const useVMListFilters = (
   const osFilters = useOSFilter();
   const nodesFilter = useNodesFilter(vmiMapper);
   const liveMigratableFilter = useLiveMigratableFilter();
+  const instanceTypesFilter = useInstanceTypesFilter(vms);
 
   return {
-    filters: [statusFilter, templatesFilter, osFilters, liveMigratableFilter, nodesFilter],
+    filters: [
+      statusFilter,
+      templatesFilter,
+      osFilters,
+      liveMigratableFilter,
+      nodesFilter,
+      instanceTypesFilter,
+    ],
     vmiMapper,
     vmimMapper,
   };

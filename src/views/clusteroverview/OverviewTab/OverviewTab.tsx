@@ -7,7 +7,7 @@ import OverviewAlertsCard from './alerts-card/OverviewAlertsCard';
 import GettingStartedCard from './getting-started-card/GettingStartedCard';
 import ChartsCard from './metric-charts-card/components/ChartsCard';
 import VMStatusesCard from './vm-statuses-card/VMStatusesCard';
-import VMsPerTemplateCard from './vms-per-template-card/VMsPerTemplateCard';
+import VMsPerResourceCard from './vms-per-resource-card/VMsPerResourceCard';
 
 const OverviewTab: React.FC = () => {
   return (
@@ -20,7 +20,7 @@ const OverviewTab: React.FC = () => {
           <VMStatusesCard />
         </GridItem>
         <GridItem span={6}>
-          <VMsPerTemplateCard />
+          <VMsPerResourceCard />
         </GridItem>
       </Grid>
     </Overview>

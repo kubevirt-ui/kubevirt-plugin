@@ -1,4 +1,4 @@
-.vms-per-template-card__gradient {
+.vms-per-resource-card__gradient {
   position: relative;
   &:after {
     background: linear-gradient(rgba(255, 255, 255, 0), var(--pf-global--BackgroundColor--100));
@@ -10,4 +10,8 @@
     position: absolute;
     width: calc(100% - var(--pf-global--spacer--lg));
   }
+}
+
+.vm-per-resources-dropdown {
+  margin-left: auto;
 }
