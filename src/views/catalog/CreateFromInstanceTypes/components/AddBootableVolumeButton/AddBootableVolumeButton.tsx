@@ -17,9 +17,12 @@ export type AddBootableVolumeButtonProps = {
 const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ buttonVariant }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
+  const sourceNamespace = isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS;
+
   const [canCreateVolume] = useAccessReview({
     group: DataSourceModel.apiGroup,
-    namespace: isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS,
+    namespace: sourceNamespace,
     resource: DataSourceModel.plural,
     verb: 'create' as K8sVerb,
   });
@@ -30,7 +33,11 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ buttonVaria
     <Button
       onClick={() =>
         createModal((props) => (
-          <AddBootableVolumeModal onCreateVolume={onSelectCreatedVolume} {...props} />
+          <AddBootableVolumeModal
+            enforceNamespace={sourceNamespace}
+            onCreateVolume={onSelectCreatedVolume}
+            {...props}
+          />
         ))
       }
       isDisabled={loadError || !canCreateVolume}

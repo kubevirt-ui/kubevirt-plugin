@@ -3,20 +3,20 @@ import React, { FC, useState } from 'react';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import DefaultStorageClassAlert from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClass/DefaultStorageClassAlert';
 import StorageClassSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClass/StorageClassSelect';
-import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isUpstream } from '@kubevirt-utils/utils/utils';
 import { FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
-import { AddBootableVolumeState } from '../../utils/constants';
+import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
 
 type VolumeDestinationProps = {
   bootableVolume: AddBootableVolumeState;
-  setBootableVolumeField: (key: string, fieldKey?: string) => (value: string) => void;
+  namespace: string;
+  setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const VolumeDestination: FC<VolumeDestinationProps> = ({
   bootableVolume,
+  namespace,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -57,12 +57,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
         />
       </FormGroup>
       <FormGroup label={t('Destination project')}>
-        <TextInput
-          id="destination-project"
-          isDisabled
-          type="text"
-          value={isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS}
-        />
+        <TextInput id="destination-project" isDisabled type="text" value={namespace} />
       </FormGroup>
     </>
   );

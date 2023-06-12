@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { V1alpha2VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -17,7 +17,7 @@ import { getInstanceTypeMenuItems } from './utils/utils';
 
 type InstanceTypeMenuItemsProps = {
   selected: string;
-  setSelected: Dispatch<SetStateAction<string>>;
+  setSelected: (value: string) => void;
 };
 
 export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({

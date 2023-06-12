@@ -10,34 +10,50 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { Checkbox, PopoverPosition, Split, SplitItem } from '@patternfly/react-core';
 
-import { AddBootableVolumeState } from '../../utils/constants';
+import { AddBootableVolumeState, DROPDOWN_FORM_SELECTION } from '../../utils/constants';
+
+import VolumeRegistryData from './VolumeRegistryData';
 
 type VolumeSourceProps = {
   bootableVolume: AddBootableVolumeState;
-  isUploadForm: boolean;
-  setBootableVolumeField: (key: string, fieldKey?: string) => (value: string) => void;
+  setBootableVolumeField: (
+    key: keyof AddBootableVolumeState,
+    fieldKey?: string,
+  ) => (value: string) => void;
+  sourceType: DROPDOWN_FORM_SELECTION;
   upload: DataUpload;
 };
 
 const VolumeSource: FC<VolumeSourceProps> = ({
   bootableVolume,
-  isUploadForm,
   setBootableVolumeField,
+  sourceType,
   upload,
 }) => {
   const { t } = useKubevirtTranslation();
   const { pvcName, pvcNamespace, uploadFile, uploadFilename } = bootableVolume || {};
 
-  return isUploadForm ? (
-    <DiskSourceUploadPVC
-      label={t('Upload PVC image')}
-      relevantUpload={upload}
-      setUploadFile={setBootableVolumeField('uploadFile')}
-      setUploadFileName={setBootableVolumeField('uploadFilename')}
-      uploadFile={uploadFile}
-      uploadFileName={uploadFilename}
-    />
-  ) : (
+  if (sourceType === DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE)
+    return (
+      <DiskSourceUploadPVC
+        label={t('Upload PVC image')}
+        relevantUpload={upload}
+        setUploadFile={setBootableVolumeField('uploadFile')}
+        setUploadFileName={setBootableVolumeField('uploadFilename')}
+        uploadFile={uploadFile}
+        uploadFileName={uploadFilename}
+      />
+    );
+
+  if (sourceType === DROPDOWN_FORM_SELECTION.USE_REGISTRY)
+    return (
+      <VolumeRegistryData
+        bootableVolume={bootableVolume}
+        setBootableVolumeField={setBootableVolumeField}
+      />
+    );
+
+  return (
     <>
       <DiskSourcePVCSelect
         setDiskSize={(newSize) =>
