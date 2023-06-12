@@ -2,8 +2,9 @@ import React, { FC, useEffect, useState } from 'react';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
+import { Card, Divider, Grid, GridItem, List, PopoverPosition } from '@patternfly/react-core';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBootableVolumeButton';
 import BootableVolumeList from './components/BootableVolumeList/BootableVolumeList';
@@ -29,8 +30,19 @@ const CreateFromInstanceType: FC = () => {
           <Card>
             <List className="create-vm-instance-type-section__list" isPlain>
               <SectionListItem
+                headerText={
+                  <>
+                    {t('Select volume to boot from')}{' '}
+                    <HelpTextIcon
+                      bodyContent={t(
+                        'Select a volume (image) to start your VirtualMachine from. You can click the "Add volume" button to add another OS image that doesn\'t appear on the list.',
+                      )}
+                      className="create-vm-instance-type-section__HelpTextIcon"
+                      position={PopoverPosition.right}
+                    />
+                  </>
+                }
                 headerAction={<AddBootableVolumeButton />}
-                headerText={t('Select volume to boot from')}
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_VOLUME}
                 sectionState={sectionState}
               >

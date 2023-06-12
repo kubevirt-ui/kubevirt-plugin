@@ -24,6 +24,11 @@
   }
   &__header {
     font-size: var(--pf-global--FontSize--xl);
+
+    .help-icon__cursor {
+      color: var(--pf-global--Color--dark-100);
+      font-size: var(--pf-global--FontSize--sm);
+    }
   }
   &__header.current {
     color: var(--pf-global--primary-color--100);
@@ -35,5 +40,8 @@
   &__divider {
     --pf-c-divider--BorderWidth--base: var(--pf-global--spacer--form-element);
     --pf-c-divider--after--BackgroundColor: var(--pf-global--palette--black-200);
+  }
+  &__HelpTextIcon {
+    max-width: 425px;
   }
 }
