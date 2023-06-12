@@ -80,32 +80,30 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
         </Menu>
       }
       trigger={
-        <div className="instance-type-series-menu-card">
-          <MenuToggle
-            className={classNames(
-              'instance-type-series-menu-card__toggle-container',
-              isSelectedMenu && 'selected',
-            )}
-            isExpanded={isMenuExpanded}
-            onClick={(event) => onMenuToggle(event, seriesName)}
-            variant="plain"
-          >
-            <Card className="instance-type-series-menu-card__toggle-card">
-              <div className="instance-type-series-menu-card__card-icon">
-                <Icon />
+        <MenuToggle
+          className={classNames(
+            'instance-type-series-menu-card__toggle-container',
+            isSelectedMenu && 'selected',
+          )}
+          isExpanded={isMenuExpanded}
+          onClick={(event) => onMenuToggle(event, seriesName)}
+          variant="plain"
+        >
+          <Card className="instance-type-series-menu-card__toggle-card">
+            <div className="instance-type-series-menu-card__card-icon">
+              <Icon />
+            </div>
+            <CardBody>
+              <div className="instance-type-series-menu-card__card-title">{seriesTitle}</div>
+              <div className="instance-type-series-menu-card__card-toggle-text">
+                {seriesLabel || classAnnotation} <AngleDownIcon />
               </div>
-              <CardBody>
-                <div className="instance-type-series-menu-card__card-title">{seriesTitle}</div>
-                <div className="instance-type-series-menu-card__card-toggle-text">
-                  {seriesLabel || classAnnotation} <AngleDownIcon />
-                </div>
-              </CardBody>
-              <CardFooter className="instance-type-series-menu-card__card-footer">
-                {isSelectedMenu && selectedITLabel}
-              </CardFooter>
-            </Card>
-          </MenuToggle>
-        </div>
+            </CardBody>
+            <CardFooter className="instance-type-series-menu-card__card-footer">
+              {isSelectedMenu && selectedITLabel}
+            </CardFooter>
+          </Card>
+        </MenuToggle>
       }
       direction="down"
       isVisible={isMenuExpanded}
