@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { INSTANCE_TYPE_ENABLED } from '@kubevirt-utils/hooks/usePreviewFeatures/constants';
+import { usePreviewFeatures } from '@kubevirt-utils/hooks/usePreviewFeatures/usePreviewFeatures';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { OverviewDetailItem } from '@openshift-console/plugin-shared';
 import {
   Alert,
   AlertVariant,
+  Checkbox,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
@@ -38,6 +41,21 @@ const GeneralTab = () => {
     loaded,
     loadErrors,
   } = useKubevirtCSVDetails();
+
+  const {
+    featureEnabled: instanceTypesEnabled,
+    toggleFeature: toggleInstanceTypesFeature,
+    canEdit,
+    loading,
+  } = usePreviewFeatures(INSTANCE_TYPE_ENABLED);
+
+  const [isChecked, setIsChecked] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      setIsChecked(instanceTypesEnabled);
+    }
+  }, [loading, instanceTypesEnabled]);
 
   return (
     <>
@@ -80,6 +98,20 @@ const GeneralTab = () => {
           </DescriptionListDescription>
         </DescriptionListGroup>
       </DescriptionList>
+      <Divider className="general-tab__divider" />
+      <OverviewDetailItem isLoading={loading} title={t('Preview features')}>
+        <Checkbox
+          className="general-tab__checkbox"
+          id="tp-instance-type"
+          isChecked={isChecked}
+          onClick={(event) => {
+            toggleInstanceTypesFeature(event.currentTarget.checked);
+            setIsChecked(event.currentTarget.checked);
+          }}
+          label={t('Enable creating a VirtualMachine from an InstanceType')}
+          isDisabled={!canEdit}
+        />
+      </OverviewDetailItem>
       {!isEmpty(loadErrors) && loaded && (
         <Alert
           variant={AlertVariant.danger}

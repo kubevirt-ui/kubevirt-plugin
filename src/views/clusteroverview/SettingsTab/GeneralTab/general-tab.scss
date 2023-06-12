@@ -2,7 +2,9 @@
   &__divider {
     margin: var(--pf-global--spacer--md) 0 var(--pf-global--spacer--md) 0;
   }
-  &__upgrade {
+
+  &__upgrade,
+  &__checkbox {
     margin-top: var(--pf-global--spacer--sm);
   }
 }
