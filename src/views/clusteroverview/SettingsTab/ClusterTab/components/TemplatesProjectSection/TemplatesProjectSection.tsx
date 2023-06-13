@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import {
@@ -28,8 +28,9 @@ import {
   TextVariants,
 } from '@patternfly/react-core';
 
-import { HyperConverged } from '../../utils/types';
-import { getHyperConvergedObject } from '../../utils/utils';
+import { HyperConverged } from '../../../../utils/types';
+import { getHyperConvergedObject } from '../../../../utils/utils';
+import ExpandSection from '../../../ExpandSection/ExpandSection';
 
 import {
   getCurrentTemplatesNamespaceFromHCO,
@@ -37,9 +38,9 @@ import {
   updateHCOCommonTemplatesNamespace,
 } from './utils/utils';
 
-import './templates-project-tab.scss';
+import './templates-project-section.scss';
 
-const TemplatesProjectTab = () => {
+const TemplatesProjectSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -93,7 +94,7 @@ const TemplatesProjectTab = () => {
   };
 
   return (
-    <div className="templates-project-tab__main">
+    <ExpandSection className="templates-project-tab__main" toggleText={t('Templates project')}>
       <Text className="templates-project-tab__main--help" component={TextVariants.small}>
         <Trans ns="plugin__kubevirt-plugin" t={t}>
           Set the project to nest Red Hat templates in. If a project is not selected, the settings
@@ -162,8 +163,8 @@ const TemplatesProjectTab = () => {
           {error || projectsLoadingError || hyperLoadingError}
         </Alert>
       )}
-    </div>
+    </ExpandSection>
   );
 };
 
-export default TemplatesProjectTab;
+export default TemplatesProjectSection;

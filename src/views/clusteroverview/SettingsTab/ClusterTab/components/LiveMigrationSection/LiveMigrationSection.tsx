@@ -1,19 +1,20 @@
-import React, { useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { HyperConvergedModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
-import { getHyperConvergedObject } from '../../utils/utils';
+import { getHyperConvergedObject } from '../../../../utils/utils';
+import ExpandSection from '../../../ExpandSection/ExpandSection';
 
 import Limits from './Limits/Limits';
 import Network from './Network/Network';
 import { HyperConverged } from './utils/utils';
 
-import './live-migration-tab.scss';
+import './live-migration-section.scss';
 
-const LiveMigrationTab = () => {
+const LiveMigrationSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const [hyperConvergeData, , hyperConvergeDataError] = useK8sWatchResource<HyperConverged[]>({
     groupVersionKind: HyperConvergedModelGroupVersionKind,
@@ -26,7 +27,7 @@ const LiveMigrationTab = () => {
   );
 
   return (
-    <div className="live-migration-tab">
+    <ExpandSection className="live-migration-tab" toggleText={t('Live migration')}>
       <Limits hyperConverge={hyperConverge} />
       <Network hyperConverge={hyperConverge} />
       {hyperConvergeDataError && (
@@ -39,8 +40,8 @@ const LiveMigrationTab = () => {
           {hyperConvergeDataError}
         </Alert>
       )}
-    </div>
+    </ExpandSection>
   );
 };
 
-export default LiveMigrationTab;
+export default LiveMigrationSection;

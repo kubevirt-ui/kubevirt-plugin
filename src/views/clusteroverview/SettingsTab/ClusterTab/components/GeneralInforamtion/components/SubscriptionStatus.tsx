@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { SubscriptionKind, SubscriptionState } from '../../../utils/types';
+import { SubscriptionKind, SubscriptionState } from '../../../../../utils/types';
 
 import SubscriptionStateAtLatest from './SubscriptionStates/SubscriptionStateAtLatest';
 import SubscriptionStateDefault from './SubscriptionStates/SubscriptionStateDefault';

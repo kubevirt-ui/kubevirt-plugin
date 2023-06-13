@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,14 +20,14 @@ import {
   SplitItem,
 } from '@patternfly/react-core';
 
-import { useKubevirtCSVDetails } from '../../utils/hooks/useKubevirtCSVDetails';
+import { useKubevirtCSVDetails } from '../../../../utils/hooks/useKubevirtCSVDetails';
 
 import SourceMissingStatus from './components/SourceMissingStatus';
 import SubscriptionStatus from './components/SubscriptionStatus';
 
-import './general-tab.scss';
+import './general-information.scss';
 
-const GeneralTab = () => {
+const GeneralInforamtion: FC = () => {
   const { t } = useKubevirtTranslation();
   const {
     catalogSourceMissing,
@@ -94,4 +94,4 @@ const GeneralTab = () => {
   );
 };
 
-export default GeneralTab;
+export default GeneralInforamtion;

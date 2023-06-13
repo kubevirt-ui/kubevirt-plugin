@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { InProgressIcon } from '@patternfly/react-icons';
 
-import BlueArrowCircleUpIcon from '../../../../utils/Components/BlueArrowCircleUpIcon';
-import { SubscriptionKind } from '../../../../utils/types';
+import BlueArrowCircleUpIcon from '../../../../../../utils/Components/BlueArrowCircleUpIcon';
+import { SubscriptionKind } from '../../../../../../utils/types';
 import { upgradeRequiresApproval } from '../utils/utils';
 
 type SubscriptionStateUpgradePendingProps = {
