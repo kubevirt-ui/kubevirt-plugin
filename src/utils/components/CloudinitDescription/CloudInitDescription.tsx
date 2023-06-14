@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
@@ -18,7 +18,7 @@ import {
 
 import CloudInitInfoHelper from './CloudinitInfoHelper';
 
-export const CloudInitDescription: React.FC<{ vm: V1VirtualMachine }> = ({ vm }) => {
+export const CloudInitDescription: FC<{ vm: V1VirtualMachine }> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const cloudInitData = getCloudInitData(getCloudInitVolume(vm));
   const userData = convertYAMLUserDataObject(cloudInitData?.userData);
@@ -37,7 +37,7 @@ export const CloudInitDescription: React.FC<{ vm: V1VirtualMachine }> = ({ vm })
           <DescriptionListGroup>
             <DescriptionListTerm>{t('Password')}</DescriptionListTerm>
             <DescriptionListDescription>
-              {userData?.password?.replace(/./g, '*') || '-'}
+              {userData?.password?.toString().replace(/./g, '*') || '-'}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup>
