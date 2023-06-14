@@ -1,11 +1,17 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   ConfigMapModel,
   modelToGroupVersionKind,
+  RoleBindingModel,
+  RoleModel,
   UserModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  IoK8sApiCoreV1ConfigMap,
+  IoK8sApiRbacV1Role,
+  IoK8sApiRbacV1RoleBinding,
+} from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -15,6 +21,11 @@ import {
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import {
+  KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
+  userSettingsRole,
+  userSettingsRoleBinding,
+} from './utils/const';
 import userSettingsInitialState, { UserSettingsState } from './utils/userSettingsInitialState';
 import { parseNestedJSON } from './utils/utils';
 
@@ -28,7 +39,6 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   const [userSettings, setUserSettings] = useState<UserSettingsState>();
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingUserName, setLoadingUserName] = useState<boolean>(true);
-  const userConfigMapName = useMemo(() => `${userName}-kubevirt-settings`, [userName]);
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -48,7 +58,7 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
     useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
       userName && {
         groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-        name: userConfigMapName,
+        name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
         namespace: DEFAULT_NAMESPACE,
       },
     );
@@ -56,32 +66,47 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   useEffect(() => {
     if (userName) {
       if (configMapError?.code === 404) {
-        try {
-          k8sCreate({
+        const createResources = async () => {
+          await k8sCreate<IoK8sApiCoreV1ConfigMap>({
             data: {
-              data: { settings: JSON.stringify(userSettingsInitialState) },
+              data: { [userName]: JSON.stringify(userSettingsInitialState) },
               metadata: {
-                name: userConfigMapName,
+                name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
                 namespace: DEFAULT_NAMESPACE,
               },
             },
             model: ConfigMapModel,
           });
+
+          await k8sCreate<IoK8sApiRbacV1Role>({
+            data: userSettingsRole,
+            model: RoleModel,
+          });
+
+          await k8sCreate<IoK8sApiRbacV1RoleBinding>({
+            data: userSettingsRoleBinding,
+            model: RoleBindingModel,
+          });
+        };
+
+        try {
+          createResources();
+          setError(null);
         } catch (e) {
           setError(e);
         }
       }
       loadedConfigMap && setLoading(false);
     }
-  }, [configMapError?.code, userName, userConfigMapName, loadedConfigMap]);
+  }, [configMapError?.code, userName, loadedConfigMap]);
 
   useEffect(() => {
-    if (!isEmpty(userConfigMap) && !userSettings) {
+    if (!isEmpty(userConfigMap) && !userSettings && userName) {
       setUserSettings(
-        (<unknown>parseNestedJSON(userConfigMap?.data?.settings) || {}) as UserSettingsState,
+        (<unknown>parseNestedJSON(userConfigMap?.data?.[userName]) || {}) as UserSettingsState,
       );
     }
-  }, [userConfigMap, userSettings]);
+  }, [userConfigMap, userSettings, userName]);
 
   const updateUserSetting = (val: any) => {
     setUserSettings((prevUserSettings) => {
@@ -95,8 +120,8 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
           data: [
             {
               op: 'replace',
-              path: '/data',
-              value: { settings: JSON.stringify(data) },
+              path: `/data/${userName}`,
+              value: JSON.stringify(data),
             },
           ],
           model: ConfigMapModel,
