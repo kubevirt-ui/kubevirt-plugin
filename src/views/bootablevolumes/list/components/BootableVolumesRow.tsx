@@ -1,10 +1,14 @@
 import React, { FC } from 'react';
+import DataSourceActions from 'src/views/datasources/actions/DataSourceActions';
 
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getBootableVolumeGroupVersionKind } from '@kubevirt-utils/resources/bootableresources/helpers';
+import {
+  getBootableVolumeGroupVersionKind,
+  isBootableVolumePVCKind,
+} from '@kubevirt-utils/resources/bootableresources/helpers';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -58,7 +62,11 @@ const BootableVolumesRow: FC<
         className="dropdown-kebab-pf pf-c-table__action"
         id=""
       >
-        <BootableVolumesActions preferences={preferences} source={obj} />
+        {isBootableVolumePVCKind(obj) ? (
+          <BootableVolumesActions preferences={preferences} source={obj} />
+        ) : (
+          <DataSourceActions dataSource={obj as V1beta1DataSource} isKebabToggle />
+        )}
       </TableData>
     </>
   );
