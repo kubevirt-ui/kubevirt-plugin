@@ -1,13 +1,12 @@
 import React, { FC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { isUpstream } from '@kubevirt-utils/utils/utils';
-import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
 export type AddBootableVolumeButtonProps = {
@@ -20,12 +19,9 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ buttonVaria
 
   const sourceNamespace = isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS;
 
-  const [canCreateVolume] = useAccessReview({
-    group: DataSourceModel.apiGroup,
-    namespace: sourceNamespace,
-    resource: DataSourceModel.plural,
-    verb: 'create' as K8sVerb,
-  });
+  const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(sourceNamespace);
+  const canCreate = canCreateDS || canCreatePVC;
+
   const { instanceTypesAndPreferencesData, onSelectCreatedVolume } = useInstanceTypeVMStore();
   const { loadError } = instanceTypesAndPreferencesData;
 
@@ -40,7 +36,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ buttonVaria
           />
         ))
       }
-      isDisabled={loadError || !canCreateVolume}
+      isDisabled={loadError || !canCreate}
       variant={buttonVariant || ButtonVariant.secondary}
     >
       {t('Add volume')}
