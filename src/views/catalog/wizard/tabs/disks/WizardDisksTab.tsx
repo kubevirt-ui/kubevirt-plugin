@@ -1,7 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 
 import { WizardTab } from '@catalog/wizard/tabs';
-import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
@@ -41,8 +40,9 @@ const WizardDisksTab: WizardTab = ({ loaded, tabsData, updateTabsData, updateVM,
           pathsToHighlight={PATHS_TO_HIGHLIGHT.DISKS_TAB}
           resource={vm}
         >
-          <DiskListTitle />
-
+          <Flex className="wizard-disk-tab__flex">
+            {t('The following information is provided by the OpenShift Virtualization operator.')}
+          </Flex>
           <ListPageCreateButton
             onClick={() =>
               createModal(({ isOpen, onClose }) => (
