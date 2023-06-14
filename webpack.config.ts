@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-env node */
-
 import * as path from 'path';
 
+import { DefinePlugin } from 'webpack';
 import { Configuration as WebpackConfiguration } from 'webpack';
+import { ProvidePlugin } from 'webpack';
 import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
 
 import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk-webpack';
@@ -20,17 +21,8 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const KUBEVIRT_PLUGIN_PORT = process.env.KUBEVIRT_PLUGIN_PORT || 9001;
 
 const config: Configuration = {
-  mode: 'development',
   context: path.resolve(__dirname, 'src'),
-  entry: {},
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-bundle.js',
-    chunkFilename: '[name]-chunk.js',
-  },
   devServer: {
-    hot: true,
-    port: KUBEVIRT_PLUGIN_PORT,
     // Allow bridge running in a container to connect to the plugin dev server.
     allowedHosts: 'all',
     client: {
@@ -42,25 +34,25 @@ const config: Configuration = {
     devMiddleware: {
       writeToDisk: true,
     },
+    headers: {
+      'Access-Control-Allow-Headers': 'X-Requested-With, Content-Type, Authorization',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Origin': '*',
+    },
+    hot: true,
+    port: KUBEVIRT_PLUGIN_PORT,
     static: {
       directory: path.join(__dirname, 'dist'),
     },
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': 'X-Requested-With, Content-Type, Authorization',
-    },
   },
-  resolve: {
-    modules: [path.join(__dirname, 'node_modules')],
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
-    plugins: [new TsconfigPathsPlugin()],
-  },
+  devtool: 'source-map',
+  entry: {},
+  mode: 'development',
   module: {
     rules: [
       {
-        test: /\.(jsx?|tsx?)$/,
         exclude: /node_modules\/(?!(@kubevirt-ui)\/kubevirt-api).*/,
+        test: /\.(jsx?|tsx?)$/,
         use: [
           {
             loader: 'ts-loader',
@@ -72,9 +64,9 @@ const config: Configuration = {
         ],
       },
       {
-        test: /\.scss$/,
         exclude:
           /node_modules\/(?!(@patternfly|@openshift-console\/plugin-shared|@openshift-console\/dynamic-plugin-sdk)\/).*/,
+        test: /\.scss$/,
         use: [
           { loader: 'style-loader' },
           {
@@ -92,10 +84,10 @@ const config: Configuration = {
           {
             loader: 'sass-loader',
             options: {
-              sourceMap: true,
               sassOptions: {
                 outputStyle: 'compressed',
               },
+              sourceMap: true,
             },
           },
         ],
@@ -107,25 +99,34 @@ const config: Configuration = {
       {
         oneOf: [
           {
-            test: /\.svg$/,
-            type: 'asset/inline',
             generator: {
               dataUrl: (content) => {
                 content = content.toString();
                 return svgToMiniDataURI(content);
               },
             },
+            test: /\.svg$/,
+            type: 'asset/inline',
           },
           {
-            test: /\.(png|jpg|jpeg|gif|svg|woff2?|ttf|eot|otf)(\?.*$|$)/,
-            type: 'asset/resource',
             generator: {
               filename: 'assets/[name].[ext]',
             },
+            test: /\.(png|jpg|jpeg|gif|svg|woff2?|ttf|eot|otf)(\?.*$|$)/,
+            type: 'asset/resource',
           },
         ],
       },
     ],
+  },
+  optimization: {
+    chunkIds: 'named',
+    minimize: false,
+  },
+  output: {
+    chunkFilename: '[name]-chunk.js',
+    filename: '[name]-bundle.js',
+    path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
     new CopyPlugin({
@@ -135,18 +136,22 @@ const config: Configuration = {
     new ForkTsCheckerWebpackPlugin({
       typescript: {
         configFile: path.resolve(__dirname, 'tsconfig.json'),
-        memoryLimit: 4096,
         diagnosticOptions: {
           semantic: true,
           syntactic: true,
         },
+        memoryLimit: 4096,
       },
     }),
+    new ProvidePlugin({
+      process: 'process/browser',
+    }),
+    new DefinePlugin({ 'process.env': JSON.stringify({ NODE_ENV: process.env.NODE_ENV }) }),
   ],
-  devtool: 'source-map',
-  optimization: {
-    chunkIds: 'named',
-    minimize: false,
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    modules: [path.join(__dirname, 'node_modules')],
+    plugins: [new TsconfigPathsPlugin()],
   },
 };
 
