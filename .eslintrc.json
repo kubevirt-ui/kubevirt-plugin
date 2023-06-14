@@ -23,6 +23,7 @@
     "@typescript-eslint",
     "react-hooks",
     "prettier",
+    "import",
     "simple-import-sort",
     "perfectionist"
   ],
@@ -39,6 +40,7 @@
   },
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
+    "import/no-unused-modules": [1, { "unusedExports": true }],
     "react/display-name": "off",
     "react/prop-types": "off",
     "prettier/prettier": [

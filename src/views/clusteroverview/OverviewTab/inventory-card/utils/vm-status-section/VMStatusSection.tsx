@@ -4,13 +4,13 @@ import classNames from 'classnames';
 import { Flex, FlexItem, Grid, GridItem, TitleSizes } from '@patternfly/react-core';
 
 import { K8sResourceKind } from '../../../../utils/types';
+import EmptyStateNoVMs from '../../../vms-per-resource-card/EmptyStateNoVMs';
 import { getVMStatusCounts } from '../utils';
 
 import VMStatusInventoryItem from './VMStatusInventoryItem';
 import VMStatusSectionSkeleton from './VMStatusSectionSkeleton';
 
 import './VMStatusSection.scss';
-import EmptyStateNoVMs from '../../../vms-per-resource-card/EmptyStateNoVMs';
 
 export type VMStatusSectionProps = {
   vms: K8sResourceKind[];
