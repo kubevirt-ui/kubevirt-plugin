@@ -9,7 +9,7 @@ oc get secrets -n default --field-selector type=kubernetes.io/service-account-to
     jq '.items[0].data."ca.crt"' -r | python3 -m base64 -d > scripts/ca.crt
 
 npm_package_consolePlugin_name="kubevirt-plugin"
-CONSOLE_IMAGE=${CONSOLE_IMAGE:="quay.io/openshift/origin-console:latest"}
+CONSOLE_IMAGE=${CONSOLE_IMAGE:="quay.io/openshift/origin-console:4.12"}
 CONSOLE_PORT=${CONSOLE_PORT:=9000}
 
 echo "Starting local OpenShift console..."
@@ -54,7 +54,7 @@ if [ -x "$(command -v podman)" ]; then
           --pull always --rm --network=host \
           -v $PWD/scripts/console-client-secret:/tmp/console-client-secret:Z \
           -v $PWD/scripts/ca.crt:/tmp/ca.crt:Z \
-          --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-performance-pod/","endpoint":"https://kubevirt-performance-pod-openshift-cnv.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
+          --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-apiserver-proxy/","endpoint":"https://kubevirt-apiserver-proxy-openshift-cnv.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
           --env-file <(set | grep BRIDGE) \
           $CONSOLE_IMAGE
     else
@@ -63,7 +63,7 @@ if [ -x "$(command -v podman)" ]; then
           --pull always --rm -p "$CONSOLE_PORT":9000 \
           -v $PWD/scripts/console-client-secret:/tmp/console-client-secret \
           -v $PWD/scripts/ca.crt:/tmp/ca.crt \
-          --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-performance-pod/","endpoint":"https://kubevirt-performance-pod-openshift-cnv.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
+          --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-apiserver-proxy/","endpoint":"https://kubevirt-apiserver-proxy-openshift-cnv.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
           --env-file <(set | grep BRIDGE) \
           $CONSOLE_IMAGE
     fi
@@ -73,7 +73,7 @@ else
       --pull always --rm -p "$CONSOLE_PORT":9000 \
       -v $PWD/scripts/console-client-secret:/tmp/console-client-secret \
       -v $PWD/scripts/ca.crt:/tmp/ca.crt \
-      --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-performance-pod/","endpoint":"https://kubevirt-performance-pod-openshift-cnv.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
+      --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-apiserver-proxy/","endpoint":"https://kubevirt-apiserver-proxy-openshift-cnv.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
       --env-file <(set | grep BRIDGE) \
       $CONSOLE_IMAGE
 fi

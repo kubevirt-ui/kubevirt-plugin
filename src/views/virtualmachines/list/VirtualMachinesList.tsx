@@ -6,7 +6,11 @@ import {
   VirtualMachineModelGroupVersionKind,
   VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+  V1VirtualMachineInstanceMigration,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
@@ -47,7 +51,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
 
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`;
 
-  const [vms, loaded, loadError] = useKubevirtWatchResource({
+  const [vms, loaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
@@ -55,7 +59,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     namespaced: true,
   });
 
-  const [vmis, vmiLoaded] = useKubevirtWatchResource({
+  const [vmis, vmiLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
@@ -65,7 +69,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
 
   const [isSingleNodeCluster, isSingleNodeLoaded] = useSingleNodeCluster();
 
-  const [vmims, vmimsLoaded] = useKubevirtWatchResource({
+  const [vmims, vmimsLoaded] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
