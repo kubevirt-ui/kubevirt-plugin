@@ -95,7 +95,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         sourceType,
         uploadData,
       })}
-      headerText={t('Add bootable resource')}
+      headerText={t('Add volume')}
       isDisabled={!labels?.[DEFAULT_PREFERENCE_LABEL]}
       isOpen={isOpen}
       obj={emptyDataSource}
@@ -103,7 +103,11 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     >
       {t('Upload a new volume, or use an existing PersistentVolumeClaim (PVC) or DataSource.')}
       <Form className="pf-u-mt-md">
-        <SourceTypeSelection formSelection={sourceType} setFormSelection={setSourceType} />
+        <SourceTypeSelection
+          formSelection={sourceType}
+          namespace={namespace}
+          setFormSelection={setSourceType}
+        />
         <Title headingLevel="h5">{t('Source details')}</Title>
         <VolumeSource
           bootableVolume={bootableVolume}

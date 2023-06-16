@@ -1,17 +1,24 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import { DROPDOWN_FORM_SELECTION } from '../../utils/constants';
 
 type SourceTypeSelectionProps = {
   formSelection: DROPDOWN_FORM_SELECTION;
+  namespace: string;
   setFormSelection: (value: DROPDOWN_FORM_SELECTION) => void;
 };
 
-const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({ formSelection, setFormSelection }) => {
+const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
+  formSelection,
+  namespace,
+  setFormSelection,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { canCreateDS, canCreatePVC, loading } = useCanCreateBootableVolume(namespace);
 
   const onSelect = useCallback(
     (event, value) => {
@@ -21,6 +28,12 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({ formSelection, setF
     },
     [setFormSelection],
   );
+
+  useEffect(() => {
+    if (!loading && !canCreatePVC) {
+      setFormSelection(DROPDOWN_FORM_SELECTION.USE_REGISTRY);
+    }
+  }, [canCreatePVC, loading, setFormSelection]);
 
   return (
     <FormGroup fieldId="source-type" label={t('Source type')}>
@@ -32,11 +45,11 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({ formSelection, setF
         selections={formSelection}
         variant={SelectVariant.single}
       >
-        <SelectOption value={DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE}>
+        <SelectOption isDisabled={!canCreatePVC} value={DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE}>
           {t('Upload volume')}
         </SelectOption>
 
-        <SelectOption value={DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC}>
+        <SelectOption isDisabled={!canCreatePVC} value={DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC}>
           {t('Use existing volume')}
         </SelectOption>
 
@@ -44,6 +57,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({ formSelection, setF
           description={t(
             'A DataImportCron will also be created, which will define a cron job for recurring polling/importing or the disk image.',
           )}
+          isDisabled={!canCreateDS}
           value={DROPDOWN_FORM_SELECTION.USE_REGISTRY}
         >
           {t('Download from registry')}

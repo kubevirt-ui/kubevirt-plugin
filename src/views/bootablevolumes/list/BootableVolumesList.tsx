@@ -15,6 +15,7 @@ import {
   VirtualMachineClusterPreferenceModelGroupVersionKind,
 } from '@kubevirt-utils/models';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
+import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import {
   K8sResourceCommon,
   ListPageBody,
@@ -42,6 +43,8 @@ const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
   const history = useHistory();
   const { createModal } = useModal();
   const { bootableVolumes, error, loaded } = useBootableVolumes(namespace);
+
+  const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(namespace);
 
   const [preferences] = useK8sWatchResource<V1alpha2VirtualMachineClusterPreference[]>({
     groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
@@ -78,9 +81,11 @@ const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
   return (
     <>
       <ListPageHeader title={t('Bootable resources')}>
-        <ListPageCreateDropdown items={createItems} onClick={onCreate}>
-          {t('Add bootable resource')}
-        </ListPageCreateDropdown>
+        {(canCreateDS || canCreatePVC) && (
+          <ListPageCreateDropdown items={createItems} onClick={onCreate}>
+            {t('Add volume')}
+          </ListPageCreateDropdown>
+        )}
       </ListPageHeader>
 
       <ListPageBody>
