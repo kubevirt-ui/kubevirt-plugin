@@ -27,7 +27,7 @@ import SubscriptionStatus from './components/SubscriptionStatus';
 
 import './general-information.scss';
 
-const GeneralInforamtion: FC = () => {
+const GeneralInformation: FC = () => {
   const { t } = useKubevirtTranslation();
   const {
     catalogSourceMissing,
@@ -94,4 +94,4 @@ const GeneralInforamtion: FC = () => {
   );
 };
 
-export default GeneralInforamtion;
+export default GeneralInformation;
