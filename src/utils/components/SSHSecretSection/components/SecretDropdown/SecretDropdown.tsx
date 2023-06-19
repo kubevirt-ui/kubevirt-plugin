@@ -15,14 +15,14 @@ type SecretDropdownProps = {
   id?: string;
   secretsResourceData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
-  sshSecretName: string;
+  sshDetails: SSHSecretDetails;
 };
 
 const SecretDropdown: FC<SecretDropdownProps> = ({
   id,
   secretsResourceData,
   setSSHDetails,
-  sshSecretName,
+  sshDetails: { sshSecretName },
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -36,11 +36,12 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
     const sshPubKey = decodeSecret(
       sshKeySecrets.find((secret) => getName(secret) === newSecretName),
     );
-    setSSHDetails({
+    setSSHDetails((val) => ({
+      ...val,
       secretOption: SecretSelectionOption.useExisting,
       sshPubKey,
       sshSecretName: newSecretName,
-    });
+    }));
     setIsOpen(false);
   };
 

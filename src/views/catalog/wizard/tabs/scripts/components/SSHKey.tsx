@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
@@ -8,7 +8,9 @@ import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import SecretNameLabel from '@kubevirt-utils/components/SSHSecretSection/components/SecretNameLabel/SecretNameLabel';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
+import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretSection/utils/constants';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
@@ -18,6 +20,7 @@ import {
   removeSecretToVM,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
@@ -31,24 +34,47 @@ const SSHKey: FC = () => {
   const { tabsData, updateTabsData, updateVM, vm } = useWizardVMContext();
   const { createModal } = useModal();
 
-  const sshSecretToCreate: IoK8sApiCoreV1Secret = useMemo(
-    () => tabsData.additionalObjects.find((obj) => obj.kind === SecretModel.kind),
-    [tabsData.additionalObjects],
-  );
+  const [authorizedSSHKeys, updateAuthorizedSSHKeys, loaded] = useKubevirtUserSettings('ssh');
 
   const vmAttachedSecretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
 
-  const initialSSHDetails = useMemo(
-    () => getInitialSSHDetails(vmAttachedSecretName, sshSecretToCreate),
-    [vmAttachedSecretName, sshSecretToCreate],
-  );
+  const [initialSSHDetails, setInitialSSHDetails] = useState(initialSSHCredentials);
+
+  useEffect(() => {
+    if (loaded && !initialSSHDetails?.appliedDefaultKey) {
+      const userSettingSSHKeySecretName: string = authorizedSSHKeys?.[getNamespace(vm)];
+      const secretToCreate: IoK8sApiCoreV1Secret =
+        isEmpty(userSettingSSHKeySecretName) &&
+        tabsData.additionalObjects.find((obj) => obj.kind === SecretModel.kind);
+      setInitialSSHDetails(
+        getInitialSSHDetails({
+          secretToCreate,
+          sshSecretName: userSettingSSHKeySecretName,
+        }),
+      );
+      !isEmpty(userSettingSSHKeySecretName) &&
+        updateVM(addSecretToVM(vm, userSettingSSHKeySecretName));
+    }
+  }, [
+    authorizedSSHKeys,
+    initialSSHDetails?.appliedDefaultKey,
+    loaded,
+    tabsData.additionalObjects,
+    updateVM,
+    vm,
+  ]);
 
   const onSubmit = useCallback(
-    (sshDetails: SSHSecretDetails) => {
+    (sshDetails: SSHSecretDetails, applyKeyToProject: boolean) => {
       const { secretOption, sshPubKey, sshSecretName } = sshDetails;
 
       if (isEqualObject(sshDetails, initialSSHDetails)) {
         return Promise.resolve();
+      }
+
+      const vmNamespace = getNamespace(vm);
+      if (applyKeyToProject && authorizedSSHKeys?.[vmNamespace] !== sshSecretName) {
+        updateAuthorizedSSHKeys({ ...authorizedSSHKeys, [vmNamespace]: sshSecretName });
       }
 
       removeSSHKeyObject(updateTabsData, initialSSHDetails.sshSecretName);
@@ -77,7 +103,7 @@ const SSHKey: FC = () => {
         return updateVM(addSecretToVM(vm, sshSecretName));
       }
     },
-    [initialSSHDetails, updateTabsData, updateVM, vm],
+    [authorizedSSHKeys, initialSSHDetails, updateAuthorizedSSHKeys, updateTabsData, updateVM, vm],
   );
 
   return (
@@ -92,7 +118,7 @@ const SSHKey: FC = () => {
               </Text>
             </Trans>
           </div>
-          <span>{vmAttachedSecretName ? t('Available') : t('Not available')}</span>
+          <SecretNameLabel secretName={vmAttachedSecretName} />
         </Stack>
       }
       onEditClick={() =>

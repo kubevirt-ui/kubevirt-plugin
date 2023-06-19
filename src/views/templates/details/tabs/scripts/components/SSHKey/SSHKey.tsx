@@ -6,6 +6,7 @@ import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import SecretNameLabel from '@kubevirt-utils/components/SSHSecretSection/components/SecretNameLabel/SecretNameLabel';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
 import {
   SecretSelectionOption,
@@ -55,14 +56,14 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
 
   const vmAttachedSecretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
 
-  const sshSecretToCreate: IoK8sApiCoreV1Secret = useMemo(
+  const secretToCreate: IoK8sApiCoreV1Secret = useMemo(
     () => template?.objects?.find((obj) => obj.kind === SecretModel.kind),
     [template.objects],
   );
 
   const initialSSHDetails = useMemo(
-    () => getInitialSSHDetails(vmAttachedSecretName, sshSecretToCreate),
-    [vmAttachedSecretName, sshSecretToCreate],
+    () => getInitialSSHDetails({ secretToCreate, sshSecretName: vmAttachedSecretName }),
+    [vmAttachedSecretName, secretToCreate],
   );
 
   const onSubmit = (sshDetails: SSHSecretDetails) => {
@@ -129,6 +130,7 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
                     <SSHSecretModal
                       {...modalProps}
                       initialSSHSecretDetails={initialSSHDetails}
+                      isTemplate
                       namespace={getNamespace(template)}
                       onSubmit={onSubmit}
                     />
@@ -151,7 +153,7 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
           <div data-test="ssh-popover">
             <Text component={TextVariants.p}>{t('Select an available secret')}</Text>
           </div>
-          <span>{vmAttachedSecretName ? t('Available') : t('Not available')}</span>
+          <SecretNameLabel secretName={vmAttachedSecretName} />
         </Stack>
       </DescriptionListDescription>
     </DescriptionListGroup>

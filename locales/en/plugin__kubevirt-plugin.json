@@ -155,6 +155,7 @@
   "Automatic update and scheduling": "Automatic update and scheduling",
   "Automatic updates": "Automatic updates",
   "Automatic Windows VirtualMachine installation": "Automatic Windows VirtualMachine installation",
+  "Automatically apply this key to any new VirtualMachine you create in this project.": "Automatically apply this key to any new VirtualMachine you create in this project.",
   "Autounattend.xml answer file": "Autounattend.xml answer file",
   "Available": "Available",
   "Available only on Nodes with labels": "Available only on Nodes with labels",
