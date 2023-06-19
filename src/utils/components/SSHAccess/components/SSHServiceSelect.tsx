@@ -1,6 +1,8 @@
 import React, { FC, useMemo } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { LOAD_BALANCER_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
@@ -22,7 +24,7 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
   const [isOpen, setIsOpen] = React.useState(false);
   const [models] = useK8sModels();
 
-  const sshServiceType = sshService?.spec?.type ?? SERVICE_TYPES.NONE;
+  const { featureEnabled: loadBalancerConfigFlag } = useFeatures(LOAD_BALANCER_ENABLED);
 
   const hasSomeMetalCrd = useMemo(
     () =>
@@ -32,6 +34,9 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
     [models],
   );
 
+  const loadBalancerEnabled = loadBalancerConfigFlag || hasSomeMetalCrd;
+
+  const sshServiceType = sshService?.spec?.type ?? SERVICE_TYPES.NONE;
   const handleChange = (event: React.ChangeEvent<Element>, newValue: string | undefined) => {
     setIsOpen(false);
 
@@ -58,7 +63,7 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
           'Assigns an external IP address to the VirtualMachine. This option requires a LoadBalancer Service backend',
         )}
         id={SERVICE_TYPES.LOAD_BALANCER}
-        isDisabled={!hasSomeMetalCrd}
+        isDisabled={!loadBalancerEnabled}
         value={SERVICE_TYPES.LOAD_BALANCER}
       >
         {t('SSH over LoadBalancer')}
