@@ -1,9 +1,9 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import instanceTypeTechPreviewModalImage from 'images/instance-type-tech-preview-modal-img.svg';
 
+import { INSTANCE_TYPE_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { INSTANCE_TYPE_ENABLED } from '@kubevirt-utils/hooks/usePreviewFeatures/constants';
-import { usePreviewFeatures } from '@kubevirt-utils/hooks/usePreviewFeatures/usePreviewFeatures';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
@@ -35,7 +35,7 @@ const EnableInstanceTypeTechPreviewModal: FC<EnableInstanceTypeTechPreviewModalP
     featureEnabled: instanceTypesEnabled,
     loading,
     toggleFeature: toggleInstanceTypesFeature,
-  } = usePreviewFeatures(INSTANCE_TYPE_ENABLED);
+  } = useFeatures(INSTANCE_TYPE_ENABLED);
 
   const [isOpen, setIsOpen] = useState(false);
 
