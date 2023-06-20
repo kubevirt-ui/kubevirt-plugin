@@ -7,7 +7,7 @@ import { INSTANCE_TYPES_SECTIONS } from '../../utils/constants';
 
 type SectionListItemProps = {
   headerAction?: ReactNode;
-  headerText: string;
+  headerText: ReactNode;
   sectionKey: INSTANCE_TYPES_SECTIONS;
   sectionState: [INSTANCE_TYPES_SECTIONS, Dispatch<SetStateAction<INSTANCE_TYPES_SECTIONS>>];
 };
