@@ -36,11 +36,12 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
     const sshPubKey = decodeSecret(
       sshKeySecrets.find((secret) => getName(secret) === newSecretName),
     );
-    setSSHDetails({
+    setSSHDetails((prev) => ({
+      ...prev,
       secretOption: SecretSelectionOption.useExisting,
       sshPubKey,
       sshSecretName: newSecretName,
-    });
+    }));
     setIsOpen(false);
   };
 

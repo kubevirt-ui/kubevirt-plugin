@@ -27,7 +27,7 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
     (secretOption: SecretSelectionOption) => {
       setSelectedOption((prevSecretOption) => {
         if (prevSecretOption !== secretOption) {
-          setSSHDetails(initialSSHCredentials);
+          setSSHDetails((prev) => ({ ...prev, secretOption, sshPubKey: '', sshSecretName: '' }));
         }
 
         return secretOption;

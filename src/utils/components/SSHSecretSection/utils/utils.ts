@@ -6,15 +6,10 @@ import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
-import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  k8sCreate,
-  k8sPatch,
-  K8sResourceCommon,
-  k8sUpdate,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, K8sResourceCommon, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 const validateSecretNameLength = (secretName: string): boolean => secretName.length <= 51;
 
@@ -34,48 +29,15 @@ export const getSecretNameErrorMessage = (
   return null;
 };
 
-export const createVmSSHSecret = (vm: V1VirtualMachine, sshKey: string, secretName?: string) =>
-  k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
-    data: {
-      apiVersion: SecretModel.apiVersion,
-      data: { key: encodeSecretKey(sshKey) },
-      kind: SecretModel.kind,
-      metadata: {
-        name: secretName || `${getName(vm)}-ssh-key`,
-        namespace: getNamespace(vm),
-        ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
-      },
-    },
-    model: SecretModel,
-  });
-
 export const removeSecretToVM = (vm: V1VirtualMachine) =>
   produce(vm, (vmDraft) => {
     delete vmDraft.spec.template.spec.accessCredentials;
   });
 
-export const detachVMSecret = async (vm: V1VirtualMachine, vmSecret: IoK8sApiCoreV1Secret) => {
-  await k8sPatch({
-    data: [
-      {
-        op: 'remove',
-        path: '/spec/template/spec/accessCredentials',
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: vm,
-  });
-
-  const updatedSecret = produce(vmSecret, (draftSecret) => {
-    if (draftSecret.metadata.ownerReferences)
-      draftSecret.metadata.ownerReferences = draftSecret.metadata.ownerReferences.filter(
-        (ref) => ref?.uid !== vm?.metadata?.uid,
-      );
-  });
-
+export const detachVMSecret = async (vm: V1VirtualMachine) => {
   await k8sUpdate({
-    data: updatedSecret,
-    model: SecretModel,
+    data: removeSecretToVM(vm),
+    model: VirtualMachineModel,
   });
 };
 
@@ -105,4 +67,18 @@ export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string) =>
         },
       },
     ];
+  });
+
+export const createSSHSecret = (sshKey: string, secretName: string, secretNamespace: string) =>
+  k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
+    data: {
+      apiVersion: SecretModel.apiVersion,
+      data: { key: encodeSecretKey(sshKey) },
+      kind: SecretModel.kind,
+      metadata: {
+        name: secretName,
+        namespace: secretNamespace,
+      },
+    },
+    model: SecretModel,
   });

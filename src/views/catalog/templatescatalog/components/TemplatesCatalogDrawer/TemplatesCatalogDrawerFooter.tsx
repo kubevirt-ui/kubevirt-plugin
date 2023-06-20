@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import {
   generateVMName,
   getTemplateVirtualMachineObject,
@@ -37,10 +38,11 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
 }) => {
   const { t } = useKubevirtTranslation();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVmTemplateSource(template);
+  const [authorizedSSHKeys, , userSettingsLoaded] = useKubevirtUserSettings('ssh');
   const [processedTemplate, processedTemplateLoaded] = useProcessedTemplate(template, namespace);
 
   const canQuickCreate = Boolean(processedTemplate) && isBootSourceAvailable;
-  const loaded = bootSourceLoaded && processedTemplateLoaded;
+  const loaded = bootSourceLoaded && processedTemplateLoaded && userSettingsLoaded;
 
   if (!loaded) {
     return <TemplatesCatalogDrawerFooterSkeleton />;
@@ -75,6 +77,7 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
             </Split>
           </StackItem>
           <TemplatesCatalogDrawerCreateForm
+            authorizedSSHKey={authorizedSSHKeys?.[namespace]}
             canQuickCreate={canQuickCreate}
             initialVMName={initialVMName}
             isBootSourceAvailable={isBootSourceAvailable}

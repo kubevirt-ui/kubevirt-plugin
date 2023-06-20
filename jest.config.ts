@@ -6,36 +6,36 @@ const { compilerOptions } = require('./tsconfig');
 
 // Sync object
 const config: Config.InitialOptions = {
-  testEnvironment: 'jest-environment-jsdom',
-  preset: 'ts-jest',
-  moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
-  transform: {
-    '^.+\\.[t|j]sx?$': 'ts-jest',
-  },
-  testURL: 'http://localhost/',
-  testRegex: '.*\\.test\\.(ts|tsx|js|jsx)$',
-  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
-  transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!(@kubevirt-ui/kubevirt-api|byte-size|@patternfly|@openshift-console\\S*?)/.*)',
-  ],
-  setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
-  moduleNameMapper: {
-    '\\.(css|less|scss|svg)$': '<rootDir>/__mocks__/dummy.ts',
-    '@console/*': '<rootDir>/__mocks__/dummy.ts',
-    'react-i18next': '<rootDir>/__mocks__/react-i18next.ts',
-    'react-router-dom': '<rootDir>/__mocks__/react-router-dom.ts',
-    ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
-  },
   globals: {
     SERVER_FLAGS: {
       basePath: 'http://localhost:9000/',
     },
     'ts-jest': {
-      isolatedModules: true,
       diagnostics: {
         ignoreCodes: ['TS151001'],
       },
+      isolatedModules: true,
     },
   },
+  moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
+  moduleNameMapper: {
+    '@console/*': '<rootDir>/__mocks__/dummy.ts',
+    '\\.(css|less|scss|svg)$': '<rootDir>/__mocks__/dummy.ts',
+    'react-i18next': '<rootDir>/__mocks__/react-i18next.ts',
+    'react-router-dom': '<rootDir>/__mocks__/react-router-dom.ts',
+    ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
+  },
+  preset: 'ts-jest',
+  setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
+  testEnvironment: 'jest-environment-jsdom',
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
+  testRegex: '.*\\.test\\.(ts|tsx|js|jsx)$',
+  testURL: 'http://localhost/',
+  transform: {
+    '^.+\\.[t|j]sx?$': 'ts-jest',
+  },
+  transformIgnorePatterns: [
+    '<rootDir>/node_modules/(?!(@kubevirt-ui/kubevirt-api|byte-size|@patternfly|@openshift-console\\S*?)/.*)',
+  ],
 };
 export default config;
