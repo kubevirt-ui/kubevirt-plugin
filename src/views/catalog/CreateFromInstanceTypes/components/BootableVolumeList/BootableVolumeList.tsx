@@ -12,6 +12,7 @@ import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/
 import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 
 import { DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
+import BootableVolumeEmptyState from '../BootableVolumeEmptyState/BootableVolumeEmptyState';
 
 import BootableVolumeRow from './components/BootableVolumeRow/BootableVolumeRow';
 import ShowAllBootableVolumesButton from './components/ShowAllBootableVolumesButton/ShowAllBootableVolumesButton';
@@ -77,6 +78,8 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     }));
   };
 
+  const displayVolumes = !isEmpty(bootableVolumes) && loaded;
+
   useEffect(() => {
     if (displayShowAllButton && !isEmpty(selectedBootableVolume)) {
       const selectedVolumeIndex = bootableVolumes?.findIndex(
@@ -99,74 +102,84 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             />
           </FormGroup>
         </SplitItem>
-        <SplitItem className="bootable-volume-list-bar__filter">
-          <ListPageFilter
-            onFilterChange={(...args) => {
-              onFilterChange(...args);
-              setPagination((prevPagination) => ({
-                ...prevPagination,
-                endIndex: prevPagination?.perPage,
-                page: 1,
-                startIndex: 0,
-              }));
-            }}
-            columnLayout={columnLayout}
-            data={unfilteredData}
-            hideLabelFilter
-            hideNameLabelFilters={!displayShowAllButton}
-            loaded={Boolean(loaded)}
-            // nameFilter={!displayShowAllButton && "modal-name"} can remove comment once this merged https://github.com/openshift/console/pull/12438 and build into new SDK version
-            rowFilters={filters}
-          />
-        </SplitItem>
-        <SplitItem isFilled />
-        <SplitItem className="bootable-volume-list-bar__pagination">
-          <Pagination
-            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-              onPageChange({ endIndex, page, perPage, startIndex })
-            }
-            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-              onPageChange({ endIndex, page, perPage, startIndex })
-            }
-            perPageOptions={
-              displayShowAllButton ? paginationDefaultValuesForm : paginationDefaultValuesModal
-            }
-            defaultToFullPage
-            isCompact={displayShowAllButton}
-            itemCount={data?.length}
-            page={pagination?.page}
-            perPage={pagination?.perPage}
-          />
-        </SplitItem>
-        {displayShowAllButton && <ShowAllBootableVolumesButton />}
+
+        {displayVolumes && (
+          <>
+            <SplitItem className="bootable-volume-list-bar__filter">
+              <ListPageFilter
+                onFilterChange={(...args) => {
+                  onFilterChange(...args);
+                  setPagination((prevPagination) => ({
+                    ...prevPagination,
+                    endIndex: prevPagination?.perPage,
+                    page: 1,
+                    startIndex: 0,
+                  }));
+                }}
+                columnLayout={columnLayout}
+                data={unfilteredData}
+                hideLabelFilter
+                hideNameLabelFilters={!displayShowAllButton}
+                loaded={Boolean(loaded)}
+                // nameFilter={!displayShowAllButton && "modal-name"} can remove comment once this merged https://github.com/openshift/console/pull/12438 and build into new SDK version
+                rowFilters={filters}
+              />
+            </SplitItem>
+            <SplitItem isFilled />
+            <SplitItem className="bootable-volume-list-bar__pagination">
+              <Pagination
+                onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                  onPageChange({ endIndex, page, perPage, startIndex })
+                }
+                onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                  onPageChange({ endIndex, page, perPage, startIndex })
+                }
+                perPageOptions={
+                  displayShowAllButton ? paginationDefaultValuesForm : paginationDefaultValuesModal
+                }
+                defaultToFullPage
+                isCompact={displayShowAllButton}
+                itemCount={data?.length}
+                page={pagination?.page}
+                perPage={pagination?.perPage}
+              />
+            </SplitItem>
+            {displayShowAllButton && <ShowAllBootableVolumesButton />}
+          </>
+        )}
       </Split>
-      <TableComposable variant={TableVariant.compact}>
-        <Thead>
-          <Tr>
-            {activeColumns.map((col, columnIndex) => (
-              <Th id={col?.id} key={col?.id} sort={getSortType(columnIndex)}>
-                {col?.title}
-              </Th>
+
+      {displayVolumes ? (
+        <TableComposable variant={TableVariant.compact}>
+          <Thead>
+            <Tr>
+              {activeColumns.map((col, columnIndex) => (
+                <Th id={col?.id} key={col?.id} sort={getSortType(columnIndex)}>
+                  {col?.title}
+                </Th>
+              ))}
+            </Tr>
+          </Thead>
+          <Tbody>
+            {sortedData.map((bs) => (
+              <BootableVolumeRow
+                rowData={{
+                  bootableVolumeSelectedState: !displayShowAllButton
+                    ? selectedBootableVolumeState
+                    : [selectedBootableVolume, onSelectCreatedVolume],
+                  preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
+                  pvcSource: getBootableVolumePVCSource(bs, pvcSources),
+                }}
+                activeColumnIDs={activeColumns?.map((col) => col?.id)}
+                bootableVolume={bs}
+                key={getName(bs)}
+              />
             ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {sortedData?.map((bs) => (
-            <BootableVolumeRow
-              rowData={{
-                bootableVolumeSelectedState: !displayShowAllButton
-                  ? selectedBootableVolumeState
-                  : [selectedBootableVolume, onSelectCreatedVolume],
-                preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
-                pvcSource: getBootableVolumePVCSource(bs, pvcSources),
-              }}
-              activeColumnIDs={activeColumns?.map((col) => col?.id)}
-              bootableVolume={bs}
-              key={getName(bs)}
-            />
-          ))}
-        </Tbody>
-      </TableComposable>
+          </Tbody>
+        </TableComposable>
+      ) : (
+        <BootableVolumeEmptyState />
+      )}
     </>
   );
 };

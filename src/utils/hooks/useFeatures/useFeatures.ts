@@ -19,13 +19,13 @@ import {
 import { useIsAdmin } from '../useIsAdmin';
 
 import {
-  PREVIEW_FEATURES_CONFIG_MAP_NAME,
-  previewFeaturesConfigMapInitialState,
-  previewFeaturesRole,
-  previewFeaturesRoleBinding,
+  FEATURES_CONFIG_MAP_NAME,
+  featuresConfigMapInitialState,
+  featuresRole,
+  featuresRoleBinding,
 } from './constants';
 
-type UsePreviewFeatures = (featureName: string) => {
+type UseFeatures = (featureName: string) => {
   canEdit: boolean;
   error: Error;
   featureEnabled: boolean;
@@ -33,17 +33,15 @@ type UsePreviewFeatures = (featureName: string) => {
   toggleFeature: (val: boolean) => void;
 };
 
-export const usePreviewFeatures: UsePreviewFeatures = (featureName) => {
+export const useFeatures: UseFeatures = (featureName) => {
   const isAdmin = useIsAdmin();
 
-  const [previewFeatureConfigMap, loaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
-    {
-      groupVersionKind: getGroupVersionKindForModel(ConfigMapModel),
-      isList: false,
-      name: PREVIEW_FEATURES_CONFIG_MAP_NAME,
-      namespace: DEFAULT_NAMESPACE,
-    },
-  );
+  const [featureConfigMap, loaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1ConfigMap>({
+    groupVersionKind: getGroupVersionKindForModel(ConfigMapModel),
+    isList: false,
+    name: FEATURES_CONFIG_MAP_NAME,
+    namespace: DEFAULT_NAMESPACE,
+  });
 
   const [featureEnabled, setFeatureEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -51,7 +49,7 @@ export const usePreviewFeatures: UsePreviewFeatures = (featureName) => {
 
   useEffect(() => {
     if (loaded) {
-      setFeatureEnabled(previewFeatureConfigMap?.data?.[featureName] === 'true');
+      setFeatureEnabled(featureConfigMap?.data?.[featureName] === 'true');
       setLoading(false);
       return;
     }
@@ -61,17 +59,17 @@ export const usePreviewFeatures: UsePreviewFeatures = (featureName) => {
 
       const createResources = async () => {
         await k8sCreate<IoK8sApiCoreV1ConfigMap>({
-          data: previewFeaturesConfigMapInitialState,
+          data: featuresConfigMapInitialState,
           model: ConfigMapModel,
         });
 
         await k8sCreate<IoK8sApiRbacV1Role>({
-          data: previewFeaturesRole,
+          data: featuresRole,
           model: RoleModel,
         });
 
         await k8sCreate<IoK8sApiRbacV1RoleBinding>({
-          data: previewFeaturesRoleBinding,
+          data: featuresRoleBinding,
           model: RoleBindingModel,
         });
       };
@@ -86,10 +84,10 @@ export const usePreviewFeatures: UsePreviewFeatures = (featureName) => {
 
       return;
     }
-  }, [loadError, previewFeatureConfigMap, loaded, featureName]);
+  }, [loadError, featureConfigMap, loaded, featureName]);
 
   const toggleFeature = (value: boolean) => {
-    const updatedConfigMap = produce(previewFeatureConfigMap, (draftCM) => {
+    const updatedConfigMap = produce(featureConfigMap, (draftCM) => {
       if (isEmpty(draftCM?.data)) draftCM.data = {};
       draftCM.data[featureName] = value.toString();
     });
