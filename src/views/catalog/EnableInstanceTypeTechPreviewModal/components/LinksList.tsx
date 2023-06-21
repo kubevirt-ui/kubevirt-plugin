@@ -12,7 +12,7 @@ const LinksList: FC = () => {
       <StackItem>
         <Button
           component="a"
-          //   href={}
+          href="https://kubevirt.io/user-guide/virtual_machines/instancetypes/"
           icon={<ExternalLinkAltIcon />}
           iconPosition="right"
           isInline
