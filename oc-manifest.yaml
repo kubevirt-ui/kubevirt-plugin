@@ -4,7 +4,7 @@ metadata:
   name: console-plugin-kubevirt-template
   annotations:
     openshift.io/display-name: OpenShift Console Kubevirt Plugin Template
-    openshift.io/documentation-url: "https://github.com/kubevirt-ui/kubevirt-plugin"
+    openshift.io/documentation-url: 'https://github.com/kubevirt-ui/kubevirt-plugin'
     iconClass: icon-nginx
     tags: openshift,console,plugin,nginx,virtualization,kubevirt
 parameters:
@@ -28,27 +28,27 @@ objects:
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      name: "${PLUGIN_NAME}"
-      namespace: "${NAMESPACE}"
+      name: '${PLUGIN_NAME}'
+      namespace: '${NAMESPACE}'
       labels:
-        app: "${PLUGIN_NAME}"
-        app.kubernetes.io/component: "${PLUGIN_NAME}"
-        app.kubernetes.io/instance: "${PLUGIN_NAME}"
-        app.kubernetes.io/part-of: "${PLUGIN_NAME}"
-        app.openshift.io/runtime-namespace: "${NAMESPACE}"
+        app: '${PLUGIN_NAME}'
+        app.kubernetes.io/component: '${PLUGIN_NAME}'
+        app.kubernetes.io/instance: '${PLUGIN_NAME}'
+        app.kubernetes.io/part-of: '${PLUGIN_NAME}'
+        app.openshift.io/runtime-namespace: '${NAMESPACE}'
     spec:
       replicas: 1
       selector:
         matchLabels:
-          app: "${PLUGIN_NAME}"
+          app: '${PLUGIN_NAME}'
       template:
         metadata:
           labels:
-            app: "${PLUGIN_NAME}"
+            app: '${PLUGIN_NAME}'
         spec:
           containers:
-            - name: "${PLUGIN_NAME}"
-              image: "${IMAGE}"
+            - name: '${PLUGIN_NAME}'
+              image: '${IMAGE}'
               ports:
                 - containerPort: 9443
                   protocol: TCP
@@ -78,13 +78,13 @@ objects:
     metadata:
       annotations:
         service.alpha.openshift.io/serving-cert-secret-name: plugin-serving-cert
-      name: "${PLUGIN_NAME}"
-      namespace: "${NAMESPACE}"
+      name: '${PLUGIN_NAME}'
+      namespace: '${NAMESPACE}'
       labels:
-        app: "${PLUGIN_NAME}"
-        app.kubernetes.io/component: "${PLUGIN_NAME}"
-        app.kubernetes.io/instance: "${PLUGIN_NAME}"
-        app.kubernetes.io/part-of: "${PLUGIN_NAME}"
+        app: '${PLUGIN_NAME}'
+        app.kubernetes.io/component: '${PLUGIN_NAME}'
+        app.kubernetes.io/instance: '${PLUGIN_NAME}'
+        app.kubernetes.io/part-of: '${PLUGIN_NAME}'
     spec:
       ports:
         - name: 9443-tcp
@@ -92,28 +92,28 @@ objects:
           port: 9443
           targetPort: 9443
       selector:
-        app: "${PLUGIN_NAME}"
+        app: '${PLUGIN_NAME}'
       type: ClusterIP
       sessionAffinity: None
   - apiVersion: console.openshift.io/v1alpha1
     kind: ConsolePlugin
     metadata:
-      name: "${PLUGIN_NAME}"
+      name: '${PLUGIN_NAME}'
       annotations:
-        console.openshift.io/use-i18n: "true"
+        console.openshift.io/use-i18n: 'true'
     spec:
-      displayName: "Console Plugin Kubevirt Template"
+      displayName: 'Console Plugin Kubevirt Template'
       proxy:
-      - type: Service
-        alias: kubevirt-performance-pod
-        endpoint:
-          type: Service
-          service:
-            name: kubevirt-performance-pod
-            namespace: openshift-cnv
-            port: 80
+        - type: Service
+          alias: kubevirt-performance-pod
+          endpoint:
+            type: Service
+            service:
+              name: kubevirt-performance-pod
+              namespace: openshift-cnv
+              port: 80
       service:
-        name: "${PLUGIN_NAME}"
-        namespace: "${NAMESPACE}"
+        name: '${PLUGIN_NAME}'
+        namespace: '${NAMESPACE}'
         port: 9443
-        basePath: "/"
+        basePath: '/'

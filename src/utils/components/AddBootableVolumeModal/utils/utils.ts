@@ -1,6 +1,7 @@
 import produce from 'immer';
 
 import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { appendDockerPrefix } from '@catalog/customize/components/CustomizeSource/utils';
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
@@ -21,7 +22,6 @@ import {
   emptySourceDataVolume,
   initialDataImportCron,
 } from './constants';
-import { appendDockerPrefix } from '@catalog/customize/components/CustomizeSource/utils';
 
 type createBootableVolumeType = (input: {
   bootableVolume: AddBootableVolumeState;

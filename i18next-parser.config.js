@@ -2,31 +2,31 @@
 const { CustomJSONLexer } = require('./i18n-scripts/lexers');
 
 module.exports = {
-  input: ['src/**/*.{js,jsx,ts,tsx,json}', './console-extensions.json'],
-  sort: true,
   createOldCatalogs: false,
+  defaultNamespace: 'plugin__kubevirt-plugin',
+  input: ['src/**/*.{js,jsx,ts,tsx,json}', './console-extensions.json'],
   keySeparator: false,
+  // see below for more details
+  lexers: {
+    default: ['JavascriptLexer'],
+    handlebars: ['HandlebarsLexer'],
+
+    hbs: ['HandlebarsLexer'],
+    htm: ['HTMLLexer'],
+
+    html: ['HTMLLexer'],
+    js: ['JavascriptLexer'], // if you're writing jsx inside .js files, change this to JsxLexer
+    json: [CustomJSONLexer],
+    jsx: ['JsxLexer'],
+    mjs: ['JavascriptLexer'],
+    ts: ['JavascriptLexer'],
+
+    tsx: ['JsxLexer'],
+  },
   locales: ['en'],
   namespaceSeparator: '~',
   reactNamespace: false,
-  defaultNamespace: 'plugin__kubevirt-plugin',
+  sort: true,
+
   useKeysAsDefaultValue: true,
-
-  // see below for more details
-  lexers: {
-    hbs: ['HandlebarsLexer'],
-    handlebars: ['HandlebarsLexer'],
-
-    htm: ['HTMLLexer'],
-    html: ['HTMLLexer'],
-
-    mjs: ['JavascriptLexer'],
-    js: ['JavascriptLexer'], // if you're writing jsx inside .js files, change this to JsxLexer
-    ts: ['JavascriptLexer'],
-    jsx: ['JsxLexer'],
-    tsx: ['JsxLexer'],
-    json: [CustomJSONLexer],
-
-    default: ['JavascriptLexer'],
-  },
 };

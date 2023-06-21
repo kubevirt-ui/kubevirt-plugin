@@ -1,13 +1,13 @@
 .mp-match-label-group {
-    margin-top: var(--pf-global--spacer--xs);
-    padding-top: var(--pf-c-label-group--m-category--PaddingTop);
-    padding-right: var(--pf-c-label-group--m-category--PaddingRight);
-    padding-bottom: var(--pf-c-label-group--m-category--PaddingBottom);
-    padding-left: var(--pf-c-label-group--m-category--PaddingLeft);
-    border: var(--pf-c-label-group--m-category--BorderWidth) solid
-      var(--pf-c-label-group--m-category--BorderColor);
+  margin-top: var(--pf-global--spacer--xs);
+  padding-top: var(--pf-c-label-group--m-category--PaddingTop);
+  padding-right: var(--pf-c-label-group--m-category--PaddingRight);
+  padding-bottom: var(--pf-c-label-group--m-category--PaddingBottom);
+  padding-left: var(--pf-c-label-group--m-category--PaddingLeft);
+  border: var(--pf-c-label-group--m-category--BorderWidth) solid
+    var(--pf-c-label-group--m-category--BorderColor);
 }
 
 .kv-migration-policy__label-vm {
-    color: var(--pf-global--link--Color);
+  color: var(--pf-global--link--Color);
 }

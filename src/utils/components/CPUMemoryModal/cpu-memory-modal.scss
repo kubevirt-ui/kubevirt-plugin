@@ -1,18 +1,18 @@
 .cpu-memory-modal {
-    .pf-c-modal-box__body {
-      display: table;
+  .pf-c-modal-box__body {
+    display: table;
+  }
+  .inputs {
+    display: flex;
+    margin-top: var(--pf-global--spacer--xl);
+    margin-bottom: var(--pf-global--spacer--2xl);
+    .input-memory {
+      &--dropdown {
+        margin-left: var(--pf-global--spacer--md);
+      }
     }
-    .inputs {
-      display: flex;
-      margin-top: var(--pf-global--spacer--xl);
-      margin-bottom: var(--pf-global--spacer--2xl);
-      .input-memory {
-        &--dropdown {
-          margin-left: var(--pf-global--spacer--md);
-        }
-      }
-      .input-cpu {
-        margin-right: var(--pf-global--spacer--xl);
-      }
+    .input-cpu {
+      margin-right: var(--pf-global--spacer--xl);
     }
   }
+}

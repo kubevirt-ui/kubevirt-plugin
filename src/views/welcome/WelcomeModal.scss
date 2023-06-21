@@ -13,7 +13,8 @@
     margin-bottom: var(--pf-global--spacer--lg);
   }
 
-  &__button, &__checkbox {
+  &__button,
+  &__checkbox {
     margin-top: var(--pf-global--spacer--lg);
     margin-bottom: var(--pf-global--spacer--xs);
   }

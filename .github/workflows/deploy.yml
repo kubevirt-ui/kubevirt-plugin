@@ -26,7 +26,7 @@ jobs:
       - name: Login to Quay.io
         uses: docker/login-action@v1
         env:
-          GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
+          GITHUB_TOKEN: '${{ secrets.BOT_PAT }}'
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
@@ -36,7 +36,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         env:
-          GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
+          GITHUB_TOKEN: '${{ secrets.BOT_PAT }}'
         with:
           push: true
           tags: quay.io/kubevirt-ui/kubevirt-plugin:${{env.VERSION_TAG}}
