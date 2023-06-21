@@ -14,7 +14,7 @@ const DetailsRightGrid: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const { activeNamespace, instanceTypeVMState, setInstanceTypeVMState, vmNamespaceTarget } =
+  const { instanceTypeVMState, setInstanceTypeVMState, vmNamespaceTarget } =
     useInstanceTypeVMStore();
   const { pvcSource, sshSecretCredentials } = instanceTypeVMState;
 
@@ -23,7 +23,7 @@ const DetailsRightGrid: FC = () => {
 
   const setSSHCredentials = (credentials: SSHSecretDetails) => {
     setInstanceTypeVMState({
-      payload: credentials,
+      payload: { ...credentials, appliedDefaultKey: sshSecretCredentials?.appliedDefaultKey },
       type: instanceTypeActionType.setSSHCredentials,
     });
 
@@ -50,7 +50,7 @@ const DetailsRightGrid: FC = () => {
             <SSHSecretModal
               {...modalProps}
               initialSSHSecretDetails={sshSecretCredentials}
-              namespace={activeNamespace}
+              namespace={vmNamespaceTarget}
               onSubmit={setSSHCredentials}
             />
           ))

@@ -3,6 +3,7 @@ import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 
 export type TabsData = {
   additionalObjects?: any[];
+  authorizedSSHKey?: string;
   disks?: {
     dataVolumesToAddOwnerRef?: V1beta1DataVolume[];
   };

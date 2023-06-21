@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import produce from 'immer';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { SecretModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { DataUpload, useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -18,7 +19,7 @@ import {
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { useWizardVMContext } from '../../../utils/WizardVMContext';
 import { INSTALLATION_CDROM_NAME } from '../../constants';
@@ -124,7 +125,9 @@ export const useCustomizeFormSubmit = ({
       // keep template's name and namespace for navigation
       updateTabsData((tabsDataDraft) => {
         // additional objects
-        tabsDataDraft.additionalObjects = additionalObjects;
+        tabsDataDraft.additionalObjects = !isEmpty(tabsData?.authorizedSSHKey)
+          ? additionalObjects.filter((obj) => obj?.kind !== SecretModel.kind)
+          : additionalObjects;
 
         // overview
         ensurePath(tabsDataDraft, 'overview.templateMetadata');
@@ -182,7 +185,11 @@ export const useCustomizeFormSubmit = ({
       );
 
       // update context vm
-      await updateVM(updatedVM);
+      await updateVM(
+        !isEmpty(tabsData?.authorizedSSHKey)
+          ? addSecretToVM(updatedVM, tabsData?.authorizedSSHKey)
+          : updatedVM,
+      );
 
       history.push(`/k8s/ns/${ns || DEFAULT_NAMESPACE}/templatescatalog/review`);
       setTemplateError(undefined);

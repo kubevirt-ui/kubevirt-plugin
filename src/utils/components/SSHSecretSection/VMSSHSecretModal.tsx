@@ -1,56 +1,62 @@
 import React, { FC, useCallback, useMemo } from 'react';
 
-import { modelToGroupVersionKind, SecretModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { getAccessCredentials, getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
+import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { isEqualObject } from '../NodeSelectorModal/utils/helpers';
 
 import { SecretSelectionOption, SSHSecretDetails } from './utils/types';
-import { addSecretToVM, createVmSSHSecret, detachVMSecret } from './utils/utils';
+import { addSecretToVM, createSSHSecret, detachVMSecret } from './utils/utils';
 import SSHSecretModal from './SSHSecretModal';
 
 type VMSSHSecretModalProps = {
+  authorizedSSHKeys: { [namespace: string]: string };
   isOpen: boolean;
   onClose: () => void;
+  updateAuthorizedSSHKeys: (val: any) => void;
   updateVM: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
 };
 
-const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({ isOpen, onClose, updateVM, vm }) => {
-  const namespace = useMemo(() => getNamespace(vm), [vm]);
-  const hasSSHKey = useMemo(() => !isEmpty(getAccessCredentials(vm)), [vm]);
-  const secretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
+const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
+  authorizedSSHKeys,
+  isOpen,
+  onClose,
+  updateAuthorizedSSHKeys,
+  updateVM,
+  vm,
+}) => {
+  const [namespace, secretName] = useMemo(() => [getNamespace(vm), getVMSSHSecretName(vm)], [vm]);
 
-  const [secret] = useK8sWatchResource<IoK8sApiCoreV1Secret>(
-    hasSSHKey && {
-      groupVersionKind: modelToGroupVersionKind(SecretModel),
-      isList: false,
-      name: secretName,
-      namespace,
-    },
+  const initialSSHDetails = useMemo(
+    () =>
+      getInitialSSHDetails({
+        applyKeyToProject: authorizedSSHKeys?.[namespace] === secretName,
+        sshSecretName: secretName,
+      }),
+    [authorizedSSHKeys, namespace, secretName],
   );
-
-  const initialSSHDetails = useMemo(() => getInitialSSHDetails(secretName), [secretName]);
 
   const onSubmit = useCallback(
     (sshDetails: SSHSecretDetails) => {
-      const { secretOption, sshPubKey, sshSecretName } = sshDetails;
+      const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshDetails;
 
       if (isEqualObject(sshDetails, initialSSHDetails)) {
         return Promise.resolve();
+      }
+
+      if (applyKeyToProject && authorizedSSHKeys?.[namespace] !== sshSecretName) {
+        updateAuthorizedSSHKeys({ ...authorizedSSHKeys, [namespace]: sshSecretName });
       }
 
       if (
         secretOption === SecretSelectionOption.none &&
         initialSSHDetails.secretOption !== SecretSelectionOption.none
       ) {
-        return detachVMSecret(vm, secret);
+        return detachVMSecret(vm);
       }
 
       if (
@@ -66,12 +72,14 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({ isOpen, onClose, updateVM
         !isEmpty(sshPubKey) &&
         !isEmpty(sshSecretName)
       ) {
-        return createVmSSHSecret(vm, sshPubKey, sshSecretName).then(() =>
+        return createSSHSecret(sshPubKey, sshSecretName, getNamespace(vm)).then(() =>
           updateVM(addSecretToVM(vm, sshSecretName)),
         );
       }
+
+      return Promise.resolve();
     },
-    [initialSSHDetails, secret, updateVM, vm],
+    [authorizedSSHKeys, initialSSHDetails, namespace, updateAuthorizedSSHKeys, updateVM, vm],
   );
 
   return (

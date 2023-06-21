@@ -6,8 +6,9 @@ import { generateVM } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
-import { createVmSSHSecret } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -36,10 +37,12 @@ const CreateVMFooter: FC = () => {
   const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();
 
+  const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
+
   const { activeNamespace, instanceTypeVMState, vmNamespaceTarget } = useInstanceTypeVMStore();
   const { selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
     instanceTypeVMState;
-  const { secretOption, sshPubKey, sshSecretName } = sshSecretCredentials;
+  const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials;
 
   const onCancel = useCallback(
     () => history.push(getResourceUrl({ activeNamespace, model: VirtualMachineModel })),
@@ -64,13 +67,21 @@ const CreateVMFooter: FC = () => {
 
     const vmToCreate = generateVM(instanceTypeVMState, vmNamespaceTarget, startVM);
 
+    if (
+      applyKeyToProject &&
+      !isEmpty(sshSecretName) &&
+      authorizedSSHKeys?.[vmNamespaceTarget] !== sshSecretName
+    ) {
+      setAuthorizedSSHKeys({ ...authorizedSSHKeys, [vmNamespaceTarget]: sshSecretName });
+    }
+
     return k8sCreate({
       data: vmToCreate,
       model: VirtualMachineModel,
     })
-      .then((createdVM) => {
+      .then(() => {
         if (secretOption === SecretSelectionOption.addNew) {
-          createVmSSHSecret(createdVM, sshPubKey, sshSecretName);
+          createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
         }
         history.push(getResourceUrl({ model: VirtualMachineModel, resource: vmToCreate }));
       })

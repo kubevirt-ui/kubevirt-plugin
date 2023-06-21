@@ -3,6 +3,7 @@ import produce from 'immer';
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import {
   LABEL_USED_TEMPLATE_NAME,
@@ -10,6 +11,7 @@ import {
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createMultipleResources } from './utils';
@@ -17,6 +19,7 @@ import { createMultipleResources } from './utils';
 type QuickCreateVMType = (inputs: {
   models: { [key: string]: K8sModel };
   overrides: {
+    authorizedSSHKey: string;
     name: string;
     namespace: string;
     startVM: boolean;
@@ -26,7 +29,7 @@ type QuickCreateVMType = (inputs: {
 
 export const quickCreateVM: QuickCreateVMType = async ({
   models,
-  overrides: { name, namespace = DEFAULT_NAMESPACE, startVM },
+  overrides: { authorizedSSHKey, name, namespace = DEFAULT_NAMESPACE, startVM },
   template,
 }) => {
   const processedTemplate = await k8sCreate<V1Template>({
@@ -51,7 +54,11 @@ export const quickCreateVM: QuickCreateVMType = async ({
     }
   });
 
-  const { objects } = replaceTemplateVM(processedTemplate, overridedVM);
+  const vmToCreate = !isEmpty(authorizedSSHKey)
+    ? addSecretToVM(overridedVM, authorizedSSHKey)
+    : overridedVM;
+
+  const { objects } = replaceTemplateVM(processedTemplate, vmToCreate);
 
   const createdObjects = await createMultipleResources(objects, models, namespace);
 

@@ -27,6 +27,7 @@ import {
   VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -63,6 +64,8 @@ export const usePendingChanges = (
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const { createModal } = useModal();
+  const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
+
   const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
@@ -373,7 +376,14 @@ export const usePendingChanges = (
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
         createModal(({ isOpen, onClose }) => (
-          <VMSSHSecretModal isOpen={isOpen} onClose={onClose} updateVM={onSubmit} vm={vm} />
+          <VMSSHSecretModal
+            authorizedSSHKeys={authorizedSSHKeys}
+            isOpen={isOpen}
+            onClose={onClose}
+            updateAuthorizedSSHKeys={updateAuthorizedSSHKeys}
+            updateVM={onSubmit}
+            vm={vm}
+          />
         ));
       },
       hasPendingChange: sshServiceChanged,

@@ -62,6 +62,10 @@ jest.mock('@kubevirt-utils/resources/template/hooks/useVmTemplateSource', () => 
   }),
 }));
 
+jest.mock('@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings', () => {
+  return jest.fn().mockReturnValue([{}, jest.fn(), true, null]);
+});
+
 afterEach(cleanup);
 
 const renderWithWizardContext = ({ children }) => (

@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 import { RouteComponentProps } from 'react-router-dom';
 
@@ -11,13 +11,14 @@ import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/Cloudi
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import SecretNameLabel from '@kubevirt-utils/components/SSHSecretSection/components/SecretNameLabel/SecretNameLabel';
 import VMSSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/VMSSHSecretModal';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { getAccessCredentials } from '@kubevirt-utils/resources/vm';
+import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   k8sUpdate,
   K8sVerb,
@@ -46,6 +47,8 @@ type VirtualMachineScriptPageProps = RouteComponentProps<{
 const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const [authorizedSSHKeys, updateAuthorizedSSHKeys, loaded] = useKubevirtUserSettings('ssh');
+  const secretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
@@ -104,18 +107,23 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
                       <Text component={TextVariants.p}>Store the key in a project secret.</Text>
                     </Trans>
                   </div>
-                  <span>
-                    {!isEmpty(getAccessCredentials(vm)) ? t('Available') : t('Not available')}
-                  </span>
+                  <SecretNameLabel secretName={secretName} />
                 </Stack>
               }
               onEditClick={() =>
                 createModal((modalProps) => (
-                  <VMSSHSecretModal {...modalProps} updateVM={onSubmit} vm={vm} />
+                  <VMSSHSecretModal
+                    {...modalProps}
+                    authorizedSSHKeys={authorizedSSHKeys}
+                    updateAuthorizedSSHKeys={updateAuthorizedSSHKeys}
+                    updateVM={onSubmit}
+                    vm={vm}
+                  />
                 ))
               }
               data-test-id="authorized-ssh-key-button"
               descriptionHeader={t('Authorized SSH key')}
+              isDisabled={!loaded}
               isEdit={canUpdateVM}
               label={<LinuxLabel />}
               showEditOnTitle

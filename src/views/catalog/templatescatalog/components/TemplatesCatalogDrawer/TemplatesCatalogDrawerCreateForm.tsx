@@ -8,7 +8,11 @@ import {
 } from '@catalog/customize/utils';
 import { quickCreateVM } from '@catalog/utils/quick-create-vm';
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
-import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  ProcessedTemplatesModel,
+  SecretModel,
+  V1Template,
+} from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
@@ -33,7 +37,10 @@ import {
   TextInput,
 } from '@patternfly/react-core';
 
+import AuthorizedSSHKey from './AuthorizedSSHKey';
+
 type TemplatesCatalogDrawerCreateFormProps = {
+  authorizedSSHKey: string;
   canQuickCreate: boolean;
   initialVMName?: string;
   isBootSourceAvailable: boolean;
@@ -43,7 +50,15 @@ type TemplatesCatalogDrawerCreateFormProps = {
 };
 
 export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFormProps> = memo(
-  ({ canQuickCreate, initialVMName, isBootSourceAvailable, namespace, onCancel, template }) => {
+  ({
+    authorizedSSHKey,
+    canQuickCreate,
+    initialVMName,
+    isBootSourceAvailable,
+    namespace,
+    onCancel,
+    template,
+  }) => {
     const history = useHistory();
     const { t } = useKubevirtTranslation();
     const { updateTabsData, vm } = useWizardVMContext();
@@ -70,8 +85,13 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
         if (parameterForName)
           replaceTemplateParameterValue(draftTemplate, parameterForName, vmName);
 
+        const vmObject = getTemplateVirtualMachineObject(draftTemplate);
+
+        if (!isEmpty(authorizedSSHKey)) {
+          draftTemplate.objects = template.objects.filter((obj) => obj?.kind !== SecretModel.kind);
+        }
+
         if (vm?.spec?.template) {
-          const vmObject = getTemplateVirtualMachineObject(draftTemplate);
           ensurePath(vmObject, [
             'spec.template.spec.domain.resources',
             'spec.template.spec.domain.cpu',
@@ -86,7 +106,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
       quickCreateVM({
         models,
-        overrides: { name: vmName, namespace, startVM },
+        overrides: { authorizedSSHKey, name: vmName, namespace, startVM },
         template: templateToProcess,
       })
         .then((quickCreatedVM) => {
@@ -105,6 +125,10 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
       if (vmName) {
         catalogUrl += `&vmName=${vmName}`;
+      }
+
+      if (!isEmpty(authorizedSSHKey)) {
+        updateTabsData((currentTabsData) => ({ ...currentTabsData, authorizedSSHKey }));
       }
 
       history.push(catalogUrl);
@@ -150,6 +174,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                       </DescriptionListGroup>
                     </DescriptionList>
                   </SplitItem>
+                  <AuthorizedSSHKey authorizedSSHKey={authorizedSSHKey} template={template} />
                 </Split>
               </StackItem>
               <StackItem />

@@ -31,17 +31,26 @@ export const generateSSHKeySecret = (name: string, namespace: string, sshKey: st
   metadata: { name, namespace },
 });
 
-export const getInitialSSHDetails = (
-  sshSecretName: string,
-  secretToCreate?: IoK8sApiCoreV1Secret,
-): SSHSecretDetails =>
+export const getInitialSSHDetails = ({
+  applyKeyToProject = false,
+  secretToCreate,
+  sshSecretName,
+}: {
+  applyKeyToProject?: boolean;
+  secretToCreate?: IoK8sApiCoreV1Secret;
+  sshSecretName: string;
+}): SSHSecretDetails =>
   !isEmpty(secretToCreate)
     ? {
+        appliedDefaultKey: false,
+        applyKeyToProject,
         secretOption: SecretSelectionOption.addNew,
         sshPubKey: decodeSecret(secretToCreate),
         sshSecretName: getName(secretToCreate),
       }
     : {
+        appliedDefaultKey: true,
+        applyKeyToProject,
         secretOption: !isEmpty(sshSecretName)
           ? SecretSelectionOption.useExisting
           : SecretSelectionOption.none,
