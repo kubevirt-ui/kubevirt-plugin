@@ -11,7 +11,7 @@ const BootableVolumeEmptyState: FC = () => {
     <EmptyState>
       <Trans ns="plugin__kubevirt-plugin" t={t}>
         <Title headingLevel="h3">No volumes found</Title>
-        Click the <b> Add volume</b> button to add a volume to boot from
+        Click <b> Add volume</b> to add a volume to boot from
       </Trans>
     </EmptyState>
   );

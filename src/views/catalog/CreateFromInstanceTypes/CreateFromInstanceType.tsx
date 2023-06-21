@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import { Trans } from 'react-i18next';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
@@ -34,9 +35,17 @@ const CreateFromInstanceType: FC = () => {
                   <>
                     {t('Select volume to boot from')}{' '}
                     <HelpTextIcon
-                      bodyContent={t(
-                        'Select a volume (image) to start your VirtualMachine from. You can click the "Add volume" button to add another OS image that doesn\'t appear on the list.',
-                      )}
+                      bodyContent={
+                        <>
+                          <Trans ns="plugin__kubevirt-plugin" t={t}>
+                            The Volume table displays DataSources and PersistentVolumeClaims that
+                            VirtualMachines can boot from.
+                            <div>
+                              Click <b> Add volume</b> to boot from a volume that is not listed.
+                            </div>
+                          </Trans>
+                        </>
+                      }
                       className="create-vm-instance-type-section__HelpTextIcon"
                       position={PopoverPosition.right}
                     />
