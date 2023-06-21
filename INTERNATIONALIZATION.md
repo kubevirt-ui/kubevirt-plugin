@@ -14,6 +14,7 @@ In general, these files shouldn't be manually updated, though sometimes plurals 
 after files are generated.
 
 To generate and update text files:
+
 ```
 yarn i18n
 ```
@@ -21,40 +22,45 @@ yarn i18n
 This command launches the [code parser](https://github.com/i18next/i18next-parser), generates JSON files containing English key:value pairs for all internationalized strings, and consolidates any English JSON files with identical names to avoid namespace conflicts in i18next.
 
 #### Scope
+
 We are not able to translate all text in the application. Text located in backend code or non-Red-Hat-controlled development environments may not be accessible for translation.
 
 This may include items such as:
-* Resource statuses (i.e. "Running")
-* Events surfaced from Kubernetes
-* Alerts
-* Error messages displayed to the user or in logs
-* Operators that surface informational messages
-* Logging messages
-* Monitoring dashboard chart titles and dropdowns that come from the config map dashboard definition
+
+- Resource statuses (i.e. "Running")
+- Events surfaced from Kubernetes
+- Alerts
+- Error messages displayed to the user or in logs
+- Operators that surface informational messages
+- Logging messages
+- Monitoring dashboard chart titles and dropdowns that come from the config map dashboard definition
 
 Localizaton is not included in the CLI at this time, and bidirectional (right-to-left) text such as Hebrew and Arabic are out of scope.
 
 #### Internationalization guidelines
 
-* Any usage of i18next's `TFunction` (rather than react-i18next's `TFunction`) must be performed inside a function or component.
-* Don't use backticks inside of a `TFunction`. Our code parser will not automatically pick up the keys that contain backticks.
+- Any usage of i18next's `TFunction` (rather than react-i18next's `TFunction`) must be performed inside a function or component.
+- Don't use backticks inside of a `TFunction`. Our code parser will not automatically pick up the keys that contain backticks.
 
 Examples:
+
 ```
 Bad: t(`public~Hello, it is now {{date}}`, { date: new Date() })
 Good: t('public~Hello, it is now {{date}}', { date: new Date() })
 ```
 
-* `aria-label`, `aria-placeholder`, `aria-roledescription`, and `aria-valuetext` should be internationalized.
-* Use the query parameter `?pseudolocalization=true&lng=en` to see pseudolocalization on strings you've marked for internationalization.
-    * Pseudolocalization adds brackets around the text and makes it longer so you can test components with different text lengths.
-* Make sure there are no missing key warnings in your browser's developer tools - missing keys will trigger errors in integration tests. The warning will show up as an error in the JavaScript console.
-* When displaying a resource kind, you can hard-code it directly in the internationalized text or use the predefined label on the model for the kind.
-    * `model.labelPluralKey` contains the key for the internationalized kind name and must be wrapped in its own `TFunction`. Not all kinds have this attribute, so it is necessary to check for it first as shown below:
+- `aria-label`, `aria-placeholder`, `aria-roledescription`, and `aria-valuetext` should be internationalized.
+- Use the query parameter `?pseudolocalization=true&lng=en` to see pseudolocalization on strings you've marked for internationalization.
+  - Pseudolocalization adds brackets around the text and makes it longer so you can test components with different text lengths.
+- Make sure there are no missing key warnings in your browser's developer tools - missing keys will trigger errors in integration tests. The warning will show up as an error in the JavaScript console.
+- When displaying a resource kind, you can hard-code it directly in the internationalized text or use the predefined label on the model for the kind.
+  - `model.labelPluralKey` contains the key for the internationalized kind name and must be wrapped in its own `TFunction`. Not all kinds have this attribute, so it is necessary to check for it first as shown below:
+
 ```
 model.labelPluralKey ? t(model.labelPluralKey) :  model.labelPlural
 ```
-* While i18next extracts translation keys in runtime, i18next-parser (the tool we use to generate JSON files) doesn't run the code, so it can't interpolate values in these expressions:
+
+- While i18next extracts translation keys in runtime, i18next-parser (the tool we use to generate JSON files) doesn't run the code, so it can't interpolate values in these expressions:
 
 ```
 t(key)
@@ -63,6 +69,7 @@ t(`key${id}`)
 ```
 
 As a workaround, you should specify possible static values in comments anywhere in your file:
+
 ```
 // t('key_1')
 // t('key_2')
@@ -74,8 +81,8 @@ t('key2')
 t('key' + id)
 ```
 
-* The optional i18nKey property on the [react-i18next Trans component](https://react.i18next.com/latest/trans-component) should only be used as a last resort. There is a known (rare) issue with the parser, where it will sometimes incorrectly generate a key that contains HTML tags. If this is the case, you will see a missingKey error in the developer tools of your browser or in our end to end tests. In this instance, the i18nKey prop should be used and made the same as the text being internationalized. HTML tags like `<strong>` can be used directly in the i18nKey prop.
-* Write tests for pseudolocalized code in Cypress
+- The optional i18nKey property on the [react-i18next Trans component](https://react.i18next.com/latest/trans-component) should only be used as a last resort. There is a known (rare) issue with the parser, where it will sometimes incorrectly generate a key that contains HTML tags. If this is the case, you will see a missingKey error in the developer tools of your browser or in our end to end tests. In this instance, the i18nKey prop should be used and made the same as the text being internationalized. HTML tags like `<strong>` can be used directly in the i18nKey prop.
+- Write tests for pseudolocalized code in Cypress
 
 #### Translations
 
@@ -86,11 +93,13 @@ Translation work is done by the Red Hat Globalization team. We send them updated
 #### Adding support for a new language
 
 To add support for a new language to OpenShift:
+
 1. Look up the [ISO 639-1 code](https://www.loc.gov/standards/iso639-2/php/code_list.php) for the new language.
 2. Add the new language code to `./i18n-scripts/languages.sh`
 3. Update the language switcher component (`./public/components/modals/language-preferences-modal.tsx`) to support the new language if translations are available.
 
 #### Utilities
+
 We have added various scripts to help us automate internationalization-related tasks in OpenShift.
 
 These scripts can all be found in `./i18n-scripts`.

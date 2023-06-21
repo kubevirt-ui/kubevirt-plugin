@@ -7,8 +7,6 @@ import { ChartDonut } from '@patternfly/react-charts';
 import { CardBody, TitleSizes } from '@patternfly/react-core';
 
 import useVMsPerResource from './hooks/useVMsPerResource';
-import EmptyStateNoVMs from './EmptyStateNoVMs';
-import RunningVMsChartLegend from './RunningVMsChartLegend';
 import {
   getChartData,
   getInstanceTypeSeriesLabel,
@@ -16,6 +14,8 @@ import {
   getResourcesToVMCountMap,
   vmsPerResourceCount,
 } from './utils/utils';
+import EmptyStateNoVMs from './EmptyStateNoVMs';
+import RunningVMsChartLegend from './RunningVMsChartLegend';
 
 import './VMsPerResourceCard.scss';
 type VMsPerResourceChartProps = {

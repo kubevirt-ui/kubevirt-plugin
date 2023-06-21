@@ -5,7 +5,7 @@ metadata:
 parameters:
   - name: OAUTH_SECRET
     generate: expression
-    from: "[a-zA-Z0-9]{40}"
+    from: '[a-zA-Z0-9]{40}'
   - name: REDIRECT_URL
     value: http://localhost:9000/auth/callback
     required: true
@@ -17,4 +17,4 @@ objects:
     grantMethod: auto
     secret: ${OAUTH_SECRET}
     redirectURIs:
-    - ${REDIRECT_URL}
+      - ${REDIRECT_URL}

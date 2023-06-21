@@ -1,12 +1,12 @@
 import React from 'react';
+import { Trans } from 'react-i18next';
 
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, NumberInput, Text, TextInput, Title } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
-import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
-import { Trans } from 'react-i18next';
 
 type VolumeRegistryDataProps = {
   bootableVolume: AddBootableVolumeState;

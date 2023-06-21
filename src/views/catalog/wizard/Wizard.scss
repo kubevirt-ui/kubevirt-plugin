@@ -1,5 +1,4 @@
-
-  @import '../../../utils/styles/secondary-editor.scss';
+@import '../../../utils/styles/secondary-editor.scss';
 
 .vm-wizard-body {
   .co-m-page__body {
@@ -12,15 +11,12 @@
     &.save-button {
       @include secondary-editor-save-button;
     }
-  
+
     &.reload-button {
       @include secondary-editor-reload-button;
     }
   }
 }
-
-
-
 
 .vm-wizard-footer {
   padding: var(--pf-global--spacer--lg);
