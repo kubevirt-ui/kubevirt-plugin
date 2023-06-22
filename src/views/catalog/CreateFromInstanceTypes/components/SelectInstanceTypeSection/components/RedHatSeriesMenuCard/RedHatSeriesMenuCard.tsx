@@ -42,7 +42,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
 
   const { classAnnotation, seriesName, sizes } = rhSeriesItem;
 
-  const { Icon, seriesLabel, seriesTitle } = instanceTypeSeriesNameMapper[seriesName];
+  const { Icon, seriesLabel, seriesTitle } = instanceTypeSeriesNameMapper[seriesName] || {};
 
   const isMenuExpanded = useMemo(() => seriesName === activeMenu, [activeMenu, seriesName]);
   const isSelectedMenu = useMemo(
@@ -90,9 +90,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
           variant="plain"
         >
           <Card className="instance-type-series-menu-card__toggle-card">
-            <div className="instance-type-series-menu-card__card-icon">
-              <Icon />
-            </div>
+            <div className="instance-type-series-menu-card__card-icon">{Icon && <Icon />}</div>
             <CardBody>
               <div className="instance-type-series-menu-card__card-title">{seriesTitle}</div>
               <div className="instance-type-series-menu-card__card-toggle-text">

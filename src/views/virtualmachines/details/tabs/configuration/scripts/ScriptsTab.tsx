@@ -1,5 +1,4 @@
 import React, { FC, useCallback, useMemo } from 'react';
-import { Trans } from 'react-i18next';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
@@ -17,7 +16,7 @@ import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMac
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
+import { getIsDynamicSSHInjectionEnabled, getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   k8sUpdate,
@@ -31,9 +30,9 @@ import {
   Divider,
   PageSection,
   Stack,
-  Text,
-  TextVariants,
 } from '@patternfly/react-core';
+
+import DynamicSSHKeyInjectionDescription from './components/DynamicSSHKeyInjectionDescription';
 
 import './scripts-tab.scss';
 
@@ -49,6 +48,7 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys, loaded] = useKubevirtUserSettings('ssh');
   const secretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
+  const isDynamicSSHInjection = useMemo(() => getIsDynamicSSHInjectionEnabled(vm), [vm]);
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
@@ -103,9 +103,11 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               descriptionData={
                 <Stack hasGutter>
                   <div data-test="ssh-popover">
-                    <Trans ns="plugin__kubevirt-plugin" t={t}>
-                      <Text component={TextVariants.p}>Store the key in a project secret.</Text>
-                    </Trans>
+                    {isDynamicSSHInjection ? (
+                      <>{t('Store the key in a project secret.')}</>
+                    ) : (
+                      <DynamicSSHKeyInjectionDescription />
+                    )}
                   </div>
                   <SecretNameLabel secretName={secretName} />
                 </Stack>
@@ -123,7 +125,7 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               }
               data-test-id="authorized-ssh-key-button"
               descriptionHeader={t('Authorized SSH key')}
-              isDisabled={!loaded}
+              isDisabled={!loaded || !isDynamicSSHInjection}
               isEdit={canUpdateVM}
               label={<LinuxLabel />}
               showEditOnTitle

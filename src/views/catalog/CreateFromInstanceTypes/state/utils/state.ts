@@ -9,6 +9,7 @@ import {
 import { getRandomVMName } from './utils';
 
 const instanceTypeVMInitialState: InstanceTypeVMState = {
+  isDynamicSSHInjection: false,
   pvcSource: null,
   selectedBootableVolume: null,
   selectedInstanceType: '',

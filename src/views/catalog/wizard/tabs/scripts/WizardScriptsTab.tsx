@@ -5,6 +5,7 @@ import { WizardTab } from '@catalog/wizard/tabs';
 import AlertScripts from '@kubevirt-utils/components/AlertScripts/AlertScripts';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
+import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,6 +17,7 @@ import {
   PageSection,
 } from '@patternfly/react-core';
 
+import DynamicSSHKeyInjectionWizard from './components/DynamicSSHKeyInjectionWizard';
 import SSHKey from './components/SSHKey';
 import Sysprep from './components/Sysprep';
 
@@ -24,6 +26,7 @@ import './WizardScriptsTab.scss';
 const WizardScriptsTab: WizardTab = ({ updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const showDynamicSSHKeyInjection = vm?.metadata?.labels?.[DYNAMIC_CREDENTIALS_SUPPORT];
 
   return (
     <PageSection className="wizard-scripts-tab">
@@ -50,6 +53,12 @@ const WizardScriptsTab: WizardTab = ({ updateVM, vm }) => {
           />
           <Divider />
           <SSHKey />
+          {showDynamicSSHKeyInjection && (
+            <>
+              <Divider />
+              <DynamicSSHKeyInjectionWizard />
+            </>
+          )}
           <Divider />
           <Sysprep />
         </DescriptionList>

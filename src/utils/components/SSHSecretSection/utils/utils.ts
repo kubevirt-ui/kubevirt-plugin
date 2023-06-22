@@ -3,7 +3,17 @@ import produce from 'immer';
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1CloudInitConfigDriveSource,
+  V1CloudInitNoCloudSource,
+  V1SSHPublicKeyAccessCredentialPropagationMethod,
+  V1VirtualMachine,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  convertYAMLUserDataObject,
+  getCloudInitData,
+  getCloudInitVolume,
+} from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -41,14 +51,19 @@ export const detachVMSecret = async (vm: V1VirtualMachine) => {
   });
 };
 
-export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string) =>
-  produce(vm, (vmDraft) => {
+export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string, isDynamic?: boolean) => {
+  return produce(vm, (vmDraft) => {
     const cloudInitNoCloudVolume = getVolumes(vm)?.find((v) => v.cloudInitNoCloud);
+
     if (cloudInitNoCloudVolume) {
       vmDraft.spec.template.spec.volumes = [
         ...getVolumes(vm).filter((v) => !v.cloudInitNoCloud),
         {
-          cloudInitConfigDrive: { ...cloudInitNoCloudVolume.cloudInitNoCloud },
+          cloudInitConfigDrive: getCloudInitConfigDrive(
+            isDynamic,
+            cloudInitNoCloudVolume.cloudInitNoCloud,
+          ),
+
           name: cloudInitNoCloudVolume.name,
         },
       ];
@@ -56,9 +71,7 @@ export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string) =>
     vmDraft.spec.template.spec.accessCredentials = [
       {
         sshPublicKey: {
-          propagationMethod: {
-            configDrive: {},
-          },
+          propagationMethod: getCloudInitPropagationMethod(isDynamic, vm),
           source: {
             secret: {
               secretName: secretName || `${getName(vm)}-ssh-key`,
@@ -68,7 +81,37 @@ export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string) =>
       },
     ];
   });
+};
 
+export const getCloudInitPropagationMethod = (
+  isDynamic: boolean,
+  vm: V1VirtualMachine,
+): V1SSHPublicKeyAccessCredentialPropagationMethod => {
+  const cloudInitData = getCloudInitData(getCloudInitVolume(vm));
+  const userData = convertYAMLUserDataObject(cloudInitData?.userData);
+  return isDynamic
+    ? {
+        qemuGuestAgent: {
+          users: [userData?.user],
+        },
+      }
+    : { configDrive: {} };
+};
+export const getCloudInitConfigDrive = (
+  isDynamic: boolean,
+  cloudInitVolume: V1CloudInitConfigDriveSource | V1CloudInitNoCloudSource,
+): V1CloudInitConfigDriveSource => {
+  const runCmd = `\nruncmd:\n- [ setsebool, -P, virt_qemu_ga_manage_ssh, on ]`;
+  const userData = cloudInitVolume?.userData?.concat(runCmd);
+  const userDataClean = cloudInitVolume?.userData?.replace(runCmd, '');
+
+  return isDynamic
+    ? {
+        ...cloudInitVolume,
+        userData,
+      }
+    : { ...cloudInitVolume, userData: userDataClean };
+};
 export const createSSHSecret = (sshKey: string, secretName: string, secretNamespace: string) =>
   k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
     data: {
