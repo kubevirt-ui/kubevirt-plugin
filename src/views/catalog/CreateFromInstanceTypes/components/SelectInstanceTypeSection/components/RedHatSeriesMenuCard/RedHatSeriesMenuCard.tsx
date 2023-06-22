@@ -16,6 +16,7 @@ import {
   MenuList,
   MenuToggle,
   Popper,
+  Tooltip,
 } from '@patternfly/react-core';
 import { AngleDownIcon } from '@patternfly/react-icons';
 
@@ -40,9 +41,9 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
     instanceTypeVMState: { selectedInstanceType },
   } = useInstanceTypeVMStore();
 
-  const { classAnnotation, seriesName, sizes } = rhSeriesItem;
+  const { classAnnotation, descriptionAnnotation, seriesName, sizes } = rhSeriesItem;
 
-  const { Icon, seriesLabel, seriesTitle } = instanceTypeSeriesNameMapper[seriesName] || {};
+  const { Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
 
   const isMenuExpanded = useMemo(() => seriesName === activeMenu, [activeMenu, seriesName]);
   const isSelectedMenu = useMemo(
@@ -63,6 +64,20 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
     });
   }, [selectedInstanceType, seriesName, sizes, t]);
 
+  const card = (
+    <Card className="instance-type-series-menu-card__toggle-card">
+      <div className="instance-type-series-menu-card__card-icon">{Icon && <Icon />}</div>
+      <CardBody>
+        <div className="instance-type-series-menu-card__card-title">{classAnnotation}</div>
+        <div className="instance-type-series-menu-card__card-toggle-text">
+          {seriesLabel || classAnnotation} <AngleDownIcon />
+        </div>
+      </CardBody>
+      <CardFooter className="instance-type-series-menu-card__card-footer">
+        {isSelectedMenu && selectedITLabel}
+      </CardFooter>
+    </Card>
+  );
   return (
     <Popper
       popper={
@@ -89,18 +104,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
           onClick={(event) => onMenuToggle(event, seriesName)}
           variant="plain"
         >
-          <Card className="instance-type-series-menu-card__toggle-card">
-            <div className="instance-type-series-menu-card__card-icon">{Icon && <Icon />}</div>
-            <CardBody>
-              <div className="instance-type-series-menu-card__card-title">{seriesTitle}</div>
-              <div className="instance-type-series-menu-card__card-toggle-text">
-                {seriesLabel || classAnnotation} <AngleDownIcon />
-              </div>
-            </CardBody>
-            <CardFooter className="instance-type-series-menu-card__card-footer">
-              {isSelectedMenu && selectedITLabel}
-            </CardFooter>
-          </Card>
+          {!isMenuExpanded ? <Tooltip content={descriptionAnnotation}>{card}</Tooltip> : card}
         </MenuToggle>
       }
       direction="down"

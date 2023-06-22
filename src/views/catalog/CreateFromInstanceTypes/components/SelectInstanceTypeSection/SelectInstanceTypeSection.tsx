@@ -1,9 +1,10 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { Grid, GridItem, Tab, Tabs } from '@patternfly/react-core';
+import { Flex, Tab, Tabs } from '@patternfly/react-core';
 
 import RedHatSeriesMenuCard from './components/RedHatSeriesMenuCard/RedHatSeriesMenuCard';
 import UsersInstanceTypesList from './components/UsersInstanceTypeList/UsersInstanceTypeList';
@@ -39,13 +40,20 @@ const SelectInstanceTypeSection: FC = () => {
     <>
       <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
         <Tab eventKey={TabKey.RedHat} title={menuItems.redHatProvided.label}>
-          <Grid hasGutter span={2}>
-            {menuItems.redHatProvided.items.map((rhSeriesItem) => (
-              <GridItem key={rhSeriesItem?.seriesName}>
-                <RedHatSeriesMenuCard rhSeriesItem={rhSeriesItem} {...menuProps} />
-              </GridItem>
-            ))}
-          </Grid>
+          <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
+            {menuItems.redHatProvided.items.map((rhSeriesItem) => {
+              const seriesName = rhSeriesItem?.seriesName;
+              return (
+                !instanceTypeSeriesNameMapper[seriesName]?.disabled && (
+                  <RedHatSeriesMenuCard
+                    key={seriesName}
+                    rhSeriesItem={rhSeriesItem}
+                    {...menuProps}
+                  />
+                )
+              );
+            })}
+          </Flex>
         </Tab>
         <Tab eventKey={TabKey.Users} title={menuItems.userProvided.label}>
           <UsersInstanceTypesList />
