@@ -1,5 +1,6 @@
 import { V1AccessCredential, V1Disk, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
+import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 
 import { VM_WORKLOAD_ANNOTATION } from './annotations';
 
@@ -144,6 +145,10 @@ export const getWorkload = (vm: V1VirtualMachine): string =>
  */
 export const getAccessCredentials = (vm: V1VirtualMachine): V1AccessCredential[] =>
   vm?.spec?.template?.spec?.accessCredentials;
+
+export const getIsDynamicSSHInjectionEnabled = (vm: V1VirtualMachine): boolean =>
+  getLabel(vm, DYNAMIC_CREDENTIALS_SUPPORT) === 'true' &&
+  Boolean(getAccessCredentials(vm)?.[0]?.sshPublicKey?.propagationMethod?.qemuGuestAgent);
 
 /**
  * A selector that finds the SSH secret name of the VM

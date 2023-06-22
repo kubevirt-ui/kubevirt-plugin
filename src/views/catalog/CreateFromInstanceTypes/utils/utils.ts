@@ -44,6 +44,7 @@ export const generateVM = (
   };
 
   const selectedPreference = selectedBootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL];
+  const isDynamic = instanceTypeState?.isDynamicSSHInjection;
 
   const emptyVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
@@ -126,5 +127,5 @@ export const generateVM = (
     },
   };
 
-  return sshSecretName ? addSecretToVM(emptyVM, sshSecretName) : emptyVM;
+  return sshSecretName ? addSecretToVM(emptyVM, sshSecretName, isDynamic) : emptyVM;
 };

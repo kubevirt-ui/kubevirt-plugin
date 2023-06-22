@@ -26,6 +26,8 @@ type WizardDescriptionItemProps = {
     content: ReactNode;
     header: ReactNode;
   };
+  /** help text icon */
+  helpTextIcon?: ReactNode;
   /** disabled state of the description group */
   isDisabled?: boolean;
   /** is the description group editable */
@@ -49,6 +51,7 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
     count,
     description,
     helperPopover,
+    helpTextIcon,
     isDisabled,
     isEdit,
     label,
@@ -78,7 +81,7 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
 
       return (
         <DescriptionListTerm>
-          {titleWithCount} {label}
+          {titleWithCount} {label} {helpTextIcon}
         </DescriptionListTerm>
       );
     };
