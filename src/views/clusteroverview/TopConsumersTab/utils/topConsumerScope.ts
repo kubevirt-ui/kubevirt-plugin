@@ -15,11 +15,23 @@ abstract class TopConsumerScopeObjectEnum<T> extends DropdownEnum<T> {
 }
 
 export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
-  private static readonly ALL = Object.freeze(
+  static readonly NODE = new TopConsumerScope('NODE', {
+    dropdownLabel: 'Node',
+  });
+
+  static readonly PROJECT = new TopConsumerScope('PROJECT', {
+    dropdownLabel: 'Project',
+  });
+
+  static readonly VM = new TopConsumerScope('VM', {
+    dropdownLabel: 'VM',
+  });
+
+  private static readonly all = Object.freeze(
     ObjectEnum.getAllClassEnumProperties<TopConsumerScope>(TopConsumerScope),
   );
 
-  private static readonly dropdownLabelMapper = TopConsumerScope.ALL.reduce(
+  private static readonly dropdownLabelMapper = TopConsumerScope.all.reduce(
     (accumulator, scope: TopConsumerScope) => ({
       ...accumulator,
       [scope.dropdownLabel]: scope,
@@ -32,25 +44,13 @@ export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
 
   static fromString = (source: string): TopConsumerScope => TopConsumerScope.stringMapper[source];
 
-  static getAll = () => TopConsumerScope.ALL;
+  static getAll = () => TopConsumerScope.all;
 
-  static readonly NODE = new TopConsumerScope('NODE', {
-    dropdownLabel: 'Node',
-  });
-
-  static readonly PROJECT = new TopConsumerScope('PROJECT', {
-    dropdownLabel: 'Project',
-  });
-
-  private static readonly stringMapper = TopConsumerScope.ALL.reduce(
+  private static readonly stringMapper = TopConsumerScope.all.reduce(
     (accumulator, scope: TopConsumerScope) => ({
       ...accumulator,
       [scope.value]: scope,
     }),
     {},
   );
-
-  static readonly VM = new TopConsumerScope('VM', {
-    dropdownLabel: 'VM',
-  });
 }

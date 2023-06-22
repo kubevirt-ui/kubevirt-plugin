@@ -21,29 +21,10 @@ abstract class TopConsumerMetricObjectEnum<T> extends DropdownEnum<T> {
 }
 
 export class TopConsumerMetric extends TopConsumerMetricObjectEnum<string> {
-  private static readonly ALL = Object.freeze(
-    ObjectEnum.getAllClassEnumProperties<TopConsumerMetric>(TopConsumerMetric),
-  );
-
   static readonly CPU = new TopConsumerMetric('cpu', {
     chartLabel: 'CPU',
     dropdownLabel: 'By CPU',
   });
-
-  private static readonly dropdownLabelMapper = TopConsumerMetric.ALL.reduce(
-    (accumulator, metric: TopConsumerMetric) => ({
-      ...accumulator,
-      [metric.dropdownLabel]: metric,
-    }),
-    {},
-  );
-
-  static fromDropdownLabel = (dropdownLabel: string): TopConsumerMetric =>
-    TopConsumerMetric.dropdownLabelMapper[dropdownLabel];
-
-  static fromString = (source: string): TopConsumerMetric => TopConsumerMetric.stringMapper[source];
-
-  static getAll = () => TopConsumerMetric.ALL;
 
   static readonly MEMORY = new TopConsumerMetric('memory', {
     chartLabel: 'Memory',
@@ -65,16 +46,35 @@ export class TopConsumerMetric extends TopConsumerMetricObjectEnum<string> {
     dropdownLabel: 'By throughput',
   });
 
-  private static readonly stringMapper = TopConsumerMetric.ALL.reduce(
+  static readonly VCPU_WAIT = new TopConsumerMetric('vcpu-wait', {
+    chartLabel: 'vCPU wait',
+    dropdownLabel: 'By vCPU wait',
+  });
+
+  private static readonly all = Object.freeze(
+    ObjectEnum.getAllClassEnumProperties<TopConsumerMetric>(TopConsumerMetric),
+  );
+
+  private static readonly dropdownLabelMapper = TopConsumerMetric.all.reduce(
+    (accumulator, metric: TopConsumerMetric) => ({
+      ...accumulator,
+      [metric.dropdownLabel]: metric,
+    }),
+    {},
+  );
+
+  static fromDropdownLabel = (dropdownLabel: string): TopConsumerMetric =>
+    TopConsumerMetric.dropdownLabelMapper[dropdownLabel];
+
+  static fromString = (source: string): TopConsumerMetric => TopConsumerMetric.stringMapper[source];
+
+  static getAll = () => TopConsumerMetric.all;
+
+  private static readonly stringMapper = TopConsumerMetric.all.reduce(
     (accumulator, metric: TopConsumerMetric) => ({
       ...accumulator,
       [metric.value]: metric,
     }),
     {},
   );
-
-  static readonly VCPU_WAIT = new TopConsumerMetric('vcpu-wait', {
-    chartLabel: 'vCPU wait',
-    dropdownLabel: 'By vCPU wait',
-  });
 }
