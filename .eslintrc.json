@@ -26,30 +26,36 @@
     "simple-import-sort",
     "perfectionist"
   ],
-  "settings": {
-    "react": {
-      "version": "detect"
-    },
-    "import/resolver": {
-      "typescript": {}, // this loads <rootdir>/tsconfig.json to eslint
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
-      }
-    }
-  },
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
-    "react/display-name": "off",
-    "react/prop-types": "off",
+    "@typescript-eslint/no-shadow": ["error"],
+    "no-nested-ternary": "error",
+    "perfectionist/sort-classes": [
+      "error",
+      {
+        "groups": [
+          "static-property",
+          "private-property",
+          "property",
+          "constructor",
+          "static-method",
+          "private-method",
+          "method"
+        ],
+        "order": "asc",
+        "type": "natural"
+      }
+    ],
+    "perfectionist/sort-imports": "off",
     "prettier/prettier": [
       "error",
       {
         "endOfLine": "auto"
       }
     ],
-    "no-nested-ternary": "error",
+    "react/display-name": "off",
+    "react/prop-types": "off",
     "simple-import-sort/exports": "error",
-    "@typescript-eslint/no-shadow": ["error"],
     "simple-import-sort/imports": [
       "warn",
       {
@@ -73,7 +79,17 @@
           ["^.+\\.s?css$"]
         ]
       }
-    ],
-    "perfectionist/sort-imports": "off"
+    ]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      },
+      "typescript": {} // this loads <rootdir>/tsconfig.json to eslint
+    },
+    "react": {
+      "version": "detect"
+    }
   }
 }

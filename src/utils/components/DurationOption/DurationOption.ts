@@ -32,18 +32,6 @@ const mapperDuration = {
 const getDurationMilliseconds = (duration) => mapperDuration?.[duration] || mapperDuration?.['5m'];
 
 class DurationOption extends DropdownEnum<string> {
-  private static readonly ALL = Object.freeze(
-    ObjectEnum.getAllClassEnumProperties<DurationOption>(DurationOption),
-  );
-
-  private static readonly dropdownLabelMapper = DurationOption.ALL.reduce(
-    (accumulator, durationOption: DurationOption) => ({
-      ...accumulator,
-      [durationOption.dropdownLabel]: durationOption,
-    }),
-    {},
-  );
-
   static readonly FIFTEEN_MIN = new DurationOption('15m', {
     dropdownLabel: 'Last 15 minutes',
   });
@@ -51,16 +39,6 @@ class DurationOption extends DropdownEnum<string> {
   static readonly FIVE_MIN = new DurationOption('5m', {
     dropdownLabel: 'Last 5 minutes',
   });
-
-  static fromDropdownLabel = (dropdownLabel: string): DurationOption =>
-    DurationOption.dropdownLabelMapper[dropdownLabel];
-
-  static fromString = (source: string): DurationOption => DurationOption.stringMapper[source];
-
-  static getAll = () => DurationOption.ALL;
-
-  static getMilliseconds = (duration: string): number =>
-    DurationOption.stringMapper?.[duration]?.millisecondsTime;
 
   static readonly ONE_DAY = new DurationOption('1d', {
     dropdownLabel: 'Last 1 day',
@@ -78,14 +56,6 @@ class DurationOption extends DropdownEnum<string> {
     dropdownLabel: 'Last 6 hours',
   });
 
-  private static readonly stringMapper = DurationOption.ALL.reduce(
-    (accumulator, durationOption: DurationOption) => ({
-      ...accumulator,
-      [durationOption.value]: durationOption,
-    }),
-    {},
-  );
-
   static readonly THIRTY_MIN = new DurationOption('30m', {
     dropdownLabel: 'Last 30 minutes',
   });
@@ -102,8 +72,31 @@ class DurationOption extends DropdownEnum<string> {
     dropdownLabel: 'Last 2 day',
   });
 
-  protected readonly millisecondsTime: number;
+  private static readonly all = Object.freeze(
+    ObjectEnum.getAllClassEnumProperties<DurationOption>(DurationOption),
+  );
+  private static readonly dropdownLabelMapper = DurationOption.all.reduce(
+    (accumulator, durationOption: DurationOption) => ({
+      ...accumulator,
+      [durationOption.dropdownLabel]: durationOption,
+    }),
+    {},
+  );
+  static fromDropdownLabel = (dropdownLabel: string): DurationOption =>
+    DurationOption.dropdownLabelMapper[dropdownLabel];
 
+  static fromString = (source: string): DurationOption => DurationOption.stringMapper[source];
+  static getAll = () => DurationOption.all;
+  static getMilliseconds = (duration: string): number =>
+    DurationOption.stringMapper?.[duration]?.millisecondsTime;
+  private static readonly stringMapper = DurationOption.all.reduce(
+    (accumulator, durationOption: DurationOption) => ({
+      ...accumulator,
+      [durationOption.value]: durationOption,
+    }),
+    {},
+  );
+  protected readonly millisecondsTime: number;
   constructor(value: string, { dropdownLabel }) {
     super(value, { dropdownLabel });
     this.millisecondsTime = getDurationMilliseconds(value);
