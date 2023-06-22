@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 
 import { Divider } from '@patternfly/react-core';
 
-import EnableInstanceTypeSection from './components/EnableInstanceTypeSection/EnableInstanceTypeSection';
 import EnableLoadBalancerSection from './components/EnableLoadBalancerSection/EnableLoadBalancerSection';
+import EnablePreviewFeaturesSection from './components/EnablePreviewFeaturesSection/EnablePreviewFeaturesSection';
 import GeneralInformation from './components/GeneralInformation/GeneralInformation';
 import LiveMigrationSection from './components/LiveMigrationSection/LiveMigrationSection';
 import TemplatesProjectSection from './components/TemplatesProjectSection/TemplatesProjectSection';
@@ -16,7 +16,7 @@ const ClusterTab: FC = () => {
       <Divider className="section-divider" />
       <TemplatesProjectSection />
       <Divider className="section-divider" />
-      <EnableInstanceTypeSection />
+      <EnablePreviewFeaturesSection />
       <Divider className="section-divider" />
       <EnableLoadBalancerSection />
     </>

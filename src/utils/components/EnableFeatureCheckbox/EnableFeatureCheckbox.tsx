@@ -19,13 +19,13 @@ const EnableFeatureCheckbox: FC<EnableFeatureCheckboxProps> = ({
 }) => {
   const { canEdit, featureEnabled, loading, toggleFeature } = useFeatures(featureName);
 
-  const [isChecked, setIsChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState<boolean>(null);
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && isChecked === null) {
       setIsChecked(featureEnabled);
     }
-  }, [loading, featureEnabled]);
+  }, [loading, featureEnabled, isChecked]);
 
   if (loading) return <Loading />;
 
@@ -38,7 +38,7 @@ const EnableFeatureCheckbox: FC<EnableFeatureCheckboxProps> = ({
       description={description}
       id={id}
       isChecked={isChecked}
-      isDisabled={!canEdit}
+      isDisabled={!canEdit || loading}
       label={label}
     />
   );

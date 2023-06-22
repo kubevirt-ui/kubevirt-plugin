@@ -8,6 +8,7 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 
 export const INSTANCE_TYPE_ENABLED = 'instanceTypesEnabled';
+export const KUBEVIRT_APISERVER_PROXY = 'kubevirtApiserverProxy';
 export const LOAD_BALANCER_ENABLED = 'loadBalancerEnabled';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
@@ -15,7 +16,11 @@ const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
 const FEATURES_ROLE_BINDING_NAME = 'kubevirt-ui-features-reader-binding';
 
 export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
-  data: { [INSTANCE_TYPE_ENABLED]: 'false', [LOAD_BALANCER_ENABLED]: 'false' },
+  data: {
+    [INSTANCE_TYPE_ENABLED]: 'false',
+    [KUBEVIRT_APISERVER_PROXY]: 'true',
+    [LOAD_BALANCER_ENABLED]: 'false',
+  },
   metadata: {
     name: FEATURES_CONFIG_MAP_NAME,
     namespace: DEFAULT_NAMESPACE,
