@@ -103,15 +103,6 @@ objects:
         console.openshift.io/use-i18n: 'true'
     spec:
       displayName: 'Console Plugin Kubevirt Template'
-      proxy:
-        - type: Service
-          alias: kubevirt-performance-pod
-          endpoint:
-            type: Service
-            service:
-              name: kubevirt-performance-pod
-              namespace: openshift-cnv
-              port: 80
       service:
         name: '${PLUGIN_NAME}'
         namespace: '${NAMESPACE}'
