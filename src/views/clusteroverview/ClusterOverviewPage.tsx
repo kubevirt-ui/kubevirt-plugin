@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
@@ -18,41 +18,44 @@ const ClusterOverviewPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const [quickStarts, , loaded] = useKubevirtUserSettings('quickStart');
-  const [isOpen, setIsOpen] = useState<boolean>(true);
 
-  const overviewTabs: NavPage[] = [
-    {
-      component: OverviewTab,
-      href: '',
-      name: t('Overview'),
-    },
-    {
-      component: TopConsumersTab,
-      href: 'top-consumers',
-      name: t('Top consumers'),
-    },
-    {
-      component: MigrationsTab,
-      href: 'migrations',
-      name: t('Migrations'),
-    },
-    {
-      component: SettingsTab,
-      href: 'settings',
-      name: t('Settings'),
-    },
-  ];
+  const overviewTabs: NavPage[] = useMemo(() => {
+    const adminPages: NavPage[] = [
+      {
+        component: TopConsumersTab,
+        href: 'top-consumers',
+        name: t('Top consumers'),
+      },
+      {
+        component: MigrationsTab,
+        href: 'migrations',
+        name: t('Migrations'),
+      },
+    ];
+
+    return [
+      {
+        component: OverviewTab,
+        href: '',
+        name: t('Overview'),
+      },
+      ...(isAdmin ? [...adminPages] : []),
+      {
+        component: SettingsTab,
+        href: 'settings',
+        name: t('Settings'),
+      },
+    ];
+  }, [isAdmin, t]);
 
   return (
     <>
       <Helmet>
         <title>{t('Virtualization')}</title>
       </Helmet>
-      {loaded && !quickStarts?.dontShowWelcomeModal && (
-        <WelcomeModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
-      )}
+      {loaded && !quickStarts?.dontShowWelcomeModal && <WelcomeModal />}
       <ClusterOverviewPageHeader />
-      {isAdmin ? <HorizontalNav pages={overviewTabs} /> : <OverviewTab />}
+      <HorizontalNav pages={overviewTabs} />
     </>
   );
 };

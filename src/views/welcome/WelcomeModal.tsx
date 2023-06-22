@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Trans } from 'react-i18next';
 import openCulture from 'images/openCulture.svg';
 
@@ -20,14 +20,12 @@ import WelcomeButtons from './components/WelcomeButtons';
 
 import './WelcomeModal.scss';
 
-type WelcomeModalProps = {
-  isOpen: boolean;
-  onClose: () => Promise<void> | void;
-};
-
-const WelcomeModal: FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
+const WelcomeModal: FC = () => {
   const { t } = useKubevirtTranslation();
+  const [isOpen, setIsOpen] = useState<boolean>(true);
   const [quickStarts, setQuickStarts] = useKubevirtUserSettings('quickStart');
+
+  const onClose = useCallback(() => setIsOpen(false), []);
 
   return (
     <Modal

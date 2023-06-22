@@ -1,5 +1,6 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
@@ -9,9 +10,11 @@ import UserTab from './UserTab/UserTab';
 
 import './settings-tab.scss';
 
-const SettingsTab: React.FC = () => {
+const SettingsTab: FC = () => {
   const { t } = useKubevirtTranslation();
-  const [activeTab, setActiveTab] = React.useState<number>(0);
+  const isAdmin = useIsAdmin();
+  const [activeTab, setActiveTab] = useState<number>(isAdmin ? 0 : 1);
+
   return (
     <Overview>
       <Alert
@@ -27,11 +30,13 @@ const SettingsTab: React.FC = () => {
           isVertical
           onSelect={(_, activeKey) => setActiveTab(+activeKey)}
         >
-          <Tab eventKey={0} title={<TabTitleText>{t('Cluster')}</TabTitleText>}>
-            <div className="settings-tab__content">
-              <ClusterTab />
-            </div>
-          </Tab>
+          {isAdmin && (
+            <Tab eventKey={0} title={<TabTitleText>{t('Cluster')}</TabTitleText>}>
+              <div className="settings-tab__content">
+                <ClusterTab />
+              </div>
+            </Tab>
+          )}
           <Tab eventKey={1} title={<TabTitleText>{t('User')}</TabTitleText>}>
             <div className="settings-tab__content">
               <UserTab />
