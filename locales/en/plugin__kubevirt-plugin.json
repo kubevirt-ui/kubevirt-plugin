@@ -435,6 +435,7 @@
   "Enable create VirtualMachine from InstanceType": "Enable create VirtualMachine from InstanceType",
   "Enable Descheduler": "Enable Descheduler",
   "Enable headless mode": "Enable headless mode",
+  "Enable Kubevirt proxy": "Enable Kubevirt proxy",
   "Enable preallocation": "Enable preallocation",
   "Enable the creation of SSH service over LoadBalancer for VirtualMachines": "Enable the creation of SSH service over LoadBalancer for VirtualMachines",
   "Enabled": "Enabled",
