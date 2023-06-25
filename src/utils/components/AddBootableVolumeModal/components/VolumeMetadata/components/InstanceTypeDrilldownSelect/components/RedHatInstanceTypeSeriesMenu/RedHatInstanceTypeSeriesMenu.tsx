@@ -15,12 +15,12 @@ type RedHatInstanceTypeSeriesMenuProps = {
 const RedHatInstanceTypeSeriesMenu: FC<RedHatInstanceTypeSeriesMenuProps> = ({
   series,
   ...restProps
-}) => {
-  return (
-    <>
-      {series.map(({ classAnnotation, seriesName, sizes }) => {
-        const { Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
-        return (
+}) => (
+  <>
+    {series.map(({ classAnnotation, seriesName, sizes }) => {
+      const { disabled, Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
+      return (
+        !disabled && (
           <DrilldownMenuItem
             Icon={Icon && Icon}
             id={seriesName}
@@ -33,10 +33,10 @@ const RedHatInstanceTypeSeriesMenu: FC<RedHatInstanceTypeSeriesMenuProps> = ({
               {...restProps}
             />
           </DrilldownMenuItem>
-        );
-      })}
-    </>
-  );
-};
+        )
+      );
+    })}
+  </>
+);
 
 export default RedHatInstanceTypeSeriesMenu;

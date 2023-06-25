@@ -1,5 +1,6 @@
 import { ComponentClass } from 'react';
 
+import { InstanceTypeSize } from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   MemoryIcon,
@@ -40,55 +41,56 @@ export const initialMenuItems: InstanceTypesMenuItemsData = {
 };
 
 export const instanceTypeSeriesNameMapper: {
-  [key: string]: { Icon: ComponentClass; seriesLabel: string; seriesTitle: string };
+  [key: string]: {
+    disabled?: boolean;
+    Icon: ComponentClass;
+    possibleSizes?: InstanceTypeSize[];
+    seriesLabel: string;
+  };
 } = {
-  c1: {
-    Icon: ServerGroupIcon,
-    seriesLabel: t('C series'),
-    // sizes: ['medium', 'large', '2xlarge', '4xlarge', '8xlarge'],
-    seriesTitle: t('General purpose applications'),
-  },
-  co1: {
-    Icon: ModuleIcon,
-    seriesLabel: t('CO series'),
-    // sizes: ['medium', 'large', '2xlarge', '4xlarge', '8xlarge'],
-    seriesTitle: t('Oversubscribed resources'),
-  },
   cx1: {
     Icon: RegistryIcon,
+    possibleSizes: ['medium', 'large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
     seriesLabel: t('CX series'),
-    // sizes: ['medium', 'large', '2xlarge', '4xlarge', '8xlarge'],
-    seriesTitle: t('Compute-intensive applications'),
   },
   gn1: {
     Icon: MicrochipIcon,
+    possibleSizes: ['xlarge', '2xlarge', '4xlarge', '8xlarge'],
     seriesLabel: t('GN series'),
-    // sizes: ['xlarge', '2xlarge', '4xlarge', '8xlarge'],
-    seriesTitle: t('Attached NVIDIA GPU resources'),
   },
   highperformance: {
+    disabled: true,
     Icon: TrendUpIcon,
     seriesLabel: t('HP series'),
-    seriesTitle: t('High-performance applications'),
   },
   m1: {
     Icon: MemoryIcon,
+    possibleSizes: ['large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
     seriesLabel: t('M series'),
-    // sizes: ['large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
-    seriesTitle: t('Memory-intensive applications'),
   },
   n1: {
+    disabled: true,
     Icon: NetworkIcon,
+    possibleSizes: ['medium', 'large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
     seriesLabel: t('N series'),
-    // sizes: ['large', 'xlarge', '2xlarge'],
-    seriesTitle: t('Network-intensive applications'),
+  },
+  o1: {
+    Icon: ModuleIcon,
+    possibleSizes: ['medium', 'large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
+    seriesLabel: t('O series'),
   },
   server: {
+    disabled: true,
     Icon: ServerIcon,
     seriesLabel: t('S series'),
-    seriesTitle: t('Server dedicated applications'),
+  },
+  u1: {
+    Icon: ServerGroupIcon,
+    possibleSizes: ['medium', 'large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
+    seriesLabel: t('U series'),
   },
 };
 
 export const COMMON_INSTANCETYPES = 'common-instancetypes';
 export const INSTANCETYPE_CLASS_ANNOTATION = 'instancetype.kubevirt.io/class';
+export const INSTANCETYPE_DESCRIPTION_ANNOTATION = 'instancetype.kubevirt.io/description';
