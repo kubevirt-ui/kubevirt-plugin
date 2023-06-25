@@ -1,10 +1,7 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 import instanceTypeTechPreviewModalImage from 'images/instance-type-tech-preview-modal-img.svg';
 
-import { INSTANCE_TYPE_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   ButtonVariant,
@@ -21,38 +18,19 @@ import EnableInstanceTypeContent from './components/EnableInstanceTypeContent';
 import LinksList from './components/LinksList';
 
 type EnableInstanceTypeTechPreviewModalProps = {
-  navigateToCatalog: () => void;
+  canEdit: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+  onEnableInstanceTypeFeature: () => void;
 };
 
 const EnableInstanceTypeTechPreviewModal: FC<EnableInstanceTypeTechPreviewModalProps> = ({
-  navigateToCatalog,
+  canEdit,
+  isOpen,
+  onClose,
+  onEnableInstanceTypeFeature,
 }) => {
   const { t } = useKubevirtTranslation();
-
-  const {
-    canEdit,
-    error,
-    featureEnabled: instanceTypesEnabled,
-    loading,
-    toggleFeature: toggleInstanceTypesFeature,
-  } = useFeatures(INSTANCE_TYPE_ENABLED);
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    if (!isEmpty(error)) {
-      setIsOpen(true);
-      return;
-    }
-    if (!loading) {
-      setIsOpen(!instanceTypesEnabled);
-    }
-  }, [loading, instanceTypesEnabled, error]);
-
-  const onClose = useCallback(() => {
-    setIsOpen(false);
-    navigateToCatalog();
-  }, [navigateToCatalog]);
 
   return (
     <Modal
@@ -73,12 +51,7 @@ const EnableInstanceTypeTechPreviewModal: FC<EnableInstanceTypeTechPreviewModalP
             <StackItem>
               <Split hasGutter>
                 {canEdit && (
-                  <Button
-                    onClick={() => {
-                      toggleInstanceTypesFeature(true);
-                    }}
-                    variant={ButtonVariant.primary}
-                  >
+                  <Button onClick={onEnableInstanceTypeFeature} variant={ButtonVariant.primary}>
                     {t('Enable')}
                   </Button>
                 )}
