@@ -2,7 +2,6 @@ import React, { FC, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromInstanceType';
-import EnableInstanceTypeTechPreviewModal from '@catalog/EnableInstanceTypeTechPreviewModal/EnableInstanceTypeTechPreviewModal';
 import TemplatesCatalog from '@catalog/templatescatalog/TemplatesCatalog';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -61,15 +60,13 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
           eventKey={CREATE_VM_TAB.INSTANCE_TYPES}
           title={<CreateVMTabTitle Icon={ImageIcon} titleText={t('InstanceTypes')} />}
         >
-          <CreateFromInstanceType />
-          {currentTab === CREATE_VM_TAB.INSTANCE_TYPES && (
-            <EnableInstanceTypeTechPreviewModal
-              navigateToCatalog={() => {
-                setCurrentTab(CREATE_VM_TAB.CATALOG);
-                history.push(catalogURL);
-              }}
-            />
-          )}
+          <CreateFromInstanceType
+            navigateToCatalog={() => {
+              setCurrentTab(CREATE_VM_TAB.CATALOG);
+              history.push(catalogURL);
+            }}
+            isInstanceTypeTab={currentTab === CREATE_VM_TAB.INSTANCE_TYPES}
+          />
         </Tab>
       </Tabs>
     </div>

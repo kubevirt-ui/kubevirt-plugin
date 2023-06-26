@@ -29,7 +29,11 @@ import YamlAndCLIViewerModal from './components/YamlAndCLIViewerModal/YamlAndCLI
 
 import './CreateVMFooter.scss';
 
-const CreateVMFooter: FC = () => {
+type CreateVMFooterProps = {
+  isDisabled: boolean;
+};
+
+const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const [startVM, setStartVM] = useState(true);
@@ -121,6 +125,7 @@ const CreateVMFooter: FC = () => {
             <SplitItem>
               <Button
                 isDisabled={
+                  isDisabled ||
                   isSubmitting ||
                   isEmpty(selectedBootableVolume) ||
                   !canCreateVM ||

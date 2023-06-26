@@ -24,14 +24,9 @@ import {
   featuresRole,
   featuresRoleBinding,
 } from './constants';
+import { UseFeaturesValues } from './types';
 
-type UseFeatures = (featureName: string) => {
-  canEdit: boolean;
-  error: Error;
-  featureEnabled: boolean;
-  loading: boolean;
-  toggleFeature: (val: boolean) => Promise<IoK8sApiCoreV1ConfigMap>;
-};
+type UseFeatures = (featureName: string) => UseFeaturesValues;
 
 export const useFeatures: UseFeatures = (featureName) => {
   const isAdmin = useIsAdmin();
