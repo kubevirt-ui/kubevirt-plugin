@@ -6,6 +6,7 @@ import { Stack, StackItem, Text, TextVariants } from '@patternfly/react-core';
 
 const EnableInstanceTypeContent: FC = () => {
   const { t } = useKubevirtTranslation();
+
   return (
     <Trans ns="plugin__kubevirt-plugin" t={t}>
       <Stack hasGutter>
@@ -24,7 +25,7 @@ const EnableInstanceTypeContent: FC = () => {
             >
               Developer Preview feature
             </Text>{' '}
-            provides a simple and quick way to create a VirtualMachine.{' '}
+            provides a simple way to create a VirtualMachine.{' '}
             <Text component={TextVariants.p}>
               You must have cluster admin permissions to enable this feature. You can disable it at
               any

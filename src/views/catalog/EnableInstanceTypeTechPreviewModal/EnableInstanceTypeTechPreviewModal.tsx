@@ -87,16 +87,20 @@ const EnableInstanceTypeTechPreviewModal: FC<EnableInstanceTypeTechPreviewModalP
             <StackItem isFilled />
             <StackItem>
               <Split hasGutter>
+                {canEdit && (
+                  <Button
+                    onClick={() => {
+                      toggleInstanceTypesFeature(true);
+                    }}
+                    variant={ButtonVariant.primary}
+                  >
+                    {t('Enable')}
+                  </Button>
+                )}
                 <Button
-                  variant={ButtonVariant.primary}
-                  isDisabled={!canEdit}
-                  onClick={() => {
-                    toggleInstanceTypesFeature(true);
-                  }}
+                  variant={canEdit ? ButtonVariant.link : ButtonVariant.primary}
+                  onClick={onClose}
                 >
-                  {t('Enable')}
-                </Button>
-                <Button variant={ButtonVariant.link} onClick={onClose}>
                   {t('Go to Catalog')}
                 </Button>
               </Split>
