@@ -17,7 +17,6 @@ import {
   ChartThreshold,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
-import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
@@ -87,21 +86,10 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
               x: [currentTime - timespan, currentTime],
             }}
             height={height}
-            padding={{ bottom: 35, left: 70, right: 35, top: 35 }}
+            padding={35}
             scale={{ x: 'time', y: 'linear' }}
             width={width}
           >
-            <ChartAxis
-              style={{
-                grid: {
-                  stroke: chart_color_black_200.value,
-                },
-              }}
-              dependentAxis
-              tickCount={2}
-              tickFormat={(tick: number) => `${tick === 0 ? tick : tick?.toFixed(2)} s`}
-              tickValues={[0, thresholdData?.[0]?.y]}
-            />
             <ChartAxis
               style={{
                 tickLabels: { padding: 2 },

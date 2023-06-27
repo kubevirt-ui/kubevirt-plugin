@@ -84,6 +84,7 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) =>
           >
             <ChartAxis
               style={{
+                tickLabels: { padding: 2 },
                 ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}

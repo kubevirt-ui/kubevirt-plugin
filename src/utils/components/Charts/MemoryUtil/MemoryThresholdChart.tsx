@@ -14,7 +14,6 @@ import {
   ChartThreshold,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
-import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
@@ -22,13 +21,7 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import {
-  formatMemoryYTick,
-  MILLISECONDS_MULTIPLIER,
-  queriesToLink,
-  tickFormat,
-  TICKS_COUNT,
-} from '../utils/utils';
+import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
 
 type MemoryThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
@@ -87,21 +80,10 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
               x: [currentTime - timespan, currentTime],
             }}
             height={height}
-            padding={{ bottom: 35, left: 55, right: 35, top: 35 }}
+            padding={35}
             scale={{ x: 'time', y: 'linear' }}
             width={width}
           >
-            <ChartAxis
-              style={{
-                grid: {
-                  stroke: chart_color_black_200.value,
-                },
-              }}
-              dependentAxis
-              tickCount={2}
-              tickFormat={formatMemoryYTick(thresholdLine?.[0]?.y, 0)}
-              tickValues={[0, thresholdLine?.[0]?.y]}
-            />
             <ChartAxis
               style={{
                 tickLabels: { padding: 2 },
