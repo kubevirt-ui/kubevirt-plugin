@@ -30,7 +30,9 @@ const EnableInstanceTypeContent: FC = () => {
               You must have cluster admin permissions to enable this feature. You can disable it at
               any
             </Text>{' '}
-            <Text component={TextVariants.p}>time on the Settings tab on the Overview page.</Text>
+            <Text component={TextVariants.p}>
+              time on the Settings tab on the Virtualization {'>'} Overview page.
+            </Text>
           </Text>
         </StackItem>
       </Stack>
