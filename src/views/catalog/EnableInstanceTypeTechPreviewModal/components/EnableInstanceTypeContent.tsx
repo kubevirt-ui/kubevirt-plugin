@@ -25,12 +25,12 @@ const EnableInstanceTypeContent: FC = () => {
             >
               Technology Preview feature
             </Text>{' '}
-            provides a simple way to create a VirtualMachine.{' '}
+            provides a simple way to create a VirtualMachine. You must have
             <Text component={TextVariants.p}>
-              You must have cluster admin permissions to enable this feature. You can disable it at
-              any
-            </Text>{' '}
-            <Text component={TextVariants.p}>time on the Settings tab on the Overview page.</Text>
+              cluster admin permissions to enable this feature. You can disable it at any time on
+              the Settings tab
+            </Text>
+            <Text component={TextVariants.p}>on the Virtualization {'>'} Overview page</Text>
           </Text>
         </StackItem>
       </Stack>
