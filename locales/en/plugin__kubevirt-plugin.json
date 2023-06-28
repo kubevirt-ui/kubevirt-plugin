@@ -968,6 +968,7 @@
   "SSH key name": "SSH key name",
   "SSH over LoadBalancer": "SSH over LoadBalancer",
   "SSH over NodePort": "SSH over NodePort",
+  "SSH secret not configured": "SSH secret not configured",
   "SSH service type": "SSH service type",
   "SSH using virtctl": "SSH using virtctl",
   "Start": "Start",

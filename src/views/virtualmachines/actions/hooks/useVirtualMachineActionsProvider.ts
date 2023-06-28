@@ -7,7 +7,6 @@ import {
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -26,12 +25,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
   isSingleNodeCluster,
 ) => {
   const { createModal } = useModal();
-  const userName = getCloudInitCredentials(vm)?.users?.[0]?.name;
-  const virtctlCommand = getConsoleVirtctlCommand(
-    userName,
-    vm?.metadata?.name,
-    vm?.metadata?.namespace,
-  );
+
+  const virtctlCommand = getConsoleVirtctlCommand(vm);
 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
   const actions: Action[] = React.useMemo(() => {

@@ -13,3 +13,5 @@ export enum SERVICE_TYPES {
 }
 
 export const METALLB_GROUP = 'metallb.io';
+
+export const exampleIdentityFilePath = '--identity-file=/home/jdoe/.ssh/id_rsa';
