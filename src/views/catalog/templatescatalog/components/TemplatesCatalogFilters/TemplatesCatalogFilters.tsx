@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, memo } from 'react';
 
 import { CATALOG_FILTERS } from '@catalog/templatescatalog/utils/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,10 +16,10 @@ import { TemplatesCatalogProjectsDropdown } from '../TemplatesCatalogProjectsDro
 
 import { TemplatesCatalogFiltersGroup } from './TemplatesCatalogFiltersGroup';
 
-export const TemplatesCatalogFilters: React.FC<{
+export const TemplatesCatalogFilters: FC<{
   filters: TemplateFilters;
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
-}> = React.memo(({ filters, onFilterChange }) => {
+}> = memo(({ filters, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -35,14 +35,14 @@ export const TemplatesCatalogFilters: React.FC<{
           data-test-id="catalog-template-filter-all-items"
           id={'all-templates'}
           onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_DEFAULT, false)}
-          title={t('All Items')}
+          title={t('All items')}
         />
         <VerticalTabsTab
           active={filters?.onlyDefault}
           data-test-id="catalog-template-filter-default-templates"
           id={'default-templates'}
           onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_DEFAULT, true)}
-          title={t('Default Templates')}
+          title={t('Default templates')}
         />
       </VerticalTabs>
       <FilterSidePanel className="co-catalog-page__tabs" id="vm-catalog-filter-panel">

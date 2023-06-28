@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, memo, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -14,15 +14,15 @@ import { ListIcon, ThIcon } from '@patternfly/react-icons';
 import { TemplateFilters } from '../hooks/useVmTemplatesFilters';
 import { CATALOG_FILTERS } from '../utils/consts';
 
-export const TemplatesCatalogHeader: React.FC<{
+export const TemplatesCatalogHeader: FC<{
   filters: TemplateFilters;
   itemCount: number;
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
-}> = React.memo(({ filters, itemCount, onFilterChange }) => {
+}> = memo(({ filters, itemCount, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
-  const [query, setQuery] = React.useState<string>(filters?.query || '');
+  const [query, setQuery] = useState<string>(filters?.query || '');
 
-  React.useEffect(
+  useEffect(
     () => {
       // Update debounced value after delay
       const handler = setTimeout(() => {
@@ -40,7 +40,7 @@ export const TemplatesCatalogHeader: React.FC<{
   return (
     <div className="co-catalog-page__header">
       <div className="co-catalog-page__heading text-capitalize">
-        {filters?.onlyDefault ? t('Default Templates') : t('All Items')}
+        {filters?.onlyDefault ? t('Default templates') : t('All items')}
       </div>
       <div className="co-catalog-page__filter">
         <div>

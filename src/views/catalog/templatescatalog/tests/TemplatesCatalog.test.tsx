@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { BOOT_SOURCE } from '@kubevirt-utils/resources/template/utils/constants';
@@ -67,12 +67,12 @@ test('TemplatesCatalog', async () => {
   expect(getByTestId('container-template')).toBeInTheDocument();
 
   // not default variant template, should be in catalog
-  fireEvent.click(getByText('All Items'));
+  fireEvent.click(getByText('All items'));
   expect(getByTestId('url-template')).toBeInTheDocument();
 
-  // switching to default templates, url template should still be in catalog as custom template
-  fireEvent.click(getByText('Default Templates'));
-  expect(queryByTestId('url-template')).toBeInTheDocument();
+  // switching to default templates, url template should not be in catalog as custom template
+  fireEvent.click(getByText('Default templates'));
+  expect(queryByTestId('url-template')).not.toBeInTheDocument();
 
   // picking RHEL filter, container-template should not be in catalog
   fireEvent.click(getByText('RHEL'));
