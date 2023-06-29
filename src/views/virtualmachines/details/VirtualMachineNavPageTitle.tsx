@@ -3,9 +3,12 @@ import { useHistory } from 'react-router-dom';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Split, SplitItem } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
@@ -64,9 +67,17 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name,
               <SidebarEditorSwitch />
             </SplitItem>
           )}
-          <SplitItem>
-            <VirtualMachineActions isSingleNodeCluster={isSingleNodeCluster} vm={vm} vmim={vmim} />
-          </SplitItem>
+          {!isEmpty(vm) ? (
+            <SplitItem id={getName(vm)}>
+              <VirtualMachineActions
+                isSingleNodeCluster={isSingleNodeCluster}
+                vm={vm}
+                vmim={vmim}
+              />
+            </SplitItem>
+          ) : (
+            <Loading />
+          )}
         </Split>
       </span>
       <VirtualMachinePendingChangesAlert vm={vm} vmi={vmi} />
