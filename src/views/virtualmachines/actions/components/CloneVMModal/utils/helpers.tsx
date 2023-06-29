@@ -9,7 +9,7 @@ import {
   IoK8sApiCoreV1PersistentVolumeClaim,
 } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getDataVolumeTemplates,
   getDisks,
@@ -17,7 +17,7 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sGet, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 export const getRandomChars = (len: number): string => {
@@ -123,22 +123,28 @@ export const updateClonedPersistentVolumeClaims = (
     const pvcName = vol?.persistentVolumeClaim?.claimName;
     delete vol.persistentVolumeClaim;
 
-    const pvcToClone = pvcs?.find((pvc) => pvc.metadata.name === pvcName);
+    const pvcToClone = pvcs?.find((pvc) => getName(pvc) === pvcName);
     if (pvcToClone) {
       const clonedDVTemplate = createDataVolumeTemplateFromPVC(
         pvcToClone,
-        `${vm?.metadata?.name}-${vol.name}-${getRandomChars(5)}`,
+        `${getName(vm)}-${vol.name}-${getRandomChars(5)}`,
       );
 
-      vm.spec.dataVolumeTemplates = vm.spec.dataVolumeTemplates.filter(
-        (dataVolume) =>
-          dataVolume.metadata.name === clonedDVTemplate.metadata.name &&
-          dataVolume.metadata.namespace === clonedDVTemplate.metadata.namespace,
-      );
+      const dataVolumeTemplates = [...getDataVolumeTemplates(vm)];
+
+      if (!isEmpty(dataVolumeTemplates)) {
+        vm.spec.dataVolumeTemplates = dataVolumeTemplates.filter(
+          (dataVolume) =>
+            getName(dataVolume) === getName(clonedDVTemplate) &&
+            getNamespace(dataVolume) === getNamespace(clonedDVTemplate),
+        );
+      } else {
+        vm.spec.dataVolumeTemplates = [];
+      }
 
       vm.spec.dataVolumeTemplates.push(clonedDVTemplate);
       vol.dataVolume = {
-        name: clonedDVTemplate?.metadata?.name,
+        name: getName(clonedDVTemplate),
       };
     }
   });
