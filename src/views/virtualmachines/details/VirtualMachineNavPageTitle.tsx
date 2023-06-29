@@ -7,11 +7,11 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Split, SplitItem } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
+import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import useVirtualMachineInstanceMigration from '@virtualmachines/actions/hooks/useVirtualMachineInstanceMigration';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 
@@ -38,6 +38,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name,
   });
   const vmim = useVirtualMachineInstanceMigration(vm);
   const [isSingleNodeCluster] = useSingleNodeCluster();
+  const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);
 
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
 
@@ -68,12 +69,8 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name,
             </SplitItem>
           )}
           {!isEmpty(vm) ? (
-            <SplitItem id={getName(vm)}>
-              <VirtualMachineActions
-                isSingleNodeCluster={isSingleNodeCluster}
-                vm={vm}
-                vmim={vmim}
-              />
+            <SplitItem>
+              <VirtualMachineActions actions={actions} />
             </SplitItem>
           ) : (
             <Loading />

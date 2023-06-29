@@ -5,8 +5,10 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
+import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 
 import VirtualMachineStatus from '../VirtualMachineStatus/VirtualMachineStatus';
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
@@ -25,17 +27,18 @@ const VirtualMachineRowLayout: React.FC<
     }
   >
 > = ({ activeColumnIDs, obj, rowData: { ips, isSingleNodeCluster, kind, node, vmim } }) => {
+  const [actions] = useVirtualMachineActionsProvider(obj, vmim, isSingleNodeCluster);
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column" id="name">
-        <ResourceLink kind={kind} name={obj.metadata.name} namespace={obj.metadata.namespace} />
+        <ResourceLink kind={kind} name={getName(obj)} namespace={getNamespace(obj)} />
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
         className="pf-m-width-10 vm-column"
         id="namespace"
       >
-        <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
+        <ResourceLink kind="Namespace" name={getNamespace(obj)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column" id="status">
         <VirtualMachineStatus vm={obj} />
@@ -65,12 +68,7 @@ const VirtualMachineRowLayout: React.FC<
         className="dropdown-kebab-pf pf-c-table__action"
         id=""
       >
-        <VirtualMachineActions
-          isKebabToggle
-          isSingleNodeCluster={isSingleNodeCluster}
-          vm={obj}
-          vmim={vmim}
-        />
+        <VirtualMachineActions actions={actions} isKebabToggle />
       </TableData>
     </>
   );
