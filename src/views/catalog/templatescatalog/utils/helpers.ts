@@ -9,7 +9,6 @@ import {
   getTemplateName,
   getTemplateOS,
   getTemplateWorkload,
-  isCustomTemplate,
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
@@ -27,9 +26,7 @@ export const filterTemplates = (templates: V1Template[], filters: TemplateFilter
           tmp?.metadata?.name?.includes(textFilterLowerCase)
         : true;
 
-      const defaultVariantFilter = filters?.onlyDefault
-        ? isDefaultVariantTemplate(tmp) || isCustomTemplate(tmp)
-        : true;
+      const defaultVariantFilter = filters?.onlyDefault ? isDefaultVariantTemplate(tmp) : true;
 
       const workloadFilter = filters?.workload?.size > 0 ? filters.workload.has(workload) : true;
 

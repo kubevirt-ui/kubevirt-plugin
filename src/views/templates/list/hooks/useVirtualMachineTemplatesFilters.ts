@@ -43,7 +43,7 @@ const useVirtualMachineTemplatesFilters = (
       items: [
         {
           id: 'is-default',
-          title: t('Default Templates'),
+          title: t('Default templates'),
         },
       ],
       reducer: (obj) => (isDefaultVariantTemplate(obj) ? 'is-default' : ''),
