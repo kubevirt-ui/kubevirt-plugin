@@ -51,10 +51,10 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
       <div className="util-upper">
         <div className="util-title">{t('CPU')}</div>
         <div className="util-summary" data-test-id="util-summary-cpu">
-          <div className="util-summary-value">{`${isReady ? cpuUsage?.toFixed(2) : 0}s`}</div>
+          <div className="util-summary-value">{`${isReady ? cpuUsage?.toFixed(2) : 0}m`}</div>
           <div className="util-summary-text text-muted">
             <div>{t('Requested of ')}</div>
-            <div>{`${isReady ? cpuRequested?.toFixed(2) : 0}s`}</div>
+            <div>{`${isReady ? cpuRequested?.toFixed(2) : 0}m`}</div>
           </div>
         </div>
       </div>
@@ -67,7 +67,7 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
             }}
             animate
             constrainToVisibleArea
-            labels={({ datum }) => (datum.x ? `${datum.x}: ${(cpuUsage || 0)?.toFixed(2)}s` : null)}
+            labels={({ datum }) => (datum.x ? `${datum.x}: ${(cpuUsage || 0)?.toFixed(2)}m` : null)}
             style={{ labels: { fontSize: 20 } }}
             subTitle={t('Used')}
             subTitleComponent={<ChartLabel y={135} />}
