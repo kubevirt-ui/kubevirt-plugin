@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -39,15 +39,50 @@ const ProjectSSHKeysList: FC = () => {
 
   const loaded = useMemo(() => settingsLoaded && projectsLoaded, [settingsLoaded, projectsLoaded]);
 
-  if (!loaded) return <Skeleton />;
-
-  const addSSHKey = () => {
+  const addSSHKey = useCallback(() => {
     setSSHSecretKeys((prev) => ({ ...prev, '': '' }));
     setIsAddingKey(true);
-  };
+  }, [setIsAddingKey, setSSHSecretKeys]);
+
+  if (!loaded) return <Skeleton />;
 
   return (
     <>
+      <Panel isScrollable>
+        <PanelMain maxHeight="12.25rem">
+          <Grid>
+            <GridItem span={5}>
+              <Text component={TextVariants.h6}>{t('Project')}</Text>
+            </GridItem>
+            <GridItem span={1} />
+            <GridItem span={5}>
+              <Text component={TextVariants.h6}>{t('Authorized SSH key')}</Text>
+            </GridItem>
+          </Grid>
+          {projectsWithSSHKey.map((projectName) => (
+            <ProjectSSHKeysRow
+              handleChangeKeys={(val: any) => {
+                updateAuthorizedSSHKeys(val);
+                setSSHSecretKeys(val);
+                setIsAddingKey(false);
+              }}
+              handleRemoveKey={() => {
+                if (isAddingKey) {
+                  setIsAddingKey(false);
+                  const updatedKeys = { ...sshSecretKeys };
+                  delete updatedKeys?.[''];
+                  setSSHSecretKeys(updatedKeys);
+                }
+              }}
+              authorizedSSHKeys={authorizedSSHKeys}
+              key={projectName}
+              projectsWithoutSSHKey={projectsWithoutSSHKey}
+              secretProject={projectName}
+            />
+          ))}
+        </PanelMain>
+      </Panel>
+
       <Button
         icon={<PlusCircleIcon />}
         isDisabled={isAddingKey || isEmpty(projectsWithoutSSHKey)}
@@ -55,44 +90,8 @@ const ProjectSSHKeysList: FC = () => {
         onClick={addSSHKey}
         variant="link"
       >
-        {t('Add authorized SSH key to project')}
+        {t('Add more')}
       </Button>
-      {!isEmpty(projectsWithSSHKey) && (
-        <Panel isScrollable>
-          <PanelMain maxHeight="12.25rem">
-            <Grid>
-              <GridItem span={5}>
-                <Text component={TextVariants.h6}>{t('Project')}</Text>
-              </GridItem>
-              <GridItem span={1} />
-              <GridItem span={5}>
-                <Text component={TextVariants.h6}>{t('Authorized SSH key')}</Text>
-              </GridItem>
-            </Grid>
-            {projectsWithSSHKey.map((projectName) => (
-              <ProjectSSHKeysRow
-                handleChangeKeys={(val: any) => {
-                  updateAuthorizedSSHKeys(val);
-                  setSSHSecretKeys(val);
-                  setIsAddingKey(false);
-                }}
-                handleRemoveKey={() => {
-                  if (isAddingKey) {
-                    setIsAddingKey(false);
-                    const updatedKeys = { ...sshSecretKeys };
-                    delete updatedKeys?.[''];
-                    setSSHSecretKeys(updatedKeys);
-                  }
-                }}
-                authorizedSSHKeys={authorizedSSHKeys}
-                key={projectName}
-                projectsWithoutSSHKey={projectsWithoutSSHKey}
-                secretProject={projectName}
-              />
-            ))}
-          </PanelMain>
-        </Panel>
-      )}
     </>
   );
 };

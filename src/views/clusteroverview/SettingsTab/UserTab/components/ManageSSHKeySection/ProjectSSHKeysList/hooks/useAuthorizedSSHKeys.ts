@@ -20,12 +20,15 @@ const useAuthorizedSSHKeys: UseAuthorizedSSHKeys = () => {
   const [authorizedSSHKeys = {}, updateAuthorizedSSHKeys, loaded, error] =
     useKubevirtUserSettings('ssh');
 
-  const [sshSecretKeys, setSSHSecretKeys] = useState<ProjectSSHSecretMap>({});
+  const [sshSecretKeys, setSSHSecretKeys] = useState<ProjectSSHSecretMap>({ '': '' });
 
-  const [isAddingKey, setIsAddingKey] = useState(false);
+  const [isAddingKey, setIsAddingKey] = useState(true);
 
   useEffect(() => {
-    if (loaded && !isEmpty(authorizedSSHKeys)) setSSHSecretKeys(authorizedSSHKeys);
+    if (loaded && !isEmpty(authorizedSSHKeys)) {
+      setSSHSecretKeys(authorizedSSHKeys);
+      setIsAddingKey(false);
+    }
   }, [loaded, authorizedSSHKeys]);
 
   return {
