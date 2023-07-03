@@ -8,6 +8,7 @@ import { getRandomChars } from '@kubevirt-utils/utils/utils';
 export const SYSPREP = 'sysprep';
 export const AUTOUNATTEND = 'Autounattend.xml';
 export const UNATTEND = 'Unattend.xml';
+export const WINDOWS = 'windows';
 
 export type SysprepData = { autounattend?: string; unattended?: string };
 

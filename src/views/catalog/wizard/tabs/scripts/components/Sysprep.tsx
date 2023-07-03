@@ -9,7 +9,9 @@ import {
   AUTOUNATTEND,
   removeSysprepConfig,
   UNATTEND,
+  WINDOWS,
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
+import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/SysprepDescription';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
@@ -21,7 +23,6 @@ import {
   pushSysprepObject,
   removeSysprepObject,
 } from './sysprep-utils';
-import { SysprepDescription } from './SysprepDescription';
 
 const Sysprep: React.FC = () => {
   const { t } = useKubevirtTranslation();
@@ -86,6 +87,7 @@ const Sysprep: React.FC = () => {
         <SysprepDescription
           hasAutoUnattend={!!autoUnattend}
           hasUnattend={!!unattend}
+          loaded
           selectedSysprepName={selectedSysprep}
         />
       }
@@ -102,6 +104,7 @@ const Sysprep: React.FC = () => {
           />
         ))
       }
+      isDisabled={tabsData?.overview?.templateMetadata?.osType !== WINDOWS}
       isEdit
       label={<WindowsLabel />}
       showEditOnTitle
