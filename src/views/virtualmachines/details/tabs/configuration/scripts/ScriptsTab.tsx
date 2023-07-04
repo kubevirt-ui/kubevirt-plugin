@@ -33,6 +33,7 @@ import {
 } from '@patternfly/react-core';
 
 import DynamicSSHKeyInjectionDescription from './components/DynamicSSHKeyInjectionDescription';
+import VirtualMachineScriptsTabSysprep from './components/VirtualMachineScriptsTabSysprep';
 
 import './scripts-tab.scss';
 
@@ -130,6 +131,8 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               label={<LinuxLabel />}
               showEditOnTitle
             />
+            <Divider />
+            <VirtualMachineScriptsTabSysprep canUpdateVM={canUpdateVM} vm={vm} />
           </DescriptionList>
         )}
       </SidebarEditor>
