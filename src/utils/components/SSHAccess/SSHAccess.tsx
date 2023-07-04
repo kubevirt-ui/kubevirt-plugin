@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { DescriptionList } from '@patternfly/react-core';
 
 import ConsoleOverVirtctl from './components/ConsoleOverVirtctl';
@@ -16,16 +15,9 @@ type SSHAccessProps = {
 };
 
 const SSHAccess: React.FC<SSHAccessProps> = ({ sshService, sshServiceLoaded, vm, vmi }) => {
-  const userData = getCloudInitCredentials(vm);
-  const userName = userData?.users?.[0]?.name;
-
   return (
     <DescriptionList>
-      <ConsoleOverVirtctl
-        userName={userName}
-        vmName={vm?.metadata?.name}
-        vmNamespace={vm?.metadata?.namespace}
-      />
+      <ConsoleOverVirtctl vm={vm} />
       <SSHCommand sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
     </DescriptionList>
   );

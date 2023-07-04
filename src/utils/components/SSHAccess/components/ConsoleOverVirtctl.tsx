@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  ClipboardCopy,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
@@ -10,19 +10,14 @@ import {
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
-import { getConsoleVirtctlCommand } from '../utils';
+import VirtctlSSHCommandClipboardCopy from './VirtctlSSHCommandClipboardCopy';
 
 type ConsoleOverVirtctlProps = {
-  userName?: string;
-  vmName: string;
-  vmNamespace: string;
+  vm: V1VirtualMachine;
 };
 
-const ConsoleOverVirtctl: React.FC<ConsoleOverVirtctlProps> = ({
-  userName,
-  vmName,
-  vmNamespace,
-}) => {
+const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
+  const { t } = useKubevirtTranslation();
   return (
     <DescriptionListGroup>
       <DescriptionListTerm className="pf-u-font-size-xs">
@@ -39,14 +34,7 @@ const ConsoleOverVirtctl: React.FC<ConsoleOverVirtctlProps> = ({
       </DescriptionListTerm>
 
       <DescriptionListDescription className="sshcommand-body">
-        <ClipboardCopy
-          clickTip={t('Copied')}
-          data-test="ssh-over-virtctl"
-          hoverTip={t('Copy to clipboard')}
-          isReadOnly
-        >
-          {getConsoleVirtctlCommand(userName, vmName, vmNamespace)}
-        </ClipboardCopy>
+        <VirtctlSSHCommandClipboardCopy vm={vm} />
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

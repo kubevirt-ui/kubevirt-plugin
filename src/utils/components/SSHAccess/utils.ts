@@ -5,7 +5,8 @@ import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/model
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { ensurePath, getRandomChars } from '@kubevirt-utils/utils/utils';
+import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
+import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   k8sCreate,
   k8sDelete,
@@ -13,7 +14,7 @@ import {
   k8sUpdate,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { buildOwnerReference } from './../../resources/shared';
+import { buildOwnerReference, getName, getNamespace } from './../../resources/shared';
 import { PORT, SERVICE_TYPES, SSH_PORT, VMI_LABEL_AS_SSH_SERVICE_SELECTOR } from './constants';
 
 const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES, sshLabel: string) => ({
@@ -106,5 +107,14 @@ export const createSSHService = async (
   });
 };
 
-export const getConsoleVirtctlCommand = (userName: string, vmName: string, vmNamespace?: string) =>
-  `virtctl ${vmNamespace ? `-n ${vmNamespace}` : ''} ssh ${userName}@${vmName}`;
+export const getConsoleVirtctlCommand = (vm: V1VirtualMachine, identityFlag?: string) => {
+  const [vmName, vmNamespace, userName] = [
+    getName(vm),
+    getNamespace(vm),
+    getCloudInitCredentials(vm)?.users?.[0]?.name,
+  ];
+
+  return `virtctl -n ${vmNamespace} ssh ${userName}@${vmName} ${
+    !isEmpty(identityFlag) ? identityFlag : '--identity-file=<path_to_sshkey>'
+  }`;
+};

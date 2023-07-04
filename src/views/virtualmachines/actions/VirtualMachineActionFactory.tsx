@@ -11,6 +11,8 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 
@@ -78,6 +80,7 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => command && navigator.clipboard.writeText(command),
       description: t('SSH using virtctl'),
+      disabled: isEmpty(getVMSSHSecretName(vm)),
       icon: <CopyIcon />,
       id: 'vm-action-copy-ssh',
       label: t('Copy SSH command'),

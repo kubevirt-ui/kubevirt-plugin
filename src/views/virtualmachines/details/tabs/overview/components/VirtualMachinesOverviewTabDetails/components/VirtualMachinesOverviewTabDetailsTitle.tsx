@@ -6,7 +6,8 @@ import { printableVMStatus } from 'src/views/virtualmachines/utils';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
+import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { CardTitle, Dropdown, DropdownItem, KebabToggle } from '@patternfly/react-core';
 import { CopyIcon } from '@patternfly/react-icons';
 
@@ -21,12 +22,7 @@ const VirtualMachinesOverviewTabDetailsTitle: FC<VirtualMachinesOverviewTabDetai
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { t } = useKubevirtTranslation();
-  const userName = getCloudInitCredentials(vm)?.users?.[0]?.name;
-  const virtctlCommand = getConsoleVirtctlCommand(
-    userName,
-    vm?.metadata?.name,
-    vm?.metadata?.namespace,
-  );
+  const virtctlCommand = getConsoleVirtctlCommand(vm);
 
   const isMachinePaused = vm?.status?.printableStatus === printableVMStatus.Paused;
   const isMachineStopped = vm?.status?.printableStatus === printableVMStatus.Stopped;
@@ -38,6 +34,7 @@ const VirtualMachinesOverviewTabDetailsTitle: FC<VirtualMachinesOverviewTabDetai
         dropdownItems={[
           <DropdownItem
             description={t('SSH using virtctl')}
+            isDisabled={isEmpty(getVMSSHSecretName(vm))}
             key="copy"
             onClick={() => virtctlCommand && navigator.clipboard.writeText(virtctlCommand)}
           >
