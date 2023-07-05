@@ -12,6 +12,16 @@ import ScriptsTab from '../scripts/ScriptsTab';
 
 export const tabs = [
   {
+    Component: DiskListPage,
+    name: VirtualMachineDetailsTab.Disks,
+    title: VirtualMachineDetailsTabLabel.Disks,
+  },
+  {
+    Component: NetworkInterfaceListPage,
+    name: NETWORK,
+    title: VirtualMachineDetailsTabLabel.NetworkInterfaces,
+  },
+  {
     Component: VirtualMachineSchedulingPage,
     name: VirtualMachineDetailsTab.Scheduling,
     title: VirtualMachineDetailsTabLabel.Scheduling,
@@ -20,16 +30,6 @@ export const tabs = [
     Component: VirtualMachineEnvironmentPage,
     name: VirtualMachineDetailsTab.Environment,
     title: VirtualMachineDetailsTabLabel.Environment,
-  },
-  {
-    Component: NetworkInterfaceListPage,
-    name: NETWORK,
-    title: VirtualMachineDetailsTabLabel.NetworkInterfaces,
-  },
-  {
-    Component: DiskListPage,
-    name: VirtualMachineDetailsTab.Disks,
-    title: VirtualMachineDetailsTabLabel.Disks,
   },
   {
     Component: ScriptsTab,

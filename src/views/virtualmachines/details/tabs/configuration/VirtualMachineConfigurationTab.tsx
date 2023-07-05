@@ -19,9 +19,7 @@ type VirtualMachineConfigurationTabProps = RouteComponentProps<{
 const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = (props) => {
   const { history } = props;
 
-  const [activeTabKey, setActiveTabKey] = useState<number | string>(
-    VirtualMachineDetailsTab.Scheduling,
-  );
+  const [activeTabKey, setActiveTabKey] = useState<number | string>(VirtualMachineDetailsTab.Disks);
 
   const redirectTab = useCallback(
     (name: string) => {

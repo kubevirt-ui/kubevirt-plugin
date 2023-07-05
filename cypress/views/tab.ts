@@ -38,11 +38,11 @@ export const tab = {
   },
   navigateToDisks: () => {
     cy.byLegacyTestID(tabs.Configuration).click();
-    cy.get(tabList).eq(3).click();
+    cy.get(tabList).eq(0).click();
   },
   navigateToEnvironment: () => {
     cy.byLegacyTestID(tabs.Configuration).click();
-    cy.get(tabList).eq(1).click();
+    cy.get(tabList).eq(3).click();
   },
   navigateToEvents: () => {
     navigateToTab(tabs.Events);
@@ -52,7 +52,7 @@ export const tab = {
   },
   navigateToNetworks: () => {
     cy.byLegacyTestID(tabs.Configuration).click();
-    cy.get(tabList).eq(2).click();
+    cy.get(tabList).eq(1).click();
   },
   navigateToOverview: () => {
     navigateToTab(tabs.Overview);
@@ -62,7 +62,7 @@ export const tab = {
   },
   navigateToScheduling: () => {
     cy.byLegacyTestID(tabs.Configuration).click();
-    cy.get(tabList).eq(0).click();
+    cy.get(tabList).eq(2).click();
   },
   navigateToScripts: () => {
     cy.byLegacyTestID(tabs.Configuration).click();
