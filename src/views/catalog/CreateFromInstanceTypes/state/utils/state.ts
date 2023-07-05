@@ -6,7 +6,6 @@ import {
   UseBootableVolumesValues,
   UseInstanceTypeAndPreferencesValues,
 } from './types';
-import { getRandomVMName } from './utils';
 
 const instanceTypeVMInitialState: InstanceTypeVMState = {
   isDynamicSSHInjection: false,
@@ -14,7 +13,7 @@ const instanceTypeVMInitialState: InstanceTypeVMState = {
   selectedBootableVolume: null,
   selectedInstanceType: '',
   sshSecretCredentials: initialSSHCredentials,
-  vmName: getRandomVMName(),
+  vmName: '',
 };
 
 export const instanceTypeVMStoreInitialState: InstanceTypeVMStoreState = {

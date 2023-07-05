@@ -2,8 +2,10 @@ import produce from 'immer';
 import { create } from 'zustand';
 
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
+import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { getLabel } from '@kubevirt-utils/resources/shared';
 
 import { instanceTypeVMStoreInitialState } from '../utils/state';
 import {
@@ -25,16 +27,12 @@ export const useInstanceTypeVMInitialStore = create<InstanceTypeVMStore>()((set,
             get().bootableVolumesData.pvcSources,
           );
           instanceTypeVMState.selectedInstanceType = getInstanceTypeFromVolume(selectedVolume);
+
+          const osName = getLabel(selectedVolume, DEFAULT_PREFERENCE_LABEL).replace('.', '');
+          instanceTypeVMState.vmName = getRandomVMName(osName);
         }),
       ),
-    resetInstanceTypeVMState: () =>
-      set({
-        ...instanceTypeVMStoreInitialState,
-        instanceTypeVMState: {
-          ...instanceTypeVMStoreInitialState.instanceTypeVMState,
-          vmName: getRandomVMName(),
-        },
-      }),
+    resetInstanceTypeVMState: () => set(instanceTypeVMStoreInitialState),
     setActiveNamespace: (namespace: string) => set({ activeNamespace: namespace }),
     setBootableVolumesData: (data: UseBootableVolumesValues) => set({ bootableVolumesData: data }),
     setInstanceTypesAndPreferencesData: (data: UseInstanceTypeAndPreferencesValues) =>
