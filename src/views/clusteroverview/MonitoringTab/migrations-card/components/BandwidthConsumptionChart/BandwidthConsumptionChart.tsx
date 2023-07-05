@@ -20,7 +20,7 @@ import {
 } from '@patternfly/react-charts';
 import { Bullseye, HelperText, HelperTextItem } from '@patternfly/react-core';
 
-import { roundToNearest512MiB } from './utils';
+import { getDomainY, getTickValuesAxisY } from './utils';
 
 type ChartDataObject = {
   x: Date;
@@ -88,7 +88,7 @@ const BandwidthConsumptionChart: React.FC<BandwidthConsumptionChartProps> = ({ d
           width={width}
           domain={{
             x: [currentTime - timespan, currentTime],
-            y: [0, Math.max(...bandwidthConsumed.map((o) => o.y)) * 1.5],
+            y: getDomainY(Math.max(...bandwidthConsumed.map((o) => o.y))),
           }}
           padding={{ top: 25, bottom: 55, left: 85, right: 55 }}
           scale={{ x: 'time', y: 'linear' }}
@@ -125,7 +125,8 @@ const BandwidthConsumptionChart: React.FC<BandwidthConsumptionChartProps> = ({ d
           />
           <ChartAxis
             dependentAxis
-            tickFormat={(y) => xbytes(roundToNearest512MiB(y), { iec: true, fixed: 1 })}
+            tickValues={getTickValuesAxisY(Math.max(...bandwidthConsumed.map((o) => o.y)))}
+            tickFormat={(y) => xbytes(y, { fixed: 0, iec: true, prefixIndex: 3 })}
             style={{ tickLabels: fontSize }}
           />
           <ChartLine data={bandwidthConsumed} />
