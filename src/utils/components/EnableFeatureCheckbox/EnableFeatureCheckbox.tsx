@@ -2,10 +2,15 @@ import React, { FC, useEffect, useState } from 'react';
 
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { Loading } from '@patternfly/quickstarts';
-import { Checkbox } from '@patternfly/react-core';
+import { Checkbox, Flex, FlexItem } from '@patternfly/react-core';
+
+import ExternalLink from '../ExternalLink/ExternalLink';
+
+import './EnableFeatureCheckbox.scss';
 
 type EnableFeatureCheckboxProps = {
   description?: string;
+  externalLink?: string;
   featureName: string;
   id: string;
   label: string;
@@ -13,6 +18,7 @@ type EnableFeatureCheckboxProps = {
 
 const EnableFeatureCheckbox: FC<EnableFeatureCheckboxProps> = ({
   description,
+  externalLink,
   featureName,
   id,
   label,
@@ -30,17 +36,24 @@ const EnableFeatureCheckbox: FC<EnableFeatureCheckboxProps> = ({
   if (loading) return <Loading />;
 
   return (
-    <Checkbox
-      onClick={(event) => {
-        toggleFeature(event.currentTarget.checked);
-        setIsChecked(event.currentTarget.checked);
-      }}
-      description={description}
-      id={id}
-      isChecked={isChecked}
-      isDisabled={!canEdit || loading}
-      label={label}
-    />
+    <Flex>
+      <FlexItem className="enable-feature-checkbox">
+        <Checkbox
+          onClick={(event) => {
+            toggleFeature(event.currentTarget.checked);
+            setIsChecked(event.currentTarget.checked);
+          }}
+          description={description}
+          id={id}
+          isChecked={isChecked}
+          isDisabled={!canEdit || loading}
+          label={label}
+        />
+      </FlexItem>
+      <FlexItem>
+        <ExternalLink href={externalLink} />
+      </FlexItem>
+    </Flex>
   );
 };
 

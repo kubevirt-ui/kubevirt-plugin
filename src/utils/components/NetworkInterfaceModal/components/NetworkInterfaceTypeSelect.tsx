@@ -10,15 +10,16 @@ type NetworkInterfaceTypeSelectProps = {
   interfaceType: string;
   networkName: string | undefined;
   setInterfaceType: Dispatch<SetStateAction<string>>;
+  showTypeHelperText?: boolean;
 };
 
 const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
   interfaceType,
   networkName,
   setInterfaceType,
+  showTypeHelperText,
 }) => {
   const { t } = useKubevirtTranslation();
-
   const isPodNetworkName = useMemo(() => networkNameStartWithPod(networkName), [networkName]);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,7 +37,7 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
       // in case of pod network, networkName is undefined
       allowOption: isPodNetworkName,
       description: t(
-        'Put the VirtualMachine behind a NAT Proxy for high compability with different network providers. The VirtualMachines IP will differ from the IP seen on the pod network',
+        'Put the VirtualMachine behind a NAT Proxy for high compatibility with different network providers. The VirtualMachines IP will differ from the IP seen on the pod network',
       ),
       id: interfaceTypeTypes.MASQUERADE,
       name: t('Masquerade'),
@@ -59,7 +60,11 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
   };
 
   return (
-    <FormGroup fieldId="type" label={t('Type')}>
+    <FormGroup
+      fieldId="type"
+      helperText={showTypeHelperText && t('Hot plug is enabled only for "Bridge" type')}
+      label={t('Type')}
+    >
       <div data-test-id="network-interface-type-select">
         <Select
           isOpen={isOpen}

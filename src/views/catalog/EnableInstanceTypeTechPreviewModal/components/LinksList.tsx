@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { INSTANCE_TYPES_USER_GUIDE_LINK } from '@kubevirt-utils/constants/url-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, StackItem } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
@@ -12,7 +13,7 @@ const LinksList: FC = () => {
       <StackItem>
         <Button
           component="a"
-          href="https://kubevirt.io/user-guide/virtual_machines/instancetypes/"
+          href={INSTANCE_TYPES_USER_GUIDE_LINK}
           icon={<ExternalLinkAltIcon />}
           iconPosition="right"
           isInline

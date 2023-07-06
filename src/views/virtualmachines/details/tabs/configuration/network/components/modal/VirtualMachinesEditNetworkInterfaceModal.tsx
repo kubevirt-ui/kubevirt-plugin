@@ -61,6 +61,7 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
     <NetworkInterfaceModal
       fixedName
       headerText={t('Edit network interface')}
+      isEdit
       isOpen={isOpen}
       nicPresentation={nicPresentation}
       onClose={onClose}

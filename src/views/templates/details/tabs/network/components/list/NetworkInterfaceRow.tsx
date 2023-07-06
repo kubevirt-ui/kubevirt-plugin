@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FC } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
@@ -14,7 +15,7 @@ export type NetworkInterfaceRowProps = {
   obj: NetworkPresentation;
 };
 
-const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation, { template: V1Template }>> = ({
+const NetworkInterfaceRow: FC<RowProps<NetworkPresentation, { template: V1Template }>> = ({
   activeColumnIDs,
   obj: { iface, network },
   rowData: { template },

@@ -11,6 +11,8 @@ import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Alert,
+  AlertVariant,
   ButtonVariant,
   Dropdown,
   DropdownItem,
@@ -75,9 +77,20 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
-        <ConfirmActionMessage
-          obj={{ metadata: { name: nicName, namespace: vm?.metadata?.namespace } }}
-        />
+        <span>
+          <Alert
+            title={t(
+              'Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13  or for network interfaces that were added to the VirtualMachine in these versions.',
+            )}
+            component={'h6'}
+            isInline
+            variant={AlertVariant.warning}
+          />
+          <br />
+          <ConfirmActionMessage
+            obj={{ metadata: { name: nicName, namespace: vm?.metadata?.namespace } }}
+          />
+        </span>
       </TabModal>
     ));
     setIsDropdownOpen(false);

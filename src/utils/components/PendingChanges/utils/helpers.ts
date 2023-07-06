@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import {
+  V1Interface,
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1Volume,
@@ -30,7 +31,7 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
-import { getVMIVolumes } from '@kubevirt-utils/resources/vmi/utils/selectors';
+import { getVMIInterfaces, getVMIVolumes } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { PendingChange } from './types';
@@ -119,20 +120,30 @@ export const getChangedEnvDisks = (
   return changedEnvDisks;
 };
 
-export const getChangedNics = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance): string[] => {
+export const getInterfaceByName = (
+  name: string,
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+) =>
+  getInterfaces(vm)?.find((iface) => iface?.name === name) ||
+  getVMIInterfaces(vmi)?.find((iface) => iface?.name === name);
+
+export const isBridge = (iface: V1Interface) => Boolean(iface?.bridge);
+
+export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance): string[] => {
   if (isEmpty(vm) || isEmpty(vmi)) {
     return [];
   }
   const vmInterfaces = getInterfaces(vm);
-  const vmiInterfaces = vmi?.spec?.domain?.devices?.interfaces;
-  const vmNicsNames = vmInterfaces?.map((nic) => nic?.name);
-  const vmiNicsNames = vmiInterfaces?.map((nic) => nic?.name);
-  const unchangedNics = vmNicsNames?.filter((vmNicName) =>
-    vmiNicsNames?.some((vmiNicName) => vmNicName === vmiNicName),
+  const vmiInterfaces = getVMIInterfaces(vmi);
+  const vmNICsNames = vmInterfaces?.map((nic) => nic?.name);
+  const vmiNICsNames = vmiInterfaces?.map((nic) => nic?.name);
+  const unchangedNICs = vmNICsNames?.filter((vmNicName) =>
+    vmiNICsNames?.some((vmiNicName) => vmNicName === vmiNicName),
   );
-  const changedNics = [
-    ...(vmNicsNames?.filter((nic) => !unchangedNics?.includes(nic)) || []),
-    ...(vmiNicsNames?.filter((nic) => !unchangedNics?.includes(nic)) || []),
+  const changedNICs = [
+    ...(vmNICsNames?.filter((nic) => !unchangedNICs?.includes(nic)) || []),
+    ...(vmiNICsNames?.filter((nic) => !unchangedNICs?.includes(nic)) || []),
   ];
 
   if (
@@ -143,8 +154,70 @@ export const getChangedNics = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
   )
     return [];
 
-  return changedNics;
+  return changedNICs;
 };
+
+export const hasPendingChange = (pendingChange: PendingChange[]) =>
+  pendingChange?.[0]?.hasPendingChange;
+
+// Checks for other types of changes and non-hot-plug NIC changes
+export const nonHotPlugNICChangesExist = (
+  pendingChanges: PendingChange[],
+  nonHotPlugNICsExist: boolean,
+) => {
+  const moreChangeTypesExist = pendingChanges?.every(
+    (change) => change?.tabLabel === VirtualMachineDetailsTabLabel.NetworkInterfaces,
+  );
+  return moreChangeTypesExist || nonHotPlugNICsExist;
+};
+
+const getSortedNICs = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): { hotPlugNICs: string[]; nonHotPlugNICs: string[] } => {
+  const changedNICs = getChangedNICs(vm, vmi);
+  return changedNICs?.reduce(
+    (acc, nicName) => {
+      const isHotPlug = Boolean(getInterfaceByName(nicName, vm, vmi)?.bridge);
+      isHotPlug ? acc.hotPlugNICs.push(nicName) : acc.nonHotPlugNICs.push(nicName);
+      return acc;
+    },
+    { hotPlugNICs: [], nonHotPlugNICs: [] },
+  );
+};
+
+export const getSortedNICPendingChanges = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+  history,
+) => {
+  const sortedNICs = getSortedNICs(vm, vmi);
+  const { hotPlugNICs, nonHotPlugNICs } = sortedNICs;
+
+  return {
+    hotPlugPendingChanges: [
+      {
+        handleAction: () => {
+          history.push(getTabURL(vm, VirtualMachineDetailsTab.NetworkInterfaces));
+        },
+        hasPendingChange: !isEmpty(hotPlugNICs),
+        label: hotPlugNICs?.length > 1 ? hotPlugNICs.join(', ') : hotPlugNICs[0],
+        tabLabel: VirtualMachineDetailsTabLabel.NetworkInterfaces,
+      },
+    ],
+    nonHotPlugPendingChanges: [
+      {
+        handleAction: () => {
+          history.push(getTabURL(vm, VirtualMachineDetailsTab.NetworkInterfaces));
+        },
+        hasPendingChange: !isEmpty(nonHotPlugNICs),
+        label: nonHotPlugNICs?.length > 1 ? nonHotPlugNICs.join(', ') : nonHotPlugNICs[0],
+        tabLabel: VirtualMachineDetailsTabLabel.NetworkInterfaces,
+      },
+    ],
+  };
+};
+
 export const getChangedGPUDevices = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
@@ -165,6 +238,7 @@ export const getChangedGPUDevices = (
   ];
   return changedGPUDevices;
 };
+
 export const getChangedHostDevices = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
