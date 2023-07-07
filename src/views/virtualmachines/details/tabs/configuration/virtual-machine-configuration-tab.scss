@@ -1,6 +1,7 @@
 .VirtualMachineConfigurationTab {
   &--main {
     margin: var(--pf-global--spacer--sm);
+    overflow: visible;
   }
   &--tab-nav {
     height: 100%;
