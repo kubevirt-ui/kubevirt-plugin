@@ -7,36 +7,20 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  getGroupVersionKindForModel,
-  k8sCreate,
-  k8sUpdate,
-  useK8sWatchResource,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
-import { useIsAdmin } from '../useIsAdmin';
-
-import {
-  FEATURES_CONFIG_MAP_NAME,
-  featuresConfigMapInitialState,
-  featuresRole,
-  featuresRoleBinding,
-} from './constants';
+import { featuresConfigMapInitialState, featuresRole, featuresRoleBinding } from './constants';
 import { UseFeaturesValues } from './types';
+import useFeaturesConfigMap from './useFeaturesConfigMap';
 
 type UseFeatures = (featureName: string) => UseFeaturesValues;
 
 export const useFeatures: UseFeatures = (featureName) => {
-  const isAdmin = useIsAdmin();
-
-  const [featureConfigMap, loaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1ConfigMap>({
-    groupVersionKind: getGroupVersionKindForModel(ConfigMapModel),
-    isList: false,
-    name: FEATURES_CONFIG_MAP_NAME,
-    namespace: DEFAULT_NAMESPACE,
-  });
+  const {
+    featuresConfigMapData: [featureConfigMap, loaded, loadError],
+    isAdmin,
+  } = useFeaturesConfigMap();
 
   const [featureEnabled, setFeatureEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -71,6 +55,7 @@ export const useFeatures: UseFeatures = (featureName) => {
 
       try {
         createResources();
+        setFeatureEnabled(featuresConfigMapInitialState.data[featureName] === 'true');
         setLoading(false);
         setError(null);
       } catch (createError) {
