@@ -94,14 +94,14 @@ const TemplatesProjectSection: FC = () => {
   };
 
   return (
-    <ExpandSection className="templates-project-tab__main" toggleText={t('Templates project')}>
+    <ExpandSection className="templates-project-tab__main" toggleText={t('Template project')}>
       <Text className="templates-project-tab__main--help" component={TextVariants.small}>
         <Trans ns="plugin__kubevirt-plugin" t={t}>
-          Set the project to nest Red Hat templates in. If a project is not selected, the settings
-          defaults to &apos;openshift&apos;.
+          Select a project for Red Hat templates. The default project is &apos;openshift&apos;. If
+          you want to store Red Hat templates in multiple projects, you must clone
           <br />
-          To nest Red Hat templates in more than one project, use the clone template action from the
-          Templates kebab actions.
+          the Red Hat template by selecting <b>Clone template</b> from the template action menu and
+          then selecting another project for the cloned template.
         </Trans>
       </Text>
       <Text className="templates-project-tab__main--field-title" component={TextVariants.h6}>
