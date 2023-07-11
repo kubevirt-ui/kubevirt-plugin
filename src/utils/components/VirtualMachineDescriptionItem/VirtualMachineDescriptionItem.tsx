@@ -24,6 +24,7 @@ type VirtualMachineDescriptionItemProps = {
   descriptionData: any;
   descriptionHeader?: string;
   editOnTitleJustify?: boolean;
+  iconContent?: ReactNode;
   isDisabled?: boolean;
   isEdit?: boolean;
   isPopover?: boolean;
@@ -41,6 +42,7 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   descriptionData,
   descriptionHeader,
   editOnTitleJustify = false,
+  iconContent,
   isDisabled,
   isEdit,
   isPopover,
@@ -78,6 +80,7 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
               bodyContent={bodyContent}
               breadcrumb={breadcrumb}
               descriptionHeader={descriptionHeader}
+              iconContent={iconContent}
               isPopover={isPopover}
               label={label}
               moreInfoURL={moreInfoURL}
