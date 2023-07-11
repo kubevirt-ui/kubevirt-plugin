@@ -10,12 +10,14 @@ const EnableLoadBalancerSection: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <ExpandSection toggleText={t('LoadBalancer')}>
+    <ExpandSection toggleText={t('LoadBalancer service')}>
       <EnableFeatureCheckbox
-        description={t('A LoadBalancer must be available in the cluster')}
+        label={t(
+          'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines',
+        )}
+        description={t('A load balancer must be configured')}
         featureName={LOAD_BALANCER_ENABLED}
         id="load-balancer-feature"
-        label={t('Enable the creation of SSH service over LoadBalancer for VirtualMachines')}
       />
     </ExpandSection>
   );
