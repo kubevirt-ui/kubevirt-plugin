@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
+  V1alpha1PersistentVolumeClaim,
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSourceRef,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -28,7 +29,7 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
   const getPVCSource = async ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
     setLoaded(false);
     try {
-      const pvc = await getPVC(name, namespace);
+      const pvc = (await getPVC(name, namespace)) as V1alpha1PersistentVolumeClaim;
       if (pvc) {
         setIsBootSourceAvailable(true);
         setTemplateBootSource({

@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { V1alpha2VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
@@ -8,13 +8,13 @@ import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base';
 
 type UseInstanceTypeListColumnsValues = {
-  columns: TableColumn<V1alpha2VirtualMachineClusterInstancetype>[];
+  columns: TableColumn<V1beta1VirtualMachineClusterInstancetype>[];
   getSortType: (columnIndex: number) => ThSortType;
-  sortedData: V1alpha2VirtualMachineClusterInstancetype[];
+  sortedData: V1beta1VirtualMachineClusterInstancetype[];
 };
 
 type UseInstanceTypeListColumns = (
-  data: V1alpha2VirtualMachineClusterInstancetype[],
+  data: V1beta1VirtualMachineClusterInstancetype[],
   pagination: PaginationState,
 ) => UseInstanceTypeListColumnsValues;
 
@@ -24,7 +24,7 @@ const useInstanceTypeListColumns: UseInstanceTypeListColumns = (data, pagination
   const [activeSortIndex, setActiveSortIndex] = useState<null | number>(null);
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc' | null>(null);
 
-  const columns: TableColumn<V1alpha2VirtualMachineClusterInstancetype>[] = useMemo(
+  const columns: TableColumn<V1beta1VirtualMachineClusterInstancetype>[] = useMemo(
     () => [
       {
         id: 'name',

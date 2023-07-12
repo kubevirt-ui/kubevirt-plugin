@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { VirtualMachineClusterPreferenceModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
@@ -10,13 +10,13 @@ import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 type UseClusterPreferenceListColumnsValues = [
-  TableColumn<V1alpha2VirtualMachineClusterPreference>[],
-  TableColumn<V1alpha2VirtualMachineClusterPreference>[],
+  TableColumn<V1beta1VirtualMachineClusterPreference>[],
+  TableColumn<V1beta1VirtualMachineClusterPreference>[],
 ];
 
 type UseClusterPreferenceListColumns = (
   pagination: PaginationState,
-  data: V1alpha2VirtualMachineClusterPreference[],
+  data: V1beta1VirtualMachineClusterPreference[],
 ) => UseClusterPreferenceListColumnsValues;
 
 const useClusterPreferenceListColumns: UseClusterPreferenceListColumns = (pagination, data) => {
@@ -26,7 +26,7 @@ const useClusterPreferenceListColumns: UseClusterPreferenceListColumns = (pagina
     (direction, path) => columnSorting(data, direction, pagination, path),
     [data, pagination],
   );
-  const columns: TableColumn<V1alpha2VirtualMachineClusterPreference>[] = useMemo(
+  const columns: TableColumn<V1beta1VirtualMachineClusterPreference>[] = useMemo(
     () => [
       {
         id: 'name',
@@ -48,7 +48,7 @@ const useClusterPreferenceListColumns: UseClusterPreferenceListColumns = (pagina
   );
 
   const [activeColumns] =
-    useKubevirtUserSettingsTableColumns<V1alpha2VirtualMachineClusterPreference>({
+    useKubevirtUserSettingsTableColumns<V1beta1VirtualMachineClusterPreference>({
       columnManagementID: VirtualMachineClusterPreferenceModelRef,
       columns,
     });

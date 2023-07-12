@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -52,7 +52,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
 
   const { t } = useKubevirtTranslation();
 
-  const [preferences] = useK8sWatchResource<V1alpha2VirtualMachineClusterPreference[]>({
+  const [preferences] = useK8sWatchResource<V1beta1VirtualMachineClusterPreference[]>({
     groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
     isList: true,
   });

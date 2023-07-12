@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import VirtualMachineClusterPreferenceModel, {
   VirtualMachineClusterPreferenceModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterPreferenceModel';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CloneResourceModal from '@kubevirt-utils/components/CloneResourceModal/CloneResourceModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -14,7 +14,7 @@ import { Action, k8sDelete, useK8sModel } from '@openshift-console/dynamic-plugi
 type UseClusterPreferenceActionsProviderValues = [Action[], boolean];
 
 type UseClusterPreferenceActionsProvider = (
-  preference: V1alpha2VirtualMachineClusterPreference,
+  preference: V1beta1VirtualMachineClusterPreference,
 ) => UseClusterPreferenceActionsProviderValues;
 
 const useClusterPreferenceActionsProvider: UseClusterPreferenceActionsProvider = (preference) => {

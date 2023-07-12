@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -46,7 +46,7 @@ const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
 
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(namespace);
 
-  const [preferences] = useK8sWatchResource<V1alpha2VirtualMachineClusterPreference[]>({
+  const [preferences] = useK8sWatchResource<V1beta1VirtualMachineClusterPreference[]>({
     groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
     isList: true,
   });

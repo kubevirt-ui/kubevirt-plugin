@@ -2,6 +2,8 @@ import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   K8sIoApiCoreV1Affinity,
   K8sIoApiCoreV1NodeAffinity,
+  K8sIoApiCoreV1NodeSelectorRequirement,
+  K8sIoApiCoreV1NodeSelectorRequirementOperatorEnum,
   K8sIoApiCoreV1NodeSelectorTerm,
   K8sIoApiCoreV1PodAffinity,
   K8sIoApiCoreV1PodAffinityTerm,
@@ -77,14 +79,18 @@ export const getRowsDataFromAffinity = (affinity: K8sIoApiCoreV1Affinity): Affin
   ...getPodLikeAffinityRows(affinity?.podAntiAffinity, true),
 ];
 
-const flattenExpressions = (affinityLabels: AffinityLabel[]) =>
+const flattenExpressions = (
+  affinityLabels: AffinityLabel[],
+): K8sIoApiCoreV1NodeSelectorRequirement[] =>
   affinityLabels?.map((aff) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, ...affinityWithoutID } = aff;
 
-    return aff.operator === 'Exists' || aff.operator === 'DoesNotExist'
-      ? { ...affinityWithoutID, values: [] }
-      : affinityWithoutID;
+    const affinityRequirement = { ...affinityWithoutID } as K8sIoApiCoreV1NodeSelectorRequirement;
+    return aff.operator === K8sIoApiCoreV1NodeSelectorRequirementOperatorEnum.Exists ||
+      aff.operator === K8sIoApiCoreV1NodeSelectorRequirementOperatorEnum.DoesNotExist
+      ? { ...affinityRequirement, values: [] }
+      : affinityRequirement;
   });
 
 const getRequiredNodeTermFromRowData = ({

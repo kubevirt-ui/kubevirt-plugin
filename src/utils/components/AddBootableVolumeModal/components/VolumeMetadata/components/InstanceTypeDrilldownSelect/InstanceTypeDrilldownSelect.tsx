@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
-import { V1alpha2VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-utils/models';
@@ -27,7 +27,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const [instanceTypes] = useK8sWatchResource<V1alpha2VirtualMachineClusterInstancetype[]>({
+  const [instanceTypes] = useK8sWatchResource<V1beta1VirtualMachineClusterInstancetype[]>({
     groupVersionKind: VirtualMachineClusterInstancetypeModelGroupVersionKind,
     isList: true,
   });

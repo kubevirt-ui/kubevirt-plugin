@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1alpha2VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
@@ -28,7 +28,7 @@ type ClusterInstancetypeListProps = {
 const ClusterInstancetypeList: FC<ClusterInstancetypeListProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
   const [instanceTypes, loaded, loadError] = useK8sWatchResource<
-    V1alpha2VirtualMachineClusterInstancetype[]
+    V1beta1VirtualMachineClusterInstancetype[]
   >({
     groupVersionKind: VirtualMachineClusterInstancetypeModelGroupVersionKind,
     isList: true,
@@ -86,7 +86,7 @@ const ClusterInstancetypeList: FC<ClusterInstancetypeListProps> = ({ kind }) => 
             perPageOptions={paginationDefaultValues}
           />
         </div>
-        <VirtualizedTable<V1alpha2VirtualMachineClusterInstancetype>
+        <VirtualizedTable<V1beta1VirtualMachineClusterInstancetype>
           columns={activeColumns}
           data={data}
           loaded={loaded}

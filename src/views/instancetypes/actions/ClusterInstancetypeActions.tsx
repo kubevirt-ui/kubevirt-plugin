@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { V1alpha2VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
@@ -9,7 +9,7 @@ import { Dropdown, DropdownPosition, DropdownToggle, KebabToggle } from '@patter
 import useClusterInstancetypeActionsProvider from './hooks/useClusterInstancetypeActionsProvider';
 
 type ClusterInstancetypeActionsProps = {
-  instanceType: V1alpha2VirtualMachineClusterInstancetype;
+  instanceType: V1beta1VirtualMachineClusterInstancetype;
   isKebabToggle?: boolean;
 };
 

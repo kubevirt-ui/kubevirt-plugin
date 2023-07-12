@@ -3,7 +3,7 @@ import DataSourceActions from 'src/views/datasources/actions/DataSourceActions';
 
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getBootableVolumeGroupVersionKind,
@@ -24,7 +24,7 @@ const BootableVolumesRow: FC<
   RowProps<
     BootableResource,
     {
-      preferences: V1alpha2VirtualMachineClusterPreference[];
+      preferences: V1beta1VirtualMachineClusterPreference[];
     }
   >
 > = ({ activeColumnIDs, obj, rowData: { preferences } }) => {

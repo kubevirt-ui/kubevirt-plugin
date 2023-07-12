@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
@@ -14,7 +14,7 @@ import { getPreferenceReadableOS, getSourcePreferenceLabelValue } from '../../ut
 const useBootableVolumesColumns = (
   pagination: { [key: string]: any },
   data: BootableResource[],
-  preferences: V1alpha2VirtualMachineClusterPreference[],
+  preferences: V1beta1VirtualMachineClusterPreference[],
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[]] => {
   const { t } = useKubevirtTranslation();
   const { endIndex, startIndex } = pagination;

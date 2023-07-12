@@ -6,6 +6,7 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   V1AddVolumeOptions,
+  V1beta1DataVolumeSpec,
   V1DataVolumeTemplateSpec,
   V1Disk,
   V1RemoveVolumeOptions,
@@ -196,7 +197,7 @@ export const getDataVolumeFromState = ({
 export const getDataVolumeTemplate = (dataVolume: V1beta1DataVolume): V1DataVolumeTemplateSpec => {
   const dataVolumeTemplate: V1DataVolumeTemplateSpec = { metadata: {}, spec: {} };
   dataVolumeTemplate.metadata = { name: dataVolume.metadata.name };
-  dataVolumeTemplate.spec = { ...dataVolume.spec };
+  dataVolumeTemplate.spec = dataVolume.spec as V1beta1DataVolumeSpec;
   return dataVolumeTemplate;
 };
 

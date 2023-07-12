@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import { getLabel } from '@kubevirt-utils/resources/shared';
@@ -10,7 +10,7 @@ import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-pl
 
 import ClusterPreferenceActions from '../../actions/ClusterPreferenceActions';
 
-const ClusterPreferenceRow: FC<RowProps<V1alpha2VirtualMachineClusterPreference>> = ({
+const ClusterPreferenceRow: FC<RowProps<V1beta1VirtualMachineClusterPreference>> = ({
   activeColumnIDs,
   obj: preference,
 }) => (

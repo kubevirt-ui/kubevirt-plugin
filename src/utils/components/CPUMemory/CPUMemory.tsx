@@ -5,7 +5,7 @@ import {
   VirtualMachineInstancetypeModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import {
-  V1alpha2VirtualMachineInstancetype,
+  V1beta1VirtualMachineInstancetype,
   V1InstancetypeMatcher,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -26,7 +26,7 @@ const CPUMemory: FC<CPUMemoryProps> = ({ vm }) => {
 
   const it: V1InstancetypeMatcher = vm?.spec?.instancetype;
 
-  const [instanceType, loaded, error] = useK8sWatchResource<V1alpha2VirtualMachineInstancetype>(
+  const [instanceType, loaded, error] = useK8sWatchResource<V1beta1VirtualMachineInstancetype>(
     !isEmpty(it) && {
       groupVersionKind: it.kind.includes('cluster')
         ? VirtualMachineClusterInstancetypeModelGroupVersionKind

@@ -12,7 +12,7 @@ export const getDataVolumeSpec = async (
 
   const dataVolume = await getDataSourceDataVolume(dataSourcePVCName, dataSourcePVCNamespace);
 
-  return dataVolume?.spec;
+  return dataVolume?.spec as Promise<V1beta1DataVolumeSpec>;
 };
 
 export const getSourceTypeFromDataVolumeSpec = (dataVolumeSpec: V1beta1DataVolumeSpec) => {

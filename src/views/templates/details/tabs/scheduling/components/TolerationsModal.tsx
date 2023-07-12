@@ -4,7 +4,11 @@ import { getTolerations } from 'src/views/templates/utils/selectors';
 
 import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import { K8sIoApiCoreV1Toleration } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  K8sIoApiCoreV1Toleration,
+  K8sIoApiCoreV1TolerationEffectEnum,
+  K8sIoApiCoreV1TolerationOperatorEnum,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
@@ -12,15 +16,12 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import TolerationEditRow from '@kubevirt-utils/components/TolerationsModal/TolerationEditRow';
 import TolerationListHeaders from '@kubevirt-utils/components/TolerationsModal/TolerationListHeaders';
 import TolerationModalDescriptionText from '@kubevirt-utils/components/TolerationsModal/TolerationModalDescriptionText';
-import {
-  TolerationLabel,
-  TOLERATIONS_EFFECTS,
-} from '@kubevirt-utils/components/TolerationsModal/utils/constants';
+import { TolerationLabel } from '@kubevirt-utils/components/TolerationsModal/utils/constants';
 import { getNodeTaintQualifier } from '@kubevirt-utils/components/TolerationsModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, ModalVariant } from '@patternfly/react-core';
 
 type TolerationsModalProps = {
@@ -53,7 +54,12 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
   const qualifiedNodes = getNodeTaintQualifier(nodes, nodesLoaded, tolerationsLabels);
 
   const onSelectorLabelAdd = () =>
-    onTolerationAdd({ effect: TOLERATIONS_EFFECTS[0], id: null, key: '', value: '' });
+    onTolerationAdd({
+      effect: K8sIoApiCoreV1TolerationEffectEnum.NoSchedule,
+      id: null,
+      key: '',
+      value: '',
+    });
 
   const updatedTemplate = React.useMemo(
     () =>
@@ -62,7 +68,9 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
           (toleration) => {
             return {
               ...toleration,
-              operator: toleration?.value ? 'Equal' : Operator.Exists,
+              operator: toleration?.value
+                ? K8sIoApiCoreV1TolerationOperatorEnum.Equal
+                : K8sIoApiCoreV1TolerationOperatorEnum.Exists,
             };
           },
         );

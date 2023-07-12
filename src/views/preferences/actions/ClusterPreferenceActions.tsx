@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
@@ -10,7 +10,7 @@ import useClusterPreferenceActionsProvider from './hooks/useClusterPreferenceAct
 
 type ClusterPreferenceActionsProps = {
   isKebabToggle?: boolean;
-  preference: V1alpha2VirtualMachineClusterPreference;
+  preference: V1beta1VirtualMachineClusterPreference;
 };
 
 const ClusterPreferenceActions: FC<ClusterPreferenceActionsProps> = ({
