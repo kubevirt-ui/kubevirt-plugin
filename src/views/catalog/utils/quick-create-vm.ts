@@ -3,14 +3,21 @@ import produce from 'immer';
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { updateVMRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { applyCloudDriveCloudInitVolume } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
+  OS_NAME_TYPES,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
+import {
+  getTemplateOS,
+  getTemplateVirtualMachineObject,
+} from '@kubevirt-utils/resources/template/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -23,13 +30,14 @@ type QuickCreateVMType = (inputs: {
     name: string;
     namespace: string;
     startVM: boolean;
+    subscriptionData: RHELAutomaticSubscriptionData;
   };
   template: V1Template;
 }) => Promise<V1VirtualMachine>;
 
 export const quickCreateVM: QuickCreateVMType = async ({
   models,
-  overrides: { authorizedSSHKey, name, namespace = DEFAULT_NAMESPACE, startVM },
+  overrides: { authorizedSSHKey, name, namespace = DEFAULT_NAMESPACE, startVM, subscriptionData },
   template,
 }) => {
   const processedTemplate = await k8sCreate<V1Template>({
@@ -43,7 +51,12 @@ export const quickCreateVM: QuickCreateVMType = async ({
 
   const vm = getTemplateVirtualMachineObject(processedTemplate);
 
-  const overridedVM = produce(vm, (draftVM) => {
+  const rhelSubscribedVM =
+    getTemplateOS(processedTemplate) === OS_NAME_TYPES.rhel
+      ? updateVMRHELSubscription(vm, subscriptionData)
+      : vm;
+
+  const overridedVM = produce(rhelSubscribedVM, (draftVM) => {
     draftVM.metadata.namespace = namespace;
     draftVM.metadata.name = name;
 
@@ -52,6 +65,8 @@ export const quickCreateVM: QuickCreateVMType = async ({
     if (startVM) {
       draftVM.spec.running = true;
     }
+
+    draftVM.spec.template.spec.volumes = applyCloudDriveCloudInitVolume(rhelSubscribedVM);
   });
 
   const vmToCreate = !isEmpty(authorizedSSHKey)

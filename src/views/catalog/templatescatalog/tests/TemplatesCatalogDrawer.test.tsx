@@ -66,6 +66,10 @@ jest.mock('@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings
   return jest.fn().mockReturnValue([{}, jest.fn(), true, null]);
 });
 
+jest.mock('@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription', () => {
+  return jest.fn().mockReturnValue({ loaded: true, subscriptionData: {} });
+});
+
 afterEach(cleanup);
 
 const renderWithWizardContext = ({ children }) => (

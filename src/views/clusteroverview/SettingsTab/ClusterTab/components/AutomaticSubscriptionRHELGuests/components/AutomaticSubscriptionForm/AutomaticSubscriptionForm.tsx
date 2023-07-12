@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useSubscriptionData from '@kubevirt-utils/hooks/useSubscriptionData/useSubscriptionData';
+import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ActionGroup,
@@ -24,7 +24,8 @@ import './AutomaticSubscriptionForm.scss';
 
 const AutomaticSubscriptionForm: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { isAdmin, loaded, loading, subscriptionData, updateSubscription } = useSubscriptionData();
+  const { canEdit, loaded, loading, subscriptionData, updateSubscription } =
+    useRHELAutomaticSubscription();
 
   const [activationKey, setActivationKey] = useState<string>(null);
   const [organizationID, setOrganizationID] = useState<string>(null);
@@ -39,7 +40,7 @@ const AutomaticSubscriptionForm: FC = () => {
   if (!loaded) return <Skeleton />;
 
   const isDisabled =
-    !isAdmin ||
+    !canEdit ||
     isEqualObject(subscriptionData, { activationKey, organizationID }) ||
     (!isEmpty(organizationID) && isEmpty(activationKey)) ||
     (isEmpty(organizationID) && !isEmpty(activationKey));

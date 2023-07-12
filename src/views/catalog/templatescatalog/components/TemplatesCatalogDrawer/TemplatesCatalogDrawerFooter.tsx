@@ -3,6 +3,7 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import {
   generateVMName,
   getTemplateVirtualMachineObject,
@@ -39,10 +40,12 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
   const { t } = useKubevirtTranslation();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVmTemplateSource(template);
   const [authorizedSSHKeys, , userSettingsLoaded] = useKubevirtUserSettings('ssh');
+  const { loaded: loadedRHELSubscription, subscriptionData } = useRHELAutomaticSubscription();
   const [processedTemplate, processedTemplateLoaded] = useProcessedTemplate(template, namespace);
 
   const canQuickCreate = Boolean(processedTemplate) && isBootSourceAvailable;
-  const loaded = bootSourceLoaded && processedTemplateLoaded && userSettingsLoaded;
+  const loaded =
+    bootSourceLoaded && processedTemplateLoaded && userSettingsLoaded && loadedRHELSubscription;
 
   if (!loaded) {
     return <TemplatesCatalogDrawerFooterSkeleton />;
@@ -83,6 +86,7 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
             isBootSourceAvailable={isBootSourceAvailable}
             namespace={namespace}
             onCancel={onCancel}
+            subscriptionData={subscriptionData}
             template={template}
           />
         </Stack>
