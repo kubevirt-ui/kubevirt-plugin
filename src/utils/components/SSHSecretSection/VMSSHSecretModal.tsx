@@ -34,7 +34,7 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
   const initialSSHDetails = useMemo(
     () =>
       getInitialSSHDetails({
-        applyKeyToProject: authorizedSSHKeys?.[namespace] === secretName,
+        applyKeyToProject: !isEmpty(secretName) && authorizedSSHKeys?.[namespace] === secretName,
         sshSecretName: secretName,
       }),
     [authorizedSSHKeys, namespace, secretName],

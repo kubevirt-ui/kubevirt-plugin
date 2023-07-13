@@ -2,6 +2,7 @@ import produce from 'immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { SecretModel } from '@kubevirt-utils/models';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
@@ -54,13 +55,15 @@ export const createMultipleResources = async (
               draftObject.metadata.namespace = namespace;
             }
 
-            if (!draftObject.metadata.ownerReferences) {
-              draftObject.metadata.ownerReferences = [];
-            }
+            if (kind !== SecretModel.kind) {
+              if (!draftObject.metadata.ownerReferences) {
+                draftObject.metadata.ownerReferences = [];
+              }
 
-            draftObject.metadata.ownerReferences.push(
-              buildOwnerReference(vmCreated, { blockOwnerDeletion: false }),
-            );
+              draftObject.metadata.ownerReferences.push(
+                buildOwnerReference(vmCreated, { blockOwnerDeletion: false }),
+              );
+            }
           }),
           model: model,
         });
