@@ -114,7 +114,7 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
         )}
         <StackItem>
           <Checkbox
-            id="start-after-create-checkbox"
+            id="start-after-creation-checkbox"
             isChecked={startVM}
             label={t('Start this VirtualMachine after creation')}
             onChange={setStartVM}
