@@ -439,7 +439,7 @@
         "kind": "VirtualMachineClusterInstancetype",
         "version": "v1alpha2"
       },
-      "name": "%plugin__kubevirt-plugin~Instancetypes%",
+      "name": "%plugin__kubevirt-plugin~InstanceTypes%",
       "section": "virtualization"
     },
     "type": "console.navigation/resource-cluster"
