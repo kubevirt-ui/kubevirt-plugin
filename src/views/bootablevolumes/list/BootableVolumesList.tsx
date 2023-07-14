@@ -100,7 +100,7 @@ const BootableVolumesList: FC<BootableVolumesListProps> = ({ namespace }) => {
                   id,
                   title,
                 })),
-                id: 'bootable-volumes-list',
+                id: DataSourceModelRef,
                 selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
                 type: t('DataSource'),
               }}
