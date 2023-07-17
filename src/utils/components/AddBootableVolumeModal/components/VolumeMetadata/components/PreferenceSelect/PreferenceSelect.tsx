@@ -3,12 +3,13 @@ import React, { FC } from 'react';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
-import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
 
 import FilterSelect from '../../../FilterSelect/FilterSelect';
+
+import PreferencePopoverContent from './PreferencePopoverContent';
 
 type PreferenceSelectProps = {
   preferencesNames: string[];
@@ -28,19 +29,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
         <>
           {t('Preference')}{' '}
           <HelpTextIcon
-            bodyContent={
-              <>
-                {t(
-                  'The preferred VirtualMachine attribute values required to run a given workload.',
-                )}{' '}
-                <ExternalLink
-                  href={
-                    'https://kubevirt.io/user-guide/virtual_machines/instancetypes/#virtualmachinepreference'
-                  }
-                  text={t('Read more')}
-                />
-              </>
-            }
+            bodyContent={<PreferencePopoverContent />}
             position={PopoverPosition.right}
           />
         </>
