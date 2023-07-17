@@ -8,7 +8,11 @@ import {
   IoK8sApiAppsV1ControllerRevision,
   IoK8sApiCoreV1PersistentVolumeClaim,
 } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1StorageSpecVolumeModeEnum,
+  V1DataVolumeTemplateSpec,
+  V1VirtualMachine,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getDataVolumeTemplates,
@@ -108,7 +112,7 @@ const createDataVolumeTemplateFromPVC = (
           },
         },
         storageClassName: pvcToClone?.spec?.storageClassName,
-        volumeMode: pvcToClone?.spec?.volumeMode,
+        volumeMode: pvcToClone?.spec?.volumeMode as V1beta1StorageSpecVolumeModeEnum,
       },
     },
   };

@@ -1,6 +1,6 @@
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   DEFAULT_INSTANCETYPE_LABEL,
   DEFAULT_PREFERENCE_LABEL,
@@ -18,7 +18,7 @@ export const getSourcePreferenceLabelValue = (obj: BootableVolume): string =>
 
 export const getPreferenceReadableOS = (
   obj: BootableVolume,
-  preferences: V1alpha2VirtualMachineClusterPreference[],
+  preferences: V1beta1VirtualMachineClusterPreference[],
 ): string => {
   const preferenceLabelValue = getSourcePreferenceLabelValue(obj); // preference name
   const preferenceObject = preferences?.find(

@@ -1,4 +1,4 @@
-import { V1alpha2VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { APP_NAME_LABEL } from '@kubevirt-utils/resources/template';
@@ -15,7 +15,7 @@ import {
 import { InstanceTypeSize, InstanceTypesMenuItemsData, RedHatInstanceTypeSeries } from './types';
 
 const getRedHatInstanceTypeSeriesAndSize = (
-  instanceType: V1alpha2VirtualMachineClusterInstancetype,
+  instanceType: V1beta1VirtualMachineClusterInstancetype,
 ): { redHatITSeries: RedHatInstanceTypeSeries; size: InstanceTypeSize } => {
   const [seriesName, sizeLabel] = getName(instanceType).split('.');
   const cpus = instanceType?.spec?.cpu?.guest;
@@ -39,7 +39,7 @@ const getRedHatInstanceTypeSeriesAndSize = (
 };
 
 export const isRedHatInstanceType = (
-  instanceType: V1alpha2VirtualMachineClusterInstancetype,
+  instanceType: V1beta1VirtualMachineClusterInstancetype,
 ): boolean => {
   if (getLabel(instanceType, APP_NAME_LABEL) !== COMMON_INSTANCETYPES) return false;
 
@@ -53,7 +53,7 @@ export const isRedHatInstanceType = (
 };
 
 export const getInstanceTypeMenuItems = (
-  instanceTypes: V1alpha2VirtualMachineClusterInstancetype[],
+  instanceTypes: V1beta1VirtualMachineClusterInstancetype[],
 ): InstanceTypesMenuItemsData => {
   if (isEmpty(instanceTypes)) return initialMenuItems;
 

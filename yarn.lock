@@ -692,10 +692,10 @@
   resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-0.0.35.tgz#9a567ea287b647cd37a47d70b87fbd75d4994a89"
   integrity sha512-3S374M9I8nHP+9lnBhL+Z3gMVssNk4vyK7uPI3lkAjal/X6zjR0+E9fWQEPv36K45KxRoUX9w/4pMGWQvVlDcQ==
 
-"@kubevirt-ui/kubevirt-api@^0.0.51":
-  version "0.0.51"
-  resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-0.0.51.tgz#179959c715758a12afb42a655a25759d20d84d89"
-  integrity sha512-TYDGia0Vl9Q4Q+DXZJYytq7wh3rGKpnLZt8NkVzfq6JYoXZ2QzAtAJ8W3crM76gqHq3aqDsBTrblS8paRELQcw==
+"@kubevirt-ui/kubevirt-api@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-1.0.0.tgz#c9b2888b43bf9d3ef816b1ea9bfd2cc19a67403c"
+  integrity sha512-fvpaCFjUxgXsPWM5nAblwQ4DCvJthz1SEG2QAYA6bBfpFa8T/DbcB4HVBszr50kA1WKfnzcmrvI7Jff3n0Ojzg==
 
 "@leichtgewicht/ip-codec@^2.0.1":
   version "2.0.4"

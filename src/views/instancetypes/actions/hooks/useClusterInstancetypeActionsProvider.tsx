@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
-import { V1alpha2VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CloneResourceModal from '@kubevirt-utils/components/CloneResourceModal/CloneResourceModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -13,7 +13,7 @@ import { Action, k8sDelete, useK8sModel } from '@openshift-console/dynamic-plugi
 type UseClusterInstancetypeActionsProviderValues = [Action[], boolean];
 
 type UseClusterInstancetypeActionsProvider = (
-  instanceType: V1alpha2VirtualMachineClusterInstancetype,
+  instanceType: V1beta1VirtualMachineClusterInstancetype,
 ) => UseClusterInstancetypeActionsProviderValues;
 
 const useClusterInstancetypeActionsProvider: UseClusterInstancetypeActionsProvider = (

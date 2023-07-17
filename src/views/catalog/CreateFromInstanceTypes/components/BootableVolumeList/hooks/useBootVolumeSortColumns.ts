@@ -1,10 +1,8 @@
 import { useState } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import {
-  V1alpha1PersistentVolumeClaim,
-  V1alpha2VirtualMachineClusterPreference,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -15,10 +13,10 @@ import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/ba
 type UseBootVolumeSortColumns = (
   unsortedData: BootableVolume[],
   preferences: {
-    [resourceKeyName: string]: V1alpha2VirtualMachineClusterPreference;
+    [resourceKeyName: string]: V1beta1VirtualMachineClusterPreference;
   },
   pvcSources: {
-    [resourceKeyName: string]: V1alpha1PersistentVolumeClaim;
+    [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
   },
   pagination: PaginationState,
 ) => {

@@ -6,7 +6,7 @@ import {
 } from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/utils/types';
 import { categoryDetailsMap } from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/utils/utils';
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FilterSelect from '@kubevirt-utils/components/AddBootableVolumeModal/components/FilterSelect/FilterSelect';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -38,7 +38,7 @@ import { changeBootableVolumeMetadata } from '../../utils/utils';
 type EditBootableVolumesModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  preferences: V1alpha2VirtualMachineClusterPreference[];
+  preferences: V1beta1VirtualMachineClusterPreference[];
   source: BootableResource;
 };
 

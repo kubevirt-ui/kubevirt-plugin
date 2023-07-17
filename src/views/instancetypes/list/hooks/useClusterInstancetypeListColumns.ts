@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha2VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
@@ -10,13 +10,13 @@ import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 type UseClusterInstancetypeListColumnsValues = [
-  TableColumn<V1alpha2VirtualMachineClusterInstancetype>[],
-  TableColumn<V1alpha2VirtualMachineClusterInstancetype>[],
+  TableColumn<V1beta1VirtualMachineClusterInstancetype>[],
+  TableColumn<V1beta1VirtualMachineClusterInstancetype>[],
 ];
 
 type UseClusterInstancetypeListColumns = (
   pagination: PaginationState,
-  data: V1alpha2VirtualMachineClusterInstancetype[],
+  data: V1beta1VirtualMachineClusterInstancetype[],
 ) => UseClusterInstancetypeListColumnsValues;
 
 const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pagination, data) => {
@@ -27,7 +27,7 @@ const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pa
     [data, pagination],
   );
 
-  const columns: TableColumn<V1alpha2VirtualMachineClusterInstancetype>[] = useMemo(
+  const columns: TableColumn<V1beta1VirtualMachineClusterInstancetype>[] = useMemo(
     () => [
       {
         id: 'name',
@@ -61,7 +61,7 @@ const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pa
   );
 
   const [activeColumns] =
-    useKubevirtUserSettingsTableColumns<V1alpha2VirtualMachineClusterInstancetype>({
+    useKubevirtUserSettingsTableColumns<V1beta1VirtualMachineClusterInstancetype>({
       columnManagementID: VirtualMachineClusterInstancetypeModelRef,
       columns,
     });

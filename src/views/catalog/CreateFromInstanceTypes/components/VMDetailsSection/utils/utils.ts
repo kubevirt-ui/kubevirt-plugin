@@ -3,8 +3,8 @@ import {
   PREFERENCE_DISPLAY_NAME_KEY,
 } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import {
-  V1alpha2VirtualMachineClusterInstancetype,
-  V1alpha2VirtualMachineClusterPreference,
+  V1beta1VirtualMachineClusterInstancetype,
+  V1beta1VirtualMachineClusterPreference,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -14,7 +14,7 @@ import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 export const getOSFromDefaultPreference = (
   bootableVolume: BootableVolume,
   preferencesMap: {
-    [resourceKeyName: string]: V1alpha2VirtualMachineClusterPreference;
+    [resourceKeyName: string]: V1beta1VirtualMachineClusterPreference;
   },
 ): string => {
   const defaultPreferenceName = getLabel(bootableVolume, DEFAULT_PREFERENCE_LABEL);
@@ -29,7 +29,7 @@ export const getOSFromDefaultPreference = (
 };
 
 export const getCPUAndMemoryFromDefaultInstanceType = (
-  instanceType: V1alpha2VirtualMachineClusterInstancetype,
+  instanceType: V1beta1VirtualMachineClusterInstancetype,
 ): string => {
   const cpu = instanceType?.spec?.cpu?.guest;
 

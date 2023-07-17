@@ -1,7 +1,7 @@
 import React from 'react';
 
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
@@ -13,7 +13,7 @@ import EditBootableVolumesModal from '../components/EditBootableVolumesModal';
 
 type BootableVolumesActionsProps = (
   source: BootableResource,
-  preferences: V1alpha2VirtualMachineClusterPreference[],
+  preferences: V1beta1VirtualMachineClusterPreference[],
 ) => [actions: Action[]];
 
 const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferences) => {

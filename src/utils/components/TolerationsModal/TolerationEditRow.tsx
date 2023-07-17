@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { K8sIoApiCoreV1TolerationEffectEnum } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
@@ -11,7 +12,7 @@ import {
 } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-import { TolerationLabel, TOLERATIONS_EFFECTS } from './utils/constants';
+import { TolerationLabel } from './utils/constants';
 
 type TolerationEditRowProps = {
   label: TolerationLabel;
@@ -46,12 +47,14 @@ const TolerationEditRow: React.FC<TolerationEditRowProps> = ({ label, onChange, 
       </GridItem>
       <GridItem span={3}>
         <FormSelect
+          onChange={(newEffect) =>
+            onChange({ ...label, effect: newEffect as K8sIoApiCoreV1TolerationEffectEnum })
+          }
           id={`toleration-${id}-effect-select`}
           isRequired
-          onChange={(newEffect) => onChange({ ...label, effect: newEffect })}
           value={effect}
         >
-          {TOLERATIONS_EFFECTS.map((effectOption) => (
+          {Object.values(K8sIoApiCoreV1TolerationEffectEnum).map((effectOption) => (
             <FormSelectOption key={effectOption} label={effectOption} value={effectOption} />
           ))}
         </FormSelect>

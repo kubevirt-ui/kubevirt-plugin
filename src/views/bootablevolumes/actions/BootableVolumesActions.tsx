@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
@@ -10,7 +10,7 @@ import { BootableResource } from '../utils/types';
 import useBootableVolumesActions from './hooks/useBootableVolumesActions';
 
 type BootableVolumesActionsProps = {
-  preferences: V1alpha2VirtualMachineClusterPreference[];
+  preferences: V1beta1VirtualMachineClusterPreference[];
   source: BootableResource;
 };
 

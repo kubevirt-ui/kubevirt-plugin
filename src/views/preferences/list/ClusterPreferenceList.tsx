@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1alpha2VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
@@ -28,7 +28,7 @@ type ClusterPreferenceListProps = {
 const ClusterPreferenceList: FC<ClusterPreferenceListProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
   const [preferences, loaded, loadError] = useK8sWatchResource<
-    V1alpha2VirtualMachineClusterPreference[]
+    V1beta1VirtualMachineClusterPreference[]
   >({
     groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
     isList: true,
@@ -86,7 +86,7 @@ const ClusterPreferenceList: FC<ClusterPreferenceListProps> = ({ kind }) => {
             perPageOptions={paginationDefaultValues}
           />
         </div>
-        <VirtualizedTable<V1alpha2VirtualMachineClusterPreference>
+        <VirtualizedTable<V1beta1VirtualMachineClusterPreference>
           columns={activeColumns}
           data={data}
           loaded={loaded}
