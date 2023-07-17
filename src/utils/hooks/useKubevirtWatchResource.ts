@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   K8sResourceCommon,
@@ -6,6 +6,8 @@ import {
   WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import { KUBEVIRT_APISERVER_PROXY } from './useFeatures/constants';
+import { useFeatures } from './useFeatures/useFeatures';
 import useKubevirtDataPodHealth from './useKubevirtDataPod/hooks/useKubevirtDataPodHealth';
 import useKubevirtDataPod from './useKubevirtDataPod/useKubevirtDataPod';
 type Result<R extends K8sResourceCommon | K8sResourceCommon[]> = [R, boolean, Error];
@@ -18,18 +20,26 @@ const useKubevirtWatchResource: UseKubevirtWatchResource = <T>(watchOptions, fil
   const [data, setData] = useState<T>((<unknown>[]) as T);
   const [loadedData, setLoadedData] = useState<boolean>(false);
   const [loadErrorData, setLoadErrorData] = useState<Error>();
-  const isPodDataAlive = useKubevirtDataPodHealth();
+  const isProxyPodAlive = useKubevirtDataPodHealth();
+  const { featureEnabled, loading } = useFeatures(KUBEVIRT_APISERVER_PROXY);
+  const shouldUseProxyPod = useMemo(() => {
+    if (!featureEnabled && !loading) return false;
+    if (featureEnabled && !loading && isProxyPodAlive !== null) return isProxyPodAlive;
+    return null;
+  }, [featureEnabled, loading, isProxyPodAlive]);
   const [resourceK8sWatch, loadedK8sWatch, loadErrorK8sWatch] = useK8sWatchResource<T>(
-    isPodDataAlive === false && watchOptions,
+    shouldUseProxyPod === false && watchOptions,
   );
   const [resourceKubevirtDataPod, loadedKubevirtDataPod, loadErrorKubevirtDataPod] =
-    useKubevirtDataPod<T>(isPodDataAlive ? watchOptions : {}, filterOptions);
+    useKubevirtDataPod<T>(shouldUseProxyPod ? watchOptions : {}, filterOptions);
 
   useEffect(() => {
-    if (isPodDataAlive !== null) {
-      const [resource, loaded, loadError] = isPodDataAlive
+    if (shouldUseProxyPod !== null) {
+      const [resource, loaded, loadError] = shouldUseProxyPod
         ? [resourceKubevirtDataPod, loadedKubevirtDataPod, loadErrorKubevirtDataPod]
         : [resourceK8sWatch, loadedK8sWatch, loadErrorK8sWatch];
+      setLoadedData(loaded);
+
       if (loadError) {
         setLoadErrorData(loadError);
         setLoadedData(true);
@@ -48,7 +58,8 @@ const useKubevirtWatchResource: UseKubevirtWatchResource = <T>(watchOptions, fil
     resourceK8sWatch,
     loadedK8sWatch,
     loadErrorK8sWatch,
-    isPodDataAlive,
+    isProxyPodAlive,
+    shouldUseProxyPod,
   ]);
   return [data, loadedData, loadErrorData];
 };
