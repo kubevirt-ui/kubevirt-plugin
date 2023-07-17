@@ -28,7 +28,7 @@ export const useInstanceTypeVMInitialStore = create<InstanceTypeVMStore>()((set,
           );
           instanceTypeVMState.selectedInstanceType = getInstanceTypeFromVolume(selectedVolume);
 
-          const osName = getLabel(selectedVolume, DEFAULT_PREFERENCE_LABEL).replace('.', '');
+          const osName = getLabel(selectedVolume, DEFAULT_PREFERENCE_LABEL).replaceAll('.', '-');
           instanceTypeVMState.vmName = getRandomVMName(osName);
         }),
       ),
