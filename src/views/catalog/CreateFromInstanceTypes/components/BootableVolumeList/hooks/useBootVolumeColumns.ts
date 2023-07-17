@@ -50,6 +50,7 @@ const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
     })),
     id: DataSourceModelRef,
     selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+    showNamespaceOverride: true,
     type: t('Bootable volumes'),
   };
 
