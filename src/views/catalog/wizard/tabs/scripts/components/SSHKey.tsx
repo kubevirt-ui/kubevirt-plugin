@@ -18,6 +18,7 @@ import {
 } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { SecretModel } from '@kubevirt-utils/models';
 import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
@@ -38,10 +39,12 @@ const SSHKey: FC = () => {
   const initialSSHDetails: SSHSecretDetails = useMemo(
     () =>
       getInitialSSHDetails({
-        applyKeyToProject: tabsData?.authorizedSSHKey === vmAttachedSecretName,
+        applyKeyToProject:
+          !isEmpty(vmAttachedSecretName) && tabsData?.authorizedSSHKey === vmAttachedSecretName,
+        secretToCreate: tabsData.additionalObjects?.find((obj) => obj?.kind === SecretModel.kind),
         sshSecretName: vmAttachedSecretName,
       }),
-    [tabsData?.authorizedSSHKey, vmAttachedSecretName],
+    [tabsData, vmAttachedSecretName],
   );
 
   const onSubmit = useCallback(
@@ -53,10 +56,19 @@ const SSHKey: FC = () => {
       }
 
       const vmNamespace = getNamespace(vm);
-      if (applyKeyToProject && authorizedSSHKeys?.[vmNamespace] !== sshSecretName) {
+      if (applyKeyToProject) {
         updateAuthorizedSSHKeys({ ...authorizedSSHKeys, [vmNamespace]: sshSecretName });
         updateTabsData((currentTabsData) => {
           currentTabsData.authorizedSSHKey = sshSecretName;
+        });
+      }
+
+      if (!applyKeyToProject && !isEmpty(tabsData.authorizedSSHKey)) {
+        const updatedAuthKeys = { ...authorizedSSHKeys };
+        delete updatedAuthKeys?.[vmNamespace];
+        updateAuthorizedSSHKeys(updatedAuthKeys);
+        updateTabsData((currentTabsData) => {
+          currentTabsData.authorizedSSHKey = null;
         });
       }
 
@@ -88,7 +100,15 @@ const SSHKey: FC = () => {
 
       return Promise.resolve();
     },
-    [authorizedSSHKeys, initialSSHDetails, updateAuthorizedSSHKeys, updateTabsData, updateVM, vm],
+    [
+      authorizedSSHKeys,
+      initialSSHDetails,
+      tabsData.authorizedSSHKey,
+      updateAuthorizedSSHKeys,
+      updateTabsData,
+      updateVM,
+      vm,
+    ],
   );
 
   return (
