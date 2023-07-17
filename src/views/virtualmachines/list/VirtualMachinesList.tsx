@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import {
   VirtualMachineInstanceMigrationModelGroupVersionKind,
@@ -12,6 +12,9 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useKubevirtDataPodHealth from '@kubevirt-utils/hooks/useKubevirtDataPod/hooks/useKubevirtDataPodHealth';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
 import {
@@ -29,6 +32,7 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
+import useQuery from '@virtualmachines/details/tabs/metrics/NetworkCharts/hook/useQuery';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { useVMListFilters } from '../utils';
@@ -48,24 +52,41 @@ type VirtualMachinesListProps = {
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
-
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`;
+  const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
+  const isProxyPodAlive = useKubevirtDataPodHealth();
+  const query = useQuery();
+  const [vms, loaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
+    {
+      groupVersionKind: VirtualMachineModelGroupVersionKind,
+      isList: true,
+      limit: OBJECTS_FETCHING_LIMIT,
+      namespace,
+      namespaced: true,
+    },
+    {
+      labels: 'metadata.labels',
+      name: 'metadata.name',
+      'rowFilter-instanceType': 'spec.instancetype.name',
+      'rowFilter-live-migratable': 'status.conditions',
+      'rowFilter-os': 'spec.template.metadata.annotations.vm\\.kubevirt\\.io/os',
+      'rowFilter-status': 'status.printableStatus',
+      'rowFilter-template': 'metadata.labels.vm\\.kubevirt\\.io/template',
+    },
+  );
 
-  const [vms, loaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>({
-    groupVersionKind: VirtualMachineModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-    namespace,
-    namespaced: true,
-  });
-
-  const [vmis, vmiLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-    namespace,
-    namespaced: true,
-  });
+  const [vmis, vmiLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>(
+    {
+      groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+      isList: true,
+      limit: OBJECTS_FETCHING_LIMIT,
+      namespace,
+      namespaced: true,
+    },
+    {
+      'rowFilter-node': 'status.nodeName',
+    },
+  );
 
   const [isSingleNodeCluster, isSingleNodeLoaded] = useSingleNodeCluster();
 
@@ -81,10 +102,24 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
-  const [unfilteredData, data, onFilterChange] = useListPageFilter<
+  const [unfilterData, dataFilters, onFilterChange] = useListPageFilter<
     V1VirtualMachine,
     V1VirtualMachine
   >(vms, filters);
+
+  const [unfilteredData, data] = useMemo(() => {
+    if (!featureEnabled || isProxyPodAlive === false) return [unfilterData, dataFilters];
+
+    const matchedVMS = vms?.filter(
+      ({ metadata: { name, namespace: ns }, status: { printableStatus } }) => {
+        return (
+          vmiMapper?.mapper?.[ns]?.[name] ||
+          (!query.has('rowFilter-node') && printableStatus !== 'Running')
+        );
+      },
+    );
+    return [matchedVMS, matchedVMS];
+  }, [featureEnabled, isProxyPodAlive, unfilterData, dataFilters, vms, vmiMapper?.mapper, query]);
 
   const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({
@@ -99,6 +134,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
 
   return (
     <>
+      {/* All of this table and components should be replaced to our own fitted components */}
       <ListPageHeader title={t('VirtualMachines')}>
         {!isEmpty(vms) && <VirtualMachinesCreateButton namespace={namespace} />}
       </ListPageHeader>
@@ -157,7 +193,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
           }}
           columns={activeColumns}
           data={data}
-          loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded}
+          loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded && !loadingFeatureProxy}
           loadError={loadError}
           Row={VirtualMachineRow}
           unfilteredData={unfilteredData}

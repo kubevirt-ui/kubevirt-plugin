@@ -1,14 +1,11 @@
 import { useEffect, useRef } from 'react';
 
-import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { PROXY_KUBEVIRT_URL, PROXY_KUBEVIRT_URL_HEALTH_PATH } from '../utils/constants';
 
 const useKubevirtDataPodHealth = (): boolean | null => {
-  const alive = useRef(null);
-  const { featureEnabled, loading } = useFeatures(KUBEVIRT_APISERVER_PROXY);
+  const alive = useRef<boolean>(null);
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -18,10 +15,10 @@ const useKubevirtDataPodHealth = (): boolean | null => {
         alive.current = false;
       }
     };
-    alive.current === null && !loading && fetch();
-  }, [loading]);
 
-  return alive.current && featureEnabled;
+    alive.current === null && fetch();
+  }, []);
+
+  return alive.current;
 };
-
 export default useKubevirtDataPodHealth;

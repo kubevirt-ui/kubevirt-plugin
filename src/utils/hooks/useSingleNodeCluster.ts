@@ -1,15 +1,14 @@
 import { useMemo } from 'react';
 
 import { InfrastructureModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { useIsAdmin } from './useIsAdmin';
 
 type UseSingleNodeCluster = () => [isSingleNodeCluster: boolean, loaded: boolean];
 const useSingleNodeCluster: UseSingleNodeCluster = () => {
   const isAdmin = useIsAdmin();
-  const [infrastructure, loaded] = useKubevirtWatchResource<
+  const [infrastructure, loaded] = useK8sWatchResource<
     K8sResourceCommon & {
       status: { infrastructureTopology: string };
     }

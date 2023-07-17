@@ -50,6 +50,7 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
   );
   useEffect(() => {
     const fetch = async () => {
+      setLoaded(false);
       try {
         const response = await consoleFetch(url);
         const jsonData = await response.json();
