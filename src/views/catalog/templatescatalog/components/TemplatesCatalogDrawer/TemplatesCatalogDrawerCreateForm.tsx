@@ -15,6 +15,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
@@ -46,6 +47,7 @@ type TemplatesCatalogDrawerCreateFormProps = {
   isBootSourceAvailable: boolean;
   namespace: string;
   onCancel: () => void;
+  subscriptionData: RHELAutomaticSubscriptionData;
   template: V1Template;
 };
 
@@ -57,6 +59,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
     isBootSourceAvailable,
     namespace,
     onCancel,
+    subscriptionData,
     template,
   }) => {
     const history = useHistory();
@@ -106,7 +109,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
       quickCreateVM({
         models,
-        overrides: { authorizedSSHKey, name: vmName, namespace, startVM },
+        overrides: { authorizedSSHKey, name: vmName, namespace, startVM, subscriptionData },
         template: templateToProcess,
       })
         .then((quickCreatedVM) => {

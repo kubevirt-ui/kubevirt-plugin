@@ -114,7 +114,7 @@ export const generateVM = (
               name: `${virtualmachineName}-disk`,
             },
             {
-              cloudInitNoCloud: {
+              cloudInitConfigDrive: {
                 userData: `#cloud-config\nuser: ${getCloudInitUserNameByOS(
                   selectedPreference,
                 )}\npassword: ${generateCloudInitPassword()}\nchpasswd: { expire: False }`,

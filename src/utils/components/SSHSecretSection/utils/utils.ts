@@ -8,6 +8,7 @@ import {
   V1CloudInitNoCloudSource,
   V1SSHPublicKeyAccessCredentialPropagationMethod,
   V1VirtualMachine,
+  V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   convertYAMLUserDataObject,
@@ -51,23 +52,21 @@ export const detachVMSecret = async (vm: V1VirtualMachine) => {
   });
 };
 
+export const applyCloudDriveCloudInitVolume = (vm: V1VirtualMachine): V1Volume[] => {
+  const cloudInitVolume = getCloudInitVolume(vm);
+  const cloudDriveVolume: V1Volume = {
+    cloudInitConfigDrive: getCloudInitData(cloudInitVolume),
+    name: cloudInitVolume.name,
+  };
+
+  return isEmpty(cloudInitVolume)
+    ? getVolumes(vm)
+    : getVolumes(vm).map((vol) => (vol.name === cloudDriveVolume.name ? cloudDriveVolume : vol));
+};
+
 export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string, isDynamic?: boolean) => {
   return produce(vm, (vmDraft) => {
-    const cloudInitNoCloudVolume = getVolumes(vm)?.find((v) => v.cloudInitNoCloud);
-
-    if (cloudInitNoCloudVolume) {
-      vmDraft.spec.template.spec.volumes = [
-        ...getVolumes(vm).filter((v) => !v.cloudInitNoCloud),
-        {
-          cloudInitConfigDrive: getCloudInitConfigDrive(
-            isDynamic,
-            cloudInitNoCloudVolume.cloudInitNoCloud,
-          ),
-
-          name: cloudInitNoCloudVolume.name,
-        },
-      ];
-    }
+    vmDraft.spec.template.spec.volumes = applyCloudDriveCloudInitVolume(vm);
     vmDraft.spec.template.spec.accessCredentials = [
       {
         sshPublicKey: {
@@ -99,19 +98,20 @@ export const getCloudInitPropagationMethod = (
 };
 export const getCloudInitConfigDrive = (
   isDynamic: boolean,
-  cloudInitVolume: V1CloudInitConfigDriveSource | V1CloudInitNoCloudSource,
+  cloudInitVolumeData: V1CloudInitConfigDriveSource | V1CloudInitNoCloudSource,
 ): V1CloudInitConfigDriveSource => {
   const runCmd = `\nruncmd:\n- [ setsebool, -P, virt_qemu_ga_manage_ssh, on ]`;
-  const userData = cloudInitVolume?.userData?.concat(runCmd);
-  const userDataClean = cloudInitVolume?.userData?.replace(runCmd, '');
+  const userData = cloudInitVolumeData?.userData?.concat(runCmd);
+  const userDataClean = cloudInitVolumeData?.userData?.replace(runCmd, '');
 
   return isDynamic
     ? {
-        ...cloudInitVolume,
+        ...cloudInitVolumeData,
         userData,
       }
-    : { ...cloudInitVolume, userData: userDataClean };
+    : { ...cloudInitVolumeData, userData: userDataClean };
 };
+
 export const createSSHSecret = (sshKey: string, secretName: string, secretNamespace: string) =>
   k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
     data: {

@@ -10,19 +10,18 @@ import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesC
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseSubscriptionData = () => {
-  isAdmin: boolean;
+import { RHELAutomaticSubscriptionData } from './utils/types';
+
+type UseRHELAutomaticSubscription = () => {
+  canEdit: boolean;
   loaded: boolean;
   loadError: Error;
   loading: boolean;
-  subscriptionData: {
-    activationKey: string;
-    organizationID: string;
-  };
+  subscriptionData: RHELAutomaticSubscriptionData;
   updateSubscription: (activationKey: string, organizationID: string) => void;
 };
 
-const useSubscriptionData: UseSubscriptionData = () => {
+const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = () => {
   const {
     featuresConfigMapData: [featureConfigMap, loaded, loadError],
     isAdmin,
@@ -45,7 +44,7 @@ const useSubscriptionData: UseSubscriptionData = () => {
   };
 
   return {
-    isAdmin,
+    canEdit: isAdmin,
     loaded,
     loadError,
     loading,
@@ -57,4 +56,4 @@ const useSubscriptionData: UseSubscriptionData = () => {
   };
 };
 
-export default useSubscriptionData;
+export default useRHELAutomaticSubscription;
