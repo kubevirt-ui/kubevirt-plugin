@@ -54,14 +54,15 @@ export const detachVMSecret = async (vm: V1VirtualMachine) => {
 
 export const applyCloudDriveCloudInitVolume = (vm: V1VirtualMachine): V1Volume[] => {
   const cloudInitVolume = getCloudInitVolume(vm);
+
+  if (isEmpty(cloudInitVolume)) return getVolumes(vm);
+
   const cloudDriveVolume: V1Volume = {
     cloudInitConfigDrive: getCloudInitData(cloudInitVolume),
     name: cloudInitVolume.name,
   };
 
-  return isEmpty(cloudInitVolume)
-    ? getVolumes(vm)
-    : getVolumes(vm).map((vol) => (vol.name === cloudDriveVolume.name ? cloudDriveVolume : vol));
+  return getVolumes(vm).map((vol) => (vol.name === cloudDriveVolume.name ? cloudDriveVolume : vol));
 };
 
 export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string, isDynamic?: boolean) => {

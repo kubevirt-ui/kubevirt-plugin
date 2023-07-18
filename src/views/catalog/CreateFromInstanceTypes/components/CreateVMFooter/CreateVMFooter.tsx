@@ -9,6 +9,7 @@ import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretSecti
 import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -42,6 +43,7 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
   const { createModal } = useModal();
 
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
+  const { subscriptionData } = useRHELAutomaticSubscription();
 
   const { activeNamespace, instanceTypeVMState, vmNamespaceTarget } = useInstanceTypeVMStore();
   const { selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
@@ -69,7 +71,12 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
     setIsSubmitting(true);
     setError(null);
 
-    const vmToCreate = generateVM(instanceTypeVMState, vmNamespaceTarget, startVM);
+    const vmToCreate = generateVM(
+      instanceTypeVMState,
+      vmNamespaceTarget,
+      startVM,
+      subscriptionData,
+    );
 
     if (
       applyKeyToProject &&
@@ -143,7 +150,12 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
                 onClick={() =>
                   createModal((props) => (
                     <YamlAndCLIViewerModal
-                      vm={generateVM(instanceTypeVMState, vmNamespaceTarget, startVM)}
+                      vm={generateVM(
+                        instanceTypeVMState,
+                        vmNamespaceTarget,
+                        startVM,
+                        subscriptionData,
+                      )}
                       {...props}
                     />
                   ))

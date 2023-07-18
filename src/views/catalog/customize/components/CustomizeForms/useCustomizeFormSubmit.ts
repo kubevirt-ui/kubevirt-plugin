@@ -2,10 +2,15 @@ import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import produce from 'immer';
 
+import { isRHELTemplate } from '@catalog/utils/utils';
 import { SecretModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import {
+  addSecretToVM,
+  applyCloudDriveCloudInitVolume,
+} from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { DataUpload, useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -81,6 +86,7 @@ export const useCustomizeFormSubmit = ({
       );
 
       const dataVolumeTemplate = vmObj?.spec?.dataVolumeTemplates?.[0];
+
       const updatedVM = produce(vmObj, (vmDraft) => {
         ensurePath(vmDraft, [
           'spec.template.spec.domain.resources',
@@ -94,7 +100,12 @@ export const useCustomizeFormSubmit = ({
           ...vmDraft?.spec?.template?.spec?.domain?.resources?.requests,
           memory: `${vm.spec.template.spec.domain.resources.requests['memory']}`,
         };
-        vmDraft.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
+        vmDraft.spec.template.spec.domain.cpu.cores = vmObj.spec.template.spec.domain.cpu.cores;
+
+        const updatedVolumes = applyCloudDriveCloudInitVolume(vmObj);
+        vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
+          ? updateCloudInitRHELSubscription(updatedVolumes, tabsData.subscriptionData)
+          : updatedVolumes;
 
         // upload is required, we need to patch the volume and delete the data volume template (keep only cd dv template if available)
         if (diskUploadFile) {

@@ -1,13 +1,17 @@
+/* eslint-disable perfectionist/sort-objects */
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { convertUserDataObjectToYAML } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { ACTIVATION_KEY } from '@kubevirt-utils/components/CloudinitModal/utils/consts';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { InstanceTypeVMState } from '../state/utils/types';
 
@@ -23,10 +27,31 @@ const getCloudInitUserNameByOS = (selectedPreferenceName: string): string => {
   return 'fedora';
 };
 
+export const createPopulatedCloudInitYAML = (
+  selectedPreference: string,
+  subscriptionData: RHELAutomaticSubscriptionData,
+) => {
+  const { activationKey, organizationID } = subscriptionData;
+  return convertUserDataObjectToYAML(
+    {
+      user: getCloudInitUserNameByOS(selectedPreference),
+      password: generateCloudInitPassword(),
+      chpasswd: { expire: false },
+      ...(selectedPreference.includes(OS_NAME_TYPES.rhel) &&
+        !isEmpty(activationKey) &&
+        !isEmpty(organizationID) && {
+          rh_subscription: { [ACTIVATION_KEY]: activationKey, org: organizationID },
+        }),
+    },
+    true,
+  );
+};
+
 export const generateVM = (
   instanceTypeState: InstanceTypeVMState,
   targetNamespace: string,
   startVM: boolean,
+  subscriptionData: RHELAutomaticSubscriptionData,
 ) => {
   const { pvcSource, selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
     instanceTypeState;
@@ -115,9 +140,7 @@ export const generateVM = (
             },
             {
               cloudInitConfigDrive: {
-                userData: `#cloud-config\nuser: ${getCloudInitUserNameByOS(
-                  selectedPreference,
-                )}\npassword: ${generateCloudInitPassword()}\nchpasswd: { expire: False }`,
+                userData: createPopulatedCloudInitYAML(selectedPreference, subscriptionData),
               },
               name: 'cloudinitdisk',
             },

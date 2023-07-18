@@ -1,4 +1,5 @@
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 
 export type TabsData = {
@@ -16,4 +17,5 @@ export type TabsData = {
     };
   };
   startVM?: boolean;
+  subscriptionData?: RHELAutomaticSubscriptionData;
 };

@@ -134,6 +134,10 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
         updateTabsData((currentTabsData) => ({ ...currentTabsData, authorizedSSHKey }));
       }
 
+      if (!isEmpty(subscriptionData?.activationKey) && !isEmpty(subscriptionData?.organizationID)) {
+        updateTabsData((currentTabsData) => ({ ...currentTabsData, subscriptionData }));
+      }
+
       history.push(catalogUrl);
     };
 

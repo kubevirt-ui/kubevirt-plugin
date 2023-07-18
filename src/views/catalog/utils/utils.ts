@@ -2,8 +2,9 @@ import produce from 'immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { SecretModel } from '@kubevirt-utils/models';
+import { SecretModel, V1Template } from '@kubevirt-utils/models';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import { getTemplateOS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   getGroupVersionKindForResource,
@@ -80,3 +81,6 @@ export const createMultipleResources = async (
     throw error;
   }
 };
+
+export const isRHELTemplate = (template: V1Template): boolean =>
+  getTemplateOS(template) === OS_NAME_TYPES.rhel;

@@ -106,18 +106,24 @@ export const createDefaultCloudInitYAML = () =>
     true,
   );
 
-export const updateVMRHELSubscription = (
-  vm: V1VirtualMachine,
+export const updateCloudInitRHELSubscription = (
+  vmVolumes: V1Volume[] = [],
   subscriptionData: RHELAutomaticSubscriptionData,
-): V1VirtualMachine => {
+): V1Volume[] => {
   const { activationKey, organizationID } = subscriptionData || {};
 
   if (isEmpty(organizationID) || isEmpty(activationKey)) {
-    return vm;
+    return vmVolumes;
   }
 
-  const cloudInitVol = getCloudInitVolume(vm);
-  const restVolumes = getVolumes(vm).filter((vol) => vol?.name !== cloudInitVol?.name);
+  const [cloudInitVol, restVolumes]: [null | V1Volume, V1Volume[]] = vmVolumes.reduce(
+    (result, vol) => {
+      vol.cloudInitConfigDrive ? (result[0] = vol) : result[1].push(vol);
+      return result;
+    },
+    [null, []],
+  );
+
   const cloudInitVolData = getCloudInitData(cloudInitVol);
 
   const userDataObject = convertYAMLUserDataObject(cloudInitVolData?.userData);
@@ -141,16 +147,12 @@ export const updateVMRHELSubscription = (
     draftCloudInitVolume.cloudInitNoCloud = updatedCloudInitVolumeData;
   });
 
-  const updatedVM = produce(vm, (draftVM) => {
-    draftVM.spec.template.spec.volumes = [...restVolumes, updatedCloudInitVolume];
-  });
-
-  return updatedVM;
+  return [...restVolumes, updatedCloudInitVolume];
 };
 
 export type CloudInitUserData = {
   chpasswd?: { expire?: boolean };
-  hostname: string;
+  hostname?: string;
   password: string;
   rh_subscription?: {
     [ACTIVATION_KEY]: string;
