@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FC, useCallback, useState } from 'react';
 import produce from 'immer';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -27,7 +28,7 @@ type NetworkInterfaceActionsProps = {
   template: V1Template;
 };
 
-const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
+const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   nicName,
   nicPresentation,
   template,
@@ -36,7 +37,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const { createModal } = useModal();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const label = t('Delete NIC?');
   const editBtnText = t('Edit');
   const submitBtnText = t('Delete');
@@ -54,7 +55,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
     setIsDropdownOpen(false);
   };
 
-  const onDelete = React.useCallback(async () => {
+  const onDelete = useCallback(async () => {
     const updatedTemplate = produce(template, (draftTemplate) => {
       const vm = getTemplateVirtualMachineObject(draftTemplate);
       vm.spec.template.spec.networks = vm.spec.template.spec.networks.filter(

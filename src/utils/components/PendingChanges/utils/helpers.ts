@@ -34,7 +34,7 @@ import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { getVMIInterfaces, getVMIVolumes } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { PendingChange } from './types';
+import { NICHotPlugPendingChanges, PendingChange } from './types';
 
 export const checkCPUMemoryChanged = (
   vm: V1VirtualMachine,
@@ -190,12 +190,12 @@ export const getSortedNICPendingChanges = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
   history,
-) => {
+): NICHotPlugPendingChanges => {
   const sortedNICs = getSortedNICs(vm, vmi);
   const { hotPlugNICs, nonHotPlugNICs } = sortedNICs;
 
   return {
-    hotPlugPendingChanges: [
+    nicHotPlugPendingChanges: [
       {
         handleAction: () => {
           history.push(getTabURL(vm, VirtualMachineDetailsTab.NetworkInterfaces));
@@ -205,7 +205,7 @@ export const getSortedNICPendingChanges = (
         tabLabel: VirtualMachineDetailsTabLabel.NetworkInterfaces,
       },
     ],
-    nonHotPlugPendingChanges: [
+    nicNonHotPlugPendingChanges: [
       {
         handleAction: () => {
           history.push(getTabURL(vm, VirtualMachineDetailsTab.NetworkInterfaces));
