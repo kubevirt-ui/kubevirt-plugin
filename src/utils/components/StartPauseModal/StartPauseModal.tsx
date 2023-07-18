@@ -3,13 +3,11 @@ import produce from 'immer';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
-
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedStartStrategy } from '../PendingChanges/utils/helpers';
 
 type StartPauseModalProps = {
   headerText: string;
@@ -47,11 +45,7 @@ const StartPauseModal: React.FC<StartPauseModalProps> = ({
       onSubmit={onSubmit}
     >
       <Form>
-        {vmi && (
-          <ModalPendingChangesAlert
-            isChanged={getChangedStartStrategy(updatedVirtualMachine, vmi)}
-          />
-        )}
+        {vmi && <ModalPendingChangesAlert />}
         <FormGroup
           helperText={t(
             'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',

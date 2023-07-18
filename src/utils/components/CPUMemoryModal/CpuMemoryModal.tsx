@@ -2,6 +2,7 @@ import React, { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
@@ -21,9 +22,6 @@ import {
   Title,
   TitleSizes,
 } from '@patternfly/react-core';
-
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { checkCPUMemoryChanged } from '../PendingChanges/utils/helpers';
 
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
 import { getCPUcores, getMemorySize, memorySizesTypes } from './utils/CpuMemoryUtils';
@@ -146,9 +144,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
       title={t('Edit CPU | Memory')}
       variant={ModalVariant.small}
     >
-      {vmi && (
-        <ModalPendingChangesAlert isChanged={checkCPUMemoryChanged(updatedVirtualMachine, vmi)} />
-      )}
+      {vmi && <ModalPendingChangesAlert />}
       <div className="inputs">
         <div className="input-cpu">
           <Title headingLevel="h6" size={TitleSizes.md}>

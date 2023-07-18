@@ -1,12 +1,10 @@
 import React, { ChangeEvent, FC, useMemo, useState } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Form, FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
-
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { checkBootModeChanged } from '../PendingChanges/utils/helpers';
 
 import { bootloaderOptions } from './utils/constants';
 import { BootloaderOptionValue } from './utils/types';
@@ -52,9 +50,7 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
       onSubmit={onSubmit}
     >
       <Form>
-        {vmi && (
-          <ModalPendingChangesAlert isChanged={checkBootModeChanged(updatedVirtualMachine, vmi)} />
-        )}
+        {vmi && <ModalPendingChangesAlert />}
         <FormGroup fieldId="firmware-bootloader" label={t('Boot mode')}>
           <Select
             isOpen={isDropdownOpen}

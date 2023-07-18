@@ -1,27 +1,14 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { PendingChangesAlert } from '../PendingChangesAlert/PendingChangesAlert';
 
-type ModalPendingChangesAlertProps = {
-  isChanged: boolean;
-};
-
-export const ModalPendingChangesAlert: React.FC<ModalPendingChangesAlertProps> = ({
-  isChanged,
-}) => {
+const ModalPendingChangesAlert: FC = () => {
   const { t } = useKubevirtTranslation();
-  const modalMsg = isChanged
-    ? t('The changes you have made require this VirtualMachine to be restarted.')
-    : t(
-        'Changes to the following settings will need to restart the VirtualMachine in order for them to be applied',
-      );
   return (
-    <PendingChangesAlert
-      isWarning={isChanged}
-      title={t('Restart required to apply changes')}
-      warningMsg={modalMsg}
-    />
+    <PendingChangesAlert isWarning title={t('Restart the VirtualMachine to apply changes.')} />
   );
 };
+
+export default ModalPendingChangesAlert;

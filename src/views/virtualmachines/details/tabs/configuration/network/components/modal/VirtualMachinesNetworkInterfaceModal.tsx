@@ -13,8 +13,7 @@ import {
   createNetwork,
   updateVMNetworkInterface,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
-import { ModalPendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedNICs } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { BRIDGED_NIC_HOTPLUG_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
@@ -71,7 +70,7 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
 
   return (
     <NetworkInterfaceModal
-      Header={vmi && <ModalPendingChangesAlert isChanged={getChangedNICs(vm, vmi)?.length > 0} />}
+      Header={vmi && <ModalPendingChangesAlert />}
       headerText={headerText}
       isOpen={isOpen}
       onClose={onClose}

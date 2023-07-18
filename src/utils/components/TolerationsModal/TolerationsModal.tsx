@@ -13,14 +13,12 @@ import {
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTolerations } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { Form, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
-
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedTolerations } from '../PendingChanges/utils/helpers';
 
 import { TolerationLabel } from './utils/constants';
 import { getNodeTaintQualifier } from './utils/helpers';
@@ -99,13 +97,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
       onSubmit={onSubmit}
     >
       <Stack hasGutter>
-        <StackItem>
-          {vmi && (
-            <ModalPendingChangesAlert
-              isChanged={getChangedTolerations(updatedVirtualMachine, vmi)}
-            />
-          )}
-        </StackItem>
+        <StackItem>{vmi && <ModalPendingChangesAlert />}</StackItem>
         <StackItem>
           <TolerationModalDescriptionText />
         </StackItem>

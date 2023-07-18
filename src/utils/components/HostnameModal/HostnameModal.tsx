@@ -2,13 +2,11 @@ import React, { useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
-
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedHostname } from '../PendingChanges/utils/helpers';
 
 type HostnameModalProps = {
   isOpen: boolean;
@@ -38,9 +36,7 @@ const HostnameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit
       onSubmit={onSubmit}
     >
       <Form>
-        {vmi && (
-          <ModalPendingChangesAlert isChanged={getChangedHostname(updatedVirtualMachine, vmi)} />
-        )}
+        {vmi && <ModalPendingChangesAlert />}
         <FormGroup
           fieldId="hostname"
           helperText={t('Please provide hostname.')}

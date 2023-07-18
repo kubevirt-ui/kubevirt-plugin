@@ -2,6 +2,7 @@ import * as React from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
 import {
@@ -11,8 +12,6 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { checkBootOrderChanged } from '../PendingChanges/utils/helpers';
 import TabModal from '../TabModal/TabModal';
 
 import { BootOrderModalBody } from './BootOrderModalBody';
@@ -55,9 +54,7 @@ export const BootOrderModal: React.FC<{
       onClose={onClose}
       onSubmit={() => onSubmit(updatedVirtualMachine)}
     >
-      {vmi && (
-        <ModalPendingChangesAlert isChanged={checkBootOrderChanged(updatedVirtualMachine, vmi)} />
-      )}
+      {vmi && <ModalPendingChangesAlert />}
       <BootOrderModalBody
         changeEditMode={(v) => setIsEditMode(v)}
         devices={devices}

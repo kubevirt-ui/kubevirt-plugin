@@ -2,8 +2,7 @@ import React, { useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { ModalPendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedHeadlessMode } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
@@ -53,11 +52,7 @@ const HardwareDevicesHeadlessModeModal: React.FC<HardwareDevicesHeadlessModeModa
       onSubmit={onSubmit}
     >
       <Form>
-        {vmi && (
-          <ModalPendingChangesAlert
-            isChanged={getChangedHeadlessMode(updatedVirtualMachine, vmi)}
-          />
-        )}
+        {vmi && <ModalPendingChangesAlert />}
         <FormGroup
           helperText={t(
             'Applying the headless mode to this Virtual Machine will cause the VNC not be available if checked.',

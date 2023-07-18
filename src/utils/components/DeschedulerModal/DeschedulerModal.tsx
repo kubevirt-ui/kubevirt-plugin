@@ -2,14 +2,12 @@ import * as React from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, Checkbox, Form, FormGroup } from '@patternfly/react-core';
-
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedDescheduler } from '../PendingChanges/utils/helpers';
 
 type DeschedulerModalProps = {
   isOpen: boolean;
@@ -54,11 +52,7 @@ const DeschedulerModal: React.FC<DeschedulerModalProps> = ({
       onSubmit={onSubmit}
     >
       <Form>
-        {vmi && (
-          <ModalPendingChangesAlert
-            isChanged={getChangedDescheduler(updatedVirtualMachine, vmi, checked)}
-          />
-        )}
+        {vmi && <ModalPendingChangesAlert />}
         <FormGroup fieldId="descheduler">
           <Checkbox
             description={t('Allow the Descheduler to evict the VirtualMachine via live migration')}
