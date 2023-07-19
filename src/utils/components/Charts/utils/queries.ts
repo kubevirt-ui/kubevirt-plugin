@@ -39,7 +39,7 @@ export const getUtilizationQueries: GetUtilizationQueries = ({
   const { name, namespace } = obj?.metadata || {};
   return {
     [VMQueries.CPU_REQUESTED]: `sum(kube_pod_resource_request{resource='cpu',pod='${launcherPodName}',namespace='${namespace}'}) BY (name, namespace)`,
-    [VMQueries.CPU_USAGE]: `sum(rate(container_cpu_usage_seconds_total{pod='${launcherPodName}',namespace='${namespace}',container="compute"}[${duration}])) BY (pod, namespace)`,
+    [VMQueries.CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.FILESYSTEM_READ_USAGE]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.FILESYSTEM_USAGE_TOTAL]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}]) + rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.FILESYSTEM_WRITE_USAGE]: `sum(rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
