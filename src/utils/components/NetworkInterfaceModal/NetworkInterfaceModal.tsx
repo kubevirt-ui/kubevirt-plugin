@@ -83,13 +83,10 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     );
   }, [nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType, onSubmit]);
 
-  console.log('***** interfaceType *****:', interfaceType);
-
+  const isBridgedNIC = interfaceType === interfaceTypeTypes.BRIDGE;
   const vmIsRunning = getVMStatus(vm) === printableVMStatus.Running;
-  const showRestartHeader =
-    !bridgedNICHotPlugEnabled || interfaceType !== interfaceTypeTypes.BRIDGE;
-  const showRestartOrMigrateHeader =
-    bridgedNICHotPlugEnabled && vmIsRunning && interfaceType === interfaceTypeTypes.BRIDGE;
+  const showRestartHeader = !bridgedNICHotPlugEnabled || !isBridgedNIC;
+  const showRestartOrMigrateHeader = bridgedNICHotPlugEnabled && vmIsRunning && isBridgedNIC;
 
   return (
     <TabModal<K8sResourceCommon>

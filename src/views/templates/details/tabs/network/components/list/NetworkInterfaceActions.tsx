@@ -55,7 +55,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
     setIsDropdownOpen(false);
   };
 
-  const onDelete = useCallback(async () => {
+  const onDelete = useCallback(() => {
     const updatedTemplate = produce(template, (draftTemplate) => {
       const vm = getTemplateVirtualMachineObject(draftTemplate);
       vm.spec.template.spec.networks = vm.spec.template.spec.networks.filter(
@@ -65,7 +65,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         vm.spec.template.spec.domain.devices.interfaces.filter(({ name }) => name !== nicName);
     });
 
-    return await k8sUpdate({
+    return k8sUpdate({
       data: updatedTemplate,
       model: TemplateModel,
       name: updatedTemplate?.metadata?.name,

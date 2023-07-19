@@ -22,14 +22,14 @@ const LiveMigratePendingChanges: React.FC<LiveMigratePendingChangesProps> = ({
   if (!showLiveMigrateSection) return null;
 
   return (
-    <span>
+    <>
       {t(
         'The following areas have pending changes that will be applied when this VirtualMachine is live migrated or restarted.',
       )}
       <List>
         <PendingChangesBreadcrumb pendingChanges={nicHotPlugPendingChanges} />
       </List>
-    </span>
+    </>
   );
 };
 

@@ -13,17 +13,15 @@ const PreviewFeaturesPopover: FC = () => {
   return (
     <Popover
       bodyContent={
-        <Stack>
+        <Stack hasGutter>
           <StackItem>
             {t(
               'Preview features are for testing purposes and should not be used in production environments.',
             )}
           </StackItem>
-          <br />
           <p>
             <ExternalLink href={DEV_PREVIEW_LINK} text={t('Developer Preview')} />
           </p>
-          <br />
           <p>
             <ExternalLink href={TECH_PREVIEW_LINK} text={t('Technology Preview')} />
           </p>
