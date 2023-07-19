@@ -18,6 +18,7 @@ import { css } from '@patternfly/react-styles';
 import styles from '@patternfly/react-styles/css/components/Consoles/VncConsole';
 
 import { ConsoleState, WS, WSS } from '../utils/ConsoleConsts';
+import useCopyPasteConsole from '../utils/hooks/useCopyPasteConsole';
 
 import { isShiftKeyRequired } from './utils/util';
 import { VncConsoleProps } from './utils/VncConsoleTypes';
@@ -63,6 +64,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
   const [rfb, setRfb] = useState<any>();
   const [status, setStatus] = useState<ConsoleState>(disconnected);
   const [activeTabKey, setActiveTabKey] = useState<number | string>(0);
+  const pasteText = useCopyPasteConsole();
   const staticRenderLocaitonRef = useRef(null);
   const StaticRenderLocaiton = useMemo(
     () => (
@@ -97,11 +99,11 @@ export const VncConsole: FC<VncConsoleProps> = ({
         rfbInstnce?.addEventListener('connect', () => setStatus(connected));
         rfbInstnce?.addEventListener('disconnect', (e: any) => {
           setStatus(disconnected);
-          onDisconnected && onDisconnected(e);
+          onDisconnected?.(e);
         });
         rfbInstnce?.addEventListener('securityfailure', (e: any) => {
           setStatus(disconnected);
-          onSecurityFailure && onSecurityFailure(e);
+          onSecurityFailure?.(e);
         });
         rfbInstnce.sendCtrlAlt1 = function sendCtrlAlt1() {
           if (this._rfbConnectionState !== connected || this._viewOnly) {
@@ -130,15 +132,13 @@ export const VncConsole: FC<VncConsoleProps> = ({
             return;
           }
           const clipboardText = await navigator?.clipboard?.readText?.();
-
-          [...clipboardText].map((char) => {
+          [...(clipboardText || pasteText.current)].forEach((char) => {
             const shiftRequired = isShiftKeyRequired(char);
 
             shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', true);
             this.sendKey(char.charCodeAt(0));
             shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
           });
-          this.sendKey(KeyTable.XK_KP_Enter);
         };
         rfbInstnce.viewOnly = viewOnly;
         rfbInstnce.scaleViewport = scaleViewport;
@@ -147,6 +147,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
       });
     }
   }, [
+    disabled,
     url,
     options,
     viewOnly,
@@ -154,7 +155,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
     resizeSession,
     onDisconnected,
     onSecurityFailure,
-    disabled,
+    pasteText,
   ]);
 
   useEffect(() => {
@@ -163,7 +164,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
         initLogging(vncLogging);
         autoConnect && connect();
       } catch (e) {
-        onInitFailed && onInitFailed(e);
+        onInitFailed?.(e);
       }
     }
 
