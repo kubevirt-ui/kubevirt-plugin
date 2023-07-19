@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { forwardRef, FunctionComponent, MutableRefObject, Ref, useEffect } from 'react';
 import classNames from 'classnames';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
@@ -10,6 +10,7 @@ import styles from '@patternfly/react-styles/css/components/Consoles/SerialConso
 import stylesVNC from '@patternfly/react-styles/css/components/Consoles/VncConsole';
 
 import { ConsoleState } from '../utils/ConsoleConsts';
+import useCopyPasteConsole from '../utils/hooks/useCopyPasteConsole';
 
 import { SerialConsoleProps } from './utils/serialConsole';
 import { XTerm } from './Xterm/Xterm';
@@ -21,7 +22,7 @@ import './SerialConsole.scss';
 
 const { connected, disconnected, loading } = ConsoleState;
 
-const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
+const SerialConsole: FunctionComponent<SerialConsoleProps> = ({
   cols,
   fontFamily,
   fontSize,
@@ -39,7 +40,9 @@ const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
   textReset,
 }) => {
   const { t } = useKubevirtTranslation();
-  React.useEffect(() => {
+  const pasteText = useCopyPasteConsole();
+
+  useEffect(() => {
     onConnect();
     return () => {
       onDisconnect();
@@ -47,7 +50,7 @@ const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
   }, [onConnect, onDisconnect]);
 
   const focusTerminal = () => {
-    innerRef && innerRef.current && innerRef.current.focusTerminal();
+    innerRef?.current?.focusTerminal();
   };
 
   const onConnectClick = () => {
@@ -69,7 +72,7 @@ const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
   const onClipboardPaste = () => {
     navigator.clipboard
       .readText()
-      .then((clipboardText) => onData(clipboardText.concat(String.fromCharCode(13)))); // concat "Enter" key
+      .then((clipboardText) => onData(clipboardText || pasteText?.current));
   };
 
   let terminal = null;
@@ -131,6 +134,6 @@ const SerialConsole: React.FunctionComponent<SerialConsoleProps> = ({
 
 SerialConsole.displayName = 'SerialConsole';
 
-export default React.forwardRef((props: SerialConsoleProps, ref: React.Ref<HTMLDivElement>) => (
-  <SerialConsole innerRef={ref as React.MutableRefObject<any>} {...props} />
+export default forwardRef((props: SerialConsoleProps, ref: Ref<HTMLDivElement>) => (
+  <SerialConsole innerRef={ref as MutableRefObject<any>} {...props} />
 ));
