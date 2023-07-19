@@ -3,9 +3,9 @@ import React, { FC, useState } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
-import { isEqualObject } from '../NodeSelectorModal/utils/helpers';
 import TabModal from '../TabModal/TabModal';
 
+import useSecretsData from './hooks/useSecretsData';
 import { SSHSecretDetails } from './utils/types';
 import SSHSecretSection from './SSHSecretSection';
 
@@ -32,10 +32,16 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
 
   const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(initialSSHSecretDetails);
 
+  const { isDisabled, secretsData } = useSecretsData(
+    initialSSHSecretDetails,
+    sshDetails,
+    namespace,
+  );
+
   return (
     <TabModal
       headerText={t('Authorized SSH key')}
-      isDisabled={isEqualObject(initialSSHSecretDetails, sshDetails)}
+      isDisabled={isDisabled}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => onSubmit(sshDetails)}
@@ -44,7 +50,7 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
       <SSHSecretSection
         isTemplate={isTemplate}
         isUserTab={isUserTab}
-        namespace={namespace}
+        secretsData={secretsData}
         setSSHDetails={setSSHDetails}
         sshDetails={sshDetails}
       />
