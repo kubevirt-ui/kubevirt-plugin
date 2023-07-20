@@ -1,9 +1,8 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import FilterSelect from '@kubevirt-utils/components/AddBootableVolumeModal/components/FilterSelect/FilterSelect';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretSection/utils/constants';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
@@ -14,37 +13,28 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, Grid, GridItem, Truncate } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-import { ProjectSSHSecretMap } from '../../utils/types';
+import { AuthKeyRow } from '../../utils/types';
 import AddProjectAuthKeyButton from '../AddProjectAuthKeyButton/AddProjectAuthKeyButton';
 
-import '../SSHKeysRow.scss';
+import './SSHAuthKeyRow.scss';
 
-type ProjectSSHKeysRowProps = {
-  authorizedSSHKeys: ProjectSSHSecretMap;
-  handleChangeKeys: (val: any) => void;
-  handleRemoveKey: () => void;
-  projectsWithoutSSHKey: string[];
-  secretProject?: string;
+type SSHAuthKeyRowProps = {
+  isRemoveDisabled: boolean;
+  onAuthKeyChange: (updatedKey: AuthKeyRow) => void;
+  onAuthKeyDelete: (keyToRemove: AuthKeyRow) => void;
+  row: AuthKeyRow;
+  selectableProjects: string[];
 };
 
-const ProjectSSHKeysRow: FC<ProjectSSHKeysRowProps> = ({
-  authorizedSSHKeys,
-  handleChangeKeys,
-  handleRemoveKey,
-  projectsWithoutSSHKey,
-  secretProject,
+const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
+  isRemoveDisabled,
+  onAuthKeyChange,
+  onAuthKeyDelete,
+  row,
+  selectableProjects,
 }) => {
   const { t } = useKubevirtTranslation();
-
-  const [selectedProject, setSelectedProject] = useState(secretProject);
-
-  const secretName = useMemo(
-    () =>
-      !isEmpty(authorizedSSHKeys)
-        ? (authorizedSSHKeys?.[selectedProject] as string)
-        : initialSSHCredentials?.sshSecretName,
-    [authorizedSSHKeys, selectedProject],
-  );
+  const { projectName, secretName } = row;
 
   const onSubmit = useCallback(
     (sshDetails: SSHSecretDetails) => {
@@ -54,10 +44,9 @@ const ProjectSSHKeysRow: FC<ProjectSSHKeysRowProps> = ({
         return Promise.resolve();
       }
 
-      const updatedKeys = { ...authorizedSSHKeys };
       if (secretOption === SecretSelectionOption.none && !isEmpty(secretName)) {
-        delete updatedKeys?.[selectedProject];
-        handleChangeKeys(updatedKeys);
+        const updatedRow = { ...row, secretName: '' };
+        onAuthKeyChange(updatedRow);
         return Promise.resolve();
       }
 
@@ -66,7 +55,8 @@ const ProjectSSHKeysRow: FC<ProjectSSHKeysRowProps> = ({
         secretName !== sshSecretName &&
         !isEmpty(sshSecretName)
       ) {
-        handleChangeKeys({ ...updatedKeys, [selectedProject]: sshDetails?.sshSecretName });
+        const updatedRow = { ...row, secretName: sshSecretName };
+        onAuthKeyChange(updatedRow);
         return Promise.resolve();
       }
 
@@ -75,47 +65,44 @@ const ProjectSSHKeysRow: FC<ProjectSSHKeysRowProps> = ({
         !isEmpty(sshPubKey) &&
         !isEmpty(sshSecretName)
       ) {
-        handleChangeKeys({ ...updatedKeys, [selectedProject]: sshDetails?.sshSecretName });
-        return createSSHSecret(sshPubKey, sshSecretName, selectedProject);
+        const updatedRow = { ...row, secretName: sshSecretName };
+        onAuthKeyChange(updatedRow);
+        return createSSHSecret(sshPubKey, sshSecretName, projectName);
       }
     },
-    [authorizedSSHKeys, secretName, selectedProject, handleChangeKeys],
+    [secretName, row, onAuthKeyChange, projectName],
   );
-
-  const handleRowRemove = () => {
-    handleRemoveKey();
-    if (!isEmpty(authorizedSSHKeys?.[selectedProject])) {
-      const updatedKeys = { ...authorizedSSHKeys };
-      delete updatedKeys?.[selectedProject];
-      handleChangeKeys(updatedKeys);
-    }
-  };
 
   return (
     <Grid className="pf-u-mb-sm">
-      <GridItem className="project-ssh-row__project-name" span={5}>
+      <GridItem className="ssh-auth-row__project-name" span={5}>
         {isEmpty(secretName) ? (
           <FilterSelect
             groupVersionKind={modelToGroupVersionKind(ProjectModel)}
             optionLabelText={t('project...')}
-            options={projectsWithoutSSHKey}
-            selected={selectedProject}
-            setSelected={setSelectedProject}
+            options={selectableProjects}
+            selected={projectName}
+            setSelected={(newProject) => onAuthKeyChange({ ...row, projectName: newProject })}
           />
         ) : (
-          <Truncate content={selectedProject} />
+          <Truncate content={projectName} />
         )}
       </GridItem>
       <GridItem span={1} />
-      <GridItem className="project-ssh-row__edit-button" span={5}>
+      <GridItem className="ssh-auth-row__edit-button" span={5}>
         <AddProjectAuthKeyButton
           onSubmit={onSubmit}
           secretName={secretName}
-          selectedProject={selectedProject}
+          selectedProject={projectName}
         />
       </GridItem>
       <GridItem span={1}>
-        <Button isInline onClick={handleRowRemove} variant="plain">
+        <Button
+          isDisabled={isRemoveDisabled}
+          isInline
+          onClick={() => onAuthKeyDelete(row)}
+          variant="plain"
+        >
           <MinusCircleIcon />
         </Button>
       </GridItem>
@@ -123,4 +110,4 @@ const ProjectSSHKeysRow: FC<ProjectSSHKeysRowProps> = ({
   );
 };
 
-export default ProjectSSHKeysRow;
+export default SSHAuthKeyRow;

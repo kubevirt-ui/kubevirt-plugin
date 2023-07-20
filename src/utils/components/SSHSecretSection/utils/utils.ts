@@ -22,10 +22,12 @@ import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sResourceCommon, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
-const validateSecretNameLength = (secretName: string): boolean => secretName.length <= 51;
+export const validateSecretNameLength = (secretName: string): boolean => secretName.length <= 51;
 
-const validateSecretNameUnique = (secretName: string, secrets: IoK8sApiCoreV1Secret[]): boolean =>
-  isEmpty(secrets?.find((secret) => getName(secret) === secretName));
+export const validateSecretNameUnique = (
+  secretName: string,
+  secrets: IoK8sApiCoreV1Secret[],
+): boolean => isEmpty(secrets?.find((secret) => getName(secret) === secretName));
 
 export const getSecretNameErrorMessage = (
   secretName: string,

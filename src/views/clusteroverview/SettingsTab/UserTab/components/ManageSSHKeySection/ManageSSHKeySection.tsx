@@ -6,7 +6,7 @@ import { Stack } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
-import ProjectSSHKeysList from './ProjectSSHKeysList/ProjectSSHKeysList';
+import SSHAuthKeysList from './SSHAuthKeysList/SSHAuthKeysList';
 
 const ManageSSHKeySection: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -19,7 +19,7 @@ const ManageSSHKeySection: FC = () => {
             'Set the authorized SSH key to automatically apply to any new VirtualMachine you create in the selected project.',
           )}
         />
-        <ProjectSSHKeysList />
+        <SSHAuthKeysList />
       </Stack>
     </ExpandSection>
   );

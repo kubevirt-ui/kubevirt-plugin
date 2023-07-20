@@ -1,6 +1,5 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
-import { modelToGroupVersionKind, SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import SecretDropdown from '@kubevirt-utils/components/SSHSecretSection/components/SecretDropdown/SecretDropdown';
 import SecretSelectionRadioGroup from '@kubevirt-utils/components/SSHSecretSection/components/SecretSelectionRadioGroup';
@@ -9,9 +8,8 @@ import {
   SecretSelectionOption,
   SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, Grid, GridItem } from '@patternfly/react-core';
 
 import './SSHSecretSection.scss';
@@ -19,7 +17,7 @@ import './SSHSecretSection.scss';
 type SSHSecretSectionProps = {
   isTemplate: boolean;
   isUserTab: boolean;
-  namespace: string;
+  secretsData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   sshDetails: SSHSecretDetails;
 };
@@ -27,7 +25,7 @@ type SSHSecretSectionProps = {
 const SSHSecretSection: FC<SSHSecretSectionProps> = ({
   isTemplate,
   isUserTab,
-  namespace,
+  secretsData: [secrets, ...loadedAndErrorData],
   setSSHDetails,
   sshDetails,
 }) => {
@@ -35,14 +33,6 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({
   const [secretSelectionOption, setSecretSelectionOption] = useState<SecretSelectionOption>(
     sshDetails.secretOption,
   );
-
-  const [secrets, ...loadedAndErrorData] = useK8sWatchResource<IoK8sApiCoreV1Secret[]>({
-    groupVersionKind: modelToGroupVersionKind(SecretModel),
-    isList: true,
-    ...(namespace !== ALL_NAMESPACES_SESSION_KEY && {
-      namespace,
-    }),
-  });
 
   return (
     <Grid span={12}>
