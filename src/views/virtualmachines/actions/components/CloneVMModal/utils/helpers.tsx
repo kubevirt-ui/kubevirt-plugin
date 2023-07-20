@@ -155,21 +155,21 @@ export const updateClonedDataVolumes = (
   vm: V1VirtualMachine,
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
 ): V1VirtualMachine => {
+  const cloneSuffix = `-volume-clone-${getRandomChars(5)}`;
+
   const updatedDVT = (getDataVolumeTemplates(vm) || []).map((dvt) =>
     produce(dvt, (dvtDraft) => {
-      dvtDraft.metadata.name = dvt.metadata.name.concat('-volume-clone');
+      dvtDraft.metadata.name = `${dvt.metadata.name}${cloneSuffix}`;
     }),
   );
-
   const vmVolumes = getVolumes(vm) || [];
   const updatedVolumes = vmVolumes.map((volume) =>
     produce(volume, (draftVolume) => {
       if (volume?.dataVolume) {
         const dvName = volume.dataVolume.name;
-        const cloneName = dvName.concat('-volume-clone');
+        const cloneName = `${dvName}${cloneSuffix}`;
         draftVolume.dataVolume.name = cloneName;
-
-        const dataVolumeTemplate = updatedDVT.find((dvt) => dvt.metadata.name === cloneName);
+        const dataVolumeTemplate = updatedDVT.find((dvt) => dvt?.metadata?.name === cloneName);
 
         if (!dataVolumeTemplate) {
           const pvcToClone = (pvcs || []).find((pvc) => pvc?.metadata?.name === dvName);
