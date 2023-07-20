@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useMemo } from 'react';
+import { Trans } from 'react-i18next';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
@@ -7,6 +8,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import AlertScripts from '@kubevirt-utils/components/AlertScripts/AlertScripts';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
@@ -29,6 +31,7 @@ import {
   DescriptionListDescription,
   Divider,
   PageSection,
+  PopoverPosition,
   Stack,
 } from '@patternfly/react-core';
 
@@ -112,6 +115,21 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
                   </div>
                   <SecretNameLabel secretName={secretName} />
                 </Stack>
+              }
+              iconContent={
+                <HelpTextIcon
+                  bodyContent={
+                    <Trans ns="plugin__kubevirt-plugin" t={t}>
+                      Static SSH keys can be added on{' '}
+                      <i>
+                        Overview {'>'} Settings {'>'} User {'>'} Manage SSH keys
+                      </i>
+                      .
+                    </Trans>
+                  }
+                  helpIconClassName="title-help-text-icon"
+                  position={PopoverPosition.right}
+                />
               }
               onEditClick={() =>
                 createModal((modalProps) => (

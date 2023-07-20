@@ -15,6 +15,7 @@ type DescriptionItemHeaderProps = {
   bodyContent: ReactNode;
   breadcrumb?: string;
   descriptionHeader: string;
+  iconContent?: ReactNode;
   isPopover: boolean;
   label?: ReactNode;
   maxWidth?: string;
@@ -25,6 +26,7 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
   bodyContent,
   breadcrumb,
   descriptionHeader,
+  iconContent,
   isPopover,
   label,
   maxWidth,
@@ -66,7 +68,7 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
 
   return (
     <DescriptionListTerm>
-      {descriptionHeader} {label}
+      {descriptionHeader} {iconContent} {label}
     </DescriptionListTerm>
   );
 };
