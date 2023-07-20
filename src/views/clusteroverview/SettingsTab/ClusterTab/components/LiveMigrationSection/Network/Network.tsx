@@ -28,7 +28,7 @@ const Network = ({ hyperConverge }) => {
   const { t } = useKubevirtTranslation();
   const [isSelectOpen, setIsSelectOpen] = useState<boolean>(false);
   const [selectedNetwork, setSelectedNetwork] = useState<string>('');
-  const [nads, nadsLoading, nadsError] = useK8sWatchResource<NetworkAttachmentDefinitionKind[]>({
+  const [nads, nadsLoaded, nadsError] = useK8sWatchResource<NetworkAttachmentDefinitionKind[]>({
     groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
     isList: true,
   });
@@ -45,7 +45,7 @@ const Network = ({ hyperConverge }) => {
       <Title className="live-migration-tab__network--title" headingLevel="h6" size="md">
         {t('Live migration network')}
       </Title>
-      {!isEmpty(nads) && nadsLoading ? (
+      {nadsLoaded ? (
         <Select
           onSelect={(_event: React.ChangeEvent<Element>, selectedValue: string) => {
             setIsSelectOpen(false);
@@ -56,6 +56,7 @@ const Network = ({ hyperConverge }) => {
             );
             setSelectedNetwork(selectedValue);
           }}
+          isDisabled={isEmpty(nads)}
           isGrouped
           isOpen={isSelectOpen}
           onToggle={() => setIsSelectOpen(!isSelectOpen)}
