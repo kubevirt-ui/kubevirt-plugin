@@ -24,7 +24,6 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import { EyeIcon } from '@patternfly/react-icons';
 
 import YamlAndCLIViewerModal from './components/YamlAndCLIViewerModal/YamlAndCLIViewerModal';
 
@@ -160,11 +159,10 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
                     />
                   ))
                 }
-                icon={<EyeIcon />}
                 isDisabled={isEmpty(selectedBootableVolume) || !hasNameAndInstanceType}
                 variant={ButtonVariant.secondary}
               >
-                YAML & CLI
+                {t('View YAML & CLI')}
               </Button>
             </SplitItem>
             <SplitItem>
