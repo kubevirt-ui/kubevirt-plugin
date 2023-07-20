@@ -11,6 +11,7 @@ import FilterSelect from '@kubevirt-utils/components/AddBootableVolumeModal/comp
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { INSTANCE_TYPES_USER_GUIDE_LINK } from '@kubevirt-utils/constants/url-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DEFAULT_INSTANCETYPE_LABEL,
@@ -146,9 +147,7 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
                       'The preferred VirtualMachine attribute values required to run a given workload.',
                     )}{' '}
                     <ExternalLink
-                      href={
-                        'https://kubevirt.io/user-guide/virtual_machines/instancetypes/#virtualmachinepreference'
-                      }
+                      href={`${INSTANCE_TYPES_USER_GUIDE_LINK}#virtualmachinepreference`}
                       text={t('Read more')}
                     />
                   </>

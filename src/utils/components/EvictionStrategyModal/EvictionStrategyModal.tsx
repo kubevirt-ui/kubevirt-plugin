@@ -2,13 +2,11 @@ import * as React from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
-
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedEvictionStrategy } from '../PendingChanges/utils/helpers';
 
 type EvictionStrategyModalProps = {
   headerText: string;
@@ -52,11 +50,7 @@ const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
       onSubmit={onSubmit}
     >
       <Form>
-        {vmi && (
-          <ModalPendingChangesAlert
-            isChanged={getChangedEvictionStrategy(updatedVirtualMachine, vmi, checked)}
-          />
-        )}
+        {vmi && <ModalPendingChangesAlert />}
         <FormGroup
           helperText={t(
             'EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.',

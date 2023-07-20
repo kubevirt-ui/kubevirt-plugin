@@ -48,7 +48,7 @@ import {
   getChangedHeadlessMode,
   getChangedHostDevices,
   getChangedHostname,
-  getChangedNics,
+  getChangedNICs,
   getChangedNodeSelector,
   getChangedStartStrategy,
   getChangedTolerations,
@@ -98,7 +98,7 @@ export const usePendingChanges = (
   const sshServiceChanged = getChangedAuthorizedSSHKey(vm, vmi);
 
   const modifiedEnvDisks = getChangedEnvDisks(vm, vmi);
-  const modifiedNics = getChangedNics(vm, vmi);
+  const modifiedNics = getChangedNICs(vm, vmi);
   const modifiedGPUDevices = getChangedGPUDevices(vm, vmi);
   const modifiedHostDevices = getChangedHostDevices(vm, vmi);
 

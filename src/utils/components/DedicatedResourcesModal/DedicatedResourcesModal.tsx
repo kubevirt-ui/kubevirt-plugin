@@ -5,6 +5,7 @@ import produce from 'immer';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
@@ -21,9 +22,6 @@ import {
   Label,
   Popover,
 } from '@patternfly/react-core';
-
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedDedicatedResources } from '../PendingChanges/utils/helpers';
 
 import { cpuManagerLabel, cpuManagerLabelKey, cpuManagerLabelValue } from './utils/constants';
 
@@ -80,11 +78,7 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
       onSubmit={onSubmit}
     >
       <Form>
-        {vmi && (
-          <ModalPendingChangesAlert
-            isChanged={getChangedDedicatedResources(updatedVirtualMachine, vmi, checked)}
-          />
-        )}
+        {vmi && <ModalPendingChangesAlert />}
         <FormGroup fieldId="dedicated-resources" isInline>
           <Checkbox
             description={

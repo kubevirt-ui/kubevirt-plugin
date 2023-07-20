@@ -7,13 +7,12 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstance,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant, Form, FormGroup, Grid, GridItem } from '@patternfly/react-core';
 import { MinusCircleIcon, PlusCircleIcon } from '@patternfly/react-icons';
 
-import { ModalPendingChangesAlert } from '../../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedGPUDevices, getChangedHostDevices } from '../../PendingChanges/utils/helpers';
 import DeviceNameSelect from '../form/DeviceNameSelect';
 import NameFormField from '../form/NameFormField';
 import useHCPermittedHostDevices from '../hooks/useHCPermittedHostDevices';
@@ -66,16 +65,11 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
         .map((device, deviceIndex) => ({ ...device, deviceIndex })),
     );
   };
-  const getChangedDevices =
-    type === HARDWARE_DEVICE_TYPE.GPUS ? getChangedGPUDevices : getChangedHostDevices;
 
   const updatedVM = produceVMDevices(vm, (vmDraft: V1VirtualMachine) => {
     vmDraft.spec.template.spec.domain.devices[type] = !isEmpty(devices) ? devices : null;
   });
 
-  const hasNewDevices = devices?.some(
-    (device) => !isEmpty(device.name) || !isEmpty(device.deviceName),
-  );
   const disableSubmit =
     !isEmpty(devices) &&
     devices?.some((device) => isEmpty(device.name) || isEmpty(device.deviceName));
@@ -88,11 +82,7 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
       onClose={onClose}
       onSubmit={onSubmit}
     >
-      {vmi && (
-        <ModalPendingChangesAlert
-          isChanged={getChangedDevices(updatedVM, vmi)?.length > 0 && hasNewDevices}
-        />
-      )}
+      {vmi && <ModalPendingChangesAlert />}
       <Form>
         <HardwareDeviceModalDescription type={type} />
         {devices.map(({ deviceIndex, deviceName, name }) => (

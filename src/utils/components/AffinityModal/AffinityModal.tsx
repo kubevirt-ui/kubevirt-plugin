@@ -4,14 +4,12 @@ import produce from 'immer';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAffinity } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ModalVariant } from '@patternfly/react-core';
-
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedAffinity } from '../PendingChanges/utils/helpers';
 
 import AffinityEditModal from './components/AffinityEditModal/AffinityEditModal';
 import AffinityEmptyState from './components/AffinityEmptyState';
@@ -147,9 +145,7 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
       onSubmit={onSubmit}
       submitBtnText={t('Apply rules')}
     >
-      {vmi && (
-        <ModalPendingChangesAlert isChanged={getChangedAffinity(updatedVirtualMachine, vmi)} />
-      )}
+      {vmi && <ModalPendingChangesAlert />}
       {list}
     </TabModal>
   );

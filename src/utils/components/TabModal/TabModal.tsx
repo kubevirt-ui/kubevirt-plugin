@@ -26,7 +26,7 @@ type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   modalVariant?: ModalVariant;
   obj?: T;
   onClose: () => Promise<void> | void;
-  onSubmit: (obj: T) => Promise<T | T[] | void>;
+  onSubmit: (obj: T) => Promise<string | T | T[] | void>;
   positionTop?: boolean;
   submitBtnText?: string;
   submitBtnVariant?: ButtonVariant;

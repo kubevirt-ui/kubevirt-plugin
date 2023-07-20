@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
+import { TECH_PREVIEW_LINK } from '@kubevirt-utils/constants/url-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Text, TextVariants } from '@patternfly/react-core';
 
@@ -18,11 +19,7 @@ const EnableInstanceTypeContent: FC = () => {
         <StackItem>
           <Text component={TextVariants.p}>
             This{' '}
-            <Text
-              component={TextVariants.a}
-              href="https://access.redhat.com/support/offerings/techpreview"
-              target="_blank"
-            >
+            <Text component={TextVariants.a} href={TECH_PREVIEW_LINK} target="_blank">
               Technology Preview feature
             </Text>{' '}
             provides a simple way to create a VirtualMachine. You must have

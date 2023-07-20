@@ -13,13 +13,13 @@ import { Label, Split, SplitItem } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import useVirtualMachineInstanceMigration from '@virtualmachines/actions/hooks/useVirtualMachineInstanceMigration';
+import VirtualMachinePendingChangesAlert from '@virtualmachines/details/VirtualMachinePendingChangesAlert/VirtualMachinePendingChangesAlert';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 
 import VirtualMachineBreadcrumb from '../list/components/VirtualMachineBreadcrumb/VirtualMachineBreadcrumb';
 import { getVMStatusIcon } from '../utils';
 
 import { vmTabsWithYAML } from './utils/constants';
-import VirtualMachinePendingChangesAlert from './VirtualMachinePendingChangesAlert';
 
 type VirtualMachineNavPageTitleProps = {
   name: string;

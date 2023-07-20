@@ -1,12 +1,11 @@
 import React from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
 
 import CloudInitInfoHelper from '../CloudinitDescription/CloudinitInfoHelper';
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedCloudInit } from '../PendingChanges/utils/helpers';
 import TabModal from '../TabModal/TabModal';
 
 import { useCloudInit } from './utils/useCloudInit';
@@ -45,9 +44,7 @@ export const CloudinitModal: React.FC<{
       submitBtnText={t('Apply')}
     >
       <Stack hasGutter>
-        <StackItem>
-          {vmi && <ModalPendingChangesAlert isChanged={getChangedCloudInit(updatedVM, vmi)} />}
-        </StackItem>
+        <StackItem>{vmi && <ModalPendingChangesAlert />}</StackItem>
         <CloudInitInfoHelper />
         <StackItem className="kv-cloudinit--radio">
           <Split hasGutter>

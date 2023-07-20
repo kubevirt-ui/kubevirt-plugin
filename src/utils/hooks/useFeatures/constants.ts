@@ -12,6 +12,7 @@ export const KUBEVIRT_APISERVER_PROXY = 'kubevirtApiserverProxy';
 export const LOAD_BALANCER_ENABLED = 'loadBalancerEnabled';
 export const AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY = 'automaticSubscriptionActivationKey';
 export const AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID = 'automaticSubscriptionOrganizationId';
+export const BRIDGED_NIC_HOTPLUG_ENABLED = 'bridgedNICHotPlugEnabled';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
 const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
@@ -21,6 +22,7 @@ export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
   data: {
     [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
     [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
+    [BRIDGED_NIC_HOTPLUG_ENABLED]: 'false',
     [INSTANCE_TYPE_ENABLED]: 'false',
     [KUBEVIRT_APISERVER_PROXY]: 'true',
     [LOAD_BALANCER_ENABLED]: 'false',

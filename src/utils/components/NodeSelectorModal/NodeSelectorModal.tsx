@@ -4,14 +4,12 @@ import produce from 'immer';
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNodeSelector } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { Form } from '@patternfly/react-core';
-
-import { ModalPendingChangesAlert } from '../PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { getChangedNodeSelector } from '../PendingChanges/utils/helpers';
 
 import LabelsList from './components/LabelList';
 import LabelRow from './components/LabelRow';
@@ -83,11 +81,7 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
       onSubmit={onSubmit}
     >
       <Form>
-        {vmi && (
-          <ModalPendingChangesAlert
-            isChanged={getChangedNodeSelector(updatedVirtualMachine, vmi)}
-          />
-        )}
+        {vmi && <ModalPendingChangesAlert />}
         <LabelsList
           isEmpty={selectorLabels?.length === 0}
           model={!isEmpty(nodes) && NodeModel}

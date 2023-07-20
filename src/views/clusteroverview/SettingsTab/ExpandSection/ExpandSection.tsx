@@ -1,13 +1,19 @@
-import React, { FC, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import { ExpandableSection } from '@patternfly/react-core';
 
 type ExpandSectionProps = {
   className?: string;
-  toggleText: string;
+  toggleContent?: ReactNode;
+  toggleText?: string;
 };
 
-const ExpandSection: FC<ExpandSectionProps> = ({ children, className, toggleText }) => {
+const ExpandSection: FC<ExpandSectionProps> = ({
+  children,
+  className,
+  toggleContent = null,
+  toggleText = '',
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -15,6 +21,7 @@ const ExpandSection: FC<ExpandSectionProps> = ({ children, className, toggleText
       className={className}
       isExpanded={isExpanded}
       onToggle={setIsExpanded}
+      toggleContent={toggleContent}
       toggleText={toggleText}
     >
       {children}
