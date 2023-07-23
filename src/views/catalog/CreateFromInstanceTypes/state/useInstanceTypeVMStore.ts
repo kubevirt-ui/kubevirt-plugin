@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-card/utils/utils';
 
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
@@ -21,7 +22,7 @@ import { instanceTypeActionType } from './utils/types';
 export const useInstanceTypeVMStore = () => {
   const store = useInstanceTypeVMInitialStore();
 
-  const bootableVolumesData = useBootableVolumes();
+  const bootableVolumesData = useBootableVolumes(getOSImagesNS());
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences();
   const [activeNamespace] = useActiveNamespace();
   const [authorizedSSHKeys, , loaded] = useKubevirtUserSettings('ssh');
