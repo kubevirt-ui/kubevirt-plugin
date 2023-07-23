@@ -11,18 +11,21 @@ type UseNADListPermissions = () => NADListPermissionsMap;
 
 const useNADListPermissions: UseNADListPermissions = () => {
   const [canListDefaultNSNads] = useAccessReview({
+    group: NetworkAttachmentDefinitionModel.apiGroup,
     namespace: DEFAULT_NAMESPACE,
     resource: NetworkAttachmentDefinitionModel.plural,
     verb: 'list' as K8sVerb,
   });
 
   const [canListOpenShiftSRIOVNetworkOperatorNamespaceNADs] = useAccessReview({
+    group: NetworkAttachmentDefinitionModel.apiGroup,
     namespace: OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
     resource: NetworkAttachmentDefinitionModel.plural,
     verb: 'list' as K8sVerb,
   });
 
   const [canListOpenShiftMultusNamespaceNADs] = useAccessReview({
+    group: NetworkAttachmentDefinitionModel.apiGroup,
     namespace: OPENSHIFT_MULTUS_NS,
     resource: NetworkAttachmentDefinitionModel.plural,
     verb: 'list' as K8sVerb,
