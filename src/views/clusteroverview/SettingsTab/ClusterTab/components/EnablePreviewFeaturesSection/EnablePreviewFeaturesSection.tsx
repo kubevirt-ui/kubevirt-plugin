@@ -8,7 +8,6 @@ import {
 import {
   BRIDGED_NIC_HOTPLUG_ENABLED,
   INSTANCE_TYPE_ENABLED,
-  KUBEVIRT_APISERVER_PROXY,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem } from '@patternfly/react-core';
@@ -44,13 +43,6 @@ const EnablePreviewFeaturesSection: FC = () => {
             featureName={INSTANCE_TYPE_ENABLED}
             id={INSTANCE_TYPE_ENABLED}
             label={t('Enable create VirtualMachine from InstanceType')}
-          />
-        </StackItem>
-        <StackItem isFilled>
-          <EnableFeatureCheckbox
-            featureName={KUBEVIRT_APISERVER_PROXY}
-            id={KUBEVIRT_APISERVER_PROXY}
-            label={t('Enable Kubevirt proxy')}
           />
         </StackItem>
       </Stack>
