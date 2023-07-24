@@ -77,7 +77,7 @@ const BootableVolumesList: FC<RouteComponentProps<{ ns: string }>> = ({ match })
 
   return (
     <>
-      <ListPageHeader title={t('Bootable resources')}>
+      <ListPageHeader title={t('Bootable volumes')}>
         {(canCreateDS || canCreatePVC) && (
           <ListPageCreateDropdown items={createItems} onClick={onCreate}>
             {t('Add volume')}
