@@ -36,7 +36,7 @@ export const FormActionGroup: React.FC<FormActionGroupProps> = ({ loading, onCan
         type="submit"
         variant="primary"
       >
-        {t('Next')}
+        {t('Customize VirtualMachine parameters')}
       </Button>
       <Button onClick={handleCancel} variant="link">
         {t('Cancel')}
