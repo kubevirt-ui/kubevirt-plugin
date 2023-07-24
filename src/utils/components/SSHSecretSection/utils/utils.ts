@@ -19,6 +19,7 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sResourceCommon, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -68,6 +69,8 @@ export const applyCloudDriveCloudInitVolume = (vm: V1VirtualMachine): V1Volume[]
 };
 
 export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string, isDynamic?: boolean) => {
+  if (isWindows(vm?.spec?.template)) return vm;
+
   return produce(vm, (vmDraft) => {
     vmDraft.spec.template.spec.volumes = applyCloudDriveCloudInitVolume(vm);
     vmDraft.spec.template.spec.accessCredentials = [
@@ -76,7 +79,7 @@ export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string, isDynam
           propagationMethod: getCloudInitPropagationMethod(isDynamic, vm),
           source: {
             secret: {
-              secretName: secretName || `${getName(vm)}-ssh-key`,
+              secretName: secretName?.toString() || `${getName(vm)}-ssh-key`,
             },
           },
         },
