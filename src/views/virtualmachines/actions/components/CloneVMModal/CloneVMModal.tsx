@@ -29,9 +29,8 @@ import { TEMPLATE_VM_NAME_LABEL } from './utils/constants';
 import {
   cloneControllerRevision,
   produceCleanClonedVM,
-  updateClonedDataVolumes,
-  updateClonedPersistentVolumeClaims,
   updateControllerRevisionOwnerReference,
+  updateVolumes,
 } from './utils/helpers';
 
 type CloneVMModalProps = {
@@ -56,8 +55,12 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ isOpen, onClose, vm }) => {
 
   const { loaded, projectNames, pvcs } = useCloneVMResources(vm);
 
-  const clonedVirtualMachine = React.useMemo(() => {
-    const clonedVM = produceCleanClonedVM(vm, (draftVM) => {
+  const onClone = async () => {
+    if (isVMRunning) {
+      await stopVM(vm);
+    }
+
+    const updatedVM = produceCleanClonedVM(vm, (draftVM) => {
       draftVM.metadata.name = cloneName;
       draftVM.metadata.namespace = cloneProject;
       draftVM.metadata.annotations[DESCRIPTION_ANNOTATION] = cloneDescription;
@@ -72,20 +75,8 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ isOpen, onClose, vm }) => {
       if (!draftVM?.spec?.template?.metadata?.labels) draftVM.spec.template.metadata.labels = {};
       draftVM.spec.template.metadata.labels[TEMPLATE_VM_NAME_LABEL] = cloneName;
 
-      // withClonedPVCs
-      updateClonedPersistentVolumeClaims(draftVM, pvcs);
-
-      // withClonedDataVolumes
-      updateClonedDataVolumes(draftVM, pvcs);
+      updateVolumes(draftVM, pvcs);
     });
-
-    return clonedVM;
-  }, [cloneDescription, cloneName, cloneProject, pvcs, startCloneVM, vm]);
-
-  const onClone = async (updatedVM: V1VirtualMachine) => {
-    if (isVMRunning) {
-      await stopVM(vm);
-    }
 
     const [cloneRevisionInstanceType, cloneRevisionPreference] = await Promise.all([
       cloneControllerRevision(
@@ -116,7 +107,7 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ isOpen, onClose, vm }) => {
     <TabModal
       headerText={t('Clone VirtualMachine')}
       isOpen={isOpen}
-      obj={clonedVirtualMachine}
+      obj={vm}
       onClose={onClose}
       onSubmit={onClone}
       submitBtnText={t('Clone')}

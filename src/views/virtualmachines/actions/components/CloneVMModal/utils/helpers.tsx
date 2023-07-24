@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
+import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import ControllerRevisionModel from '@kubevirt-ui/kubevirt-api/console/models/ControllerRevisionModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import {
@@ -9,17 +10,17 @@ import {
   IoK8sApiCoreV1PersistentVolumeClaim,
 } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import {
-  V1beta1StorageSpecVolumeModeEnum,
+  K8sIoApiCoreV1PersistentVolumeClaimSpecVolumeModeEnum,
   V1DataVolumeTemplateSpec,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
-  getDataVolumeTemplates,
-  getDisks,
-  getInterfaces,
-  getVolumes,
-} from '@kubevirt-utils/resources/vm';
+  buildOwnerReference,
+  convertResourceArrayToMap,
+  getName,
+  getNamespace,
+} from '@kubevirt-utils/resources/shared';
+import { getDisks, getInterfaces, getVolumes } from '@kubevirt-utils/resources/vm';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sGet, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
@@ -90,103 +91,77 @@ export const produceCleanClonedVM = (
 const createDataVolumeTemplateFromPVC = (
   pvcToClone: IoK8sApiCoreV1PersistentVolumeClaim,
   dvtName: string,
+  targetNamespace: string,
 ): V1DataVolumeTemplateSpec => {
   return {
     apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
     kind: DataVolumeModel.kind,
     metadata: {
       name: dvtName,
+      namespace: targetNamespace,
     },
     spec: {
-      source: {
-        pvc: {
-          name: pvcToClone?.metadata?.name,
-          namespace: pvcToClone?.metadata?.namespace,
-        },
-      },
-      storage: {
+      pvc: {
         accessModes: pvcToClone?.spec?.accessModes,
+        dataSource: {
+          apiGroup: '',
+          kind: PersistentVolumeClaimModel.kind,
+          name: getName(pvcToClone),
+        },
         resources: {
           requests: {
             storage: pvcToClone?.spec?.resources?.requests?.storage,
           },
         },
         storageClassName: pvcToClone?.spec?.storageClassName,
-        volumeMode: pvcToClone?.spec?.volumeMode as V1beta1StorageSpecVolumeModeEnum,
+        volumeMode: pvcToClone?.spec
+          ?.volumeMode as K8sIoApiCoreV1PersistentVolumeClaimSpecVolumeModeEnum,
       },
     },
   };
 };
 
-export const updateClonedPersistentVolumeClaims = (
-  vm: WritableDraft<V1VirtualMachine>,
-  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
-): V1VirtualMachine => {
-  const pvcVolumes = (getVolumes(vm) || [])?.filter((vol) => vol?.persistentVolumeClaim);
-  (pvcVolumes || [])?.forEach((vol) => {
-    const pvcName = vol?.persistentVolumeClaim?.claimName;
-    delete vol.persistentVolumeClaim;
-
-    const pvcToClone = pvcs?.find((pvc) => getName(pvc) === pvcName);
-    if (pvcToClone) {
-      const clonedDVTemplate = createDataVolumeTemplateFromPVC(
-        pvcToClone,
-        `${getName(vm)}-${vol.name}-${getRandomChars(5)}`,
-      );
-
-      const dataVolumeTemplates = [...getDataVolumeTemplates(vm)];
-
-      if (!isEmpty(dataVolumeTemplates)) {
-        vm.spec.dataVolumeTemplates = dataVolumeTemplates.filter(
-          (dataVolume) =>
-            getName(dataVolume) === getName(clonedDVTemplate) &&
-            getNamespace(dataVolume) === getNamespace(clonedDVTemplate),
-        );
-      } else {
-        vm.spec.dataVolumeTemplates = [];
-      }
-
-      vm.spec.dataVolumeTemplates.push(clonedDVTemplate);
-      vol.dataVolume = {
-        name: getName(clonedDVTemplate),
-      };
-    }
-  });
-  return vm;
-};
-
-export const updateClonedDataVolumes = (
+export const updateVolumes = (
   vm: V1VirtualMachine,
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
-): V1VirtualMachine => {
-  const cloneSuffix = `-volume-clone-${getRandomChars(5)}`;
+) => {
+  const targetNamespace = getNamespace(vm);
+  const cloneSuffix = getRandomChars(5);
+  const pvcMap = convertResourceArrayToMap(pvcs);
+  const volumesToClone: string[] = [];
 
-  const updatedDVT = (getDataVolumeTemplates(vm) || []).map((dvt) =>
-    produce(dvt, (dvtDraft) => {
-      dvtDraft.metadata.name = `${dvt.metadata.name}${cloneSuffix}`;
-    }),
+  const updatedVolumes = (getVolumes(vm) || []).map((vol) => {
+    if (!vol.persistentVolumeClaim && !vol.dataVolume) return vol;
+
+    if (vol.persistentVolumeClaim) {
+      const volumeName = vol.persistentVolumeClaim.claimName;
+      !isEmpty(pvcMap[volumeName]) && volumesToClone.push(volumeName);
+
+      const updatedVol = produce(vol, (draftVolume) => {
+        draftVolume.persistentVolumeClaim.claimName = `${volumeName}-${cloneSuffix}`;
+      });
+
+      return updatedVol;
+    }
+
+    const volumeName = vol.dataVolume.name;
+    !isEmpty(pvcMap[volumeName]) && volumesToClone.push(volumeName);
+
+    return produce(vol, (draftVolume) => {
+      draftVolume.dataVolume.name = `${vol.dataVolume.name}-${cloneSuffix}`;
+    });
+  });
+
+  const updatedDataVolumeTemplates = volumesToClone.map((volumeName) =>
+    createDataVolumeTemplateFromPVC(
+      pvcMap[volumeName],
+      `${volumeName}-${cloneSuffix}`,
+      targetNamespace,
+    ),
   );
-  const vmVolumes = getVolumes(vm) || [];
-  const updatedVolumes = vmVolumes.map((volume) =>
-    produce(volume, (draftVolume) => {
-      if (volume?.dataVolume) {
-        const dvName = volume.dataVolume.name;
-        const cloneName = `${dvName}${cloneSuffix}`;
-        draftVolume.dataVolume.name = cloneName;
-        const dataVolumeTemplate = updatedDVT.find((dvt) => dvt?.metadata?.name === cloneName);
 
-        if (!dataVolumeTemplate) {
-          const pvcToClone = (pvcs || []).find((pvc) => pvc?.metadata?.name === dvName);
-          const newDVT = createDataVolumeTemplateFromPVC(pvcToClone, cloneName);
-          updatedDVT.push(newDVT);
-        }
-      }
-    }),
-  );
-
-  vm.spec.dataVolumeTemplates = updatedDVT;
+  vm.spec.dataVolumeTemplates = updatedDataVolumeTemplates;
   vm.spec.template.spec.volumes = updatedVolumes;
-  return vm;
 };
 
 const getControllerIfExist = async (name: string, ns: string) => {
