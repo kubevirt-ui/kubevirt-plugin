@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { CUSTOMIZE_TEMPLATE_TITLE } from '@catalog/customize/constants';
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -58,13 +59,13 @@ export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ names
             isInline
             variant="link"
           >
-            {t('Customize')}
+            {CUSTOMIZE_TEMPLATE_TITLE}
           </Button>
         </BreadcrumbItem>
-        <BreadcrumbItem>{t('Review')}</BreadcrumbItem>
+        <BreadcrumbItem>{t('Customize VirtualMachine')}</BreadcrumbItem>
       </Breadcrumb>
       <Split hasGutter>
-        <Title headingLevel="h1">{t('Review and create VirtualMachine')}</Title>
+        <Title headingLevel="h1">{t('Customize and create VirtualMachine')}</Title>
         {isSidebarEditorDisplayed && <SidebarEditorSwitch />}
       </Split>
       <Text component={TextVariants.small} data-test="wizard title help">
