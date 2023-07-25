@@ -2,8 +2,9 @@ import React from 'react';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
+import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { DynamicSSHKeyInjection } from '@kubevirt-utils/components/DynamicSSHKeyInjection/DynamicSSHKeyInjection';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import DynamicSSHKeyInjectionHelpTextIcon from '@kubevirt-utils/components/DynamicSSHKeyInjection/DynamicSSHKeyInjectionHelpTextIcon';
 import {
   getCloudInitConfigDrive,
   getCloudInitPropagationMethod,
@@ -11,12 +12,13 @@ import {
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAccessCredentials, getVMSSHSecretName, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { PopoverPosition } from '@patternfly/react-core';
 
 const DynamicSSHKeyInjectionWizard = () => {
   const { updateVM, vm } = useWizardVMContext();
   const hasSSHKey = !isEmpty(getAccessCredentials(vm));
   const secretName = getVMSSHSecretName(vm);
+  const hasDynamicSSHLabel = vm?.metadata?.labels?.[DYNAMIC_CREDENTIALS_SUPPORT];
+  const isDisabled = (!hasSSHKey && !secretName) || !hasDynamicSSHLabel;
 
   const onSubmit = (checked: boolean) => {
     updateVM((vmDraft) => {
@@ -41,22 +43,8 @@ const DynamicSSHKeyInjectionWizard = () => {
 
   return (
     <WizardDescriptionItem
-      description={
-        <DynamicSSHKeyInjection
-          isDisabled={!hasSSHKey && !secretName}
-          onSubmit={onSubmit}
-          vm={vm}
-        />
-      }
-      helpTextIcon={
-        <HelpTextIcon
-          bodyContent={t(
-            'If set, SSH keys can be modified while the VM is running. If not set, the setting will depend on what is set during the first boot',
-          )}
-          className="dynamic-ssh-key"
-          position={PopoverPosition.right}
-        />
-      }
+      description={<DynamicSSHKeyInjection isDisabled={isDisabled} onSubmit={onSubmit} vm={vm} />}
+      helpTextIcon={<DynamicSSHKeyInjectionHelpTextIcon isDisabled={isDisabled} />}
       testId="wizard-dynamic-ssh-key-injection"
       title={t('Dynamic SSH key injection')}
     />
