@@ -1,6 +1,3 @@
-import { murmur3 } from 'murmurhash-js';
-
-import { MONITORING_SALT } from '@kubevirt-utils/constants/prometheus';
 import { Group, PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
 import { generateAlertId } from '@kubevirt-utils/utils/prometheus';
 import {
@@ -15,8 +12,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 export const addAlertIdToRule = (group: Group, rule: PrometheusRule): Rule => {
-  const key = generateAlertId(group, rule);
-  return { ...rule, id: String(murmur3(key, MONITORING_SALT)) };
+  return { ...rule, id: generateAlertId(group, rule) };
 };
 
 export const getAlertsAndRules = (
