@@ -30,6 +30,7 @@ import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import { WizardDescriptionItem } from '../../../components/WizardDescriptionItem';
 
+import VMNameModal from './VMNameModal/VMNameModal';
 import { WizardOverviewDisksTable } from './WizardOverviewDisksTable/WizardOverviewDisksTable';
 import { WizardOverviewNetworksTable } from './WizardOverviewNetworksTable/WizardOverviewNetworksTable';
 
@@ -74,8 +75,14 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
       <GridItem rowSpan={4} span={6}>
         <DescriptionList>
           <WizardDescriptionItem
+            onEditClick={() =>
+              createModal((modalProps) => (
+                <VMNameModal {...modalProps} onSubmit={updateVM} vm={vm} />
+              ))
+            }
             description={vm.metadata.name}
             helperPopover={{ content: t('Name of the VirtualMachine'), header: t('Name') }}
+            isEdit
             testId="wizard-overview-name"
             title={t('Name')}
           />
