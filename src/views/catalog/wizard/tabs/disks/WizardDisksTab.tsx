@@ -40,9 +40,6 @@ const WizardDisksTab: WizardTab = ({ loaded, tabsData, updateTabsData, updateVM,
           pathsToHighlight={PATHS_TO_HIGHLIGHT.DISKS_TAB}
           resource={vm}
         >
-          <Flex className="wizard-disk-tab__flex">
-            {t('The following information is provided by the OpenShift Virtualization operator.')}
-          </Flex>
           <ListPageCreateButton
             onClick={() =>
               createModal(({ isOpen, onClose }) => (
@@ -67,7 +64,7 @@ const WizardDisksTab: WizardTab = ({ loaded, tabsData, updateTabsData, updateVM,
                 />
               ))
             }
-            className="wizard-disk-tab__list-page-create-button"
+            className="list-page-create-button-margin"
             isDisabled={!loaded}
           >
             {t('Add disk')}
