@@ -990,7 +990,6 @@
   "Start this VirtualMachine in pause mode": "Start this VirtualMachine in pause mode",
   "Start VirtualMachine": "Start VirtualMachine",
   "Start VirtualMachine on clone": "Start VirtualMachine on clone",
-  "Static SSH keys can be added on <2>Overview > Settings > User > Manage SSH keys</2>.": "Static SSH keys can be added on <2>Overview > Settings > User > Manage SSH keys</2>.",
   "Status": "Status",
   "Status conditions": "Status conditions",
   "Stop": "Stop",
