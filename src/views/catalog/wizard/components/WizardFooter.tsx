@@ -5,7 +5,7 @@ import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailabl
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   Alert,
   Button,
@@ -29,6 +29,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
     loaded: vmContextLoaded,
     tabsData,
     updateTabsData,
+    vm,
   } = useWizardVMContext();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVmCreate();
@@ -114,13 +115,15 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
                   if (confirm(t('Are you sure you want to go back?'))) {
                     clearSessionStorageVM();
                     history.push(
-                      `/k8s/ns/${namespace}/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
+                      `/k8s/ns/${namespace}/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}&defaultSourceExists=${isBootSourceAvailable}&vmName=${getName(
+                        vm,
+                      )}`,
                     );
                   }
                 }}
                 variant="secondary"
               >
-                {t('Back')}
+                {t('Reset')}
               </Button>
             </SplitItem>
 
