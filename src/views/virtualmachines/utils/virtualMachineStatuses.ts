@@ -1,7 +1,7 @@
 import * as React from 'react';
 
+import { ErrorIcon } from '@kubevirt-utils/components/ErrorIcon/ErrorIcon';
 import {
-  ExclamationCircleIcon,
   HourglassHalfIcon,
   InProgressIcon,
   MigrationIcon,
@@ -56,7 +56,7 @@ export const getVMStatusIcon = (status: string): React.ComponentClass | React.FC
     case printableVMStatus.Migrating:
       return MigrationIcon;
     case errorPrintableVMStatus[status]:
-      return ExclamationCircleIcon;
+      return ErrorIcon;
     default:
       return UnknownIcon;
   }
