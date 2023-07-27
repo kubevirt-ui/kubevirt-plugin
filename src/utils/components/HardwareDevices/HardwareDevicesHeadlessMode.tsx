@@ -1,40 +1,49 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { Trans } from 'react-i18next';
+import produce from 'immer';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   Breadcrumb,
   BreadcrumbItem,
-  Button,
-  ButtonVariant,
   DescriptionListDescription,
   DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
   Flex,
   FlexItem,
   Popover,
+  Switch,
 } from '@patternfly/react-core';
-import { PencilAltIcon } from '@patternfly/react-icons';
-
-import { useModal } from '../ModalProvider/ModalProvider';
-
-import HardwareDevicesHeadlessModeModal from './modal/HardwareDevicesHeadlessModeModal';
 
 type HardwareDevicesHeadlessModeProps = {
   onSubmit: (vm: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
 };
-
-const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({
-  onSubmit,
-  vm,
-  vmi,
-}) => {
+const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({ onSubmit, vm }) => {
   const { t } = useKubevirtTranslation();
-  const { createModal } = useModal();
+
   const devices = vm?.spec?.template?.spec?.domain?.devices;
+  const [isChecked, setIsChecked] = useState<boolean>(
+    devices?.hasOwnProperty('autoattachGraphicsDevice') && !devices?.autoattachGraphicsDevice,
+  );
+
+  const updateHeadlessMode = (checked: boolean) => {
+    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
+      if (vm) {
+        ensurePath(vmDraft, ['spec.template.spec.domain.devices']);
+        if (checked) {
+          vmDraft.spec.template.spec.domain.devices.autoattachGraphicsDevice = !checked;
+          return vmDraft;
+        }
+        delete vmDraft.spec.template.spec.domain.devices.autoattachGraphicsDevice;
+        return vmDraft;
+      }
+    });
+    return onSubmit(updatedVM);
+  };
+
   return (
     <>
       <DescriptionListTermHelpText>
@@ -62,40 +71,20 @@ const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({
         </Popover>
       </DescriptionListTermHelpText>
       <DescriptionListDescription>
-        <Button
-          onClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <HardwareDevicesHeadlessModeModal
-                isOpen={isOpen}
-                onClose={onClose}
-                onSubmit={onSubmit}
-                vm={vm}
-                vmi={vmi}
-              />
-            ))
-          }
-          data-test-id={'hardware-devices-headless-mode'}
-          isInline
-          type="button"
-          variant={ButtonVariant.link}
-        >
-          <Flex spaceItems={{ default: 'spaceItemsNone' }}>
-            <FlexItem>
-              {t(
-                devices?.hasOwnProperty('autoattachGraphicsDevice') &&
-                  !devices?.autoattachGraphicsDevice
-                  ? 'ON'
-                  : 'OFF',
-              )}
-            </FlexItem>
-            <FlexItem>
-              <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-            </FlexItem>
-          </Flex>
-        </Button>
+        <Flex spaceItems={{ default: 'spaceItemsNone' }}>
+          <FlexItem>
+            <Switch
+              onChange={(checked) => {
+                setIsChecked(checked);
+                updateHeadlessMode(checked);
+              }}
+              id="headless-mode"
+              isChecked={isChecked}
+            />
+          </FlexItem>
+        </Flex>
       </DescriptionListDescription>
     </>
   );
 };
-
 export default HardwareDevicesHeadlessMode;

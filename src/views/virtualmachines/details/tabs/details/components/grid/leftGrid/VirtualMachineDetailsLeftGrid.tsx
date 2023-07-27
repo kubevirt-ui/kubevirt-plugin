@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import produce from 'immer';
 
@@ -17,7 +17,6 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
-import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -39,7 +38,8 @@ import {
   ResourceLink,
   useAccessReview,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { DescriptionList, GridItem } from '@patternfly/react-core';
+import { DescriptionList, GridItem, Switch } from '@patternfly/react-core';
+import { printableVMStatus } from '@virtualmachines/utils';
 
 import VirtualMachineAnnotations from '../../VirtualMachineAnnotations/VirtualMachineAnnotations';
 import VirtualMachineLabels from '../../VirtualMachineLabels/VirtualMachineLabels';
@@ -60,6 +60,7 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(vm);
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
+  const [isChecked, setIsChecked] = useState<boolean>(!!vm?.spec?.template?.spec?.startStrategy);
 
   const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
@@ -71,6 +72,13 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
       }),
     [],
   );
+  const updateStartStrategy = (checked: boolean) => {
+    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
+      ensurePath(vmDraft, ['spec.template.spec']);
+      vmDraft.spec.template.spec.startStrategy = checked ? printableVMStatus.Paused : null;
+    });
+    onSubmit(updatedVM);
+  };
 
   const updateDescription = (updatedDescription) => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
@@ -277,22 +285,22 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
           isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
-          onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <StartPauseModal
-                headerText={t('Start in pause mode')}
-                isOpen={isOpen}
-                onClose={onClose}
-                onSubmit={onSubmit}
-                vm={vm}
-                vmi={vmi}
-              />
-            ))
+          bodyContent={t(
+            'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
+          )}
+          descriptionData={
+            <Switch
+              onChange={(checked) => {
+                setIsChecked(checked);
+                updateStartStrategy(checked);
+              }}
+              id="start-in-pause-mode"
+              isChecked={isChecked}
+            />
           }
           data-test-id="start-pause-mode"
-          descriptionData={vm?.spec?.template?.spec?.startStrategy ? t('ON') : t('OFF')}
           descriptionHeader={t('Start in pause mode')}
-          isEdit={canUpdateVM}
+          isPopover
         />
         <VirtualMachineDescriptionItem
           descriptionData={

@@ -6,13 +6,10 @@ import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
-import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
-import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
@@ -39,10 +36,6 @@ const WizardSchedulingGrid: React.FC<WizardSchedulingGridProps> = ({ updateVM, v
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
-
-  const isDeschedulerInstalled = useDeschedulerInstalled();
-  const isAdmin = useIsAdmin();
-  const isDeschedulerEditable = isAdmin && isDeschedulerInstalled;
 
   return (
     <Grid className="wizard-scheduling-tab__grid" hasGutter>
@@ -106,13 +99,7 @@ const WizardSchedulingGrid: React.FC<WizardSchedulingGridProps> = ({ updateVM, v
           />
 
           <WizardDescriptionItem
-            onEditClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <DeschedulerModal isOpen={isOpen} onClose={onClose} onSubmit={updateVM} vm={vm} />
-              ))
-            }
             description={<Descheduler vm={vm} />}
-            isEdit={isDeschedulerEditable}
             testId="descheduler"
             title={t('Descheduler')}
           />

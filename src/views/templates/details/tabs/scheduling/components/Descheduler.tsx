@@ -1,12 +1,15 @@
 import React from 'react';
+import produce from 'immer';
 import { DESCHEDULER_URL } from 'src/views/templates/utils/constants';
 import { isDeschedulerOn } from 'src/views/templates/utils/utils';
 
-import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   DescriptionListDescription,
@@ -14,22 +17,36 @@ import {
   DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
   Popover,
-  Tooltip,
+  Switch,
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
-import DeschedulerModalButton from './DeschedulerModalButton';
-
 type DeschedulerProps = {
+  onSubmit?: (updatedTemplate: V1Template) => Promise<V1Template | void>;
   template: V1Template;
 };
 
-const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
+const Descheduler: React.FC<DeschedulerProps> = ({ onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
   const isDeschedulerInstalled = useDeschedulerInstalled();
   const isAdmin = useIsAdmin();
-  const isEditable = isAdmin && isDeschedulerInstalled;
+  const [isChecked, setIsChecked] = React.useState<boolean>(isDeschedulerOn(template));
+  const isDeschedulerEnabled = isAdmin && isDeschedulerInstalled;
 
+  const updatedDeschedulerTemplate = (checked: boolean) => {
+    return produce<V1Template>(template, (draft: V1Template) => {
+      const draftVM = getTemplateVirtualMachineObject(draft);
+      ensurePath(draftVM, 'spec.template.metadata.annotations');
+      if (!draftVM.spec.template.metadata.annotations)
+        draftVM.spec.template.metadata.annotations = {};
+      if (checked) {
+        draftVM.spec.template.metadata.annotations[DESCHEDULER_EVICT_LABEL] = 'true';
+      } else {
+        delete draftVM.spec.template.metadata.annotations[DESCHEDULER_EVICT_LABEL];
+      }
+      onSubmit(draft);
+    });
+  };
   return (
     <DescriptionListGroup>
       <DescriptionListTermHelpText>
@@ -63,18 +80,15 @@ const Descheduler: React.FC<DeschedulerProps> = ({ template }) => {
       </DescriptionListTermHelpText>
 
       <DescriptionListDescription>
-        {isAdmin && !isDeschedulerInstalled ? (
-          <Tooltip
-            content={t(
-              'To enable the Descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more Descheduler profiles.',
-            )}
-            position="right"
-          >
-            <MutedTextSpan text={isDeschedulerOn(template) ? t('ON') : t('OFF')} />
-          </Tooltip>
-        ) : (
-          <DeschedulerModalButton editable={isEditable} template={template} />
-        )}
+        <Switch
+          onChange={(checked) => {
+            setIsChecked(checked);
+            updatedDeschedulerTemplate(checked);
+          }}
+          id="descheduler-switch"
+          isChecked={isChecked}
+          isDisabled={!isDeschedulerEnabled}
+        />
       </DescriptionListDescription>
     </DescriptionListGroup>
   );
