@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
@@ -13,7 +13,6 @@ import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBoo
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -26,7 +25,8 @@ import {
   VM_WORKLOAD_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
+import { DescriptionList, Grid, GridItem, Switch } from '@patternfly/react-core';
+import { printableVMStatus } from '@virtualmachines/utils';
 
 import { WizardDescriptionItem } from '../../../components/WizardDescriptionItem';
 
@@ -44,7 +44,6 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-
   const { cpuCount, memory } = getVmCPUMemory(vm);
   const description = getAnnotation(vm, 'description');
   const workloadAnnotation = getWorkload(vm);
@@ -59,6 +58,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   const hostDevicesCount = getHostDevices(vm)?.length || 0;
   const gpusCount = getGPUDevices(vm)?.length || 0;
   const nDevices = hostDevicesCount + gpusCount;
+  const [isChecked, setIsChecked] = useState<boolean>(!!startStrategy);
 
   const updateWorkload = (newWorkload: string) => {
     return updateVM((draftVM) => {
@@ -66,6 +66,12 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
         draftVM.spec.template.metadata.annotations = {};
 
       draftVM.spec.template.metadata.annotations[VM_WORKLOAD_ANNOTATION] = newWorkload;
+    });
+  };
+
+  const updateStartStrategy = (checked: boolean) => {
+    return updateVM((vmDraft) => {
+      vmDraft.spec.template.spec.startStrategy = checked ? printableVMStatus.Paused : null;
     });
   };
 
@@ -181,19 +187,22 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
           />
 
           <WizardDescriptionItem
-            onEditClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <StartPauseModal
-                  headerText={t('Start in pause mode')}
-                  isOpen={isOpen}
-                  onClose={onClose}
-                  onSubmit={updateVM}
-                  vm={vm}
-                />
-              ))
+            description={
+              <Switch
+                onChange={(checked) => {
+                  setIsChecked(checked);
+                  updateStartStrategy(checked);
+                }}
+                id="start-in-pause-mode"
+                isChecked={isChecked}
+              />
             }
-            description={startStrategy ? t('ON') : t('OFF')}
-            isEdit
+            helperPopover={{
+              content: t(
+                'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
+              ),
+              header: t('Start in pause mode'),
+            }}
             testId="start-in-pause-mode"
             title={t('Start in pause mode')}
           />

@@ -34,7 +34,7 @@ const TemplateSchedulingLeftGrid: React.FC<TemplateSchedulingGridProps> = ({
       <NodeSelector editable={editable} onSubmit={onSubmit} template={template} />
       <Tolerations editable={editable} onSubmit={onSubmit} template={template} />
       <AffinityRules editable={editable} onSubmit={onSubmit} template={template} />
-      <Descheduler template={template} />
+      <Descheduler onSubmit={onSubmit} template={template} />
     </DescriptionList>
   );
 };

@@ -97,7 +97,7 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
       </DescriptionListGroup>
       {canEdit && !hideEdit && (
         <DescriptionListGroup>
-          <HardwareDevicesHeadlessMode onSubmit={onSubmit} vm={vm} vmi={vmi} />
+          <HardwareDevicesHeadlessMode onSubmit={onSubmit} vm={vm} />
         </DescriptionListGroup>
       )}
     </DescriptionList>

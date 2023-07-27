@@ -1082,7 +1082,6 @@
   "Time range": "Time range",
   "Time zone": "Time zone",
   "To edit this template, contact your administrator.": "To edit this template, contact your administrator.",
-  "To enable the Descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more Descheduler profiles.": "To enable the Descheduler, you must install the Kube Descheduler Operator from OperatorHub and enable one or more Descheduler profiles.",
   "To gain unlimited bandwidth, set to 0": "To gain unlimited bandwidth, set to 0",
   "To see the vCPU metric, you must set the schedstats=enable kernel argument in the MachineConfig object.": "To see the vCPU metric, you must set the schedstats=enable kernel argument in the MachineConfig object.",
   "Today": "Today",
