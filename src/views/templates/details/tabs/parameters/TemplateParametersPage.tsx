@@ -6,6 +6,7 @@ import { TemplateModel, TemplateParameter, V1Template } from '@kubevirt-ui/kubev
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionGroup,
@@ -13,6 +14,7 @@ import {
   AlertVariant,
   Button,
   Divider,
+  EmptyState,
   Form,
   PageSection,
   Title,
@@ -32,16 +34,22 @@ type TemplateParametersPageProps = RouteComponentProps<{
 };
 
 const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template }) => {
+  const { t } = useKubevirtTranslation();
   const [editableTemplate, setEditableTemplate] = useImmer(template);
 
-  useEffect(() => setEditableTemplate(template), [setEditableTemplate, template]);
-
-  const { t } = useKubevirtTranslation();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const history = useHistory();
   const [error, setError] = useState();
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => setEditableTemplate(template), [setEditableTemplate, template]);
+  const goBack = useCallback(() => {
+    history.goBack();
+  }, [history]);
+
+  if (isEmpty(editableTemplate?.parameters))
+    return <EmptyState>{t('No parameters found in this template.')}</EmptyState>;
 
   const onParameterChange = (parameter: TemplateParameter) => {
     setEditableTemplate(({ parameters: draftParameters }) => {
@@ -53,10 +61,6 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
   const parameters = editableTemplate.parameters;
 
   const isSaveDisabled = isEqualObject(template.parameters, parameters);
-
-  const goBack = useCallback(() => {
-    history.goBack();
-  }, [history]);
 
   const onSave: MouseEventHandler<HTMLButtonElement> = async (event) => {
     event.preventDefault();
