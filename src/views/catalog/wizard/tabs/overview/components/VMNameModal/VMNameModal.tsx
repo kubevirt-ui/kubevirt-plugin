@@ -40,7 +40,7 @@ const VMNameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, 
           helperTextInvalid={isEmpty(vmName) && t('VirtualMachine name can not be empty.')}
           isRequired
           label={t('VirtualMachine name')}
-          validated={isEmpty(vmName) ? ValidatedOptions.default : ValidatedOptions.error}
+          validated={!isEmpty(vmName) ? ValidatedOptions.default : ValidatedOptions.error}
         >
           <TextInput id="hostname" onChange={setVMName} type="text" value={vmName} />
         </FormGroup>
