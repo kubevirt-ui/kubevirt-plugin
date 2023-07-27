@@ -2,18 +2,13 @@ import React from 'react';
 import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
-import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import ControllerRevisionModel from '@kubevirt-ui/kubevirt-api/console/models/ControllerRevisionModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import {
   IoK8sApiAppsV1ControllerRevision,
   IoK8sApiCoreV1PersistentVolumeClaim,
 } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import {
-  K8sIoApiCoreV1PersistentVolumeClaimSpecVolumeModeEnum,
-  V1DataVolumeTemplateSpec,
-  V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   buildOwnerReference,
   convertResourceArrayToMap,
@@ -101,21 +96,14 @@ const createDataVolumeTemplateFromPVC = (
       namespace: targetNamespace,
     },
     spec: {
-      pvc: {
-        accessModes: pvcToClone?.spec?.accessModes,
-        dataSource: {
-          apiGroup: '',
-          kind: PersistentVolumeClaimModel.kind,
+      source: {
+        pvc: {
           name: getName(pvcToClone),
+          namespace: getNamespace(pvcToClone),
         },
-        resources: {
-          requests: {
-            storage: pvcToClone?.spec?.resources?.requests?.storage,
-          },
-        },
-        storageClassName: pvcToClone?.spec?.storageClassName,
-        volumeMode: pvcToClone?.spec
-          ?.volumeMode as K8sIoApiCoreV1PersistentVolumeClaimSpecVolumeModeEnum,
+      },
+      storage: {
+        resources: { requests: { storage: pvcToClone?.spec?.resources?.requests?.storage } },
       },
     },
   };
