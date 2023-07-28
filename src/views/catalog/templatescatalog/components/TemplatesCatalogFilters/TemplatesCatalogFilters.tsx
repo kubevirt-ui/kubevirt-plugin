@@ -1,6 +1,7 @@
 import React, { FC, memo } from 'react';
 
 import { CATALOG_FILTERS } from '@catalog/templatescatalog/utils/consts';
+import { TemplateFilters } from '@catalog/templatescatalog/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   OS_NAME_LABELS,
@@ -11,7 +12,6 @@ import {
 import { VerticalTabs, VerticalTabsTab } from '@patternfly/react-catalog-view-extension';
 import { FilterSidePanel } from '@patternfly/react-catalog-view-extension/dist/esm/components/FilterSidePanel';
 
-import { TemplateFilters } from '../../hooks/useVmTemplatesFilters';
 import { TemplatesCatalogProjectsDropdown } from '../TemplatesCatalogProjectsDropdown/TemplatesCatalogProjectsDropdown';
 
 import { TemplatesCatalogFiltersGroup } from './TemplatesCatalogFiltersGroup';
@@ -31,7 +31,7 @@ export const TemplatesCatalogFilters: FC<{
 
       <VerticalTabs>
         <VerticalTabsTab
-          active={!filters?.onlyDefault}
+          active={!filters?.onlyDefault && !filters?.onlyUser}
           data-test-id="catalog-template-filter-all-items"
           id={'all-templates'}
           onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_DEFAULT, false)}
@@ -43,6 +43,12 @@ export const TemplatesCatalogFilters: FC<{
           id={'default-templates'}
           onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_DEFAULT, true)}
           title={t('Default templates')}
+        />
+        <VerticalTabsTab
+          active={filters?.onlyUser}
+          id={'user-templates'}
+          onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_USER, true)}
+          title={t('User templates')}
         />
       </VerticalTabs>
       <FilterSidePanel className="co-catalog-page__tabs" id="vm-catalog-filter-panel">

@@ -1,18 +1,9 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 
 import { CATALOG_FILTERS } from '../utils/consts';
-
-export type TemplateFilters = {
-  [CATALOG_FILTERS.IS_LIST]: boolean;
-  [CATALOG_FILTERS.NAMESPACE]: string;
-  [CATALOG_FILTERS.ONLY_AVAILABLE]: boolean;
-  [CATALOG_FILTERS.ONLY_DEFAULT]: boolean;
-  [CATALOG_FILTERS.OS_NAME]: Set<string>;
-  [CATALOG_FILTERS.QUERY]: string;
-  [CATALOG_FILTERS.WORKLOAD]: Set<string>;
-};
+import { TemplateFilters } from '../utils/types';
 
 export const useTemplatesFilters = (): [
   TemplateFilters,
@@ -22,11 +13,12 @@ export const useTemplatesFilters = (): [
   const { appendParam, deleteParam, params, setParam } = useURLParams();
   const onlyDefaultParam = params.get(CATALOG_FILTERS.ONLY_DEFAULT);
 
-  const [filters, setFilters] = React.useState<TemplateFilters>({
+  const [filters, setFilters] = useState<TemplateFilters>({
     [CATALOG_FILTERS.IS_LIST]: params.get(CATALOG_FILTERS.IS_LIST) === 'true',
     [CATALOG_FILTERS.NAMESPACE]: params.get(CATALOG_FILTERS.NAMESPACE) || '',
     [CATALOG_FILTERS.ONLY_AVAILABLE]: params.get(CATALOG_FILTERS.ONLY_AVAILABLE) === 'true',
-    [CATALOG_FILTERS.ONLY_DEFAULT]: true,
+    [CATALOG_FILTERS.ONLY_DEFAULT]: !!params.get(CATALOG_FILTERS.ONLY_DEFAULT),
+    [CATALOG_FILTERS.ONLY_USER]: !!params.get(CATALOG_FILTERS.ONLY_USER),
     [CATALOG_FILTERS.OS_NAME]: new Set([...params.getAll(CATALOG_FILTERS.OS_NAME)]),
     [CATALOG_FILTERS.QUERY]: params.get(CATALOG_FILTERS.QUERY) || '',
     [CATALOG_FILTERS.WORKLOAD]: new Set([...params.getAll(CATALOG_FILTERS.WORKLOAD)]),
@@ -38,16 +30,34 @@ export const useTemplatesFilters = (): [
       [type]: value,
     }));
 
+  const updateFilterAndSetParam = (type: CATALOG_FILTERS, value: boolean | string) => {
+    updateFilter(type, value);
+    setParam(type, value.toString());
+  };
+
   const onFilterChange = (type: CATALOG_FILTERS, value: any) => {
     switch (type) {
       case CATALOG_FILTERS.ONLY_DEFAULT:
+        {
+          updateFilterAndSetParam(type, value);
+
+          updateFilter(CATALOG_FILTERS.ONLY_USER, false);
+          deleteParam(CATALOG_FILTERS.ONLY_USER);
+        }
+        break;
       case CATALOG_FILTERS.ONLY_AVAILABLE:
       case CATALOG_FILTERS.IS_LIST:
       case CATALOG_FILTERS.NAMESPACE:
       case CATALOG_FILTERS.QUERY:
+        updateFilterAndSetParam(type, value);
+        break;
+
+      case CATALOG_FILTERS.ONLY_USER:
         {
-          updateFilter(type, value);
-          setParam(type, value.toString());
+          updateFilterAndSetParam(type, value);
+
+          updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, false);
+          deleteParam(CATALOG_FILTERS.ONLY_DEFAULT);
         }
         break;
 
@@ -75,6 +85,7 @@ export const useTemplatesFilters = (): [
       [CATALOG_FILTERS.NAMESPACE]: '',
       [CATALOG_FILTERS.ONLY_AVAILABLE]: false,
       [CATALOG_FILTERS.ONLY_DEFAULT]: true,
+      [CATALOG_FILTERS.ONLY_USER]: false,
       [CATALOG_FILTERS.OS_NAME]: new Set(),
       [CATALOG_FILTERS.QUERY]: '',
       [CATALOG_FILTERS.WORKLOAD]: new Set(),
@@ -84,13 +95,8 @@ export const useTemplatesFilters = (): [
     });
   };
 
-  React.useEffect(() => {
-    if (onlyDefaultParam) {
-      updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, onlyDefaultParam === 'true');
-    } else {
-      updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    onlyDefaultParam && updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, onlyDefaultParam === 'true');
   }, [onlyDefaultParam]);
 
   return [filters, onFilterChange, clearAll];

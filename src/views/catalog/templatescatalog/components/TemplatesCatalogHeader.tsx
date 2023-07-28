@@ -11,8 +11,8 @@ import {
 } from '@patternfly/react-core';
 import { ListIcon, ThIcon } from '@patternfly/react-icons';
 
-import { TemplateFilters } from '../hooks/useVmTemplatesFilters';
 import { CATALOG_FILTERS } from '../utils/consts';
+import { TemplateFilters } from '../utils/types';
 
 export const TemplatesCatalogHeader: FC<{
   filters: TemplateFilters;
@@ -40,7 +40,9 @@ export const TemplatesCatalogHeader: FC<{
   return (
     <div className="co-catalog-page__header">
       <div className="co-catalog-page__heading text-capitalize">
-        {filters?.onlyDefault ? t('Default templates') : t('All items')}
+        {(filters?.onlyDefault && t('Default templates')) ||
+          (filters?.onlyUser && t('User templates')) ||
+          t('All items')}
       </div>
       <div className="co-catalog-page__filter">
         <div>

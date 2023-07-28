@@ -66,9 +66,13 @@ test('TemplatesCatalog', async () => {
   // default variant template, should be in catalog
   expect(getByTestId('container-template')).toBeInTheDocument();
 
-  // not default variant template, should be in catalog
-  fireEvent.click(getByText('All items'));
+  // not default variant template, clicking on 'All items', should be in catalog
+  fireEvent.click(getByTestId('catalog-template-filter-all-items'));
   expect(getByTestId('url-template')).toBeInTheDocument();
+
+  // switching to user templates, url template should be in catalog as custom template
+  fireEvent.click(getByText('User templates'));
+  expect(queryByTestId('url-template')).toBeInTheDocument();
 
   // switching to default templates, url template should not be in catalog as custom template
   fireEvent.click(getByText('Default templates'));
@@ -95,6 +99,6 @@ test('TemplatesCatalog', async () => {
   expect(queryByTestId('container-template')).toBeNull();
 
   // clear all filters, all templates should be in catalog
-  fireEvent.click(getByText('Clear All Filters'));
+  fireEvent.click(getByText('Clear all filters'));
   expect(getByTestId('container-template')).toBeInTheDocument();
 });

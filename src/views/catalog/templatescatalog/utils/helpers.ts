@@ -13,7 +13,7 @@ import {
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
-import { TemplateFilters } from '../hooks/useVmTemplatesFilters';
+import { TemplateFilters } from './types';
 
 export const filterTemplates = (templates: V1Template[], filters: TemplateFilters): V1Template[] =>
   templates
@@ -21,19 +21,20 @@ export const filterTemplates = (templates: V1Template[], filters: TemplateFilter
       const textFilterLowerCase = filters?.query.toLowerCase();
       const workload = getTemplateWorkload(tmp);
 
-      const textFilter = textFilterLowerCase
-        ? getTemplateName(tmp).toLowerCase().includes(textFilterLowerCase) ||
-          tmp?.metadata?.name?.includes(textFilterLowerCase)
-        : true;
+      const textFilter =
+        !textFilterLowerCase ||
+        getTemplateName(tmp).toLowerCase().includes(textFilterLowerCase) ||
+        tmp?.metadata?.name?.includes(textFilterLowerCase);
 
-      const defaultVariantFilter = filters?.onlyDefault ? isDefaultVariantTemplate(tmp) : true;
+      const defaultVariantFilter = !filters?.onlyDefault || isDefaultVariantTemplate(tmp);
 
-      const workloadFilter = filters?.workload?.size > 0 ? filters.workload.has(workload) : true;
+      const userFilter = !filters.onlyUser || !isDefaultVariantTemplate(tmp);
 
-      const osNameFilter =
-        filters?.osName?.size > 0 ? filters?.osName?.has(getTemplateOS(tmp)) : true;
+      const workloadFilter = filters?.workload?.size <= 0 || filters.workload.has(workload);
 
-      return defaultVariantFilter && textFilter && workloadFilter && osNameFilter;
+      const osNameFilter = filters?.osName?.size <= 0 || filters?.osName?.has(getTemplateOS(tmp));
+
+      return defaultVariantFilter && userFilter && textFilter && workloadFilter && osNameFilter;
     })
     // show RHEL templates first, then alphabetically
     .sort((a, b) => {
