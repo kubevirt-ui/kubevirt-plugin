@@ -27,7 +27,7 @@ const VMNameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, 
 
   return (
     <TabModal
-      headerText={t('Edit hostname')}
+      headerText={t('Edit VirtualMachine name')}
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onClose={onClose}
@@ -42,7 +42,7 @@ const VMNameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, 
           label={t('VirtualMachine name')}
           validated={!isEmpty(vmName) ? ValidatedOptions.default : ValidatedOptions.error}
         >
-          <TextInput id="hostname" onChange={setVMName} type="text" value={vmName} />
+          <TextInput id="vm-name" onChange={setVMName} type="text" value={vmName} />
         </FormGroup>
       </Form>
     </TabModal>
