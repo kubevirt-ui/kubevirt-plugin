@@ -5,7 +5,7 @@ import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailabl
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   Alert,
   Button,
@@ -29,7 +29,6 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
     loaded: vmContextLoaded,
     tabsData,
     updateTabsData,
-    vm,
   } = useWizardVMContext();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVmCreate();
@@ -63,8 +62,6 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
     ));
   };
 
-  const templateName = tabsData?.overview?.templateMetadata?.name;
-  const templateNamespace = tabsData?.overview?.templateMetadata?.namespace;
   const loaded = vmContextLoaded && vmCreateLoaded && bootSourceLoaded;
 
   const onChangeStartVM = useCallback(
@@ -109,24 +106,6 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
                 {t('Create VirtualMachine')}
               </Button>
             </SplitItem>
-            <SplitItem>
-              <Button
-                onClick={() => {
-                  if (confirm(t('Are you sure you want to go back?'))) {
-                    clearSessionStorageVM();
-                    history.push(
-                      `/k8s/ns/${namespace}/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}&defaultSourceExists=${isBootSourceAvailable}&vmName=${getName(
-                        vm,
-                      )}`,
-                    );
-                  }
-                }}
-                variant="secondary"
-              >
-                {t('Reset')}
-              </Button>
-            </SplitItem>
-
             <SplitItem>
               <Button
                 onClick={() => {
