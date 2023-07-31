@@ -6,11 +6,7 @@ import { getExtraNADResources } from '@kubevirt-utils/components/NetworkInterfac
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseNADsData = (namespace: string) => {
-  loaded: boolean;
-  loadError: string;
-  nads: K8sResourceCommon[];
-};
+import { UseNADsData } from './types';
 
 const useNADsData: UseNADsData = (namespace) => {
   const nadListPermissionsMap = useNADListPermissions();
