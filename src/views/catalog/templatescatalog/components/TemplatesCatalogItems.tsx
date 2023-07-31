@@ -6,7 +6,7 @@ import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Gallery, StackItem } from '@patternfly/react-core';
 
 import useTemplatesCatalogColumns from '../hooks/useTemplatesCatalogColumns';
-import { TemplateFilters } from '../hooks/useVmTemplatesFilters';
+import { TemplateFilters } from '../utils/types';
 
 import { TemplatesCatalogRow } from './TemplatesCatalogRow';
 import { TemplateTile } from './TemplatesCatalogTile';

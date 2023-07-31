@@ -40,7 +40,7 @@ export const TemplatesCatalogEmptyState: React.FC<{
       </EmptyStateBody>
       <EmptyStateSecondaryActions>
         <Button onClick={() => onClearFilters()} variant="link">
-          {t('Clear All Filters')}
+          {t('Clear all filters')}
         </Button>
       </EmptyStateSecondaryActions>
     </EmptyState>
