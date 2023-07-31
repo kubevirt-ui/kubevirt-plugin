@@ -13,7 +13,11 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { mountWinDriversToTemplate } from '@kubevirt-utils/resources/template/utils/drivers';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
+import {
+  getTemplateParameterValue,
+  getTemplateVirtualMachineObject,
+} from '@kubevirt-utils/resources/template/utils/selectors';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { NAME_INPUT_FIELD } from './constants';
@@ -77,16 +81,12 @@ export const hasCustomizableSource = (template: V1Template): boolean => {
   return true;
 };
 
-export const extractParameterNameFromMetadataName = (template: V1Template): string => {
-  const virtualMachineObject = getTemplateVirtualMachineObject(template);
-  return virtualMachineObject?.metadata.name?.replace(/[${}"]+/g, '');
-};
+export const isNameParameterExists = (template: V1Template): boolean =>
+  !isEmpty(template?.parameters) &&
+  !isEmpty(template?.parameters?.find((param) => param?.name === NAME_INPUT_FIELD));
 
-export const getTemplateNameParameterValue = (template: V1Template): string => {
-  const nameParameter = extractParameterNameFromMetadataName(template) || 'NAME';
-
-  return template?.parameters?.find((parameter) => parameter.name === nameParameter)?.value;
-};
+export const getTemplateNameParameterValue = (template: V1Template): string =>
+  getTemplateParameterValue(template, NAME_INPUT_FIELD);
 
 export const processTemplate = async ({
   formData,
@@ -105,7 +105,7 @@ export const processTemplate = async ({
     let draftVMTemplate = draftTemplate;
     draftVMTemplate.metadata.namespace = namespace;
 
-    const parameterForName = extractParameterNameFromMetadataName(template);
+    const parameterForName = NAME_INPUT_FIELD;
 
     draftVMTemplate = setTemplateParameters(draftVMTemplate, formData);
 
@@ -143,13 +143,11 @@ export const getVirtualMachineNameField = (vmName: string): TemplateParameter =>
 };
 
 export const buildFields = (template: V1Template): Array<TemplateParameter[]> => {
-  const parameterForName = extractParameterNameFromMetadataName(template);
-
   const optionalFields = template.parameters?.filter(
-    (parameter) => !parameter.required && parameterForName !== parameter.name,
+    (parameter) => !parameter.required && NAME_INPUT_FIELD !== parameter.name,
   );
   const requiredFields = template.parameters?.filter(
-    (parameter) => parameter.required && parameterForName !== parameter.name,
+    (parameter) => parameter.required && NAME_INPUT_FIELD !== parameter.name,
   );
 
   return [requiredFields, optionalFields];
