@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export type NetworkPresentation = {
@@ -5,8 +6,16 @@ export type NetworkPresentation = {
   network: V1Network;
 };
 
-export const interfacesTypes = {
+const typeHandler = {
+  get(target, prop) {
+    return target[prop] ?? target.bridge;
+  },
+};
+
+const types = {
   bridge: 'Bridge',
   masquerade: 'Masquerade',
   sriov: 'SR-IOV',
 };
+
+export const interfacesTypes = new Proxy(types, typeHandler);

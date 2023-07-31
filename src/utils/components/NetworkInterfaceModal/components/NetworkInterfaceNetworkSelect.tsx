@@ -1,8 +1,9 @@
-import React, { Dispatch, FC, useMemo, useState } from 'react';
+import React, { Dispatch, FC, useEffect, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
   FormGroup,
   Select,
@@ -11,8 +12,7 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
-import { interfaceTypeTypes } from '../utils/constants';
-import { networkNameStartWithPod, podNetworkExists } from '../utils/helpers';
+import { getNadType, networkNameStartWithPod, podNetworkExists } from '../utils/helpers';
 
 import useNADsData from './hooks/useNADsData';
 
@@ -54,21 +54,35 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   const podNetworkingText = useMemo(() => t('Pod Networking'), [t]);
 
   const networkOptions = useMemo(() => {
-    const options = nads?.map(({ metadata }) => ({
-      key: metadata?.uid,
-      value: `${metadata?.namespace}/${metadata?.name}`,
-    }));
+    const options = nads?.map((nad) => {
+      const { name, namespace: nadNamespace, uid } = nad?.metadata;
+      return {
+        key: uid,
+        type: getNadType(nad),
+        value: `${nadNamespace}/${name}`,
+      };
+    });
     if (isPodNetworkingOptionExists) {
-      options.unshift({ key: 'pod-networking', value: podNetworkingText });
+      options.unshift({
+        key: 'pod-networking',
+        type: interfacesTypes.bridge,
+        value: podNetworkingText,
+      });
     }
     return options;
   }, [isPodNetworkingOptionExists, nads, podNetworkingText]);
+
+  useEffect(() => {
+    loaded && setInterfaceType(getNadType(nads?.[0]));
+  }, [loaded, nads, setInterfaceType]);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
     event.preventDefault();
     setNetworkName(value);
     setInterfaceType(
-      value === podNetworkingText ? interfaceTypeTypes.MASQUERADE : interfaceTypeTypes.BRIDGE,
+      value === podNetworkingText
+        ? interfacesTypes.masquerade
+        : networkOptions.find((netOption) => value === netOption?.value)?.type,
     );
     setIsOpen(false);
   };

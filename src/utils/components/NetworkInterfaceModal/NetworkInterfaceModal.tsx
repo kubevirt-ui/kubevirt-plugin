@@ -8,7 +8,10 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { BRIDGED_NIC_HOTPLUG_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import {
+  interfacesTypes,
+  NetworkPresentation,
+} from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Form } from '@patternfly/react-core';
@@ -19,7 +22,7 @@ import NetworkInterfaceMACAddressInput from './components/NetworkInterfaceMacAdd
 import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
 import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect';
 import NetworkInterfaceTypeSelect from './components/NetworkInterfaceTypeSelect';
-import { interfaceModelType, interfaceTypeTypes } from './utils/constants';
+import { interfaceModelType } from './utils/constants';
 import {
   generateNicName,
   getNetworkName,
@@ -70,8 +73,8 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
   const [networkName, setNetworkName] = useState(getNetworkName(network));
   const [interfaceType, setInterfaceType] = useState(
-    interfaceTypeTypes[getNetworkInterfaceType(iface).toUpperCase()] ||
-      (podNetworkExists(vm) ? interfaceTypeTypes.BRIDGE : interfaceTypeTypes.MASQUERADE),
+    interfacesTypes[getNetworkInterfaceType(iface)] ||
+      (podNetworkExists(vm) ? null : interfacesTypes.masquerade),
   );
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
   const [submitDisabled, setSubmitDisabled] = useState(true);
@@ -83,7 +86,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     );
   }, [nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType, onSubmit]);
 
-  const isBridgedNIC = interfaceType === interfaceTypeTypes.BRIDGE;
+  const isBridgedNIC = interfaceType === interfacesTypes.bridge;
   const vmIsRunning = getVMStatus(vm) === printableVMStatus.Running;
   const showRestartHeader = !bridgedNICHotPlugEnabled || !isBridgedNIC;
   const showRestartOrMigrateHeader = bridgedNICHotPlugEnabled && vmIsRunning && isBridgedNIC;

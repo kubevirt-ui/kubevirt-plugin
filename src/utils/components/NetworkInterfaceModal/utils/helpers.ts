@@ -3,6 +3,9 @@ import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generato
 
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
+
+import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
 export const generateNicName = () => {
   return `nic-${uniqueNamesGenerator({
@@ -62,4 +65,14 @@ export const createInterface = (
     model: interfaceModel,
     name: nicName,
   };
+};
+
+export const getNadType = (nad: NetworkAttachmentDefinition): string => {
+  try {
+    const config = JSON.parse(nad?.spec?.config);
+    //can be config.type or config.plugin first element only!'
+    return interfacesTypes?.[config?.type] || interfacesTypes?.[config?.plugins?.[0]?.type];
+  } catch (e) {
+    console.log('Cannot convert NAD config: ', e);
+  }
 };
