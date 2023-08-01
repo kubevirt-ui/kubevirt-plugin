@@ -27,6 +27,8 @@ export const convertYAMLUserDataObject = (
   userData: string,
   opts?: LoadOptions,
 ): CloudInitUserData => {
+  if (!userData) return;
+
   try {
     return load(userData, opts) as CloudInitUserData;
   } catch (e) {
@@ -38,6 +40,8 @@ export const convertUserDataObjectToYAML = (
   userData: CloudInitUserData,
   addHeader: boolean,
 ): string => {
+  if (!userData) return;
+
   try {
     const filteredUser = deleteObjBlankValues(userData);
     const result = dump(filteredUser);

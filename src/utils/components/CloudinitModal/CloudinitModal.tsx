@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
@@ -13,7 +13,7 @@ import CloudinitForm from './CloudinitForm';
 
 import './cloud-init.scss';
 
-export const CloudinitModal: React.FC<{
+export const CloudinitModal: FC<{
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
@@ -23,10 +23,10 @@ export const CloudinitModal: React.FC<{
   const { t } = useKubevirtTranslation();
   const { updatedVM, updateFromYAML, ...cloudInitHookValues } = useCloudInit(vm);
 
-  const [showEditor, setShowEditor] = React.useState(false);
-  const [isSubmitDisabled, setSubmitDisabled] = React.useState(false);
+  const [showEditor, setShowEditor] = useState(false);
+  const [isSubmitDisabled, setSubmitDisabled] = useState(false);
 
-  const onEditorSave = React.useCallback(
+  const onEditorSave = useCallback(
     (yaml: string) => {
       setSubmitDisabled(false);
       updateFromYAML(yaml);

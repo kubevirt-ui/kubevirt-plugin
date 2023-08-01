@@ -539,6 +539,7 @@
   "Invalid certificate, please visit the following URL and approve it": "Invalid certificate, please visit the following URL and approve it",
   "Invalid MAC address format": "Invalid MAC address format",
   "Invalid URL": "Invalid URL",
+  "Invalid YAML": "Invalid YAML",
   "Inventory": "Inventory",
   "IOPS total: {{input}}": "IOPS total: {{input}}",
   "IP address": "IP address",

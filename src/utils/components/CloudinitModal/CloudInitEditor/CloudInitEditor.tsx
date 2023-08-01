@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React, { FC, useLayoutEffect, useRef, useState } from 'react';
 import { dump } from 'js-yaml';
 
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, AlertActionCloseButton, Divider } from '@patternfly/react-core';
+import { Alert, AlertActionCloseButton, AlertVariant, Divider } from '@patternfly/react-core';
 
 import './CloudInitEditor.scss';
 
@@ -15,20 +15,29 @@ type CloudInitEditorProps = {
 
 const EDITOR_TOOLS_SPACES = 75;
 
-export const _CloudInitEditor: React.FC<CloudInitEditorProps> = ({ cloudInitVolume, onSave }) => {
+export const _CloudInitEditor: FC<CloudInitEditorProps> = ({ cloudInitVolume, onSave }) => {
   const { t } = useKubevirtTranslation();
   const cloudInitData = cloudInitVolume?.cloudInitNoCloud || cloudInitVolume?.cloudInitConfigDrive;
 
-  const [editorHeight, setEditorHeight] = React.useState<number>();
-  const [saved, setSaved] = React.useState<boolean>(false);
-  const yamlEditorRef = React.useRef<HTMLDivElement>();
+  const [editorHeight, setEditorHeight] = useState<number>();
+  const [saved, setSaved] = useState<boolean>(false);
+  const [yamlError, setYAMLError] = useState(null);
+
+  const yamlEditorRef = useRef<HTMLDivElement>();
 
   const onSaveClick = async (yaml: string) => {
-    onSave(yaml);
-    setSaved(true);
+    setYAMLError(null);
+    setSaved(false);
+
+    try {
+      onSave(yaml);
+      setSaved(true);
+    } catch (error) {
+      setYAMLError(error);
+    }
   };
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (yamlEditorRef.current?.clientHeight) {
       setEditorHeight(yamlEditorRef.current?.clientHeight - EDITOR_TOOLS_SPACES);
     }
@@ -47,7 +56,17 @@ export const _CloudInitEditor: React.FC<CloudInitEditorProps> = ({ cloudInitVolu
           className="co-alert"
           isInline
           title={t('Saved')}
-          variant="success"
+          variant={AlertVariant.success}
+        />
+      )}
+
+      {yamlError && (
+        <Alert
+          actionClose={<AlertActionCloseButton onClose={() => setYAMLError(false)} />}
+          className="co-alert"
+          isInline
+          title={t('Invalid YAML')}
+          variant={AlertVariant.danger}
         />
       )}
       <Divider />

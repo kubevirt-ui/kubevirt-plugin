@@ -46,8 +46,19 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
       userData?: string;
     };
 
-    setUserData(convertYAMLUserDataObject(cloudData?.userData));
-    setNetworkData(convertYAMLToNetworkDataObject(cloudData?.networkData));
+    const yamlUserData = convertYAMLUserDataObject(cloudData?.userData);
+    const yamlNetworkData = convertYAMLToNetworkDataObject(cloudData?.networkData);
+
+    if (
+      !yamlUserData &&
+      !yamlNetworkData?.address &&
+      !yamlNetworkData.gateway &&
+      !yamlNetworkData.name
+    )
+      throw new Error('Invalid YAML');
+
+    setUserData(yamlUserData);
+    setNetworkData(yamlNetworkData);
   };
 
   const shouldAddHeader = React.useMemo(() => {
