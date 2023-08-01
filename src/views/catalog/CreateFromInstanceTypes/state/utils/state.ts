@@ -1,11 +1,6 @@
 import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretSection/utils/constants';
 
-import {
-  InstanceTypeVMState,
-  InstanceTypeVMStoreState,
-  UseBootableVolumesValues,
-  UseInstanceTypeAndPreferencesValues,
-} from './types';
+import { InstanceTypeVMState, InstanceTypeVMStoreState } from './types';
 
 const instanceTypeVMInitialState: InstanceTypeVMState = {
   isDynamicSSHInjection: false,
@@ -17,9 +12,7 @@ const instanceTypeVMInitialState: InstanceTypeVMState = {
 };
 
 export const instanceTypeVMStoreInitialState: InstanceTypeVMStoreState = {
-  activeNamespace: '',
-  bootableVolumesData: {} as UseBootableVolumesValues,
-  instanceTypesAndPreferencesData: {} as UseInstanceTypeAndPreferencesValues,
   instanceTypeVMState: instanceTypeVMInitialState,
+  isChangingNamespace: true,
   vmNamespaceTarget: '',
 };

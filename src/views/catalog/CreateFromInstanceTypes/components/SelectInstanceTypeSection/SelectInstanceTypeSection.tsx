@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { UseInstanceTypeAndPreferencesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -11,11 +12,17 @@ import UsersInstanceTypesList from './components/UsersInstanceTypeList/UsersInst
 import useInstanceTypeCardMenuSection from './hooks/useInstanceTypeCardMenuSection';
 import { TabKey } from './utils/constants';
 
-const SelectInstanceTypeSection: FC = () => {
+type SelectInstanceTypeSectionProps = {
+  instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
+};
+
+const SelectInstanceTypeSection: FC<SelectInstanceTypeSectionProps> = ({
+  instanceTypesAndPreferencesData,
+}) => {
   const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);
+  const { instanceTypes, loaded } = instanceTypesAndPreferencesData;
 
   const {
-    instanceTypesAndPreferencesData: { instanceTypes, loaded },
     instanceTypeVMState: { selectedInstanceType },
   } = useInstanceTypeVMStore();
   const menuItems = useMemo(() => getInstanceTypeMenuItems(instanceTypes), [instanceTypes]);
@@ -56,7 +63,9 @@ const SelectInstanceTypeSection: FC = () => {
           </Flex>
         </Tab>
         <Tab eventKey={TabKey.Users} title={menuItems.userProvided.label}>
-          <UsersInstanceTypesList />
+          <UsersInstanceTypesList
+            instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+          />
         </Tab>
       </Tabs>
     </>

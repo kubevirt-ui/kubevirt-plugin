@@ -1,12 +1,18 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Trans } from 'react-i18next';
+import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-card/utils/utils';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
 import EnableInstanceTypeTechPreviewModal from '@catalog/EnableInstanceTypeTechPreviewModal/EnableInstanceTypeTechPreviewModal';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
   Bullseye,
   Card,
@@ -22,6 +28,7 @@ import BootableVolumeList from './components/BootableVolumeList/BootableVolumeLi
 import CreateVMFooter from './components/CreateVMFooter/CreateVMFooter';
 import SectionListItem from './components/SectionListItem/SectionListItem';
 import useEnableInstanceTypeModal from './hooks/useEnableInstanceTypeModal';
+import useInstanceTypesAndPreferences from './state/hooks/useInstanceTypesAndPreferences';
 import { useInstanceTypeVMStore } from './state/useInstanceTypeVMStore';
 import { INSTANCE_TYPES_SECTIONS } from './utils/constants';
 
@@ -39,17 +46,34 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
   const { t } = useKubevirtTranslation();
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
-  const { bootableVolumesData, instanceTypesAndPreferencesData, resetInstanceTypeVMState } =
-    useInstanceTypeVMStore();
+  const bootableVolumesData = useBootableVolumes(getOSImagesNS());
+  const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences();
+  const [activeNamespace] = useActiveNamespace();
+  const [authourizedSSHKeys, , loaded] = useKubevirtUserSettings('ssh');
+
+  const { resetInstanceTypeVMState, setVMNamespaceTarget } = useInstanceTypeVMStore();
 
   const { loading, ...enableITModalProps } = useEnableInstanceTypeModal(
     isInstanceTypeTab,
     navigateToCatalog,
   );
 
-  useEffect(() => resetInstanceTypeVMState(), [resetInstanceTypeVMState]);
+  useEffect(() => {
+    resetInstanceTypeVMState();
+  }, [resetInstanceTypeVMState]);
 
-  if (loading || !bootableVolumesData?.loaded || !instanceTypesAndPreferencesData?.loaded) {
+  useEffect(() => {
+    const targetNS =
+      activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace;
+    setVMNamespaceTarget(authourizedSSHKeys?.[targetNS], targetNS);
+  }, [activeNamespace, authourizedSSHKeys, setVMNamespaceTarget]);
+
+  if (
+    loading ||
+    !bootableVolumesData?.loaded ||
+    !instanceTypesAndPreferencesData?.loaded ||
+    !loaded
+  ) {
     return (
       <Bullseye className="create-vm-instance-type-section__page-loader">
         <Loading />
@@ -64,6 +88,11 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
           <Card>
             <List className="create-vm-instance-type-section__list" isPlain>
               <SectionListItem
+                headerAction={
+                  <AddBootableVolumeButton
+                    instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+                  />
+                }
                 headerText={
                   <>
                     {t('Select volume to boot from')}{' '}
@@ -84,11 +113,14 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
                     />
                   </>
                 }
-                headerAction={<AddBootableVolumeButton />}
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_VOLUME}
                 sectionState={sectionState}
               >
-                <BootableVolumeList displayShowAllButton />
+                <BootableVolumeList
+                  bootableVolumesData={bootableVolumesData}
+                  displayShowAllButton
+                  instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+                />
               </SectionListItem>
 
               <Divider className="create-vm-instance-type-section__divider" />
@@ -98,7 +130,9 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_INSTANCE_TYPE}
                 sectionState={sectionState}
               >
-                <SelectInstanceTypeSection />
+                <SelectInstanceTypeSection
+                  instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+                />
               </SectionListItem>
 
               <Divider className="create-vm-instance-type-section__divider" />
@@ -108,7 +142,9 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
                 sectionKey={INSTANCE_TYPES_SECTIONS.VM_DETAILS}
                 sectionState={sectionState}
               >
-                <VMDetailsSection />
+                <VMDetailsSection
+                  instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+                />
               </SectionListItem>
             </List>
           </Card>

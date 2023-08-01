@@ -1,7 +1,10 @@
 import React, { FC, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import {
+  instanceTypeActionType,
+  UseInstanceTypeAndPreferencesValues,
+} from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { COMMON_INSTANCETYPES } from '@kubevirt-utils/resources/bootableresources/constants';
@@ -19,11 +22,17 @@ import { paginationDefaultValues, paginationInitialState } from './utils/constan
 
 import './UsersInstanceTypeList.scss';
 
-const UsersInstanceTypesList: FC = () => {
+type UsersInstanceTypesListProps = {
+  instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
+};
+
+const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({
+  instanceTypesAndPreferencesData,
+}) => {
   const { t } = useKubevirtTranslation();
+  const { instanceTypes } = instanceTypesAndPreferencesData;
 
   const {
-    instanceTypesAndPreferencesData: { instanceTypes },
     instanceTypeVMState: { selectedInstanceType },
     setInstanceTypeVMState,
   } = useInstanceTypeVMStore();

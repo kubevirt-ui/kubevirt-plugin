@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -35,7 +36,10 @@ type AddBootableVolumeModalProps = {
   enforceNamespace?: string;
   isOpen: boolean;
   onClose: () => void;
-  onCreateVolume?: (source: BootableVolume) => void;
+  onCreateVolume?: (
+    source: BootableVolume,
+    pvcSource?: IoK8sApiCoreV1PersistentVolumeClaim,
+  ) => void;
 };
 
 const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({

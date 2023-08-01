@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { FC } from 'react';
 
 import { getTemplateOSIcon as getOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -23,7 +23,10 @@ type BootableVolumeRowProps = {
   activeColumnIDs: string[];
   bootableVolume: BootableVolume;
   rowData: {
-    bootableVolumeSelectedState: [BootableVolume, Dispatch<SetStateAction<BootableVolume>>];
+    bootableVolumeSelectedState: [
+      BootableVolume,
+      (selectedVolume: BootableVolume, pvcSource: IoK8sApiCoreV1PersistentVolumeClaim) => void,
+    ];
     preference: V1beta1VirtualMachineClusterPreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   };
@@ -47,7 +50,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       isHoverable
       isRowSelected={getName(selectedBootableVolume) === bootVolumeName}
       isSelectable
-      onClick={() => setSelectedBootableVolume(bootableVolume)}
+      onClick={() => setSelectedBootableVolume(bootableVolume, pvcSource)}
     >
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
         <img alt="os-icon" className="vm-catalog-row-icon" src={getOSIcon(preference)} />

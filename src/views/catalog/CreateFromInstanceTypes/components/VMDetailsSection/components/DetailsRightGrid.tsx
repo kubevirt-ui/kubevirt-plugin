@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
@@ -16,7 +17,7 @@ const DetailsRightGrid: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const { instanceTypeVMState, setInstanceTypeVMState, vmNamespaceTarget } =
+  const { instanceTypeVMState, isChangingNamespace, setInstanceTypeVMState, vmNamespaceTarget } =
     useInstanceTypeVMStore();
   const { pvcSource, sshSecretCredentials } = instanceTypeVMState;
   const pvcDiskSize = pvcSource?.spec?.resources?.requests?.storage;
@@ -34,7 +35,7 @@ const DetailsRightGrid: FC = () => {
   return (
     <DescriptionList isHorizontal>
       <VirtualMachineDescriptionItem
-        descriptionData={vmNamespaceTarget}
+        descriptionData={isChangingNamespace ? <Loading /> : vmNamespaceTarget}
         descriptionHeader={t('Project')}
       />
       <VirtualMachineDescriptionItem
@@ -46,6 +47,13 @@ const DetailsRightGrid: FC = () => {
         descriptionHeader={t('Storage class')}
       />
       <VirtualMachineDescriptionItem
+        descriptionData={
+          isChangingNamespace ? (
+            <Loading />
+          ) : (
+            sshSecretCredentials?.sshSecretName || t('Not configured')
+          )
+        }
         onEditClick={() =>
           createModal((modalProps) => (
             <SSHSecretModal
@@ -56,9 +64,8 @@ const DetailsRightGrid: FC = () => {
             />
           ))
         }
-        descriptionData={sshSecretCredentials?.sshSecretName || t('Not configured')}
         descriptionHeader={t('SSH key name')}
-        isEdit
+        isEdit={!isChangingNamespace}
       />
       <DynamicSSHKeyInjectionIntanceType />
     </DescriptionList>

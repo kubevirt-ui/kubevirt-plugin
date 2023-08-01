@@ -13,6 +13,7 @@ import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomatic
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
   Alert,
   AlertVariant,
@@ -44,10 +45,11 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { subscriptionData } = useRHELAutomaticSubscription();
 
-  const { activeNamespace, instanceTypeVMState, vmNamespaceTarget } = useInstanceTypeVMStore();
+  const [activeNamespace] = useActiveNamespace();
+  const { instanceTypeVMState, vmNamespaceTarget } = useInstanceTypeVMStore();
   const { selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
     instanceTypeVMState;
-  const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials;
+  const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
 
   const onCancel = useCallback(
     () => history.push(getResourceUrl({ activeNamespace, model: VirtualMachineModel })),
