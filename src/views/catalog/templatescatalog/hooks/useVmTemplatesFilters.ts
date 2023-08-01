@@ -12,12 +12,18 @@ export const useTemplatesFilters = (): [
 ] => {
   const { appendParam, deleteParam, params, setParam } = useURLParams();
   const onlyDefaultParam = params.get(CATALOG_FILTERS.ONLY_DEFAULT);
+  const hasNoDefaultUserAllParams =
+    !!params.get(CATALOG_FILTERS.ONLY_DEFAULT) &&
+    !!params.get(CATALOG_FILTERS.ONLY_USER) &&
+    !!params.get(CATALOG_FILTERS.ALL_ITEMS); // has no any of those params when accessing catalog first time
 
   const [filters, setFilters] = useState<TemplateFilters>({
+    [CATALOG_FILTERS.ALL_ITEMS]: params.get(CATALOG_FILTERS.ONLY_DEFAULT) === 'false',
     [CATALOG_FILTERS.IS_LIST]: params.get(CATALOG_FILTERS.IS_LIST) === 'true',
     [CATALOG_FILTERS.NAMESPACE]: params.get(CATALOG_FILTERS.NAMESPACE) || '',
     [CATALOG_FILTERS.ONLY_AVAILABLE]: params.get(CATALOG_FILTERS.ONLY_AVAILABLE) === 'true',
-    [CATALOG_FILTERS.ONLY_DEFAULT]: !!params.get(CATALOG_FILTERS.ONLY_DEFAULT),
+    [CATALOG_FILTERS.ONLY_DEFAULT]:
+      !!params.get(CATALOG_FILTERS.ONLY_DEFAULT) || hasNoDefaultUserAllParams,
     [CATALOG_FILTERS.ONLY_USER]: !!params.get(CATALOG_FILTERS.ONLY_USER),
     [CATALOG_FILTERS.OS_NAME]: new Set([...params.getAll(CATALOG_FILTERS.OS_NAME)]),
     [CATALOG_FILTERS.QUERY]: params.get(CATALOG_FILTERS.QUERY) || '',
@@ -37,10 +43,21 @@ export const useTemplatesFilters = (): [
 
   const onFilterChange = (type: CATALOG_FILTERS, value: any) => {
     switch (type) {
+      case CATALOG_FILTERS.ALL_ITEMS:
+        {
+          updateFilter(type, value);
+          setParam(CATALOG_FILTERS.ONLY_DEFAULT, 'false');
+
+          updateFilter(CATALOG_FILTERS.ONLY_USER, false);
+          updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, false);
+          deleteParam(CATALOG_FILTERS.ONLY_USER);
+        }
+        break;
       case CATALOG_FILTERS.ONLY_DEFAULT:
         {
           updateFilterAndSetParam(type, value);
 
+          updateFilter(CATALOG_FILTERS.ALL_ITEMS, false);
           updateFilter(CATALOG_FILTERS.ONLY_USER, false);
           deleteParam(CATALOG_FILTERS.ONLY_USER);
         }
@@ -56,6 +73,7 @@ export const useTemplatesFilters = (): [
         {
           updateFilterAndSetParam(type, value);
 
+          updateFilter(CATALOG_FILTERS.ALL_ITEMS, false);
           updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, false);
           deleteParam(CATALOG_FILTERS.ONLY_DEFAULT);
         }
@@ -81,6 +99,7 @@ export const useTemplatesFilters = (): [
 
   const clearAll = () => {
     setFilters({
+      [CATALOG_FILTERS.ALL_ITEMS]: false,
       [CATALOG_FILTERS.IS_LIST]: filters.isList,
       [CATALOG_FILTERS.NAMESPACE]: '',
       [CATALOG_FILTERS.ONLY_AVAILABLE]: false,
@@ -97,7 +116,7 @@ export const useTemplatesFilters = (): [
 
   useEffect(() => {
     onlyDefaultParam && updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, onlyDefaultParam === 'true');
-  }, [onlyDefaultParam]);
+  }, [hasNoDefaultUserAllParams, onlyDefaultParam]);
 
   return [filters, onFilterChange, clearAll];
 };

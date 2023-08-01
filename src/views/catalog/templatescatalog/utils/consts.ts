@@ -1,4 +1,5 @@
 export enum CATALOG_FILTERS {
+  ALL_ITEMS = 'allItems',
   IS_LIST = 'isList',
   NAMESPACE = 'namespace',
   ONLY_AVAILABLE = 'onlyAvailable',
