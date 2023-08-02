@@ -26,7 +26,9 @@ export const filterTemplates = (templates: V1Template[], filters: TemplateFilter
         getTemplateName(tmp).toLowerCase().includes(textFilterLowerCase) ||
         tmp?.metadata?.name?.includes(textFilterLowerCase);
 
-      const defaultVariantFilter = !filters?.onlyDefault || isDefaultVariantTemplate(tmp);
+      const defaultVariantFilter =
+        (!filters?.onlyDefault && !hasNoDefaultUserAllFilters(filters)) ||
+        isDefaultVariantTemplate(tmp);
 
       const userFilter = !filters.onlyUser || !isDefaultVariantTemplate(tmp);
 
@@ -73,3 +75,6 @@ export const updateVMCPUMemory = (
     return updateVM(updatedVM);
   };
 };
+
+export const hasNoDefaultUserAllFilters = (filters: TemplateFilters): boolean =>
+  !filters?.allItems && !filters?.onlyDefault && !filters?.onlyUser; // none of the filters are set - when first time in

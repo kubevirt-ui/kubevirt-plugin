@@ -67,7 +67,7 @@ test('TemplatesCatalog', async () => {
   expect(getByTestId('container-template')).toBeInTheDocument();
 
   // not default variant template, clicking on 'All items', should be in catalog
-  fireEvent.click(getByTestId('catalog-template-filter-all-items'));
+  fireEvent.click(getByText('All items'));
   expect(getByTestId('url-template')).toBeInTheDocument();
 
   // switching to user templates, url template should be in catalog as custom template

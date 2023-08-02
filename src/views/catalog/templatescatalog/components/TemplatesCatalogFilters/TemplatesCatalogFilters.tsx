@@ -1,6 +1,7 @@
 import React, { FC, memo } from 'react';
 
 import { CATALOG_FILTERS } from '@catalog/templatescatalog/utils/consts';
+import { hasNoDefaultUserAllFilters } from '@catalog/templatescatalog/utils/helpers';
 import { TemplateFilters } from '@catalog/templatescatalog/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -31,14 +32,14 @@ export const TemplatesCatalogFilters: FC<{
 
       <VerticalTabs>
         <VerticalTabsTab
-          active={!filters?.onlyDefault && !filters?.onlyUser}
+          active={filters?.allItems}
           data-test-id="catalog-template-filter-all-items"
           id={'all-templates'}
-          onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_DEFAULT, false)}
+          onActivate={() => onFilterChange(CATALOG_FILTERS.ALL_ITEMS, true)}
           title={t('All items')}
         />
         <VerticalTabsTab
-          active={filters?.onlyDefault}
+          active={filters?.onlyDefault || hasNoDefaultUserAllFilters(filters)}
           data-test-id="catalog-template-filter-default-templates"
           id={'default-templates'}
           onActivate={() => onFilterChange(CATALOG_FILTERS.ONLY_DEFAULT, true)}
