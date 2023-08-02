@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -25,15 +25,15 @@ type DiskRowActionsProps = {
   vm: V1VirtualMachine;
 };
 
-const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdate, vm }) => {
+const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdate, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const deleteBtnText = t('Detach');
 
   const { initialDiskSourceState, initialDiskState } = useEditDiskStates(vm, diskName);
 
-  const onDelete = React.useCallback(() => {
+  const onDelete = useCallback(() => {
     const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
       const volumeToDelete = draftVM.spec.template.spec.volumes.find(
         (volume) => volume.name === diskName,
@@ -82,6 +82,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName, isDisabled, o
         initialDiskSourceState={initialDiskSourceState}
         initialDiskState={initialDiskState}
         isOpen={isOpen}
+        isTemplate
         onClose={onClose}
         onSubmit={onUpdate}
         vm={vm}

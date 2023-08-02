@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ChangeEvent, Dispatch, FC, useEffect, useMemo, useState } from 'react';
 
 import {
   appendDockerPrefix,
@@ -33,18 +33,20 @@ import DiskSourceUrlInput from './components/DiskSourceUrlInput';
 type DiskSourceFormSelectProps = {
   diskSourceState: DiskSourceState;
   diskState: DiskFormState;
-  dispatchDiskSourceState: React.Dispatch<DiskSourceReducerActionType>;
-  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
+  dispatchDiskSourceState: Dispatch<DiskSourceReducerActionType>;
+  dispatchDiskState: Dispatch<DiskReducerActionType>;
+  isTemplate: boolean;
   isVMRunning: boolean;
   relevantUpload?: DataUpload;
   vm: V1VirtualMachine;
 };
 
-const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
+const DiskSourceFormSelect: FC<DiskSourceFormSelectProps> = ({
   diskSourceState,
   diskState,
   dispatchDiskSourceState,
   dispatchDiskState,
+  isTemplate,
   isVMRunning,
   relevantUpload,
   vm,
@@ -52,7 +54,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const { diskSize, diskSource, diskType } = diskState || {};
   const isCDROMType = diskType === diskTypes.cdrom;
-  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const {
     dataSourceName,
     dataSourceNamespace,
@@ -68,9 +70,9 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
 
   const os = getAnnotation(vm?.spec?.template, ANNOTATIONS.os) || getOperatingSystem(vm);
 
-  const sourceOptions = React.useMemo(() => Object.values(getSourceOptions(t)), [t]);
+  const sourceOptions = useMemo(() => getSourceOptions(isTemplate), [isTemplate]);
 
-  const onSelect = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
+  const onSelect = (event: ChangeEvent<HTMLSelectElement>, value: string) => {
     event.preventDefault();
 
     if (diskSize === DYNAMIC && value !== sourceTypes.EPHEMERAL)
@@ -80,7 +82,7 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
     setIsOpen(false);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     // if the selected disk source is black or ephemeral and the user changed
     // the disk type to CDROM, we need to reset the disk source to the default (url)
     if (isCDROMType && sourceTypes.BLANK === diskSource) {
@@ -104,7 +106,8 @@ const DiskSourceFormSelect: React.FC<DiskSourceFormSelectProps> = ({
             {sourceOptions.map(({ description, id, name }) => {
               const isDisabled =
                 (isVMRunning && id === sourceTypes.EPHEMERAL) ||
-                (isCDROMType && id === sourceTypes.BLANK);
+                (isCDROMType && id === sourceTypes.BLANK) ||
+                (isTemplate && id === sourceTypes.UPLOAD);
               return (
                 <SelectOption
                   data-test-id={`disk-source-select-${id}`}
