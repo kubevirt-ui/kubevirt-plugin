@@ -63,7 +63,7 @@ const useEnvironments = (
 
       const diskName = `environment-disk-${getRandomChars()}`;
       getDisks(draftVM).push({
-        disk: { bus: 'sata' },
+        disk: {},
         name: diskName,
         serial: getRandomSerial().toUpperCase(),
       });
