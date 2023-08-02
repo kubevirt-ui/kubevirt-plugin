@@ -7,6 +7,8 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Bullseye, Checkbox, StackItem } from '@patternfly/react-core';
 
+import { findPVCOwner } from '../utils/helpers';
+
 type DeleteOwnedResourcesMessageProps = {
   dataVolumes: V1beta1DataVolume[];
   deleteOwnedResource: boolean;
@@ -34,7 +36,9 @@ const DeleteOwnedResourcesMessage: React.FC<DeleteOwnedResourcesMessageProps> = 
     );
   }
 
-  const diskCount = dataVolumes?.length + pvcs?.length || 0;
+  const pvcsWithNoDataVolumes = pvcs?.filter((pvc) => !findPVCOwner(pvc, dataVolumes));
+
+  const diskCount = dataVolumes?.length + pvcsWithNoDataVolumes?.length || 0;
   const hasSnapshots = snapshots?.length > 0;
 
   return (
