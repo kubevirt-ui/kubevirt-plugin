@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback, useMemo, useReducer } from 'react';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -47,16 +47,18 @@ type DiskModalProps = {
   createOwnerReference?: boolean;
   headerText: string;
   isOpen: boolean;
+  isTemplate?: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
   vm: V1VirtualMachine;
 };
 
-const DiskModal: React.FC<DiskModalProps> = ({
+const DiskModal: FC<DiskModalProps> = ({
   createOwnerReference = true,
   headerText,
   isOpen,
+  isTemplate = false,
   onClose,
   onSubmit,
   onUploadedDataVolume,
@@ -64,12 +66,12 @@ const DiskModal: React.FC<DiskModalProps> = ({
 }) => {
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
   const { upload, uploadData } = useCDIUpload();
-  const [diskState, dispatchDiskState] = React.useReducer(diskReducer, initialStateDiskForm);
-  const [diskSourceState, dispatchDiskSourceState] = React.useReducer(
+  const [diskState, dispatchDiskState] = useReducer(diskReducer, initialStateDiskForm);
+  const [diskSourceState, dispatchDiskSourceState] = useReducer(
     diskSourceReducer,
     initialStateDiskSource,
   );
-  const sourceRequiresDataVolume = React.useMemo(
+  const sourceRequiresDataVolume = useMemo(
     () => requiresDataVolume(diskState.diskSource),
     [diskState.diskSource],
   );
@@ -78,7 +80,7 @@ const DiskModal: React.FC<DiskModalProps> = ({
     diskState?.storageClass,
   );
 
-  const hotplugPromise = React.useCallback(
+  const hotplugPromise = useCallback(
     (vmObj: V1VirtualMachine) => {
       const resultDisk = getDiskFromState(diskState);
       if (diskState.diskSource === sourceTypes.PVC) {
@@ -106,7 +108,7 @@ const DiskModal: React.FC<DiskModalProps> = ({
     [diskState, diskSourceState, createOwnerReference, vm?.metadata?.name],
   );
 
-  const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine: V1VirtualMachine = useMemo(() => {
     const updatedVM = produceVMDisks(vm, (vmDraft) => {
       const dvName = nameWithoutParameter(
         `${vmDraft?.metadata?.name}-${diskState.diskName}`,
@@ -146,7 +148,7 @@ const DiskModal: React.FC<DiskModalProps> = ({
     return isVMRunning ? vm : updatedVM; // we will create DataVolume and make a API call to attach the hotplug disk
   }, [vm, isVMRunning, diskState, diskSourceState, createOwnerReference, sourceRequiresDataVolume]);
 
-  const handleSubmit = React.useCallback(
+  const handleSubmit = useCallback(
     async (updatedVM: V1VirtualMachine) => {
       if (diskState.diskSource === sourceTypes.UPLOAD) {
         const dataVolume = getDataVolumeFromState({
@@ -204,6 +206,7 @@ const DiskModal: React.FC<DiskModalProps> = ({
           diskState={diskState}
           dispatchDiskSourceState={dispatchDiskSourceState}
           dispatchDiskState={dispatchDiskState}
+          isTemplate={isTemplate}
           isVMRunning={isVMRunning}
           relevantUpload={upload}
           vm={vm}

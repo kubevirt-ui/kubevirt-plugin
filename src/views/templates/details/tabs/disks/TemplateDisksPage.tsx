@@ -77,6 +77,7 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
                   createOwnerReference={false}
                   headerText={t('Add disk')}
                   isOpen={isOpen}
+                  isTemplate
                   onClose={onClose}
                   onSubmit={onUpdate}
                   vm={vm}

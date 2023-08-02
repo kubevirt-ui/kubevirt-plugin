@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback, useMemo, useReducer } from 'react';
 
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -49,30 +49,32 @@ type DiskModalProps = {
   initialDiskSourceState: DiskSourceState;
   initialDiskState: DiskFormState;
   isOpen: boolean;
+  isTemplate?: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
   vm: V1VirtualMachine;
 };
 
-const EditDiskModal: React.FC<DiskModalProps> = ({
+const EditDiskModal: FC<DiskModalProps> = ({
   createOwnerReference = true,
   headerText,
   initialDiskSourceState,
   initialDiskState,
   isOpen,
+  isTemplate = false,
   onClose,
   onSubmit,
   onUploadedDataVolume,
   vm,
 }) => {
   const { upload, uploadData } = useCDIUpload();
-  const [diskState, dispatchDiskState] = React.useReducer(diskReducer, initialDiskState);
-  const [diskSourceState, dispatchDiskSourceState] = React.useReducer(
+  const [diskState, dispatchDiskState] = useReducer(diskReducer, initialDiskState);
+  const [diskSourceState, dispatchDiskSourceState] = useReducer(
     diskSourceReducer,
     initialDiskSourceState,
   );
-  const sourceRequiresDataVolume = React.useMemo(
+  const sourceRequiresDataVolume = useMemo(
     () => requiresDataVolume(diskState.diskSource),
     [diskState.diskSource],
   );
@@ -81,7 +83,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     diskState?.storageClass,
   );
 
-  const uploadPromise = React.useCallback(() => {
+  const uploadPromise = useCallback(() => {
     const currentVmVolumes = getVolumes(vm);
 
     const volumeToUpdate = currentVmVolumes.find(
@@ -115,7 +117,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     uploadData,
   ]);
 
-  const updatedVirtualMachine: V1VirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine: V1VirtualMachine = useMemo(() => {
     const currentVmVolumes = getVolumes(vm);
 
     const volumeToUpdate = currentVmVolumes.find(
@@ -176,7 +178,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
     initialDiskState.diskSource,
   ]);
 
-  const handleSubmit = React.useCallback(
+  const handleSubmit = useCallback(
     async (updatedVM: V1VirtualMachine) => {
       if (diskState.diskSource === sourceTypes.UPLOAD) {
         await uploadPromise();
@@ -212,6 +214,7 @@ const EditDiskModal: React.FC<DiskModalProps> = ({
           diskState={diskState}
           dispatchDiskSourceState={dispatchDiskSourceState}
           dispatchDiskState={dispatchDiskState}
+          isTemplate={isTemplate}
           isVMRunning={false}
           relevantUpload={upload}
           vm={vm}

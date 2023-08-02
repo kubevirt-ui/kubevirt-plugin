@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ChangeEvent, Dispatch, FC, useEffect, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
@@ -12,11 +12,11 @@ import { getInterfaceOptions } from './utils/helpers';
 
 type DiskInterfaceSelectProps = {
   diskState: DiskFormState;
-  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
+  dispatchDiskState: Dispatch<DiskReducerActionType>;
   isVMRunning: boolean;
 };
 
-const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
+const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({
   diskState,
   dispatchDiskState,
   isVMRunning,
@@ -24,16 +24,16 @@ const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const { diskInterface, diskType } = diskState || {};
   const isCDROMType = diskType === diskTypes.cdrom;
-  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const interfaceOptions = React.useMemo(() => Object.values(getInterfaceOptions(t)), [t]);
+  const interfaceOptions = useMemo(() => getInterfaceOptions(), []);
 
-  const onSelect = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
+  const onSelect = (event: ChangeEvent<HTMLSelectElement>, value: string) => {
     setIsOpen(false);
     dispatchDiskState({ payload: value, type: diskReducerActions.SET_DISK_INTERFACE });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     // only SCSI is supported for hotplug
     if (isVMRunning && diskInterface !== interfaceTypes.SCSI) {
       dispatchDiskState({
@@ -43,7 +43,7 @@ const DiskInterfaceSelect: React.FC<DiskInterfaceSelectProps> = ({
     }
   }, [dispatchDiskState, isVMRunning, diskInterface]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // virtio is not supported for CDROM
     if (isCDROMType && diskInterface === interfaceTypes.VIRTIO) {
       dispatchDiskState({

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_IMAGE_LINKS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
@@ -9,9 +9,8 @@ import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { getURLSourceHelpertText } from '../../utils/helpers';
 import { HTTP_URL_PREFIX, HTTPS_URL_PREFIX } from '../utils/constants';
 
-const URLSourceHelperText: React.FC<{ os: OS_NAME_TYPES }> = ({ os }) => {
-  const { t } = useKubevirtTranslation();
-  const { afterLabelText, beforeLabelText, label } = getURLSourceHelpertText(t, os);
+const URLSourceHelperText: FC<{ os: OS_NAME_TYPES }> = ({ os }) => {
+  const { afterLabelText, beforeLabelText, label } = getURLSourceHelpertText(os);
   return (
     <>
       {beforeLabelText}
@@ -31,10 +30,10 @@ type DiskSourceUrlInputProps = {
   url: string;
 };
 
-const DiskSourceUrlInput: React.FC<DiskSourceUrlInputProps> = ({ onChange, os, url }) => {
+const DiskSourceUrlInput: FC<DiskSourceUrlInputProps> = ({ onChange, os, url }) => {
   const { t } = useKubevirtTranslation();
 
-  const isValidURL = React.useMemo(() => {
+  const isValidURL = useMemo(() => {
     if (!url) {
       return true;
     } else {
