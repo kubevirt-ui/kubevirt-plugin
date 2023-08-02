@@ -34,9 +34,10 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
   );
   const [shouldConnect, setShouldConnect] = useState<boolean>(false);
   const socket = useWebSocket<{ object: K8sResourceCommon; type: string }>(
-    `ws://${window.location.host}${url}`,
+    `${window.location.protocol === 'https' ? 'wss' : 'ws'}://${window.location.host}${url}`,
     {
       onClose: () => console.log('websocket closed kubevirt: ', url),
+      onError: (err) => console.log('Websocket error kubevirt:', err),
       onOpen: () => console.log('websocket open kubevirt: ', url),
       queryParams: {
         cluster: 'local-cluster',
