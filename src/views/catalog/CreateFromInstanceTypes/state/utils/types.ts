@@ -48,21 +48,21 @@ type InstanceTypeAction = {
 };
 
 export type InstanceTypeVMStoreState = {
-  activeNamespace: string;
-  bootableVolumesData: UseBootableVolumesValues;
-  instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
   instanceTypeVMState: InstanceTypeVMState;
+  isChangingNamespace: boolean;
   vmNamespaceTarget: string;
 };
 
 type InstanceTypeVMStoreActions = {
-  onSelectCreatedVolume: (selectedVolume: BootableVolume) => void;
+  applySSHFromSettings: (sshSecretName: string, targetNamespace: string) => void;
+  onSelectCreatedVolume: (
+    selectedVolume: BootableVolume,
+    pvcSource: IoK8sApiCoreV1PersistentVolumeClaim,
+  ) => void;
   resetInstanceTypeVMState: () => void;
-  setActiveNamespace: Dispatch<string>;
-  setBootableVolumesData: Dispatch<UseBootableVolumesValues>;
-  setInstanceTypesAndPreferencesData: Dispatch<UseInstanceTypeAndPreferencesValues>;
   setInstanceTypeVMState: Dispatch<InstanceTypeAction>;
-  setVMNamespaceTarget: Dispatch<string>;
+  setIsChangingNamespace: () => void;
+  setVMNamespaceTarget: (sshSecretName: string, targetNamespace: string) => void;
 };
 
 export type InstanceTypeVMStore = InstanceTypeVMStoreState & InstanceTypeVMStoreActions;

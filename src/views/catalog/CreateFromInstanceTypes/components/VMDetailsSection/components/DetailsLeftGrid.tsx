@@ -1,7 +1,10 @@
 import React, { FC, useMemo } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import {
+  instanceTypeActionType,
+  UseInstanceTypeAndPreferencesValues,
+} from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
@@ -10,10 +13,13 @@ import { DescriptionList, TextInput } from '@patternfly/react-core';
 
 import { getCPUAndMemoryFromDefaultInstanceType, getOSFromDefaultPreference } from '../utils/utils';
 
-const DetailsLeftGrid: FC = () => {
+type DetailsLeftGridProps = {
+  instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
+};
+
+const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferencesData }) => {
   const { t } = useKubevirtTranslation();
-  const { instanceTypesAndPreferencesData, instanceTypeVMState, setInstanceTypeVMState } =
-    useInstanceTypeVMStore();
+  const { instanceTypeVMState, setInstanceTypeVMState } = useInstanceTypeVMStore();
   const { selectedBootableVolume, selectedInstanceType, vmName } = instanceTypeVMState;
   const { instanceTypes, preferences } = instanceTypesAndPreferencesData;
 

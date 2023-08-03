@@ -1,6 +1,10 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import {
+  UseBootableVolumesValues,
+  UseInstanceTypeAndPreferencesValues,
+} from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
@@ -30,21 +34,20 @@ import { getPaginationFromVolumeIndex } from './utils/utils';
 import './BootableVolumeList.scss';
 
 type BootableVolumeListProps = {
+  bootableVolumesData: UseBootableVolumesValues;
   displayShowAllButton?: boolean;
+  instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
   selectedBootableVolumeState?: [BootableVolume, (selectedVolume: BootableVolume) => void];
 };
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
+  bootableVolumesData,
   displayShowAllButton = false,
+  instanceTypesAndPreferencesData,
   selectedBootableVolumeState,
 }) => {
   const { t } = useKubevirtTranslation();
-  const {
-    bootableVolumesData,
-    instanceTypesAndPreferencesData,
-    instanceTypeVMState,
-    onSelectCreatedVolume,
-  } = useInstanceTypeVMStore();
+  const { instanceTypeVMState, onSelectCreatedVolume } = useInstanceTypeVMStore();
 
   const { selectedBootableVolume } = instanceTypeVMState;
   const { bootableVolumes, loaded, pvcSources } = bootableVolumesData;
@@ -144,7 +147,12 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                 perPage={pagination?.perPage}
               />
             </SplitItem>
-            {displayShowAllButton && <ShowAllBootableVolumesButton />}
+            {displayShowAllButton && (
+              <ShowAllBootableVolumesButton
+                bootableVolumesData={bootableVolumesData}
+                instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+              />
+            )}
           </>
         )}
       </Split>
