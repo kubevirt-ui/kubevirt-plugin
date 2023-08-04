@@ -1,10 +1,8 @@
 import React, { FC, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import {
-  UseBootableVolumesValues,
-  UseInstanceTypeAndPreferencesValues,
-} from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -14,9 +12,9 @@ import BootableVolumeList from '../../BootableVolumeList';
 
 type BootableVolumeListModalProps = {
   bootableVolumesData: UseBootableVolumesValues;
-  instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
   isOpen: boolean;
   onClose: () => void;
+  preferencesData: V1beta1VirtualMachineClusterPreference[];
 };
 
 const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({

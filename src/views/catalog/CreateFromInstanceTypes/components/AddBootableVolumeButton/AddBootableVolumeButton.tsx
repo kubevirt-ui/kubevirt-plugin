@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { UseInstanceTypeAndPreferencesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
@@ -11,12 +10,10 @@ import { isUpstream } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
 export type AddBootableVolumeButtonProps = {
-  instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
+  loadError: Error;
 };
 
-const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
-  instanceTypesAndPreferencesData,
-}) => {
+const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -26,7 +23,6 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
   const canCreate = canCreateDS || canCreatePVC;
 
   const { onSelectCreatedVolume } = useInstanceTypeVMStore();
-  const { loadError } = instanceTypesAndPreferencesData;
 
   return (
     <Button
@@ -39,7 +35,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
           />
         ))
       }
-      isDisabled={loadError || !canCreate}
+      isDisabled={!!loadError || !canCreate}
       variant={ButtonVariant.secondary}
     >
       {t('Add volume')}

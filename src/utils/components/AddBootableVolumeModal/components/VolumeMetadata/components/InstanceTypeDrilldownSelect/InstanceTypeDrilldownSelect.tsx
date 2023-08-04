@@ -1,10 +1,8 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypes';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-utils/models';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
 
 import ComposableDrilldownSelect from './components/ComposableDrilldownSelect/ComposableDrilldownSelect';
@@ -27,10 +25,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const [instanceTypes] = useK8sWatchResource<V1beta1VirtualMachineClusterInstancetype[]>({
-    groupVersionKind: VirtualMachineClusterInstancetypeModelGroupVersionKind,
-    isList: true,
-  });
+  const [instanceTypes] = useInstanceTypes();
   const menuItems = useMemo(() => getInstanceTypeMenuItems(instanceTypes), [instanceTypes]);
 
   const onSelect = useCallback(

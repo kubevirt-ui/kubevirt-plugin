@@ -1,16 +1,15 @@
 import React, { FC } from 'react';
 
+import useInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypes';
 import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-utils/models';
 import {
   ListPageBody,
   ListPageCreate,
   ListPageFilter,
   ListPageHeader,
-  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -27,13 +26,7 @@ type ClusterInstancetypeListProps = {
 
 const ClusterInstancetypeList: FC<ClusterInstancetypeListProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
-  const [instanceTypes, loaded, loadError] = useK8sWatchResource<
-    V1beta1VirtualMachineClusterInstancetype[]
-  >({
-    groupVersionKind: VirtualMachineClusterInstancetypeModelGroupVersionKind,
-    isList: true,
-    namespaced: false,
-  });
+  const [instanceTypes, loaded, loadError] = useInstanceTypes();
 
   const { onPaginationChange, pagination } = usePagination();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(instanceTypes);

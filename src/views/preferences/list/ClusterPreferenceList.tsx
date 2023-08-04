@@ -1,16 +1,15 @@
 import React, { FC } from 'react';
 
+import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-utils/models';
 import {
   ListPageBody,
   ListPageCreate,
   ListPageFilter,
   ListPageHeader,
-  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -27,13 +26,7 @@ type ClusterPreferenceListProps = {
 
 const ClusterPreferenceList: FC<ClusterPreferenceListProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
-  const [preferences, loaded, loadError] = useK8sWatchResource<
-    V1beta1VirtualMachineClusterPreference[]
-  >({
-    groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
-    isList: true,
-    namespaced: false,
-  });
+  const [preferences, loaded, loadError] = useClusterPreferences();
 
   const { onPaginationChange, pagination } = usePagination();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(preferences);
