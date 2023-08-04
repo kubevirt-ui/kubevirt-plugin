@@ -7,7 +7,11 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 
 import { ANNOTATIONS } from './annotations';
-import { GENERATE_VM_PRETTY_NAME_ANNOTATION } from './constants';
+import {
+  GENERATE_VM_PRETTY_NAME_ANNOTATION,
+  TEMPLATE_TYPE_BASE,
+  TEMPLATE_TYPE_LABEL,
+} from './constants';
 import { getTemplatePVCName } from './selectors';
 
 // Only used for replacing parameters in the template, do not use for anything else
@@ -25,6 +29,9 @@ export const poorManProcess = (template: V1Template): V1Template => {
 
   return JSON.parse(templateString);
 };
+
+export const isCommonTemplate = (template: V1Template): boolean =>
+  template?.metadata?.labels?.[TEMPLATE_TYPE_LABEL] === TEMPLATE_TYPE_BASE;
 
 export const isDeprecatedTemplate = (template: V1Template): boolean =>
   getAnnotation(template, ANNOTATIONS.deprecated) === 'true';

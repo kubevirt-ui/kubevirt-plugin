@@ -4,7 +4,7 @@ import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { isCommonTemplate, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import {
   getTemplateName,
   getTemplateOS,
@@ -14,6 +14,9 @@ import {
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 import { TemplateFilters } from './types';
+
+const isUserTemplate = (template: V1Template): boolean =>
+  !isDefaultVariantTemplate(template) && !isCommonTemplate(template);
 
 export const filterTemplates = (templates: V1Template[], filters: TemplateFilters): V1Template[] =>
   templates
@@ -30,7 +33,7 @@ export const filterTemplates = (templates: V1Template[], filters: TemplateFilter
         (!filters?.onlyDefault && !hasNoDefaultUserAllFilters(filters)) ||
         isDefaultVariantTemplate(tmp);
 
-      const userFilter = !filters.onlyUser || !isDefaultVariantTemplate(tmp);
+      const userFilter = !filters.onlyUser || isUserTemplate(tmp);
 
       const workloadFilter = filters?.workload?.size <= 0 || filters.workload.has(workload);
 
