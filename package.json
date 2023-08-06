@@ -184,6 +184,7 @@
     "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/docs/console-extensions.md .",
     "prepare": "husky install",
     "start-console": "./start-console.sh",
+    "start-console-with-monitoring": "./start-console.sh monitoring-plugin",
     "test": "jest",
     "test-cov": "jest --coverage",
     "test-cypress": "cd cypress && $(npm bin)/cypress open --config-file ./cypress.json --env openshift=true",
