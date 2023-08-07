@@ -5,10 +5,9 @@ apiVersion: ${VirtualMachineClusterInstancetypeModel.apiGroup}/${VirtualMachineC
 kind: ${VirtualMachineClusterInstancetypeModel.kind}
 metadata:
   name: example
-  namespace: default
 spec: 
   cpu:
     guest: 1
   memory:
-    guest: 1Gi
+    guest: 2Gi
 `;
