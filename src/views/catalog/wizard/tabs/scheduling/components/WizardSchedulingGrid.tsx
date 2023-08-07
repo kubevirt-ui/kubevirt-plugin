@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
@@ -19,6 +19,7 @@ import { WizardDescriptionItem } from '../../../components/WizardDescriptionItem
 import Affinity from './Affinity';
 import DedicatedResources from './DedicatedResources';
 import Descheduler from './Descheduler';
+import DeschedulerPopover from './DeschedulerPopover';
 import EvictionStrategy from './EvictionStrategy';
 import NodeSelector from './NodeSelector';
 import Tolerations from './Tolerations';
@@ -28,7 +29,7 @@ type WizardSchedulingGridProps = {
   vm: V1VirtualMachine;
 };
 
-const WizardSchedulingGrid: React.FC<WizardSchedulingGridProps> = ({ updateVM, vm }) => {
+const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -99,6 +100,10 @@ const WizardSchedulingGrid: React.FC<WizardSchedulingGridProps> = ({ updateVM, v
           />
 
           <WizardDescriptionItem
+            helperPopover={{
+              content: <DeschedulerPopover />,
+              header: t('Descheduler'),
+            }}
             description={<Descheduler vm={vm} />}
             testId="descheduler"
             title={t('Descheduler')}

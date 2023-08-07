@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { Trans } from 'react-i18next';
+import React, { FC, useCallback } from 'react';
 
 import Descheduler from '@catalog/wizard/tabs/scheduling/components/Descheduler';
+import DeschedulerPopover from '@catalog/wizard/tabs/scheduling/components/DeschedulerPopover';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -26,7 +26,7 @@ type VirtualMachineSchedulingLeftGridProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGridProps> = ({
+const VirtualMachineSchedulingLeftGrid: FC<VirtualMachineSchedulingLeftGridProps> = ({
   canUpdateVM,
   nodes,
   nodesLoaded,
@@ -36,7 +36,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const onSubmit = React.useCallback(
+  const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
         data: updatedVM,
@@ -108,16 +108,7 @@ const VirtualMachineSchedulingLeftGrid: React.FC<VirtualMachineSchedulingLeftGri
           isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
-          bodyContent={
-            <Trans ns="plugin__kubevirt-plugin" t={t}>
-              <p>
-                The descheduler can be used to evict a running pod to allow the pod to be
-                rescheduled onto a more suitable node.
-              </p>
-              <br />
-              <p>Note: if VirtualMachine has LiveMigratable=False condition, edit is disabled.</p>
-            </Trans>
-          }
+          bodyContent={<DeschedulerPopover />}
           data-test-id="descheduler"
           descriptionData={<Descheduler vm={vm} />}
           descriptionHeader={t('Descheduler')}
