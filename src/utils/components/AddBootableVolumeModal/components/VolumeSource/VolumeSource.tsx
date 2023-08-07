@@ -8,11 +8,16 @@ import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import { Checkbox, PopoverPosition, Split, SplitItem } from '@patternfly/react-core';
+import {
+  Checkbox,
+  FormGroup,
+  PopoverPosition,
+  Split,
+  SplitItem,
+  TextInput,
+} from '@patternfly/react-core';
 
 import { AddBootableVolumeState, DROPDOWN_FORM_SELECTION } from '../../utils/constants';
-
-import VolumeRegistryData from './VolumeRegistryData';
 
 type VolumeSourceProps = {
   bootableVolume: AddBootableVolumeState;
@@ -31,7 +36,7 @@ const VolumeSource: FC<VolumeSourceProps> = ({
   upload,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { pvcName, pvcNamespace, uploadFile, uploadFilename } = bootableVolume || {};
+  const { pvcName, pvcNamespace, registryURL, uploadFile, uploadFilename } = bootableVolume || {};
 
   if (sourceType === DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE)
     return (
@@ -47,10 +52,20 @@ const VolumeSource: FC<VolumeSourceProps> = ({
 
   if (sourceType === DROPDOWN_FORM_SELECTION.USE_REGISTRY)
     return (
-      <VolumeRegistryData
-        bootableVolume={bootableVolume}
-        setBootableVolumeField={setBootableVolumeField}
-      />
+      <FormGroup
+        fieldId="volume-registry-url"
+        helperText={t('Example: quay.io/containerdisks/centos:7-2009')}
+        isRequired
+        label={t('Registry URL')}
+      >
+        <TextInput
+          data-test-id="volume-registry-url"
+          id="volume-registry-url"
+          onChange={setBootableVolumeField('registryURL')}
+          type="text"
+          value={registryURL}
+        />
+      </FormGroup>
     );
 
   return (

@@ -1,56 +1,27 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, NumberInput, Text, TextInput, Title } from '@patternfly/react-core';
 
-import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
+import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../utils/constants';
 
-type VolumeRegistryDataProps = {
+type SchedulingSettingsProps = {
   bootableVolume: AddBootableVolumeState;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const VolumeRegistryData: React.FC<VolumeRegistryDataProps> = ({
+const SchedulingSettings: FC<SchedulingSettingsProps> = ({
   bootableVolume,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const { bootableVolumeName, cronExpression, registryURL, retainRevisions, size } =
-    bootableVolume || {};
+  const { cronExpression, retainRevisions } = bootableVolume || {};
 
   return (
     <>
-      <FormGroup fieldId="volume-registry-name" isRequired label={t('Name')}>
-        <TextInput
-          data-test-id="volume-registry-name"
-          id="volume-registry-name"
-          onChange={setBootableVolumeField('bootableVolumeName')}
-          type="text"
-          value={bootableVolumeName}
-        />
-      </FormGroup>
-
-      <FormGroup
-        fieldId="volume-registry-url"
-        helperText={t('Example: quay.io/containerdisks/centos:7-2009')}
-        isRequired
-        label={t('Registry URL')}
-      >
-        <TextInput
-          data-test-id="volume-registry-url"
-          id="volume-registry-url"
-          onChange={setBootableVolumeField('registryURL')}
-          type="text"
-          value={registryURL}
-        />
-      </FormGroup>
-
-      <CapacityInput label={t('Disk size')} onChange={setBootableVolumeField('size')} size={size} />
-
       <FormGroup
         helperText={t(
           'Specify the number of revisions that should be retained. A value of X means that the X latest versions will be kept.',
@@ -105,4 +76,4 @@ const VolumeRegistryData: React.FC<VolumeRegistryDataProps> = ({
   );
 };
 
-export default VolumeRegistryData;
+export default SchedulingSettings;
