@@ -341,6 +341,23 @@
     "type": "console.yaml-template"
   },
   {
+    "flags": {
+      "required": ["KUBEVIRT"]
+    },
+    "properties": {
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineClusterPreference",
+        "version": "v1alpha2"
+      },
+      "name": "default",
+      "template": {
+        "$codeRef": "yamlTemplates.defaultVirtualMachineClusterPreferenceYamlTemplate"
+      }
+    },
+    "type": "console.yaml-template"
+  },
+  {
     "properties": {
       "id": "VirtualizationSeparator",
       "insertAfter": "templates",

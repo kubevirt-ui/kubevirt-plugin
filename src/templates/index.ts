@@ -1,4 +1,5 @@
 export * from './clusterinstancetype-yaml';
+export * from './clusterpreference-yaml';
 export * from './datasource-yaml';
 export * from './migrationpolicy-yaml';
 export * from './vm-template-yaml';
