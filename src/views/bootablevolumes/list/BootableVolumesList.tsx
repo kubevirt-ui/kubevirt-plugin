@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -10,10 +10,7 @@ import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import {
-  DataSourceModelRef,
-  VirtualMachineClusterPreferenceModelGroupVersionKind,
-} from '@kubevirt-utils/models';
+import { DataSourceModelRef } from '@kubevirt-utils/models';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import {
@@ -22,7 +19,6 @@ import {
   ListPageCreateDropdown,
   ListPageFilter,
   ListPageHeader,
-  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -43,10 +39,7 @@ const BootableVolumesList: FC<RouteComponentProps<{ ns: string }>> = ({ match })
 
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(namespace);
 
-  const [preferences] = useK8sWatchResource<V1beta1VirtualMachineClusterPreference[]>({
-    groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
-    isList: true,
-  });
+  const [preferences] = useClusterPreferences();
 
   const [data, filteredData, onFilterChange] = useListPageFilter(
     bootableVolumes,

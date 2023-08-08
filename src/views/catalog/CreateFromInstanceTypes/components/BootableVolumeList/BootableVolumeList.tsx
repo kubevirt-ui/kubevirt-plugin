@@ -1,10 +1,8 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import {
-  UseBootableVolumesValues,
-  UseInstanceTypeAndPreferencesValues,
-} from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
@@ -36,14 +34,14 @@ import './BootableVolumeList.scss';
 type BootableVolumeListProps = {
   bootableVolumesData: UseBootableVolumesValues;
   displayShowAllButton?: boolean;
-  instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
+  preferencesData: V1beta1VirtualMachineClusterPreference[];
   selectedBootableVolumeState?: [BootableVolume, (selectedVolume: BootableVolume) => void];
 };
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
   bootableVolumesData,
   displayShowAllButton = false,
-  instanceTypesAndPreferencesData,
+  preferencesData,
   selectedBootableVolumeState,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -52,10 +50,10 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const { selectedBootableVolume } = instanceTypeVMState;
   const { bootableVolumes, loaded, pvcSources } = bootableVolumesData;
 
-  const preferencesMap = useMemo(() => {
-    const { preferences } = instanceTypesAndPreferencesData;
-    return convertResourceArrayToMap(preferences);
-  }, [instanceTypesAndPreferencesData]);
+  const preferencesMap = useMemo(
+    () => convertResourceArrayToMap(preferencesData),
+    [preferencesData],
+  );
 
   const { activeColumns, columnLayout } = useBootVolumeColumns(!displayShowAllButton);
   const filters = useBootVolumeFilters(!displayShowAllButton);
@@ -150,7 +148,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             {displayShowAllButton && (
               <ShowAllBootableVolumesButton
                 bootableVolumesData={bootableVolumesData}
-                instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+                preferencesData={preferencesData}
               />
             )}
           </>

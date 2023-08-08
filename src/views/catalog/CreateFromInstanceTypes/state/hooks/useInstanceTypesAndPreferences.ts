@@ -1,42 +1,23 @@
-import {
-  VirtualMachineClusterInstancetypeModelGroupVersionKind,
-  VirtualMachineClusterPreferenceModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
-import {
-  V1beta1VirtualMachineClusterInstancetype,
-  V1beta1VirtualMachineClusterPreference,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-
 import { UseInstanceTypeAndPreferencesValues } from '../utils/types';
+
+import useClusterPreferences from './useClusterPreferences';
+import useInstanceTypes from './useInstanceTypes';
 
 type UseInstanceTypeAndPreferences = () => UseInstanceTypeAndPreferencesValues;
 
 const useInstanceTypesAndPreferences: UseInstanceTypeAndPreferences = () => {
-  const [preferences, preferencesLoaded, preferencesLoadError] = useK8sWatchResource<
-    V1beta1VirtualMachineClusterPreference[]
-  >({
-    groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
-    isList: true,
-  });
+  const [instanceTypes, instanceTypesLoaded, instanceTypesLoadError] = useInstanceTypes();
 
-  const [instanceTypes, instanceTypesLoaded, instanceTypesLoadError] = useK8sWatchResource<
-    V1beta1VirtualMachineClusterInstancetype[]
-  >({
-    groupVersionKind: VirtualMachineClusterInstancetypeModelGroupVersionKind,
-    isList: true,
-  });
+  const [preferences, preferencesLoaded, preferencesLoadError] = useClusterPreferences();
 
   const loaded = preferencesLoaded && instanceTypesLoaded;
   const loadError = preferencesLoadError || instanceTypesLoadError;
 
-  const errorState = !loaded || loadError || isEmpty(preferences) || isEmpty(instanceTypes);
   return {
-    instanceTypes: errorState ? [] : instanceTypes,
-    loaded: loadError ? true : loaded,
+    instanceTypes,
+    loaded: loaded || !!loadError,
     loadError,
-    preferences: errorState ? [] : preferences,
+    preferences,
   };
 };
 

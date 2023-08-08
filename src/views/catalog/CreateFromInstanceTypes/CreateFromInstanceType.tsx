@@ -89,9 +89,7 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
             <List className="create-vm-instance-type-section__list" isPlain>
               <SectionListItem
                 headerAction={
-                  <AddBootableVolumeButton
-                    instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
-                  />
+                  <AddBootableVolumeButton loadError={instanceTypesAndPreferencesData.loadError} />
                 }
                 headerText={
                   <>
@@ -119,7 +117,7 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
                 <BootableVolumeList
                   bootableVolumesData={bootableVolumesData}
                   displayShowAllButton
-                  instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+                  preferencesData={instanceTypesAndPreferencesData.preferences}
                 />
               </SectionListItem>
 

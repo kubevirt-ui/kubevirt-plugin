@@ -1,8 +1,8 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
+import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -10,10 +10,8 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-utils/models';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
 
@@ -56,10 +54,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
 
   const { t } = useKubevirtTranslation();
 
-  const [preferences] = useK8sWatchResource<V1beta1VirtualMachineClusterPreference[]>({
-    groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
-    isList: true,
-  });
+  const [preferences] = useClusterPreferences();
 
   const preferencesNames = useMemo(() => preferences.map(getName), [preferences]);
   const [sourceType, setSourceType] = useState<DROPDOWN_FORM_SELECTION>(
