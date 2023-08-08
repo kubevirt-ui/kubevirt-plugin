@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
@@ -12,6 +12,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
@@ -25,13 +26,14 @@ type UseDataSourceActionsProvider = (
 
 export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataSource) => {
   const dataImportCronName = getDataSourceCronJob(dataSource);
-  const [dataImportCron, setDataImportCron] = React.useState<V1beta1DataImportCron>();
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [dataImportCron, setDataImportCron] = useState<V1beta1DataImportCron>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataSource);
+  const lastNamespacePath = useLastNamespacePath();
 
-  const lazyLoadDataImportCron = React.useCallback(() => {
+  const lazyLoadDataImportCron = useCallback(() => {
     if (dataImportCronName && !dataImportCron && !isOwnedBySSP) {
       setIsLoading(true);
       k8sGet<V1beta1DataImportCron>({
@@ -45,7 +47,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
     }
   }, [dataImportCron, dataImportCronName, dataSource?.metadata?.namespace, isOwnedBySSP]);
 
-  const actions = React.useMemo(
+  const actions = useMemo(
     () => [
       {
         cta: () =>
@@ -123,6 +125,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
               isOpen={isOpen}
               obj={dataSource}
               onClose={onClose}
+              redirectUrl={`/k8s/${lastNamespacePath}/bootablevolumes`}
             />
           )),
         id: 'datasource-action-delete',
@@ -156,7 +159,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
         ),
       },
     ],
-    [t, dataSource, isLoading, dataImportCron, isOwnedBySSP, createModal],
+    [t, dataSource, isOwnedBySSP, dataImportCron, isLoading, createModal, lastNamespacePath],
   );
 
   return [actions, lazyLoadDataImportCron];
