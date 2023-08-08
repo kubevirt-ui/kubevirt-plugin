@@ -21,7 +21,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   const createItems = {
     catalog: t('From template'),
     volume: t('From volume'),
-    yaml: t('From YAML'),
+    yaml: t('With YAML'),
   };
 
   const catalogURL = useMemo(
