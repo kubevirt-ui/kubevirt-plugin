@@ -15,6 +15,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
 
+import SchedulingSettings from './components/SchedulingSettings';
 import SourceTypeSelection from './components/SourceTypeSelection/SourceTypeSelection';
 import VolumeDestination from './components/VolumeDestination/VolumeDestination';
 import VolumeMetadata from './components/VolumeMetadata/VolumeMetadata';
@@ -114,17 +115,20 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           sourceType={sourceType}
           upload={upload}
         />
-        {sourceType !== DROPDOWN_FORM_SELECTION.USE_REGISTRY && (
-          <>
-            <Title className="pf-u-mt-md" headingLevel="h5">
-              {t('Destination details')}
-            </Title>
-            <VolumeDestination
-              bootableVolume={bootableVolume}
-              namespace={namespace}
-              setBootableVolumeField={setBootableVolumeField}
-            />
-          </>
+        <Title className="pf-u-mt-md" headingLevel="h5">
+          {t('Destination details')}
+        </Title>
+        <VolumeDestination
+          bootableVolume={bootableVolume}
+          namespace={namespace}
+          setBootableVolumeField={setBootableVolumeField}
+        />
+
+        {sourceType === DROPDOWN_FORM_SELECTION.USE_REGISTRY && (
+          <SchedulingSettings
+            bootableVolume={bootableVolume}
+            setBootableVolumeField={setBootableVolumeField}
+          />
         )}
         <Title className="pf-u-mt-md" headingLevel="h5">
           {t('Volume metadata')}{' '}

@@ -112,7 +112,14 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   bootableVolume,
   initialDataSource,
 ) => {
-  const { bootableVolumeName, cronExpression, registryURL, retainRevisions, size } = bootableVolume;
+  const {
+    bootableVolumeName,
+    cronExpression,
+    registryURL,
+    retainRevisions,
+    size,
+    storageClassName,
+  } = bootableVolume;
 
   const dataImportCronName = `${bootableVolumeName}-import-cron-${getRandomChars()}`;
   const dataImportCron = produce(initialDataImportCron, (draft) => {
@@ -136,6 +143,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
                 storage: size,
               },
             },
+            storageClassName,
           },
         },
       },
