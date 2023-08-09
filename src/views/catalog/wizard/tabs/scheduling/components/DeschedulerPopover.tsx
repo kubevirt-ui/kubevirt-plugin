@@ -9,11 +9,11 @@ const DeschedulerPopover = () => {
   return (
     <Trans ns="plugin__kubevirt-plugin" t={t}>
       <p>
-        The descheduler can be used to evict a running pod to allow the pod to be rescheduled onto a
-        more suitable node.
+        The descheduler evicts a running pod so that the pod can be rescheduled on a more suitable
+        node.
       </p>
       <br />
-      <p>Note: if VirtualMachine has LiveMigratable=False condition, edit is disabled.</p>
+      <p>Note: This setting is disabled if the VirtualMachine is not live migratable.</p>
     </Trans>
   );
 };
