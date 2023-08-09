@@ -31,7 +31,7 @@ const BootSourceCheckbox: React.FC<BootSourceCheckboxProps> = ({
   isDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
-  const showOverrideAlert = !isDisabled && isBootSource;
+  const showOverrideAlert = !isDisabled && isBootSource && initialBootDiskName;
 
   return (
     <FormGroup fieldId="enable-bootsource">
