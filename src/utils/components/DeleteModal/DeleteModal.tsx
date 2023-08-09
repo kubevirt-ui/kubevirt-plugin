@@ -35,10 +35,9 @@ const DeleteModal: FC<DeleteModalProps> = memo(
 
     return (
       <TabModal<K8sResourceCommon>
-        onSubmit={() => {
-          return onDeleteSubmit().then(() => {
-            history.push(url);
-          });
+        onSubmit={async () => {
+          await onDeleteSubmit();
+          history.push(url);
         }}
         headerText={headerText || t('Delete Resource?')}
         isOpen={isOpen}
