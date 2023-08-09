@@ -24,8 +24,7 @@ const ForceStopAlert: FC<ForceStopAlertProps> = ({ vm }) => {
       variant={AlertVariant.warning}
     >
       <Trans t={t}>
-        There was an error processing the request. Click <strong> Force stop </strong>
-        to complete the shutdown.
+        Click <strong>Force stop</strong> to start an immediate shutdown of the VirtualMachine.
       </Trans>
       <div className="force-stop-button">
         <Button
