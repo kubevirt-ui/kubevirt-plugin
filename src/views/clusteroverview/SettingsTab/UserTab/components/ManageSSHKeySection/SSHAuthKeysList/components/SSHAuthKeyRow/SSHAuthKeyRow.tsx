@@ -37,7 +37,7 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
   const { projectName, secretName } = row;
 
   const onSubmit = useCallback(
-    (sshDetails: SSHSecretDetails) => {
+    async (sshDetails: SSHSecretDetails) => {
       const { secretOption, sshPubKey, sshSecretName } = sshDetails;
 
       if (isEqualObject(sshDetails?.sshSecretName, secretName)) {
@@ -65,9 +65,10 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
         !isEmpty(sshPubKey) &&
         !isEmpty(sshSecretName)
       ) {
+        const secretSucceed = await createSSHSecret(sshPubKey, sshSecretName, projectName);
         const updatedRow = { ...row, secretName: sshSecretName };
-        onAuthKeyChange(updatedRow);
-        return createSSHSecret(sshPubKey, sshSecretName, projectName);
+        secretSucceed && onAuthKeyChange(updatedRow);
+        return secretSucceed;
       }
     },
     [secretName, row, onAuthKeyChange, projectName],

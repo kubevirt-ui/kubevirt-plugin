@@ -87,14 +87,23 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
       setAuthorizedSSHKeys({ ...authorizedSSHKeys, [vmNamespaceTarget]: sshSecretName });
     }
 
+    const newSSHKey = secretOption === SecretSelectionOption.addNew;
+    if (newSSHKey) {
+      try {
+        await createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget, true);
+      } catch (e) {
+        setError(e);
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
     return k8sCreate({
       data: vmToCreate,
       model: VirtualMachineModel,
     })
       .then(() => {
-        if (secretOption === SecretSelectionOption.addNew) {
-          createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
-        }
+        newSSHKey && createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
         history.push(getResourceUrl({ model: VirtualMachineModel, resource: vmToCreate }));
       })
       .catch(setError)
