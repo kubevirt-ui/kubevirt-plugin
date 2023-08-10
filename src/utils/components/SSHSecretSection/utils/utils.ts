@@ -118,7 +118,12 @@ export const getCloudInitConfigDrive = (
     : { ...cloudInitVolumeData, userData: userDataClean };
 };
 
-export const createSSHSecret = (sshKey: string, secretName: string, secretNamespace: string) =>
+export const createSSHSecret = (
+  sshKey: string,
+  secretName: string,
+  secretNamespace: string,
+  dryRun = false,
+) =>
   k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
     data: {
       apiVersion: SecretModel.apiVersion,
@@ -130,4 +135,5 @@ export const createSSHSecret = (sshKey: string, secretName: string, secretNamesp
       },
     },
     model: SecretModel,
+    ...(dryRun && { queryParams: { dryRun: 'All' } }),
   });

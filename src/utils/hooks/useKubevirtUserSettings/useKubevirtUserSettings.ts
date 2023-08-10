@@ -110,27 +110,28 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
 
   const updateUserSetting = (val: any) => {
     setUserSettings((prevUserSettings) => {
+      const updateResource = async (data: { [key: string]: any }) => {
+        try {
+          await k8sPatch({
+            data: [
+              {
+                op: 'replace',
+                path: `/data/${userName}`,
+                value: JSON.stringify(data),
+              },
+            ],
+            model: ConfigMapModel,
+            resource: userConfigMap,
+          });
+        } catch (e) {
+          setError(e);
+        }
+      };
+
       const data = key ? { ...prevUserSettings, [key]: val } : val;
       updateResource(data);
       return data;
     });
-    const updateResource = async (data: { [key: string]: any }) => {
-      try {
-        await k8sPatch({
-          data: [
-            {
-              op: 'replace',
-              path: `/data/${userName}`,
-              value: JSON.stringify(data),
-            },
-          ],
-          model: ConfigMapModel,
-          resource: userConfigMap,
-        });
-      } catch (e) {
-        setError(e);
-      }
-    };
   };
 
   return [

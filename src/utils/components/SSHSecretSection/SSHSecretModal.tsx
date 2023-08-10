@@ -6,7 +6,8 @@ import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import TabModal from '../TabModal/TabModal';
 
 import useSecretsData from './hooks/useSecretsData';
-import { SSHSecretDetails } from './utils/types';
+import { SecretSelectionOption, SSHSecretDetails } from './utils/types';
+import { createSSHSecret } from './utils/utils';
 import SSHSecretSection from './SSHSecretSection';
 
 type SSHSecretModalProps = {
@@ -40,11 +41,18 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
 
   return (
     <TabModal
+      onSubmit={async () => {
+        const { secretOption, sshPubKey, sshSecretName } = sshDetails;
+        if (secretOption === SecretSelectionOption.addNew) {
+          await createSSHSecret(sshPubKey, sshSecretName, namespace, true);
+        }
+
+        return onSubmit(sshDetails);
+      }}
       headerText={t('Authorized SSH key')}
       isDisabled={isDisabled}
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={() => onSubmit(sshDetails)}
     >
       <MutedTextSpan text={t('SSH key is saved in the project as a secret')} />
       <SSHSecretSection
