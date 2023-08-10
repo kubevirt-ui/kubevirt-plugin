@@ -1,5 +1,9 @@
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1Disk,
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   convertYAMLToNetworkDataObject,
   convertYAMLUserDataObject,
@@ -9,7 +13,6 @@ import {
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import {
   getAffinity,
-  getBootDisk,
   getGPUDevices,
   getHostDevices,
   getInterfaces,
@@ -47,14 +50,17 @@ export const checkBootOrderChanged = (
     return false;
   }
 
-  const vmBootDisk = getBootDisk(vm);
-  const vmiBootDisk = (vmi?.spec?.domain?.devices?.disks || [])
-    .filter((d) => d.bootOrder)
-    .reduce((acc, disk) => {
-      return acc.bootOrder < disk.bootOrder ? acc : disk;
-    }, vmi?.spec?.domain?.devices?.disks?.[0]);
+  const getCleanDisk = (disk: V1Disk) => ({ bootOrder: disk?.bootOrder, name: disk?.name });
+  const sortDisks = (a: V1Disk, b: V1Disk) => (a?.name > b?.name ? 1 : -1);
+  const vmDisks = (vm?.spec?.template?.spec?.domain?.devices?.disks || [])
+    .map(getCleanDisk)
+    .sort(sortDisks);
+  const vmiDisks = (vmi?.spec?.domain?.devices?.disks || []).map(getCleanDisk).sort(sortDisks);
+  if (vmDisks?.length !== vmiDisks?.length) return true;
 
-  return !isEqualObject(vmBootDisk, vmiBootDisk);
+  const hasChanges = vmDisks?.some((val, idx) => !isEqualObject(val, vmiDisks[idx]));
+
+  return hasChanges;
 };
 
 export const checkBootModeChanged = (
