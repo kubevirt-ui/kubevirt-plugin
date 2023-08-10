@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
 import { initialAuthKeyRow } from '../utils/constants';
 import { AuthKeyRow } from '../utils/types';
@@ -17,23 +19,51 @@ type UseSSHAuthKeys = () => {
   selectableProjects: string[];
 };
 
+const filterAuthRows = async (rows: AuthKeyRow[]) => {
+  const filteredRowsPromises: Promise<AuthKeyRow>[] = rows.map(async (row) => {
+    try {
+      await k8sGet({
+        model: SecretModel,
+        name: row.secretName,
+        ns: row.projectName,
+      }); // Assuming k8sGet returns an object or throws an error
+      return row;
+    } catch (error) {
+      // If an error occurs during k8sGet, return a new object representing the error
+      return { ...row, secretName: '' };
+    }
+  });
+
+  return Promise.all(filteredRowsPromises);
+};
+
 const useSSHAuthKeys: UseSSHAuthKeys = () => {
   const [authorizedSSHKeys = {}, updateAuthorizedSSHKeys, loadedSettings] =
     useKubevirtUserSettings('ssh');
 
   const [authKeyRows, setAuthKeyRows] = useState<AuthKeyRow[]>([initialAuthKeyRow]);
   const [isInitEffect, setIsInitEffect] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (loadedSettings && isInitEffect) {
-      !isEmpty(authorizedSSHKeys) &&
-        setAuthKeyRows(
-          Object.entries(authorizedSSHKeys).map(([projectName, secretName], id) => ({
+      if (!isEmpty(authorizedSSHKeys)) {
+        const authRows: AuthKeyRow[] = Object.entries(authorizedSSHKeys).map(
+          ([projectName, secretName], id) => ({
             id,
             projectName,
             secretName,
-          })),
+          }),
         );
+
+        filterAuthRows(authRows)
+          .then((filteredRows) => {
+            setAuthKeyRows(filteredRows);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
 
       setIsInitEffect(false);
     }
@@ -81,7 +111,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
 
   return {
     authKeyRows,
-    loaded: loaded && loadedSettings,
+    loaded: loaded && loadedSettings && !loading,
     onAuthKeyAdd,
     onAuthKeyChange,
     onAuthKeyDelete,
