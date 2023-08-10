@@ -10,6 +10,7 @@ import {
   getCloudInitPropagationMethod,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getLabel } from '@kubevirt-utils/resources/shared';
 import { getAccessCredentials, getVMSSHSecretName, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -17,7 +18,7 @@ const DynamicSSHKeyInjectionWizard = () => {
   const { updateVM, vm } = useWizardVMContext();
   const hasSSHKey = !isEmpty(getAccessCredentials(vm));
   const secretName = getVMSSHSecretName(vm);
-  const hasDynamicSSHLabel = vm?.metadata?.labels?.[DYNAMIC_CREDENTIALS_SUPPORT];
+  const hasDynamicSSHLabel = getLabel(vm, DYNAMIC_CREDENTIALS_SUPPORT) === 'true';
   const isDisabled = (!hasSSHKey && !secretName) || !hasDynamicSSHLabel;
 
   const onSubmit = (checked: boolean) => {
