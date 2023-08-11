@@ -158,3 +158,11 @@ export const getIsDynamicSSHInjectionEnabled = (vm: V1VirtualMachine): boolean =
 export const getVMSSHSecretName = (vm: V1VirtualMachine): string =>
   getAccessCredentials(vm)?.find((ac) => ac?.sshPublicKey?.source?.secret?.secretName)?.sshPublicKey
     ?.source?.secret?.secretName;
+
+/**
+ * A selector that returns the autoAttachPodInterface of the VM
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns {boolean} the autoAttachPodInterface
+ */
+export const getAutoAttachPodInterface = (vm: V1VirtualMachine): boolean =>
+  vm?.spec?.template?.spec?.domain?.devices?.autoattachPodInterface;

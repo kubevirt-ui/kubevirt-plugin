@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -16,7 +16,7 @@ type VirtualMachinePendingChangesAlertProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinePendingChangesAlert: React.FC<VirtualMachinePendingChangesAlertProps> = ({
+const VirtualMachinePendingChangesAlert: FC<VirtualMachinePendingChangesAlertProps> = ({
   vm,
   vmi,
 }) => {

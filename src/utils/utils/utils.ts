@@ -111,3 +111,9 @@ export const columnSorting = <T>(
   };
   return data?.sort(predicate)?.slice(startIndex, endIndex);
 };
+
+export const removeDuplicatesByName = (array: any[]) =>
+  array?.reduce((acc, curr) => {
+    if (!acc.find((item) => item?.name === curr?.name)) acc.push(curr);
+    return acc;
+  }, []);

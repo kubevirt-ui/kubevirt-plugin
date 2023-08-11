@@ -7,6 +7,13 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 export const getVMIVolumes = (vmi: V1VirtualMachineInstance) => vmi?.spec?.volumes;
 
 /**
+ * A selector for the virtual machine instance's networks
+ * @param {V1VirtualMachineInstance} vmi the virtual machine
+ * @returns the virtual machine instance networks
+ */
+export const getVMINetworks = (vmi: V1VirtualMachineInstance) => vmi?.spec?.networks;
+
+/**
  * A selector for the virtual machine instance's interfaces
  * @param {V1VirtualMachineInstance} vmi the virtual machine
  * @returns the virtual machine instance interfaces
