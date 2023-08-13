@@ -60,12 +60,14 @@ const useSSHAuthProjects: UseSSHAuthProjects = (authKeyRows) => {
 
       Promise.all(promises)
         .then((accessReviewResults) => {
-          const projectsAllowedCreateSecret = accessReviewResults.reduce((acc, accessReview) => {
-            accessReview?.status?.allowed &&
-              acc.push(accessReview?.spec?.resourceAttributes?.namespace);
+          const projectsAllowedCreateSecret = accessReviewResults
+            .reduce((acc, accessReview) => {
+              accessReview?.status?.allowed &&
+                acc.push(accessReview?.spec?.resourceAttributes?.namespace);
 
-            return acc;
-          }, []);
+              return acc;
+            }, [])
+            .sort((a, b) => a?.localeCompare(b));
 
           setSelectableProjects(projectsAllowedCreateSecret);
         })
