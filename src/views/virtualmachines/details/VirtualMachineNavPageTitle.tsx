@@ -55,9 +55,11 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name,
             <SplitItem>
               <span className="co-m-resource-icon co-m-resource-icon--lg">{t('VM')}</span>
               {name}{' '}
-              <Label className="vm-resource-label" icon={<StatusIcon />} isCompact>
-                {vm?.status?.printableStatus}
-              </Label>
+              {!isEmpty(vm) && (
+                <Label className="vm-resource-label" icon={<StatusIcon />} isCompact>
+                  {vm?.status?.printableStatus}
+                </Label>
+              )}
             </SplitItem>
             <VMNotMigratableLabel vm={vm} />
           </Split>
