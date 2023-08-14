@@ -111,7 +111,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     if (!featureEnabled || isProxyPodAlive === false) return [unfilterData, dataFilters];
 
     const matchedVMS = vms?.filter(
-      ({ metadata: { name, namespace: ns }, status: { printableStatus } }) => {
+      ({ metadata: { name, namespace: ns }, status: { printableStatus = '' } = {} }) => {
         return (
           vmiMapper?.mapper?.[ns]?.[name] ||
           (!query.has('rowFilter-node') && printableStatus !== 'Running')
