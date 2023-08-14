@@ -52,44 +52,42 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({
       });
     }
   }, [diskInterface, dispatchDiskState, isCDROMType]);
+
   return (
-    <>
-      <FormGroup
-        fieldId="disk-interface"
-        helperText={t('Hot plug is enabled only for "SCSI" interface')}
-        isRequired
-        label={t('Interface')}
-      >
-        <div data-test-id="disk-interface-select">
-          <Select
-            direction="up"
-            isOpen={isOpen}
-            menuAppendTo="parent"
-            onSelect={onSelect}
-            onToggle={setIsOpen}
-            selections={diskInterface}
-            variant={SelectVariant.single}
-          >
-            {interfaceOptions.map(({ description, id, name }) => {
-              const isDisabled =
-                (isVMRunning && id !== interfaceTypes.SCSI) ||
-                (isCDROMType && id === interfaceTypes.VIRTIO);
-              return (
-                <SelectOption
-                  data-test-id={`disk-interface-select-${id}`}
-                  description={description}
-                  isDisabled={isDisabled}
-                  key={id}
-                  value={id}
-                >
-                  {name}
-                </SelectOption>
-              );
-            })}
-          </Select>
-        </div>
-      </FormGroup>
-    </>
+    <FormGroup
+      fieldId="disk-interface"
+      helperText={t('Hot plug is enabled only for "SCSI" interface')}
+      isRequired
+      label={t('Interface')}
+    >
+      <div data-test-id="disk-interface-select">
+        <Select
+          direction="up"
+          isDisabled={isVMRunning}
+          isOpen={isOpen}
+          menuAppendTo="parent"
+          onSelect={onSelect}
+          onToggle={setIsOpen}
+          selections={diskInterface}
+          variant={SelectVariant.single}
+        >
+          {interfaceOptions.map(({ description, id, name }) => {
+            const isDisabled = isCDROMType && id === interfaceTypes.VIRTIO;
+            return (
+              <SelectOption
+                data-test-id={`disk-interface-select-${id}`}
+                description={description}
+                isDisabled={isDisabled}
+                key={id}
+                value={id}
+              >
+                {name}
+              </SelectOption>
+            );
+          })}
+        </Select>
+      </div>
+    </FormGroup>
   );
 };
 

@@ -6,6 +6,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getBootDisk,
   getDataVolumeTemplates,
@@ -15,20 +16,16 @@ import {
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { Form } from '@patternfly/react-core';
 
-import AccessMode from './DiskFormFields/AccessMode';
-import ApplyStorageProfileSettingsCheckbox from './DiskFormFields/ApplyStorageProfileSettingsCheckbox';
+import { PendingChangesAlert } from '../PendingChanges/PendingChangesAlert/PendingChangesAlert';
+
 import BootSourceCheckbox from './DiskFormFields/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './DiskFormFields/DiskInterfaceSelect';
 import DiskSourceSizeInput from './DiskFormFields/DiskSizeInput/DiskSizeInput';
 import DiskSourceFormSelect from './DiskFormFields/DiskSourceFormSelect/DiskSourceFormSelect';
 import DiskTypeSelect from './DiskFormFields/DiskTypeSelect';
-import EnablePreallocationCheckbox from './DiskFormFields/EnablePreallocationCheckbox';
-import useStorageProfileClaimPropertySets from './DiskFormFields/hooks/useStorageProfileClaimPropertySets';
 import NameFormField from './DiskFormFields/NameFormField';
-import AlertedStorageClassSelect from './DiskFormFields/StorageClass/AlertedStorageClassSelect';
+import StorageClassAndPreallocation from './DiskFormFields/StorageClassAndPreallocation';
 import { sourceTypes } from './DiskFormFields/utils/constants';
-import VolumeMode from './DiskFormFields/VolumeMode';
-import { diskReducerActions } from './state/actions';
 import { initialStateDiskForm, initialStateDiskSource } from './state/initialState';
 import { diskReducer, diskSourceReducer } from './state/reducers';
 import {
@@ -64,6 +61,8 @@ const DiskModal: FC<DiskModalProps> = ({
   onUploadedDataVolume,
   vm,
 }) => {
+  const { t } = useKubevirtTranslation();
+
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
   const { upload, uploadData } = useCDIUpload();
   const [diskState, dispatchDiskState] = useReducer(diskReducer, initialStateDiskForm);
@@ -74,10 +73,6 @@ const DiskModal: FC<DiskModalProps> = ({
   const sourceRequiresDataVolume = useMemo(
     () => requiresDataVolume(diskState.diskSource),
     [diskState.diskSource],
-  );
-
-  const { claimPropertySets, loaded: storageProfileLoaded } = useStorageProfileClaimPropertySets(
-    diskState?.storageClass,
   );
 
   const hotplugPromise = useCallback(
@@ -193,6 +188,13 @@ const DiskModal: FC<DiskModalProps> = ({
       obj={updatedVirtualMachine}
       onSubmit={handleSubmit}
     >
+      {isVMRunning && (
+        <PendingChangesAlert title={t(' Adding hot plugged disk')}>
+          {t(
+            'Additional disks types and interfaces are available when the VirtualMachine is stopped.',
+          )}
+        </PendingChangesAlert>
+      )}
       <Form>
         <BootSourceCheckbox
           dispatchDiskState={dispatchDiskState}
@@ -222,43 +224,7 @@ const DiskModal: FC<DiskModalProps> = ({
           dispatchDiskState={dispatchDiskState}
           isVMRunning={isVMRunning}
         />
-        {(sourceRequiresDataVolume || diskState.diskSource === sourceTypes.UPLOAD) && (
-          <>
-            <AlertedStorageClassSelect
-              setStorageClassName={(scName) =>
-                dispatchDiskState({ payload: scName, type: diskReducerActions.SET_STORAGE_CLASS })
-              }
-              setStorageClassProvisioner={(scProvisioner: string) =>
-                dispatchDiskState({
-                  payload: scProvisioner,
-                  type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER,
-                })
-              }
-              storageClass={diskState.storageClass}
-            />
-            <ApplyStorageProfileSettingsCheckbox
-              claimPropertySets={claimPropertySets}
-              diskState={diskState}
-              dispatchDiskState={dispatchDiskState}
-              loaded={storageProfileLoaded}
-            />
-            <AccessMode
-              diskState={diskState}
-              dispatchDiskState={dispatchDiskState}
-              spAccessMode={claimPropertySets?.[0]?.accessModes?.[0]}
-            />
-            <VolumeMode
-              diskState={diskState}
-              dispatchDiskState={dispatchDiskState}
-              spVolumeMode={claimPropertySets?.[0]?.volumeMode}
-            />
-            <EnablePreallocationCheckbox
-              dispatchDiskState={dispatchDiskState}
-              enablePreallocation={diskState.enablePreallocation}
-              isDisabled={!sourceRequiresDataVolume}
-            />
-          </>
-        )}
+        <StorageClassAndPreallocation diskState={diskState} dispatchDiskState={dispatchDiskState} />
       </Form>
     </TabModal>
   );

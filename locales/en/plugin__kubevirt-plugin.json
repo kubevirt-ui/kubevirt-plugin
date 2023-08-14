@@ -1,5 +1,6 @@
 {
   " {{sockets}} sockets, {{threads}} threads, and {{cores}} cores.": " {{sockets}} sockets, {{threads}} threads, and {{cores}} cores.",
+  " Adding hot plugged disk": " Adding hot plugged disk",
   "--- Pick an Operating system ---": "--- Pick an Operating system ---",
   "--- Select {{ dsLabel }} name ---": "--- Select {{ dsLabel }} name ---",
   "--- Select {{dsLabel}} project ---": "--- Select {{dsLabel}} project ---",
@@ -104,6 +105,7 @@
   "Add tolerations to allow a VirtualMachine to schedule onto Nodes with matching taints.": "Add tolerations to allow a VirtualMachine to schedule onto Nodes with matching taints.",
   "Add volume": "Add volume",
   "Adding a bridged network interface to a running VirtualMachine is a Technology Preview feature that allows you to choose between live-migrating the VirtualMachine or restarting it to apply the changes. Enabling this feature requires cluster admin permissions.": "Adding a bridged network interface to a running VirtualMachine is a Technology Preview feature that allows you to choose between live-migrating the VirtualMachine or restarting it to apply the changes. Enabling this feature requires cluster admin permissions.",
+  "Additional disks types and interfaces are available when the VirtualMachine is stopped.": "Additional disks types and interfaces are available when the VirtualMachine is stopped.",
   "Additional resources": "Additional resources",
   "Additional statuses": "Additional statuses",
   "Address": "Address",
