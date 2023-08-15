@@ -1,9 +1,16 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import {
+  V1Network,
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getAutoAttachPodInterface } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
+import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/network/utils';
+import { getVMINetworks } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageFilter,
@@ -24,34 +31,29 @@ type NetworkInterfaceTableProps = {
 };
 
 const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm }) => {
-  const vmiExists = printableVMStatus.Stopped !== vm?.status?.printableStatus;
+  const filters = useNetworkRowFilters();
 
+  const vmiExists = printableVMStatus.Stopped !== vm?.status?.printableStatus;
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>(
     vmiExists && {
       groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
       isList: false,
-      name: vm?.metadata?.name,
-      namespace: vm?.metadata?.namespace,
+      name: getName(vm),
+      namespace: getNamespace(vm),
     },
   );
 
-  const [networks, interfaces] = useMemo(
-    () =>
-      vmiExists
-        ? [vmi?.spec?.networks, vmi?.spec?.domain?.devices?.interfaces]
-        : [getNetworks(vm), getInterfaces(vm)],
-    [vm, vmi, vmiExists],
-  );
-
-  const filters = useNetworkRowFilters();
+  const { interfaces, networks } = getInterfacesAndNetworks(vm, vmi);
 
   const networkInterfacesData = getNetworkInterfaceRowData(networks, interfaces);
   const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
 
   const columns = useNetworkColumns(filteredData);
 
-  const autoattachPodInterface =
-    vm?.spec?.template?.spec?.domain?.devices?.autoattachPodInterface !== false;
+  const autoattachPodInterface = getAutoAttachPodInterface(vm) !== false;
+
+  const isPending = (network: V1Network) =>
+    getVMINetworks(vmi)?.some((ntwork) => ntwork?.name !== network.name);
 
   return (
     <>
@@ -63,7 +65,7 @@ const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm }) => {
         loaded={!isEmpty(vm)}
         loadError={false}
         Row={NetworkInterfaceRow}
-        rowData={{ vm }}
+        rowData={{ isPending, vm }}
         unfilteredData={data}
       />
     </>

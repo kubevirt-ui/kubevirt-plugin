@@ -1,6 +1,7 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import PendingBadge from '@kubevirt-utils/components/PendingBadge/PendingBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -13,16 +14,19 @@ export type NetworkInterfaceRowProps = {
   obj: NetworkPresentation;
 };
 
-const NetworkInterfaceRow: React.FC<RowProps<NetworkPresentation, { vm: V1VirtualMachine }>> = ({
-  activeColumnIDs,
-  obj: { iface, network },
-  rowData: { vm },
-}) => {
+const NetworkInterfaceRow: FC<
+  RowProps<
+    NetworkPresentation,
+    { isPending: (network: V1Network) => boolean; vm: V1VirtualMachine }
+  >
+> = ({ activeColumnIDs, obj: { iface, network }, rowData: { isPending, vm } }) => {
   const { t } = useKubevirtTranslation();
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
         {network.name}
+        {isPending(network) && <PendingBadge />}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="model">
         {iface.model || NO_DATA_DASH}
