@@ -1,5 +1,6 @@
 import React, { FC, memo, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import produce from 'immer';
 
 import { updateVMCPUMemory } from '@catalog/templatescatalog/utils/helpers';
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
@@ -79,8 +80,12 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
     useEffect(() => {
       setError(undefined);
 
+      const updatedTemplate = produce<V1Template>(template, (draftTemplate) => {
+        draftTemplate.metadata.namespace = ns;
+      });
+
       k8sCreate<V1Template>({
-        data: template,
+        data: updatedTemplate,
         model: ProcessedTemplatesModel,
         queryParams: {
           dryRun: 'All',
