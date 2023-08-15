@@ -50,9 +50,11 @@ const EnableFeatureCheckbox: FC<EnableFeatureCheckboxProps> = ({
           label={label}
         />
       </FlexItem>
-      <FlexItem>
-        <ExternalLink href={externalLink} />
-      </FlexItem>
+      {externalLink && (
+        <FlexItem>
+          <ExternalLink href={externalLink} />
+        </FlexItem>
+      )}
     </Flex>
   );
 };
