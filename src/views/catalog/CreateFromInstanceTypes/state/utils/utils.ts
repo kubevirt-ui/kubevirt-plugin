@@ -30,7 +30,7 @@ export const getSSHCredentials = (
   })
     .then((secret) => ({
       appliedDefaultKey: true,
-      applyKeyToProject: true,
+      applyKeyToProject: false,
       secretOption: SecretSelectionOption.useExisting,
       sshPubKey: decodeSecret(secret),
       sshSecretName: sshSecretName,

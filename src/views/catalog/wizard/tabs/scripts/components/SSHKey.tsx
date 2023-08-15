@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
@@ -17,7 +17,6 @@ import {
   removeSecretToVM,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { SecretModel } from '@kubevirt-utils/models';
 import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -32,58 +31,41 @@ const SSHKey: FC = () => {
   const { tabsData, updateTabsData, updateVM, vm } = useWizardVMContext();
   const { createModal } = useModal();
 
-  const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
-
   const vmAttachedSecretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
 
-  const initialSSHDetails: SSHSecretDetails = useMemo(
-    () =>
-      getInitialSSHDetails({
-        applyKeyToProject:
-          !isEmpty(vmAttachedSecretName) && tabsData?.authorizedSSHKey === vmAttachedSecretName,
-        secretToCreate: tabsData.additionalObjects?.find((obj) => obj?.kind === SecretModel.kind),
-        sshSecretName: vmAttachedSecretName,
-      }),
-    [tabsData, vmAttachedSecretName],
+  const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(
+    getInitialSSHDetails({
+      applyKeyToProject: tabsData.applySSHToSettings,
+      secretToCreate: tabsData.additionalObjects?.find((obj) => obj?.kind === SecretModel.kind),
+      sshSecretName: vmAttachedSecretName,
+    }),
   );
 
   const onSubmit = useCallback(
-    (sshDetails: SSHSecretDetails) => {
-      const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshDetails;
+    (details: SSHSecretDetails) => {
+      const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = details;
 
-      if (isEqualObject(sshDetails, initialSSHDetails)) {
+      if (isEqualObject(details, sshDetails)) {
         return Promise.resolve();
       }
 
-      const vmNamespace = getNamespace(vm);
-      if (applyKeyToProject) {
-        updateAuthorizedSSHKeys({ ...authorizedSSHKeys, [vmNamespace]: sshSecretName });
-        updateTabsData((currentTabsData) => {
-          currentTabsData.authorizedSSHKey = sshSecretName;
-        });
-      }
-
-      if (!applyKeyToProject && !isEmpty(tabsData.authorizedSSHKey)) {
-        const updatedAuthKeys = { ...authorizedSSHKeys };
-        delete updatedAuthKeys?.[vmNamespace];
-        updateAuthorizedSSHKeys(updatedAuthKeys);
-        updateTabsData((currentTabsData) => {
-          currentTabsData.authorizedSSHKey = null;
-        });
-      }
-
-      removeSSHKeyObject(updateTabsData, initialSSHDetails.sshSecretName);
+      setSSHDetails(details);
+      removeSSHKeyObject(updateTabsData, sshDetails.sshSecretName);
+      updateTabsData((currentTabsData) => {
+        currentTabsData.authorizedSSHKey = sshSecretName;
+        currentTabsData.applySSHToSettings = applyKeyToProject;
+      });
 
       if (
         secretOption === SecretSelectionOption.none &&
-        initialSSHDetails.secretOption !== SecretSelectionOption.none
+        sshDetails.secretOption !== SecretSelectionOption.none
       ) {
         return updateVM(removeSecretToVM(vm));
       }
 
       if (
         secretOption === SecretSelectionOption.useExisting &&
-        initialSSHDetails.sshSecretName !== sshSecretName &&
+        sshDetails.sshSecretName !== sshSecretName &&
         !isEmpty(sshSecretName)
       ) {
         return updateVM(addSecretToVM(vm, sshSecretName));
@@ -100,15 +82,7 @@ const SSHKey: FC = () => {
 
       return Promise.resolve();
     },
-    [
-      authorizedSSHKeys,
-      initialSSHDetails,
-      tabsData.authorizedSSHKey,
-      updateAuthorizedSSHKeys,
-      updateTabsData,
-      updateVM,
-      vm,
-    ],
+    [sshDetails, updateTabsData, updateVM, vm],
   );
 
   return (
@@ -130,7 +104,7 @@ const SSHKey: FC = () => {
         createModal((modalProps) => (
           <SSHSecretModal
             {...modalProps}
-            initialSSHSecretDetails={initialSSHDetails}
+            initialSSHSecretDetails={sshDetails}
             namespace={getNamespace(vm)}
             onSubmit={onSubmit}
           />

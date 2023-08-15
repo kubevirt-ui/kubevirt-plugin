@@ -3,6 +3,7 @@ import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { K8sResourceCommon, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createMultipleResources } from './utils';
@@ -22,6 +23,8 @@ type UseWizardVmCreateValues = {
 export const useWizardVmCreate = (): UseWizardVmCreateValues => {
   const { tabsData, vm } = useWizardVMContext();
   const [models] = useK8sModels();
+  const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
+
   const [loaded, setLoaded] = useState<boolean>(true);
   const [error, setError] = useState<any>();
 
@@ -49,6 +52,13 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
             addUploadDataVolumeOwnerReference(newVM, dv),
           ),
         );
+      }
+
+      if (tabsData.authorizedSSHKey && tabsData.applySSHToSettings) {
+        updateAuthorizedSSHKeys({
+          ...authorizedSSHKeys,
+          [newVM.metadata.namespace]: tabsData.authorizedSSHKey,
+        });
       }
 
       setLoaded(true);
