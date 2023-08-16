@@ -61,7 +61,7 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
     });
 
   return (
-    <ComponentReady isReady={isReady}>
+    <ComponentReady isReady={isReady} linkToMetrics={link}>
       <div className="util-threshold-chart" ref={ref}>
         <Link to={link}>
           <Chart

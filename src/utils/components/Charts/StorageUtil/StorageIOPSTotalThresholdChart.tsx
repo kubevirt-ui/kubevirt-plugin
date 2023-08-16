@@ -54,11 +54,12 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
     return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
   const yMax = findMaxYValue(chartData);
+  const linkToMetrics = queriesToLink(queries.STORAGE_IOPS_TOTAL);
 
   return (
-    <ComponentReady isReady={!isEmpty(chartData)}>
+    <ComponentReady isReady={!isEmpty(chartData)} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={queriesToLink(queries?.STORAGE_IOPS_TOTAL)}>
+        <Link to={linkToMetrics}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer
