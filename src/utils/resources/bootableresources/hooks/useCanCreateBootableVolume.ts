@@ -1,11 +1,13 @@
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import VirtualMachineClusterPreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterPreferenceModel';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseCanCreateBootableVolume = (namespace: string) => {
   canCreateDS: boolean;
   canCreatePVC: boolean;
+  canListInstanceTypesPrefernce: boolean;
   loading: boolean;
 };
 
@@ -31,10 +33,17 @@ const useCanCreateBootableVolume: UseCanCreateBootableVolume = (namespace) => {
     verb: 'create' as K8sVerb,
   });
 
+  const [canListInstanceTypesPrefernce, loadingInstanceTypesPrefernce] = useAccessReview({
+    group: VirtualMachineClusterPreferenceModel.apiGroup,
+    resource: VirtualMachineClusterPreferenceModel.plural,
+    verb: 'list' as K8sVerb,
+  });
+
   return {
     canCreateDS: canCreateDS && canCreateDIC,
     canCreatePVC,
-    loading: loadingPVC || loadingDS || loadingDIC,
+    canListInstanceTypesPrefernce,
+    loading: loadingPVC || loadingDS || loadingDIC || loadingInstanceTypesPrefernce,
   };
 };
 
