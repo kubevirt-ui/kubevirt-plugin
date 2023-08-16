@@ -866,7 +866,7 @@
   "Requested of ": "Requested of ",
   "Required": "Required",
   "Required when automatic update is enabled": "Required when automatic update is enabled",
-  "Requires RHEL 9 and QEMU guest agent. If enabled, SSH keys can be changed while the VirtualMachine is running. Otherwise, the VirtualMachine inherits the key injection setting of its image.": "Requires RHEL 9 and QEMU guest agent. If enabled, SSH keys can be changed while the VirtualMachine is running. Otherwise, the VirtualMachine inherits the key injection setting of its image.",
+  "Requires RHEL 9. If enabled, SSH keys can be changed while the VirtualMachine is running. Otherwise, the VirtualMachine inherits the key injection setting of its image.": "Requires RHEL 9. If enabled, SSH keys can be changed while the VirtualMachine is running. Otherwise, the VirtualMachine inherits the key injection setting of its image.",
   "Reset": "Reset",
   "Resource": "Resource",
   "Resource already selected": "Resource already selected",
