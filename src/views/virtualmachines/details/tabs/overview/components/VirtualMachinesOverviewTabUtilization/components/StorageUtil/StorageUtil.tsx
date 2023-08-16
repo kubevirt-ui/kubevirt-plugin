@@ -5,6 +5,7 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
+import { removeDuplicatesByName } from '@kubevirt-utils/utils/utils';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
 
 type StorageUtilProps = {
@@ -17,7 +18,7 @@ const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
   const [guestAgentData, loaded] = useGuestOS(vmi);
 
   const { totalBytes = 0, usedBytes = 0 } =
-    guestAgentData?.fsInfo?.disks?.reduce(
+    removeDuplicatesByName(guestAgentData?.fsInfo?.disks)?.reduce(
       (acc, data) => {
         acc.totalBytes += data?.totalBytes;
         acc.usedBytes += data?.usedBytes;
@@ -36,11 +37,11 @@ const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
         <div className="util-title">{t('Storage')}</div>
         <div className="util-summary" data-test-id="util-summary-storage">
           <div className="util-summary-value">
-            {xbytes(usedBytes || 0, { fixed: 0, iec: true })}
+            {xbytes(usedBytes || 0, { fixed: 2, iec: true })}
           </div>
           <div className="util-summary-text text-muted">
             <div>{t('Used of ')}</div>
-            <div>{xbytes(totalBytes || 0, { fixed: 0, iec: true })}</div>
+            <div>{xbytes(totalBytes || 0, { fixed: 2, iec: true })}</div>
           </div>
         </div>
       </div>
