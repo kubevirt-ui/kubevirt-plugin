@@ -63,11 +63,11 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
   const thresholdData = storageWriteData?.map(([x]) => {
     return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: yMax };
   });
-
+  const linkToMetrics = queriesToLink(queries.FILESYSTEM_TOTAL_USAGE);
   return (
-    <ComponentReady isReady={!isEmpty(chartData)}>
+    <ComponentReady isReady={!isEmpty(chartData)} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={queriesToLink(queries?.FILESYSTEM_TOTAL_USAGE)}>
+        <Link to={linkToMetrics}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer

@@ -59,11 +59,11 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   }));
 
   const isReady = !isEmpty(chartData) || !isEmpty(thresholdLine);
-
+  const linkToMetrics = queriesToLink(queries?.MEMORY_USAGE);
   return (
-    <ComponentReady isReady={isReady}>
+    <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={queriesToLink(queries?.MEMORY_USAGE)}>
+        <Link to={linkToMetrics}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer

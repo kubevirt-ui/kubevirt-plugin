@@ -96,17 +96,15 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
   const isReady =
     !isEmpty(chartDataProcessed) || !isEmpty(chartDataRemaining) || !isEmpty(chartDataDirtyRate);
   const yMax = findMigrationMaxYValue(chartDataProcessed, chartDataRemaining, chartDataDirtyRate);
-
+  const linkToMetrics = queriesToLink([
+    queries?.MIGRATION_DATA_REMAINING,
+    queries.MIGRATION_DATA_PROCESSED,
+    queries.MIGRATION_MEMORY_DIRTY_RATE,
+  ]);
   return (
-    <ComponentReady isReady={isReady}>
+    <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link
-          to={queriesToLink([
-            queries?.MIGRATION_DATA_REMAINING,
-            queries.MIGRATION_DATA_PROCESSED,
-            queries.MIGRATION_MEMORY_DIRTY_RATE,
-          ])}
-        >
+        <Link to={linkToMetrics}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer

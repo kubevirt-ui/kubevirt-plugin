@@ -68,11 +68,12 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
   });
 
   const isReady = !isEmpty(chartData) && !isEmpty(thresholdData);
+  const linkToMetrics = queriesToLink(queries?.CPU_USAGE);
 
   return (
-    <ComponentReady isReady={isReady}>
+    <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={queriesToLink(queries?.CPU_USAGE)}>
+        <Link to={linkToMetrics}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer

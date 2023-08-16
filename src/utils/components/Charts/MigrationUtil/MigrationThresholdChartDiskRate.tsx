@@ -57,11 +57,11 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
 
   const isReady = !isEmpty(chartDataProcessed);
   const yMax = findMaxYValue(chartDataProcessed);
-
+  const linkToMetrics = queriesToLink(queries.MIGRATION_DISK_TRANSFER_RATE);
   return (
-    <ComponentReady isReady={isReady}>
+    <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={queriesToLink(queries.MIGRATION_DISK_TRANSFER_RATE)}>
+        <Link to={linkToMetrics}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer
