@@ -37,7 +37,8 @@ const BootableVolumesList: FC<RouteComponentProps<{ ns: string }>> = ({ match })
   const { createModal } = useModal();
   const { bootableVolumes, error, loaded } = useBootableVolumes(namespace);
 
-  const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(namespace);
+  const { canCreateDS, canCreatePVC, canListInstanceTypesPrefernce } =
+    useCanCreateBootableVolume(namespace);
 
   const [preferences] = useClusterPreferences();
 
@@ -71,7 +72,7 @@ const BootableVolumesList: FC<RouteComponentProps<{ ns: string }>> = ({ match })
   return (
     <>
       <ListPageHeader title={t('Bootable volumes')}>
-        {(canCreateDS || canCreatePVC) && (
+        {(canCreateDS || canCreatePVC) && canListInstanceTypesPrefernce && (
           <ListPageCreateDropdown items={createItems} onClick={onCreate}>
             {t('Add volume')}
           </ListPageCreateDropdown>
