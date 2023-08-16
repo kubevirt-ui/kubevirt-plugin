@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, FC, useCallback, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { diskTypes, diskTypesLabels } from '@kubevirt-utils/resources/vm/utils/disk/constants';
@@ -8,27 +8,24 @@ import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 
 type DiskTypeSelectProps = {
   diskType: string;
-  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
+  dispatchDiskState: Dispatch<DiskReducerActionType>;
   isVMRunning?: boolean;
 };
 
-const DiskTypeSelect: React.FC<DiskTypeSelectProps> = ({
-  diskType,
-  dispatchDiskState,
-  isVMRunning,
-}) => {
+const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ diskType, dispatchDiskState, isVMRunning }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const typeOptions = Object.values(diskTypes).filter((type) => type !== diskTypes.floppy);
 
-  const onSelectDiskSource = React.useCallback(
-    (event: React.MouseEvent<Element, MouseEvent>, selection: string) => {
+  const onSelectDiskSource = useCallback(
+    (_event: React.MouseEvent<Element, MouseEvent>, selection: string) => {
       dispatchDiskState({ payload: selection, type: diskReducerActions.SET_DISK_TYPE });
       setIsOpen(false);
     },
     [dispatchDiskState],
   );
+
   return (
     <FormGroup
       fieldId="disk-source-type-select"
@@ -37,6 +34,7 @@ const DiskTypeSelect: React.FC<DiskTypeSelectProps> = ({
     >
       <div data-test-id="disk-type-select">
         <Select
+          isDisabled={isVMRunning}
           isOpen={isOpen}
           menuAppendTo="parent"
           onSelect={onSelectDiskSource}
@@ -45,12 +43,7 @@ const DiskTypeSelect: React.FC<DiskTypeSelectProps> = ({
           variant={SelectVariant.single}
         >
           {typeOptions.map((type) => (
-            <SelectOption
-              data-test-id={`disk-type-select-${type}`}
-              isDisabled={isVMRunning && type !== diskTypes.disk}
-              key={type}
-              value={type}
-            >
+            <SelectOption data-test-id={`disk-type-select-${type}`} key={type} value={type}>
               {diskTypesLabels[type]}
             </SelectOption>
           ))}

@@ -13,20 +13,14 @@ import {
 } from '@kubevirt-utils/resources/vm';
 import { Form } from '@patternfly/react-core';
 
-import AccessMode from './DiskFormFields/AccessMode';
-import ApplyStorageProfileSettingsCheckbox from './DiskFormFields/ApplyStorageProfileSettingsCheckbox';
 import BootSourceCheckbox from './DiskFormFields/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './DiskFormFields/DiskInterfaceSelect';
 import DiskSourceSizeInput from './DiskFormFields/DiskSizeInput/DiskSizeInput';
 import DiskSourceFormSelect from './DiskFormFields/DiskSourceFormSelect/DiskSourceFormSelect';
 import DiskTypeSelect from './DiskFormFields/DiskTypeSelect';
-import EnablePreallocationCheckbox from './DiskFormFields/EnablePreallocationCheckbox';
-import useStorageProfileClaimPropertySets from './DiskFormFields/hooks/useStorageProfileClaimPropertySets';
 import NameFormField from './DiskFormFields/NameFormField';
-import AlertedStorageClassSelect from './DiskFormFields/StorageClass/AlertedStorageClassSelect';
+import StorageClassAndPreallocation from './DiskFormFields/StorageClassAndPreallocation';
 import { sourceTypes } from './DiskFormFields/utils/constants';
-import VolumeMode from './DiskFormFields/VolumeMode';
-import { diskReducerActions } from './state/actions';
 import { DiskFormState, DiskSourceState } from './state/initialState';
 import { diskReducer, diskSourceReducer } from './state/reducers';
 import {
@@ -77,10 +71,6 @@ const EditDiskModal: FC<DiskModalProps> = ({
   const sourceRequiresDataVolume = useMemo(
     () => requiresDataVolume(diskState.diskSource),
     [diskState.diskSource],
-  );
-
-  const { claimPropertySets, loaded: storageProfileLoaded } = useStorageProfileClaimPropertySets(
-    diskState?.storageClass,
   );
 
   const uploadPromise = useCallback(() => {
@@ -230,43 +220,7 @@ const EditDiskModal: FC<DiskModalProps> = ({
           dispatchDiskState={dispatchDiskState}
           isVMRunning={false}
         />
-        {(sourceRequiresDataVolume || diskState.diskSource === sourceTypes.UPLOAD) && (
-          <>
-            <AlertedStorageClassSelect
-              setStorageClassName={(scName) =>
-                dispatchDiskState({ payload: scName, type: diskReducerActions.SET_STORAGE_CLASS })
-              }
-              setStorageClassProvisioner={(scProvisioner: string) =>
-                dispatchDiskState({
-                  payload: scProvisioner,
-                  type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER,
-                })
-              }
-              storageClass={diskState.storageClass}
-            />
-            <ApplyStorageProfileSettingsCheckbox
-              claimPropertySets={claimPropertySets}
-              diskState={diskState}
-              dispatchDiskState={dispatchDiskState}
-              loaded={storageProfileLoaded}
-            />
-            <AccessMode
-              diskState={diskState}
-              dispatchDiskState={dispatchDiskState}
-              spAccessMode={claimPropertySets?.[0]?.accessModes?.[0]}
-            />
-            <VolumeMode
-              diskState={diskState}
-              dispatchDiskState={dispatchDiskState}
-              spVolumeMode={claimPropertySets?.[0]?.volumeMode}
-            />
-            <EnablePreallocationCheckbox
-              dispatchDiskState={dispatchDiskState}
-              enablePreallocation={diskState.enablePreallocation}
-              isDisabled={!sourceRequiresDataVolume}
-            />
-          </>
-        )}
+        <StorageClassAndPreallocation diskState={diskState} dispatchDiskState={dispatchDiskState} />
       </Form>
     </TabModal>
   );
