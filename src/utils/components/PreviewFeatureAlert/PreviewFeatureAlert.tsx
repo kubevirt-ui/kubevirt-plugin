@@ -1,8 +1,9 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import { OVERVIEW_SETTINGS_TAB_PATH } from '@kubevirt-utils/components/PreviewFeatureAlert/utils/constants';
+import { getOverviewSettingsPath } from '@kubevirt-utils/components/PreviewFeatureAlert/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Alert, AlertVariant, Stack, StackItem } from '@patternfly/react-core';
 
 import './PreviewFeatureAlert.scss';
@@ -13,6 +14,8 @@ type PreviewFeatureAlertProps = {
 
 const PreviewFeatureAlert: FC<PreviewFeatureAlertProps> = ({ onClose }) => {
   const { t } = useKubevirtTranslation();
+  const [activeNamespace] = useActiveNamespace();
+
   return (
     <Alert
       className="preview-features-alert"
@@ -28,7 +31,7 @@ const PreviewFeatureAlert: FC<PreviewFeatureAlertProps> = ({ onClose }) => {
         </StackItem>
         <StackItem>
           <span onClick={onClose}>
-            <Link to={OVERVIEW_SETTINGS_TAB_PATH}>
+            <Link to={getOverviewSettingsPath(activeNamespace)}>
               {t('Go to the Virtualization Settings tab to enable this feature')}
             </Link>
           </span>

@@ -10,7 +10,7 @@ import {
 
 type UseActiveNamespacePathType = () => string;
 
-const buildNSPath = (namespace: string): string =>
+export const buildNSPath = (namespace: string): string =>
   [ALL_NAMESPACES, ALL_NAMESPACES_ACTIVE_KEY].includes(namespace)
     ? ALL_NAMESPACES
     : `ns/${namespace}`;
