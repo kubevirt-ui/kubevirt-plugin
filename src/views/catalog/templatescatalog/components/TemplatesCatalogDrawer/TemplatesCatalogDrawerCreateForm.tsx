@@ -200,9 +200,9 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
         catalogUrl += `&vmName=${vmName}`;
       }
 
-      if (!isEmpty(authorizedSSHKey)) {
-        updateTabsData((currentTabsData) => ({ ...currentTabsData, authorizedSSHKey }));
-      }
+      updateTabsData((currentTabs) => {
+        currentTabs.authorizedSSHKey = authorizedSSHKey;
+      });
 
       if (!isEmpty(subscriptionData?.activationKey) && !isEmpty(subscriptionData?.organizationID)) {
         updateTabsData((currentTabsData) => ({ ...currentTabsData, subscriptionData }));
