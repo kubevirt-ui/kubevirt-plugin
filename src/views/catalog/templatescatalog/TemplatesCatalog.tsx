@@ -1,6 +1,7 @@
 import React, { FC, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
+import { clearSessionStorageVM } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { Stack, Toolbar, ToolbarContent } from '@patternfly/react-core';
@@ -54,12 +55,15 @@ const TemplatesCatalog: FC<RouteComponentProps<{ ns: string }>> = ({
             </Toolbar>
             {filteredTemplates?.length > 0 ? (
               <TemplatesCatalogItems
+                onTemplateClick={(template) => {
+                  clearSessionStorageVM();
+                  setSelectedTemplate(template);
+                }}
                 availableDatasources={availableDatasources}
                 availableTemplatesUID={availableTemplatesUID}
                 bootSourcesLoaded={bootSourcesLoaded}
                 filters={filters}
                 loaded={loaded}
-                onTemplateClick={setSelectedTemplate}
                 templates={filteredTemplates}
               />
             ) : (
