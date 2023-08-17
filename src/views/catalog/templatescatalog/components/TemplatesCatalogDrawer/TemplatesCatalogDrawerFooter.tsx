@@ -1,6 +1,7 @@
-import * as React from 'react';
+import React, { FC, useEffect } from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { SecretModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
@@ -12,6 +13,10 @@ import {
   useProcessedTemplate,
   useVmTemplateSource,
 } from '@kubevirt-utils/resources/template/hooks';
+import {
+  getGroupVersionKindForModel,
+  useK8sWatchResource,
+} from '@openshift-console/dynamic-plugin-sdk';
 import {
   Split,
   SplitItem,
@@ -32,16 +37,32 @@ type TemplateCatalogDrawerFooterProps = {
   template: undefined | V1Template;
 };
 
-export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterProps> = ({
+export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> = ({
   namespace,
   onCancel,
   template,
 }) => {
   const { t } = useKubevirtTranslation();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVmTemplateSource(template);
-  const [authorizedSSHKeys, , userSettingsLoaded] = useKubevirtUserSettings('ssh');
+  const [authorizedSSHKeys, updateAuthorizedSSHKeys, userSettingsLoaded] =
+    useKubevirtUserSettings('ssh');
   const { loaded: loadedRHELSubscription, subscriptionData } = useRHELAutomaticSubscription();
   const [processedTemplate, processedTemplateLoaded] = useProcessedTemplate(template, namespace);
+  const [, , loadError] = useK8sWatchResource<IoK8sApiCoreV1Secret>(
+    authorizedSSHKeys?.[namespace] && {
+      groupVersionKind: getGroupVersionKindForModel(SecretModel),
+      isList: false,
+      name: authorizedSSHKeys?.[namespace],
+      namespace,
+    },
+  );
+
+  useEffect(() => {
+    // if an error exists it means the secret can not be reached and should be removed from user settings
+    if (loadError && authorizedSSHKeys?.[namespace]) {
+      updateAuthorizedSSHKeys({ ...authorizedSSHKeys, [namespace]: '' });
+    }
+  }, [authorizedSSHKeys, loadError, namespace, updateAuthorizedSSHKeys]);
 
   const canQuickCreate = Boolean(processedTemplate) && isBootSourceAvailable;
   const loaded =
@@ -80,7 +101,7 @@ export const TemplatesCatalogDrawerFooter: React.FC<TemplateCatalogDrawerFooterP
             </Split>
           </StackItem>
           <TemplatesCatalogDrawerCreateForm
-            authorizedSSHKey={authorizedSSHKeys?.[namespace]}
+            authorizedSSHKey={!loadError && authorizedSSHKeys?.[namespace]}
             canQuickCreate={canQuickCreate}
             initialVMName={initialVMName}
             isBootSourceAvailable={isBootSourceAvailable}
