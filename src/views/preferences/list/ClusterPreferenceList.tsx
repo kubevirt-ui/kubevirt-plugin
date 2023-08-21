@@ -80,6 +80,11 @@ const ClusterPreferenceList: FC<ClusterPreferenceListProps> = ({ kind }) => {
           />
         </div>
         <VirtualizedTable<V1beta1VirtualMachineClusterPreference>
+          EmptyMsg={() => (
+            <div className="pf-u-text-align-center" id="no-preference-msg">
+              {t('No preferences found')}
+            </div>
+          )}
           columns={activeColumns}
           data={data}
           loaded={loaded}

@@ -11,7 +11,7 @@ const UsersInstanceTypeEmptyState: FC = () => {
       <EmptyState>
         <EmptyStateIcon icon={SearchIcon} />
         <Title headingLevel="h2" size="lg">
-          {t('No InstanceTypes found.')}
+          {t('No InstanceTypes found')}
         </Title>
       </EmptyState>
     </Bullseye>

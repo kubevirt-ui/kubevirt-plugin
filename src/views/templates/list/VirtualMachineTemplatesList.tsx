@@ -86,6 +86,11 @@ const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>>
                 cloneInProgressDatasources: Record<string, V1beta1DataSource>;
               }
             >
+              EmptyMsg={() => (
+                <div className="pf-u-text-align-center" id="no-templates-msg">
+                  {t('No templates found')}
+                </div>
+              )}
               columns={activeColumns}
               data={filteredData}
               loaded={templatesLoaded}
