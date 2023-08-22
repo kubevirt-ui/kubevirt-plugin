@@ -46,6 +46,7 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
     try {
       if (sshService) {
         await deleteSSHService(sshService);
+        setSSHService(null);
       }
 
       if (newServiceType && newServiceType !== SERVICE_TYPES.NONE) {
