@@ -125,6 +125,11 @@ const BootableVolumesList: FC<RouteComponentProps<{ ns: string }>> = ({ match })
           </StackItem>
 
           <VirtualizedTable<K8sResourceCommon>
+            EmptyMsg={() => (
+              <div className="pf-u-text-align-center" id="no-bootable-volumes-msg">
+                {t('No bootable volumes found')}
+              </div>
+            )}
             rowData={{
               preferences,
             }}

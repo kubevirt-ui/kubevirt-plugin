@@ -80,6 +80,11 @@ const ClusterInstancetypeList: FC<ClusterInstancetypeListProps> = ({ kind }) => 
           />
         </div>
         <VirtualizedTable<V1beta1VirtualMachineClusterInstancetype>
+          EmptyMsg={() => (
+            <div className="pf-u-text-align-center" id="no-instancetype-msg">
+              {t('No InstanceTypes found')}
+            </div>
+          )}
           columns={activeColumns}
           data={data}
           loaded={loaded}
