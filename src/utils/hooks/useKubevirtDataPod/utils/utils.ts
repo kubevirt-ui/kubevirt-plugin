@@ -1,5 +1,6 @@
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { PROXY_KUBEVIRT_URL } from './constants';
 
@@ -20,4 +21,11 @@ export const constructURL = (watchOptions: WatchK8sResource, query?: string) => 
   const appendedQuery = !isEmpty(query) ? `?${query}` : '';
 
   return `${baseUrl}${namespaceUrl}${kindUrl}${nameUrl}${appendedQuery}`;
+};
+
+export const compareNameAndNamespace = (
+  obj: K8sResourceCommon,
+  compObj: K8sResourceCommon,
+): boolean => {
+  return getNamespace(obj) === getNamespace(compObj) && getName(obj) === getName(compObj);
 };

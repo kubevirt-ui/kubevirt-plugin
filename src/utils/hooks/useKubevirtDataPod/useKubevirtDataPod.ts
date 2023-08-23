@@ -10,7 +10,12 @@ import {
 
 import useDeepCompareMemoize from '../useDeepCompareMemoize/useDeepCompareMemoize';
 
-import { constructURL, getResourceVersion, registerResourceVersion } from './utils/utils';
+import {
+  compareNameAndNamespace,
+  constructURL,
+  getResourceVersion,
+  registerResourceVersion,
+} from './utils/utils';
 import useKubevirtDataPodFilters from './useKubevirtDataPodFilters';
 
 type UseKubevirtDataPod = <T extends K8sResourceCommon>(
@@ -80,14 +85,20 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
       return;
     }
 
-    if (socket?.lastJsonMessage?.object) {
-      const { name: socketItemName, namespace: socketItemNamespace } =
-        socket?.lastJsonMessage?.object?.metadata;
+    if (socket?.lastJsonMessage?.type == 'DELETED') {
+      setData((prevData) => {
+        const filteredItems = (prevData as T & { items: T[] })?.items?.filter((item) =>
+          compareNameAndNamespace(item, socket?.lastJsonMessage?.object),
+        );
+        return { ...prevData, items: filteredItems };
+      });
+      return;
+    }
 
+    if (socket?.lastJsonMessage?.object) {
       setData((prevData) => {
         const newData = (prevData as T & { items: T[] })?.items.map((item) => {
-          const { name: itemName, namespace: itemNamespace } = item?.metadata;
-          if (itemName === socketItemName && itemNamespace === socketItemNamespace) {
+          if (compareNameAndNamespace(item, socket?.lastJsonMessage?.object)) {
             return socket?.lastJsonMessage?.object;
           }
           return item;
