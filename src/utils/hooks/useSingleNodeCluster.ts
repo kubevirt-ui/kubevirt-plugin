@@ -1,13 +1,21 @@
 import { useMemo } from 'react';
 
 import { InfrastructureModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-
-import { useIsAdmin } from './useIsAdmin';
+import {
+  K8sResourceCommon,
+  K8sVerb,
+  useAccessReview,
+  useK8sWatchResource,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 type UseSingleNodeCluster = () => [isSingleNodeCluster: boolean, loaded: boolean];
 const useSingleNodeCluster: UseSingleNodeCluster = () => {
-  const isAdmin = useIsAdmin();
+  const [canAccessInfra] = useAccessReview({
+    group: InfrastructureModel.apiGroup,
+    resource: InfrastructureModel.plural,
+    verb: 'list' as K8sVerb,
+  });
+
   const [infrastructure, loaded] = useK8sWatchResource<
     K8sResourceCommon & {
       status: { infrastructureTopology: string };
@@ -22,7 +30,7 @@ const useSingleNodeCluster: UseSingleNodeCluster = () => {
     [infrastructure],
   );
 
-  return isAdmin ? [isSingleNodeCluster, loaded] : [undefined, true];
+  return canAccessInfra ? [isSingleNodeCluster, loaded] : [undefined, true];
 };
 
 export default useSingleNodeCluster;
