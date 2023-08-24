@@ -56,12 +56,15 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
           }),
         );
 
-        filterAuthRows(authRows).then((filteredRows) => {
-          setAuthKeyRows(filteredRows);
-        });
+        filterAuthRows(authRows)
+          .then((filteredRows) => {
+            setAuthKeyRows(filteredRows);
+          })
+          .finally(() => setLoading(false));
+      } else {
+        setLoading(false);
       }
 
-      setLoading(false);
       setIsInitEffect(false);
     }
   }, [loadedSettings, authorizedSSHKeys, isInitEffect]);
