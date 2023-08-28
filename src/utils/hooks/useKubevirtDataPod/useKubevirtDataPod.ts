@@ -87,8 +87,8 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
 
     if (socket?.lastJsonMessage?.type == 'DELETED') {
       setData((prevData) => {
-        const filteredItems = (prevData as T & { items: T[] })?.items?.filter((item) =>
-          compareNameAndNamespace(item, socket?.lastJsonMessage?.object),
+        const filteredItems = (prevData as T & { items: T[] })?.items?.filter(
+          (item) => !compareNameAndNamespace(item, socket?.lastJsonMessage?.object),
         );
         return { ...prevData, items: filteredItems };
       });
