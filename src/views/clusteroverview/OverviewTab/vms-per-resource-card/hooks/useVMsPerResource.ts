@@ -4,7 +4,7 @@ import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/c
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseVMsPerResource = () => {
   loaded: boolean;

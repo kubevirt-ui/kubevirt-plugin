@@ -1,7 +1,5 @@
-import {
-  useActiveNamespace,
-  useLastNamespace,
-} from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import {
   ALL_NAMESPACES,

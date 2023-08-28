@@ -15,7 +15,7 @@ import {
   useK8sWatchResource,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 import useHCMigrations from '../components/MigrationsLimitionsPopover/hooks/useHCMigrations';
 import {

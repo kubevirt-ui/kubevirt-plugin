@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { getPrometheusData } from '@kubevirt-utils/components/Charts/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ChartDataObject } from './constants';
 import { getBaseQuery, mapPrometheusValues } from './utils';
