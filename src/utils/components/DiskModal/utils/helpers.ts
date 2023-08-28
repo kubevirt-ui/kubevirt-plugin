@@ -66,16 +66,18 @@ export const produceVMDisks = (
   updateDisks: (vmDraft: WritableDraft<V1VirtualMachine>) => void,
 ) => {
   return produce(vm, (draftVM) => {
-    ensurePath(draftVM, ['spec.template.spec.domain.devices']);
+    if (draftVM) {
+      ensurePath(draftVM, ['spec.template.spec.domain.devices']);
 
-    if (!draftVM.spec.template.spec.domain.devices.disks)
-      draftVM.spec.template.spec.domain.devices.disks = [];
+      if (!draftVM.spec.template.spec.domain.devices.disks)
+        draftVM.spec.template.spec.domain.devices.disks = [];
 
-    if (!draftVM.spec.template.spec.volumes) draftVM.spec.template.spec.volumes = [];
+      if (!draftVM.spec.template.spec.volumes) draftVM.spec.template.spec.volumes = [];
 
-    if (!draftVM.spec.dataVolumeTemplates) draftVM.spec.dataVolumeTemplates = [];
+      if (!draftVM.spec.dataVolumeTemplates) draftVM.spec.dataVolumeTemplates = [];
 
-    updateDisks(draftVM);
+      updateDisks(draftVM);
+    }
   });
 };
 
