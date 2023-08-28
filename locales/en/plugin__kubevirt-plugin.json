@@ -363,7 +363,7 @@
   "Delete VirtualMachineInstance?": "Delete VirtualMachineInstance?",
   "Delete VirtualMachineSnapshot?": "Delete VirtualMachineSnapshot?",
   "Delete volume metadata?": "Delete volume metadata?",
-  "Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13  or for network interfaces that were added to the VirtualMachine in these versions.": "Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13  or for network interfaces that were added to the VirtualMachine in these versions.",
+  "Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13 or for network interfaces that were added to the VirtualMachine in these versions.": "Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13 or for network interfaces that were added to the VirtualMachine in these versions.",
   "Deleting the metadata will mark this volume as non-bootable and remove it from the bootable volumes list. The volume will still be available in the cluster.": "Deleting the metadata will mark this volume as non-bootable and remove it from the bootable volumes list. The volume will still be available in the cluster.",
   "Deprecated": "Deprecated",
   "Descheduler": "Descheduler",
