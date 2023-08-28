@@ -2,7 +2,11 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+
+import { isAllNamespaces } from '../vm-statuses-card/utils/utils';
 
 import { getInstanceTypeSeriesLabel } from './utils/utils';
 
@@ -23,9 +27,11 @@ type RunningVMsChartLegendLabelProps = {
 };
 
 const RunningVMsChartLegendLabel: React.FC<RunningVMsChartLegendLabelProps> = ({ item }) => {
+  const [activeNamespace] = useActiveNamespace();
+  const namespace = isAllNamespaces(activeNamespace) ? ALL_NAMESPACES : `ns/${activeNamespace}`;
   const iconStyle = { color: item.color };
   const filterKey = item.isInstanceType ? 'instanceType' : 'template';
-  const linkPath = `/k8s/all-namespaces/${VirtualMachineModelRef}?rowFilter-${filterKey}=${getInstanceTypePrefix(
+  const linkPath = `/k8s/${namespace}/${VirtualMachineModelRef}?rowFilter-${filterKey}=${getInstanceTypePrefix(
     item.name,
   )}`;
 
