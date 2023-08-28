@@ -12,6 +12,7 @@ type PersistentVolumeClaimSelectProps = {
   pvcNameSelected: string;
   selectNamespace: (namespace: string) => void;
   selectPVCName: (pvcName: string) => void;
+  setVolumeQuantity: (size: string) => void;
 };
 
 export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectProps> = ({
@@ -20,12 +21,13 @@ export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectPr
   pvcNameSelected,
   selectNamespace,
   selectPVCName,
+  setVolumeQuantity,
 }) => {
-  const { filteredPVCNames, projectsLoaded, projectsNames, pvcsLoaded } =
+  const { filteredPVCNames, projectsLoaded, projectsNames, pvcMapper, pvcsLoaded } =
     useProjectsAndPVCs(projectSelected);
 
   const onSelectProject = React.useCallback(
-    (newProject) => {
+    (newProject: string) => {
       selectNamespace(newProject);
       selectPVCName(undefined);
     },
@@ -33,10 +35,12 @@ export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectPr
   );
 
   const onPVCSelected = React.useCallback(
-    (selection) => {
+    (selection: string) => {
       selectPVCName(selection);
+      const size = pvcMapper?.[projectSelected]?.[selection]?.spec?.resources?.requests?.storage;
+      setVolumeQuantity(size);
     },
-    [selectPVCName],
+    [projectSelected, pvcMapper, selectPVCName, setVolumeQuantity],
   );
 
   return (

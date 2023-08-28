@@ -6,6 +6,7 @@ import {
   ProjectModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { SelectOption } from '@patternfly/react-core';
 
@@ -29,6 +30,7 @@ type useProjectsAndPVCsReturnType = {
   filteredPVCNames: string[];
   projectsLoaded: boolean;
   projectsNames: string[];
+  pvcMapper: { [name: string]: IoK8sApiCoreV1PersistentVolumeClaim };
   pvcsLoaded: boolean;
 };
 
@@ -75,6 +77,7 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
     filteredPVCNames: pvcNamesFilteredByProjects,
     projectsLoaded,
     projectsNames,
+    pvcMapper: convertResourceArrayToMap(pvcs, true),
     pvcsLoaded,
   };
 };
