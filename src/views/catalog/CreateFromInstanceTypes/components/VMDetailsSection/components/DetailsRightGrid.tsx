@@ -64,7 +64,7 @@ const DetailsRightGrid: FC = () => {
             />
           ))
         }
-        descriptionHeader={t('SSH key name')}
+        descriptionHeader={t('Authorized SSH key')}
         isEdit={!isChangingNamespace}
       />
       <DynamicSSHKeyInjectionIntanceType />

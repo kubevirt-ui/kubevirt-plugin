@@ -983,7 +983,6 @@
   "SSH access using the virtctl command is possible only when the API server is reachable.": "SSH access using the virtctl command is possible only when the API server is reachable.",
   "SSH key is invalid": "SSH key is invalid",
   "SSH key is saved in the project as a secret": "SSH key is saved in the project as a secret",
-  "SSH key name": "SSH key name",
   "SSH over LoadBalancer": "SSH over LoadBalancer",
   "SSH secret not configured": "SSH secret not configured",
   "SSH service type": "SSH service type",
