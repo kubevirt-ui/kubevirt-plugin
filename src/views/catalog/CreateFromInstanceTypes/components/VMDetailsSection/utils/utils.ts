@@ -24,8 +24,9 @@ export const getOSFromDefaultPreference = (
   const defaultPreferenceDisplayName = getAnnotation(
     defaultPreference,
     PREFERENCE_DISPLAY_NAME_KEY,
+    '',
   );
-  return defaultPreferenceDisplayName || defaultPreferenceName;
+  return defaultPreferenceDisplayName;
 };
 
 export const getCPUAndMemoryFromDefaultInstanceType = (
