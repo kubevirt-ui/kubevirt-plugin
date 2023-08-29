@@ -28,3 +28,8 @@ export const getTemplateOSIcon = (template: K8sResourceCommon): string => {
   const icon = template?.metadata?.annotations?.iconClass;
   return iconMap[icon] || iconMap['icon-other'];
 };
+
+export const getVolumeNameOSIcon = (volumeName: string): string => {
+  const icon = 'icon-'.concat(volumeName.replace(/\d/, '').split('-')[0]);
+  return iconMap[icon];
+};

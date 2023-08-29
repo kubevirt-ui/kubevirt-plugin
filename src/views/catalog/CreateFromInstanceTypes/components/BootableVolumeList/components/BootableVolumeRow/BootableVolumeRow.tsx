@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { getTemplateOSIcon as getOSIcon } from '@catalog/templatescatalog/utils/os-icons';
+import { getTemplateOSIcon, getVolumeNameOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -44,6 +44,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   const { t } = useKubevirtTranslation();
   const bootVolumeName = getName(bootableVolume);
   const sizeData = formatBytes(pvcSource?.spec?.resources?.requests?.storage);
+  const icon = getVolumeNameOSIcon(bootVolumeName) || getTemplateOSIcon(preference);
 
   return (
     <Tr
@@ -53,7 +54,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       onClick={() => setSelectedBootableVolume(bootableVolume, pvcSource)}
     >
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
-        <img alt="os-icon" className="vm-catalog-row-icon" src={getOSIcon(preference)} />
+        <img alt="os-icon" className="vm-catalog-row-icon" src={icon} />
         <Text component={TextVariants.small}>{bootVolumeName}</Text>
         {isDataSourceCloning(bootableVolume as V1beta1DataSource) && (
           <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>
