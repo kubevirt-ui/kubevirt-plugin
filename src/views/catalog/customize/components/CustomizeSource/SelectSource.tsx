@@ -88,13 +88,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           getGenericSourceCustomization(selectedSourceType, null, volumeQuantity),
         );
       case PVC_SOURCE_NAME:
-        return onSourceChange(
-          getPVCSource(
-            pvcNameSelected,
-            pvcNamespaceSelected,
-            showSizeInput ? volumeQuantity : null,
-          ),
-        );
+        return onSourceChange(getPVCSource(pvcNameSelected, pvcNamespaceSelected, volumeQuantity));
       case HTTP_SOURCE_NAME:
         return onSourceChange(
           getGenericSourceCustomization(
@@ -149,6 +143,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
           pvcNameSelected={pvcNameSelected}
           selectNamespace={selectPVCNamespace}
           selectPVCName={selectPVCName}
+          setVolumeQuantity={setVolumeQuantity}
         />
       )}
 
