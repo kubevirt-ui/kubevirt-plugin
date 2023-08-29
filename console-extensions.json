@@ -445,6 +445,9 @@
     "type": "console.page/resource/list"
   },
   {
+    "flags": {
+      "required": ["CAN_LIST_NS"]
+    },
     "properties": {
       "dataAttributes": {
         "data-quickstart-id": "qs-nav-virtualmachineclusterinstancetypes",
@@ -473,6 +476,9 @@
     "type": "console.page/resource/list"
   },
   {
+    "flags": {
+      "required": ["CAN_LIST_NS"]
+    },
     "properties": {
       "dataAttributes": {
         "data-quickstart-id": "qs-nav-virtualmachineclusterpreferences",
