@@ -5,6 +5,8 @@ apiVersion: ${VirtualMachineClusterPreferenceModel.apiGroup}/${VirtualMachineClu
 kind: ${VirtualMachineClusterPreferenceModel.kind}
 metadata:
   name: example
+  annotations:
+    openshift.io/display-name: Fedora
 spec: 
   devices:
     preferredDiskBus: virtio
