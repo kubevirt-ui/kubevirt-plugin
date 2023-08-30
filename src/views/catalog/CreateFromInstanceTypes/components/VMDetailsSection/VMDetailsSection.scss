@@ -4,6 +4,9 @@
   .pf-c-expandable-section__content {
     --pf-c-expandable-section__content--MarginTop: var(--pf-global--spacer--xs);
   }
+  .pf-c-description-list__group {
+    grid-template-columns: 200px calc(100% - 200px);
+  }
 }
 
 .instancetypes-vm-details-body {
