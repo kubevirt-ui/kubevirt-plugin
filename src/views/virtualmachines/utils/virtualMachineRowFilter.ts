@@ -86,7 +86,7 @@ const useTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
     () =>
       [
         ...new Set(
-          (vms || []).map((vm) => {
+          (Array.isArray(vms) ? vms : [])?.map((vm) => {
             const templateName = vm.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME];
             return templateName ?? noTemplate;
           }),
@@ -165,7 +165,7 @@ const useInstanceTypesFilter = (vms: V1VirtualMachine[]): RowFilter => {
     () =>
       [
         ...new Set(
-          (vms || []).map((vm) => {
+          (Array.isArray(vms) ? vms : [])?.map((vm) => {
             const instanceTypeName = getInstanceTypePrefix(vm?.spec?.instancetype?.name);
             return instanceTypeName ?? noInstanceType;
           }),
@@ -198,7 +198,7 @@ export const useVMListFilters = (
   vmims: V1VirtualMachineInstanceMigration[],
 ): { filters: RowFilter<V1VirtualMachine>[]; vmiMapper: VmiMapper; vmimMapper: VmimMapper } => {
   const vmiMapper: VmiMapper = useMemo(() => {
-    return vmis?.reduce(
+    return (Array.isArray(vmis) ? vmis : [])?.reduce(
       (acc, vmi) => {
         const name = vmi?.metadata?.name;
         const namespace = vmi?.metadata?.namespace;
@@ -220,7 +220,7 @@ export const useVMListFilters = (
   }, [vmis]);
 
   const vmimMapper: VmimMapper = useMemo(() => {
-    return vmims?.reduce((acc, vmim) => {
+    return (Array.isArray(vmims) ? vmims : [])?.reduce((acc, vmim) => {
       const name = vmim?.spec?.vmiName;
       const namespace = vmim?.metadata?.namespace;
       if (!acc[namespace]) {
