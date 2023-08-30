@@ -1,8 +1,9 @@
 import React, { FC } from 'react';
+import { Link } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { Popover, PopoverPosition } from '@patternfly/react-core';
+import { Popover, PopoverPosition, Text } from '@patternfly/react-core';
 
 import StatusPopoverButton from '../StatusPopoverButton/StatusPopoverButton';
 
@@ -19,9 +20,21 @@ const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({
   return (
     <>
       <Popover
-        bodyContent={t('VirtualMachine is currently {{status}}', {
-          status: vmPrintableStatus,
-        })}
+        bodyContent={
+          <>
+            <Text>
+              {t('VirtualMachine is currently {{ status }}', {
+                status: vmPrintableStatus,
+              })}
+            </Text>
+            <br />
+            <Text>
+              <Link to={(location) => location?.pathname + '/diagnostics'}>
+                {t('View diagnostic')}
+              </Link>
+            </Text>
+          </>
+        }
         headerContent={vmPrintableStatus}
         position={PopoverPosition.right}
       >
