@@ -16,6 +16,7 @@ import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryM
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
 import {
@@ -59,6 +60,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
     const { createModal } = useModal();
     const { updateVM } = useWizardVMContext();
     const { ns } = useParams<{ ns: string }>();
+    const vmNamespace = ns || DEFAULT_NAMESPACE;
 
     const notAvailable = t('N/A');
     const vmObject = getTemplateVirtualMachineObject(template);
@@ -81,7 +83,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
       setError(undefined);
 
       const updatedTemplate = produce<V1Template>(template, (draftTemplate) => {
-        draftTemplate.metadata.namespace = ns;
+        draftTemplate.metadata.namespace = vmNamespace;
       });
 
       k8sCreate<V1Template>({
@@ -93,7 +95,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
       })
         .then((processedTemplate) => {
           updateVMCPUMemory(
-            ns,
+            vmNamespace,
             updateVM,
             setUpdatedVM,
           )(getTemplateVirtualMachineObject(processedTemplate)).catch((err) => {
@@ -103,8 +105,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
         .catch((err) => {
           setError(err);
         });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ns, template]);
+    }, [vmNamespace, template]);
 
     return (
       <div className="modal-body modal-body-border modal-body-content">
@@ -174,7 +175,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
                             <CPUMemoryModal
                               isOpen={isOpen}
                               onClose={onClose}
-                              onSubmit={updateVMCPUMemory(ns, updateVM, setUpdatedVM)}
+                              onSubmit={updateVMCPUMemory(vmNamespace, updateVM, setUpdatedVM)}
                               templateNamespace={template?.metadata?.namespace}
                               vm={updatedVM}
                             />
