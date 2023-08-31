@@ -24,7 +24,7 @@ import {
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { useWizardVMContext } from '../../../utils/WizardVMContext';
 import { INSTALLATION_CDROM_NAME } from '../../constants';
@@ -205,7 +205,7 @@ export const useCustomizeFormSubmit = ({
       history.push(`/k8s/ns/${ns || DEFAULT_NAMESPACE}/templatescatalog/review`);
       setTemplateError(undefined);
     } catch (error) {
-      console.error(error);
+      kubevirtConsole.error(error);
       setTemplateError(error);
     } finally {
       setTemplateLoaded(true);

@@ -3,6 +3,7 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import { clearSessionStorageVM } from '@catalog/utils/WizardVMContext';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { ActionGroup, Button } from '@patternfly/react-core';
 
 type FormActionGroupProps = {
@@ -21,7 +22,7 @@ export const FormActionGroup: React.FC<FormActionGroupProps> = ({ loading, onCan
   const history = useHistory();
 
   const handleCancel = React.useCallback(() => {
-    onCancel?.().catch(console.error);
+    onCancel?.().catch(kubevirtConsole.error);
     clearSessionStorageVM();
     history.push(`/k8s/ns/${namespace}/templatescatalog`);
   }, [history, namespace, onCancel]);

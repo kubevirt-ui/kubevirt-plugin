@@ -1,6 +1,7 @@
 import React, { ComponentType, memo, MouseEventHandler, ReactNode, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionList,
@@ -67,7 +68,7 @@ const TabModal: TabModalFC = memo(
         .then(onClose)
         .catch((submitError) => {
           setApiError(submitError);
-          console.error(submitError);
+          kubevirtConsole.error(submitError);
         })
         .finally(() => setIsSubmitting(false));
     };

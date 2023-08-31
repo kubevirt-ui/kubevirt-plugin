@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+
 import { COMPONENT_NOT_FOUND_ERROR } from './constants';
 
 const URLHealthItemPopup: React.FC<any> = ({ subsystem }) => {
@@ -19,7 +21,7 @@ const URLHealthItemPopup: React.FC<any> = ({ subsystem }) => {
         })
         .catch((error) => {
           if (error === COMPONENT_NOT_FOUND_ERROR) {
-            console.error(COMPONENT_NOT_FOUND_ERROR);
+            kubevirtConsole.error(COMPONENT_NOT_FOUND_ERROR);
           } else {
             setTimeout(() => loadComponent(), 1000);
           }

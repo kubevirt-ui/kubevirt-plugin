@@ -2,6 +2,7 @@ import { load } from 'js-yaml';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { CLOUD_INIT_MISSING_USERNAME } from '@kubevirt-utils/components/Consoles/utils/constants';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 type CloudinitUserDataObject = {
   passwd?: { users: { name: string }[] };
@@ -40,7 +41,7 @@ export const getCloudInitCredentials = (
       };
     }
   } catch (e) {
-    console.error(e);
+    kubevirtConsole.error(e);
   }
 
   return { users: [] };

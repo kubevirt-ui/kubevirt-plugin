@@ -4,6 +4,7 @@ import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generato
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
@@ -73,6 +74,6 @@ export const getNadType = (nad: NetworkAttachmentDefinition): string => {
     //can be config.type or config.plugin first element only!'
     return interfacesTypes?.[config?.type] || interfacesTypes?.[config?.plugins?.[0]?.type];
   } catch (e) {
-    console.log('Cannot convert NAD config: ', e);
+    kubevirtConsole.log('Cannot convert NAD config: ', e);
   }
 };

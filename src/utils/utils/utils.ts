@@ -2,6 +2,8 @@ import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugi
 
 import { ItemsToFilterProps } from './types';
 
+export const kubevirtConsole = console;
+
 export const isEmpty = (obj) =>
   [Array, Object].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
 

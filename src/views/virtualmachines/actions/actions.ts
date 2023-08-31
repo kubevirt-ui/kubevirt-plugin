@@ -10,6 +10,7 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   consoleFetch,
   k8sCreate,
@@ -67,7 +68,7 @@ export const VMActionRequest = async (
 
     return response.text();
   } catch (error) {
-    console.error(error);
+    kubevirtConsole.error(error);
     return;
   }
 };

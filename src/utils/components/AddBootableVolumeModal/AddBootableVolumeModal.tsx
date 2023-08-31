@@ -12,6 +12,7 @@ import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
 
@@ -84,7 +85,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     <TabModal
       onClose={() => {
         if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
-          upload.cancelUpload().catch(console.error);
+          upload.cancelUpload().catch(kubevirtConsole.error);
         }
         onClose();
       }}

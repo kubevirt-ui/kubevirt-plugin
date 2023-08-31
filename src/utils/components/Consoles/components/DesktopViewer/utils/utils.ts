@@ -9,6 +9,7 @@ import {
   IoK8sApiCoreV1ServicePort,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { buildOwnerReference } from '../../../../../resources/shared';
@@ -68,7 +69,10 @@ export const getRdpAddressPort = (
     case 'LoadBalancer':
       address = rdpService?.spec?.externalIPs?.[0];
       if (!address) {
-        console.warn('External IP is not defined for the LoadBalancer RDP Service: ', rdpService);
+        kubevirtConsole.warn(
+          'External IP is not defined for the LoadBalancer RDP Service: ',
+          rdpService,
+        );
       }
       break;
     case 'NodePort':
@@ -77,21 +81,21 @@ export const getRdpAddressPort = (
         address = launcherPod?.status?.hostIP;
       }
       if (!address) {
-        console.warn(
+        kubevirtConsole.warn(
           'Node IP (launcherpod.status.hostIP) is not yet known for NodePort RDP Service: ',
           rdpService,
         );
       }
       break;
     default:
-      console.error('Unrecognized Service type: ', rdpService);
+      kubevirtConsole.error('Unrecognized Service type: ', rdpService);
   }
 
   if (!address || !port) {
     return null;
   }
 
-  console.log('RDP requested for: ', address, port);
+  kubevirtConsole.log('RDP requested for: ', address, port);
   return {
     address,
     port,

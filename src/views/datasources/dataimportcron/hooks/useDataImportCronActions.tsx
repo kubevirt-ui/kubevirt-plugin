@@ -15,6 +15,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Action, k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Loading } from '@patternfly/quickstarts';
 import { Split, SplitItem } from '@patternfly/react-core';
@@ -46,7 +47,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
         ns: dataImportCron?.metadata?.namespace,
       })
         .then((ds) => setDataSource(ds))
-        .catch(console.error)
+        .catch(kubevirtConsole.error)
         .finally(() => setIsLoading(false));
     }
   }, [dataSource, dataSourceName, dataImportCron?.metadata?.namespace, isOwnedBySSP]);
