@@ -932,7 +932,7 @@
   "Select StorageClass": "Select StorageClass",
   "Select volume to boot from": "Select volume to boot from",
   "Select workloads that must have all the following expressions.": "Select workloads that must have all the following expressions.",
-  "Selected StorageClass is different from StorageClass of the template's boot source": "Selected StorageClass is different from StorageClass of the template's boot source",
+  "Selected StorageClass is different from StorageClass of the source": "Selected StorageClass is different from StorageClass of the source",
   "Selected sysprep": "Selected sysprep",
   "selector key": "selector key",
   "selector value": "selector value",

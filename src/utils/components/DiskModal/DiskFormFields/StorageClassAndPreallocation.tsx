@@ -13,11 +13,13 @@ import EnablePreallocationCheckbox from './EnablePreallocationCheckbox';
 import VolumeMode from './VolumeMode';
 
 type StorageClassAndPreallocationProps = {
+  checkSC?: (selectedStorageClass: string) => boolean;
   diskState: DiskFormState;
   dispatchDiskState: React.Dispatch<DiskReducerActionType>;
 };
 
 const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({
+  checkSC,
   diskState,
   dispatchDiskState,
 }) => {
@@ -44,6 +46,7 @@ const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({
             type: diskReducerActions.SET_STORAGE_CLASS_PROVISIONER,
           })
         }
+        checkSC={checkSC}
         storageClass={diskState.storageClass}
       />
       <ApplyStorageProfileSettingsCheckbox
