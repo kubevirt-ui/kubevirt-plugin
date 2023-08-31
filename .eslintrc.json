@@ -29,6 +29,7 @@
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-shadow": ["error"],
+    "no-console": "error",
     "no-nested-ternary": "error",
     "perfectionist/sort-classes": [
       "error",

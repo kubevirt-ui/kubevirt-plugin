@@ -23,6 +23,7 @@ import {
   getPVC,
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
 import { appendDockerPrefix } from './components/utils';
@@ -96,7 +97,7 @@ export const getDataSourceDataVolume = async (
     dataVolume = await getDataVolume(dataSourcePVCName, dataSourcePVCNamespace);
   } catch (error) {
     // If raised error means that dataVolume is not available
-    console.error(error);
+    kubevirtConsole.error(error);
   }
 
   return dataVolume;

@@ -1,10 +1,12 @@
 import { load } from 'js-yaml';
 
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+
 export const safeLoad = <Resource>(value: string): Resource | undefined => {
   try {
     return load(value) as Resource;
   } catch (error) {
-    console.error(error);
+    kubevirtConsole.error(error);
     return;
   }
 };

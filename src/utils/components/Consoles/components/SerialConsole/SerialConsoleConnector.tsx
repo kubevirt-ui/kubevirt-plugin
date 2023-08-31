@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { WSFactory } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/ws-factory';
 
 import { INSECURE, SECURE } from '../../utils/constants';
@@ -70,7 +71,7 @@ const SerialConsoleConnector: React.FC<SerialConsoleConnectorProps> = ({ vmi }) 
       .onopen(setConnected)
       .onclose(onBackendDisconnected)
       .onerror((event) => {
-        console.log('WebSocket error received: ', event);
+        kubevirtConsole.log('WebSocket error received: ', event);
       });
   }, [onDataFromBackend, setConnected, vmi, onBackendDisconnected]);
 

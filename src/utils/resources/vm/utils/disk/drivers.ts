@@ -2,7 +2,7 @@ import produce from 'immer';
 
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -27,7 +27,7 @@ const getVirtioWinConfigMap = async (): Promise<any> => {
         return configMap;
       }
     } catch (e) {
-      console.error(
+      kubevirtConsole.error(
         `The ${VIRTIO_WIN_CONFIG_MAP_NAME} can not be found in the ${namespace} namespace.  Another namespace will be queried, if any left. Error: `,
         e,
       );
@@ -44,7 +44,7 @@ export const getDriversImage = async (): Promise<string> => {
     const configMap = await getVirtioWinConfigMap();
     if (configMap?.data?.[VIRTIO_WIN_IMAGE]) return configMap.data[VIRTIO_WIN_IMAGE];
   } catch (error) {
-    console.error(error);
+    kubevirtConsole.error(error);
   }
 
   return driversImage;

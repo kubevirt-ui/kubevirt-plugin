@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   consoleFetch,
   K8sResourceCommon,
@@ -41,9 +41,9 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
   const socket = useWebSocket<{ object: K8sResourceCommon; type: string }>(
     `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}${url}`,
     {
-      onClose: () => console.log('websocket closed kubevirt: ', url),
-      onError: (err) => console.log('Websocket error kubevirt:', err),
-      onOpen: () => console.log('websocket open kubevirt: ', url),
+      onClose: () => kubevirtConsole.log('websocket closed kubevirt: ', url),
+      onError: (err) => kubevirtConsole.log('Websocket error kubevirt:', err),
+      onOpen: () => kubevirtConsole.log('websocket open kubevirt: ', url),
       queryParams: {
         cluster: 'local-cluster',
         resourceVersion,

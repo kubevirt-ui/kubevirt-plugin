@@ -9,6 +9,7 @@ import {
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
   ResourceLink,
@@ -81,7 +82,7 @@ const TemplatesProjectSection: FC = () => {
       value,
       setError,
       setLoading,
-    ).catch((e) => console.log(e));
+    ).catch((e) => kubevirtConsole.log(e));
   };
 
   const onFilter = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {

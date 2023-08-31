@@ -8,7 +8,11 @@ import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ensurePath, getContentScrollableElement } from '@kubevirt-utils/utils/utils';
+import {
+  ensurePath,
+  getContentScrollableElement,
+  kubevirtConsole,
+} from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ButtonVariant,
@@ -60,7 +64,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
         model: DataVolumeModel,
         resource: dataVolumeToDelete,
       })
-        .catch(console.error)
+        .catch(kubevirtConsole.error)
         .finally(() => updateVM(vmWithDeletedDisk)) as Promise<V1VirtualMachine>;
     }
 

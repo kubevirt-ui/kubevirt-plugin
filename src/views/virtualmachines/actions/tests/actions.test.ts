@@ -1,5 +1,6 @@
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { VMActionRequest, VMActionType } from '../actions';
 
@@ -25,7 +26,7 @@ describe('actions.ts tests', () => {
       action,
       VirtualMachineModel,
     );
-    console.log(failedResponse);
+    kubevirtConsole.log(failedResponse);
 
     // Test to check a VMActionRequest works with 'start' action
     const response = VMActionRequest(exampleRunningVirtualMachine, action, VirtualMachineModel);

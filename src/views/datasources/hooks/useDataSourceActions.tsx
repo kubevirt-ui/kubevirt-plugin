@@ -14,6 +14,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Action, k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
 
@@ -42,7 +43,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
         ns: dataSource?.metadata?.namespace,
       })
         .then((dic) => setDataImportCron(dic))
-        .catch(console.error)
+        .catch(kubevirtConsole.error)
         .finally(() => setIsLoading(false));
     }
   }, [dataImportCron, dataImportCronName, dataSource?.metadata?.namespace, isOwnedBySSP]);
@@ -113,7 +114,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
                     resource: dataImportCron,
                   });
                 } catch (e) {
-                  console.log(e?.message);
+                  kubevirtConsole.log(e?.message);
                 } finally {
                   await k8sDelete({
                     model: DataSourceModel,

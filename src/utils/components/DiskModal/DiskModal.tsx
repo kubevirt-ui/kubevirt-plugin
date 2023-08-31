@@ -13,7 +13,7 @@ import {
   getDisks,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { getRandomChars, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Form } from '@patternfly/react-core';
 
 import { PendingChangesAlert } from '../PendingChanges/PendingChangesAlert/PendingChangesAlert';
@@ -179,7 +179,7 @@ const DiskModal: FC<DiskModalProps> = ({
     <TabModal
       onClose={() => {
         if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
-          upload.cancelUpload().catch(console.error);
+          upload.cancelUpload().catch(kubevirtConsole.error);
         }
         onClose();
       }}

@@ -8,7 +8,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { ACTIVATION_KEY, CLOUD_CONFIG_HEADER } from './consts';
 
@@ -43,7 +43,7 @@ export const convertUserDataObjectToYAML = (
     const result = dump(filteredUser);
     return addHeader ? `${CLOUD_CONFIG_HEADER}\n${result}` : result;
   } catch (e) {
-    console.error(e);
+    kubevirtConsole.error(e);
     return undefined;
   }
 };
@@ -61,7 +61,7 @@ export const convertYAMLToNetworkDataObject = (networkData: string): CloudInitNe
       name: networkToEdit?.name,
     };
   } catch (e) {
-    console.error(e);
+    kubevirtConsole.error(e);
     return undefined;
   }
 };
@@ -91,7 +91,7 @@ export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData
       })
     );
   } catch (e) {
-    console.error(e);
+    kubevirtConsole.error(e);
     return undefined;
   }
 };
