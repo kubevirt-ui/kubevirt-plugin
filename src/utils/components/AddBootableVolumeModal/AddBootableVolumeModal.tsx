@@ -3,6 +3,7 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import useStorageProfileClaimPropertySets from '@kubevirt-utils/components/DiskModal/DiskFormFields/hooks/useStorageProfileClaimPropertySets';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -48,24 +49,27 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   onClose,
   onCreateVolume,
 }) => {
+  const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
   const selectedNamespace =
     activeNamespace === ALL_NAMESPACES_SESSION_KEY ? undefined : activeNamespace;
-
   const namespace = enforceNamespace ?? selectedNamespace ?? DEFAULT_NAMESPACE;
-
-  const { t } = useKubevirtTranslation();
-
-  const [preferences] = useClusterPreferences();
-
-  const preferencesNames = useMemo(() => preferences.map(getName), [preferences]);
-  const [sourceType, setSourceType] = useState<DROPDOWN_FORM_SELECTION>(
-    DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE,
-  );
-  const { upload, uploadData } = useCDIUpload();
 
   const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>(
     initialBootableVolumeState,
+  );
+  const [sourceType, setSourceType] = useState<DROPDOWN_FORM_SELECTION>(
+    DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE,
+  );
+  const applyStorageProfileState = useState<boolean>(true);
+
+  const [preferences] = useClusterPreferences();
+  const preferencesNames = useMemo(() => preferences.map(getName), [preferences]);
+
+  const { upload, uploadData } = useCDIUpload();
+
+  const claimPropertySetsData = useStorageProfileClaimPropertySets(
+    bootableVolume?.storageClassName,
   );
 
   const { labels } = bootableVolume || {};
@@ -90,7 +94,9 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         onClose();
       }}
       onSubmit={createBootableVolume({
+        applyStorageProfileSettings: applyStorageProfileState[0],
         bootableVolume,
+        claimPropertySets: claimPropertySetsData?.claimPropertySets,
         namespace,
         onCreateVolume,
         sourceType,
@@ -120,7 +126,9 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           {t('Destination details')}
         </Title>
         <VolumeDestination
+          applyStorageProfileState={applyStorageProfileState}
           bootableVolume={bootableVolume}
+          claimPropertySetsData={claimPropertySetsData}
           namespace={namespace}
           setBootableVolumeField={setBootableVolumeField}
         />

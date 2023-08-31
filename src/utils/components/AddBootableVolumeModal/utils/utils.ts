@@ -13,6 +13,7 @@ import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
+import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -24,7 +25,9 @@ import {
 } from './constants';
 
 type createBootableVolumeType = (input: {
+  applyStorageProfileSettings: boolean;
   bootableVolume: AddBootableVolumeState;
+  claimPropertySets: ClaimPropertySets;
   namespace: string;
   onCreateVolume: (createdVolume: BootableVolume) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
@@ -32,7 +35,15 @@ type createBootableVolumeType = (input: {
 }) => (dataSource: V1beta1DataSource) => Promise<V1beta1DataSource>;
 
 export const createBootableVolume: createBootableVolumeType =
-  ({ bootableVolume, namespace, onCreateVolume, sourceType, uploadData }) =>
+  ({
+    applyStorageProfileSettings,
+    bootableVolume,
+    claimPropertySets,
+    namespace,
+    onCreateVolume,
+    sourceType,
+    uploadData,
+  }) =>
   async (dataSource: V1beta1DataSource) => {
     const {
       annotations,
@@ -70,6 +81,11 @@ export const createBootableVolume: createBootableVolumeType =
 
       if (storageClassName) {
         draftBootableVolume.spec.storage.storageClassName = storageClassName;
+      }
+
+      if (!applyStorageProfileSettings) {
+        draftBootableVolume.spec.storage.accessModes = claimPropertySets?.[0]?.accessModes;
+        draftBootableVolume.spec.storage.volumeMode = claimPropertySets?.[0]?.volumeMode;
       }
 
       draftBootableVolume.spec.source = isUploadForm

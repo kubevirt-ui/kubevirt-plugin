@@ -1,14 +1,12 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import StorageProfileModel from '@kubevirt-ui/kubevirt-api/console/models/StorageProfileModel';
+import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { StorageProfile } from '../utils/constants';
 
-type UseStorageProfileClaimPropertySetsValue = {
-  claimPropertySets: {
-    accessModes: string[];
-    volumeMode?: string;
-  }[];
+export type UseStorageProfileClaimPropertySetsValue = {
+  claimPropertySets: ClaimPropertySets;
   error: any;
   loaded: boolean;
 };
