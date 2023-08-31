@@ -22,9 +22,7 @@ import useVirtualMachineTemplatesColumns from './hooks/useVirtualMachineTemplate
 import useVirtualMachineTemplatesFilters from './hooks/useVirtualMachineTemplatesFilters';
 
 const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>> = ({
-  match: {
-    params: { ns: namespace },
-  },
+  match: { params: { ns: namespace } = {} } = {},
 }) => {
   const { t } = useKubevirtTranslation();
   const {
