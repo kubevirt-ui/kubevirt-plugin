@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { getOverviewSettingsPath } from '@kubevirt-utils/components/PreviewFeatureAlert/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Stack, StackItem } from '@patternfly/react-core';
 
 import './PreviewFeatureAlert.scss';

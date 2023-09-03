@@ -13,7 +13,7 @@ import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomatic
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,

@@ -12,7 +12,7 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Bullseye,
   Card,

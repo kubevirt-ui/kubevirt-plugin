@@ -4,7 +4,7 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useAlerts from '@kubevirt-utils/hooks/useAlerts/useAlerts';
 import { inNamespace, isKubeVirtAlert } from '@kubevirt-utils/utils/prometheus';
 import { Alert } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 export type UseKubevirtAlerts = () => [Alert[], boolean];
 

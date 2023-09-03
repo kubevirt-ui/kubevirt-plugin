@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { YAMLEditorRef } from '@openshift-console/dynamic-plugin-sdk';
+import { CodeEditorRef } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createSelection, getLinesToHighlight } from './utils';
 
@@ -9,7 +9,7 @@ export const useEditorHighlighter = (
   pathsToHighlight: string[],
   showEditor: boolean,
 ) => {
-  const [editor, setEditor] = useState<YAMLEditorRef['editor']>();
+  const [editor, setEditor] = useState<CodeEditorRef['editor']>();
   const isHighlighed = useRef(false);
 
   useEffect(() => {
@@ -35,5 +35,5 @@ export const useEditorHighlighter = (
     highlightPaths();
   }, [editableYAML, editor, pathsToHighlight]);
 
-  return (ref: YAMLEditorRef) => setEditor(ref?.editor);
+  return (ref: CodeEditorRef) => setEditor(ref?.editor);
 };
