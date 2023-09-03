@@ -29,6 +29,7 @@ import { sourceTypes } from './DiskFormFields/utils/constants';
 import { initialStateDiskForm, initialStateDiskSource } from './state/initialState';
 import { diskReducer, diskSourceReducer } from './state/reducers';
 import {
+  checkDifferentStorageClassFromBootPVC,
   getDataVolumeFromState,
   getDataVolumeHotplugPromise,
   getDataVolumeTemplate,
@@ -224,7 +225,13 @@ const DiskModal: FC<DiskModalProps> = ({
           dispatchDiskState={dispatchDiskState}
           isVMRunning={isVMRunning}
         />
-        <StorageClassAndPreallocation diskState={diskState} dispatchDiskState={dispatchDiskState} />
+        <StorageClassAndPreallocation
+          checkSC={(selectedStorageClass) =>
+            checkDifferentStorageClassFromBootPVC(vm, selectedStorageClass)
+          }
+          diskState={diskState}
+          dispatchDiskState={dispatchDiskState}
+        />
       </Form>
     </TabModal>
   );

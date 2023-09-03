@@ -26,6 +26,7 @@ type StorageClassSelectProps = {
 } & AlertedStorageClassSelectProps;
 
 const StorageClassSelect: FC<StorageClassSelectProps> = ({
+  checkSC,
   setShowSCAlert,
   setStorageClassName,
   setStorageClassProvisioner,
@@ -43,7 +44,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
 
   const onSelect = useCallback(
     (event: ChangeEvent<Element>, selection: string) => {
-      setShowSCAlert(selection !== defaultSC?.metadata?.name);
+      setShowSCAlert(checkSC ? checkSC(selection) : false);
       setStorageClassName(selection);
       setIsOpen(false);
       setStorageClassProvisioner?.(

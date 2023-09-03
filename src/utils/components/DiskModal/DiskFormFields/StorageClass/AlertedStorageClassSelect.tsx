@@ -4,6 +4,7 @@ import DefaultStorageClassAlert from './DefaultStorageClassAlert';
 import StorageClassSelect from './StorageClassSelect';
 
 export type AlertedStorageClassSelectProps = {
+  checkSC?: (selectedSC: string) => boolean;
   setStorageClassName: (value: string) => void;
   setStorageClassProvisioner?: Dispatch<SetStateAction<string>>;
   storageClass: string;

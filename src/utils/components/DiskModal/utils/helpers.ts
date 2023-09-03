@@ -14,8 +14,9 @@ import {
   V1VirtualMachineInstance,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import { buildOwnerReference, getName } from '@kubevirt-utils/resources/shared';
 import { hasTemplateParameter } from '@kubevirt-utils/resources/template';
+import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { ensurePath, getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -268,4 +269,18 @@ export const getRunningVMMissingVolumesFromVMI = (
     (vol) => !vmVolumeNames?.includes(vol?.name),
   );
   return missingVolumesFromVMI || [];
+};
+
+export const checkDifferentStorageClassFromBootPVC = (
+  vm: V1VirtualMachine,
+  selectedStorageClass: string,
+): boolean => {
+  const bootDiskName = getBootDisk(vm)?.name;
+  const bootVolume = getVolumes(vm).find((vol) => vol?.name === bootDiskName);
+  const bootDVT = getDataVolumeTemplates(vm)?.find(
+    (dvt) => getName(dvt) === bootVolume?.dataVolume?.name,
+  );
+
+  const source = Boolean(bootDVT?.spec?.source?.pvc || bootDVT?.spec?.sourceRef);
+  return source && bootDVT?.spec?.storage?.storageClassName !== selectedStorageClass;
 };
