@@ -287,6 +287,14 @@ export const getName = <A extends K8sResourceCommon = K8sResourceCommon>(resourc
   resource?.metadata?.name;
 
 /**
+ *
+ * @param resource k8s resource
+ * @returns resource's namespace
+ */
+export const getNamespace = <A extends K8sResourceCommon = K8sResourceCommon>(resource: A) =>
+  resource?.metadata?.namespace;
+
+/**
  * convertResourceArrayToMap is a function that takes in an array of
  * K8sResourceCommon objects and an optional boolean value.
  * It returns an object with the resourceKeyName as the key,
