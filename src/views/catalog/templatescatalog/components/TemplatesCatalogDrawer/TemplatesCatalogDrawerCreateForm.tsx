@@ -135,6 +135,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
     const onCustomize = (e: MouseEvent) => {
       e.preventDefault();
+
       if (isEmpty(template?.parameters)) {
         return k8sCreate<V1Template>({
           data: { ...template, metadata: { ...template?.metadata, namespace } },
@@ -159,8 +160,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
               ...vmDraft?.spec?.template?.spec?.domain?.resources?.requests,
               memory: `${vm.spec.template.spec.domain.resources.requests['memory']}`,
             };
-            vmDraft.spec.template.spec.domain.cpu.cores =
-              vmObject.spec.template.spec.domain.cpu.cores;
+            vmDraft.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
 
             const updatedVolumes = applyCloudDriveCloudInitVolume(vmObject);
             vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)

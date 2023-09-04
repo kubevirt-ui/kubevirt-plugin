@@ -100,7 +100,7 @@ export const useCustomizeFormSubmit = ({
           ...vmDraft?.spec?.template?.spec?.domain?.resources?.requests,
           memory: `${vm.spec.template.spec.domain.resources.requests['memory']}`,
         };
-        vmDraft.spec.template.spec.domain.cpu.cores = vmObj.spec.template.spec.domain.cpu.cores;
+        vmDraft.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
 
         const updatedVolumes = applyCloudDriveCloudInitVolume(vmObj);
         vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
