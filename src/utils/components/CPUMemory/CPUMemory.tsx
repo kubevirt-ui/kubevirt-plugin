@@ -10,6 +10,7 @@ import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Skeleton } from '@patternfly/react-core';
+import { isVMRunning } from '@virtualmachines/utils';
 
 type CPUMemoryProps = {
   vm: V1VirtualMachine;
@@ -19,17 +20,17 @@ const CPUMemory: FC<CPUMemoryProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const itMatcher: V1InstancetypeMatcher = vm?.spec?.instancetype;
   const { instanceType, instanceTypeLoaded, instanceTypeLoadError } = useInstanceType(itMatcher);
+  const isMachineRunning = isVMRunning(vm);
   const { vmi, vmiLoadError } = useVMI(getName(vm), getNamespace(vm));
 
-  if (vmiLoadError || (instanceTypeLoadError && !isEmpty(itMatcher)))
+  if ((isMachineRunning && vmiLoadError) || (!isEmpty(itMatcher) && instanceTypeLoadError))
     return <MutedTextSpan text={t('Not available')} />;
 
-  if (!vmi || !vm || !instanceTypeLoaded) return <Skeleton />;
+  if ((isMachineRunning && !vmi) || !vm || !instanceTypeLoaded) return <Skeleton />;
 
   const cpu =
-    vCPUCount(vmi?.spec?.domain?.cpu) ||
-    instanceType?.spec?.cpu?.guest ||
-    vCPUCount(vm?.spec?.template?.spec?.domain?.cpu);
+    vCPUCount(vmi?.spec?.domain?.cpu || vm?.spec?.template?.spec?.domain?.cpu) ||
+    instanceType?.spec?.cpu?.guest;
 
   const memory = readableSizeUnit(
     vmi?.spec?.domain?.memory?.guest ||

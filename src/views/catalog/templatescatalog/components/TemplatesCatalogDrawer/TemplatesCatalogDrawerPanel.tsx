@@ -166,7 +166,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
                       <VirtualMachineDescriptionItem
                         bodyContent={
                           <CPUDescription
-                            cpu={vmObject?.spec?.template?.spec?.domain?.cpu}
+                            cpu={updatedVM?.spec?.template?.spec?.domain?.cpu}
                             helperTextResource={CpuMemHelperTextResources.FutureVM}
                           />
                         }
