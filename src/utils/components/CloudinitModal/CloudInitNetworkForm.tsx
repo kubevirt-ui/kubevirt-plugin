@@ -59,7 +59,7 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
               id={'address'}
               onChange={(v) => updateNetworkField('address', v)}
               type="text"
-              value={networkData?.address}
+              value={networkData?.address || ''}
             />
           </FormGroup>
           <FormGroup

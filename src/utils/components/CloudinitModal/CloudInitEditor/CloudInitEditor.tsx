@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useLayoutEffect, useRef, useState } from 'react';
 import { dump } from 'js-yaml';
 
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -15,20 +15,20 @@ type CloudInitEditorProps = {
 
 const EDITOR_TOOLS_SPACES = 75;
 
-export const _CloudInitEditor: React.FC<CloudInitEditorProps> = ({ cloudInitVolume, onSave }) => {
+export const _CloudInitEditor: FC<CloudInitEditorProps> = ({ cloudInitVolume, onSave }) => {
   const { t } = useKubevirtTranslation();
   const cloudInitData = cloudInitVolume?.cloudInitNoCloud || cloudInitVolume?.cloudInitConfigDrive;
 
-  const [editorHeight, setEditorHeight] = React.useState<number>();
-  const [saved, setSaved] = React.useState<boolean>(false);
-  const yamlEditorRef = React.useRef<HTMLDivElement>();
+  const [editorHeight, setEditorHeight] = useState<number>();
+  const [saved, setSaved] = useState<boolean>(false);
+  const yamlEditorRef = useRef<HTMLDivElement>();
 
-  const onSaveClick = async (yaml: string) => {
+  const onSaveClick = (yaml: string) => {
     onSave(yaml);
     setSaved(true);
   };
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (yamlEditorRef.current?.clientHeight) {
       setEditorHeight(yamlEditorRef.current?.clientHeight - EDITOR_TOOLS_SPACES);
     }

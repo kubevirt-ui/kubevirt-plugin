@@ -1,8 +1,12 @@
-import React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { load } from 'js-yaml';
 
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
-import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1CloudInitNoCloudSource,
+  V1VirtualMachine,
+  V1Volume,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 
 import {
@@ -13,71 +17,95 @@ import {
   convertYAMLToNetworkDataObject,
   convertYAMLUserDataObject,
   createDefaultCloudInitYAML,
-  deleteObjBlankValues,
   getCloudInitData,
   getCloudInitVolume,
 } from './cloudinit-utils';
-import { CLOUD_CONFIG_HEADER } from './consts';
 
 export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
-  const cloudInitVol = React.useMemo(() => getCloudInitVolume(vm), [vm]);
-  const cloudInit = React.useMemo(() => getCloudInitData(cloudInitVol), [cloudInitVol]);
-
-  const [userData, setUserData] = React.useState<CloudInitUserData>(
-    convertYAMLUserDataObject(cloudInit?.userData ?? createDefaultCloudInitYAML()),
+  const cloudInitVol = useMemo(() => getCloudInitVolume(vm), [vm]);
+  const cloudInit = useMemo(
+    () => <V1CloudInitNoCloudSource>getCloudInitData(cloudInitVol) || createDefaultCloudInitYAML(),
+    [cloudInitVol],
   );
 
-  const [networkData, setNetworkData] = React.useState<CloudInitNetworkData>(
-    convertYAMLToNetworkDataObject(cloudInit?.networkData ?? ''),
-  );
-  const [enableNetworkData, setEnableNetworkData] = React.useState<boolean>(
-    !!networkData?.name || !!networkData?.address || !!networkData?.gateway,
-  );
+  const [yamlJSObject, setYamlJSObject] = useState<V1CloudInitNoCloudSource>(cloudInit);
 
-  const updateUserField = (key: keyof CloudInitUserData, value: string) => {
-    setUserData({ ...userData, [key]: value });
-  };
-  const updateNetworkField = (key: keyof CloudInitNetworkData, value: string) => {
-    setNetworkData({ ...networkData, [key]: value });
-  };
-  const updateFromYAML = (yaml: string) => {
-    const cloudData = load(yaml) as {
-      networkData?: string;
-      userData?: string;
-    };
+  const [userData, setUserData] = useState<CloudInitUserData>();
 
-    setUserData(convertYAMLUserDataObject(cloudData?.userData));
-    setNetworkData(convertYAMLToNetworkDataObject(cloudData?.networkData));
-  };
+  const [networkData, setNetworkData] = useState<CloudInitNetworkData>();
+  const [latestNetworkData, setLatestNetworkData] = useState<CloudInitNetworkData>();
+  const [enableNetworkData, setEnableNetworkData] = useState<boolean>();
 
-  const shouldAddHeader = React.useMemo(() => {
-    const firstLineSepIndex = cloudInit?.userData ? cloudInit?.userData.indexOf('\n') : -1;
-    const header =
-      firstLineSepIndex === -1 ? undefined : cloudInit?.userData.substring(0, firstLineSepIndex);
-
-    return header?.trimEnd() === CLOUD_CONFIG_HEADER;
-  }, [cloudInit?.userData]);
-
-  const cloudInitVolume: V1Volume = React.useMemo(() => {
-    const cloudInitNoBlanks = deleteObjBlankValues({
-      networkData: enableNetworkData ? convertNetworkDataObjectToYAML(networkData) : null,
-      userData: convertUserDataObjectToYAML(userData, shouldAddHeader),
+  const wrappedSetEnableNetworkData = (checked: boolean): void => {
+    setLatestNetworkData(networkData);
+    setYamlJSObject((yaml) => {
+      const { networkData: _ = '', ...restYaml } = yaml || {};
+      const ntData = convertNetworkDataObjectToYAML(latestNetworkData || networkData);
+      return checked
+        ? {
+            ...yaml,
+            ...(ntData && { networkData: ntData }),
+          }
+        : restYaml;
     });
 
+    setEnableNetworkData(checked);
+  };
+
+  const updateUserField = (key: keyof CloudInitUserData, value: string): void => {
+    setYamlJSObject((yamlObj) => {
+      return {
+        ...yamlObj,
+        userData: convertUserDataObjectToYAML({ ...userData, [key]: value }, true),
+      };
+    });
+  };
+  const updateNetworkField = (key: keyof CloudInitNetworkData, value: string): void => {
+    setYamlJSObject((yamlObj) => {
+      const ntData = convertNetworkDataObjectToYAML({
+        ...convertYAMLToNetworkDataObject(yamlObj?.networkData),
+        [key]: value,
+      });
+      const { networkData: _, ...restYaml } = yamlObj || {};
+      return {
+        ...restYaml,
+        ...(ntData && { networkData: ntData }),
+      };
+    });
+  };
+
+  const updateFromYAML = (yaml: string) => {
+    const cloudData = <V1CloudInitNoCloudSource>load(yaml);
+    setYamlJSObject(cloudData);
+  };
+
+  useEffect(() => {
+    const networkDataObj =
+      yamlJSObject?.networkData && convertYAMLToNetworkDataObject(yamlJSObject?.networkData);
+
+    networkDataObj && setEnableNetworkData(true);
+    setNetworkData(networkDataObj);
+
+    const userDataObj = yamlJSObject?.userData && convertYAMLUserDataObject(yamlJSObject?.userData);
+
+    setUserData(userDataObj);
+  }, [yamlJSObject]);
+
+  const cloudInitVolume: V1Volume = useMemo(() => {
     if (cloudInitVol?.cloudInitConfigDrive) {
       return {
-        cloudInitConfigDrive: cloudInitNoBlanks,
+        cloudInitConfigDrive: yamlJSObject,
         name: 'cloudinitdisk',
       };
     }
 
     return {
-      cloudInitNoCloud: cloudInitNoBlanks,
+      cloudInitNoCloud: yamlJSObject,
       name: 'cloudinitdisk',
     };
-  }, [userData, shouldAddHeader, networkData, cloudInitVol, enableNetworkData]);
+  }, [cloudInitVol?.cloudInitConfigDrive, yamlJSObject]);
 
-  const updatedVM = React.useMemo(
+  const updatedVM = useMemo(
     () =>
       produceVMDisks(vm, (vmDraft) => {
         const cloudInitDiskName = cloudInitVol?.name || 'cloudinitdisk';
@@ -108,12 +136,10 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
     cloudInitVolume,
     enableNetworkData,
     networkData,
-    setEnableNetworkData,
+    setEnableNetworkData: wrappedSetEnableNetworkData,
     updatedVM,
-
     updateFromYAML,
     updateNetworkField,
-    // methods
     updateUserField,
     userData,
   };
