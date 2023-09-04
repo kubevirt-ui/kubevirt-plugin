@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 import { isAllNamespaces } from '../vm-statuses-card/utils/utils';
 
