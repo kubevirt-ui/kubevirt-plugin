@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, Fragment, Suspense, useState } from 'react';
 import { Trans } from 'react-i18next';
 import RandExp from 'randexp';
 
@@ -33,7 +33,7 @@ type CloudinitFormProps = {
   updateUserField: (key: keyof CloudInitUserData, value: string) => void;
   userData: CloudInitUserData;
 };
-const CloudinitForm: React.FC<CloudinitFormProps> = ({
+const CloudinitForm: FC<CloudinitFormProps> = ({
   cloudInitVolume,
   enableNetworkData,
   networkData,
@@ -46,12 +46,12 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
   userData,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [passwordHidden, setPasswordHidden] = React.useState<boolean>(true);
+  const [passwordHidden, setPasswordHidden] = useState<boolean>(true);
 
   return (
-    <React.Fragment key="cloudinit-editor">
+    <Fragment key="cloudinit-editor">
       {showEditor ? (
-        <React.Suspense
+        <Suspense
           fallback={
             <Bullseye>
               <Loading />
@@ -59,7 +59,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
           }
         >
           <CloudInitEditor cloudInitVolume={cloudInitVolume} onSave={onEditorSave} />
-        </React.Suspense>
+        </Suspense>
       ) : (
         <Form>
           <FormGroup
@@ -124,7 +124,7 @@ const CloudinitForm: React.FC<CloudinitFormProps> = ({
           />
         </Form>
       )}
-    </React.Fragment>
+    </Fragment>
   );
 };
 

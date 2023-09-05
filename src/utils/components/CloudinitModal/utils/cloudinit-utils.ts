@@ -2,7 +2,7 @@ import produce from 'immer';
 import { dump, load, LoadOptions } from 'js-yaml';
 
 import {
-  V1CloudInitConfigDriveSource,
+  V1CloudInitNoCloudSource,
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -12,14 +12,14 @@ import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { ACTIVATION_KEY, CLOUD_CONFIG_HEADER } from './consts';
 
-export const deleteObjBlankValues = (obj: object) =>
-  Object.fromEntries(Object.entries(obj).filter(([, v]) => !!v));
+export const deleteObjBlankValues = (obj: object = {}) =>
+  Object.fromEntries(Object.entries(obj)?.filter(([, v]) => !!v));
 
 export const getCloudInitVolume = (vm: V1VirtualMachine): V1Volume => {
   return getVolumes(vm)?.find((vol) => !!vol.cloudInitConfigDrive || !!vol.cloudInitNoCloud);
 };
 
-export const getCloudInitData = (cloudInitVolume: V1Volume): V1CloudInitConfigDriveSource => {
+export const getCloudInitData = (cloudInitVolume: V1Volume): V1CloudInitNoCloudSource => {
   return cloudInitVolume?.cloudInitConfigDrive || cloudInitVolume?.cloudInitNoCloud;
 };
 
@@ -53,42 +53,20 @@ export const convertYAMLToNetworkDataObject = (networkData: string): CloudInitNe
     const networkObj = load(networkData) as CloudInitNetwork;
     const networkToEdit = networkObj?.network?.config?.[0];
 
-    return {
-      address: Array.isArray(networkToEdit?.subnets?.[0]?.address)
-        ? networkToEdit?.subnets?.[0]?.address?.join(',')
-        : networkToEdit?.subnets?.[0]?.address,
-      gateway: networkToEdit?.subnets?.[0]?.gateway,
-      name: networkToEdit?.name,
-    };
-  } catch (e) {
-    kubevirtConsole.error(e);
-    return undefined;
-  }
-};
+    const ips =
+      !isEmpty(networkToEdit?.subnets?.[0]?.address) && networkToEdit?.subnets?.[0]?.address;
+    const address = Array.isArray(ips) ? ips?.join(',') : ips;
+    const gateway = networkToEdit?.subnets?.[0]?.gateway;
+    const name = networkToEdit?.name;
 
-export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData): string => {
-  try {
-    const hasValue = networkData?.name || networkData?.address || networkData?.gateway;
+    const nonEmptyNetworkObj = !!address || !!gateway || !!name;
+
     return (
-      hasValue &&
-      dump({
-        network: {
-          config: [
-            {
-              name: networkData?.name,
-              subnets: [
-                {
-                  address: networkData?.address?.replace(/\s/g, '').split(','),
-                  gateway: networkData?.gateway,
-                  type: 'static',
-                },
-              ],
-              type: 'physical',
-            },
-          ],
-          version: '1',
-        },
-      })
+      nonEmptyNetworkObj && {
+        address,
+        gateway,
+        name,
+      }
     );
   } catch (e) {
     kubevirtConsole.error(e);
@@ -96,15 +74,39 @@ export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData
   }
 };
 
-export const createDefaultCloudInitYAML = () =>
-  convertUserDataObjectToYAML(
-    {
-      hostname: '',
-      password: '',
-      user: '',
-    },
-    true,
-  );
+export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData): string => {
+  const hasValue = !isEmpty(networkData?.name || networkData?.address || networkData?.gateway);
+  try {
+    return hasValue
+      ? dump({
+          network: {
+            config: [
+              {
+                name: networkData?.name,
+                subnets: [
+                  {
+                    address: (networkData?.address || '')?.replace(/\s/g, '').split(','),
+                    gateway: networkData?.gateway,
+                    type: 'static',
+                  },
+                ],
+                type: 'physical',
+              },
+            ],
+            version: '1',
+          },
+        })
+      : null;
+  } catch (e) {
+    kubevirtConsole.error(e);
+    return undefined;
+  }
+};
+
+export const createDefaultCloudInitYAML = () => ({
+  networkData: '',
+  userData: '',
+});
 
 export const updateCloudInitRHELSubscription = (
   vmVolumes: V1Volume[] = [],
