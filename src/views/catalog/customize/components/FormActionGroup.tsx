@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { clearSessionStorageVM } from '@catalog/utils/WizardVMContext';
+import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { ActionGroup, Button } from '@patternfly/react-core';
@@ -16,15 +17,16 @@ type FormActionGroupProps = {
   }>;
 };
 
-export const FormActionGroup: React.FC<FormActionGroupProps> = ({ loading, onCancel }) => {
+export const FormActionGroup: FC<FormActionGroupProps> = ({ loading, onCancel }) => {
   const { t } = useKubevirtTranslation();
   const { ns: namespace } = useParams<{ ns: string }>();
   const history = useHistory();
 
-  const handleCancel = React.useCallback(() => {
+  const handleCancel = useCallback(() => {
+    const namespaceUrl = namespace ? `ns/${namespace}` : ALL_NAMESPACES;
     onCancel?.().catch(kubevirtConsole.error);
     clearSessionStorageVM();
-    history.push(`/k8s/ns/${namespace}/templatescatalog`);
+    history.push(`/k8s/${namespaceUrl}/templatescatalog`);
   }, [history, namespace, onCancel]);
 
   return (
