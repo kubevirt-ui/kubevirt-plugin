@@ -28,7 +28,7 @@ const HealthPopupChart: React.FC<HealthPopupChartProps> = ({ alerts }) => {
         });
         return acc;
       }, []),
-    [alerts],
+    [alerts, totalNumberAlerts],
   );
 
   return (

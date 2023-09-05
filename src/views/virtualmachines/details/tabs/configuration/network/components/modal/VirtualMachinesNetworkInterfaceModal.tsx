@@ -65,7 +65,7 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
           });
         }
       },
-    [vm],
+    [nicHotPlugEnabled, vm],
   );
 
   return (
