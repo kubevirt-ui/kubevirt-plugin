@@ -13,6 +13,7 @@ import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kuberne
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Select, SelectVariant } from '@patternfly/react-core';
 
@@ -55,7 +56,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
   );
 
   useEffect(() => {
-    if (!storageClass && loaded) {
+    if (!storageClass && loaded && !isEmpty(defaultSC)) {
       setStorageClassName(defaultSC?.metadata?.name);
       setStorageClassProvisioner?.(defaultSC?.provisioner);
     }
