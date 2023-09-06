@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useMemo, useReducer } from 'react';
-import { printableVMStatus } from 'src/views/virtualmachines/utils';
+import { isRunning } from 'src/views/virtualmachines/utils';
 
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -64,7 +64,7 @@ const DiskModal: FC<DiskModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
+  const isVMRunning = isRunning(vm);
   const { upload, uploadData } = useCDIUpload();
   const [diskState, dispatchDiskState] = useReducer(diskReducer, initialStateDiskForm);
   const [diskSourceState, dispatchDiskSourceState] = useReducer(

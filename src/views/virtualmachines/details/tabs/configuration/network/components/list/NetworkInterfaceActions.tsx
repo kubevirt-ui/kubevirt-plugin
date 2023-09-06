@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { FC, useMemo, useState } from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -23,7 +23,7 @@ import {
   KebabToggle,
 } from '@patternfly/react-core';
 import { removeInterface } from '@virtualmachines/actions/actions';
-import { isVMRunning } from '@virtualmachines/utils';
+import { isRunning } from '@virtualmachines/utils';
 
 import VirtualMachinesEditNetworkInterfaceModal from '../modal/VirtualMachinesEditNetworkInterfaceModal';
 
@@ -88,7 +88,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         submitBtnVariant={ButtonVariant.danger}
       >
         <span>
-          {isVMRunning(vm) && (
+          {isRunning(vm) && (
             <Alert
               title={t(
                 'Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13 or for network interfaces that were added to the VirtualMachine in these versions.',

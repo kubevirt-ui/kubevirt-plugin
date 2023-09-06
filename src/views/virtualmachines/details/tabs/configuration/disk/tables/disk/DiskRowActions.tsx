@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -9,7 +9,7 @@ import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
-import { printableVMStatus } from '@virtualmachines/utils';
+import { isRunning } from '@virtualmachines/utils';
 
 import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
@@ -24,17 +24,12 @@ type DiskRowActionsProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskRowActions: React.FC<DiskRowActionsProps> = ({
-  diskName,
-  pvcResourceExists,
-  vm,
-  vmi,
-}) => {
+const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, pvcResourceExists, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const isVMRunning = vm?.status?.printableStatus !== printableVMStatus.Stopped;
+  const isVMRunning = isRunning(vm);
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
   const isEditDisabled = isVMRunning || pvcResourceExists;
 
@@ -47,7 +42,7 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
   const deleteBtnText = t('Detach');
   const removeHotplugBtnText = t('Make persistent');
 
-  const disabledEditText = React.useMemo(() => {
+  const disabledEditText = useMemo(() => {
     if (isVMRunning) {
       return t('Can edit only when VirtualMachine is stopped');
     }
@@ -127,17 +122,15 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({
     );
   }
   return (
-    <>
-      <Dropdown
-        dropdownItems={items}
-        isOpen={isDropdownOpen}
-        isPlain
-        menuAppendTo={getContentScrollableElement}
-        onSelect={() => setIsDropdownOpen(false)}
-        position={DropdownPosition.right}
-        toggle={<KebabToggle id="toggle-id-6" onToggle={setIsDropdownOpen} />}
-      />
-    </>
+    <Dropdown
+      dropdownItems={items}
+      isOpen={isDropdownOpen}
+      isPlain
+      menuAppendTo={getContentScrollableElement}
+      onSelect={() => setIsDropdownOpen(false)}
+      position={DropdownPosition.right}
+      toggle={<KebabToggle id="toggle-id-6" onToggle={setIsDropdownOpen} />}
+    />
   );
 };
 
