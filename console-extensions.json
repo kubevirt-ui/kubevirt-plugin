@@ -296,12 +296,12 @@
     "properties": {
       "model": {
         "group": "cdi.kubevirt.io",
-        "kind": "DataSource",
+        "kind": "DataVolume",
         "version": "v1beta1"
       },
       "name": "default",
       "template": {
-        "$codeRef": "yamlTemplates.defaultDataSourceYamlTemplate"
+        "$codeRef": "yamlTemplates.defaultBootableVolumeYamlTemplate"
       }
     },
     "type": "console.yaml-template"

@@ -10,7 +10,7 @@ import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { DataSourceModelRef } from '@kubevirt-utils/models';
+import { DataSourceModelRef, DataVolumeModelRef } from '@kubevirt-utils/models';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import {
@@ -66,7 +66,7 @@ const BootableVolumesList: FC<RouteComponentProps<{ ns: string }>> = ({ match })
   const onCreate = (type: string) => {
     return type === 'form'
       ? createModal((props) => <AddBootableVolumeModal {...props} />)
-      : history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/~new`);
+      : history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataVolumeModelRef}/~new`);
   };
 
   return (
