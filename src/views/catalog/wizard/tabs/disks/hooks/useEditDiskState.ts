@@ -78,13 +78,15 @@ export const useEditDiskStates: UseEditDiskStates = (vm, diskName) => {
     const volume = volumes?.find(({ name }) => name === diskName);
     // volume consists of 2 keys:
     // name and one of: containerDisk/cloudInitNoCloud
-    const volumeSource = Object.keys(volume).find((key) =>
-      [
-        volumeTypes.CONTAINER_DISK,
-        volumeTypes.DATA_VOLUME,
-        volumeTypes.PERSISTENT_VOLUME_CLAIM,
-      ].includes(key),
-    );
+    const volumeSource =
+      volume &&
+      Object.keys(volume)?.find((key) =>
+        [
+          volumeTypes.CONTAINER_DISK,
+          volumeTypes.DATA_VOLUME,
+          volumeTypes.PERSISTENT_VOLUME_CLAIM,
+        ].includes(key),
+      );
 
     const isBootDisk = getBootDisk(vm)?.name === diskName;
 

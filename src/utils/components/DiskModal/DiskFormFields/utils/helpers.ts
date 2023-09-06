@@ -111,7 +111,8 @@ export const getInterfaceOptions = (t: TFunction) => ({
 });
 
 export const getVolumeType = (volume: V1Volume): string => {
-  const volumeType = Object.keys(volume)?.find((key) => Object.values(volumeTypes).includes(key));
+  const volumeType =
+    volume && Object.keys(volume)?.find((key) => Object.values(volumeTypes).includes(key));
   return volumeType;
 };
 
