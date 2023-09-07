@@ -46,7 +46,7 @@ export const createNetwork = (nicName: string, networkName: string): V1Network =
   };
 
   if (!networkNameStartWithPod(networkName) && networkName) {
-    network.multus = { networkName };
+    network.multus = { networkName: networkName?.split('/')?.[1] || networkName };
   } else {
     network.pod = {};
   }
@@ -61,7 +61,7 @@ export const createInterface = (
   interfaceType: string,
 ): V1Interface => {
   return {
-    [interfaceType]: {},
+    [interfaceType.toLowerCase()]: {},
     macAddress: interfaceMACAddress,
     model: interfaceModel,
     name: nicName,
