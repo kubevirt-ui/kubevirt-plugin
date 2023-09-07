@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, memo } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { CUSTOMIZE_TEMPLATE_TITLE } from '@catalog/customize/constants';
@@ -17,7 +17,7 @@ import {
   Title,
 } from '@patternfly/react-core';
 
-export const WizardHeader: React.FC<{ namespace: string }> = React.memo(({ namespace }) => {
+export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const { tabsData } = useWizardVMContext();
   const history = useHistory();
