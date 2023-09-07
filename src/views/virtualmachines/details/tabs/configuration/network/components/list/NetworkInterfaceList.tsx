@@ -18,7 +18,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { printableVMStatus } from '@virtualmachines/utils';
+import { isRunning } from '@virtualmachines/utils';
 
 import useNetworkColumns from '../../hooks/useNetworkColumns';
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
@@ -33,9 +33,8 @@ type NetworkInterfaceTableProps = {
 const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm }) => {
   const filters = useNetworkRowFilters();
 
-  const vmiExists = printableVMStatus.Stopped !== vm?.status?.printableStatus;
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>(
-    vmiExists && {
+    isRunning(vm) && {
       groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
       isList: false,
       name: getName(vm),
@@ -52,8 +51,8 @@ const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm }) => {
 
   const autoattachPodInterface = getAutoAttachPodInterface(vm) !== false;
 
-  const isPending = (network: V1Network) =>
-    getVMINetworks(vmi)?.some((ntwork) => ntwork?.name !== network.name);
+  const isPending = (network: V1Network): boolean =>
+    isRunning(vm) && !getVMINetworks(vmi)?.some((ntwork) => ntwork?.name === network.name);
 
   return (
     <>
