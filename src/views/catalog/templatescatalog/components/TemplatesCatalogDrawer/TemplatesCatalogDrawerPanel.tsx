@@ -105,6 +105,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
         .catch((err) => {
           setError(err);
         });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [vmNamespace, template]);
 
     return (

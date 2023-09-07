@@ -26,7 +26,7 @@ const useAlerts: UseAlerts = () => {
     const { alerts } = getAlertsAndRules((response as PrometheusRulesResponse)?.data);
 
     return silenceFiringAlerts(alerts, silences);
-  }, [response]);
+  }, [response, silences]);
 
   return { alerts: allAlerts || [], loaded: pollingStatus === SUCCESS };
 };
