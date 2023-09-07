@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { Trans } from 'react-i18next';
 
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,13 +7,13 @@ import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath
 import { BootableResource } from '../../utils/types';
 import { deleteBootableVolumeMetadata } from '../../utils/utils';
 
-type DeleteBootableVolumesModalProps = {
+type RemoveBootableVolumesModalProps = {
   isOpen: boolean;
   onClose: () => void;
   source: BootableResource;
 };
 
-const DeleteBootableVolumesModal: FC<DeleteBootableVolumesModalProps> = ({
+const RemoveBootableVolumesModal: FC<RemoveBootableVolumesModalProps> = ({
   isOpen,
   onClose,
   source,
@@ -24,13 +23,10 @@ const DeleteBootableVolumesModal: FC<DeleteBootableVolumesModalProps> = ({
 
   return (
     <DeleteModal
-      bodyText={
-        <Trans t={t}>
-          Deleting the metadata will mark this volume as non-bootable and remove it from the
-          bootable volumes list. The volume will still be available in the cluster.
-        </Trans>
-      }
-      headerText={t('Delete volume metadata?')}
+      body={t(
+        'Remove from list will mark this volume as non-bootable. The volume will still be available in the cluster.',
+      )}
+      headerText={t('Remove from list?')}
       isOpen={isOpen}
       obj={source}
       onClose={onClose}
@@ -40,4 +36,4 @@ const DeleteBootableVolumesModal: FC<DeleteBootableVolumesModalProps> = ({
   );
 };
 
-export default DeleteBootableVolumesModal;
+export default RemoveBootableVolumesModal;
