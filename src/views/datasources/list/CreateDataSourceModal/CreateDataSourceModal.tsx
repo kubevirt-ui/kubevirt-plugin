@@ -74,7 +74,7 @@ export const CreateDataSourceModal: React.FC<CreateDataSourceModalProps> = ({
         <StackItem>
           <MutedTextSpan
             text={t(
-              'A DataImportCron will also be created, which will define a cron job for recurring polling/importing of the disk image',
+              'Creates a DataImportCron, which defines a cron job to poll and import the disk image.',
             )}
           />
         </StackItem>

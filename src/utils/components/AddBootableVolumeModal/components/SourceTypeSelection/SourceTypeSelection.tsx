@@ -55,7 +55,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
 
         <SelectOption
           description={t(
-            'A DataImportCron will also be created, which will define a cron job for recurring polling/importing or the disk image.',
+            'Creates a DataImportCron, which defines a cron job to poll and import the disk image.',
           )}
           isDisabled={!canCreateDS}
           value={DROPDOWN_FORM_SELECTION.USE_REGISTRY}
