@@ -1,5 +1,8 @@
 import React, { FC, useMemo } from 'react';
 
+import ApplyStorageProfileSettingsCheckbox from '@kubevirt-utils/components/ApplyStorageProfileSettingsCheckbox/ApplyStorageProfileSettingsCheckbox';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+
 import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 import { DiskFormState } from '../state/initialState';
 import { requiresDataVolume } from '../utils/helpers';
@@ -8,7 +11,6 @@ import useStorageProfileClaimPropertySets from './hooks/useStorageProfileClaimPr
 import AlertedStorageClassSelect from './StorageClass/AlertedStorageClassSelect';
 import { sourceTypes } from './utils/constants';
 import AccessMode from './AccessMode';
-import ApplyStorageProfileSettingsCheckbox from './ApplyStorageProfileSettingsCheckbox';
 import EnablePreallocationCheckbox from './EnablePreallocationCheckbox';
 import VolumeMode from './VolumeMode';
 
@@ -34,6 +36,12 @@ const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({
 
   if (!sourceRequiresDataVolume && diskState.diskSource !== sourceTypes.UPLOAD) return null;
 
+  const handleApplyOptimizedSettingsChange = (checked: boolean) =>
+    dispatchDiskState({
+      payload: checked,
+      type: diskReducerActions.SET_APPLY_STORAGE_PROFILE_SETTINGS,
+    });
+
   return (
     <>
       <AlertedStorageClassSelect
@@ -51,9 +59,9 @@ const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({
       />
       <ApplyStorageProfileSettingsCheckbox
         claimPropertySets={claimPropertySets}
-        diskState={diskState}
-        dispatchDiskState={dispatchDiskState}
-        loaded={storageProfileLoaded}
+        disabled={!storageProfileLoaded || !claimPropertySets || isEmpty(claimPropertySets)}
+        handleChange={handleApplyOptimizedSettingsChange}
+        isChecked={diskState?.applyStorageProfileSettings}
       />
       <AccessMode
         diskState={diskState}

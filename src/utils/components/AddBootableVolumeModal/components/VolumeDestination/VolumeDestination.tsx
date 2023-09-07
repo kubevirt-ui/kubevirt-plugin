@@ -1,6 +1,8 @@
-import React, { FC, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
+import ApplyStorageProfileSettingsCheckbox from '@kubevirt-utils/components/ApplyStorageProfileSettingsCheckbox/ApplyStorageProfileSettingsCheckbox';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
+import { UseStorageProfileClaimPropertySetsValue } from '@kubevirt-utils/components/DiskModal/DiskFormFields/hooks/useStorageProfileClaimPropertySets';
 import DefaultStorageClassAlert from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClass/DefaultStorageClassAlert';
 import StorageClassSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClass/StorageClassSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,13 +11,17 @@ import { FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
 
 type VolumeDestinationProps = {
+  applyStorageProfileState: [boolean, Dispatch<SetStateAction<boolean>>];
   bootableVolume: AddBootableVolumeState;
+  claimPropertySetsData: UseStorageProfileClaimPropertySetsValue;
   namespace: string;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const VolumeDestination: FC<VolumeDestinationProps> = ({
+  applyStorageProfileState,
   bootableVolume,
+  claimPropertySetsData,
   namespace,
   setBootableVolumeField,
 }) => {
@@ -23,6 +29,10 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
   const [showSCAlert, setShowSCAlert] = useState(false);
 
   const { bootableVolumeName, size, storageClassName } = bootableVolume || {};
+
+  const [applyStorageProfile, setApplyStorageProfile] = applyStorageProfileState;
+
+  const { claimPropertySets, loaded: storageProfileLoaded } = claimPropertySetsData;
 
   return (
     <>
@@ -32,6 +42,14 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
             setShowSCAlert={setShowSCAlert}
             setStorageClassName={setBootableVolumeField('storageClassName')}
             storageClass={storageClassName}
+          />
+        </GridItem>
+        <GridItem span={12}>
+          <ApplyStorageProfileSettingsCheckbox
+            claimPropertySets={claimPropertySets}
+            disabled={!storageProfileLoaded}
+            handleChange={setApplyStorageProfile}
+            isChecked={applyStorageProfile}
           />
         </GridItem>
         <GridItem span={6}>
