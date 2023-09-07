@@ -10,7 +10,7 @@ export const exampleVirtualMachineWithEnvironments: V1VirtualMachine = {
       'vm.kubevirt.io/validations': `[
           {    
             "name": "minimal-required-memory",    
-            "path": "jsonpath::.spec.domain.resources.requests.memory",    
+            "path": "jsonpath::.spec.domain.memory.guest",
             "rule": "integer",    
             "message": "This VM requires more memory.",    
             "min": 1610612736  

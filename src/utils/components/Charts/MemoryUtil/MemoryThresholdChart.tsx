@@ -32,10 +32,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
   const { height, ref, width } = useResponsiveCharts();
 
-  const requests = vmi?.spec?.domain?.resources?.requests as {
-    [key: string]: string;
-  };
-  const memory = getMemorySize(requests?.memory);
+  const memory = getMemorySize(vmi?.spec?.domain?.memory?.guest);
 
   const [data] = usePrometheusPoll({
     endpoint: PrometheusEndpoint?.QUERY_RANGE,

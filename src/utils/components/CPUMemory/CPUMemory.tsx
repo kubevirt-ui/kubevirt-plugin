@@ -35,7 +35,7 @@ const CPUMemory: FC<CPUMemoryProps> = ({ vm }) => {
   const memory = readableSizeUnit(
     vmi?.spec?.domain?.memory?.guest ||
       instanceType?.spec?.memory?.guest ||
-      (vm?.spec?.template?.spec?.domain?.resources?.requests as { [key: string]: string })?.memory,
+      vm?.spec?.template?.spec?.domain?.memory?.guest,
   );
 
   return (

@@ -89,18 +89,16 @@ export const useCustomizeFormSubmit = ({
 
       const updatedVM = produce(vmObj, (vmDraft) => {
         ensurePath(vmDraft, [
-          'spec.template.spec.domain.resources',
           'spec.template.spec.domain.cpu',
+          'spec.template.spec.domain.memory.guest',
         ]);
 
         vmDraft.metadata.namespace = ns || DEFAULT_NAMESPACE;
         vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
         vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
-        vmDraft.spec.template.spec.domain.resources.requests = {
-          ...vmDraft?.spec?.template?.spec?.domain?.resources?.requests,
-          memory: `${vm.spec.template.spec.domain.resources.requests['memory']}`,
-        };
+
         vmDraft.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
+        vmDraft.spec.template.spec.domain.memory.guest = vm.spec.template.spec.domain.memory.guest;
 
         const updatedVolumes = applyCloudDriveCloudInitVolume(vmObj);
         vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)

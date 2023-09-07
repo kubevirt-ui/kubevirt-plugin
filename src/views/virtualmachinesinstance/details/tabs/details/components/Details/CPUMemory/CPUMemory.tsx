@@ -20,9 +20,7 @@ const CPUMemory: FC<TolerationsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const cpu = vCPUCount(vmi?.spec?.domain?.cpu);
 
-  const memory = readableSizeUnit(
-    (vmi?.spec?.domain?.resources?.requests as { [key: string]: string })?.memory,
-  );
+  const memory = readableSizeUnit(vmi?.spec?.domain?.memory?.guest);
 
   return (
     <>

@@ -63,14 +63,15 @@ export const updateVMCPUMemory = (
 ) => {
   return (vm: V1VirtualMachine) => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      ensurePath(vmDraft, ['spec.template.spec.domain.resources', 'spec.template.spec.domain.cpu']);
+      ensurePath(vmDraft, [
+        'spec.template.spec.domain.cpu',
+        'spec.template.spec.domain.memory.guest',
+      ]);
 
       vmDraft.metadata.namespace = ns || DEFAULT_NAMESPACE;
-      vmDraft.spec.template.spec.domain.resources.requests = {
-        ...vmDraft?.spec?.template?.spec?.domain?.resources?.requests,
-        memory: `${vm.spec.template.spec.domain.resources.requests['memory']}`,
-      };
+
       vmDraft.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
+      vmDraft.spec.template.spec.domain.memory.guest = vm.spec.template.spec.domain.memory.guest;
     });
 
     setUpdatedVM(updatedVM);
