@@ -40,10 +40,8 @@ export const getFlavorData = (
   memory: string;
 } => {
   const cpu = getTemplateVirtualMachineCPU(template);
-  const memory = (
-    getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.resources
-      ?.requests as { memory: string }
-  )?.memory;
+  const memory =
+    getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.memory?.guest;
 
   const cpuCount = vCPUCount(cpu);
   const flavor = getTemplateFlavor(template);
@@ -66,8 +64,7 @@ export const getVmCPUMemory = (
   memory: string;
 } => {
   const cpu = vm?.spec?.template?.spec?.domain?.cpu;
-  const memory = (vm?.spec?.template?.spec?.domain?.resources?.requests as { memory: string })
-    ?.memory;
+  const memory = vm?.spec?.template?.spec?.domain?.memory?.guest;
 
   const cpuCount = vCPUCount(cpu);
 

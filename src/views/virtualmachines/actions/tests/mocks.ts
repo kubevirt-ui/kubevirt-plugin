@@ -8,7 +8,7 @@ export const exampleRunningVirtualMachine: V1VirtualMachine = {
       description: 'VM example',
       'name.os.template.kubevirt.io/rhel8.5': 'Red Hat Enterprise Linux 8.0 or higher',
       'vm.kubevirt.io/validations':
-        '[\n  {\n    "name": "minimal-required-memory",\n    "path": "jsonpath::.spec.domain.resources.requests.memory",\n    "rule": "integer",\n    "message": "This VM requires more memory.",\n    "min": 1610612736\n  }\n]\n',
+        '[\n  {\n    "name": "minimal-required-memory",\n    "path": "jsonpath::.spec.domain.memory.guest",\n    "rule": "integer",\n    "message": "This VM requires more memory.",\n    "min": 1610612736\n  }\n]\n',
     },
     labels: {
       app: 'vm-example',

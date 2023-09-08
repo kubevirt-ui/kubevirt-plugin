@@ -8,7 +8,7 @@ export const PATHS_TO_HIGHLIGHT = {
     'spec.template.metadata.annotations',
     'spec.template.metadata.labels',
     'spec.template.spec.domain.cpu',
-    'spec.template.spec.domain.resources.requests',
+    'spec.template.spec.domain.memory.guest',
     'metadata.labels',
     'metadata.annotations',
   ],

@@ -107,14 +107,13 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
         if (vm?.spec?.template) {
           ensurePath(vmObject, [
-            'spec.template.spec.domain.resources',
             'spec.template.spec.domain.cpu',
+            'spec.template.spec.domain.memory.guest',
           ]);
-          vmObject.spec.template.spec.domain.resources.requests = {
-            ...vmObject?.spec?.template?.spec?.domain?.resources?.requests,
-            memory: `${vm.spec.template.spec.domain.resources.requests['memory']}`,
-          };
+
           vmObject.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
+          vmObject.spec.template.spec.domain.memory.guest =
+            vm.spec.template.spec.domain.memory.guest;
         }
       });
 
@@ -149,18 +148,17 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
           const updatedVM = produce(vmObject, (vmDraft) => {
             ensurePath(vmDraft, [
-              'spec.template.spec.domain.resources',
               'spec.template.spec.domain.cpu',
+              'spec.template.spec.domain.memory.guest',
             ]);
 
             vmDraft.metadata.namespace = namespace;
             vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = template.metadata.name;
             vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
-            vmDraft.spec.template.spec.domain.resources.requests = {
-              ...vmDraft?.spec?.template?.spec?.domain?.resources?.requests,
-              memory: `${vm.spec.template.spec.domain.resources.requests['memory']}`,
-            };
+
             vmDraft.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
+            vmDraft.spec.template.spec.domain.memory.guest =
+              vm.spec.template.spec.domain.memory.guest;
 
             const updatedVolumes = applyCloudDriveCloudInitVolume(vmObject);
             vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)

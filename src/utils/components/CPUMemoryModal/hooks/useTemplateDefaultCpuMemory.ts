@@ -39,7 +39,7 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (
   }, [templateName, templateNamespace]);
 
   const defaultMemory = getMemorySize(
-    template?.objects?.[0]?.spec?.template?.spec?.domain?.resources?.requests?.memory,
+    template?.objects?.[0]?.spec?.template?.spec?.domain?.memory?.guest,
   );
   const defaultCpu = getCPUcores(template?.objects?.[0]);
 

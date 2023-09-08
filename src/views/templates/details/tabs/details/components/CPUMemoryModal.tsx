@@ -54,25 +54,21 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubm
     () =>
       produce<V1Template>(template, (templateDraft: V1Template) => {
         const draftVM = getTemplateVirtualMachineObject(templateDraft);
+
         ensurePath(draftVM, [
-          'spec.template.spec.domain.resources',
           'spec.template.spec.domain.cpu',
+          'spec.template.spec.domain.memory.guest',
         ]);
-        draftVM.spec.template.spec.domain.resources.requests = {
-          ...vm?.spec?.template?.spec?.domain?.resources?.requests,
-          memory: `${memory}${memoryUnit}`,
-        };
+
         draftVM.spec.template.spec.domain.cpu.cores = cpuCores;
+        draftVM.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit}`;
       }),
-    [vm, memory, cpuCores, memoryUnit, template],
+    [memory, cpuCores, memoryUnit, template],
   );
 
   React.useEffect(() => {
     if (vm?.metadata) {
-      const requests = vm?.spec?.template?.spec?.domain?.resources?.requests as {
-        [key: string]: string;
-      };
-      const { size, unit } = getMemorySize(requests?.memory);
+      const { size, unit } = getMemorySize(vm?.spec?.template?.spec?.domain?.memory?.guest);
       setMemoryUnit(unit);
       setMemory(size);
       setCpuCores(getCPUcores(vm));
