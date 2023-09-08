@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { printableVMStatus } from 'src/views/virtualmachines/utils';
+import { useMemo } from 'react';
+import { isRunning } from 'src/views/virtualmachines/utils';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
@@ -34,15 +34,15 @@ const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
     name: vm?.metadata?.name,
     namespace: vm?.metadata?.namespace,
   });
-  const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
-  const vmDisks = React.useMemo(
+  const isVMRunning = isRunning(vm);
+  const vmDisks = useMemo(
     () =>
       !isVMRunning
         ? getDisks(vm)
         : [...(getDisks(vm) || []), ...getRunningVMMissingDisksFromVMI(getDisks(vm) || [], vmi)],
     [vm, vmi, isVMRunning],
   );
-  const vmVolumes = React.useMemo(
+  const vmVolumes = useMemo(
     () =>
       !isVMRunning
         ? getVolumes(vm)
@@ -60,7 +60,7 @@ const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
     namespaced: true,
   });
 
-  const disks = React.useMemo(() => {
+  const disks = useMemo(() => {
     const diskDevices: DiskRawData[] = (vmVolumes || []).map((volume) => {
       const disk = vmDisks?.find(({ name }) => name === volume?.name);
       const pvc = pvcs?.find(

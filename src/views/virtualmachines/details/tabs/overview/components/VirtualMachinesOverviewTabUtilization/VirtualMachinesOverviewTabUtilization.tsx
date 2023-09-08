@@ -17,8 +17,7 @@ import {
   Popover,
   PopoverPosition,
 } from '@patternfly/react-core';
-
-import { printableVMStatus } from '../../../../../utils';
+import { isRunning } from '@virtualmachines/utils';
 
 import CPUUtil from './components/CPUUtil/CPUUtil';
 import MemoryUtil from './components/MemoryUtil/MemoryUtil';
@@ -37,7 +36,6 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
 }) => {
   const { t } = useKubevirtTranslation();
   const { pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
   return (
     <Card className="VirtualMachinesOverviewTabUtilization--main">
@@ -62,7 +60,7 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
       </div>
       <Divider />
       <CardBody isFilled>
-        <ComponentReady isReady={isVMRunning} text={t('VirtualMachine is not running')}>
+        <ComponentReady isReady={isRunning(vm)} text={t('VirtualMachine is not running')}>
           <Grid>
             <GridItem span={3}>
               <CPUUtil pods={pods} vmi={vmi} />

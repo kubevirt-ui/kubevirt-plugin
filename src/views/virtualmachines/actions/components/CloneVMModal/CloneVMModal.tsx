@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import VirtualMachineModel, {
@@ -14,8 +14,8 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { Form } from '@patternfly/react-core';
+import { isRunning } from '@virtualmachines/utils';
 
-import { printableVMStatus } from '../../../utils';
 import { stopVM } from '../../actions';
 
 import CloneRunningVMAlert from './components/CloneRunningVMAlert';
@@ -39,19 +39,19 @@ type CloneVMModalProps = {
   vm: V1VirtualMachine;
 };
 
-const CloneVMModal: React.FC<CloneVMModalProps> = ({ isOpen, onClose, vm }) => {
+const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
 
   const history = useHistory();
 
-  const [cloneName, setCloneName] = React.useState(`${vm?.metadata?.name}-clone`);
-  const [cloneDescription, setCloneDescription] = React.useState(
+  const [cloneName, setCloneName] = useState(`${vm?.metadata?.name}-clone`);
+  const [cloneDescription, setCloneDescription] = useState(
     vm?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
   );
-  const [cloneProject, setCloneProject] = React.useState(vm?.metadata?.namespace);
-  const [startCloneVM, setStartCloneVM] = React.useState(false);
+  const [cloneProject, setCloneProject] = useState(vm?.metadata?.namespace);
+  const [startCloneVM, setStartCloneVM] = useState(false);
 
-  const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
+  const isVMRunning = isRunning(vm);
 
   const { loaded, projectNames, pvcs } = useCloneVMResources(vm);
 

@@ -9,5 +9,5 @@ export const isLiveMigratable = (vm: V1VirtualMachine, isSingleNodeCluster: bool
     ({ status, type }) => type === 'LiveMigratable' && status === 'True',
   );
 
-export const isVMRunning = (vm: V1VirtualMachine): boolean =>
+export const isRunning = (vm: V1VirtualMachine): boolean =>
   vm?.status?.printableStatus === printableVMStatus.Running;

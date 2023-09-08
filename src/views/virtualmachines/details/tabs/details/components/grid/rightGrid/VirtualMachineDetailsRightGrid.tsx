@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { printableVMStatus } from 'src/views/virtualmachines/utils';
+import React, { FC } from 'react';
+import { isRunning } from 'src/views/virtualmachines/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,11 +12,10 @@ type VirtualMachineDetailsRightGridProps = {
   vm?: V1VirtualMachine;
 };
 
-const VirtualMachineDetailsRightGrid: React.FC<VirtualMachineDetailsRightGridProps> = ({ vm }) => {
+const VirtualMachineDetailsRightGrid: FC<VirtualMachineDetailsRightGridProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
-  const isVMRunning = vm?.status?.printableStatus !== printableVMStatus.Stopped;
 
-  return isVMRunning ? (
+  return isRunning(vm) ? (
     <RunningVirtualMachineDetailsRightGrid vm={vm} />
   ) : (
     <VirtualMachineDetailsRightGridLayout
