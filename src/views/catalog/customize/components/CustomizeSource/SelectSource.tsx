@@ -81,7 +81,6 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   React.useEffect(() => {
     switch (selectedSourceType) {
       case DEFAULT_SOURCE:
-        return onSourceChange(undefined);
       case BLANK_SOURCE_NAME:
       case UPLOAD_SOURCE_NAME:
         return onSourceChange(
@@ -255,7 +254,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
         </FormGroup>
       )}
 
-      {showSizeInput && selectedSourceType !== DEFAULT_SOURCE && (
+      {showSizeInput && selectedSourceType !== CONTAINER_DISK_SOURCE_NAME && (
         <CapacityInput label={t('Disk size')} onChange={setVolumeQuantity} size={volumeQuantity} />
       )}
     </>
