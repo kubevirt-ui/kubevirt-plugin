@@ -18,6 +18,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import {
+  getCPU,
   getGPUDevices,
   getHostDevices,
   getMachineType,
@@ -146,7 +147,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             helperPopover={{
               content: (
                 <CPUDescription
-                  cpu={vm?.spec?.template?.spec?.domain?.cpu}
+                  cpu={getCPU(vm)}
                   helperTextResource={CpuMemHelperTextResources.FutureVM}
                 />
               ),

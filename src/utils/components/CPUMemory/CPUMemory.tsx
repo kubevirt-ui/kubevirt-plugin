@@ -5,6 +5,7 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { vCPUCount } from '@kubevirt-utils/resources/template/utils';
+import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import useInstanceType from '@kubevirt-utils/resources/vm/hooks/useInstanceType';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
@@ -28,14 +29,10 @@ const CPUMemory: FC<CPUMemoryProps> = ({ vm }) => {
 
   if ((isVMRunning && !vmi) || !vm || !instanceTypeLoaded) return <Skeleton />;
 
-  const cpu =
-    vCPUCount(vmi?.spec?.domain?.cpu || vm?.spec?.template?.spec?.domain?.cpu) ||
-    instanceType?.spec?.cpu?.guest;
+  const cpu = vCPUCount(getCPU(vmi) || getCPU(vm)) || instanceType?.spec?.cpu?.guest;
 
   const memory = readableSizeUnit(
-    vmi?.spec?.domain?.memory?.guest ||
-      instanceType?.spec?.memory?.guest ||
-      vm?.spec?.template?.spec?.domain?.memory?.guest,
+    getMemory(vmi) || instanceType?.spec?.memory?.guest || getMemory(vm),
   );
 
   return (

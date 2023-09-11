@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import produce from 'immer';
 
@@ -9,6 +9,7 @@ import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
+import { getCPU } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -34,7 +35,7 @@ type DedicatedResourcesModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
+const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
   headerText,
   isOpen,
   onClose,
@@ -43,16 +44,14 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [checked, setChecked] = React.useState<boolean>(
-    !!vm?.spec?.template?.spec?.domain?.cpu?.dedicatedCpuPlacement,
-  );
+  const [checked, setChecked] = useState<boolean>(!!getCPU(vm)?.dedicatedCpuPlacement);
 
   const [nodes, loaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
 
-  const { hasNodes, qualifiedNodes } = React.useMemo(() => {
+  const { hasNodes, qualifiedNodes } = useMemo(() => {
     const filteredNodes = nodes?.filter(
       (node) => node?.metadata?.labels?.[cpuManagerLabelKey] === cpuManagerLabelValue,
     );
@@ -62,7 +61,7 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
     };
   }, [nodes]);
 
-  const updatedVirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, ['spec.template.spec.domain.cpu']);
       vmDraft.spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;

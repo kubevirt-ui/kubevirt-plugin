@@ -23,7 +23,7 @@ import {
   getTemplateOS,
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template/utils/selectors';
-import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { getMemoryCPU, getVolumes } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { useWizardVMContext } from '../../../utils/WizardVMContext';
@@ -96,9 +96,9 @@ export const useCustomizeFormSubmit = ({
         vmDraft.metadata.namespace = ns || DEFAULT_NAMESPACE;
         vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
         vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
-
-        vmDraft.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
-        vmDraft.spec.template.spec.domain.memory.guest = vm.spec.template.spec.domain.memory.guest;
+        const { cpu, memory } = getMemoryCPU(vm);
+        vmDraft.spec.template.spec.domain.cpu.cores = cpu?.cores;
+        vmDraft.spec.template.spec.domain.memory.guest = memory;
 
         const updatedVolumes = applyCloudDriveCloudInitVolume(vmObj);
         vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)

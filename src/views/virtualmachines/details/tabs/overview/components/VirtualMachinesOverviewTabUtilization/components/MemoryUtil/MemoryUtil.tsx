@@ -6,6 +6,7 @@ import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/Com
 import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getMemory } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
@@ -20,7 +21,7 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const { currentTime, duration } = useDuration();
   const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
 
-  const memory = getMemorySize(vmi?.spec?.domain?.memory?.guest);
+  const memory = getMemorySize(getMemory(vmi));
 
   const [data] = usePrometheusPoll({
     endpoint: PrometheusEndpoint?.QUERY,

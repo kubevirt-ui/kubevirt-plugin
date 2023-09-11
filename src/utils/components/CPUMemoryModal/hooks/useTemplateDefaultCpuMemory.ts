@@ -1,9 +1,13 @@
 import React from 'react';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getMemory } from '@kubevirt-utils/resources/vm';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getCPUcores, getMemorySize } from '../utils/CpuMemoryUtils';
+import { getMemorySize } from '../utils/CpuMemoryUtils';
+
+import { getTemplateVirtualMachineCPU } from './../../../resources/template/utils/selectors';
 
 type UseTemplateDefaultCpuMemory = (
   templateName: string,
@@ -38,10 +42,8 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (
       });
   }, [templateName, templateNamespace]);
 
-  const defaultMemory = getMemorySize(
-    template?.objects?.[0]?.spec?.template?.spec?.domain?.memory?.guest,
-  );
-  const defaultCpu = getCPUcores(template?.objects?.[0]);
+  const defaultMemory = getMemorySize(getMemory(getTemplateVirtualMachineObject(template)));
+  const defaultCpu = getTemplateVirtualMachineCPU(template)?.cores;
 
   return {
     data: {

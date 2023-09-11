@@ -23,9 +23,11 @@ import {
 } from '@kubevirt-utils/constants/tabs-constants';
 import {
   getAffinity,
+  getCPU,
   getGPUDevices,
   getHostDevices,
   getInterfaces,
+  getMemory,
   getNodeSelector,
   getTolerations,
   getVolumes,
@@ -43,12 +45,12 @@ export const checkCPUMemoryChanged = (
   if (isEmpty(vm) || isEmpty(vmi)) {
     return false;
   }
-  const vmMemory = vm?.spec?.template?.spec?.domain?.memory?.guest;
-  const vmCPU = vm?.spec?.template?.spec?.domain?.cpu?.cores || 0;
+  const vmMemory = getMemory(vm);
+  const vmCPU = getCPU(vm)?.cores || 0;
 
-  const vmiMemory = vmi?.spec?.domain?.memory?.guest || '';
+  const vmiMemory = getMemory(vmi) || '';
 
-  const vmiCPU = vmi?.spec?.domain?.cpu?.cores || 0;
+  const vmiCPU = getCPU(vmi)?.cores || 0;
 
   return vmMemory !== vmiMemory || vmCPU !== vmiCPU;
 };
@@ -284,9 +286,8 @@ export const getChangedDedicatedResources = (
   if (isEmpty(vm) || isEmpty(vmi)) {
     return false;
   }
-  const vmDedicatedResources =
-    vm?.spec?.template?.spec?.domain?.cpu?.dedicatedCpuPlacement || false;
-  const vmiDedicatedResources = vmi?.spec?.domain?.cpu?.dedicatedCpuPlacement || false;
+  const vmDedicatedResources = getCPU(vm)?.dedicatedCpuPlacement || false;
+  const vmiDedicatedResources = getCPU(vmi)?.dedicatedCpuPlacement || false;
 
   return (
     vmDedicatedResources !== vmiDedicatedResources || currentSelection !== vmiDedicatedResources

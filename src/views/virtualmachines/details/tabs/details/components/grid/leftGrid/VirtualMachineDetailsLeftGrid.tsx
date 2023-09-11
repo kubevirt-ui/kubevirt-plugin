@@ -24,6 +24,7 @@ import { asAccessReview, getAnnotation, getLabel } from '@kubevirt-utils/resourc
 import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
 import {
   DESCRIPTION_ANNOTATION,
+  getCPU,
   getMachineType,
   useVMIAndPodsForVM,
   VM_TEMPLATE_ANNOTATION,
@@ -227,11 +228,6 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
           isPopover
         />
         <VirtualMachineDescriptionItem
-          bodyContent={
-            vm?.spec?.instancetype ? null : (
-              <CPUDescription cpu={vm?.spec?.template?.spec?.domain?.cpu} />
-            )
-          }
           messageOnDisabled={t(
             'CPU and Memory can not be edited if the VirtualMachine is created from InstanceType',
           )}
@@ -246,6 +242,7 @@ const VirtualMachineDetailsLeftGrid: FC<VirtualMachineDetailsLeftGridProps> = ({
               />
             ))
           }
+          bodyContent={vm?.spec?.instancetype ? null : <CPUDescription cpu={getCPU(vm)} />}
           data-test-id={`${vm?.metadata?.name}-cpu-memory`}
           descriptionData={<CPUMemory vm={vm} />}
           descriptionHeader={t('CPU | Memory')}
