@@ -9,6 +9,7 @@ import {
 } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getMemory } from '@kubevirt-utils/resources/vm';
 import { toIECUnit } from '@kubevirt-utils/utils/units';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
@@ -68,7 +69,7 @@ const CPUMemoryModal: React.FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubm
 
   React.useEffect(() => {
     if (vm?.metadata) {
-      const { size, unit } = getMemorySize(vm?.spec?.template?.spec?.domain?.memory?.guest);
+      const { size, unit } = getMemorySize(getMemory(vm));
       setMemoryUnit(unit);
       setMemory(size);
       setCpuCores(getCPUcores(vm));

@@ -4,6 +4,7 @@ import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
+import { getMemory } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -32,7 +33,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
   const { height, ref, width } = useResponsiveCharts();
 
-  const memory = getMemorySize(vmi?.spec?.domain?.memory?.guest);
+  const memory = getMemorySize(getMemory(vmi));
 
   const [data] = usePrometheusPoll({
     endpoint: PrometheusEndpoint?.QUERY_RANGE,

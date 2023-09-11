@@ -1,5 +1,6 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1CPU, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 
 import {
   getTemplateFlavor,
@@ -40,8 +41,7 @@ export const getFlavorData = (
   memory: string;
 } => {
   const cpu = getTemplateVirtualMachineCPU(template);
-  const memory =
-    getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.memory?.guest;
+  const memory = getMemory(getTemplateVirtualMachineObject(template));
 
   const cpuCount = vCPUCount(cpu);
   const flavor = getTemplateFlavor(template);
@@ -63,8 +63,8 @@ export const getVmCPUMemory = (
   cpuCount: number;
   memory: string;
 } => {
-  const cpu = vm?.spec?.template?.spec?.domain?.cpu;
-  const memory = vm?.spec?.template?.spec?.domain?.memory?.guest;
+  const cpu = getCPU(vm);
+  const memory = getMemory(vm);
 
   const cpuCount = vCPUCount(cpu);
 

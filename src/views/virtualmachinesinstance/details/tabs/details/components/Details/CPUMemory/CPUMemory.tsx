@@ -5,6 +5,7 @@ import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescrip
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vCPUCount } from '@kubevirt-utils/resources/template/utils';
+import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   DescriptionListTermHelpText,
@@ -18,19 +19,16 @@ type TolerationsProps = {
 
 const CPUMemory: FC<TolerationsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const cpu = vCPUCount(vmi?.spec?.domain?.cpu);
+  const cpu = vCPUCount(getCPU(vmi));
 
-  const memory = readableSizeUnit(vmi?.spec?.domain?.memory?.guest);
+  const memory = readableSizeUnit(getMemory(vmi));
 
   return (
     <>
       <DescriptionListTermHelpText>
         <Popover
           bodyContent={
-            <CPUDescription
-              cpu={vmi?.spec?.domain?.cpu}
-              helperTextResource={CpuMemHelperTextResources.VMI}
-            />
+            <CPUDescription cpu={getCPU(vmi)} helperTextResource={CpuMemHelperTextResources.VMI} />
           }
           hasAutoWidth
           headerContent={t('CPU | Memory')}

@@ -6,7 +6,7 @@ import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
-import { VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { toIECUnit } from '@kubevirt-utils/utils/units';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
@@ -80,7 +80,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
 
   useEffect(() => {
     if (vm?.metadata) {
-      const { size, unit } = getMemorySize(vm?.spec?.template?.spec?.domain?.memory?.guest);
+      const { size, unit } = getMemorySize(getMemory(vm));
       setMemoryUnit(unit);
       setMemory(size);
       setCpuCores(getCPUcores(vm));

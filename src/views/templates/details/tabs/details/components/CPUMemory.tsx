@@ -6,7 +6,7 @@ import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescrip
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineCPU } from '@kubevirt-utils/resources/template';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
@@ -59,7 +59,7 @@ const CPUMemory: FC<CPUMemoryProps> = ({ template }) => {
         <Popover
           bodyContent={
             <CPUDescription
-              cpu={getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.cpu}
+              cpu={getTemplateVirtualMachineCPU(template)}
               helperTextResource={CpuMemHelperTextResources.Template}
             />
           }

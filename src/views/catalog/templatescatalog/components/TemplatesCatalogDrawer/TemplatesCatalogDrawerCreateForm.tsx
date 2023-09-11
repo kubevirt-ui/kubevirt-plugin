@@ -28,6 +28,7 @@ import {
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
 } from '@kubevirt-utils/resources/template';
+import { getMemoryCPU } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
@@ -111,9 +112,15 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
             'spec.template.spec.domain.memory.guest',
           ]);
 
-          vmObject.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
-          vmObject.spec.template.spec.domain.memory.guest =
-            vm.spec.template.spec.domain.memory.guest;
+          const { cpu, memory } = getMemoryCPU(vm);
+          vmObject.spec.template.spec.domain.cpu.cores = cpu?.cores;
+          vmObject.spec.template.spec.domain.memory.guest = memory;
+
+          const modifiedTemplateObjects = template?.objects?.map((obj) =>
+            obj.kind === VirtualMachineModel.kind ? vmObject : obj,
+          );
+
+          draftTemplate.objects = modifiedTemplateObjects;
         }
       });
 
@@ -155,10 +162,9 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
             vmDraft.metadata.namespace = namespace;
             vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = template.metadata.name;
             vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
-
-            vmDraft.spec.template.spec.domain.cpu.cores = vm.spec.template.spec.domain.cpu.cores;
-            vmDraft.spec.template.spec.domain.memory.guest =
-              vm.spec.template.spec.domain.memory.guest;
+            const { cpu, memory } = getMemoryCPU(vm);
+            vmDraft.spec.template.spec.domain.cpu.cores = cpu?.cores;
+            vmDraft.spec.template.spec.domain.memory.guest = memory;
 
             const updatedVolumes = applyCloudDriveCloudInitVolume(vmObject);
             vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)

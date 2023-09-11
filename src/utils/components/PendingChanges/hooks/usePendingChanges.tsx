@@ -28,7 +28,7 @@ import {
 } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -77,7 +77,7 @@ export const usePendingChanges = (
   const dedicatedResourcesChanged = getChangedDedicatedResources(
     vm,
     vmi,
-    vm?.spec?.template?.spec?.domain?.cpu?.dedicatedCpuPlacement || false,
+    getCPU(vm)?.dedicatedCpuPlacement || false,
   );
   const startStrategyChanged = getChangedStartStrategy(vm, vmi);
   const hostnameChanged = getChangedHostname(vm, vmi);

@@ -30,7 +30,7 @@ import {
   getTemplateWorkload,
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
-import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -167,7 +167,7 @@ export const TemplatesCatalogDrawerPanel: FC<TemplatesCatalogDrawerPanelProps> =
                       <VirtualMachineDescriptionItem
                         bodyContent={
                           <CPUDescription
-                            cpu={updatedVM?.spec?.template?.spec?.domain?.cpu}
+                            cpu={getCPU(updatedVM)}
                             helperTextResource={CpuMemHelperTextResources.FutureVM}
                           />
                         }

@@ -1,4 +1,10 @@
-import { V1AccessCredential, V1Disk, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1AccessCredential,
+  V1CPU,
+  V1Disk,
+  V1DomainSpec,
+  V1VirtualMachine,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 
@@ -166,3 +172,16 @@ export const getVMSSHSecretName = (vm: V1VirtualMachine): string =>
  */
 export const getAutoAttachPodInterface = (vm: V1VirtualMachine): boolean =>
   vm?.spec?.template?.spec?.domain?.devices?.autoattachPodInterface;
+
+export const getDomain = <T extends Record<string, any>>(obj: T): V1DomainSpec =>
+  obj?.spec?.domain || obj?.spec?.template?.spec?.domain;
+
+export const getMemory = <T>(obj: T): string =>
+  getDomain(obj)?.memory?.guest || getDomain(obj)?.resources?.requests?.['memory'];
+
+export const getCPU = <T>(obj: T): V1CPU => getDomain(obj)?.cpu;
+
+export const getMemoryCPU = <T>(obj: T): { cpu: V1CPU; memory: string } => ({
+  cpu: getCPU(obj),
+  memory: getMemory(obj),
+});
