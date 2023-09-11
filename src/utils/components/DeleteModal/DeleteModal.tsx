@@ -15,17 +15,27 @@ import { ButtonVariant } from '@patternfly/react-core';
 import ConfirmActionMessage from '../ConfirmActionMessage/ConfirmActionMessage';
 
 type DeleteModalProps = {
-  bodyText?: ReactNode | string;
+  body?: ReactNode | string;
   headerText?: string;
   isOpen: boolean;
   obj: K8sResourceCommon;
   onClose: () => void;
   onDeleteSubmit: () => Promise<K8sResourceCommon | void>;
   redirectUrl?: string;
+  shouldRedirect?: boolean;
 };
 
 const DeleteModal: FC<DeleteModalProps> = memo(
-  ({ bodyText, headerText, isOpen, obj, onClose, onDeleteSubmit, redirectUrl }) => {
+  ({
+    body,
+    headerText,
+    isOpen,
+    obj,
+    onClose,
+    onDeleteSubmit,
+    redirectUrl,
+    shouldRedirect = true,
+  }) => {
     const { t } = useKubevirtTranslation();
     const history = useHistory();
 
@@ -37,7 +47,7 @@ const DeleteModal: FC<DeleteModalProps> = memo(
       <TabModal<K8sResourceCommon>
         onSubmit={async () => {
           await onDeleteSubmit();
-          history.push(url);
+          shouldRedirect && history.push(url);
         }}
         headerText={headerText || t('Delete Resource?')}
         isOpen={isOpen}
@@ -45,9 +55,9 @@ const DeleteModal: FC<DeleteModalProps> = memo(
         onClose={onClose}
         submitBtnText={t('Delete')}
         submitBtnVariant={ButtonVariant.danger}
-        titleIconVariant={'warning'}
+        titleIconVariant="warning"
       >
-        {bodyText || <ConfirmActionMessage obj={obj} />}
+        {body || <ConfirmActionMessage obj={obj} />}
       </TabModal>
     );
   },

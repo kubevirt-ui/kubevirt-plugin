@@ -7,17 +7,16 @@ import {
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
-import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { Action, k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { Action, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
 
+import DeleteDataSourceModal from '../actions/DeleteDataSourceModal/DeleteDataSourceModal';
 import { DataImportCronManageModal } from '../dataimportcron/details/DataImportCronManageModal/DataImportCronManageModal';
 import { getDataSourceCronJob, isDataResourceOwnedBySSP } from '../utils';
 
@@ -26,13 +25,14 @@ type UseDataSourceActionsProvider = (
 ) => [actions: Action[], onOpen: () => void];
 
 export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataSource) => {
-  const dataImportCronName = getDataSourceCronJob(dataSource);
-  const [dataImportCron, setDataImportCron] = useState<V1beta1DataImportCron>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
+  const [dataImportCron, setDataImportCron] = useState<V1beta1DataImportCron>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataSource);
-  const lastNamespacePath = useLastNamespacePath();
+  const dataImportCronName = getDataSourceCronJob(dataSource);
 
   const lazyLoadDataImportCron = useCallback(() => {
     if (dataImportCronName && !dataImportCron && !isOwnedBySSP) {
@@ -106,27 +106,11 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
         accessReview: asAccessReview(DataSourceModel, dataSource, 'delete'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
-            <DeleteModal
-              onDeleteSubmit={async () => {
-                try {
-                  await k8sDelete({
-                    model: DataImportCronModel,
-                    resource: dataImportCron,
-                  });
-                } catch (e) {
-                  kubevirtConsole.log(e?.message);
-                } finally {
-                  await k8sDelete({
-                    model: DataSourceModel,
-                    resource: dataSource,
-                  });
-                }
-              }}
-              headerText={t('Delete DataSource?')}
+            <DeleteDataSourceModal
+              dataImportCron={dataImportCron}
+              dataSource={dataSource}
               isOpen={isOpen}
-              obj={dataSource}
               onClose={onClose}
-              redirectUrl={`/k8s/${lastNamespacePath}/bootablevolumes`}
             />
           )),
         id: 'datasource-action-delete',
@@ -160,7 +144,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
         ),
       },
     ],
-    [t, dataSource, isOwnedBySSP, dataImportCron, isLoading, createModal, lastNamespacePath],
+    [t, dataSource, isOwnedBySSP, dataImportCron, isLoading, createModal],
   );
 
   return [actions, lazyLoadDataImportCron];

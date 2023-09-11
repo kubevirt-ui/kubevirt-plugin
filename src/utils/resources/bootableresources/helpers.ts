@@ -5,9 +5,14 @@ import {
 import DataSourceModel, {
   DataSourceModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import {
+  V1beta1DataSource,
+  V1beta1DataVolume,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
 import { BootableVolume } from './types';
 
@@ -39,4 +44,16 @@ export const getInstanceTypePrefix = (instanceTypeNamePrefix: string): string =>
     return instanceTypeNamePrefix?.split('.')?.[0];
   }
   return instanceTypeNamePrefix;
+};
+
+export const deleteDVAndPVC = async (
+  dataVolume: BootableVolume | V1beta1DataVolume,
+  persistentVolumeClaim: BootableVolume | IoK8sApiCoreV1PersistentVolumeClaim,
+): Promise<void> => {
+  // We try to delete the created DV, if already GC, we want to fallback to delete the PVC
+  try {
+    await k8sDelete({ model: DataVolumeModel, resource: dataVolume });
+  } catch {
+    await k8sDelete({ model: PersistentVolumeClaimModel, resource: persistentVolumeClaim });
+  }
 };
