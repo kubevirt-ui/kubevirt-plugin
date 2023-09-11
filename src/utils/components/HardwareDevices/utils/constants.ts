@@ -8,3 +8,8 @@ export type HardwareDeviceModalRow = {
   deviceName: string;
   name: string;
 };
+
+export type HardwareDevicePageRow = {
+  resourceName: string;
+  selector: string;
+};
