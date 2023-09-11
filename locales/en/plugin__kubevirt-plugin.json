@@ -933,6 +933,7 @@
   "Select workloads that must have all the following expressions.": "Select workloads that must have all the following expressions.",
   "Selected StorageClass is different from StorageClass of the source": "Selected StorageClass is different from StorageClass of the source",
   "Selected sysprep": "Selected sysprep",
+  "Selector": "Selector",
   "selector key": "selector key",
   "selector value": "selector value",
   "Send key": "Send key",

@@ -49,7 +49,7 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
   const [devices, setDevices] = React.useState<HardwareDeviceModalRow[]>(
     getInitialDevices(initialDevices),
   );
-  const permittedHostDevices = useHCPermittedHostDevices();
+  const { permittedHostDevices } = useHCPermittedHostDevices();
 
   const onAddDevice = () => {
     setDevices((listDevices) => [

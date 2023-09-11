@@ -1,44 +1,57 @@
 import React from 'react';
 
+import { V1PciHostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Button, Popover } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
-import HardwareDevicesTable from './HardwareDevicesTable';
+import HardwareDevicesPageTable from './HardwareDevicesPageTable';
 
 export const HardwareDevicesPage: React.FC<any> = (props) => {
   const { t } = useKubevirtTranslation();
-  const permittedHostDevices = useHCPermittedHostDevices();
+  const { errorHcList, loadedHcList, permittedHostDevices } = useHCPermittedHostDevices();
 
   const pages = [
     {
       component: (pageProps) => (
         <div className="co-m-pane__body">
           <Bullseye>
-            <HardwareDevicesTable {...pageProps} />
+            <HardwareDevicesPageTable {...pageProps} />
           </Bullseye>
         </div>
       ),
       href: '',
       name: t('PCI Host devices'),
       pageData: {
-        devices: permittedHostDevices?.pciHostDevices,
+        devices: permittedHostDevices?.pciHostDevices?.map(
+          (device: V1PciHostDevice & { pciDeviceSelector: string }) => ({
+            ...device,
+            selector: device?.pciVendorSelector || device?.pciDeviceSelector,
+          }),
+        ),
+        error: errorHcList,
+        loaded: loadedHcList,
       },
     },
     {
       component: (pageProps) => (
         <div className="co-m-pane__body">
           <Bullseye>
-            <HardwareDevicesTable {...pageProps} />
+            <HardwareDevicesPageTable {...pageProps} />
           </Bullseye>
         </div>
       ),
       href: 'mediated',
       name: t('Mediated devices'),
       pageData: {
-        devices: permittedHostDevices?.mediatedDevices,
+        devices: permittedHostDevices?.mediatedDevices?.map((device) => ({
+          ...device,
+          selector: device?.mdevNameSelector,
+        })),
+        error: errorHcList,
+        loaded: loadedHcList,
       },
     },
   ];
