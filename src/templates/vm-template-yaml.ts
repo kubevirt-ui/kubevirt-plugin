@@ -65,9 +65,8 @@ objects:
                 efi: {}
             machine:
               type: q35
-            resources:
-              requests:
-                memory: 2Gi
+            memory:
+              guest: 2Gi
           hostname: '\${NAME}'
           networks:
             - name: default
