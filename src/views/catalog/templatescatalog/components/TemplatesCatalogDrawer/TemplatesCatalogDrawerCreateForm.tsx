@@ -229,13 +229,8 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
             <>
               <StackItem>
                 <Split hasGutter>
-                  <SplitItem>
-                    <FormGroup
-                      className="template-catalog-drawer-form-name"
-                      fieldId="vm-name-field"
-                      isRequired
-                      label={t('VirtualMachine name')}
-                    >
+                  <SplitItem className="template-catalog-drawer-form-name" isFilled>
+                    <FormGroup fieldId="vm-name-field" isRequired label={t('VirtualMachine name')}>
                       <TextInput
                         aria-label="virtualmachine name"
                         data-test-id="template-catalog-vm-name-input"
