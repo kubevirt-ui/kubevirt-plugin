@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
 import { produceVMDevices } from '@catalog/utils/WizardVMContext';
 import {
@@ -17,7 +17,7 @@ import DeviceNameSelect from '../form/DeviceNameSelect';
 import NameFormField from '../form/NameFormField';
 import useHCPermittedHostDevices from '../hooks/useHCPermittedHostDevices';
 import { HARDWARE_DEVICE_TYPE, HardwareDeviceModalRow } from '../utils/constants';
-import { getInitialDevices } from '../utils/helpers';
+import { generateDeviceName, getInitialDevices } from '../utils/helpers';
 
 import HardwareDeviceModalDescription from './HardwareDeviceModalDescription';
 
@@ -35,7 +35,7 @@ type HardwareDevicesModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
+const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
   btnText,
   headerText,
   initialDevices,
@@ -46,15 +46,15 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
   vm,
   vmi,
 }) => {
-  const [devices, setDevices] = React.useState<HardwareDeviceModalRow[]>(
-    getInitialDevices(initialDevices),
+  const [devices, setDevices] = useState<HardwareDeviceModalRow[]>(
+    getInitialDevices(initialDevices, type),
   );
   const { permittedHostDevices } = useHCPermittedHostDevices();
 
   const onAddDevice = () => {
     setDevices((listDevices) => [
       ...listDevices,
-      { deviceIndex: devices.length, deviceName: '', name: '' },
+      { deviceIndex: devices.length, deviceName: '', name: generateDeviceName(type) },
     ]);
   };
 
@@ -66,13 +66,12 @@ const HardwareDevicesModal: React.FC<HardwareDevicesModalProps> = ({
     );
   };
 
+  const disableSubmit = devices.some((device) => isEmpty(device?.deviceName));
+
   const updatedVM = produceVMDevices(vm, (vmDraft: V1VirtualMachine) => {
     vmDraft.spec.template.spec.domain.devices[type] = !isEmpty(devices) ? devices : null;
   });
 
-  const disableSubmit =
-    !isEmpty(devices) &&
-    devices?.some((device) => isEmpty(device.name) || isEmpty(device.deviceName));
   return (
     <TabModal
       headerText={headerText}
