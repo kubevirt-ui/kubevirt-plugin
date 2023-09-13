@@ -17,6 +17,7 @@ import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/
 import { BRIDGED_NIC_HOTPLUG_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { addInterface } from '@virtualmachines/actions/actions';
 
@@ -51,7 +52,7 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
         const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
         const updatedVM = updateVMNetworkInterface(vm, updatedNetworks, updatedInterfaces);
 
-        if (nicHotPlugEnabled && interfaceType === 'bridge') {
+        if (nicHotPlugEnabled && interfaceType === interfacesTypes.bridge) {
           return addInterface(updatedVM, {
             name: nicName,
             networkAttachmentDefinitionName: networkName,
