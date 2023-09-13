@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
 import {
@@ -17,7 +17,7 @@ type RestartPendingChangesProps = {
   pendingChanges: PendingChange[];
 };
 
-const RestartPendingChanges: React.FC<RestartPendingChangesProps> = ({
+const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
   nonHotPlugPendingChanges,
   pendingChanges,
 }) => {
@@ -34,8 +34,7 @@ const RestartPendingChanges: React.FC<RestartPendingChangesProps> = ({
   } = pendingChangesTabs;
   const showRestartSection =
     !nicHotPlugEnabled ||
-    nonHotPlugNICChangesExist(pendingChanges, hasPendingChange(nonHotPlugPendingChanges)) ||
-    Object.values(pendingChangesTabs).some((changes) => changes.length > 0);
+    nonHotPlugNICChangesExist(pendingChanges, hasPendingChange(nonHotPlugPendingChanges));
   if (!showRestartSection) return null;
 
   return (

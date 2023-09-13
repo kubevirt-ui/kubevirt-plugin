@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
 import { hasPendingChange } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
@@ -12,7 +12,7 @@ type LiveMigratePendingChangesProps = {
   nicHotPlugPendingChanges: PendingChange[];
 };
 
-const LiveMigratePendingChanges: React.FC<LiveMigratePendingChangesProps> = ({
+const LiveMigratePendingChanges: FC<LiveMigratePendingChangesProps> = ({
   nicHotPlugPendingChanges,
 }) => {
   const { t } = useKubevirtTranslation();

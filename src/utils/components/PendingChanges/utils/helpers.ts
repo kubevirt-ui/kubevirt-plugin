@@ -163,9 +163,9 @@ export const nonHotPlugNICChangesExist = (
   pendingChanges: PendingChange[],
   nonHotPlugNICsExist: boolean,
 ) => {
-  const moreChangeTypesExist = pendingChanges?.every(
-    (change) => change?.tabLabel === VirtualMachineDetailsTabLabel.NetworkInterfaces,
-  );
+  const moreChangeTypesExist = pendingChanges
+    ?.filter((change) => change?.hasPendingChange)
+    ?.some((change) => change?.tabLabel !== VirtualMachineDetailsTabLabel.NetworkInterfaces);
   return moreChangeTypesExist || nonHotPlugNICsExist;
 };
 
