@@ -26,6 +26,7 @@ import { SelectSourceUploadPVCProgress } from './SelectSourceUploadPVCProgress';
 import {
   appendDockerPrefix,
   getContainerDiskSource,
+  getDefaultSourceStorage,
   getGenericSourceCustomization,
   getPVCSource,
 } from './utils';
@@ -81,6 +82,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   React.useEffect(() => {
     switch (selectedSourceType) {
       case DEFAULT_SOURCE:
+        return onSourceChange(getDefaultSourceStorage(volumeQuantity));
       case BLANK_SOURCE_NAME:
       case UPLOAD_SOURCE_NAME:
         return onSourceChange(
