@@ -4,25 +4,24 @@ import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/
 import {
   getPendingChangesByTab,
   hasPendingChange,
-  nonHotPlugNICChangesExist,
 } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
 import { PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';
-import { BRIDGED_NIC_HOTPLUG_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { List } from '@patternfly/react-core';
 
 type RestartPendingChangesProps = {
+  nicHotPlugEnabled: boolean;
   nonHotPlugPendingChanges: PendingChange[];
   pendingChanges: PendingChange[];
 };
 
 const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
+  nicHotPlugEnabled,
   nonHotPlugPendingChanges,
   pendingChanges,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { featureEnabled: nicHotPlugEnabled } = useFeatures(BRIDGED_NIC_HOTPLUG_ENABLED);
+
   const pendingChangesTabs = getPendingChangesByTab(pendingChanges);
   const {
     pendingChangesDetailsTab,
@@ -32,10 +31,6 @@ const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
     pendingChangesSchedulingTab,
     pendingChangesScriptsTab,
   } = pendingChangesTabs;
-  const showRestartSection =
-    !nicHotPlugEnabled ||
-    nonHotPlugNICChangesExist(pendingChanges, hasPendingChange(nonHotPlugPendingChanges));
-  if (!showRestartSection) return null;
 
   return (
     <span>
