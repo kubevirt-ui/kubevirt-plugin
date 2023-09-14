@@ -240,7 +240,9 @@ export const VirtualMachineActionFactory = {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => stopVM(vm),
-      disabled: [Stopped, Stopping, Terminating, Unknown].includes(vm?.status?.printableStatus),
+      disabled: [Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
+        vm?.status?.printableStatus,
+      ),
       id: 'vm-action-stop',
       label: t('Stop'),
     };
