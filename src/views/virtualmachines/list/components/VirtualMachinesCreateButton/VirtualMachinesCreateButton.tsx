@@ -20,7 +20,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
 
   const createItems = {
     catalog: t('From template'),
-    volume: t('From volume'),
+    instanceType: t('From InstanceType'),
     yaml: t('With YAML'),
   };
 
@@ -34,7 +34,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
       switch (type) {
         case 'catalog':
           return history.push(catalogURL);
-        case 'volume':
+        case 'instanceType':
           return history.push(`${catalogURL}/instanceTypes`);
         default:
           return history.push(
