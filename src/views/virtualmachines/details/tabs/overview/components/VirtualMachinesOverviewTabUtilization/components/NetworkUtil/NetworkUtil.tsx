@@ -58,7 +58,7 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
     <div className="util network">
       <div className="util-upper">
         <div className="util-title">
-          {t('Network Transfer')}
+          {t('Network transfer')}
           <Popover
             bodyContent={
               <div>
@@ -110,7 +110,7 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
         </div>
 
         <div className="util-summary" data-test-id="util-summary-network-transfer">
-          <div className="util-summary-value">{`${totalTransferred}s`}</div>
+          <div className="util-summary-value">{`${totalTransferred}ps`}</div>
           <div className="util-summary-text text-muted network-value">
             <div>{t('Total')}</div>
           </div>
