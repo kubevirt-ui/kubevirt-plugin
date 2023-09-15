@@ -9,7 +9,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
 import LiveMigratePendingChanges from '@virtualmachines/details/VirtualMachinePendingChangesAlert/LiveMigratePendingChanges';
 import RestartPendingChanges from '@virtualmachines/details/VirtualMachinePendingChangesAlert/RestartPendingChanges';
-import { printableVMStatus } from '@virtualmachines/utils';
+import { isRunning } from '@virtualmachines/utils';
 
 type VirtualMachinePendingChangesAlertProps = {
   vm: V1VirtualMachine;
@@ -26,12 +26,7 @@ const VirtualMachinePendingChangesAlert: FC<VirtualMachinePendingChangesAlertPro
   const hasPendingChanges = pendingChanges?.some((change) => change?.hasPendingChange);
   const isInstanceTypeVM = !isEmpty(vm?.spec?.instancetype) || !isEmpty(vm?.spec?.preference);
 
-  if (
-    !vmi ||
-    vm?.status?.printableStatus === printableVMStatus.Stopped ||
-    !hasPendingChanges ||
-    isInstanceTypeVM
-  ) {
+  if (!vmi || !isRunning(vm) || !hasPendingChanges || isInstanceTypeVM) {
     return null;
   }
 
