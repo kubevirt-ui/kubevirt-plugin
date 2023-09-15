@@ -8,14 +8,14 @@ export const getVMIVolumes = (vmi: V1VirtualMachineInstance) => vmi?.spec?.volum
 
 /**
  * A selector for the virtual machine instance's networks
- * @param {V1VirtualMachineInstance} vmi the virtual machine
+ * @param {V1VirtualMachineInstance} vmi the virtual machine instance
  * @returns the virtual machine instance networks
  */
 export const getVMINetworks = (vmi: V1VirtualMachineInstance) => vmi?.spec?.networks;
 
 /**
  * A selector for the virtual machine instance's interfaces
- * @param {V1VirtualMachineInstance} vmi the virtual machine
+ * @param {V1VirtualMachineInstance} vmi the virtual machine instance
  * @returns the virtual machine instance interfaces
  */
 export const getVMIInterfaces = (vmi: V1VirtualMachineInstance) =>

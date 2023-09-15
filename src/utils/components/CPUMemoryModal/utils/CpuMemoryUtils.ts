@@ -1,8 +1,3 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getCPU } from '@kubevirt-utils/resources/vm';
-
-export const getCPUcores = (vm: V1VirtualMachine): number => getCPU(vm)?.cores || 1;
-
 const GI = 'Gi';
 const MI = 'Mi';
 const TI = 'Ti';

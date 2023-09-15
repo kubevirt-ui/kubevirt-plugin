@@ -24,6 +24,7 @@ import {
 import {
   getAffinity,
   getCPU,
+  getCPUcores,
   getGPUDevices,
   getHostDevices,
   getInterfaces,
@@ -46,11 +47,10 @@ export const checkCPUMemoryChanged = (
     return false;
   }
   const vmMemory = getMemory(vm);
-  const vmCPU = getCPU(vm)?.cores || 0;
+  const vmCPU = getCPUcores(vm);
 
   const vmiMemory = getMemory(vmi) || '';
-
-  const vmiCPU = getCPU(vmi)?.cores || 0;
+  const vmiCPU = getCPUcores(vmi);
 
   return vmMemory !== vmiMemory || vmCPU !== vmiCPU;
 };
