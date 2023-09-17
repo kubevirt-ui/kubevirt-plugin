@@ -6,7 +6,7 @@ import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
-import { getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { getCPUcores, getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { toIECUnit } from '@kubevirt-utils/utils/units';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
@@ -24,7 +24,7 @@ import {
 } from '@patternfly/react-core';
 
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
-import { getCPUcores, getMemorySize, memorySizesTypes } from './utils/CpuMemoryUtils';
+import { getMemorySize, memorySizesTypes } from './utils/CpuMemoryUtils';
 
 import './cpu-memory-modal.scss';
 

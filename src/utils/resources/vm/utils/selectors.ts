@@ -185,3 +185,10 @@ export const getMemoryCPU = <T>(obj: T): { cpu: V1CPU; memory: string } => ({
   cpu: getCPU(obj),
   memory: getMemory(obj),
 });
+
+/**
+ * A selector that returns number of CPU cores of the resource
+ * @param {T} obj resource such as vm or vmi
+ * @returns {number} the number of CPU cores
+ */
+export const getCPUcores = <T>(obj: T): number => getCPU(obj)?.cores || 1;

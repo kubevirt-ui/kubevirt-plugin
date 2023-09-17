@@ -3,13 +3,12 @@ import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
-  getCPUcores,
   getMemorySize,
   memorySizesTypes,
 } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { getMemory } from '@kubevirt-utils/resources/vm';
+import { getCPUcores, getMemory } from '@kubevirt-utils/resources/vm';
 import { toIECUnit } from '@kubevirt-utils/utils/units';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
