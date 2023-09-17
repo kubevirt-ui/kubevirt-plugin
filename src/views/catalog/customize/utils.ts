@@ -28,8 +28,16 @@ export const overrideVirtualMachineDataVolumeSpec = (
 ): V1VirtualMachine => {
   return produceVMDisks(virtualMachine, (draftVM) => {
     const dataVolumeTemplate = draftVM.spec.dataVolumeTemplates[0];
-    if (dataVolumeTemplate && Boolean(customSource)) {
-      draftVM.spec.dataVolumeTemplates[0].spec = customSource;
+    if (dataVolumeTemplate && !isEmpty(customSource)) {
+      const { storage, ...restSpec } = customSource;
+
+      if (!isEmpty(storage)) {
+        if (!isEmpty(restSpec)) {
+          draftVM.spec.dataVolumeTemplates[0].spec = customSource;
+        } else {
+          draftVM.spec.dataVolumeTemplates[0].spec.storage = storage;
+        }
+      }
 
       const shouldAddImmediateBind = customSource?.source?.blank || customSource?.source?.upload;
 
