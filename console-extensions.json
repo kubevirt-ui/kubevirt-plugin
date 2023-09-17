@@ -6,6 +6,10 @@
     "type": "console.flag"
   },
   {
+    "properties": { "handler": { "$codeRef": "kubevirtFlags.useEnableKubevirtMenuFlags" } },
+    "type": "console.flag/hookProvider"
+  },
+  {
     "properties": {
       "flag": "KUBEVIRT_CDI",
       "model": {
@@ -125,7 +129,7 @@
   },
   {
     "flags": {
-      "required": ["CAN_LIST_NS"]
+      "required": ["KUBEVIRT_INSTANCETYPES"]
     },
     "properties": {
       "dataAttributes": {
@@ -156,7 +160,7 @@
   },
   {
     "flags": {
-      "required": ["CAN_LIST_NS"]
+      "required": ["KUBEVIRT_PREFERENCES"]
     },
     "properties": {
       "dataAttributes": {
