@@ -7,16 +7,17 @@ import {
   PendingChange,
 } from '@kubevirt-utils/components/PendingChanges/utils/types';
 
-export const showLiveMigrateAndRestartSections = (
-  bridgeNICHotPlugEnabled: boolean,
+export const showPendingChangesSections = (
+  nicHotPlugEnabled: boolean,
   pendingChanges: PendingChange[],
   sortedNICHotPlugPendingChanges: NICHotPlugPendingChanges,
-) => {
+): { showLiveMigrateSection: boolean; showRestartSection: boolean } => {
   const { nicHotPlugPendingChanges, nicNonHotPlugPendingChanges } = sortedNICHotPlugPendingChanges;
-  const showLiveMigrateSection =
-    bridgeNICHotPlugEnabled && hasPendingChange(nicHotPlugPendingChanges);
-  const showRestartSection =
-    !bridgeNICHotPlugEnabled ||
-    nonHotPlugNICChangesExist(pendingChanges, hasPendingChange(nicNonHotPlugPendingChanges));
-  return showLiveMigrateSection && showRestartSection;
+
+  return {
+    showLiveMigrateSection: nicHotPlugEnabled && hasPendingChange(nicHotPlugPendingChanges),
+    showRestartSection:
+      !nicHotPlugEnabled ||
+      nonHotPlugNICChangesExist(pendingChanges, hasPendingChange(nicNonHotPlugPendingChanges)),
+  };
 };
