@@ -3,10 +3,8 @@
     padding: 0;
 
     .template-catalog-drawer-footer-section {
-      padding-top: var(--pf-c-modal-box__footer--PaddingTop);
-      padding-right: var(--pf-c-modal-box__footer--PaddingRight);
-      padding-bottom: var(--pf-c-modal-box__footer--PaddingBottom);
-      padding-left: var(--pf-c-modal-box__footer--PaddingLeft);
+      padding: var(--pf-c-modal-box__footer--PaddingTop) var(--pf-global--spacer--xl)
+        var(--pf-global--spacer--xl);
       border-top: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--300);
     }
   }
