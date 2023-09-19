@@ -2,6 +2,7 @@ import { Buffer } from 'buffer';
 
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
@@ -10,18 +11,25 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { getName } from '../shared';
 
+import {
+  getCloudInitData,
+  getCloudInitVolume,
+} from './../../components/CloudinitModal/utils/cloudinit-utils';
+
 export const decodeSecret = (secret: IoK8sApiCoreV1Secret): string =>
   Buffer.from(secret?.data?.key || Object.values(secret?.data)?.[0] || '', 'base64').toString();
 
 export const encodeSecretKey = (key: string) => Buffer.from(key).toString('base64');
 
-export const encodeKeyForVirtctlCommand = (decodedPubKey: string): string => {
-  const sshWithCloudInitPrefix = `
-#cloud-config
-ssh_authorized_keys:
-  - ${decodedPubKey}`;
+export const encodeKeyForVirtctlCommand = (vm: V1VirtualMachine, decodedPubKey: string): string => {
+  const sshKeys = `ssh_authorized_keys:
+                     - ${decodedPubKey}`;
 
-  return encodeSecretKey(sshWithCloudInitPrefix);
+  const sshString = decodedPubKey ? sshKeys : '';
+
+  const cloudInitUserData = getCloudInitData(getCloudInitVolume(vm))?.userData.concat(sshString);
+
+  return encodeSecretKey(cloudInitUserData);
 };
 
 export const generateSSHKeySecret = (name: string, namespace: string, sshKey: string) => ({
