@@ -11,7 +11,8 @@ import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/Cloudi
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
-import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
+import { EVICTION_STRATEGY_DEFAULT } from '@kubevirt-utils/components/EvictionStrategy/constants';
+import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import HardwareDevicesHeadlessModeModal from '@kubevirt-utils/components/HardwareDevices/modal/HardwareDevicesHeadlessModeModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/modal/HardwareDevicesModal';
@@ -26,6 +27,7 @@ import {
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/constants/tabs-constants';
+import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
@@ -66,6 +68,8 @@ export const usePendingChanges = (
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
 
+  const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration();
+
   const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
@@ -81,11 +85,15 @@ export const usePendingChanges = (
   );
   const startStrategyChanged = getChangedStartStrategy(vm, vmi);
   const hostnameChanged = getChangedHostname(vm, vmi);
-  const evictionStrategyChanged = getChangedEvictionStrategy(
-    vm,
-    vmi,
-    !!vm?.spec?.template?.spec?.evictionStrategy,
-  );
+  const evictionStrategyChanged =
+    hyperLoaded &&
+    !hyperLoadingError &&
+    getChangedEvictionStrategy(
+      vm,
+      vmi,
+      hyperConverge?.spec?.evictionStrategy || EVICTION_STRATEGY_DEFAULT,
+    );
+
   const nodeSelectorChanged = getChangedNodeSelector(vm, vmi);
   const tolerationsChanged = getChangedTolerations(vm, vmi);
   const affinityChanged = getChangedAffinity(vm, vmi);
