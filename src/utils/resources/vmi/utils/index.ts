@@ -5,5 +5,6 @@ export * from './guest-agent';
 export * from './ips';
 export * from './nodeSelector';
 export * from './pod';
+export * from './selectors';
 export * from './services';
 export * from './status';

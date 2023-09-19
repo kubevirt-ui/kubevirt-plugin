@@ -3,16 +3,17 @@ import * as React from 'react';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
-import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
+import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
+import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/ShowEvictionStrategy';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
 import DedicatedResources from './DedicatedResources';
-import EvictionStrategy from './EvictionStrategy';
 
 type VirtualMachineSchedulingRightGridProps = {
   canUpdateVM: boolean;
@@ -78,7 +79,7 @@ const VirtualMachineSchedulingRightGrid: React.FC<VirtualMachineSchedulingRightG
             ))
           }
           data-test-id="eviction-strategy"
-          descriptionData={<EvictionStrategy vm={vm} />}
+          descriptionData={<ShowEvictionStrategy evictionStrategy={getEvictionStrategy(vm)} />}
           descriptionHeader={t('Eviction strategy')}
           isEdit={canUpdateVM}
         />

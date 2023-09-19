@@ -6,11 +6,13 @@ import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
-import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategyModal/EvictionStrategyModal';
+import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
+import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/ShowEvictionStrategy';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
@@ -20,7 +22,6 @@ import Affinity from './Affinity';
 import DedicatedResources from './DedicatedResources';
 import Descheduler from './Descheduler';
 import DeschedulerPopover from './DeschedulerPopover';
-import EvictionStrategy from './EvictionStrategy';
 import NodeSelector from './NodeSelector';
 import Tolerations from './Tolerations';
 
@@ -143,7 +144,7 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
                 />
               ))
             }
-            description={<EvictionStrategy vm={vm} />}
+            description={<ShowEvictionStrategy evictionStrategy={getEvictionStrategy(vm)} />}
             isEdit
             testId="eviction-strategy"
             title={t('Eviction strategy')}

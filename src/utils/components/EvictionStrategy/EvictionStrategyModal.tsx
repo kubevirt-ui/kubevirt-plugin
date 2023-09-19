@@ -1,12 +1,16 @@
-import * as React from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
+
+import { EVICTION_STRATEGIES } from './constants';
 
 type EvictionStrategyModalProps = {
   headerText: string;
@@ -17,7 +21,7 @@ type EvictionStrategyModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
+const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
   headerText,
   isOpen,
   onClose,
@@ -26,21 +30,35 @@ const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [checked, setChecked] = React.useState<boolean>(
-    !!vm?.spec?.template?.spec?.evictionStrategy,
-  );
 
-  const updatedVirtualMachine = React.useMemo(() => {
+  const [isChecked, setIsChecked] = useState<boolean>(true);
+  const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration();
+
+  useEffect(() => {
+    const vmEvictionStrategy = getEvictionStrategy(vm);
+    if (vmEvictionStrategy || hyperLoadingError || !hyperLoaded) {
+      setIsChecked(vmEvictionStrategy === EVICTION_STRATEGIES.LiveMigrate);
+      return;
+    }
+
+    if (hyperConverge?.spec?.evictionStrategy) {
+      setIsChecked(hyperConverge?.spec?.evictionStrategy === EVICTION_STRATEGIES.LiveMigrate);
+      return;
+    }
+  }, [hyperConverge, hyperLoaded, hyperLoadingError, vm]);
+
+  const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, ['spec.template.spec']);
-      if (checked) {
-        vmDraft.spec.template.spec.evictionStrategy = 'LiveMigrate';
+      if (isChecked) {
+        vmDraft.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.LiveMigrate;
       } else {
-        delete vmDraft.spec.template.spec.evictionStrategy;
+        vmDraft.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.None;
       }
     });
     return updatedVM;
-  }, [vm, checked]);
+  }, [vm, isChecked]);
+
   return (
     <TabModal
       headerText={headerText}
@@ -60,9 +78,9 @@ const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
         >
           <Checkbox
             id="eviction-strategy"
-            isChecked={checked}
+            isChecked={isChecked}
             label={t('LiveMigrate')}
-            onChange={setChecked}
+            onChange={setIsChecked}
           />
         </FormGroup>
       </Form>

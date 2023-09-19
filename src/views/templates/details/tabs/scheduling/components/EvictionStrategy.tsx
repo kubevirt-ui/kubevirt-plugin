@@ -2,6 +2,7 @@ import React from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getEvictionStrategy } from 'src/views/templates/utils/selectors';
 
+import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/ShowEvictionStrategy';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -45,7 +46,7 @@ const EvictionStrategy: React.FC<TemplateSchedulingGridProps> = ({
           type="button"
           variant="link"
         >
-          {strategy}
+          <ShowEvictionStrategy evictionStrategy={strategy} />
           <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
         </Button>
       </DescriptionListDescription>
