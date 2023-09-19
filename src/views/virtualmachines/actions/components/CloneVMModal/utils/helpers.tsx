@@ -128,13 +128,13 @@ export const updateClonedPersistentVolumeClaims = (
         `${vm?.metadata?.name}-${vol.name}-${getRandomChars(5)}`,
       );
 
-      vm.spec.dataVolumeTemplates = vm.spec.dataVolumeTemplates.filter(
+      vm.spec.dataVolumeTemplates = (vm?.spec?.dataVolumeTemplates || [])?.filter(
         (dataVolume) =>
           dataVolume.metadata.name === clonedDVTemplate.metadata.name &&
           dataVolume.metadata.namespace === clonedDVTemplate.metadata.namespace,
       );
 
-      vm.spec.dataVolumeTemplates.push(clonedDVTemplate);
+      vm?.spec?.dataVolumeTemplates?.push(clonedDVTemplate);
       vol.dataVolume = {
         name: clonedDVTemplate?.metadata?.name,
       };
