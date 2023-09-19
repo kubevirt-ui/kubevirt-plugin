@@ -17,6 +17,7 @@ import {
 import { css } from '@patternfly/react-styles';
 import styles from '@patternfly/react-styles/css/components/Consoles/VncConsole';
 
+import { sleep } from '../../utils/utils';
 import { ConsoleState, WS, WSS } from '../utils/ConsoleConsts';
 import useCopyPasteConsole from '../utils/hooks/useCopyPasteConsole';
 
@@ -132,13 +133,19 @@ export const VncConsole: FC<VncConsoleProps> = ({
             return;
           }
           const clipboardText = await navigator?.clipboard?.readText?.();
-          [...(clipboardText || pasteText.current)].forEach((char) => {
+          const text = clipboardText || pasteText.current;
+          const lastItem = text.length - 1;
+          for (let i = 0; i < text.length; i++) {
+            const char = text[i];
             const shiftRequired = isShiftKeyRequired(char);
-
+            await sleep(50);
             shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', true);
             this.sendKey(char.charCodeAt(0));
             shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
-          });
+            i === lastItem &&
+              clipboardText.charCodeAt(lastItem) === 13 &&
+              this.sendKey(KeyTable.XK_KP_Enter);
+          }
         };
         rfbInstnce.viewOnly = viewOnly;
         rfbInstnce.scaleViewport = scaleViewport;
