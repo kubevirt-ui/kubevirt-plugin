@@ -17,8 +17,10 @@ export const getCreateVMVirtctlCommand = (
     ? '--volume-clone-pvc='
     : '--volume-datasource=src:';
 
-  const encodedSSHCloudInitUserData =
-    sshPubKey && `--cloud-init-user-data ${encodeKeyForVirtctlCommand(sshPubKey)}`;
+  const encodedSSHCloudInitUserData = `--cloud-init-user-data ${encodeKeyForVirtctlCommand(
+    vm,
+    sshPubKey,
+  )}`;
 
   return `virtctl create vm \\
   --name=${getName(vm)} \\
