@@ -30,6 +30,16 @@ export const getSourceTypeFromDiskSource = (
   return DEFAULT_SOURCE;
 };
 
+export const getDefaultSourceStorage = (storage: string): V1beta1DataVolumeSpec => ({
+  storage: {
+    resources: {
+      requests: {
+        storage,
+      },
+    },
+  },
+});
+
 export const getGenericSourceCustomization = (
   diskSourceId: SOURCE_OPTIONS_IDS,
   url?: string,
