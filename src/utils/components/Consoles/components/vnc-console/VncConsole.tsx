@@ -1,4 +1,13 @@
-import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  FC,
+  MouseEvent,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import cn from 'classnames';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
@@ -208,9 +217,13 @@ export const VncConsole: FC<VncConsoleProps> = ({
               text: 'Ctrl + Alt + 2',
             },
           ]}
+          onInjectTextFromClipboard={(e: MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.blur();
+            e.preventDefault();
+            rfb?.sendPasteCMD();
+          }}
           additionalButtons={additionalButtons}
           onDisconnect={() => rfb?.disconnect()}
-          onInjectTextFromClipboard={() => rfb?.sendPasteCMD()}
           textDisconnect={textDisconnect}
           textSendShortcut={textSendShortcut}
         />

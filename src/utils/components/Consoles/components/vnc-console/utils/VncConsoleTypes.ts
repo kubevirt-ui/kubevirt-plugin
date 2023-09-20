@@ -1,31 +1,33 @@
+import { FC, HTMLProps, MouseEventHandler, ReactNode } from 'react';
+
 export type VncConsoleActionsProps = {
   /** VNC console additional action elements */
-  additionalButtons?: React.ReactNode[];
+  additionalButtons?: ReactNode[];
   /** VNC console additional send keys elements */
   customButtons?: { onClick: () => void; text: string }[];
-  onDisconnect: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onDisconnect: MouseEventHandler<HTMLButtonElement>;
   /** Injext text to VNC console from copied clipboard text */
-  onInjectTextFromClipboard?: () => void;
+  onInjectTextFromClipboard?: MouseEventHandler<HTMLButtonElement>;
   textDisconnect?: string;
   textSendShortcut?: string;
 };
 
-export type VncConsoleProps = React.HTMLProps<HTMLDivElement> & {
-  additionalButtons?: React.ReactNode[];
+export type VncConsoleProps = HTMLProps<HTMLDivElement> & {
+  additionalButtons?: ReactNode[];
 
   /** Should console try to connect once rendering */
   autoConnect?: boolean;
   /** Children nodes */
-  children?: React.ReactNode;
+  children?: ReactNode;
   consoleContainerId?: string;
   /** An Object specifying the credentials to provide to the server when authenticating
    * { username: '' password: '' target: ''}
    */
   credentials?: object;
   /** A custom component to replace th default connect button screen */
-  CustomConnectComponent?: React.FC<{ connect: () => void }>;
+  CustomConnectComponent?: FC<{ connect: () => void }>;
   /** A custom component to replace th default disabled component */
-  CustomDisabledComponent?: React.ReactNode;
+  CustomDisabledComponent?: ReactNode;
   encrypt?: boolean;
   /** Should console render alt tabs */
   hasGPU?: boolean;
@@ -56,7 +58,7 @@ export type VncConsoleProps = React.HTMLProps<HTMLDivElement> & {
   /* Text content rendered inside the EmptyState in the "Connect' button for when console is disconnnected */
   textConnect?: string;
   /* Text content rendered inside the EmptyState for when console is connecting */
-  textConnecting?: React.ReactNode | string;
+  textConnecting?: ReactNode | string;
   /** Text content rendered inside the Ctrl-Alt-Delete dropdown entry */
   textCtrlAltDel?: string;
   /** Text content rendered inside the Disconnect button */
