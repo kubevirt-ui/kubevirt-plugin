@@ -1,10 +1,9 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { Breadcrumb, BreadcrumbItem, Label } from '@patternfly/react-core';
 
 import DataSourceActions from '../actions/DataSourceActions';
@@ -13,26 +12,20 @@ import { isDataSourceReady } from '../utils';
 type DataSourcePageTitleProps = {
   dataSource: V1beta1DataSource;
   name: string;
-  namespace: string;
 };
 
-const DataSourcePageTitle: React.FC<DataSourcePageTitleProps> = ({
-  dataSource,
-  name,
-  namespace,
-}) => {
+const DataSourcePageTitle: FC<DataSourcePageTitleProps> = ({ dataSource, name }) => {
   const { t } = useKubevirtTranslation();
+  const lastNamespacePath = useLastNamespacePath();
 
   return (
     <>
       <div className="pf-c-page__main-breadcrumb">
         <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
           <BreadcrumbItem>
-            <Link to={`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}`}>
-              {t('DataSources')}
-            </Link>
+            <Link to={`/k8s/${lastNamespacePath}/bootablevolumes`}>{t('Bootable volumes')}</Link>
           </BreadcrumbItem>
-          <BreadcrumbItem>{t('DataSource Details')}</BreadcrumbItem>
+          <BreadcrumbItem>{t('DataSource details')}</BreadcrumbItem>
         </Breadcrumb>
       </div>
       <div className="co-m-nav-title co-m-nav-title--detail co-m-nav-title--breadcrumbs">

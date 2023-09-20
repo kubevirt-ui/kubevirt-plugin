@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -16,7 +16,7 @@ type DataSourcePageProps = {
   namespace: string;
 };
 
-const DataSourceNavPage: React.FC<DataSourcePageProps> = ({ kind, name, namespace }) => {
+const DataSourceNavPage: FC<DataSourcePageProps> = ({ kind, name, namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dataSource, loaded] = useK8sWatchResource<V1beta1DataSource>({
     kind,
@@ -24,7 +24,7 @@ const DataSourceNavPage: React.FC<DataSourcePageProps> = ({ kind, name, namespac
     namespace,
   });
 
-  const pages = React.useMemo(
+  const pages = useMemo(
     () => [
       {
         component: DataSourceDetailsPage,
@@ -42,7 +42,7 @@ const DataSourceNavPage: React.FC<DataSourcePageProps> = ({ kind, name, namespac
 
   return (
     <>
-      <DataSourcePageTitle dataSource={dataSource} name={name} namespace={namespace} />
+      <DataSourcePageTitle dataSource={dataSource} name={name} />
       {loaded ? (
         <HorizontalNav pages={pages} resource={dataSource} />
       ) : (
