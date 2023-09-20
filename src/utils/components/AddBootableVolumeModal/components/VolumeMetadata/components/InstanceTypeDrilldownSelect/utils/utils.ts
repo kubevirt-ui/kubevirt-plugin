@@ -1,3 +1,5 @@
+import { parseSize } from 'xbytes';
+
 import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
@@ -57,7 +59,7 @@ export const getInstanceTypeMenuItems = (
 ): InstanceTypesMenuItemsData => {
   if (isEmpty(instanceTypes)) return initialMenuItems;
 
-  return instanceTypes.reduce((acc, it) => {
+  const itemsData = instanceTypes.reduce((acc, it) => {
     if (!isRedHatInstanceType(it)) {
       !acc.userProvided.items.includes(getName(it)) && acc.userProvided.items.push(getName(it));
       return acc;
@@ -85,4 +87,11 @@ export const getInstanceTypeMenuItems = (
 
     return acc;
   }, initialMenuItems);
+
+  itemsData.redHatProvided.items = itemsData.redHatProvided.items.map((series) => ({
+    ...series,
+    sizes: series.sizes.sort((a, b) => parseSize(a?.memory) - parseSize(b?.memory)),
+  }));
+
+  return itemsData;
 };
