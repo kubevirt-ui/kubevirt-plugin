@@ -1,13 +1,10 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { ChangeEvent, FC, MouseEvent, useEffect, useState } from 'react';
 import { Trans } from 'react-i18next';
 
-import {
-  HyperConvergedModelGroupVersionKind,
-  modelToGroupVersionKind,
-  ProjectModel,
-} from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
@@ -29,8 +26,6 @@ import {
   TextVariants,
 } from '@patternfly/react-core';
 
-import { HyperConverged } from '../../../../utils/types';
-import { getHyperConvergedObject } from '../../../../utils/utils';
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
 import {
@@ -56,36 +51,24 @@ const TemplatesProjectSection: FC = () => {
     },
   );
 
-  const [hyperConvergeData, hyperLoaded, hyperLoadingError] = useK8sWatchResource<HyperConverged[]>(
-    {
-      groupVersionKind: HyperConvergedModelGroupVersionKind,
-      isList: true,
-    },
-  );
+  const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration();
 
   useEffect(() => {
-    const hyperConvergeObject = getHyperConvergedObject(hyperConvergeData);
-    if (hyperConvergeObject) {
-      const currentNamespaceHCO = getCurrentTemplatesNamespaceFromHCO(hyperConvergeObject);
+    if (hyperConverge) {
+      const currentNamespaceHCO = getCurrentTemplatesNamespaceFromHCO(hyperConverge);
       !selectedProject && setSelectedProject(currentNamespaceHCO ?? OPENSHIFT);
     }
-  }, [hyperConvergeData, selectedProject]);
+  }, [hyperConverge, selectedProject]);
 
-  const onSelect = (
-    _event: React.ChangeEvent<Element> | React.MouseEvent<Element, MouseEvent>,
-    value: string,
-  ) => {
+  const onSelect = (_event: ChangeEvent | MouseEvent, value: string) => {
     setIsOpen(false);
     setSelectedProject(value);
-    updateHCOCommonTemplatesNamespace(
-      getHyperConvergedObject(hyperConvergeData),
-      value,
-      setError,
-      setLoading,
-    ).catch((e) => kubevirtConsole.log(e));
+    updateHCOCommonTemplatesNamespace(hyperConverge, value, setError, setLoading).catch((e) =>
+      kubevirtConsole.log(e),
+    );
   };
 
-  const onFilter = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+  const onFilter = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
     const filteredProjects = projects.filter((project) => project?.metadata?.name?.includes(value));
     return filteredProjects?.map((project) => (
       <SelectOption key={project?.metadata?.name} value={project?.metadata?.name}>

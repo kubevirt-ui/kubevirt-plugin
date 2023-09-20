@@ -192,3 +192,11 @@ export const getMemoryCPU = <T>(obj: T): { cpu: V1CPU; memory: string } => ({
  * @returns {number} the number of CPU cores
  */
 export const getCPUcores = <T>(obj: T): number => getCPU(obj)?.cores || 1;
+
+/**
+ * A selector that returns virtual machine evictionStrategy
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns {string} the evictionStrategy
+ */
+export const getEvictionStrategy = (vm: V1VirtualMachine): string =>
+  vm?.spec?.template?.spec?.evictionStrategy;

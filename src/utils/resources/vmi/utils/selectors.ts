@@ -20,3 +20,11 @@ export const getVMINetworks = (vmi: V1VirtualMachineInstance) => vmi?.spec?.netw
  */
 export const getVMIInterfaces = (vmi: V1VirtualMachineInstance) =>
   vmi?.spec?.domain?.devices?.interfaces;
+
+/**
+ * A selector that returns the virtual machine instance evictionStrategy
+ * @param {V1VirtualMachine} vmi the virtual machine instance
+ * @returns {string} the evictionStrategy
+ */
+export const getEvictionStrategy = (vmi: V1VirtualMachineInstance): string =>
+  vmi?.spec?.evictionStrategy;

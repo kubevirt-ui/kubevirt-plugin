@@ -25,6 +25,7 @@ import {
   getAffinity,
   getCPU,
   getCPUcores,
+  getEvictionStrategy,
   getGPUDevices,
   getHostDevices,
   getInterfaces,
@@ -33,7 +34,10 @@ import {
   getTolerations,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
-import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
+import {
+  DESCHEDULER_EVICT_LABEL,
+  getEvictionStrategy as getVMIEvictionStrategy,
+} from '@kubevirt-utils/resources/vmi';
 import { getVMIInterfaces, getVMIVolumes } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -297,14 +301,17 @@ export const getChangedDedicatedResources = (
 export const getChangedEvictionStrategy = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
-  currentSelection: boolean,
+  clusterEvictionStrategy: string,
 ): boolean => {
   if (isEmpty(vm) || isEmpty(vmi)) {
     return false;
   }
-  const vmEvictionStrategy = !!vm?.spec?.template?.spec?.evictionStrategy;
-  const vmiEvictionStrategy = !!vmi?.spec?.evictionStrategy;
-  return vmEvictionStrategy !== vmiEvictionStrategy || currentSelection !== vmiEvictionStrategy;
+  const vmEvictionStrategy = getEvictionStrategy(vm);
+  const vmiEvictionStrategy = getVMIEvictionStrategy(vmi);
+
+  if (!vmEvictionStrategy) return clusterEvictionStrategy !== vmiEvictionStrategy;
+
+  return vmEvictionStrategy !== vmiEvictionStrategy;
 };
 
 export const getChangedStartStrategy = (
