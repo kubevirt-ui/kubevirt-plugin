@@ -1,3 +1,5 @@
+import { ROOTDISK } from '@kubevirt-utils/constants/constants';
+
 export const containerTemplateMock = {
   apiVersion: 'template.openshift.io/v1',
   kind: 'Template',
@@ -43,7 +45,7 @@ export const containerTemplateMock = {
                     disk: {
                       bus: 'virtio',
                     },
-                    name: 'rootdisk',
+                    name: ROOTDISK,
                   },
                 ],
                 interfaces: [
@@ -72,7 +74,7 @@ export const containerTemplateMock = {
                 containerDisk: {
                   image: 'fooContainer',
                 },
-                name: 'rootdisk',
+                name: ROOTDISK,
               },
             ],
           },
@@ -130,7 +132,7 @@ export const urlTemplateMock = {
                     disk: {
                       bus: 'virtio',
                     },
-                    name: 'rootdisk',
+                    name: ROOTDISK,
                   },
                 ],
                 interfaces: [
@@ -160,7 +162,7 @@ export const urlTemplateMock = {
                   // eslint-disable-next-line no-template-curly-in-string
                   name: 'url-template-rootdisk',
                 },
-                name: 'rootdisk',
+                name: ROOTDISK,
               },
             ],
           },

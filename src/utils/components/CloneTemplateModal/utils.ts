@@ -5,13 +5,14 @@ import {
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSpec,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 const getBootSourceDataVolumeTemplate = (template: V1Template) => {
   const vm = getTemplateVirtualMachineObject(template);
-  const rootVolume = getVolumes(vm)?.find((volume) => volume.name === 'rootdisk');
+  const rootVolume = getVolumes(vm)?.find((volume) => volume.name === ROOTDISK);
 
   if (rootVolume?.dataVolume?.name)
     return getDataVolumeTemplates(vm)?.find(

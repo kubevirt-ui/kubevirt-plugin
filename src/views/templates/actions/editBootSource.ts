@@ -12,7 +12,7 @@ import {
   V1beta1DataVolumeSpec,
   V1DataVolumeTemplateSpec,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { DEFAULT_NAMESPACE, ROOTDISK } from '@kubevirt-utils/constants/constants';
 import {
   getTemplateVirtualMachineObject,
   poorManProcess,
@@ -64,7 +64,7 @@ const getRootDiskDataVolumeTemplate = (
 ): undefined | V1DataVolumeTemplateSpec => {
   const vm = getTemplateVirtualMachineObject(template);
 
-  const rootVolume = getVolumes(vm)?.find((volume) => volume.name === 'rootdisk');
+  const rootVolume = getVolumes(vm)?.find((volume) => volume.name === ROOTDISK);
 
   return vm?.spec?.dataVolumeTemplates?.find(
     (dataVolumeTemplate) => rootVolume?.dataVolume?.name === dataVolumeTemplate?.metadata?.name,
