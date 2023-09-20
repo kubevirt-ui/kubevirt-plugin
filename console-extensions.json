@@ -128,6 +128,68 @@
     "type": "console.page/resource/list"
   },
   {
+    "flags": {
+      "required": ["KUBEVIRT_INSTANCETYPES"]
+    },
+    "properties": {
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualmachineclusterinstancetypes",
+        "data-test-id": "virtualmachineclusterinstancetypes-nav-item"
+      },
+      "id": "virtualmachineclusterinstancetypes",
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineClusterInstancetype",
+        "version": "v1alpha2"
+      },
+      "name": "%plugin__kubevirt-plugin~InstanceTypes%",
+      "section": "virtualization"
+    },
+    "type": "console.navigation/resource-cluster"
+  },
+  {
+    "properties": {
+      "component": { "$codeRef": "ClusterInstancetypeList" },
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineClusterInstancetype",
+        "version": "v1alpha2"
+      }
+    },
+    "type": "console.page/resource/list"
+  },
+  {
+    "flags": {
+      "required": ["KUBEVIRT_PREFERENCES"]
+    },
+    "properties": {
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualmachineclusterpreferences",
+        "data-test-id": "virtualmachineclusterpreferences-nav-item"
+      },
+      "id": "virtualmachineclusterpreferences",
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineClusterPreference",
+        "version": "v1alpha2"
+      },
+      "name": "%plugin__kubevirt-plugin~Preferences%",
+      "section": "virtualization"
+    },
+    "type": "console.navigation/resource-cluster"
+  },
+  {
+    "properties": {
+      "component": { "$codeRef": "ClusterPreferenceList" },
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineClusterPreference",
+        "version": "v1alpha2"
+      }
+    },
+    "type": "console.page/resource/list"
+  },
+  {
     "properties": {
       "component": {
         "$codeRef": "TemplatesCatalog"
@@ -364,8 +426,8 @@
   {
     "properties": {
       "id": "VirtualizationSeparator",
-      "insertAfter": "templates",
-      "insertBefore": "bootablevolumes",
+      "insertAfter": "virtualmachineclusterpreferences",
+      "insertBefore": "virtualization-bootablevolumes",
       "perspective": "admin",
       "section": "virtualization",
       "testID": "VirtualizationSeparator"
@@ -419,7 +481,7 @@
   },
   {
     "flags": {
-      "required": ["KUBEVIRT_INSTANCETYPES"]
+      "required": ["CAN_LIST_NS"]
     },
     "properties": {
       "dataAttributes": {
@@ -444,68 +506,6 @@
         "group": "migrations.kubevirt.io",
         "kind": "MigrationPolicy",
         "version": "v1alpha1"
-      }
-    },
-    "type": "console.page/resource/list"
-  },
-  {
-    "flags": {
-      "required": ["KUBEVIRT_PREFERENCES"]
-    },
-    "properties": {
-      "dataAttributes": {
-        "data-quickstart-id": "qs-nav-virtualmachineclusterinstancetypes",
-        "data-test-id": "virtualmachineclusterinstancetypes-nav-item"
-      },
-      "id": "virtualmachineclusterinstancetypes",
-      "model": {
-        "group": "instancetype.kubevirt.io",
-        "kind": "VirtualMachineClusterInstancetype",
-        "version": "v1alpha2"
-      },
-      "name": "%plugin__kubevirt-plugin~InstanceTypes%",
-      "section": "virtualization"
-    },
-    "type": "console.navigation/resource-cluster"
-  },
-  {
-    "properties": {
-      "component": { "$codeRef": "ClusterInstancetypeList" },
-      "model": {
-        "group": "instancetype.kubevirt.io",
-        "kind": "VirtualMachineClusterInstancetype",
-        "version": "v1alpha2"
-      }
-    },
-    "type": "console.page/resource/list"
-  },
-  {
-    "flags": {
-      "required": ["CAN_LIST_NS"]
-    },
-    "properties": {
-      "dataAttributes": {
-        "data-quickstart-id": "qs-nav-virtualmachineclusterpreferences",
-        "data-test-id": "virtualmachineclusterpreferences-nav-item"
-      },
-      "id": "virtualmachineclusterpreferences",
-      "model": {
-        "group": "instancetype.kubevirt.io",
-        "kind": "VirtualMachineClusterPreference",
-        "version": "v1alpha2"
-      },
-      "name": "%plugin__kubevirt-plugin~Preferences%",
-      "section": "virtualization"
-    },
-    "type": "console.navigation/resource-cluster"
-  },
-  {
-    "properties": {
-      "component": { "$codeRef": "ClusterPreferenceList" },
-      "model": {
-        "group": "instancetype.kubevirt.io",
-        "kind": "VirtualMachineClusterPreference",
-        "version": "v1alpha2"
       }
     },
     "type": "console.page/resource/list"
