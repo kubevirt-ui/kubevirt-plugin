@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
@@ -29,7 +29,7 @@ type NodeSelectorModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
+const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
   isOpen,
   nodes,
   nodesLoaded,
@@ -50,7 +50,7 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
 
   const onSelectorLabelAdd = () => onLabelAdd({ id: null, key: '', value: '' });
 
-  const updatedVirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, ['spec.template.template.spec.nodeSelector']);
       if (!vmDraft.spec.template.spec.nodeSelector) {

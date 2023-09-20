@@ -7,6 +7,7 @@ import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynam
 
 export type HyperConverged = K8sResourceCommon & {
   spec: {
+    configuration?: { ksmConfiguration: { nodeLabelSelector?: Record<string, never> } };
     evictionStrategy?: string;
     liveMigrationConfig: V1MigrationConfiguration;
   };

@@ -7,6 +7,7 @@ import EnableLoadBalancerSection from './components/EnableLoadBalancerSection/En
 import EnablePreviewFeaturesSection from './components/EnablePreviewFeaturesSection/EnablePreviewFeaturesSection';
 import GeneralInformation from './components/GeneralInformation/GeneralInformation';
 import LiveMigrationSection from './components/LiveMigrationSection/LiveMigrationSection';
+import ResourceManagementSection from './components/ResourceManagementSection/ResourceManagementSection';
 import TemplatesProjectSection from './components/TemplatesProjectSection/TemplatesProjectSection';
 
 const ClusterTab: FC = () => {
@@ -22,6 +23,8 @@ const ClusterTab: FC = () => {
       <EnableLoadBalancerSection />
       <Divider className="section-divider" />
       <TemplatesProjectSection />
+      <Divider className="section-divider" />
+      <ResourceManagementSection />
     </>
   );
 };
