@@ -1,8 +1,13 @@
-import * as React from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 import { getEvictionStrategy } from 'src/views/templates/utils/selectors';
 
+import {
+  EVICTION_STRATEGIES,
+  EVICTION_STRATEGY_DEFAULT,
+} from '@kubevirt-utils/components/EvictionStrategy/constants';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
@@ -15,23 +20,40 @@ type EvictionStrategyModalProps = {
   template: V1Template;
 };
 
-const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
+const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
   template,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [checked, setChecked] = React.useState<boolean>(!!getEvictionStrategy(template));
+  const templateEvictionStrategy = getEvictionStrategy(template);
 
-  const updatedTemplate = React.useMemo(() => {
+  const [isChecked, setIsChecked] = useState<boolean>(
+    templateEvictionStrategy === EVICTION_STRATEGIES.LiveMigrate,
+  );
+
+  const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration();
+
+  useEffect(() => {
+    if (templateEvictionStrategy || hyperLoadingError || !hyperLoaded) return;
+
+    if (hyperConverge?.spec?.evictionStrategy) {
+      setIsChecked(hyperConverge?.spec?.evictionStrategy === EVICTION_STRATEGIES.LiveMigrate);
+      return;
+    }
+
+    setIsChecked(EVICTION_STRATEGY_DEFAULT === EVICTION_STRATEGIES.LiveMigrate);
+  }, [hyperConverge, hyperLoaded, hyperLoadingError, templateEvictionStrategy]);
+
+  const updatedTemplate = useMemo(() => {
     return produce<V1Template>(template, (templateDraft: V1Template) => {
       const draftVM = getTemplateVirtualMachineObject(templateDraft);
-      checked
-        ? (draftVM.spec.template.spec.evictionStrategy = 'LiveMigrate')
-        : delete draftVM.spec.template.spec.evictionStrategy;
+      isChecked
+        ? (draftVM.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.LiveMigrate)
+        : (draftVM.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.None);
     });
-  }, [checked, template]);
+  }, [isChecked, template]);
 
   return (
     <TabModal
@@ -51,9 +73,9 @@ const EvictionStrategyModal: React.FC<EvictionStrategyModalProps> = ({
         >
           <Checkbox
             id="eviction-strategy"
-            isChecked={checked}
-            label={'LiveMigrate'}
-            onChange={setChecked}
+            isChecked={isChecked}
+            label={t('LiveMigrate')}
+            onChange={setIsChecked}
           />
         </FormGroup>
       </Form>
