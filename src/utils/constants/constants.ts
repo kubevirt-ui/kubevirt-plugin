@@ -8,3 +8,5 @@ export const OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS = 'openshift-sriov-network-oper
 export const OPENSHIFT_MULTUS_NS = 'openshift-multus';
 
 export const VENDOR_LABEL = 'instancetype.kubevirt.io/vendor';
+
+export const ROOTDISK = 'rootdisk';

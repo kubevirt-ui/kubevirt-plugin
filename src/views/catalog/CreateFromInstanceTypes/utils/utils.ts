@@ -7,6 +7,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { convertUserDataObjectToYAML } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { ACTIVATION_KEY } from '@kubevirt-utils/components/CloudinitModal/utils/consts';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -122,7 +123,7 @@ export const generateVM = (
                   disk: {
                     bus: 'virtio',
                   },
-                  name: `${virtualmachineName}-disk`,
+                  name: ROOTDISK,
                 },
                 {
                   disk: {
@@ -136,7 +137,7 @@ export const generateVM = (
           volumes: [
             {
               dataVolume: { name: `${virtualmachineName}-volume` },
-              name: `${virtualmachineName}-disk`,
+              name: ROOTDISK,
             },
             {
               cloudInitConfigDrive: {
