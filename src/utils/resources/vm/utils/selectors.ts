@@ -1,5 +1,6 @@
 import { V1AccessCredential, V1Disk, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 
 import { VM_WORKLOAD_ANNOTATION } from './annotations';
@@ -146,8 +147,11 @@ export const getWorkload = (vm: V1VirtualMachine): string =>
 export const getAccessCredentials = (vm: V1VirtualMachine): V1AccessCredential[] =>
   vm?.spec?.template?.spec?.accessCredentials;
 
-export const getIsDynamicSSHInjectionEnabled = (vm: V1VirtualMachine): boolean =>
-  getLabel(vm, DYNAMIC_CREDENTIALS_SUPPORT) === 'true' &&
+export const getIsDynamicSSHInjectionEnabled = (
+  vm: V1VirtualMachine,
+  bootableVolume?: BootableVolume,
+): boolean =>
+  getLabel(bootableVolume || vm, DYNAMIC_CREDENTIALS_SUPPORT) === 'true' &&
   Boolean(getAccessCredentials(vm)?.[0]?.sshPublicKey?.propagationMethod?.qemuGuestAgent);
 
 /**

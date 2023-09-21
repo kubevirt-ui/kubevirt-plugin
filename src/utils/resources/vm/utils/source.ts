@@ -1,14 +1,52 @@
+import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1DataVolumeSourcePVC,
+  V1beta1DataVolumeSourceRef,
+  V1VirtualMachine,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getName } from '@kubevirt-utils/resources/shared';
 import {
   BOOT_SOURCE,
   BOOT_SOURCE_LABELS,
   DATA_SOURCE_CRONJOB_LABEL,
 } from '@kubevirt-utils/resources/template';
 import { TemplateBootSource } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
 
 import { getBootDisk, getVolumes } from './selectors';
+
+/**
+ * A function to get the data source from a vm and its name and namespace
+ * @param {V1VirtualMachine} vm - the vm to get the data source from.
+ * @returns {V1beta1DataVolumeSourcePVC | V1beta1DataVolumeSourceRef} - The vms data volume source.
+ */
+export const getPVCSourceOrSourceRef = (
+  vm: V1VirtualMachine,
+): V1beta1DataVolumeSourcePVC | V1beta1DataVolumeSourceRef => {
+  const bootDisk = getBootDisk(vm);
+  const volume = getVolumes(vm)?.find((vol) => vol.name === bootDisk?.name);
+  const dataVolumeTemplate = getDataVolumeTemplates(vm)?.find(
+    (dv) => getName(dv) === volume?.dataVolume?.name,
+  );
+  const sourceRef = dataVolumeTemplate?.spec?.sourceRef;
+  const pvc = dataVolumeTemplate?.spec?.source?.pvc;
+
+  if (sourceRef && sourceRef?.kind === DataSourceModel.kind) {
+    return sourceRef;
+  }
+
+  if (pvc) {
+    return {
+      kind: PersistentVolumeClaimModel?.kind,
+      name: pvc?.name,
+      namespace: pvc?.namespace,
+    };
+  }
+
+  return {} as V1beta1DataVolumeSourcePVC;
+};
 
 /**
  * a function to get the boot source from a vm and its status
