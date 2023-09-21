@@ -55,13 +55,16 @@ export const detachVMSecret = async (vm: V1VirtualMachine) => {
   });
 };
 
-export const applyCloudDriveCloudInitVolume = (vm: V1VirtualMachine): V1Volume[] => {
+export const applyCloudDriveCloudInitVolume = (
+  vm: V1VirtualMachine,
+  isDynamic?: boolean,
+): V1Volume[] => {
   const cloudInitVolume = getCloudInitVolume(vm);
 
   if (isEmpty(cloudInitVolume)) return getVolumes(vm);
 
   const cloudDriveVolume: V1Volume = {
-    cloudInitConfigDrive: getCloudInitData(cloudInitVolume),
+    cloudInitConfigDrive: getCloudInitConfigDrive(isDynamic, getCloudInitData(cloudInitVolume)),
     name: cloudInitVolume.name,
   };
 
@@ -72,7 +75,7 @@ export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string, isDynam
   if (isWindows(vm?.spec?.template)) return vm;
 
   return produce(vm, (vmDraft) => {
-    vmDraft.spec.template.spec.volumes = applyCloudDriveCloudInitVolume(vm);
+    vmDraft.spec.template.spec.volumes = applyCloudDriveCloudInitVolume(vm, isDynamic);
     vmDraft.spec.template.spec.accessCredentials = [
       {
         sshPublicKey: {
@@ -105,8 +108,11 @@ export const getCloudInitPropagationMethod = (
 export const getCloudInitConfigDrive = (
   isDynamic: boolean,
   cloudInitVolumeData: V1CloudInitConfigDriveSource | V1CloudInitNoCloudSource,
+  isTemplate = false,
 ): V1CloudInitConfigDriveSource => {
-  const runCmd = `\nruncmd:\n- [ setsebool, -P, virt_qemu_ga_manage_ssh, on ]`;
+  const runCmd = `${
+    isTemplate ? '\n' : ''
+  }runcmd:\n- [ setsebool, -P, virt_qemu_ga_manage_ssh, on ]`;
   const userData = cloudInitVolumeData?.userData?.concat(runCmd);
   const userDataClean = cloudInitVolumeData?.userData?.replace(runCmd, '');
 
