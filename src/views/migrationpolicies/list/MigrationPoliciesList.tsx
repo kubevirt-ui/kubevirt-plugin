@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,7 +21,7 @@ type MigrationPoliciesListProps = {
   kind: string;
 };
 
-const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) => {
+const MigrationPoliciesList: FC<MigrationPoliciesListProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
   const [mps, loaded, loadError] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
     isList: true,
@@ -54,10 +54,11 @@ const MigrationPoliciesList: React.FC<MigrationPoliciesListProps> = ({ kind }) =
           loaded={loaded}
           onFilterChange={onFilterChange}
         />
+        {isEmpty(mps) && <MigrationPoliciesEmptyState kind={kind} />}
         <VirtualizedTable<V1alpha1MigrationPolicy>
           columns={activeColumns}
           data={data}
-          EmptyMsg={() => <MigrationPoliciesEmptyState kind={kind} />}
+          EmptyMsg={() => <></>}
           loaded={loaded}
           loadError={loadError}
           Row={MigrationPoliciesRow}
