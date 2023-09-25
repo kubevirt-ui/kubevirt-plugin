@@ -5,7 +5,6 @@ import produce from 'immer';
 import { NAME_INPUT_FIELD } from '@catalog/customize/constants';
 import { isNameParameterExists, replaceTemplateParameterValue } from '@catalog/customize/utils';
 import { quickCreateVM } from '@catalog/utils/quick-create-vm';
-import { isRHELTemplate } from '@catalog/utils/utils';
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import {
   ProcessedTemplatesModel,
@@ -13,24 +12,13 @@ import {
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
-import {
-  addSecretToVM,
-  applyCloudDriveCloudInitVolume,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
-import { getAnnotation, getResourceUrl } from '@kubevirt-utils/resources/shared';
-import {
-  ANNOTATIONS,
-  getTemplateOS,
-  getTemplateVirtualMachineObject,
-  LABEL_USED_TEMPLATE_NAME,
-  LABEL_USED_TEMPLATE_NAMESPACE,
-} from '@kubevirt-utils/resources/template';
+import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getMemoryCPU } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -76,7 +64,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
   }) => {
     const history = useHistory();
     const { t } = useKubevirtTranslation();
-    const { updateTabsData, updateVM, vm } = useWizardVMContext();
+    const { updateTabsData, vm } = useWizardVMContext();
 
     const [vmName, setVMName] = useState(initialVMName || '');
     const [startVM, setStartVM] = useState(true);
@@ -90,7 +78,9 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
       verb: 'create',
     });
 
-    const onQuickCreate = () => {
+    const onQuickCreate = (e: MouseEvent) => {
+      e.preventDefault();
+
       setIsQuickCreating(true);
       setQuickCreateError(undefined);
 
@@ -142,68 +132,6 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
     const onCustomize = (e: MouseEvent) => {
       e.preventDefault();
 
-      if (isEmpty(template?.parameters)) {
-        return k8sCreate<V1Template>({
-          data: { ...template, metadata: { ...template?.metadata, namespace } },
-          model: ProcessedTemplatesModel,
-          ns: namespace,
-          queryParams: {
-            dryRun: 'All',
-          },
-        }).then(async (processedTemplate) => {
-          const vmObject = getTemplateVirtualMachineObject(processedTemplate);
-
-          const updatedVM = produce(vmObject, (vmDraft) => {
-            ensurePath(vmDraft, [
-              'spec.template.spec.domain.cpu',
-              'spec.template.spec.domain.memory.guest',
-            ]);
-
-            vmDraft.metadata.namespace = namespace;
-            vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = template.metadata.name;
-            vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
-            const { cpu, memory } = getMemoryCPU(vm);
-            vmDraft.spec.template.spec.domain.cpu.cores = cpu?.cores;
-            vmDraft.spec.template.spec.domain.memory.guest = memory;
-
-            const updatedVolumes = applyCloudDriveCloudInitVolume(vmObject);
-            vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
-              ? updateCloudInitRHELSubscription(updatedVolumes, subscriptionData)
-              : updatedVolumes;
-          });
-
-          updateTabsData((tabsDataDraft) => {
-            // additional objects
-            tabsDataDraft.additionalObjects = processedTemplate.objects.filter((obj) =>
-              !isEmpty(authorizedSSHKey)
-                ? obj.kind !== VirtualMachineModel.kind || obj.kind !== SecretModel
-                : obj.kind !== VirtualMachineModel.kind,
-            );
-            // overview
-            ensurePath(tabsDataDraft, 'overview.templateMetadata');
-            tabsDataDraft.overview.templateMetadata.name = template.metadata.name;
-            tabsDataDraft.overview.templateMetadata.namespace = template.metadata.namespace;
-            tabsDataDraft.overview.templateMetadata.osType = getTemplateOS(template);
-            tabsDataDraft.overview.templateMetadata.displayName = getAnnotation(
-              template,
-              ANNOTATIONS.displayName,
-            );
-          });
-
-          // update context vm
-          await updateVM(
-            !isEmpty(authorizedSSHKey) ? addSecretToVM(updatedVM, authorizedSSHKey) : updatedVM,
-          );
-
-          history.push(`/k8s/ns/${namespace}/templatescatalog/review`);
-        });
-      }
-      let catalogUrl = `templatescatalog/customize?name=${template.metadata.name}&namespace=${template.metadata.namespace}&defaultSourceExists=${isBootSourceAvailable}`;
-
-      if (vmName) {
-        catalogUrl += `&vmName=${vmName}`;
-      }
-
       updateTabsData((currentTabs) => {
         currentTabs.authorizedSSHKey = authorizedSSHKey;
       });
@@ -212,7 +140,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
         updateTabsData((currentTabsData) => ({ ...currentTabsData, subscriptionData }));
       }
 
-      history.push(catalogUrl);
+      history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog/review`);
     };
 
     const onChangeStartVM = (checked: boolean) => {
@@ -221,6 +149,13 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
         return { ...currentTabsData, startVM: checked };
       });
     };
+
+    const areButtonsDisabled =
+      !isBootSourceAvailable ||
+      isQuickCreating ||
+      !vmName ||
+      isEmpty(models) ||
+      !processedTemplateAccessReview;
 
     return (
       <form className="template-catalog-drawer-form" id="quick-create-form">
@@ -264,11 +199,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
               </StackItem>
             </>
           ) : (
-            <StackItem>
-              {t(
-                'This Template requires some additional parameters. Click the Customize VirtualMachine button to complete the creation flow.',
-              )}
-            </StackItem>
+            <StackItem>{t('This Template requires some additional parameters.')}</StackItem>
           )}
           <StackItem />
           {quickCreateError && (
@@ -281,29 +212,22 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
           <StackItem>
             <Split hasGutter>
-              {canQuickCreate && (
-                <SplitItem>
-                  <Button
-                    isDisabled={
-                      !isBootSourceAvailable || isQuickCreating || !vmName || isEmpty(models)
-                    }
-                    onClick={(e: MouseEvent) => {
-                      e.preventDefault();
-                      onQuickCreate();
-                    }}
-                    data-test-id="quick-create-vm-btn"
-                    form="quick-create-form"
-                    isLoading={isQuickCreating || modelsLoading}
-                    type="submit"
-                  >
-                    {t('Quick create VirtualMachine')}
-                  </Button>
-                </SplitItem>
-              )}
+              <SplitItem>
+                <Button
+                  data-test-id="quick-create-vm-btn"
+                  form="quick-create-form"
+                  isDisabled={areButtonsDisabled}
+                  isLoading={isQuickCreating || modelsLoading}
+                  onClick={onQuickCreate}
+                  type="submit"
+                >
+                  {t('Quick create VirtualMachine')}
+                </Button>
+              </SplitItem>
               <SplitItem>
                 <Button
                   data-test-id="customize-vm-btn"
-                  isDisabled={!processedTemplateAccessReview}
+                  isDisabled={areButtonsDisabled}
                   onClick={onCustomize}
                   variant={canQuickCreate ? ButtonVariant.secondary : ButtonVariant.primary}
                 >

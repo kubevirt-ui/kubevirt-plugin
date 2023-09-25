@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
@@ -14,7 +14,7 @@ import { wizardNavPages } from './tabs';
 
 import './Wizard.scss';
 
-const Wizard: React.FC = () => {
+const Wizard: FC = () => {
   const { ns } = useParams<{ ns: string }>();
   const { vm } = useWizardVMContext();
 

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
 import { TemplateParameter } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,11 +12,9 @@ type ExpandableOptionsFieldsProps = {
   optionalFields: TemplateParameter[];
 };
 
-export const ExpandableOptionsFields: React.FC<ExpandableOptionsFieldsProps> = ({
-  optionalFields,
-}) => {
+export const ExpandableOptionsFields: FC<ExpandableOptionsFieldsProps> = ({ optionalFields }) => {
   const { t } = useKubevirtTranslation();
-  const [optionalFieldsExpanded, setOptionalFieldsExpanded] = React.useState(false);
+  const [optionalFieldsExpanded, setOptionalFieldsExpanded] = useState(false);
 
   if (!optionalFields || optionalFields.length === 0) return null;
 
