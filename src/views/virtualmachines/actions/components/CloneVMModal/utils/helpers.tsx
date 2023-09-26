@@ -6,13 +6,10 @@ import { ensurePath } from '@catalog/utils/WizardVMContext';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  getDataVolumeTemplates,
-  getDisks,
-  getInterfaces,
-  getVolumes,
-} from '@kubevirt-utils/resources/vm';
+import { convertResourceArrayToMap, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getDisks, getInterfaces, getVolumes } from '@kubevirt-utils/resources/vm';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 export const getRandomChars = (len: number): string => {
   return Math.random()
@@ -35,8 +32,8 @@ export const getClonedDisksSummary = (
       if (volume?.dataVolume || volume?.persistentVolumeClaim) {
         const pvc = pvcs.find(
           (p) =>
-            p?.metadata?.name === volume?.persistentVolumeClaim?.claimName ||
-            p?.metadata?.name === volume?.dataVolume?.name,
+            getName(p) === volume?.persistentVolumeClaim?.claimName ||
+            getName(p) === volume?.dataVolume?.name,
         );
         description.push(
           formatBytes(pvc?.spec?.resources?.requests?.storage),
@@ -84,95 +81,69 @@ export const produceCleanClonedVM = (
 const createDataVolumeTemplateFromPVC = (
   pvcToClone: IoK8sApiCoreV1PersistentVolumeClaim,
   dvtName: string,
+  targetNamespace: string,
 ): V1DataVolumeTemplateSpec => {
   return {
     apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
     kind: DataVolumeModel.kind,
     metadata: {
       name: dvtName,
+      namespace: targetNamespace,
     },
     spec: {
-      storage: {
-        accessModes: pvcToClone?.spec?.accessModes,
-        volumeMode: pvcToClone?.spec?.volumeMode,
-        resources: {
-          requests: {
-            storage: pvcToClone?.spec?.resources?.requests?.storage,
-          },
-        },
-        storageClassName: pvcToClone?.spec?.storageClassName,
-      },
       source: {
         pvc: {
-          name: pvcToClone?.metadata?.name,
-          namespace: pvcToClone?.metadata?.namespace,
+          name: getName(pvcToClone),
+          namespace: getNamespace(pvcToClone),
         },
+      },
+      storage: {
+        resources: { requests: { storage: pvcToClone?.spec?.resources?.requests?.storage } },
       },
     },
   };
 };
 
-export const updateClonedPersistentVolumeClaims = (
-  vm: WritableDraft<V1VirtualMachine>,
-  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
-): V1VirtualMachine => {
-  const pvcVolumes = (getVolumes(vm) || [])?.filter((vol) => vol?.persistentVolumeClaim);
-  (pvcVolumes || [])?.forEach((vol) => {
-    const pvcName = vol?.persistentVolumeClaim?.claimName;
-    delete vol.persistentVolumeClaim;
-
-    const pvcToClone = pvcs?.find((pvc) => pvc.metadata.name === pvcName);
-    if (pvcToClone) {
-      const clonedDVTemplate = createDataVolumeTemplateFromPVC(
-        pvcToClone,
-        `${vm?.metadata?.name}-${vol.name}-${getRandomChars(5)}`,
-      );
-
-      vm.spec.dataVolumeTemplates = (vm?.spec?.dataVolumeTemplates || [])?.filter(
-        (dataVolume) =>
-          dataVolume.metadata.name === clonedDVTemplate.metadata.name &&
-          dataVolume.metadata.namespace === clonedDVTemplate.metadata.namespace,
-      );
-
-      vm?.spec?.dataVolumeTemplates?.push(clonedDVTemplate);
-      vol.dataVolume = {
-        name: clonedDVTemplate?.metadata?.name,
-      };
-    }
-  });
-  return vm;
-};
-
-export const updateClonedDataVolumes = (
+export const updateClonedVolumes = (
   vm: V1VirtualMachine,
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
-): V1VirtualMachine => {
-  const updatedDVT = (getDataVolumeTemplates(vm) || []).map((dvt) =>
-    produce(dvt, (dvtDraft) => {
-      dvtDraft.metadata.name = dvt.metadata.name.concat('-volume-clone');
-    }),
+) => {
+  const targetNamespace = getNamespace(vm);
+  const cloneSuffix = getRandomChars(5);
+  const pvcMap = convertResourceArrayToMap(pvcs);
+  const volumesToClone: string[] = [];
+
+  const updatedVolumes = (getVolumes(vm) || []).map((vol) => {
+    if (!vol.persistentVolumeClaim && !vol.dataVolume) return vol;
+
+    if (vol.persistentVolumeClaim) {
+      const volumeName = vol.persistentVolumeClaim.claimName;
+      !isEmpty(pvcMap[volumeName]) && volumesToClone.push(volumeName);
+
+      const updatedVol = produce(vol, (draftVolume) => {
+        draftVolume.persistentVolumeClaim.claimName = `${volumeName}-${cloneSuffix}`;
+      });
+
+      return updatedVol;
+    }
+
+    const volumeName = vol.dataVolume.name;
+    !isEmpty(pvcMap[volumeName]) && volumesToClone.push(volumeName);
+
+    return produce(vol, (draftVolume) => {
+      draftVolume.dataVolume.name = `${vol.dataVolume.name}-${cloneSuffix}`;
+    });
+  });
+
+  const updatedDataVolumeTemplates = volumesToClone.map((volumeName) =>
+    createDataVolumeTemplateFromPVC(
+      pvcMap[volumeName],
+      `${volumeName}-${cloneSuffix}`,
+      targetNamespace,
+    ),
   );
 
-  const vmVolumes = getVolumes(vm) || [];
-  const updatedVolumes = vmVolumes.map((volume) =>
-    produce(volume, (draftVolume) => {
-      if (volume?.dataVolume) {
-        const dvName = volume.dataVolume.name;
-        const cloneName = dvName.concat('-volume-clone');
-        draftVolume.dataVolume.name = cloneName;
-
-        const dataVolumeTemplate = updatedDVT.find((dvt) => dvt.metadata.name === cloneName);
-
-        if (!dataVolumeTemplate) {
-          const pvcToClone = (pvcs || []).find((pvc) => pvc?.metadata?.name === dvName);
-          const newDVT = createDataVolumeTemplateFromPVC(pvcToClone, cloneName);
-          updatedDVT.push(newDVT);
-        }
-      }
-    }),
-  );
-
-  vm.spec.dataVolumeTemplates = updatedDVT;
+  debugger;
+  vm.spec.dataVolumeTemplates = updatedDataVolumeTemplates;
   vm.spec.template.spec.volumes = updatedVolumes;
-  return vm;
 };
