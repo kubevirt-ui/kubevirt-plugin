@@ -32,6 +32,7 @@ const DynamicSSHKeyInjectionWizard = () => {
             cloudInitConfigDrive: getCloudInitConfigDrive(
               checked,
               cloudInitConfigDrive.cloudInitConfigDrive,
+              true,
             ),
             name: cloudInitConfigDrive.name,
           },
