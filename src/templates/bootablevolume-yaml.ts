@@ -8,6 +8,8 @@ metadata:
   labels:
     instancetype.kubevirt.io/default-instancetype: u1.medium
     instancetype.kubevirt.io/default-preference: fedora
+  annotations:
+    cdi.kubevirt.io/storage.bind.immediate.requested: 'true'
 spec:
   source:
     registry:
