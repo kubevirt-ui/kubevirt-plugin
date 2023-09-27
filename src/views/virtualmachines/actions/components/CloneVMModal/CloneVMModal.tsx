@@ -7,6 +7,7 @@ import VirtualMachineModel, {
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, NAME_OS_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import {
   getOperatingSystem,
@@ -26,11 +27,7 @@ import ProjectSelectInput from './components/ProjectSelectInput';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox';
 import useCloneVMResources from './hooks/useCloneVMResources';
 import { TEMPLATE_VM_NAME_LABEL } from './utils/constants';
-import {
-  produceCleanClonedVM,
-  updateClonedDataVolumes,
-  updateClonedPersistentVolumeClaims,
-} from './utils/helpers';
+import { produceCleanClonedVM, updateClonedVolumes } from './utils/helpers';
 
 type CloneVMModalProps = {
   vm: V1VirtualMachine;
@@ -43,23 +40,24 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
 
   const history = useHistory();
 
-  const [cloneName, setCloneName] = React.useState(`${vm?.metadata?.name}-clone`);
+  const [cloneName, setCloneName] = React.useState(`${getName(vm)}-clone`);
   const [cloneDescription, setCloneDescription] = React.useState(
     vm?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
   );
-  const [cloneProject, setCloneProject] = React.useState(vm?.metadata?.namespace);
+  const [cloneProject, setCloneProject] = React.useState(getNamespace(vm));
   const [startCloneVM, setStartCloneVM] = React.useState(false);
 
   const isVMRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
   const { projects, pvcs, loaded } = useCloneVMResources(vm);
 
-  const projectNames = React.useMemo(
-    () => (projects || [])?.map((project) => project.metadata.name),
-    [projects],
-  );
+  const projectNames = React.useMemo(() => (projects || [])?.map(getName), [projects]);
 
-  const clonedVirtualMachine = React.useMemo(() => {
+  const onClone = async () => {
+    if (isVMRunning) {
+      await stopVM(vm);
+    }
+
     const clonedVM = produceCleanClonedVM(vm, (draftVM) => {
       draftVM.metadata.name = cloneName;
       draftVM.metadata.namespace = cloneProject;
@@ -75,24 +73,13 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
       if (!draftVM?.spec?.template?.metadata?.labels) draftVM.spec.template.metadata.labels = {};
       draftVM.spec.template.metadata.labels[TEMPLATE_VM_NAME_LABEL] = cloneName;
 
-      // withClonedPVCs
-      updateClonedPersistentVolumeClaims(draftVM, pvcs);
-
-      // withClonedDataVolumes
-      updateClonedDataVolumes(draftVM, pvcs);
+      updateClonedVolumes(draftVM, pvcs);
     });
 
-    return clonedVM;
-  }, [cloneDescription, cloneName, cloneProject, pvcs, startCloneVM, vm]);
-
-  const onClone = async (updatedVM: V1VirtualMachine) => {
-    if (isVMRunning) {
-      await stopVM(vm);
-    }
-    await k8sCreate({ model: VirtualMachineModel, data: updatedVM });
+    await k8sCreate({ model: VirtualMachineModel, data: clonedVM });
 
     history.push(
-      `/k8s/ns/${updatedVM.metadata.namespace}/${VirtualMachineModelRef}/${updatedVM.metadata.name}`,
+      `/k8s/ns/${getNamespace(clonedVM)}/${VirtualMachineModelRef}/${getName(clonedVM)}`,
     );
   };
 
@@ -102,7 +89,6 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onClone}
-      obj={clonedVirtualMachine}
       submitBtnText={t('Clone')}
     >
       <Form isHorizontal>
@@ -113,11 +99,11 @@ const CloneVMModal: React.FC<CloneVMModalProps> = ({ vm, isOpen, onClose }) => {
           setProject={setCloneProject}
           projectNames={projectNames}
           projectsLoaded={loaded}
-          vmNamespace={vm?.metadata?.namespace}
+          vmNamespace={getNamespace(vm)}
         />
         <StartClonedVMCheckbox startCloneVM={startCloneVM} setStartCloneVM={setStartCloneVM} />
         <ConfigurationSummary vm={vm} pvcs={pvcs} />
-        <CloneRunningVMAlert vmName={vm?.metadata?.name} isVMRunning={isVMRunning} />
+        <CloneRunningVMAlert vmName={getName(vm)} isVMRunning={isVMRunning} />
       </Form>
     </TabModal>
   );
