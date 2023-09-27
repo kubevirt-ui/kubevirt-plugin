@@ -6,8 +6,8 @@ import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
 export const SYSPREP = 'sysprep';
-export const AUTOUNATTEND = 'Autounattend.xml';
-export const UNATTEND = 'Unattend.xml';
+export const AUTOUNATTEND = 'autounattend.xml';
+export const UNATTEND = 'unattend.xml';
 export const WINDOWS = 'windows';
 
 export type SysprepData = { autounattend?: string; unattended?: string };
