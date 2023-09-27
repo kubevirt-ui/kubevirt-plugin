@@ -4,8 +4,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Label, Popover } from '@patternfly/react-core';
 import { InfoCircleIcon } from '@patternfly/react-icons';
 
-import './DeveloperPreviewLabel.scss';
-
 const DeveloperPreviewLabel: React.FC = () => {
   const { t } = useKubevirtTranslation();
 
@@ -15,7 +13,7 @@ const DeveloperPreviewLabel: React.FC = () => {
         'Developer preview features are not intended to use in production environments. The clusters deployed with the developer preview features are developmental clusters and are not currently supported by Red Hat.',
       )}
     >
-      <Label isCompact icon={<InfoCircleIcon />} className="dev-preview-label">
+      <Label isCompact icon={<InfoCircleIcon />} color="orange">
         {t('Developer preview')}
       </Label>
     </Popover>
