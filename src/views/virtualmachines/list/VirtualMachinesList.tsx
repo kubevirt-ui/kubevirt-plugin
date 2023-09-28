@@ -56,7 +56,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const isProxyPodAlive = useKubevirtDataPodHealth();
   const query = useQuery();
-  const [vms, loaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
+  const [vms, vmLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
     {
       groupVersionKind: VirtualMachineModelGroupVersionKind,
       isList: true,
@@ -132,6 +132,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
 
   const [columns, activeColumns] = useVirtualMachineColumns(namespace, pagination, data);
 
+  const loaded = vmLoaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded && !loadingFeatureProxy;
+
   return (
     <>
       {/* All of this table and components should be replaced to our own fitted components */}
@@ -161,7 +163,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
               }));
             }}
             data={unfilteredData}
-            loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded}
+            loaded={loaded}
             rowFilters={filters}
           />
           {!isEmpty(vms) && (
@@ -181,7 +183,9 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
             />
           )}
         </div>
-        {isEmpty(vms) && <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />}
+        {loaded && isEmpty(vms) && (
+          <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
+        )}
         <VirtualizedTable<K8sResourceCommon>
           rowData={{
             getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
@@ -191,9 +195,9 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
           }}
           columns={activeColumns}
           data={data}
-          loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded && !loadingFeatureProxy}
+          EmptyMsg={() => <></>}
+          loaded={loaded}
           loadError={loadError}
-          NoDataEmptyMsg={() => <></>}
           Row={VirtualMachineRow}
           unfilteredData={unfilteredData}
         />
