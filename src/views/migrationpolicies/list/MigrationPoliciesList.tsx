@@ -54,7 +54,7 @@ const MigrationPoliciesList: FC<MigrationPoliciesListProps> = ({ kind }) => {
           loaded={loaded}
           onFilterChange={onFilterChange}
         />
-        {isEmpty(mps) && <MigrationPoliciesEmptyState kind={kind} />}
+        {loaded && isEmpty(mps) && <MigrationPoliciesEmptyState kind={kind} />}
         <VirtualizedTable<V1alpha1MigrationPolicy>
           columns={activeColumns}
           data={data}
