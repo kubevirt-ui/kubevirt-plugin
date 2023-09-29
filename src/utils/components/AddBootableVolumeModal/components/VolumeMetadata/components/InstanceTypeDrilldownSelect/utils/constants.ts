@@ -75,6 +75,7 @@ export const instanceTypeSeriesNameMapper: {
     seriesLabel: t('N series'),
   },
   o1: {
+    disabled: true,
     Icon: ModuleIcon,
     possibleSizes: [
       'nano',
