@@ -75,6 +75,7 @@ export const instanceTypeSeriesNameMapper: {
     seriesLabel: t('N series'),
   },
   o1: {
+    disabled: true,
     Icon: ModuleIcon,
     possibleSizes: ['medium', 'large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
     seriesLabel: t('O series'),
