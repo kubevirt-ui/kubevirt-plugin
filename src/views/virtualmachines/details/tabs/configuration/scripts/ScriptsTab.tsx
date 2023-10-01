@@ -15,8 +15,8 @@ import VMSSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/VMSSHS
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { getIsDynamicSSHInjectionEnabled, getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
+import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   k8sUpdate,
@@ -34,6 +34,7 @@ import {
 
 import DynamicSSHKeyInjectionDescription from './components/DynamicSSHKeyInjectionDescription';
 import VirtualMachineScriptsTabSysprep from './components/VirtualMachineScriptsTabSysprep';
+import { useDynamicSSHInjection } from './hooks/useDynamicSSHInjection';
 
 import './scripts-tab.scss';
 
@@ -49,14 +50,14 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys, loaded] = useKubevirtUserSettings('ssh');
   const secretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
-  const isDynamicSSHInjection = useMemo(() => getIsDynamicSSHInjectionEnabled(vm), [vm]);
+  const isDynamicSSHInjectionEnabled = useDynamicSSHInjection(vm);
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: false,
-    name: vm?.metadata?.name,
-    namespace: vm?.metadata?.namespace,
+    name: getName(vm),
+    namespace: getNamespace(vm),
   });
 
   const onSubmit = useCallback(
@@ -104,7 +105,7 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               descriptionData={
                 <Stack hasGutter>
                   <div data-test="ssh-popover">
-                    {isDynamicSSHInjection ? (
+                    {isDynamicSSHInjectionEnabled ? (
                       <>{t('Store the key in a project secret.')}</>
                     ) : (
                       <DynamicSSHKeyInjectionDescription />
@@ -126,7 +127,7 @@ const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
               }
               data-test-id="authorized-ssh-key-button"
               descriptionHeader={t('Authorized SSH key')}
-              isDisabled={!loaded || !isDynamicSSHInjection}
+              isDisabled={!loaded || !isDynamicSSHInjectionEnabled}
               isEdit={canUpdateVM}
               label={<LinuxLabel />}
               showEditOnTitle
