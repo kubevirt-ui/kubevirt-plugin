@@ -8,6 +8,10 @@
       border-top: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--300);
     }
   }
+
+  .field-group {
+    margin-bottom: var(--pf-global--spacer--md);
+  }
 }
 .template-catalog-drawer-info {
   flex: 1;
@@ -24,4 +28,8 @@
 
 .template-catalog-drawer-description {
   max-width: 300px;
+
+  #expandable-content {
+    padding-left: 0;
+  }
 }

@@ -59,7 +59,7 @@ export const filterTemplates = (templates: V1Template[], filters: TemplateFilter
 
 export const updateVMCPUMemory = (
   ns: string,
-  updateVM: UpdateValidatedVM,
+  updateVM: ((vmDraft: V1VirtualMachine) => void) | UpdateValidatedVM,
   setUpdatedVM?: (value: React.SetStateAction<V1VirtualMachine>) => void,
 ) => {
   return (vm: V1VirtualMachine) => {

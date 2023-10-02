@@ -28,7 +28,11 @@ export default (template: V1Template): [template: V1Template, error: Error] => {
       { excludedParameters: [], parametersToGenerate: [] },
     );
 
-    if (parametersToGenerate.length === 0) return setTemplateWithGeneratedValues(template);
+    if (parametersToGenerate.length === 0) {
+      setError(null);
+      setTemplateWithGeneratedValues(template);
+      return;
+    }
 
     k8sCreate<V1Template>({
       data: {
@@ -49,6 +53,7 @@ export default (template: V1Template): [template: V1Template, error: Error] => {
           ...template,
           parameters: mergedParameters,
         });
+        setError(null);
       })
       .catch(setError);
   }, [namespace, template]);

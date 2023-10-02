@@ -9,3 +9,7 @@ export enum CATALOG_FILTERS {
   QUERY = 'query',
   WORKLOAD = 'workload',
 }
+
+export const NAME_INPUT_FIELD = 'NAME';
+
+export const DRAWER_FORM_ID = 'drawer-form';

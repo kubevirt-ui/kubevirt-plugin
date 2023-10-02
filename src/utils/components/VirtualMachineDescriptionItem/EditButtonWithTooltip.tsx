@@ -19,7 +19,7 @@ const EditButtonWithTooltip: FC<EditButtonWithTooltipProps> = ({
 }) => {
   const EditButton = () => (
     <Button
-      className="edit-button-on-content"
+      className="pf-u-w-100"
       data-test-id={testId}
       isDisabled={!isEditable}
       isInline

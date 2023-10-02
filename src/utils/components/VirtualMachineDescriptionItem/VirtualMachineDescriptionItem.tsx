@@ -65,7 +65,7 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   );
 
   return (
-    <DescriptionListGroup>
+    <DescriptionListGroup className="virtual-machine-description-list">
       <DescriptionListTermHelpText>
         <Flex
           justifyContent={{

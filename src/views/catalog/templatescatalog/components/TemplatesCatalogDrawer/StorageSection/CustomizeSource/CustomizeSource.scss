@@ -1,0 +1,29 @@
+.storage-section__customize-source {
+  margin-bottom: var(--pf-global--spacer--md);
+
+  .disk-source-form-group {
+    margin-bottom: var(--pf-global--spacer--md);
+  }
+
+  .co-section-heading {
+    margin-top: var(--pf-global--spacer--lg);
+  }
+
+  .divider {
+    margin: var(--pf-global--spacer--lg) 0;
+  }
+
+  .select-source-option {
+    a {
+      color: var(--pf-c-select__menu-item--Color);
+
+      &:hover {
+        text-decoration: none;
+      }
+
+      svg {
+        margin-left: var(--pf-global--spacer--xs);
+      }
+    }
+  }
+}

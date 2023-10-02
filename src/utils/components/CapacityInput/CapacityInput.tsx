@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-import { CAPACITY_UNITS } from '@catalog/customize/components/CustomizeSource';
-import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   FormGroup,
@@ -14,6 +12,8 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
+
+import { CAPACITY_UNITS, removeByteSuffix } from './utils';
 
 type CapacityInputProps = {
   label: string;

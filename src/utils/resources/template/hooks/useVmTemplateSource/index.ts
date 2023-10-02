@@ -1,1 +1,1 @@
-export * from './useVmTemplateSource';
+export * from './useVMTemplateSource';

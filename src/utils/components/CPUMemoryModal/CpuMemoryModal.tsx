@@ -28,10 +28,12 @@ import { getMemorySize, memorySizesTypes } from './utils/CpuMemoryUtils';
 
 import './cpu-memory-modal.scss';
 
+type VirtuaMachineOrVoid = V1VirtualMachine | void;
+
 type CPUMemoryModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  onSubmit: (updatedVM: V1VirtualMachine) => Promise<VirtuaMachineOrVoid> | VirtuaMachineOrVoid;
   templateNamespace?: string;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
@@ -87,19 +89,19 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
     }
   }, [vm]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setUpdateInProcess(true);
     setUpdateError(null);
 
-    onSubmit(updatedVirtualMachine)
-      .then(() => {
-        setUpdateInProcess(false);
-        onClose();
-      })
-      .catch((err) => {
-        setUpdateInProcess(false);
-        setUpdateError(err.message);
-      });
+    try {
+      await onSubmit(updatedVirtualMachine);
+
+      setUpdateInProcess(false);
+      onClose();
+    } catch (error) {
+      setUpdateInProcess(false);
+      setUpdateError(error.message);
+    }
   };
 
   return (

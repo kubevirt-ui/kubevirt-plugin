@@ -1,18 +1,10 @@
 import React, { FC, useEffect } from 'react';
 
-import { SecretModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
-import {
-  generateVMName,
-  getTemplateVirtualMachineObject,
-} from '@kubevirt-utils/resources/template';
-import {
-  useProcessedTemplate,
-  useVmTemplateSource,
-} from '@kubevirt-utils/resources/template/hooks';
 import {
   getGroupVersionKindForModel,
   useK8sWatchResource,
@@ -28,26 +20,26 @@ import {
 } from '@patternfly/react-core';
 import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
+import { useDrawerContext } from './hooks/useDrawerContext';
 import { TemplatesCatalogDrawerCreateForm } from './TemplatesCatalogDrawerCreateForm';
 import { TemplatesCatalogDrawerFooterSkeleton } from './TemplatesCatalogDrawerFooterSkeleton';
+import { allRequiredParametersAreFulfilled } from './utils';
 
 type TemplateCatalogDrawerFooterProps = {
   namespace: string;
   onCancel: () => void;
-  template: undefined | V1Template;
 };
 
 export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> = ({
   namespace,
   onCancel,
-  template,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVmTemplateSource(template);
   const [authorizedSSHKeys, updateAuthorizedSSHKeys, userSettingsLoaded] =
     useKubevirtUserSettings('ssh');
   const { loaded: loadedRHELSubscription, subscriptionData } = useRHELAutomaticSubscription();
-  const [processedTemplate, processedTemplateLoaded] = useProcessedTemplate(template, namespace);
+  const { isBootSourceAvailable, template, templateDataLoaded } = useDrawerContext();
+
   const [, , loadError] = useK8sWatchResource<IoK8sApiCoreV1Secret>(
     authorizedSSHKeys?.[namespace] && {
       groupVersionKind: getGroupVersionKindForModel(SecretModel),
@@ -64,16 +56,13 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
     }
   }, [authorizedSSHKeys, loadError, namespace, updateAuthorizedSSHKeys]);
 
-  const canQuickCreate = Boolean(processedTemplate) && isBootSourceAvailable;
-  const loaded =
-    bootSourceLoaded && processedTemplateLoaded && userSettingsLoaded && loadedRHELSubscription;
+  const canQuickCreate =
+    Boolean(allRequiredParametersAreFulfilled(template)) && isBootSourceAvailable;
+  const loaded = templateDataLoaded && userSettingsLoaded && loadedRHELSubscription;
 
   if (!loaded) {
     return <TemplatesCatalogDrawerFooterSkeleton />;
   }
-
-  const initialVMName =
-    getTemplateVirtualMachineObject(processedTemplate)?.metadata?.name || generateVMName(template);
 
   return (
     <Stack className="template-catalog-drawer-info">
@@ -103,12 +92,9 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
           <TemplatesCatalogDrawerCreateForm
             authorizedSSHKey={!loadError && authorizedSSHKeys?.[namespace]}
             canQuickCreate={canQuickCreate}
-            initialVMName={initialVMName}
-            isBootSourceAvailable={isBootSourceAvailable}
             namespace={namespace}
             onCancel={onCancel}
             subscriptionData={subscriptionData}
-            template={template}
           />
         </Stack>
       </div>

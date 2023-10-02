@@ -14,20 +14,22 @@ import { Skeleton } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 type CPUMemoryProps = {
+  fetchVMI?: boolean;
   vm: V1VirtualMachine;
 };
 
-const CPUMemory: FC<CPUMemoryProps> = ({ vm }) => {
+const CPUMemory: FC<CPUMemoryProps> = ({ fetchVMI = true, vm }) => {
   const { t } = useKubevirtTranslation();
   const itMatcher: V1InstancetypeMatcher = vm?.spec?.instancetype;
   const { instanceType, instanceTypeLoaded, instanceTypeLoadError } = useInstanceType(itMatcher);
   const isVMRunning = isRunning(vm);
-  const { vmi, vmiLoadError } = useVMI(getName(vm), getNamespace(vm));
+  const { vmi, vmiLoadError } = useVMI(getName(vm), getNamespace(vm), fetchVMI);
 
   if ((isVMRunning && vmiLoadError) || (!isEmpty(itMatcher) && instanceTypeLoadError))
     return <MutedTextSpan text={t('Not available')} />;
 
-  if ((isVMRunning && !vmi) || !vm || !instanceTypeLoaded) return <Skeleton />;
+  if ((isVMRunning && !vmi) || !vm || !instanceTypeLoaded)
+    return <Skeleton className="pf-m-width-sm" />;
 
   const cpu = vCPUCount(getCPU(vmi) || getCPU(vm)) || instanceType?.spec?.cpu?.guest;
 

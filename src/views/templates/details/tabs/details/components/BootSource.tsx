@@ -2,7 +2,7 @@ import React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useVmTemplateSource } from '@kubevirt-utils/resources/template';
+import { useVMTemplateSource } from '@kubevirt-utils/resources/template';
 import {
   DescriptionListDescription,
   DescriptionListGroup,
@@ -15,7 +15,7 @@ type BootSourceProps = {
 
 const BootSource: React.FC<BootSourceProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
-  const { isBootSourceAvailable } = useVmTemplateSource(template);
+  const { isBootSourceAvailable } = useVMTemplateSource(template);
 
   return (
     <DescriptionListGroup>
