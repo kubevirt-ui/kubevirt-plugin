@@ -10,7 +10,6 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getAutoAttachPodInterface } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/network/utils';
-import { getVMINetworks } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageFilter,
@@ -22,6 +21,7 @@ import { isRunning } from '@virtualmachines/utils';
 
 import useNetworkColumns from '../../hooks/useNetworkColumns';
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
+import { isPendingHotPlugNIC } from '../../utils/utils';
 
 import AutoAttachedNetworkEmptyState from './AutoAttachedNetworkEmptyState';
 import NetworkInterfaceRow from './NetworkInterfaceRow';
@@ -51,8 +51,7 @@ const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm }) => {
 
   const autoattachPodInterface = getAutoAttachPodInterface(vm) !== false;
 
-  const isPending = (network: V1Network): boolean =>
-    isRunning(vm) && !getVMINetworks(vmi)?.some((ntwork) => ntwork?.name === network.name);
+  const isPending = (network: V1Network): boolean => isPendingHotPlugNIC(vm, vmi, network?.name);
 
   return (
     <>

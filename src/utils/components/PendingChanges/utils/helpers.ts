@@ -3,7 +3,6 @@ import isEqual from 'lodash/isEqual';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import {
-  V1Interface,
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1Volume,
@@ -39,6 +38,7 @@ import {
 } from '@kubevirt-utils/resources/vmi';
 import { getVMIInterfaces, getVMIVolumes } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isPendingHotPlugNIC } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
 import { NICHotPlugPendingChanges, PendingChange } from './types';
 
@@ -130,8 +130,6 @@ export const getInterfaceByName = (
   getInterfaces(vm)?.find((iface) => iface?.name === name) ||
   getVMIInterfaces(vmi)?.find((iface) => iface?.name === name);
 
-export const isBridge = (iface: V1Interface) => Boolean(iface?.bridge);
-
 export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance): string[] => {
   if (isEmpty(vm) || isEmpty(vmi)) {
     return [];
@@ -146,6 +144,7 @@ export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
   const changedNICs = [
     ...(vmNICsNames?.filter((nic) => !unchangedNICs?.includes(nic)) || []),
     ...(vmiNICsNames?.filter((nic) => !unchangedNICs?.includes(nic)) || []),
+    ...(unchangedNICs?.filter((nic) => isPendingHotPlugNIC(vm, vmi, nic)) || []),
   ];
 
   if (
