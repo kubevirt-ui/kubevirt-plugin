@@ -11,15 +11,11 @@ import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceMo
 import {
   createInterface,
   createNetwork,
-  updateVMNetworkInterface,
+  updateVMNetworkInterfaces,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
-import { BRIDGED_NIC_HOTPLUG_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
-import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { addInterface } from '@virtualmachines/actions/actions';
 
 type VirtualMachinesNetworkInterfaceModalProps = {
   headerText: string;
@@ -36,7 +32,6 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
   vm,
   vmi,
 }) => {
-  const { featureEnabled: nicHotPlugEnabled } = useFeatures(BRIDGED_NIC_HOTPLUG_ENABLED);
   const onSubmit = useCallback(
     ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
       () => {
@@ -50,23 +45,16 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
 
         const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
         const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
-        const updatedVM = updateVMNetworkInterface(vm, updatedNetworks, updatedInterfaces);
+        const updatedVM = updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
 
-        if (nicHotPlugEnabled && interfaceType === interfacesTypes.bridge) {
-          return addInterface(updatedVM, {
-            name: nicName,
-            networkAttachmentDefinitionName: networkName,
-          });
-        } else {
-          return k8sUpdate({
-            data: updatedVM,
-            model: VirtualMachineModel,
-            name: updatedVM.metadata.name,
-            ns: updatedVM.metadata.namespace,
-          });
-        }
+        return k8sUpdate({
+          data: updatedVM,
+          model: VirtualMachineModel,
+          name: updatedVM.metadata.name,
+          ns: updatedVM.metadata.namespace,
+        });
       },
-    [nicHotPlugEnabled, vm],
+    [vm],
   );
 
   return (

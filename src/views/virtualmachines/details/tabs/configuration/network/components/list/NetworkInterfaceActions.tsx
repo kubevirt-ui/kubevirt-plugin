@@ -5,12 +5,15 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { updateVMNetworkInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
+import {
+  updateInterfacesForDeletion,
+  updateVMNetworkInterfaces,
+} from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { BRIDGED_NIC_HOTPLUG_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -22,7 +25,6 @@ import {
   DropdownPosition,
   KebabToggle,
 } from '@patternfly/react-core';
-import { removeInterface } from '@virtualmachines/actions/actions';
 import { isRunning } from '@virtualmachines/utils';
 
 import VirtualMachinesEditNetworkInterfaceModal from '../modal/VirtualMachinesEditNetworkInterfaceModal';
@@ -47,11 +49,14 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const deleteBtnText = t('Delete');
 
   const resultVirtualMachine = useMemo(() => {
-    const networks = getNetworks(vm)?.filter(({ name }) => name !== nicName);
-    const interfaces = getInterfaces(vm)?.filter(({ name }) => name !== nicName);
+    const isHotPlug = nicHotPlugEnabled && Boolean(nicPresentation?.iface?.bridge);
+    const networks = isHotPlug
+      ? getNetworks(vm)
+      : getNetworks(vm)?.filter(({ name }) => name !== nicName);
+    const interfaces = updateInterfacesForDeletion(isHotPlug, nicName, vm);
 
-    return updateVMNetworkInterface(vm, networks, interfaces);
-  }, [nicName, vm]);
+    return updateVMNetworkInterfaces(vm, networks, interfaces);
+  }, [nicHotPlugEnabled, nicName, nicPresentation, vm]);
 
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
@@ -68,18 +73,14 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const onDeleteModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
-        onSubmit={(obj) => {
-          if (nicHotPlugEnabled && nicPresentation?.iface?.bridge) {
-            return removeInterface(vm, { name: nicName });
-          } else {
-            return k8sUpdate({
-              data: obj,
-              model: VirtualMachineModel,
-              name: obj?.metadata?.name,
-              ns: obj?.metadata?.namespace,
-            });
-          }
-        }}
+        onSubmit={(obj) =>
+          k8sUpdate({
+            data: obj,
+            model: VirtualMachineModel,
+            name: obj?.metadata?.name,
+            ns: obj?.metadata?.namespace,
+          })
+        }
         headerText={deleteModalHeader}
         isOpen={isOpen}
         obj={resultVirtualMachine}
