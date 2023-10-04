@@ -51,20 +51,22 @@ export const convertUserDataObjectToYAML = (
 export const convertYAMLToNetworkDataObject = (networkData: string): CloudInitNetworkData => {
   try {
     const networkObj = load(networkData) as CloudInitNetwork;
-    const networkToEdit = networkObj?.network?.config?.[0];
+
+    const name = Object.keys(networkObj?.ethernets)?.[0];
 
     const ips =
-      !isEmpty(networkToEdit?.subnets?.[0]?.address) && networkToEdit?.subnets?.[0]?.address;
-    const address = Array.isArray(ips) ? ips?.join(',') : ips;
-    const gateway = networkToEdit?.subnets?.[0]?.gateway;
-    const name = networkToEdit?.name;
+      !isEmpty(networkObj?.ethernets?.[name]?.addresses) &&
+      networkObj?.ethernets?.[name]?.addresses;
 
-    const nonEmptyNetworkObj = !!address || !!gateway || !!name;
+    const addresses = Array.isArray(ips) ? ips?.join(',') : ips;
+    const gateway4 = networkObj?.ethernets?.[name]?.gateway4;
+
+    const nonEmptyNetworkObj = !!addresses || !!name || !!gateway4;
 
     return (
       nonEmptyNetworkObj && {
-        address,
-        gateway,
+        addresses,
+        gateway4,
         name,
       }
     );
@@ -75,27 +77,19 @@ export const convertYAMLToNetworkDataObject = (networkData: string): CloudInitNe
 };
 
 export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData): string => {
-  const hasValue = !isEmpty(networkData?.name || networkData?.address || networkData?.gateway);
+  const { addresses, gateway4, name } = networkData || {};
+  const hasValue = !isEmpty(name) || !isEmpty(addresses) || !isEmpty(gateway4);
   try {
     return hasValue
       ? dump({
-          network: {
-            config: [
-              {
-                name: networkData?.name,
-                subnets: [
-                  {
-                    address: (networkData?.address || '')?.replace(/\s/g, '').split(','),
-                    gateway: networkData?.gateway,
-                    type: 'static',
-                  },
-                ],
-                type: 'physical',
-              },
-            ],
-            version: '1',
+          ethernets: {
+            [name || '']: {
+              addresses: (addresses || '')?.replace(/\s/g, '').split(','),
+              ...(gateway4 && { gateway4 }),
+            },
           },
-        })
+          version: 2,
+        } as CloudInitNetwork)
       : null;
   } catch (e) {
     kubevirtConsole.error(e);
@@ -164,19 +158,17 @@ export type CloudInitUserData = {
 };
 
 export type CloudInitNetworkData = {
-  address: string;
-  gateway: string;
+  addresses: string;
+  gateway4: string;
   name: string;
 };
 
 type CloudInitNetwork = {
-  network: {
-    config: {
-      mac_address?: string;
-      name: string;
-      subnets: { address: string[]; gateway: string; type: string }[];
-      type: string;
-    }[];
-    version: string;
+  ethernets: {
+    [name: string]: {
+      addresses: string[];
+      gateway4: string;
+    };
   };
+  version: number;
 };
