@@ -1,4 +1,7 @@
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1VirtualMachineInstance,
+  V1VirtualMachineInstanceNetworkInterface,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 /**
  * A selector for the virtual machine instance's volumes
  * @param {V1VirtualMachineInstance} vmi the virtual machine instance
@@ -28,3 +31,14 @@ export const getVMIInterfaces = (vmi: V1VirtualMachineInstance) =>
  */
 export const getEvictionStrategy = (vmi: V1VirtualMachineInstance): string =>
   vmi?.spec?.evictionStrategy;
+
+/**
+ * A selector that returns the interfaces listed in the virtual machine
+ * instance's status block
+ * @param {V1VirtualMachine} vmi the virtual machine instance
+ * @returns {V1VirtualMachineInstanceNetworkInterface[]} the interfaces
+ * listed in the virtual machine interface's status block
+ */
+export const getVMIStatusInterfaces = (
+  vmi: V1VirtualMachineInstance,
+): V1VirtualMachineInstanceNetworkInterface[] => vmi?.status?.interfaces;
