@@ -6,7 +6,7 @@ import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceMo
 import {
   createInterface,
   createNetwork,
-  updateVMNetworkInterface,
+  updateVMNetworkInterfaces,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
@@ -45,7 +45,7 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
             []),
           resultInterface,
         ];
-        const updatedVM = updateVMNetworkInterface(vm, updatedNetworks, updatedInterfaces);
+        const updatedVM = updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
 
         return k8sUpdate({
           data: updatedVM,
