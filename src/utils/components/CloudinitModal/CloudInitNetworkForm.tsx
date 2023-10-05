@@ -57,9 +57,9 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
           >
             <TextInput
               id={'address'}
-              onChange={(v) => updateNetworkField('address', v)}
+              onChange={(v) => updateNetworkField('addresses', v)}
               type="text"
-              value={networkData?.address || ''}
+              value={networkData?.addresses || ''}
             />
           </FormGroup>
           <FormGroup
@@ -69,9 +69,9 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
           >
             <TextInput
               id={'gateway'}
-              onChange={(v) => updateNetworkField('gateway', v)}
+              onChange={(v) => updateNetworkField('gateway4', v)}
               type="text"
-              value={networkData?.gateway || ''}
+              value={networkData?.gateway4 || ''}
             />
           </FormGroup>
         </>
