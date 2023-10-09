@@ -114,7 +114,7 @@ export const updateCloudInitRHELSubscription = (
 
   const [cloudInitVol, restVolumes]: [null | V1Volume, V1Volume[]] = vmVolumes.reduce(
     (result, vol) => {
-      vol.cloudInitConfigDrive ? (result[0] = vol) : result[1].push(vol);
+      !isEmpty(getCloudInitData(vol)) ? (result[0] = vol) : result[1].push(vol);
       return result;
     },
     [null, []],
@@ -136,10 +136,6 @@ export const updateCloudInitRHELSubscription = (
   });
 
   const updatedCloudInitVolume = produce(cloudInitVol, (draftCloudInitVolume) => {
-    if (cloudInitVol?.cloudInitConfigDrive) {
-      draftCloudInitVolume.cloudInitConfigDrive = updatedCloudInitVolumeData;
-      return;
-    }
     draftCloudInitVolume.cloudInitNoCloud = updatedCloudInitVolumeData;
   });
 

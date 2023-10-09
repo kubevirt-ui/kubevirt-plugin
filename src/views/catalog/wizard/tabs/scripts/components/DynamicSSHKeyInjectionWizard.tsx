@@ -2,6 +2,10 @@ import React from 'react';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
+import {
+  getCloudInitData,
+  getCloudInitVolume,
+} from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { DynamicSSHKeyInjection } from '@kubevirt-utils/components/DynamicSSHKeyInjection/DynamicSSHKeyInjection';
 import DynamicSSHKeyInjectionHelpTextIcon from '@kubevirt-utils/components/DynamicSSHKeyInjection/DynamicSSHKeyInjectionHelpTextIcon';
@@ -23,18 +27,18 @@ const DynamicSSHKeyInjectionWizard = () => {
 
   const onSubmit = (checked: boolean) => {
     updateVM((vmDraft) => {
-      const cloudInitConfigDrive = getVolumes(vm)?.find((v) => v.cloudInitConfigDrive);
+      const cloudInitVolume = getCloudInitVolume(vm);
 
-      if (cloudInitConfigDrive) {
+      if (cloudInitVolume) {
         vmDraft.spec.template.spec.volumes = [
-          ...getVolumes(vm).filter((v) => !v.cloudInitConfigDrive),
+          ...getVolumes(vm).filter((volume) => !getCloudInitData(volume)),
           {
-            cloudInitConfigDrive: getCloudInitConfigDrive(
+            cloudInitNoCloud: getCloudInitConfigDrive(
               checked,
-              cloudInitConfigDrive.cloudInitConfigDrive,
+              getCloudInitData(cloudInitVolume),
               true,
             ),
-            name: cloudInitConfigDrive.name,
+            name: cloudInitVolume.name,
           },
         ];
       }

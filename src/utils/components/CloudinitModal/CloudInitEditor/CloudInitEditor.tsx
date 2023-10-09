@@ -6,6 +6,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertActionCloseButton, Divider } from '@patternfly/react-core';
 
+import { getCloudInitData } from '../utils/cloudinit-utils';
+
 import './CloudInitEditor.scss';
 
 type CloudInitEditorProps = {
@@ -17,7 +19,7 @@ const EDITOR_TOOLS_SPACES = 75;
 
 export const _CloudInitEditor: FC<CloudInitEditorProps> = ({ cloudInitVolume, onSave }) => {
   const { t } = useKubevirtTranslation();
-  const cloudInitData = cloudInitVolume?.cloudInitNoCloud || cloudInitVolume?.cloudInitConfigDrive;
+  const cloudInitData = getCloudInitData(cloudInitVolume);
 
   const [editorHeight, setEditorHeight] = useState<number>();
   const [saved, setSaved] = useState<boolean>(false);

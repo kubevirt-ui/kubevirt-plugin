@@ -91,19 +91,13 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
     setUserData(userDataObj);
   }, [yamlJSObject]);
 
-  const cloudInitVolume: V1Volume = useMemo(() => {
-    if (cloudInitVol?.cloudInitConfigDrive) {
-      return {
-        cloudInitConfigDrive: yamlJSObject,
-        name: 'cloudinitdisk',
-      };
-    }
-
-    return {
+  const cloudInitVolume: V1Volume = useMemo(
+    () => ({
       cloudInitNoCloud: yamlJSObject,
       name: 'cloudinitdisk',
-    };
-  }, [cloudInitVol?.cloudInitConfigDrive, yamlJSObject]);
+    }),
+    [yamlJSObject],
+  );
 
   const updatedVM = useMemo(
     () =>

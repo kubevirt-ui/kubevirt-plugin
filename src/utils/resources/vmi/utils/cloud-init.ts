@@ -1,6 +1,10 @@
 import { load } from 'js-yaml';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  getCloudInitData,
+  getCloudInitVolume,
+} from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { CLOUD_INIT_MISSING_USERNAME } from '@kubevirt-utils/components/Consoles/utils/constants';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
@@ -13,14 +17,11 @@ type CloudinitUserDataObject = {
 export const getCloudInitCredentials = (
   vm: V1VirtualMachine,
 ): { users: { name?: string; password?: string }[] } => {
-  const cloudInitVolume = vm?.spec?.template?.spec?.volumes?.find(
-    (volume) => volume?.cloudInitNoCloud || volume?.cloudInitConfigDrive,
-  );
-  const cloudInitDataSource =
-    cloudInitVolume?.cloudInitNoCloud || cloudInitVolume?.cloudInitConfigDrive;
+  const cloudInitVolume = getCloudInitVolume(vm);
+  const cloudInitData = getCloudInitData(cloudInitVolume);
 
   try {
-    const userDataObject: CloudinitUserDataObject = load(cloudInitDataSource?.userData);
+    const userDataObject: CloudinitUserDataObject = load(cloudInitData?.userData);
 
     if (userDataObject?.user || userDataObject?.password) {
       return {

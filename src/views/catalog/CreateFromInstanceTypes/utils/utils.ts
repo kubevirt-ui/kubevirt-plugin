@@ -140,7 +140,7 @@ export const generateVM = (
               name: ROOTDISK,
             },
             {
-              cloudInitConfigDrive: {
+              cloudInitNoCloud: {
                 userData: createPopulatedCloudInitYAML(selectedPreference, subscriptionData),
               },
               name: 'cloudinitdisk',
