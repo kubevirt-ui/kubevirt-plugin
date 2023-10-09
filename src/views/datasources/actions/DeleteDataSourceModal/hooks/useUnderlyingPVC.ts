@@ -19,18 +19,24 @@ type UseUnderlyingPVC = (dataSource: V1beta1DataSource) => {
 };
 
 const useUnderlyingPVC: UseUnderlyingPVC = (dataSource) => {
-  const { name, namespace } = getDataSourcePVCSource(dataSource) || {};
-  const [pvc] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim>({
-    groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-    name,
-    namespace,
-  });
+  const dataSourcePVC = getDataSourcePVCSource(dataSource);
+  const { name, namespace } = dataSourcePVC || {};
 
-  const [dv] = useK8sWatchResource<V1beta1DataVolume>({
-    groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
-    name,
-    namespace,
-  });
+  const [pvc] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim>(
+    dataSourcePVC && {
+      groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
+      name,
+      namespace,
+    },
+  );
+
+  const [dv] = useK8sWatchResource<V1beta1DataVolume>(
+    dataSourcePVC && {
+      groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
+      name,
+      namespace,
+    },
+  );
 
   const sourceExists = !isEmpty(pvc) || !isEmpty(dv);
   return { dv, pvc, sourceExists };

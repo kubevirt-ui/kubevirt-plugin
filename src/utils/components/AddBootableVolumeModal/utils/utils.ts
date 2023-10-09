@@ -9,6 +9,7 @@ import {
   V1beta1DataImportCron,
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataVolumeSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
@@ -45,71 +46,33 @@ export const createBootableVolume: createBootableVolumeType =
     uploadData,
   }) =>
   async (dataSource: V1beta1DataSource) => {
-    const {
-      annotations,
-      bootableVolumeName,
-      labels,
-      pvcName,
-      pvcNamespace,
-      size,
-      storageClassName,
-      uploadFile,
-    } = bootableVolume || {};
+    const draftDataSource = setDataSourceMetadata(bootableVolume, namespace, dataSource);
 
-    const draftDataSource = produce(dataSource, (draftDS) => {
-      draftDS.metadata.name = bootableVolumeName;
-      draftDS.metadata.namespace = namespace;
-      draftDS.metadata.annotations = annotations;
-      draftDS.metadata.labels = labels;
-    });
+    const actionBySourceType: Record<string, () => Promise<V1beta1DataSource>> = {
+      [DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE]: () =>
+        createBootableVolumeFromUpload(
+          bootableVolume,
+          namespace,
+          applyStorageProfileSettings,
+          claimPropertySets,
+          draftDataSource,
+          uploadData,
+        ),
+      [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: () =>
+        createPVCBootableVolume(
+          bootableVolume,
+          namespace,
+          applyStorageProfileSettings,
+          claimPropertySets,
+          draftDataSource,
+        ),
+      [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: () =>
+        createDataSourceWithImportCron(bootableVolume, draftDataSource),
+      [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: () =>
+        createSnapshotDataSource(bootableVolume, draftDataSource),
+    };
 
-    if (sourceType === DROPDOWN_FORM_SELECTION.USE_REGISTRY) {
-      const newDataSource = await createDataSourceWithImportCron(bootableVolume, draftDataSource);
-
-      onCreateVolume?.(newDataSource);
-
-      return newDataSource;
-    }
-
-    const isUploadForm = sourceType === DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE;
-
-    const bootableVolumeToCreate = produce(emptySourceDataVolume, (draftBootableVolume) => {
-      draftBootableVolume.metadata.name = bootableVolumeName;
-      draftBootableVolume.metadata.namespace = namespace;
-      draftBootableVolume.spec.storage.resources.requests.storage = size;
-      draftBootableVolume.metadata.labels = labels;
-
-      if (storageClassName) {
-        draftBootableVolume.spec.storage.storageClassName = storageClassName;
-      }
-
-      if (!applyStorageProfileSettings) {
-        draftBootableVolume.spec.storage.accessModes = claimPropertySets?.[0]?.accessModes;
-        draftBootableVolume.spec.storage.volumeMode = claimPropertySets?.[0]?.volumeMode;
-      }
-
-      draftBootableVolume.spec.source = isUploadForm
-        ? { upload: {} }
-        : { pvc: { name: pvcName, namespace: pvcNamespace } };
-    });
-
-    const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
-      draftDS.spec.source = {
-        pvc: {
-          name: bootableVolumeToCreate.metadata.name,
-          namespace: bootableVolumeToCreate.metadata.namespace,
-        },
-      };
-    });
-
-    isUploadForm
-      ? await uploadData({
-          dataVolume: bootableVolumeToCreate,
-          file: uploadFile as File,
-        })
-      : await k8sCreate({ data: bootableVolumeToCreate, model: DataVolumeModel });
-
-    const newDataSource = await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+    const newDataSource = await actionBySourceType[sourceType]();
 
     onCreateVolume?.(newDataSource);
 
@@ -119,10 +82,134 @@ export const createBootableVolume: createBootableVolumeType =
 export const getInstanceTypeFromVolume = (bootableVolume: BootableVolume): string =>
   bootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL] ?? '';
 
+const getDataVolumeWithSource = (
+  bootableVolume: AddBootableVolumeState,
+  applyStorageProfileSettings: boolean,
+  claimPropertySets: ClaimPropertySets,
+  namespace: string,
+  dataVolumeSource: V1beta1DataVolumeSource,
+) => {
+  const { bootableVolumeName, labels, size, storageClassName } = bootableVolume || {};
+
+  return produce(emptySourceDataVolume, (draftBootableVolume) => {
+    draftBootableVolume.metadata.name = bootableVolumeName;
+    draftBootableVolume.metadata.namespace = namespace;
+    draftBootableVolume.spec.storage.resources.requests.storage = size;
+    draftBootableVolume.metadata.labels = labels;
+
+    if (storageClassName) {
+      draftBootableVolume.spec.storage.storageClassName = storageClassName;
+    }
+
+    if (!applyStorageProfileSettings) {
+      draftBootableVolume.spec.storage.accessModes = claimPropertySets?.[0]?.accessModes;
+      draftBootableVolume.spec.storage.volumeMode = claimPropertySets?.[0]?.volumeMode;
+    }
+
+    draftBootableVolume.spec.source = dataVolumeSource;
+  });
+};
+
 type CreateDataSourceWithImportCronType = (
   bootableVolume: AddBootableVolumeState,
   initialDataSource: V1beta1DataSource,
 ) => Promise<V1beta1DataSource>;
+
+const setDataSourceMetadata = (
+  bootableVolume: AddBootableVolumeState,
+  namespace: string,
+  dataSource: V1beta1DataSource,
+): V1beta1DataSource => {
+  const { annotations, bootableVolumeName, labels } = bootableVolume || {};
+
+  return produce(dataSource, (draftDS) => {
+    draftDS.metadata.name = bootableVolumeName;
+    draftDS.metadata.namespace = namespace;
+    draftDS.metadata.annotations = annotations;
+    draftDS.metadata.labels = labels;
+  });
+};
+
+const createBootableVolumeFromUpload = async (
+  bootableVolume: AddBootableVolumeState,
+  namespace: string,
+  applyStorageProfileSettings: boolean,
+  claimPropertySets: ClaimPropertySets,
+  draftDataSource: V1beta1DataSource,
+  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
+) => {
+  const { uploadFile } = bootableVolume || {};
+
+  const bootableVolumeToCreate = getDataVolumeWithSource(
+    bootableVolume,
+    applyStorageProfileSettings,
+    claimPropertySets,
+    namespace,
+    { upload: {} },
+  );
+
+  const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
+    draftDS.spec.source = {
+      pvc: {
+        name: bootableVolumeToCreate.metadata.name,
+        namespace: bootableVolumeToCreate.metadata.namespace,
+      },
+    };
+  });
+  await uploadData({
+    dataVolume: bootableVolumeToCreate,
+    file: uploadFile as File,
+  });
+
+  return await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+};
+
+const createSnapshotDataSource = async (
+  bootableVolume: AddBootableVolumeState,
+  draftDataSource: V1beta1DataSource,
+) => {
+  const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
+    draftDS.spec.source = {
+      snapshot: {
+        name: bootableVolume.snapshotName,
+        namespace: bootableVolume.snapshotNamespace,
+      },
+    };
+  });
+
+  return await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+};
+
+const createPVCBootableVolume = async (
+  bootableVolume: AddBootableVolumeState,
+  namespace: string,
+  applyStorageProfileSettings: boolean,
+  claimPropertySets: ClaimPropertySets,
+  draftDataSource: V1beta1DataSource,
+) => {
+  const { pvcName, pvcNamespace } = bootableVolume || {};
+
+  const bootableVolumeToCreate = getDataVolumeWithSource(
+    bootableVolume,
+    applyStorageProfileSettings,
+    claimPropertySets,
+    namespace,
+    { pvc: { name: pvcName, namespace: pvcNamespace } },
+  );
+
+  const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
+    draftDS.spec.source = {
+      pvc: {
+        name: bootableVolumeToCreate.metadata.name,
+        namespace: bootableVolumeToCreate.metadata.namespace,
+      },
+    };
+  });
+
+  await k8sCreate({ data: bootableVolumeToCreate, model: DataVolumeModel });
+
+  return await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+};
 
 export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType = async (
   bootableVolume,

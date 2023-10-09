@@ -18,7 +18,8 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
   setFormSelection,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { canCreateDS, canCreatePVC, loading } = useCanCreateBootableVolume(namespace);
+  const { canCreateDS, canCreatePVC, canCreateSnapshots, loading } =
+    useCanCreateBootableVolume(namespace);
 
   const onSelect = useCallback(
     (event, value) => {
@@ -51,6 +52,10 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
 
         <SelectOption isDisabled={!canCreatePVC} value={DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC}>
           {t('Use existing volume')}
+        </SelectOption>
+
+        <SelectOption isDisabled={!canCreateSnapshots} value={DROPDOWN_FORM_SELECTION.USE_SNAPSHOT}>
+          {t('Use existing volume snapshot')}
         </SelectOption>
 
         <SelectOption
