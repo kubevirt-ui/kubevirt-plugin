@@ -42,14 +42,13 @@ const SSHKey: FC = () => {
   );
 
   const onSubmit = useCallback(
-    (details: SSHSecretDetails) => {
+    async (details: SSHSecretDetails) => {
       const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = details;
 
       if (isEqualObject(details, sshDetails)) {
-        return Promise.resolve();
+        return;
       }
 
-      setSSHDetails(details);
       removeSSHKeyObject(updateTabsData, sshDetails.sshSecretName);
       updateTabsData((currentTabsData) => {
         currentTabsData.authorizedSSHKey = sshSecretName;
@@ -60,7 +59,7 @@ const SSHKey: FC = () => {
         secretOption === SecretSelectionOption.none &&
         sshDetails.secretOption !== SecretSelectionOption.none
       ) {
-        return updateVM(removeSecretToVM(vm));
+        await updateVM(removeSecretToVM(vm));
       }
 
       if (
@@ -68,7 +67,7 @@ const SSHKey: FC = () => {
         sshDetails.sshSecretName !== sshSecretName &&
         !isEmpty(sshSecretName)
       ) {
-        return updateVM(addSecretToVM(vm, sshSecretName));
+        await updateVM(addSecretToVM(vm, sshSecretName));
       }
 
       if (
@@ -77,9 +76,10 @@ const SSHKey: FC = () => {
         !isEmpty(sshSecretName)
       ) {
         updateSSHKeyObject(vm, updateTabsData, sshPubKey, sshSecretName);
-        return updateVM(addSecretToVM(vm, sshSecretName));
+        await updateVM(addSecretToVM(vm, sshSecretName));
       }
 
+      setSSHDetails(details);
       return Promise.resolve();
     },
     [sshDetails, updateTabsData, updateVM, vm],
