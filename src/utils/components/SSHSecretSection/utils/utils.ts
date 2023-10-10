@@ -64,7 +64,7 @@ export const applyCloudDriveCloudInitVolume = (
   if (isEmpty(cloudInitVolume)) return getVolumes(vm);
 
   const cloudDriveVolume: V1Volume = {
-    cloudInitConfigDrive: getCloudInitConfigDrive(isDynamic, getCloudInitData(cloudInitVolume)),
+    cloudInitNoCloud: getCloudInitConfigDrive(isDynamic, getCloudInitData(cloudInitVolume)),
     name: cloudInitVolume.name,
   };
 
@@ -103,7 +103,7 @@ export const getCloudInitPropagationMethod = (
           users: [userData?.user],
         },
       }
-    : { configDrive: {} };
+    : ({ noCloud: {} } as V1SSHPublicKeyAccessCredentialPropagationMethod);
 };
 export const getCloudInitConfigDrive = (
   isDynamic: boolean,
