@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import produce from 'immer';
 
+import {
+  applyCPUMemory,
+  applyTemplateMetadataToVM,
+} from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/utils/helpers';
 import { isRHELTemplate } from '@catalog/utils/utils';
 import { SecretModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -14,16 +18,12 @@ import {
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { DataUpload, useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
-import {
-  ANNOTATIONS,
-  LABEL_USED_TEMPLATE_NAME,
-  LABEL_USED_TEMPLATE_NAMESPACE,
-} from '@kubevirt-utils/resources/template';
+import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import {
   getTemplateOS,
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template/utils/selectors';
-import { getMemoryCPU, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { useWizardVMContext } from '../../../utils/WizardVMContext';
@@ -88,17 +88,10 @@ export const useCustomizeFormSubmit = ({
       const dataVolumeTemplate = vmObj?.spec?.dataVolumeTemplates?.[0];
 
       const updatedVM = produce(vmObj, (vmDraft) => {
-        ensurePath(vmDraft, [
-          'spec.template.spec.domain.cpu',
-          'spec.template.spec.domain.memory.guest',
-        ]);
+        applyCPUMemory(vmDraft, vm);
+        applyTemplateMetadataToVM(vmDraft, template);
 
         vmDraft.metadata.namespace = ns || DEFAULT_NAMESPACE;
-        vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
-        vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
-        const { cpu, memory } = getMemoryCPU(vm);
-        vmDraft.spec.template.spec.domain.cpu.cores = cpu?.cores;
-        vmDraft.spec.template.spec.domain.memory.guest = memory;
 
         const updatedVolumes = applyCloudDriveCloudInitVolume(vmObj);
         vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)

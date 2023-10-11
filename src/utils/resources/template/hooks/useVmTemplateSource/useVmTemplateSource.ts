@@ -65,6 +65,11 @@ export const useVmTemplateSource = (template: V1Template): useVmTemplateSourceVa
         setTemplateBootSource({
           source: {
             pvc: dataSource?.spec?.source?.pvc,
+            sourceRef: {
+              kind: dataSource?.kind,
+              name,
+              namespace,
+            },
           },
           storageClassName: pvc?.spec?.storageClassName,
           type: BOOT_SOURCE.DATA_SOURCE,

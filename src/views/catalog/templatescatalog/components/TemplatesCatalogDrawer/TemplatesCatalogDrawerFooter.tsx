@@ -43,7 +43,12 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
   template,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVmTemplateSource(template);
+  const {
+    isBootSourceAvailable,
+    loaded: bootSourceLoaded,
+    templateBootSource,
+  } = useVmTemplateSource(template);
+
   const [authorizedSSHKeys, updateAuthorizedSSHKeys, userSettingsLoaded] =
     useKubevirtUserSettings('ssh');
   const { loaded: loadedRHELSubscription, subscriptionData } = useRHELAutomaticSubscription();
@@ -109,6 +114,7 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
             onCancel={onCancel}
             subscriptionData={subscriptionData}
             template={template}
+            templateBootSource={templateBootSource}
           />
         </Stack>
       </div>

@@ -13,7 +13,9 @@ import {
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { V1DataVolumeTemplateSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import {
   addSecretToVM,
   applyCloudDriveCloudInitVolume,
@@ -25,12 +27,10 @@ import {
   ANNOTATIONS,
   getTemplateOS,
   getTemplateVirtualMachineObject,
-  LABEL_USED_TEMPLATE_NAME,
-  LABEL_USED_TEMPLATE_NAMESPACE,
 } from '@kubevirt-utils/resources/template';
-import { getMemoryCPU } from '@kubevirt-utils/resources/vm';
+import { TemplateBootSource } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -50,6 +50,12 @@ import {
   TextInput,
 } from '@patternfly/react-core';
 
+import {
+  applyCPUMemory,
+  applyTemplateMetadataToVM,
+  processTemplate,
+  shouldApplyInitialStorageClass,
+} from './utils/helpers';
 import AuthorizedSSHKey from './AuthorizedSSHKey';
 
 type TemplatesCatalogDrawerCreateFormProps = {
@@ -61,6 +67,7 @@ type TemplatesCatalogDrawerCreateFormProps = {
   onCancel: () => void;
   subscriptionData: RHELAutomaticSubscriptionData;
   template: V1Template;
+  templateBootSource: TemplateBootSource;
 };
 
 export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFormProps> = memo(
@@ -73,6 +80,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
     onCancel,
     subscriptionData,
     template,
+    templateBootSource,
   }) => {
     const history = useHistory();
     const { t } = useKubevirtTranslation();
@@ -90,84 +98,86 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
       verb: 'create',
     });
 
-    const onQuickCreate = () => {
+    const onQuickCreate = async () => {
       setIsQuickCreating(true);
       setQuickCreateError(undefined);
 
-      const nameParameterExists = isNameParameterExists(template);
-
       const templateToProcess = produce(template, (draftTemplate) => {
-        if (nameParameterExists)
+        if (isNameParameterExists(template)) {
           replaceTemplateParameterValue(draftTemplate, NAME_INPUT_FIELD, vmName);
-
-        const vmObject = getTemplateVirtualMachineObject(draftTemplate);
+        }
 
         if (!isEmpty(authorizedSSHKey)) {
           draftTemplate.objects = template.objects.filter((obj) => obj?.kind !== SecretModel.kind);
         }
-
-        if (vm?.spec?.template) {
-          ensurePath(vmObject, [
-            'spec.template.spec.domain.cpu',
-            'spec.template.spec.domain.memory.guest',
-          ]);
-
-          const { cpu, memory } = getMemoryCPU(vm);
-          vmObject.spec.template.spec.domain.cpu.cores = cpu?.cores;
-          vmObject.spec.template.spec.domain.memory.guest = memory;
-
-          const modifiedTemplateObjects = template?.objects?.map((obj) =>
-            obj.kind === VirtualMachineModel.kind ? vmObject : obj,
-          );
-
-          draftTemplate.objects = modifiedTemplateObjects;
-        }
       });
 
-      quickCreateVM({
-        models,
-        overrides: { authorizedSSHKey, name: vmName, namespace, startVM, subscriptionData },
-        template: templateToProcess,
-      })
-        .then((quickCreatedVM) => {
-          setIsQuickCreating(false);
-          history.push(getResourceUrl({ model: VirtualMachineModel, resource: quickCreatedVM }));
-        })
-        .catch((err) => {
-          setIsQuickCreating(false);
-          setQuickCreateError(err);
+      try {
+        const processedTemplate = await processTemplate(templateToProcess, namespace);
+
+        const vmObject = getTemplateVirtualMachineObject(processedTemplate);
+
+        const applyBootSourceStorageClass = await shouldApplyInitialStorageClass(vmObject);
+
+        const overrideVM = produce(vmObject, (draftVM) => {
+          draftVM.metadata.namespace = namespace;
+
+          applyTemplateMetadataToVM(draftVM, template);
+          applyCPUMemory(draftVM, vm);
+
+          const updatedVolumes = applyCloudDriveCloudInitVolume(draftVM);
+          draftVM.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
+            ? updateCloudInitRHELSubscription(updatedVolumes, subscriptionData)
+            : updatedVolumes;
+
+          if (startVM) draftVM.spec.running = true;
+
+          if (applyBootSourceStorageClass) {
+            const dataVolumeTemplates: V1DataVolumeTemplateSpec[] = getDataVolumeTemplates(vm).map(
+              (dvt) => {
+                if (isEqualObject(dvt?.spec?.sourceRef, templateBootSource?.source?.sourceRef)) {
+                  return produce(dvt, (draftDVT) => {
+                    draftDVT.spec.storage.storageClassName = applyBootSourceStorageClass;
+                  });
+                }
+
+                return dvt;
+              },
+            );
+
+            draftVM.spec.dataVolumeTemplates = dataVolumeTemplates;
+          }
         });
+
+        const quickCreatedVM = await quickCreateVM({
+          models,
+          processedTemplate,
+          vm: !isEmpty(authorizedSSHKey) ? addSecretToVM(overrideVM, authorizedSSHKey) : overrideVM,
+        });
+
+        setIsQuickCreating(false);
+        history.push(getResourceUrl({ model: VirtualMachineModel, resource: quickCreatedVM }));
+      } catch (processError) {
+        setIsQuickCreating(false);
+        setQuickCreateError(processError);
+      }
     };
 
     const onCustomize = (e: MouseEvent) => {
       e.preventDefault();
 
       if (isEmpty(template?.parameters)) {
-        return k8sCreate<V1Template>({
-          data: { ...template, metadata: { ...template?.metadata, namespace } },
-          model: ProcessedTemplatesModel,
-          ns: namespace,
-          queryParams: {
-            dryRun: 'All',
-          },
-        }).then(async (processedTemplate) => {
+        return processTemplate(template, namespace).then(async (processedTemplate) => {
           const vmObject = getTemplateVirtualMachineObject(processedTemplate);
 
-          const updatedVM = produce(vmObject, (vmDraft) => {
-            ensurePath(vmDraft, [
-              'spec.template.spec.domain.cpu',
-              'spec.template.spec.domain.memory.guest',
-            ]);
+          const updatedVM = produce(vmObject, (draftVM) => {
+            draftVM.metadata.namespace = namespace;
 
-            vmDraft.metadata.namespace = namespace;
-            vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAME] = template.metadata.name;
-            vmDraft.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
-            const { cpu, memory } = getMemoryCPU(vm);
-            vmDraft.spec.template.spec.domain.cpu.cores = cpu?.cores;
-            vmDraft.spec.template.spec.domain.memory.guest = memory;
+            applyCPUMemory(draftVM, vm);
+            applyTemplateMetadataToVM(draftVM, template);
 
-            const updatedVolumes = applyCloudDriveCloudInitVolume(vmObject);
-            vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
+            const updatedVolumes = applyCloudDriveCloudInitVolume(draftVM);
+            draftVM.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
               ? updateCloudInitRHELSubscription(updatedVolumes, subscriptionData)
               : updatedVolumes;
           });
