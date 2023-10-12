@@ -14,12 +14,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  k8sCreate,
-  k8sGet,
-  k8sPatch,
-  useK8sWatchResource,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, k8sGet, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
@@ -27,11 +22,11 @@ import {
   userSettingsRoleBinding,
 } from './utils/const';
 import userSettingsInitialState, { UserSettingsState } from './utils/userSettingsInitialState';
-import { parseNestedJSON } from './utils/utils';
+import { parseNestedJSON, patchUserConfigMap } from './utils/utils';
 
 type UseKubevirtUserSettings = (
   key?: string,
-) => [{ [key: string]: any }, (val: any) => void, boolean, Error];
+) => [{ [key: string]: any }, (val: any) => Promise<{ [key: string]: any }>, boolean, Error];
 
 const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   const [error, setError] = useState<Error>();
@@ -108,29 +103,29 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
     }
   }, [userConfigMap, userSettings, userName]);
 
-  const updateUserSetting = (val: any) => {
-    setUserSettings((prevUserSettings) => {
-      const updateResource = async (data: { [key: string]: any }) => {
-        try {
-          await k8sPatch({
-            data: [
-              {
-                op: 'replace',
-                path: `/data/${userName}`,
-                value: JSON.stringify(data),
-              },
-            ],
-            model: ConfigMapModel,
-            resource: userConfigMap,
-          });
-        } catch (e) {
-          setError(e);
-        }
-      };
+  const pushUserSettingsChanges = async (data, resolve, reject) => {
+    setLoading(true);
 
-      const data = key ? { ...prevUserSettings, [key]: val } : val;
-      updateResource(data);
-      return data;
+    try {
+      await patchUserConfigMap(userConfigMap, userName, data);
+      resolve(key ? data[key] : data);
+    } catch (apiError) {
+      setError(apiError);
+      reject(apiError);
+    }
+
+    setLoading(false);
+  };
+
+  const updateUserSetting = (val: any) => {
+    return new Promise((resolve, reject) => {
+      setUserSettings((prevUserSettings) => {
+        const data = key ? { ...prevUserSettings, [key]: val } : val;
+
+        pushUserSettingsChanges(data, resolve, reject);
+
+        return data;
+      });
     });
   };
 

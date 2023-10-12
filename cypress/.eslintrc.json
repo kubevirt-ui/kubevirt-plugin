@@ -10,7 +10,8 @@
   ],
   "plugins": ["cypress", "chai-friendly"],
   "rules": {
-    "cypress/no-force": "error",
-    "cypress/assertion-before-screenshot": "error"
+    "chai-friendly/no-unused-expressions": "off",
+    "cypress/assertion-before-screenshot": "error",
+    "cypress/no-force": "error"
   }
 }

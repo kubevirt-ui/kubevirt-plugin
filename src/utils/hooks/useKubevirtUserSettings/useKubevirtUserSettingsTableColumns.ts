@@ -1,15 +1,27 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import { useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
+import { TableColumn, useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
 import { useUserSettings } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import useKubevirtUserSettings from './useKubevirtUserSettings';
 
-const useKubevirtUserSettingsTableColumns = <T>({ columnManagementID, columns }) => {
-  const updateOnceFromUserSetting = useRef(null);
-  const [userColumns, setUserColumns] = useKubevirtUserSettings('columns');
-  const [localStorageSettings, setLocalSotrageSettings] = useUserSettings<{
+type UseKubevirtUserSettingsTableColumnsType = <T>(input: {
+  columnManagementID;
+  columns;
+}) => [
+  activeColumns: TableColumn<T>[],
+  setActiveColumns: (val: any) => void,
+  loaded: boolean,
+  error: Error,
+];
+
+const useKubevirtUserSettingsTableColumns: UseKubevirtUserSettingsTableColumnsType = <T>({
+  columnManagementID,
+  columns,
+}) => {
+  const [userColumns, setUserColumns, loaded, error] = useKubevirtUserSettings('columns');
+  const [localStorageSettings, setLocalStorageSettings] = useUserSettings<{
     [key: string]: string;
   }>('console.tableColumns');
 
@@ -20,20 +32,18 @@ const useKubevirtUserSettingsTableColumns = <T>({ columnManagementID, columns })
   });
 
   useEffect(() => {
-    if (userColumns?.[columnManagementID] && !updateOnceFromUserSetting.current) {
-      setLocalSotrageSettings({
+    if (!loaded || error) return;
+
+    if (
+      !isEqualObject(userColumns?.[columnManagementID], localStorageSettings?.[columnManagementID])
+    ) {
+      setLocalStorageSettings({
         ...localStorageSettings,
         [columnManagementID]: userColumns?.[columnManagementID],
       });
-      updateOnceFromUserSetting.current = true;
     }
 
-    if (
-      !isEqualObject(
-        userColumns?.[columnManagementID],
-        activeColumns.map((col) => col?.id),
-      )
-    ) {
+    if (userColumns?.[columnManagementID] === undefined && activeColumns?.length > 0) {
       setUserColumns?.({
         ...userColumns,
         [columnManagementID]: activeColumns.map((col) => col?.id),
@@ -43,12 +53,23 @@ const useKubevirtUserSettingsTableColumns = <T>({ columnManagementID, columns })
     activeColumns,
     columnManagementID,
     localStorageSettings,
-    setLocalSotrageSettings,
+    setLocalStorageSettings,
     setUserColumns,
     userColumns,
+    loaded,
+    error,
   ]);
 
-  return [activeColumns];
+  const setActiveColumns = useCallback(
+    (columnIds: string[]) =>
+      setUserColumns?.({
+        ...userColumns,
+        [columnManagementID]: columnIds,
+      }),
+    [columnManagementID, setUserColumns, userColumns],
+  );
+
+  return [activeColumns, setActiveColumns, loaded, error];
 };
 
 export default useKubevirtUserSettingsTableColumns;

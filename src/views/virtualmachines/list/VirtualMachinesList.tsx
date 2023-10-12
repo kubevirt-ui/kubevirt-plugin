@@ -4,6 +4,7 @@ import {
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineInstanceModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
+  VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1VirtualMachine,
@@ -129,7 +130,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     }));
   };
 
-  const [_, activeColumns] = useVirtualMachineColumns(namespace, pagination, data);
+  const [columns, activeColumns] = useVirtualMachineColumns(namespace, pagination, data);
 
   const loaded = vmLoaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded && !loadingFeatureProxy;
 
@@ -142,6 +143,16 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
       <ListPageBody>
         <div className="list-managment-group">
           <ListPageFilter
+            columnLayout={{
+              columns: columns?.map(({ additional, id, title }) => ({
+                additional,
+                id,
+                title,
+              })),
+              id: VirtualMachineModelRef,
+              selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+              type: t('VirtualMachine'),
+            }}
             onFilterChange={(...args) => {
               onFilterChange(...args);
               setPagination((prevPagination) => ({

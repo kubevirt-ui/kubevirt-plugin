@@ -3,6 +3,7 @@ import React, { FC, useMemo, useState } from 'react';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  ColumnLayout,
   FilterValue,
   K8sResourceCommon,
   OnFilterChange,
@@ -19,6 +20,8 @@ import {
   ToolbarToggleGroup,
 } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
+
+import ColumnManagement from '../ColumnManagementModal/ColumnManagement';
 
 import useListPageFiltersMethods from './hooks/useListPageFiltersMethods';
 import { useRowFiltersParameters } from './hooks/useRowFiltersParametersType';
@@ -40,13 +43,22 @@ import {
 } from './utils';
 
 type ListPageFilterProps = {
+  columnLayout?: ColumnLayout;
   data?: K8sResourceCommon[];
+  hideColumnManagement?: boolean;
   loaded?: boolean;
   onFilterChange?: OnFilterChange;
   rowFilters?: RowFilter[];
 };
 
-const ListPageFilter: FC<ListPageFilterProps> = ({ data, loaded, onFilterChange, rowFilters }) => {
+const ListPageFilter: FC<ListPageFilterProps> = ({
+  columnLayout,
+  data,
+  hideColumnManagement,
+  loaded,
+  onFilterChange,
+  rowFilters,
+}) => {
   const { t } = useKubevirtTranslation();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
@@ -186,6 +198,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({ data, loaded, onFilterChange,
             </ToolbarFilter>
           </ToolbarItem>
         </ToolbarToggleGroup>
+        <ColumnManagement columnLayout={columnLayout} hideColumnManagement={hideColumnManagement} />
       </ToolbarContent>
     </Toolbar>
   );
