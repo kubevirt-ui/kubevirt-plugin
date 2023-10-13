@@ -1,0 +1,32 @@
+.expand-section-with-switch {
+  &__contents {
+    padding-left: var(--pf-global--spacer--lg);
+  }
+
+  &__help-text-popover {
+    .pf-c-popover__content {
+      width: 400px;
+    }
+  }
+
+  // Firefox
+  @-moz-document url-prefix() {
+    &__help-icon,
+    .pf-c-switch {
+      vertical-align: -moz-middle-with-baseline !important;
+    }
+  }
+
+  // Chrome
+  @media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: 0.001dpcm) {
+    &__help-icon,
+    .pf-c-switch {
+      vertical-align: -webkit-baseline-middle !important;
+    }
+  }
+
+  &__help-icon {
+    color: var(--pf-global--Color--100);
+    margin-left: calc(-1 * var(--pf-global--spacer--sm));
+  }
+}
