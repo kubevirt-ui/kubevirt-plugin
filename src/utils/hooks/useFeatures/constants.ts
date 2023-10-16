@@ -15,9 +15,13 @@ export const KUBEVIRT_APISERVER_PROXY = 'kubevirtApiserverProxy';
 export const LOAD_BALANCER_ENABLED = 'loadBalancerEnabled';
 export const AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED = 'autocomputeCPULimitsPreviewEnabled';
 export const AUTOCOMPUTE_CPU_LIMITS_ENABLED = 'autocomputeCPULimitsEnabled';
+
 export const NODE_PORT_ADDRESS = 'nodePortAddress';
 export const NODE_PORT_ENABLED = 'nodePortEnabled';
 export const DISABLED_GUEST_SYSTEM_LOGS_ACCESS = 'disabledGuestSystemLogsAccess';
+
+export const CPU_HOT_PLUG_ENABLED = 'cpuHotPlugEnabled';
+export const MEMORY_HOT_PLUG_ENABLED = 'memoryHotPlugEnabled';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
 const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
@@ -31,9 +35,11 @@ export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
     [AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED]: 'false',
     [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
     [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
+    [CPU_HOT_PLUG_ENABLED]: 'false',
     [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
     [KUBEVIRT_APISERVER_PROXY]: 'true',
     [LOAD_BALANCER_ENABLED]: 'false',
+    [MEMORY_HOT_PLUG_ENABLED]: 'false',
     [NODE_PORT_ADDRESS]: '',
     [NODE_PORT_ENABLED]: 'false',
   },

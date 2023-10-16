@@ -203,6 +203,13 @@ export const getMemoryCPU = <T>(obj: T): { cpu: V1CPU; memory: string } => ({
 export const getCPUcores = <T>(obj: T): number => getCPU(obj)?.cores || 1;
 
 /**
+ * A selector that returns number of CPU sockets of the resource
+ * @param {T} obj resource such as vm or vmi
+ * @returns {number} the number of CPU sockets
+ */
+export const getCPUSockets = <T>(obj: T): number => getCPU(obj)?.sockets || 1;
+
+/**
  * A selector that returns virtual machine evictionStrategy
  * @param {V1VirtualMachine} vm the virtual machine
  * @returns {string} the evictionStrategy
@@ -223,3 +230,6 @@ export const getInstanceTypeMatcher = (vm: V1VirtualMachine): V1InstancetypeMatc
 
 export const getPreferenceMatcher = (vm: V1VirtualMachine): V1PreferenceMatcher =>
   vm?.spec?.preference;
+
+export const getTemplateAnnotations = (vm: V1VirtualMachine): { [p: string]: string } =>
+  vm?.spec?.template?.metadata?.annotations;

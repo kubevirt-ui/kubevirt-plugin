@@ -3,5 +3,8 @@ export const INSTANCE_TYPES_USER_GUIDE_LINK =
 export const AUTOCOMPUTE_CPU_LIMITS_LINK =
   'https://kubevirt.io/user-guide/virtual_machines/resources_requests_and_limits/';
 
+export const CPU_HOT_PLUG_USER_GUIDE_LINK = 'Not available yet';
+export const MEMORY_HOT_PLUG_USER_GUIDE_LINK = 'Not available yet';
+
 export const TECH_PREVIEW_LINK = 'https://access.redhat.com/support/offerings/techpreview';
 export const DEV_PREVIEW_LINK = 'https://access.redhat.com/support/offerings/devpreview';

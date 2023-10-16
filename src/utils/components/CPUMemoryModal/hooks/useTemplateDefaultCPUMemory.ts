@@ -7,7 +7,7 @@ import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getMemorySize } from '../utils/CpuMemoryUtils';
 
-type UseTemplateDefaultCpuMemory = (
+type UseTemplateDefaultCPUMemory = (
   templateName: string,
   templateNamespace: string,
 ) => {
@@ -19,7 +19,7 @@ type UseTemplateDefaultCpuMemory = (
   loaded: boolean;
 };
 
-const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (
+const useTemplateDefaultCPUMemory: UseTemplateDefaultCPUMemory = (
   templateName,
   templateNamespace,
 ) => {
@@ -42,11 +42,11 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (
 
   const vmObject = getTemplateVirtualMachineObject(template);
   const defaultMemory = getMemorySize(getMemory(vmObject));
-  const defaultCpu = getCPUcores(vmObject);
+  const defaultCPU = getCPUcores(vmObject);
 
   return {
     data: {
-      defaultCpu,
+      defaultCpu: defaultCPU,
       defaultMemory,
     },
     error,
@@ -54,4 +54,4 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (
   };
 };
 
-export default useTemplateDefaultCpuMemory;
+export default useTemplateDefaultCPUMemory;

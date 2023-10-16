@@ -51,3 +51,17 @@ export const bytesFromQuantity = (
 
   return [parseFloat(byteSizeResult.value), byteSizeResult.unit];
 };
+
+export const bytesFromHumanReadable = (quantity: string) => {
+  const value = parseFloat(quantity);
+  const ISUnit = /[KMGTPEZ]i$/.exec(quantity);
+  const bytesUnit = /[KMGTPEZ]iB$/.exec(quantity);
+  const decimalUnit = /[KMGTPEZ]$/.exec(quantity.toUpperCase());
+  const originalUnit = ISUnit || bytesUnit || decimalUnit;
+
+  if (originalUnit?.length) {
+    return value * multipliers[bytesUnit?.[0] || ISUnit?.[0] || decimalUnit?.[0]];
+  }
+
+  return null;
+};
