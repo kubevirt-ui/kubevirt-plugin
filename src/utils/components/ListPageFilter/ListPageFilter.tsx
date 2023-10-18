@@ -2,6 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ColumnLayout,
   FilterValue,
@@ -63,8 +64,11 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
+  const toolbarFilters = rowFilters.filter((filter) => !isEmpty(filter.items));
+  const searchFilters = rowFilters.filter((filter) => isEmpty(filter.items));
+
   // Generate rowFilter items and counts. Memoize to minimize re-renders.
-  const generatedRowFilters = useDeepCompareMemoize(generateRowFilters(rowFilters ?? [], data));
+  const generatedRowFilters = useDeepCompareMemoize(generateRowFilters(toolbarFilters ?? [], data));
 
   // Reduce generatedRowFilters once and memoize
   const [filters, filtersNameMap, filterKeys] = useMemo<[Filter, FilterKeys, FilterKeys, string[]]>(
@@ -77,11 +81,16 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
     filters,
   });
 
-  const textFilters = useSearchFiltersParameters();
+  const textFilters = useSearchFiltersParameters(searchFilters);
 
-  const [searchType, setSearchType] = useState<keyof typeof STATIC_SEARCH_FILTERS>(
-    STATIC_SEARCH_FILTERS.name,
+  const alreadySearchedParam = searchFilters?.find(
+    (searchFilter) => textFilters[searchFilter.type],
+  )?.type;
+
+  const [searchType, setSearchType] = useState<string>(
+    alreadySearchedParam || STATIC_SEARCH_FILTERS.name,
   );
+
   const [searchInputText, setSearchInputText] = useState<string>(
     getInitialSearchText(textFilters, searchType),
   );
@@ -105,6 +114,8 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 
   if (!loaded) return null;
 
+  const selectedSearchFilter = searchFilters?.find((f) => f.type === searchType);
+
   return (
     <Toolbar
       className="co-toolbar-no-padding pf-m-toggle-group-container"
@@ -119,7 +130,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
             filters={filters}
             filtersNameMap={filtersNameMap}
             generatedRowFilters={generatedRowFilters}
-            rowFilters={rowFilters}
+            rowFilters={toolbarFilters}
             selectedRowFilters={selectedRowFilters}
             updateRowFilterSelected={updateRowFilterSelected}
           />
@@ -135,6 +146,20 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
               categoryName={STATIC_SEARCH_FILTERS_LABELS.labels}
               chips={textFilters.labels ?? []}
             >
+              {searchFilters.map((filter) => (
+                <ToolbarFilter
+                  deleteChip={() => {
+                    applyTextFilters(filter.type);
+                    searchType === filter.type && setSearchInputText('');
+                  }}
+                  categoryName={filter.type}
+                  chips={textFilters[filter.type] ? [textFilters[filter.type]] : []}
+                  key={filter.type}
+                >
+                  <></>
+                </ToolbarFilter>
+              ))}
+
               <ToolbarFilter
                 deleteChip={() => {
                   applyTextFilters('name');
@@ -154,7 +179,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                     isOpen={isDropdownOpen}
                     onSelect={onSelect}
                     onToggle={setIsDropdownOpen}
-                    selections={searchType}
+                    selections={selectedSearchFilter?.filterGroupName || searchType}
                     variant={SelectVariant.single}
                   >
                     <SelectOption value={STATIC_SEARCH_FILTERS.name}>
@@ -164,6 +189,14 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                     <SelectOption value={STATIC_SEARCH_FILTERS.labels}>
                       {STATIC_SEARCH_FILTERS_LABELS.labels}
                     </SelectOption>
+
+                    <>
+                      {searchFilters.map((filter) => (
+                        <SelectOption key={filter.type} value={filter.type}>
+                          {filter.filterGroupName}
+                        </SelectOption>
+                      ))}
+                    </>
                   </Select>
 
                   {searchType === STATIC_SEARCH_FILTERS.labels ? (
@@ -188,8 +221,13 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                         setSearchInputText(newSearchInput);
                         applyTextFiltersWithDebounce(searchType, newSearchInput);
                       }}
+                      placeholder={
+                        STATIC_SEARCH_FILTERS_PLACEHOLDERS[searchType] ||
+                        t('Search by {{filterName}}', {
+                          filterName: selectedSearchFilter?.filterGroupName,
+                        })
+                      }
                       data-test={`${searchType}-filter-input`}
-                      placeholder={STATIC_SEARCH_FILTERS_PLACEHOLDERS.name}
                       value={searchInputText}
                     />
                   )}

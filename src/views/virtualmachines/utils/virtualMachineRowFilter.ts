@@ -18,9 +18,10 @@ import {
   getOperatingSystem,
   getOperatingSystemName,
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import { isLiveMigratable } from './utils';
+import { compareCIDR, isLiveMigratable } from './utils';
 import { isErrorPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
 
 type VmiMapper = {
@@ -192,6 +193,28 @@ const useInstanceTypesFilter = (vms: V1VirtualMachine[]): RowFilter => {
   };
 };
 
+const useIPSearchFilter = (vmiMapper: VmiMapper): RowFilter => ({
+  filter: (input, obj) => {
+    const search = input.selected?.[0];
+
+    if (!search) return true;
+
+    const vmi = vmiMapper.mapper?.[obj?.metadata?.namespace]?.[obj?.metadata?.name];
+
+    const ipAddresses = getVMIIPAddresses(vmi);
+
+    if (search.includes('/')) {
+      return ipAddresses.some((ipAddress) => compareCIDR(search, ipAddress));
+    }
+
+    return ipAddresses.some((ipAddress) => ipAddress?.startsWith(search));
+  },
+  filterGroupName: t('IP Address'),
+  isMatch: () => true,
+  items: [],
+  type: 'ip',
+});
+
 export const useVMListFilters = (
   vmis: V1VirtualMachineInstance[],
   vms: V1VirtualMachine[],
@@ -239,6 +262,7 @@ export const useVMListFilters = (
   const nodesFilter = useNodesFilter(vmiMapper);
   const liveMigratableFilter = useLiveMigratableFilter();
   const instanceTypesFilter = useInstanceTypesFilter(vms);
+  const searchByIP = useIPSearchFilter(vmiMapper);
 
   return {
     filters: [
@@ -248,6 +272,7 @@ export const useVMListFilters = (
       liveMigratableFilter,
       nodesFilter,
       instanceTypesFilter,
+      searchByIP,
     ],
     vmiMapper,
     vmimMapper,
