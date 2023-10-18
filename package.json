@@ -6,6 +6,10 @@
     "displayName": "Kubevirt Plugin",
     "exposedModules": {
       "BootableVolumesList": "./views/bootablevolumes/list/BootableVolumesList.tsx",
+      "Checkups": "./views/checkups/Checkups.tsx",
+      "CheckupsNetworkDetailsPage": "./views/checkups/network/details/CheckupsNetworkDetailsPage.tsx",
+      "CheckupsNetworkForm": "./views/checkups/network/components/form/CheckupsNetworkForm.tsx",
+      "CheckupsStorageForm": "./views/checkups/storage/CheckupsStorageForm.tsx",
       "ClusterInstancetypeList": "./views/instancetypes/list/ClusterInstancetypeList.tsx",
       "ClusterOverviewPage": "./views/clusteroverview/ClusterOverviewPage.tsx",
       "ClusterPreferenceList": "./views/preferences/list/ClusterPreferenceList.tsx",
