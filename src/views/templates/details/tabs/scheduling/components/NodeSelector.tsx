@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
@@ -7,6 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
+  ButtonVariant,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
@@ -17,7 +18,7 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import NodeSelectorModal from './NodeSelectorModal';
 
-const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
+const NodeSelector: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const nodeSelector = getNodeSelector(template);
@@ -51,7 +52,7 @@ const NodeSelector: React.FC<TemplateSchedulingGridProps> = ({ editable, onSubmi
           isInline
           onClick={onEditClick}
           type="button"
-          variant="link"
+          variant={ButtonVariant.link}
         >
           {nodeSelectorLabels}
           <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
