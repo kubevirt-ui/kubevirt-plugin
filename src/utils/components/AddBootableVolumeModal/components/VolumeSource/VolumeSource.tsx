@@ -1,23 +1,14 @@
 import React, { FC } from 'react';
-import xbytes from 'xbytes';
 
-import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
-import DiskSourcePVCSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourcePVCSelect';
 import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourceUploadPVC';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import {
-  Checkbox,
-  FormGroup,
-  PopoverPosition,
-  Split,
-  SplitItem,
-  TextInput,
-} from '@patternfly/react-core';
+import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, DROPDOWN_FORM_SELECTION } from '../../utils/constants';
+
+import PVCSource from './components/PVCSource';
+import SnapshotSource from './components/SnapshotSource';
 
 type VolumeSourceProps = {
   bootableVolume: AddBootableVolumeState;
@@ -36,10 +27,10 @@ const VolumeSource: FC<VolumeSourceProps> = ({
   upload,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { pvcName, pvcNamespace, registryURL, uploadFile, uploadFilename } = bootableVolume || {};
+  const { registryURL, uploadFile, uploadFilename } = bootableVolume || {};
 
-  if (sourceType === DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE)
-    return (
+  const sourceComponentByType = {
+    [DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE]: (
       <DiskSourceUploadPVC
         label={t('Upload PVC image')}
         relevantUpload={upload}
@@ -48,10 +39,11 @@ const VolumeSource: FC<VolumeSourceProps> = ({
         uploadFile={uploadFile}
         uploadFileName={uploadFilename}
       />
-    );
-
-  if (sourceType === DROPDOWN_FORM_SELECTION.USE_REGISTRY)
-    return (
+    ),
+    [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: (
+      <PVCSource bootableVolume={bootableVolume} setBootableVolumeField={setBootableVolumeField} />
+    ),
+    [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: (
       <FormGroup
         fieldId="volume-registry-url"
         helperText={t('Example: quay.io/containerdisks/centos:7-2009')}
@@ -66,36 +58,16 @@ const VolumeSource: FC<VolumeSourceProps> = ({
           value={registryURL}
         />
       </FormGroup>
-    );
-
-  return (
-    <>
-      <DiskSourcePVCSelect
-        setDiskSize={(newSize) =>
-          setBootableVolumeField('size')(
-            hasSizeUnit(newSize)
-              ? removeByteSuffix(newSize)
-              : removeByteSuffix(xbytes(Number(newSize), { iec: true, space: false })),
-          )
-        }
-        pvcNameSelected={pvcName}
-        pvcNamespaceSelected={pvcNamespace}
-        selectPVCName={setBootableVolumeField('pvcName')}
-        selectPVCNamespace={setBootableVolumeField('pvcNamespace')}
+    ),
+    [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: (
+      <SnapshotSource
+        bootableVolume={bootableVolume}
+        setBootableVolumeField={setBootableVolumeField}
       />
-      <Split hasGutter>
-        <SplitItem>
-          <Checkbox id="clone-pvc-checkbox" isChecked isDisabled label={t('Clone existing PVC')} />
-        </SplitItem>
-        <SplitItem>
-          <HelpTextIcon
-            bodyContent={t('This will create a cloned copy of the PVC in the destination project.')}
-            position={PopoverPosition.right}
-          />
-        </SplitItem>
-      </Split>
-    </>
-  );
+    ),
+  };
+
+  return sourceComponentByType[sourceType];
 };
 
 export default VolumeSource;

@@ -108,7 +108,9 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
       obj={emptyDataSource}
       submitBtnText={t('Save')}
     >
-      {t('Upload a new volume, or use an existing PersistentVolumeClaim (PVC) or DataSource.')}
+      {t(
+        'Upload a new volume, or use an existing PersistentVolumeClaim (PVC), VolumeSnapshot or DataSource.',
+      )}
       <Form className="pf-u-mt-md">
         <SourceTypeSelection
           formSelection={sourceType}

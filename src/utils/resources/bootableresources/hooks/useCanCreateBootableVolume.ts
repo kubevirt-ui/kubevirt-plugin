@@ -1,4 +1,4 @@
-import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
+import { PersistentVolumeClaimModel, VolumeSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineClusterPreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterPreferenceModel';
@@ -7,6 +7,7 @@ import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk'
 type UseCanCreateBootableVolume = (namespace: string) => {
   canCreateDS: boolean;
   canCreatePVC: boolean;
+  canCreateSnapshots: boolean;
   canListInstanceTypesPrefernce: boolean;
   loading: boolean;
 };
@@ -16,6 +17,12 @@ const useCanCreateBootableVolume: UseCanCreateBootableVolume = (namespace) => {
     group: PersistentVolumeClaimModel.apiGroup,
     namespace: namespace,
     resource: PersistentVolumeClaimModel.plural,
+    verb: 'create' as K8sVerb,
+  });
+  const [canCreateSnapshots, loadingShapshots] = useAccessReview({
+    group: VolumeSnapshotModel.apiGroup,
+    namespace: namespace,
+    resource: VolumeSnapshotModel.plural,
     verb: 'create' as K8sVerb,
   });
 
@@ -42,8 +49,10 @@ const useCanCreateBootableVolume: UseCanCreateBootableVolume = (namespace) => {
   return {
     canCreateDS: canCreateDS && canCreateDIC,
     canCreatePVC,
+    canCreateSnapshots,
     canListInstanceTypesPrefernce,
-    loading: loadingPVC || loadingDS || loadingDIC || loadingInstanceTypesPrefernce,
+    loading:
+      loadingPVC || loadingDS || loadingDIC || loadingInstanceTypesPrefernce || loadingShapshots,
   };
 };
 

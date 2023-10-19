@@ -1,9 +1,9 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
+import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-card/utils/utils';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -99,7 +99,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               aria-label="bootable volume list"
               className="bootable-volume-list-bar__volume-namespace"
               isDisabled
-              value={OPENSHIFT_OS_IMAGES_NS}
+              value={getOSImagesNS()}
             />
           </FormGroup>
         </SplitItem>

@@ -2,9 +2,7 @@ import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import DataSourceModel, {
-  DataSourceModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import { DataSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import {
   V1beta1DataSource,
@@ -17,7 +15,7 @@ import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import { BootableVolume } from './types';
 
 export const isBootableVolumePVCKind = (bootableVolume: BootableVolume): boolean =>
-  bootableVolume?.kind !== DataSourceModel.kind;
+  bootableVolume?.kind === PersistentVolumeClaimModel.kind;
 
 export const getBootableVolumeGroupVersionKind = (bootableVolume: BootableVolume) =>
   isBootableVolumePVCKind(bootableVolume)

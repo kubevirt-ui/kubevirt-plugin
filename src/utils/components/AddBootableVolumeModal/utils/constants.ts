@@ -14,6 +14,7 @@ export enum DROPDOWN_FORM_SELECTION {
   UPLOAD_IMAGE = 'upload',
   USE_EXISTING_PVC = 'pvc',
   USE_REGISTRY = 'registry',
+  USE_SNAPSHOT = 'snapshot',
 }
 
 export type AddBootableVolumeState = {
@@ -26,6 +27,8 @@ export type AddBootableVolumeState = {
   registryURL: string;
   retainRevisions: number;
   size: string;
+  snapshotName: string;
+  snapshotNamespace: string;
   storageClassName: string;
   storageClassProvisioner: string;
   uploadFile: File | string;
@@ -47,6 +50,8 @@ export const initialBootableVolumeState: AddBootableVolumeState = {
   registryURL: null,
   retainRevisions: 3,
   size: DEFAULT_DISK_SIZE,
+  snapshotName: null,
+  snapshotNamespace: null,
   storageClassName: null,
   storageClassProvisioner: null,
   uploadFile: null,
