@@ -1,6 +1,7 @@
 import React, { ChangeEvent, Dispatch, MouseEvent, SetStateAction, useMemo, useState } from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -18,8 +19,6 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
-
-import { V1Node } from '../../utils/types';
 
 type CheckupsNetworkFormNodes = {
   isNodesChecked: boolean;
@@ -42,7 +41,7 @@ const CheckupsNetworkFormNodes = ({
   const [isNodeSourceOpen, setIsNodeSourceOpen] = useState<boolean>(false);
   const [isNodeTargetOpen, setIsNodeTargetOpen] = useState<boolean>(false);
 
-  const [nodes] = useK8sWatchResource<V1Node[]>({
+  const [nodes] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
