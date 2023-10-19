@@ -7,7 +7,7 @@ import { generateConfigMapName } from '../../utils/utils';
 
 import CheckupsNetworkFormActions from './CheckupsNetworkFormActions';
 import CheckupsNetworkFormLatency from './CheckupsNetworkFormLatency';
-import CheckupsNetworkFormNADS from './CheckupsNetworkFormNads';
+import CheckupsNetworkFormNADS from './CheckupsNetworkFormNADS';
 import CheckupsNetworkFormNodes from './CheckupsNetworkFormNodes';
 
 import './checkups-network-form.scss';
