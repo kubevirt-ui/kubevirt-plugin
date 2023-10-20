@@ -1,5 +1,4 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1MigrationConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export type Descriptor<T = any> = {
@@ -206,13 +205,6 @@ export type CatalogSourceKind = {
     updateStrategy?: { registryPoll: { interval: string } };
   };
 } & K8sResourceKind;
-
-export type HyperConverged = K8sResourceCommon & {
-  spec: {
-    commonTemplatesNamespace?: string;
-    liveMigrationConfig: V1MigrationConfiguration;
-  };
-};
 
 export type TemplateList = K8sResourceCommon & {
   items: V1Template[];

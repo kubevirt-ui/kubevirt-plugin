@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ClipboardEvent, FC } from 'react';
 
 import PlainIconButton from '@kubevirt-utils/components/HardwareDevices/form/PlainIconButton';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,9 +13,20 @@ type LabelRowProps = {
   onDelete: (id: any) => void;
 };
 
-const LabelRow: React.FC<LabelRowProps> = ({ label, onChange, onDelete }) => {
+const LabelRow: FC<LabelRowProps> = ({ label, onChange, onDelete }) => {
   const { t } = useKubevirtTranslation();
   const { id, key, value } = label;
+
+  const handlePasteLabelKey = (event: ClipboardEvent<HTMLInputElement>): void => {
+    event.preventDefault();
+    const text = event.clipboardData.getData('text');
+    const strings = text.split('=');
+
+    if (strings.length > 1) return onChange({ ...label, key: strings[0], value: strings[1] });
+
+    return onChange({ ...label, key: text });
+  };
+
   return (
     <>
       <GridItem span={6}>
@@ -25,6 +36,7 @@ const LabelRow: React.FC<LabelRowProps> = ({ label, onChange, onDelete }) => {
             id={`label-${id}-key-input`}
             isRequired
             onChange={(newKey) => onChange({ ...label, key: newKey })}
+            onPaste={handlePasteLabelKey}
             placeholder={t('Key')}
             type="text"
             value={key}
