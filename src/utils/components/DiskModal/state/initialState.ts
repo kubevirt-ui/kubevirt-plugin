@@ -3,6 +3,7 @@ import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { interfaceTypes, sourceTypes } from '../DiskFormFields/utils/constants';
 
 export const DEFAULT_DISK_SIZE = '30Gi';
+export const DEFAULT_CDROM_DISK_SIZE = '10Gi';
 
 export type DiskFormState = {
   accessMode: string;

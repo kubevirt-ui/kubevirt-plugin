@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -26,7 +27,7 @@ type CreateDataSourceModalProps = {
   onClose: () => void;
 };
 
-export const CreateDataSourceModal: React.FC<CreateDataSourceModalProps> = ({
+export const CreateDataSourceModal: FC<CreateDataSourceModalProps> = ({
   isOpen,
   namespace,
   onClose,
@@ -44,7 +45,7 @@ export const CreateDataSourceModal: React.FC<CreateDataSourceModalProps> = ({
     defaultValues: {
       importsToKeep: 3,
       name: generateDataSourceName(),
-      size: '30Gi',
+      size: DEFAULT_DISK_SIZE,
     },
   });
   const importsToKeep = watch('importsToKeep');
