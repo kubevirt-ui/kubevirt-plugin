@@ -500,6 +500,69 @@
     "type": "console.navigation/resource-cluster"
   },
   {
+    "flags": {
+      "required": ["KUBEVIRT"]
+    },
+    "properties": {
+      "dataAttributes": {
+        "data-quickstart-id": "qs-nav-virtualization-checkups",
+        "data-test-id": "virtualization-checkups-nav-item"
+      },
+      "href": "checkups",
+      "id": "virtualization-checkups",
+      "insertAfter": "migrationpolicies",
+      "name": "%plugin__kubevirt-plugin~Checkups%",
+      "prefixNamespaced": true,
+      "section": "virtualization"
+    },
+    "type": "console.navigation/href"
+  },
+  {
+    "flags": {
+      "required": ["KUBEVIRT"]
+    },
+    "properties": {
+      "component": {
+        "$codeRef": "CheckupsNetworkForm"
+      },
+      "path": ["/k8s/ns/:ns/checkups/network/form", "/k8s/all-namespaces/checkups/network/form"]
+    },
+    "type": "console.page/route"
+  },
+  {
+    "flags": {
+      "required": ["KUBEVIRT"]
+    },
+    "properties": {
+      "component": {
+        "$codeRef": "CheckupsNetworkDetailsPage"
+      },
+      "path": ["/k8s/ns/:ns/checkups/network/:vmName"]
+    },
+    "type": "console.page/route"
+  },
+  {
+    "flags": {
+      "required": ["KUBEVIRT"]
+    },
+    "properties": {
+      "component": {
+        "$codeRef": "CheckupsStorageForm"
+      },
+      "path": ["/k8s/ns/:ns/checkups/storage", "/k8s/all-namespaces/checkups/storage"]
+    },
+    "type": "console.page/route"
+  },
+  {
+    "properties": {
+      "component": {
+        "$codeRef": "Checkups"
+      },
+      "path": ["/k8s/ns/:ns/checkups", "/k8s/all-namespaces/checkups"]
+    },
+    "type": "console.page/route"
+  },
+  {
     "properties": {
       "component": { "$codeRef": "MigrationPoliciesList" },
       "model": {
@@ -551,7 +614,7 @@
       "id": "hardwaredevices",
       "insertBefore": "baremetalhosts",
       "name": "%plugin__kubevirt-plugin~Hardware Devices%",
-      "prefixNamespaced": false,
+      "prefixNamespaced": true,
       "section": "compute"
     },
     "type": "console.navigation/href"

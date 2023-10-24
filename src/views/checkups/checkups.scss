@@ -1,0 +1,8 @@
+.CheckupsRunButton {
+  &--main {
+    button {
+      color: var(--pf-global--disabled-color--100);
+      background-color: var(--pf-global--disabled-color--200);
+    }
+  }
+}
