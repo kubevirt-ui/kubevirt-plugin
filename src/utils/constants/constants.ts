@@ -9,4 +9,6 @@ export const OPENSHIFT_MULTUS_NS = 'openshift-multus';
 
 export const VENDOR_LABEL = 'instancetype.kubevirt.io/vendor';
 
+export const AUTO_COMPUTE_CPU_LIMITS_LABEL = 'cpu.autocompute.kubevirt.io=true';
+
 export const ROOTDISK = 'rootdisk';

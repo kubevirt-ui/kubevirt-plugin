@@ -1,15 +1,20 @@
 import { useMemo } from 'react';
 
 import { HyperConvergedModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { V1LabelSelector } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1MigrationConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 export type HyperConverged = K8sResourceCommon & {
   spec: {
+    commonTemplatesNamespace?: string;
     configuration?: { ksmConfiguration: { nodeLabelSelector?: Record<string, never> } };
     evictionStrategy?: string;
     liveMigrationConfig: V1MigrationConfiguration;
+    resourceRequirements: {
+      autoCPULimitNamespaceLabelSelector: V1LabelSelector;
+    };
   };
 };
 

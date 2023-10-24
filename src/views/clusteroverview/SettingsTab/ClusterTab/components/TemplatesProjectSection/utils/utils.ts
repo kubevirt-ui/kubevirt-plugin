@@ -1,8 +1,9 @@
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
+import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';
 import { k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
-import { HyperConverged, TemplateList } from '../../../../../utils/types';
+import { TemplateList } from '../../../../../utils/types';
 
 const TYPE_LABEL = 'template.kubevirt.io/type';
 const BASE = 'base';

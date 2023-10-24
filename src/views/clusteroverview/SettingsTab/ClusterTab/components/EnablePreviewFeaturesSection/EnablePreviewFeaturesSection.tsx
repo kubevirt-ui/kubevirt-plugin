@@ -6,6 +6,7 @@ import {
   NIC_HOT_PLUG_LINK,
 } from '@kubevirt-utils/constants/url-constants';
 import {
+  AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED,
   BRIDGED_NIC_HOTPLUG_ENABLED,
   INSTANCE_TYPE_ENABLED,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -43,6 +44,14 @@ const EnablePreviewFeaturesSection: FC = () => {
             featureName={INSTANCE_TYPE_ENABLED}
             id={INSTANCE_TYPE_ENABLED}
             label={t('Enable create VirtualMachine from InstanceType')}
+          />
+        </StackItem>
+        <StackItem isFilled>
+          <EnableFeatureCheckbox
+            externalLink={INSTANCE_TYPES_USER_GUIDE_LINK}
+            featureName={AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED}
+            id={AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED}
+            label={t('Enable CPU limit')}
           />
         </StackItem>
       </Stack>

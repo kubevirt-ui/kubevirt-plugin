@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
@@ -7,14 +8,14 @@ import { ExternalLinkAltIcon, PlusCircleIcon } from '@patternfly/react-icons';
 
 type LabelsListProps = {
   addRowText?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   emptyStateAddRowText?: string;
   isEmpty: boolean;
   model?: K8sModel;
   onLabelAdd: () => void;
 };
 
-const LabelsList: React.FC<LabelsListProps> = ({
+const LabelsList: FC<LabelsListProps> = ({
   addRowText = null,
   children,
   emptyStateAddRowText = null,
