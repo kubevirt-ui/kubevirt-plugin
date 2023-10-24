@@ -1,7 +1,11 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  DEFAULT_CDROM_DISK_SIZE,
+  DEFAULT_DISK_SIZE,
+} from '@kubevirt-utils/components/DiskModal/state/initialState';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateImportURLs } from '@kubevirt-utils/resources/template';
@@ -42,7 +46,7 @@ export type CustomizeSourceProps = {
   withDrivers: boolean;
 };
 
-export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
+export const CustomizeSource: FC<CustomizeSourceProps> = ({
   cdSource,
   cdUpload,
   diskSource,
@@ -55,7 +59,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
   withDrivers,
 }) => {
   const { t } = useKubevirtTranslation();
-  const onCDCheckboxChange = React.useCallback(() => {
+  const onCDCheckboxChange = useCallback(() => {
     if (cdSource) {
       setCDSource(undefined);
     } else {
@@ -72,25 +76,28 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
       <BootCDCheckbox cdSource={cdSource} onChange={onCDCheckboxChange} />
 
       {cdSource && (
-        <SelectSource
-          sourceOptions={[
-            HTTP_SOURCE_NAME,
-            PVC_SOURCE_NAME,
-            CONTAINER_DISK_SOURCE_NAME,
-            UPLOAD_SOURCE_NAME,
-          ]}
-          data-test-id="cd-boot-source"
-          httpSourceHelperURL={httpSourceHelperURL}
-          onSourceChange={setCDSource}
-          registrySourceHelperText={registrySourceHelperText}
-          relevantUpload={cdUpload}
-          selectedSource={cdSource}
-          sourceLabel={t('CD source')}
-          sourcePopOver={<SelectCDSourcePopOver />}
-        />
+        <>
+          <SelectSource
+            sourceOptions={[
+              HTTP_SOURCE_NAME,
+              PVC_SOURCE_NAME,
+              CONTAINER_DISK_SOURCE_NAME,
+              UPLOAD_SOURCE_NAME,
+            ]}
+            data-test-id="cd-boot-source"
+            httpSourceHelperURL={httpSourceHelperURL}
+            initialVolumeQuantity={DEFAULT_CDROM_DISK_SIZE}
+            onSourceChange={setCDSource}
+            registrySourceHelperText={registrySourceHelperText}
+            relevantUpload={cdUpload}
+            selectedSource={cdSource}
+            sourceLabel={t('CD source')}
+            sourcePopOver={<SelectCDSourcePopOver />}
+          />
+          <Divider className="divider" />
+        </>
       )}
 
-      {cdSource && <Divider className="divider" />}
       <SelectSource
         sourceOptions={
           isBootSourceAvailable
@@ -113,7 +120,7 @@ export const CustomizeSource: React.FC<CustomizeSourceProps> = ({
         data-test-id="disk-boot-source"
         defaultsAsBlank={Boolean(cdSource)}
         httpSourceHelperURL={httpSourceHelperURL}
-        initialVolumeQuantity={getTemplateStorageQuantity(template) || '30Gi'}
+        initialVolumeQuantity={getTemplateStorageQuantity(template) || DEFAULT_DISK_SIZE}
         onSourceChange={setDiskSource}
         registrySourceHelperText={registrySourceHelperText}
         relevantUpload={diskUpload}

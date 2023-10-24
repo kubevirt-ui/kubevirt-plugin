@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
+import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
@@ -20,14 +21,14 @@ type SelectSourceProps = {
   initialVolumeQuantity?: string;
   onSourceChange: (customSource: V1beta1DataVolumeSpec) => void;
   source: V1beta1DataVolumeSpec;
-  sourceLabel: React.ReactNode;
+  sourceLabel: ReactNode;
   sourceOptions: SOURCE_OPTIONS_IDS[];
   withSize?: boolean;
 };
 
-export const SelectSource: React.FC<SelectSourceProps> = ({
+export const SelectSource: FC<SelectSourceProps> = ({
   httpSourceHelperText,
-  initialVolumeQuantity = '30Gi',
+  initialVolumeQuantity = DEFAULT_DISK_SIZE,
   onSourceChange,
   source,
   sourceLabel,

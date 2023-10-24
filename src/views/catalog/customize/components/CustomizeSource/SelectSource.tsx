@@ -1,8 +1,16 @@
-import * as React from 'react';
+import React, {
+  FC,
+  JSXElementConstructor,
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useState,
+} from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
+import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -40,17 +48,17 @@ export type SelectSourceProps = {
   registrySourceHelperText?: string;
   relevantUpload?: DataUpload;
   selectedSource?: V1beta1DataVolumeSpec | V1ContainerDiskSource;
-  sourceLabel: React.ReactNode | string;
+  sourceLabel: ReactNode | string;
   sourceOptions: SOURCE_OPTIONS_IDS[];
-  sourcePopOver?: React.ReactElement<any, React.JSXElementConstructor<any> | string>;
+  sourcePopOver?: ReactElement<any, JSXElementConstructor<any> | string>;
   withSize?: boolean;
 };
 
-export const SelectSource: React.FC<SelectSourceProps> = ({
+export const SelectSource: FC<SelectSourceProps> = ({
   'data-test-id': testId,
   defaultsAsBlank,
   httpSourceHelperURL,
-  initialVolumeQuantity = '30Gi',
+  initialVolumeQuantity = DEFAULT_DISK_SIZE,
   onSourceChange,
   registrySourceHelperText,
   relevantUpload,
@@ -69,17 +77,17 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
   const httpURL = watch(`${testId}-httpURL`);
   const containerImage = watch(`${testId}-containerImage`);
 
-  const [volumeQuantity, setVolumeQuantity] = React.useState(initialVolumeQuantity);
+  const [volumeQuantity, setVolumeQuantity] = useState(initialVolumeQuantity);
 
-  const [selectedSourceType, setSourceType] = React.useState<SOURCE_OPTIONS_IDS>(sourceOptions[0]);
-  const [pvcNameSelected, selectPVCName] = React.useState<string>();
-  const [pvcNamespaceSelected, selectPVCNamespace] = React.useState<string>();
+  const [selectedSourceType, setSourceType] = useState<SOURCE_OPTIONS_IDS>(sourceOptions[0]);
+  const [pvcNameSelected, selectPVCName] = useState<string>();
+  const [pvcNamespaceSelected, selectPVCNamespace] = useState<string>();
   const showSizeInput =
     withSize ||
     selectedSourceType === HTTP_SOURCE_NAME ||
     selectedSourceType === UPLOAD_SOURCE_NAME;
 
-  React.useEffect(() => {
+  useEffect(() => {
     switch (selectedSourceType) {
       case DEFAULT_SOURCE:
         return onSourceChange(getDefaultSourceStorage(volumeQuantity));
@@ -120,7 +128,7 @@ export const SelectSource: React.FC<SelectSourceProps> = ({
     showSizeInput,
   ]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (defaultsAsBlank) {
       setSourceType(BLANK_SOURCE_NAME);
     }

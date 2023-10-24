@@ -1,5 +1,6 @@
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
 
 import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
 import { getDataSourceDataVolume } from '../editBootSource';
@@ -35,7 +36,7 @@ export const getGenericSourceCustomization = (
     storage: {
       resources: {
         requests: {
-          storage: storage ?? '30Gi',
+          storage: storage ?? DEFAULT_DISK_SIZE,
         },
       },
     },

@@ -8,6 +8,10 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import {
+  DEFAULT_CDROM_DISK_SIZE,
+  DEFAULT_DISK_SIZE,
+} from '@kubevirt-utils/components/DiskModal/state/initialState';
+import {
   addSecretToVM,
   applyCloudDriveCloudInitVolume,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
@@ -156,12 +160,13 @@ export const useCustomizeFormSubmit = ({
       const diskUploadDV = getUploadDataVolume(
         dataVolumeTemplate?.metadata?.name,
         updatedVM.metadata.namespace,
-        diskSource?.storage?.resources?.requests?.storage || '30Gi',
+        diskSource?.storage?.resources?.requests?.storage || DEFAULT_DISK_SIZE,
       );
       const cdUploadDV = getUploadDataVolume(
         `${updatedVM?.metadata?.name}-${INSTALLATION_CDROM_NAME}`,
         updatedVM.metadata.namespace,
-        (cdSource as V1beta1DataVolumeSpec)?.storage?.resources?.requests?.storage || '30Gi',
+        (cdSource as V1beta1DataVolumeSpec)?.storage?.resources?.requests?.storage ||
+          DEFAULT_CDROM_DISK_SIZE,
       );
 
       await Promise.all(

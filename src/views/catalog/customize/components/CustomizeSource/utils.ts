@@ -2,6 +2,7 @@ import { TFunction } from 'react-i18next';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
 import {
   getTemplateContainerDisks,
   getTemplateVirtualMachineObject,
@@ -52,7 +53,7 @@ export const getGenericSourceCustomization = (
     storage: {
       resources: {
         requests: {
-          storage: storage ?? '30Gi',
+          storage: storage ?? DEFAULT_DISK_SIZE,
         },
       },
     },
