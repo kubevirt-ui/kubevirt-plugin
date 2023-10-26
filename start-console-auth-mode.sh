@@ -51,6 +51,7 @@ if [ -x "$(command -v podman)" ]; then
         # Use host networking on Linux since host.containers.internal is unreachable in some environments.
         BRIDGE_PLUGINS="${npm_package_consolePlugin_name}=http://localhost:9001"
         podman run \
+          --platform linux/x86_64/v8 \
           --pull always --rm --network=host \
           -v $PWD/scripts/console-client-secret:/tmp/console-client-secret:Z \
           -v $PWD/scripts/ca.crt:/tmp/ca.crt:Z \
@@ -60,6 +61,7 @@ if [ -x "$(command -v podman)" ]; then
     else
         BRIDGE_PLUGINS="${npm_package_consolePlugin_name}=http://host.containers.internal:9001"
         podman run \
+          --platform linux/x86_64/v8 \
           --pull always --rm -p "$CONSOLE_PORT":9000 \
           -v $PWD/scripts/console-client-secret:/tmp/console-client-secret \
           -v $PWD/scripts/ca.crt:/tmp/ca.crt \
@@ -70,6 +72,7 @@ if [ -x "$(command -v podman)" ]; then
 else
     BRIDGE_PLUGINS="${npm_package_consolePlugin_name}=http://host.docker.internal:9001"
     docker run \
+      --platform linux/x86_64/v8 \
       --pull always --rm -p "$CONSOLE_PORT":9000 \
       -v $PWD/scripts/console-client-secret:/tmp/console-client-secret \
       -v $PWD/scripts/ca.crt:/tmp/ca.crt \
