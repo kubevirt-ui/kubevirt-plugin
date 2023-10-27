@@ -655,16 +655,6 @@
       "required": ["KUBEVIRT"]
     },
     "properties": {
-      "label": "%plugin__kubevirt-plugin~With Data upload form%",
-      "path": "~new/data"
-    },
-    "type": "console.pvc/create-prop"
-  },
-  {
-    "flags": {
-      "required": ["KUBEVIRT"]
-    },
-    "properties": {
       "alert": { "$codeRef": "pvcAlert" }
     },
     "type": "console.pvc/alert"

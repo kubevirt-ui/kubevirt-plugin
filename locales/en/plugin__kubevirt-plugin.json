@@ -1307,7 +1307,6 @@
   "Whether to attach the default graphics device or not. VNC will not be available if checked <2><0>VirtualMachine</0><1>spec</1><2>template</2><3>devices</3><4>autoattachGraphicsDevice</4></2>": "Whether to attach the default graphics device or not. VNC will not be available if checked <2><0>VirtualMachine</0><1>spec</1><2>template</2><3>devices</3><4>autoattachGraphicsDevice</4></2>",
   "Will make disk persistent on next reboot": "Will make disk persistent on next reboot",
   "Windows only": "Windows only",
-  "With Data upload form": "With Data upload form",
   "With form": "With form",
   "With grace period": "With grace period",
   "With YAML": "With YAML",
