@@ -64,6 +64,11 @@ export const useFeatures: UseFeatures = (featureName) => {
 
       return;
     }
+
+    if (!loaded && loadError && loadError?.code !== 404) {
+      setFeatureEnabled(false);
+      setLoading(false);
+    }
   }, [loadError, featureConfigMap, loaded, featureName]);
 
   const toggleFeature = async (value: boolean) => {
