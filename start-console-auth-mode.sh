@@ -4,9 +4,9 @@ set -euo pipefail
 PATH+=:/usr/bin
 
 oc process -f scripts/oauth-client.yaml | oc apply -f -
-oc get oauthclient console-oauth-client -o jsonpath='{.secret}' > scripts/console-client-secret
-oc get secrets -n default --field-selector type=kubernetes.io/service-account-token -o json | \
-    jq '.items[0].data."ca.crt"' -r | python3 -m base64 -d > scripts/ca.crt
+oc get oauthclient console-oauth-client -o jsonpath='{.secret}' >scripts/console-client-secret
+oc get secrets -n default --field-selector type=kubernetes.io/service-account-token -o json |
+    jq '.items[0].data."ca.crt"' -r | python3 -m base64 -d >scripts/ca.crt
 
 npm_package_consolePlugin_name="kubevirt-plugin"
 CONSOLE_IMAGE=${CONSOLE_IMAGE:="quay.io/openshift/origin-console"}
@@ -51,29 +51,40 @@ if [ -x "$(command -v podman)" ]; then
         # Use host networking on Linux since host.containers.internal is unreachable in some environments.
         BRIDGE_PLUGINS="${npm_package_consolePlugin_name}=http://localhost:9001"
         podman run \
-          --pull always --rm --network=host \
-          -v $PWD/scripts/console-client-secret:/tmp/console-client-secret:Z \
-          -v $PWD/scripts/ca.crt:/tmp/ca.crt:Z \
-          --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-apiserver-proxy/","endpoint":"https://kubevirt-apiserver-proxy.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
-          --env-file <(set | grep BRIDGE) \
-          $CONSOLE_IMAGE
+            --pull always --rm --network=host \
+            -v $PWD/scripts/console-client-secret:/tmp/console-client-secret:Z \
+            -v $PWD/scripts/ca.crt:/tmp/ca.crt:Z \
+            --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-apiserver-proxy/","endpoint":"https://kubevirt-apiserver-proxy.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
+            --env-file <(set | grep BRIDGE) \
+            $CONSOLE_IMAGE
     else
         BRIDGE_PLUGINS="${npm_package_consolePlugin_name}=http://host.containers.internal:9001"
         podman run \
-          --pull always --rm -p "$CONSOLE_PORT":9000 \
-          -v $PWD/scripts/console-client-secret:/tmp/console-client-secret \
-          -v $PWD/scripts/ca.crt:/tmp/ca.crt \
-          --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-apiserver-proxy/","endpoint":"https://kubevirt-apiserver-proxy.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
-          --env-file <(set | grep BRIDGE) \
-          $CONSOLE_IMAGE
+            --pull always --rm -p "$CONSOLE_PORT":9000 \
+            -v $PWD/scripts/console-client-secret:/tmp/console-client-secret \
+            -v $PWD/scripts/ca.crt:/tmp/ca.crt \
+            --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-apiserver-proxy/","endpoint":"https://kubevirt-apiserver-proxy.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
+            --env-file <(set | grep BRIDGE) \
+            $CONSOLE_IMAGE
     fi
 else
     BRIDGE_PLUGINS="${npm_package_consolePlugin_name}=http://host.docker.internal:9001"
-    docker run \
-      --pull always --rm -p "$CONSOLE_PORT":9000 \
-      -v $PWD/scripts/console-client-secret:/tmp/console-client-secret \
-      -v $PWD/scripts/ca.crt:/tmp/ca.crt \
-      --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-apiserver-proxy/","endpoint":"https://kubevirt-apiserver-proxy.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
-      --env-file <(set | grep BRIDGE) \
-      $CONSOLE_IMAGE
+    if [ "$(uname)" == "Darwin" ]; then
+        docker run \
+            --platform linux/x86_64 \
+            --pull always --rm -p "$CONSOLE_PORT":9000 \
+            -v $PWD/scripts/console-client-secret:/tmp/console-client-secret \
+            -v $PWD/scripts/ca.crt:/tmp/ca.crt \
+            --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-apiserver-proxy/","endpoint":"https://kubevirt-apiserver-proxy.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
+            --env-file <(set | grep BRIDGE) \
+            $CONSOLE_IMAGE
+    else
+        docker run \
+            --pull always --rm -p "$CONSOLE_PORT":9000 \
+            -v $PWD/scripts/console-client-secret:/tmp/console-client-secret \
+            -v $PWD/scripts/ca.crt:/tmp/ca.crt \
+            --env BRIDGE_PLUGIN_PROXY='{"services":[{"consoleAPIPath":"/api/proxy/plugin/console-plugin-kubevirt/kubevirt-apiserver-proxy/","endpoint":"https://kubevirt-apiserver-proxy.'${CLUSTER_DOMAIN}'","authorize": true}]}' \
+            --env-file <(set | grep BRIDGE) \
+            $CONSOLE_IMAGE
+    fi
 fi
