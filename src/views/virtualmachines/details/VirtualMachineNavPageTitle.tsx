@@ -12,6 +12,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Split, SplitItem } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
+import VMActionsIconBar from '@virtualmachines/actions/components/VMActionsIconBar/VMActionsIconBar';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import useVirtualMachineInstanceMigration from '@virtualmachines/actions/hooks/useVirtualMachineInstanceMigration';
 import VirtualMachinePendingChangesAlert from '@virtualmachines/details/VirtualMachinePendingChangesAlert/VirtualMachinePendingChangesAlert';
@@ -70,12 +71,15 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name,
               <SidebarEditorSwitch />
             </SplitItem>
           )}
-          {!isEmpty(vm) ? (
-            <SplitItem>
-              <VirtualMachineActions actions={actions} />
-            </SplitItem>
-          ) : (
+          {isEmpty(vm) ? (
             <Loading />
+          ) : (
+            <>
+              <VMActionsIconBar vm={vm} />
+              <SplitItem>
+                <VirtualMachineActions actions={actions} />
+              </SplitItem>
+            </>
           )}
         </Split>
       </span>
