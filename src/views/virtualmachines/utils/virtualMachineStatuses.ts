@@ -1,6 +1,8 @@
-import * as React from 'react';
+import { ComponentClass, FC } from 'react';
 
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ErrorIcon } from '@kubevirt-utils/components/ErrorIcon/ErrorIcon';
+import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import {
   HourglassHalfIcon,
   InProgressIcon,
@@ -38,7 +40,7 @@ export const errorPrintableVMStatus = {
 export const isErrorPrintableStatus = (printableStatus: string) =>
   Object.values(errorPrintableVMStatus).includes(printableStatus);
 
-export const getVMStatusIcon = (status: string): React.ComponentClass | React.FC => {
+export const getVMStatusIcon = (status: string): ComponentClass | FC => {
   switch (status) {
     case printableVMStatus.Stopped:
       return OffIcon;
@@ -61,3 +63,9 @@ export const getVMStatusIcon = (status: string): React.ComponentClass | React.FC
       return UnknownIcon;
   }
 };
+
+export const isStopped = (vm: V1VirtualMachine): boolean =>
+  getVMStatus(vm) === printableVMStatus.Stopped;
+
+export const isPaused = (vm: V1VirtualMachine): boolean =>
+  getVMStatus(vm) === printableVMStatus.Paused;

@@ -1,4 +1,5 @@
 import React, { FC, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -17,6 +18,7 @@ import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
   CardBody,
+  CardTitle,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
@@ -29,6 +31,7 @@ import {
   Split,
   SplitItem,
 } from '@patternfly/react-core';
+import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 import { printableVMStatus } from '@virtualmachines/utils';
 
@@ -36,7 +39,6 @@ import MigrationProgressPopover from './components/MigrationProgressPopover/Migr
 import StatusPopoverButton from './components/StatusPopoverButton/StatusPopoverButton';
 import VirtualMachineOverviewStatus from './components/VirtualMachineOverviewStatus/VirtualMachineOverviewStatus';
 import VirtualMachinesOverviewTabDetailsConsole from './components/VirtualMachinesOverviewTabDetailsConsole';
-import VirtualMachinesOverviewTabDetailsTitle from './components/VirtualMachinesOverviewTabDetailsTitle';
 
 import './virtual-machines-overview-tab-details.scss';
 
@@ -81,7 +83,9 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
   return (
     <div className="VirtualMachinesOverviewTabDetails--details">
       <Card>
-        <VirtualMachinesOverviewTabDetailsTitle vm={vm} />
+        <CardTitle className="text-muted card-title">
+          <Link to={createURL('details', location?.pathname)}>{t('Details')}</Link>
+        </CardTitle>
         <Divider />
         <CardBody isFilled>
           <Grid>
