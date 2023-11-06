@@ -10,9 +10,9 @@ import {
   SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Grid, GridItem, PopoverPosition } from '@patternfly/react-core';
 
 import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';

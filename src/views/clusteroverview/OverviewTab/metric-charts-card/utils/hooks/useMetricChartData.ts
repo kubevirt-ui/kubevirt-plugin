@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 import { getPrometheusData } from '@kubevirt-utils/components/Charts/utils/utils';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import { getMetricQuery } from '../metricQueries';
 

@@ -3,10 +3,10 @@ import React from 'react';
 import { NodeModel, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import NetworkAttachmentDefinitionModel from '@kubevirt-ui/kubevirt-api/console/models/NetworkAttachmentDefinitionModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, Grid, GridItem } from '@patternfly/react-core';
 
 import useResourcesQuantities from './hooks/useResourcesQuantities';

@@ -2,9 +2,9 @@ import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react'
 
 import { SSHSecretCredentials } from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/components/SSHKeySection/utils/types';
 import SelectSecret from '@kubevirt-utils/components/AuthorizedSSHKeyModal/SelectSecret';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getRandomChars, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
   Button,
   ButtonVariant,
