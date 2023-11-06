@@ -181,10 +181,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
             />
           )}
         </div>
+        {isEmpty(vms) && <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />}
         <VirtualizedTable<K8sResourceCommon>
-          NoDataEmptyMsg={() => (
-            <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
-          )}
           rowData={{
             getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
             getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
@@ -195,6 +193,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
           data={data}
           loaded={loaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded && !loadingFeatureProxy}
           loadError={loadError}
+          NoDataEmptyMsg={() => <></>}
           Row={VirtualMachineRow}
           unfilteredData={unfilteredData}
         />
