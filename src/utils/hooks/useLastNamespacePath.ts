@@ -1,12 +1,10 @@
-import {
-  useActiveNamespace,
-  useLastNamespace,
-} from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import {
   ALL_NAMESPACES,
   ALL_NAMESPACES_SESSION_KEY as ALL_NAMESPACES_ACTIVE_KEY,
 } from './constants';
+import useActiveNamespace from './useActiveNamespace';
 
 type UseActiveNamespacePathType = () => string;
 

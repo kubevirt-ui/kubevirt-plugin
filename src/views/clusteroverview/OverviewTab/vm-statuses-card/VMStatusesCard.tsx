@@ -3,10 +3,10 @@ import * as React from 'react';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
   Accordion,
   AccordionContent,

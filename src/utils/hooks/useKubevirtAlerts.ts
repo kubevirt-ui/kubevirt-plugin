@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useAlerts from '@kubevirt-utils/hooks/useAlerts/useAlerts';
 import { inNamespace, isKubeVirtAlert } from '@kubevirt-utils/utils/prometheus';
 import { Alert } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 export type UseKubevirtAlerts = () => [Alert[], boolean];
 

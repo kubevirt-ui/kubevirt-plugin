@@ -9,13 +9,13 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import {
   OnFilterChange,
   RowFilter,
   useK8sWatchResource,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import useHCMigrations from '../components/MigrationsLimitionsPopover/hooks/useHCMigrations';
 import {

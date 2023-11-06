@@ -10,10 +10,10 @@ import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBootableVolumeButton';
