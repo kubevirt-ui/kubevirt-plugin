@@ -1,23 +1,18 @@
 import React, { FC } from 'react';
 
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
-import {
-  getPendingChangesByTab,
-  hasPendingChange,
-} from '@kubevirt-utils/components/PendingChanges/utils/helpers';
+import { getPendingChangesByTab } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
 import { PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { List } from '@patternfly/react-core';
 
 type RestartPendingChangesProps = {
-  nicHotPlugEnabled: boolean;
-  nonHotPlugPendingChanges: PendingChange[];
+  nonHotPlugNICPendingChanges: PendingChange[];
   pendingChanges: PendingChange[];
 };
 
 const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
-  nicHotPlugEnabled,
-  nonHotPlugPendingChanges,
+  nonHotPlugNICPendingChanges,
   pendingChanges,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -27,7 +22,6 @@ const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
     pendingChangesDetailsTab,
     pendingChangesDisksTab,
     pendingChangesEnvTab,
-    pendingChangesNICsTab,
     pendingChangesSchedulingTab,
     pendingChangesScriptsTab,
   } = pendingChangesTabs;
@@ -42,10 +36,7 @@ const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
         <PendingChangesBreadcrumb pendingChanges={pendingChangesDetailsTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesSchedulingTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesEnvTab} />
-        {!nicHotPlugEnabled && <PendingChangesBreadcrumb pendingChanges={pendingChangesNICsTab} />}
-        {nicHotPlugEnabled && hasPendingChange(nonHotPlugPendingChanges) && (
-          <PendingChangesBreadcrumb pendingChanges={nonHotPlugPendingChanges} />
-        )}
+        <PendingChangesBreadcrumb pendingChanges={nonHotPlugNICPendingChanges} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesScriptsTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesDisksTab} />
       </List>

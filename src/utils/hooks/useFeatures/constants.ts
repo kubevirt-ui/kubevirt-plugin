@@ -13,7 +13,6 @@ export const AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID = 'automaticSubscriptionOrga
 export const INSTANCE_TYPE_ENABLED = 'instanceTypesEnabled';
 export const KUBEVIRT_APISERVER_PROXY = 'kubevirtApiserverProxy';
 export const LOAD_BALANCER_ENABLED = 'loadBalancerEnabled';
-export const BRIDGED_NIC_HOTPLUG_ENABLED = 'bridgedNICHotPlugEnabled';
 export const AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED = 'autocomputeCPULimitsPreviewEnabled';
 export const AUTOCOMPUTE_CPU_LIMITS_ENABLED = 'autocomputeCPULimitsEnabled';
 
@@ -27,7 +26,6 @@ export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
     [AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED]: 'false',
     [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
     [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
-    [BRIDGED_NIC_HOTPLUG_ENABLED]: 'false',
     [INSTANCE_TYPE_ENABLED]: 'false',
     [KUBEVIRT_APISERVER_PROXY]: 'true',
     [LOAD_BALANCER_ENABLED]: 'false',

@@ -1,11 +1,10 @@
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
+  AUTOCOMPUTE_CPU_LIMITS_LINK,
   INSTANCE_TYPES_USER_GUIDE_LINK,
-  NIC_HOT_PLUG_LINK,
 } from '@kubevirt-utils/constants/url-constants';
 import {
   AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED,
-  BRIDGED_NIC_HOTPLUG_ENABLED,
   INSTANCE_TYPE_ENABLED,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -31,12 +30,6 @@ type UsePreviewFeaturesData = () => {
 
 const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const { t } = useKubevirtTranslation();
-  const {
-    canEdit: canEditNicHotplug,
-    featureEnabled: isEnabledNicHotplug,
-    loading: loadingNicHotplug,
-    toggleFeature: toggleNicHotplug,
-  } = useFeatures(BRIDGED_NIC_HOTPLUG_ENABLED);
 
   const {
     canEdit: canEditInstancetypes,
@@ -54,15 +47,6 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
 
   const features = [
     {
-      canEdit: canEditNicHotplug,
-      externalLink: NIC_HOT_PLUG_LINK,
-      featureEnabled: isEnabledNicHotplug,
-      id: BRIDGED_NIC_HOTPLUG_ENABLED,
-      label: t('Enable bridged network interface hot plug'),
-      loading: loadingNicHotplug,
-      toggleFeature: toggleNicHotplug,
-    },
-    {
       canEdit: canEditInstancetypes,
       externalLink: INSTANCE_TYPES_USER_GUIDE_LINK,
       featureEnabled: isEnabledInstancetypes,
@@ -73,7 +57,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
     },
     {
       canEdit: canEditCpuLimits,
-      externalLink: NIC_HOT_PLUG_LINK,
+      externalLink: AUTOCOMPUTE_CPU_LIMITS_LINK,
       featureEnabled: isEnabledCpuLimits,
       id: AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED,
       label: t('Enable CPU limit'),
