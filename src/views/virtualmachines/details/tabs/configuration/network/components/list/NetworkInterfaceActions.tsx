@@ -10,8 +10,6 @@ import {
   updateVMNetworkInterfaces,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { BRIDGED_NIC_HOTPLUG_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -41,7 +39,6 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { featureEnabled: nicHotPlugEnabled } = useFeatures(BRIDGED_NIC_HOTPLUG_ENABLED);
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const deleteModalHeader = t('Delete NIC?');
@@ -49,14 +46,14 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const deleteBtnText = t('Delete');
 
   const resultVirtualMachine = useMemo(() => {
-    const isHotPlug = nicHotPlugEnabled && Boolean(nicPresentation?.iface?.bridge);
+    const isHotPlug = Boolean(nicPresentation?.iface?.bridge);
     const networks = isHotPlug
       ? getNetworks(vm)
       : getNetworks(vm)?.filter(({ name }) => name !== nicName);
     const interfaces = updateInterfacesForDeletion(isHotPlug, nicName, vm);
 
     return updateVMNetworkInterfaces(vm, networks, interfaces);
-  }, [nicHotPlugEnabled, nicName, nicPresentation, vm]);
+  }, [nicName, nicPresentation, vm]);
 
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (

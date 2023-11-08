@@ -1,13 +1,9 @@
 import React, { FC } from 'react';
 
 import EnableFeatureCheckbox from '@kubevirt-utils/components/EnableFeatureCheckbox/EnableFeatureCheckbox';
-import {
-  INSTANCE_TYPES_USER_GUIDE_LINK,
-  NIC_HOT_PLUG_LINK,
-} from '@kubevirt-utils/constants/url-constants';
+import { INSTANCE_TYPES_USER_GUIDE_LINK } from '@kubevirt-utils/constants/url-constants';
 import {
   AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED,
-  BRIDGED_NIC_HOTPLUG_ENABLED,
   INSTANCE_TYPE_ENABLED,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -30,14 +26,6 @@ const EnablePreviewFeaturesSection: FC = () => {
       }
     >
       <Stack hasGutter>
-        <StackItem isFilled>
-          <EnableFeatureCheckbox
-            externalLink={NIC_HOT_PLUG_LINK}
-            featureName={BRIDGED_NIC_HOTPLUG_ENABLED}
-            id={BRIDGED_NIC_HOTPLUG_ENABLED}
-            label={t('Enable bridged network interface hot plug')}
-          />
-        </StackItem>
         <StackItem isFilled>
           <EnableFeatureCheckbox
             externalLink={INSTANCE_TYPES_USER_GUIDE_LINK}

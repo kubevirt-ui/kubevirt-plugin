@@ -34,7 +34,7 @@ const AutoComputeCPULimits: FC = () => {
 
   useEffect(() => {
     if (!autoComputeCPUPreviewEnabled) toggleCPULimits(false);
-  }, [autoComputeCPUPreviewEnabled]);
+  }, [autoComputeCPUPreviewEnabled]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

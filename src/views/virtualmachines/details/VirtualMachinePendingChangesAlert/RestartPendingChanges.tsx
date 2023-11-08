@@ -10,13 +10,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { List } from '@patternfly/react-core';
 
 type RestartPendingChangesProps = {
-  nicHotPlugEnabled: boolean;
   nonHotPlugPendingChanges: PendingChange[];
   pendingChanges: PendingChange[];
 };
 
 const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
-  nicHotPlugEnabled,
   nonHotPlugPendingChanges,
   pendingChanges,
 }) => {
@@ -42,8 +40,8 @@ const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
         <PendingChangesBreadcrumb pendingChanges={pendingChangesDetailsTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesSchedulingTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesEnvTab} />
-        {!nicHotPlugEnabled && <PendingChangesBreadcrumb pendingChanges={pendingChangesNICsTab} />}
-        {nicHotPlugEnabled && hasPendingChange(nonHotPlugPendingChanges) && (
+        <PendingChangesBreadcrumb pendingChanges={pendingChangesNICsTab} />
+        {hasPendingChange(nonHotPlugPendingChanges) && (
           <PendingChangesBreadcrumb pendingChanges={nonHotPlugPendingChanges} />
         )}
         <PendingChangesBreadcrumb pendingChanges={pendingChangesScriptsTab} />

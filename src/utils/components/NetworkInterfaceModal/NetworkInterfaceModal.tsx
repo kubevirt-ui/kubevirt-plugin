@@ -3,11 +3,7 @@ import React, { FC, ReactNode, useCallback, useState } from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import BridgedNICHotPlugModalAlert from '@kubevirt-utils/components/BridgedNICHotPlugModalAlert/BridgedNICHotPlugModalAlert';
-import PreviewFeatureAlert from '@kubevirt-utils/components/PreviewFeatureAlert/PreviewFeatureAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { BRIDGED_NIC_HOTPLUG_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import {
   interfacesTypes,
   NetworkPresentation,
@@ -15,7 +11,7 @@ import {
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Form } from '@patternfly/react-core';
-import { printableVMStatus } from '@virtualmachines/utils';
+import { isRunning } from '@virtualmachines/utils';
 
 import NameFormField from './components/NameFormField';
 import NetworkInterfaceMACAddressInput from './components/NetworkInterfaceMacAddressInput';
@@ -67,7 +63,6 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   onSubmit,
   vm,
 }) => {
-  const { featureEnabled: bridgedNICHotPlugEnabled } = useFeatures(BRIDGED_NIC_HOTPLUG_ENABLED);
   const { iface = null, network = null } = nicPresentation;
   const [nicName, setNicName] = useState(network?.name || generateNicName());
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
@@ -87,9 +82,9 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   }, [nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType, onSubmit]);
 
   const isBridgedNIC = interfaceType === interfacesTypes.bridge;
-  const vmIsRunning = getVMStatus(vm) === printableVMStatus.Running;
-  const showRestartHeader = !bridgedNICHotPlugEnabled || !isBridgedNIC;
-  const showRestartOrMigrateHeader = bridgedNICHotPlugEnabled && vmIsRunning && isBridgedNIC;
+  const vmIsRunning = isRunning(vm);
+  const showRestartHeader = !isBridgedNIC;
+  const showRestartOrMigrateHeader = vmIsRunning && isBridgedNIC;
 
   return (
     <TabModal<K8sResourceCommon>
@@ -103,7 +98,6 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
       <Form>
         {showRestartHeader && Header}
         {showRestartOrMigrateHeader && <BridgedNICHotPlugModalAlert />}
-        {!bridgedNICHotPlugEnabled && vmIsRunning && <PreviewFeatureAlert onClose={onClose} />}
         <NameFormField isDisabled={fixedName} objName={nicName} setObjName={setNicName} />
         <NetworkInterfaceModelSelect
           interfaceModel={interfaceModel}
@@ -122,7 +116,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           interfaceType={interfaceType}
           networkName={networkName}
           setInterfaceType={setInterfaceType}
-          showTypeHelperText={vmIsRunning && !isEdit && bridgedNICHotPlugEnabled}
+          showTypeHelperText={vmIsRunning && !isEdit}
         />
         <NetworkInterfaceMACAddressInput
           interfaceMACAddress={interfaceMACAddress}
