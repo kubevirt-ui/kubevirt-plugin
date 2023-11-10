@@ -172,6 +172,15 @@ export const nonHotPlugNICChangesExist = (
   return moreChangeTypesExist || nonHotPlugNICsExist;
 };
 
+const isHotPlugNIC = (
+  nicName: string,
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  const iface = getInterfaceByName(nicName, vm, vmi);
+  return Boolean(iface?.bridge || iface?.sriov);
+};
+
 const getSortedNICs = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
@@ -179,7 +188,7 @@ const getSortedNICs = (
   const changedNICs = getChangedNICs(vm, vmi);
   return changedNICs?.reduce(
     (acc, nicName) => {
-      const isHotPlug = Boolean(getInterfaceByName(nicName, vm, vmi)?.bridge);
+      const isHotPlug = isHotPlugNIC(nicName, vm, vmi);
       isHotPlug ? acc.hotPlugNICs.push(nicName) : acc.nonHotPlugNICs.push(nicName);
       return acc;
     },

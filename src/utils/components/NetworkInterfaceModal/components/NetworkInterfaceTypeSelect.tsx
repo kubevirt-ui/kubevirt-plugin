@@ -65,8 +65,10 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
 
   return (
     <FormGroup
+      helperText={
+        showTypeHelperText && t('Hot plug is enabled only for "Bridge" and "SR-IOV" types')
+      }
       fieldId="type"
-      helperText={showTypeHelperText && t('Hot plug is enabled only for "Bridge" type')}
       label={t('Type')}
     >
       <div data-test-id="network-interface-type-select">

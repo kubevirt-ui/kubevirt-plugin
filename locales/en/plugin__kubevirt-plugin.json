@@ -538,7 +538,7 @@
   "Host devices": "Host devices",
   "Host devices ({{hostDevicesCount}})": "Host devices ({{hostDevicesCount}})",
   "Hostname": "Hostname",
-  "Hot plug is enabled only for \"Bridge\" type": "Hot plug is enabled only for \"Bridge\" type",
+  "Hot plug is enabled only for \"Bridge\" and \"SR-IOV\" types": "Hot plug is enabled only for \"Bridge\" and \"SR-IOV\" types",
   "Hot plug is enabled only for \"Disk\" type": "Hot plug is enabled only for \"Disk\" type",
   "Hot plug is enabled only for \"SCSI\" interface": "Hot plug is enabled only for \"SCSI\" interface",
   "HP series": "HP series",

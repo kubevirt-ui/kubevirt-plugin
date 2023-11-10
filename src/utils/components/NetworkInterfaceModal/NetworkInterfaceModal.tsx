@@ -2,7 +2,7 @@ import React, { FC, ReactNode, useCallback, useState } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import BridgedNICHotPlugModalAlert from '@kubevirt-utils/components/BridgedNICHotPlugModalAlert/BridgedNICHotPlugModalAlert';
+import NICHotPlugModalAlert from '@kubevirt-utils/components/BridgedNICHotPlugModalAlert/NICHotPlugModalAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import {
   interfacesTypes,
@@ -81,10 +81,11 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     );
   }, [nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType, onSubmit]);
 
-  const isBridgedNIC = interfaceType === interfacesTypes.bridge;
+  const isHotPlugNIC =
+    interfaceType === interfacesTypes.bridge || interfaceType === interfacesTypes.sriov;
   const vmIsRunning = isRunning(vm);
-  const showRestartHeader = !isBridgedNIC;
-  const showRestartOrMigrateHeader = vmIsRunning && isBridgedNIC;
+  const showRestartHeader = !isHotPlugNIC;
+  const showRestartOrMigrateHeader = vmIsRunning && isHotPlugNIC;
 
   return (
     <TabModal<K8sResourceCommon>
@@ -97,7 +98,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     >
       <Form>
         {showRestartHeader && Header}
-        {showRestartOrMigrateHeader && <BridgedNICHotPlugModalAlert />}
+        {showRestartOrMigrateHeader && <NICHotPlugModalAlert />}
         <NameFormField isDisabled={fixedName} objName={nicName} setObjName={setNicName} />
         <NetworkInterfaceModelSelect
           interfaceModel={interfaceModel}
