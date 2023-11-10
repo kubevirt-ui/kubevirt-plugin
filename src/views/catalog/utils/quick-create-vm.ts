@@ -23,6 +23,7 @@ type QuickCreateVMType = (inputs: {
   models: { [key: string]: K8sModel };
   overrides: {
     authorizedSSHKey: string;
+    autoUpdateEnabled: boolean;
     name: string;
     namespace: string;
     startVM: boolean;
@@ -33,7 +34,14 @@ type QuickCreateVMType = (inputs: {
 
 export const quickCreateVM: QuickCreateVMType = async ({
   models,
-  overrides: { authorizedSSHKey, name, namespace = DEFAULT_NAMESPACE, startVM, subscriptionData },
+  overrides: {
+    authorizedSSHKey,
+    autoUpdateEnabled,
+    name,
+    namespace = DEFAULT_NAMESPACE,
+    startVM,
+    subscriptionData,
+  },
   template,
 }) => {
   const processedTemplate = await k8sCreate<V1Template>({
@@ -59,7 +67,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
 
     const updatedVolumes = applyCloudDriveCloudInitVolume(vm);
     draftVM.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
-      ? updateCloudInitRHELSubscription(updatedVolumes, subscriptionData)
+      ? updateCloudInitRHELSubscription(updatedVolumes, subscriptionData, autoUpdateEnabled)
       : updatedVolumes;
   });
 

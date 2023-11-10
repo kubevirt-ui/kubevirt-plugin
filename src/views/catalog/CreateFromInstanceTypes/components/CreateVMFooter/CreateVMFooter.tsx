@@ -1,5 +1,6 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { AUTOMATIC_UPDATE_FEATURE_NAME } from 'src/views/clusteroverview/SettingsTab/ClusterTab/components/AutomaticSubscriptionRHELGuests/utils/constants';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { generateVM } from '@catalog/CreateFromInstanceTypes/utils/utils';
@@ -7,6 +8,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
 import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
@@ -41,6 +43,8 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();
+
+  const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
 
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { subscriptionData } = useRHELAutomaticSubscription();
@@ -77,6 +81,7 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
       vmNamespaceTarget,
       startVM,
       subscriptionData,
+      autoUpdateEnabled,
     );
 
     if (
@@ -156,6 +161,7 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({ isDisabled }) => {
                         vmNamespaceTarget,
                         startVM,
                         subscriptionData,
+                        autoUpdateEnabled,
                       )}
                       {...props}
                     />
