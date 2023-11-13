@@ -8,7 +8,7 @@ import {
   AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
@@ -16,10 +16,13 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 import { addLabelsToHyperConvergedCR } from './utils/utils';
 import ProjectSelectorModal from './ProjectSelectorModal';
 
-const AutoComputeCPULimits: FC = () => {
+type AutoComputeCPULimitsProps = {
+  hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
+};
+const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({ hyperConvergeConfiguration }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const [hco] = useHyperConvergeConfiguration();
+  const [hco] = hyperConvergeConfiguration;
   const [error, setError] = useState<Error>();
   const { featureEnabled: autoComputeCPUEnabled, toggleFeature: toggleCPULimits } = useFeatures(
     AUTOCOMPUTE_CPU_LIMITS_ENABLED,
@@ -34,50 +37,48 @@ const AutoComputeCPULimits: FC = () => {
 
   useEffect(() => {
     if (!autoComputeCPUPreviewEnabled) toggleCPULimits(false);
-  }, [autoComputeCPUPreviewEnabled]);
+  }, [autoComputeCPUPreviewEnabled, toggleCPULimits]);
 
   return (
-    <>
-      <ExpandSectionWithSwitch
-        helpTextIconContent={t('Automatically compute CPU limits on projects containing labels')}
-        isDisabled={!autoComputeCPUPreviewEnabled}
-        switchIsOn={autoComputeCPUEnabled && autoComputeCPUPreviewEnabled}
-        toggleContent={t('Auto-compute CPU limits')}
-        turnOnSwitch={toggleCPULimits}
-      >
-        <div>
-          {t('Project selector')}
-          <Button
-            onClick={() =>
-              createModal((props) => (
-                <ProjectSelectorModal
-                  {...props}
-                  labels={
-                    hco?.spec?.resourceRequirements?.autoCPULimitNamespaceLabelSelector?.matchLabels
-                  }
-                  onSubmit={handleSubmit}
-                />
-              ))
-            }
-            isDisabled={!autoComputeCPUEnabled || !autoComputeCPUPreviewEnabled}
-            isInline
-            variant={ButtonVariant.link}
-          >
-            <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-          </Button>
-        </div>
-        {error && (
-          <Alert
-            className="autocompute-cpu-limits__error-alert"
-            isInline
-            title={t('Error')}
-            variant={AlertVariant.danger}
-          >
-            {error}
-          </Alert>
-        )}
-      </ExpandSectionWithSwitch>
-    </>
+    <ExpandSectionWithSwitch
+      helpTextIconContent={t('Automatically compute CPU limits on projects containing labels')}
+      isDisabled={!autoComputeCPUPreviewEnabled}
+      switchIsOn={autoComputeCPUEnabled && autoComputeCPUPreviewEnabled}
+      toggleContent={t('Auto-compute CPU limits')}
+      turnOnSwitch={toggleCPULimits}
+    >
+      <div>
+        {t('Project selector')}
+        <Button
+          onClick={() =>
+            createModal((props) => (
+              <ProjectSelectorModal
+                {...props}
+                labels={
+                  hco?.spec?.resourceRequirements?.autoCPULimitNamespaceLabelSelector?.matchLabels
+                }
+                onSubmit={handleSubmit}
+              />
+            ))
+          }
+          isDisabled={!autoComputeCPUEnabled || !autoComputeCPUPreviewEnabled}
+          isInline
+          variant={ButtonVariant.link}
+        >
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+        </Button>
+      </div>
+      {error && (
+        <Alert
+          className="autocompute-cpu-limits__error-alert"
+          isInline
+          title={t('Error')}
+          variant={AlertVariant.danger}
+        >
+          {error}
+        </Alert>
+      )}
+    </ExpandSectionWithSwitch>
   );
 };
 

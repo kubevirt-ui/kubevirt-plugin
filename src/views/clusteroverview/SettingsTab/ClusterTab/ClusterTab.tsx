@@ -1,30 +1,41 @@
 import React, { FC } from 'react';
 
-import { Divider } from '@patternfly/react-core';
+import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Alert, AlertVariant, Divider } from '@patternfly/react-core';
 
-import AutomaticSubscriptionRHELGuests from './components/AutomaticSubscriptionRHELGuests/AutomaticSubscriptionRHELGuests';
 import EnableLoadBalancerSection from './components/EnableLoadBalancerSection/EnableLoadBalancerSection';
 import EnablePreviewFeaturesSection from './components/EnablePreviewFeaturesSection/EnablePreviewFeaturesSection';
 import GeneralInformation from './components/GeneralInformation/GeneralInformation';
+import GuestManagementSection from './components/GuestManagmentSection/GuestManagementSection';
 import LiveMigrationSection from './components/LiveMigrationSection/LiveMigrationSection';
 import ResourceManagementSection from './components/ResourceManagementSection/ResourceManagementSection';
 import TemplatesProjectSection from './components/TemplatesProjectSection/TemplatesProjectSection';
 
 const ClusterTab: FC = () => {
+  const { t } = useKubevirtTranslation();
+  const hyperConvergeConfiguration = useHyperConvergeConfiguration();
+  const error = hyperConvergeConfiguration?.[2];
+
   return (
     <>
       <GeneralInformation />
       <EnablePreviewFeaturesSection />
       <Divider className="section-divider" />
-      <LiveMigrationSection />
+      <LiveMigrationSection hyperConvergeConfiguration={hyperConvergeConfiguration} />
       <Divider className="section-divider" />
-      <AutomaticSubscriptionRHELGuests />
+      <GuestManagementSection hyperConvergeConfiguration={hyperConvergeConfiguration} />
       <Divider className="section-divider" />
       <EnableLoadBalancerSection />
       <Divider className="section-divider" />
-      <TemplatesProjectSection />
+      <TemplatesProjectSection hyperConvergeConfiguration={hyperConvergeConfiguration} />
       <Divider className="section-divider" />
-      <ResourceManagementSection />
+      <ResourceManagementSection hyperConvergeConfiguration={hyperConvergeConfiguration} />
+      {error && (
+        <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
+          {error}
+        </Alert>
+      )}
     </>
   );
 };

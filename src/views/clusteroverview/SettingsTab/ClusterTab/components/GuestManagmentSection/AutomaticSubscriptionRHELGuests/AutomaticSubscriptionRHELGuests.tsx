@@ -5,7 +5,7 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack } from '@patternfly/react-core';
 
-import ExpandSection from '../../../ExpandSection/ExpandSection';
+import ExpandSection from '../../../../ExpandSection/ExpandSection';
 
 import AutomaticSubscriptionForm from './components/AutomaticSubscriptionForm/AutomaticSubscriptionForm';
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from './utils/constants';

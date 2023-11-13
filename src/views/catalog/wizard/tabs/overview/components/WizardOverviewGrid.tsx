@@ -3,7 +3,7 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { TabsData } from '@catalog/utils/WizardVMContext/utils/tabs-data';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
@@ -56,11 +56,19 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   const interfaces = vm?.spec?.template?.spec?.domain?.devices?.interfaces;
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
   const displayName = tabsData?.overview?.templateMetadata?.displayName;
+  const logSerialConsole = (
+    vm.spec.template.spec.domain.devices as V1Devices & {
+      logSerialConsole: boolean;
+    }
+  )?.logSerialConsole;
 
   const hostDevicesCount = getHostDevices(vm)?.length || 0;
   const gpusCount = getGPUDevices(vm)?.length || 0;
   const nDevices = hostDevicesCount + gpusCount;
   const [isChecked, setIsChecked] = useState<boolean>(!!startStrategy);
+  const [isCheckedGuestSystemLogAccess, setIsCheckedGuestSystemLogAccess] = useState<boolean>(
+    logSerialConsole || logSerialConsole === undefined,
+  );
 
   const updateWorkload = (newWorkload: string) => {
     return updateVM((draftVM) => {
@@ -277,6 +285,33 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             isEdit
             testId="wizard-overview-hostname"
             title={t('Hostname')}
+          />
+          <WizardDescriptionItem
+            description={
+              <Switch
+                onChange={(checked) => {
+                  setIsCheckedGuestSystemLogAccess(checked);
+                  updateVM((vmDraft) => {
+                    (
+                      vmDraft.spec.template.spec.domain.devices as V1Devices & {
+                        logSerialConsole: boolean;
+                      }
+                    ).logSerialConsole = checked ? null : false;
+                    return vmDraft;
+                  });
+                }}
+                id="guest-system-log-access"
+                isChecked={isCheckedGuestSystemLogAccess}
+              />
+            }
+            helperPopover={{
+              content: t(
+                'Enables access to the VirtualMachine guest system log. Wait a few seconds for logging to start before viewing the log.',
+              ),
+              header: t('Guest system log access'),
+            }}
+            testId="guest-system-log-access"
+            title={t('Guest system log access')}
           />
         </DescriptionList>
       </GridItem>

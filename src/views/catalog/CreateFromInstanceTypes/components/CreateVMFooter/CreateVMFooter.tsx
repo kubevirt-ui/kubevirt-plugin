@@ -1,6 +1,5 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { AUTOMATIC_UPDATE_FEATURE_NAME } from 'src/views/clusteroverview/SettingsTab/ClusterTab/components/AutomaticSubscriptionRHELGuests/utils/constants';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { generateVM } from '@catalog/CreateFromInstanceTypes/utils/utils';
@@ -27,6 +26,8 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+
+import { AUTOMATIC_UPDATE_FEATURE_NAME } from '../../../../clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 
 import YamlAndCLIViewerModal from './components/YamlAndCLIViewerModal/YamlAndCLIViewerModal';
 

@@ -1,9 +1,13 @@
-import * as React from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1Devices,
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
@@ -18,7 +22,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { WORKLOADS, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import { getWorkload, VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
-import { DescriptionList, GridItem } from '@patternfly/react-core';
+import { DescriptionList, GridItem, Switch } from '@patternfly/react-core';
 import VirtualMachineStatus from '@virtualmachines/list/components/VirtualMachineStatus/VirtualMachineStatus';
 
 import { VirtualMachineDetailsRightGridLayoutPresentation } from '../../../utils/gridHelper';
@@ -29,8 +33,7 @@ type VirtualMachineDetailsRightGridLayout = {
   vmDetailsRightGridObj: VirtualMachineDetailsRightGridLayoutPresentation;
   vmi?: V1VirtualMachineInstance;
 };
-
-const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightGridLayout> = ({
+const VirtualMachineDetailsRightGridLayout: FC<VirtualMachineDetailsRightGridLayout> = ({
   vm,
   vmDetailsRightGridObj,
   vmi,
@@ -39,15 +42,24 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
 
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
+  const logSerialConsole = (
+    vm?.spec?.template?.spec?.domain?.devices as V1Devices & { logSerialConsole: boolean }
+  )?.logSerialConsole;
+  const [isCheckedGuestSystemAccessLog, setIsCheckedGuestSystemAccessLog] = useState<boolean>(
+    logSerialConsole || logSerialConsole === undefined,
+  );
+
   const hostname = vm?.spec?.template?.spec?.hostname;
   const vmName = vm?.metadata?.name;
+
   const [canGetNode] = useAccessReview({
     namespace: vmi?.metadata?.namespace,
     resource: NodeModel.plural,
     verb: 'get' as K8sVerb,
   });
 
-  const onSubmit = React.useCallback(
+  const onSubmit = useCallback(
     (obj: V1VirtualMachine) =>
       k8sUpdate({
         data: obj,
@@ -59,6 +71,15 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
   );
 
   const vmWorkload = getWorkload(vm);
+
+  const updateGuestSystemAccessLog = (checked: boolean) => {
+    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
+      (
+        vmDraft.spec.template.spec.domain.devices as V1Devices & { logSerialConsole: boolean }
+      ).logSerialConsole = checked ? null : false;
+    });
+    onSubmit(updatedVM);
+  };
 
   const updateWorkload = (newWorkload: WORKLOADS) => {
     if (vmWorkload === newWorkload) return Promise.resolve();
@@ -177,6 +198,24 @@ const VirtualMachineDetailsRightGridLayout: React.FC<VirtualMachineDetailsRightG
         <VirtualMachineDescriptionItem
           descriptionData={<HardwareDevices canEdit onSubmit={onSubmit} vm={vm} vmi={vmi} />}
           descriptionHeader={t('Hardware devices')}
+        />
+        <VirtualMachineDescriptionItem
+          bodyContent={t(
+            'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
+          )}
+          descriptionData={
+            <Switch
+              onChange={(checked) => {
+                setIsCheckedGuestSystemAccessLog(checked);
+                updateGuestSystemAccessLog(checked);
+              }}
+              id="guest-system-log-access"
+              isChecked={isCheckedGuestSystemAccessLog}
+            />
+          }
+          data-test-id="guest-system-log-access"
+          descriptionHeader={t('Guest system log access')}
+          isPopover
         />
       </DescriptionList>
     </GridItem>
