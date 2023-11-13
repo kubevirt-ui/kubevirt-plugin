@@ -1,6 +1,7 @@
 import React, { FC, memo, MouseEvent, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import produce from 'immer';
+import { AUTOMATIC_UPDATE_FEATURE_NAME } from 'src/views/clusteroverview/SettingsTab/ClusterTab/components/AutomaticSubscriptionRHELGuests/utils/constants';
 
 import { NAME_INPUT_FIELD } from '@catalog/customize/constants';
 import { isNameParameterExists, replaceTemplateParameterValue } from '@catalog/customize/utils';
@@ -18,6 +19,7 @@ import {
   addSecretToVM,
   applyCloudDriveCloudInitVolume,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { getAnnotation, getResourceUrl } from '@kubevirt-utils/resources/shared';
@@ -77,6 +79,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
     const history = useHistory();
     const { t } = useKubevirtTranslation();
     const { updateTabsData, updateVM, vm } = useWizardVMContext();
+    const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
 
     const [vmName, setVMName] = useState(initialVMName || '');
     const [startVM, setStartVM] = useState(true);
@@ -126,7 +129,14 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
       quickCreateVM({
         models,
-        overrides: { authorizedSSHKey, name: vmName, namespace, startVM, subscriptionData },
+        overrides: {
+          authorizedSSHKey,
+          autoUpdateEnabled,
+          name: vmName,
+          namespace,
+          startVM,
+          subscriptionData,
+        },
         template: templateToProcess,
       })
         .then((quickCreatedVM) => {

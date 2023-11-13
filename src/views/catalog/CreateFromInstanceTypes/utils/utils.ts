@@ -1,11 +1,14 @@
-/* eslint-disable perfectionist/sort-objects */
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { convertUserDataObjectToYAML } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
-import { ACTIVATION_KEY } from '@kubevirt-utils/components/CloudinitModal/utils/consts';
+import {
+  addCloudInitUpdateCMD,
+  CloudInitUserData,
+  convertUserDataObjectToYAML,
+} from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { ACTIVATION_KEY } from '@kubevirt-utils/components/CloudinitModal/utils/constants';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
@@ -31,21 +34,27 @@ const getCloudInitUserNameByOS = (selectedPreferenceName: string): string => {
 export const createPopulatedCloudInitYAML = (
   selectedPreference: string,
   subscriptionData: RHELAutomaticSubscriptionData,
+  autoUpdateEnabled?: boolean,
 ) => {
   const { activationKey, organizationID } = subscriptionData;
-  return convertUserDataObjectToYAML(
-    {
-      user: getCloudInitUserNameByOS(selectedPreference),
-      password: generateCloudInitPassword(),
-      chpasswd: { expire: false },
-      ...(selectedPreference.includes(OS_NAME_TYPES.rhel) &&
-        !isEmpty(activationKey) &&
-        !isEmpty(organizationID) && {
-          rh_subscription: { [ACTIVATION_KEY]: activationKey, org: organizationID },
-        }),
-    },
-    true,
-  );
+
+  const cloudInitConfig: CloudInitUserData = {
+    chpasswd: { expire: false },
+    password: generateCloudInitPassword(),
+    user: getCloudInitUserNameByOS(selectedPreference),
+  };
+
+  const isRHELVM = selectedPreference.includes(OS_NAME_TYPES.rhel);
+
+  if (isRHELVM && !isEmpty(activationKey) && !isEmpty(organizationID)) {
+    cloudInitConfig.rh_subscription = { [ACTIVATION_KEY]: activationKey, org: organizationID };
+
+    if (autoUpdateEnabled) {
+      addCloudInitUpdateCMD(cloudInitConfig);
+    }
+  }
+
+  return convertUserDataObjectToYAML(cloudInitConfig, true);
 };
 
 export const generateVM = (
@@ -53,6 +62,7 @@ export const generateVM = (
   targetNamespace: string,
   startVM: boolean,
   subscriptionData: RHELAutomaticSubscriptionData,
+  autoUpdateEnabled?: boolean,
 ) => {
   const { pvcSource, selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
     instanceTypeState;
@@ -141,7 +151,11 @@ export const generateVM = (
             },
             {
               cloudInitNoCloud: {
-                userData: createPopulatedCloudInitYAML(selectedPreference, subscriptionData),
+                userData: createPopulatedCloudInitYAML(
+                  selectedPreference,
+                  subscriptionData,
+                  autoUpdateEnabled,
+                ),
               },
               name: 'cloudinitdisk',
             },

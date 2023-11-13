@@ -10,7 +10,12 @@ import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAuto
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
-import { ACTIVATION_KEY, CLOUD_CONFIG_HEADER } from './consts';
+import {
+  ACTIVATION_KEY,
+  AUTO_UPDATE_OS_CMD,
+  CLOUD_CONFIG_HEADER,
+  DNF_AUTOMATIC_PACKAGE,
+} from './constants';
 
 export const deleteObjBlankValues = (obj: object = {}) =>
   Object.fromEntries(Object.entries(obj)?.filter(([, v]) => !!v));
@@ -102,9 +107,18 @@ export const createDefaultCloudInitYAML = () => ({
   userData: '',
 });
 
+export const addCloudInitUpdateCMD = (userData: CloudInitUserData) => {
+  userData.packages ??= [];
+  userData.packages.push(DNF_AUTOMATIC_PACKAGE);
+
+  userData.runcmd ??= [];
+  userData.runcmd.push(AUTO_UPDATE_OS_CMD);
+};
+
 export const updateCloudInitRHELSubscription = (
   vmVolumes: V1Volume[] = [],
   subscriptionData: RHELAutomaticSubscriptionData,
+  autoUpdateEnabled?: boolean,
 ): V1Volume[] => {
   const { activationKey, organizationID } = subscriptionData || {};
 
@@ -129,6 +143,8 @@ export const updateCloudInitRHELSubscription = (
       [ACTIVATION_KEY]: activationKey,
       org: organizationID,
     };
+
+    autoUpdateEnabled && addCloudInitUpdateCMD(draftUserDataObject);
   });
 
   const updatedCloudInitVolumeData = produce(cloudInitVolData, (draftCloudInitVolumeData) => {
@@ -145,11 +161,13 @@ export const updateCloudInitRHELSubscription = (
 export type CloudInitUserData = {
   chpasswd?: { expire?: boolean };
   hostname?: string;
+  packages?: string[];
   password: string;
   rh_subscription?: {
     [ACTIVATION_KEY]: string;
     org: string;
   };
+  runcmd?: string[];
   user: string;
 };
 
