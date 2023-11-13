@@ -326,6 +326,17 @@
       "required": ["KUBEVIRT"]
     },
     "properties": {
+      "component": { "$codeRef": "LogsStandAlone" },
+      "exact": false,
+      "path": ["/k8s/ns/:ns/kubevirt.io~v1~VirtualMachine/:name/diagnostics/logs/standalone"]
+    },
+    "type": "console.page/route/standalone"
+  },
+  {
+    "flags": {
+      "required": ["KUBEVIRT"]
+    },
+    "properties": {
       "model": {
         "group": "kubevirt.io",
         "kind": "VirtualMachine",

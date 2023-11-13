@@ -57,7 +57,7 @@ export const convertYAMLToNetworkDataObject = (networkData: string): CloudInitNe
   try {
     const networkObj = load(networkData) as CloudInitNetwork;
 
-    const name = Object.keys(networkObj?.ethernets)?.[0];
+    const name = networkObj?.ethernets && Object.keys(networkObj?.ethernets)?.[0];
 
     const ips =
       !isEmpty(networkObj?.ethernets?.[name]?.addresses) &&

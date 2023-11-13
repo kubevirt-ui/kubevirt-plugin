@@ -4,7 +4,7 @@ import { Trans } from 'react-i18next';
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
@@ -36,7 +36,13 @@ import {
 
 import './templates-project-section.scss';
 
-const TemplatesProjectSection: FC = () => {
+type TemplatesProjectSectionProps = {
+  hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
+};
+
+const TemplatesProjectSection: FC<TemplatesProjectSectionProps> = ({
+  hyperConvergeConfiguration,
+}) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -51,7 +57,7 @@ const TemplatesProjectSection: FC = () => {
     },
   );
 
-  const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration();
+  const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
 
   useEffect(() => {
     if (hyperConverge) {
@@ -137,14 +143,14 @@ const TemplatesProjectSection: FC = () => {
       ) : (
         <Skeleton width={'300px'} />
       )}
-      {(error || projectsLoadingError || hyperLoadingError) && (
+      {(error || projectsLoadingError) && (
         <Alert
           className="templates-project-tab__main--error"
           isInline
           title={t('Error')}
           variant={AlertVariant.danger}
         >
-          {error || projectsLoadingError || hyperLoadingError}
+          {error || projectsLoadingError}
         </Alert>
       )}
     </ExpandSection>

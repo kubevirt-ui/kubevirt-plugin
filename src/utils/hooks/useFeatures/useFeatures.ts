@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import produce from 'immer';
 
 import { ConfigMapModel, RoleBindingModel, RoleModel } from '@kubevirt-ui/kubevirt-api/console';
@@ -71,26 +71,29 @@ export const useFeatures: UseFeatures = (featureName) => {
     }
   }, [loadError, featureConfigMap, loaded, featureName]);
 
-  const toggleFeature = async (value: boolean) => {
-    const updatedConfigMap = produce(featureConfigMap, (draftCM) => {
-      if (isEmpty(draftCM?.data)) draftCM.data = {};
-      draftCM.data[featureName] = value.toString();
-    });
-    setLoading(true);
-
-    try {
-      const promise = await k8sUpdate({
-        data: updatedConfigMap,
-        model: ConfigMapModel,
+  const toggleFeature = useCallback(
+    async (value: boolean) => {
+      const updatedConfigMap = produce(featureConfigMap, (draftCM) => {
+        if (isEmpty(draftCM?.data)) draftCM.data = {};
+        draftCM.data[featureName] = value.toString();
       });
-      setLoading(false);
-      setError(null);
-      return promise;
-    } catch (updateError) {
-      setLoading(false);
-      setError(updateError);
-    }
-  };
+      setLoading(true);
+
+      try {
+        const promise = await k8sUpdate({
+          data: updatedConfigMap,
+          model: ConfigMapModel,
+        });
+        setLoading(false);
+        setError(null);
+        return promise;
+      } catch (updateError) {
+        setLoading(false);
+        setError(updateError);
+      }
+    },
+    [featureConfigMap, featureName],
+  );
 
   return {
     canEdit: isAdmin,

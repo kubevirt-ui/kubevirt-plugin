@@ -1,4 +1,16 @@
 .VirtualMachineDiagnosticTab {
+  &--main {
+    display: flex;
+    &__tabs {
+      flex-basis: max-content;
+      flex-shrink: 0;
+    }
+    &__content {
+      padding: var(--pf-global--spacer--sm);
+      width: 100%;
+    }
+  }
+
   &--header {
     margin-top: var(--pf-global--spacer--lg);
   }

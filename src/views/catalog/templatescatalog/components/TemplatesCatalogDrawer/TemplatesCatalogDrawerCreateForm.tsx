@@ -1,7 +1,6 @@
 import React, { FC, memo, MouseEvent, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import produce from 'immer';
-import { AUTOMATIC_UPDATE_FEATURE_NAME } from 'src/views/clusteroverview/SettingsTab/ClusterTab/components/AutomaticSubscriptionRHELGuests/utils/constants';
 
 import { NAME_INPUT_FIELD } from '@catalog/customize/constants';
 import { isNameParameterExists, replaceTemplateParameterValue } from '@catalog/customize/utils';
@@ -51,6 +50,8 @@ import {
   StackItem,
   TextInput,
 } from '@patternfly/react-core';
+
+import { AUTOMATIC_UPDATE_FEATURE_NAME } from '../../../../clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 
 import AuthorizedSSHKey from './AuthorizedSSHKey';
 

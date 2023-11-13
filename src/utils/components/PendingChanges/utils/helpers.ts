@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import {
+  V1Devices,
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1Volume,
@@ -426,6 +427,23 @@ export const getChangedAuthorizedSSHKey = (
   const vmiAccessCredentials = vmi?.spec?.accessCredentials?.[0] || {};
 
   return !isEqualObject(vmAccessCredentials, vmiAccessCredentials);
+};
+
+export const getChangedGuestSystemAccessLog = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  const vmLogSerialConsole = (
+    vm?.spec?.template?.spec?.domain?.devices as V1Devices & { logSerialConsole: boolean }
+  )?.logSerialConsole;
+  const vmiLogSerialConsole = (
+    vmi?.spec?.domain?.devices as V1Devices & { logSerialConsole: boolean }
+  )?.logSerialConsole;
+
+  return vmLogSerialConsole !== vmiLogSerialConsole;
 };
 
 export const getChangedHeadlessMode = (

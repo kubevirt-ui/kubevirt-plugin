@@ -47,6 +47,7 @@ import {
   getChangedEnvDisks,
   getChangedEvictionStrategy,
   getChangedGPUDevices,
+  getChangedGuestSystemAccessLog,
   getChangedHeadlessMode,
   getChangedHostDevices,
   getChangedHostname,
@@ -112,6 +113,7 @@ export const usePendingChanges = (
 
   const modifiedVolumesHotplug = getChangedVolumesHotplug(vm, vmi);
   const modifiedHedlessMode = getChangedHeadlessMode(vm, vmi);
+  const modifiedGuestSystemAccessLog = getChangedGuestSystemAccessLog(vm, vmi);
 
   const onSubmit = (updatedVM: V1VirtualMachine) =>
     k8sUpdate({
@@ -423,6 +425,14 @@ export const usePendingChanges = (
       },
       hasPendingChange: modifiedHedlessMode,
       label: t('Headless mode'),
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
+    },
+    {
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+      },
+      hasPendingChange: modifiedGuestSystemAccessLog,
+      label: t('Guest system log access'),
       tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
   ];

@@ -2,9 +2,7 @@ import React, { FC, useState } from 'react';
 
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import useHyperConvergeConfiguration, {
-  HyperConverged,
-} from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -19,9 +17,12 @@ import {
 
 import './KernelSamepageMerging.scss';
 
-const KernelSamepageMerging: FC = () => {
+type KernelSamepageMergingProps = {
+  hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
+};
+const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({ hyperConvergeConfiguration }) => {
   const { t } = useKubevirtTranslation();
-  const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration();
+  const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
   const ksmConfiguration = hyperConverge?.spec?.configuration?.ksmConfiguration;
   const [isEnabled, setIsEnabled] = useState(
     !!(ksmConfiguration && isEmpty(ksmConfiguration?.nodeLabelSelector)), // Empty nodeLabelSelector will enable KSM on every node.
@@ -64,14 +65,14 @@ const KernelSamepageMerging: FC = () => {
           </SplitItem>
         )}
       </Split>
-      {(error || hyperLoadingError) && (
+      {error && (
         <Alert
           className="KernelSamepageMerging__Alert"
           isInline
           title={t('An error occurred')}
           variant={AlertVariant.danger}
         >
-          {error || hyperLoadingError}
+          {error}
         </Alert>
       )}
     </>
