@@ -80,8 +80,6 @@
   "Access mode": "Access mode",
   "Access Mode": "Access Mode",
   "Access mode: {{accessMode}} / Volume mode: {{volumeMode}}": "Access mode: {{accessMode}} / Volume mode: {{volumeMode}}",
-  "Access to public boot sources": "Access to public boot sources",
-  "Access to public templates": "Access to public templates",
   "Actions": "Actions",
   "Activation key": "Activation key",
   "Active Descheduler": "Active Descheduler",
@@ -1015,7 +1013,6 @@
   "Set the authorized SSH key to automatically apply to any new VirtualMachine you create in the selected project.": "Set the authorized SSH key to automatically apply to any new VirtualMachine you create in the selected project.",
   "Set the volume metadata to use the volume as a bootable image.": "Set the volume metadata to use the volume as a bootable image.",
   "Settings": "Settings",
-  "Share templates": "Share templates",
   "Shared access (RWX)": "Shared access (RWX)",
   "Show": "Show",
   "Show all": "Show all",
@@ -1334,6 +1331,7 @@
   "You can select the boot source in the <2>Disks</2> tab.": "You can select the boot source in the <2>Disks</2> tab.",
   "You can select up to {{MAX_VIEW_COLS}} columns": "You can select up to {{MAX_VIEW_COLS}} columns",
   "You can use cloud-init to initialize the operating system with a specific configuration when the VirtualMachine is started.": "You can use cloud-init to initialize the operating system with a specific configuration when the VirtualMachine is started.",
+  "You don't have permission to perform this action": "You don't have permission to perform this action",
   "You must ensure that the configuration is correct before starting the VirtualMachine.": "You must ensure that the configuration is correct before starting the VirtualMachine.",
   "You're in view-only mode": "You're in view-only mode"
 }

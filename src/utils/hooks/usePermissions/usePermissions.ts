@@ -7,10 +7,13 @@ import {
 } from '@kubevirt-utils/constants/constants';
 import { FLAG_KUBEVIRT_CDI } from '@kubevirt-utils/flags/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useAccessReview, useFlag } from '@openshift-console/dynamic-plugin-sdk';
 
+type Key = 'attacheNetworks' | 'clone' | 'uploadImage';
+
 export type UsePermissions = () => {
-  capabilitiesData: { allowed: boolean; isLoading: boolean; taskName: string }[];
+  capabilitiesData: { [key in Key]: { allowed: boolean; isLoading: boolean; taskName: string } };
   isLoading: boolean;
 };
 
@@ -22,12 +25,6 @@ const usePermissions: UsePermissions = () => {
     namespace: OPENSHIFT_NAMESPACE,
     resource: TemplateModel.plural,
     verb: 'get',
-  });
-
-  const [canWriteToOpenshiftNs, canWriteToOpenshiftNsLoading] = useAccessReview({
-    namespace: OPENSHIFT_NAMESPACE,
-    resource: TemplateModel.plural,
-    verb: 'create',
   });
 
   const [canReadOpenshiftOsImgNs, canReadOpenshiftOsImgNsLoading] = useAccessReview({
@@ -48,12 +45,6 @@ const usePermissions: UsePermissions = () => {
     verb: 'create',
   });
 
-  const [canWriteToOpenshiftOsImgNs, canWriteToOpenshiftOsImgNsLoading] = useAccessReview({
-    namespace: OPENSHIFT_OS_IMAGES_NS,
-    resource: TemplateModel.plural,
-    verb: 'create',
-  });
-
   const [canReadNads, canReadNadsLoading] = useAccessReview({
     resource: NetworkAttachmentDefinitionModel.plural,
     verb: 'get',
@@ -65,45 +56,27 @@ const usePermissions: UsePermissions = () => {
   const basePermissionsAllowed = canReadOpenshiftNs && canReadOsImagesNs;
   const basePermissionsLoading = canReadOpenshiftNsLoading && canReadOsImagesNsLoading;
 
-  const canWriteToOsImagesNs = canWriteToKvOsImgNs && canWriteToOpenshiftOsImgNs;
-  const canWriteToOsImagesNsLoading =
-    canWriteToKvOsImgNsLoading && canWriteToOpenshiftOsImgNsLoading;
-
-  const capabilitiesData = [
-    {
-      allowed: basePermissionsAllowed,
-      isLoading: basePermissionsLoading,
-      taskName: t('Access to public templates'),
-    },
-    {
-      allowed: basePermissionsAllowed,
-      isLoading: basePermissionsLoading,
-      taskName: t('Access to public boot sources'),
-    },
-    {
-      allowed: basePermissionsAllowed && cdiInstalled,
-      isLoading: basePermissionsLoading,
-      taskName: t('Clone a VirtualMachine'),
-    },
-    {
+  const capabilitiesData = {
+    attacheNetworks: {
       allowed: basePermissionsAllowed && canReadNads,
       isLoading: basePermissionsLoading && canReadNadsLoading,
       taskName: t('Attach VirtualMachine to multiple networks'),
     },
-    {
+    clone: {
+      allowed: basePermissionsAllowed && cdiInstalled,
+      isLoading: basePermissionsLoading,
+      taskName: t('Clone a VirtualMachine'),
+    },
+    uploadImage: {
       allowed: basePermissionsAllowed && canWriteToKvOsImgNs,
       isLoading: basePermissionsLoading && canWriteToKvOsImgNsLoading,
       taskName: t('Upload a base image from local disk'),
     },
-    {
-      allowed: basePermissionsAllowed && canWriteToOpenshiftNs && canWriteToOsImagesNs,
-      isLoading:
-        basePermissionsLoading && canWriteToOpenshiftNsLoading && canWriteToOsImagesNsLoading,
-      taskName: t('Share templates'),
-    },
-  ];
+  };
 
-  const isLoading = capabilitiesData.filter((task) => task.isLoading === true).length > 0;
+  const isLoading = !isEmpty(
+    Object.values(capabilitiesData)?.filter((task) => task.isLoading === true),
+  );
 
   return {
     capabilitiesData,
