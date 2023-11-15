@@ -1,5 +1,4 @@
 import { TFunction } from 'i18next';
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
@@ -20,13 +19,6 @@ export const getVolumeSnapshotStatusesPartition = (
     supportedVolumes,
     unsupportedVolumes,
   };
-};
-
-export const createSnapshotName = () => {
-  return `snapshot-${uniqueNamesGenerator({
-    dictionaries: [adjectives, animals],
-    separator: '-',
-  })}`;
 };
 
 export const validateSnapshotDeadline = (deadline: string, t: TFunction): string => {

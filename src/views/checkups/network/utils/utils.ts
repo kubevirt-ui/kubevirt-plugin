@@ -1,5 +1,3 @@
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
-
 import {
   ClusterRoleBindingModel,
   ClusterRoleModel,
@@ -179,13 +177,6 @@ export const installOrRemoveCheckupsNetworkPermissions = (
 
 export const findObjectByName = (arr: K8sResourceCommon[], name: string) =>
   (arr || []).find((obj) => obj?.metadata?.name === name);
-
-export const generateConfigMapName = () => {
-  return `kubevirt-vm-latency-checkup-${uniqueNamesGenerator({
-    dictionaries: [adjectives, animals],
-    separator: '-',
-  })}`;
-};
 
 type CreateNetworkCheckupType = (arg: {
   desiredLatency: string;

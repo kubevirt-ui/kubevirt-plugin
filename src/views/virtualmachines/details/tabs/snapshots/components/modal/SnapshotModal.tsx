@@ -9,13 +9,13 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
+import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, TextArea, TextInput } from '@patternfly/react-core';
 
 import { printableVMStatus } from '../../../../../utils';
 import { deadlineUnits } from '../../utils/consts';
 import {
-  createSnapshotName,
   getEmptyVMSnapshotResource,
   getVolumeSnapshotStatusesPartition,
 } from '../../utils/helpers';
@@ -33,7 +33,7 @@ type SnapshotModalProps = {
 
 const SnapshotModal: React.FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
-  const [snapshotName, setSnapshotName] = React.useState<string>(createSnapshotName());
+  const [snapshotName, setSnapshotName] = React.useState<string>(generatePrettyName('snapshot'));
   const [description, setDescription] = React.useState<string>(undefined);
   const [deadline, setDeadline] = React.useState<string>(undefined);
   const [deadlineUnit, setDeadlineUnit] = React.useState<deadlineUnits>(deadlineUnits.Seconds);

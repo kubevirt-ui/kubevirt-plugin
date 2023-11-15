@@ -6,10 +6,11 @@ import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootabl
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel } from '@kubevirt-utils/resources/shared';
+import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 
 import { instanceTypeVMStoreInitialState } from './utils/state';
 import { InstanceTypeVMStore } from './utils/types';
-import { getRandomVMName, getSSHCredentials } from './utils/utils';
+import { getSSHCredentials } from './utils/utils';
 
 export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) => {
   return {
@@ -36,7 +37,7 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
           instanceTypeVMState.selectedInstanceType = getInstanceTypeFromVolume(selectedVolume);
 
           const osName = getLabel(selectedVolume, DEFAULT_PREFERENCE_LABEL).replaceAll('.', '-');
-          instanceTypeVMState.vmName = getRandomVMName(osName);
+          instanceTypeVMState.vmName = generatePrettyName(osName);
         }),
       ),
     resetInstanceTypeVMState: () => set(instanceTypeVMStoreInitialState),

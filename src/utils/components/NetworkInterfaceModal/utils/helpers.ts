@@ -1,5 +1,4 @@
 import produce from 'immer';
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,13 +8,6 @@ import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { ABSENT } from '@virtualmachines/details/tabs/configuration/network/utils/constants';
 
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
-
-export const generateNicName = () => {
-  return `nic-${uniqueNamesGenerator({
-    dictionaries: [adjectives, animals],
-    separator: '-',
-  })}`;
-};
 
 export const podNetworkExists = (vm: V1VirtualMachine): boolean =>
   !!vm?.spec?.template?.spec?.networks?.find((network) => typeof network.pod === 'object');

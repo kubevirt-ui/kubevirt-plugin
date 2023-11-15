@@ -9,7 +9,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant, Form, FormGroup, Grid, GridItem } from '@patternfly/react-core';
 import { MinusCircleIcon, PlusCircleIcon } from '@patternfly/react-icons';
 
@@ -17,7 +17,7 @@ import DeviceNameSelect from '../form/DeviceNameSelect';
 import NameFormField from '../form/NameFormField';
 import useHCPermittedHostDevices from '../hooks/useHCPermittedHostDevices';
 import { HARDWARE_DEVICE_TYPE, HardwareDeviceModalRow } from '../utils/constants';
-import { generateDeviceName, getInitialDevices } from '../utils/helpers';
+import { getInitialDevices } from '../utils/helpers';
 
 import HardwareDeviceModalDescription from './HardwareDeviceModalDescription';
 
@@ -54,7 +54,7 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
   const onAddDevice = () => {
     setDevices((listDevices) => [
       ...listDevices,
-      { deviceIndex: devices.length, deviceName: '', name: generateDeviceName(type) },
+      { deviceIndex: devices.length, deviceName: '', name: generatePrettyName(type) },
     ]);
   };
 

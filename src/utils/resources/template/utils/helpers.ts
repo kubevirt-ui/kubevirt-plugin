@@ -1,10 +1,10 @@
 import produce from 'immer';
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 
 import { ANNOTATIONS } from './annotations';
 import {
@@ -50,10 +50,7 @@ export const replaceTemplateVM = (template: V1Template, vm: V1VirtualMachine) =>
  * @returns a unique vm name
  */
 export const generateVMName = (template: V1Template): string => {
-  return `${getTemplatePVCName(template) || template?.metadata?.name}-${uniqueNamesGenerator({
-    dictionaries: [adjectives, animals],
-    separator: '-',
-  })}`;
+  return generatePrettyName(getTemplatePVCName(template) || template?.metadata?.name);
 };
 
 export const generateVMNamePrettyParam = (template: V1Template): TemplateParameter => {

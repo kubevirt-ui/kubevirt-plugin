@@ -1,5 +1,3 @@
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
-
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1DataVolumeTemplateSpec, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -155,10 +153,3 @@ export const isDefaultStorageClass = (storageClass: IoK8sApiStorageV1StorageClas
 export const getDefaultStorageClass = (
   storageClasses: IoK8sApiStorageV1StorageClass[],
 ): IoK8sApiStorageV1StorageClass => storageClasses?.find(isDefaultStorageClass);
-
-export const generateDiskName = () => {
-  return `disk-${uniqueNamesGenerator({
-    dictionaries: [adjectives, animals],
-    separator: '-',
-  })}`;
-};

@@ -1,3 +1,5 @@
+import { animals, colors, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
+
 import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ItemsToFilterProps } from './types';
@@ -115,3 +117,13 @@ export const removeDuplicatesByName = (array: any[]) =>
     if (!acc.find((item) => item?.name === curr?.name)) acc.push(curr);
     return acc;
   }, []);
+
+export const generatePrettyName = (prefix?: string): string => {
+  const numberDictionary = NumberDictionary.generate({ length: 2 });
+  const prefixValue = prefix ? `${prefix}-` : '';
+
+  return `${prefixValue}${uniqueNamesGenerator({
+    dictionaries: [colors, animals, numberDictionary],
+    separator: '-',
+  })}`;
+};

@@ -13,6 +13,7 @@ import {
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Form } from '@patternfly/react-core';
 import { printableVMStatus } from '@virtualmachines/utils';
@@ -23,12 +24,7 @@ import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelec
 import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect';
 import NetworkInterfaceTypeSelect from './components/NetworkInterfaceTypeSelect';
 import { interfaceModelType } from './utils/constants';
-import {
-  generateNicName,
-  getNetworkName,
-  networkNameStartWithPod,
-  podNetworkExists,
-} from './utils/helpers';
+import { getNetworkName, networkNameStartWithPod, podNetworkExists } from './utils/helpers';
 
 type NetworkInterfaceModalOnSubmit = {
   interfaceMACAddress: string;
@@ -69,7 +65,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
 }) => {
   const { featureEnabled: bridgedNICHotPlugEnabled } = useFeatures(BRIDGED_NIC_HOTPLUG_ENABLED);
   const { iface = null, network = null } = nicPresentation;
-  const [nicName, setNicName] = useState(network?.name || generateNicName());
+  const [nicName, setNicName] = useState(network?.name || generatePrettyName('nic'));
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
   const [networkName, setNetworkName] = useState(getNetworkName(network));
   const [interfaceType, setInterfaceType] = useState(

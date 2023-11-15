@@ -8,10 +8,11 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import { CreateDataSourceForm } from './CreateDataSourceForm';
-import { createDataSourceWithImportCron, generateDataSourceName } from './utils';
+import { createDataSourceWithImportCron } from './utils';
 
 export type CreateDataSourceModalFormType = {
   importsToKeep: number;
@@ -44,7 +45,7 @@ export const CreateDataSourceModal: FC<CreateDataSourceModalProps> = ({
   } = useForm<CreateDataSourceModalFormType>({
     defaultValues: {
       importsToKeep: 3,
-      name: generateDataSourceName(),
+      name: generatePrettyName('datasource'),
       size: DEFAULT_DISK_SIZE,
     },
   });

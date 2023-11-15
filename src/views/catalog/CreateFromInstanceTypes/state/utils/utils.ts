@@ -1,5 +1,3 @@
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
-
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretSection/utils/constants';
@@ -10,12 +8,6 @@ import {
 import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
-
-export const getRandomVMName = (osName: string) =>
-  `${osName}-${uniqueNamesGenerator({
-    dictionaries: [adjectives, animals],
-    separator: '-',
-  })}`;
 
 export const getSSHCredentials = (
   sshSecretName: string,

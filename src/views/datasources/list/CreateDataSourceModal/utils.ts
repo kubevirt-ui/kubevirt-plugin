@@ -1,5 +1,4 @@
 import produce from 'immer';
-import { adjectives, uniqueNamesGenerator } from 'unique-names-generator';
 
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
@@ -11,13 +10,6 @@ import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUploa
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-
-export const generateDataSourceName = (): string => {
-  return `datasource-${uniqueNamesGenerator({
-    dictionaries: [adjectives],
-    separator: '-',
-  })}`;
-};
 
 const initialDataSource: V1beta1DataSource = {
   apiVersion: 'cdi.kubevirt.io/v1beta1',
