@@ -40,7 +40,7 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
       setError(null);
       try {
         const user = await k8sGet({ model: UserModel, path: '~' });
-        setUserName(user?.metadata?.name?.replace(':', '-'));
+        setUserName(user?.metadata?.uid || user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-'));
       } catch (e) {
         setError(e);
       }
