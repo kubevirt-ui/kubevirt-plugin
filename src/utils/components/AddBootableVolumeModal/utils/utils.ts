@@ -1,7 +1,6 @@
 import produce from 'immer';
 
 import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { appendDockerPrefix } from '@catalog/customize/components/CustomizeSource/utils';
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
@@ -15,7 +14,7 @@ import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/type
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { appendDockerPrefix, getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import {

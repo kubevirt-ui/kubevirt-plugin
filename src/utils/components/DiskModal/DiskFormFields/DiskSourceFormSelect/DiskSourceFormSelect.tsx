@@ -1,9 +1,5 @@
 import React, { ChangeEvent, Dispatch, FC, useEffect, useMemo, useState } from 'react';
 
-import {
-  appendDockerPrefix,
-  removeDockerPrefix,
-} from '@catalog/customize/components/CustomizeSource/utils';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,6 +8,7 @@ import { ANNOTATIONS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { hasSizeUnit as getOSNameWithoutVersionNumber } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { appendDockerPrefix, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import {

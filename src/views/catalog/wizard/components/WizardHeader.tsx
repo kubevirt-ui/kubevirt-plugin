@@ -1,7 +1,6 @@
 import React, { FC, memo } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { CUSTOMIZE_TEMPLATE_TITLE } from '@catalog/customize/constants';
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -24,7 +23,6 @@ export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
 
   const templateName = tabsData?.overview?.templateMetadata?.name;
   const templateDisplayName = tabsData?.overview?.templateMetadata?.displayName || templateName;
-  const templateNamespace = tabsData?.overview?.templateMetadata?.namespace;
 
   const onBreadcrumbClick = (url: string) =>
     confirm(t('Are you sure you want to leave this page?')) && history.push(url);
@@ -47,22 +45,6 @@ export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
             {t('Catalog')}
           </Button>
         </BreadcrumbItem>
-        <BreadcrumbItem>
-          <Button
-            onClick={() =>
-              onBreadcrumbClick(
-                `/k8s/ns/${
-                  namespace || DEFAULT_NAMESPACE
-                }/templatescatalog/customize?name=${templateName}&namespace=${templateNamespace}`,
-              )
-            }
-            isInline
-            variant="link"
-          >
-            {CUSTOMIZE_TEMPLATE_TITLE}
-          </Button>
-        </BreadcrumbItem>
-        <BreadcrumbItem>{t('Customize VirtualMachine')}</BreadcrumbItem>
       </Breadcrumb>
       <Split hasGutter>
         <Title headingLevel="h1">{t('Customize and create VirtualMachine')}</Title>

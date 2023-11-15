@@ -13,7 +13,6 @@ import {
   LABEL_USED_TEMPLATE_NAMESPACE,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -30,6 +29,7 @@ type QuickCreateVMType = (inputs: {
     subscriptionData: RHELAutomaticSubscriptionData;
   };
   template: V1Template;
+  uploadData: (processedTemplate: V1Template) => Promise<V1VirtualMachine>;
 }) => Promise<V1VirtualMachine>;
 
 export const quickCreateVM: QuickCreateVMType = async ({
@@ -43,6 +43,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
     subscriptionData,
   },
   template,
+  uploadData,
 }) => {
   const processedTemplate = await k8sCreate<V1Template>({
     data: { ...template, metadata: { ...template?.metadata, namespace } },
@@ -53,7 +54,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
     },
   });
 
-  const vm = getTemplateVirtualMachineObject(processedTemplate);
+  const vm = await uploadData(processedTemplate);
 
   const overridedVM = produce(vm, (draftVM) => {
     draftVM.metadata.namespace = namespace;

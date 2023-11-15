@@ -7,6 +7,7 @@ import { Modal } from '@patternfly/react-core';
 
 import { getTemplateOSIcon } from '../../utils/os-icons';
 
+import { DrawerContextProvider } from './hooks/useDrawerContext';
 import { TemplatesCatalogDrawerFooter } from './TemplatesCatalogDrawerFooter';
 import { TemplatesCatalogDrawerPanel } from './TemplatesCatalogDrawerPanel';
 
@@ -29,31 +30,27 @@ export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({
   const osIcon = getTemplateOSIcon(template);
 
   return (
-    <Modal
-      footer={
-        template && (
-          <TemplatesCatalogDrawerFooter
-            namespace={namespace}
-            onCancel={onClose}
-            template={template}
+    <DrawerContextProvider template={template}>
+      <Modal
+        footer={
+          template && <TemplatesCatalogDrawerFooter namespace={namespace} onCancel={onClose} />
+        }
+        header={
+          <CatalogItemHeader
+            className="co-catalog-page__overlay-header"
+            iconImg={osIcon}
+            title={templateName}
+            vendor={template?.metadata?.name}
           />
-        )
-      }
-      header={
-        <CatalogItemHeader
-          className="co-catalog-page__overlay-header"
-          iconImg={osIcon}
-          title={templateName}
-          vendor={template?.metadata?.name}
-        />
-      }
-      aria-label="Template drawer"
-      className="ocs-modal co-catalog-page__overlay co-catalog-page__overlay--right template-catalog-drawer"
-      disableFocusTrap
-      isOpen={isOpen}
-      onClose={onClose}
-    >
-      <TemplatesCatalogDrawerPanel template={template} />
-    </Modal>
+        }
+        aria-label="Template drawer"
+        className="ocs-modal co-catalog-page__overlay co-catalog-page__overlay--right template-catalog-drawer"
+        disableFocusTrap
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+        <TemplatesCatalogDrawerPanel />
+      </Modal>
+    </DrawerContextProvider>
   );
 };
