@@ -16,4 +16,9 @@
 
 .add-network-interface-button {
   margin: 1rem 0 0.5rem 0;
+  &.isDisabled {
+    cursor: unset;
+    color: var(--pf-global--disabled-color--100);
+    background-color: var(--pf-global--disabled-color--200);
+  }
 }

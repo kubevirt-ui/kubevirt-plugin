@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import usePermissions from '@kubevirt-utils/hooks/usePermissions/usePermissions';
 import {
   GreenCheckCircleIcon,
   YellowExclamationTriangleIcon,
@@ -8,8 +9,6 @@ import {
 import { Divider, Flex, FlexItem, Skeleton, Title } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
-
-import usePermissions from './hooks/usePermissions';
 
 const TaskPermissionsSection: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -30,7 +29,7 @@ const TaskPermissionsSection: FC = () => {
       </Flex>
       <Divider className="permissions-tab--main__divider" />
       {!isLoading ? (
-        capabilitiesData?.map(({ allowed, taskName }) => (
+        Object.values(capabilitiesData)?.map(({ allowed, taskName }) => (
           <Flex className="permissions-tab--main__row" key={taskName}>
             <FlexItem>{taskName}</FlexItem>
             <FlexItem align={{ default: 'alignRight' }}>

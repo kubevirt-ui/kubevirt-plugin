@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import usePermissions from '@kubevirt-utils/hooks/usePermissions/usePermissions';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
@@ -20,6 +21,8 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const { canCreateDS, canCreatePVC, canCreateSnapshots, loading } =
     useCanCreateBootableVolume(namespace);
+  const { capabilitiesData, isLoading: permissionsLoading } = usePermissions();
+  const canUploadImage = capabilitiesData.uploadImage.allowed && canCreatePVC;
 
   const onSelect = useCallback(
     (event, value) => {
@@ -31,10 +34,14 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
   );
 
   useEffect(() => {
-    if (!loading && !canCreatePVC) {
-      setFormSelection(DROPDOWN_FORM_SELECTION.USE_REGISTRY);
+    if (!permissionsLoading && !loading) {
+      setFormSelection(
+        !canUploadImage
+          ? DROPDOWN_FORM_SELECTION.USE_REGISTRY
+          : DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE,
+      );
     }
-  }, [canCreatePVC, loading, setFormSelection]);
+  }, [canUploadImage, permissionsLoading, loading, setFormSelection]);
 
   return (
     <FormGroup fieldId="source-type" label={t('Source type')}>
@@ -46,7 +53,13 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
         selections={formSelection}
         variant={SelectVariant.single}
       >
-        <SelectOption isDisabled={!canCreatePVC} value={DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE}>
+        <SelectOption
+          isDisabled={!canUploadImage}
+          value={DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE}
+          {...(!canUploadImage && {
+            description: t("You don't have permission to perform this action"),
+          })}
+        >
           {t('Upload volume')}
         </SelectOption>
 
