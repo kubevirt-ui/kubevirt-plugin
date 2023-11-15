@@ -1,18 +1,10 @@
 import produce from 'immer';
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { BinaryUnit } from '@kubevirt-utils/utils/units';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { getEmptyMigrationPolicy } from '../../../../utils/utils';
-
-const generateMigrationPolicyName = (): string => {
-  return `policy-${uniqueNamesGenerator({
-    dictionaries: [adjectives, animals],
-    separator: '-',
-  })}`;
-};
 
 export type InitialMigrationPolicyState = {
   allowAutoConverge?: boolean;
@@ -26,7 +18,7 @@ export type InitialMigrationPolicyState = {
 };
 
 export const initialMigrationPolicyState: InitialMigrationPolicyState = {
-  migrationPolicyName: generateMigrationPolicyName(),
+  migrationPolicyName: generatePrettyName('policy'),
   namespaceSelectorMatchLabel: {},
   vmiSelectorMatchLabel: {},
 };

@@ -1,11 +1,10 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import { diskReducerActions, DiskReducerActionType } from '../state/actions';
-
-import { generateDiskName } from './utils/helpers';
 
 type NameFormFieldProps = {
   dispatchDiskState: React.Dispatch<DiskReducerActionType>;
@@ -26,7 +25,10 @@ const NameFormField: React.FC<NameFormFieldProps> = ({ dispatchDiskState, objNam
   React.useEffect(() => {
     // explicit check for null to check if the field is empty by initialState
     if (objName === null) {
-      dispatchDiskState({ payload: generateDiskName(), type: diskReducerActions.SET_DISK_NAME });
+      dispatchDiskState({
+        payload: generatePrettyName('disk'),
+        type: diskReducerActions.SET_DISK_NAME,
+      });
     }
   }, [dispatchDiskState, objName]);
 

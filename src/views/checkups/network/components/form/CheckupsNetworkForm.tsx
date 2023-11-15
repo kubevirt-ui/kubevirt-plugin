@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { Form, FormGroup, FormSection, Grid, GridItem, TextInput } from '@patternfly/react-core';
-
-import { generateConfigMapName } from '../../utils/utils';
 
 import CheckupsNetworkFormActions from './CheckupsNetworkFormActions';
 import CheckupsNetworkFormLatency from './CheckupsNetworkFormLatency';
@@ -18,7 +17,7 @@ const CheckupsNetworkForm = () => {
   const [isDesiredLatency, setIsDesiredLatency] = useState<boolean>(false);
   const [isNodesChecked, setIsNodesChecked] = useState<boolean>(false);
 
-  const [name, setName] = useState<string>(generateConfigMapName());
+  const [name, setName] = useState<string>(generatePrettyName('kubevirt-vm-latency-checkup'));
   const [sampleDuration, setSampleDuration] = useState<string>('5');
   const [desiredLatency, setDesiredLatency] = useState<string>();
   const [selectedNAD, setSelectedNAD] = useState<string>();

@@ -1,5 +1,3 @@
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
-
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -15,7 +13,7 @@ import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAuto
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
-import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
+import { generatePrettyName, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { InstanceTypeVMState } from '../state/utils/types';
 
@@ -67,12 +65,7 @@ export const generateVM = (
   const { pvcSource, selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
     instanceTypeState;
   const { sshSecretName } = sshSecretCredentials;
-  const virtualmachineName =
-    vmName ??
-    uniqueNamesGenerator({
-      dictionaries: [adjectives, animals],
-      separator: '-',
-    });
+  const virtualmachineName = vmName ?? generatePrettyName();
 
   const sourcePVC = {
     name: getName(selectedBootableVolume),
