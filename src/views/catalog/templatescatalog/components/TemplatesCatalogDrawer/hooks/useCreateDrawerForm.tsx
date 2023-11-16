@@ -171,9 +171,10 @@ const useCreateDrawerForm = (
         // additional objects
         tabsDataDraft.additionalObjects = processedTemplate.objects.filter((obj) =>
           !isEmpty(authorizedSSHKey)
-            ? obj.kind !== VirtualMachineModel.kind || obj.kind !== SecretModel
+            ? obj.kind !== VirtualMachineModel.kind && obj.kind !== SecretModel
             : obj.kind !== VirtualMachineModel.kind,
         );
+
         // overview
         ensurePath(tabsDataDraft, 'overview.templateMetadata');
         tabsDataDraft.overview.templateMetadata.name = template.metadata.name;
