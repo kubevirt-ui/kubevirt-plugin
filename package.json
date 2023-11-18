@@ -112,6 +112,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^16.11.12",
     "@types/react": "^17.0.40",
+    "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "5.x",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
@@ -169,7 +170,9 @@
   "name": "kubevirt-plugin",
   "private": true,
   "resolutions": {
-    "@types/react": "17.0.40",
+    "@patternfly/react-icons": "^4.82.8",
+    "@types/react": "^17.0.40",
+    "@types/react-dom": "^17.0.0",
     "webpack": "^5.68.0"
   },
   "scripts": {
