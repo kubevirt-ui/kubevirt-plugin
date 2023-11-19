@@ -4,6 +4,7 @@ import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { PopoverPosition, Split, SplitItem, Switch } from '@patternfly/react-core';
 
 import ExpandSection from '../../../views/clusteroverview/SettingsTab/ExpandSection/ExpandSection';
+import NewBadge from '../NewBadge/NewBadge';
 
 import './ExpandSectionWithSwitch.scss';
 
@@ -11,6 +12,7 @@ type ExpandSectionWithSwitchProps = {
   children: ReactNode;
   helpTextIconContent?: ReactNode;
   isDisabled?: boolean;
+  newBadge: boolean;
   switchIsOn: boolean;
   toggleContent?: ReactNode;
   toggleText?: string;
@@ -21,6 +23,7 @@ const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
   children,
   helpTextIconContent,
   isDisabled,
+  newBadge = false,
   switchIsOn,
   toggleContent,
   toggleText,
@@ -40,6 +43,7 @@ const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
           helpIconClassName="expand-section-with-switch__help-icon"
           position={PopoverPosition.right}
         />
+        {newBadge && <NewBadge />}
       </SplitItem>
     )}
     <SplitItem>

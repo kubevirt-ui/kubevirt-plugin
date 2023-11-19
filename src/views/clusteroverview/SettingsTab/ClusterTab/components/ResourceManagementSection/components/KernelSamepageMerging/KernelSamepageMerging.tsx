@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import NewBadge from '@kubevirt-utils/components/NewBadge/NewBadge';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -19,8 +20,12 @@ import './KernelSamepageMerging.scss';
 
 type KernelSamepageMergingProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
+  newBadge?: boolean;
 };
-const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({ hyperConvergeConfiguration }) => {
+const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
+  hyperConvergeConfiguration,
+  newBadge = false,
+}) => {
   const { t } = useKubevirtTranslation();
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
   const ksmConfiguration = hyperConverge?.spec?.configuration?.ksmConfiguration;
@@ -58,6 +63,7 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({ hyperConvergeCo
             helpIconClassName="KernelSamepageMerging__HelpIcon"
             position={PopoverPosition.bottom}
           />
+          {newBadge && <NewBadge />}
         </SplitItem>
         {hyperLoaded && (
           <SplitItem>

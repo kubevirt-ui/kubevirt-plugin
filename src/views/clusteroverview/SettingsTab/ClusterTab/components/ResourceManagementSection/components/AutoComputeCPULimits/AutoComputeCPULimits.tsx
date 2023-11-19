@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import ExpandSectionWithSwitch from '@kubevirt-utils/components/ExpandSectionWithSwitch/ExpandSectionWithSwitch';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -18,8 +18,12 @@ import ProjectSelectorModal from './ProjectSelectorModal';
 
 type AutoComputeCPULimitsProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
+  newBadge?: boolean;
 };
-const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({ hyperConvergeConfiguration }) => {
+const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
+  hyperConvergeConfiguration,
+  newBadge,
+}) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [hco] = hyperConvergeConfiguration;
@@ -35,14 +39,11 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({ hyperConvergeConf
     addLabelsToHyperConvergedCR(hco, idLabels).catch((err) => setError(err.message));
   };
 
-  useEffect(() => {
-    if (!autoComputeCPUPreviewEnabled) toggleCPULimits(false);
-  }, [autoComputeCPUPreviewEnabled, toggleCPULimits]);
-
   return (
     <ExpandSectionWithSwitch
       helpTextIconContent={t('Automatically compute CPU limits on projects containing labels')}
       isDisabled={!autoComputeCPUPreviewEnabled}
+      newBadge={newBadge}
       switchIsOn={autoComputeCPUEnabled && autoComputeCPUPreviewEnabled}
       toggleContent={t('Auto-compute CPU limits')}
       turnOnSwitch={toggleCPULimits}

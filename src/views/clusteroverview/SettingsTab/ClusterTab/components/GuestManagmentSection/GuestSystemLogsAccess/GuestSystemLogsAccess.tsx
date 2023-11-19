@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import NewBadge from '@kubevirt-utils/components/NewBadge/NewBadge';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -18,9 +19,13 @@ import './guest-system-logs-access.scss';
 
 type GuestSystemLogsAccessProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
+  newBadge?: boolean;
 };
 
-const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({ hyperConvergeConfiguration }) => {
+const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
+  hyperConvergeConfiguration,
+  newBadge = false,
+}) => {
   const { t } = useKubevirtTranslation();
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
   const disableSerialConsoleLog =
@@ -61,6 +66,7 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({ hyperConvergeCo
             )}
             position={PopoverPosition.bottom}
           />
+          {newBadge && <NewBadge />}
         </SplitItem>
         {hyperLoaded && (
           <SplitItem>

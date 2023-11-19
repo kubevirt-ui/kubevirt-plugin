@@ -11,10 +11,12 @@ import KernelSamepageMerging from './components/KernelSamepageMerging/KernelSame
 
 type ResourceManagementSectionProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
+  newBadge?: boolean;
 };
 
 const ResourceManagementSection: FC<ResourceManagementSectionProps> = ({
   hyperConvergeConfiguration,
+  newBadge,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -22,10 +24,16 @@ const ResourceManagementSection: FC<ResourceManagementSectionProps> = ({
     <ExpandSection toggleText={t('Resource management')}>
       <Stack hasGutter>
         <StackItem isFilled>
-          <AutoComputeCPULimits hyperConvergeConfiguration={hyperConvergeConfiguration} />
+          <AutoComputeCPULimits
+            hyperConvergeConfiguration={hyperConvergeConfiguration}
+            newBadge={newBadge}
+          />
         </StackItem>
         <StackItem isFilled>
-          <KernelSamepageMerging hyperConvergeConfiguration={hyperConvergeConfiguration} />
+          <KernelSamepageMerging
+            hyperConvergeConfiguration={hyperConvergeConfiguration}
+            newBadge={newBadge}
+          />
         </StackItem>
       </Stack>
     </ExpandSection>

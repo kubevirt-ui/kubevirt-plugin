@@ -22,6 +22,7 @@ import { buildUrlForCSVSubscription } from './../utils';
 type UseKubevirtCSVDetails = {
   catalogSourceMissing: boolean;
   displayName: string;
+  installedCSV: ClusterServiceVersionKind;
   kubevirtSubscription: SubscriptionKind;
   loaded: boolean;
   loadErrors: Error[];
@@ -90,6 +91,7 @@ export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
   return {
     catalogSourceMissing,
     displayName,
+    installedCSV,
     kubevirtSubscription: subscription,
     loaded,
     loadErrors,
