@@ -163,7 +163,7 @@ const useCreateDrawerForm = (
 
         const updatedVolumes = applyCloudDriveCloudInitVolume(vmObject);
         vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
-          ? updateCloudInitRHELSubscription(updatedVolumes, subscriptionData)
+          ? updateCloudInitRHELSubscription(updatedVolumes, subscriptionData, autoUpdateEnabled)
           : updatedVolumes;
       });
 
