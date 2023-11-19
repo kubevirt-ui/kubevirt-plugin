@@ -8,26 +8,49 @@ import { ListPageCreateDropdown, useActiveNamespace } from '@openshift-console/d
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
-const CheckupsRunButton: FC<RouteComponentProps> = ({ history }) => {
+import useCheckupsNetworkPermissions from './network/hooks/useCheckupsNetworkPermissions';
+import { useCheckupsStoragePermissions } from './storage/components/hooks/useCheckupsStoragePermissions';
+import { trimLastHistoryPath } from './utils/utils';
+
+const CheckupsRunButton: FC<{ history: RouteComponentProps['history'] }> = ({ history }) => {
   const [namespace] = useActiveNamespace();
   const { t } = useKubevirtTranslation();
+  const { isPermitted: isCreateNetworkPermitted } = useCheckupsNetworkPermissions();
+  const { isPermitted: isCreateStoragePermitted } = useCheckupsStoragePermissions();
 
   const createItems = {
-    network: t('Network latency'),
-    storage: t('Storage'),
+    network: (
+      <div
+        className={classNames({ 'CheckupsRunButton--item__disabled': !isCreateNetworkPermitted })}
+      >
+        {t('Network latency')}
+      </div>
+    ),
+    storage: (
+      <div
+        className={classNames({ 'CheckupsRunButton--item__disabled': !isCreateStoragePermitted })}
+      >
+        {t('Storage')}
+      </div>
+    ),
   };
 
   const onCreate = useCallback(
     (type: string) => {
-      const { pathname } = history?.location;
       switch (type) {
         case 'network':
-          return history.push(createURL('network/form', pathname));
+          return (
+            isCreateNetworkPermitted &&
+            history.push(createURL('network/form', trimLastHistoryPath(history)))
+          );
         case 'storage':
-          return history.push(createURL('storage', pathname));
+          return (
+            isCreateStoragePermitted &&
+            history.push(createURL('storage/form', trimLastHistoryPath(history)))
+          );
       }
     },
-    [history],
+    [history, isCreateNetworkPermitted, isCreateStoragePermitted],
   );
 
   return (

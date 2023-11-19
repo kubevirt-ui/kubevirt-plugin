@@ -13,8 +13,8 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
+import { findObjectByName } from '../../utils/utils';
 import {
-  findObjectByName,
   KIAGNOSE_CONFIGMAP_ACCESS,
   KUBEVIRT_VM_LATENCY_CHECKER,
   VM_LATENCY_CHECKUP_SA,

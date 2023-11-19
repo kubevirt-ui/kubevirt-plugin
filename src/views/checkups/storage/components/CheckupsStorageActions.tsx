@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Dropdown,
@@ -12,14 +12,16 @@ import {
 } from '@patternfly/react-core';
 
 import { STATUS_SUCCEEDED } from '../../utils/utils';
-import { deleteNetworkCheckup, rerunNetworkCheckup } from '../utils/utils';
+import { deleteStorageCheckup, rerunStorageCheckup } from '../utils/utils';
 
-const CheckupsNetworkActions = ({
+const CheckupsStorageActions = ({
   configMap,
   isKebab = false,
+  jobs,
 }: {
   configMap: IoK8sApiCoreV1ConfigMap;
   isKebab?: boolean;
+  jobs: IoK8sApiBatchV1Job[];
 }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
@@ -31,8 +33,8 @@ const CheckupsNetworkActions = ({
         <DropdownItem
           onClick={() => {
             setIsActionsOpen(false);
-            deleteNetworkCheckup(configMap);
-            history.push(`/k8s/ns/${configMap?.metadata?.namespace}/checkups`);
+            deleteStorageCheckup(configMap, jobs);
+            history.push(`/k8s/ns/${configMap?.metadata?.namespace}/checkups/storage`);
           }}
           key="delete"
         >
@@ -41,7 +43,7 @@ const CheckupsNetworkActions = ({
         <DropdownItem
           onClick={() => {
             setIsActionsOpen(false);
-            return rerunNetworkCheckup(configMap);
+            return rerunStorageCheckup(configMap);
           }}
           isDisabled={configMap?.data?.[STATUS_SUCCEEDED] === undefined}
           key="rerun"
@@ -61,4 +63,4 @@ const CheckupsNetworkActions = ({
   );
 };
 
-export default CheckupsNetworkActions;
+export default CheckupsStorageActions;

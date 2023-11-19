@@ -8,17 +8,17 @@ import { Bullseye, Divider, PageSection, Tab, Tabs, TabTitleText } from '@patter
 
 import CheckupsDetailsPageHistory from '../../CheckupsDetailsPageHistory';
 import { getJobByName } from '../../utils/utils';
-import useCheckupsNetworkData from '../hooks/useCheckupsNetworkData';
+import useCheckupsStorageData from '../components/hooks/useCheckupsStorageData';
 
-import CheckupsNetworkDetailsPageHeader from './CheckupsNetworkDetailsPageHeader';
-import CheckupsNetworkDetailsPageSection from './CheckupsNetworkDetailsPageSection';
+import CheckupsStorageDetailsPageHeader from './CheckupsStorageDetailsPageHeader';
+import CheckupsStorageDetailsPageSection from './CheckupsStorageDetailsPageSection';
 
-import './checkups-network-details-page.scss';
+import './checkups-storage-details-page.scss';
 
-const CheckupsNetworkDetailsPage = () => {
+const CheckupsStorageDetailsPage = () => {
   const { vmName } = useParams<{ vmName: string }>();
   const { t } = useKubevirtTranslation();
-  const { configMaps, error, jobs, loading } = useCheckupsNetworkData();
+  const { configMaps, error, jobs, loading } = useCheckupsStorageData();
   const [activeTabKey, setActiveTabKey] = useState<number>(0);
 
   const configMap = configMaps.find((cm) => cm.metadata.name === vmName);
@@ -33,7 +33,7 @@ const CheckupsNetworkDetailsPage = () => {
 
   return (
     <PageSection>
-      <CheckupsNetworkDetailsPageHeader configMap={configMap} />
+      <CheckupsStorageDetailsPageHeader configMap={configMap} jobs={jobMatches} />
       <Tabs
         onSelect={(_, tabIndex: number) => {
           setActiveTabKey(tabIndex);
@@ -42,7 +42,7 @@ const CheckupsNetworkDetailsPage = () => {
       >
         <Tab eventKey={0} title={<TabTitleText>{t('Details')}</TabTitleText>}>
           <PageSection>
-            <CheckupsNetworkDetailsPageSection configMap={configMap} job={jobMatches?.[0]} />
+            <CheckupsStorageDetailsPageSection configMap={configMap} job={jobMatches?.[0]} />
           </PageSection>
           <PageSection>
             <Divider />
@@ -59,4 +59,4 @@ const CheckupsNetworkDetailsPage = () => {
   );
 };
 
-export default CheckupsNetworkDetailsPage;
+export default CheckupsStorageDetailsPage;

@@ -5,8 +5,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Title } from '@patternfly/react-core';
 
-import useCheckupsNetworkDetailsPageHistoryColumns from './hooks/useCheckupsNetworkDetailsPageHistoryColumns';
-import CheckupsNetworkDetailsPageHistoryRow from './CheckupsNetworkDetailsPageHistoryRow';
+import useCheckupsNetworkDetailsPageHistoryColumns from './network/details/hooks/useCheckupsNetworkDetailsPageHistoryColumns';
+import CheckupsNetworkDetailsPageHistoryRow from './CheckupsDetailsPageHistoryRow';
 
 type CheckupsNetworkDetailsPageHistoryProps = {
   error: Error;

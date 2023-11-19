@@ -8,7 +8,6 @@ import {
 import {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
-  IoK8sApiCoreV1Container,
   IoK8sApiCoreV1ServiceAccount,
   IoK8sApiRbacV1ClusterRole,
   IoK8sApiRbacV1ClusterRoleBinding,
@@ -21,12 +20,21 @@ import {
   K8sResourceCommon,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import {
+  CONFIGMAP_NAME,
+  generateWithNumbers,
+  KUBEVIRT_VM_LATENCY_LABEL,
+  STATUS_COMPILATION_TIME_STAMP,
+  STATUS_FAILURE_REASON,
+  STATUS_START_TIME_STAMP,
+  STATUS_SUCCEEDED,
+  STATUS_TIMEOUT,
+} from '../../utils/utils';
+
 export const KIAGNOSE_CONFIGMAP_ACCESS = 'kiagnose-configmap-access';
 export const VM_LATENCY_CHECKUP_SA = 'vm-latency-checkup-sa';
 export const KUBEVIRT_VM_LATENCY_CHECKER = 'kubevirt-vm-latency-checker';
 export const KUBEVIRT_VM_LATENCY_LABEL_VALUE = 'kubevirt-vm-latency';
-export const KUBEVIRT_VM_LATENCY_LABEL = 'kiagnose/checkup-type';
-export const CONFIGMAP_NAME = 'CONFIGMAP_NAME';
 export const CONFIGMAP_NAMESPACE = 'CONFIGMAP_NAMESPACE';
 
 export const STATUS_AVG_LATENCY_NANO = 'status.result.avgLatencyNanoSec';
@@ -36,16 +44,10 @@ export const STATUS_MIN_LATENCY_NANO = 'status.result.minLatencyNanoSec';
 export const STATUS_TARGET_NODE = 'status.result.targetNode';
 export const STATUS_SOURCE_NODE = 'status.result.sourceNode';
 
-export const STATUS_TIMEOUT = 'spec.timeout';
 export const STATUS_SAMPLE_DURATION = 'spec.param.sampleDurationSeconds';
 export const STATUS_NAD_NAMESPACE = 'spec.param.networkAttachmentDefinitionNamespace';
 export const STATUS_NAD_NAME = 'spec.param.networkAttachmentDefinitionName';
 export const STATUS_MAX_DESIRED_LATENCY = 'spec.param.maxDesiredLatencyMilliseconds';
-
-export const STATUS_START_TIME_STAMP = 'status.startTimestamp';
-export const STATUS_FAILURE_REASON = 'status.failureReason';
-export const STATUS_SUCCEEDED = 'status.succeeded';
-export const STATUS_COMPILATION_TIME_STAMP = 'status.completionTimestamp';
 
 const serviceAccountResource = (namespace: string) => ({
   metadata: { name: VM_LATENCY_CHECKUP_SA, namespace },
@@ -188,9 +190,6 @@ type CreateNetworkCheckupType = (arg: {
   selectedNAD: string;
 }) => Promise<IoK8sApiCoreV1ConfigMap>;
 
-const generateWithNumbers = (name: string): string =>
-  `${name}-${Math.floor(Math.random() * 10000)}`;
-
 const createJob = (name: string, namespace: string): Promise<IoK8sApiBatchV1Job> =>
   k8sCreate({
     data: {
@@ -301,55 +300,4 @@ export const rerunNetworkCheckup = async (
   });
 
   return createJob(resource.metadata.name, resource.metadata.namespace);
-};
-const getJobContainers = (job: IoK8sApiBatchV1Job): IoK8sApiCoreV1Container[] =>
-  job?.spec?.template?.spec?.containers;
-
-export const getJobByName = (
-  jobs: IoK8sApiBatchV1Job[],
-  configMapName: string,
-): IoK8sApiBatchV1Job[] =>
-  (jobs || [])
-    ?.filter((job) => {
-      const envs = getJobContainers(job)
-        ?.map((containers) => containers?.env)
-        .flat();
-      const name = envs?.find((env) => env?.name == CONFIGMAP_NAME)?.value;
-      return name === configMapName && job;
-    })
-    .sort((a, b) =>
-      new Date(a.metadata.creationTimestamp) < new Date(b.metadata.creationTimestamp) ? 1 : -1,
-    );
-
-export enum NetworkCheckupsStatus {
-  'Done' = 'done',
-  'Failed' = 'failed',
-  'Running' = 'running',
-}
-
-export const getJobStatus = (job: IoK8sApiBatchV1Job): NetworkCheckupsStatus => {
-  if (job?.status?.succeeded === 1) return NetworkCheckupsStatus.Done;
-
-  if (job?.status?.active === 1) return NetworkCheckupsStatus.Running;
-
-  if (job?.status?.succeeded === 0 || job?.status?.failed === 1)
-    return NetworkCheckupsStatus.Failed;
-};
-export const getConfigMapStatus = (
-  configMap: IoK8sApiCoreV1ConfigMap,
-  jobStatus: NetworkCheckupsStatus,
-): NetworkCheckupsStatus => {
-  if (configMap?.data?.[STATUS_SUCCEEDED] === 'true') return NetworkCheckupsStatus.Done;
-
-  if (configMap?.data?.[STATUS_SUCCEEDED] === 'false' || jobStatus === NetworkCheckupsStatus.Failed)
-    return NetworkCheckupsStatus.Failed;
-
-  if (configMap?.data?.[STATUS_SUCCEEDED] === undefined && jobStatus === NetworkCheckupsStatus.Done)
-    return NetworkCheckupsStatus.Failed;
-
-  if (
-    configMap?.data?.[STATUS_SUCCEEDED] === undefined &&
-    jobStatus === NetworkCheckupsStatus.Running
-  )
-    return NetworkCheckupsStatus.Running;
 };

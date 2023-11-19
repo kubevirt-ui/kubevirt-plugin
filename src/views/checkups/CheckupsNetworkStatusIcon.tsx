@@ -5,9 +5,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { CheckCircleIcon, ExclamationCircleIcon, SyncAltIcon } from '@patternfly/react-icons';
 
-import { getConfigMapStatus, getJobStatus, NetworkCheckupsStatus } from '../utils/utils';
+import { getConfigMapStatus, getJobStatus, NetworkCheckupsStatus } from './utils/utils';
 
-import './checkups-network-status.icon.scss';
+import './checkups.scss';
 
 type CheckupsNetworkStatusIconProps = {
   configMap?: IoK8sApiCoreV1ConfigMap;

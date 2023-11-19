@@ -9,18 +9,12 @@ import { sortable, SortByDirection } from '@patternfly/react-table';
 import {
   columnsSorting,
   STATUS_COMPILATION_TIME_STAMP,
+  STATUS_FAILURE_REASON,
   STATUS_START_TIME_STAMP,
   STATUS_SUCCEEDED,
-} from '../../utils/utils';
-import {
-  STATUS_MAX_LATENCY_NANO,
-  STATUS_NAD_NAME,
-  STATUS_SAMPLE_DURATION,
-  STATUS_SOURCE_NODE,
-  STATUS_TARGET_NODE,
-} from '../utils/utils';
+} from './../../../utils/utils';
 
-const useCheckupsNetworkCheckupsListColumns = (): [
+const useCheckupsStorageListColumns = (): [
   TableColumn<IoK8sApiCoreV1ConfigMap>[],
   TableColumn<IoK8sApiCoreV1ConfigMap>[],
 ] => {
@@ -45,13 +39,6 @@ const useCheckupsNetworkCheckupsListColumns = (): [
         ]
       : []),
     {
-      id: 'nad',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_NAD_NAME),
-      title: t('NetworkAttachmentDefinition'),
-      transforms: [sortable],
-    },
-    {
       id: 'status',
       sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
         columnsSorting(data, sortDirection, STATUS_SUCCEEDED),
@@ -59,50 +46,24 @@ const useCheckupsNetworkCheckupsListColumns = (): [
       transforms: [sortable],
     },
     {
-      id: 'latency',
+      id: 'failure',
       sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_MAX_LATENCY_NANO),
-      title: t('Latency'),
+        columnsSorting(data, sortDirection, STATUS_FAILURE_REASON),
+      title: t('Failure reason'),
       transforms: [sortable],
     },
     {
-      additional: true,
-      id: 'duration',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_SAMPLE_DURATION, true),
-      title: t('Duration'),
-      transforms: [sortable],
-    },
-    {
-      additional: true,
-      id: 'source-node',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_SOURCE_NODE),
-      title: t('Source node'),
-      transforms: [sortable],
-    },
-    {
-      additional: true,
-      id: 'target-node',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_TARGET_NODE),
-      title: t('Target node'),
-      transforms: [sortable],
-    },
-    {
-      additional: true,
       id: 'start-time',
       sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_START_TIME_STAMP, true),
+        columnsSorting(data, sortDirection, STATUS_START_TIME_STAMP),
       title: t('Start time'),
       transforms: [sortable],
     },
     {
-      additional: true,
       id: 'complete-time',
       sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_COMPILATION_TIME_STAMP, true),
-      title: t('Complete time'),
+        columnsSorting(data, sortDirection, STATUS_COMPILATION_TIME_STAMP),
+      title: t('Completion time'),
       transforms: [sortable],
     },
     {
@@ -120,4 +81,4 @@ const useCheckupsNetworkCheckupsListColumns = (): [
   return [columns, activeColumns];
 };
 
-export default useCheckupsNetworkCheckupsListColumns;
+export default useCheckupsStorageListColumns;
