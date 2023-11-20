@@ -23,7 +23,6 @@ import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 import { useDrawerContext } from './hooks/useDrawerContext';
 import { TemplatesCatalogDrawerCreateForm } from './TemplatesCatalogDrawerCreateForm';
 import { TemplatesCatalogDrawerFooterSkeleton } from './TemplatesCatalogDrawerFooterSkeleton';
-import { allRequiredParametersAreFulfilled } from './utils';
 
 type TemplateCatalogDrawerFooterProps = {
   namespace: string;
@@ -38,7 +37,7 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
   const [authorizedSSHKeys, updateAuthorizedSSHKeys, userSettingsLoaded] =
     useKubevirtUserSettings('ssh');
   const { loaded: loadedRHELSubscription, subscriptionData } = useRHELAutomaticSubscription();
-  const { isBootSourceAvailable, template, templateDataLoaded } = useDrawerContext();
+  const { isBootSourceAvailable, templateDataLoaded } = useDrawerContext();
 
   const [, , loadError] = useK8sWatchResource<IoK8sApiCoreV1Secret>(
     authorizedSSHKeys?.[namespace] && {
@@ -56,8 +55,6 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
     }
   }, [authorizedSSHKeys, loadError, namespace, updateAuthorizedSSHKeys]);
 
-  const canQuickCreate =
-    Boolean(allRequiredParametersAreFulfilled(template)) && isBootSourceAvailable;
   const loaded = templateDataLoaded && userSettingsLoaded && loadedRHELSubscription;
 
   if (!loaded) {
@@ -72,12 +69,12 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
             <Split hasGutter>
               <SplitItem>
                 <Title headingLevel="h1" size="lg">
-                  {canQuickCreate
+                  {isBootSourceAvailable
                     ? t('Quick create VirtualMachine')
                     : t('Customize VirtualMachine')}
                 </Title>
               </SplitItem>
-              {canQuickCreate && (
+              {isBootSourceAvailable && (
                 <SplitItem className="template-catalog-drawer-footer-tooltip">
                   <Tooltip
                     content={<div>{t('This Template supports quick create VirtualMachine')}</div>}
@@ -91,7 +88,7 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
           </StackItem>
           <TemplatesCatalogDrawerCreateForm
             authorizedSSHKey={!loadError && authorizedSSHKeys?.[namespace]}
-            canQuickCreate={canQuickCreate}
+            canQuickCreate={isBootSourceAvailable}
             namespace={namespace}
             onCancel={onCancel}
             subscriptionData={subscriptionData}

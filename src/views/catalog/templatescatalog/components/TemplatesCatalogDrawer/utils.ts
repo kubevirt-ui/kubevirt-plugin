@@ -20,7 +20,9 @@ import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { INSTALLATION_CDROM_NAME } from './StorageSection/constants';
 
 export const allRequiredParametersAreFulfilled = (template: V1Template) =>
-  template.parameters.every((parameter) => parameter.required && parameter.value !== '');
+  template.parameters
+    .filter((parameter) => parameter.required)
+    .every((parameter) => parameter.value !== '');
 
 export const hasNameParameter = (template: V1Template): boolean =>
   !isEmpty((template?.parameters || [])?.find((param) => param?.name === NAME_INPUT_FIELD));
