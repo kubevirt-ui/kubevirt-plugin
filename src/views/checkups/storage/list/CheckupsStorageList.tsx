@@ -2,7 +2,6 @@ import React from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import useNADsData from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/useNADsData';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
@@ -10,36 +9,33 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   ListPageFilter,
-  useActiveNamespace,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
 import { getJobByName } from '../../utils/utils';
-import useCheckupsNetworkData from '../hooks/useCheckupsNetworkData';
-import useCheckupsNetworkFilters from '../hooks/useCheckupsNetworkFilters';
-import useCheckupsNetworkCheckupsListColumns from '../hooks/useCheckupsNetworkListColumns';
-import useCheckupsNetworkPermissions from '../hooks/useCheckupsNetworkPermissions';
+import useCheckupsStorageData from '../components/hooks/useCheckupsStorageData';
+import useCheckupsStorageListColumns from '../components/hooks/useCheckupsStorageListColumns';
+import useCheckupsStorageListFilters from '../components/hooks/useCheckupsStorageListFilters';
+import { useCheckupsStoragePermissions } from '../components/hooks/useCheckupsStoragePermissions';
 
-import CheckupsNetworkListEmptyState from './CheckupsNetworkListEmptyState';
-import CheckupsNetworkListRow from './CheckupsNetworkListRow';
+import CheckupsStorageListEmptyState from './CheckupsStorageListEmptyState';
+import CheckupsStorageListRow from './CheckupsStorageListRow';
 
-import '@kubevirt-utils/styles/list-managment-group.scss';
-
-const CheckupsNetworkList = () => {
+const CheckupsStorageList = () => {
   const { t } = useKubevirtTranslation();
-  const [columns, activeColumns] = useCheckupsNetworkCheckupsListColumns();
-  const [namespace] = useActiveNamespace();
+  const [columns, activeColumns] = useCheckupsStorageListColumns();
 
-  const { nads } = useNADsData(namespace);
-  const { isPermitted, loading: loadingPermissions } = useCheckupsNetworkPermissions();
-  const { configMaps, error, jobs, loading } = useCheckupsNetworkData();
+  const {
+    clusterRoleBinding,
+    isPermitted,
+    loading: loadingPermissions,
+  } = useCheckupsStoragePermissions();
+  const { configMaps, error, jobs, loading } = useCheckupsStorageData();
 
   const { onPaginationChange, pagination } = usePagination();
   const [unfilterData, dataFilters, onFilterChange, filters] =
-    useCheckupsNetworkFilters(configMaps);
-
-  const nadsInNamespace = !isEmpty(nads.filter((nad) => nad.metadata.namespace === namespace));
+    useCheckupsStorageListFilters(configMaps);
 
   return (
     <ListPageBody>
@@ -86,9 +82,10 @@ const CheckupsNetworkList = () => {
         )}
       </div>
       {isEmpty(configMaps) && loading && !loadingPermissions && (
-        <CheckupsNetworkListEmptyState
+        <CheckupsStorageListEmptyState
+          clusterRoleBinding={clusterRoleBinding}
           isPermitted={isPermitted}
-          nadsInNamespace={nadsInNamespace}
+          loadingPermissions={loadingPermissions}
         />
       )}
       <VirtualizedTable<IoK8sApiCoreV1ConfigMap>
@@ -101,11 +98,11 @@ const CheckupsNetworkList = () => {
         loaded={loading && !loadingPermissions}
         loadError={error}
         NoDataEmptyMsg={() => null}
-        Row={CheckupsNetworkListRow}
+        Row={CheckupsStorageListRow}
         unfilteredData={unfilterData}
       />
     </ListPageBody>
   );
 };
 
-export default CheckupsNetworkList;
+export default CheckupsStorageList;

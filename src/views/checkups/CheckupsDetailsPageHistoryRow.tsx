@@ -10,7 +10,7 @@ import {
   Timestamp,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import CheckupsNetworkStatusIcon from '../components/CheckupsNetworkStatusIcon';
+import CheckupsNetworkStatusIcon from './CheckupsNetworkStatusIcon';
 
 const CheckupsNetworkDetailsPageHistoryRow: FC<
   RowProps<IoK8sApiBatchV1Job, { job: IoK8sApiBatchV1Job }>

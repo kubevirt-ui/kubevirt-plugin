@@ -21,18 +21,20 @@ import {
   Title,
 } from '@patternfly/react-core';
 
-import CheckupsNetworkStatusIcon from '../components/CheckupsNetworkStatusIcon';
+import CheckupsNetworkStatusIcon from '../../CheckupsNetworkStatusIcon';
 import {
-  STATUS_AVG_LATENCY_NANO,
   STATUS_COMPILATION_TIME_STAMP,
   STATUS_FAILURE_REASON,
+  STATUS_START_TIME_STAMP,
+} from '../../utils/utils';
+import {
+  STATUS_AVG_LATENCY_NANO,
   STATUS_MAX_LATENCY_NANO,
   STATUS_MIN_LATENCY_NANO,
   STATUS_NAD_NAME,
   STATUS_NAD_NAMESPACE,
   STATUS_SAMPLE_DURATION,
   STATUS_SOURCE_NODE,
-  STATUS_START_TIME_STAMP,
   STATUS_TARGET_NODE,
 } from '../utils/utils';
 

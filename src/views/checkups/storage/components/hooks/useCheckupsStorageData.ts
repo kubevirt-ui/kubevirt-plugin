@@ -1,3 +1,5 @@
+import { KUBEVIRT_VM_LATENCY_LABEL } from 'src/views/checkups/utils/utils';
+
 import {
   ConfigMapModel,
   JobModel,
@@ -8,10 +10,9 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
-import { KUBEVIRT_VM_LATENCY_LABEL } from '../../utils/utils';
-import { KUBEVIRT_VM_LATENCY_LABEL_VALUE } from '../utils/utils';
+import { KUBEVIRT_STORAGE_LABEL_VALUE } from '../../utils/utils';
 
-const useCheckupsNetworkData = () => {
+const useCheckupsStorageData = () => {
   const [namespace] = useActiveNamespace();
 
   const [configMaps, loadingConfigMap, loadErrorConfigMaps] = useKubevirtWatchResource<
@@ -22,7 +23,7 @@ const useCheckupsNetworkData = () => {
     ...(namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
     selector: {
       matchLabels: {
-        [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_VM_LATENCY_LABEL_VALUE,
+        [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_STORAGE_LABEL_VALUE,
       },
     },
   });
@@ -33,7 +34,7 @@ const useCheckupsNetworkData = () => {
     ...(namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
     selector: {
       matchLabels: {
-        [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_VM_LATENCY_LABEL_VALUE,
+        [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_STORAGE_LABEL_VALUE,
       },
     },
   });
@@ -45,4 +46,4 @@ const useCheckupsNetworkData = () => {
   };
 };
 
-export default useCheckupsNetworkData;
+export default useCheckupsStorageData;

@@ -536,7 +536,7 @@
       "component": {
         "$codeRef": "CheckupsNetworkForm"
       },
-      "path": ["/k8s/ns/:ns/checkups/network/form", "/k8s/all-namespaces/checkups/network/form"]
+      "path": ["/k8s/ns/:ns/checkups/network/form"]
     },
     "type": "console.page/route"
   },
@@ -560,7 +560,19 @@
       "component": {
         "$codeRef": "CheckupsStorageForm"
       },
-      "path": ["/k8s/ns/:ns/checkups/storage", "/k8s/all-namespaces/checkups/storage"]
+      "path": ["/k8s/ns/:ns/checkups/storage/form"]
+    },
+    "type": "console.page/route"
+  },
+  {
+    "flags": {
+      "required": ["KUBEVIRT"]
+    },
+    "properties": {
+      "component": {
+        "$codeRef": "CheckupsStorageDetailsPage"
+      },
+      "path": ["/k8s/ns/:ns/checkups/storage/:vmName"]
     },
     "type": "console.page/route"
   },
