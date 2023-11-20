@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import EnableFeatureCheckbox from '@kubevirt-utils/components/EnableFeatureCheckbox/EnableFeatureCheckbox';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import NewBadge from '@kubevirt-utils/components/NewBadge/NewBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack } from '@patternfly/react-core';
 
@@ -10,11 +11,24 @@ import ExpandSection from '../../../../ExpandSection/ExpandSection';
 import AutomaticSubscriptionForm from './components/AutomaticSubscriptionForm/AutomaticSubscriptionForm';
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from './utils/constants';
 
-const AutomaticSubscriptionRHELGuests: FC = () => {
+type AutomaticSubscriptionRHELGuestsProps = {
+  newBadge?: boolean;
+};
+
+const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> = ({
+  newBadge = false,
+}) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <ExpandSection toggleText={t('Automatic subscription of new RHEL VirtualMachines')}>
+    <ExpandSection
+      toggleContent={
+        <>
+          {t('Automatic subscription of new RHEL VirtualMachines')}
+          {newBadge && <NewBadge />}
+        </>
+      }
+    >
       <Stack hasGutter>
         <MutedTextSpan
           text={t('Enable automatic subscription for Red Hat Enterprise Linux VirtualMachines.\n')}

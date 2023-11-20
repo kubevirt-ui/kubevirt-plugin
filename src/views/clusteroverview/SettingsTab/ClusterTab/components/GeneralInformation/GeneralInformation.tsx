@@ -20,24 +20,32 @@ import {
   SplitItem,
 } from '@patternfly/react-core';
 
-import { useKubevirtCSVDetails } from '../../../../utils/hooks/useKubevirtCSVDetails';
+import { SubscriptionKind } from '../../../../../../views/clusteroverview/utils/types';
 
 import SourceMissingStatus from './components/SourceMissingStatus';
 import SubscriptionStatus from './components/SubscriptionStatus';
 
 import './general-information.scss';
 
-const GeneralInformation: FC = () => {
+type GeneralInformationProps = {
+  catalogSourceMissing: boolean;
+  kubevirtSubscription: SubscriptionKind;
+  loaded: boolean;
+  loadErrors: Error[];
+  operatorLink: string;
+  updateChannel: string;
+  version: string;
+};
+const GeneralInformation: FC<GeneralInformationProps> = ({
+  catalogSourceMissing,
+  kubevirtSubscription,
+  loaded,
+  loadErrors,
+  operatorLink,
+  updateChannel,
+  version,
+}) => {
   const { t } = useKubevirtTranslation();
-  const {
-    catalogSourceMissing,
-    kubevirtSubscription,
-    loaded,
-    loadErrors,
-    operatorLink,
-    updateChannel,
-    version,
-  } = useKubevirtCSVDetails();
 
   return (
     <Split className="general-tab" hasGutter>

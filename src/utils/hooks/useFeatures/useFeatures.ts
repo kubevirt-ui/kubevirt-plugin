@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import produce from 'immer';
 
 import { ConfigMapModel, RoleBindingModel, RoleModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
@@ -7,8 +6,7 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { featuresConfigMapInitialState, featuresRole, featuresRoleBinding } from './constants';
 import { UseFeaturesValues } from './types';
@@ -22,12 +20,12 @@ export const useFeatures: UseFeatures = (featureName) => {
     isAdmin,
   } = useFeaturesConfigMap();
 
-  const [featureEnabled, setFeatureEnabled] = useState(false);
+  const [featureEnabled, setFeatureEnabled] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error>(null);
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded && featureEnabled === null) {
       setFeatureEnabled(featureConfigMap?.data?.[featureName] === 'true');
       setLoading(false);
       return;
@@ -69,23 +67,21 @@ export const useFeatures: UseFeatures = (featureName) => {
       setFeatureEnabled(false);
       setLoading(false);
     }
-  }, [loadError, featureConfigMap, loaded, featureName]);
+  }, [loadError, featureConfigMap, loaded, featureName, featureEnabled]);
 
   const toggleFeature = useCallback(
     async (value: boolean) => {
-      const updatedConfigMap = produce(featureConfigMap, (draftCM) => {
-        if (isEmpty(draftCM?.data)) draftCM.data = {};
-        draftCM.data[featureName] = value.toString();
-      });
       setLoading(true);
 
       try {
-        const promise = await k8sUpdate({
-          data: updatedConfigMap,
+        const promise = await k8sPatch({
+          data: [{ op: 'replace', path: `/data/${featureName}`, value: value.toString() }],
           model: ConfigMapModel,
+          resource: featureConfigMap,
         });
-        setLoading(false);
         setError(null);
+        setFeatureEnabled(promise?.data?.[featureName] === 'true');
+        setLoading(false);
         return promise;
       } catch (updateError) {
         setLoading(false);

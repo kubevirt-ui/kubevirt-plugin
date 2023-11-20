@@ -11,10 +11,12 @@ import GuestSystemLogsAccess from './GuestSystemLogsAccess/GuestSystemLogsAccess
 
 type GuestManagementSectionProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
+  newBadge?: boolean;
 };
 
 const GuestManagementSection: FC<GuestManagementSectionProps> = ({
   hyperConvergeConfiguration,
+  newBadge,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -22,10 +24,13 @@ const GuestManagementSection: FC<GuestManagementSectionProps> = ({
     <ExpandSection toggleText={t('Guest management')}>
       <Stack hasGutter>
         <StackItem isFilled>
-          <AutomaticSubscriptionRHELGuests />
+          <AutomaticSubscriptionRHELGuests newBadge={newBadge} />
         </StackItem>
         <StackItem isFilled>
-          <GuestSystemLogsAccess hyperConvergeConfiguration={hyperConvergeConfiguration} />
+          <GuestSystemLogsAccess
+            hyperConvergeConfiguration={hyperConvergeConfiguration}
+            newBadge={newBadge}
+          />
         </StackItem>
       </Stack>
     </ExpandSection>
