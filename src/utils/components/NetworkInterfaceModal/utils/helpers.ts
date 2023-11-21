@@ -47,11 +47,10 @@ const getInterface = (interfaces: V1Interface[], nicName: string) =>
 export const markInterfaceAbsent = (interfaces: V1Interface[], nicName: string) => {
   if (!getInterface(interfaces, nicName)) return null;
 
-  const updatedInterfaces = produce<V1Interface[]>(interfaces, (draftInterfaces: V1Interface[]) => {
+  return produce<V1Interface[]>(interfaces, (draftInterfaces: V1Interface[]) => {
     const ifaceToDelete = getInterface(draftInterfaces, nicName);
     ifaceToDelete.state = ABSENT;
   });
-  return updatedInterfaces;
 };
 
 const removeInterfaceToBeDeleted = (nicName: string, vm: V1VirtualMachine) =>
