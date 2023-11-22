@@ -1,19 +1,8 @@
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
-
-export const VirtualMachineModel = {
-  abbr: 'VM',
-  apiGroup: 'kubevirt.io',
-  apiVersion: 'v1',
-  crd: true,
-  id: 'virtualmachine',
-  kind: 'VirtualMachine',
-  label: 'Virtual Machine',
-  labelPlural: 'Virtual Machines',
-  namespaced: true,
-  plural: 'virtualmachines',
-};
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+export { default as VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 
 export const diskImportKindMapping = {
   [TemplateModel.kind]: TemplateModel,
