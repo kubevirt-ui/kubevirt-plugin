@@ -1,0 +1,23 @@
+form.kv-sysprep--main.pf-c-form {
+  grid-gap: 0;
+}
+
+.kv-sysprep--title {
+  display: inline-flex;
+  align-items: baseline;
+  margin-top: var(--pf-global--spacer--md);
+}
+
+.kv-sysprep--error {
+  color: var(--pf-global--danger-color--200);
+}
+
+.kv-sysprep-info {
+  margin: 0;
+}
+
+.kv-sysprep-modal button.pf-m-danger {
+  padding-left: 0;
+  margin-bottom: var(--pf-global-spacer-md);
+  margin-top: var(--pf-global-spacer-sm);
+}

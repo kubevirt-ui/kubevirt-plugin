@@ -1,0 +1,25 @@
+.settings-tab {
+  &__scope-message {
+    margin-bottom: var(--pf-global--spacer--md);
+  }
+
+  &__card {
+    height: fit-content;
+    flex-direction: row;
+  }
+
+  &__menu {
+    flex-basis: fit-content;
+    min-width: 145px;
+  }
+
+  &__content {
+    width: 100%;
+    padding: var(--pf-global--spacer--2xl);
+    padding-left: calc(var(--pf-global--spacer--3xl) * 2);
+  }
+}
+
+.section-divider {
+  margin: var(--pf-global--spacer--md) 0;
+}

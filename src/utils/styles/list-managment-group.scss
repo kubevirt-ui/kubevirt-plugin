@@ -1,0 +1,7 @@
+.list-managment-group {
+  display: flex;
+  justify-content: space-between;
+  &__pagination {
+    flex-grow: 1;
+  }
+}

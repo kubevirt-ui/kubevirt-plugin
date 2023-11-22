@@ -1,0 +1,15 @@
+.vm-scripts-tab {
+  max-width: 700px;
+
+  &__buttons {
+    margin-top: var(--pf-global--spacer--lg);
+  }
+
+  .vm-description-item__title {
+    .pf-c-description-list__term {
+      font-family: var(--pf-global--FontFamily--heading--sans-serif);
+      font-size: var(--pf-global--FontSize--xl);
+      font-weight: var(--pf-global--FontWeight--normal);
+    }
+  }
+}

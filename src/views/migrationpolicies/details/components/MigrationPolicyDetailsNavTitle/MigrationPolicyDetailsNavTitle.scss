@@ -1,0 +1,23 @@
+.kv-resource-details-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--pf-global--spacer--lg);
+}
+
+.kv-resource-details-header-container {
+  margin-top: var(--pf-global--spacer--lg);
+  padding: 0 var(--pf-global--spacer--lg);
+  border-bottom: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
+  justify-content: space-between;
+}
+
+.kv-resource-icon {
+  background-color: #2b9af3;
+  border-radius: var(--pf-global--BorderRadius--lg);
+  color: var(--pf-global--palette--white);
+  display: inline-block;
+  font-size: var(--pf-global--icon--FontSize--md);
+  line-height: var(--pf-global--FontSize--xl);
+  margin-right: calc(var(--pf-global--spacer--sm) - 1px);
+  padding: 0 calc(var(--pf-global--spacer--sm) - 1px);
+}

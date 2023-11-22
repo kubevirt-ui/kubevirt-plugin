@@ -1,0 +1,10 @@
+.VirtualMachinesDetailsSection {
+  .link-icon {
+    float: left;
+    margin-left: -1.5em;
+    opacity: 0;
+    &:hover {
+      opacity: 100;
+    }
+  }
+}

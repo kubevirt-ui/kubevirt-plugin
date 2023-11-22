@@ -1,0 +1,25 @@
+.vnc-container {
+  height: 100%;
+  width: 100%;
+  display: block;
+  div:first-child {
+    // vnc console use element as ref and inline styling on element to control auto resizing, we need to use important in this case.
+    background-color: transparent !important;
+  }
+}
+.hide {
+  display: none;
+}
+.vnc-screen-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: -5px;
+}
+.pf-c-console__actions-vnc {
+  grid-area: actions-main;
+  margin-left: 250px;
+  justify-content: unset;
+}
+.vnc-actions-disconnect-button {
+  justify-self: flex-end;
+}

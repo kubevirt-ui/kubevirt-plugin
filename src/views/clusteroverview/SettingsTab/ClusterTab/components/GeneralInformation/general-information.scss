@@ -1,0 +1,10 @@
+.general-tab {
+  border: 1px solid var(--pf-global--BackgroundColor--200);
+  padding: var(--pf-global--spacer--md) var(--pf-global--spacer--2xl);
+  --pf-l-split--m-gutter--MarginRight: var(--pf-global--spacer--2xl);
+  margin-bottom: var(--pf-global--spacer--xl);
+
+  &__upgrade {
+    margin-top: var(--pf-global--spacer--sm);
+  }
+}

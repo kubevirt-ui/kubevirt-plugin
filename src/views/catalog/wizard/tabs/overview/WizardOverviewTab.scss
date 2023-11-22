@@ -1,0 +1,9 @@
+.wizard-overview-description-left-column {
+  grid-column: 1;
+}
+
+.wizard-overview-tab {
+  &__grid {
+    margin-top: var(--pf-global--spacer--md);
+  }
+}

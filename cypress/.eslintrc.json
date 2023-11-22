@@ -1,0 +1,17 @@
+{
+  "env": {
+    "cypress/globals": true,
+    "node": true
+  },
+  "extends": [
+    "../.eslintrc.json",
+    "plugin:cypress/recommended",
+    "plugin:chai-friendly/recommended"
+  ],
+  "plugins": ["cypress", "chai-friendly"],
+  "rules": {
+    "chai-friendly/no-unused-expressions": "off",
+    "cypress/assertion-before-screenshot": "error",
+    "cypress/no-force": "error"
+  }
+}

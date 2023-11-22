@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VMStatusConditionLabel 1`] = `
+<DocumentFragment>
+  <span
+    class="pf-c-label"
+  >
+    <a
+      class="pf-c-label__content"
+      href="#"
+    >
+      <span
+        class="pf-c-label__text"
+      >
+        Failure=true
+      </span>
+    </a>
+  </span>
+</DocumentFragment>
+`;

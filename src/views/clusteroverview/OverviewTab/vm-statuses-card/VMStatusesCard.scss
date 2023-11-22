@@ -1,0 +1,57 @@
+.vm-statuses-card {
+  &__header {
+    padding-bottom: 0;
+  }
+
+  &__grid-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  &__status-item {
+    display: inline-block;
+
+    &--count {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    &--icon {
+      margin-right: var(--pf-global--spacer--xs);
+      font-size: var(--pf-global--FontSize--md);
+      vertical-align: middle;
+    }
+
+    &--value {
+      font-size: var(--pf-global--FontSize--3xl);
+      vertical-align: middle;
+    }
+
+    &--status {
+      text-align: center;
+    }
+  }
+
+  &__accordion {
+    &-toggle {
+      padding-left: 24px;
+      padding-right: 24px;
+
+      &--label {
+        margin-left: var(--pf-global--spacer--sm);
+      }
+    }
+
+    .pf-c-accordion__toggle,
+    .pf-c-accordion__expanded-content-body {
+      &:after,
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: transparent;
+      }
+    }
+  }
+}

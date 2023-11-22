@@ -1,0 +1,11 @@
+.KernelSamepageMerging {
+  &__HelpTextIcon {
+    .pf-c-popover__content {
+      width: 465px;
+    }
+  }
+
+  &__Alert {
+    margin-top: var(--pf-global--spacer--md);
+  }
+}

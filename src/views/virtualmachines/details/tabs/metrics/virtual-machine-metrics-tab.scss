@@ -1,0 +1,65 @@
+.virtual-machine-metrics-tab {
+  &__main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    .timerange {
+      &--main {
+        display: flex;
+        justify-content: space-between;
+        margin: var(--pf-global--spacer--sm) var(--pf-global--spacer--lg)
+          var(--pf-global--spacer--md) var(--pf-global--spacer--lg);
+        &__text {
+          font-weight: var(--pf-global--FontWeight--bold);
+          display: inline-flex;
+          align-items: center;
+          &--time-range {
+            margin-right: var(--pf-global--spacer--sm);
+            width: 100%;
+          }
+        }
+        a {
+          align-self: center;
+        }
+      }
+    }
+
+    .title {
+      margin: var(--pf-global--spacer--lg) var(--pf-global--spacer--lg) var(--pf-global--spacer--sm)
+        var(--pf-global--spacer--lg);
+    }
+  }
+  &__charts {
+    flex-grow: 1;
+    .pf-c-card {
+      margin: var(--pf-global--spacer--sm);
+    }
+    .pf-c-expandable-section__toggle {
+      align-items: center;
+      &-text {
+        font-size: var(--pf-global--FontSize--lg);
+        font-weight: var(--pf-global--FontWeight--bold);
+      }
+    }
+    .pf-c-expandable-section__content {
+      margin-top: 0;
+    }
+  }
+}
+
+.networkcharts-by-nic--title {
+  display: inline-flex;
+}
+
+.util-threshold-chart {
+  width: 100%;
+  height: 150px;
+}
+.network ul.pf-c-dropdown__menu {
+  max-height: 200px;
+  overflow-y: scroll;
+}
+.network-popover {
+  display: flex;
+  justify-content: space-between;
+}

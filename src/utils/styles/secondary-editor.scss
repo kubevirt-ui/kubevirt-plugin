@@ -1,0 +1,45 @@
+@mixin secondary-editor-save-button {
+  width: 90px;
+  --pf-c-button--after--BorderColor: var(--pf-c-button--m-secondary--after--BorderColor);
+  color: var(--pf-c-button--m-secondary--Color);
+  background-color: var(--pf-c-button--m-secondary--BackgroundColor);
+}
+
+@mixin secondary-editor-reload-button {
+  --pf-c-button--after--BorderColor: var(--pf-c-button--m-link--disabled--BackgroundColor);
+  --pf-c-button--disabled--BackgroundColor: var(--pf-c-button--m-link--disabled--BackgroundColor);
+  color: var(--pf-c-button--m-link--Color);
+  background-color: var(--pf-c-button--m-link--BackgroundColor);
+}
+
+@mixin secondary-editor-cancel-button {
+  display: none;
+}
+
+@mixin secondary-editor-download-button {
+  --pf-c-button--after--BorderColor: var(--pf-c-button--m-link--disabled--BackgroundColor);
+  --pf-c-button--disabled--BackgroundColor: var(--pf-c-button--m-link--disabled--BackgroundColor);
+  color: var(--pf-c-button--m-link--Color);
+  background-color: var(--pf-c-button--m-link--BackgroundColor);
+}
+
+@mixin secondary-resource-yaml-editor {
+  .yaml-editor__buttons {
+    #save-changes {
+      @include secondary-editor-save-button;
+    }
+
+    #reload-object {
+      @include secondary-editor-reload-button;
+    }
+
+    #cancel {
+      @include secondary-editor-cancel-button;
+    }
+
+    // download button
+    .pf-c-button--align-right {
+      @include secondary-editor-download-button;
+    }
+  }
+}

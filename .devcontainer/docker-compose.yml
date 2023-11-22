@@ -1,0 +1,51 @@
+version: '3.8'
+# create dev.env with the following values:
+# OC_URL
+# OC_USER
+# OC_PASS
+# OC_PLUGIN_NAME
+services:
+  console:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.console
+    env_file: dev.env
+    healthcheck:
+      test: oc whoami
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
+
+  plugin:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.plugin
+    env_file: dev.env
+    depends_on:
+      - console
+      - x11-bridge
+    network_mode: service:console
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+    # Cache local workspace and copy shell history, gh auth.
+    volumes:
+      - ..:/workspace:cached
+      - ~/.bash_history:/root/.bash_history
+      - ~/.zsh_history:/root/.zsh_history
+      - ~/.config/gh:/root/.config/gh
+    volumes_from:
+      - x11-bridge:rw
+
+  # x11 service for cypress
+  x11-bridge:
+    image: jare/x11-bridge
+    volumes:
+      - '/tmp/.X11-unix:/tmp/.X11-unix:rw'
+    ports:
+      - '10000:10000'
+    restart: unless-stopped
+    environment:
+      MODE: tcp
+      XPRA_HTML: 'yes'
+      DISPLAY: :14
+      XPRA_PASSWORD: kubevirt

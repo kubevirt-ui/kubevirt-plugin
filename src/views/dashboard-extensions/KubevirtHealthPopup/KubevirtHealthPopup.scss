@@ -1,0 +1,23 @@
+.kv-health-popup {
+  &__description {
+    color: var(--pf-global--Color--200);
+    margin-bottom: var(--pf-global--spacer--md);
+  }
+
+  &__alerts-title {
+    font-weight: var(--pf-global--FontWeight--bold);
+    margin-bottom: var(--pf-global--spacer--sm);
+  }
+
+  &__alerts-count {
+    margin-bottom: var(--pf-global--spacer--md);
+
+    &--icon {
+      margin-right: var(--pf-global--spacer--sm);
+    }
+  }
+
+  &__empty-state--no-alerts {
+    padding-top: 16px;
+  }
+}

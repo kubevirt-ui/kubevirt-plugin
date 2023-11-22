@@ -1,0 +1,17 @@
+.cloud-init-editor {
+  height: 400px;
+  width: 500px;
+
+  .yaml-editor {
+    height: 400px;
+    padding-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+
+    button#cancel.pf-c-button.pf-m-secondary {
+      display: none;
+    }
+  }
+
+  @import '../../../styles/secondary-editor';
+}

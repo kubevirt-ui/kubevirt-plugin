@@ -1,0 +1,18 @@
+.bootable-volume-list-bar {
+  margin-top: var(--pf-global--spacer--md);
+  &__filter {
+    margin-top: var(--pf-global--spacer--xs);
+  }
+
+  &__pagination {
+    margin-top: var(--pf-global--spacer--md);
+  }
+
+  &__show-all-btn {
+    margin-top: calc(var(--pf-global--spacer--md) + var(--pf-global--spacer--xs));
+  }
+
+  &__volume-namespace {
+    width: 240px;
+  }
+}

@@ -1,0 +1,30 @@
+.resources-inventory-card {
+  margin-bottom: var(--pf-global--spacer--md);
+
+  &__grid {
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+
+  &__resource {
+    display: inline-block;
+  }
+
+  &__grid-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--pf-global--spacer--lg);
+  }
+
+  &__quantity {
+    color: var(--co-global--palette--blue-400);
+    font-size: var(--pf-global--FontSize--4xl);
+    text-align: center;
+    margin-bottom: calc(var(--pf-global--spacer--xs) * -1);
+  }
+
+  &__quantity-label {
+    font-size: var(--pf-global--FontSize--xl);
+  }
+}

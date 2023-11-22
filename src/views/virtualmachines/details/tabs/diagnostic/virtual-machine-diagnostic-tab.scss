@@ -1,0 +1,31 @@
+.VirtualMachineDiagnosticTab {
+  &--main {
+    display: flex;
+    &__tabs {
+      flex-basis: max-content;
+      flex-shrink: 0;
+    }
+    &__content {
+      padding: var(--pf-global--spacer--sm);
+      width: 100%;
+    }
+  }
+
+  &--header {
+    margin-top: var(--pf-global--spacer--lg);
+  }
+}
+
+.VirtualMachineDiagnosticTabRow--expanded {
+  display: inline-flex;
+  align-items: baseline;
+  margin-left: var(--pf-global--spacer--3xl);
+  svg {
+    margin-right: var(--pf-global--spacer--sm);
+  }
+}
+.pf-c-table {
+  tr.VirtualMachineDiagnosticTabRow--row {
+    border-bottom: none;
+  }
+}

@@ -1,0 +1,13 @@
+.alert-margin-top-bottom {
+  margin-top: 1.5rem;
+  margin-bottom: -1.5rem;
+}
+
+.margin-top {
+  margin-top: var(--pf-global--spacer--md);
+}
+
+.title-edit-item-space {
+  justify-content: space-between;
+  flex: 1;
+}

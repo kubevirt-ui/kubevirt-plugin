@@ -1,0 +1,27 @@
+.VirtualMachinesOverviewTabInterfaces--main {
+  .co-virtualized-table {
+    tr {
+      border: none;
+    }
+  }
+  .pf-c-card {
+    .pf-c-card__body {
+      padding: 0;
+    }
+  }
+  .pf-c-description-list__text.pf-m-help-text.help {
+    text-underline-offset: 0.25rem;
+  }
+  .no-data-empty-message {
+    margin: var(--pf-global--spacer--2xl);
+  }
+}
+
+.pf-c-popover {
+  .interface-row--title {
+    font-weight: var(--pf-global--FontWeight--bold);
+  }
+  .interface-row--value {
+    margin-bottom: var(--pf-global--spacer--sm);
+  }
+}

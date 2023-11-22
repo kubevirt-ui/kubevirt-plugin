@@ -1,0 +1,23 @@
+.live-migration-tab {
+  &__number {
+    &--container {
+      display: flex;
+      margin-bottom: var(--pf-global--spacer--2xl);
+      margin-top: var(--pf-global--spacer--sm);
+    }
+    &--cluster {
+      margin-right: var(--pf-global--spacer--2xl);
+    }
+  }
+  &__network {
+    &--title {
+      margin-top: var(--pf-global--spacer--sm);
+    }
+  }
+  small {
+    color: var(--pf-global--Color--200);
+  }
+  &--error {
+    margin-top: var(--pf-global--spacer--lg);
+  }
+}

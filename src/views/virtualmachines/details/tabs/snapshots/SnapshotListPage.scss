@@ -1,0 +1,12 @@
+.snapshot-list-page {
+  &__title {
+    margin-top: var(--pf-global--spacer--lg);
+  }
+}
+
+.snapshots-list {
+  &__empty-state-icon {
+    font-size: var(--pf-global--FontSize--2xl);
+    margin-bottom: 0;
+  }
+}

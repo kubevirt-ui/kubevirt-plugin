@@ -1,0 +1,10 @@
+.ssh-key-upload {
+  &__file-upload {
+    margin-top: var(--pf-global--spacer--xs);
+  }
+
+  &__form-group {
+    --pf-c-form--m-horizontal__group-label--md--GridColumnGap: var(--pf-global--spacer--xs);
+    --pf-c-form--m-horizontal__group-label--md--GridColumnWidth: 0.3fr;
+  }
+}

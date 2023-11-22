@@ -1,0 +1,15 @@
+.VirtualMachineConfigurationTab {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+
+  &--main {
+    margin: var(--pf-global--spacer--sm);
+    width: fit-content;
+    min-width: max-content;
+  }
+
+  &--content {
+    width: 100%;
+  }
+}

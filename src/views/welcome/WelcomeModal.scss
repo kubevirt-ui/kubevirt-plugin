@@ -1,0 +1,25 @@
+.WelcomeModal {
+  &__grid {
+    margin: var(--pf-global--spacer--2xl) var(--pf-global--spacer--xl) var(--pf-global--spacer--md);
+  }
+
+  &__image {
+    width: 260;
+    height: 250px;
+  }
+
+  &__text {
+    margin-top: var(--pf-global--spacer--lg);
+    margin-bottom: var(--pf-global--spacer--lg);
+  }
+
+  &__button,
+  &__checkbox {
+    margin-top: var(--pf-global--spacer--lg);
+    margin-bottom: var(--pf-global--spacer--xs);
+  }
+
+  &__button-link {
+    --pf-c-button--PaddingLeft: 0;
+  }
+}

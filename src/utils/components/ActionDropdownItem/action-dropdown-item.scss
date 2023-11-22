@@ -1,0 +1,6 @@
+.ActionDropdownItem {
+  &__disabled {
+    cursor: unset;
+    color: var(--pf-global--disabled-color--100);
+  }
+}

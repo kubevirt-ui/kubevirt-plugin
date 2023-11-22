@@ -1,0 +1,23 @@
+{
+  "extends": "../../.eslintrc.json",
+  "plugins": ["jsdoc"],
+  "rules": {
+    "require-jsdoc": [
+      "warn",
+      {
+        "require": {
+          "FunctionExpression": true,
+          "FunctionDeclaration": true
+        }
+      }
+    ],
+    "jsdoc/require-param": "warn",
+    "jsdoc/require-param-description": "warn",
+    "jsdoc/require-param-name": "warn",
+    "jsdoc/require-param-type": "off",
+    "jsdoc/require-property": "warn",
+    "jsdoc/require-property-description": "warn",
+    "jsdoc/require-property-name": "warn",
+    "jsdoc/require-property-type": "warn"
+  }
+}
