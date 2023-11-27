@@ -207,7 +207,7 @@ const useIPSearchFilter = (vmiMapper: VmiMapper): RowFilter => ({
       return ipAddresses.some((ipAddress) => compareCIDR(search, ipAddress));
     }
 
-    return ipAddresses.some((ipAddress) => ipAddress?.startsWith(search));
+    return ipAddresses.some((ipAddress) => ipAddress?.includes(search));
   },
   filterGroupName: t('IP Address'),
   isMatch: () => true,

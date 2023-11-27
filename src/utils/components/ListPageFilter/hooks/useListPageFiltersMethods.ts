@@ -1,6 +1,6 @@
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
-import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
+import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { STATIC_SEARCH_FILTERS } from '../constants';
 import { generateRowFilters, intersection } from '../utils';
@@ -11,6 +11,7 @@ type ListPageFiltersMethodsInputs = {
   applyFilters: (type: string, input: FilterValue) => void;
   generatedRowFilters: ReturnType<typeof generateRowFilters>;
   onRowFilterSearchParamChange: (selected: string[]) => void;
+  searchFilters: RowFilter[];
   selectedRowFilters: string[];
   setSearchInputText: (text: string) => void;
 };
@@ -19,6 +20,7 @@ const useListPageFiltersMethods = ({
   applyFilters,
   generatedRowFilters,
   onRowFilterSearchParamChange,
+  searchFilters,
   selectedRowFilters,
   setSearchInputText,
 }: ListPageFiltersMethodsInputs) => {
@@ -60,6 +62,8 @@ const useListPageFiltersMethods = ({
     updateRowFilterSelected(selectedRowFilters);
     applyTextFilters(STATIC_SEARCH_FILTERS.name);
     applyTextFilters(STATIC_SEARCH_FILTERS.labels);
+
+    searchFilters.forEach((filter) => applyTextFilters(filter.type));
     setSearchInputText('');
   };
 
