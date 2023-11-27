@@ -108,6 +108,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
       applyFilters,
       generatedRowFilters,
       onRowFilterSearchParamChange,
+      searchFilters,
       selectedRowFilters,
       setSearchInputText,
     });
