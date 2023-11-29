@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -18,7 +18,7 @@ import { BootOrderModalBody } from './BootOrderModalBody';
 
 import './boot-order.scss';
 
-export const BootOrderModal: React.FC<{
+const BootOrderModal: FC<{
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
@@ -28,10 +28,10 @@ export const BootOrderModal: React.FC<{
   const { t } = useKubevirtTranslation();
   const transformedDevices = transformDevices(getDisks(vm), getInterfaces(vm));
 
-  const [devices, setDevices] = React.useState<BootableDeviceType[]>(
+  const [devices, setDevices] = useState<BootableDeviceType[]>(
     transformedDevices.sort((a, b) => a.value.bootOrder - b.value.bootOrder),
   );
-  const [isEditMode, setIsEditMode] = React.useState(
+  const [isEditMode, setIsEditMode] = useState(
     transformedDevices.some((device) => !!device.value.bootOrder),
   );
 
@@ -64,3 +64,5 @@ export const BootOrderModal: React.FC<{
     </TabModal>
   );
 };
+
+export default BootOrderModal;

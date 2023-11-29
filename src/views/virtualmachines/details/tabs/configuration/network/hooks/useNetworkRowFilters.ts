@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -7,7 +7,7 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 const useNetworkRowFilters = (): RowFilter[] => {
   const { t } = useKubevirtTranslation();
-  const filters: RowFilter[] = React.useMemo(
+  const filters: RowFilter[] = useMemo(
     () => [
       {
         filter: (interfaces, obj) => {

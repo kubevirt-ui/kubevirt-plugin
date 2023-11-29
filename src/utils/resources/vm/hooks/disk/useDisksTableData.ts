@@ -7,10 +7,7 @@ import {
   getRunningVMMissingVolumesFromVMI,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  PersistentVolumeClaimModel,
-  VirtualMachineInstanceModelGroupVersionKind,
-} from '@kubevirt-utils/models';
+import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -19,21 +16,17 @@ import { getDiskRowDataLayout } from '../../utils/disk/rowData';
 
 type UseDisksTableDisks = (
   vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
 ) => [DiskRowDataLayout[], boolean, any, V1VirtualMachineInstance];
 
 /**
  * A Hook for getting disks data for a VM
  * @param vm - virtual machine to get disks from
+ * @param vmi - virtual machine instance
  * @returns disks data and loading state
  */
-const useDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
+const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
   const { t } = useKubevirtTranslation();
-  // to get hotplug data, we need to get the raw data from the VMI
-  const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    name: vm?.metadata?.name,
-    namespace: vm?.metadata?.namespace,
-  });
   const isVMRunning = isRunning(vm);
   const vmDisks = useMemo(
     () =>

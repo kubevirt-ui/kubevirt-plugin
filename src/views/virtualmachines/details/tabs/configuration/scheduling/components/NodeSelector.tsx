@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ type NodeSelectorProps = {
   vm: V1VirtualMachine;
 };
 
-const NodeSelector: React.FC<NodeSelectorProps> = ({ vm }) => {
+const NodeSelector: FC<NodeSelectorProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const nodes = vm?.spec?.template?.spec?.nodeSelector;
   const nodeSelector = getNodeSelector(nodes);

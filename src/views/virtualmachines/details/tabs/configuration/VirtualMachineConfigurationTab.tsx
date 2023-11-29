@@ -3,6 +3,7 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/utils';
@@ -18,14 +19,16 @@ type VirtualMachineConfigurationTabProps = RouteComponentProps<{
 
 const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = (props) => {
   const { history } = props;
-
-  const [activeTabKey, setActiveTabKey] = useState<number | string>(VirtualMachineDetailsTab.Disks);
+  const { vmi } = useVMI(props?.obj?.metadata?.name, props?.obj?.metadata?.namespace);
+  const [activeTabKey, setActiveTabKey] = useState<number | string>(
+    VirtualMachineDetailsTab.Details,
+  );
 
   const redirectTab = useCallback(
     (name: string) => {
+      setActiveTabKey(name);
       const isConfiguration = includesConfigurationPath(history.location.pathname);
       history.push(isConfiguration ? name : `${VirtualMachineDetailsTab.Configurations}/${name}`);
-      setActiveTabKey(name);
     },
     [history],
   );
@@ -46,7 +49,7 @@ const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = 
             onClick={() => redirectTab(name)}
             title={<TabTitleText>{title}</TabTitleText>}
           >
-            {activeTabKey === name && <Component {...props} />}
+            {activeTabKey === name && <Component {...props} vmi={vmi} />}
           </Tab>
         ))}
       </Tabs>

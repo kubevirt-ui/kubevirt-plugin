@@ -15,8 +15,8 @@ import VirtualMachinesOverviewTabDisksRow from './VirtualMachinesOverviewTabDisk
 
 import './virtual-machines-overview-tab-disks.scss';
 
-const VirtualMachinesOverviewTabDisks = ({ vm }) => {
-  const [disks, loaded, loadedError] = useDisksTableData(vm);
+const VirtualMachinesOverviewTabDisks = ({ vm, vmi }) => {
+  const [disks, loaded, loadedError] = useDisksTableData(vm, vmi);
   const { t } = useKubevirtTranslation();
   const columns = useVirtualMachinesOverviewTabDisksColumns();
 

@@ -7,7 +7,6 @@ import { NETWORK } from '@virtualmachines/utils';
 
 import VirtualMachineConfigurationTab from '../tabs/configuration/VirtualMachineConfigurationTab';
 import VirtualMachineConsolePage from '../tabs/console/VirtualMachineConsolePage';
-import VirtualMachineDetailsPage from '../tabs/details/VirtualMachineDetailsPage';
 import VirtualMachineDiagnosticTab from '../tabs/diagnostic/VirtualMachineDiagnosticTab';
 import VirtualMachinePageEventsTab from '../tabs/events/VirtualMachinePageEvents';
 import VirtualMachineMetricsTab from '../tabs/metrics/VirtualMachineMetricsTab';
@@ -23,11 +22,6 @@ export const useVirtualMachineTabs = () => {
       component: VirtualMachinesOverviewTab,
       href: VirtualMachineDetailsTab.Overview,
       name: t(VirtualMachineDetailsTabLabel.Overview),
-    },
-    {
-      component: VirtualMachineDetailsPage,
-      href: VirtualMachineDetailsTab.Details,
-      name: t(VirtualMachineDetailsTabLabel.Details),
     },
     {
       component: VirtualMachineMetricsTab,
@@ -47,6 +41,31 @@ export const useVirtualMachineTabs = () => {
     {
       component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Disks}`,
+      name: 'hide',
+    },
+    {
+      component: VirtualMachineConfigurationTab,
+      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.SSH}`,
+      name: 'hide',
+    },
+    {
+      component: VirtualMachineConfigurationTab,
+      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab['Initial-run']}`,
+      name: 'hide',
+    },
+    {
+      component: VirtualMachineConfigurationTab,
+      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Storage}`,
+      name: 'hide',
+    },
+    {
+      component: VirtualMachineConfigurationTab,
+      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Details}`,
+      name: 'hide',
+    },
+    {
+      component: VirtualMachineConfigurationTab,
+      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Metadata}`,
       name: 'hide',
     },
     {

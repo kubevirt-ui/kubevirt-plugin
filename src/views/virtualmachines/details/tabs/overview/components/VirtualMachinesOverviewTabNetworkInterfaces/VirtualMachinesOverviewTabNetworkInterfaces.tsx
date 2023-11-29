@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
@@ -16,9 +17,16 @@ import VirtualMachinesOverviewTabNetworkInterfacesRow from './VirtualMachinesOve
 
 import './virtual-machines-overview-tab-interfaces.scss';
 
-const VirtualMachinesOverviewTabInterfaces = ({ vm }) => {
+type VirtualMachinesOverviewTabInterfacesProps = {
+  vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
+};
+const VirtualMachinesOverviewTabInterfaces: FC<VirtualMachinesOverviewTabInterfacesProps> = ({
+  vm,
+  vmi,
+}) => {
   const { t } = useKubevirtTranslation();
-  const [data] = useVirtualMachinesOverviewTabInterfacesData(vm);
+  const data = useVirtualMachinesOverviewTabInterfacesData(vm, vmi);
   const columns = useVirtualMachinesOverviewTabInterfacesColumns();
 
   return (

@@ -8,6 +8,7 @@ import {
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
+import { WORKLOADS } from '@kubevirt-utils/resources/template';
 
 import { VM_WORKLOAD_ANNOTATION } from './annotations';
 
@@ -142,8 +143,8 @@ export const getMachineType = (vm: V1VirtualMachine): string =>
  * A selector that returns the workload of a given virtual machine
  * @param {V1VirtualMachine} vm the virtual machine
  */
-export const getWorkload = (vm: V1VirtualMachine): string =>
-  getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION);
+export const getWorkload = (vm: V1VirtualMachine): WORKLOADS =>
+  getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) as WORKLOADS;
 
 /**
  * A selector that returns the VM accessCredentials array
