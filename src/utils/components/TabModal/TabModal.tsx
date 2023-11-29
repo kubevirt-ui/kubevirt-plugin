@@ -20,8 +20,10 @@ import './TabModal.scss';
 
 type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   children: ReactNode;
+  closeOnSubmit?: boolean;
   headerText: string;
   isDisabled?: boolean;
+  isLoading?: boolean;
   isOpen: boolean;
   modalError?: any;
   modalVariant?: ModalVariant;
@@ -41,8 +43,10 @@ export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(
 const TabModal: TabModalFC = memo(
   ({
     children,
+    closeOnSubmit = true,
     headerText,
     isDisabled,
+    isLoading,
     isOpen,
     modalError,
     modalVariant,
@@ -65,7 +69,7 @@ const TabModal: TabModalFC = memo(
       setApiError(undefined);
 
       onSubmit(obj)
-        .then(onClose)
+        .then(() => closeOnSubmit && onClose())
         .catch((submitError) => {
           setApiError(submitError);
           kubevirtConsole.error(submitError);
@@ -109,7 +113,7 @@ const TabModal: TabModalFC = memo(
                 <ActionListItem>
                   <Button
                     isDisabled={isDisabled || isSubmitting}
-                    isLoading={isSubmitting}
+                    isLoading={isLoading || isSubmitting}
                     onClick={handleSubmit}
                     variant={submitBtnVariant ?? 'primary'}
                   >

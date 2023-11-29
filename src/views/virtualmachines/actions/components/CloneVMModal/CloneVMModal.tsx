@@ -1,37 +1,21 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import VirtualMachineModel, {
-  VirtualMachineModelRef,
-} from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import { V1alpha1VirtualMachineClone, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DESCRIPTION_ANNOTATION, NAME_OS_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
-import {
-  getOperatingSystem,
-  getOperatingSystemName,
-} from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-import { Form } from '@patternfly/react-core';
-import { isRunning } from '@virtualmachines/utils';
+import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
+import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { Form, ModalVariant } from '@patternfly/react-core';
 
-import { stopVM } from '../../actions';
-
-import CloneRunningVMAlert from './components/CloneRunningVMAlert';
+import CloningStatus from './components/CloningStatus';
 import ConfigurationSummary from './components/ConfigurationSummary';
-import DescriptionInput from './components/DescriptionInput';
 import NameInput from './components/NameInput';
-import ProjectSelectInput from './components/ProjectSelectInput';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox';
-import useCloneVMResources from './hooks/useCloneVMResources';
-import { TEMPLATE_VM_NAME_LABEL } from './utils/constants';
-import {
-  cloneControllerRevision,
-  produceCleanClonedVM,
-  updateControllerRevisionOwnerReference,
-  updateVolumes,
-} from './utils/helpers';
+import useCloneVMModal from './hooks/useCloneVMModal';
+import { CLONING_STATUSES } from './utils/constants';
+import { cloneVM, runVM, vmExist } from './utils/helpers';
 
 type CloneVMModalProps = {
   isOpen: boolean;
@@ -41,90 +25,62 @@ type CloneVMModalProps = {
 
 const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
-
   const history = useHistory();
+  const namespace = vm?.metadata?.namespace;
 
-  const [cloneName, setCloneName] = useState(`${vm?.metadata?.name}-clone`);
-  const [cloneDescription, setCloneDescription] = useState(
-    vm?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
+  const [cloneName, setCloneName] = useState(
+    `${vm?.metadata?.name}-clone-${getRandomChars()}`.substring(0, MAX_K8S_NAME_LENGTH),
   );
-  const [cloneProject, setCloneProject] = useState(vm?.metadata?.namespace);
+
   const [startCloneVM, setStartCloneVM] = useState(false);
 
-  const isVMRunning = isRunning(vm);
+  const [initialCloneRequest, setInitialCloneRequest] = useState<V1alpha1VirtualMachineClone>();
 
-  const { loaded, projectNames, pvcs } = useCloneVMResources(vm);
+  const sendCloneRequest = async () => {
+    const vmSameName = await vmExist(cloneName, namespace);
 
-  const onClone = async () => {
-    if (isVMRunning) {
-      await stopVM(vm);
+    if (vmSameName) {
+      throw new Error(t('VirtualMachine with this name already exists'));
     }
 
-    const updatedVM = produceCleanClonedVM(vm, (draftVM) => {
-      draftVM.metadata.name = cloneName;
-      draftVM.metadata.namespace = cloneProject;
-      draftVM.metadata.annotations[DESCRIPTION_ANNOTATION] = cloneDescription;
-      draftVM.spec.running = startCloneVM;
+    const request = await cloneVM(vm?.metadata?.name, cloneName, namespace);
 
-      const osId = getOperatingSystem(vm);
-      const osName = getOperatingSystemName(vm);
-
-      if (osId && osName) {
-        draftVM.metadata.annotations[`${NAME_OS_TEMPLATE_ANNOTATION}/${osId}`] = osName;
-      }
-      if (!draftVM?.spec?.template?.metadata?.labels) draftVM.spec.template.metadata.labels = {};
-      draftVM.spec.template.metadata.labels[TEMPLATE_VM_NAME_LABEL] = cloneName;
-
-      updateVolumes(draftVM, pvcs);
-    });
-
-    const [cloneRevisionInstanceType, cloneRevisionPreference] = await Promise.all([
-      cloneControllerRevision(
-        updatedVM?.spec?.instancetype?.revisionName,
-        updatedVM.metadata.namespace,
-        vm.metadata.namespace,
-      ),
-      cloneControllerRevision(
-        updatedVM?.spec?.preference?.revisionName,
-        updatedVM.metadata.namespace,
-        vm.metadata.namespace,
-      ),
-    ]);
-
-    const createdVM = await k8sCreate({ data: updatedVM, model: VirtualMachineModel });
-
-    await Promise.all([
-      updateControllerRevisionOwnerReference(cloneRevisionInstanceType, createdVM),
-      updateControllerRevisionOwnerReference(cloneRevisionPreference, createdVM),
-    ]);
-
-    history.push(
-      `/k8s/ns/${updatedVM.metadata.namespace}/${VirtualMachineModelRef}/${updatedVM.metadata.name}`,
-    );
+    setInitialCloneRequest(request);
   };
+
+  const cloneRequest = useCloneVMModal(
+    initialCloneRequest?.metadata?.name,
+    initialCloneRequest?.metadata?.namespace,
+  );
+
+  useEffect(() => {
+    if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
+      startCloneVM && runVM(cloneName, namespace);
+
+      history.push(`/k8s/ns/${namespace}/${VirtualMachineModelRef}/${cloneName}`);
+
+      onClose();
+    }
+  }, [cloneRequest, history, startCloneVM, cloneName, namespace, onClose]);
 
   return (
     <TabModal
+      closeOnSubmit={false}
       headerText={t('Clone VirtualMachine')}
+      isDisabled={Boolean(initialCloneRequest)}
+      isLoading={Boolean(initialCloneRequest)}
       isOpen={isOpen}
+      modalVariant={ModalVariant.large}
       obj={vm}
       onClose={onClose}
-      onSubmit={onClone}
+      onSubmit={sendCloneRequest}
       submitBtnText={t('Clone')}
     >
-      <Form isHorizontal>
+      <Form className="pf-u-w-75-on-md pf-u-w-66-on-lg pf-u-m-auto" isHorizontal>
         <NameInput name={cloneName} setName={setCloneName} />
-        <DescriptionInput description={cloneDescription} setDescription={setCloneDescription} />
-        <ProjectSelectInput
-          project={cloneProject}
-          projectNames={projectNames}
-          projectsLoaded={loaded}
-          setProject={setCloneProject}
-          vmNamespace={vm?.metadata?.namespace}
-        />
         <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
-        <ConfigurationSummary pvcs={pvcs} vm={vm} />
-        <CloneRunningVMAlert isVMRunning={isVMRunning} vmName={vm?.metadata?.name} />
+        <ConfigurationSummary vm={vm} />
+        <CloningStatus vmCloneRequest={cloneRequest || initialCloneRequest} />
       </Form>
     </TabModal>
   );

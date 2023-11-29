@@ -1,7 +1,7 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 import produce from 'immer';
-import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
@@ -16,10 +16,10 @@ type DeschedulerProps = {
   vm: V1VirtualMachine;
 };
 
-const Descheduler: React.FC<DeschedulerProps> = ({ vm }) => {
+const Descheduler: FC<DeschedulerProps> = ({ vm }) => {
   const deschedulerLabel =
     vm?.spec?.template?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL] === 'true';
-  const [isChecked, setChecked] = React.useState<boolean>(deschedulerLabel);
+  const [isChecked, setChecked] = useState<boolean>(deschedulerLabel);
   const [isSingleNodeCluster] = useSingleNodeCluster();
   const isMigratable = isLiveMigratable(vm, isSingleNodeCluster);
   const isDeschedulerInstalled = useDeschedulerInstalled();

@@ -1,5 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 
+import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
 import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
@@ -64,12 +65,11 @@ export const VirtualMachineActionFactory = {
   },
   clone: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      accessReview: asAccessReview(VirtualMachineCloneModel, vm, 'create'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <CloneVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
         )),
-      disabled: ![Paused, Running, Stopped].includes(vm?.status?.printableStatus),
       id: 'vm-action-clone',
       label: t('Clone'),
     };
