@@ -19,13 +19,14 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   const history = useHistory();
 
   const createItems = {
-    catalog: t('From template'),
     instanceType: t('From InstanceType'),
+    //eslint-disable-next-line perfectionist/sort-objects
+    catalog: t('From template'),
     yaml: t('With YAML'),
   };
 
   const catalogURL = useMemo(
-    () => `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`,
+    () => `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`,
     [namespace],
   );
 
@@ -33,9 +34,9 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
     (type: string) => {
       switch (type) {
         case 'catalog':
-          return history.push(catalogURL);
+          return history.push(`${catalogURL}/template`);
         case 'instanceType':
-          return history.push(`${catalogURL}/instanceTypes`);
+          return history.push(catalogURL);
         default:
           return history.push(
             `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${VirtualMachineModelRef}/~new`,

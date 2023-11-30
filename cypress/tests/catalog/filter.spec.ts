@@ -5,6 +5,7 @@ describe('Test VM catalog filter', () => {
   before(() => {
     cy.login();
     cy.visitCatalog();
+    cy.byTestID('templates-tab').click();
   });
 
   it('ID(CNV-8464) Filter VM catalog by OS name', () => {

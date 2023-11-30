@@ -11,8 +11,8 @@ const Catalog: React.FC = () => {
       <Switch>
         <Route
           path={[
-            '/k8s/ns/:ns/templatescatalog/review',
-            '/k8s/all-namespaces/templatescatalog/review',
+            '/k8s/ns/:ns/catalog/template/review',
+            '/k8s/all-namespaces/catalog/template/review',
           ]}
           component={Wizard}
         />

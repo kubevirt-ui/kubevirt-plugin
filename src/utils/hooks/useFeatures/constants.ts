@@ -26,7 +26,6 @@ export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
     [AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED]: 'false',
     [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
     [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
-    [INSTANCE_TYPE_ENABLED]: 'false',
     [KUBEVIRT_APISERVER_PROXY]: 'true',
     [LOAD_BALANCER_ENABLED]: 'false',
   },
