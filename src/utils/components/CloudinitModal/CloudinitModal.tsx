@@ -13,7 +13,7 @@ import CloudinitForm from './CloudinitForm';
 
 import './cloud-init.scss';
 
-export const CloudinitModal: FC<{
+const CloudinitModal: FC<{
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
@@ -86,3 +86,5 @@ export const CloudinitModal: FC<{
     </TabModal>
   );
 };
+
+export default CloudinitModal;

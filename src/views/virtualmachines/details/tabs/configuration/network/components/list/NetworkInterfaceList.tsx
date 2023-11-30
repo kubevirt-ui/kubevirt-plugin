@@ -1,23 +1,19 @@
 import React, { FC } from 'react';
 
-import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1Network,
   V1VirtualMachine,
   V1VirtualMachineInstance,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getAutoAttachPodInterface } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageFilter,
-  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { isRunning } from '@virtualmachines/utils';
 
 import useNetworkColumns from '../../hooks/useNetworkColumns';
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
@@ -28,19 +24,11 @@ import NetworkInterfaceRow from './NetworkInterfaceRow';
 
 type NetworkInterfaceTableProps = {
   vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
-const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm }) => {
+const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm, vmi }) => {
   const filters = useNetworkRowFilters();
-
-  const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>(
-    isRunning(vm) && {
-      groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-      isList: false,
-      name: getName(vm),
-      namespace: getNamespace(vm),
-    },
-  );
 
   const { interfaces, networks } = getInterfacesAndNetworks(vm, vmi);
 

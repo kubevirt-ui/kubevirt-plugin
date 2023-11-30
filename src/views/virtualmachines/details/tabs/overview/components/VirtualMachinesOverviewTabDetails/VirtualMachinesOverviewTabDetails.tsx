@@ -2,19 +2,24 @@ import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+  V1VirtualMachineInstanceGuestAgentInfo,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
+import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
-import { useVMIAndPodsForVM, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { getMachineType, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { getOsNameFromGuestAgent, useGuestOS } from '@kubevirt-utils/resources/vmi';
+import { getOsNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceLink, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
   CardBody,
@@ -23,6 +28,7 @@ import {
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
+  DescriptionListTermHelpText,
   Divider,
   Grid,
   GridItem,
@@ -43,13 +49,23 @@ import VirtualMachinesOverviewTabDetailsConsole from './components/VirtualMachin
 import './virtual-machines-overview-tab-details.scss';
 
 type VirtualMachinesOverviewTabDetailsProps = {
+  error: Error;
+  guestAgentData: V1VirtualMachineInstanceGuestAgentInfo;
+  guestAgentDataLoaded: boolean;
+  loaded: boolean;
   vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsProps> = ({ vm }) => {
+const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsProps> = ({
+  error,
+  guestAgentData,
+  guestAgentDataLoaded,
+  loaded,
+  vm,
+  vmi,
+}) => {
   const { t } = useKubevirtTranslation();
-  const { error, loaded, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
-  const [guestAgentData, loadedGuestAgent] = useGuestOS(vmi);
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
   const None = <MutedTextSpan text={t('None')} />;
@@ -64,7 +80,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
 
   const { fallback, hostname, osName } = useMemo(() => {
     const isLoadingVMI = !loaded && !error;
-    if (!loadedGuestAgent || isLoadingVMI)
+    if (!guestAgentDataLoaded || isLoadingVMI)
       return {
         fallback: <Skeleton />,
       };
@@ -76,7 +92,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
     return {
       fallback: <GuestAgentIsRequiredText vmi={vmi} />,
     };
-  }, [loadedGuestAgent, loaded, error, guestAgentData, vmi]);
+  }, [loaded, error, guestAgentDataLoaded, guestAgentData, vmi]);
 
   const vmPrintableStatus = vm?.status?.printableStatus;
 
@@ -119,9 +135,14 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Created')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-created">
-                    {timestamp !== NO_DATA_DASH
-                      ? t('{{timestampPluralized}} ago', { timestampPluralized })
-                      : NO_DATA_DASH}
+                    {timestamp !== NO_DATA_DASH ? (
+                      <>
+                        <Timestamp simple timestamp={vm?.metadata?.creationTimestamp} /> (
+                        {t('{{timestampPluralized}} ago', { timestampPluralized })})
+                      </>
+                    ) : (
+                      NO_DATA_DASH
+                    )}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
 
@@ -131,7 +152,6 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                     {osName ?? fallback}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
-
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
                   <DescriptionListDescription>
@@ -158,6 +178,26 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                     ) : (
                       None
                     )}
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>{t('Time zone')}</DescriptionListTerm>
+                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-timezone">
+                    {guestAgentData?.timezone?.split(',')[0] || NO_DATA_DASH}
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTermHelpText>
+                    <DescriptionItemHeader
+                      bodyContent={t(
+                        'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
+                      )}
+                      descriptionHeader={t('Machine type')}
+                      isPopover
+                    />
+                  </DescriptionListTermHelpText>
+                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-timezone">
+                    {getMachineType(vm) || NO_DATA_DASH}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
               </DescriptionList>

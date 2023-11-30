@@ -3,7 +3,6 @@ export const tabList = '.pf-c-tabs__list > li';
 export enum tabs {
   Configuration = 'horizontal-link-Configuration',
   Console = 'horizontal-link-Console',
-  Details = 'horizontal-link-Details',
   Diagnostics = 'horizontal-link-Diagnostics',
   Disks = 'horizontal-link-Disks',
   Environment = 'horizontal-link-Environment',
@@ -29,9 +28,6 @@ export const tab = {
   },
   navigateToConsole: () => {
     navigateToTab(tabs.Console);
-  },
-  navigateToDetails: () => {
-    navigateToTab(tabs.Details);
   },
   navigateToDiagnostics: () => {
     navigateToTab(tabs.Diagnostics);

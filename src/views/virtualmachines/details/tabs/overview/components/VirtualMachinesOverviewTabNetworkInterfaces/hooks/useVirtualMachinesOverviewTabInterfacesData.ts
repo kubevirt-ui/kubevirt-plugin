@@ -1,23 +1,18 @@
-import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { InterfacesData } from '../utils/types';
 
 type UseVirtualMachinesOverviewTabInterfacesData = (
   vm: V1VirtualMachine,
-) => [InterfacesData[], boolean, any];
+  vmi: V1VirtualMachineInstance,
+) => InterfacesData[];
 
 const useVirtualMachinesOverviewTabInterfacesData: UseVirtualMachinesOverviewTabInterfacesData = (
   vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
 ) => {
-  const [vmi, loaded, loadError] = useK8sWatchResource<V1VirtualMachineInstance>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    name: vm?.metadata?.name,
-    namespace: vm?.metadata?.namespace,
-  });
   const networks = getNetworks(vm);
   const interfaces = getInterfaces(vm);
   const interfacesIPs = vmi?.status?.interfaces?.filter((iface) => !!iface.name) || [];
@@ -32,7 +27,7 @@ const useVirtualMachinesOverviewTabInterfacesData: UseVirtualMachinesOverviewTab
     };
   });
 
-  return [networkInterfacesData, loaded, loadError];
+  return networkInterfacesData;
 };
 
 export default useVirtualMachinesOverviewTabInterfacesData;

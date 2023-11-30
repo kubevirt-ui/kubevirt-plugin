@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import {
@@ -9,14 +9,14 @@ import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseGuestOS = (
   vmi?: V1VirtualMachineInstance,
-) => [V1VirtualMachineInstanceGuestAgentInfo, boolean, any];
+) => [V1VirtualMachineInstanceGuestAgentInfo, boolean, Error];
 
 export const useGuestOS: UseGuestOS = (vmi) => {
-  const [loaded, setLoaded] = React.useState(false);
-  const [data, setData] = React.useState<V1VirtualMachineInstanceGuestAgentInfo>({});
-  const [error, setError] = React.useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [data, setData] = useState<V1VirtualMachineInstanceGuestAgentInfo>({});
+  const [error, setError] = useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const guestOS = vmi?.status?.guestOSInfo?.id;
 
     setError(null);

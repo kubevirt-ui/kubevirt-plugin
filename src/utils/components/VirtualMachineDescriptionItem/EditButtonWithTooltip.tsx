@@ -1,13 +1,13 @@
-import React, { FC, PropsWithChildren, ReactNode } from 'react';
+import React, { FC, PropsWithChildren, ReactNode, SyntheticEvent } from 'react';
 
-import { Button, Flex, FlexItem, Tooltip } from '@patternfly/react-core';
+import { Button, Flex, Tooltip } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 type EditButtonWithTooltipProps = PropsWithChildren<{
   isEditable: boolean;
   onEditClick: () => void;
   testId: string;
-  tooltipContent: ReactNode;
+  tooltipContent?: ReactNode;
 }>;
 
 const EditButtonWithTooltip: FC<EditButtonWithTooltipProps> = ({
@@ -19,19 +19,18 @@ const EditButtonWithTooltip: FC<EditButtonWithTooltipProps> = ({
 }) => {
   const EditButton = () => (
     <Button
-      className="pf-u-w-100"
+      onClick={(e: SyntheticEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        onEditClick?.();
+      }}
       data-test-id={testId}
       isDisabled={!isEditable}
       isInline
-      onClick={onEditClick}
-      type="button"
       variant="link"
     >
-      <Flex spaceItems={{ default: 'spaceItemsNone' }}>
-        <FlexItem>{children}</FlexItem>
-        <FlexItem>
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </FlexItem>
+      <Flex>
+        {children}
+        <PencilAltIcon className="co-icon-space-l" />
       </Flex>
     </Button>
   );

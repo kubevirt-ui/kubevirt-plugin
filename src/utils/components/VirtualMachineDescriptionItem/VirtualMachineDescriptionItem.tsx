@@ -20,6 +20,7 @@ import './VirtualMachineDescriptionItem.scss';
 type VirtualMachineDescriptionItemProps = {
   bodyContent?: ReactNode;
   breadcrumb?: string;
+  className?: string;
   'data-test-id'?: string;
   descriptionData: any;
   descriptionHeader?: string;
@@ -37,6 +38,7 @@ type VirtualMachineDescriptionItemProps = {
 const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   bodyContent,
   breadcrumb,
+  className,
   'data-test-id': testId,
   descriptionData,
   descriptionHeader,
@@ -65,7 +67,7 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   );
 
   return (
-    <DescriptionListGroup className="virtual-machine-description-list">
+    <DescriptionListGroup className={`virtual-machine-description-list ${className}`}>
       <DescriptionListTermHelpText>
         <Flex
           justifyContent={{

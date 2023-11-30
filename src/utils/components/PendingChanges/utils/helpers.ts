@@ -25,6 +25,7 @@ import {
   getAffinity,
   getCPU,
   getCPUcores,
+  getDevices,
   getEvictionStrategy,
   getGPUDevices,
   getHostDevices,
@@ -38,7 +39,11 @@ import {
   DESCHEDULER_EVICT_LABEL,
   getEvictionStrategy as getVMIEvictionStrategy,
 } from '@kubevirt-utils/resources/vmi';
-import { getVMIInterfaces, getVMIVolumes } from '@kubevirt-utils/resources/vmi/utils/selectors';
+import {
+  getVMIDevices,
+  getVMIInterfaces,
+  getVMIVolumes,
+} from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isPendingHotPlugNIC } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
@@ -169,7 +174,7 @@ export const nonHotPlugNICChangesExist = (
 ) => {
   const moreChangeTypesExist = pendingChanges
     ?.filter((change) => change?.hasPendingChange)
-    ?.some((change) => change?.tabLabel !== VirtualMachineDetailsTabLabel.NetworkInterfaces);
+    ?.some((change) => change?.tabLabel !== VirtualMachineDetailsTabLabel.Network);
   return moreChangeTypesExist || nonHotPlugNICsExist;
 };
 
@@ -200,21 +205,21 @@ export const getSortedNICPendingChanges = (
     nicHotPlugPendingChanges: [
       {
         handleAction: () => {
-          history.push(getTabURL(vm, VirtualMachineDetailsTab.NetworkInterfaces));
+          history.push(getTabURL(vm, VirtualMachineDetailsTab.Network));
         },
         hasPendingChange: !isEmpty(hotPlugNICs),
         label: hotPlugNICs?.length > 1 ? hotPlugNICs.join(', ') : hotPlugNICs[0],
-        tabLabel: VirtualMachineDetailsTabLabel.NetworkInterfaces,
+        tabLabel: VirtualMachineDetailsTabLabel.Network,
       },
     ],
     nicNonHotPlugPendingChanges: [
       {
         handleAction: () => {
-          history.push(getTabURL(vm, VirtualMachineDetailsTab.NetworkInterfaces));
+          history.push(getTabURL(vm, VirtualMachineDetailsTab.Network));
         },
         hasPendingChange: !isEmpty(nonHotPlugNICs),
         label: nonHotPlugNICs?.length > 1 ? nonHotPlugNICs.join(', ') : nonHotPlugNICs[0],
-        tabLabel: VirtualMachineDetailsTabLabel.NetworkInterfaces,
+        tabLabel: VirtualMachineDetailsTabLabel.Network,
       },
     ],
   };
@@ -436,12 +441,10 @@ export const getChangedGuestSystemAccessLog = (
   if (isEmpty(vm) || isEmpty(vmi)) {
     return false;
   }
-  const vmLogSerialConsole = (
-    vm?.spec?.template?.spec?.domain?.devices as V1Devices & { logSerialConsole: boolean }
-  )?.logSerialConsole;
-  const vmiLogSerialConsole = (
-    vmi?.spec?.domain?.devices as V1Devices & { logSerialConsole: boolean }
-  )?.logSerialConsole;
+  const vmLogSerialConsole = (getDevices(vm) as V1Devices & { logSerialConsole: boolean })
+    ?.logSerialConsole;
+  const vmiLogSerialConsole = (getVMIDevices(vmi) as V1Devices & { logSerialConsole: boolean })
+    ?.logSerialConsole;
 
   return vmLogSerialConsole !== vmiLogSerialConsole;
 };
@@ -488,8 +491,7 @@ export const getPendingChangesByTab = (pendingChanges: PendingChange[]) => {
   );
   const pendingChangesNICsTab = pendingChanges?.filter(
     (change) =>
-      change?.tabLabel === VirtualMachineDetailsTabLabel.NetworkInterfaces &&
-      change?.hasPendingChange,
+      change?.tabLabel === VirtualMachineDetailsTabLabel.Network && change?.hasPendingChange,
   );
   const pendingChangesScriptsTab = pendingChanges?.filter(
     (change) =>

@@ -4,5 +4,3 @@ export const booleanTextIds = {
   no: 'no',
   yes: 'yes',
 };
-
-export const NETWORK = 'network';

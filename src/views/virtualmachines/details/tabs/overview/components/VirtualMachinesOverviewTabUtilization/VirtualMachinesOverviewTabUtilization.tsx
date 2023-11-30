@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
   CardBody,
@@ -28,14 +28,17 @@ import UtilizationThresholdCharts from './components/UtilizationThresholdCharts'
 import './virtual-machines-overview-tab-utilization.scss';
 
 type VirtualMachinesOverviewTabUtilizationProps = {
+  pods: K8sResourceCommon[];
   vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
 const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtilizationProps> = ({
+  pods,
   vm,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
 
   return (
     <Card className="VirtualMachinesOverviewTabUtilization--main">

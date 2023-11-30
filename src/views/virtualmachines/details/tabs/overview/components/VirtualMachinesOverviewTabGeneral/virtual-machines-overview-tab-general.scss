@@ -1,0 +1,14 @@
+.VirtualMachinesOverviewTabGeneral {
+  &--main {
+    .pf-c-description-list__group,
+    .pf-c-description-list > .pf-c-card {
+      column-gap: 4rem;
+    }
+
+    .co-resource-item__resource-name {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}

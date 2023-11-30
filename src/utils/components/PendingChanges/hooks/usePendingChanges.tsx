@@ -6,8 +6,8 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
-import { BootOrderModal } from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
-import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
+import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
+import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
@@ -187,14 +187,14 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.NetworkInterfaces));
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Network));
       },
       hasPendingChange: !isEmpty(modifiedNics),
       label:
         !isEmpty(modifiedNics) && modifiedNics?.length > 1
           ? modifiedNics.join(', ')
           : modifiedNics[0],
-      tabLabel: VirtualMachineDetailsTabLabel.NetworkInterfaces,
+      tabLabel: VirtualMachineDetailsTabLabel.Network,
     },
     {
       handleAction: () => {

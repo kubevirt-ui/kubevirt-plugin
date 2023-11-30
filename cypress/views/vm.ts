@@ -4,7 +4,6 @@ import { NoBootSource } from '../utils/const/string';
 
 import * as catalogView from './catalog';
 import * as vmView from './selector';
-import { tab } from './tab';
 
 export const getRow = (name: string, within: VoidFunction) =>
   cy.byTestRows('resource-row').contains(name).parents('tr').within(within);
@@ -76,7 +75,6 @@ export const vm = {
       }
     });
 
-    tab.navigateToDetails();
     if (vmData.startOnCreation) {
       waitForStatus(VM_STATUS.Provisioning);
       waitForStatus(VM_STATUS.Starting);

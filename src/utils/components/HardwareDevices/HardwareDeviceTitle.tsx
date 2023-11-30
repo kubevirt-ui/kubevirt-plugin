@@ -27,7 +27,6 @@ const HardwareDeviceTitle: FC<HardwareDeviceTitleProps> = ({
         className="pf-m-link--align-left"
         isDisabled={!canEdit}
         isInline
-        isLarge
         onClick={onClick}
         variant="link"
       >
