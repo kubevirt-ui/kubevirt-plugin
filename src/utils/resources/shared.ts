@@ -15,7 +15,7 @@ import {
 
 import { isDataSourceReady } from '../../views/datasources/utils';
 
-import { isEmpty, kubevirtConsole } from './../utils/utils';
+import { isEmpty } from './../utils/utils';
 import {
   isDataSourceCloning,
   isDataSourceUploading,
@@ -162,7 +162,6 @@ export const asAccessReview = (
   subresource?: string,
 ): AccessReviewResourceAttributes => {
   if (!obj) {
-    kubevirtConsole.warn('review obj should not be null');
     return null;
   }
   return {

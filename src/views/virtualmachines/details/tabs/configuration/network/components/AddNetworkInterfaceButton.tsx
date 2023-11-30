@@ -1,24 +1,23 @@
 import React, { FC } from 'react';
 import classNames from 'classnames';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WithPermissionTooltip from '@kubevirt-utils/components/WithPermissionTooltip/WithPermissionTooltip';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePermissions from '@kubevirt-utils/hooks/usePermissions/usePermissions';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
 
 import VirtualMachinesNetworkInterfaceModal from './modal/VirtualMachinesNetworkInterfaceModal';
 
 type AddNetworkInterfaceButtonProps = {
   vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
-const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({ vm }) => {
+const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const { capabilitiesData } = usePermissions();
   const isAddNetworkDisabled = !capabilitiesData?.attacheNetworks?.allowed;
   const actionText = t('Add network interface');

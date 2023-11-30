@@ -4,7 +4,7 @@ import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescript
 import { WizardTab } from '@catalog/wizard/tabs';
 import AlertScripts from '@kubevirt-utils/components/AlertScripts/AlertScripts';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
-import { CloudinitModal } from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
+import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

@@ -22,35 +22,17 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('vm tabs are loaded', () => {
-      tab.navigateToDetails();
-      cy.contains('VirtualMachine details').scrollIntoView().should('be.visible');
-
       tab.navigateToMetrics();
       cy.contains('Utilization').should('be.visible');
 
       tab.navigateToYAML();
       cy.contains('Download').should('be.visible');
 
-      tab.navigateToScheduling();
-      cy.contains('Scheduling and resource requirements').should('be.visible');
-
-      tab.navigateToEnvironment();
-      cy.contains('Include all values').should('be.visible');
-
       tab.navigateToEvents();
       cy.contains('event').should('be.visible');
 
       tab.navigateToConsole();
       cy.contains('This VirtualMachine is down').should('be.visible');
-
-      tab.navigateToNetworks();
-      cy.contains('Pod networking').should('be.visible');
-
-      tab.navigateToDisks();
-      cy.contains('rootdisk').should('be.visible');
-
-      tab.navigateToScripts();
-      cy.contains('Cloud-init').should('be.visible');
 
       tab.navigateToSnapshots();
       cy.contains('Take snapshot').should('be.visible');

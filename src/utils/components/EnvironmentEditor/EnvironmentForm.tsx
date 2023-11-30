@@ -3,11 +3,8 @@ import { useImmer } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { Button, Form } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
-
-import SidebarEditor from '../SidebarEditor/SidebarEditor';
 
 import EnvironmentEditor from './components/EnvironmentEditor';
 import EnvironmentFormActions from './components/EnvironmentFormActions';
@@ -61,11 +58,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
   if (!loaded) return <EnvironmentFormSkeleton />;
 
   return (
-    <SidebarEditor<V1VirtualMachine>
-      onChange={setTemporaryVM}
-      pathsToHighlight={PATHS_TO_HIGHLIGHT.ENV_TAB}
-      resource={temporaryVM}
-    >
+    <>
       <EnvironmentFormTitle />
       <Form className="environment-form__form">
         {environments.length !== 0 && (
@@ -122,7 +115,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
           onSave={() => updateVM(temporaryVM)}
         />
       </Form>
-    </SidebarEditor>
+    </>
   );
 };
 

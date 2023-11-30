@@ -1,0 +1,10 @@
+.VirtualMachinesDetailsSection {
+  .DetailsSection {
+    &-margin__bottom {
+      margin-bottom: var(--pf-global--spacer--md);
+    }
+    &-divider__height {
+      height: 100%;
+    }
+  }
+}

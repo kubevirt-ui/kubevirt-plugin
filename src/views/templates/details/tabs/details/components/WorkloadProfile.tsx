@@ -60,7 +60,7 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ editable, templat
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <WorkloadProfileModal
-        initialWorkload={getTemplateWorkload(template)}
+        initialWorkload={getTemplateWorkload(template) as WORKLOADS}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={updateWorkload}

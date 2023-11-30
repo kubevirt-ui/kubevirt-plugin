@@ -2,24 +2,30 @@ import {
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/constants/tabs-constants';
-import { NETWORK } from '@virtualmachines/utils';
 
-import DiskListPage from '../disk/DiskListPage';
-import VirtualMachineEnvironmentPage from '../environment/VirtualMachineEnvironmentPage';
-import NetworkInterfaceListPage from '../network/NetworkInterfaceListPage';
-import VirtualMachineSchedulingPage from '../scheduling/VirtualMachineSchedulingPage';
-import ScriptsTab from '../scripts/ScriptsTab';
+import DetailsTab from '../details/DetailsTab';
+import InitialRunTab from '../initialrun/InitialRunTab';
+import MetadataTab from '../metadata/MetadataTab';
+import NetworkInterfaceListPage from '../network/NetworkTab';
+import VirtualMachineSchedulingPage from '../scheduling/SchedulingTab';
+import SSHTab from '../ssh/SSHTab';
+import StorageTab from '../storage/StorageTab';
 
 export const tabs = [
   {
-    Component: DiskListPage,
-    name: VirtualMachineDetailsTab.Disks,
-    title: VirtualMachineDetailsTabLabel.Disks,
+    Component: DetailsTab,
+    name: VirtualMachineDetailsTab.Details,
+    title: VirtualMachineDetailsTabLabel.Details,
+  },
+  {
+    Component: StorageTab,
+    name: VirtualMachineDetailsTab.Storage,
+    title: VirtualMachineDetailsTabLabel.Storage,
   },
   {
     Component: NetworkInterfaceListPage,
-    name: NETWORK,
-    title: VirtualMachineDetailsTabLabel.NetworkInterfaces,
+    name: VirtualMachineDetailsTab.Network,
+    title: VirtualMachineDetailsTabLabel.Network,
   },
   {
     Component: VirtualMachineSchedulingPage,
@@ -27,14 +33,19 @@ export const tabs = [
     title: VirtualMachineDetailsTabLabel.Scheduling,
   },
   {
-    Component: VirtualMachineEnvironmentPage,
-    name: VirtualMachineDetailsTab.Environment,
-    title: VirtualMachineDetailsTabLabel.Environment,
+    Component: SSHTab,
+    name: VirtualMachineDetailsTab.SSH,
+    title: VirtualMachineDetailsTabLabel.SSH,
   },
   {
-    Component: ScriptsTab,
-    name: VirtualMachineDetailsTab.Scripts,
-    title: VirtualMachineDetailsTabLabel.Scripts,
+    Component: InitialRunTab,
+    name: VirtualMachineDetailsTab['Initial-run'],
+    title: VirtualMachineDetailsTabLabel['Initial-run'],
+  },
+  {
+    Component: MetadataTab,
+    name: VirtualMachineDetailsTab.Metadata,
+    title: VirtualMachineDetailsTabLabel.Metadata,
   },
 ];
 

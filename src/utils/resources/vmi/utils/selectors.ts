@@ -1,4 +1,5 @@
 import {
+  V1Devices,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -42,3 +43,6 @@ export const getEvictionStrategy = (vmi: V1VirtualMachineInstance): string =>
 export const getVMIStatusInterfaces = (
   vmi: V1VirtualMachineInstance,
 ): V1VirtualMachineInstanceNetworkInterface[] => vmi?.status?.interfaces;
+
+export const getVMIDevices = (vmi: V1VirtualMachineInstance): V1Devices =>
+  vmi?.spec?.domain?.devices;
