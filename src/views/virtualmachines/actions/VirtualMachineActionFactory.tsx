@@ -8,6 +8,7 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
+import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +20,6 @@ import { CopyIcon } from '@patternfly/react-icons';
 
 import { isLiveMigratable, printableVMStatus } from '../utils';
 
-import CloneVMModal from './components/CloneVMModal/CloneVMModal';
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
 import {
   cancelMigration,
@@ -68,7 +68,7 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineCloneModel, vm, 'create'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
-          <CloneVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
+          <CloneVMModal isOpen={isOpen} onClose={onClose} source={vm} />
         )),
       id: 'vm-action-clone',
       label: t('Clone'),

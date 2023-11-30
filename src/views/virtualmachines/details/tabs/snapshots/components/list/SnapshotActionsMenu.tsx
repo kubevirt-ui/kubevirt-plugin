@@ -1,12 +1,14 @@
-import * as React from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
+import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sDelete, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ButtonVariant,
   Dropdown,
@@ -22,23 +24,33 @@ type SnapshotActionsMenuProps = {
   snapshot: V1alpha1VirtualMachineSnapshot;
 };
 
-const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
-  isRestoreDisabled,
-  snapshot,
-}) => {
+const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, snapshot }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const [canClone] = useAccessReview({
+    resource: VirtualMachineCloneModel.plural,
+    verb: 'create',
+  });
+
   const deleteLabel = t('Delete');
 
-  const onRestoreModalToggle = React.useCallback(() => {
+  const onRestoreModalToggle = useCallback(() => {
     createModal(({ isOpen, onClose }) => (
       <RestoreModal isOpen={isOpen} onClose={onClose} snapshot={snapshot} />
     ));
     setIsDropdownOpen(false);
   }, [createModal, snapshot]);
 
-  const onDeleteModalToggle = React.useCallback(() => {
+  const onClone = useCallback(() => {
+    createModal(({ isOpen, onClose }) => (
+      <CloneVMModal isOpen={isOpen} onClose={onClose} source={snapshot} />
+    ));
+    setIsDropdownOpen(false);
+  }, [createModal, snapshot]);
+
+  const onDeleteModalToggle = useCallback(() => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1alpha1VirtualMachineSnapshot>
         onSubmit={(obj) =>
@@ -62,9 +74,17 @@ const SnapshotActionsMenu: React.FC<SnapshotActionsMenuProps> = ({
 
   const items = [
     <DropdownItem
+      description={t('Clone this snapshot to create a VirtualMachine from it')}
+      isDisabled={!canClone}
+      key="snapshot-clone"
+      onClick={onClone}
+    >
+      {t('Clone')}
+    </DropdownItem>,
+    <DropdownItem
       description={t('Restore is enabled only for offline VirtualMachine.')}
       isDisabled={isRestoreDisabled}
-      key="snapshot-resotre"
+      key="snapshot-restore"
       onClick={onRestoreModalToggle}
     >
       {t('Restore')}
