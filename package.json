@@ -6,6 +6,7 @@
     "displayName": "Kubevirt Plugin",
     "exposedModules": {
       "BootableVolumesList": "./views/bootablevolumes/list/BootableVolumesList.tsx",
+      "Catalog": "./views/catalog/Catalog.tsx",
       "Checkups": "./views/checkups/Checkups.tsx",
       "CheckupsNetworkDetailsPage": "./views/checkups/network/details/CheckupsNetworkDetailsPage.tsx",
       "CheckupsNetworkForm": "./views/checkups/network/components/form/CheckupsNetworkForm.tsx",
@@ -39,7 +40,6 @@
       "pvcUploadStatus": "src/views/cdi-upload-provider/popover/UploadPVCPopover.tsx",
       "pvcUploadUtils": "src/views/cdi-upload-provider/utils/utils.tsx",
       "TemplateNavPage": "./views/templates/details/TemplateNavPage.tsx",
-      "TemplatesCatalog": "./views/catalog/Catalog.tsx",
       "UploadPVC": "src/views/cdi-upload-provider/upload-pvc-form/UploadPVC.tsx",
       "useCDIUpload": "src/views/cdi-upload-provider/hooks/useCDIUpload.tsx",
       "useVirtualMachineActionsProvider": "./views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts",

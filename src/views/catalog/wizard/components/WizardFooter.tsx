@@ -111,7 +111,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
                 onClick={() => {
                   if (confirm(t('Are you sure you want to cancel?'))) {
                     clearSessionStorageVM();
-                    history.push(`/k8s/ns/${namespace}/templatescatalog`);
+                    history.push(`/k8s/ns/${namespace}/catalog/template`);
                   }
                 }}
                 variant="link"

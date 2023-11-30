@@ -17,7 +17,7 @@ export const WizardNoBootModal: React.VFC<{
 
   const goToDisksTab = () => {
     onClose();
-    history.push(`/k8s/ns/${namespace}/templatescatalog/review/disks`);
+    history.push(`/k8s/ns/${namespace}/catalog/template/review/disks`);
   };
 
   return (

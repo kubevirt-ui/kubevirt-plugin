@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromInstanceType';
@@ -21,20 +21,17 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
   const { t } = useKubevirtTranslation();
 
   const [currentTab, setCurrentTab] = useState<CREATE_VM_TAB>(
-    location.pathname.endsWith(CREATE_VM_TAB.INSTANCE_TYPES)
-      ? CREATE_VM_TAB.INSTANCE_TYPES
-      : CREATE_VM_TAB.CATALOG,
+    location.pathname.endsWith(CREATE_VM_TAB.TEMPLATE)
+      ? CREATE_VM_TAB.TEMPLATE
+      : CREATE_VM_TAB.INSTANCE_TYPES,
   );
 
   const catalogURL = useMemo(
-    () => `/k8s/${match?.params?.ns ? `ns/${match?.params?.ns}` : ALL_NAMESPACES}/templatescatalog`,
+    () => `/k8s/${match?.params?.ns ? `ns/${match?.params?.ns}` : ALL_NAMESPACES}/catalog`,
     [match],
   );
 
-  const handleTabClick = (
-    event: MouseEvent | React.KeyboardEvent | React.MouseEvent<any>,
-    tabIndex: CREATE_VM_TAB,
-  ) => {
+  const handleTabClick = (_event: MouseEvent, tabIndex: CREATE_VM_TAB) => {
     setCurrentTab(tabIndex);
     history.push(`${catalogURL}${tabIndex}`);
   };
@@ -51,22 +48,18 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
       </div>
       <Tabs activeKey={currentTab} onSelect={handleTabClick} usePageInsets>
         <Tab
-          eventKey={CREATE_VM_TAB.CATALOG}
-          title={<CreateVMTabTitle Icon={CatalogIcon} titleText={t('Template catalog')} />}
-        >
-          <TemplatesCatalog history={history} location={location} match={match} />
-        </Tab>
-        <Tab
+          data-test="instancetypes-tab"
           eventKey={CREATE_VM_TAB.INSTANCE_TYPES}
           title={<CreateVMTabTitle Icon={ImageIcon} titleText={t('InstanceTypes')} />}
         >
-          <CreateFromInstanceType
-            navigateToCatalog={() => {
-              setCurrentTab(CREATE_VM_TAB.CATALOG);
-              history.push(catalogURL);
-            }}
-            isInstanceTypeTab={currentTab === CREATE_VM_TAB.INSTANCE_TYPES}
-          />
+          <CreateFromInstanceType />
+        </Tab>
+        <Tab
+          data-test="templates-tab"
+          eventKey={CREATE_VM_TAB.TEMPLATE}
+          title={<CreateVMTabTitle Icon={CatalogIcon} titleText={t('Template catalog')} />}
+        >
+          <TemplatesCatalog history={history} location={location} match={match} />
         </Tab>
       </Tabs>
     </div>

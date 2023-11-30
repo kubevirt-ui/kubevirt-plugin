@@ -12,7 +12,7 @@ export const welcomeModalButtons = (ns: string): WelcomeModalButtonsData[] => {
     {
       className: 'WelcomeModal__button',
       name: t('Create VirtualMachine'),
-      url: `/k8s/${namespace}/templatescatalog`,
+      url: `/k8s/${namespace}/catalog`,
       variant: ButtonVariant.primary,
     },
     {

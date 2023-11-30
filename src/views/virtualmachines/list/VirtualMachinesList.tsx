@@ -52,7 +52,7 @@ type VirtualMachinesListProps = {
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
-  const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`;
+  const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const isProxyPodAlive = useKubevirtDataPodHealth();
   const query = useQuery();

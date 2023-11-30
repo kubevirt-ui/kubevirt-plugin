@@ -28,7 +28,7 @@ export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
     confirm(t('Are you sure you want to leave this page?')) && history.push(url);
 
   const isSidebarEditorDisplayed = !history.location.pathname.includes(
-    `/templatescatalog/review/${VirtualMachineDetailsTab.YAML}`,
+    `/catalog/template/review/${VirtualMachineDetailsTab.YAML}`,
   );
 
   return (
@@ -37,7 +37,7 @@ export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
         <BreadcrumbItem>
           <Button
             onClick={() =>
-              onBreadcrumbClick(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`)
+              onBreadcrumbClick(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog/template`)
             }
             isInline
             variant="link"

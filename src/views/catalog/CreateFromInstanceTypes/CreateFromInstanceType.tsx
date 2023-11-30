@@ -4,7 +4,6 @@ import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-c
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
-import EnableInstanceTypeTechPreviewModal from '@catalog/EnableInstanceTypeTechPreviewModal/EnableInstanceTypeTechPreviewModal';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -27,22 +26,13 @@ import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBoo
 import BootableVolumeList from './components/BootableVolumeList/BootableVolumeList';
 import CreateVMFooter from './components/CreateVMFooter/CreateVMFooter';
 import SectionListItem from './components/SectionListItem/SectionListItem';
-import useEnableInstanceTypeModal from './hooks/useEnableInstanceTypeModal';
 import useInstanceTypesAndPreferences from './state/hooks/useInstanceTypesAndPreferences';
 import { useInstanceTypeVMStore } from './state/useInstanceTypeVMStore';
 import { INSTANCE_TYPES_SECTIONS } from './utils/constants';
 
 import './CreateFromInstanceType.scss';
 
-type CreateFromInstanceTypeProps = {
-  isInstanceTypeTab: boolean;
-  navigateToCatalog: () => void;
-};
-
-const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
-  isInstanceTypeTab,
-  navigateToCatalog,
-}) => {
+const CreateFromInstanceType: FC = () => {
   const { t } = useKubevirtTranslation();
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
@@ -52,11 +42,6 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
   const [authourizedSSHKeys, , loaded] = useKubevirtUserSettings('ssh');
 
   const { resetInstanceTypeVMState, setVMNamespaceTarget } = useInstanceTypeVMStore();
-
-  const { loading, ...enableITModalProps } = useEnableInstanceTypeModal(
-    isInstanceTypeTab,
-    navigateToCatalog,
-  );
 
   useEffect(() => {
     resetInstanceTypeVMState();
@@ -68,12 +53,7 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
     setVMNamespaceTarget(authourizedSSHKeys?.[targetNS], targetNS);
   }, [activeNamespace, authourizedSSHKeys, setVMNamespaceTarget]);
 
-  if (
-    loading ||
-    !bootableVolumesData?.loaded ||
-    !instanceTypesAndPreferencesData?.loaded ||
-    !loaded
-  ) {
+  if (!bootableVolumesData?.loaded || !instanceTypesAndPreferencesData?.loaded || !loaded) {
     return (
       <Bullseye className="create-vm-instance-type-section__page-loader">
         <Loading />
@@ -148,8 +128,7 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({
           </Card>
         </GridItem>
       </Grid>
-      <CreateVMFooter isDisabled={enableITModalProps?.isOpen} />
-      <EnableInstanceTypeTechPreviewModal {...enableITModalProps} />
+      <CreateVMFooter />
     </>
   );
 };

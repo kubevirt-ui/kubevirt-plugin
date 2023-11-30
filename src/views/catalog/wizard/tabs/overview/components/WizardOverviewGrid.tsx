@@ -253,7 +253,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               />
             }
             onTitleClick={() =>
-              history.push(`/k8s/ns/${ns}/templatescatalog/review/network-interfaces`)
+              history.push(`/k8s/ns/${ns}/catalog/template/review/network-interfaces`)
             }
             count={networks?.length}
             testId="wizard-overview-network-interfaces"
@@ -263,7 +263,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
           <WizardDescriptionItem
             count={disks?.length}
             description={<WizardOverviewDisksTable isInlineGrid vm={vm} />}
-            onTitleClick={() => history.push(`/k8s/ns/${ns}/templatescatalog/review/disks`)}
+            onTitleClick={() => history.push(`/k8s/ns/${ns}/catalog/template/review/disks`)}
             testId="wizard-overview-disks"
             title={t('Disks')}
           />

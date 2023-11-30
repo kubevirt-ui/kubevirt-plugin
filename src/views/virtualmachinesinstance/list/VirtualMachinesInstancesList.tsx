@@ -27,7 +27,7 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
   namespace,
 }) => {
   const { t } = useKubevirtTranslation();
-  const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/templatescatalog`;
+  const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
 
   const [vmis, loaded, loadError] = useK8sWatchResource<V1VirtualMachineInstance[]>({
     isList: true,

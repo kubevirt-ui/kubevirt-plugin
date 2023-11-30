@@ -191,7 +191,7 @@ const useCreateDrawerForm = (
         !isEmpty(authorizedSSHKey) ? addSecretToVM(updatedVM, authorizedSSHKey) : updatedVM,
       );
 
-      history.push(`/k8s/ns/${namespace}/templatescatalog/review`);
+      history.push(`/k8s/ns/${namespace}/catalog/template/review`);
     } catch (error) {
       setCreateError(error);
     }
