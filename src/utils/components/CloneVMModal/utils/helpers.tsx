@@ -2,7 +2,12 @@ import produce from 'immer';
 
 import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1alpha1VirtualMachineClone, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
+import {
+  V1alpha1VirtualMachineClone,
+  V1alpha1VirtualMachineSnapshot,
+  V1VirtualMachine,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -27,9 +32,22 @@ const cloneVMToVM: V1alpha1VirtualMachineClone = {
   },
 };
 
-export const cloneVM = (originVMName: string, newVMName: string, namespace: string) => {
+export const isVM = (
+  source: V1alpha1VirtualMachineSnapshot | V1VirtualMachine,
+): source is V1VirtualMachine => source.kind === VirtualMachineModel.kind;
+
+export const cloneVM = (
+  source: V1alpha1VirtualMachineSnapshot | V1VirtualMachine,
+  newVMName: string,
+  namespace: string,
+) => {
   const cloningRequest = produce(cloneVMToVM, (draftCloneData) => {
-    draftCloneData.spec.source.name = originVMName;
+    draftCloneData.spec.source = {
+      apiGroup: isVM(source) ? VirtualMachineModel.apiGroup : VirtualMachineSnapshotModel.apiGroup,
+      kind: source.kind,
+      name: source.metadata.name,
+    };
+
     draftCloneData.spec.target.name = newVMName;
 
     draftCloneData.metadata.namespace = namespace;

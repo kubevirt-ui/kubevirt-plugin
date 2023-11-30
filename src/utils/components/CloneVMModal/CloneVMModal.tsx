@@ -2,7 +2,11 @@ import React, { FC, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha1VirtualMachineClone, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1alpha1VirtualMachineClone,
+  V1alpha1VirtualMachineSnapshot,
+  V1VirtualMachine,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
@@ -15,21 +19,21 @@ import NameInput from './components/NameInput';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox';
 import useCloneVMModal from './hooks/useCloneVMModal';
 import { CLONING_STATUSES } from './utils/constants';
-import { cloneVM, runVM, vmExist } from './utils/helpers';
+import { cloneVM, isVM, runVM, vmExist } from './utils/helpers';
 
 type CloneVMModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  vm: V1VirtualMachine;
+  source: V1alpha1VirtualMachineSnapshot | V1VirtualMachine;
 };
 
-const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, vm }) => {
+const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
   const history = useHistory();
-  const namespace = vm?.metadata?.namespace;
+  const namespace = source?.metadata?.namespace;
 
   const [cloneName, setCloneName] = useState(
-    `${vm?.metadata?.name}-clone-${getRandomChars()}`.substring(0, MAX_K8S_NAME_LENGTH),
+    `${source?.metadata?.name}-clone-${getRandomChars()}`.substring(0, MAX_K8S_NAME_LENGTH),
   );
 
   const [startCloneVM, setStartCloneVM] = useState(false);
@@ -43,7 +47,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, vm }) => {
       throw new Error(t('VirtualMachine with this name already exists'));
     }
 
-    const request = await cloneVM(vm?.metadata?.name, cloneName, namespace);
+    const request = await cloneVM(source, cloneName, namespace);
 
     setInitialCloneRequest(request);
   };
@@ -66,12 +70,12 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, vm }) => {
   return (
     <TabModal
       closeOnSubmit={false}
-      headerText={t('Clone VirtualMachine')}
+      headerText={t('Clone {{sourceKind}}', { sourceKind: source.kind })}
       isDisabled={Boolean(initialCloneRequest)}
       isLoading={Boolean(initialCloneRequest)}
       isOpen={isOpen}
       modalVariant={ModalVariant.large}
-      obj={vm}
+      obj={source}
       onClose={onClose}
       onSubmit={sendCloneRequest}
       submitBtnText={t('Clone')}
@@ -79,7 +83,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, vm }) => {
       <Form className="pf-u-w-75-on-md pf-u-w-66-on-lg pf-u-m-auto" isHorizontal>
         <NameInput name={cloneName} setName={setCloneName} />
         <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
-        <ConfigurationSummary vm={vm} />
+        {isVM(source) && <ConfigurationSummary vm={source} />}
         <CloningStatus vmCloneRequest={cloneRequest || initialCloneRequest} />
       </Form>
     </TabModal>
