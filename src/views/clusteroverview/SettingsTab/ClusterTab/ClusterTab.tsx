@@ -11,6 +11,7 @@ import EnableLoadBalancerSection from './components/EnableLoadBalancerSection/En
 import GeneralInformation from './components/GeneralInformation/GeneralInformation';
 import GuestManagementSection from './components/GuestManagmentSection/GuestManagementSection';
 import LiveMigrationSection from './components/LiveMigrationSection/LiveMigrationSection';
+import PersistentReservationSection from './components/PersistentReservationSection/PersistentReservationSection';
 import ResourceManagementSection from './components/ResourceManagementSection/ResourceManagementSection';
 import TemplatesProjectSection from './components/TemplatesProjectSection/TemplatesProjectSection';
 
@@ -38,6 +39,9 @@ const ClusterTab: FC = () => {
         hyperConvergeConfiguration={hyperConvergeConfiguration}
         newBadge={newBadge}
       />
+      <Divider className="section-divider" />
+
+      <PersistentReservationSection hyperConvergeConfiguration={hyperConvergeConfiguration} />
       {error && (
         <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
           {error}

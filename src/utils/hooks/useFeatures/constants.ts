@@ -20,6 +20,8 @@ export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
 const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
 const FEATURES_ROLE_BINDING_NAME = 'kubevirt-ui-features-reader-binding';
 
+export const FEATURE_HCO_PERSISTENT_RESERVATION = 'persistentReservationHCO';
+
 export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
   data: {
     [AUTOCOMPUTE_CPU_LIMITS_ENABLED]: 'false',

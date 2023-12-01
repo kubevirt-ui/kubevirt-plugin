@@ -10,6 +10,16 @@ export type HyperConverged = K8sResourceCommon & {
   spec: {
     commonTemplatesNamespace?: string;
     evictionStrategy?: string;
+    featureGates: {
+      deployKubeSecondaryDNS?: boolean;
+      deployTektonTaskResources?: boolean;
+      disableMDevConfiguration?: boolean;
+      enableCommonBootImageImport?: boolean;
+      nonRoot?: boolean;
+      persistentReservation?: boolean;
+      root?: boolean;
+      withHostPassthroughCPU?: boolean;
+    };
     ksmConfiguration: { nodeLabelSelector?: Record<string, never> };
     liveMigrationConfig: V1MigrationConfiguration;
     resourceRequirements: {
