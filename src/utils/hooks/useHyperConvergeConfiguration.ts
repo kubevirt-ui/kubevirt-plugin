@@ -9,8 +9,8 @@ import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynam
 export type HyperConverged = K8sResourceCommon & {
   spec: {
     commonTemplatesNamespace?: string;
-    configuration?: { ksmConfiguration: { nodeLabelSelector?: Record<string, never> } };
     evictionStrategy?: string;
+    ksmConfiguration: { nodeLabelSelector?: Record<string, never> };
     liveMigrationConfig: V1MigrationConfiguration;
     resourceRequirements: {
       autoCPULimitNamespaceLabelSelector: V1LabelSelector;
