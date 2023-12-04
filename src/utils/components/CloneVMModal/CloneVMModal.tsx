@@ -16,6 +16,7 @@ import { Form, ModalVariant } from '@patternfly/react-core';
 import CloningStatus from './components/CloningStatus';
 import ConfigurationSummary from './components/ConfigurationSummary';
 import NameInput from './components/NameInput';
+import SnapshotContentConfigurationSummary from './components/SnapshotContentConfigurationSummary';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox';
 import useCloneVMModal from './hooks/useCloneVMModal';
 import { CLONING_STATUSES } from './utils/constants';
@@ -83,7 +84,11 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, source }) => {
       <Form className="pf-u-w-75-on-md pf-u-w-66-on-lg pf-u-m-auto" isHorizontal>
         <NameInput name={cloneName} setName={setCloneName} />
         <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
-        {isVM(source) && <ConfigurationSummary vm={source} />}
+        {isVM(source) ? (
+          <ConfigurationSummary vm={source} />
+        ) : (
+          <SnapshotContentConfigurationSummary snapshot={source} />
+        )}
         <CloningStatus vmCloneRequest={cloneRequest || initialCloneRequest} />
       </Form>
     </TabModal>

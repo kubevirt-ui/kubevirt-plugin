@@ -478,6 +478,7 @@
   "Environment": "Environment",
   "environment disk": "environment disk",
   "Error": "Error",
+  "Error loading the VirtualMachineSnapshotContent": "Error loading the VirtualMachineSnapshotContent",
   "Error uploading data": "Error uploading data",
   "Ethernet name": "Ethernet name",
   "Events": "Events",
