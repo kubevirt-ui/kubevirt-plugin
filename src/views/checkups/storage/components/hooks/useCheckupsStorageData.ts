@@ -7,15 +7,14 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { KUBEVIRT_STORAGE_LABEL_VALUE } from '../../utils/utils';
 
 const useCheckupsStorageData = () => {
   const [namespace] = useActiveNamespace();
 
-  const [configMaps, loadingConfigMap, loadErrorConfigMaps] = useKubevirtWatchResource<
+  const [configMaps, loadingConfigMap, loadErrorConfigMaps] = useK8sWatchResource<
     IoK8sApiCoreV1ConfigMap[]
   >({
     groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
@@ -28,7 +27,7 @@ const useCheckupsStorageData = () => {
     },
   });
 
-  const [jobs, loadingJobs, loadErrorJobs] = useKubevirtWatchResource<IoK8sApiBatchV1Job[]>({
+  const [jobs, loadingJobs, loadErrorJobs] = useK8sWatchResource<IoK8sApiBatchV1Job[]>({
     groupVersionKind: modelToGroupVersionKind(JobModel),
     isList: true,
     ...(namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
