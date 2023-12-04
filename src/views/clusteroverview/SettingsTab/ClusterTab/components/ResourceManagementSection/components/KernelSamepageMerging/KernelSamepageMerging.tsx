@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -28,10 +28,22 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
-  const ksmConfiguration = hyperConverge?.spec?.configuration?.ksmConfiguration;
-  const [isEnabled, setIsEnabled] = useState(
-    !!(ksmConfiguration && isEmpty(ksmConfiguration?.nodeLabelSelector)), // Empty nodeLabelSelector will enable KSM on every node.
+  const ksmConfiguration = hyperConverge?.spec?.ksmConfiguration;
+  const [isEnabled, setIsEnabled] = useState<boolean>();
+
+  useEffect(
+    () =>
+      hyperLoaded &&
+      setIsEnabled(
+        !!(
+          ksmConfiguration?.hasOwnProperty('nodeLabelSelector') &&
+          // Empty nodeLabelSelector will enable KSM on every node.
+          isEmpty(ksmConfiguration?.nodeLabelSelector)
+        ),
+      ),
+    [ksmConfiguration, hyperLoaded],
   );
+
   const [error, setError] = useState(null);
 
   const onKSMchange = (value: boolean) => {
@@ -39,7 +51,7 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
       data: [
         {
           op: 'replace',
-          path: `/spec/configuration/ksmConfiguration/nodeLabelSelector`,
+          path: `/spec/ksmConfiguration/nodeLabelSelector`,
           value: value ? {} : null,
         },
       ],
