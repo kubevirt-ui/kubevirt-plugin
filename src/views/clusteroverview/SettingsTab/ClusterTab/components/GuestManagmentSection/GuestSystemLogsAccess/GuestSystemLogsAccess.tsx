@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -32,9 +32,9 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
     hyperConverge?.spec?.virtualMachineOptions?.disableSerialConsoleLog;
 
   const [error, setError] = useState<Error>(null);
-  const [isChecked, setIsChecked] = useState<boolean>(
-    disableSerialConsoleLog === 'true' || disableSerialConsoleLog === undefined,
-  );
+  const [isChecked, setIsChecked] = useState<boolean>();
+
+  useEffect(() => setIsChecked(!disableSerialConsoleLog), [disableSerialConsoleLog]);
 
   const onChange = async (checked: boolean) => {
     try {
@@ -43,7 +43,7 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
           {
             op: 'replace',
             path: `/spec/virtualMachineOptions/disableSerialConsoleLog`,
-            value: checked,
+            value: !checked,
           },
         ],
         model: HyperConvergedModel,
