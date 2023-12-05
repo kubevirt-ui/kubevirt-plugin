@@ -77,7 +77,17 @@ export const instanceTypeSeriesNameMapper: {
   o1: {
     disabled: true,
     Icon: ModuleIcon,
-    possibleSizes: ['medium', 'large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
+    possibleSizes: [
+      'nano',
+      'micro',
+      'small',
+      'medium',
+      'large',
+      'xlarge',
+      '2xlarge',
+      '4xlarge',
+      '8xlarge',
+    ],
     seriesLabel: t('O series'),
   },
   server: {
@@ -87,7 +97,17 @@ export const instanceTypeSeriesNameMapper: {
   },
   u1: {
     Icon: ServerGroupIcon,
-    possibleSizes: ['medium', 'large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
+    possibleSizes: [
+      'nano',
+      'micro',
+      'small',
+      'medium',
+      'large',
+      'xlarge',
+      '2xlarge',
+      '4xlarge',
+      '8xlarge',
+    ],
     seriesLabel: t('U series'),
   },
 };

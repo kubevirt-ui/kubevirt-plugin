@@ -1,6 +1,15 @@
 import { MutableRefObject } from 'react';
 
-export type InstanceTypeSize = '2xlarge' | '4xlarge' | '8xlarge' | 'large' | 'medium' | 'xlarge';
+export type InstanceTypeSize =
+  | '2xlarge'
+  | '4xlarge'
+  | '8xlarge'
+  | 'large'
+  | 'medium'
+  | 'micro'
+  | 'nano'
+  | 'small'
+  | 'xlarge';
 
 export enum InstanceTypeCategory {
   ComputeIntensive = 'ComputeIntensive',
