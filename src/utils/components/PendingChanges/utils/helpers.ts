@@ -166,10 +166,14 @@ export const nonHotPlugNICChangesExist = (
   pendingChanges: PendingChange[],
   nonHotPlugNICsExist: boolean,
 ) => {
-  const moreChangeTypesExist = pendingChanges?.every(
-    (change) => change?.tabLabel === VirtualMachineDetailsTabLabel.NetworkInterfaces,
-  );
-  return moreChangeTypesExist || nonHotPlugNICsExist;
+  const nonNICChangesExist =
+    pendingChanges.filter(
+      (change) =>
+        change.hasPendingChange &&
+        change.tabLabel !== VirtualMachineDetailsTabLabel.NetworkInterfaces,
+    ).length > 0;
+
+  return nonNICChangesExist || nonHotPlugNICsExist;
 };
 
 const getSortedNICs = (

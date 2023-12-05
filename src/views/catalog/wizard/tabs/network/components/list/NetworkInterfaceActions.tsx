@@ -9,6 +9,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import {
+  Alert,
+  AlertVariant,
   ButtonVariant,
   Dropdown,
   DropdownItem,
@@ -72,9 +74,20 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
         submitBtnText={submitBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
-        <ConfirmActionMessage
-          obj={{ metadata: { name: nicName, namespace: vm?.metadata?.namespace } }}
-        />
+        <span>
+          <Alert
+            title={t(
+              'Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13 or for network interfaces that were added to the VirtualMachine in these versions.',
+            )}
+            component={'h6'}
+            isInline
+            variant={AlertVariant.warning}
+          />
+          <br />
+          <ConfirmActionMessage
+            obj={{ metadata: { name: nicName, namespace: vm?.metadata?.namespace } }}
+          />
+        </span>
       </TabModal>
     ));
     setIsDropdownOpen(false);

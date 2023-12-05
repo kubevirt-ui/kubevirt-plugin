@@ -2,7 +2,9 @@ import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/cons
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
+  V1AddInterfaceOptions,
   V1AddVolumeOptions,
+  V1RemoveInterfaceOptions,
   V1RemoveVolumeOptions,
   V1StopOptions,
   V1VirtualMachine,
@@ -19,8 +21,10 @@ import {
 const generateRandomString = () => Math.random().toString(36).substring(2, 7);
 
 export enum VMActionType {
+  AddInterface = 'addinterface',
   AddVolume = 'addvolume',
   Pause = 'pause',
+  RemoveInterface = 'removeinterface',
   RemoveVolume = 'removevolume',
   Restart = 'restart',
   Start = 'start',
@@ -32,7 +36,12 @@ export const VMActionRequest = async (
   vm: V1VirtualMachine,
   action: VMActionType,
   model: K8sModel,
-  body?: V1AddVolumeOptions | V1RemoveVolumeOptions | V1StopOptions,
+  body?:
+    | V1AddInterfaceOptions
+    | V1AddVolumeOptions
+    | V1RemoveInterfaceOptions
+    | V1RemoveVolumeOptions
+    | V1StopOptions,
 ) => {
   const {
     metadata: { name, namespace },
@@ -110,3 +119,8 @@ export const deleteVM = async (vm: V1VirtualMachine) => {
     resource: vm,
   });
 };
+
+export const addInterface = async (vm: V1VirtualMachine, body: V1AddInterfaceOptions) =>
+  VMActionRequest(vm, VMActionType.AddInterface, VirtualMachineModel, body);
+export const removeInterface = async (vm: V1VirtualMachine, body: V1RemoveInterfaceOptions) =>
+  VMActionRequest(vm, VMActionType.RemoveInterface, VirtualMachineModel, body);

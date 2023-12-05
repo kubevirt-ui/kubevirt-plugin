@@ -13,6 +13,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { BRIDGED_NIC_HOTPLUG_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
@@ -25,6 +26,7 @@ import {
   DropdownPosition,
   KebabToggle,
 } from '@patternfly/react-core';
+import { removeInterface } from '@virtualmachines/actions/actions';
 import { isRunning } from '@virtualmachines/utils';
 
 import VirtualMachinesEditNetworkInterfaceModal from '../modal/VirtualMachinesEditNetworkInterfaceModal';
@@ -48,8 +50,9 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const editBtnText = t('Edit');
   const deleteBtnText = t('Delete');
 
+  const isHotPlug = nicHotPlugEnabled && Boolean(nicPresentation?.iface?.bridge);
+
   const resultVirtualMachine = useMemo(() => {
-    const isHotPlug = nicHotPlugEnabled && Boolean(nicPresentation?.iface?.bridge);
     const networks = isHotPlug
       ? getNetworks(vm)
       : getNetworks(vm)?.filter(({ name }) => name !== nicName);
@@ -73,14 +76,16 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const onDeleteModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
-        onSubmit={(obj) =>
-          k8sUpdate({
-            data: obj,
-            model: VirtualMachineModel,
-            name: obj?.metadata?.name,
-            ns: obj?.metadata?.namespace,
-          })
-        }
+        onSubmit={(obj) => {
+          return isHotPlug
+            ? removeInterface(vm, { name: nicName })
+            : k8sUpdate({
+                data: obj,
+                model: VirtualMachineModel,
+                name: getName(obj),
+                ns: getNamespace(obj),
+              });
+        }}
         headerText={deleteModalHeader}
         isOpen={isOpen}
         obj={resultVirtualMachine}

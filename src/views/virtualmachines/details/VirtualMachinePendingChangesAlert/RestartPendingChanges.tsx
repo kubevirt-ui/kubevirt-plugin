@@ -23,6 +23,12 @@ const RestartPendingChanges: React.FC<RestartPendingChangesProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { featureEnabled: nicHotPlugEnabled } = useFeatures(BRIDGED_NIC_HOTPLUG_ENABLED);
+
+  const showRestartSection =
+    !nicHotPlugEnabled ||
+    nonHotPlugNICChangesExist(pendingChanges, hasPendingChange(nonHotPlugPendingChanges));
+  if (!showRestartSection) return null;
+
   const pendingChangesTabs = getPendingChangesByTab(pendingChanges);
   const {
     pendingChangesDetailsTab,
@@ -32,11 +38,6 @@ const RestartPendingChanges: React.FC<RestartPendingChangesProps> = ({
     pendingChangesSchedulingTab,
     pendingChangesScriptsTab,
   } = pendingChangesTabs;
-  const showRestartSection =
-    !nicHotPlugEnabled ||
-    nonHotPlugNICChangesExist(pendingChanges, hasPendingChange(nonHotPlugPendingChanges)) ||
-    Object.values(pendingChangesTabs).some((changes) => changes.length > 0);
-  if (!showRestartSection) return null;
 
   return (
     <span>
