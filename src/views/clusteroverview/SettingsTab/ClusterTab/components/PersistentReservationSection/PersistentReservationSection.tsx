@@ -27,7 +27,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
-  const persistentReservation = hyperConverge?.spec?.featureGates?.persistentReservation ?? false;
+  const persistentReservation = Boolean(hyperConverge?.spec?.featureGates?.persistentReservation);
 
   const [error, setError] = useState<Error>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -56,7 +56,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
   };
 
   return (
-    <ExpandSection toggleText={t('SCSI Persistent Reservation')}>
+    <ExpandSection toggleText={t('SCSI persistent reservation')}>
       <Split>
         <SplitItem isFilled>
           {t('Enable persistent reservation')}{' '}
@@ -64,8 +64,6 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
             bodyContent={t(
               'The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications',
             )}
-            className="KernelSamepageMerging__HelpTextIcon"
-            helpIconClassName="KernelSamepageMerging__HelpIcon"
             position={PopoverPosition.bottom}
           />
         </SplitItem>
@@ -81,12 +79,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
         )}
       </Split>
       {error && (
-        <Alert
-          className="persistent-reservation-section--alert"
-          isInline
-          title={t('Error')}
-          variant={AlertVariant.danger}
-        >
+        <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
           {error}
         </Alert>
       )}

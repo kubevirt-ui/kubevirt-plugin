@@ -13,6 +13,10 @@ import {
 
 export const diskReducer = (state: DiskFormState, action: DiskReducerActionType): DiskFormState => {
   switch (action.type) {
+    case diskReducerActions.SET_LUN_RESERVATION:
+      return { ...state, lunReservation: action.payload };
+    case diskReducerActions.SET_SHARABLE:
+      return { ...state, sharable: action.payload };
     case diskReducerActions.SET_DISK_NAME:
       return { ...state, diskName: action.payload };
     case diskReducerActions.SET_DISK_SOURCE:

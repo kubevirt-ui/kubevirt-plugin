@@ -15,6 +15,8 @@ export type DiskFormState = {
   diskSource: string;
   diskType: string;
   enablePreallocation: boolean;
+  lunReservation?: boolean;
+  sharable?: boolean;
   storageClass: string;
   storageClassProvisioner: string;
   storageProfileSettingsCheckboxDisabled: boolean;
@@ -31,6 +33,8 @@ export const initialStateDiskForm: DiskFormState = {
   diskSource: sourceTypes.BLANK,
   diskType: diskTypes.disk,
   enablePreallocation: false,
+  lunReservation: false,
+  sharable: false,
   storageClass: null,
   storageClassProvisioner: null,
   storageProfileSettingsCheckboxDisabled: true,

@@ -9,6 +9,8 @@ export const diskReducerActions = Object.freeze({
   SET_DISK_SOURCE: 'setDiskSource',
   SET_DISK_TYPE: 'setDiskType',
   SET_ENABLE_PREALLOCATION: 'setEnablePreallocation',
+  SET_LUN_RESERVATION: 'setLunReservation',
+  SET_SHARABLE: 'setSharable',
   SET_STORAGE_CLASS: 'setStorageClass',
   SET_STORAGE_CLASS_PROVISIONER: 'setStorageClassProvisioner',
   SET_STORAGE_PROFILE_SETTINGS_CHECKBOX_DISABLED: 'setStorageProfileSettingsCheckboxDisabled',

@@ -92,12 +92,21 @@ export const requiresDataVolume = (diskSource: string): boolean => {
   ].includes(diskSource);
 };
 
-export const getDiskFromState = (diskState: DiskFormState): V1Disk => ({
-  [diskState.diskType]: {
-    bus: diskState.diskInterface,
-  },
-  name: diskState.diskName,
-});
+export const getDiskFromState = (diskState: DiskFormState): V1Disk => {
+  const disk: V1Disk = {
+    [diskState.diskType]: {
+      bus: diskState.diskInterface,
+    },
+    name: diskState.diskName,
+    shareable: diskState.sharable || null,
+  };
+
+  if (diskState.lunReservation && disk.lun) {
+    disk.lun.reservation = true;
+  }
+
+  return disk;
+};
 
 export const getVolumeFromState = (
   vm: V1VirtualMachine,
