@@ -1,12 +1,6 @@
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
-import { V1MigrationConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-
-export type HyperConverged = K8sResourceCommon & {
-  spec: {
-    liveMigrationConfig: V1MigrationConfiguration;
-  };
-};
 
 export type HyperConvergedList = K8sResourceCommon & {
   items: HyperConverged[];
