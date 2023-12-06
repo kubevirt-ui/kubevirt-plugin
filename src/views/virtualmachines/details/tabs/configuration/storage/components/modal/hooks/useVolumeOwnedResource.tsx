@@ -34,14 +34,18 @@ const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
   const updatedVolume = volume.dataVolume ? convertDataVolumeToPVC(volume, cdiConfig) : volume;
   const volumeType = getVolumeType(updatedVolume);
   const volumeResourceModel = mapVolumeTypeToK8sModel[volumeType];
+  const volumeGroupVersionKind =
+    volumeResourceModel && modelToGroupVersionKind(volumeResourceModel);
   const volumeResourceName = getVolumeResourceName(volume);
   const watchVolumeResource = {
-    groupVersionKind: volumeResourceModel && modelToGroupVersionKind(volumeResourceModel),
+    groupVersionKind: volumeGroupVersionKind,
     isList: false,
     name: volumeResourceName,
     namespace: vm.metadata.namespace,
   };
-  const [resource, loaded, error] = useK8sWatchResource<K8sResourceCommon>(watchVolumeResource);
+  const [resource, loaded, error] = useK8sWatchResource<K8sResourceCommon>(
+    volumeGroupVersionKind && volumeResourceName && watchVolumeResource,
+  );
 
   if (!volumeResourceModel || !volumeResourceName) {
     return {
