@@ -4,6 +4,7 @@ import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SecretNameLabel from '@kubevirt-utils/components/SSHSecretSection/components/SecretNameLabel/SecretNameLabel';
 import VMSSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/VMSSHSecretModal';
 import EditButtonWithTooltip from '@kubevirt-utils/components/VirtualMachineDescriptionItem/EditButtonWithTooltip';
@@ -40,7 +41,7 @@ const SSHTabAuthorizedSSHKey = ({ vm }) => {
     <ExpandableSection
       toggleContent={
         <div>
-          {t('Authorized SSH key')} <LinuxLabel />{' '}
+          <SearchItem id="authorized-ssh-key">{t('Authorized SSH key')}</SearchItem> <LinuxLabel />{' '}
           <EditButtonWithTooltip
             onEditClick={() =>
               createModal((modalProps) => (

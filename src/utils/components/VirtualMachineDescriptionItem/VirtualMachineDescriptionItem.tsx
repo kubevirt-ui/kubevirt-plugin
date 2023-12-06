@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FC, ReactElement, ReactNode } from 'react';
 
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -23,7 +23,7 @@ type VirtualMachineDescriptionItemProps = {
   className?: string;
   'data-test-id'?: string;
   descriptionData: any;
-  descriptionHeader?: string;
+  descriptionHeader?: ReactElement;
   editOnTitleJustify?: boolean;
   isDisabled?: boolean;
   isEdit?: boolean;

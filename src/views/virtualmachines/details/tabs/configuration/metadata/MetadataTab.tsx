@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -20,7 +21,9 @@ const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
 
   return (
     <PageSection>
-      <Title headingLevel="h2">{t('Metadata')}</Title>
+      <Title headingLevel="h2">
+        <SearchItem id="metadata">{t('Metadata')}</SearchItem>
+      </Title>
       <Grid span={6}>
         <DescriptionList>
           <VirtualMachineDescriptionItem
@@ -40,7 +43,7 @@ const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
             breadcrumb="VirtualMachine.metadata.labels"
             data-test-id={`${getName(vm)}-labels`}
             descriptionData={<MetadataTabLabels labels={vm?.metadata?.labels} />}
-            descriptionHeader={t('Labels')}
+            descriptionHeader={<SearchItem id="labels">{t('Labels')}</SearchItem>}
             editOnTitleJustify
             isEdit
             isPopover
@@ -63,7 +66,7 @@ const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
             }
             breadcrumb="VirtualMachine.metadata.annotations"
             descriptionData={<MetadataTabAnnotations annotations={vm?.metadata?.annotations} />}
-            descriptionHeader={t('Annotations')}
+            descriptionHeader={<SearchItem id="metadata">{t('Annotations')}</SearchItem>}
             isEdit
             isPopover
             moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"

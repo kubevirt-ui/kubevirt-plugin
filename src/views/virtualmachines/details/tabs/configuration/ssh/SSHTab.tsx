@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -21,7 +22,9 @@ const SSHTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
       resource={vm}
     >
       <PageSection>
-        <Title headingLevel="h2">{t('SSH')}</Title>
+        <Title headingLevel="h2">
+          <SearchItem id="ssh">{t('SSH')} </SearchItem>
+        </Title>
         <Grid span={6}>
           <GridItem>
             <Stack hasGutter>

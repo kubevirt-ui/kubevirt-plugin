@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, ReactElement, ReactNode } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,11 +17,11 @@ import { DescriptionItemHeader } from './DescriptionItemHeader';
 import './DescriptionItem.scss';
 
 type DescriptionItemProps = {
-  bodyContent?: React.ReactNode;
+  bodyContent?: ReactNode;
   breadcrumb?: string;
   'data-test-id'?: string;
-  descriptionData: React.ReactNode;
-  descriptionHeader?: string;
+  descriptionData: ReactNode;
+  descriptionHeader?: ReactElement;
   isDisabled?: boolean;
   isEdit?: boolean;
   isPopover?: boolean;
@@ -30,7 +30,7 @@ type DescriptionItemProps = {
   showEditOnTitle?: boolean;
 };
 
-const DescriptionItem: React.FC<DescriptionItemProps> = ({
+const DescriptionItem: FC<DescriptionItemProps> = ({
   bodyContent,
   breadcrumb,
   'data-test-id': testId,

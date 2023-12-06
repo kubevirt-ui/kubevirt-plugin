@@ -1,4 +1,5 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -7,11 +8,13 @@ import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderM
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { ExpandableSection, Switch } from '@patternfly/react-core';
 
+import { DETAILS_TAB_BOOT_IDS, expandURLHash } from '../../utils/search';
 import { updateBootLoader, updatedBootOrder, updateStartStrategy } from '../utils/utils';
 
 type DetailsSectionBootProps = {
@@ -23,16 +26,21 @@ type DetailsSectionBootProps = {
 const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({ canUpdateVM, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const location = useLocation();
   const [isChecked, setIsChecked] = useState<boolean>(!!vm?.spec?.template?.spec?.startStrategy);
   const [isExpanded, setIsExpanded] = useState<boolean>();
   const vmName = getName(vm);
+
+  useEffect(() => {
+    expandURLHash(DETAILS_TAB_BOOT_IDS, location?.hash, setIsExpanded);
+  }, [location?.hash]);
 
   return (
     <ExpandableSection
       isExpanded={isExpanded}
       isIndented
       onToggle={setIsExpanded}
-      toggleText={t('Boot management')}
+      toggleContent={<SearchItem id="boot-management">{t('Boot management')}</SearchItem>}
     >
       <VirtualMachineDescriptionItem
         descriptionData={
@@ -53,7 +61,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({ canUpdateVM, vm, vmi 
         }
         className="DetailsSection-margin__bottom"
         data-test-id={`${vmName}-boot-method`}
-        descriptionHeader={t('Boot mode')}
+        descriptionHeader={<SearchItem id="boot-mode">{t('Boot mode')}</SearchItem>}
         isEdit={canUpdateVM}
       />
       <VirtualMachineDescriptionItem
@@ -65,7 +73,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({ canUpdateVM, vm, vmi 
         className="DetailsSection-margin__bottom"
         data-test-id={`${vmName}-boot-order`}
         descriptionData={<BootOrderSummary vm={vm} />}
-        descriptionHeader={t('Boot order')}
+        descriptionHeader={<SearchItem id="boot-order">{t('Boot order')}</SearchItem>}
         isEdit
       />
       <VirtualMachineDescriptionItem
@@ -82,9 +90,11 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({ canUpdateVM, vm, vmi 
             isChecked={isChecked}
           />
         }
+        descriptionHeader={
+          <SearchItem id="start-pause-mode">{t('Start in pause mode')}</SearchItem>
+        }
         className="DetailsSection-margin__bottom"
         data-test-id="start-pause-mode"
-        descriptionHeader={t('Start in pause mode')}
         isPopover
       />
     </ExpandableSection>

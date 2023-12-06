@@ -5,6 +5,7 @@ import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-a
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { AUTOUNATTEND, UNATTEND } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/SysprepDescription';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
@@ -46,7 +47,7 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, vm }
         />
       }
       data-test-id="sysprep-button"
-      descriptionHeader={t('Sysprep')}
+      descriptionHeader={<SearchItem id="sysprep">{t('Sysprep')}</SearchItem>}
       isDisabled
       isEdit={canUpdateVM}
       label={<WindowsLabel />}

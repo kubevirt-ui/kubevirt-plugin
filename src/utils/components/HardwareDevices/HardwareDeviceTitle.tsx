@@ -4,6 +4,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Button, DescriptionListTerm } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
+import SearchItem from '../SearchItem/SearchItem';
+
 type HardwareDeviceTitleProps = {
   canEdit: boolean;
   hideEdit?: boolean;
@@ -30,7 +32,7 @@ const HardwareDeviceTitle: FC<HardwareDeviceTitleProps> = ({
         onClick={onClick}
         variant="link"
       >
-        {title}
+        <SearchItem id={title.replace(' ', '-')}>{title}</SearchItem>
         <PencilAltIcon alt={t('Edit')} className="co-icon-space-l pf-c-button-icon--plain" />
       </Button>
     </DescriptionListTerm>

@@ -4,6 +4,7 @@ import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/co
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import {
@@ -32,7 +33,9 @@ const SchedulingSection: FC<SchedulingSectionProps> = ({ vm, vmi }) => {
 
   return (
     <>
-      <Title headingLevel="h2">{t('Scheduling and resource requirements')}</Title>
+      <Title headingLevel="h2">
+        <SearchItem id="scheduling">{t('Scheduling and resource requirements')}</SearchItem>
+      </Title>
       <Grid hasGutter>
         <SchedulingSectionLeftGrid
           canUpdateVM={canUpdateVM}
