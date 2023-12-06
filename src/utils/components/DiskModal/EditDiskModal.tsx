@@ -13,6 +13,7 @@ import {
 } from '@kubevirt-utils/resources/vm';
 import { Form } from '@patternfly/react-core';
 
+import AdvancedSettings from './DiskFormFields/AdvancedSettings';
 import BootSourceCheckbox from './DiskFormFields/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './DiskFormFields/DiskInterfaceSelect';
 import DiskSourceSizeInput from './DiskFormFields/DiskSizeInput/DiskSizeInput';
@@ -221,6 +222,7 @@ const EditDiskModal: FC<DiskModalProps> = ({
           isVMRunning={false}
         />
         <StorageClassAndPreallocation diskState={diskState} dispatchDiskState={dispatchDiskState} />
+        <AdvancedSettings diskState={diskState} dispatchDiskState={dispatchDiskState} />
       </Form>
     </TabModal>
   );

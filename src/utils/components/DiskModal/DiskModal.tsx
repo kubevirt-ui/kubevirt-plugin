@@ -18,6 +18,7 @@ import { Form } from '@patternfly/react-core';
 
 import { PendingChangesAlert } from '../PendingChanges/PendingChangesAlert/PendingChangesAlert';
 
+import AdvancedSettings from './DiskFormFields/AdvancedSettings';
 import BootSourceCheckbox from './DiskFormFields/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './DiskFormFields/DiskInterfaceSelect';
 import DiskSourceSizeInput from './DiskFormFields/DiskSizeInput/DiskSizeInput';
@@ -232,6 +233,7 @@ const DiskModal: FC<DiskModalProps> = ({
           diskState={diskState}
           dispatchDiskState={dispatchDiskState}
         />
+        <AdvancedSettings diskState={diskState} dispatchDiskState={dispatchDiskState} />
       </Form>
     </TabModal>
   );
