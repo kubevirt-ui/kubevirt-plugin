@@ -28,7 +28,7 @@ const DynamicSSHKeyInjectionIntanceType = () => {
           isDisabled={isDisabled}
         />
       }
-      descriptionHeader={t('Dynamic SSH key injection')}
+      descriptionHeader={<>{t('Dynamic SSH key injection')}</>}
       label={<DynamicSSHKeyInjectionHelpTextIcon isDisabled={isDisabled} />}
     />
   );

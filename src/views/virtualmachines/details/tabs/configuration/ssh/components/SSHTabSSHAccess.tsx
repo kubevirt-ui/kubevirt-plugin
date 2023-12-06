@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +16,8 @@ const SSHTabSSHAccess = ({ vm, vmi }) => {
     <ExpandableSection
       toggleContent={
         <>
-          {t('SSH access')} <LinuxLabel />
+          <SearchItem id="ssh-access">{t('SSH access')}</SearchItem>
+          <LinuxLabel />
         </>
       }
       isExpanded={isExpanded}

@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
@@ -27,7 +28,9 @@ const InitialRunTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
     >
       {(resource) => (
         <PageSection>
-          <Title headingLevel="h2">{t('Initial run')}</Title>
+          <Title headingLevel="h2">
+            <SearchItem id="initial-run">{t('Initial run')}</SearchItem>
+          </Title>
           <DescriptionList>
             <InitialRunTabCloudinit
               canUpdateVM={canUpdateVM}

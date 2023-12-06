@@ -9,6 +9,7 @@ import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import { getNamespace } from '../../../../cdi-upload-provider/utils/selectors';
 
+import VirtualMachineConfigurationTabSearch from './search/VirtualMachineConfigurationTabSearch';
 import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/utils';
 
 import './virtual-machine-configuration-tab.scss';
@@ -42,20 +43,23 @@ const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = 
   }, [history.location.pathname]);
 
   return (
-    <div className="VirtualMachineConfigurationTab">
-      <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
-        {tabs.map(({ Component, name, title }) => (
-          <Tab
-            className="VirtualMachineConfigurationTab--content"
-            eventKey={name}
-            key={name}
-            onClick={() => redirectTab(name)}
-            title={<TabTitleText>{title}</TabTitleText>}
-          >
-            {activeTabKey === name && <Component {...props} vm={props?.obj} vmi={vmi} />}
-          </Tab>
-        ))}
-      </Tabs>
+    <div className="co-dashboard-body">
+      <VirtualMachineConfigurationTabSearch />
+      <div className="VirtualMachineConfigurationTab">
+        <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
+          {tabs.map(({ Component, name, title }) => (
+            <Tab
+              className="VirtualMachineConfigurationTab--content"
+              eventKey={name}
+              key={name}
+              onClick={() => redirectTab(name)}
+              title={<TabTitleText>{title}</TabTitleText>}
+            >
+              {activeTabKey === name && <Component {...props} vm={props?.obj} vmi={vmi} />}
+            </Tab>
+          ))}
+        </Tabs>
+      </div>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourc
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
 import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/ShowEvictionStrategy';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
@@ -44,6 +45,9 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
     <GridItem span={5}>
       <DescriptionList>
         <VirtualMachineDescriptionItem
+          descriptionHeader={
+            <SearchItem id="dedicated-resources">{t('Dedicated resources')}</SearchItem>
+          }
           messageOnDisabled={t(
             'Can not configure dedicated resources if the VirtualMachine is created from InstanceType',
           )}
@@ -61,11 +65,13 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
           }
           data-test-id="dedicated-resources"
           descriptionData={<DedicatedResources vm={vm} />}
-          descriptionHeader={t('Dedicated resources')}
           isDisabled={!isEmpty(vm?.spec?.instancetype)}
           isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
+          descriptionHeader={
+            <SearchItem id="eviction-strategy">{t('Eviction strategy')}</SearchItem>
+          }
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <EvictionStrategyModal
@@ -80,7 +86,6 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
           }
           data-test-id="eviction-strategy"
           descriptionData={<ShowEvictionStrategy evictionStrategy={getEvictionStrategy(vm)} />}
-          descriptionHeader={t('Eviction strategy')}
           isEdit={canUpdateVM}
         />
       </DescriptionList>

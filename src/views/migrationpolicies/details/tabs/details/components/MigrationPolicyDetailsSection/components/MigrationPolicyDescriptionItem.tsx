@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, ReactElement, ReactNode } from 'react';
 
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -10,15 +10,15 @@ import {
 
 type MigrationPolicyDescriptionItemProps = {
   breadcrumb?: string;
-  description?: React.ReactNode;
+  description?: ReactNode;
   hasAutoWidth?: boolean;
   isPopover?: boolean;
   moreInfoURL?: string;
-  popoverContent?: React.ReactNode;
-  title: string;
+  popoverContent?: ReactNode;
+  title: ReactElement;
 };
 
-const MigrationPolicyDescriptionItem: React.FC<MigrationPolicyDescriptionItemProps> = ({
+const MigrationPolicyDescriptionItem: FC<MigrationPolicyDescriptionItemProps> = ({
   breadcrumb,
   description,
   isPopover,

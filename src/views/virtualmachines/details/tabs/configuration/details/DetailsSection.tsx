@@ -15,6 +15,7 @@ import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModa
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -64,7 +65,9 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
 
   return (
     <div className="VirtualMachinesDetailsSection">
-      <Title headingLevel="h2">{t('Details')}</Title>
+      <Title headingLevel="h2">
+        <SearchItem id="details">{t('Details')}</SearchItem>
+      </Title>
       <DescriptionList>
         <VirtualMachineDescriptionItem
           descriptionData={
@@ -81,7 +84,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
             ))
           }
           data-test-id={`${vmName}-description`}
-          descriptionHeader={t('Description')}
+          descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
           isEdit
         />
         <VirtualMachineDescriptionItem
@@ -103,7 +106,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
             ))
           }
           data-test-id={`${vmName}-workload-profile`}
-          descriptionHeader={t('Workload profile')}
+          descriptionHeader={<SearchItem id="workload-profile">{t('Workload profile')}</SearchItem>}
           isEdit
         />
         <VirtualMachineDescriptionItem
@@ -124,7 +127,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
           bodyContent={vm?.spec?.instancetype ? null : <CPUDescription cpu={getCPU(vm)} />}
           data-test-id={`${vmName}-cpu-memory`}
           descriptionData={<CPUMemory vm={vm} />}
-          descriptionHeader={t('CPU | Memory')}
+          descriptionHeader={<SearchItem id="cpu-memory">{t('CPU | Memory')}</SearchItem>}
           isDisabled={!!vm?.spec?.instancetype}
           isEdit={canUpdateVM}
           isPopover
@@ -143,7 +146,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
           }
           data-test-id={`${vmName}-hostname`}
           descriptionData={vm?.spec?.template?.spec?.hostname || vmName}
-          descriptionHeader={t('Hostname')}
+          descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
           isEdit
         />
         <VirtualMachineDescriptionItem
@@ -158,7 +161,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
           }
           breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
           data-test-id={`${vmName}-headless`}
-          descriptionHeader={t('Headless mode')}
+          descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
           isPopover
         />
         <VirtualMachineDescriptionItem
@@ -175,8 +178,10 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
               isChecked={isCheckedGuestSystemAccessLog}
             />
           }
+          descriptionHeader={
+            <SearchItem id="guest-system-log-access">{t('Guest system log access')}</SearchItem>
+          }
           data-test-id="guest-system-log-access"
-          descriptionHeader={t('Guest system log access')}
           isPopover
         />
         <DetailsSectionHardware vm={vm} vmi={vmi} />

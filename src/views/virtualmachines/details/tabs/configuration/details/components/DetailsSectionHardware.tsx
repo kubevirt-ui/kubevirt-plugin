@@ -1,4 +1,5 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HardwareDevicesTable from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesTable';
@@ -6,10 +7,12 @@ import HardwareDeviceTitle from '@kubevirt-utils/components/HardwareDevices/Hard
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/modal/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { Bullseye, Divider, ExpandableSection, Flex, Grid, GridItem } from '@patternfly/react-core';
 
+import { DETAILS_TAB_HARDWARE_IDS, expandURLHash } from '../../utils/search';
 import { updateHardwareDevices } from '../utils/utils';
 
 type DetailsSectionHardwareProps = {
@@ -20,10 +23,15 @@ type DetailsSectionHardwareProps = {
 const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const location = useLocation();
   const [isExpanded, setIsExpanded] = useState<boolean>();
 
   const hostDevices = getHostDevices(vm);
   const gpus = getGPUDevices(vm);
+
+  useEffect(() => {
+    expandURLHash(DETAILS_TAB_HARDWARE_IDS, location?.hash, setIsExpanded);
+  }, [location?.hash]);
 
   const onEditHostDevices = () => {
     createModal(({ isOpen, onClose }) => (
@@ -61,9 +69,13 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({ vm, vmi }) =>
 
   return (
     <ExpandableSection
-      toggleText={t('Hardware devices ({{count}})', {
-        count: gpus?.length + hostDevices?.length || 0,
-      })}
+      toggleContent={
+        <SearchItem id="hardware-devices">
+          {t('Hardware devices ({{count}})', {
+            count: gpus?.length + hostDevices?.length || 0,
+          })}
+        </SearchItem>
+      }
       isExpanded={isExpanded}
       isIndented
       onToggle={setIsExpanded}

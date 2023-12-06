@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -18,19 +19,19 @@ const NetworkTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <>
-      <SidebarEditor
-        onResourceUpdate={onSubmitYAML}
-        pathsToHighlight={PATHS_TO_HIGHLIGHT.NETWORK_TAB}
-        resource={vm}
-      >
-        <PageSection>
-          <Title headingLevel="h2">{t('Network')}</Title>
-          <AddNetworkInterfaceButton vm={vm} vmi={vmi} />
-          <NetworkInterfaceList vm={vm} vmi={vmi} />
-        </PageSection>
-      </SidebarEditor>
-    </>
+    <SidebarEditor
+      onResourceUpdate={onSubmitYAML}
+      pathsToHighlight={PATHS_TO_HIGHLIGHT.NETWORK_TAB}
+      resource={vm}
+    >
+      <PageSection>
+        <Title headingLevel="h2">
+          <SearchItem id="network">{t('Network')}</SearchItem>
+        </Title>
+        <AddNetworkInterfaceButton vm={vm} vmi={vmi} />
+        <NetworkInterfaceList vm={vm} vmi={vmi} />
+      </PageSection>
+    </SidebarEditor>
   );
 };
 

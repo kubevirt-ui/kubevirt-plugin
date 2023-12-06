@@ -2,6 +2,7 @@ import React, { FC, memo } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Title } from '@patternfly/react-core';
 
@@ -12,7 +13,9 @@ const EnvironmentFormTitle: FC = memo(() => {
   return (
     <>
       {!history.location.pathname.includes('/review/environment') && (
-        <Title headingLevel="h2">{t('Environment')}</Title>
+        <SearchItem id="Environment">
+          <Title headingLevel="h2">{t('Environment')}</Title>
+        </SearchItem>
       )}
       {t('Include all values from existing config maps, secrets or service accounts (as disk)')}{' '}
       <HelpTextIcon

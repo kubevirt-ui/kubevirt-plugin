@@ -8,6 +8,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
@@ -66,7 +67,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           }
           data-test-id="node-selector"
           descriptionData={<NodeSelector vm={vm} />}
-          descriptionHeader={t('Node selector')}
+          descriptionHeader={<SearchItem id="node-selector">{t('Node selector')}</SearchItem>}
           isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
@@ -85,7 +86,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           }
           data-test-id="tolerations"
           descriptionData={<Tolerations vm={vm} />}
-          descriptionHeader={t('Tolerations')}
+          descriptionHeader={<SearchItem id="tolerations">{t('Tolerations')}</SearchItem>}
           isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
@@ -104,14 +105,14 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           }
           data-test-id="affinity-rules"
           descriptionData={<Affinity vm={vm} />}
-          descriptionHeader={t('Affinity rules')}
+          descriptionHeader={<SearchItem id="affinity">{t('Affinity rules')}</SearchItem>}
           isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem
           bodyContent={<DeschedulerPopover />}
           data-test-id="descheduler"
           descriptionData={<Descheduler vm={vm} />}
-          descriptionHeader={t('Descheduler')}
+          descriptionHeader={<SearchItem id="descheduler">{t('Descheduler')}</SearchItem>}
           isPopover
         />
       </DescriptionList>
