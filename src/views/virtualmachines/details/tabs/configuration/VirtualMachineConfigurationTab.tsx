@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps, useHistory } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
@@ -22,7 +22,7 @@ type VirtualMachineConfigurationTabProps = RouteComponentProps<{
 };
 
 const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = (props) => {
-  const { history } = props;
+  const history = useHistory();
   const { vmi } = useVMI(getName(props?.obj), getNamespace(props?.obj));
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,

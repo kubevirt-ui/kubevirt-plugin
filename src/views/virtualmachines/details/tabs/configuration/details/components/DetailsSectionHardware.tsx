@@ -12,6 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { Bullseye, Divider, ExpandableSection, Flex, Grid, GridItem } from '@patternfly/react-core';
 
+import { getSearchItemsIds } from '../../search/utils/utils';
 import { DETAILS_TAB_HARDWARE_IDS, expandURLHash } from '../../utils/search';
 import { updateHardwareDevices } from '../utils/utils';
 
@@ -30,7 +31,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({ vm, vmi }) =>
   const gpus = getGPUDevices(vm);
 
   useEffect(() => {
-    expandURLHash(DETAILS_TAB_HARDWARE_IDS, location?.hash, setIsExpanded);
+    expandURLHash(getSearchItemsIds(DETAILS_TAB_HARDWARE_IDS), location?.hash, setIsExpanded);
   }, [location?.hash]);
 
   const onEditHostDevices = () => {
