@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-const BridgedNICHotPlugModalAlert: FC = () => {
+const NICHotPlugModalAlert: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -14,4 +14,4 @@ const BridgedNICHotPlugModalAlert: FC = () => {
   );
 };
 
-export default BridgedNICHotPlugModalAlert;
+export default NICHotPlugModalAlert;
