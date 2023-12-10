@@ -16,6 +16,10 @@ const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
 
   const columns: TableColumn<BootableVolume>[] = [
     {
+      id: 'favorites',
+      title: '',
+    },
+    {
       id: 'name',
       title: t('Volume name'),
     },

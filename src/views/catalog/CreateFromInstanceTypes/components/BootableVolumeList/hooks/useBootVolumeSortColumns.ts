@@ -12,6 +12,7 @@ import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/ba
 
 type UseBootVolumeSortColumns = (
   unsortedData: BootableVolume[],
+  volumeFavorites: string[],
   preferences: {
     [resourceKeyName: string]: V1beta1VirtualMachineClusterPreference;
   },
@@ -26,12 +27,13 @@ type UseBootVolumeSortColumns = (
 
 const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   unsortedData = [],
+  volumeFavorites,
   preferences,
   pvcSources,
   pagination,
 ) => {
-  const [activeSortIndex, setActiveSortIndex] = useState<null | number>(null);
-  const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc' | null>(null);
+  const [activeSortIndex, setActiveSortIndex] = useState<null | number>(0);
+  const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc' | null>('asc');
 
   const getSortableRowValues = (bootableVolume: BootableVolume): string[] => {
     const pvcSource = getBootableVolumePVCSource(bootableVolume, pvcSources);
@@ -68,9 +70,30 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
     },
   });
 
+  // will try to keep the same sorting for other fields such as name and only arrange the favorites to be first
+  const arrangeFavorites = (
+    acc: [favorites: BootableVolume[], notFavorites: BootableVolume[]],
+    volume: BootableVolume,
+  ): [BootableVolume[], BootableVolume[]] => {
+    if (activeSortIndex === 0) {
+      const isASC = activeSortDirection === 'asc';
+      if (volumeFavorites?.includes(volume?.metadata?.name)) {
+        acc[isASC ? 0 : 1].push(volume);
+      } else {
+        acc[isASC ? 1 : 0].push(volume);
+      }
+      return acc;
+    }
+    acc[0].push(volume);
+    return acc;
+  };
+
   const sortedData = unsortedData
     .sort(sortVolumes)
+    .reduce(arrangeFavorites, [[], []])
+    .flat()
     .slice(pagination.startIndex, pagination.endIndex);
+
   return { getSortType, sortedData };
 };
 
