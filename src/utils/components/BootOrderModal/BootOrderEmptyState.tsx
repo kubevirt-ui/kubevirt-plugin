@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import {
   Alert,
+  AlertVariant,
   Button,
   EmptyState,
   EmptyStateBody,
@@ -11,7 +12,7 @@ import {
 } from '@patternfly/react-core';
 
 // Display and empty with a Call to add new source if no sources are defined.
-export const BootOrderEmptyState: React.FC<BootOrderEmptyProps> = ({
+export const BootOrderEmptyState: FC<BootOrderEmptyProps> = ({
   addItemDisabledMessage,
   addItemIsDisabled,
   addItemMessage,
@@ -30,7 +31,7 @@ export const BootOrderEmptyState: React.FC<BootOrderEmptyProps> = ({
           {addItemMessage}
         </Button>
       ) : (
-        <Alert title={addItemDisabledMessage} variant="info" />
+        <Alert title={addItemDisabledMessage} variant={AlertVariant.info} />
       )}
     </EmptyStateSecondaryActions>
   </EmptyState>
