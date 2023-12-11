@@ -1,6 +1,7 @@
 const userSettingsInitialState: UserSettingsState = {
   cards: {},
   columns: {},
+  favoriteBootableVolumes: [],
   quickStart: {},
   ssh: {},
 };
@@ -8,6 +9,7 @@ const userSettingsInitialState: UserSettingsState = {
 export type UserSettingsState = {
   cards: CardsUserSettings;
   columns: ColumnsUserSettings;
+  favoriteBootableVolumes: string[];
   quickStart: QuickStartUserSettings;
   ssh: SSHUserSettings;
 };

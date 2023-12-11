@@ -53,7 +53,15 @@ const CreateFromInstanceType: FC = () => {
     setVMNamespaceTarget(authourizedSSHKeys?.[targetNS], targetNS);
   }, [activeNamespace, authourizedSSHKeys, setVMNamespaceTarget]);
 
-  if (!bootableVolumesData?.loaded || !instanceTypesAndPreferencesData?.loaded || !loaded) {
+  const [favorites, updaterFavorites, loadedFavorites] =
+    useKubevirtUserSettings('favoriteBootableVolumes');
+
+  if (
+    !bootableVolumesData?.loaded ||
+    !instanceTypesAndPreferencesData?.loaded ||
+    !loaded ||
+    (!loadedFavorites && !favorites)
+  ) {
     return (
       <Bullseye className="create-vm-instance-type-section__page-loader">
         <Loading />
@@ -97,6 +105,7 @@ const CreateFromInstanceType: FC = () => {
                 <BootableVolumeList
                   bootableVolumesData={bootableVolumesData}
                   displayShowAllButton
+                  favorites={[favorites as [], updaterFavorites]}
                   preferencesData={instanceTypesAndPreferencesData.preferences}
                 />
               </SectionListItem>

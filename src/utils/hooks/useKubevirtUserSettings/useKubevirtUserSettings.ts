@@ -21,12 +21,9 @@ import {
   userSettingsRole,
   userSettingsRoleBinding,
 } from './utils/const';
+import { UseKubevirtUserSettings } from './utils/types';
 import userSettingsInitialState, { UserSettingsState } from './utils/userSettingsInitialState';
 import { parseNestedJSON, patchUserConfigMap } from './utils/utils';
-
-type UseKubevirtUserSettings = (
-  key?: string,
-) => [{ [key: string]: any }, (val: any) => Promise<{ [key: string]: any }>, boolean, Error];
 
 const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   const [error, setError] = useState<Error>();

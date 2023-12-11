@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, MouseEvent } from 'react';
 
 import { getTemplateOSIcon, getVolumeNameOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -27,6 +27,7 @@ type BootableVolumeRowProps = {
       BootableVolume,
       (selectedVolume: BootableVolume, pvcSource: IoK8sApiCoreV1PersistentVolumeClaim) => void,
     ];
+    favorites: [isFavorite: boolean, updaterFavorites: (val: boolean) => void];
     preference: V1beta1VirtualMachineClusterPreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   };
@@ -37,6 +38,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   bootableVolume,
   rowData: {
     bootableVolumeSelectedState: [selectedBootableVolume, setSelectedBootableVolume],
+    favorites,
     preference,
     pvcSource,
   },
@@ -45,6 +47,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   const bootVolumeName = getName(bootableVolume);
   const sizeData = formatBytes(pvcSource?.spec?.resources?.requests?.storage);
   const icon = getVolumeNameOSIcon(bootVolumeName) || getTemplateOSIcon(preference);
+  const [isFavorite, addOrRemoveFavorite] = favorites;
 
   return (
     <Tr
@@ -53,6 +56,17 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       isSelectable
       onClick={() => setSelectedBootableVolume(bootableVolume, pvcSource)}
     >
+      <TableData
+        favorites={{
+          isFavorited: isFavorite,
+          onFavorite: (e: MouseEvent, isFavoring: boolean) => {
+            e.stopPropagation();
+            addOrRemoveFavorite(isFavoring);
+          },
+        }}
+        activeColumnIDs={activeColumnIDs}
+        id="favorites"
+      />
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
         <img alt="os-icon" className="vm-catalog-row-icon" src={icon} />
         <Text component={TextVariants.small}>{bootVolumeName}</Text>

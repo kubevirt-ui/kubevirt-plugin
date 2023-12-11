@@ -5,6 +5,7 @@ import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/u
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { convertResourceArrayToMap, getLabel, getName } from '@kubevirt-utils/resources/shared';
@@ -34,6 +35,7 @@ import './BootableVolumeList.scss';
 type BootableVolumeListProps = {
   bootableVolumesData: UseBootableVolumesValues;
   displayShowAllButton?: boolean;
+  favorites: UserSettingFavorites;
   preferencesData: V1beta1VirtualMachineClusterPreference[];
   selectedBootableVolumeState?: [BootableVolume, (selectedVolume: BootableVolume) => void];
 };
@@ -41,6 +43,7 @@ type BootableVolumeListProps = {
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
   bootableVolumesData,
   displayShowAllButton = false,
+  favorites,
   preferencesData,
   selectedBootableVolumeState,
 }) => {
@@ -64,12 +67,15 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal,
   );
 
+  const [volumeFavorites, updateFavorites] = favorites;
   const { getSortType, sortedData } = useBootVolumeSortColumns(
     data,
+    volumeFavorites,
     preferencesMap,
     pvcSources,
     pagination,
   );
+
   const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({
       endIndex,
@@ -148,6 +154,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             {displayShowAllButton && (
               <ShowAllBootableVolumesButton
                 bootableVolumesData={bootableVolumesData}
+                favorites={favorites}
                 preferencesData={preferencesData}
               />
             )}
@@ -160,7 +167,15 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           <Thead>
             <Tr>
               {activeColumns.map((col, columnIndex) => (
-                <Th id={col?.id} key={col?.id} sort={getSortType(columnIndex)}>
+                <Th
+                  sort={
+                    columnIndex === 0
+                      ? { ...getSortType(columnIndex), isFavorites: true }
+                      : getSortType(columnIndex)
+                  }
+                  id={col?.id}
+                  key={col?.id}
+                >
                   {col?.title}
                 </Th>
               ))}
@@ -173,6 +188,15 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                   bootableVolumeSelectedState: !displayShowAllButton
                     ? selectedBootableVolumeState
                     : [selectedBootableVolume, onSelectCreatedVolume],
+                  favorites: [
+                    volumeFavorites?.includes(bs?.metadata?.name),
+                    (addTofavorites: boolean) =>
+                      updateFavorites(
+                        addTofavorites
+                          ? [...volumeFavorites, bs?.metadata?.name]
+                          : volumeFavorites.filter((fav: string) => fav !== bs?.metadata?.name),
+                      ),
+                  ],
                   preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
                   pvcSource: getBootableVolumePVCSource(bs, pvcSources),
                 }}
