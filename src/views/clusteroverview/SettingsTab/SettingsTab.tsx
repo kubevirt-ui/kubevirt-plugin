@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, AlertVariant, Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+import { Alert, Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import ClusterTab from './ClusterTab/ClusterTab';
 import PreviewFeaturesTab from './PreviewFeaturesTab/PreviewFeaturesTab';
@@ -22,7 +22,7 @@ const SettingsTab: FC = () => {
         className="settings-tab__scope-message"
         isInline
         title={t('All settings are effective across the entire cluster.')}
-        variant={AlertVariant.info}
+        variant="info"
       />
       <Card className="settings-tab__card">
         <Tabs

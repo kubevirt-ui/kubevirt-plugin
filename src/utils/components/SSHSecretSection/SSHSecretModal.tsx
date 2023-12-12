@@ -33,7 +33,11 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
 
   const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(initialSSHSecretDetails);
 
-  const { isDisabled, secretsData } = useSecretsData(sshDetails, null);
+  const { isDisabled, secretsData } = useSecretsData(
+    initialSSHSecretDetails,
+    sshDetails,
+    namespace,
+  );
 
   return (
     <TabModal
