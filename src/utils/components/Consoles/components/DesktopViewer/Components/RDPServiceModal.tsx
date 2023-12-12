@@ -1,10 +1,17 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert, Checkbox, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
+import {
+  Alert,
+  AlertVariant,
+  Checkbox,
+  ModalVariant,
+  Stack,
+  StackItem,
+} from '@patternfly/react-core';
 
 import { NODE_PORTS_LINK } from '../utils/constants';
 import { createRDPService } from '../utils/utils';
@@ -16,9 +23,9 @@ type RDPServiceModalProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const RDPServiceModal: React.FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi }) => {
+const RDPServiceModal: FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [isChecked, setChecked] = React.useState<boolean>(false);
+  const [isChecked, setChecked] = useState<boolean>(false);
 
   return (
     <TabModal
@@ -41,7 +48,7 @@ const RDPServiceModal: React.FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, 
           />
         </StackItem>
         <StackItem>
-          <Alert isInline title={t('Node port')} variant="info">
+          <Alert isInline title={t('Node port')} variant={AlertVariant.info}>
             <div>
               {t('RDP Service is using a node port. Node port requires additional port resources.')}
               <div>
