@@ -17,7 +17,7 @@ import {
   Title,
 } from '@patternfly/react-core';
 
-import { NetworkAttachmentDefinitionKind } from '../../../../../OverviewTab/inventory-card/utils/types';
+import { NetworkAttachmentDefinitionKind } from '../../../../../../OverviewTab/inventory-card/utils/types';
 import {
   getLiveMigrationNetwork,
   PRIMARY_NETWORK,

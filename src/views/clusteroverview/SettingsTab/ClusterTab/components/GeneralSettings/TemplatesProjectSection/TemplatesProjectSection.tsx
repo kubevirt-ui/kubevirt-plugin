@@ -26,7 +26,7 @@ import {
   TextVariants,
 } from '@patternfly/react-core';
 
-import ExpandSection from '../../../ExpandSection/ExpandSection';
+import ExpandSection from '../../../../ExpandSection/ExpandSection';
 
 import {
   getCurrentTemplatesNamespaceFromHCO,

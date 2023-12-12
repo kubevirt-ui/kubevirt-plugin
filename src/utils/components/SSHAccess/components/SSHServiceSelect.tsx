@@ -1,7 +1,10 @@
 import React, { FC, useMemo } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { LOAD_BALANCER_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
+import {
+  LOAD_BALANCER_ENABLED,
+  NODE_PORT_ENABLED,
+} from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
@@ -25,6 +28,7 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
   const [models] = useK8sModels();
 
   const { featureEnabled: loadBalancerConfigFlag } = useFeatures(LOAD_BALANCER_ENABLED);
+  const { featureEnabled: nodePortEnabled } = useFeatures(NODE_PORT_ENABLED);
 
   const hasSomeMetalCrd = useMemo(
     () =>
@@ -67,6 +71,16 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
         value={SERVICE_TYPES.LOAD_BALANCER}
       >
         {t('SSH over LoadBalancer')}
+      </SelectOption>
+      <SelectOption
+        description={t(
+          'Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.',
+        )}
+        id={SERVICE_TYPES.NODE_PORT}
+        isDisabled={!nodePortEnabled}
+        value={SERVICE_TYPES.NODE_PORT}
+      >
+        {t('SSH over NodePort')}
       </SelectOption>
     </Select>
   );

@@ -1,5 +1,6 @@
 import { animals, colors, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
 
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ItemsToFilterProps } from './types';
@@ -24,6 +25,9 @@ export const get = (obj: unknown, path: string | string[], defaultValue = undefi
 export const isUpstream = (window as any).SERVER_FLAGS?.branding === 'okd';
 
 export const isString = (val: unknown) => val !== null && typeof val === 'string';
+
+export const getSSHNodePort = (sshService: IoK8sApiCoreV1Service) =>
+  sshService?.spec?.ports?.find((port) => parseInt(port.targetPort, 10) === 22)?.nodePort;
 
 export const isTemplateParameter = (value: string): boolean =>
   Boolean(/^\${[A-z0-9_]+}$/.test(value));
