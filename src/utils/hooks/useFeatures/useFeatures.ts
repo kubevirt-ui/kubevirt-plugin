@@ -26,7 +26,17 @@ export const useFeatures: UseFeatures = (featureName) => {
 
   useEffect(() => {
     if (loaded && featureEnabled === null) {
-      setFeatureEnabled(featureConfigMap?.data?.[featureName] === 'true');
+      switch (featureConfigMap?.data?.[featureName]) {
+        case 'true':
+          setFeatureEnabled(true);
+          break;
+        case 'false': {
+          setFeatureEnabled(false);
+          break;
+        }
+        default:
+          setFeatureEnabled(featureConfigMap?.data?.[featureName]);
+      }
       setLoading(false);
       return;
     }

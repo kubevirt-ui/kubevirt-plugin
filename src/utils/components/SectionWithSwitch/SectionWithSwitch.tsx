@@ -3,46 +3,35 @@ import React, { FC, FormEvent, ReactNode } from 'react';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { PopoverPosition, Split, SplitItem, Switch } from '@patternfly/react-core';
 
-import ExpandSection from '../../../views/clusteroverview/SettingsTab/ExpandSection/ExpandSection';
 import NewBadge from '../NewBadge/NewBadge';
 
-import './ExpandSectionWithSwitch.scss';
+import './section-with-switch.scss';
 
 type ExpandSectionWithSwitchProps = {
-  children: ReactNode;
   helpTextIconContent?: ReactNode;
   id?: string;
   isDisabled?: boolean;
   newBadge: boolean;
   switchIsOn: boolean;
-  toggleContent?: ReactNode;
-  toggleText?: string;
+  title?: ReactNode;
   turnOnSwitch: (checked: boolean, event: FormEvent<HTMLInputElement>) => void;
 };
-
-const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
-  children,
+const SectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
   helpTextIconContent,
   id,
   isDisabled,
   newBadge = false,
   switchIsOn,
-  toggleContent,
-  toggleText,
+  title,
   turnOnSwitch,
 }) => (
-  <Split className="expand-section-with-switch" id={id}>
-    <SplitItem>
-      <ExpandSection isDisabled={isDisabled} toggleContent={toggleContent} toggleText={toggleText}>
-        {children}
-      </ExpandSection>
-    </SplitItem>
+  <Split className="section-with-switch" id={id}>
+    {title}
     {helpTextIconContent && (
       <SplitItem isFilled>
         <HelpTextIcon
           bodyContent={helpTextIconContent}
-          className="expand-section-with-switch__help-text-popover"
-          helpIconClassName="expand-section-with-switch__help-icon"
+          helpIconClassName="section-with-switch__help-text-popover"
           position={PopoverPosition.right}
         />
         {newBadge && <NewBadge />}
@@ -54,4 +43,4 @@ const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
   </Split>
 );
 
-export default ExpandSectionWithSwitch;
+export default SectionWithSwitch;

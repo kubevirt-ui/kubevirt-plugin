@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import ExpandSection from '../../../ExpandSection/ExpandSection';
+import ExpandSection from '../../../../ExpandSection/ExpandSection';
 
 import Limits from './Limits/Limits';
 import Network from './Network/Network';
