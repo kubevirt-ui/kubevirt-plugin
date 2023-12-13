@@ -1,66 +1,75 @@
-import React, { Dispatch, FC, ReactElement, SetStateAction, useState } from 'react';
+import React, {
+  ChangeEvent,
+  Dispatch,
+  FC,
+  MouseEvent,
+  ReactElement,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
-import { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, AlertVariant, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import Loading from '../../../Loading/Loading';
 import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
 
 type SecretDropdownProps = {
   id?: string;
-  secretsResourceData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
+  namespace: string;
+  secretsResourceData: IoK8sApiCoreV1Secret[];
+  selectedProject: string;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
-  sshSecretName: string;
+  sshDetails: SSHSecretDetails;
 };
 
 const SecretDropdown: FC<SecretDropdownProps> = ({
   id,
+  namespace,
   secretsResourceData,
+  selectedProject,
   setSSHDetails,
-  sshSecretName,
+  sshDetails,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [activeNamespace] = useActiveNamespace();
 
-  const [allSecrets = [], secretsLoaded, secretsError] = secretsResourceData;
-  const sshKeySecrets = allSecrets
-    ?.filter((secret) => secret?.data && validateSSHPublicKey(decodeSecret(secret)))
-    ?.sort((a, b) => a?.metadata?.name.localeCompare(b?.metadata?.name));
+  const [secretName, setSecretName] = useState<string>(sshDetails?.sshSecretName);
+  useEffect(
+    () => isEmpty(sshDetails?.sshSecretName) && isEmpty(sshDetails.sshPubKey) && setSecretName(''),
+    [sshDetails.sshPubKey, sshDetails?.sshSecretName],
+  );
 
-  const onSelect = (_, newSecretName: string) => {
-    const sshPubKey = decodeSecret(
-      sshKeySecrets.find((secret) => getName(secret) === newSecretName),
+  const onSelect = (_: MouseEvent, newSecretName: string) => {
+    const selectedSecret = secretsResourceData.find(
+      (secret: IoK8sApiCoreV1Secret) => getName(secret) === newSecretName,
     );
+    const addNew = namespace ? selectedProject !== namespace : selectedProject !== activeNamespace;
+    const sshPubKey = decodeSecret(selectedSecret);
     setSSHDetails((prev) => ({
       ...prev,
-      secretOption: SecretSelectionOption.useExisting,
+      secretOption: addNew ? SecretSelectionOption.addNew : SecretSelectionOption.useExisting,
       sshPubKey,
-      sshSecretName: newSecretName,
+      sshSecretName: generatePrettyName(newSecretName),
+      sshSecretNamespace: selectedSecret?.metadata?.namespace,
     }));
+    setSecretName(newSecretName);
     setIsOpen(false);
   };
 
-  const filterSecrets = (_, userInput: string): ReactElement[] =>
-    sshKeySecrets
-      ?.filter((secret) => getName(secret)?.includes(userInput))
-      ?.map((secret) => {
+  const filterSecrets = (_: ChangeEvent<HTMLInputElement>, userInput: string): ReactElement[] =>
+    secretsResourceData
+      ?.filter((secret: IoK8sApiCoreV1Secret) => getName(secret)?.includes(userInput))
+      ?.map((secret: IoK8sApiCoreV1Secret) => {
         const name = getName(secret);
         return <SelectOption key={name} value={name} />;
       });
-
-  if (!secretsLoaded) return <Loading />;
-
-  if (secretsError)
-    return (
-      <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
-        {secretsError?.message}
-      </Alert>
-    );
 
   return (
     <Select
@@ -73,10 +82,10 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
       onSelect={onSelect}
       onToggle={() => setIsOpen(!isOpen)}
       placeholderText={t('--- Select secret ---')}
-      selections={sshSecretName}
+      selections={secretName}
       variant={SelectVariant.single}
     >
-      {sshKeySecrets?.map((secret) => {
+      {secretsResourceData?.map((secret: IoK8sApiCoreV1Secret) => {
         const name = getName(secret);
         return <SelectOption key={name} value={name} />;
       })}

@@ -25,7 +25,8 @@ export const getSSHCredentials = (
       applyKeyToProject: false,
       secretOption: SecretSelectionOption.useExisting,
       sshPubKey: decodeSecret(secret),
-      sshSecretName: sshSecretName,
+      sshSecretName,
+      sshSecretNamespace,
     }))
     .catch(() => initialSSHCredentials);
 };
