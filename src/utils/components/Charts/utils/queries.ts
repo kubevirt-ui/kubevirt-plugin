@@ -6,6 +6,8 @@ enum VMQueries {
   FILESYSTEM_READ_USAGE = 'FILESYSTEM_READ_USAGE',
   FILESYSTEM_USAGE_TOTAL = 'FILESYSTEM_TOTAL_USAGE',
   FILESYSTEM_WRITE_USAGE = 'FILESYSTEM_WRITE_USAGE',
+  INSTANT_MIGRATION_DATA_PROCESSED = 'INSTANT_MIGRATION_DATA_PROCESSED',
+  INSTANT_MIGRATION_DATA_REMAINING = 'INSTANT_MIGRATION_DATA_REMAINING',
   MEMORY_USAGE = 'MEMORY_USAGE',
   MIGRATION_DATA_PROCESSED = 'MIGRATION_DATA_PROCESSED',
   MIGRATION_DATA_REMAINING = 'MIGRATION_DATA_REMAINING',
@@ -21,7 +23,7 @@ enum VMQueries {
 }
 
 type UtilizationQueriesArgs = {
-  duration: string;
+  duration?: string;
   launcherPodName?: string;
   nic?: string;
   obj: K8sResourceCommon;
@@ -43,6 +45,8 @@ export const getUtilizationQueries: GetUtilizationQueries = ({
     [VMQueries.FILESYSTEM_READ_USAGE]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.FILESYSTEM_USAGE_TOTAL]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}]) + rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.FILESYSTEM_WRITE_USAGE]: `sum(rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
+    [VMQueries.INSTANT_MIGRATION_DATA_PROCESSED]: `kubevirt_migrate_vmi_data_processed_bytes{name='${name}',namespace='${namespace}'}`,
+    [VMQueries.INSTANT_MIGRATION_DATA_REMAINING]: `kubevirt_migrate_vmi_data_remaining_bytes{name='${name}',namespace='${namespace}'}`,
     [VMQueries.MEMORY_USAGE]: `last_over_time(kubevirt_vmi_memory_used_bytes{name='${name}',namespace='${namespace}'}[${duration}])`,
     [VMQueries.MIGRATION_DATA_PROCESSED]: `sum(sum_over_time(kubevirt_migrate_vmi_data_processed_bytes{name='${name}',namespace='${namespace}'}[${duration}]))  BY (name, namespace)`,
     [VMQueries.MIGRATION_DATA_REMAINING]: `sum(sum_over_time(kubevirt_migrate_vmi_data_remaining_bytes{name='${name}',namespace='${namespace}'}[${duration}]))  BY (name, namespace)`,

@@ -23,3 +23,5 @@ export const PATHS_TO_HIGHLIGHT = {
   ],
   SCRIPTS_TAB: ['spec.template.spec.volumes', 'spec.template.spec.accessCredentials'],
 };
+
+export const MIGRATION__PROMETHEUS_DELAY = 15 * MILLISECONDS_TO_SECONDS_MULTIPLIER;

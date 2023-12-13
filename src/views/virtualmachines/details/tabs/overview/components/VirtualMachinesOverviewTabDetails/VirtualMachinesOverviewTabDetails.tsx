@@ -43,6 +43,7 @@ import { printableVMStatus } from '@virtualmachines/utils';
 
 import MigrationProgressPopover from './components/MigrationProgressPopover/MigrationProgressPopover';
 import StatusPopoverButton from './components/StatusPopoverButton/StatusPopoverButton';
+import VirtualMachineMigrationPercentage from './components/VirtualMachineMigrationPercentage';
 import VirtualMachineOverviewStatus from './components/VirtualMachineOverviewStatus/VirtualMachineOverviewStatus';
 import VirtualMachinesOverviewTabDetailsConsole from './components/VirtualMachinesOverviewTabDetailsConsole';
 
@@ -122,9 +123,12 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                         {vmPrintableStatus !== printableVMStatus.Migrating ? (
                           <VirtualMachineOverviewStatus vmPrintableStatus={vmPrintableStatus} />
                         ) : (
-                          <MigrationProgressPopover vmi={vmi}>
-                            <StatusPopoverButton vmPrintableStatus={vmPrintableStatus} />
-                          </MigrationProgressPopover>
+                          <>
+                            <MigrationProgressPopover vmi={vmi}>
+                              <StatusPopoverButton vmPrintableStatus={vmPrintableStatus} />
+                            </MigrationProgressPopover>
+                            <VirtualMachineMigrationPercentage vm={vm} />
+                          </>
                         )}
                       </SplitItem>
                       <VMNotMigratableLabel vm={vm} />
