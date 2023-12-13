@@ -39,11 +39,6 @@ export const useVirtualMachineTabs = () => {
     },
     {
       component: VirtualMachineConfigurationTab,
-      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Disks}`,
-      name: 'hide',
-    },
-    {
-      component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.SSH}`,
       name: 'hide',
     },
@@ -69,22 +64,12 @@ export const useVirtualMachineTabs = () => {
     },
     {
       component: VirtualMachineConfigurationTab,
-      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Environment}`,
-      name: 'hide',
-    },
-    {
-      component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Network}`,
       name: 'hide',
     },
     {
       component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scheduling}`,
-      name: 'hide',
-    },
-    {
-      component: VirtualMachineConfigurationTab,
-      href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scripts}`,
       name: 'hide',
     },
     {
