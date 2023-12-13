@@ -39,6 +39,7 @@ const AddProjectAuthKeyButton: FC<AddProjectAuthKeyButtonProps> = ({
                     secretOption: SecretSelectionOption.useExisting,
                     sshPubKey: '',
                     sshSecretName: secretName,
+                    sshSecretNamespace: selectedProject,
                   }
             }
             namespace={selectedProject}

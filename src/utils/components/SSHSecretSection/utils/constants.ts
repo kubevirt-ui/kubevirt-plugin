@@ -6,4 +6,5 @@ export const initialSSHCredentials: SSHSecretDetails = {
   secretOption: SecretSelectionOption.none,
   sshPubKey: '',
   sshSecretName: '',
+  sshSecretNamespace: '',
 };

@@ -55,6 +55,7 @@ export const getInitialSSHDetails = ({
         secretOption: SecretSelectionOption.addNew,
         sshPubKey: decodeSecret(secretToCreate),
         sshSecretName: getName(secretToCreate),
+        sshSecretNamespace: '',
       }
     : {
         appliedDefaultKey: true,
@@ -64,4 +65,5 @@ export const getInitialSSHDetails = ({
           : SecretSelectionOption.none,
         sshPubKey: '',
         sshSecretName: sshSecretName || '',
+        sshSecretNamespace: '',
       };

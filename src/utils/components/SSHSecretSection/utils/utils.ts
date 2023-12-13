@@ -16,11 +16,11 @@ import {
   getCloudInitVolume,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
+import { decodeSecret, encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sResourceCommon, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 export const validateSecretNameLength = (secretName: string): boolean => secretName.length <= 51;
@@ -143,3 +143,24 @@ export const createSSHSecret = (
     model: SecretModel,
     ...(dryRun && { queryParams: { dryRun: 'All' } }),
   });
+
+export const getAllSecretsFromSecretData = (secretsResourceData: IoK8sApiCoreV1Secret[]) => {
+  const sshKeySecrets = secretsResourceData
+    ?.filter((secret) => secret?.data?.key && validateSSHPublicKey(decodeSecret(secret)))
+    ?.sort((a, b) => a?.metadata?.name.localeCompare(b?.metadata?.name));
+
+  return sshKeySecrets;
+};
+
+export const getMappedProjectsWithKeys = (
+  secretsData: IoK8sApiCoreV1Secret[],
+): { [namespace: string]: IoK8sApiCoreV1Secret[] } => {
+  const sshKeySecrets = getAllSecretsFromSecretData(secretsData);
+
+  const sshData = sshKeySecrets.reduce((acc, secret) => {
+    acc[secret?.metadata?.namespace] = [...(acc?.[secret?.metadata?.namespace] || []), secret];
+    return acc;
+  }, {} as { [namespace: string]: IoK8sApiCoreV1Secret[] });
+
+  return sshData;
+};

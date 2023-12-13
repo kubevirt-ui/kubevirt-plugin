@@ -15,4 +15,6 @@ export type SSHSecretDetails = {
   sshPubKey: string;
   // The name of Secret resource that holds the ssh public key
   sshSecretName: string;
+  // The namespace of secret
+  sshSecretNamespace: string;
 };
