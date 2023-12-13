@@ -1,4 +1,8 @@
 .virtual-machine-metrics-tab {
+  &__migration-completed-timestamp {
+    display: inline;
+  }
+
   &__main {
     flex-grow: 1;
     display: flex;
