@@ -3,6 +3,8 @@ import React, { FC, useEffect, useState } from 'react';
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import NewBadge from '@kubevirt-utils/components/NewBadge/NewBadge';
+import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -28,6 +30,9 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
+  const { toggleFeature: guestSystemLogsAccessToggle } = useFeatures(
+    DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
+  );
   const disableSerialConsoleLog =
     hyperConverge?.spec?.virtualMachineOptions?.disableSerialConsoleLog;
 
@@ -49,6 +54,7 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
         model: HyperConvergedModel,
         resource: hyperConverge,
       });
+      guestSystemLogsAccessToggle(!checked);
       setIsChecked(checked);
     } catch (err) {
       setError(err.message);

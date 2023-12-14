@@ -2,7 +2,7 @@ import produce from 'immer';
 
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { applyCloudDriveCloudInitVolume } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
@@ -23,6 +23,7 @@ type QuickCreateVMType = (inputs: {
   overrides: {
     authorizedSSHKey: string;
     autoUpdateEnabled: boolean;
+    isDisabledGuestSystemLogs: boolean;
     name: string;
     namespace: string;
     startVM: boolean;
@@ -37,6 +38,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
   overrides: {
     authorizedSSHKey,
     autoUpdateEnabled,
+    isDisabledGuestSystemLogs,
     name,
     namespace = DEFAULT_NAMESPACE,
     startVM,
@@ -64,6 +66,14 @@ export const quickCreateVM: QuickCreateVMType = async ({
     draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
     if (startVM) {
       draftVM.spec.running = true;
+    }
+
+    if (isDisabledGuestSystemLogs) {
+      const devices = (<unknown>draftVM.spec.template.spec.domain.devices) as V1Devices & {
+        logSerialConsole: boolean;
+      };
+      devices.logSerialConsole = false;
+      draftVM.spec.template.spec.domain.devices = devices;
     }
 
     const updatedVolumes = applyCloudDriveCloudInitVolume(vm);

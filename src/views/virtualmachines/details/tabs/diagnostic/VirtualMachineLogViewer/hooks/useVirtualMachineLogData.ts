@@ -24,6 +24,7 @@ const useVirtualMachineLogData: UseVirtualMachineLogData = ({ connect = true, po
         container: 'guest-console-log',
         follow: 'true',
       },
+      retryOnError: true,
     },
     connect,
   );

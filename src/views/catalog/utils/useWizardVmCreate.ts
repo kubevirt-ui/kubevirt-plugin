@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import produce from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { K8sResourceCommon, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
@@ -10,12 +10,17 @@ import { createMultipleResources } from './utils';
 import { useWizardVMContext } from './WizardVMContext';
 
 type CreateVMArguments = {
+  isDisableGuestSystemAccessLog: boolean;
   onFullfilled: (vm: V1VirtualMachine) => void;
   startVM: boolean;
 };
 
 type UseWizardVmCreateValues = {
-  createVM: ({ onFullfilled, startVM }: CreateVMArguments) => Promise<void>;
+  createVM: ({
+    isDisableGuestSystemAccessLog,
+    onFullfilled,
+    startVM,
+  }: CreateVMArguments) => Promise<void>;
   error: any;
   loaded: boolean;
 };
@@ -28,13 +33,25 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
   const [loaded, setLoaded] = useState<boolean>(true);
   const [error, setError] = useState<any>();
 
-  const createVM = async ({ onFullfilled, startVM }: CreateVMArguments) => {
+  const createVM = async ({
+    isDisableGuestSystemAccessLog,
+    onFullfilled,
+    startVM,
+  }: CreateVMArguments) => {
     try {
       setLoaded(false);
       setError(undefined);
 
       const vmToCrete = produce(vm, (vmDraft) => {
         vmDraft.spec.running = startVM;
+
+        if (isDisableGuestSystemAccessLog) {
+          const devices = (<unknown>vmDraft.spec.template.spec.domain.devices) as V1Devices & {
+            logSerialConsole: boolean;
+          };
+          devices.logSerialConsole = false;
+          vmDraft.spec.template.spec.domain.devices = devices;
+        }
       });
 
       const createdObjects = await createMultipleResources(

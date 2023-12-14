@@ -4,6 +4,8 @@ import { useHistory } from 'react-router-dom';
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
@@ -33,13 +35,16 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVmCreate();
   const { createModal } = useModal();
-
+  const { featureEnabled: isDisableGuestSystemAccessLog } = useFeatures(
+    DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
+  );
   const [startVM, setStartVM] = useState<boolean>(
     isBootSourceAvailable && (tabsData?.startVM ?? true),
   );
 
   const onCreate = () =>
     createVM({
+      isDisableGuestSystemAccessLog,
       onFullfilled: (createdVM) => {
         clearSessionStorageVM();
         history.push(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));

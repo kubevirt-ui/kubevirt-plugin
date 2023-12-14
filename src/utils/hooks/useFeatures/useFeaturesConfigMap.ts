@@ -25,8 +25,7 @@ const useFeaturesConfigMap: UseFeaturesConfigMap = () => {
     name: FEATURES_CONFIG_MAP_NAME,
     namespace: DEFAULT_NAMESPACE,
   });
-
-  return { featuresConfigMapData, isAdmin };
+  return { featuresConfigMapData: [...featuresConfigMapData], isAdmin };
 };
 
 export default useFeaturesConfigMap;

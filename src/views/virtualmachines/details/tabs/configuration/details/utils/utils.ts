@@ -112,7 +112,7 @@ export const updateGuestSystemAccessLog = (updatedVM: V1VirtualMachine, checked:
       {
         op: 'replace',
         path: `/spec/template/spec/domain/devices/logSerialConsole`,
-        value: checked ? null : false,
+        value: checked,
       },
     ],
     model: VirtualMachineModel,
