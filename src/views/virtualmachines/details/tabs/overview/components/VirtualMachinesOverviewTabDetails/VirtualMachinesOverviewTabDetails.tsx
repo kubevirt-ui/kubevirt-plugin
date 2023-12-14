@@ -12,6 +12,7 @@ import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionIte
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
@@ -101,7 +102,14 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
     <div className="VirtualMachinesOverviewTabDetails--details">
       <Card>
         <CardTitle className="text-muted card-title">
-          <Link to={createURL('details', location?.pathname)}>{t('Details')}</Link>
+          <Link
+            to={createURL(
+              `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Details}`,
+              location?.pathname,
+            )}
+          >
+            {t('Details')}
+          </Link>
         </CardTitle>
         <Divider />
         <CardBody isFilled>
