@@ -35,6 +35,7 @@ type NetworkInterfaceModalOnSubmit = {
   interfaceModel: string;
   interfaceType: string;
   networkName: string;
+  nicHotPlugEnabled?: boolean;
   nicName: string;
 };
 
@@ -67,7 +68,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   onSubmit,
   vm,
 }) => {
-  const { featureEnabled: bridgedNICHotPlugEnabled } = useFeatures(BRIDGED_NIC_HOTPLUG_ENABLED);
+  const { featureEnabled: nicHotPlugEnabled } = useFeatures(BRIDGED_NIC_HOTPLUG_ENABLED);
   const { iface = null, network = null } = nicPresentation;
   const [nicName, setNicName] = useState(network?.name || generateNicName());
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
@@ -82,14 +83,21 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const onSubmitModal = useCallback(() => {
     return (
       onSubmit &&
-      onSubmit({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName })
+      onSubmit({
+        interfaceMACAddress,
+        interfaceModel,
+        interfaceType,
+        networkName,
+        nicHotPlugEnabled,
+        nicName,
+      })
     );
   }, [nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType, onSubmit]);
 
   const isBridgedNIC = interfaceType === interfacesTypes.bridge;
   const vmIsRunning = getVMStatus(vm) === printableVMStatus.Running;
-  const showRestartHeader = !bridgedNICHotPlugEnabled || !isBridgedNIC;
-  const showRestartOrMigrateHeader = bridgedNICHotPlugEnabled && vmIsRunning && isBridgedNIC;
+  const showRestartHeader = !nicHotPlugEnabled || !isBridgedNIC;
+  const showRestartOrMigrateHeader = nicHotPlugEnabled && vmIsRunning && isBridgedNIC;
 
   return (
     <TabModal<K8sResourceCommon>
@@ -103,7 +111,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
       <Form>
         {showRestartHeader && Header}
         {showRestartOrMigrateHeader && <BridgedNICHotPlugModalAlert />}
-        {!bridgedNICHotPlugEnabled && vmIsRunning && <PreviewFeatureAlert onClose={onClose} />}
+        {!nicHotPlugEnabled && vmIsRunning && <PreviewFeatureAlert onClose={onClose} />}
         <NameFormField isDisabled={fixedName} objName={nicName} setObjName={setNicName} />
         <NetworkInterfaceModelSelect
           interfaceModel={interfaceModel}
@@ -122,7 +130,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           interfaceType={interfaceType}
           networkName={networkName}
           setInterfaceType={setInterfaceType}
-          showTypeHelperText={vmIsRunning && !isEdit && bridgedNICHotPlugEnabled}
+          showTypeHelperText={vmIsRunning && !isEdit && nicHotPlugEnabled}
         />
         <NetworkInterfaceMACAddressInput
           interfaceMACAddress={interfaceMACAddress}

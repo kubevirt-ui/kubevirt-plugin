@@ -15,7 +15,9 @@ import {
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { addInterface } from '@virtualmachines/actions/actions';
 
 type VirtualMachinesNetworkInterfaceModalProps = {
   headerText: string;
@@ -33,7 +35,14 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
   vmi,
 }) => {
   const onSubmit = useCallback(
-    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
+    ({
+        interfaceMACAddress,
+        interfaceModel,
+        interfaceType,
+        networkName,
+        nicHotPlugEnabled,
+        nicName,
+      }) =>
       () => {
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface(
@@ -47,12 +56,19 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
         const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
         const updatedVM = updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
 
-        return k8sUpdate({
-          data: updatedVM,
-          model: VirtualMachineModel,
-          name: updatedVM.metadata.name,
-          ns: updatedVM.metadata.namespace,
-        });
+        const isHotPlug = nicHotPlugEnabled && interfaceType === interfacesTypes.bridge;
+
+        return isHotPlug
+          ? addInterface(updatedVM, {
+              name: nicName,
+              networkAttachmentDefinitionName: networkName,
+            })
+          : k8sUpdate({
+              data: updatedVM,
+              model: VirtualMachineModel,
+              name: updatedVM.metadata.name,
+              ns: updatedVM.metadata.namespace,
+            });
       },
     [vm],
   );
