@@ -26,7 +26,7 @@ const VirtualMachinesOverviewTabDisks = ({ vm, vmi }) => {
         <CardTitle className="text-muted">
           <Link
             to={createURL(
-              `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Disks}`,
+              `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Storage}`,
               location?.pathname,
             )}
           >
