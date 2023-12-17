@@ -22,10 +22,15 @@ export const getCreateVMVirtctlCommand = (
     sshPubKey,
   )}`;
 
-  return `virtctl create vm \\
-  --name=${getName(vm)} \\
-  --instancetype=${vm?.spec?.instancetype?.name} \\
-  --preference=${vm?.spec?.preference?.name} \\
-  ${source}${sourceMetadata} ${sshPubKey && '\\'}
-  ${encodedSSHCloudInitUserData}`;
+  const commandStructure = [
+    'virtctl create vm',
+    `--name=${getName(vm)}`,
+    `--instancetype=${vm?.spec?.instancetype?.name}`,
+    `--preference=${vm?.spec?.preference?.name}`,
+    `${source}${sourceMetadata}`,
+    sshPubKey || null,
+    encodedSSHCloudInitUserData,
+  ];
+
+  return commandStructure.filter(Boolean).join(` \\\n`);
 };
