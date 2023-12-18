@@ -15,32 +15,13 @@ import useFeaturesConfigMap from './useFeaturesConfigMap';
 type UseFeatures = (featureName: string) => UseFeaturesValues;
 
 export const useFeatures: UseFeatures = (featureName) => {
-  const {
-    featuresConfigMapData: [featureConfigMap, loaded, loadError],
-    isAdmin,
-  } = useFeaturesConfigMap();
-
+  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap();
+  const [featureConfigMap, loaded, loadError] = featuresConfigMapData;
   const [featureEnabled, setFeatureEnabled] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error>(null);
 
   useEffect(() => {
-    if (loaded && featureEnabled === null) {
-      switch (featureConfigMap?.data?.[featureName]) {
-        case 'true':
-          setFeatureEnabled(true);
-          break;
-        case 'false': {
-          setFeatureEnabled(false);
-          break;
-        }
-        default:
-          setFeatureEnabled(featureConfigMap?.data?.[featureName]);
-      }
-      setLoading(false);
-      return;
-    }
-
     if (loadError?.code === 404) {
       setError(loadError);
 
@@ -76,6 +57,22 @@ export const useFeatures: UseFeatures = (featureName) => {
     if (!loaded && loadError && loadError?.code !== 404) {
       setFeatureEnabled(false);
       setLoading(false);
+    }
+
+    if (loaded) {
+      switch (featureConfigMap?.data?.[featureName]) {
+        case 'true':
+          setFeatureEnabled(true);
+          break;
+        case 'false': {
+          setFeatureEnabled(false);
+          break;
+        }
+        default:
+          setFeatureEnabled(featureConfigMap?.data?.[featureName]);
+      }
+      setLoading(false);
+      return;
     }
   }, [loadError, featureConfigMap, loaded, featureName, featureEnabled]);
 

@@ -17,6 +17,7 @@ import {
   addSecretToVM,
   applyCloudDriveCloudInitVolume,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { getAnnotation, getResourceUrl } from '@kubevirt-utils/resources/shared';
@@ -44,6 +45,9 @@ const useCreateDrawerForm = (
 ) => {
   const { updateTabsData, updateVM } = useWizardVMContext();
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
+  const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
+    DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
+  );
 
   const history = useHistory();
   const { cdFile, diskFile, isBootSourceAvailable, template, uploadCDData, uploadDiskData, vm } =
@@ -99,6 +103,7 @@ const useCreateDrawerForm = (
         overrides: {
           authorizedSSHKey,
           autoUpdateEnabled,
+          isDisabledGuestSystemLogs,
           name: nameField,
           namespace,
           startVM,

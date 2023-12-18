@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
@@ -18,6 +18,8 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
+import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview, getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
@@ -46,14 +48,23 @@ type DetailsSectionProps = {
 const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
-
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
+  const { featureEnabled: isGuestSystemLogsDisabled } = useFeatures(
+    DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
+  );
+
   const logSerialConsole = (
     vm?.spec?.template?.spec?.domain?.devices as V1Devices & { logSerialConsole: boolean }
   )?.logSerialConsole;
-  const [isCheckedGuestSystemAccessLog, setIsCheckedGuestSystemAccessLog] = useState<boolean>(
-    logSerialConsole || logSerialConsole === undefined,
+  const [isCheckedGuestSystemAccessLog, setIsCheckedGuestSystemAccessLog] = useState<boolean>();
+
+  useEffect(
+    () =>
+      setIsCheckedGuestSystemAccessLog(
+        logSerialConsole || (logSerialConsole === undefined && !isGuestSystemLogsDisabled),
+      ),
+    [isGuestSystemLogsDisabled, logSerialConsole],
   );
 
   const vmWorkload = getWorkload(vm);
@@ -176,6 +187,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
               }}
               id="guest-system-log-access"
               isChecked={isCheckedGuestSystemAccessLog}
+              isDisabled={isGuestSystemLogsDisabled}
             />
           }
           descriptionHeader={
