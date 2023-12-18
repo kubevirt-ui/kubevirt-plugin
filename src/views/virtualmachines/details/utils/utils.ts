@@ -1,23 +1,19 @@
-import {
-  hasPendingChange,
-  nonHotPlugNICChangesExist,
-} from '@kubevirt-utils/components/PendingChanges/utils/helpers';
-import {
-  NICHotPlugPendingChanges,
-  PendingChange,
-} from '@kubevirt-utils/components/PendingChanges/utils/types';
+import { PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';
 
-export const showPendingChangesSections = (
+export const splitPendingChanges = (
   pendingChanges: PendingChange[],
-  sortedNICHotPlugPendingChanges: NICHotPlugPendingChanges,
-): { showLiveMigrateSection: boolean; showRestartSection: boolean } => {
-  const { nicHotPlugPendingChanges, nicNonHotPlugPendingChanges } = sortedNICHotPlugPendingChanges;
+): { liveMigrationChanges: PendingChange[]; restartChanges: PendingChange[] } =>
+  pendingChanges.reduce(
+    (acc, pendingChange) => {
+      if (!pendingChange.hasPendingChange) return acc;
 
-  return {
-    showLiveMigrateSection: hasPendingChange(nicHotPlugPendingChanges),
-    showRestartSection: nonHotPlugNICChangesExist(
-      pendingChanges,
-      hasPendingChange(nicNonHotPlugPendingChanges),
-    ),
-  };
-};
+      if (pendingChange.appliedOnLiveMigration) {
+        acc.liveMigrationChanges.push(pendingChange);
+        return acc;
+      }
+
+      acc.restartChanges.push(pendingChange);
+      return acc;
+    },
+    { liveMigrationChanges: [], restartChanges: [] },
+  );

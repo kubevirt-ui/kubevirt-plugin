@@ -47,7 +47,7 @@ import {
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isPendingHotPlugNIC } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
-import { NICHotPlugPendingChanges, PendingChange } from './types';
+import { PendingChange } from './types';
 
 export const checkCPUMemoryChanged = (
   vm: V1VirtualMachine,
@@ -142,8 +142,16 @@ export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
   }
   const vmInterfaces = getInterfaces(vm);
   const vmiInterfaces = getVMIInterfaces(vmi);
-  const vmNICsNames = vmInterfaces?.map((nic) => nic?.name);
-  const vmiNICsNames = vmiInterfaces?.map((nic) => nic?.name);
+  const vmNICsNames = vmInterfaces?.map((nic) => nic?.name) || [];
+  const vmiNICsNames = vmiInterfaces?.map((nic) => nic?.name) || [];
+
+  if (
+    vmiInterfaces?.find((nic) => nic.name === 'default' && nic.masquerade) &&
+    !vmNICsNames.includes('default')
+  ) {
+    vmNICsNames.push('default');
+  }
+
   const unchangedNICs = vmNICsNames?.filter((vmNicName) =>
     vmiNICsNames?.some((vmiNicName) => vmNicName === vmiNicName),
   );
@@ -153,19 +161,11 @@ export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
     ...(unchangedNICs?.filter((nic) => isPendingHotPlugNIC(vm, vmi, nic)) || []),
   ];
 
-  if (
-    (!vmInterfaces || vmInterfaces?.length === 0) &&
-    vmiInterfaces?.length === 1 &&
-    vmiInterfaces?.[0].name === 'default' &&
-    vmiInterfaces?.[0]?.masquerade
-  )
-    return [];
-
   return changedNICs;
 };
 
 export const hasPendingChange = (pendingChange: PendingChange[]) =>
-  pendingChange?.[0]?.hasPendingChange;
+  pendingChange?.some((p) => p.hasPendingChange);
 
 // Checks for other types of changes and non-hot-plug NIC changes
 export const nonHotPlugNICChangesExist = (
@@ -187,12 +187,12 @@ const isHotPlugNIC = (
   return Boolean(iface?.bridge || iface?.sriov);
 };
 
-const getSortedNICs = (
+export const getSortedNICs = (
+  changedNICs: string[],
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
-): { hotPlugNICs: string[]; nonHotPlugNICs: string[] } => {
-  const changedNICs = getChangedNICs(vm, vmi);
-  return changedNICs?.reduce(
+): { hotPlugNICs: string[]; nonHotPlugNICs: string[] } =>
+  changedNICs?.reduce(
     (acc, nicName) => {
       const isHotPlug = isHotPlugNIC(nicName, vm, vmi);
       isHotPlug ? acc.hotPlugNICs.push(nicName) : acc.nonHotPlugNICs.push(nicName);
@@ -200,39 +200,6 @@ const getSortedNICs = (
     },
     { hotPlugNICs: [], nonHotPlugNICs: [] },
   );
-};
-
-export const getSortedNICPendingChanges = (
-  vm: V1VirtualMachine,
-  vmi: V1VirtualMachineInstance,
-  history,
-): NICHotPlugPendingChanges => {
-  const sortedNICs = getSortedNICs(vm, vmi);
-  const { hotPlugNICs, nonHotPlugNICs } = sortedNICs;
-
-  return {
-    nicHotPlugPendingChanges: [
-      {
-        handleAction: () => {
-          history.push(getTabURL(vm, VirtualMachineDetailsTab.Network));
-        },
-        hasPendingChange: !isEmpty(hotPlugNICs),
-        label: hotPlugNICs?.length > 1 ? hotPlugNICs.join(', ') : hotPlugNICs[0],
-        tabLabel: VirtualMachineDetailsTabLabel.Network,
-      },
-    ],
-    nicNonHotPlugPendingChanges: [
-      {
-        handleAction: () => {
-          history.push(getTabURL(vm, VirtualMachineDetailsTab.Network));
-        },
-        hasPendingChange: !isEmpty(nonHotPlugNICs),
-        label: nonHotPlugNICs?.length > 1 ? nonHotPlugNICs.join(', ') : nonHotPlugNICs[0],
-        tabLabel: VirtualMachineDetailsTabLabel.Network,
-      },
-    ],
-  };
-};
 
 export const getChangedGPUDevices = (
   vm: V1VirtualMachine,

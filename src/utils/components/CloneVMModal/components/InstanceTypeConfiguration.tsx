@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import { V1InstancetypeMatcher } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getInstanceTypeModelFromMatcher } from '@kubevirt-utils/resources/instancetype/helper';
 import useInstanceType from '@kubevirt-utils/resources/vm/hooks/useInstanceType';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Skeleton, TextListItem, TextListItemVariants } from '@patternfly/react-core';
@@ -25,9 +25,10 @@ const InstanceTypeConfiguration: FC<InstanceTypeConfigurationProps> = ({ itMatch
       <TextListItem component={TextListItemVariants.dd}>
         {instanceTypeLoaded ? (
           <ResourceLink
-            groupVersionKind={modelToGroupVersionKind(VirtualMachineClusterInstancetypeModel)}
+            groupVersionKind={modelToGroupVersionKind(getInstanceTypeModelFromMatcher(itMatcher))}
             linkTo={true}
             name={instanceType.metadata.name}
+            namespace={instanceType.metadata.namespace}
           />
         ) : (
           <Skeleton className="pf-m-width-sm" />

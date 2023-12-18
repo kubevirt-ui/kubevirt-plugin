@@ -7,14 +7,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { List } from '@patternfly/react-core';
 
 type RestartPendingChangesProps = {
-  nonHotPlugNICPendingChanges: PendingChange[];
   pendingChanges: PendingChange[];
 };
 
-const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
-  nonHotPlugNICPendingChanges,
-  pendingChanges,
-}) => {
+const RestartPendingChanges: FC<RestartPendingChangesProps> = ({ pendingChanges }) => {
   const { t } = useKubevirtTranslation();
 
   const pendingChangesTabs = getPendingChangesByTab(pendingChanges);
@@ -22,6 +18,7 @@ const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
     pendingChangesDetailsTab,
     pendingChangesDisksTab,
     pendingChangesEnvTab,
+    pendingChangesNICsTab,
     pendingChangesSchedulingTab,
     pendingChangesScriptsTab,
   } = pendingChangesTabs;
@@ -36,7 +33,7 @@ const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
         <PendingChangesBreadcrumb pendingChanges={pendingChangesDetailsTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesSchedulingTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesEnvTab} />
-        <PendingChangesBreadcrumb pendingChanges={nonHotPlugNICPendingChanges} />
+        <PendingChangesBreadcrumb pendingChanges={pendingChangesNICsTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesScriptsTab} />
         <PendingChangesBreadcrumb pendingChanges={pendingChangesDisksTab} />
       </List>
