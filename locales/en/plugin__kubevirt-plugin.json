@@ -1095,6 +1095,8 @@
   "Status conditions": "Status conditions",
   "Stop": "Stop",
   "Storage": "Storage",
+  "Storage ({{count}})": "Storage ({{count}})",
+  "Storage ({{count}})_plural": "Storage ({{count}})",
   "Storage checkup": "Storage checkup",
   "Storage checkup details": "Storage checkup details",
   "Storage checkup validating storage is working correctly for VirtualMachines using the kiagnose engine.": "Storage checkup validating storage is working correctly for VirtualMachines using the kiagnose engine.",

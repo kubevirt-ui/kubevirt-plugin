@@ -30,7 +30,7 @@ const VirtualMachinesOverviewTabDisks = ({ vm, vmi }) => {
               location?.pathname,
             )}
           >
-            {t('Disks ({{count}})', { count: disks.length || 0 })}
+            {t('Storage ({{count}})', { count: disks.length || 0 })}
           </Link>
         </CardTitle>
         <Divider />
