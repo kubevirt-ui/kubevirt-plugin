@@ -1,8 +1,9 @@
 import React, { FC } from 'react';
 
-import EnableFeatureCheckbox from '@kubevirt-utils/components/EnableFeatureCheckbox/EnableFeatureCheckbox';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import NewBadge from '@kubevirt-utils/components/NewBadge/NewBadge';
+import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack } from '@patternfly/react-core';
 
@@ -19,6 +20,7 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
   newBadge = false,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { featureEnabled, toggleFeature } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
 
   return (
     <ExpandSection
@@ -37,11 +39,12 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
           text={t('Cluster administrator permissions are required to enable this feature.')}
         />
         <AutomaticSubscriptionForm />
-        <EnableFeatureCheckbox
-          featureName={AUTOMATIC_UPDATE_FEATURE_NAME}
-          helpText={t('Automatically pull updates from the RHEL repository')}
+        <SectionWithSwitch
+          helpTextIconContent={t('Automatically pull updates from the RHEL repository')}
           id={AUTOMATIC_UPDATE_FEATURE_NAME}
-          label={t('Enable auto updates for RHEL VirtualMachines')}
+          switchIsOn={featureEnabled}
+          title={t('Enable auto updates for RHEL VirtualMachines')}
+          turnOnSwitch={toggleFeature}
         />
       </Stack>
     </ExpandSection>

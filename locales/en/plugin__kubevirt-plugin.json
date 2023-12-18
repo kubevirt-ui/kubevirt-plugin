@@ -120,7 +120,6 @@
   "Affinity rules": "Affinity rules",
   "Alerts": "Alerts",
   "Alerts ({{alertsQuantity}})": "Alerts ({{alertsQuantity}})",
-  "All": "All",
   "All items": "All items",
   "All settings are effective across the entire cluster.": "All settings are effective across the entire cluster.",
   "All snapshots of this VirtualMachine will be deleted as well.": "All snapshots of this VirtualMachine will be deleted as well.",
