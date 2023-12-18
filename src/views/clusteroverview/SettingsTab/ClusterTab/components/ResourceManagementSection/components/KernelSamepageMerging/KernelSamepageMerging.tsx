@@ -50,9 +50,9 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
     k8sPatch<HyperConverged>({
       data: [
         {
-          op: 'replace',
-          path: `/spec/ksmConfiguration/nodeLabelSelector`,
-          value: value ? {} : null,
+          op: !ksmConfiguration ? 'add' : 'replace',
+          path: `/spec/ksmConfiguration`,
+          value: value ? { nodeLabelSelector: {} } : {},
         },
       ],
       model: HyperConvergedModel,
