@@ -160,16 +160,22 @@ export const createStorageCheckup = async (
   });
 };
 
-const installPermissions = (namespace: string) => [
+const installPermissions = (
+  namespace: string,
+  clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
+) => [
   k8sCreate({ data: serviceAccountResource(namespace), model: ServiceAccountModel }),
   k8sCreate({ data: storageClusterRoleBinding(namespace), model: ClusterRoleBindingModel }).catch(
     () => {
+      const subjectsExist = clusterRoleBinding?.subjects;
       return k8sPatch({
         data: [
           {
             op: 'add',
-            path: '/subjects/-',
-            value: { kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace },
+            path: `/subjects${subjectsExist ? '/-' : ''}`,
+            value: subjectsExist
+              ? { kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }
+              : [{ kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }],
           },
         ],
         model: ClusterRoleBindingModel,
@@ -210,7 +216,7 @@ export const installOrRemoveCheckupsStoragePermissions = (
     return Promise.all(
       isPermitted
         ? removePermissions(namespace, clusterRoleBinding)
-        : installPermissions(namespace),
+        : installPermissions(namespace, clusterRoleBinding),
     );
   } catch (error) {
     kubevirtConsole.log(error);

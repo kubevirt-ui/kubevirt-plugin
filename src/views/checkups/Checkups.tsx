@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
@@ -13,8 +13,9 @@ import CheckupsRunButton from './CheckupsRunButton';
 
 import './checkups.scss';
 
-const CheckupsList: FC<RouteComponentProps> = ({ history }) => {
+const CheckupsList: FC = () => {
   const { t } = useKubevirtTranslation();
+  const history = useHistory();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     history?.location?.pathname.endsWith('storage') ? 1 : 0,
   );
