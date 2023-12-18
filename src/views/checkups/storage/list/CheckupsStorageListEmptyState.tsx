@@ -42,7 +42,7 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
     <EmptyState variant={EmptyStateVariant.large}>
       <EmptyStateIcon icon={StorageDomainIcon} />
       <Title headingLevel="h4" size="lg">
-        {t('No network latency checkups yet')}
+        {t('No storage checkups yet')}
       </Title>
       <EmptyStateBody>
         {t('To get started, install permissions and then run a checkup')}
@@ -77,7 +77,7 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
         </Button>
       </EmptyStateSecondaryActions>
       <EmptyStateSecondaryActions>
-        <ExternalLink href={'#'} text={t('Learn about network checkups')} />
+        <ExternalLink href={'#'} text={t('Learn about storage checkups')} />
       </EmptyStateSecondaryActions>
     </EmptyState>
   );
