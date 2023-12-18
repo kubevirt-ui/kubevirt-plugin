@@ -163,7 +163,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
       </Split>
 
       {displayVolumes ? (
-        <TableComposable variant={TableVariant.compact}>
+        <TableComposable className="BootableVolumeList-table" variant={TableVariant.compact}>
           <Thead>
             <Tr>
               {activeColumns.map((col, columnIndex) => (

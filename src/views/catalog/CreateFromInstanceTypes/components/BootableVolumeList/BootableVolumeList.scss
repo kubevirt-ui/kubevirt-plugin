@@ -16,3 +16,25 @@
     width: 240px;
   }
 }
+
+.BootableVolumeList {
+  &-table {
+    th:first-child {
+      padding-right: 0;
+      padding-left: 30px;
+      .pf-c-table__sort-indicator {
+        margin: 0;
+      }
+    }
+    tbody {
+      tr {
+        td:first-child {
+          padding-left: var(--pf-global--spacer--md);
+          width: unset;
+          display: flex;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}
