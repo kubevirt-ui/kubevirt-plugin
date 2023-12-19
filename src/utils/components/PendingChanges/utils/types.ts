@@ -1,4 +1,5 @@
 export type PendingChange = {
+  appliedOnLiveMigration?: boolean;
   handleAction: () => void;
   hasPendingChange: boolean;
   label: string;

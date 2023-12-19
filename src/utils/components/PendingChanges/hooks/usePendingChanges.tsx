@@ -56,6 +56,7 @@ import {
   getChangedStartStrategy,
   getChangedTolerations,
   getChangedVolumesHotplug,
+  getSortedNICs,
   getTabURL,
 } from '../utils/helpers';
 import { PendingChange } from '../utils/types';
@@ -65,6 +66,8 @@ export const usePendingChanges = (
   vmi: V1VirtualMachineInstance,
 ): PendingChange[] => {
   const { t } = useKubevirtTranslation();
+  const isInstanceTypeVM = !isEmpty(vm?.spec?.instancetype) || !isEmpty(vm?.spec?.preference);
+
   const history = useHistory();
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
@@ -107,7 +110,10 @@ export const usePendingChanges = (
   const sshServiceChanged = getChangedAuthorizedSSHKey(vm, vmi);
 
   const modifiedEnvDisks = getChangedEnvDisks(vm, vmi);
-  const modifiedNics = getChangedNICs(vm, vmi);
+  const modifiedNICs = getChangedNICs(vm, vmi);
+
+  const { hotPlugNICs, nonHotPlugNICs } = getSortedNICs(modifiedNICs, vm, vmi);
+
   const modifiedGPUDevices = getChangedGPUDevices(vm, vmi);
   const modifiedHostDevices = getChangedHostDevices(vm, vmi);
 
@@ -131,7 +137,7 @@ export const usePendingChanges = (
           <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
         ));
       },
-      hasPendingChange: cpuMemoryChanged,
+      hasPendingChange: !isInstanceTypeVM && cpuMemoryChanged,
       label: t('CPU | Memory'),
       tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
@@ -186,16 +192,23 @@ export const usePendingChanges = (
       tabLabel: VirtualMachineDetailsTabLabel.Environment,
     },
     {
+      appliedOnLiveMigration: true,
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Network));
       },
-      hasPendingChange: !isEmpty(modifiedNics),
-      label:
-        !isEmpty(modifiedNics) && modifiedNics?.length > 1
-          ? modifiedNics.join(', ')
-          : modifiedNics[0],
+      hasPendingChange: !isEmpty(hotPlugNICs),
+      label: hotPlugNICs?.length > 1 ? hotPlugNICs.join(', ') : hotPlugNICs[0],
       tabLabel: VirtualMachineDetailsTabLabel.Network,
     },
+    {
+      handleAction: () => {
+        history.push(getTabURL(vm, VirtualMachineDetailsTab.Network));
+      },
+      hasPendingChange: !isEmpty(nonHotPlugNICs),
+      label: nonHotPlugNICs?.length > 1 ? nonHotPlugNICs.join(', ') : nonHotPlugNICs[0],
+      tabLabel: VirtualMachineDetailsTabLabel.Network,
+    },
+
     {
       handleAction: () => {
         history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
