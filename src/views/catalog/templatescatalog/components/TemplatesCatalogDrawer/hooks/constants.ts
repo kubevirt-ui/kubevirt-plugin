@@ -12,6 +12,7 @@ export const initialValue: DrawerContext = {
   setTemplate: null,
   template: null,
   templateDataLoaded: false,
+  templateLoadingError: null,
   uploadCDData: null,
   uploadDiskData: null,
   vm: null,

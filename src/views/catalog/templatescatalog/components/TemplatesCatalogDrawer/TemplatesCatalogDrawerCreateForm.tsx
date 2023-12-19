@@ -37,7 +37,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
   ({ authorizedSSHKey, canQuickCreate, namespace, onCancel, subscriptionData }) => {
     const { t } = useKubevirtTranslation();
 
-    const { template } = useDrawerContext();
+    const { template, templateLoadingError } = useDrawerContext();
 
     const {
       createError,
@@ -53,6 +53,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
       startVM,
     } = useCreateDrawerForm(namespace, subscriptionData, authorizedSSHKey);
 
+    const error = templateLoadingError || createError;
     return (
       <form className="template-catalog-drawer-form" id="quick-create-form">
         <Stack hasGutter>
@@ -65,6 +66,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                       <TextInput
                         aria-label="virtualmachine name"
                         data-test-id="template-catalog-vm-name-input"
+                        isDisabled={Boolean(templateLoadingError)}
                         isRequired
                         name="vmname"
                         onChange={onVMNameChange}
@@ -102,15 +104,15 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
             </StackItem>
           )}
           <StackItem />
-          {createError && (
+          {error && (
             <StackItem>
               <Alert isInline title={t('Quick create error')} variant={AlertVariant.danger}>
                 <Stack hasGutter>
-                  <StackItem>{createError.message}</StackItem>
-                  {createError?.href && (
+                  <StackItem>{error.message}</StackItem>
+                  {error?.href && (
                     <StackItem>
-                      <a href={createError.href} rel="noreferrer" target="_blank">
-                        {createError.href}
+                      <a href={error.href} rel="noreferrer" target="_blank">
+                        {error.href}
                       </a>
                     </StackItem>
                   )}

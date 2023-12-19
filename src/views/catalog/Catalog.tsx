@@ -16,7 +16,17 @@ const Catalog: React.FC = () => {
           ]}
           component={Wizard}
         />
-        <Route component={CreateVMHorizontalNav} />
+        <Route
+          path={[
+            '/k8s/all-namespaces/catalog',
+            '/k8s/ns/:ns/catalog',
+            '/k8s/ns/:ns/catalog/template',
+            '/k8s/all-namespaces/catalog/template',
+            '/k8s/ns/:ns/catalog/instanceTypes',
+            '/k8s/all-namespaces/catalog/instanceTypes',
+          ]}
+          component={CreateVMHorizontalNav}
+        />
       </Switch>
     </WizardVMContextProvider>
   );
