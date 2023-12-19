@@ -31,10 +31,10 @@ const CPUMemory: FC<CPUMemoryProps> = ({ fetchVMI = true, vm }) => {
   if ((isVMRunning && !vmi) || !vm || !instanceTypeLoaded)
     return <Skeleton className="pf-m-width-sm" />;
 
-  const cpu = vCPUCount(getCPU(vmi) || getCPU(vm)) || instanceType?.spec?.cpu?.guest;
+  const cpu = vCPUCount(getCPU(vm)) || getCPU(vmi) || instanceType?.spec?.cpu?.guest;
 
   const memory = readableSizeUnit(
-    getMemory(vmi) || instanceType?.spec?.memory?.guest || getMemory(vm),
+    getMemory(vm) || instanceType?.spec?.memory?.guest || getMemory(vmi),
   );
 
   return (
