@@ -57,7 +57,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
         id="load-balancer-feature"
         isDisabled={!loaded || !isAdmin}
         newBadge={newBadge}
-        switchIsOn={!!featureConfigMap?.data?.[LOAD_BALANCER_ENABLED]}
+        switchIsOn={featureConfigMap?.data?.[LOAD_BALANCER_ENABLED] === 'true'}
         title={t('SSH over LoadBalancer service')}
         turnOnSwitch={(checked) => onChange(checked.toString(), LOAD_BALANCER_ENABLED)}
       />
