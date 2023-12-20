@@ -1,9 +1,10 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 import classNames from 'classnames';
 
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { MAX_SUGGESTIONS } from './constants';
+import { useDocumentListener } from './hooks/useDocumentListener';
+import { MAX_SUGGESTIONS, suggestionBoxKeyHandler } from './constants';
 import SearchFilter from './SearchFilter';
 import SuggestionLine from './SuggestionLine';
 import { fuzzyCaseInsensitive, labelParser } from './utils';
@@ -27,8 +28,7 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({
   textValue,
 }) => {
   const [suggestions, setSuggestions] = useState<string[]>();
-  const [visible, setVisible] = useState<boolean>(true);
-  const inputRef = useRef<HTMLInputElement>();
+  const { ref, setVisible, visible } = useDocumentListener<HTMLDivElement>(suggestionBoxKeyHandler);
 
   const processedData = useMemo(() => Array.from(labelParser(data)), [data]);
 
@@ -48,36 +48,9 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({
     setSuggestions(filtered);
   };
 
-  useEffect(() => {
-    const inputElement = inputRef.current;
-
-    if (!inputElement) return;
-
-    const onFocus = () => {
-      setVisible(true);
-    };
-
-    const onBlur = () => {
-      setVisible(false);
-    };
-
-    inputElement.addEventListener('focus', onFocus);
-    inputElement.addEventListener('blur', onBlur);
-
-    return () => {
-      inputElement.removeEventListener('focus', onFocus);
-      inputElement.removeEventListener('blur', onBlur);
-    };
-  }, []);
-
   return (
-    <div className="co-suggestion-box">
-      <SearchFilter
-        onChange={handleInput}
-        placeholder={placeholder}
-        ref={inputRef}
-        value={textValue}
-      />
+    <div className="co-suggestion-box" ref={ref}>
+      <SearchFilter onChange={handleInput} placeholder={placeholder} value={textValue} />
       {visible && (
         <div
           className={classNames('co-suggestion-box__suggestions', {
