@@ -37,7 +37,7 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
   const [authorizedSSHKeys, updateAuthorizedSSHKeys, userSettingsLoaded] =
     useKubevirtUserSettings('ssh');
   const { loaded: loadedRHELSubscription, subscriptionData } = useRHELAutomaticSubscription();
-  const { isBootSourceAvailable, templateDataLoaded } = useDrawerContext();
+  const { isBootSourceAvailable, templateDataLoaded, templateLoadingError } = useDrawerContext();
 
   const [, , loadError] = useK8sWatchResource<IoK8sApiCoreV1Secret>(
     authorizedSSHKeys?.[namespace] && {
@@ -57,7 +57,7 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
 
   const loaded = templateDataLoaded && userSettingsLoaded && loadedRHELSubscription;
 
-  if (!loaded) {
+  if (!loaded && !templateLoadingError) {
     return <TemplatesCatalogDrawerFooterSkeleton />;
   }
 

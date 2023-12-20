@@ -38,6 +38,7 @@ export type DrawerContext = {
   setVM?: (vm: V1VirtualMachine) => void;
   template: V1Template;
   templateDataLoaded: boolean;
+  templateLoadingError: Error;
   uploadCDData?: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
   uploadDiskData?: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
   vm: V1VirtualMachine;
@@ -83,7 +84,8 @@ const useDrawer = (template: V1Template) => {
     setTemplate: setCustomizedTemplate,
     setVM,
     template: customizedTemplate || template,
-    templateDataLoaded: templateWithGeneratedParams && !error && bootSourceLoaded,
+    templateDataLoaded: !!templateWithGeneratedParams && bootSourceLoaded,
+    templateLoadingError: error,
     uploadCDData,
     uploadDiskData,
     vm,
