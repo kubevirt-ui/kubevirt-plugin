@@ -63,9 +63,9 @@ const useDrawer = (template: V1Template) => {
 
   const setVM = useCallback(
     (newVM: V1VirtualMachine) => {
-      setCustomizedTemplate(replaceTemplateVM(template, newVM));
+      setCustomizedTemplate(replaceTemplateVM(customizedTemplate, newVM));
     },
-    [setCustomizedTemplate, template],
+    [setCustomizedTemplate, customizedTemplate],
   );
 
   useEffect(() => {
