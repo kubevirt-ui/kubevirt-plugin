@@ -31,7 +31,7 @@ const VirtualMachinePendingChangesAlert: FC<VirtualMachinePendingChangesAlertPro
   const { liveMigrationChanges, restartChanges } = splitPendingChanges(pendingChanges);
 
   return (
-    <PendingChangesAlert isWarning>
+    <PendingChangesAlert isExpandable isWarning>
       <Stack hasGutter>
         {!isEmpty(liveMigrationChanges) && (
           <StackItem>
