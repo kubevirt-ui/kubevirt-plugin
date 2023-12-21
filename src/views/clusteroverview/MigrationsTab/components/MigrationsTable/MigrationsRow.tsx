@@ -82,7 +82,7 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ activeCol
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-c-table__action"
+        className="dropdown-kebab-pf pf-v5-c-table__action"
         id=""
       >
         <MigrationActionsDropdown isKebabToggle vmim={obj?.vmim} />

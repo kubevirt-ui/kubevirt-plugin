@@ -35,7 +35,7 @@ const ClusterInstancetypeRow: FC<RowProps<V1beta1VirtualMachineClusterInstancety
     </TableData>
     <TableData
       activeColumnIDs={activeColumnIDs}
-      className="dropdown-kebab-pf pf-c-table__action"
+      className="dropdown-kebab-pf pf-v5-c-table__action"
       id=""
     >
       <ClusterInstancetypeActions instanceType={it} isKebabToggle />

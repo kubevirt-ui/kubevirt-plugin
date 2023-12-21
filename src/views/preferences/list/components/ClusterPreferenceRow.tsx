@@ -28,7 +28,7 @@ const ClusterPreferenceRow: FC<RowProps<V1beta1VirtualMachineClusterPreference>>
     </TableData>
     <TableData
       activeColumnIDs={activeColumnIDs}
-      className="dropdown-kebab-pf pf-c-table__action"
+      className="dropdown-kebab-pf pf-v5-c-table__action"
       id=""
     >
       <ClusterPreferenceActions isKebabToggle preference={preference} />

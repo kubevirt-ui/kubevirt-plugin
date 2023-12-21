@@ -32,7 +32,7 @@ const BootableVolumesRow: FC<
 
   return (
     <>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
+      <TableData activeColumnIDs={activeColumnIDs} id="name">
         <ResourceLink
           groupVersionKind={getBootableVolumeGroupVersionKind(obj)}
           inline
@@ -59,7 +59,7 @@ const BootableVolumesRow: FC<
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-c-table__action"
+        className="dropdown-kebab-pf pf-v5-c-table__action"
         id=""
       >
         {isBootableVolumePVCKind(obj) ? (
