@@ -1,21 +1,30 @@
-import React, { FormEvent, MouseEvent, useState } from 'react';
+import React, { FC, FormEvent, MouseEvent, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useEventListener from '@kubevirt-utils/hooks/useEventListener';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Menu, MenuContent, MenuItem, MenuList, Popper, SearchInput } from '@patternfly/react-core';
 
-import { SearchItem, searchItems } from '../utils/search';
+import { getSearchItems, SearchItem } from '../utils/search';
 
 import { createConfigurationSearchURL } from './utils/utils';
 
 import './virtual-machine-configuration-tab-search.scss';
 
-const VirtualMachineConfigurationTabSearch = () => {
+type VirtualMachineConfigurationTabSearchProps = {
+  vm: V1VirtualMachine;
+};
+
+const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSearchProps> = ({
+  vm,
+}) => {
+  const searchItems = getSearchItems(vm);
   const [value, setValue] = useState<string>('');
   const history = useHistory();
   const [autocompleteOptions, setAutocompleteOptions] =
     useState<{ element: SearchItem; tab: string }[]>(searchItems);
+
   const [isAutocompleteOpen, setIsAutocompleteOpen] = useState<boolean>(false);
   useEventListener('click', () => setIsAutocompleteOpen(false));
 
@@ -33,6 +42,9 @@ const VirtualMachineConfigurationTabSearch = () => {
         (acc, item) => {
           const title = item.element.title.toLowerCase();
           const match = newValue.toLowerCase();
+
+          if (item.element.isDisabled) return acc;
+
           if (title.startsWith(match)) {
             acc.startWith.push(item);
             return acc;
@@ -54,6 +66,10 @@ const VirtualMachineConfigurationTabSearch = () => {
     setValue(itemId);
     setIsAutocompleteOpen(false);
   };
+
+  useEffect(() => {
+    setAutocompleteOptions(getSearchItems(vm));
+  }, [vm]);
 
   return (
     <Popper

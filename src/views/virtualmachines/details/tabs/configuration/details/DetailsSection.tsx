@@ -23,7 +23,12 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview, getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
-import { DESCRIPTION_ANNOTATION, getCPU, getWorkload } from '@kubevirt-utils/resources/vm';
+import {
+  DESCRIPTION_ANNOTATION,
+  getCPU,
+  getInstanceTypeMatcher,
+  getWorkload,
+} from '@kubevirt-utils/resources/vm';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Switch, Title } from '@patternfly/react-core';
 
@@ -98,28 +103,32 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
           descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
           isEdit
         />
-        <VirtualMachineDescriptionItem
-          descriptionData={
-            vmWorkload ? (
-              WORKLOADS_LABELS[vmWorkload] || vmWorkload
-            ) : (
-              <MutedTextSpan text={t('Not available')} />
-            )
-          }
-          onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <WorkloadProfileModal
-                initialWorkload={vmWorkload}
-                isOpen={isOpen}
-                onClose={onClose}
-                onSubmit={(workload) => updateWorkload(vm, workload)}
-              />
-            ))
-          }
-          data-test-id={`${vmName}-workload-profile`}
-          descriptionHeader={<SearchItem id="workload-profile">{t('Workload profile')}</SearchItem>}
-          isEdit
-        />
+        {!getInstanceTypeMatcher(vm) && (
+          <VirtualMachineDescriptionItem
+            descriptionData={
+              vmWorkload ? (
+                WORKLOADS_LABELS[vmWorkload] || vmWorkload
+              ) : (
+                <MutedTextSpan text={t('Not available')} />
+              )
+            }
+            descriptionHeader={
+              <SearchItem id="workload-profile">{t('Workload profile')}</SearchItem>
+            }
+            onEditClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <WorkloadProfileModal
+                  initialWorkload={vmWorkload}
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  onSubmit={(workload) => updateWorkload(vm, workload)}
+                />
+              ))
+            }
+            data-test-id={`${vmName}-workload-profile`}
+            isEdit
+          />
+        )}
         <VirtualMachineDescriptionItem
           messageOnDisabled={t(
             'CPU and Memory can not be edited if the VirtualMachine is created from InstanceType',

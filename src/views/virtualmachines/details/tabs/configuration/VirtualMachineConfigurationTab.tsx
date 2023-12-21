@@ -41,7 +41,7 @@ const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = 
 
   return (
     <div className="co-dashboard-body">
-      <VirtualMachineConfigurationTabSearch />
+      <VirtualMachineConfigurationTabSearch vm={props?.obj} />
       <div className="VirtualMachineConfigurationTab">
         <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
           {tabs.map(({ Component, name, title }) => (

@@ -15,7 +15,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { ExpandableSection, Switch } from '@patternfly/react-core';
 
 import { getSearchItemsIds } from '../../search/utils/utils';
-import { DETAILS_TAB_BOOT_IDS, expandURLHash } from '../../utils/search';
+import { expandURLHash, getDetailsTabBootIds } from '../../utils/search';
 import { updateBootLoader, updatedBootOrder, updateStartStrategy } from '../utils/utils';
 
 type DetailsSectionBootProps = {
@@ -33,8 +33,8 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({ canUpdateVM, vm, vmi 
   const vmName = getName(vm);
 
   useEffect(() => {
-    expandURLHash(getSearchItemsIds(DETAILS_TAB_BOOT_IDS), location?.hash, setIsExpanded);
-  }, [location?.hash]);
+    expandURLHash(getSearchItemsIds(getDetailsTabBootIds(vm)), location?.hash, setIsExpanded);
+  }, [vm, location?.hash]);
 
   return (
     <ExpandableSection
