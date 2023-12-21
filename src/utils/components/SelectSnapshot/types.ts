@@ -11,5 +11,6 @@ export type VolumeSnapshotKind = K8sResourceCommon & {
   };
   status?: V1VolumeSnapshotStatus & {
     boundVolumeSnapshotContentName?: string;
+    restoreSize: string;
   };
 };

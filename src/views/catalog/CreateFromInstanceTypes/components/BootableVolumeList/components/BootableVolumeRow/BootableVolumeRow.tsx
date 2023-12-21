@@ -4,7 +4,12 @@ import { getTemplateOSIcon, getVolumeNameOSIcon } from '@catalog/templatescatalo
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  getVolumeSnapshotSize,
+  getVolumeSnapshotStorageClass,
+} from '@kubevirt-utils/resources/bootableresources/selectors';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
@@ -30,6 +35,7 @@ type BootableVolumeRowProps = {
     favorites: [isFavorite: boolean, updaterFavorites: (val: boolean) => void];
     preference: V1beta1VirtualMachineClusterPreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
+    volumeSnapshotSource: VolumeSnapshotKind;
   };
 };
 
@@ -41,12 +47,16 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
     favorites,
     preference,
     pvcSource,
+    volumeSnapshotSource,
   },
 }) => {
   const { t } = useKubevirtTranslation();
   const bootVolumeName = getName(bootableVolume);
-  const sizeData = formatBytes(pvcSource?.spec?.resources?.requests?.storage);
+  const sizeData = formatBytes(
+    pvcSource?.spec?.resources?.requests?.storage || getVolumeSnapshotSize(volumeSnapshotSource),
+  );
   const icon = getVolumeNameOSIcon(bootVolumeName) || getTemplateOSIcon(preference);
+
   const [isFavorite, addOrRemoveFavorite] = favorites;
 
   return (
@@ -81,10 +91,12 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         {preference?.metadata?.annotations?.[ANNOTATIONS.displayName] || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="storage-class" width={20}>
-        {pvcSource?.spec?.storageClassName || NO_DATA_DASH}
+        {getVolumeSnapshotStorageClass(volumeSnapshotSource) ||
+          pvcSource?.spec?.storageClassName ||
+          NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="size" width={10}>
-        {sizeData || NO_DATA_DASH}
+        {sizeData}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description} width={30}>
         <TableText wrapModifier={WrapModifier.truncate}>
