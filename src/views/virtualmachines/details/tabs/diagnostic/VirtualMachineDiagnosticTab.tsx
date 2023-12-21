@@ -1,5 +1,4 @@
 import React, { FC, useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
@@ -11,7 +10,7 @@ import VirtualMachineLogViewer from './VirtualMachineLogViewer/VirtualMachineLog
 
 import './virtual-machine-diagnostic-tab.scss';
 
-type VirtualMachineDiagnosticTabProps = RouteComponentProps & {
+type VirtualMachineDiagnosticTabProps = {
   obj: V1VirtualMachine;
 };
 

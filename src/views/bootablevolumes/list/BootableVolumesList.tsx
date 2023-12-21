@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
@@ -30,8 +30,8 @@ import useBootableVolumesFilters from './hooks/useBootableVolumesFilters';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const BootableVolumesList: FC<RouteComponentProps<{ ns: string }>> = ({ match }) => {
-  const namespace = match.params.ns;
+const BootableVolumesList: FC = () => {
+  const { ns: namespace } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const { createModal } = useModal();

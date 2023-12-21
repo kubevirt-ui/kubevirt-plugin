@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { RouteComponentProps } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -15,10 +14,7 @@ import useSnapshotData from './hooks/useSnapshotData';
 
 import './SnapshotListPage.scss';
 
-type SnapshotListPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type SnapshotListPageProps = {
   obj?: V1VirtualMachine;
 };
 
