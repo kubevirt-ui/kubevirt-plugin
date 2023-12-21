@@ -5,11 +5,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Divider,
   Dropdown,
   DropdownGroup,
   DropdownItem,
   DropdownPosition,
-  DropdownSeparator,
   DropdownToggle,
   KebabToggle,
 } from '@patternfly/react-core';
@@ -59,7 +59,7 @@ const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKeba
             </DropdownItem>
           ))}
         </DropdownGroup>,
-        <DropdownSeparator key="dropdown separator" />,
+        <Divider key="divider" />,
         <DropdownGroup key="datasource-manage" label={t('DataImportCron')}>
           <DropdownItem
             data-test-id="datasource-manage"

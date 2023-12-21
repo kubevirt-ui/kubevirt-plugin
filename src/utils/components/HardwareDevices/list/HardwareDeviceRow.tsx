@@ -20,7 +20,7 @@ const HardwareDeviceRow: React.FC<
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-30" id="deviceName">
         {device.deviceName}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-c-table__action" id="">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v5-c-table__action" id="">
         <Button onClick={() => handleRemoveDevice(device)} variant="plain">
           <MinusCircleIcon />
         </Button>

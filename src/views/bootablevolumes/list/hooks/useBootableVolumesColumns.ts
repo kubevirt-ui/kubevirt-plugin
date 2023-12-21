@@ -28,7 +28,6 @@ const useBootableVolumesColumns = (
     () => [
       {
         id: 'name',
-        props: { className: 'pf-m-width-20' },
         sort: (_, direction) => sorting(direction, 'metadata.name'),
         title: t('Name'),
         transforms: [sortable],
@@ -89,7 +88,7 @@ const useBootableVolumesColumns = (
       },
       {
         id: '',
-        props: { className: 'dropdown-kebab-pf pf-c-table__action' },
+        props: { className: 'dropdown-kebab-pf pf-v5-c-table__action' },
         title: '',
       },
     ],
