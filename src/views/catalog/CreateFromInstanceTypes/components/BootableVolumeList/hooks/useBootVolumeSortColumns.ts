@@ -3,8 +3,13 @@ import { useState } from 'react';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
+import {
+  getVolumeSnapshotSize,
+  getVolumeSnapshotStorageClass,
+} from '@kubevirt-utils/resources/bootableresources/selectors';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
@@ -19,6 +24,9 @@ type UseBootVolumeSortColumns = (
   pvcSources: {
     [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
   },
+  volumeSnapshotSources: {
+    [datSourceName: string]: VolumeSnapshotKind;
+  },
   pagination: PaginationState,
 ) => {
   getSortType: (columnIndex: number) => ThSortType;
@@ -30,6 +38,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   volumeFavorites,
   preferences,
   pvcSources,
+  volumeSnapshotSources,
   pagination,
 ) => {
   const [activeSortIndex, setActiveSortIndex] = useState<null | number>(0);
@@ -37,12 +46,13 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
 
   const getSortableRowValues = (bootableVolume: BootableVolume): string[] => {
     const pvcSource = getBootableVolumePVCSource(bootableVolume, pvcSources);
+    const volumeSnapshotSource = volumeSnapshotSources?.[bootableVolume?.metadata?.name];
 
     return [
       getName(bootableVolume),
       getName(preferences[bootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]]),
-      pvcSource?.spec?.storageClassName,
-      pvcSource?.spec?.resources?.requests?.storage,
+      pvcSource?.spec?.storageClassName || getVolumeSnapshotStorageClass(volumeSnapshotSource),
+      pvcSource?.spec?.resources?.requests?.storage || getVolumeSnapshotSize(volumeSnapshotSource),
       bootableVolume?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
     ];
   };

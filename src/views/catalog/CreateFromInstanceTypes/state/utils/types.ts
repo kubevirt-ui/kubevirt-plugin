@@ -5,6 +5,7 @@ import {
   V1beta1VirtualMachineClusterInstancetype,
   V1beta1VirtualMachineClusterPreference,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 
@@ -17,11 +18,12 @@ export type UseInstanceTypeAndPreferencesValues = {
 
 export type UseBootableVolumesValues = {
   bootableVolumes: BootableVolume[];
+  error: Error;
   loaded: boolean;
-  loadError?: any;
   pvcSources: {
     [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
   };
+  volumeSnapshotSources: { [dataSourceName: string]: VolumeSnapshotKind };
 };
 
 export type InstanceTypeVMState = {

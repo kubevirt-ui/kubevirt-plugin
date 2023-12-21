@@ -51,7 +51,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const { instanceTypeVMState, onSelectCreatedVolume } = useInstanceTypeVMStore();
 
   const { selectedBootableVolume } = instanceTypeVMState;
-  const { bootableVolumes, loaded, pvcSources } = bootableVolumesData;
+  const { bootableVolumes, loaded, pvcSources, volumeSnapshotSources } = bootableVolumesData;
 
   const preferencesMap = useMemo(
     () => convertResourceArrayToMap(preferencesData),
@@ -73,6 +73,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     volumeFavorites,
     preferencesMap,
     pvcSources,
+    volumeSnapshotSources,
     pagination,
   );
 
@@ -199,6 +200,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                   ],
                   preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
                   pvcSource: getBootableVolumePVCSource(bs, pvcSources),
+                  volumeSnapshotSource: volumeSnapshotSources?.[bs?.metadata?.name],
                 }}
                 activeColumnIDs={activeColumns?.map((col) => col?.id)}
                 bootableVolume={bs}
