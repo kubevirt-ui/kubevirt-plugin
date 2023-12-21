@@ -5,6 +5,8 @@ import {
   V1Devices,
   V1Disk,
   V1DomainSpec,
+  V1InstancetypeMatcher,
+  V1PreferenceMatcher,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
@@ -215,3 +217,9 @@ export const getBootloader = (vm: V1VirtualMachine): V1Bootloader =>
   vm?.spec?.template?.spec?.domain?.firmware?.bootloader;
 
 export const getHostname = (vm: V1VirtualMachine): string => vm?.spec?.template?.spec?.hostname;
+
+export const getInstanceTypeMatcher = (vm: V1VirtualMachine): V1InstancetypeMatcher =>
+  vm?.spec?.instancetype;
+
+export const getPreferenceMatcher = (vm: V1VirtualMachine): V1PreferenceMatcher =>
+  vm?.spec?.preference;

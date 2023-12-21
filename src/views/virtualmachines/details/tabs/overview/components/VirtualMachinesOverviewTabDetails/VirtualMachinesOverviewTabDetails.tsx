@@ -1,7 +1,6 @@
 import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstance,
@@ -10,17 +9,14 @@ import {
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
-import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getLabel } from '@kubevirt-utils/resources/shared';
-import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
-import { getMachineType, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { getInstanceTypeMatcher, getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOsNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceLink, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
+import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
   CardBody,
@@ -42,8 +38,10 @@ import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 import { printableVMStatus } from '@virtualmachines/utils';
 
+import InstanceTypeDescription from './components/InstanceTypeDescription';
 import MigrationProgressPopover from './components/MigrationProgressPopover/MigrationProgressPopover';
 import StatusPopoverButton from './components/StatusPopoverButton/StatusPopoverButton';
+import TemplateDescription from './components/TemplateDescription';
 import VirtualMachineMigrationPercentage from './components/VirtualMachineMigrationPercentage';
 import VirtualMachineOverviewStatus from './components/VirtualMachineOverviewStatus/VirtualMachineOverviewStatus';
 import VirtualMachinesOverviewTabDetailsConsole from './components/VirtualMachinesOverviewTabDetailsConsole';
@@ -68,9 +66,6 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
-  const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
-  const None = <MutedTextSpan text={t('None')} />;
 
   const timestamp = timestampFor(
     new Date(vm?.metadata?.creationTimestamp),
@@ -178,20 +173,11 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   </DescriptionListDescription>
                 </DescriptionListGroup>
 
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Template')}</DescriptionListTerm>
-                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-template">
-                    {templateName && templateNamespace ? (
-                      <ResourceLink
-                        groupVersionKind={modelToGroupVersionKind(TemplateModel)}
-                        name={templateName}
-                        namespace={templateNamespace}
-                      />
-                    ) : (
-                      None
-                    )}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
+                {getInstanceTypeMatcher(vm) ? (
+                  <InstanceTypeDescription vm={vm} />
+                ) : (
+                  <TemplateDescription vm={vm} />
+                )}
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Time zone')}</DescriptionListTerm>
                   <DescriptionListDescription data-test-id="virtual-machine-overview-details-timezone">
