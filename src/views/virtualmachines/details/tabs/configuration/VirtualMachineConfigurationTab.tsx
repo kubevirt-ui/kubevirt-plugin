@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
@@ -14,10 +14,7 @@ import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/ut
 
 import './virtual-machine-configuration-tab.scss';
 
-type VirtualMachineConfigurationTabProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type VirtualMachineConfigurationTabProps = {
   obj?: V1VirtualMachine;
 };
 

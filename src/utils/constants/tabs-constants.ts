@@ -1,7 +1,7 @@
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export enum VirtualMachineDetailsTab {
-  Configurations = 'configurations',
+  Configurations = 'configuration',
   Console = 'console',
   Details = 'details',
   Diagnostics = 'diagnostics',

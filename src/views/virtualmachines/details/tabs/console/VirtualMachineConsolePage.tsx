@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -7,13 +6,19 @@ import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, EmptyState, EmptyStateBody, PageSection } from '@patternfly/react-core';
+import {
+  Bullseye,
+  EmptyState,
+  EmptyStateBody,
+  PageSection,
+  PageSectionVariants,
+} from '@patternfly/react-core';
 
 import { printableVMStatus } from '../../../utils';
 
 import VirtualMachineConsolePageTitle from './components/VirtualMachineConsolePageTitle';
 
-type VirtualMachineConsolePageProps = RouteComponentProps & {
+type VirtualMachineConsolePageProps = {
   obj: V1VirtualMachine;
 };
 
@@ -53,7 +58,7 @@ const VirtualMachineConsolePage: FC<VirtualMachineConsolePageProps> = ({ obj: vm
   return (
     <>
       <VirtualMachineConsolePageTitle />
-      <PageSection>
+      <PageSection variant={PageSectionVariants.light}>
         <Consoles vmi={vmi} />
       </PageSection>
     </>

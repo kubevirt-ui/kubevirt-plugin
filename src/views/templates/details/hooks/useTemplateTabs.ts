@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import TemplateDetailsPage from '../tabs/details/TemplateDetailsPage';
@@ -13,46 +11,43 @@ import TemplateYAMLPage from '../tabs/yaml/TemplateYAMLPage';
 export const useVirtualMachineTabs = () => {
   const { t } = useKubevirtTranslation();
 
-  const tabs = React.useMemo(
-    () => [
-      {
-        component: TemplateDetailsPage,
-        href: '',
-        name: t('Details'),
-      },
-      {
-        component: TemplateYAMLPage,
-        href: 'yaml',
-        name: 'YAML',
-      },
-      {
-        component: TemplateSchedulingTab,
-        href: 'scheduling',
-        name: t('Scheduling'),
-      },
-      {
-        component: TemplateNetworkPage,
-        href: 'network-interfaces',
-        name: t('Network interfaces'),
-      },
-      {
-        component: TemplateDisksPage,
-        href: 'disks',
-        name: t('Disks'),
-      },
-      {
-        component: TemplateScriptsPage,
-        href: 'scripts',
-        name: t('Scripts'),
-      },
-      {
-        component: TemplateParametersPage,
-        href: 'parameters',
-        name: t('Parameters'),
-      },
-    ],
-    [t],
-  );
+  const tabs = [
+    {
+      component: TemplateDetailsPage,
+      href: '',
+      name: t('Details'),
+    },
+    {
+      component: TemplateYAMLPage,
+      href: 'yaml',
+      name: 'YAML',
+    },
+    {
+      component: TemplateSchedulingTab,
+      href: 'scheduling',
+      name: t('Scheduling'),
+    },
+    {
+      component: TemplateNetworkPage,
+      href: 'network-interfaces',
+      name: t('Network interfaces'),
+    },
+    {
+      component: TemplateDisksPage,
+      href: 'disks',
+      name: t('Disks'),
+    },
+    {
+      component: TemplateScriptsPage,
+      href: 'scripts',
+      name: t('Scripts'),
+    },
+    {
+      component: TemplateParametersPage,
+      href: 'parameters',
+      name: t('Parameters'),
+    },
+  ];
 
   return tabs;
 };

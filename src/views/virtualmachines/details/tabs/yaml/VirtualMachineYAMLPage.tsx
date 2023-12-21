@@ -1,19 +1,17 @@
-import * as React from 'react';
-import { RouteComponentProps } from 'react-router';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
 
-type VirtualMachineYAMLPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+import './virtual-machine-yaml-page.scss';
+
+type VirtualMachineYAMLPageProps = {
   obj?: V1VirtualMachine;
 };
 
-const VirtualMachineYAMLPage: React.FC<VirtualMachineYAMLPageProps> = ({ obj: vm }) => {
+const VirtualMachineYAMLPage: FC<VirtualMachineYAMLPageProps> = ({ obj: vm }) => {
   const loading = (
     <Bullseye>
       <Loading />
@@ -23,7 +21,9 @@ const VirtualMachineYAMLPage: React.FC<VirtualMachineYAMLPageProps> = ({ obj: vm
     loading
   ) : (
     <React.Suspense fallback={loading}>
-      <ResourceYAMLEditor initialResource={vm} />
+      <div className="VirtualMachineYAML--main">
+        <ResourceYAMLEditor initialResource={vm} />
+      </div>
     </React.Suspense>
   );
 };

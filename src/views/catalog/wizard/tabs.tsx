@@ -1,7 +1,6 @@
-import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import React from 'react';
 
-import { NavPage } from '@openshift-console/dynamic-plugin-sdk';
+import { NavPageKubevirt } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 
 import { useWizardVMContext, WizardVMContextType } from '../utils/WizardVMContext';
 
@@ -14,16 +13,15 @@ import WizardSchedulingTab from './tabs/scheduling/WizardSchedulingTab';
 import WizardScriptsTab from './tabs/scripts/WizardScriptsTab';
 import WizardYAMLTab from './tabs/yaml/WizardYAMLTab';
 
-type TabRouteProps = RouteComponentProps<{ ns: string }>;
-export type WizardTab = React.VFC<TabRouteProps & WizardVMContextType>;
+export type WizardTab = React.VFC<WizardVMContextType>;
 
-const withWizardVMContext = (Tab: WizardTab) => (routeProps: TabRouteProps) => {
+const withWizardVMContext = (Tab: WizardTab) => (routeProps) => {
   const vmContext = useWizardVMContext();
 
   return <Tab {...vmContext} {...routeProps} />;
 };
 
-export const wizardNavPages: NavPage[] = [
+export const wizardNavPages: NavPageKubevirt[] = [
   {
     component: withWizardVMContext(WizardOverviewTab),
     href: '',
