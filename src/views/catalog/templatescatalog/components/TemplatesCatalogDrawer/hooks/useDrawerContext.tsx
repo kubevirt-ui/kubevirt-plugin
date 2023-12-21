@@ -23,8 +23,6 @@ import {
 } from '@kubevirt-utils/resources/template';
 import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
 
-import { hasValidSource } from '../utils';
-
 import { initialValue } from './constants';
 import useDefaultVMSource from './useDefaultVMSource';
 
@@ -85,9 +83,7 @@ const useDrawer = (template: V1Template) => {
     cdUpload,
     diskFile,
     diskUpload,
-    isBootSourceAvailable: isDefaultDiskSource
-      ? isBootSourceAvailable
-      : hasValidSource(customizedTemplate),
+    isBootSourceAvailable: isDefaultDiskSource ? isBootSourceAvailable : true,
     setCDFile,
     setDiskFile,
     setTemplate: setCustomizedTemplate,

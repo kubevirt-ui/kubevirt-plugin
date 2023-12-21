@@ -18,7 +18,7 @@ import {
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
 
 import { INSTALLATION_CDROM_NAME } from './StorageSection/constants';
 
@@ -34,7 +34,8 @@ const hasVMValidDVSources = (vm: V1VirtualMachine) =>
   vm.spec.dataVolumeTemplates.every((dataVolume) => {
     if (dataVolume?.spec?.source?.http) return Boolean(dataVolume.spec.source.http.url);
 
-    if (dataVolume?.spec?.source?.registry) return Boolean(dataVolume.spec.source.registry.url);
+    if (dataVolume?.spec?.source?.registry)
+      return Boolean(removeDockerPrefix(dataVolume.spec.source.registry?.url));
 
     if (dataVolume?.spec?.source?.pvc)
       return (
@@ -46,7 +47,7 @@ const hasVMValidDVSources = (vm: V1VirtualMachine) =>
 
 const hasVMValidVolumeSources = (vm: V1VirtualMachine) =>
   vm.spec.template.spec.volumes.every((volume) => {
-    if (volume?.containerDisk) return Boolean(volume?.containerDisk?.image);
+    if (volume?.containerDisk) return Boolean(removeDockerPrefix(volume?.containerDisk?.image));
 
     return true;
   });

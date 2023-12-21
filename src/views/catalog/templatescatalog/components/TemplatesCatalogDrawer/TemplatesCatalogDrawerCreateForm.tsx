@@ -119,10 +119,10 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                 <Tooltip
                   content={
                     isBootSourceAvailable
-                      ? t('Source not available')
-                      : t(
+                      ? t(
                           'To enable Quick create button, fill all the required parameters and storage fields',
                         )
+                      : t('Source not available')
                   }
                   hidden={!isQuickCreateDisabled}
                 >
