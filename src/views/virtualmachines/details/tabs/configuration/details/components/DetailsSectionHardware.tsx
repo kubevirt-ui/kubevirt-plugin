@@ -13,7 +13,7 @@ import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { Bullseye, Divider, ExpandableSection, Flex, Grid, GridItem } from '@patternfly/react-core';
 
 import { getSearchItemsIds } from '../../search/utils/utils';
-import { DETAILS_TAB_HARDWARE_IDS, expandURLHash } from '../../utils/search';
+import { expandURLHash, getDetailsTabHardwareIds } from '../../utils/search';
 import { updateHardwareDevices } from '../utils/utils';
 
 type DetailsSectionHardwareProps = {
@@ -31,8 +31,8 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({ vm, vmi }) =>
   const gpus = getGPUDevices(vm);
 
   useEffect(() => {
-    expandURLHash(getSearchItemsIds(DETAILS_TAB_HARDWARE_IDS), location?.hash, setIsExpanded);
-  }, [location?.hash]);
+    expandURLHash(getSearchItemsIds(getDetailsTabHardwareIds(vm)), location?.hash, setIsExpanded);
+  }, [location?.hash, vm]);
 
   const onEditHostDevices = () => {
     createModal(({ isOpen, onClose }) => (
