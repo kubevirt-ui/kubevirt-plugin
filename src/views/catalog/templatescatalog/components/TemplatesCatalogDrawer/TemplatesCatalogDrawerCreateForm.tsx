@@ -19,6 +19,7 @@ import {
   Stack,
   StackItem,
   TextInput,
+  Tooltip,
 } from '@patternfly/react-core';
 
 import useCreateDrawerForm from './hooks/useCreateDrawerForm';
@@ -27,17 +28,16 @@ import AuthorizedSSHKey from './AuthorizedSSHKey';
 
 type TemplatesCatalogDrawerCreateFormProps = {
   authorizedSSHKey: string;
-  canQuickCreate: boolean;
   namespace: string;
   onCancel: () => void;
   subscriptionData: RHELAutomaticSubscriptionData;
 };
 
 export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFormProps> = memo(
-  ({ authorizedSSHKey, canQuickCreate, namespace, onCancel, subscriptionData }) => {
+  ({ authorizedSSHKey, namespace, onCancel, subscriptionData }) => {
     const { t } = useKubevirtTranslation();
 
-    const { template, templateLoadingError } = useDrawerContext();
+    const { isBootSourceAvailable, template, templateLoadingError } = useDrawerContext();
 
     const {
       createError,
@@ -57,52 +57,44 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
     return (
       <form className="template-catalog-drawer-form" id="quick-create-form">
         <Stack hasGutter>
-          {canQuickCreate ? (
-            <>
-              <StackItem>
-                <Split hasGutter>
-                  <SplitItem className="template-catalog-drawer-form-name" isFilled>
-                    <FormGroup fieldId="vm-name-field" isRequired label={t('VirtualMachine name')}>
-                      <TextInput
-                        aria-label="virtualmachine name"
-                        data-test-id="template-catalog-vm-name-input"
-                        isDisabled={Boolean(templateLoadingError)}
-                        isRequired
-                        name="vmname"
-                        onChange={onVMNameChange}
-                        type="text"
-                        value={nameField}
-                      />
-                    </FormGroup>
-                  </SplitItem>
-                  <SplitItem>
-                    <DescriptionList>
-                      <DescriptionListGroup>
-                        <DescriptionListTerm>{t('Project')}</DescriptionListTerm>
-                        <DescriptionListDescription>{namespace}</DescriptionListDescription>
-                      </DescriptionListGroup>
-                    </DescriptionList>
-                  </SplitItem>
-                  <AuthorizedSSHKey authorizedSSHKey={authorizedSSHKey} template={template} />
-                </Split>
-              </StackItem>
-              <StackItem />
-              <StackItem>
-                <Checkbox
-                  id="start-after-create-checkbox"
-                  isChecked={startVM}
-                  label={t('Start this VirtualMachine after creation')}
-                  onChange={onChangeStartVM}
-                />
-              </StackItem>
-            </>
-          ) : (
+          <>
             <StackItem>
-              {t(
-                'This Template requires some additional parameters. Click the Customize VirtualMachine button to complete the creation flow.',
-              )}
+              <Split hasGutter>
+                <SplitItem className="template-catalog-drawer-form-name" isFilled>
+                  <FormGroup fieldId="vm-name-field" isRequired label={t('VirtualMachine name')}>
+                    <TextInput
+                      aria-label="virtualmachine name"
+                      data-test-id="template-catalog-vm-name-input"
+                      isDisabled={Boolean(templateLoadingError)}
+                      isRequired
+                      name="vmname"
+                      onChange={onVMNameChange}
+                      type="text"
+                      value={nameField}
+                    />
+                  </FormGroup>
+                </SplitItem>
+                <SplitItem>
+                  <DescriptionList>
+                    <DescriptionListGroup>
+                      <DescriptionListTerm>{t('Project')}</DescriptionListTerm>
+                      <DescriptionListDescription>{namespace}</DescriptionListDescription>
+                    </DescriptionListGroup>
+                  </DescriptionList>
+                </SplitItem>
+                <AuthorizedSSHKey authorizedSSHKey={authorizedSSHKey} template={template} />
+              </Split>
             </StackItem>
-          )}
+            <StackItem />
+            <StackItem>
+              <Checkbox
+                id="start-after-create-checkbox"
+                isChecked={startVM}
+                label={t('Start this VirtualMachine after creation')}
+                onChange={onChangeStartVM}
+              />
+            </StackItem>
+          </>
           <StackItem />
           {error && (
             <StackItem>
@@ -123,20 +115,31 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
           <StackItem>
             <Split hasGutter>
-              {canQuickCreate && (
-                <SplitItem>
-                  <Button
-                    data-test-id="quick-create-vm-btn"
-                    form={DRAWER_FORM_ID}
-                    isDisabled={isQuickCreateDisabled}
-                    isLoading={isQuickCreateLoading}
-                    onClick={onQuickCreate}
-                    type="submit"
-                  >
-                    {t('Quick create VirtualMachine')}
-                  </Button>
-                </SplitItem>
-              )}
+              <SplitItem>
+                <Tooltip
+                  content={
+                    isBootSourceAvailable
+                      ? t(
+                          'To enable Quick create button, fill all the required parameters and storage fields',
+                        )
+                      : t('Source not available')
+                  }
+                  hidden={!isQuickCreateDisabled}
+                >
+                  <span>
+                    <Button
+                      data-test-id="quick-create-vm-btn"
+                      form={DRAWER_FORM_ID}
+                      isDisabled={isQuickCreateDisabled}
+                      isLoading={isQuickCreateLoading}
+                      onClick={onQuickCreate}
+                      type="submit"
+                    >
+                      {t('Quick create VirtualMachine')}
+                    </Button>
+                  </span>
+                </Tooltip>
+              </SplitItem>
               <SplitItem>
                 <Button
                   data-test-id="customize-vm-btn"
@@ -144,7 +147,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                   isDisabled={isCustomizeDisabled}
                   isLoading={isCustomizeLoading}
                   onClick={onCustomize}
-                  variant={canQuickCreate ? ButtonVariant.secondary : ButtonVariant.primary}
+                  variant={ButtonVariant.secondary}
                 >
                   {t('Customize VirtualMachine')}
                 </Button>

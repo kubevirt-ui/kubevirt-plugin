@@ -9,16 +9,7 @@ import {
   getGroupVersionKindForModel,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Split,
-  SplitItem,
-  Stack,
-  StackItem,
-  Title,
-  Tooltip,
-  TooltipPosition,
-} from '@patternfly/react-core';
-import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
+import { Stack, StackItem, Title } from '@patternfly/react-core';
 
 import { useDrawerContext } from './hooks/useDrawerContext';
 import { TemplatesCatalogDrawerCreateForm } from './TemplatesCatalogDrawerCreateForm';
@@ -37,7 +28,7 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
   const [authorizedSSHKeys, updateAuthorizedSSHKeys, userSettingsLoaded] =
     useKubevirtUserSettings('ssh');
   const { loaded: loadedRHELSubscription, subscriptionData } = useRHELAutomaticSubscription();
-  const { isBootSourceAvailable, templateDataLoaded, templateLoadingError } = useDrawerContext();
+  const { templateDataLoaded, templateLoadingError } = useDrawerContext();
 
   const [, , loadError] = useK8sWatchResource<IoK8sApiCoreV1Secret>(
     authorizedSSHKeys?.[namespace] && {
@@ -66,29 +57,12 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
       <div className="template-catalog-drawer-footer-section">
         <Stack hasGutter>
           <StackItem>
-            <Split hasGutter>
-              <SplitItem>
-                <Title headingLevel="h1" size="lg">
-                  {isBootSourceAvailable
-                    ? t('Quick create VirtualMachine')
-                    : t('Customize VirtualMachine')}
-                </Title>
-              </SplitItem>
-              {isBootSourceAvailable && (
-                <SplitItem className="template-catalog-drawer-footer-tooltip">
-                  <Tooltip
-                    content={<div>{t('This Template supports quick create VirtualMachine')}</div>}
-                    position={TooltipPosition.right}
-                  >
-                    <OutlinedQuestionCircleIcon />
-                  </Tooltip>
-                </SplitItem>
-              )}
-            </Split>
+            <Title headingLevel="h1" size="lg">
+              {t('Quick create VirtualMachine')}
+            </Title>
           </StackItem>
           <TemplatesCatalogDrawerCreateForm
             authorizedSSHKey={!loadError && authorizedSSHKeys?.[namespace]}
-            canQuickCreate={isBootSourceAvailable}
             namespace={namespace}
             onCancel={onCancel}
             subscriptionData={subscriptionData}

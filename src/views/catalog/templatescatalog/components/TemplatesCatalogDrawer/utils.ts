@@ -13,11 +13,44 @@ import {
 } from '@kubevirt-utils/components/DiskModal/state/initialState';
 import { DEFAULT_NAMESPACE, ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
-import { getTemplateParameterValue } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateParameterValue,
+  getTemplateVirtualMachineObject,
+} from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
 
 import { INSTALLATION_CDROM_NAME } from './StorageSection/constants';
+
+export const hasValidSource = (template: V1Template) => {
+  const vm = getTemplateVirtualMachineObject(template);
+
+  const hasValidDVSources = hasVMValidDVSources(vm);
+  const hasValidVolumeSources = hasVMValidVolumeSources(vm);
+  return hasValidDVSources && hasValidVolumeSources;
+};
+
+const hasVMValidDVSources = (vm: V1VirtualMachine) =>
+  vm.spec.dataVolumeTemplates.every((dataVolume) => {
+    if (dataVolume?.spec?.source?.http) return Boolean(dataVolume.spec.source.http.url);
+
+    if (dataVolume?.spec?.source?.registry)
+      return Boolean(removeDockerPrefix(dataVolume.spec.source.registry?.url));
+
+    if (dataVolume?.spec?.source?.pvc)
+      return (
+        Boolean(dataVolume.spec.source.pvc.name) && Boolean(dataVolume.spec.source.pvc.namespace)
+      );
+
+    return true;
+  });
+
+const hasVMValidVolumeSources = (vm: V1VirtualMachine) =>
+  vm.spec.template.spec.volumes.every((volume) => {
+    if (volume?.containerDisk) return Boolean(removeDockerPrefix(volume?.containerDisk?.image));
+
+    return true;
+  });
 
 export const allRequiredParametersAreFulfilled = (template: V1Template) =>
   template.parameters

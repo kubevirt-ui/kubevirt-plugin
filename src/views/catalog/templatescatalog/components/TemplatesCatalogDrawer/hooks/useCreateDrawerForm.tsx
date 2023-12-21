@@ -33,7 +33,7 @@ import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 
-import { allRequiredParametersAreFulfilled, uploadFiles } from '../utils';
+import { allRequiredParametersAreFulfilled, hasValidSource, uploadFiles } from '../utils';
 
 import useCreateVMName from './useCreateVMName';
 import { useDrawerContext } from './useDrawerContext';
@@ -219,7 +219,8 @@ const useCreateDrawerForm = (
       isQuickCreating ||
       !nameField ||
       isEmpty(models) ||
-      !Boolean(allRequiredParametersAreFulfilled(template)),
+      !allRequiredParametersAreFulfilled(template) ||
+      !hasValidSource(template),
     isQuickCreateLoading: isQuickCreating || modelsLoading,
     nameField,
     onChangeStartVM,

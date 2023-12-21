@@ -14,7 +14,6 @@ import { addInstallationCDRom, removeCDInstallation } from '../cd';
 import {
   BLANK_SOURCE_NAME,
   CD_SOURCES,
-  DISK_SOURCES,
   DISK_SOURCES_WITH_DEFAULT,
   INSTALLATION_CDROM_NAME,
 } from '../constants';
@@ -33,11 +32,10 @@ import { getGenericSourceCustomization, getQuantityFromSource } from './utils';
 import './CustomizeSource.scss';
 
 export type CustomizeSourceProps = {
-  isBootSourceAvailable?: boolean;
   template: V1Template;
 };
 
-export const CustomizeSource: FC<CustomizeSourceProps> = ({ isBootSourceAvailable, template }) => {
+export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { cdUpload, diskUpload, setCDFile, setDiskFile, setVM, vm } = useDrawerContext();
 
@@ -111,7 +109,7 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ isBootSourceAvailabl
         relevantUpload={diskUpload}
         selectedSource={diskSource}
         sourceLabel={t('Disk source')}
-        sourceOptions={isBootSourceAvailable ? DISK_SOURCES_WITH_DEFAULT : DISK_SOURCES}
+        sourceOptions={DISK_SOURCES_WITH_DEFAULT}
         sourcePopOver={<SelectDiskSourcePopOver />}
         withSize={!('image' in diskSource)}
       />
