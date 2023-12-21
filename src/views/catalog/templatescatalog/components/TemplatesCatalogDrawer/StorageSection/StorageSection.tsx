@@ -16,11 +16,9 @@ import { CustomizeSource } from './CustomizeSource/CustomizeSource';
 
 const StorageSection: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { isBootSourceAvailable, template, templateDataLoaded, vm } = useDrawerContext();
+  const { template, templateDataLoaded, vm } = useDrawerContext();
 
-  const [storageFieldsExpanded, setStorageFieldsExpanded] = useState<boolean>(
-    !isBootSourceAvailable,
-  );
+  const [storageFieldsExpanded, setStorageFieldsExpanded] = useState<boolean>(true);
 
   const loaded = vm && templateDataLoaded;
   return (
@@ -49,11 +47,7 @@ const StorageSection: FC = () => {
         isExpanded={storageFieldsExpanded}
         isIndented
       >
-        {loaded ? (
-          <CustomizeSource isBootSourceAvailable={isBootSourceAvailable} template={template} />
-        ) : (
-          <Skeleton />
-        )}
+        {loaded ? <CustomizeSource template={template} /> : <Skeleton />}
       </ExpandableSection>
     </>
   );

@@ -23,7 +23,10 @@ import {
 } from '@kubevirt-utils/resources/template';
 import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
 
+import { hasValidSource } from '../utils';
+
 import { initialValue } from './constants';
+import useDefaultVMSource from './useDefaultVMSource';
 
 export type DrawerContext = {
   bootSourceLoaded: boolean;
@@ -61,6 +64,8 @@ const useDrawer = (template: V1Template) => {
     [customizedTemplate],
   );
 
+  const { isDefaultDiskSource, updateDefaultDiskSource } = useDefaultVMSource(vm);
+
   const setVM = useCallback(
     (newVM: V1VirtualMachine) => {
       setCustomizedTemplate(replaceTemplateVM(template, newVM));
@@ -69,8 +74,10 @@ const useDrawer = (template: V1Template) => {
   );
 
   useEffect(() => {
+    updateDefaultDiskSource(getTemplateVirtualMachineObject(templateWithGeneratedParams));
+
     setCustomizedTemplate(templateWithGeneratedParams);
-  }, [setCustomizedTemplate, templateWithGeneratedParams]);
+  }, [setCustomizedTemplate, templateWithGeneratedParams, updateDefaultDiskSource]);
 
   return {
     bootSourceLoaded,
@@ -78,7 +85,9 @@ const useDrawer = (template: V1Template) => {
     cdUpload,
     diskFile,
     diskUpload,
-    isBootSourceAvailable,
+    isBootSourceAvailable: isDefaultDiskSource
+      ? isBootSourceAvailable
+      : hasValidSource(customizedTemplate),
     setCDFile,
     setDiskFile,
     setTemplate: setCustomizedTemplate,

@@ -219,7 +219,7 @@ const useCreateDrawerForm = (
       isQuickCreating ||
       !nameField ||
       isEmpty(models) ||
-      !Boolean(allRequiredParametersAreFulfilled(template)),
+      !allRequiredParametersAreFulfilled(template),
     isQuickCreateLoading: isQuickCreating || modelsLoading,
     nameField,
     onChangeStartVM,
