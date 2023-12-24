@@ -40,9 +40,9 @@ const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = 
   }, [history.location.pathname]);
 
   return (
-    <div className="co-dashboard-body">
+    <div className="co-dashboard-body VirtualMachineConfigurationTab">
       <VirtualMachineConfigurationTabSearch vm={props?.obj} />
-      <div className="VirtualMachineConfigurationTab">
+      <div className="VirtualMachineConfigurationTab--body">
         <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
           {tabs.map(({ Component, name, title }) => (
             <Tab

@@ -30,7 +30,7 @@ import {
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
-import { DescriptionList, Switch, Title } from '@patternfly/react-core';
+import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
 
 import DetailsSectionBoot from './components/DetailsSectionBoot';
 import DetailsSectionHardware from './components/DetailsSectionHardware';
@@ -84,130 +84,138 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
       <Title headingLevel="h2">
         <SearchItem id="details">{t('Details')}</SearchItem>
       </Title>
-      <DescriptionList>
-        <VirtualMachineDescriptionItem
-          descriptionData={
-            getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
-          }
-          onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <DescriptionModal
-                isOpen={isOpen}
-                obj={vm}
-                onClose={onClose}
-                onSubmit={(description) => updateDescription(vm, description)}
+      <Grid>
+        <GridItem span={5}>
+          <DescriptionList>
+            <VirtualMachineDescriptionItem
+              descriptionData={
+                getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
+              }
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <DescriptionModal
+                    isOpen={isOpen}
+                    obj={vm}
+                    onClose={onClose}
+                    onSubmit={(description) => updateDescription(vm, description)}
+                  />
+                ))
+              }
+              data-test-id={`${vmName}-description`}
+              descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
+              isEdit
+            />
+            {!getInstanceTypeMatcher(vm) && (
+              <VirtualMachineDescriptionItem
+                descriptionData={
+                  vmWorkload ? (
+                    WORKLOADS_LABELS[vmWorkload] || vmWorkload
+                  ) : (
+                    <MutedTextSpan text={t('Not available')} />
+                  )
+                }
+                descriptionHeader={
+                  <SearchItem id="workload-profile">{t('Workload profile')}</SearchItem>
+                }
+                onEditClick={() =>
+                  createModal(({ isOpen, onClose }) => (
+                    <WorkloadProfileModal
+                      initialWorkload={vmWorkload}
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      onSubmit={(workload) => updateWorkload(vm, workload)}
+                    />
+                  ))
+                }
+                data-test-id={`${vmName}-workload-profile`}
+                isEdit
               />
-            ))
-          }
-          data-test-id={`${vmName}-description`}
-          descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
-          isEdit
-        />
-        {!getInstanceTypeMatcher(vm) && (
-          <VirtualMachineDescriptionItem
-            descriptionData={
-              vmWorkload ? (
-                WORKLOADS_LABELS[vmWorkload] || vmWorkload
-              ) : (
-                <MutedTextSpan text={t('Not available')} />
-              )
-            }
-            descriptionHeader={
-              <SearchItem id="workload-profile">{t('Workload profile')}</SearchItem>
-            }
-            onEditClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <WorkloadProfileModal
-                  initialWorkload={vmWorkload}
-                  isOpen={isOpen}
-                  onClose={onClose}
-                  onSubmit={(workload) => updateWorkload(vm, workload)}
+            )}
+            <VirtualMachineDescriptionItem
+              messageOnDisabled={t(
+                'CPU and Memory can not be edited if the VirtualMachine is created from InstanceType',
+              )}
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <CPUMemoryModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onSubmit={updatedVirtualMachine}
+                    vm={vm}
+                    vmi={vmi}
+                  />
+                ))
+              }
+              bodyContent={vm?.spec?.instancetype ? null : <CPUDescription cpu={getCPU(vm)} />}
+              data-test-id={`${vmName}-cpu-memory`}
+              descriptionData={<CPUMemory vm={vm} />}
+              descriptionHeader={<SearchItem id="cpu-memory">{t('CPU | Memory')}</SearchItem>}
+              isDisabled={!!vm?.spec?.instancetype}
+              isEdit={canUpdateVM}
+              isPopover
+            />
+            <VirtualMachineDescriptionItem
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <HostnameModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onSubmit={updatedHostname}
+                    vm={vm}
+                    vmi={vmi}
+                  />
+                ))
+              }
+              data-test-id={`${vmName}-hostname`}
+              descriptionData={vm?.spec?.template?.spec?.hostname || vmName}
+              descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
+              isEdit
+            />
+            <VirtualMachineDescriptionItem
+              bodyContent={t(
+                'Whether to attach the default graphics device or not. VNC will not be available if checked.',
+              )}
+              descriptionData={
+                <HeadlessMode
+                  updateHeadlessMode={(checked) => updateHeadlessMode(vm, checked)}
+                  vm={vm}
                 />
-              ))
-            }
-            data-test-id={`${vmName}-workload-profile`}
-            isEdit
-          />
-        )}
-        <VirtualMachineDescriptionItem
-          messageOnDisabled={t(
-            'CPU and Memory can not be edited if the VirtualMachine is created from InstanceType',
-          )}
-          onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <CPUMemoryModal
-                isOpen={isOpen}
-                onClose={onClose}
-                onSubmit={updatedVirtualMachine}
-                vm={vm}
-                vmi={vmi}
-              />
-            ))
-          }
-          bodyContent={vm?.spec?.instancetype ? null : <CPUDescription cpu={getCPU(vm)} />}
-          data-test-id={`${vmName}-cpu-memory`}
-          descriptionData={<CPUMemory vm={vm} />}
-          descriptionHeader={<SearchItem id="cpu-memory">{t('CPU | Memory')}</SearchItem>}
-          isDisabled={!!vm?.spec?.instancetype}
-          isEdit={canUpdateVM}
-          isPopover
-        />
-        <VirtualMachineDescriptionItem
-          onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <HostnameModal
-                isOpen={isOpen}
-                onClose={onClose}
-                onSubmit={updatedHostname}
-                vm={vm}
-                vmi={vmi}
-              />
-            ))
-          }
-          data-test-id={`${vmName}-hostname`}
-          descriptionData={vm?.spec?.template?.spec?.hostname || vmName}
-          descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
-          isEdit
-        />
-        <VirtualMachineDescriptionItem
-          bodyContent={t(
-            'Whether to attach the default graphics device or not. VNC will not be available if checked.',
-          )}
-          descriptionData={
-            <HeadlessMode
-              updateHeadlessMode={(checked) => updateHeadlessMode(vm, checked)}
-              vm={vm}
+              }
+              breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
+              data-test-id={`${vmName}-headless`}
+              descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
+              isPopover
             />
-          }
-          breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
-          data-test-id={`${vmName}-headless`}
-          descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
-          isPopover
-        />
-        <VirtualMachineDescriptionItem
-          bodyContent={t(
-            'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
-          )}
-          descriptionData={
-            <Switch
-              onChange={(checked) => {
-                setIsCheckedGuestSystemAccessLog(checked);
-                updateGuestSystemAccessLog(vm, checked);
-              }}
-              id="guest-system-log-access"
-              isChecked={isCheckedGuestSystemAccessLog}
-              isDisabled={isGuestSystemLogsDisabled}
+            <VirtualMachineDescriptionItem
+              bodyContent={t(
+                'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
+              )}
+              descriptionData={
+                <Switch
+                  onChange={(checked) => {
+                    setIsCheckedGuestSystemAccessLog(checked);
+                    updateGuestSystemAccessLog(vm, checked);
+                  }}
+                  id="guest-system-log-access"
+                  isChecked={isCheckedGuestSystemAccessLog}
+                  isDisabled={isGuestSystemLogsDisabled}
+                />
+              }
+              descriptionHeader={
+                <SearchItem id="guest-system-log-access">{t('Guest system log access')}</SearchItem>
+              }
+              data-test-id="guest-system-log-access"
+              isPopover
             />
-          }
-          descriptionHeader={
-            <SearchItem id="guest-system-log-access">{t('Guest system log access')}</SearchItem>
-          }
-          data-test-id="guest-system-log-access"
-          isPopover
-        />
-        <DetailsSectionHardware vm={vm} vmi={vmi} />
-        <DetailsSectionBoot canUpdateVM={canUpdateVM} vm={vm} vmi={vmi} />
-      </DescriptionList>
+          </DescriptionList>
+        </GridItem>
+        <GridItem span={5}>
+          <DescriptionList>
+            <DetailsSectionHardware vm={vm} vmi={vmi} />
+            <DetailsSectionBoot canUpdateVM={canUpdateVM} vm={vm} vmi={vmi} />
+          </DescriptionList>
+        </GridItem>
+      </Grid>
     </div>
   );
 };
