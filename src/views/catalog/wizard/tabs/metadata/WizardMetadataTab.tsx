@@ -7,7 +7,12 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { DescriptionList, PageSection, pluralize } from '@patternfly/react-core';
+import {
+  DescriptionList,
+  PageSection,
+  PageSectionVariants,
+  pluralize,
+} from '@patternfly/react-core';
 
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
 
@@ -20,7 +25,7 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
   const { createModal } = useModal();
 
   return (
-    <PageSection className="wizard-metadata-tab">
+    <PageSection className="wizard-metadata-tab" variant={PageSectionVariants.light}>
       <SidebarEditor
         onResourceUpdate={(newVM) => updateVM(newVM)}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.DETAILS_TAB}
