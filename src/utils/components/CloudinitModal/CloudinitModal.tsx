@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react';
+import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
@@ -6,6 +7,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Radio, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
 
 import CloudInitInfoHelper from '../CloudinitDescription/CloudinitInfoHelper';
+import {
+  getCloudInitPropagationMethod,
+  getPropagationMethod,
+} from '../SSHSecretSection/utils/utils';
 import TabModal from '../TabModal/TabModal';
 
 import { useCloudInit } from './utils/useCloudInit';
@@ -31,13 +36,26 @@ const CloudinitModal: FC<{
     updateFromYAML(yaml);
   };
 
+  const onSubmitModal = () => {
+    const updateSSHDynamicInjectionVM = produce<V1VirtualMachine>(
+      updatedVM,
+      (vmDraft: V1VirtualMachine) => {
+        if (getPropagationMethod(vmDraft)?.qemuGuestAgent?.users) {
+          vmDraft.spec.template.spec.accessCredentials[0].sshPublicKey.propagationMethod =
+            getCloudInitPropagationMethod(true, vmDraft);
+        }
+      },
+    );
+    return onSubmit(updateSSHDynamicInjectionVM);
+  };
+
   return (
     <TabModal
       headerText={t('Cloud-init')}
       isDisabled={isSubmitDisabled}
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={() => onSubmit(updatedVM)}
+      onSubmit={onSubmitModal}
       submitBtnText={t('Apply')}
     >
       <Stack hasGutter>

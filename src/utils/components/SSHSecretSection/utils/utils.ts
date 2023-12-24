@@ -164,3 +164,8 @@ export const getMappedProjectsWithKeys = (
 
   return sshData;
 };
+
+export const getPropagationMethod = (
+  vm: V1VirtualMachine,
+): V1SSHPublicKeyAccessCredentialPropagationMethod =>
+  vm?.spec?.template?.spec?.accessCredentials?.[0].sshPublicKey.propagationMethod;
