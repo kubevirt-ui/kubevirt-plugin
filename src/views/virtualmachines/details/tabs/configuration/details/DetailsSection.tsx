@@ -82,7 +82,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
   return (
     <div className="VirtualMachinesDetailsSection">
       <Title headingLevel="h2">
-        <SearchItem id="details">{t('Details')}</SearchItem>
+        <SearchItem id="details">{t('VirtualMachine details')}</SearchItem>
       </Title>
       <Grid>
         <GridItem span={5}>

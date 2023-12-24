@@ -1084,6 +1084,7 @@
   "SSH over NodePort service": "SSH over NodePort service",
   "SSH secret not configured": "SSH secret not configured",
   "SSH service type": "SSH service type",
+  "SSH settings": "SSH settings",
   "SSH using virtctl": "SSH using virtctl",
   "Start": "Start",
   "Start cloned VM": "Start cloned VM",
