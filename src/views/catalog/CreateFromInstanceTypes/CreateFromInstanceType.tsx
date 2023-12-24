@@ -53,7 +53,7 @@ const CreateFromInstanceType: FC = () => {
     setVMNamespaceTarget(authourizedSSHKeys?.[targetNS], targetNS);
   }, [activeNamespace, authourizedSSHKeys, setVMNamespaceTarget]);
 
-  const [favorites, updaterFavorites, loadedFavorites] =
+  const [favorites = [], updaterFavorites, loadedFavorites] =
     useKubevirtUserSettings('favoriteBootableVolumes');
 
   if (
