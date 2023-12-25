@@ -25,7 +25,7 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
   return (
     <DescriptionList className="hardware-devices-table" columnModifier={{ default: '2Col' }}>
       <DescriptionListGroup>
-        <DescriptionListTerm>{t('Resource name')}</DescriptionListTerm>
+        <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
         <DescriptionListDescription>
           <Stack>
             {devices.map((device) => (
@@ -35,7 +35,7 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
         </DescriptionListDescription>
       </DescriptionListGroup>
       <DescriptionListGroup>
-        <DescriptionListTerm>{t('Hardware device name')}</DescriptionListTerm>
+        <DescriptionListTerm>{t('Device name')}</DescriptionListTerm>
         <DescriptionListDescription>
           <Stack>
             {devices.map((device: { deviceName: string; index: number; name: string }) => (

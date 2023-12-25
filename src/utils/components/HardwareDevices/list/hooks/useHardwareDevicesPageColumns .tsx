@@ -13,7 +13,7 @@ const useHardwareDevicesPageColumns = () => {
       {
         id: 'resourceName',
         props: { className: 'pf-m-width-20' },
-        title: t('Resource name'),
+        title: t('Device name'),
       },
       {
         id: 'selector',

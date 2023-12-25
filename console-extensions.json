@@ -628,11 +628,10 @@
   },
   {
     "properties": {
-      "href": "/hardwaredevices",
+      "href": "hardwaredevices",
       "id": "hardwaredevices",
       "insertBefore": "baremetalhosts",
       "name": "%plugin__kubevirt-plugin~Hardware Devices%",
-      "prefixNamespaced": true,
       "section": "compute"
     },
     "type": "console.navigation/href"
@@ -640,7 +639,7 @@
   {
     "properties": {
       "component": {
-        "$codeRef": "HardwareDevicesPage.HardwareDevicesPage"
+        "$codeRef": "HardwareDevicesPage"
       },
       "path": ["/hardwaredevices"]
     },

@@ -9,7 +9,7 @@ import { HelpIcon } from '@patternfly/react-icons';
 import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
 import HardwareDevicesPageTable from './HardwareDevicesPageTable';
 
-export const HardwareDevicesPage: React.FC<any> = (props) => {
+const HardwareDevicesPage: React.FC<any> = (props) => {
   const { t } = useKubevirtTranslation();
   const { errorHcList, loadedHcList, permittedHostDevices } = useHCPermittedHostDevices();
 
@@ -76,3 +76,5 @@ export const HardwareDevicesPage: React.FC<any> = (props) => {
     </div>
   );
 };
+
+export default HardwareDevicesPage;
