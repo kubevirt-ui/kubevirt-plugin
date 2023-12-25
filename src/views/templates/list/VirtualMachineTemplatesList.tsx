@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import React, { FC } from 'react';
 
 import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -21,9 +20,10 @@ import { useTemplatesWithAvailableSource } from './hooks/useTemplatesWithAvailab
 import useVirtualMachineTemplatesColumns from './hooks/useVirtualMachineTemplatesColumns';
 import useVirtualMachineTemplatesFilters from './hooks/useVirtualMachineTemplatesFilters';
 
-const VirtualMachineTemplatesList: React.FC<RouteComponentProps<{ ns: string }>> = ({
-  match: { params: { ns: namespace } = {} } = {},
-}) => {
+type VirtualMachineTemplatesListProps = {
+  namespace: string;
+};
+const VirtualMachineTemplatesList: FC<VirtualMachineTemplatesListProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const {
     availableDatasources,
