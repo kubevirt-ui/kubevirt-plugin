@@ -6,7 +6,7 @@ import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/Enviro
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { Bullseye, PageSection } from '@patternfly/react-core';
+import { Bullseye, PageSection, PageSectionVariants } from '@patternfly/react-core';
 
 import './wizard-environment-tab.scss';
 
@@ -19,7 +19,7 @@ const WizardEnvironmentTab: WizardTab = ({ setDisableVmCreate, updateVM, vm }) =
     );
 
   return (
-    <PageSection className="wizard-environment-tab">
+    <PageSection className="wizard-environment-tab" variant={PageSectionVariants.light}>
       <SidebarEditor<V1VirtualMachine>
         onChange={updateVM}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.ENV_TAB}

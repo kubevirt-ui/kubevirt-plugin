@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import { WizardTab } from '@catalog/wizard/tabs';
@@ -14,6 +14,7 @@ import {
   DescriptionListDescription,
   Divider,
   PageSection,
+  PageSectionVariants,
 } from '@patternfly/react-core';
 
 import DynamicSSHKeyInjectionWizard from './components/DynamicSSHKeyInjectionWizard';
@@ -27,7 +28,7 @@ const WizardScriptsTab: WizardTab = ({ updateVM, vm }) => {
   const { createModal } = useModal();
 
   return (
-    <PageSection className="wizard-scripts-tab">
+    <PageSection className="wizard-scripts-tab" variant={PageSectionVariants.light}>
       <SidebarEditor
         onResourceUpdate={(newVM) => updateVM(newVM)}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.SCRIPTS_TAB}

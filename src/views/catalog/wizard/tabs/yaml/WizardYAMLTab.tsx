@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { load } from 'js-yaml';
 
 import { WizardTab } from '@catalog/wizard/tabs';
@@ -12,8 +12,8 @@ import './WizardYAMLTab.scss';
 
 const WizardYAMLTab: WizardTab = ({ setDisableVmCreate, updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
-  const [error, setError] = React.useState<any>();
-  const [success, setSuccess] = React.useState(false);
+  const [error, setError] = useState<any>();
+  const [success, setSuccess] = useState(false);
 
   const onSave = (yaml: string) => {
     setError(undefined);
@@ -25,20 +25,22 @@ const WizardYAMLTab: WizardTab = ({ setDisableVmCreate, updateVM, vm }) => {
       });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     setDisableVmCreate(!!error);
     return () => setDisableVmCreate(false);
   }, [error, setDisableVmCreate]);
 
   return (
-    <React.Suspense
+    <Suspense
       fallback={
         <Bullseye>
           <Loading />
         </Bullseye>
       }
     >
-      <ResourceYAMLEditor initialResource={vm} onSave={onSave} />
+      <div className="wizard-yaml-body">
+        <ResourceYAMLEditor initialResource={vm} onSave={onSave} />
+      </div>
       {error && (
         <div className="wizard-yaml-alert">
           <Alert
@@ -64,7 +66,7 @@ const WizardYAMLTab: WizardTab = ({ setDisableVmCreate, updateVM, vm }) => {
           </Alert>
         </div>
       )}
-    </React.Suspense>
+    </Suspense>
   );
 };
 
