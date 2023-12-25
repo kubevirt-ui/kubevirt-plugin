@@ -1,25 +1,26 @@
 .VirtualMachineConfigurationTab {
-  display: flex;
-  flex-direction: row;
   height: 100%;
-  background: var(--pf-c-page__main-section--m-light--BackgroundColor);
   &--main {
     margin: var(--pf-global--spacer--sm);
     width: fit-content;
     min-width: max-content;
   }
-
   &--content {
     width: 100%;
   }
-  .pf-c-page__main-section {
-    background: none;
-  }
-  .pf-c-expandable-section__toggle-icon {
+  &--body {
     display: flex;
-    align-self: center;
-  }
-  h2 {
-    margin: var(--pf-global--spacer--md) 0;
+    flex-direction: row;
+    background: var(--pf-c-page__main-section--m-light--BackgroundColor);
+    .pf-c-page__main-section {
+      background: none;
+    }
+    .pf-c-expandable-section__toggle-icon {
+      display: flex;
+      align-self: center;
+    }
+    h2 {
+      margin: var(--pf-global--spacer--md) 0;
+    }
   }
 }
