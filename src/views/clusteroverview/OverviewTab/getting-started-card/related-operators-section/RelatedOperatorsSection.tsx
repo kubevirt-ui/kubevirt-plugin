@@ -26,7 +26,7 @@ const RelatedOperatorsSection: React.FC = () => {
       external: !isAdmin,
       href: isAdmin
         ? '/operatorhub/all-namespaces?keyword=nmstate'
-        : 'https://docs.openshift.com/container-platform/4.10/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html',
+        : 'https://docs.openshift.com/container-platform/4.14/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html',
       id: 'kubernetes-nmstate',
       title: t('Kubernetes NMState Operator'),
     },
@@ -34,7 +34,7 @@ const RelatedOperatorsSection: React.FC = () => {
       external: !isAdmin,
       href: isAdmin
         ? '/operatorhub/all-namespaces?keyword=ODF'
-        : 'https://access.redhat.com/documentation/en-us/red_hat_openshift_data_foundation/4.10/html-single/red_hat_openshift_data_foundation_architecture/index',
+        : 'https://access.redhat.com/documentation/en-us/red_hat_openshift_data_foundation/4.14/html-single/red_hat_openshift_data_foundation_architecture/index',
       id: 'openshift-data-foundation',
       title: t('OpenShift Data Foundation'),
     },
@@ -43,7 +43,7 @@ const RelatedOperatorsSection: React.FC = () => {
       external: !isAdmin,
       href: isAdmin
         ? '/operatorhub/all-namespaces?keyword=MTV'
-        : 'https://access.redhat.com/documentation/en-us/migration_toolkit_for_virtualization/2.3/html/installing_and_using_the_migration_toolkit_for_virtualization/index',
+        : 'https://access.redhat.com/documentation/en-us/migration_toolkit_for_virtualization/2.5/html/installing_and_using_the_migration_toolkit_for_virtualization/index',
       id: 'openshift-virtualization-mtv',
       secondaryLinkExternal: true,
       secondaryLinkHref: mtvLink,
