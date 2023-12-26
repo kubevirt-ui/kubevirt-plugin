@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
@@ -14,6 +14,8 @@ import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/Hardware
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
+import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
@@ -47,6 +49,9 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { cpuCount, memory } = getVmCPUMemory(vm);
+  const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
+    DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
+  );
   const description = getAnnotation(vm, 'description');
   const workloadAnnotation = getWorkload(vm);
   const startStrategy = vm?.spec?.template?.spec?.startStrategy;
@@ -66,9 +71,13 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   const gpusCount = getGPUDevices(vm)?.length || 0;
   const nDevices = hostDevicesCount + gpusCount;
   const [isChecked, setIsChecked] = useState<boolean>(!!startStrategy);
-  const [isCheckedGuestSystemLogAccess, setIsCheckedGuestSystemLogAccess] = useState<boolean>(
-    logSerialConsole || logSerialConsole === undefined,
-  );
+  const [isCheckedGuestSystemLogAccess, setIsCheckedGuestSystemLogAccess] = useState<boolean>();
+
+  useEffect(() => {
+    setIsCheckedGuestSystemLogAccess(
+      (logSerialConsole || logSerialConsole === undefined) && !isDisabledGuestSystemLogs,
+    );
+  }, [isDisabledGuestSystemLogs, logSerialConsole]);
 
   const updateWorkload = (newWorkload: string) => {
     return updateVM((draftVM) => {
@@ -302,12 +311,15 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
                 }}
                 id="guest-system-log-access"
                 isChecked={isCheckedGuestSystemLogAccess}
+                isDisabled={isDisabledGuestSystemLogs}
               />
             }
             helperPopover={{
-              content: t(
-                'Enables access to the VirtualMachine guest system log. Wait a few seconds for logging to start before viewing the log.',
-              ),
+              content: isDisabledGuestSystemLogs
+                ? t('Guest system access logs disabled at cluster')
+                : t(
+                    'Enables access to the VirtualMachine guest system log. Wait a few seconds for logging to start before viewing the log.',
+                  ),
               header: t('Guest system log access'),
             }}
             testId="guest-system-log-access"
