@@ -7,10 +7,11 @@ import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { generateParamsWithPrettyName } from './../utils/helpers';
 
-export default (template: V1Template): [template: V1Template, error: Error] => {
+export default (template: V1Template): [template: V1Template, loading: boolean, error: Error] => {
   const [error, setError] = useState<Error>();
   const { ns: namespace = DEFAULT_NAMESPACE } = useParams<{ ns: string }>();
   const [templateWithGeneratedValues, setTemplateWithGeneratedValues] = useState<V1Template>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (!template) return;
@@ -30,10 +31,10 @@ export default (template: V1Template): [template: V1Template, error: Error] => {
 
     if (parametersToGenerate.length === 0) {
       setError(null);
-      setTemplateWithGeneratedValues(template);
+      setTemplateWithGeneratedValues({ ...template, parameters });
       return;
     }
-
+    setLoading(true);
     k8sCreate<V1Template>({
       data: {
         ...template,
@@ -55,8 +56,9 @@ export default (template: V1Template): [template: V1Template, error: Error] => {
         });
         setError(null);
       })
-      .catch(setError);
+      .catch(setError)
+      .finally(() => setLoading(false));
   }, [namespace, template]);
 
-  return [templateWithGeneratedValues, error];
+  return [templateWithGeneratedValues, loading, error];
 };
