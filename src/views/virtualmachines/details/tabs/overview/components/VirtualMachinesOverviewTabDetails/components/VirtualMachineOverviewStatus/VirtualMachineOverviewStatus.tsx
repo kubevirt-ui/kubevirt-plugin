@@ -5,6 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { Popover, PopoverPosition, Text } from '@patternfly/react-core';
 
+import { createURL } from '../../../../utils/utils';
 import StatusPopoverButton from '../StatusPopoverButton/StatusPopoverButton';
 
 type VirtualMachineOverviewStatusProps = {
@@ -29,7 +30,7 @@ const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({
             </Text>
             <br />
             <Text>
-              <Link to={(location) => location?.pathname + '/diagnostics'}>
+              <Link to={(location) => createURL('diagnostics', location?.pathname)}>
                 {t('View diagnostic')}
               </Link>
             </Text>
