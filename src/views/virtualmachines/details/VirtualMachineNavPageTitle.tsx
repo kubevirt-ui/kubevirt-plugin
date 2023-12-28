@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import ForceStopAlert from '@kubevirt-utils/components/ForceStopAlert/ForceStopAlert';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -84,7 +83,6 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name,
         </Split>
       </span>
       <VirtualMachinePendingChangesAlert vm={vm} vmi={vmi} />
-      <ForceStopAlert vm={vm} />
     </div>
   );
 };
