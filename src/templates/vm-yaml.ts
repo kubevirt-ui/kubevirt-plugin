@@ -9,14 +9,14 @@ metadata:
     description: VM example
   labels:
     app: example
-    os.template.kubevirt.io/fedora36: 'true'
+    os.template.kubevirt.io/fedora: 'true'
 spec:
   running: false
   template:
     metadata:
       annotations:
         vm.kubevirt.io/flavor: small
-        vm.kubevirt.io/os: fedora36
+        vm.kubevirt.io/os: fedora
         vm.kubevirt.io/workload: server
       labels:
         kubevirt.io/domain: example
@@ -60,7 +60,7 @@ spec:
       volumes:
         - name: rootdisk
           containerDisk:
-            image: 'quay.io/containerdisks/fedora:36'
+            image: 'quay.io/containerdisks/fedora'
         - cloudInitNoCloud:
             userData: |-
               #cloud-config
