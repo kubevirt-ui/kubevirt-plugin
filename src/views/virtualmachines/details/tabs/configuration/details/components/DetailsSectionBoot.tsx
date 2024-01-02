@@ -54,7 +54,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({ canUpdateVM, vm, vmi 
             <FirmwareBootloaderModal
               isOpen={isOpen}
               onClose={onClose}
-              onSubmit={updateBootLoader}
+              onSubmit={(updatedVM) => updateBootLoader(updatedVM, vm)}
               vm={vm}
               vmi={vmi}
             />

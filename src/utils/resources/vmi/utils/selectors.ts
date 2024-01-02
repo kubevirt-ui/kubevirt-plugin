@@ -1,4 +1,5 @@
 import {
+  V1Bootloader,
   V1Devices,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceNetworkInterface,
@@ -46,3 +47,6 @@ export const getVMIStatusInterfaces = (
 
 export const getVMIDevices = (vmi: V1VirtualMachineInstance): V1Devices =>
   vmi?.spec?.domain?.devices;
+
+export const getVMIBootLoader = (vmi: V1VirtualMachineInstance): V1Bootloader =>
+  vmi?.spec?.domain?.firmware.bootloader;
