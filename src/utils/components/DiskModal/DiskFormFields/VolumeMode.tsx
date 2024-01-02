@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, FC, useEffect, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
@@ -15,11 +15,11 @@ import {
 
 type VolumeModeProps = {
   diskState: DiskFormState;
-  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
+  dispatchDiskState: Dispatch<DiskReducerActionType>;
   spVolumeMode?: string;
 };
 
-const VolumeMode: React.FC<VolumeModeProps> = ({ diskState, dispatchDiskState, spVolumeMode }) => {
+const VolumeMode: FC<VolumeModeProps> = ({ diskState, dispatchDiskState, spVolumeMode }) => {
   const { t } = useKubevirtTranslation();
 
   const {
@@ -30,12 +30,12 @@ const VolumeMode: React.FC<VolumeModeProps> = ({ diskState, dispatchDiskState, s
     volumeMode,
   } = diskState || {};
 
-  const allowedVolumeModes = React.useMemo(
+  const allowedVolumeModes = useMemo(
     () => getVolumeModeForProvisioner(storageClassProvisioner, accessMode as AccessMode),
     [accessMode, storageClassProvisioner],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!storageProfileSettingsCheckboxDisabled) {
       if (applyStorageProfileSettings) {
         dispatchDiskState({
@@ -76,7 +76,7 @@ const VolumeMode: React.FC<VolumeModeProps> = ({ diskState, dispatchDiskState, s
           }
           id={value}
           isChecked={value === volumeMode}
-          isDisabled={!allowedVolumeModes?.includes(value)}
+          isDisabled={!allowedVolumeModes?.includes(value) || applyStorageProfileSettings}
           key={value}
           label={label}
           name="volumeMode"

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, FC, useEffect, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
@@ -14,11 +14,11 @@ import {
 
 type AccessModeProps = {
   diskState: DiskFormState;
-  dispatchDiskState: React.Dispatch<DiskReducerActionType>;
+  dispatchDiskState: Dispatch<DiskReducerActionType>;
   spAccessMode?: string;
 };
 
-const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatchDiskState, spAccessMode }) => {
+const AccessMode: FC<AccessModeProps> = ({ diskState, dispatchDiskState, spAccessMode }) => {
   const { t } = useKubevirtTranslation();
 
   const {
@@ -29,11 +29,11 @@ const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatchDiskState, s
     volumeMode,
   } = diskState || {};
 
-  const allowedAccessModes = React.useMemo(() => {
+  const allowedAccessModes = useMemo(() => {
     return getAccessModeForProvisioner(storageClassProvisioner, volumeMode as VolumeMode);
   }, [storageClassProvisioner, volumeMode]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!storageProfileSettingsCheckboxDisabled) {
       if (applyStorageProfileSettings) {
         dispatchDiskState({
@@ -74,7 +74,7 @@ const AccessMode: React.FC<AccessModeProps> = ({ diskState, dispatchDiskState, s
           }
           id={value}
           isChecked={value === accessMode}
-          isDisabled={!allowedAccessModes?.includes(value)}
+          isDisabled={!allowedAccessModes?.includes(value) || applyStorageProfileSettings}
           key={value}
           label={label}
           name="accessMode"

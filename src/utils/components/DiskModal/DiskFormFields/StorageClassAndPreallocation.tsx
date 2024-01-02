@@ -2,6 +2,7 @@ import React, { FC, useMemo } from 'react';
 
 import ApplyStorageProfileSettingsCheckbox from '@kubevirt-utils/components/ApplyStorageProfileSettingsCheckbox/ApplyStorageProfileSettingsCheckbox';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { Flex, FlexItem } from '@patternfly/react-core';
 
 import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 import { DiskFormState } from '../state/initialState';
@@ -13,6 +14,8 @@ import { sourceTypes } from './utils/constants';
 import AccessMode from './AccessMode';
 import EnablePreallocationCheckbox from './EnablePreallocationCheckbox';
 import VolumeMode from './VolumeMode';
+
+import './storage-class-and-preallocation.scss';
 
 type StorageClassAndPreallocationProps = {
   checkSC?: (selectedStorageClass: string) => boolean;
@@ -36,11 +39,20 @@ const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({
 
   if (!sourceRequiresDataVolume && diskState.diskSource !== sourceTypes.UPLOAD) return null;
 
-  const handleApplyOptimizedSettingsChange = (checked: boolean) =>
+  const handleApplyOptimizedSettingsChange = (checked: boolean) => {
     dispatchDiskState({
       payload: checked,
       type: diskReducerActions.SET_APPLY_STORAGE_PROFILE_SETTINGS,
     });
+    dispatchDiskState({
+      payload: claimPropertySets?.[0]?.volumeMode,
+      type: diskReducerActions.SET_VOLUME_MODE,
+    });
+    dispatchDiskState({
+      payload: claimPropertySets?.[0]?.accessModes[0],
+      type: diskReducerActions.SET_ACCESS_MODE,
+    });
+  };
 
   return (
     <>
@@ -57,22 +69,33 @@ const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({
         checkSC={checkSC}
         storageClass={diskState.storageClass}
       />
-      <ApplyStorageProfileSettingsCheckbox
-        claimPropertySets={claimPropertySets}
-        disabled={!storageProfileLoaded || !claimPropertySets || isEmpty(claimPropertySets)}
-        handleChange={handleApplyOptimizedSettingsChange}
-        isChecked={diskState?.applyStorageProfileSettings}
-      />
-      <AccessMode
-        diskState={diskState}
-        dispatchDiskState={dispatchDiskState}
-        spAccessMode={claimPropertySets?.[0]?.accessModes?.[0]}
-      />
-      <VolumeMode
-        diskState={diskState}
-        dispatchDiskState={dispatchDiskState}
-        spVolumeMode={claimPropertySets?.[0]?.volumeMode}
-      />
+      <div>
+        <ApplyStorageProfileSettingsCheckbox
+          claimPropertySets={claimPropertySets}
+          disabled={!storageProfileLoaded || !claimPropertySets || isEmpty(claimPropertySets)}
+          handleChange={handleApplyOptimizedSettingsChange}
+          isChecked={diskState?.applyStorageProfileSettings}
+        />
+        <Flex
+          className="StorageClassAndPreallocation--volume-access-section"
+          spaceItems={{ default: 'spaceItems3xl' }}
+        >
+          <FlexItem>
+            <AccessMode
+              diskState={diskState}
+              dispatchDiskState={dispatchDiskState}
+              spAccessMode={claimPropertySets?.[0]?.accessModes?.[0]}
+            />
+          </FlexItem>
+          <FlexItem>
+            <VolumeMode
+              diskState={diskState}
+              dispatchDiskState={dispatchDiskState}
+              spVolumeMode={claimPropertySets?.[0]?.volumeMode}
+            />
+          </FlexItem>
+        </Flex>
+      </div>
       <EnablePreallocationCheckbox
         dispatchDiskState={dispatchDiskState}
         enablePreallocation={diskState.enablePreallocation}
