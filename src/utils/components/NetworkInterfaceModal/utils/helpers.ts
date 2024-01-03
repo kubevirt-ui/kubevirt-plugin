@@ -1,6 +1,7 @@
 import produce from 'immer';
 
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces } from '@kubevirt-utils/resources/vm';
 import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -72,7 +73,8 @@ export const createNetwork = (nicName: string, networkName: string): V1Network =
   };
 
   if (!networkNameStartWithPod(networkName) && networkName) {
-    network.multus = { networkName: networkName?.split('/')?.[1] || networkName };
+    const [namespace, name] = networkName?.split('/');
+    network.multus = { networkName: namespace === DEFAULT_NAMESPACE ? networkName : name };
   } else {
     network.pod = {};
   }
