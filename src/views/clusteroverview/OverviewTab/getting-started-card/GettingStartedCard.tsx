@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -15,7 +15,7 @@ import useGettingStartedShowState from './utils/hooks/useGettingStartedShowState
 
 import './GettingStartedCard.scss';
 
-const GettingStartedCard: React.FC = () => {
+const GettingStartedCard: FC = () => {
   const { t } = useKubevirtTranslation();
   const [showState, setShowState, showStateLoaded] = useGettingStartedShowState(
     KUBEVIRT_QUICK_START_USER_SETTINGS_KEY,
@@ -32,7 +32,7 @@ const GettingStartedCard: React.FC = () => {
               'Learn how to create, import, and run virtual machines on OpenShift with step-by-step instructions and tasks.',
             )}
             featured={['explore-pipelines', 'connect-ext-net-to-vm', 'create-rhel-vm']}
-            filter={(qs) => ['explore-pipelines'].includes(qs.metadata.name)}
+            filter={(qs) => ['creating-virtual-machine-from-volume'].includes(qs.metadata.name)}
             title={t('Quick Starts')}
           />
           <FeatureHighlightsSection />
