@@ -45,7 +45,7 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
 
         return onSubmit(sshDetails);
       }}
-      headerText={t('Authorized SSH key')}
+      headerText={t('Public SSH key')}
       isDisabled={isDisabled}
       isOpen={isOpen}
       onClose={onClose}

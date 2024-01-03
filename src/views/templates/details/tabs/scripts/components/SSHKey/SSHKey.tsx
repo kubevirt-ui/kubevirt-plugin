@@ -120,7 +120,7 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
           <Flex className="vm-description-item__title">
             <FlexItem>
               <Title headingLevel="h2">
-                {t('Authorized SSH key')} {<LinuxLabel />}
+                {t('Public SSH key')} {<LinuxLabel />}
               </Title>
             </FlexItem>
             <FlexItem>

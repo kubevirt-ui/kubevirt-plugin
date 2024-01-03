@@ -30,7 +30,7 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, templat
       <SplitItem>
         <DescriptionList>
           <DescriptionListGroup>
-            <DescriptionListTerm>{t('Authorized SSH key')}</DescriptionListTerm>
+            <DescriptionListTerm>{t('Public SSH key')}</DescriptionListTerm>
             <DescriptionListDescription>{authorizedSSHKey}</DescriptionListDescription>
             {!isEmpty(additionalSecretResource) && (
               <HelperText>

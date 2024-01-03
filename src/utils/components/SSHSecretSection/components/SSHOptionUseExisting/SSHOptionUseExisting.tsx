@@ -138,7 +138,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
           <FormGroup
             className="ssh-secret-section__form-group-secret"
             fieldId="secret"
-            label={t('Authorized SSH key')}
+            label={t('Public SSH key')}
           >
             <SecretDropdown
               namespace={namespace}

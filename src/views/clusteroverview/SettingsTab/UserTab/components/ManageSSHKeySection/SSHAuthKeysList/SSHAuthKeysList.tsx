@@ -42,7 +42,7 @@ const SSHAuthKeysList: FC = () => {
             </GridItem>
             <GridItem span={1} />
             <GridItem span={5}>
-              <Text component={TextVariants.h6}>{t('Authorized SSH key')}</Text>
+              <Text component={TextVariants.h6}>{t('Public SSH key')}</Text>
             </GridItem>
           </Grid>
           {authKeyRows?.map((row) => (
@@ -65,7 +65,7 @@ const SSHAuthKeysList: FC = () => {
         onClick={onAuthKeyAdd}
         variant="link"
       >
-        {t('Add authorized SSH key to project')}
+        {t('Add public SSH key to project')}
       </Button>
     </>
   );

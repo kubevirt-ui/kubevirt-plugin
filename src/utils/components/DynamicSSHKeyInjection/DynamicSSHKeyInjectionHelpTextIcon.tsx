@@ -17,7 +17,7 @@ const DynamicSSHKeyInjectionHelpTextIcon: FC<DynamicSSHKeyInjectionHelpTextIconP
       bodyContent={
         isDisabled
           ? t(
-              'Only RHEL 9 supports dynamic SSH key injection. Instead, you must add an authorized SSH key before the VirtualMachine boots for the first time.',
+              'Only RHEL 9 supports dynamic SSH key injection. Instead, you must add an public SSH key before the VirtualMachine boots for the first time.',
             )
           : t(
               'Requires RHEL 9. If enabled, SSH keys can be changed while the VirtualMachine is running. Otherwise, the VirtualMachine inherits the key injection setting of its image.',
