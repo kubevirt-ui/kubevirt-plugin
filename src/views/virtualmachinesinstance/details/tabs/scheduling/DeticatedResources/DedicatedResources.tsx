@@ -10,7 +10,7 @@ type DedicatedResourcesProps = {
 
 const DedicatedResources: FC<DedicatedResourcesProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const isDedicatedResources = getCPU(vmi).dedicatedCpuPlacement;
+  const isDedicatedResources = getCPU(vmi)?.dedicatedCpuPlacement;
 
   return isDedicatedResources
     ? t('Workload scheduled with dedicated resources (guaranteed policy)')
