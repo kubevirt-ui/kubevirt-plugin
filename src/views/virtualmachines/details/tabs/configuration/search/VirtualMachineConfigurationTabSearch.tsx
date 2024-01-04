@@ -1,10 +1,22 @@
-import React, { FC, FormEvent, MouseEvent, useEffect, useState } from 'react';
+import React, { FC, FormEvent, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import useEventListener from '@kubevirt-utils/hooks/useEventListener';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Menu, MenuContent, MenuItem, MenuList, Popper, SearchInput } from '@patternfly/react-core';
+import {
+  Bullseye,
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuList,
+  Popper,
+  SearchInput,
+  Title,
+} from '@patternfly/react-core';
+import { SearchIcon } from '@patternfly/react-icons';
 
 import { getSearchItems, SearchItem } from '../utils/search';
 
@@ -19,7 +31,7 @@ type VirtualMachineConfigurationTabSearchProps = {
 const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSearchProps> = ({
   vm,
 }) => {
-  const searchItems = getSearchItems(vm);
+  const searchItems = useMemo(() => getSearchItems(vm), [vm]);
   const [value, setValue] = useState<string>('');
   const history = useHistory();
   const [autocompleteOptions, setAutocompleteOptions] =
@@ -31,6 +43,13 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
   const onClear = () => {
     setValue('');
   };
+
+  // Every click on item set and render as its pushing new url - this is for keeping the select item in search bar
+  useEffect(() => {
+    const hash = history?.location?.hash;
+    const item = searchItems?.find(({ element }) => element?.id === hash.substring(1));
+    setValue(item?.element?.title || '');
+  }, [history.location.hash, searchItems]);
 
   const onChange = (_e: FormEvent<HTMLInputElement>, newValue: string) => {
     setIsAutocompleteOpen(true);
@@ -91,6 +110,14 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
                   {element?.title}
                 </MenuItem>
               ))}
+              {isEmpty(autocompleteOptions) && (
+                <Bullseye className="VirtualMachineConfigurationTanSearch--main__no-results">
+                  <SearchIcon color="grey" size="xl" />
+                  <Title headingLevel="h5">
+                    <MutedTextSpan text={t('No configurable settings found')} />
+                  </Title>
+                </Bullseye>
+              )}
             </MenuList>
           </MenuContent>
         </Menu>
