@@ -542,6 +542,7 @@
   "Guest management": "Guest management",
   "Guest system access logs are disabled at cluster": "Guest system access logs are disabled at cluster",
   "Guest system access logs are disabled at VirtualMachine": "Guest system access logs are disabled at VirtualMachine",
+  "Guest system access logs disabled at cluster": "Guest system access logs disabled at cluster",
   "Guest system access logs not ready. a restart required": "Guest system access logs not ready. a restart required",
   "Guest system log access": "Guest system log access",
   "Hardware devices": "Hardware devices",
