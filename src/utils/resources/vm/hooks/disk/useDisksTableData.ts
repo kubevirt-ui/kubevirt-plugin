@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { isRunning } from 'src/views/virtualmachines/utils';
 
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   getRunningVMMissingDisksFromVMI,
@@ -9,7 +10,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getBootDisk, getDisks, getVolumes } from '../../utils';
 import { getDiskRowDataLayout } from '../../utils/disk/rowData';
@@ -46,7 +47,7 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
     [vm, vmi, isVMRunning],
   );
 
-  const [pvcs, loaded, loadingError] = useK8sWatchResource<K8sResourceCommon[]>({
+  const [pvcs, loaded, loadingError] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>({
     isList: true,
     kind: PersistentVolumeClaimModel.kind,
     namespace: vm?.metadata?.namespace,

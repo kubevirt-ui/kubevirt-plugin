@@ -1,14 +1,10 @@
-import {
-  V1alpha1PersistentVolumeClaim,
-  V1DataVolumeTemplateSpec,
-  V1Disk,
-  V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { V1DataVolumeTemplateSpec, V1Disk, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export type DiskRawData = {
   dataVolumeTemplate?: V1DataVolumeTemplateSpec;
   disk: V1Disk;
-  pvc?: V1alpha1PersistentVolumeClaim;
+  pvc?: IoK8sApiCoreV1PersistentVolumeClaim;
   volume: V1Volume;
 };
 
@@ -22,6 +18,7 @@ export type DiskRowDataLayout = {
   namespace?: string;
   size: string;
   source: string;
+  sourceStatus?: string;
   storageClass: string;
 };
 
