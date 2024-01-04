@@ -13,6 +13,11 @@ export const getVMIIPAddresses = (vmi: V1VirtualMachineInstance): string[] => {
     iface?.ipAddress,
     ...(iface?.ipAddresses || []),
   ]);
-  const trimmedIPAddresses = ipAddresses?.map((ip) => ip?.trim())?.filter((ip) => ip?.length > 0);
+  const trimmedIPAddresses = ipAddresses
+    ?.map((ip) => ip?.trim())
+    ?.filter((ip) => ip?.length > 0 && isIPv4(ip));
   return [...new Set(trimmedIPAddresses)];
 };
+
+export const isIPv4 = (str: string) =>
+  /^((25[0-5]|(2[0-4]|1[0-9]|[1-9]|)[0-9])(\.(?!$)|$)){4}$/.test(str);

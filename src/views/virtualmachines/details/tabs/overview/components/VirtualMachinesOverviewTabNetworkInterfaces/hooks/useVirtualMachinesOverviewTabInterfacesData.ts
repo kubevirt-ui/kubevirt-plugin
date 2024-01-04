@@ -1,6 +1,6 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { isIPv4 } from '@kubevirt-utils/resources/vmi';
 
 import { InterfacesData } from '../utils/types';
 
@@ -19,7 +19,9 @@ const useVirtualMachinesOverviewTabInterfacesData: UseVirtualMachinesOverviewTab
 
   const networkInterfacesData = interfaces?.map((iface) => {
     const network = networks?.find((net) => net.name === iface.name);
-    const ipAddresses = interfacesIPs.find((iIP) => iIP.name === iface.name)?.ipAddresses;
+    const ipAddresses = interfacesIPs
+      .find((iIP) => iIP.name === iface.name)
+      ?.ipAddresses?.filter(isIPv4);
     return {
       iface,
       ipAddresses,
