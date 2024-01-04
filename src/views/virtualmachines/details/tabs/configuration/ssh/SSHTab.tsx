@@ -23,7 +23,7 @@ const SSHTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
     >
       <PageSection>
         <Title headingLevel="h2">
-          <SearchItem id="ssh">{t('SSH')} </SearchItem>
+          <SearchItem id="ssh">{t('SSH settings')} </SearchItem>
         </Title>
         <Grid span={6}>
           <GridItem>

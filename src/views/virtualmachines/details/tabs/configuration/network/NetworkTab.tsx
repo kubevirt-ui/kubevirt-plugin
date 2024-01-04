@@ -26,7 +26,7 @@ const NetworkTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
     >
       <PageSection>
         <Title headingLevel="h2">
-          <SearchItem id="network">{t('Network')}</SearchItem>
+          <SearchItem id="network">{t('Network interfaces')}</SearchItem>
         </Title>
         <AddNetworkInterfaceButton vm={vm} vmi={vmi} />
         <NetworkInterfaceList vm={vm} vmi={vmi} />
