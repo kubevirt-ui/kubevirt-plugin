@@ -1,7 +1,9 @@
 import React, { FC } from 'react';
 
-import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachinePreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
+import {
+  modelToGroupVersionKind,
+  VirtualMachineClusterPreferenceModelGroupVersionKind,
+} from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -47,7 +49,7 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
         <DescriptionListDescription data-test-id="virtual-machine-overview-details-preference">
           {preferenceMatcher ? (
             <ResourceLink
-              groupVersionKind={modelToGroupVersionKind(VirtualMachinePreferenceModel)}
+              groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
               name={preferenceMatcher.name}
             />
           ) : (
