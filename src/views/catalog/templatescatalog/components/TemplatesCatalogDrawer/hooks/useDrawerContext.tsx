@@ -55,7 +55,7 @@ const useDrawer = (template: V1Template) => {
   const [diskFile, setDiskFile] = useState<File | string>();
   const [cdFile, setCDFile] = useState<File | string>();
 
-  const [templateWithGeneratedParams, error] = useVMTemplateGeneratedParams(template);
+  const [templateWithGeneratedParams, loading, error] = useVMTemplateGeneratedParams(template);
 
   const vm = useMemo(
     () => getTemplateVirtualMachineObject(customizedTemplate),
@@ -89,7 +89,7 @@ const useDrawer = (template: V1Template) => {
     setTemplate: setCustomizedTemplate,
     setVM,
     template: customizedTemplate || template,
-    templateDataLoaded: !!templateWithGeneratedParams && bootSourceLoaded,
+    templateDataLoaded: !!templateWithGeneratedParams && !loading && bootSourceLoaded,
     templateLoadingError: error,
     uploadCDData,
     uploadDiskData,
