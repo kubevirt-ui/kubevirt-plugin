@@ -1,6 +1,6 @@
 import byteSize, { ByteSizeResult } from 'byte-size';
 
-import { binaryUnits, customUnits, multipliers, toIECUnit } from '@kubevirt-utils/utils/units';
+import { customUnits, multipliers, toIECUnit } from '@kubevirt-utils/utils/units';
 
 export const bytesToIECBytes = (
   bytes: number,
@@ -15,8 +15,8 @@ export const bytesToIECBytes = (
 };
 
 export const bytesToDiskSize = (size: string) => {
-  const bytesizeresult = bytesToIECBytes(parseFloat(size), 0, binaryUnits);
-  return [bytesizeresult.value, bytesizeresult.unit].join('');
+  const bytesizeresult = bytesFromQuantity(size, 0);
+  return [bytesizeresult[0], bytesizeresult[1]].join('');
 };
 
 export const bytesFromQuantity = (
