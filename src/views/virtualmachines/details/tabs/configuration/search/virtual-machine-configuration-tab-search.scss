@@ -2,5 +2,14 @@
   &--main {
     margin-bottom: var(--pf-global--spacer--md);
     margin-top: calc(-1 * var(--pf-global--spacer--sm));
+    &__no-results {
+      flex-direction: column;
+      > * {
+        margin-top: var(--pf-global--spacer--md);
+      }
+      > :last-child {
+        margin-bottom: var(--pf-global--spacer--md);
+      }
+    }
   }
 }
