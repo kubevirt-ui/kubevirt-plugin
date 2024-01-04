@@ -31,18 +31,20 @@ export const updateStartStrategy = (checked: boolean, vm: V1VirtualMachine) => {
   });
 };
 
-export const updateBootLoader = (updatedVM: V1VirtualMachine) =>
-  k8sPatch({
+export const updateBootLoader = (updatedVM: V1VirtualMachine, vm: V1VirtualMachine) => {
+  const bootLoaderBeforeUpdate = getBootloader(vm);
+  return k8sPatch({
     data: [
       {
-        op: 'replace',
-        path: `/spec/template/spec/domain/firmware/bootloader`,
-        value: getBootloader(updatedVM),
+        op: bootLoaderBeforeUpdate ? 'replace' : 'add',
+        path: `/spec/template/spec/domain/firmware`,
+        value: { bootloader: getBootloader(updatedVM) },
       },
     ],
     model: VirtualMachineModel,
     resource: updatedVM,
   });
+};
 
 export const updatedBootOrder = (updatedVM: V1VirtualMachine) =>
   k8sPatch({

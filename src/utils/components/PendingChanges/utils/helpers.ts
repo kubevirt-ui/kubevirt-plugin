@@ -40,12 +40,15 @@ import {
   getEvictionStrategy as getVMIEvictionStrategy,
 } from '@kubevirt-utils/resources/vmi';
 import {
+  getVMIBootLoader,
   getVMIDevices,
   getVMIInterfaces,
   getVMIVolumes,
 } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isPendingHotPlugNIC } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
+
+import { getBootloader } from '../../../resources/vm/utils/selectors';
 
 import { PendingChange } from './types';
 
@@ -93,8 +96,8 @@ export const checkBootModeChanged = (
   if (isEmpty(vm) || isEmpty(vmi)) {
     return false;
   }
-  const vmiBootloader = vmi?.spec?.domain?.firmware?.bootloader;
-  const vmBootloader = vm?.spec?.template?.spec?.domain?.firmware?.bootloader;
+  const vmiBootloader = getVMIBootLoader(vmi);
+  const vmBootloader = getBootloader(vm);
   return !isEqualObject(vmiBootloader, vmBootloader);
 };
 
