@@ -41,7 +41,7 @@ const SSHTabAuthorizedSSHKey = ({ vm }) => {
     <ExpandableSection
       toggleContent={
         <div>
-          <SearchItem id="authorized-ssh-key">{t('Authorized SSH key')}</SearchItem> <LinuxLabel />{' '}
+          <SearchItem id="public-ssh-key">{t('Public SSH key')}</SearchItem> <LinuxLabel />{' '}
           <EditButtonWithTooltip
             onEditClick={() =>
               createModal((modalProps) => (

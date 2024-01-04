@@ -114,7 +114,7 @@ const SSHKey: FC = () => {
       label={<LinuxLabel />}
       showEditOnTitle
       testId="wizard-sshkey"
-      title={t('Authorized SSH key')}
+      title={t('Public SSH key')}
     />
   );
 };

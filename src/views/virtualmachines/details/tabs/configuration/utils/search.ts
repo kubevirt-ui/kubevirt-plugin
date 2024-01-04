@@ -61,7 +61,7 @@ export const getSchedulingTabIds: SearchItemGetter = () => [
 export const getSSHTabIds: SearchItemGetter = () => [
   { description: '', id: 'ssh', title: t('SSH') },
   { description: '', id: 'ssh-access', title: t('SSH access') },
-  { description: '', id: 'authorized-ssh-key', title: t('Authorized SSH key') },
+  { description: '', id: 'public-ssh-key', title: t('Public SSH key') },
 ];
 
 export const getInitialRunTabIds: SearchItemGetter = () => [

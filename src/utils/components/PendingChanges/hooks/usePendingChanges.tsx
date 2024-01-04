@@ -410,7 +410,7 @@ export const usePendingChanges = (
         ));
       },
       hasPendingChange: sshServiceChanged,
-      label: t('Authorized SSH key'),
+      label: t('Public SSH key'),
       tabLabel: VirtualMachineDetailsTabLabel.Scripts,
     },
     {
