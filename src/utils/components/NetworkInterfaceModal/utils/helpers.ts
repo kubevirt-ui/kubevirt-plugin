@@ -36,7 +36,7 @@ export const updateVMNetworkInterfaces = (
 };
 
 const getInterface = (interfaces: V1Interface[], nicName: string) =>
-  interfaces.find((iface) => iface?.name === nicName);
+  interfaces?.find((iface) => iface?.name === nicName);
 
 /**
  * To delete a hot plug NIC the state of the interface is set to 'absent'. The
