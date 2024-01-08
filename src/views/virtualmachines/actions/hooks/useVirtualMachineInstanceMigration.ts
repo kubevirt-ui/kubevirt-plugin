@@ -8,6 +8,11 @@ const useVirtualMachineInstanceMigration = (resource: K8sResourceCommon) => {
     isList: true,
     name: `${resource?.metadata?.name}-migration`,
     namespace: resource?.metadata?.namespace,
+    selector: {
+      matchLabels: {
+        'kubevirt.io/vmi-name': resource?.metadata?.name,
+      },
+    },
   });
 
   // since migration objects are kepts until VMI is deleted
