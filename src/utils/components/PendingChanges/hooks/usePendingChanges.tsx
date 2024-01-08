@@ -31,6 +31,7 @@ import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConverg
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import { isInstanceTypeVM } from '@kubevirt-utils/resources/vm/utils/instanceTypes';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -66,7 +67,6 @@ export const usePendingChanges = (
   vmi: V1VirtualMachineInstance,
 ): PendingChange[] => {
   const { t } = useKubevirtTranslation();
-  const isInstanceTypeVM = !isEmpty(vm?.spec?.instancetype) || !isEmpty(vm?.spec?.preference);
 
   const history = useHistory();
   const { createModal } = useModal();
@@ -137,7 +137,7 @@ export const usePendingChanges = (
           <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
         ));
       },
-      hasPendingChange: !isInstanceTypeVM && cpuMemoryChanged,
+      hasPendingChange: !isInstanceTypeVM(vm) && cpuMemoryChanged,
       label: t('CPU | Memory'),
       tabLabel: VirtualMachineDetailsTabLabel.Details,
     },

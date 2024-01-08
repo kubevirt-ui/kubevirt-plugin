@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,16 +13,13 @@ import {
   PageSection,
   PageSectionVariants,
 } from '@patternfly/react-core';
+import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { printableVMStatus } from '../../../utils';
 
 import VirtualMachineConsolePageTitle from './components/VirtualMachineConsolePageTitle';
 
-type VirtualMachineConsolePageProps = {
-  obj: V1VirtualMachine;
-};
-
-const VirtualMachineConsolePage: FC<VirtualMachineConsolePageProps> = ({ obj: vm }) => {
+const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const [vmi, vmiLoaded] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,

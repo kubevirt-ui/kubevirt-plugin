@@ -1,12 +1,12 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableSection, Title } from '@patternfly/react-core';
+import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import MigrationCharts from './MigrationCharts/MigrationCharts';
 import NetworkCharts from './NetworkCharts/NetworkCharts';
@@ -17,11 +17,7 @@ import { MetricsTabExpendedSections } from './utils/utils';
 
 import './virtual-machine-metrics-tab.scss';
 
-type VirtualMachineMetricsTabProps = {
-  obj: V1VirtualMachine;
-};
-
-const VirtualMachineMetricsTab: FC<VirtualMachineMetricsTabProps> = ({ obj: vm }) => {
+const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
   const { loaded, pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);

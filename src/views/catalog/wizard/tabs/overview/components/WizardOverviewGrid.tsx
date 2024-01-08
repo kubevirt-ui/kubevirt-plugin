@@ -62,7 +62,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   const disks = vm?.spec?.template?.spec?.domain?.devices?.disks;
   const displayName = tabsData?.overview?.templateMetadata?.displayName;
   const logSerialConsole = (
-    vm.spec.template.spec.domain.devices as V1Devices & {
+    vm?.spec?.template?.spec?.domain?.devices as V1Devices & {
       logSerialConsole: boolean;
     }
   )?.logSerialConsole;
@@ -104,7 +104,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
                 <VMNameModal {...modalProps} onSubmit={updateVM} vm={vm} />
               ))
             }
-            description={vm.metadata.name}
+            description={vm?.metadata?.name}
             helperPopover={{ content: t('Name of the VirtualMachine'), header: t('Name') }}
             isEdit
             testId="wizard-overview-name"
@@ -116,7 +116,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               content: t('Namespace of the VirtualMachine'),
               header: t('Namespace'),
             }}
-            description={vm.metadata.namespace}
+            description={vm?.metadata?.namespace}
             testId="wizard-overview-namespace"
             title={t('Namespace')}
           />

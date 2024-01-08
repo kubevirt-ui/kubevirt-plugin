@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import useDiagnosticData from './hooks/useDianosticData';
 import VirtualMachineDiagnosticTabConditions from './tables/VirtualMachineDiagnosticTabConditions';
@@ -10,11 +10,7 @@ import VirtualMachineLogViewer from './VirtualMachineLogViewer/VirtualMachineLog
 
 import './virtual-machine-diagnostic-tab.scss';
 
-type VirtualMachineDiagnosticTabProps = {
-  obj: V1VirtualMachine;
-};
-
-const VirtualMachineDiagnosticTab: FC<VirtualMachineDiagnosticTabProps> = ({ obj: vm }) => {
+const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ vm }) => {
   const { conditions, volumeSnapshotStatuses } = useDiagnosticData(vm);
   const [activeTabKey, setActiveTabKey] = useState<number>(0);
 

@@ -57,7 +57,7 @@ const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
             {t('Flavor')}
           </TextListItem>
           <TextListItem component={TextListItemVariants.dd}>
-            <CPUMemory vm={vm} />
+            <CPUMemory vm={vm} vmi={vmi} />
           </TextListItem>
           <TextListItem className="text-muted" component={TextListItemVariants.dt}>
             {t('Workload profile')}

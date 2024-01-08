@@ -1,17 +1,13 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
+import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import './virtual-machine-yaml-page.scss';
 
-type VirtualMachineYAMLPageProps = {
-  obj?: V1VirtualMachine;
-};
-
-const VirtualMachineYAMLPage: FC<VirtualMachineYAMLPageProps> = ({ obj: vm }) => {
+const VirtualMachineYAMLPage: FC<NavPageComponentProps> = ({ vm }) => {
   const loading = (
     <Bullseye>
       <Loading />

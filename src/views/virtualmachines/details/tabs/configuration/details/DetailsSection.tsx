@@ -46,11 +46,12 @@ import {
 import './details-section.scss';
 
 type DetailsSectionProps = {
+  instanceTypeVM: V1VirtualMachine;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
-const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
+const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
@@ -148,7 +149,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
               }
               bodyContent={vm?.spec?.instancetype ? null : <CPUDescription cpu={getCPU(vm)} />}
               data-test-id={`${vmName}-cpu-memory`}
-              descriptionData={<CPUMemory vm={vm} />}
+              descriptionData={<CPUMemory vm={instanceTypeVM || vm} vmi={vmi} />}
               descriptionHeader={<SearchItem id="cpu-memory">{t('CPU | Memory')}</SearchItem>}
               isDisabled={!!vm?.spec?.instancetype}
               isEdit={canUpdateVM}
@@ -212,7 +213,12 @@ const DetailsSection: FC<DetailsSectionProps> = ({ vm, vmi }) => {
         <GridItem span={5}>
           <DescriptionList>
             <DetailsSectionHardware vm={vm} vmi={vmi} />
-            <DetailsSectionBoot canUpdateVM={canUpdateVM} vm={vm} vmi={vmi} />
+            <DetailsSectionBoot
+              canUpdateVM={canUpdateVM}
+              instanceTypeVM={instanceTypeVM}
+              vm={vm}
+              vmi={vmi}
+            />
           </DescriptionList>
         </GridItem>
       </Grid>
