@@ -2,12 +2,19 @@ import { VirtualMachineInstanceMigrationModelGroupVersionKind } from '@kubevirt-
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
+import { MIRATION_VMI_NAME_LABEL } from './constants';
+
 const useVirtualMachineInstanceMigration = (resource: K8sResourceCommon) => {
   const [vmims] = useK8sWatchResource<V1VirtualMachineInstanceMigration[]>({
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
     name: `${resource?.metadata?.name}-migration`,
     namespace: resource?.metadata?.namespace,
+    selector: {
+      matchLabels: {
+        [MIRATION_VMI_NAME_LABEL]: resource?.metadata?.name,
+      },
+    },
   });
 
   // since migration objects are kepts until VMI is deleted
