@@ -7,6 +7,7 @@ const instanceTypeVMInitialState: InstanceTypeVMState = {
   pvcSource: null,
   selectedBootableVolume: null,
   selectedInstanceType: '',
+  selectedStorageClass: null,
   sshSecretCredentials: initialSSHCredentials,
   vmName: '',
 };

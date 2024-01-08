@@ -31,6 +31,7 @@ export type InstanceTypeVMState = {
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   selectedBootableVolume: BootableVolume;
   selectedInstanceType: string;
+  selectedStorageClass: string;
   sshSecretCredentials: SSHSecretDetails;
   vmName: string;
 };
@@ -64,6 +65,7 @@ type InstanceTypeVMStoreActions = {
   resetInstanceTypeVMState: () => void;
   setInstanceTypeVMState: Dispatch<InstanceTypeAction>;
   setIsChangingNamespace: () => void;
+  setSelectedStorageClass: (storageClass: string) => void;
   setVMNamespaceTarget: (sshSecretName: string, targetNamespace: string) => void;
 };
 

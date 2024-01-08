@@ -103,7 +103,8 @@ export const generateVM = (
                 }),
             storage: {
               resources: { requests: { storage: pvcSource?.spec?.resources?.requests?.storage } },
-              storageClassName: pvcSource?.spec?.storageClassName,
+              storageClassName:
+                instanceTypeState.selectedStorageClass || pvcSource?.spec?.storageClassName,
             },
           },
         },

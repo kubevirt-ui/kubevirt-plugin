@@ -39,7 +39,7 @@ const CreateFromInstanceType: FC = () => {
   const bootableVolumesData = useBootableVolumes(getOSImagesNS());
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences();
   const [activeNamespace] = useActiveNamespace();
-  const [authourizedSSHKeys, , loaded] = useKubevirtUserSettings('ssh');
+  const [authorizedSSHKeys, , loaded] = useKubevirtUserSettings('ssh');
 
   const { resetInstanceTypeVMState, setVMNamespaceTarget } = useInstanceTypeVMStore();
 
@@ -50,8 +50,8 @@ const CreateFromInstanceType: FC = () => {
   useEffect(() => {
     const targetNS =
       activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace;
-    setVMNamespaceTarget(authourizedSSHKeys?.[targetNS], targetNS);
-  }, [activeNamespace, authourizedSSHKeys, setVMNamespaceTarget]);
+    setVMNamespaceTarget(authorizedSSHKeys?.[targetNS], targetNS);
+  }, [activeNamespace, authorizedSSHKeys, setVMNamespaceTarget]);
 
   const [favorites = [], updaterFavorites, loadedFavorites] =
     useKubevirtUserSettings('favoriteBootableVolumes');
