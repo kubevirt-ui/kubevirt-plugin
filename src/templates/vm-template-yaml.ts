@@ -7,10 +7,10 @@ metadata:
   name: example
   labels:
     template.kubevirt.io/type: vm
-    os.template.kubevirt.io/fedora36: 'true'
+    os.template.kubevirt.io/fedora: 'true'
     workload.template.kubevirt.io/server: 'true'
   annotations:
-    name.os.template.kubevirt.io/fedora36: Fedora 36
+    name.os.template.kubevirt.io/fedora: Fedora 
     description: VM template example
     openshift.io/display-name: "Fedora VM"
     iconClass: icon-fedora
@@ -24,14 +24,14 @@ objects:
       labels:
         app: '\${NAME}'
         vm.kubevirt.io/template: example
-        os.template.kubevirt.io/fedora36: 'true'
+        os.template.kubevirt.io/fedora: 'true'
     spec:
       running: false
       template:
         metadata:
           annotations:
             vm.kubevirt.io/flavor: small
-            vm.kubevirt.io/os: fedora36
+            vm.kubevirt.io/os: fedora
             vm.kubevirt.io/workload: server
           labels:
             kubevirt.io/domain: '\${NAME}'
@@ -75,7 +75,7 @@ objects:
           volumes:
             - name: rootdisk
               containerDisk:
-                image: 'quay.io/containerdisks/fedora:36'
+                image: 'quay.io/containerdisks/fedora'
             - cloudInitNoCloud:
                 userData: |-
                   #cloud-config
