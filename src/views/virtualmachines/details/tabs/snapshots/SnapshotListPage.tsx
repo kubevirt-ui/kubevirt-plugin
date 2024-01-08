@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
 import { Title } from '@patternfly/react-core';
+import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { printableVMStatus } from '../../../utils';
 
@@ -14,11 +14,7 @@ import useSnapshotData from './hooks/useSnapshotData';
 
 import './SnapshotListPage.scss';
 
-type SnapshotListPageProps = {
-  obj?: V1VirtualMachine;
-};
-
-const SnapshotListPage: FC<SnapshotListPageProps> = ({ obj: vm }) => {
+const SnapshotListPage: FC<NavPageComponentProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { error, loaded, restoresMap, snapshots } = useSnapshotData(

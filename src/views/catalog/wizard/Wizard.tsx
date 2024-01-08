@@ -25,7 +25,7 @@ const Wizard: FC = () => {
       <Stack hasGutter>
         <WizardHeader namespace={ns} />
         <StackItem className="vm-wizard-body" isFilled>
-          <HorizontalNavbar pages={wizardNavPages} />
+          <HorizontalNavbar pages={wizardNavPages} vm={vm} />
         </StackItem>
         <WizardFooter namespace={ns} />
       </Stack>

@@ -1,8 +1,8 @@
 import { ComponentType } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { NavPage } from '@openshift-console/dynamic-plugin-sdk';
+import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 export const trimLastHistoryPath = (
   history: RouteComponentProps['history'],
@@ -25,6 +25,6 @@ export const trimLastHistoryPath = (
 };
 
 export type NavPageKubevirt = Omit<NavPage, 'component'> & {
-  component: ComponentType<{ obj: V1VirtualMachine }>;
+  component: ComponentType<NavPageComponentProps>;
   isHidden?: boolean;
 };

@@ -119,7 +119,7 @@ export const TemplateInfoSection: FC = memo(() => {
               />
             ))
           }
-          descriptionData={<CPUMemory fetchVMI={false} vm={vm} />}
+          descriptionData={<CPUMemory vm={vm} />}
           descriptionHeader={t('CPU | Memory')}
           isEdit
           isPopover

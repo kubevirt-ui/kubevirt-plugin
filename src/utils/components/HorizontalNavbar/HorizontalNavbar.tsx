@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Route, Switch, useHistory } from 'react-router-dom';
 
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Nav, NavItem, NavList } from '@patternfly/react-core';
 
 import { NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
@@ -9,11 +9,12 @@ import { NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
 import './horizontal-nav-bar.scss';
 
 type HorizontalNavbarProps = {
+  instanceTypeExpandedSpec?: V1VirtualMachine;
   pages: NavPageKubevirt[];
-  resource?: K8sResourceCommon;
+  vm?: V1VirtualMachine;
 };
 
-const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ pages, resource }) => {
+const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec, pages, vm }) => {
   const [activeItem, setActiveItem] = useState<number | string>(pages?.[0]?.name.toLowerCase());
   const history = useHistory();
   const paths = pages.map((page) => page.href);
@@ -64,7 +65,9 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ pages, resource }) => {
           const Component = page.component;
           return (
             <Route
-              component={(props) => <Component {...props} obj={resource} />}
+              component={(props) => (
+                <Component instanceTypeExpandedSpec={instanceTypeExpandedSpec} vm={vm} {...props} />
+              )}
               exact
               key={page.href}
               path={trimLastHistoryPath(history, paths) + '/' + page.href}

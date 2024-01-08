@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AlertsCard from '@kubevirt-utils/components/AlertsCard/AlertsCard';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { Grid, GridItem } from '@patternfly/react-core';
+import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import VirtualMachinesOverviewTabActiveUser from './components/VirtualMachinesOverviewTabActiveUser/VirtualMachinesOverviewTabActiveUser';
 import VirtualMachinesOverviewTabDetails from './components/VirtualMachinesOverviewTabDetails/VirtualMachinesOverviewTabDetails';
@@ -18,11 +18,10 @@ import VirtualMachinesOverviewTabSnapshots from './components/VirtualMachinesOve
 import VirtualMachinesOverviewTabUtilization from './components/VirtualMachinesOverviewTabUtilization/VirtualMachinesOverviewTabUtilization';
 import useVMAlerts from './utils/hook/useVMAlerts';
 
-type VirtualMachinesOverviewTabProps = {
-  obj: V1VirtualMachine;
-};
-
-const VirtualMachinesOverviewTab: FC<VirtualMachinesOverviewTabProps> = ({ obj: vm }) => {
+const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
+  instanceTypeExpandedSpec,
+  vm,
+}) => {
   const vmAlerts = useVMAlerts(vm);
   const { error, loaded, pods, vmi } = useVMIAndPodsForVM(
     vm?.metadata?.name,
@@ -39,6 +38,7 @@ const VirtualMachinesOverviewTab: FC<VirtualMachinesOverviewTabProps> = ({ obj: 
               error={error}
               guestAgentData={guestAgentData}
               guestAgentDataLoaded={guestAgentDataLoaded}
+              instanceTypeExpandedSpec={instanceTypeExpandedSpec}
               loaded={loaded}
               vm={vm}
               vmi={vmi}

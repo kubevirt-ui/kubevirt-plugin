@@ -20,11 +20,17 @@ import { updateBootLoader, updatedBootOrder, updateStartStrategy } from '../util
 
 type DetailsSectionBootProps = {
   canUpdateVM: boolean;
+  instanceTypeVM: V1VirtualMachine;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
-const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({ canUpdateVM, vm, vmi }) => {
+const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
+  canUpdateVM,
+  instanceTypeVM,
+  vm,
+  vmi,
+}) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const location = useLocation();
@@ -46,7 +52,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({ canUpdateVM, vm, vmi 
       <VirtualMachineDescriptionItem
         descriptionData={
           <div className={classNames({ 'text-muted': !canUpdateVM })}>
-            {getBootloaderTitleFromVM(vm)}
+            {getBootloaderTitleFromVM(instanceTypeVM || vm)}
           </div>
         }
         onEditClick={() =>
@@ -55,7 +61,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({ canUpdateVM, vm, vmi 
               isOpen={isOpen}
               onClose={onClose}
               onSubmit={(updatedVM) => updateBootLoader(updatedVM, vm)}
-              vm={vm}
+              vm={instanceTypeVM}
               vmi={vmi}
             />
           ))
