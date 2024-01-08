@@ -28,12 +28,14 @@ import { isRunning } from '@virtualmachines/utils';
 import VirtualMachinesEditNetworkInterfaceModal from '../modal/VirtualMachinesEditNetworkInterfaceModal';
 
 type NetworkInterfaceActionsProps = {
+  nicDisabled: boolean;
   nicName: string;
   nicPresentation: NetworkPresentation;
   vm: V1VirtualMachine;
 };
 
 const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
+  nicDisabled,
   nicName,
   nicPresentation,
   vm,
@@ -116,16 +118,16 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   ];
 
   return (
-    <>
-      <Dropdown
-        dropdownItems={items}
-        isOpen={isDropdownOpen}
-        isPlain
-        onSelect={() => setIsDropdownOpen(false)}
-        position={DropdownPosition.right}
-        toggle={<KebabToggle id="toggle-id-6" onToggle={setIsDropdownOpen} />}
-      />
-    </>
+    <Dropdown
+      toggle={
+        <KebabToggle id="toggle-id-6" isDisabled={nicDisabled} onToggle={setIsDropdownOpen} />
+      }
+      dropdownItems={items}
+      isOpen={isDropdownOpen}
+      isPlain
+      onSelect={() => setIsDropdownOpen(false)}
+      position={DropdownPosition.right}
+    />
   );
 };
 
