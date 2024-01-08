@@ -31,7 +31,7 @@ export const hasValidSource = (template: V1Template) => {
 };
 
 const hasVMValidDVSources = (vm: V1VirtualMachine) =>
-  vm.spec.dataVolumeTemplates.every((dataVolume) => {
+  vm?.spec?.dataVolumeTemplates?.every((dataVolume) => {
     if (dataVolume?.spec?.source?.http) return Boolean(dataVolume.spec.source.http.url);
 
     if (dataVolume?.spec?.source?.registry)
