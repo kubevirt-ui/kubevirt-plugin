@@ -6,6 +6,7 @@ import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
@@ -15,19 +16,22 @@ import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
 
 import { getEditDiskStates } from './utils/getEditDiskStates';
-import { isHotplugVolume } from './utils/helpers';
+import { isHotplugVolume, isPVCSource, isPVCStatusBound } from './utils/helpers';
 
 type DiskRowActionsProps = {
-  diskName: string;
-  pvcResourceExists: boolean;
+  obj: DiskRowDataLayout;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, pvcResourceExists, vm, vmi }) => {
+const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const diskName = obj?.name;
+  const pvcResourceExists = isPVCSource(obj);
+  const isPVCBound = isPVCStatusBound(obj);
 
   const isVMRunning = isRunning(vm);
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
@@ -52,7 +56,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, pvcResourceExists, 
     return null;
   }, [isVMRunning, pvcResourceExists, t]);
 
-  const onSubmit = (updatedVM) =>
+  const onSubmit = (updatedVM: V1VirtualMachine) =>
     k8sUpdate({
       data: updatedVM,
       model: VirtualMachineModel,
@@ -102,7 +106,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, pvcResourceExists, 
           ? t('Can detach only hotplug volumes while VirtualMachine is Running')
           : null
       }
-      isDisabled={!isHotplug && isVMRunning}
+      isDisabled={(!isHotplug && isVMRunning) || (pvcResourceExists && !isPVCBound)}
       key="disk-delete"
       onClick={() => onModalOpen(createDeleteDiskModal)}
     >

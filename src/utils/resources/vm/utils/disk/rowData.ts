@@ -49,6 +49,7 @@ export const getDiskRowDataLayout = (
 
     if (device?.pvc) {
       diskRowDataObject.source = device?.pvc?.metadata?.name;
+      diskRowDataObject.sourceStatus = device?.pvc?.status?.phase;
       diskRowDataObject.size = formatBytes(device?.pvc?.spec?.resources?.requests?.storage);
       diskRowDataObject.storageClass = device?.pvc?.spec?.storageClassName;
     }

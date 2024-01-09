@@ -1,10 +1,6 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  CONTAINER_EPHERMAL,
-  OTHER,
-} from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
@@ -12,14 +8,14 @@ import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Stack, StackItem } from '@patternfly/react-core';
 
+import { isPVCSource } from './utils/helpers';
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
 
-const DiskRow: React.FC<
+const DiskRow: FC<
   RowProps<DiskRowDataLayout, { vm: V1VirtualMachine; vmi?: V1VirtualMachineInstance }>
 > = ({ activeColumnIDs, obj, rowData: { vm, vmi } }) => {
   const { t } = useKubevirtTranslation();
-  const isPVCSource = ![CONTAINER_EPHERMAL, OTHER].includes(obj?.source);
 
   return (
     <>
@@ -46,7 +42,7 @@ const DiskRow: React.FC<
       </TableData>
 
       <TableData activeColumnIDs={activeColumnIDs} id="source">
-        {isPVCSource ? (
+        {isPVCSource(obj) ? (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
             name={obj?.source}
@@ -73,7 +69,7 @@ const DiskRow: React.FC<
         className="dropdown-kebab-pf pf-v5-c-table__action"
         id=""
       >
-        <DiskRowActions diskName={obj?.name} pvcResourceExists={isPVCSource} vm={vm} vmi={vmi} />
+        <DiskRowActions obj={obj} vm={vm} vmi={vmi} />
       </TableData>
     </>
   );
