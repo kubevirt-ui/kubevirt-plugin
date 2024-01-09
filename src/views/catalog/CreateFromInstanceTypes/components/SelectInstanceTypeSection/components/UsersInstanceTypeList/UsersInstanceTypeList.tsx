@@ -1,15 +1,11 @@
 import React, { FC, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import {
-  instanceTypeActionType,
-  UseInstanceTypeAndPreferencesValues,
-} from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { COMMON_INSTANCETYPES } from '@kubevirt-utils/resources/bootableresources/constants';
-import { getLabel, getName } from '@kubevirt-utils/resources/shared';
-import { APP_NAME_LABEL } from '@kubevirt-utils/resources/template';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
@@ -23,14 +19,11 @@ import { paginationDefaultValues, paginationInitialState } from './utils/constan
 import './UsersInstanceTypeList.scss';
 
 type UsersInstanceTypesListProps = {
-  instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
+  userInstanceTypes: V1beta1VirtualMachineInstancetype[];
 };
 
-const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({
-  instanceTypesAndPreferencesData,
-}) => {
+const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({ userInstanceTypes }) => {
   const { t } = useKubevirtTranslation();
-  const { instanceTypes } = instanceTypesAndPreferencesData;
 
   const {
     instanceTypeVMState: { selectedInstanceType },
@@ -48,11 +41,6 @@ const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({
       startIndex,
     });
   };
-
-  const userInstanceTypes = useMemo(
-    () => instanceTypes.filter((it) => getLabel(it, APP_NAME_LABEL) !== COMMON_INSTANCETYPES),
-    [instanceTypes],
-  );
 
   const filteredItems = useMemo(() => {
     return userInstanceTypes.filter(
