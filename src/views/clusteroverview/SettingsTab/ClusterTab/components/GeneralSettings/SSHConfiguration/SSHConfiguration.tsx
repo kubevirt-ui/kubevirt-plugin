@@ -2,7 +2,6 @@ import React, { FC, useCallback, useState } from 'react';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
-import ExpandSectionWithSwitch from '@kubevirt-utils/components/ExpandSectionWithSwitch/ExpandSectionWithSwitch';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import {
   LOAD_BALANCER_ENABLED,
@@ -49,7 +48,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
   }, 700);
 
   return (
-    <ExpandSection toggleText={t('SSH configuration')}>
+    <ExpandSection toggleText={t('SSH configurations')}>
       <SectionWithSwitch
         helpTextIconContent={t(
           'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',
@@ -61,7 +60,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
         title={t('SSH over LoadBalancer service')}
         turnOnSwitch={(checked) => onChange(checked.toString(), LOAD_BALANCER_ENABLED)}
       />
-      <ExpandSectionWithSwitch
+      <SectionWithSwitch
         helpTextIconContent={t(
           'Allow the creation of NodePort services for SSH connections to VirtualMachines. An address of a publicly available Node must be provided.',
         )}
@@ -69,14 +68,12 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
           featureConfigMap?.data?.[NODE_PORT_ENABLED] === 'true' &&
           !isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])
         }
-        turnOnSwitch={(checked) =>
-          !isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS]) &&
-          onChange(checked.toString(), NODE_PORT_ENABLED)
-        }
         id="node-port-feature"
-        isDisabled={!loaded || !isAdmin}
+        inlineCheckbox
+        isDisabled={!loaded || !isAdmin || isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])}
         newBadge={newBadge}
-        toggleContent={t('SSH over NodePort service')}
+        title={t('SSH over NodePort service')}
+        turnOnSwitch={(checked) => onChange(checked.toString(), NODE_PORT_ENABLED)}
       >
         <Form isHorizontal>
           <FormGroup
@@ -97,7 +94,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
             />
           </FormGroup>
         </Form>
-      </ExpandSectionWithSwitch>
+      </SectionWithSwitch>
     </ExpandSection>
   );
 };
