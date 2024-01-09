@@ -48,6 +48,12 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
         }),
       ),
     setIsChangingNamespace: () => set({ isChangingNamespace: true }),
+    setSelectedStorageClass: (storageClass: string) =>
+      set(
+        produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
+          instanceTypeVMState.selectedStorageClass = storageClass;
+        }),
+      ),
     setVMNamespaceTarget: (sshSecretName, targetNamespace) => {
       get().setIsChangingNamespace();
       get().applySSHFromSettings(sshSecretName, targetNamespace);
