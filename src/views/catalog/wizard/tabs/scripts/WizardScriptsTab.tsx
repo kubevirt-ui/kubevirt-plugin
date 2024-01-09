@@ -8,6 +8,7 @@ import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitM
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   DescriptionList,
@@ -23,7 +24,7 @@ import Sysprep from './components/Sysprep';
 
 import './WizardScriptsTab.scss';
 
-const WizardScriptsTab: WizardTab = ({ updateVM, vm }) => {
+const WizardScriptsTab: WizardTab = ({ tabsData, updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -45,6 +46,7 @@ const WizardScriptsTab: WizardTab = ({ updateVM, vm }) => {
               ))
             }
             description={<CloudInitDescription vm={vm} />}
+            isDisabled={tabsData.overview.templateMetadata.osType === OS_NAME_TYPES.windows}
             isEdit
             showEditOnTitle
             testId="wizard-cloudinit"

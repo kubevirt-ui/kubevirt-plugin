@@ -109,4 +109,4 @@ export const updateSysprepObject = (
   }
 };
 
-export const getSyspredConfigMapName = (volume: V1Volume) => volume?.sysprep?.configMap?.name;
+export const getSysprepConfigMapName = (volume: V1Volume) => volume?.sysprep?.configMap?.name;
