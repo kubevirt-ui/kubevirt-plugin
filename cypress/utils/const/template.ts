@@ -17,19 +17,19 @@ export const TEMPLATE = {
   },
   RHEL6: {
     metadataName: 'rhel6-server-small',
-    name: 'Red Hat Enterprise Linux 6.0+ VM',
+    name: 'Red Hat Enterprise Linux 6 VM',
   },
   RHEL7: {
     metadataName: 'rhel7-server-small',
-    name: 'Red Hat Enterprise Linux 7.0+ VM',
+    name: 'Red Hat Enterprise Linux 7 VM',
   },
   RHEL8: {
     metadataName: 'rhel8-server-small',
-    name: 'Red Hat Enterprise Linux 8.0+ VM',
+    name: 'Red Hat Enterprise Linux 8 VM',
   },
   RHEL9: {
     metadataName: 'rhel9-server-small',
-    name: 'Red Hat Enterprise Linux 9.0 VM',
+    name: 'Red Hat Enterprise Linux 9 VM',
   },
   WIN10: {
     metadataName: 'windows10-desktop-medium',

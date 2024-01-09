@@ -2,7 +2,7 @@ import { K8S_KIND, TEST_NS } from '../../utils/const/index';
 import { defaultSourceVM } from '../../utils/const/testVM';
 import { vm } from '../../views/vm';
 
-xdescribe('Create VM from catalog', () => {
+describe('Create VM from catalog', () => {
   before(() => {
     cy.login();
     cy.deleteResource(K8S_KIND.VM, defaultSourceVM.name, TEST_NS);
@@ -16,7 +16,6 @@ xdescribe('Create VM from catalog', () => {
     cy.newProject(TEST_NS);
     cy.selectProject(TEST_NS);
     vm.create(defaultSourceVM);
-    cy.visitCatalog();
     cy.visitVMs();
     cy.byLegacyTestID(defaultSourceVM.name).should('be.visible');
   });

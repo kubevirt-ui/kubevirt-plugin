@@ -64,11 +64,15 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
 export const vm = {
   create: (vmData: VirtualMachineData) => {
     cy.visitCatalog();
+    cy.get(catalogView.TEMPLATE_CATALOG).click();
     cy.contains(catalogView.vmCatalog, vmData.template.metadataName).click();
+
+    cy.get(catalogView.startVMCheckbox).click();
+
     cy.get(catalogView.customizeVMBtn).click();
     fillReviewAndCreate(vmData);
-    cy.get(catalogView.customizeVMSubmitBtn).click();
     cy.byButtonText(catalogView.createBtnText).click();
+
     cy.get('body').then(($body) => {
       if ($body.text().includes(NoBootSource)) {
         cy.byButtonText(catalogView.createWithNoBS).click();

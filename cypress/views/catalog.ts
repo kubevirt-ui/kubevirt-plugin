@@ -1,3 +1,4 @@
+export const TEMPLATE_CATALOG = '[data-test="templates-tab"]';
 export const GRID = '#vm-catalog-grid';
 export const vmCatalog = '.vm-catalog-grid-tile';
 export const filterText = '#filter-text-input';
@@ -14,10 +15,12 @@ export const DESKTOP = '[data-test-id="workload-Desktop"]';
 export const SERVER = '[data-test-id="workload-Server"]';
 
 // template info
+export const quickCreateVMBtn = '[data-test-id="quick-create-vm-btn"]';
 export const customizeVMBtn = '[data-test-id="customize-vm-btn"]';
+export const startVMCheckbox = '#start-after-create-checkbox';
 
 // review and create
-export const vmName = '#vm-customize-NAME';
+export const vmName = '[data-test-id="template-catalog-vm-name-input"]';
 export const diskSourceSelect = '[data-test-id="default"]';
 export const diskSourceURL = 'input[aria-label="Image URL"]';
 export const customizeVMSubmitBtn = '[data-test-id="customize-vm-submit-button"]';
