@@ -21,10 +21,13 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
   const { t } = useKubevirtTranslation();
   const { instanceTypeVMState, setInstanceTypeVMState } = useInstanceTypeVMStore();
   const { selectedBootableVolume, selectedInstanceType, vmName } = instanceTypeVMState;
-  const { instanceTypes, preferences } = instanceTypesAndPreferencesData;
+  const { clusterInstanceTypes, preferences } = instanceTypesAndPreferencesData;
 
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
-  const instanceTypesMap = useMemo(() => convertResourceArrayToMap(instanceTypes), [instanceTypes]);
+  const instanceTypesMap = useMemo(
+    () => convertResourceArrayToMap(clusterInstanceTypes),
+    [clusterInstanceTypes],
+  );
 
   const operatingSystem = getOSFromDefaultPreference(selectedBootableVolume, preferencesMap);
   const cpuMemoryString = !isEmpty(instanceTypesMap?.[selectedInstanceType])
