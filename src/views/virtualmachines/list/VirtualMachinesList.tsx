@@ -84,6 +84,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
       namespaced: true,
     },
     {
+      ip: 'status.interfaces',
       'rowFilter-node': 'status.nodeName',
     },
   );
@@ -114,7 +115,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
       ({ metadata: { name, namespace: ns }, status: { printableStatus = '' } = {} }) => {
         return (
           vmiMapper?.mapper?.[ns]?.[name] ||
-          (!query.has('rowFilter-node') && printableStatus !== 'Running')
+          (!query.has('rowFilter-node') && !query.has('ip') && printableStatus !== 'Running')
         );
       },
     );
@@ -183,7 +184,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
             />
           )}
         </div>
-        {loaded && isEmpty(vms) && (
+        {loaded && isEmpty(data) && (
           <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
         )}
         <VirtualizedTable<K8sResourceCommon>
