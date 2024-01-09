@@ -10,4 +10,11 @@
       margin-left: var(--pf-global--spacer--sm);
     }
   }
+  &__inline {
+    width: 100%;
+    display: inline-flex;
+    justify-content: space-between;
+    margin-top: var(--pf-global--spacer--md);
+    align-items: center;
+  }
 }

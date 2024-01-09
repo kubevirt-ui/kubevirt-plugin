@@ -1076,7 +1076,7 @@
   "SSH": "SSH",
   "SSH access": "SSH access",
   "SSH access using the virtctl command is possible only when the API server is reachable.": "SSH access using the virtctl command is possible only when the API server is reachable.",
-  "SSH configuration": "SSH configuration",
+  "SSH configurations": "SSH configurations",
   "SSH key is invalid": "SSH key is invalid",
   "SSH key is saved in the project as a secret": "SSH key is saved in the project as a secret",
   "SSH over LoadBalancer": "SSH over LoadBalancer",
