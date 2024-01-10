@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
-import useInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypes';
+import useClusterInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterInstanceTypes';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
@@ -25,7 +25,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const [instanceTypes] = useInstanceTypes();
+  const [instanceTypes] = useClusterInstanceTypes();
   const menuItems = useMemo(() => getInstanceTypeMenuItems(instanceTypes), [instanceTypes]);
 
   const onSelect = useCallback(

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import useInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypes';
+import useClusterInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterInstanceTypes';
 import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
@@ -26,7 +26,7 @@ type ClusterInstancetypeListProps = {
 
 const ClusterInstancetypeList: FC<ClusterInstancetypeListProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
-  const [instanceTypes, loaded, loadError] = useInstanceTypes();
+  const [instanceTypes, loaded, loadError] = useClusterInstanceTypes();
 
   const { onPaginationChange, pagination } = usePagination();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(instanceTypes);

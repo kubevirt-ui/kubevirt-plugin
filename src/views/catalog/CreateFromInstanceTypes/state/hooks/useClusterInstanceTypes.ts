@@ -2,13 +2,13 @@ import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevir
 import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseInstanceTypes = () => [
+type UseClusterInstanceTypes = () => [
   instanceTypes: V1beta1VirtualMachineClusterInstancetype[],
   loaded: boolean,
   loadError: Error,
 ];
 
-const useInstanceTypes: UseInstanceTypes = () => {
+const useClusterInstanceTypes: UseClusterInstanceTypes = () => {
   const [instanceTypes, loaded, loadError] = useK8sWatchResource<
     V1beta1VirtualMachineClusterInstancetype[]
   >({
@@ -19,4 +19,4 @@ const useInstanceTypes: UseInstanceTypes = () => {
   return [instanceTypes || [], loaded || !!loadError, loadError];
 };
 
-export default useInstanceTypes;
+export default useClusterInstanceTypes;
