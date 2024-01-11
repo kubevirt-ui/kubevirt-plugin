@@ -11,8 +11,6 @@ fi
 
 function generateLogsAndCopyArtifacts {
   oc cluster-info dump > ${ARTIFACT_DIR}/cluster_info.json
-  oc get secrets -A -o wide > ${ARTIFACT_DIR}/secrets.yaml
-  oc get secrets -A -o yaml >> ${ARTIFACT_DIR}/secrets.yaml
   oc get catalogsource -A -o wide > ${ARTIFACT_DIR}/catalogsource.yaml
   oc get catalogsource -A -o yaml >> ${ARTIFACT_DIR}/catalogsource.yaml
   oc get subscriptions -n ${NS} -o wide > ${ARTIFACT_DIR}/subscription_details.yaml
