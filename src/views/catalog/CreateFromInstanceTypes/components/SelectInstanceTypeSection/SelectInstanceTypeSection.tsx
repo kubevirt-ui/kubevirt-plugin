@@ -20,12 +20,15 @@ const SelectInstanceTypeSection: FC<SelectInstanceTypeSectionProps> = ({
   instanceTypesAndPreferencesData,
 }) => {
   const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);
-  const { instanceTypes, loaded } = instanceTypesAndPreferencesData;
+  const { clusterInstanceTypes, loaded } = instanceTypesAndPreferencesData;
 
   const {
     instanceTypeVMState: { selectedInstanceType },
   } = useInstanceTypeVMStore();
-  const menuItems = useMemo(() => getInstanceTypeMenuItems(instanceTypes), [instanceTypes]);
+  const menuItems = useMemo(
+    () => getInstanceTypeMenuItems(clusterInstanceTypes),
+    [clusterInstanceTypes],
+  );
 
   const menuProps = useInstanceTypeCardMenuSection();
 
@@ -64,7 +67,7 @@ const SelectInstanceTypeSection: FC<SelectInstanceTypeSectionProps> = ({
         </Tab>
         <Tab eventKey={TabKey.Users} title={menuItems.userProvided.label}>
           <UsersInstanceTypesList
-            instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+            userInstanceTypes={instanceTypesAndPreferencesData.userInstanceTypes}
           />
         </Tab>
       </Tabs>
