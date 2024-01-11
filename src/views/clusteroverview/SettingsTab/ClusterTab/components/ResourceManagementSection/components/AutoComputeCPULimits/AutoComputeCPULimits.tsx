@@ -16,6 +16,8 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 import { addLabelsToHyperConvergedCR } from './utils/utils';
 import ProjectSelectorModal from './ProjectSelectorModal';
 
+import './AutoComputeCPULimits.scss';
+
 type AutoComputeCPULimitsProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
   newBadge?: boolean;
@@ -42,13 +44,14 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
   return (
     <ExpandSectionWithSwitch
       helpTextIconContent={t('Automatically compute CPU limits on projects containing labels')}
+      id="auto-compute-cpu-limits-settings"
       isDisabled={!autoComputeCPUPreviewEnabled}
       newBadge={newBadge}
       switchIsOn={autoComputeCPUEnabled && autoComputeCPUPreviewEnabled}
       toggleContent={t('Auto-compute CPU limits')}
       turnOnSwitch={toggleCPULimits}
     >
-      <div>
+      <div className="auto-compute-cpu-limits-settings">
         {t('Project selector')}
         <Button
           onClick={() =>
@@ -66,7 +69,7 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
           isInline
           variant={ButtonVariant.link}
         >
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain auto-compute-cpu-limits-settings__edit-icon" />
         </Button>
       </div>
       {error && (
