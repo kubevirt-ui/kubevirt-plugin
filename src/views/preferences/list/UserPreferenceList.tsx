@@ -1,31 +1,42 @@
-import React, { FC } from 'react';
+import React from 'react';
 
-import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
-import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  VirtualMachinePreferenceModelGroupVersionKind,
+  VirtualMachinePreferenceModelRef,
+} from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
+import { V1beta1VirtualMachinePreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import {
   ListPageBody,
   ListPageFilter,
+  useActiveNamespace,
+  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
-import ClusterPreferenceRow from './components/ClusterPreferenceRow';
-import useClusterPreferenceListColumns from './hooks/useClusterPreferenceListColumns';
+import UserPreferenceRow from './components/UserPreferenceRow';
+import useUserPreferenceListColumns from './hooks/useUserPreferenceListColumns';
 
-import '@kubevirt-utils/styles/list-managment-group.scss';
-
-const ClusterPreferenceList: FC = () => {
+const UserPreferenceList = () => {
   const { t } = useKubevirtTranslation();
-  const [preferences, loaded, loadError] = useClusterPreferences();
+  const [activeNamespace] = useActiveNamespace();
+  const [preferences, loaded, loadError] = useK8sWatchResource<V1beta1VirtualMachinePreference[]>({
+    groupVersionKind: VirtualMachinePreferenceModelGroupVersionKind,
+    isList: true,
+    ...(activeNamespace !== ALL_NAMESPACES_SESSION_KEY && { namespace: activeNamespace }),
+  });
 
   const { onPaginationChange, pagination } = usePagination();
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(preferences);
-  const [columns, activeColumns] = useClusterPreferenceListColumns(pagination, data);
+  const [unfilteredData, data, onFilterChange] = useListPageFilter<
+    V1beta1VirtualMachinePreference,
+    V1beta1VirtualMachinePreference
+  >(preferences);
+  const [columns, activeColumns] = useUserPreferenceListColumns(pagination, data);
 
   return (
     <ListPageBody>
@@ -37,9 +48,9 @@ const ClusterPreferenceList: FC = () => {
               id,
               title,
             })),
-            id: VirtualMachineClusterInstancetypeModelGroupVersionKind.kind,
+            id: VirtualMachinePreferenceModelRef,
             selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-            type: '',
+            type: t('preferences'),
           }}
           onFilterChange={(...args) => {
             onFilterChange(...args);
@@ -68,8 +79,8 @@ const ClusterPreferenceList: FC = () => {
           perPageOptions={paginationDefaultValues}
         />
       </div>
-      <VirtualizedTable<V1beta1VirtualMachineClusterPreference>
-        EmptyMsg={() => (
+      <VirtualizedTable<V1beta1VirtualMachinePreference>
+        NoDataEmptyMsg={() => (
           <div className="pf-u-text-align-center" id="no-preference-msg">
             {t('No preferences found')}
           </div>
@@ -78,11 +89,11 @@ const ClusterPreferenceList: FC = () => {
         data={data}
         loaded={loaded}
         loadError={loadError}
-        Row={ClusterPreferenceRow}
+        Row={UserPreferenceRow}
         unfilteredData={unfilteredData}
       />
     </ListPageBody>
   );
 };
 
-export default ClusterPreferenceList;
+export default UserPreferenceList;

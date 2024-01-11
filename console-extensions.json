@@ -180,7 +180,9 @@
   },
   {
     "properties": {
-      "component": { "$codeRef": "ClusterPreferenceList" },
+      "component": {
+        "$codeRef": "PreferencePage"
+      },
       "model": {
         "group": "instancetype.kubevirt.io",
         "kind": "VirtualMachineClusterPreference",
@@ -188,6 +190,20 @@
       }
     },
     "type": "console.page/resource/list"
+  },
+  {
+    "properties": {
+      "component": {
+        "$codeRef": "PreferencePage"
+      },
+      "exact": true,
+      "path": [
+        "/k8s/ns/:ns/instancetype.kubevirt.io~v1alpha2~VirtualMachinePreference",
+        "/k8s/all-namespaces/instancetype.kubevirt.io~v1alpha2~VirtualMachinePreference"
+      ],
+      "prefixNamespaced": true
+    },
+    "type": "console.page/route"
   },
   {
     "properties": {
