@@ -13,6 +13,7 @@ type CloneResourceModalProps<T extends K8sResourceCommon = K8sResourceCommon> = 
   headerText?: string;
   isOpen: boolean;
   model: K8sModel;
+  namespace?: string;
   object: T;
   onClose: () => void;
 };
@@ -20,6 +21,7 @@ type CloneResourceModalProps<T extends K8sResourceCommon = K8sResourceCommon> = 
 const CloneResourceModal: FC<CloneResourceModalProps> = ({
   headerText,
   model,
+  namespace,
   object,
   ...modalProps
 }) => {
@@ -30,6 +32,7 @@ const CloneResourceModal: FC<CloneResourceModalProps> = ({
     const newObject = produce(object, (draftObject) => {
       draftObject.metadata = {};
       draftObject.metadata.name = newName;
+      if (namespace) draftObject.metadata.namespace = namespace;
     });
 
     return k8sCreate({
