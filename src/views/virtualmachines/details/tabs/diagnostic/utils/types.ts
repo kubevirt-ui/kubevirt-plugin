@@ -19,3 +19,11 @@ export type DiagnosticSort = {
   direction: string;
   sortIndex: number;
 };
+
+export type VirtualizationDataVolumeStatus = {
+  id: string;
+  message: string;
+  name: string;
+  phase: string;
+  progress: string;
+};

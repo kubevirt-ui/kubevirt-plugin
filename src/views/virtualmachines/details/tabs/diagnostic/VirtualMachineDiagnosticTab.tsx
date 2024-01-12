@@ -5,13 +5,14 @@ import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import useDiagnosticData from './hooks/useDianosticData';
 import VirtualMachineDiagnosticTabConditions from './tables/VirtualMachineDiagnosticTabConditions';
+import VirtualMachineDiagnosticTabDataVolumeStatus from './tables/VirtualMachineDiagnosticTabDataVolumeStatus';
 import VirtualMachineDiagnosticTabVolumeStatus from './tables/VirtualMachineDiagnosticTabVolumeStatus';
 import VirtualMachineLogViewer from './VirtualMachineLogViewer/VirtualMachineLogViewer';
 
 import './virtual-machine-diagnostic-tab.scss';
 
 const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ vm }) => {
-  const { conditions, volumeSnapshotStatuses } = useDiagnosticData(vm);
+  const { conditions, dataVolumesStatuses, volumeSnapshotStatuses } = useDiagnosticData(vm);
   const [activeTabKey, setActiveTabKey] = useState<number>(0);
 
   return (
@@ -31,6 +32,7 @@ const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ vm }) => {
           <VirtualMachineDiagnosticTabVolumeStatus
             volumeSnapshotStatuses={volumeSnapshotStatuses}
           />
+          <VirtualMachineDiagnosticTabDataVolumeStatus dataVolumesStatuses={dataVolumesStatuses} />
         </Tab>
         <Tab
           className="VirtualMachineDiagnosticTab--main__content"

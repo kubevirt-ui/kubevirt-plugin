@@ -1,11 +1,19 @@
 import { v4 as uuidv4 } from 'uuid';
 
+import { DataVolumeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
+  V1VirtualMachine,
   V1VirtualMachineCondition,
   V1VolumeSnapshotStatus,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
 
-import { VirtualizationStatusCondition, VirtualizationVolumeSnapshotStatus } from './types';
+import {
+  VirtualizationDataVolumeStatus,
+  VirtualizationStatusCondition,
+  VirtualizationVolumeSnapshotStatus,
+} from './types';
 
 export const volumeSnapshotStatusesTransformer = (
   volumeSnapshotStatuses: V1VolumeSnapshotStatus[] = [],
@@ -50,3 +58,38 @@ export const conditionsTransformer = (
     return copyConditions;
   });
 };
+
+export const buildDVStatus = (
+  data: WatchK8sResults<{ [name: string]: V1beta1DataVolume }>,
+): VirtualizationDataVolumeStatus[] => {
+  const elements = Object.values(data).map((dv) => dv.data);
+  return elements.map((element) => {
+    const conditions = element?.status?.conditions;
+    const message = conditions?.[conditions.length - 1]?.message;
+
+    return {
+      id: element?.metadata?.uid,
+      message,
+      name: element?.metadata?.name,
+      phase: element?.status?.phase,
+      progress: element?.status?.progress,
+    };
+  });
+};
+
+const getDataVolumesNames = (vm: V1VirtualMachine) =>
+  vm?.spec?.template?.spec?.volumes
+    .filter((volume) => volume?.dataVolume)
+    .map((volume) => volume?.dataVolume?.name);
+
+export const buildDataVolumeResources = (vm: V1VirtualMachine) =>
+  Object.fromEntries(
+    getDataVolumesNames(vm)?.map((name) => [
+      name,
+      {
+        groupVersionKind: DataVolumeModelGroupVersionKind,
+        name,
+        namespace: vm?.metadata?.namespace,
+      },
+    ]) || [],
+  );
