@@ -30,8 +30,11 @@ export const hasValidSource = (template: V1Template) => {
   return hasValidDVSources && hasValidVolumeSources;
 };
 
-const hasVMValidDVSources = (vm: V1VirtualMachine) =>
-  vm?.spec?.dataVolumeTemplates?.every((dataVolume) => {
+const hasVMValidDVSources = (vm: V1VirtualMachine) => {
+  if (!vm?.spec?.dataVolumeTemplates && !getVolumes(vm).find((volume) => volume.dataVolume))
+    return true;
+
+  return vm.spec.dataVolumeTemplates.every((dataVolume) => {
     if (dataVolume?.spec?.source?.http) return Boolean(dataVolume.spec.source.http.url);
 
     if (dataVolume?.spec?.source?.registry)
@@ -44,6 +47,7 @@ const hasVMValidDVSources = (vm: V1VirtualMachine) =>
 
     return true;
   });
+};
 
 const hasVMValidVolumeSources = (vm: V1VirtualMachine) =>
   vm.spec.template.spec.volumes.every((volume) => {
