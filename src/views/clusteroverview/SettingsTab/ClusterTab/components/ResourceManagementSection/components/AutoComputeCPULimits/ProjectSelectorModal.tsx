@@ -115,7 +115,6 @@ const ProjectSelectorModal: FC<ProjectSelectorModalProps> = ({
           <ActionList>
             <ActionListItem>
               <Button
-                isDisabled={isEmpty(qualifiedProjects) || isEmpty(selectorLabels)}
                 isLoading={!projectsLoaded}
                 onClick={handleSubmit}
                 variant={ButtonVariant.primary}
