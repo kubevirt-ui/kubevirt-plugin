@@ -106,7 +106,7 @@ const ProjectSelectorModal: FC<ProjectSelectorModalProps> = ({
             {projects?.length && (
               <ProjectCheckerAlert
                 projectsLoaded={projectsLoaded}
-                qualifiedProjects={isEmpty(selectorLabels) ? projects : qualifiedProjects}
+                qualifiedProjects={isEmpty(selectorLabels) ? [] : qualifiedProjects}
               />
             )}
           </Form>
