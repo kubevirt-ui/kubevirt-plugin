@@ -1171,7 +1171,6 @@
   "The following credentials for this operating system were created via cloud-init. If unsuccessful, cloud-init could be improperly configured.": "The following credentials for this operating system were created via cloud-init. If unsuccessful, cloud-init could be improperly configured.",
   "The following disk will not be included in the snapshot": "The following disk will not be included in the snapshot",
   "The following disk will not be included in the snapshot_plural": "The following disk will not be included in the snapshot",
-  "The following information is provided by the OpenShift Virtualization operator.": "The following information is provided by the OpenShift Virtualization operator.",
   "The following information regarding how the disks are partitioned is provided by the guest agent.": "The following information regarding how the disks are partitioned is provided by the guest agent.",
   "The following resources will be deleted along with this VirtualMachine. Unchecked items will not be deleted.": "The following resources will be deleted along with this VirtualMachine. Unchecked items will not be deleted.",
   "The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.": "The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.",
