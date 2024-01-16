@@ -70,9 +70,11 @@ const SerialConsole: FunctionComponent<SerialConsoleProps> = ({
   };
 
   const onClipboardPaste = () => {
-    navigator.clipboard
-      .readText()
-      .then((clipboardText) => onData(clipboardText || pasteText?.current));
+    try {
+      navigator.clipboard.readText().then((clipboardText) => onData(clipboardText));
+    } catch {
+      onData(pasteText?.current);
+    }
   };
 
   let terminal = null;
