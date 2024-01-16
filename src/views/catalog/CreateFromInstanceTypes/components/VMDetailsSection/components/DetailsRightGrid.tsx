@@ -2,16 +2,15 @@ import React, { FC, MouseEvent, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Select, SelectOption } from '@patternfly/react-core';
 
 import DynamicSSHKeyInjectionIntanceType from './DynamicSSHKeyInjectionIntanceType';
@@ -22,10 +21,8 @@ const DetailsRightGrid: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isOpenStorageClass, setIsOpenStorageClass] = useState<boolean>(false);
-  const [storageClasses] = useK8sWatchResource<IoK8sApiStorageV1StorageClass[]>({
-    groupVersionKind: modelToGroupVersionKind(StorageClassModel),
-    isList: true,
-  });
+  const [{ clusterDefaultStorageClass, storageClasses, virtDefaultStorageClass }] =
+    useDefaultStorageClass();
 
   const {
     instanceTypeVMState,
@@ -70,7 +67,10 @@ const DetailsRightGrid: FC = () => {
               setIsOpenStorageClass(false);
             }}
             selections={
-              instanceTypeVMState.selectedStorageClass || pvcSource?.spec?.storageClassName
+              instanceTypeVMState.selectedStorageClass ||
+              pvcSource?.spec?.storageClassName ||
+              getName(virtDefaultStorageClass) ||
+              getName(clusterDefaultStorageClass)
             }
             className="storageclass-select__dropdown"
             hasInlineFilter
