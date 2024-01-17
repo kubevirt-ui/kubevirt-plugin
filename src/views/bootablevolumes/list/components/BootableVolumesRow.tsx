@@ -32,7 +32,7 @@ const BootableVolumesRow: FC<
 
   return (
     <>
-      <TableData activeColumnIDs={activeColumnIDs} id="name">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
         <ResourceLink
           groupVersionKind={getBootableVolumeGroupVersionKind(obj)}
           inline

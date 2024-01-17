@@ -28,6 +28,7 @@ const useBootableVolumesColumns = (
     () => [
       {
         id: 'name',
+        props: { className: 'pf-m-width-20' },
         sort: (_, direction) => sorting(direction, 'metadata.name'),
         title: t('Name'),
         transforms: [sortable],
