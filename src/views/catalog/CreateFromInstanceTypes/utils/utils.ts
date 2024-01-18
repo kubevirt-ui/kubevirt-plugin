@@ -136,8 +136,10 @@ export const generateVM = (
                   name: 'cloudinitdisk',
                 },
               ],
+              interfaces: [{ masquerade: {}, name: 'default' }],
             },
           },
+          networks: [{ name: 'default', pod: {} }],
           volumes: [
             {
               dataVolume: { name: `${virtualmachineName}-volume` },
