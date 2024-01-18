@@ -3,7 +3,8 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { getSecretNameErrorMessage } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
+import { getValidNamespace, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   FileUpload,
   Form,
@@ -26,9 +27,12 @@ type SSHKeyUploadProps = {
 
 const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetails }) => {
   const { t } = useKubevirtTranslation();
+  const [activeNamespace] = useActiveNamespace();
   const [nameErrorMessage, setNameErrorMessage] = useState<string>(null);
   const [isValidKey, setIsValidKey] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const vmNamespaceTarget = getValidNamespace(activeNamespace);
 
   return (
     <Form isHorizontal>
@@ -69,7 +73,7 @@ const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetail
       >
         <TextInput
           onChange={(secretName: string) => {
-            setNameErrorMessage(getSecretNameErrorMessage(secretName, secrets));
+            setNameErrorMessage(getSecretNameErrorMessage(secretName, vmNamespaceTarget, secrets));
             setSSHDetails({
               ...sshDetails,
               secretOption: SecretSelectionOption.addNew,

@@ -1,0 +1,25 @@
+.ssh-use-existing {
+  &__body {
+    margin-top: var(--pf-global--spacer--md);
+  }
+
+  &__form-group--project {
+    padding-right: var(--pf-global--spacer--sm);
+    margin-bottom: var(--pf-global--spacer--sm);
+  }
+
+  &__form-group--new-secret-name {
+    --pf-c-form--m-horizontal__group-label--md--GridColumnGap: var(--pf-global--spacer--xs);
+    --pf-c-form--m-horizontal__group-label--md--GridColumnWidth: 0.4fr;
+  }
+
+  &__form-group--secret {
+    padding-left: var(--pf-global--spacer--sm);
+    margin-bottom: var(--pf-global--spacer--sm);
+  }
+}
+
+// prevents shortening of text field in error condition
+#new-secret-name {
+  margin-right: 0;
+}
