@@ -73,6 +73,7 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({
             localNSProject={localNSProject}
             namespace={namespace}
             projectsWithSecrets={projectsWithSecrets}
+            secrets={secrets}
             setLocalNSProject={setLocalNSProject}
             setSSHDetails={setSSHDetails}
             sshDetails={sshDetails}

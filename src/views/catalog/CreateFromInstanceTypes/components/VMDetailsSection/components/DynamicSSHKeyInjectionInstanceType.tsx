@@ -8,7 +8,7 @@ import DynamicSSHKeyInjectionHelpTextIcon from '@kubevirt-utils/components/Dynam
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-const DynamicSSHKeyInjectionIntanceType = () => {
+const DynamicSSHKeyInjectionInstanceType = () => {
   const { instanceTypeVMState, setInstanceTypeVMState } = useInstanceTypeVMStore();
   const { sshSecretCredentials } = instanceTypeVMState;
   const hasDynamicSSHLabel =
@@ -33,4 +33,4 @@ const DynamicSSHKeyInjectionIntanceType = () => {
     />
   );
 };
-export default DynamicSSHKeyInjectionIntanceType;
+export default DynamicSSHKeyInjectionInstanceType;
