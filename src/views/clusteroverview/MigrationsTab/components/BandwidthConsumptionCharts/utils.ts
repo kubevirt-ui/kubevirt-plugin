@@ -76,7 +76,7 @@ export const getDomainY = (maxValue: number, normalize = multipliers.Gi): [numbe
 export const getBaseQuery = (duration: string, activeNamespace: string) => {
   const namespacedQuery = activeNamespace !== ALL_NAMESPACES_SESSION_KEY;
 
-  return `(sum_over_time(kubevirt_migrate_vmi_data_processed_bytes${
+  return `(sum_over_time(kubevirt_vmi_migration_data_processed_bytes${
     namespacedQuery ? `{namespace='${activeNamespace}'}` : ''
   }[${duration}]))${namespacedQuery ? ' BY (namespace)' : ''}`;
 };
