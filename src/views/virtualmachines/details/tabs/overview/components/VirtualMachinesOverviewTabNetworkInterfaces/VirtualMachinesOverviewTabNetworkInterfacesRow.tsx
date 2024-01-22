@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import FirstItemListPopover from 'src/views/virtualmachines/list/components/FirstItemListPopover/FirstItemListPopover';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +14,7 @@ type VirtualMachinesOverviewTabNetworkInterfacesProps = {
   obj: InterfacesData;
 };
 
-const VirtualMachinesOverviewTabInterfacesRow: React.FC<
+const VirtualMachinesOverviewTabInterfacesRow: FC<
   VirtualMachinesOverviewTabNetworkInterfacesProps
 > = ({ activeColumnIDs, obj }) => {
   const { t } = useKubevirtTranslation();

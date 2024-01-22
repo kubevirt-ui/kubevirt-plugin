@@ -6,7 +6,7 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
+import { getVMIIPAddressesWithName } from '@kubevirt-utils/resources/vmi';
 import { ResourceLink, RowProps } from '@openshift-console/dynamic-plugin-sdk';
 
 import FirstItemListPopover from '../FirstItemListPopover/FirstItemListPopover';
@@ -26,7 +26,7 @@ const VirtualMachineRunningRow: React.FC<
 > = ({ activeColumnIDs, obj, rowData: { isSingleNodeCluster, kind, vmi, vmim } }) => {
   const { t } = useKubevirtTranslation();
 
-  const ipAddressess = vmi && getVMIIPAddresses(vmi);
+  const ipAddressess = vmi && getVMIIPAddressesWithName(vmi);
   return (
     <VirtualMachineRowLayout
       rowData={{

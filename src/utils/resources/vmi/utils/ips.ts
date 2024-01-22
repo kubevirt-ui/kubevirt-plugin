@@ -1,4 +1,6 @@
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { IpAddresses } from '@virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabNetworkInterfaces/utils/types';
 
 /**
  * Get VMI IPs
@@ -13,11 +15,19 @@ export const getVMIIPAddresses = (vmi: V1VirtualMachineInstance): string[] => {
     iface?.ipAddress,
     ...(iface?.ipAddresses || []),
   ]);
-  const trimmedIPAddresses = ipAddresses
-    ?.map((ip) => ip?.trim())
-    ?.filter((ip) => ip?.length > 0 && isIPv4(ip));
+  const trimmedIPAddresses = ipAddresses?.filter((ip) => !isEmpty(ip));
   return [...new Set(trimmedIPAddresses)];
 };
 
-export const isIPv4 = (str: string) =>
-  /^((25[0-5]|(2[0-4]|1[0-9]|[1-9]|)[0-9])(\.(?!$)|$)){4}$/.test(str);
+export const getVMIIPAddressesWithName = (vmi: V1VirtualMachineInstance): IpAddresses => {
+  const namedInterfaces = vmi?.status?.interfaces?.filter((iface) => !!iface.name) || [];
+  return namedInterfaces?.reduce((acc, iface) => {
+    const ips = [...new Set([iface?.ipAddress, ...(iface?.ipAddresses || [])])];
+    if (!isEmpty(ips)) {
+      for (const ip of ips) {
+        acc.push({ interfaceName: iface?.interfaceName, ip });
+      }
+    }
+    return acc;
+  }, [] as IpAddresses);
+};

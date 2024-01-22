@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -10,15 +10,16 @@ import {
   Popover,
   PopoverPosition,
 } from '@patternfly/react-core';
+import { IpAddresses } from '@virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabNetworkInterfaces/utils/types';
 
 type FirstItemListPopoverProps = {
   className?: string;
-  headerContent?: React.ReactNode | string;
+  headerContent?: ReactNode | string;
   includeCopyFirstItem?: boolean;
-  items: string[];
+  items: IpAddresses;
 };
 
-const FirstItemListPopover: React.FC<FirstItemListPopoverProps> = ({
+const FirstItemListPopover: FC<FirstItemListPopoverProps> = ({
   className,
   headerContent,
   includeCopyFirstItem,
@@ -35,16 +36,18 @@ const FirstItemListPopover: React.FC<FirstItemListPopoverProps> = ({
             isCode
             variant={ClipboardCopyVariant.inlineCompact}
           >
-            {items?.[0]}
+            {items?.[0]?.ip}
           </ClipboardCopy>
         ) : (
-          items?.[0] || NO_DATA_DASH
+          items?.[0]?.ip || NO_DATA_DASH
         )}
       </div>
       {items?.length > 1 && (
         <Popover
-          bodyContent={items.map((item) => (
-            <div key={item}>{item}</div>
+          bodyContent={items.map(({ interfaceName, ip }) => (
+            <div key={ip}>
+              {interfaceName}: {ip}
+            </div>
           ))}
           hasAutoWidth
           headerContent={headerContent}
