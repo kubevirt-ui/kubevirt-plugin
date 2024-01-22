@@ -114,7 +114,8 @@ sed -i -r "s|$EXISTING_PLUGIN_IMAGE|$KUBEVIRT_PLUGIN_IMAGE|" /tmp/hco_csv.json
 oc apply -f /tmp/hco_csv.json
 
 until \
-  oc wait pods -n ${NS} --for=jsonpath='{.spec.containers[0].image}'="$KUBEVIRT_PLUGIN_IMAGE" -l app=kubevirt-plugin
+  oc wait pods -n ${NS} --for=jsonpath='{.spec.containers[0].image}'="$KUBEVIRT_PLUGIN_IMAGE" -l app=kubevirt-hyperconverged -l app.kubernetes.io/component=kubevirt-console-plugin
+
   do
     sleep 1
   done
