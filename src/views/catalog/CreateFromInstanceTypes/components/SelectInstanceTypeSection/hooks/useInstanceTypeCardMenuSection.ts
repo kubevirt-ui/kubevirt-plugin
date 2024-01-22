@@ -21,7 +21,7 @@ const useInstanceTypeCardMenuSection = (): UseInstanceTypeCardMenuSectionValues 
     setActiveMenu(null);
 
     setInstanceTypeVMState({
-      payload: itName,
+      payload: { name: itName, namespace: null },
       type: instanceTypeActionType.setSelectedInstanceType,
     });
   };

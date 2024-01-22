@@ -6,7 +6,7 @@ const instanceTypeVMInitialState: InstanceTypeVMState = {
   isDynamicSSHInjection: false,
   pvcSource: null,
   selectedBootableVolume: null,
-  selectedInstanceType: '',
+  selectedInstanceType: { name: '', namespace: null },
   selectedStorageClass: null,
   sshSecretCredentials: initialSSHCredentials,
   vmName: '',
