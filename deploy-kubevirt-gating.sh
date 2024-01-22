@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export ON_CI="ON_CI"
+export BRIDGE_BRANDING="okd"
 
 # Wait until master and worker MCP are updated
 # or timeout after 90min.

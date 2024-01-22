@@ -79,7 +79,7 @@
     "js-yaml": "^4.1.0",
     "lodash.clonedeepwith": "^4.5.0",
     "lodash.shuffle": "^4.2.0",
-    "mochawesome-report-generator": "^6.0.1",
+    "mochawesome-report-generator": "^6.2.0",
     "murmurhash-js": "1.0.0",
     "randexp": "^0.5.3",
     "react": "17.0.2",

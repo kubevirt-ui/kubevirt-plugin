@@ -17,4 +17,5 @@ export type VirtualMachineData = {
   namespace?: string;
   startOnCreation?: boolean;
   template?: Template;
+  volume?: string;
 };

@@ -23,7 +23,7 @@ Cypress.Commands.add('visitOverview', () => {
 
 Cypress.Commands.add('visitCatalog', () => {
   cy.clickVirtLink(catalogNav);
-  cy.contains('Create new VirtualMachine').should('be.visible');
+  cy.contains('Select volume to boot from').should('be.visible');
   // eslint-disable-next-line cypress/no-unnecessary-waiting
   cy.wait(1000);
 });

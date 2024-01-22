@@ -37,7 +37,11 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
     masthead.username.shouldBeVisible();
 
     // wait for virtualization page
-    cy.contains('.pf-c-nav__link', 'Virtualization').should('be.visible');
+    if (idp === KUBEADMIN_IDP) {
+      cy.get('[data-quickstart-id="qs-nav-sec-virtualization"]', { timeout: 60000 }).should(
+        'be.visible',
+      );
+    }
   });
 });
 

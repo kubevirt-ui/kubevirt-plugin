@@ -1,23 +1,23 @@
+import { VirtualMachineData } from '../../types/vm';
 import { K8S_KIND, TEST_NS } from '../../utils/const/index';
-import { defaultSourceVM } from '../../utils/const/testVM';
 import { vm } from '../../views/vm';
 
-xdescribe('Create VM from catalog', () => {
+const testVM: VirtualMachineData = {
+  name: 'vm-from-it-fedora',
+  volume: 'fedora',
+};
+
+describe('Create VM from instanceType', () => {
   before(() => {
     cy.login();
-    cy.deleteResource(K8S_KIND.VM, defaultSourceVM.name, TEST_NS);
+    cy.visit('');
   });
 
   after(() => {
-    cy.deleteResource(K8S_KIND.VM, defaultSourceVM.name, TEST_NS);
+    cy.deleteResource(K8S_KIND.VM, testVM.name, TEST_NS);
   });
 
-  it('ID(CNV-) Create VM from default source', () => {
-    cy.newProject(TEST_NS);
-    cy.selectProject(TEST_NS);
-    vm.create(defaultSourceVM);
-    cy.visitCatalog();
-    cy.visitVMs();
-    cy.byLegacyTestID(defaultSourceVM.name).should('be.visible');
+  it('create VM from instanceType', () => {
+    vm.create(testVM);
   });
 });

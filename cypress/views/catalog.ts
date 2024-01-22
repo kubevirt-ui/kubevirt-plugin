@@ -26,3 +26,7 @@ export const customizeVMSubmitBtn = '[data-test-id="customize-vm-submit-button"]
 export const startOnCreation = '#start-after-create-checkbox';
 export const createBtnText = 'Create VirtualMachine';
 export const createWithNoBS = 'Create with no available boot source';
+
+// catalog instance
+export const volName = 'td[id="name"]';
+export const instanceVMName = 'input[data-test-id="instancetypes-vm-name-input"]';

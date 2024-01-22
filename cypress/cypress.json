@@ -9,7 +9,7 @@
   },
   "retries": {
     "openMode": 0,
-    "runMode": 1
+    "runMode": 0
   },
   "screenshotOnRunFailure": true,
   "screenshotsFolder": "./gui-test-screenshots/screenshots/",

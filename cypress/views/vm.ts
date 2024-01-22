@@ -1,6 +1,5 @@
 import { VirtualMachineData } from '../types/vm';
 import { ACTION_TIMEOUT, VM_STATUS } from '../utils/const/index';
-import { NoBootSource } from '../utils/const/string';
 
 import * as catalogView from './catalog';
 import * as vmView from './selector';
@@ -64,22 +63,10 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
 export const vm = {
   create: (vmData: VirtualMachineData) => {
     cy.visitCatalog();
-    cy.contains(catalogView.vmCatalog, vmData.template.metadataName).click();
-    cy.get(catalogView.customizeVMBtn).click();
-    fillReviewAndCreate(vmData);
-    cy.get(catalogView.customizeVMSubmitBtn).click();
+    cy.contains(catalogView.volName, vmData.volume).click();
+    cy.get(catalogView.instanceVMName).clear().type(vmData.name);
     cy.byButtonText(catalogView.createBtnText).click();
-    cy.get('body').then(($body) => {
-      if ($body.text().includes(NoBootSource)) {
-        cy.byButtonText(catalogView.createWithNoBS).click();
-      }
-    });
-
-    if (vmData.startOnCreation) {
-      waitForStatus(VM_STATUS.Provisioning);
-      waitForStatus(VM_STATUS.Starting);
-      waitForStatus(VM_STATUS.Running);
-    }
+    cy.contains('Operating system').should('exist');
   },
   createVMFromYAML: () => {
     cy.byButtonText('Create').click();
