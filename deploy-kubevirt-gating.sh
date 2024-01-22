@@ -155,7 +155,7 @@ if ! type virtctl; then
   # Install virtctl binary and add to PATH
   mkdir virtctl
 
-  wget ${VIRTCTL_AMD64} -O virtctl/virtctl || wget ${VIRTCTL_X86_64} -O virtctl/virtctl
+  wget ${VIRTCTL_AMD64} -O virtctl/virtctl --quiet || wget ${VIRTCTL_X86_64} -O virtctl/virtctl --quiet
   [[ ! -f "virtctl/virtctl" ]] && echo "ERROR: virtctl binary is unavailable for download" && exit 1
 
   chmod +x virtctl/virtctl
