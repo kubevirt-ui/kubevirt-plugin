@@ -32,7 +32,7 @@ export type InstanceTypeVMState = {
   isDynamicSSHInjection: boolean;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   selectedBootableVolume: BootableVolume;
-  selectedInstanceType: string;
+  selectedInstanceType: { name: string; namespace: string };
   selectedStorageClass: string;
   sshSecretCredentials: SSHSecretDetails;
   vmName: string;
@@ -48,7 +48,12 @@ export enum instanceTypeActionType {
 }
 
 type InstanceTypeAction = {
-  payload: boolean | BootableVolume | SSHSecretDetails | string;
+  payload:
+    | { name: string; namespace: string }
+    | boolean
+    | BootableVolume
+    | SSHSecretDetails
+    | string;
   type: string;
 };
 

@@ -30,8 +30,8 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
   );
 
   const operatingSystem = getOSFromDefaultPreference(selectedBootableVolume, preferencesMap);
-  const cpuMemoryString = !isEmpty(instanceTypesMap?.[selectedInstanceType])
-    ? getCPUAndMemoryFromDefaultInstanceType(instanceTypesMap[selectedInstanceType])
+  const cpuMemoryString = !isEmpty(instanceTypesMap?.[selectedInstanceType?.name])
+    ? getCPUAndMemoryFromDefaultInstanceType(instanceTypesMap[selectedInstanceType?.name])
     : null;
 
   return (
@@ -57,7 +57,7 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
         descriptionHeader={t('Operating system')}
       />
       <VirtualMachineDescriptionItem
-        descriptionData={selectedInstanceType}
+        descriptionData={selectedInstanceType?.name}
         descriptionHeader={t('InstanceType')}
       />
       <VirtualMachineDescriptionItem

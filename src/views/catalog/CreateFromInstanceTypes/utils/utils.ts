@@ -1,4 +1,6 @@
+import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
@@ -14,6 +16,7 @@ import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresou
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { generatePrettyName, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
+import { K8sGroupVersionKind, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { InstanceTypeVMState } from '../state/utils/types';
 
@@ -110,8 +113,11 @@ export const generateVM = (
         },
       ],
       instancetype: {
+        kind: instanceTypeState?.selectedInstanceType?.namespace
+          ? VirtualMachineInstancetypeModel.kind
+          : VirtualMachineClusterInstancetypeModelGroupVersionKind?.kind,
         name:
-          selectedInstanceType ||
+          selectedInstanceType?.name ||
           selectedBootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
       },
       preference: {
@@ -162,4 +168,12 @@ export const generateVM = (
   };
 
   return sshSecretName ? addSecretToVM(emptyVM, sshSecretName, isDynamic) : emptyVM;
+};
+
+export const groupVersionKindFromCommonResource = (
+  resource: K8sResourceCommon,
+): K8sGroupVersionKind => {
+  const [group, version] = resource.apiVersion.split('/');
+  const kind = resource.kind;
+  return { group, kind, version };
 };

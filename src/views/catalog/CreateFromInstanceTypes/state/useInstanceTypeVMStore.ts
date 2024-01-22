@@ -34,7 +34,10 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
         produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
           instanceTypeVMState.selectedBootableVolume = selectedVolume;
           instanceTypeVMState.pvcSource = pvcSource;
-          instanceTypeVMState.selectedInstanceType = getInstanceTypeFromVolume(selectedVolume);
+          instanceTypeVMState.selectedInstanceType = {
+            name: getInstanceTypeFromVolume(selectedVolume),
+            namespace: null,
+          };
 
           const osName = getLabel(selectedVolume, DEFAULT_PREFERENCE_LABEL).replaceAll('.', '-');
           instanceTypeVMState.vmName = generatePrettyName(osName);
