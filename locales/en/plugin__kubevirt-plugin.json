@@ -1021,6 +1021,7 @@
   "Select InstanceType": "Select InstanceType",
   "Select nodes": "Select nodes",
   "Select Nodes that must have all the following expressions.": "Select Nodes that must have all the following expressions.",
+  "Select project in order to see user provided instancetypes": "Select project in order to see user provided instancetypes",
   "Select size": "Select size",
   "Select StorageClass": "Select StorageClass",
   "Select volume to boot from": "Select volume to boot from",

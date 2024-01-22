@@ -2,14 +2,21 @@ import React, { FC, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { groupVersionKindFromCommonResource } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceLink, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
-import { ActionList, ActionListItem, Pagination, SearchInput } from '@patternfly/react-core';
+import { ResourceLink, Timestamp, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  ActionList,
+  ActionListItem,
+  Bullseye,
+  Pagination,
+  SearchInput,
+} from '@patternfly/react-core';
 import { TableComposable, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
 import UsersInstanceTypeEmptyState from './components/UsersInstanceTypeEmptyState';
@@ -24,6 +31,7 @@ type UsersInstanceTypesListProps = {
 
 const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({ userInstanceTypes }) => {
   const { t } = useKubevirtTranslation();
+  const [activeNamespace] = useActiveNamespace();
 
   const {
     instanceTypeVMState: { selectedInstanceType },
@@ -54,6 +62,14 @@ const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({ userInstanceT
     filteredItems,
     pagination,
   );
+
+  if (activeNamespace === ALL_NAMESPACES_SESSION_KEY) {
+    return (
+      <Bullseye className={'instance-type-list__all-projects'}>
+        {t('Select project in order to see user provided instancetypes')}
+      </Bullseye>
+    );
+  }
 
   return (
     <>
@@ -103,22 +119,26 @@ const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({ userInstanceT
           <Tbody>
             {sortedData.map((instanceType) => {
               const itName = getName(instanceType);
+              const itNamespace = getNamespace(instanceType);
               return (
                 <Tr
+                  isRowSelected={
+                    selectedInstanceType?.name === itName &&
+                    selectedInstanceType?.namespace === itNamespace
+                  }
                   onRowClick={() =>
                     setInstanceTypeVMState({
-                      payload: itName,
+                      payload: { name: itName, namespace: itNamespace },
                       type: instanceTypeActionType.setSelectedInstanceType,
                     })
                   }
                   isHoverable
-                  isRowSelected={selectedInstanceType === itName}
                   isSelectable
                   key={itName}
                 >
                   <Td>
                     <ResourceLink
-                      groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
+                      groupVersionKind={groupVersionKindFromCommonResource(instanceType)}
                       linkTo={false}
                       name={itName}
                     />
