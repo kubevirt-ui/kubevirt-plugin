@@ -47,13 +47,13 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
 
   const isMenuExpanded = useMemo(() => seriesName === activeMenu, [activeMenu, seriesName]);
   const isSelectedMenu = useMemo(
-    () => selectedInstanceType?.startsWith(seriesName),
+    () => selectedInstanceType?.name?.startsWith(seriesName),
     [selectedInstanceType, seriesName],
   );
 
   const selectedITLabel = useMemo(() => {
     const itSize = sizes?.find(
-      (size) => `${seriesName}.${size.sizeLabel}` === selectedInstanceType,
+      (size) => `${seriesName}.${size.sizeLabel}` === selectedInstanceType?.name,
     );
 
     const { cpus, memory, sizeLabel } = itSize || {};
@@ -85,7 +85,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
           <MenuContent>
             <MenuList>
               <RedHatInstanceTypeSeriesSizesMenuItems
-                selected={selectedInstanceType}
+                selected={selectedInstanceType?.name}
                 seriesName={seriesName}
                 setSelected={onMenuSelect}
                 sizes={sizes}
