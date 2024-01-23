@@ -10,16 +10,9 @@ import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesC
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
-import { RHELAutomaticSubscriptionData } from './utils/types';
+import { RHELAutomaticSubscriptionFormProps } from './utils/types';
 
-type UseRHELAutomaticSubscription = () => {
-  canEdit: boolean;
-  loaded: boolean;
-  loadError: Error;
-  loading: boolean;
-  subscriptionData: RHELAutomaticSubscriptionData;
-  updateSubscription: (activationKey: string, organizationID: string) => void;
-};
+type UseRHELAutomaticSubscription = () => RHELAutomaticSubscriptionFormProps;
 
 const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = () => {
   const {
