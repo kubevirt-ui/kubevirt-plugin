@@ -99,14 +99,14 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     namespaced: true,
   });
 
-  const { filters, vmiMapper, vmimMapper } = useVMListFilters(vmis, vms, vmims);
+  const { filters, searchFilters, vmiMapper, vmimMapper } = useVMListFilters(vmis, vms, vmims);
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
   const [unfilterData, dataFilters, onFilterChange] = useListPageFilter<
     V1VirtualMachine,
     V1VirtualMachine
-  >(vms, filters);
+  >(vms, [...filters, ...searchFilters]);
 
   const [unfilteredData, data] = useMemo(() => {
     if (!featureEnabled || isProxyPodAlive === false) return [unfilterData, dataFilters];
@@ -166,6 +166,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
             data={unfilteredData}
             loaded={loaded}
             rowFilters={filters}
+            searchFilters={searchFilters}
           />
           {!isEmpty(vms) && (
             <Pagination
