@@ -2,8 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { RHELAutomaticSubscriptionFormProps } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
   ActionGroup,
   Button,
@@ -22,10 +21,14 @@ import OrganizationIDHelpIcon from '../OrganizationIDHelpIcon/OrganizationIDHelp
 
 import './AutomaticSubscriptionForm.scss';
 
-const AutomaticSubscriptionForm: FC = () => {
+const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
+  canEdit,
+  loaded,
+  loading,
+  subscriptionData,
+  updateSubscription,
+}) => {
   const { t } = useKubevirtTranslation();
-  const { canEdit, loaded, loading, subscriptionData, updateSubscription } =
-    useRHELAutomaticSubscription();
 
   const [activationKey, setActivationKey] = useState<string>(null);
   const [organizationID, setOrganizationID] = useState<string>(null);
@@ -39,11 +42,7 @@ const AutomaticSubscriptionForm: FC = () => {
 
   if (!loaded) return <Skeleton />;
 
-  const isDisabled =
-    !canEdit ||
-    isEqualObject(subscriptionData, { activationKey, organizationID }) ||
-    (!isEmpty(organizationID) && isEmpty(activationKey)) ||
-    (isEmpty(organizationID) && !isEmpty(activationKey));
+  const isDisabled = !canEdit || isEqualObject(subscriptionData, { activationKey, organizationID });
 
   const handleSubmit = () => {
     !isDisabled && updateSubscription(activationKey, organizationID);

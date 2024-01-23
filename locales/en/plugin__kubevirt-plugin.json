@@ -175,7 +175,7 @@
   "Automatically apply this key to any new VirtualMachine you create in this project.": "Automatically apply this key to any new VirtualMachine you create in this project.",
   "Automatically compute CPU limits on projects containing labels": "Automatically compute CPU limits on projects containing labels",
   "Automatically compute CPU limits on projects containing these labels": "Automatically compute CPU limits on projects containing these labels",
-  "Automatically pull updates from the RHEL repository": "Automatically pull updates from the RHEL repository",
+  "Automatically pull updates from the RHEL repository. Activation key and Organization ID are mandatory to enable this.": "Automatically pull updates from the RHEL repository. Activation key and Organization ID are mandatory to enable this.",
   "Autounattend.xml answer file": "Autounattend.xml answer file",
   "Available": "Available",
   "Available only on Nodes with labels": "Available only on Nodes with labels",
