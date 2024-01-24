@@ -10,6 +10,7 @@ import {
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesConfigMap';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useMetalLBOperatorInstalled } from '@kubevirt-utils/hooks/useMetalLBOperatorInstalled/useMetalLBOperatorInstalled';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
@@ -25,6 +26,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
     featuresConfigMapData: [featureConfigMap, loaded],
     isAdmin,
   } = useFeaturesConfigMap();
+  const hasMetalLBInstalled = useMetalLBOperatorInstalled();
 
   const onChange = useCallback(
     (val: string, field: string) => {
@@ -53,10 +55,12 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
         helpTextIconContent={t(
           'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',
         )}
+        switchIsOn={
+          featureConfigMap?.data?.[LOAD_BALANCER_ENABLED] === 'true' || hasMetalLBInstalled
+        }
         id="load-balancer-feature"
-        isDisabled={!loaded || !isAdmin}
+        isDisabled={!loaded || !isAdmin || hasMetalLBInstalled}
         newBadge={newBadge}
-        switchIsOn={featureConfigMap?.data?.[LOAD_BALANCER_ENABLED] === 'true'}
         title={t('SSH over LoadBalancer service')}
         turnOnSwitch={(checked) => onChange(checked.toString(), LOAD_BALANCER_ENABLED)}
       />
