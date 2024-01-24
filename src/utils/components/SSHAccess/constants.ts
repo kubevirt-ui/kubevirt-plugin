@@ -11,5 +11,3 @@ export enum SERVICE_TYPES {
   NODE_PORT = 'NodePort',
   NONE = 'None',
 }
-
-export const exampleIdentityFilePath = '--identity-file=/home/jdoe/.ssh/id_rsa';
