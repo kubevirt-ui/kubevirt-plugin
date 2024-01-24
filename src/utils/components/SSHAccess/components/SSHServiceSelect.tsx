@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { ChangeEvent, FC, useState } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
@@ -7,10 +7,10 @@ import {
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
+import { useMetalLBOperatorInstalled } from '@kubevirt-utils/hooks/useMetalLBOperatorInstalled/useMetalLBOperatorInstalled';
 import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
-import { METALLB_GROUP, SERVICE_TYPES } from '../constants';
+import { SERVICE_TYPES } from '../constants';
 
 type SSHServiceSelectProps = {
   onSSHChange: (serviceType: SERVICE_TYPES) => void;
@@ -24,24 +24,16 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
   sshServiceLoaded,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [models] = useK8sModels();
+  const [isOpen, setIsOpen] = useState(false);
+  const hasMetalLBInstalled = useMetalLBOperatorInstalled();
 
   const { featureEnabled: loadBalancerConfigFlag } = useFeatures(LOAD_BALANCER_ENABLED);
   const { featureEnabled: nodePortEnabled } = useFeatures(NODE_PORT_ENABLED);
 
-  const hasSomeMetalCrd = useMemo(
-    () =>
-      Object.keys(models).some((modelGroupVersionKind) =>
-        modelGroupVersionKind.startsWith(METALLB_GROUP),
-      ),
-    [models],
-  );
-
-  const loadBalancerEnabled = loadBalancerConfigFlag || hasSomeMetalCrd;
+  const loadBalancerEnabled = loadBalancerConfigFlag || hasMetalLBInstalled;
 
   const sshServiceType = sshService?.spec?.type ?? SERVICE_TYPES.NONE;
-  const handleChange = (event: React.ChangeEvent<Element>, newValue: string | undefined) => {
+  const handleChange = (event: ChangeEvent<Element>, newValue: string | undefined) => {
     setIsOpen(false);
 
     if (newValue === sshServiceType) return;
