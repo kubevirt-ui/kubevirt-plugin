@@ -219,7 +219,12 @@ export const useVMListFilters = (
   vmis: V1VirtualMachineInstance[],
   vms: V1VirtualMachine[],
   vmims: V1VirtualMachineInstanceMigration[],
-): { filters: RowFilter<V1VirtualMachine>[]; vmiMapper: VmiMapper; vmimMapper: VmimMapper } => {
+): {
+  filters: RowFilter<V1VirtualMachine>[];
+  searchFilters: RowFilter<V1VirtualMachine>[];
+  vmiMapper: VmiMapper;
+  vmimMapper: VmimMapper;
+} => {
   const vmiMapper: VmiMapper = useMemo(() => {
     return (Array.isArray(vmis) ? vmis : [])?.reduce(
       (acc, vmi) => {
@@ -272,8 +277,8 @@ export const useVMListFilters = (
       liveMigratableFilter,
       nodesFilter,
       instanceTypesFilter,
-      searchByIP,
     ],
+    searchFilters: [searchByIP],
     vmiMapper,
     vmimMapper,
   };

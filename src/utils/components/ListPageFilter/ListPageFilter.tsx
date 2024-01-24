@@ -2,7 +2,6 @@ import React, { FC, useMemo, useState } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ColumnLayout,
   FilterValue,
@@ -50,6 +49,7 @@ type ListPageFilterProps = {
   loaded?: boolean;
   onFilterChange?: OnFilterChange;
   rowFilters?: RowFilter[];
+  searchFilters?: RowFilter[];
 };
 
 const ListPageFilter: FC<ListPageFilterProps> = ({
@@ -59,13 +59,13 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   loaded,
   onFilterChange,
   rowFilters,
+  searchFilters = [],
 }) => {
   const { t } = useKubevirtTranslation();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
-  const toolbarFilters = rowFilters.filter((filter) => !isEmpty(filter.items));
-  const searchFilters = rowFilters.filter((filter) => isEmpty(filter.items));
+  const toolbarFilters = rowFilters.filter((filter) => 'items' in filter);
 
   // Generate rowFilter items and counts. Memoize to minimize re-renders.
   const generatedRowFilters = useDeepCompareMemoize(generateRowFilters(toolbarFilters ?? [], data));
