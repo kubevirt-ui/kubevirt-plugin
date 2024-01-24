@@ -1,16 +1,21 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
+  Grid,
+  GridItem,
   Popover,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 import VirtctlSSHCommandClipboardCopy from './VirtctlSSHCommandClipboardCopy';
+
+import './ConsoleOverVirtctl.scss';
 
 type ConsoleOverVirtctlProps = {
   vm: V1VirtualMachine;
@@ -23,10 +28,24 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
       <DescriptionListTerm className="pf-u-font-size-xs">
         {t('SSH using virtctl')}{' '}
         <Popover
-          bodyContent={t(
-            'SSH access using the virtctl command is possible only when the API server is reachable.',
-          )}
+          bodyContent={
+            <>
+              <div>
+                {t(
+                  'SSH access using the virtctl command is possible only when the API server is reachable.',
+                )}
+              </div>
+              <br />
+              <Grid>
+                <GridItem span={2}>{t('Example: ')}</GridItem>
+                <GridItem id="ssh-using-virtctl--example" span={10}>
+                  {getConsoleVirtctlCommand(vm)}
+                </GridItem>
+              </Grid>
+            </>
+          }
           aria-label={'Help'}
+          minWidth="585px"
           position="right"
         >
           <HelpIcon />
