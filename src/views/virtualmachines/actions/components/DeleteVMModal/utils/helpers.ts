@@ -36,5 +36,5 @@ export const findPVCOwner = (
   resources: K8sResourceCommon[],
 ) =>
   resources.find((resource) =>
-    pvc?.metadata?.ownerReferences.find((owner) => owner.uid === resource.metadata.uid),
+    pvc?.metadata?.ownerReferences?.find((owner) => owner.uid === resource.metadata.uid),
   );
