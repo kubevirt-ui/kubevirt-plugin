@@ -66,8 +66,8 @@ const SSHTabAuthorizedSSHKey = ({ vm }) => {
       onToggle={setIsExpanded}
     >
       <Stack hasGutter>
-        <DynamicSSHKeyInjectionDescription isDynamicSSHInjectionEnabled />
         <SecretNameLabel secretName={secretName} />
+        <DynamicSSHKeyInjectionDescription isDynamicSSHInjectionEnabled />
       </Stack>
     </ExpandableSection>
   );
