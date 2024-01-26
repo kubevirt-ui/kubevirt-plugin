@@ -5,7 +5,7 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseDataVolumeConvertedVolumeNames = (vmVolumes: V1Volume[]) => {
   dvVolumesNames: string[];
-  pvcVolumesNames: string[];
+  isDataVolumeGarbageCollector: boolean;
 };
 
 const useDataVolumeConvertedVolumeNames: UseDataVolumeConvertedVolumeNames = (vmVolumes) => {
@@ -21,14 +21,9 @@ const useDataVolumeConvertedVolumeNames: UseDataVolumeConvertedVolumeNames = (vm
     .filter((volume) => volume?.dataVolume)
     ?.map((volume) => volume?.dataVolume?.name);
 
-  const pvcVolumesNames = (vmVolumes || [])
-    .filter((volume) => volume?.persistentVolumeClaim)
-    ?.map((volume) => volume?.persistentVolumeClaim?.claimName);
   return {
     dvVolumesNames,
-    pvcVolumesNames: isDataVolumeGarbageCollector
-      ? pvcVolumesNames.concat(dvVolumesNames)
-      : pvcVolumesNames,
+    isDataVolumeGarbageCollector,
   };
 };
 

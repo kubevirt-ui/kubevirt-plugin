@@ -24,7 +24,9 @@ type UseDeleteVMResources = (vm: V1VirtualMachine) => {
 };
 
 const useDeleteVMResources: UseDeleteVMResources = (vm) => {
-  const { dvVolumesNames, pvcVolumesNames } = useDataVolumeConvertedVolumeNames(getVolumes(vm));
+  const { dvVolumesNames, isDataVolumeGarbageCollector } = useDataVolumeConvertedVolumeNames(
+    getVolumes(vm),
+  );
   const namespace = vm?.metadata?.namespace;
   const [dataVolumes, dataVolumesLoaded, dataVolumesLoadError] = useK8sWatchResource<
     V1beta1DataVolume[]
@@ -48,7 +50,9 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
     namespaced: true,
   });
 
-  const filteredPvcs = pvcs?.filter((pvc) => pvcVolumesNames?.includes(pvc?.metadata?.name));
+  const filteredPvcs = isDataVolumeGarbageCollector
+    ? pvcs?.filter((pvc) => dvVolumesNames?.includes(pvc?.metadata?.name))
+    : [];
 
   const [snapshots, snapshotsLoaded, snapshotsLoadError] = useK8sWatchResource<
     V1alpha1VirtualMachineSnapshot[]
