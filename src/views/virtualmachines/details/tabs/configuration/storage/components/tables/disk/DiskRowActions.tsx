@@ -1,6 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -8,8 +7,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
+import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import DeleteDiskModal from '../../modal/DeleteDiskModal';
@@ -56,14 +55,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, vm, vmi }) => {
     return null;
   }, [isVMRunning, pvcResourceExists, t]);
 
-  const onSubmit = (updatedVM: V1VirtualMachine) =>
-    k8sUpdate({
-      data: updatedVM,
-      model: VirtualMachineModel,
-      name: updatedVM?.metadata?.name,
-      ns: updatedVM?.metadata?.namespace,
-    });
-
   const createEditDiskModal = () =>
     createModal(({ isOpen, onClose }) => (
       <EditDiskModal
@@ -72,7 +63,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, vm, vmi }) => {
         initialDiskState={initialDiskState}
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={onSubmit}
+        onSubmit={updateDisks}
         vm={vm}
       />
     ));

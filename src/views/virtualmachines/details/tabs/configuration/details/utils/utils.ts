@@ -7,11 +7,13 @@ import {
   DESCRIPTION_ANNOTATION,
   getBootloader,
   getCPUcores,
+  getDataVolumeTemplates,
   getDevices,
   getDisks,
   getHostname,
   getInterfaces,
   getMemory,
+  getVolumes,
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
 import { k8sPatch, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
@@ -191,6 +193,42 @@ export const updateHeadlessMode = (updatedVM: V1VirtualMachine, checked: boolean
         op: 'replace',
         path: `/spec/template/spec/domain/devices/autoattachGraphicsDevice`,
         value: checked ? false : null,
+      },
+    ],
+    model: VirtualMachineModel,
+    resource: updatedVM,
+  });
+
+export const updateDisks = (updatedVM: V1VirtualMachine) =>
+  k8sPatch({
+    data: [
+      {
+        op: 'replace',
+        path: `/spec/template/spec/domain/devices/disks`,
+        value: getDisks(updatedVM),
+      },
+      {
+        op: 'replace',
+        path: `/spec/template/spec/volumes`,
+        value: getVolumes(updatedVM),
+      },
+      {
+        op: 'replace',
+        path: `/spec/dataVolumeTemplates`,
+        value: getDataVolumeTemplates(updatedVM),
+      },
+    ],
+    model: VirtualMachineModel,
+    resource: updatedVM,
+  });
+
+export const updateVolumes = (updatedVM: V1VirtualMachine) =>
+  k8sPatch({
+    data: [
+      {
+        op: 'replace',
+        path: `/spec/template/spec/volumes`,
+        value: getVolumes(updatedVM),
       },
     ],
     model: VirtualMachineModel,
