@@ -1,14 +1,14 @@
 import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { K8sResourceCommon, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem } from '@patternfly/react-core';
+
+import { updateVolumes } from '../../../details/utils/utils';
 
 type MakePersistentModalProps = {
   isOpen: boolean;
@@ -40,19 +40,12 @@ const MakePersistentModal: FC<MakePersistentModalProps> = ({ isOpen, onClose, vm
   }, [vm, volume]);
 
   return (
-    <TabModal<K8sResourceCommon>
-      onSubmit={() =>
-        k8sUpdate({
-          data: updatedVirtualMachine,
-          model: VirtualMachineModel,
-          name: updatedVirtualMachine?.metadata?.name,
-          ns: updatedVirtualMachine?.metadata?.namespace,
-        })
-      }
+    <TabModal<V1VirtualMachine>
       headerText={t('Make persistent?')}
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onClose={onClose}
+      onSubmit={updateVolumes}
     >
       <Stack hasGutter>
         <StackItem>

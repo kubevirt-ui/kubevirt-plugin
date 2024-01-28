@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
@@ -10,13 +9,13 @@ import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDri
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import {
-  k8sUpdate,
   ListPageCreateButton,
   ListPageFilter,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem } from '@patternfly/react-core';
+import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
 import useDiskColumns from '../../hooks/useDiskColumns';
 import useDisksFilters from '../../hooks/useDisksFilters';
@@ -47,17 +46,10 @@ const DiskList: FC<DiskListProps> = ({ vm, vmi }) => {
         onClick={() =>
           createModal(({ isOpen, onClose }) => (
             <DiskModal
-              onSubmit={(obj) =>
-                k8sUpdate({
-                  data: obj,
-                  model: VirtualMachineModel,
-                  name: obj.metadata.name,
-                  ns: obj.metadata.namespace,
-                })
-              }
               headerText={headerText}
               isOpen={isOpen}
               onClose={onClose}
+              onSubmit={updateDisks}
               vm={vm}
             />
           ))
@@ -79,17 +71,7 @@ const DiskList: FC<DiskListProps> = ({ vm, vmi }) => {
         </FlexItem>
 
         <FlexItem>
-          <WindowsDrivers
-            updateVM={(newVM) =>
-              k8sUpdate({
-                data: newVM,
-                model: VirtualMachineModel,
-                name: newVM?.metadata?.name,
-                ns: newVM?.metadata?.namespace,
-              })
-            }
-            vm={vm}
-          />
+          <WindowsDrivers updateVM={updateDisks} vm={vm} />
         </FlexItem>
       </Flex>
       <VirtualizedTable

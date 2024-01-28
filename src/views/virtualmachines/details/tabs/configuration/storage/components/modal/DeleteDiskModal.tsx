@@ -1,8 +1,7 @@
-import * as React from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import {
@@ -17,6 +16,8 @@ import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/re
 import { k8sDelete, K8sResourceCommon, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
+import { updateDisks } from '../../../details/utils/utils';
+
 import useVolumeOwnedResource from './hooks/useVolumeOwnedResource';
 
 type DeleteDiskModalProps = {
@@ -26,9 +27,9 @@ type DeleteDiskModalProps = {
   volume: V1Volume;
 };
 
-const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ isOpen, onClose, vm, volume }) => {
+const DeleteDiskModal: FC<DeleteDiskModalProps> = ({ isOpen, onClose, vm, volume }) => {
   const { t } = useKubevirtTranslation();
-  const [deleteOwnedResource, setDeleteOwnedResource] = React.useState(false);
+  const [deleteOwnedResource, setDeleteOwnedResource] = useState(false);
 
   const diskName = volume?.name;
 
@@ -40,7 +41,7 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ isOpen, onClose, vm, 
     volumeResourceName,
   } = useVolumeOwnedResource(vm, volume);
 
-  const updatedVirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine = useMemo(() => {
     const updatedDisks = (getDisks(vm) || [])?.filter(({ name }) => name !== diskName);
     const updatedVolumes = (getVolumes(vm) || [])?.filter(({ name }) => name !== diskName);
     const updatedDataVolumeTemplates = (getDataVolumeTemplates(vm) || [])?.filter(
@@ -55,16 +56,11 @@ const DeleteDiskModal: React.FC<DeleteDiskModalProps> = ({ isOpen, onClose, vm, 
     return updatedVM;
   }, [vm, diskName, volumeResourceName]);
 
-  const onSubmit = (updatedVM: K8sResourceCommon) => {
+  const onSubmit = (updatedVM: V1VirtualMachine) => {
     const deletePromise =
       vm?.status?.printableStatus === printableVMStatus.Running
         ? getRemoveHotplugPromise(vm, diskName)
-        : k8sUpdate({
-            data: updatedVM,
-            model: VirtualMachineModel,
-            name: updatedVM?.metadata?.name,
-            ns: updatedVM?.metadata?.namespace,
-          });
+        : updateDisks(updatedVM);
 
     return deletePromise.then(() => {
       if (volumeResource) {
