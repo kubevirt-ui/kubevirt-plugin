@@ -30,11 +30,11 @@ wait_mcp_for_updated()
 # ----------------------------------------------------------------------------------------------------
 # Install HCO (kubevirt and helper operators)
 
-export HCO_IMAGE_VER=${HCO_IMAGE_VER:-"1.8.0-unstable"}
+export HCO_IMAGE_VER=${HCO_IMAGE_VER:-"1.11.0-unstable"}
 export HCO_GIT_TAG=${HCO_GIT_TAG:-"main"}
-export HCO_SUBSCRIPTION_CHANNEL=${HCO_SUBSCRIPTION_CHANNEL:-"1.8.0"}
-export VIRTCTL_VERSION="v0.49.0"
-export HPP_VERSION="release-v0.12"
+export HCO_SUBSCRIPTION_CHANNEL=${HCO_SUBSCRIPTION_CHANNEL:-"candidate-v1.11"}
+export VIRTCTL_VERSION="v1.0.1"
+export HPP_VERSION="release-v0.18"
 
 cat <<EOF | oc apply -f -
 apiVersion: operators.coreos.com/v1alpha1
@@ -72,6 +72,7 @@ spec:
     name: community-kubevirt-hyperconverged
     channel: ${HCO_SUBSCRIPTION_CHANNEL}
 EOF
+
 
 # Wait for HCO cr to be created
 sleep 60
@@ -155,7 +156,8 @@ if ! type virtctl; then
   # Install virtctl binary and add to PATH
   mkdir virtctl
 
-  wget ${VIRTCTL_AMD64} -O virtctl/virtctl || wget ${VIRTCTL_X86_64} -O virtctl/virtctl
+  # --quiet as wget logs an URL that should not be logged since it provides access to download a file (it is a presigned URL)
+  wget ${VIRTCTL_AMD64} -O virtctl/virtctl --quiet || wget ${VIRTCTL_X86_64} -O virtctl/virtctl --quiet
   [[ ! -f "virtctl/virtctl" ]] && echo "ERROR: virtctl binary is unavailable for download" && exit 1
 
   chmod +x virtctl/virtctl
