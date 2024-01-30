@@ -28,7 +28,6 @@ export const getCreateVMVirtctlCommand = (
     `--instancetype=${vm?.spec?.instancetype?.name}`,
     `--preference=${vm?.spec?.preference?.name}`,
     `${source}${sourceMetadata}`,
-    sshPubKey || null,
     encodedSSHCloudInitUserData,
   ];
 
