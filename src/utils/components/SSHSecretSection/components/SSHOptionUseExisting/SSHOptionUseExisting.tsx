@@ -1,18 +1,15 @@
-import React, {
-  Dispatch,
-  FC,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceLink, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  K8sResourceCommon,
+  ResourceLink,
+  useActiveNamespace,
+  useK8sWatchResource,
+} from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -30,15 +27,19 @@ import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
 import SecretDropdown from '../SecretDropdown/SecretDropdown';
 
 type SSHOptionUseExistingProps = {
+  localNSProject: string;
   namespace?: string;
   projectsWithSecrets: { [namespace: string]: IoK8sApiCoreV1Secret[] };
+  setLocalNSProject: Dispatch<SetStateAction<string>>;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   sshDetails: SSHSecretDetails;
 };
 
 const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
+  localNSProject,
   namespace,
   projectsWithSecrets,
+  setLocalNSProject,
   setSSHDetails,
   sshDetails,
 }) => {
@@ -46,7 +47,11 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   const [activeNamespace] = useActiveNamespace();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<string>();
-  const projects = useMemo(() => Object.keys(projectsWithSecrets), [projectsWithSecrets]);
+  const [projectsData] = useK8sWatchResource<K8sResourceCommon[]>({
+    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    isList: true,
+  });
+  const projects = projectsData?.map(({ metadata }) => metadata?.name);
   const showNewSecretNameField = namespace
     ? selectedProject !== namespace
     : selectedProject !== sshDetails?.sshSecretNamespace;
@@ -54,8 +59,10 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   useEffect(
     () =>
       !selectedProject &&
-      setSelectedProject(namespace || sshDetails?.sshSecretNamespace || projects?.[0]),
-    [namespace, projects, selectedProject, sshDetails?.sshSecretNamespace],
+      setSelectedProject(
+        localNSProject || namespace || sshDetails?.sshSecretNamespace || projects?.[0],
+      ),
+    [namespace, localNSProject, projects, selectedProject, sshDetails?.sshSecretNamespace],
   );
 
   const onFilterProject = (_: any, value: string) => {
@@ -75,6 +82,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   const onSelectProject = useCallback(
     (_: any, newValue: string) => {
       setSelectedProject(newValue);
+      setLocalNSProject(newValue);
       const addNew = namespace ? newValue !== namespace : newValue !== activeNamespace;
       setSSHDetails((prev) => ({
         ...prev,
@@ -86,7 +94,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
 
       setIsOpen(false);
     },
-    [setSSHDetails, activeNamespace, namespace],
+    [setLocalNSProject, namespace, activeNamespace, setSSHDetails],
   );
 
   const onChangeSecretName = (newSecretName: string) => {

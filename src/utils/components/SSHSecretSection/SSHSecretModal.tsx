@@ -32,8 +32,8 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
   const { t } = useKubevirtTranslation();
 
   const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(initialSSHSecretDetails);
-
-  const { isDisabled, secretsData } = useSecretsData(sshDetails, null);
+  const [localNSProject, setLocalNSProject] = useState<string>(namespace);
+  const { isDisabled, secretsData } = useSecretsData(sshDetails, localNSProject);
 
   return (
     <TabModal
@@ -54,8 +54,10 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
       <SSHSecretSection
         isTemplate={isTemplate}
         isUserTab={isUserTab}
+        localNSProject={localNSProject}
         namespace={namespace}
         secretsData={secretsData}
+        setLocalNSProject={setLocalNSProject}
         setSSHDetails={setSSHDetails}
         sshDetails={sshDetails}
       />
