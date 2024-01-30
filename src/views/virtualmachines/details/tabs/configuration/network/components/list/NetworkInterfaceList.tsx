@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import {
   V1Network,
@@ -30,9 +30,11 @@ type NetworkInterfaceTableProps = {
 const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm, vmi }) => {
   const filters = useNetworkRowFilters();
 
-  const { interfaces, networks } = getInterfacesAndNetworks(vm, vmi);
+  const networkInterfacesData = useMemo(() => {
+    const { interfaces, networks } = getInterfacesAndNetworks(vm, vmi);
+    return getNetworkInterfaceRowData(networks, interfaces);
+  }, [vm, vmi]);
 
-  const networkInterfacesData = getNetworkInterfaceRowData(networks, interfaces);
   const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
 
   const columns = useNetworkColumns(filteredData);
