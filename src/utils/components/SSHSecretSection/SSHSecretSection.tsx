@@ -22,8 +22,10 @@ import './SSHSecretSection.scss';
 type SSHSecretSectionProps = {
   isTemplate: boolean;
   isUserTab: boolean;
+  localNSProject: string;
   namespace?: string;
   secretsData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
+  setLocalNSProject: Dispatch<SetStateAction<string>>;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   sshDetails: SSHSecretDetails;
 };
@@ -31,8 +33,10 @@ type SSHSecretSectionProps = {
 const SSHSecretSection: FC<SSHSecretSectionProps> = ({
   isTemplate,
   isUserTab,
+  localNSProject,
   namespace,
   secretsData: [secrets, loadedSecrets, errorLoadingSecrets],
+  setLocalNSProject,
   setSSHDetails,
   sshDetails,
 }) => {
@@ -66,8 +70,10 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({
       <GridItem className="ssh-secret-section__body">
         {secretSelectionOption === SecretSelectionOption.useExisting && (
           <SSHOptionUseExisting
+            localNSProject={localNSProject}
             namespace={namespace}
             projectsWithSecrets={projectsWithSecrets}
+            setLocalNSProject={setLocalNSProject}
             setSSHDetails={setSSHDetails}
             sshDetails={sshDetails}
           />
