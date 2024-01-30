@@ -9,6 +9,7 @@ export enum VirtualMachineDetailsTab {
   Environment = 'environment',
   Events = 'events',
   'Initial-run' = 'initial',
+  Logs = 'logs',
   Metadata = 'metadata',
   Metrics = 'metrics',
   Network = 'network',
@@ -18,6 +19,7 @@ export enum VirtualMachineDetailsTab {
   Snapshots = 'snapshots',
   SSH = 'ssh',
   Storage = 'storage',
+  Tables = 'tables',
   YAML = 'yaml',
 }
 

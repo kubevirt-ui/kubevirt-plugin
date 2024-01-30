@@ -99,5 +99,17 @@ export const useVirtualMachineTabs = () => {
       href: VirtualMachineDetailsTab.Diagnostics,
       name: t(VirtualMachineDetailsTabLabel.Diagnostics),
     },
+    {
+      component: VirtualMachineDiagnosticTab,
+      href: `${VirtualMachineDetailsTab.Diagnostics}/${VirtualMachineDetailsTab.Tables}`,
+      isHidden: true,
+      name: t(VirtualMachineDetailsTabLabel.Diagnostics),
+    },
+    {
+      component: VirtualMachineDiagnosticTab,
+      href: `${VirtualMachineDetailsTab.Diagnostics}/${VirtualMachineDetailsTab.Logs}`,
+      isHidden: true,
+      name: t(VirtualMachineDetailsTabLabel.Diagnostics),
+    },
   ];
 };

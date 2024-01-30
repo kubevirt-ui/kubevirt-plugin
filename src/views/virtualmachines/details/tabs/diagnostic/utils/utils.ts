@@ -7,6 +7,7 @@ import {
   V1VirtualMachineCondition,
   V1VolumeSnapshotStatus,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -93,3 +94,16 @@ export const buildDataVolumeResources = (vm: V1VirtualMachine) =>
       },
     ]) || [],
   );
+
+export const createURLDiagnostic = (str: string, append: string): string => {
+  const urlSpitted = str.split('/');
+  if (
+    urlSpitted[urlSpitted.length - 1] === VirtualMachineDetailsTab.Logs ||
+    urlSpitted[urlSpitted.length - 1] === VirtualMachineDetailsTab.Tables
+  ) {
+    urlSpitted.pop();
+    urlSpitted.push(append);
+    return urlSpitted.join('/');
+  }
+  return str.concat('/' + append);
+};
