@@ -1,31 +1,45 @@
 import React, { FC } from 'react';
 
-import useClusterInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterInstanceTypes';
-import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  VirtualMachineInstancetypeModelGroupVersionKind,
+  VirtualMachineInstancetypeModelRef,
+} from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import {
   ListPageBody,
   ListPageFilter,
+  useActiveNamespace,
+  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
-import ClusterInstancetypeRow from './components/ClusterInstancetypeRow';
-import useClusterInstancetypeListColumns from './hooks/useClusterInstancetypeListColumns';
+import UserInstancetypeRow from './components/UserInstancetypeRow';
+import useUserInstancetypeListColumns from './hooks/useUserInstancetypeListColumns';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const ClusterInstancetypeList: FC = () => {
+const UserInstancetypeList: FC = () => {
   const { t } = useKubevirtTranslation();
-  const [instanceTypes, loaded, loadError] = useClusterInstanceTypes();
-
+  const [activeNamespace] = useActiveNamespace();
+  const [instanceTypes, loaded, loadError] = useK8sWatchResource<
+    V1beta1VirtualMachineInstancetype[]
+  >({
+    groupVersionKind: VirtualMachineInstancetypeModelGroupVersionKind,
+    isList: true,
+    ...(activeNamespace !== ALL_NAMESPACES_SESSION_KEY && { namespace: activeNamespace }),
+  });
   const { onPaginationChange, pagination } = usePagination();
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(instanceTypes);
-  const [columns, activeColumns] = useClusterInstancetypeListColumns(pagination, data);
+  const [unfilteredData, data, onFilterChange] = useListPageFilter<
+    V1beta1VirtualMachineInstancetype,
+    V1beta1VirtualMachineInstancetype
+  >(instanceTypes);
+  const [columns, activeColumns] = useUserInstancetypeListColumns(pagination, data);
 
   return (
     <ListPageBody>
@@ -37,7 +51,7 @@ const ClusterInstancetypeList: FC = () => {
               id,
               title,
             })),
-            id: VirtualMachineClusterInstancetypeModelRef,
+            id: VirtualMachineInstancetypeModelRef,
             selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
             type: '',
           }}
@@ -68,21 +82,21 @@ const ClusterInstancetypeList: FC = () => {
           perPageOptions={paginationDefaultValues}
         />
       </div>
-      <VirtualizedTable<V1beta1VirtualMachineClusterInstancetype>
+      <VirtualizedTable<V1beta1VirtualMachineInstancetype>
         EmptyMsg={() => (
           <div className="pf-u-text-align-center" id="no-instancetype-msg">
-            {t('No VirtualMachineClusterInstanceType found')}
+            {t('No VirtualMachineInstanceType found')}
           </div>
         )}
         columns={activeColumns}
         data={data}
         loaded={loaded}
         loadError={loadError}
-        Row={ClusterInstancetypeRow}
+        Row={UserInstancetypeRow}
         unfilteredData={unfilteredData}
       />
     </ListPageBody>
   );
 };
 
-export default ClusterInstancetypeList;
+export default UserInstancetypeList;
