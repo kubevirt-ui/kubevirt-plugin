@@ -149,7 +149,7 @@
   },
   {
     "properties": {
-      "component": { "$codeRef": "ClusterInstancetypeList" },
+      "component": { "$codeRef": "InstanceTypePage" },
       "model": {
         "group": "instancetype.kubevirt.io",
         "kind": "VirtualMachineClusterInstancetype",
@@ -157,6 +157,20 @@
       }
     },
     "type": "console.page/resource/list"
+  },
+  {
+    "properties": {
+      "component": {
+        "$codeRef": "InstanceTypePage"
+      },
+      "exact": true,
+      "path": [
+        "/k8s/ns/:ns/instancetype.kubevirt.io~v1alpha2~VirtualMachineInstancetype",
+        "/k8s/all-namespaces/instancetype.kubevirt.io~v1alpha2~VirtualMachineInstancetype"
+      ],
+      "prefixNamespaced": true
+    },
+    "type": "console.page/route"
   },
   {
     "flags": {
@@ -424,6 +438,23 @@
       "name": "default",
       "template": {
         "$codeRef": "yamlTemplates.defaultVirtualMachineClusterInstancetypeYamlTemplate"
+      }
+    },
+    "type": "console.yaml-template"
+  },
+  {
+    "flags": {
+      "required": ["KUBEVIRT"]
+    },
+    "properties": {
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachineInstancetype",
+        "version": "v1alpha2"
+      },
+      "name": "default",
+      "template": {
+        "$codeRef": "yamlTemplates.defaultVirtualMachineInstancetypeYamlTemplate"
       }
     },
     "type": "console.yaml-template"
