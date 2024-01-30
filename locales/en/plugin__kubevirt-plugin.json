@@ -121,7 +121,6 @@
   "Alerts": "Alerts",
   "Alerts ({{alertsQuantity}})": "Alerts ({{alertsQuantity}})",
   "All items": "All items",
-  "All settings are effective across the entire cluster.": "All settings are effective across the entire cluster.",
   "All snapshots of this VirtualMachine will be deleted as well.": "All snapshots of this VirtualMachine will be deleted as well.",
   "All sources selected": "All sources selected",
   "Allocating resources": "Allocating resources",
