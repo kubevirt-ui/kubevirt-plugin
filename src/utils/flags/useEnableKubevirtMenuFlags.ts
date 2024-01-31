@@ -1,19 +1,27 @@
-import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
-import VirtualMachineClusterPreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterPreferenceModel';
-import { K8sVerb, SetFeatureFlag, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
+import VirtualMachinePreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
+import {
+  K8sVerb,
+  SetFeatureFlag,
+  useAccessReview,
+  useActiveNamespace,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 import { FLAG_KUBEVIRT_INSTANCETYPES, FLAG_KUBEVIRT_PREFERENCES } from './consts';
 
 const useEnableKubevirtMenuFlags = (setFeatureFlag: SetFeatureFlag) => {
+  const [namespace] = useActiveNamespace();
   const [canShowInstancetypes] = useAccessReview({
-    group: VirtualMachineClusterInstancetypeModel.apiGroup,
-    resource: VirtualMachineClusterInstancetypeModel.plural,
+    group: VirtualMachineInstancetypeModel.apiGroup,
+    namespace,
+    resource: VirtualMachineInstancetypeModel.plural,
     verb: 'list' as K8sVerb,
   });
 
   const [canShowPreferences] = useAccessReview({
-    group: VirtualMachineClusterPreferenceModel.apiGroup,
-    resource: VirtualMachineClusterPreferenceModel.plural,
+    group: VirtualMachinePreferenceModel.apiGroup,
+    namespace,
+    resource: VirtualMachinePreferenceModel.plural,
     verb: 'list' as K8sVerb,
   });
 

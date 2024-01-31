@@ -69,6 +69,7 @@ const PreferencePage = () => {
           <ListPageCreate
             createAccessReview={{
               groupVersionKind,
+              ...(activeTabKey !== 0 && { namespace: activeNamespace }),
             }}
             groupVersionKind={groupVersionKind}
           >
