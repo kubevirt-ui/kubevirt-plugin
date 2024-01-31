@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, MouseEvent, useCallback } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -24,6 +24,7 @@ import {
   overrideVirtualMachineDataVolumeSpec,
 } from '../utils';
 
+import StorageClassSelect from './StorageClassSelect/StorageClassSelect';
 import SelectCDSourcePopOver from './SelectCDSourcePopOver';
 import SelectDiskSourcePopOver from './SelectDiskSourcePopOver';
 import { SelectSource } from './SelectSource';
@@ -37,7 +38,17 @@ export type CustomizeSourceProps = {
 
 export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
-  const { cdUpload, diskUpload, setCDFile, setDiskFile, setVM, vm } = useDrawerContext();
+  const {
+    cdUpload,
+    diskUpload,
+    setCDFile,
+    setDiskFile,
+    setStorageClassName,
+    setVM,
+    storageClassName,
+    storageClassRequired,
+    vm,
+  } = useDrawerContext();
 
   const diskSource = getDiskSource(vm, ROOTDISK);
 
@@ -78,6 +89,17 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
     [vm, setVM],
   );
 
+  const onStorageClassChange = (_: MouseEvent, value: string) => {
+    setStorageClassName(value);
+
+    const source: V1beta1DataVolumeSpec = { ...(diskSource as V1beta1DataVolumeSpec) };
+    const updatedSource: V1beta1DataVolumeSpec = {
+      ...source,
+      storage: { ...source.storage, storageClassName: value },
+    };
+    onDiskSourceChange(updatedSource);
+  };
+
   return (
     <div className="storage-section__customize-source">
       <BootCDCheckbox hasCDSource={!isEmpty(cdSource)} onChange={onCDCheckboxChange} />
@@ -112,6 +134,11 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
         sourceOptions={DISK_SOURCES_WITH_DEFAULT}
         sourcePopOver={<SelectDiskSourcePopOver />}
         withSize={!('image' in diskSource)}
+      />
+      <StorageClassSelect
+        onStorageClassChange={onStorageClassChange}
+        storageClassName={storageClassName}
+        storageClassRequired={storageClassRequired}
       />
       <Divider className="divider" />
       <DriversCheckbox />

@@ -10,18 +10,24 @@ import React, {
 import { Updater, useImmer } from 'use-immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import {
   DataUpload,
   UploadDataProps,
   useCDIUpload,
 } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
+import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateVirtualMachineObject,
   replaceTemplateVM,
   useVMTemplateSource,
 } from '@kubevirt-utils/resources/template';
 import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+
+import { getDiskSource } from '../StorageSection/utils';
 
 import { initialValue } from './constants';
 import useDefaultVMSource from './useDefaultVMSource';
@@ -35,8 +41,11 @@ export type DrawerContext = {
   isBootSourceAvailable: boolean;
   setCDFile: (file: File | string) => void;
   setDiskFile: (file: File | string) => void;
+  setStorageClassName: (scName: string) => void;
   setTemplate: Updater<V1Template>;
   setVM?: (vm: V1VirtualMachine) => void;
+  storageClassName: string;
+  storageClassRequired: boolean;
   template: V1Template;
   templateDataLoaded: boolean;
   templateLoadingError: Error;
@@ -54,12 +63,21 @@ const useDrawer = (template: V1Template) => {
 
   const [diskFile, setDiskFile] = useState<File | string>();
   const [cdFile, setCDFile] = useState<File | string>();
+  const [storageClassName, setStorageClassName] = useState<string>(null);
 
   const [templateWithGeneratedParams, loading, error] = useVMTemplateGeneratedParams(template);
+  const [{ clusterDefaultStorageClass, virtDefaultStorageClass }] = useDefaultStorageClass();
 
   const vm = useMemo(
     () => getTemplateVirtualMachineObject(customizedTemplate),
     [customizedTemplate],
+  );
+
+  const templateBootSourceStorageClass = useMemo(
+    () =>
+      (getDiskSource(getTemplateVirtualMachineObject(template), ROOTDISK) as V1beta1DataVolumeSpec)
+        ?.storage?.storageClassName,
+    [template],
   );
 
   const { isDefaultDiskSource, updateDefaultDiskSource } = useDefaultVMSource(vm);
@@ -86,8 +104,14 @@ const useDrawer = (template: V1Template) => {
     isBootSourceAvailable: isDefaultDiskSource ? isBootSourceAvailable : true,
     setCDFile,
     setDiskFile,
+    setStorageClassName,
     setTemplate: setCustomizedTemplate,
     setVM,
+    storageClassName,
+    storageClassRequired:
+      isEmpty(templateBootSourceStorageClass) &&
+      isEmpty(getName(virtDefaultStorageClass)) &&
+      isEmpty(getName(clusterDefaultStorageClass)),
     template: customizedTemplate || template,
     templateDataLoaded: !!templateWithGeneratedParams && !loading && bootSourceLoaded,
     templateLoadingError: error,
