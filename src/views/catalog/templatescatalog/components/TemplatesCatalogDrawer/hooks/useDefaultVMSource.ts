@@ -5,6 +5,7 @@ import {
   V1ContainerDiskSource,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 
 import { getDiskSource } from '../StorageSection/utils';
@@ -20,9 +21,16 @@ const useDefaultVMSource = (vm: V1VirtualMachine) => {
     defaultDiskSource.current = source;
   }, []);
 
+  const { storage: _, ...restDefaultSpec }: V1beta1DataVolumeSpec = {
+    ...(defaultDiskSource.current as V1beta1DataVolumeSpec),
+  };
+  const { storage: __, ...restCurrentSpec }: V1beta1DataVolumeSpec = {
+    ...(currentDiskSource as V1beta1DataVolumeSpec),
+  };
+
   return {
     currentDiskSource,
-    isDefaultDiskSource: currentDiskSource === defaultDiskSource.current,
+    isDefaultDiskSource: isEqualObject(restDefaultSpec, restCurrentSpec),
     updateDefaultDiskSource,
   };
 };

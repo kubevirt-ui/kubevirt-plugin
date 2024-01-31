@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { StorageClassModel } from '@kubevirt-utils/models';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { isEmpty } from '../../utils/utils';
@@ -15,7 +16,7 @@ import {
 type UseDefaultStorageClass = () => [
   {
     clusterDefaultStorageClass: IoK8sApiStorageV1StorageClass;
-    storageClasses: IoK8sApiStorageV1StorageClass[];
+    sortedStorageClasses: string[];
     virtDefaultStorageClass: IoK8sApiStorageV1StorageClass;
   },
   boolean,
@@ -43,7 +44,13 @@ const useDefaultStorageClass: UseDefaultStorageClass = () => {
       return acc;
     }, defaultSC);
   }, [storageClasses, loaded]);
-  return [{ ...defaultStorageClass, storageClasses }, loaded];
+
+  const sortedStorageClasses = useMemo(
+    () => storageClasses?.map(getName)?.sort(),
+    [storageClasses],
+  );
+
+  return [{ ...defaultStorageClass, sortedStorageClasses }, loaded];
 };
 
 export default useDefaultStorageClass;

@@ -100,15 +100,24 @@ export const SelectSource: FC<SelectSourceProps> = ({
 
   const onSourceTypeChange = (selection: SOURCE_OPTIONS_IDS) => {
     const newVolume = showSizeInput ? volumeQuantity : null;
+    const storageClassName = (selectedSource as V1beta1DataVolumeSpec)?.storage?.storageClassName;
     const handlers = {
-      [BLANK_SOURCE_NAME]: () => getGenericSourceCustomization(selection, null),
+      [BLANK_SOURCE_NAME]: () =>
+        getGenericSourceCustomization(selection, null, null, storageClassName),
       [CONTAINER_DISK_SOURCE_NAME]: () => getContainerDiskSource(''),
       [DEFAULT_SOURCE]: () => initialDiskSource.current,
-      [HTTP_SOURCE_NAME]: () => getGenericSourceCustomization(selection, '', newVolume),
-      [PVC_SOURCE_NAME]: () => getPVCSource('', '', newVolume),
+      [HTTP_SOURCE_NAME]: () =>
+        getGenericSourceCustomization(selection, '', newVolume, storageClassName),
+      [PVC_SOURCE_NAME]: () => getPVCSource('', '', newVolume, storageClassName),
       [REGISTRY_SOURCE_NAME]: () =>
-        getGenericSourceCustomization(selection, appendDockerPrefix(''), newVolume),
-      [UPLOAD_SOURCE_NAME]: () => getGenericSourceCustomization(selection, null),
+        getGenericSourceCustomization(
+          selection,
+          appendDockerPrefix(''),
+          newVolume,
+          storageClassName,
+        ),
+      [UPLOAD_SOURCE_NAME]: () =>
+        getGenericSourceCustomization(selection, null, null, storageClassName),
     };
 
     if (selection !== UPLOAD_SOURCE_NAME) {
