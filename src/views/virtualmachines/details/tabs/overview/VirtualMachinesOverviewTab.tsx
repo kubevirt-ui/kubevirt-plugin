@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AlertsCard from '@kubevirt-utils/components/AlertsCard/AlertsCard';
@@ -13,7 +12,7 @@ import VirtualMachinesOverviewTabSnapshots from './components/VirtualMachinesOve
 import VirtualMachinesOverviewTabUtilization from './components/VirtualMachinesOverviewTabUtilization/VirtualMachinesOverviewTabUtilization';
 import useVMAlerts from './utils/hook/useVMAlerts';
 
-type VirtualMachinesOverviewTabProps = RouteComponentProps & {
+type VirtualMachinesOverviewTabProps = {
   obj: V1VirtualMachine;
 };
 

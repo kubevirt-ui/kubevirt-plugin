@@ -1,3 +1,4 @@
+import { NavPageKubevirt } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import {
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,
@@ -15,7 +16,7 @@ import VirtualMachinesOverviewTab from '../tabs/overview/VirtualMachinesOverview
 import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
 import VirtualMachineYAMLPage from '../tabs/yaml/VirtualMachineYAMLPage';
 
-export const useVirtualMachineTabs = () => {
+export const useVirtualMachineTabs = (): NavPageKubevirt[] => {
   const { t } = useKubevirtTranslation();
 
   return [
@@ -47,27 +48,32 @@ export const useVirtualMachineTabs = () => {
     {
       component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Disks}`,
-      name: 'hide',
+      isHidden: true,
+      name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Disks}`,
     },
     {
       component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Environment}`,
-      name: 'hide',
+      isHidden: true,
+      name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Environment}`,
     },
     {
       component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${NETWORK}`,
-      name: 'hide',
+      isHidden: true,
+      name: `${VirtualMachineDetailsTab.Configurations}/${NETWORK}`,
     },
     {
       component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scheduling}`,
-      name: 'hide',
+      isHidden: true,
+      name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scheduling}`,
     },
     {
       component: VirtualMachineConfigurationTab,
       href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scripts}`,
-      name: 'hide',
+      isHidden: true,
+      name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scripts}`,
     },
     {
       component: VirtualMachinePageEventsTab,

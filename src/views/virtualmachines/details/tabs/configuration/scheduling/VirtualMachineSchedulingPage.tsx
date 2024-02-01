@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -8,16 +7,11 @@ import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { PageSection } from '@patternfly/react-core';
 
+import { ConfigurationInnerTabProps } from '../utils/types';
+
 import SchedulingSection from './components/SchedulingSection/SchedulingSection';
 
-type VirtualMachineSchedulingPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
-  obj?: V1VirtualMachine;
-};
-
-const VirtualMachineSchedulingPage: React.FC<VirtualMachineSchedulingPageProps> = ({ obj: vm }) => {
+const VirtualMachineSchedulingPage: React.FC<ConfigurationInnerTabProps> = ({ vm }) => {
   const onChangeResource = React.useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
