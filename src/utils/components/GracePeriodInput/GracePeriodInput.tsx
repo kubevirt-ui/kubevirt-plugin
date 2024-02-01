@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Checkbox,
@@ -29,7 +29,7 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
   onCheckboxChange,
   setGracePeriodSeconds,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useKubevirtTranslation();
 
   return (
     <StackItem>

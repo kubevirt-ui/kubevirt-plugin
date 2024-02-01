@@ -17,8 +17,8 @@ const HardwareDeviceModalDescription: React.FC<HardwareDevicesModalProps> = ({ t
       <Text className="text-muted" component={TextVariants.p}>
         Enter a name for the device to be assigned and select it from the dropdown menu. Click{' '}
         <b> Save</b>.<br /> Click{' '}
-        <b> + Add {type === HARDWARE_DEVICE_TYPE.GPUS ? 'GPU' : 'Host'} device </b> to add another
-        devices.
+        <b>+ Add {{ hardwareType: type === HARDWARE_DEVICE_TYPE.GPUS ? 'GPU' : 'Host' }} device</b>{' '}
+        to add another devices.
       </Text>
     </Trans>
   );

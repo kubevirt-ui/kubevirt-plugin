@@ -17,18 +17,18 @@ const UploadPVCErrorMessage: React.FC<UploadErrorMessageProps> = ({ message, upl
   const Error = {
     [uploadErrorType.ALLOCATE]: t('Could not create persistent volume claim'),
     [uploadErrorType.CERT]: (
-      <Trans ns="plugin__kubevirt-plugin" t={t}>
-        It seems that your browser does not trust the certificate of the upload proxy.{' '}
+      <>
+        {t('It seems that your browser does not trust the certificate of the upload proxy.')}
         {uploadProxyURL && (
-          <>
+          <Trans ns="plugin__kubevirt-plugin" t={t}>
             Please{' '}
             <a href={`https://${uploadProxyURL}`} rel="noopener noreferrer" target="_blank">
               approve this certificate
             </a>{' '}
             and try again
-          </>
+          </Trans>
         )}
-      </Trans>
+      </>
     ),
     [uploadErrorType.MISSING]: t('File input is missing'),
   };

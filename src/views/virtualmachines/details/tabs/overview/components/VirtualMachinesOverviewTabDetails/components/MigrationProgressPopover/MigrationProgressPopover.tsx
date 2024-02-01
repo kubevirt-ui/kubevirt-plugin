@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
@@ -48,38 +47,30 @@ const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ chi
       bodyContent={
         <Stack hasGutter>
           <StackItem>
-            <Trans ns="plugin__kubevirt-plugin">
-              <b>Phase</b> <Icon /> {vmim?.status?.phase}
-            </Trans>
+            <b>{t('Phase')}</b> <Icon /> {vmim?.status?.phase}
           </StackItem>
           <StackItem>
-            <Trans ns="plugin__kubevirt-plugin">
-              <b>Started</b>{' '}
-              {vmi?.status?.migrationState?.startTimestamp &&
-                dateTimeFormatter.format(new Date(vmi?.status?.migrationState?.startTimestamp))}
-            </Trans>
+            <b>{t('Started')}</b>{' '}
+            {vmi?.status?.migrationState?.startTimestamp &&
+              dateTimeFormatter.format(new Date(vmi?.status?.migrationState?.startTimestamp))}
           </StackItem>
           <StackItem>
-            <Trans ns="plugin__kubevirt-plugin">
-              <b>Elapsed time</b>{' '}
-              {t('{{minutes}}{{seconds}} seconds', {
-                minutes: minutes ? `${minutes} minutes, ` : null,
-                seconds,
-              })}
-            </Trans>
+            <b>{t('Elapsed time')}</b>{' '}
+            {t('{{minutes}}{{seconds}} seconds', {
+              minutes: minutes ? `${minutes} minutes, ` : null,
+              seconds,
+            })}
           </StackItem>
           <StackItem>
-            <Trans ns="plugin__kubevirt-plugin">
-              <b>Policy</b>{' '}
-              {vmi?.status?.migrationState?.migrationPolicyName ? (
-                <ResourceLink
-                  groupVersionKind={MigrationPolicyModelGroupVersionKind}
-                  name={vmi.status.migrationState.migrationPolicyName}
-                />
-              ) : (
-                <MutedTextSpan text="No MigrationPolicy" />
-              )}
-            </Trans>
+            <b>{t('Policy')}</b>{' '}
+            {vmi?.status?.migrationState?.migrationPolicyName ? (
+              <ResourceLink
+                groupVersionKind={MigrationPolicyModelGroupVersionKind}
+                name={vmi.status.migrationState.migrationPolicyName}
+              />
+            ) : (
+              <MutedTextSpan text="No MigrationPolicy" />
+            )}
           </StackItem>
           <StackItem>
             <Link

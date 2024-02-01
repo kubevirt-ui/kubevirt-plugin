@@ -14,16 +14,18 @@ const ConfirmActionMessage: React.FC<ConfirmActionMessageProps> = ({ action = 'd
   const objNamespace = obj?.metadata?.namespace;
 
   return (
-    <Trans t={t}>
-      Are you sure you want to {action} <strong>{obj?.metadata?.name}</strong>
+    <>
+      <Trans t={t}>
+        Are you sure you want to {{ action }} <strong>{{ name: obj?.metadata?.name }}</strong>
+      </Trans>
+
       {objNamespace && (
-        <>
+        <Trans t={t}>
           {' '}
-          in namespace <strong>{objNamespace}</strong>
-        </>
+          in namespace <strong>{{ objNamespace }}</strong>
+        </Trans>
       )}
-      ?
-    </Trans>
+    </>
   );
 };
 

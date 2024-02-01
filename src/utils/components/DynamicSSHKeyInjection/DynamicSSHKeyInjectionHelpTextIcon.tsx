@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PopoverPosition } from '@patternfly/react-core';
 
 import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
@@ -11,7 +11,7 @@ type DynamicSSHKeyInjectionHelpTextIconProps = {
 const DynamicSSHKeyInjectionHelpTextIcon: FC<DynamicSSHKeyInjectionHelpTextIconProps> = (
   isDisabled,
 ) => {
-  const { t } = useTranslation();
+  const { t } = useKubevirtTranslation();
   return (
     <HelpTextIcon
       bodyContent={
