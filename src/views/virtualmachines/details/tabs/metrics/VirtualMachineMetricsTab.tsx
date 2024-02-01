@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,12 +17,13 @@ import { MetricsTabExpendedSections } from './utils/utils';
 
 import './virtual-machine-metrics-tab.scss';
 
-type VirtualMachineMetricsTabProps = RouteComponentProps & {
+type VirtualMachineMetricsTabProps = {
   obj: V1VirtualMachine;
 };
 
-const VirtualMachineMetricsTab: FC<VirtualMachineMetricsTabProps> = ({ location, obj: vm }) => {
+const VirtualMachineMetricsTab: FC<VirtualMachineMetricsTabProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
+  const location = useLocation();
   const { loaded, pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
 
   const [expended, setExpended] = useState<{ [key in MetricsTabExpendedSections]: boolean }>({

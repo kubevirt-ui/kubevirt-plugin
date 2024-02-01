@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
@@ -9,7 +8,7 @@ import VirtualMachineDiagnosticTabVolumeStatus from './tables/VirtualMachineDiag
 
 import './virtual-machine-diagnostic-tab.scss';
 
-type VirtualMachineDiagnosticTabProps = RouteComponentProps & {
+type VirtualMachineDiagnosticTabProps = {
   obj: V1VirtualMachine;
 };
 

@@ -1,5 +1,4 @@
 import React, { FC, useCallback, useMemo } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -32,20 +31,15 @@ import {
   Stack,
 } from '@patternfly/react-core';
 
+import { ConfigurationInnerTabProps } from '../utils/types';
+
 import DynamicSSHKeyInjectionDescription from './components/DynamicSSHKeyInjectionDescription';
 import VirtualMachineScriptsTabSysprep from './components/VirtualMachineScriptsTabSysprep';
 import { useDynamicSSHInjection } from './hooks/useDynamicSSHInjection';
 
 import './scripts-tab.scss';
 
-type VirtualMachineScriptPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
-  obj?: V1VirtualMachine;
-};
-
-const ScriptsTab: FC<VirtualMachineScriptPageProps> = ({ obj: vm }) => {
+const ScriptsTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys, loaded] = useKubevirtUserSettings('ssh');

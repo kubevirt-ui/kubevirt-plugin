@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -13,7 +12,7 @@ import { printableVMStatus } from '../../../utils';
 
 import VirtualMachineConsolePageTitle from './components/VirtualMachineConsolePageTitle';
 
-type VirtualMachineConsolePageProps = RouteComponentProps & {
+type VirtualMachineConsolePageProps = {
   obj: V1VirtualMachine;
 };
 

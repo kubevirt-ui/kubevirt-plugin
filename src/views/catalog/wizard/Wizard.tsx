@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 
+import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
-import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import { useWizardVMContext } from '../utils/WizardVMContext';
@@ -25,7 +25,7 @@ const Wizard: React.FC = () => {
       <Stack hasGutter>
         <WizardHeader namespace={ns} />
         <StackItem className="vm-wizard-body" isFilled>
-          <HorizontalNav pages={wizardNavPages} />
+          <HorizontalNavbar pages={wizardNavPages} />
         </StackItem>
         <WizardFooter namespace={ns} />
       </Stack>

@@ -1,5 +1,4 @@
 import React, { FC, useCallback } from 'react';
-import { RouteComponentProps } from 'react-router';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -9,20 +8,15 @@ import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants
 import { k8sUpdate, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Title } from '@patternfly/react-core';
 
+import { ConfigurationInnerTabProps } from '../utils/types';
+
 import AddNetworkInterfaceButton from './components/AddNetworkInterfaceButton';
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 
 import 'src/utils/styles/ListPageCreateButton.scss';
 import './network-interface-list-page.scss';
 
-type NetworkInterfaceListPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
-  obj?: V1VirtualMachine;
-};
-
-const NetworkInterfaceListPage: FC<NetworkInterfaceListPageProps> = ({ obj: vm }) => {
+const NetworkInterfaceListPage: FC<ConfigurationInnerTabProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   const onSubmit = useCallback(

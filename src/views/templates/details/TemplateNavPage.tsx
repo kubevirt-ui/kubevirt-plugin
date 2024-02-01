@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import {
   modelToGroupVersionKind,
@@ -17,16 +17,8 @@ import TemplatePageTitle from './TemplatePageTitle';
 
 import './TemplateNavPage.scss';
 
-export type TemplateNavPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}>;
-
-const TemplateNavPage: React.FC<TemplateNavPageProps> = ({
-  match: {
-    params: { name, ns: namespace },
-  },
-}) => {
+const TemplateNavPage: React.FC = () => {
+  const { name, ns: namespace } = useParams<{ name: string; ns: string }>();
   const [template, loaded] = useK8sWatchResource<V1Template>({
     groupVersionKind: modelToGroupVersionKind(TemplateModel),
     isList: false,

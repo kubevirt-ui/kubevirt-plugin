@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -12,10 +11,7 @@ import DetailsSection from './components/sections/DetailsSection';
 import ServicesSection from './components/sections/ServicesSection';
 import ActiveUserListSection from './components/sections/UserList/ActiveUserListSection';
 
-type VirtualMachineDetailsPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type VirtualMachineDetailsPageProps = {
   obj?: V1VirtualMachine;
 };
 

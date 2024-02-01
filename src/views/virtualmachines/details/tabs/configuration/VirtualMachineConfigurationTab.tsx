@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
@@ -9,15 +9,12 @@ import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/ut
 
 import './virtual-machine-configuration-tab.scss';
 
-type VirtualMachineConfigurationTabProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type VirtualMachineConfigurationTabProps = {
   obj?: V1VirtualMachine;
 };
 
 const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = (props) => {
-  const { history } = props;
+  const history = useHistory();
 
   const [activeTabKey, setActiveTabKey] = useState<number | string>(VirtualMachineDetailsTab.Disks);
 
@@ -46,7 +43,7 @@ const VirtualMachineConfigurationTab: FC<VirtualMachineConfigurationTabProps> = 
             onClick={() => redirectTab(name)}
             title={<TabTitleText>{title}</TabTitleText>}
           >
-            {activeTabKey === name && <Component {...props} />}
+            {activeTabKey === name && <Component {...props} vm={props?.obj} />}
           </Tab>
         ))}
       </Tabs>

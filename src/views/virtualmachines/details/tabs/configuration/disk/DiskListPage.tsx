@@ -1,5 +1,4 @@
 import React, { FC, useCallback } from 'react';
-import { RouteComponentProps } from 'react-router';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -7,19 +6,14 @@ import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEdito
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
+import { ConfigurationInnerTabProps } from '../utils/types';
+
 import DiskList from './tables/disk/DiskList';
 import FilesystemList from './tables/filesystem/FilesystemList';
 
 import './disk-list-page.scss';
 
-type DiskListPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
-  obj?: V1VirtualMachine;
-};
-
-const DiskListPage: FC<DiskListPageProps> = ({ obj }) => {
+const DiskListPage: FC<ConfigurationInnerTabProps> = ({ vm: obj }) => {
   const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
       k8sUpdate({
