@@ -6,7 +6,7 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   V1AddVolumeOptions,
-  V1beta1DataVolumeSpec,
+  V1beta1StorageSpecVolumeModeEnum,
   V1DataVolumeTemplateSpec,
   V1Disk,
   V1RemoveVolumeOptions,
@@ -17,6 +17,7 @@ import {
 import { buildOwnerReference, getName } from '@kubevirt-utils/resources/shared';
 import { hasTemplateParameter } from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
+import { converCDIDVSpecToKubeirtDVSpec } from '@kubevirt-utils/types/storage';
 import { ensurePath, getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -166,7 +167,7 @@ export const getDataVolumeFromState = ({
   dataVolume.spec.storage.storageClassName = diskState.storageClass;
   if (!diskState.applyStorageProfileSettings) {
     dataVolume.spec.storage.accessModes = [diskState.accessMode];
-    dataVolume.spec.storage.volumeMode = diskState.volumeMode;
+    dataVolume.spec.storage.volumeMode = diskState.volumeMode as V1beta1StorageSpecVolumeModeEnum;
   }
   dataVolume.spec.preallocation = diskState.enablePreallocation;
   if (diskState.diskSource === sourceTypes.BLANK) {
@@ -209,7 +210,7 @@ export const getDataVolumeFromState = ({
 export const getDataVolumeTemplate = (dataVolume: V1beta1DataVolume): V1DataVolumeTemplateSpec => {
   const dataVolumeTemplate: V1DataVolumeTemplateSpec = { metadata: {}, spec: {} };
   dataVolumeTemplate.metadata = { name: dataVolume.metadata.name };
-  dataVolumeTemplate.spec = dataVolume.spec as V1beta1DataVolumeSpec;
+  dataVolumeTemplate.spec = converCDIDVSpecToKubeirtDVSpec(dataVolume.spec);
   return dataVolumeTemplate;
 };
 

@@ -1,9 +1,9 @@
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   K8sIoApiCoreV1ResourceRequirements,
   V1alpha1PersistentVolumeClaim,
+  V1DataVolumeTemplateSpec,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { V1Template } from '@kubevirt-utils/models';
@@ -56,13 +56,13 @@ const getStorageSize = (value: K8sIoApiCoreV1ResourceRequirements): string =>
 const getParameterValue = (obj: V1Template, name: string, defaultValue = null): string =>
   obj?.parameters?.find((parameter) => parameter.name === name)?.value || defaultValue;
 
-const getPVCDataVolumeResources = (dataVolume: V1beta1DataVolume) =>
+const getPVCDataVolumeResources = (dataVolume: V1DataVolumeTemplateSpec) =>
   dataVolume?.spec?.pvc?.resources;
 
-const getDataVolumeResources = (dataVolume: V1beta1DataVolume) =>
+const getDataVolumeResources = (dataVolume: V1DataVolumeTemplateSpec) =>
   dataVolume?.spec?.storage?.resources || getPVCDataVolumeResources(dataVolume);
 
-export const getDataVolumeStorageSize = (dataVolume: V1beta1DataVolume): string =>
+export const getDataVolumeStorageSize = (dataVolume: V1DataVolumeTemplateSpec): string =>
   getStorageSize(getDataVolumeResources(dataVolume));
 
 export const getPVCNamespace = (obj: V1Template): string =>

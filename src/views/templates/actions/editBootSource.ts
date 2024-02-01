@@ -23,6 +23,7 @@ import {
   getPVC,
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { convertKubevirtDVSpecToCDIDVSpec } from '@kubevirt-utils/types/storage';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -55,7 +56,7 @@ export const createDataVolume = (
     if (bootSource?.source?.registry?.url) {
       bootSource.source.registry.url = appendDockerPrefix(bootSource?.source?.registry?.url);
     }
-    draftDataVolume.spec = bootSource;
+    draftDataVolume.spec = convertKubevirtDVSpecToCDIDVSpec(bootSource);
   });
 };
 

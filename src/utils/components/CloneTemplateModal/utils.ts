@@ -8,6 +8,7 @@ import {
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
+import { convertKubevirtDVSpecToCDIDVSpec } from '@kubevirt-utils/types/storage';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 const getBootSourceDataVolumeTemplate = (template: V1Template) => {
@@ -36,7 +37,7 @@ const produceDataVolume = (
     name,
     namespace,
   },
-  spec: dataVolumeSpec,
+  spec: convertKubevirtDVSpecToCDIDVSpec(dataVolumeSpec),
 });
 
 export const cloneStorage = async (template: V1Template, pvcName: string, namespace: string) => {
