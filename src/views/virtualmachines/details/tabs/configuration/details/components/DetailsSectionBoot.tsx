@@ -61,7 +61,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
               isOpen={isOpen}
               onClose={onClose}
               onSubmit={(updatedVM) => updateBootLoader(updatedVM, vm)}
-              vm={instanceTypeVM}
+              vm={instanceTypeVM || vm}
               vmi={vmi}
             />
           ))
