@@ -34,7 +34,7 @@ const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ obj }) => {
                 controller field set to true. There cannot be more than one managing controller.
               </div>
               <Breadcrumb className="margin-top">
-                <BreadcrumbItem>{obj?.kind}</BreadcrumbItem>
+                <BreadcrumbItem>{{ kind: obj?.kind }}</BreadcrumbItem>
                 <BreadcrumbItem>metadata</BreadcrumbItem>
                 <BreadcrumbItem>ownerReferences</BreadcrumbItem>
               </Breadcrumb>

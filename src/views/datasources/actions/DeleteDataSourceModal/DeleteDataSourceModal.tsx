@@ -75,8 +75,8 @@ const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
             <Checkbox
               label={
                 <Trans t={t}>
-                  Delete {pvc?.kind} source <b>{getName(pvc)}</b> in namespace{' '}
-                  <b>{getNamespace(pvc)}</b>
+                  Delete {{ kind: pvc?.kind }} source <b>{{ name: getName(pvc) }}</b> in namespace{' '}
+                  <b>{{ namespace: getNamespace(pvc) }}</b>
                 </Trans>
               }
               id="delete-pvc-checkbox"

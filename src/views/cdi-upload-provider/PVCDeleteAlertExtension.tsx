@@ -43,17 +43,19 @@ const PVCDeleteAlertExtension: React.FC<{ pvc: V1alpha1PersistentVolumeClaim }> 
       <Trans ns="plugin__kubevirt-plugin" t={t}>
         <p>
           Deleting this PVC will also delete{' '}
-          <strong className="co-break-word">{pvc?.metadata?.name}</strong> Data Volume
+          <strong className="co-break-word">{{ pvcName: pvc?.metadata?.name }}</strong> Data Volume
         </p>
-        {!loadedPvcs && !loadedTemplates && <p>Checking for usages of this PVC...</p>}
-        {(errorPvcs || errorTemplates) && <p>Error checking for usages of this PVC.</p>}
-        {isGolden && (
+      </Trans>
+      {!loadedPvcs && !loadedTemplates && <p>{t('Checking for usages of this PVC...')}</p>}
+      {(errorPvcs || errorTemplates) && <p>{t('Error checking for usages of this PVC.')}</p>}
+      {isGolden && (
+        <Trans ns="plugin__kubevirt-plugin" t={t}>
           <p>
             <strong className="co-break-word">WARNING:</strong> this PVC is used as a base operating
             system image. New VMs will not be able to clone this image
           </p>
-        )}
-      </Trans>
+        </Trans>
+      )}
     </Alert>
   );
 };
