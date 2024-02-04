@@ -1,11 +1,16 @@
 import produce from 'immer';
 
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInterfaces } from '@kubevirt-utils/resources/vm';
-import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import {
+  interfacesTypes,
+  NetworkPresentation,
+} from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ABSENT } from '@virtualmachines/details/tabs/configuration/network/utils/constants';
 
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
@@ -27,13 +32,23 @@ export const updateVMNetworkInterfaces = (
   vm: V1VirtualMachine,
   updatedNetworks: V1Network[],
   updatedInterfaces: V1Interface[],
-) => {
-  const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-    vmDraft.spec.template.spec.networks = updatedNetworks;
-    vmDraft.spec.template.spec.domain.devices.interfaces = updatedInterfaces;
+) =>
+  k8sPatch({
+    data: [
+      {
+        op: 'replace',
+        path: '/spec/template/spec/networks',
+        value: updatedNetworks,
+      },
+      {
+        op: 'replace',
+        path: '/spec/template/spec/domain/devices/interfaces',
+        value: updatedInterfaces,
+      },
+    ],
+    model: VirtualMachineModel,
+    resource: vm,
   });
-  return updatedVM;
-};
 
 const getInterface = (interfaces: V1Interface[], nicName: string) =>
   interfaces?.find((iface) => iface?.name === nicName);
@@ -104,4 +119,18 @@ export const getNadType = (nad: NetworkAttachmentDefinition): string => {
   } catch (e) {
     kubevirtConsole.log('Cannot convert NAD config: ', e);
   }
+};
+
+export const deleteNetworkInterface = (
+  vm: V1VirtualMachine,
+  nicName: string,
+  nicPresentation: NetworkPresentation,
+) => {
+  const isHotPlug = Boolean(nicPresentation?.iface?.bridge);
+  const networks = isHotPlug
+    ? getNetworks(vm)
+    : getNetworks(vm)?.filter(({ name }) => name !== nicName);
+  const interfaces = updateInterfacesForDeletion(isHotPlug, nicName, vm);
+
+  return updateVMNetworkInterfaces(vm, networks, interfaces);
 };
