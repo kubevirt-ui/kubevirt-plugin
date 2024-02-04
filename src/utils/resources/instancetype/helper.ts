@@ -6,6 +6,6 @@ import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 export const getInstanceTypeModelFromMatcher = (
   instanceTypeMatcher: V1InstancetypeMatcher,
 ): K8sModel =>
-  instanceTypeMatcher.kind.includes('cluster')
+  instanceTypeMatcher.kind.includes('Cluster')
     ? VirtualMachineClusterInstancetypeModel
     : VirtualMachineInstancetypeModel;
