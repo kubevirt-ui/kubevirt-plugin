@@ -1,19 +1,13 @@
 import React from 'react';
-import { FC, useMemo, useState } from 'react';
+import { FC, useState } from 'react';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import {
-  updateInterfacesForDeletion,
-  updateVMNetworkInterfaces,
-} from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
+import { deleteNetworkInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -47,16 +41,6 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const editBtnText = t('Edit');
   const deleteBtnText = t('Delete');
 
-  const resultVirtualMachine = useMemo(() => {
-    const isHotPlug = Boolean(nicPresentation?.iface?.bridge);
-    const networks = isHotPlug
-      ? getNetworks(vm)
-      : getNetworks(vm)?.filter(({ name }) => name !== nicName);
-    const interfaces = updateInterfacesForDeletion(isHotPlug, nicName, vm);
-
-    return updateVMNetworkInterfaces(vm, networks, interfaces);
-  }, [nicName, nicPresentation, vm]);
-
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <VirtualMachinesEditNetworkInterfaceModal
@@ -72,18 +56,10 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const onDeleteModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
-        onSubmit={(obj) =>
-          k8sUpdate({
-            data: obj,
-            model: VirtualMachineModel,
-            name: obj?.metadata?.name,
-            ns: obj?.metadata?.namespace,
-          })
-        }
         headerText={deleteModalHeader}
         isOpen={isOpen}
-        obj={resultVirtualMachine}
         onClose={onClose}
+        onSubmit={() => deleteNetworkInterface(vm, nicName, nicPresentation)}
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
