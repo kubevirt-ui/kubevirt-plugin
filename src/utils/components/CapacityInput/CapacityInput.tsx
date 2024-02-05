@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -21,7 +21,7 @@ type CapacityInputProps = {
   size: string;
 };
 
-const CapacityInput: React.FC<CapacityInputProps> = ({ label, onChange, size }) => {
+const CapacityInput: FC<CapacityInputProps> = ({ label, onChange, size }) => {
   const { t } = useKubevirtTranslation();
   const [selectOpen, toggleSelect] = useState<boolean>(false);
   const [unitValue = ''] = size?.match(/[a-zA-Z]+/g) || [];
@@ -41,6 +41,7 @@ const CapacityInput: React.FC<CapacityInputProps> = ({ label, onChange, size }) 
       helperTextInvalid={t('Size cannot be {{errorValue}}', {
         errorValue: value < 0 ? 'negative' : 'zero',
       })}
+      className="disk-source-form-group"
       fieldId={`size-required`}
       helperTextInvalidIcon={<ExclamationCircleIcon color="red" title="Error" />}
       isRequired
@@ -50,7 +51,7 @@ const CapacityInput: React.FC<CapacityInputProps> = ({ label, onChange, size }) 
       <Split hasGutter>
         <SplitItem>
           <NumberInput
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
               Number(event?.target?.value) <= Number.MAX_SAFE_INTEGER &&
               onChange(`${Number(event.target.value)}${removeByteSuffix(unit)}`)
             }

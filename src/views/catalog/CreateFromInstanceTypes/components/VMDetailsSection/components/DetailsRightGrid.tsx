@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
@@ -21,7 +21,7 @@ const DetailsRightGrid: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isOpenStorageClass, setIsOpenStorageClass] = useState<boolean>(false);
-  const [{ clusterDefaultStorageClass, storageClasses, virtDefaultStorageClass }] =
+  const [{ clusterDefaultStorageClass, sortedStorageClasses, virtDefaultStorageClass }] =
     useDefaultStorageClass();
 
   const {
@@ -35,10 +35,6 @@ const DetailsRightGrid: FC = () => {
   const { pvcSource, sshSecretCredentials } = instanceTypeVMState;
   const pvcDiskSize = pvcSource?.spec?.resources?.requests?.storage;
   const sizeData = formatBytes(pvcDiskSize);
-  const sortedStorageClasses = useMemo(
-    () => storageClasses?.map((sc) => sc?.metadata?.name)?.sort(),
-    [storageClasses],
-  );
 
   const setSSHCredentials = (credentials: SSHSecretDetails) => {
     setInstanceTypeVMState({
