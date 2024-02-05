@@ -17,6 +17,7 @@ import {
   EmptyState,
   Form,
   PageSection,
+  PageSectionVariants,
   Title,
 } from '@patternfly/react-core';
 
@@ -79,7 +80,7 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
   };
 
   return (
-    <PageSection className="template-parameters-page">
+    <PageSection className="template-parameters-page" variant={PageSectionVariants.light}>
       <SidebarEditor
         onChange={(newTemplate) => setEditableTemplate(newTemplate)}
         resource={editableTemplate}
