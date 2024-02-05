@@ -3,6 +3,7 @@ import React, { FC, useState } from 'react';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { KUBEVIRT_V1_VIRTUALMACHINE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Bullseye, Checkbox, Toolbar, ToolbarContent, ToolbarItem } from '@patternfly/react-core';
@@ -54,7 +55,7 @@ const VirtualMachineBasicLogViewer: FC<VirtualMachineBasicLogViewerProps> = ({
                 <ToolbarItem variant="separator" />
                 <ToolbarItem>
                   <ExternalLink
-                    href={`/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/diagnostics/logs/standalone`}
+                    href={`/k8s/ns/${vmi?.metadata?.namespace}/${KUBEVIRT_V1_VIRTUALMACHINE}/${vmi?.metadata?.name}/diagnostics/logs/standalone`}
                   >
                     {t('Open logs in a new window')}
                   </ExternalLink>

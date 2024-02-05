@@ -12,3 +12,5 @@ export const VENDOR_LABEL = 'instancetype.kubevirt.io/vendor';
 export const AUTO_COMPUTE_CPU_LIMITS_LABEL = 'cpu.autocompute.kubevirt.io=true';
 
 export const ROOTDISK = 'rootdisk';
+
+export const KUBEVIRT_V1_VIRTUALMACHINE = 'kubevirt.io~v1~VirtualMachine';

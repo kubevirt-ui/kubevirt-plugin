@@ -8,6 +8,7 @@ import {
   isConnectionEncrypted,
   isHeadlessModeVMI,
 } from '@kubevirt-utils/components/Consoles/utils/utils';
+import { KUBEVIRT_V1_VIRTUALMACHINE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -62,7 +63,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
         <Button
           onClick={() =>
             window.open(
-              `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
+              `/k8s/ns/${vmi?.metadata?.namespace}/${KUBEVIRT_V1_VIRTUALMACHINE}/${vmi?.metadata?.name}/console/standalone`,
             )
           }
           isDisabled={!isVMRunning || isHeadlessMode || !canConnectConsole}

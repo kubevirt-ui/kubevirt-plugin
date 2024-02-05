@@ -2,6 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { KUBEVIRT_V1_VIRTUALMACHINE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Dropdown, DropdownItem, DropdownToggle, Title } from '@patternfly/react-core';
 
@@ -44,7 +45,7 @@ const NetworkCharts: FC<NetworkChartsProps> = ({ vmi }) => {
               setSelectedNetwork(e?.currentTarget?.innerText);
               setIsDropdownOpen(false);
               history?.push(
-                `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/metrics?network=${nic}`,
+                `/k8s/ns/${vmi?.metadata?.namespace}/${KUBEVIRT_V1_VIRTUALMACHINE}/${vmi?.metadata?.name}/metrics?network=${nic}`,
               );
             }}
             key={nic}

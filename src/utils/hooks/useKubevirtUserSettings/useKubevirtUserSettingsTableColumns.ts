@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import { KUBEVIRT_V1_VIRTUALMACHINE } from '@kubevirt-utils/constants/constants';
 import { TableColumn, useActiveColumns } from '@openshift-console/dynamic-plugin-sdk';
 import { useUserSettings } from '@openshift-console/dynamic-plugin-sdk-internal';
 
@@ -35,7 +36,11 @@ const useKubevirtUserSettingsTableColumns: UseKubevirtUserSettingsTableColumnsTy
     if (!loaded || error) return;
 
     if (
-      !isEqualObject(userColumns?.[columnManagementID], localStorageSettings?.[columnManagementID])
+      !isEqualObject(
+        userColumns?.[columnManagementID],
+        localStorageSettings?.[columnManagementID],
+      ) &&
+      columnManagementID === KUBEVIRT_V1_VIRTUALMACHINE
     ) {
       setLocalStorageSettings({
         ...localStorageSettings,
