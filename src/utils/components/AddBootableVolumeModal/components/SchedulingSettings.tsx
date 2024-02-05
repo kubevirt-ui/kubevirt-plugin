@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -49,13 +48,11 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
           {t('Scheduling settings')}
         </Title>
         <Text>
-          <Trans ns="plugin__kubevirt-plugin" t={t}>
-            {t('Use cron formatting to set when and how often to look for new imports.')}{' '}
-            <ExternalLink
-              href={'https://www.redhat.com/sysadmin/automate-linux-tasks-cron'}
-              text={t('Learn more')}
-            />
-          </Trans>
+          {t('Use cron formatting to set when and how often to look for new imports.')}{' '}
+          <ExternalLink
+            href={'https://www.redhat.com/sysadmin/automate-linux-tasks-cron'}
+            text={t('Learn more')}
+          />
         </Text>
       </div>
       <FormGroup

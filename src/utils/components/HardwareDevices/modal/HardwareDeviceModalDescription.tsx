@@ -13,14 +13,14 @@ const HardwareDeviceModalDescription: React.FC<HardwareDevicesModalProps> = ({ t
   const { t } = useKubevirtTranslation();
 
   return (
-    <Trans ns="plugin__kubevirt-plugin" t={t}>
-      <Text className="text-muted" component={TextVariants.p}>
+    <Text className="text-muted" component={TextVariants.p}>
+      <Trans ns="plugin__kubevirt-plugin" t={t}>
         Enter a name for the device to be assigned and select it from the dropdown menu. Click{' '}
         <b> Save</b>.<br /> Click{' '}
         <b>+ Add {{ hardwareType: type === HARDWARE_DEVICE_TYPE.GPUS ? 'GPU' : 'Host' }} device</b>{' '}
         to add another devices.
-      </Text>
-    </Trans>
+      </Trans>
+    </Text>
   );
 };
 export default HardwareDeviceModalDescription;
