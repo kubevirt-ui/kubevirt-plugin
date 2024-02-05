@@ -137,7 +137,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
         )),
       description:
         (!loadingBootSource || !canWriteToDataSourceNs) &&
-        getEditBootSourceRefDescription(t, bootDataSource, canWriteToDataSourceNs),
+        getEditBootSourceRefDescription(bootDataSource, canWriteToDataSourceNs),
       disabled: !editableBootSource || !canWriteToDataSourceNs,
       id: 'edit-boot-source-ref',
       label: (

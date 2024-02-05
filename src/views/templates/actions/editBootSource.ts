@@ -1,4 +1,3 @@
-import { TFunction } from 'react-i18next';
 import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -13,6 +12,7 @@ import {
   V1DataVolumeTemplateSpec,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE, ROOTDISK } from '@kubevirt-utils/constants/constants';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
   poorManProcess,
@@ -152,7 +152,6 @@ export const editBootSource = async (
 };
 
 export const getEditBootSourceRefDescription = (
-  t: TFunction,
   dataSource: V1beta1DataSource,
   canEditBootSource: boolean,
 ) => {

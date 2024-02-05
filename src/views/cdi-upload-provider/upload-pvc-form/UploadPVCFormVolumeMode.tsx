@@ -4,7 +4,7 @@ import { Trans } from 'react-i18next';
 import {
   AccessMode,
   getVolumeModeForProvisioner,
-  getVolumeModeRadioOptions,
+  VOLUME_MODE_RADIO_OPTIONS,
 } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/modesMapping';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
@@ -45,7 +45,7 @@ const UploadPVCFormModeVolumeMode: React.FC<UploadPVCFormModeVolumeModeVolumeMod
           </Trans>
         </>
       ) : (
-        getVolumeModeRadioOptions(t).map(({ label, value }) => (
+        VOLUME_MODE_RADIO_OPTIONS.map(({ label, value }) => (
           <Radio
             checked={value === volumeMode}
             id={value}

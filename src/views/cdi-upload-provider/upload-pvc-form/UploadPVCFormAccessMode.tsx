@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
 import {
+  ACCESS_MODE_RADIO_OPTIONS,
   getAccessModeForProvisioner,
-  getAccessModeRadioOptions,
 } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/modesMapping';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
@@ -52,7 +52,7 @@ const UploadPVCFormAccessMode: React.FC<UploadPVCFormAccessModeProps> = ({
     <FormGroup fieldId="access-mode" isRequired label={t('Access mode')}>
       {loaded &&
         allowedAccessModes &&
-        getAccessModeRadioOptions(t).map(({ label, value }) => {
+        ACCESS_MODE_RADIO_OPTIONS.map(({ label, value }) => {
           const disabled = !allowedAccessModes.includes(value);
           const checked = value === accessMode;
           return (

@@ -7,8 +7,8 @@ import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 import { DiskFormState } from '../state/initialState';
 
 import {
+  ACCESS_MODE_RADIO_OPTIONS,
   getAccessModeForProvisioner,
-  getAccessModeRadioOptions,
   VolumeMode,
 } from './utils/modesMapping';
 
@@ -67,7 +67,7 @@ const AccessMode: FC<AccessModeProps> = ({ diskState, dispatchDiskState, spAcces
 
   return (
     <FormGroup fieldId="access-mode" label={t('Access Mode')}>
-      {getAccessModeRadioOptions(t)?.map(({ label, value }) => (
+      {ACCESS_MODE_RADIO_OPTIONS.map(({ label, value }) => (
         <Radio
           onChange={() =>
             dispatchDiskState({ payload: value, type: diskReducerActions.SET_ACCESS_MODE })

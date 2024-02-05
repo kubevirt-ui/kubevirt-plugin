@@ -1,4 +1,3 @@
-import { TFunction } from 'react-i18next';
 import xbytes from 'xbytes';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -9,6 +8,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateContainerDisks } from '@kubevirt-utils/resources/template';
 import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -110,7 +110,7 @@ export const getPVCSource = (
   return dataVolumeSpec;
 };
 
-export const getRegistryHelperText = (template: V1Template, t: TFunction) => {
+export const getRegistryHelperText = (template: V1Template) => {
   const containerDisks = getTemplateContainerDisks(template);
 
   if (containerDisks && containerDisks.length > 0)

@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { TFunction } from 'i18next';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import NetworkAddonsConfigModel from '@kubevirt-ui/kubevirt-api/console/models/NetworkAddonsConfigModel';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   GreenCheckCircleIcon,
@@ -53,7 +53,7 @@ export const filterSubsystems = <E extends Extension>(
     return true;
   });
 
-const getHealthStatusFromCSV = (csv: ClusterServiceVersionKind, t: TFunction) => {
+const getHealthStatusFromCSV = (csv: ClusterServiceVersionKind) => {
   const csvStatus = csv?.status?.phase;
   switch (csvStatus) {
     case ClusterServiceVersionPhase.CSVPhaseSucceeded:
@@ -74,14 +74,14 @@ const getHealthStatusFromCSV = (csv: ClusterServiceVersionKind, t: TFunction) =>
   }
 };
 
-export const getStorageOperatorHealthStatus = (operatorCSV, loaded, loadErrors, t) => {
+export const getStorageOperatorHealthStatus = (operatorCSV, loaded, loadErrors) => {
   if (!loaded) {
     return { state: HealthState.LOADING };
   }
   if (!isEmpty(loadErrors) || !operatorCSV) {
     return { message: t('Not available'), state: HealthState.NOT_AVAILABLE };
   }
-  return getHealthStatusFromCSV(operatorCSV, t);
+  return getHealthStatusFromCSV(operatorCSV);
 };
 
 export const getOverallStorageStatus = (lsoState, odfState, loaded, loadErrors) => {

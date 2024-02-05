@@ -1,4 +1,3 @@
-import { TFunction } from 'react-i18next';
 import produce from 'immer';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
@@ -17,6 +16,8 @@ import {
   K8sResourceCommon,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ProgressVariant } from '@patternfly/react-core';
+
+import { t } from '../useKubevirtTranslation';
 
 import { CDI_BIND_REQUESTED_ANNOTATION } from './consts';
 
@@ -40,13 +41,13 @@ export enum UPLOAD_STATUS {
   UPLOADING = 'UPLOADING',
 }
 
-export const uploadStatusLabels = (t: TFunction) => ({
+export const UPLOAD_STATUS_LABELS = {
   [UPLOAD_STATUS.ALLOCATING]: t('Allocating resources, please wait for upload to start.'),
   [UPLOAD_STATUS.CANCELED]: t('Canceled'),
   [UPLOAD_STATUS.ERROR]: t('Error'),
   [UPLOAD_STATUS.SUCCESS]: t('Success'),
   [UPLOAD_STATUS.UPLOADING]: t('Uploading'),
-});
+};
 
 export const uploadStatusToProgressVariant = {
   [UPLOAD_STATUS.CANCELED]: ProgressVariant.warning,

@@ -35,7 +35,7 @@ const SnapshotDeadlineFormField: React.FC<SnapshotDeadlineFormFieldProps> = ({
 
   const handleDeadlineChange = (value: string, event: React.FormEvent<HTMLInputElement>) => {
     event.preventDefault();
-    const error = validateSnapshotDeadline(value, t);
+    const error = validateSnapshotDeadline(value);
     setIsError(!!error);
     setDeadlineError(error);
     setDeadline(value);

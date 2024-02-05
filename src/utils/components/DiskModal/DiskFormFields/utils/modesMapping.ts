@@ -1,4 +1,4 @@
-import { TFunction } from 'i18next';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export enum ACCESS_MODES {
   ROX = 'ReadOnlyMany',
@@ -113,7 +113,7 @@ export const provisionerAccessModeMapping: ProvisionerAccessModeMapping = {
   },
 };
 
-export const getAccessModeRadioOptions = (t: TFunction) => [
+export const ACCESS_MODE_RADIO_OPTIONS = [
   {
     label: t('Single user (RWO)'),
     value: ACCESS_MODES.RWO,
@@ -128,7 +128,7 @@ export const getAccessModeRadioOptions = (t: TFunction) => [
   },
 ];
 
-export const getVolumeModeRadioOptions = (t: TFunction) => [
+export const VOLUME_MODE_RADIO_OPTIONS = [
   {
     label: t('Filesystem'),
     value: VOLUME_MODES.FILESYSTEM,

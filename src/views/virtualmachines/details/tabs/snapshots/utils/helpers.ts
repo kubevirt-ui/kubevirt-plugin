@@ -1,5 +1,3 @@
-import { TFunction } from 'i18next';
-
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
@@ -9,6 +7,7 @@ import {
   V1VirtualMachine,
   V1VolumeSnapshotStatus,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export const getVolumeSnapshotStatusesPartition = (
   volumeSnaoshotStatuses: V1VolumeSnapshotStatus[],
@@ -21,7 +20,7 @@ export const getVolumeSnapshotStatusesPartition = (
   };
 };
 
-export const validateSnapshotDeadline = (deadline: string, t: TFunction): string => {
+export const validateSnapshotDeadline = (deadline: string): string => {
   if (deadline?.length > 0) {
     if (!Number(deadline)) {
       return t('Deadline must be a number');
