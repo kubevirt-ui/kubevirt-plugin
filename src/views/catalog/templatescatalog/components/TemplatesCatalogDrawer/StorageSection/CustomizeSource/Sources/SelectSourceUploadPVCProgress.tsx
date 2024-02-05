@@ -3,7 +3,7 @@ import React from 'react';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import {
   UPLOAD_STATUS,
-  uploadStatusLabels,
+  UPLOAD_STATUS_LABELS,
   uploadStatusToProgressVariant,
 } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,7 +24,7 @@ export const SelectSourceUploadPVCProgress: React.FC<{ upload: DataUpload }> = (
         <StackItem>
           <Progress
             measureLocation={ProgressMeasureLocation.inside}
-            title={uploadStatusLabels(t)?.[upload?.uploadStatus]}
+            title={UPLOAD_STATUS_LABELS[upload?.uploadStatus]}
             value={upload?.progress}
             variant={uploadStatusToProgressVariant[upload?.uploadStatus]}
           />

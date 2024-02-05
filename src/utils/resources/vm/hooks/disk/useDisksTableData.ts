@@ -7,7 +7,6 @@ import {
   getRunningVMMissingDisksFromVMI,
   getRunningVMMissingVolumesFromVMI,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -27,7 +26,6 @@ type UseDisksTableDisks = (
  * @returns disks data and loading state
  */
 const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
-  const { t } = useKubevirtTranslation();
   const isVMRunning = isRunning(vm);
   const vmDisks = useMemo(
     () =>
@@ -65,8 +63,8 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
       return { disk, pvc, volume };
     });
 
-    return getDiskRowDataLayout(diskDevices, getBootDisk(vm), t);
-  }, [vmVolumes, vm, t, vmDisks, pvcs]);
+    return getDiskRowDataLayout(diskDevices, getBootDisk(vm));
+  }, [vmVolumes, vm, vmDisks, pvcs]);
 
   return [disks || [], loaded, loadingError, isVMRunning ? vmi : null];
 };

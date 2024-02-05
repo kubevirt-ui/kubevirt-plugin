@@ -9,7 +9,7 @@ import { DiskFormState } from '../state/initialState';
 import {
   AccessMode,
   getVolumeModeForProvisioner,
-  getVolumeModeRadioOptions,
+  VOLUME_MODE_RADIO_OPTIONS,
   VolumeMode,
 } from './utils/modesMapping';
 
@@ -69,7 +69,7 @@ const VolumeMode: FC<VolumeModeProps> = ({ diskState, dispatchDiskState, spVolum
 
   return (
     <FormGroup fieldId="volume-mode" label={t('Volume Mode')}>
-      {getVolumeModeRadioOptions(t)?.map(({ label, value }) => (
+      {VOLUME_MODE_RADIO_OPTIONS.map(({ label, value }) => (
         <Radio
           onChange={() =>
             dispatchDiskState({ payload: value, type: diskReducerActions.SET_VOLUME_MODE })
