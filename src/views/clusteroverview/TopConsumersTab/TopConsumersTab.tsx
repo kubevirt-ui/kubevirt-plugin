@@ -19,7 +19,7 @@ import {
 
 import { TOP_CONSUMERS_DURATION_KEY, TOP_CONSUMERS_NUM_ITEMS_KEY } from './utils/constants';
 import TopConsumersGridRow from './utils/TopConsumersGridRow';
-import { topAmountSelectOptions } from './utils/utils';
+import { TOP_AMOUNT_SELECT_OPTIONS } from './utils/utils';
 
 import './TopConsumersTab.scss';
 
@@ -56,7 +56,7 @@ const TopConsumersTab: FC = () => {
                 toggleId="kv-top-consumers-card-amount-select"
                 variant={SelectVariant.single}
               >
-                {topAmountSelectOptions(t).map((opt) => (
+                {TOP_AMOUNT_SELECT_OPTIONS.map((opt) => (
                   <SelectOption key={opt.key} value={opt.value} />
                 ))}
               </FormPFSelect>

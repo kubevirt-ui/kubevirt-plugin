@@ -12,8 +12,8 @@ const StorageHealthItem = () => {
   const { t } = useKubevirtTranslation();
   const { loaded, loadErrors, lsoCSV, odfCSV } = useKubevirtStorageOperatorCSVs();
 
-  const lsoState = getStorageOperatorHealthStatus(lsoCSV, loaded, loadErrors, t);
-  const odfState = getStorageOperatorHealthStatus(odfCSV, loaded, loadErrors, t);
+  const lsoState = getStorageOperatorHealthStatus(lsoCSV, loaded, loadErrors);
+  const odfState = getStorageOperatorHealthStatus(odfCSV, loaded, loadErrors);
   const status = getOverallStorageStatus(lsoState, odfState, loaded, loadErrors);
 
   return (

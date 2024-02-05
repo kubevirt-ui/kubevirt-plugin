@@ -55,7 +55,7 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
   const cdSource = getDiskSource(vm, INSTALLATION_CDROM_NAME);
 
   const httpSourceHelperURL = getTemplateImportURLs(template)?.[0];
-  const registrySourceHelperText = getRegistryHelperText(template, t);
+  const registrySourceHelperText = getRegistryHelperText(template);
 
   const onCDCheckboxChange = useCallback(
     (checked) => {

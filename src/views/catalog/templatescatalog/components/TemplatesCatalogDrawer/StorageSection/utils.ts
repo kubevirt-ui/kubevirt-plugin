@@ -1,5 +1,3 @@
-import { TFunction } from 'react-i18next';
-
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
@@ -11,13 +9,14 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateContainerDisks } from '@kubevirt-utils/resources/template';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { getRootDataVolume } from '../utils';
 
-export const getRegistryHelperText = (template: V1Template, t: TFunction) => {
+export const getRegistryHelperText = (template: V1Template) => {
   const containerDisks = getTemplateContainerDisks(template);
 
   if (!isEmpty(containerDisks))
