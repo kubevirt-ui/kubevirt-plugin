@@ -11,6 +11,7 @@ import { Updater, useImmer } from 'use-immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import {
   DataUpload,
@@ -41,9 +42,11 @@ export type DrawerContext = {
   isBootSourceAvailable: boolean;
   setCDFile: (file: File | string) => void;
   setDiskFile: (file: File | string) => void;
+  setSSHDetails: (details: SSHSecretDetails) => void;
   setStorageClassName: (scName: string) => void;
   setTemplate: Updater<V1Template>;
   setVM?: (vm: V1VirtualMachine) => void;
+  sshDetails: SSHSecretDetails;
   storageClassName: string;
   storageClassRequired: boolean;
   template: V1Template;
@@ -56,6 +59,7 @@ export type DrawerContext = {
 
 const useDrawer = (template: V1Template) => {
   const [customizedTemplate, setCustomizedTemplate] = useImmer(template);
+  const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(null);
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVMTemplateSource(template);
 
   const { upload: diskUpload, uploadData: uploadDiskData } = useCDIUpload();
@@ -104,9 +108,11 @@ const useDrawer = (template: V1Template) => {
     isBootSourceAvailable: isDefaultDiskSource ? isBootSourceAvailable : true,
     setCDFile,
     setDiskFile,
+    setSSHDetails,
     setStorageClassName,
     setTemplate: setCustomizedTemplate,
     setVM,
+    sshDetails,
     storageClassName,
     storageClassRequired:
       isEmpty(templateBootSourceStorageClass) &&

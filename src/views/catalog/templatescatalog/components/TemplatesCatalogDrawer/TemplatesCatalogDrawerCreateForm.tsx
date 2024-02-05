@@ -37,7 +37,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
   ({ authorizedSSHKey, namespace, onCancel, subscriptionData }) => {
     const { t } = useKubevirtTranslation();
 
-    const { isBootSourceAvailable, template, templateLoadingError } = useDrawerContext();
+    const { isBootSourceAvailable, templateLoadingError } = useDrawerContext();
 
     const {
       createError,
@@ -82,7 +82,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                     </DescriptionListGroup>
                   </DescriptionList>
                 </SplitItem>
-                <AuthorizedSSHKey authorizedSSHKey={authorizedSSHKey} template={template} />
+                <AuthorizedSSHKey authorizedSSHKey={authorizedSSHKey} namespace={namespace} />
               </Split>
             </StackItem>
             <StackItem />

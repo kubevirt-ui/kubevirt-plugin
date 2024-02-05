@@ -19,6 +19,7 @@ import {
 } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { getAnnotation, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
@@ -43,7 +44,8 @@ const useCreateDrawerForm = (
   subscriptionData: RHELAutomaticSubscriptionData,
   authorizedSSHKey: string,
 ) => {
-  const { updateTabsData, updateVM } = useWizardVMContext();
+  const { tabsData, updateTabsData, updateVM } = useWizardVMContext();
+  const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
@@ -54,6 +56,7 @@ const useCreateDrawerForm = (
     cdFile,
     diskFile,
     isBootSourceAvailable,
+    sshDetails,
     storageClassName,
     storageClassRequired,
     template,
@@ -86,10 +89,6 @@ const useCreateDrawerForm = (
     const templateToProcess = produce(template, (draftTemplate) => {
       const vmObject = getTemplateVirtualMachineObject(draftTemplate);
 
-      if (!isEmpty(authorizedSSHKey)) {
-        draftTemplate.objects = template.objects.filter((obj) => obj?.kind !== SecretModel.kind);
-      }
-
       if (vm?.spec?.template) {
         ensurePath(vmObject, [
           'spec.template.spec.domain.cpu',
@@ -105,6 +104,13 @@ const useCreateDrawerForm = (
         );
 
         draftTemplate.objects = modifiedTemplateObjects;
+
+        if (sshDetails.sshSecretName && sshDetails?.applyKeyToProject) {
+          updateAuthorizedSSHKeys({
+            ...authorizedSSHKeys,
+            [namespace]: tabsData.authorizedSSHKey,
+          });
+        }
       }
     });
 
@@ -112,7 +118,6 @@ const useCreateDrawerForm = (
       const quickCreatedVM = await quickCreateVM({
         models,
         overrides: {
-          authorizedSSHKey,
           autoUpdateEnabled,
           isDisabledGuestSystemLogs,
           name: nameField,
@@ -200,6 +205,11 @@ const useCreateDrawerForm = (
           template,
           ANNOTATIONS.displayName,
         );
+      });
+
+      updateTabsData((currentTabsData) => {
+        currentTabsData.authorizedSSHKey = sshDetails?.sshSecretName;
+        currentTabsData.applySSHToSettings = sshDetails?.applyKeyToProject;
       });
 
       // update context vm
