@@ -21,7 +21,13 @@ module.exports = {
     mjs: ['JavascriptLexer'],
     ts: ['JavascriptLexer'],
 
-    tsx: ['JsxLexer'],
+    tsx: [
+      {
+        lexer: 'JsxLexer',
+        transKeepBasicHtmlNodesFor: ['br'],
+        transSupportBasicHtmlNodes: true,
+      },
+    ],
   },
   locales: ['en'],
   namespaceSeparator: '~',

@@ -13,24 +13,26 @@ const ActivationKeyHelpIcon: FC = () => {
   return (
     <HelpTextIcon
       bodyContent={
-        <Trans ns="plugin__kubevirt-plugin" t={t}>
-          An activation key is a preshared authentication token that enables authorized users to
-          register and configure systems. Organization administrators can browse to{' '}
-          <Button
-            component="a"
-            href={ACTIVATION_KEYS_URL}
-            isInline
-            target="_blank"
-            variant={ButtonVariant.link}
-          >
-            Activation keys
-          </Button>{' '}
-          to track an existing Activation key or use the Create activation key button to create a
-          new one.
+        <>
+          <Trans ns="plugin__kubevirt-plugin" t={t}>
+            An activation key is a preshared authentication token that enables authorized users to
+            register and configure systems. Organization administrators can browse to{' '}
+            <Button
+              component="a"
+              href={ACTIVATION_KEYS_URL}
+              isInline
+              target="_blank"
+              variant={ButtonVariant.link}
+            >
+              Activation keys
+            </Button>{' '}
+            to track an existing Activation key or use the Create activation key button to create a
+            new one.
+          </Trans>
           <br />
           <br />
           <ExternalLink href={ACTIVATION_KEYS_DOCUMENTATION_URL} text={t('Read more')} />
-        </Trans>
+        </>
       }
     />
   );

@@ -5,17 +5,30 @@ const common = require('./common.js');
 
 const publicDir = path.join(__dirname, './../locales/');
 
+
+/**
+ * {{count}} item_other  --> 0
+ * {{count}} item_one    --> 1
+ * item_other            --> 2
+ * item_one              --> 3
+ */
 function determineRule(key) {
-  if (key.includes('WithCount_plural')) {
+  const withCount = key.startsWith('{{count}}')
+
+
+  if (withCount && key.includes('_other')) {
     return 0;
   }
-  if (key.includes('WithCount')) {
+  if (withCount) {
     return 1;
   }
-  if (key.includes('_plural')) {
+  if (key.includes('_other')) {
     return 2;
   }
-  return 3;
+  if (key.includes('_one')) {
+    return 3;
+  }
+  return 4;
 }
 
 function updateFile(fileName) {
@@ -27,31 +40,31 @@ function updateFile(fileName) {
   let originalKey;
 
   for (let i = 0; i < keys.length; i++) {
-    if (file[keys[i]] === '') {
-      // follow i18next rules
-      // "key": "item",
-      // "key_plural": "items",
-      // "keyWithCount": "{{count}} item",
-      // "keyWithCount_plural": "{{count}} items"
+      // translations
+      // "{{count}} item_other": "{{count}} items",
+      // "{{count}} item_one": "item",
+      // "item_other": "item",
+      // "item_one": "item"
       switch (determineRule(keys[i])) {
         case 0:
-          [originalKey] = keys[i].split('WithCount_plural');
+          [originalKey] = keys[i].split('_other');
           updatedFile[keys[i]] = `{{count}} ${pluralize(originalKey)}`;
           break;
         case 1:
-          [originalKey] = keys[i].split('WithCount');
+          [originalKey] = keys[i].split('_one');
           updatedFile[keys[i]] = `{{count}} ${originalKey}`;
           break;
         case 2:
-          [originalKey] = keys[i].split('_plural');
-          updatedFile[keys[i]] = pluralize(originalKey);
+          [originalKey] = keys[i].split('_other');
+          updatedFile[keys[i]] = originalKey;
+          break;
+        case 3:
+          [originalKey] = keys[i].split('_one');
+          updatedFile[keys[i]] = originalKey;
           break;
         default:
           updatedFile[keys[i]] = keys[i];
       }
-    } else {
-      updatedFile[keys[i]] = file[keys[i]];
-    }
   }
 
   fs.promises
