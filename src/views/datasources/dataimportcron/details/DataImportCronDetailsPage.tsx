@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -7,7 +7,7 @@ import {
   K8sResourceCondition,
 } from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Divider, PageSection, Title } from '@patternfly/react-core';
+import { Divider, PageSection, PageSectionVariants, Title } from '@patternfly/react-core';
 
 import { DataImportCronDetailsGrid } from './DataImportCronDetailsGrid';
 
@@ -18,20 +18,19 @@ type DataImportCronDetailsPageProps = RouteComponentProps<{
   obj?: V1beta1DataImportCron;
 };
 
-const DataImportCronDetailsPage: React.FC<DataImportCronDetailsPageProps> = ({
-  obj: dataImportCron,
-}) => {
+const DataImportCronDetailsPage: FC<DataImportCronDetailsPageProps> = ({ obj: dataImportCron }) => {
   const { t } = useKubevirtTranslation();
+
   return (
     <div>
-      <PageSection>
+      <PageSection variant={PageSectionVariants.light}>
         <Title className="co-section-heading" headingLevel="h2">
           {t('DataImportCron details')}
         </Title>
         <DataImportCronDetailsGrid dataImportCron={dataImportCron} />
       </PageSection>
       <Divider />
-      <PageSection>
+      <PageSection variant={PageSectionVariants.light}>
         <Title className="co-section-heading" headingLevel="h2">
           {t('Conditions')}
         </Title>
