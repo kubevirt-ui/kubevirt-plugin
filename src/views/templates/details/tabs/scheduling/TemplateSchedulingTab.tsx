@@ -5,7 +5,7 @@ import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
+import { Grid, GridItem, PageSection, PageSectionVariants, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -37,7 +37,7 @@ const TemplateSchedulingTab: FC<TemplateSchedulingTabProps> = ({ obj: template }
   );
 
   return (
-    <PageSection>
+    <PageSection variant={PageSectionVariants.light}>
       <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
         {(resource) => (
           <>
