@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Trans } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -40,29 +39,32 @@ const CommonTemplateAlert: React.FC<CommonTemplateAlertProps> = ({ template }) =
       isInline
       variant={AlertVariant.info}
     >
-      <Trans ns="plugin__kubevirt-plugin">
-        {{ osName }} VirtualMachine can not be edited because it is provided by OpenShift
-        Virtualization Operator.
-        <br />
-        We suggest you to create a custom Template from this {{ providerName }} Template.
-        <div className="margin-top">
-          <Button
-            onClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <CloneTemplateModal
-                  isOpen={isOpen}
-                  obj={template}
-                  onClose={onClose}
-                  onTemplateCloned={goToTemplatePage}
-                />
-              ))
-            }
-            variant={ButtonVariant.link}
-          >
-            {t('Create a new custom Template')}
-          </Button>
-        </div>
-      </Trans>
+      {t(
+        '{{ osName }} VirtualMachine can not be edited because it is provided by OpenShift Virtualization Operator.',
+        { osName },
+      )}
+      <br />
+
+      {t('We suggest you to create a custom Template from this {{ providerName }} Template.', {
+        providerName,
+      })}
+      <div className="margin-top">
+        <Button
+          onClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <CloneTemplateModal
+                isOpen={isOpen}
+                obj={template}
+                onClose={onClose}
+                onTemplateCloned={goToTemplatePage}
+              />
+            ))
+          }
+          variant={ButtonVariant.link}
+        >
+          {t('Create a new custom Template')}
+        </Button>
+      </div>
     </Alert>
   );
 };
