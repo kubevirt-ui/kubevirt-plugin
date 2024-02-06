@@ -1,7 +1,8 @@
 .KernelSamepageMerging {
   &__HelpTextIcon {
+    min-width: 473px;
     .pf-c-popover__content {
-      width: 465px;
+      min-width: 465px;
     }
   }
 

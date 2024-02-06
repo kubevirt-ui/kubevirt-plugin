@@ -3,12 +3,6 @@
     padding-left: var(--pf-global--spacer--lg);
   }
 
-  &__help-text-popover {
-    .pf-c-popover__content {
-      width: 400px;
-    }
-  }
-
   &__help-icon {
     color: var(--pf-global--Color--100);
     margin-left: calc(-1 * var(--pf-global--spacer--sm));
