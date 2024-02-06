@@ -41,7 +41,6 @@ const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
       <SplitItem isFilled>
         <HelpTextIcon
           bodyContent={helpTextIconContent}
-          className="expand-section-with-switch__help-text-popover"
           helpIconClassName="expand-section-with-switch__help-icon"
           position={PopoverPosition.right}
         />
