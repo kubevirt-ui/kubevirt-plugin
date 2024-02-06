@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
-import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { VirtualMachineClusterPreferenceModelRef } from '@kubevirt-utils/models';
 import {
   ListPageBody,
   ListPageFilter,
@@ -37,7 +37,7 @@ const ClusterPreferenceList: FC = () => {
               id,
               title,
             })),
-            id: VirtualMachineClusterInstancetypeModelGroupVersionKind.kind,
+            id: VirtualMachineClusterPreferenceModelRef,
             selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
             type: '',
           }}
