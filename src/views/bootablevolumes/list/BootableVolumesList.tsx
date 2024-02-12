@@ -108,6 +108,7 @@ const BootableVolumesList: FC = () => {
               loaded={loaded}
               rowFilters={useBootableVolumesFilters()}
             />
+
             <Pagination
               onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
                 onPageChange({ endIndex, page, perPage, startIndex })
