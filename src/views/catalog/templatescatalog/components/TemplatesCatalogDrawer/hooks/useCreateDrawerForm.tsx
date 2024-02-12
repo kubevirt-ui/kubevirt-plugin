@@ -50,8 +50,17 @@ const useCreateDrawerForm = (
   );
 
   const history = useHistory();
-  const { cdFile, diskFile, isBootSourceAvailable, template, uploadCDData, uploadDiskData, vm } =
-    useDrawerContext();
+  const {
+    cdFile,
+    diskFile,
+    isBootSourceAvailable,
+    storageClassName,
+    storageClassRequired,
+    template,
+    uploadCDData,
+    uploadDiskData,
+    vm,
+  } = useDrawerContext();
 
   const { nameField, onVMNameChange } = useCreateVMName();
 
@@ -66,6 +75,8 @@ const useCreateDrawerForm = (
     resource: ProcessedTemplatesModel.plural,
     verb: 'create',
   });
+
+  const storageClassRequiredMissing = storageClassRequired && isEmpty(storageClassName);
 
   const onQuickCreate = async (e: MouseEvent) => {
     e.preventDefault();
@@ -220,7 +231,8 @@ const useCreateDrawerForm = (
       !nameField ||
       isEmpty(models) ||
       !allRequiredParametersAreFulfilled(template) ||
-      !hasValidSource(template),
+      !hasValidSource(template) ||
+      storageClassRequiredMissing,
     isQuickCreateLoading: isQuickCreating || modelsLoading,
     nameField,
     onChangeStartVM,

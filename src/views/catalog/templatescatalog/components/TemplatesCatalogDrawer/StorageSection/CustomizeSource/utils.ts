@@ -55,6 +55,7 @@ export const getGenericSourceCustomization = (
   diskSourceId: SOURCE_OPTIONS_IDS,
   url?: string,
   storage?: string,
+  storageClassName?: string,
 ): V1beta1DataVolumeSpec => {
   const dataVolumeSpec: V1beta1DataVolumeSpec = {
     source: {
@@ -71,6 +72,8 @@ export const getGenericSourceCustomization = (
 
   if (url) dataVolumeSpec.source[diskSourceId].url = url;
 
+  if (storageClassName) dataVolumeSpec.storage.storageClassName = storageClassName;
+
   return dataVolumeSpec;
 };
 
@@ -82,6 +85,7 @@ export const getPVCSource = (
   pvcName: string,
   pvcNamespace: string,
   storage?: string,
+  storageClassName?: string,
 ): V1beta1DataVolumeSpec => {
   const dataVolumeSpec: V1beta1DataVolumeSpec = {
     source: {
@@ -100,6 +104,8 @@ export const getPVCSource = (
         },
       },
     };
+
+  if (storageClassName) dataVolumeSpec.storage.storageClassName = storageClassName;
 
   return dataVolumeSpec;
 };

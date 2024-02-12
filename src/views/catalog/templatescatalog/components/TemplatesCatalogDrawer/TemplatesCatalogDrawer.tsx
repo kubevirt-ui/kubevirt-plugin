@@ -29,6 +29,8 @@ export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({
   const templateName = getTemplateName(template);
   const osIcon = getTemplateOSIcon(template);
 
+  if (!isOpen) return null;
+
   return (
     <DrawerContextProvider template={template}>
       <Modal
