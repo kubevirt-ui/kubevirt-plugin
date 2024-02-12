@@ -165,7 +165,8 @@
     "*.{js,ts,tsx,jsx,json}": [
       "eslint . --fix",
       "prettier --write .",
-      "yarn i18n"
+      "yarn i18n",
+      "git add locales/en/plugin__kubevirt-plugin.json"
     ]
   },
   "name": "kubevirt-plugin",
