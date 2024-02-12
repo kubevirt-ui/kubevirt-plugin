@@ -2,6 +2,7 @@ import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useState }
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { getSecretNameErrorMessage } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -14,6 +15,7 @@ import {
   Alert,
   AlertVariant,
   Bullseye,
+  Form,
   FormGroup,
   Grid,
   GridItem,
@@ -21,15 +23,19 @@ import {
   SelectOption,
   SelectVariant,
   TextInput,
+  ValidatedOptions,
 } from '@patternfly/react-core';
 
 import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
 import SecretDropdown from '../SecretDropdown/SecretDropdown';
 
+import './SSHOptionUseExisting.scss';
+
 type SSHOptionUseExistingProps = {
   localNSProject: string;
   namespace?: string;
   projectsWithSecrets: { [namespace: string]: IoK8sApiCoreV1Secret[] };
+  secrets: IoK8sApiCoreV1Secret[];
   setLocalNSProject: Dispatch<SetStateAction<string>>;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   sshDetails: SSHSecretDetails;
@@ -39,6 +45,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   localNSProject,
   namespace,
   projectsWithSecrets,
+  secrets,
   setLocalNSProject,
   setSSHDetails,
   sshDetails,
@@ -51,6 +58,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
     isList: true,
   });
+  const [nameErrorMessage, setNameErrorMessage] = useState<string>(null);
   const projects = projectsData?.map(({ metadata }) => metadata?.name);
   const showNewSecretNameField = namespace
     ? selectedProject !== namespace
@@ -89,7 +97,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
         secretOption: addNew ? SecretSelectionOption.addNew : SecretSelectionOption.useExisting,
         sshPubKey: '',
         sshSecretName: '',
-        sshSecretNamespace: newValue,
+        sshSecretNamespace: namespace,
       }));
 
       setIsOpen(false);
@@ -97,7 +105,12 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
     [setLocalNSProject, namespace, activeNamespace, setSSHDetails],
   );
 
+  const onSelectSecret = (generatedSecretName: string) => {
+    setNameErrorMessage(getSecretNameErrorMessage(generatedSecretName, namespace, secrets));
+  };
+
   const onChangeSecretName = (newSecretName: string) => {
+    setNameErrorMessage(getSecretNameErrorMessage(newSecretName, namespace, secrets));
     setSSHDetails((prev) => ({
       ...prev,
       sshSecretName: newSecretName,
@@ -114,11 +127,11 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
         isInline
         variant={AlertVariant.info}
       />
-      <Grid className="ssh-secret-section__body">
+      <Grid className="ssh-use-existing__body">
         <GridItem span={6}>
           <FormGroup fieldId="project" label={t('Project')}>
             <Select
-              className="ssh-secret-section__form-group-project"
+              className="ssh-use-existing__form-group--project"
               hasInlineFilter
               inlineFilterPlaceholderText={t('Search project')}
               isOpen={isOpen}
@@ -144,12 +157,13 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
         </GridItem>
         <GridItem span={6}>
           <FormGroup
-            className="ssh-secret-section__form-group-secret"
+            className="ssh-use-existing__form-group--secret"
             fieldId="secret"
             label={t('Public SSH key')}
           >
             <SecretDropdown
               namespace={namespace}
+              onSelectSecret={onSelectSecret}
               secretsResourceData={projectsWithSecrets?.[selectedProject]}
               selectedProject={selectedProject}
               setSSHDetails={setSSHDetails}
@@ -159,18 +173,29 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
         </GridItem>
       </Grid>
       {showNewSecretNameField && (
-        <FormGroup label={t('New secret name')}>
-          <TextInput
-            id="new-secret-name"
-            onChange={onChangeSecretName}
-            type="text"
-            value={sshDetails.sshSecretName}
-          />
-        </FormGroup>
+        <Form isHorizontal>
+          <FormGroup
+            className="ssh-use-existing__form-group--new-secret-name"
+            helperTextInvalid={nameErrorMessage}
+            isInline
+            isRequired
+            label={t('New secret name')}
+            validated={!nameErrorMessage ? ValidatedOptions.default : ValidatedOptions.error}
+          >
+            <TextInput
+              className="ssh-use-existing__text--new-secret-name"
+              id="new-secret-name"
+              isRequired
+              onChange={onChangeSecretName}
+              type="text"
+              value={sshDetails.sshSecretName}
+            />
+          </FormGroup>
+        </Form>
       )}
     </>
   ) : (
-    <Bullseye>{t('No ssh keys found')}</Bullseye>
+    <Bullseye>{t('No SSH keys found')}</Bullseye>
   );
 };
 

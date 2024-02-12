@@ -10,10 +10,11 @@ import React, {
 } from 'react';
 
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { generateValidSecretName } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
@@ -22,6 +23,7 @@ import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
 type SecretDropdownProps = {
   id?: string;
   namespace: string;
+  onSelectSecret: (generatedSecretName: string) => void;
   secretsResourceData: IoK8sApiCoreV1Secret[];
   selectedProject: string;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
@@ -31,6 +33,7 @@ type SecretDropdownProps = {
 const SecretDropdown: FC<SecretDropdownProps> = ({
   id,
   namespace,
+  onSelectSecret,
   secretsResourceData,
   selectedProject,
   setSSHDetails,
@@ -52,15 +55,18 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
     );
     const addNew = namespace ? selectedProject !== namespace : selectedProject !== activeNamespace;
     const sshPubKey = decodeSecret(selectedSecret);
+    const generatedSecretName = generateValidSecretName(newSecretName);
+
     setSSHDetails((prev) => ({
       ...prev,
       secretOption: addNew ? SecretSelectionOption.addNew : SecretSelectionOption.useExisting,
       sshPubKey,
-      sshSecretName: addNew ? generatePrettyName(newSecretName) : newSecretName,
+      sshSecretName: generatedSecretName,
       sshSecretNamespace: selectedSecret?.metadata?.namespace,
     }));
     setSecretName(newSecretName);
     setIsOpen(false);
+    onSelectSecret(generatedSecretName);
   };
 
   const filterSecrets = (_: ChangeEvent<HTMLInputElement>, userInput: string): ReactElement[] =>
