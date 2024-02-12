@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import {
@@ -30,7 +30,7 @@ type CloneVMModalProps = {
 
 const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const namespace = source?.metadata?.namespace;
 
   const [cloneName, setCloneName] = useState(
@@ -62,11 +62,11 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, source }) => {
     if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
       startCloneVM && runVM(cloneName, namespace);
 
-      history.push(`/k8s/ns/${namespace}/${VirtualMachineModelRef}/${cloneName}`);
+      navigate(`/k8s/ns/${namespace}/${VirtualMachineModelRef}/${cloneName}`);
 
       onClose();
     }
-  }, [cloneRequest, history, startCloneVM, cloneName, namespace, onClose]);
+  }, [cloneRequest, startCloneVM, cloneName, namespace, onClose, navigate]);
 
   return (
     <TabModal

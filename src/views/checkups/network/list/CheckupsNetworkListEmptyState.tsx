@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -25,7 +25,7 @@ import './checkups-network-list-empty-state.scss';
 
 const CheckupsNetworkListEmptyState = ({ isPermitted, nadsInNamespace }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [namespace] = useActiveNamespace();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -46,7 +46,7 @@ const CheckupsNetworkListEmptyState = ({ isPermitted, nadsInNamespace }) => {
             isLoading ||
             namespace === ALL_NAMESPACES_SESSION_KEY
           }
-          onClick={() => history.push(createURL('form', history.location.pathname))}
+          onClick={() => navigate(createURL('form', location.pathname))}
         >
           {t('Run checkup')}
         </Button>

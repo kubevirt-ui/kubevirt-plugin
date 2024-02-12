@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,11 +13,11 @@ export const WizardNoBootModal: React.VFC<{
   onSubmit: () => Promise<void>;
 }> = ({ isOpen, namespace, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const goToDisksTab = () => {
     onClose();
-    history.push(`/k8s/ns/${namespace}/catalog/template/review/disks`);
+    navigate(`/k8s/ns/${namespace}/catalog/template/review/disks`);
   };
 
   return (

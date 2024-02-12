@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -28,7 +28,7 @@ const CheckupsNetworkFormActions: FC<CheckupsNetworkFormActionsProps> = ({
   selectedNAD,
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [namespace] = useActiveNamespace();
   const [error, setError] = useState<string>(null);
   const shouldDisableNodes = isNodesChecked ? nodeSource && nodeTarget : true;
@@ -50,7 +50,7 @@ const CheckupsNetworkFormActions: FC<CheckupsNetworkFormActionsProps> = ({
                 sampleDuration,
                 selectedNAD,
               });
-              history.push(`/k8s/ns/${namespace}/checkups`);
+              navigate(`/k8s/ns/${namespace}/checkups`);
             } catch (e) {
               kubevirtConsole.log(e);
               setError(e?.message);
@@ -61,7 +61,7 @@ const CheckupsNetworkFormActions: FC<CheckupsNetworkFormActionsProps> = ({
         >
           {t('Run')}
         </Button>
-        <Button onClick={() => history.goBack()} variant={ButtonVariant.secondary}>
+        <Button onClick={() => navigate(-1)} variant={ButtonVariant.secondary}>
           {t('Cancel')}
         </Button>
       </ActionGroup>

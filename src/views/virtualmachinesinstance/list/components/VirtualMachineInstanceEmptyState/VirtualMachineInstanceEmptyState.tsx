@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -19,11 +19,11 @@ import { RocketIcon, VirtualMachineIcon } from '@patternfly/react-icons';
 type VirtualMachineInstanceEmptyStateProps = {
   catalogURL: string;
 };
-const VirtualMachineInstanceEmptyState: React.FC<VirtualMachineInstanceEmptyStateProps> = ({
+const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps> = ({
   catalogURL,
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <EmptyState variant={EmptyStateVariant.large}>
@@ -34,23 +34,21 @@ const VirtualMachineInstanceEmptyState: React.FC<VirtualMachineInstanceEmptyStat
       <EmptyStateBody>
         <Trans ns="plugin__kubevirt-plugin" t={t}>
           See the{' '}
-          <Button isInline onClick={() => history.push(catalogURL)} variant={ButtonVariant.link}>
+          <Button isInline onClick={() => navigate(catalogURL)} variant={ButtonVariant.link}>
             catalog tab
           </Button>{' '}
           to quickly create a VirtualMachine from the available Templates.
         </Trans>
       </EmptyStateBody>
       <EmptyStatePrimary>
-        <Button onClick={() => history.push(catalogURL)} variant={ButtonVariant.primary}>
+        <Button onClick={() => navigate(catalogURL)} variant={ButtonVariant.primary}>
           {t('Create VirtualMachine')}
         </Button>
       </EmptyStatePrimary>
       <EmptyStateSecondaryActions>
         <Button
-          onClick={() =>
-            history.push({ pathname: '/quickstart', search: '?keyword=virtual+machine' })
-          }
           icon={<RocketIcon />}
+          onClick={() => navigate({ pathname: '/quickstart', search: '?keyword=virtual+machine' })}
           variant={ButtonVariant.secondary}
         >
           {t('Learn how to use VirtualMachines')}

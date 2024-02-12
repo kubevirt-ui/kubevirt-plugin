@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -25,7 +25,7 @@ type VirtualMachineEmptyStateProps = {
 
 const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ catalogURL, namespace }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <EmptyState variant={EmptyStateVariant.large}>
@@ -36,7 +36,7 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ catalogUR
       <EmptyStateBody>
         <Trans ns="plugin__kubevirt-plugin" t={t}>
           See the{' '}
-          <Button isInline onClick={() => history.push(catalogURL)} variant={ButtonVariant.link}>
+          <Button isInline onClick={() => navigate(catalogURL)} variant={ButtonVariant.link}>
             catalog tab
           </Button>{' '}
           to quickly create a VirtualMachine from the available Templates.
@@ -50,10 +50,8 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ catalogUR
       </EmptyStatePrimary>
       <EmptyStateSecondaryActions>
         <Button
-          onClick={() =>
-            history.push({ pathname: '/quickstart', search: '?keyword=virtual+machine' })
-          }
           icon={<RocketIcon />}
+          onClick={() => navigate({ pathname: '/quickstart', search: '?keyword=virtual+machine' })}
           variant={ButtonVariant.secondary}
         >
           {t('Learn how to use VirtualMachines')}

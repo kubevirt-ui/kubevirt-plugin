@@ -1,5 +1,6 @@
 import React, { FC, FormEvent, MouseEvent, useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -33,7 +34,8 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
 }) => {
   const searchItems = useMemo(() => getSearchItems(vm), [vm]);
   const [value, setValue] = useState<string>('');
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [autocompleteOptions, setAutocompleteOptions] =
     useState<{ element: SearchItem; tab: string }[]>(searchItems);
 
@@ -46,10 +48,10 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
 
   // Every click on item set and render as its pushing new url - this is for keeping the select item in search bar
   useEffect(() => {
-    const hash = history?.location?.hash;
+    const hash = location?.hash;
     const item = searchItems?.find(({ element }) => element?.id === hash.substring(1));
     setValue(item?.element?.title || '');
-  }, [history.location.hash, searchItems]);
+  }, [location.hash, searchItems]);
 
   const onChange = (_e: FormEvent<HTMLInputElement>, newValue: string) => {
     setIsAutocompleteOpen(true);
@@ -99,9 +101,7 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
               {autocompleteOptions.map(({ element, tab }) => (
                 <MenuItem
                   onClick={() =>
-                    history.push(
-                      createConfigurationSearchURL(tab, element?.id, history?.location?.pathname),
-                    )
+                    navigate(createConfigurationSearchURL(tab, element?.id, location?.pathname))
                   }
                   description={element?.description}
                   itemId={element?.title}

@@ -1,5 +1,4 @@
 import React, { FC, useCallback } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -36,10 +35,7 @@ import SysPrepItem from './components/SysPrepItem/SysPrepItem';
 
 import './template-scripts-tab.scss';
 
-type TemplateScriptsPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type TemplateScriptsPageProps = {
   obj: V1Template;
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import DataImportCronModel, {
   DataImportCronModelRef,
@@ -35,7 +35,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const history = useHistory();
+  const navigate = useNavigate();
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataImportCron);
 
   const lazyLoadDataSource = React.useCallback(() => {
@@ -134,7 +134,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
       },
       {
         cta: () =>
-          history.push(
+          navigate(
             `/k8s/ns/${dataImportCron.metadata.namespace}/${DataImportCronModelRef}/${dataImportCron.metadata.name}/yaml`,
           ),
         disabled: false,
@@ -162,7 +162,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
         label: t('Delete'),
       },
     ],
-    [t, isLoading, dataImportCron, isOwnedBySSP, createModal, dataSource, history],
+    [t, isLoading, dataImportCron, isOwnedBySSP, createModal, dataSource, navigate],
   );
 
   return [actions, lazyLoadDataSource];

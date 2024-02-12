@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -24,7 +24,7 @@ import { clearSessionStorageVM, useWizardVMContext } from '../../utils/WizardVMC
 import { WizardNoBootModal } from './WizardNoBootModal';
 
 export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { t } = useKubevirtTranslation();
   const {
     disableVmCreate,
@@ -47,7 +47,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
       isDisableGuestSystemAccessLog,
       onFullfilled: (createdVM) => {
         clearSessionStorageVM();
-        history.push(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
+        navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
       },
       startVM,
     });
@@ -116,7 +116,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
                 onClick={() => {
                   if (confirm(t('Are you sure you want to cancel?'))) {
                     clearSessionStorageVM();
-                    history.push(`/k8s/ns/${namespace}/catalog/template`);
+                    navigate(`/k8s/ns/${namespace}/catalog/template`);
                   }
                 }}
                 variant="link"

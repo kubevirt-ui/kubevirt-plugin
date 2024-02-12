@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import MigrationPolicyModel from '@kubevirt-ui/kubevirt-api/console/models/MigrationPolicyModel';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -26,7 +26,7 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
   migrationPolicy,
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState(undefined);
@@ -38,7 +38,7 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
     setError(undefined);
 
     k8sCreate({ data: migrationPolicy, model: MigrationPolicyModel })
-      .then(() => history.push(`${migrationPoliciesPageBaseURL}/${migrationPolicyName}`))
+      .then(() => navigate(`${migrationPoliciesPageBaseURL}/${migrationPolicyName}`))
       .catch(setError)
       .finally(() => setIsSubmitting(false));
   };
@@ -46,7 +46,7 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
   const closeModal = () => {
     setError(undefined);
     setIsSubmitting(false);
-    history.goBack();
+    navigate(-1);
   };
 
   return (

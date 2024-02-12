@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
@@ -21,17 +22,20 @@ const VirtualMachineRowLayout: React.FC<
     {
       ips: React.ReactNode | string;
       isSingleNodeCluster: boolean;
-      kind: string;
       node: React.ReactNode | string;
       vmim: V1VirtualMachineInstanceMigration;
     }
   >
-> = ({ activeColumnIDs, obj, rowData: { ips, isSingleNodeCluster, kind, node, vmim } }) => {
+> = ({ activeColumnIDs, obj, rowData: { ips, isSingleNodeCluster, node, vmim } }) => {
   const [actions] = useVirtualMachineActionsProvider(obj, vmim, isSingleNodeCluster);
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column" id="name">
-        <ResourceLink kind={kind} name={getName(obj)} namespace={getNamespace(obj)} />
+        <ResourceLink
+          groupVersionKind={VirtualMachineModelGroupVersionKind}
+          name={getName(obj)}
+          namespace={getNamespace(obj)}
+        />
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}

@@ -1,6 +1,6 @@
 import React, { FC, FormEvent, useContext, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { match, useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 import axios from 'axios';
 import cx from 'classnames';
 
@@ -25,6 +25,7 @@ import {
 import {
   K8sVerb,
   useAccessReview,
+  useActiveNamespace,
   useK8sWatchResource,
   WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -46,10 +47,6 @@ import UploadPVCButtonBar from './UploadPVCButtonBar';
 import UploadPVCForm from './UploadPVCForm';
 import UploadPVCFormStatus from './UploadPVCFormStatus';
 
-type UploadPVCPageProps = {
-  match: match<{ ns?: string }>;
-};
-
 const templatesResource: WatchK8sResource = {
   groupVersionKind: modelToGroupVersionKind(TemplateModel),
   isList: true,
@@ -59,7 +56,7 @@ const templatesResource: WatchK8sResource = {
     matchLabels: { [TEMPLATE_TYPE_LABEL]: TEMPLATE_TYPE_BASE },
   },
 };
-const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
+const UploadPVCPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingCertificate, setCheckingCertificate] = useState(false);
@@ -73,7 +70,7 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
   const [dvObj, setDvObj] = useState<V1beta1DataVolume>(null);
   const [commonTemplates, loadedTemplates, errorTemplates] =
     useK8sWatchResource<V1Template[]>(templatesResource);
-  const history = useHistory();
+  const navigate = useNavigate();
   const goldenNamespacesResources = useMemo(() => {
     const goldenNamespaces = [
       ...new Set(
@@ -117,7 +114,7 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
       : null,
   );
 
-  const initialNamespace = props?.match?.params?.ns;
+  const [initialNamespace] = useActiveNamespace();
   const namespace = getNamespace(dvObj) || initialNamespace;
   const urlParams = new URLSearchParams(window.location.search);
   const osParam = urlParams.get(CDI_UPLOAD_OS_URL_PARAM);
@@ -244,7 +241,7 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
               >
                 {t('Upload')}
               </Button>
-              <Button onClick={history.goBack} type="button" variant="secondary">
+              <Button onClick={() => navigate(-1)} type="button" variant="secondary">
                 {t('Cancel')}
               </Button>
             </ActionGroup>
@@ -257,7 +254,7 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
           setError('');
         }}
         onSuccessClick={() =>
-          history.push(resourcePath(PersistentVolumeClaimModel, getName(dvObj), namespace))
+          navigate(resourcePath(PersistentVolumeClaimModel, getName(dvObj), namespace))
         }
         upload={uploads?.find(
           (upl) => upl?.pvcName === getName(dvObj) && upl?.namespace === namespace,
@@ -266,7 +263,7 @@ const UploadPVCPage: FC<UploadPVCPageProps> = (props) => {
         dataVolume={dvObj}
         isAllocating={isAllocating}
         isSubmitting={isSubmitting}
-        onCancelClick={() => history.push(resourcePath(PersistentVolumeClaimModel))}
+        onCancelClick={() => navigate(resourcePath(PersistentVolumeClaimModel))}
       />
     </>
   );

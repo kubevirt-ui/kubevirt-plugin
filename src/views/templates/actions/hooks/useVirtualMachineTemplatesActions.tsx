@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
@@ -44,7 +44,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const { t } = useKubevirtTranslation();
   const { hasEditPermission, isCommonTemplate } = useEditTemplateAccessReview(template);
   const { createModal } = useModal();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [bootDataSource, setBootDataSource] = React.useState<V1beta1DataSource>();
   const [loadingBootSource, setLoadingBootSource] = React.useState(true);
   const editableBootSource = hasEditableBootSource(bootDataSource);
@@ -70,11 +70,11 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
 
   const goToTemplatePage = React.useCallback(
     (clonedTemplate: V1Template) => {
-      history.push(
+      navigate(
         `/k8s/ns/${clonedTemplate.metadata.namespace}/templates/${clonedTemplate.metadata.name}`,
       );
     },
-    [history],
+    [navigate],
   );
 
   const onLazyActions = React.useCallback(async () => {
@@ -89,14 +89,14 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     await k8sDelete({
       model: TemplateModel,
       resource: template,
-    }).then(() => history.push(`/k8s/${lastNamespacePath}/templates`));
+    }).then(() => navigate(`/k8s/${lastNamespacePath}/templates`));
   };
 
   const actions = [
     {
       cta: () =>
         // lead to the template details page
-        history.push(`/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}`),
+        navigate(`/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}`),
       id: EDIT_TEMPLATE_ID,
       label: t('Edit'),
     },
@@ -115,7 +115,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     },
     {
       cta: () =>
-        history.push(
+        navigate(
           `/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}/disks`,
         ),
       description:

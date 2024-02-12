@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,7 +24,7 @@ const CheckupsNetworkDetailsPageHeader: FC<CheckupsNetworkDetailsPageHeaderProps
   configMap,
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [namespace] = useActiveNamespace();
 
   return (
@@ -33,7 +33,7 @@ const CheckupsNetworkDetailsPageHeader: FC<CheckupsNetworkDetailsPageHeaderProps
         <BreadcrumbItem>
           <Button
             isInline
-            onClick={() => history.push(`/k8s/ns/${namespace}/checkups`)}
+            onClick={() => navigate(`/k8s/ns/${namespace}/checkups`)}
             variant={ButtonVariant.link}
           >
             {t('Network latency checkup')}

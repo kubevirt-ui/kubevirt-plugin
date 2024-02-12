@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 
 import { AlertType, SimplifiedAlert } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { alertIcon } from '@kubevirt-utils/components/AlertsCard/utils/utils';

@@ -7,9 +7,9 @@ export const createConfigurationSearchURL = (
   element: string,
   pathname: string,
 ): string => {
-  return pathname?.endsWith(VirtualMachineDetailsTab.Configurations)
-    ? `${VirtualMachineDetailsTab.Configurations}/${tab}#${element}`
-    : `${tab}#${element}`;
+  const index = pathname?.lastIndexOf(VirtualMachineDetailsTab.Configurations);
+  const substr = pathname.slice(0, index);
+  return substr + `${VirtualMachineDetailsTab.Configurations}/${tab}#${element}`;
 };
 
 export const getSearchItemsIds = (searchItems: SearchItem[]): string[] =>

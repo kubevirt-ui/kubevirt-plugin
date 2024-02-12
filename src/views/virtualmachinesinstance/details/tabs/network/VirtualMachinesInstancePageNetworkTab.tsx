@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
@@ -10,16 +9,13 @@ import VirtualMachineInstancePageNetworkTabRow from './VirtualMachineInstancePag
 
 import './virtual-machines-insance-page-network-tab.scss';
 
-type VirtualMachinesInstancePageNetworkTabProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type VirtualMachinesInstancePageNetworkTabProps = {
   obj: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesInstancePageNetworkTab: React.FC<
-  VirtualMachinesInstancePageNetworkTabProps
-> = ({ obj: vmi }) => {
+const VirtualMachinesInstancePageNetworkTab: FC<VirtualMachinesInstancePageNetworkTabProps> = ({
+  obj: vmi,
+}) => {
   const columns = useVirtualMachineInstanceNetworkTabColumns();
   const [data] = useVirtualMachineInstanceNetworkTab(vmi);
 

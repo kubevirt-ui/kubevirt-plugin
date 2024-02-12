@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { FC } from 'react';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
@@ -13,20 +13,20 @@ type CommonTemplateAlertProps = {
   template: V1Template;
 };
 
-const CommonTemplateAlert: React.FC<CommonTemplateAlertProps> = ({ template }) => {
+const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const osName = getOperatingSystemName(template);
   const providerName = getTemplateProviderName(template);
   const { createModal } = useModal();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const goToTemplatePage = React.useCallback(
     (clonedTemplate: V1Template) => {
-      history.push(
+      navigate(
         `/k8s/ns/${clonedTemplate.metadata.namespace}/templates/${clonedTemplate.metadata.name}`,
       );
     },
-    [history],
+    [navigate],
   );
 
   return (

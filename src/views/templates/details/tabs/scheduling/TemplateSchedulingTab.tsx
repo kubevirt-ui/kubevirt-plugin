@@ -1,5 +1,4 @@
 import React, { FC, useCallback } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
@@ -14,10 +13,7 @@ import TemplateSchedulingRightGrid from './components/TemplateSchedulingRightGri
 
 import './TemplateSchedulingTab.scss';
 
-type TemplateSchedulingTabProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type TemplateSchedulingTabProps = {
   obj?: V1Template;
 };
 

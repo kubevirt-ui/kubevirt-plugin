@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { RouteComponentProps } from 'react-router';
+import React from 'react';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Divider, PageSection } from '@patternfly/react-core';
@@ -10,12 +10,13 @@ import ActiveUserList from './components/UserList/ActiveUserList';
 
 import './virtual-machines-instance-details-tab.scss';
 
-type VirtualMachinesInstancePageDetailsTabProps = RouteComponentProps & {
+type VirtualMachinesInstancePageDetailsTabProps = {
   obj: V1VirtualMachineInstance;
 };
 const VirtualMachinesInstancePageDetailsTab: React.FC<
   VirtualMachinesInstancePageDetailsTabProps
-> = ({ location, obj: vmi }) => {
+> = ({ obj: vmi }) => {
+  const location = useLocation();
   return (
     <div className="VirtualMachinesInstanceDetailsTab">
       <PageSection>

@@ -1,33 +1,17 @@
-import * as React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import React, { FC } from 'react';
+import { Route, Routes } from 'react-router-dom-v5-compat';
 
 import CreateVMHorizontalNav from './CreateVMHorizontalNav/CreateVMHorizontalNav';
 import { WizardVMContextProvider } from './utils/WizardVMContext';
 import Wizard from './wizard/Wizard';
 
-const Catalog: React.FC = () => {
+const Catalog: FC = () => {
   return (
     <WizardVMContextProvider>
-      <Switch>
-        <Route
-          path={[
-            '/k8s/ns/:ns/catalog/template/review',
-            '/k8s/all-namespaces/catalog/template/review',
-          ]}
-          component={Wizard}
-        />
-        <Route
-          path={[
-            '/k8s/all-namespaces/catalog',
-            '/k8s/ns/:ns/catalog',
-            '/k8s/ns/:ns/catalog/template',
-            '/k8s/all-namespaces/catalog/template',
-            '/k8s/ns/:ns/catalog/instanceTypes',
-            '/k8s/all-namespaces/catalog/instanceTypes',
-          ]}
-          component={CreateVMHorizontalNav}
-        />
-      </Switch>
+      <Routes>
+        <Route Component={Wizard} path={'template/review/*'} />
+        <Route Component={CreateVMHorizontalNav} path={'/*'} />
+      </Routes>
     </WizardVMContextProvider>
   );
 };

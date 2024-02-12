@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { RouteComponentProps } from 'react-router';
 
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
@@ -11,10 +10,7 @@ import { Divider, PageSection, PageSectionVariants, Title } from '@patternfly/re
 
 import { DataSourceDetailsGrid } from './components/DataSourceDetailsGrid.tsx/DataSourceDetailsGrid';
 
-type DataSourceDetailsPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type DataSourceDetailsPageProps = {
   obj?: V1beta1DataSource;
 };
 

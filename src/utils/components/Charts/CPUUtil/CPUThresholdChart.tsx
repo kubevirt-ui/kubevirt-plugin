@@ -1,5 +1,5 @@
 import React, { FC, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';

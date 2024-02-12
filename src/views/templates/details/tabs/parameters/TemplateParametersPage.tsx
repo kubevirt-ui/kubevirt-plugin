@@ -1,5 +1,5 @@
 import React, { FC, MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 import { useImmer } from 'use-immer';
 
 import { TemplateModel, TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -27,10 +27,7 @@ import ParameterEditor from './ParameterEditor';
 
 import './template-parameters-page.scss';
 
-type TemplateParametersPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type TemplateParametersPageProps = {
   obj?: V1Template;
 };
 
@@ -39,15 +36,15 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
   const [editableTemplate, setEditableTemplate] = useImmer(template);
 
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
-  const history = useHistory();
+  const navigate = useNavigate();
   const [error, setError] = useState();
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => setEditableTemplate(template), [setEditableTemplate, template]);
   const goBack = useCallback(() => {
-    history.goBack();
-  }, [history]);
+    navigate(-1);
+  }, [navigate]);
 
   if (isEmpty(editableTemplate?.parameters))
     return <EmptyState>{t('No parameters found in this template.')}</EmptyState>;

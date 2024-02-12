@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import { Button, ButtonVariant, StackItem } from '@patternfly/react-core';
 
@@ -11,7 +11,7 @@ type WelcomeButtonsProps = {
 };
 
 const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { ns } = useParams<{ ns: string }>();
 
   return (
@@ -20,7 +20,7 @@ const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
         <StackItem key={modalButton.name}>
           <Button
             onClick={() => {
-              history.push(modalButton.url);
+              navigate(modalButton.url);
               onClose();
             }}
             className={modalButton?.className || 'WelcomeModal__button-link'}
