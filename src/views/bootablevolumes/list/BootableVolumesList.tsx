@@ -71,7 +71,7 @@ const BootableVolumesList: FC = () => {
 
   return (
     <>
-      <ListPageHeader title={t('Bootable volumes')}>
+      <ListPageHeader title={t('Bootable volume volume')}>
         {(canCreateDS || canCreatePVC) && canListInstanceTypesPrefernce && (
           <ListPageCreateDropdown items={createItems} onClick={onCreate}>
             {t('Add volume')}
