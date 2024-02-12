@@ -1,4 +1,4 @@
-import { RouteComponentProps } from 'react-router-dom';
+import { Location } from 'react-router-dom-v5-compat';
 
 import {
   IoK8sApiBatchV1Job,
@@ -40,8 +40,7 @@ export const columnsSorting = (
   return sortDirection === 'asc' ? sortedArr.reverse() : sortedArr;
 };
 
-export const trimLastHistoryPath = (history: RouteComponentProps['history']): string => {
-  const pathName = history?.location?.pathname;
+export const trimLastHistoryPath = (pathName: Location['pathname']): string => {
   return pathName.endsWith('checkups') ? pathName : pathName.replace(/\/[^\/]*$/, '');
 };
 

@@ -1,26 +1,27 @@
 .horizontal-nav-bar {
   &__menu-item {
     font-size: var(--pf-v5-global--FontSize--lg);
-    &.pf-c-nav__link.pf-m-current {
+    background: transparent;
+    border: 0;
+    color: var(--pf-v5-global--Color--200);
+    display: block;
+    padding: 6px 1rem 8px;
+    position: relative;
+    text-decoration: none;
+    &::after {
+      bottom: 0;
+      content: '';
+      display: block;
+      height: 2px;
+      left: 1rem;
+      position: absolute;
+      right: 1rem;
+    }
+    &.active {
       color: var(--pf-v5-global--link--Color);
-      &:before {
-        border-color: unset;
-        border-bottom-width: 2px;
+      &::after {
+        background: var(--pf-v5-global--link--Color);
       }
     }
-    &.pf-c-nav__link:hover {
-      color: var(--pf-v5-global--Color--100);
-      &:before {
-        border-color: unset;
-        border-bottom-width: 2px;
-      }
-    }
-    &.pf-c-nav__link {
-      color: var(--pf-v5-global--Color--200);
-    }
-  }
-  &__list {
-    padding-left: var(--pf-v5-global--spacer--sm);
-    align-items: self-end;
   }
 }

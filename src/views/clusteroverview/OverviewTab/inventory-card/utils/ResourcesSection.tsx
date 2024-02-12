@@ -6,6 +6,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { getAllowedResourceData } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon, WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
 import { ResourceInventoryItem } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { K8sModel } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import './ResourcesSection.scss';
@@ -41,7 +42,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ isAdmin, resources 
           dataTest="kv-inventory-card--vms"
           error={!!vms?.loadError}
           isLoading={vms?.loaded === false}
-          kind={VirtualMachineModel}
+          kind={VirtualMachineModel as K8sModel}
           resources={vms?.data as K8sResourceCommon[]}
           showLink={isAdmin}
         />
@@ -52,7 +53,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ isAdmin, resources 
           dataTest="kv-inventory-card--vm-templates"
           error={!!templates?.loadError}
           isLoading={templates?.loaded === false}
-          kind={TemplateModel}
+          kind={TemplateModel as K8sModel}
           resources={templates?.data}
           showLink={isAdmin}
         />
@@ -62,7 +63,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ isAdmin, resources 
           dataTest="kv-inventory-card--nodes"
           error={!!resources?.nodes?.loadError}
           isLoading={resources?.nodes?.loaded === false}
-          kind={NodeModel}
+          kind={NodeModel as K8sModel}
           resources={resources?.nodes?.data}
           showLink={isAdmin}
         />
@@ -72,7 +73,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({ isAdmin, resources 
           dataTest="kv-inventory-card--nads"
           error={!!nads?.loadError}
           isLoading={nads?.loaded === false}
-          kind={NetworkAttachmentDefinitionModel}
+          kind={NetworkAttachmentDefinitionModel as K8sModel}
           resources={nads?.data}
           showLink={isAdmin}
           title="Network"

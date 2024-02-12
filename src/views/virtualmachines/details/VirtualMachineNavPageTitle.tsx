@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -29,7 +29,7 @@ type VirtualMachineNavPageTitleProps = {
 
 const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name, vm }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const location = useLocation();
 
   const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
@@ -43,7 +43,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name,
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
 
   const isSidebarEditorDisplayed = vmTabsWithYAML.find((tab) =>
-    history.location.pathname.includes(`/${name}/${tab}`),
+    location.pathname.includes(`/${name}/${tab}`),
   );
 
   return (

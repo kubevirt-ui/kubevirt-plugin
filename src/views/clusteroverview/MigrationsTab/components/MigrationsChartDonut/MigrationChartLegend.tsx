@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { CardFooter, Grid, GridItem } from '@patternfly/react-core';

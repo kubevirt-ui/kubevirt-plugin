@@ -1,5 +1,4 @@
 import React, { FC, useCallback } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -28,10 +27,7 @@ import { getTemplateVMWithNamespace } from './utils';
 
 import './TemplateDisksPage.scss';
 
-type TemplateDisksPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type TemplateDisksPageProps = {
   obj: V1Template;
 };
 

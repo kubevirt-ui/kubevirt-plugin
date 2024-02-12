@@ -22,7 +22,7 @@ const config: Config.InitialOptions = {
     '@console/*': '<rootDir>/__mocks__/dummy.ts',
     '\\.(css|less|scss|svg)$': '<rootDir>/__mocks__/dummy.ts',
     'react-i18next': '<rootDir>/__mocks__/react-i18next.ts',
-    'react-router-dom': '<rootDir>/__mocks__/react-router-dom.ts',
+    'react-router-dom-v5-compat': '<rootDir>/__mocks__/react-router-dom-v5-compat.ts',
     ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
   },
   preset: 'ts-jest',

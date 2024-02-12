@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -16,6 +17,8 @@ const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({
   vmPrintableStatus,
 }) => {
   const { t } = useKubevirtTranslation();
+  const location = useLocation();
+
   if (!vmPrintableStatus) return <>{NO_DATA_DASH}</>;
 
   return (
@@ -30,9 +33,7 @@ const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({
             </Text>
             <br />
             <Text>
-              <Link to={(location) => createURL('diagnostics', location?.pathname)}>
-                {t('View diagnostic')}
-              </Link>
+              <Link to={createURL('diagnostics', location?.pathname)}>{t('View diagnostic')}</Link>
             </Text>
           </>
         }

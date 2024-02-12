@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -29,14 +29,14 @@ const VirtualMachineTemplatesRow: React.FC<
   rowData: { availableDatasources, availableTemplatesUID, cloneInProgressDatasources },
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-30" id="name">
         <ResourceLink
           onClick={() =>
-            history.push(`/k8s/ns/${obj.metadata.namespace}/templates/${obj.metadata.name}`)
+            navigate(`/k8s/ns/${obj.metadata.namespace}/templates/${obj.metadata.name}`)
           }
           kind={TemplateModel.kind}
           name={obj.metadata.name}

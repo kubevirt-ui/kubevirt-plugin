@@ -1,5 +1,5 @@
 import React, { FC, useCallback } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -12,8 +12,10 @@ import useCheckupsNetworkPermissions from './network/hooks/useCheckupsNetworkPer
 import { useCheckupsStoragePermissions } from './storage/components/hooks/useCheckupsStoragePermissions';
 import { trimLastHistoryPath } from './utils/utils';
 
-const CheckupsRunButton: FC<{ history: RouteComponentProps['history'] }> = ({ history }) => {
+const CheckupsRunButton: FC = () => {
   const [namespace] = useActiveNamespace();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useKubevirtTranslation();
   const { isPermitted: isCreateNetworkPermitted } = useCheckupsNetworkPermissions();
   const { isPermitted: isCreateStoragePermitted } = useCheckupsStoragePermissions();
@@ -41,16 +43,16 @@ const CheckupsRunButton: FC<{ history: RouteComponentProps['history'] }> = ({ hi
         case 'network':
           return (
             isCreateNetworkPermitted &&
-            history.push(createURL('network/form', trimLastHistoryPath(history)))
+            navigate(createURL('network/form', trimLastHistoryPath(location.pathname)))
           );
         case 'storage':
           return (
             isCreateStoragePermitted &&
-            history.push(createURL('storage/form', trimLastHistoryPath(history)))
+            navigate(createURL('storage/form', trimLastHistoryPath(location.pathname)))
           );
       }
     },
-    [history, isCreateNetworkPermitted, isCreateStoragePermitted],
+    [isCreateNetworkPermitted, navigate, location, isCreateStoragePermitted],
   );
 
   return (

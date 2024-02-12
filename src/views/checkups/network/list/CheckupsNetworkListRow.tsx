@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';

@@ -1,4 +1,4 @@
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 /**
  * A Hook for manipulating URL Parameters and History.
@@ -13,7 +13,7 @@ export const useURLParams = (): {
   setParam: (key: string, value: string) => void;
 } => {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
 
   /**
@@ -24,11 +24,11 @@ export const useURLParams = (): {
   const setParam = (key: string, value: string) => {
     if (value) {
       params.set(key, value);
-      history.replace({ pathname: location.pathname, search: params.toString() });
+      navigate({ pathname: location.pathname, search: params.toString() });
     } else {
       if (params.has(key)) {
         params.delete(key);
-        history.replace({ pathname: location.pathname, search: params.toString() });
+        navigate({ pathname: location.pathname, search: params.toString() });
       }
     }
   };
@@ -40,7 +40,7 @@ export const useURLParams = (): {
    */
   const appendParam = (key: string, value: string) => {
     params.append(key, value);
-    history.replace({ pathname: location.pathname, search: params.toString() });
+    navigate({ pathname: location.pathname, search: params.toString() });
   };
 
   /**
@@ -53,11 +53,11 @@ export const useURLParams = (): {
       const newParams = [...params.getAll(key)].filter((v) => v !== value);
       params.delete(key);
       newParams.forEach((v) => params.append(key, v));
-      history.replace({ pathname: location.pathname, search: params.toString() });
+      navigate({ pathname: location.pathname, search: params.toString() });
     } else {
       if (params.has(key)) {
         params.delete(key);
-        history.replace({ pathname: location.pathname, search: params.toString() });
+        navigate({ pathname: location.pathname, search: params.toString() });
       }
     }
   };

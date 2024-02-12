@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';

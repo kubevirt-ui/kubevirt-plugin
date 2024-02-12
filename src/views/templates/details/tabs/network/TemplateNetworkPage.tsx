@@ -1,5 +1,4 @@
 import React, { FC, useCallback } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -16,10 +15,7 @@ import TemplatesNetworkInterfaceModal from './components/modal/TemplatesNetworkI
 import 'src/utils/styles/ListPageCreateButton.scss';
 import './template-network-tab.scss';
 
-type TemplateNetworkProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type TemplateNetworkProps = {
   obj: V1Template;
 };
 

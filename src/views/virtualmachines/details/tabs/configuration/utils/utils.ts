@@ -57,5 +57,8 @@ export const innerTabs: { [key: string]: string } = tabs.reduce((acc, { name }) 
 export const getInnerTabFromPath = (path: string) =>
   innerTabs[path.slice(path.lastIndexOf('/') + 1)];
 
-export const includesConfigurationPath = (path: string): boolean =>
-  path.includes(`${VirtualMachineDetailsTab.Configurations}/`);
+export const includesConfigurationPath = (path: string, append: string): string => {
+  const index = path.lastIndexOf(`${VirtualMachineDetailsTab.Configurations}`);
+  const substr = path.slice(0, index);
+  return substr + append;
+};

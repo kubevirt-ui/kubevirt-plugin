@@ -1,5 +1,6 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -16,7 +17,8 @@ import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/ut
 import './virtual-machine-configuration-tab.scss';
 
 const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ vm }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { vmi } = useVMI(getName(vm), getNamespace(vm));
   const [instanceTypeVM] = useInstanceTypeExpandSpec(vm);
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
@@ -26,16 +28,19 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ vm }) => {
   const redirectTab = useCallback(
     (name: string) => {
       setActiveTabKey(name);
-      const isConfiguration = includesConfigurationPath(history.location.pathname);
-      history.push(isConfiguration ? name : `${VirtualMachineDetailsTab.Configurations}/${name}`);
+      const redirectPath = includesConfigurationPath(
+        location.pathname,
+        `${VirtualMachineDetailsTab.Configurations}/${name}`,
+      );
+      navigate(redirectPath);
     },
-    [history],
+    [location.pathname, navigate],
   );
 
   useEffect(() => {
-    const innerTab = getInnerTabFromPath(history.location.pathname);
+    const innerTab = getInnerTabFromPath(location.pathname);
     innerTab && setActiveTabKey(innerTab);
-  }, [history.location.pathname]);
+  }, [location.pathname]);
 
   return (
     <div className="co-dashboard-body VirtualMachineConfigurationTab">

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { useForm } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
@@ -34,7 +34,7 @@ export const CreateDataSourceModal: FC<CreateDataSourceModalProps> = ({
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const {
     formState: { errors },
@@ -60,7 +60,7 @@ export const CreateDataSourceModal: FC<CreateDataSourceModalProps> = ({
         namespace: namespace || DEFAULT_NAMESPACE,
         url: data?.url?.includes('docker://') ? data?.url : 'docker://' + data?.url,
       }).then(() =>
-        history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/${name}`),
+        navigate(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/${name}`),
       ),
     () => Promise.reject({ message: t('Missing required fields') }),
   );

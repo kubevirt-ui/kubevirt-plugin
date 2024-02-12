@@ -1,5 +1,5 @@
 import React, { FC, memo } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -8,11 +8,11 @@ import { Title } from '@patternfly/react-core';
 
 const EnvironmentFormTitle: FC = memo(() => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const location = useLocation();
 
   return (
     <>
-      {!history.location.pathname.includes('/review/environment') && (
+      {!location.pathname.includes('/review/environment') && (
         <SearchItem id="Environment">
           <Title headingLevel="h2">{t('Environment')}</Title>
         </SearchItem>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
 import {
@@ -24,12 +24,11 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const PreferencePage = () => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeNamespace] = useActiveNamespace();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
-    history?.location?.pathname.includes(VirtualMachineClusterPreferenceModelGroupVersionKind.kind)
-      ? 0
-      : 1,
+    location?.pathname.includes(VirtualMachineClusterPreferenceModelGroupVersionKind.kind) ? 0 : 1,
   );
 
   const urlUserPreference = useMemo(
@@ -49,12 +48,12 @@ const PreferencePage = () => {
   );
 
   useEffect(() => {
-    history.push(
+    navigate(
       activeTabKey === 0
         ? `/k8s/cluster/${VirtualMachineClusterPreferenceModelRef}`
         : urlUserPreference,
     );
-  }, [activeTabKey, history, urlUserPreference]);
+  }, [activeTabKey, navigate, urlUserPreference]);
 
   return (
     <>

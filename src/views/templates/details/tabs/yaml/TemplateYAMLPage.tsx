@@ -1,20 +1,16 @@
-import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import React, { FC, Suspense } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
 
-type TemplateYAMLPageProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type TemplateYAMLPageProps = {
   obj: V1Template;
 };
 
-const TemplateYAMLPage: React.FC<TemplateYAMLPageProps> = ({ obj: template }) => (
-  <React.Suspense
+const TemplateYAMLPage: FC<TemplateYAMLPageProps> = ({ obj: template }) => (
+  <Suspense
     fallback={
       <Bullseye>
         <Loading />
@@ -22,7 +18,7 @@ const TemplateYAMLPage: React.FC<TemplateYAMLPageProps> = ({ obj: template }) =>
     }
   >
     <ResourceYAMLEditor initialResource={template} />
-  </React.Suspense>
+  </Suspense>
 );
 
 export default TemplateYAMLPage;

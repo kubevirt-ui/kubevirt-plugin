@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -22,7 +22,7 @@ const CheckupsNetworkActions = ({
   isKebab?: boolean;
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [isActionsOpen, setIsActionsOpen] = useState<boolean>(false);
   const Toggle = isKebab ? KebabToggle : DropdownToggle;
   return (
@@ -32,7 +32,7 @@ const CheckupsNetworkActions = ({
           onClick={() => {
             setIsActionsOpen(false);
             deleteNetworkCheckup(configMap);
-            history.push(`/k8s/ns/${configMap?.metadata?.namespace}/checkups`);
+            navigate(`/k8s/ns/${configMap?.metadata?.namespace}/checkups`);
           }}
           key="delete"
         >

@@ -7,8 +7,7 @@ import {
 } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/helpers';
 import { CDIConfigModelGroupVersionKind, modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { buildOwnerReference, compareOwnerReferences } from '@kubevirt-utils/resources/shared';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
+import { K8sModel, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 
 import { convertDataVolumeToPVC } from './utils/utils';

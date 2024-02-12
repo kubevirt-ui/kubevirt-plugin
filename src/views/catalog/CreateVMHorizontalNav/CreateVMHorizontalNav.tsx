@@ -1,5 +1,5 @@
 import React, { FC, MouseEvent, useMemo, useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromInstanceType';
 import TemplatesCatalog from '@catalog/templatescatalog/TemplatesCatalog';
@@ -13,13 +13,10 @@ import { CREATE_VM_TAB } from './constants';
 
 import './CreateVMHorizontalNav.scss';
 
-const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
-  history,
-  location,
-  match,
-}) => {
+const CreateVMHorizontalNav: FC = () => {
   const { t } = useKubevirtTranslation();
-
+  const navigate = useNavigate();
+  const params = useParams();
   const [currentTab, setCurrentTab] = useState<CREATE_VM_TAB>(
     location.pathname.endsWith(CREATE_VM_TAB.TEMPLATE)
       ? CREATE_VM_TAB.TEMPLATE
@@ -27,13 +24,13 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
   );
 
   const catalogURL = useMemo(
-    () => `/k8s/${match?.params?.ns ? `ns/${match?.params?.ns}` : ALL_NAMESPACES}/catalog`,
-    [match],
+    () => `/k8s/${params?.ns ? `ns/${params?.ns}` : ALL_NAMESPACES}/catalog`,
+    [params],
   );
 
   const handleTabClick = (_event: MouseEvent, tabIndex: CREATE_VM_TAB) => {
     setCurrentTab(tabIndex);
-    history.push(`${catalogURL}${tabIndex}`);
+    navigate(`${catalogURL}${tabIndex}`);
   };
 
   return (
@@ -59,7 +56,7 @@ const CreateVMHorizontalNav: FC<RouteComponentProps<{ ns: string }>> = ({
           eventKey={CREATE_VM_TAB.TEMPLATE}
           title={<CreateVMTabTitle Icon={CatalogIcon} titleText={t('Template catalog')} />}
         >
-          <TemplatesCatalog history={history} location={location} match={match} />
+          <TemplatesCatalog />
         </Tab>
       </Tabs>
     </div>

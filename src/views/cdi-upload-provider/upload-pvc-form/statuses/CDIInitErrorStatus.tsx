@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui/kubevirt-api/console';
 import { killUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
@@ -37,7 +37,7 @@ const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ namespace, onErrorCl
     namespace,
   });
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const onClick = async () => {
     shouldKillDv && (await killUploadPVC(pvcName, namespace));
@@ -80,7 +80,7 @@ const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ namespace, onErrorCl
         <EmptyStateSecondaryActions>
           <Button
             onClick={() =>
-              history.push(`${resourcePath(PodModel, pod?.metadata?.name, namespace)}/logs`)
+              navigate(`${resourcePath(PodModel, pod?.metadata?.name, namespace)}/logs`)
             }
             id="cdi-upload-check-logs"
             variant={ButtonVariant.link}

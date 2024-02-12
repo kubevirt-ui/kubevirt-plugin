@@ -1,14 +1,12 @@
-import React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import React, { FC } from 'react';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
 
 import Consoles from './Consoles';
 
-type ConsoleStandAloneProps = RouteComponentProps<{ name: string; ns: string }>;
-
-const ConsoleStandAlone: React.FC<ConsoleStandAloneProps> = ({ match }) => {
-  const { name, ns } = match?.params;
+const ConsoleStandAlone: FC = () => {
+  const { name, ns } = useParams<{ name: string; ns: string }>();
   const { vmi } = useVMIAndPodsForVM(name, ns);
 
   return <Consoles vmi={vmi} />;

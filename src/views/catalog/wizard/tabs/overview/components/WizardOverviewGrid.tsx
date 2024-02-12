@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { TabsData } from '@catalog/utils/WizardVMContext/utils/tabs-data';
@@ -44,7 +44,7 @@ type WizardOverviewGridProps = {
 };
 
 const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, vm }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -262,7 +262,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               />
             }
             onTitleClick={() =>
-              history.push(`/k8s/ns/${ns}/catalog/template/review/network-interfaces`)
+              navigate(`/k8s/ns/${ns}/catalog/template/review/network-interfaces`)
             }
             count={networks?.length}
             testId="wizard-overview-network-interfaces"
@@ -272,7 +272,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
           <WizardDescriptionItem
             count={disks?.length}
             description={<WizardOverviewDisksTable isInlineGrid vm={vm} />}
-            onTitleClick={() => history.push(`/k8s/ns/${ns}/catalog/template/review/disks`)}
+            onTitleClick={() => navigate(`/k8s/ns/${ns}/catalog/template/review/disks`)}
             testId="wizard-overview-disks"
             title={t('Disks')}
           />

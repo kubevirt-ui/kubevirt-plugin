@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 import produce from 'immer';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';

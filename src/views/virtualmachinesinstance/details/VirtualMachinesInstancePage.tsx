@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -12,7 +12,7 @@ type VirtualMachinesInstanceDetailsProps = {
   namespace: string;
 };
 
-const VirtualMachinesInstanceDetails: React.FC<VirtualMachinesInstanceDetailsProps> = ({
+const VirtualMachinesInstanceDetails: FC<VirtualMachinesInstanceDetailsProps> = ({
   kind,
   name,
   namespace,

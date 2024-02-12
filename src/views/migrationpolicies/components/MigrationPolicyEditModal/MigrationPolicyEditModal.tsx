@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import MigrationPolicyModel from '@kubevirt-ui/kubevirt-api/console/models/MigrationPolicyModel';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -29,13 +29,13 @@ const MigrationPolicyEditModal: React.FC<MigrationPolicyEditModalProps> = ({
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
-
+  const navigate = useNavigate();
+  const location = useLocation();
   const [state, setState] = useState<EditMigrationPolicyInitialState>(
     extractEditMigrationPolicyInitialValues(mp),
   );
 
-  const actualPathArray = history.location.pathname.split('/');
+  const actualPathArray = location.pathname.split('/');
   const lastPolicyPathElement = actualPathArray[actualPathArray.length - 1]; // last part of url after "/", MigrationPolicy's previous name or ''
 
   const setStateField = (field: string) => (value: any) => {
@@ -57,9 +57,9 @@ const MigrationPolicyEditModal: React.FC<MigrationPolicyEditModalProps> = ({
         return k8sDelete({ model: MigrationPolicyModel, resource: mp }).then(() => {
           if (lastPolicyPathElement === mp?.metadata?.name) {
             // if we were on MigrationPolicy details page, stay there and just update the data
-            history.push(`${migrationPoliciesPageBaseURL}/${updatedMP?.metadata?.name}`);
+            navigate(`${migrationPoliciesPageBaseURL}/${updatedMP?.metadata?.name}`);
           } else {
-            history.push(migrationPoliciesPageBaseURL); // MigrationPolicies list
+            navigate(migrationPoliciesPageBaseURL); // MigrationPolicies list
           }
         });
       });

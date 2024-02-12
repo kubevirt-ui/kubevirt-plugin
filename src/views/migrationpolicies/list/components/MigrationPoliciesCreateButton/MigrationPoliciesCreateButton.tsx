@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
@@ -12,12 +12,12 @@ type MigrationPoliciesCreateButtonProps = {
 
 const MigrationPoliciesCreateButton: FC<MigrationPoliciesCreateButtonProps> = ({ kind }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const onCreate = (type: string) => {
     return type === 'form'
-      ? history.push(`${migrationPoliciesPageBaseURL}/form`)
-      : history.push(`${migrationPoliciesPageBaseURL}/~new`);
+      ? navigate(`${migrationPoliciesPageBaseURL}/form`)
+      : navigate(`${migrationPoliciesPageBaseURL}/~new`);
   };
 
   return (

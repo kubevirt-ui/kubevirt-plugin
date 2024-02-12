@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';

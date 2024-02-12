@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
@@ -22,10 +22,11 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const InstanceTypePage = () => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeNamespace] = useActiveNamespace();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
-    history?.location?.pathname.includes(VirtualMachineClusterInstancetypeModel.kind) ? 0 : 1,
+    location?.pathname.includes(VirtualMachineClusterInstancetypeModel.kind) ? 0 : 1,
   );
 
   const urlUserPreference = useMemo(
@@ -45,12 +46,12 @@ const InstanceTypePage = () => {
   );
 
   useEffect(() => {
-    history.push(
+    navigate(
       activeTabKey === 0
         ? `/k8s/cluster/${VirtualMachineClusterInstancetypeModelRef}`
         : urlUserPreference,
     );
-  }, [activeTabKey, history, urlUserPreference]);
+  }, [activeTabKey, navigate, urlUserPreference]);
 
   return (
     <>
