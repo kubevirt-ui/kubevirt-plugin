@@ -13,7 +13,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { DescriptionList, Select, SelectOption } from '@patternfly/react-core';
 
-import DynamicSSHKeyInjectionIntanceType from './DynamicSSHKeyInjectionIntanceType';
+import DynamicSSHKeyInjectionInstanceType from './DynamicSSHKeyInjectionInstanceType';
 
 import './details-right-grid.scss';
 
@@ -101,7 +101,7 @@ const DetailsRightGrid: FC = () => {
         descriptionHeader={t('Public SSH key')}
         isEdit={!isChangingNamespace}
       />
-      <DynamicSSHKeyInjectionIntanceType />
+      <DynamicSSHKeyInjectionInstanceType />
     </DescriptionList>
   );
 };

@@ -15,30 +15,42 @@ import {
   getCloudInitData,
   getCloudInitVolume,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import {
+  MAX_NAME_LENGTH,
+  MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX,
+} from '@kubevirt-utils/components/SSHSecretSection/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { decodeSecret, encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
+import { generatePrettyName, isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sResourceCommon, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
-export const validateSecretNameLength = (secretName: string): boolean => secretName.length <= 51;
+export const validateSecretNameLength = (secretName: string): boolean =>
+  secretName.length <= MAX_NAME_LENGTH;
 
 export const validateSecretNameUnique = (
   secretName: string,
+  vmNamespaceTarget: string,
   secrets: IoK8sApiCoreV1Secret[],
-): boolean => isEmpty(secrets?.find((secret) => getName(secret) === secretName));
+): boolean =>
+  isEmpty(
+    secrets?.find(
+      (secret) => getName(secret) === secretName && getNamespace(secret) === vmNamespaceTarget,
+    ),
+  );
 
 export const getSecretNameErrorMessage = (
   secretName: string,
+  vmNamespaceTarget: string,
   secrets: IoK8sApiCoreV1Secret[],
 ): string => {
-  if (!validateSecretNameUnique(secretName, secrets))
+  if (!validateSecretNameUnique(secretName, vmNamespaceTarget, secrets))
     return t('Secret name must be unique in this namespace.');
 
   if (!validateSecretNameLength(secretName))
-    return t('Secret name too long, maximum of 51 characters.');
+    return t('Secret name too long, maximum of 253 characters.');
 
   return null;
 };
@@ -169,3 +181,8 @@ export const getPropagationMethod = (
   vm: V1VirtualMachine,
 ): V1SSHPublicKeyAccessCredentialPropagationMethod =>
   vm?.spec?.template?.spec?.accessCredentials?.[0].sshPublicKey.propagationMethod;
+
+export const generateValidSecretName = (secretName: string) =>
+  secretName.length > MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX
+    ? generatePrettyName()
+    : generatePrettyName(secretName);
