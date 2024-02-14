@@ -65,7 +65,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
-  const toolbarFilters = rowFilters.filter((filter) => 'items' in filter);
+  const toolbarFilters = rowFilters?.filter((filter) => 'items' in filter);
 
   // Generate rowFilter items and counts. Memoize to minimize re-renders.
   const generatedRowFilters = useDeepCompareMemoize(generateRowFilters(toolbarFilters ?? [], data));

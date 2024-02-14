@@ -1,4 +1,3 @@
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,6 +22,7 @@ import {
 const useCheckupsNetworkCheckupsListColumns = (): [
   TableColumn<IoK8sApiCoreV1ConfigMap>[],
   TableColumn<IoK8sApiCoreV1ConfigMap>[],
+  boolean,
 ] => {
   const [namespace] = useActiveNamespace();
   const { t } = useKubevirtTranslation();
@@ -112,12 +112,13 @@ const useCheckupsNetworkCheckupsListColumns = (): [
     },
   ];
 
-  const [activeColumns] = useKubevirtUserSettingsTableColumns<IoK8sApiCoreV1ConfigMap>({
-    columnManagementID: ConfigMapModel.kind,
-    columns,
-  });
+  const [activeColumns, , loadedColumns] =
+    useKubevirtUserSettingsTableColumns<IoK8sApiCoreV1ConfigMap>({
+      columnManagementID: 'checkups-network',
+      columns,
+    });
 
-  return [columns, activeColumns];
+  return [columns, activeColumns, loadedColumns];
 };
 
 export default useCheckupsNetworkCheckupsListColumns;

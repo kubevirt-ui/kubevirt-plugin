@@ -131,9 +131,19 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     }));
   };
 
-  const [columns, activeColumns] = useVirtualMachineColumns(namespace, pagination, data);
+  const [columns, activeColumns, loadedColumns] = useVirtualMachineColumns(
+    namespace,
+    pagination,
+    data,
+  );
 
-  const loaded = vmLoaded && vmiLoaded && vmimsLoaded && isSingleNodeLoaded && !loadingFeatureProxy;
+  const loaded =
+    vmLoaded &&
+    vmiLoaded &&
+    vmimsLoaded &&
+    isSingleNodeLoaded &&
+    !loadingFeatureProxy &&
+    loadedColumns;
 
   return (
     <>

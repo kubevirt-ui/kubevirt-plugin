@@ -6,7 +6,7 @@ import { sortable } from '@patternfly/react-table';
 
 const useVirtualMachineTemplatesColumns = (
   namespace: string,
-): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[]] => {
+): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
 
   const columns = [
@@ -51,12 +51,12 @@ const useVirtualMachineTemplatesColumns = (
     },
   ];
 
-  const [activeColumns] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
+  const [activeColumns, , loadedColumns] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
     columnManagementID: modelToRef(TemplateModel),
     columns,
   });
 
-  return [columns, activeColumns];
+  return [columns, activeColumns, loadedColumns];
 };
 
 export default useVirtualMachineTemplatesColumns;

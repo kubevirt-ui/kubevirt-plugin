@@ -1,11 +1,15 @@
 import React, { FC } from 'react';
 
+import {
+  MigrationPolicyModelGroupVersionKind,
+  MigrationPolicyModelRef,
+} from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
-  ListPageFilter,
   ListPageHeader,
   useK8sWatchResource,
   useListPageFilter,
@@ -17,25 +21,21 @@ import MigrationPoliciesEmptyState from './components/MigrationPoliciesEmptyStat
 import MigrationPoliciesRow from './components/MigrationPoliciesRow/MigrationPoliciesRow';
 import useMigrationPoliciesListColumns from './hooks/useMigrationPoliciesListColumns';
 
-type MigrationPoliciesListProps = {
-  kind: string;
-};
-
-const MigrationPoliciesList: FC<MigrationPoliciesListProps> = ({ kind }) => {
+const MigrationPoliciesList: FC = () => {
   const { t } = useKubevirtTranslation();
   const [mps, loaded, loadError] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
+    groupVersionKind: MigrationPolicyModelGroupVersionKind,
     isList: true,
-    kind,
     namespaced: false,
   });
 
-  const [columns, activeColumns] = useMigrationPoliciesListColumns();
+  const [columns, activeColumns, loadedColumns] = useMigrationPoliciesListColumns();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(mps);
 
   return (
     <>
       <ListPageHeader title={t('MigrationPolicies')}>
-        {!isEmpty(mps) && <MigrationPoliciesCreateButton kind={kind} />}
+        {!isEmpty(mps) && <MigrationPoliciesCreateButton />}
       </ListPageHeader>
 
       <ListPageBody>
@@ -46,20 +46,20 @@ const MigrationPoliciesList: FC<MigrationPoliciesListProps> = ({ kind }) => {
               id,
               title,
             })),
-            id: kind,
+            id: MigrationPolicyModelRef,
             selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
             type: t('MigrationPolicy'),
           }}
           data={unfilteredData}
-          loaded={loaded}
+          loaded={loaded && loadedColumns}
           onFilterChange={onFilterChange}
         />
-        {loaded && isEmpty(mps) && <MigrationPoliciesEmptyState kind={kind} />}
+        {loaded && isEmpty(mps) && <MigrationPoliciesEmptyState />}
         <VirtualizedTable<V1alpha1MigrationPolicy>
           columns={activeColumns}
           data={data}
           EmptyMsg={() => <></>}
-          loaded={loaded}
+          loaded={loaded && loadedColumns}
           loadError={loadError}
           Row={MigrationPoliciesRow}
           unfilteredData={unfilteredData}

@@ -1,16 +1,13 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
+import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createItems, migrationPoliciesPageBaseURL } from '../../utils/constants';
 
-type MigrationPoliciesCreateButtonProps = {
-  kind: string;
-};
-
-const MigrationPoliciesCreateButton: FC<MigrationPoliciesCreateButtonProps> = ({ kind }) => {
+const MigrationPoliciesCreateButton: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
 
@@ -22,7 +19,7 @@ const MigrationPoliciesCreateButton: FC<MigrationPoliciesCreateButtonProps> = ({
 
   return (
     <ListPageCreateDropdown
-      createAccessReview={{ groupVersionKind: kind }}
+      createAccessReview={{ groupVersionKind: MigrationPolicyModelGroupVersionKind }}
       items={createItems}
       onClick={onCreate}
     >

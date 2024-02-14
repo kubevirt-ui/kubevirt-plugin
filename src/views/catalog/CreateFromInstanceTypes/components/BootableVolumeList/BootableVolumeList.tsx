@@ -4,13 +4,14 @@ import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-c
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { convertResourceArrayToMap, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/react-core';
 import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 
@@ -58,7 +59,10 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     [preferencesData],
   );
 
-  const { activeColumns, columnLayout } = useBootVolumeColumns(!displayShowAllButton);
+  const { activeColumns, columnLayout, loadedColumns } = useBootVolumeColumns(
+    !displayShowAllButton,
+  );
+
   const filters = useBootVolumeFilters(!displayShowAllButton);
 
   const [unfilteredData, data, onFilterChange] = useListPageFilter(bootableVolumes, filters);
@@ -86,7 +90,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     }));
   };
 
-  const displayVolumes = !isEmpty(bootableVolumes) && loaded;
+  const displayVolumes = !isEmpty(bootableVolumes) && loaded && loadedColumns;
 
   useEffect(() => {
     if (displayShowAllButton && !isEmpty(selectedBootableVolume)) {
@@ -126,9 +130,9 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                 }}
                 columnLayout={columnLayout}
                 data={unfilteredData}
-                hideLabelFilter
-                hideNameLabelFilters={!displayShowAllButton}
-                loaded={Boolean(loaded)}
+                // hideLabelFilter
+                // hideNameLabelFilters={!displayShowAllButton}
+                loaded={Boolean(loaded) && loadedColumns}
                 // nameFilter={!displayShowAllButton && "modal-name"} can remove comment once this merged https://github.com/openshift/console/pull/12438 and build into new SDK version
                 rowFilters={filters}
               />

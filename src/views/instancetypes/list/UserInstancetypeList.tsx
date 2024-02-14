@@ -5,13 +5,13 @@ import {
   VirtualMachineInstancetypeModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import {
   ListPageBody,
-  ListPageFilter,
   useActiveNamespace,
   useK8sWatchResource,
   useListPageFilter,
@@ -39,7 +39,7 @@ const UserInstancetypeList: FC = () => {
     V1beta1VirtualMachineInstancetype,
     V1beta1VirtualMachineInstancetype
   >(instanceTypes);
-  const [columns, activeColumns] = useUserInstancetypeListColumns(pagination, data);
+  const [columns, activeColumns, loadedColumns] = useUserInstancetypeListColumns(pagination, data);
 
   return (
     <ListPageBody>
@@ -65,7 +65,7 @@ const UserInstancetypeList: FC = () => {
             });
           }}
           data={unfilteredData}
-          loaded={loaded}
+          loaded={loaded && loadedColumns}
         />
         <Pagination
           onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
@@ -90,7 +90,7 @@ const UserInstancetypeList: FC = () => {
         )}
         columns={activeColumns}
         data={data}
-        loaded={loaded}
+        loaded={loaded && loadedColumns}
         loadError={loadError}
         Row={UserInstancetypeRow}
         unfilteredData={unfilteredData}
