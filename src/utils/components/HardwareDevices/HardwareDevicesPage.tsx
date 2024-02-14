@@ -11,7 +11,7 @@ import HardwareDevicesPageTable from './HardwareDevicesPageTable';
 
 const HardwareDevicesPage: React.FC<any> = (props) => {
   const { t } = useKubevirtTranslation();
-  const { errorHcList, loadedHcList, permittedHostDevices } = useHCPermittedHostDevices();
+  const { hcError, hcLoaded, permittedHostDevices } = useHCPermittedHostDevices();
 
   const pages = [
     {
@@ -31,8 +31,8 @@ const HardwareDevicesPage: React.FC<any> = (props) => {
             selector: device?.pciVendorSelector || device?.pciDeviceSelector,
           }),
         ),
-        error: errorHcList,
-        loaded: loadedHcList,
+        error: hcError,
+        loaded: hcLoaded,
       },
     },
     {
@@ -50,8 +50,8 @@ const HardwareDevicesPage: React.FC<any> = (props) => {
           ...device,
           selector: device?.mdevNameSelector,
         })),
-        error: errorHcList,
-        loaded: loadedHcList,
+        error: hcError,
+        loaded: hcLoaded,
       },
     },
   ];
