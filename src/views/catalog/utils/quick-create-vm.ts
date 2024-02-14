@@ -5,7 +5,6 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { applyCloudDriveCloudInitVolume } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
-import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
@@ -13,7 +12,6 @@ import {
   LABEL_USED_TEMPLATE_NAMESPACE,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createMultipleResources, isRHELTemplate } from './utils';
@@ -21,7 +19,6 @@ import { createMultipleResources, isRHELTemplate } from './utils';
 type QuickCreateVMType = (inputs: {
   models: { [key: string]: K8sModel };
   overrides: {
-    authorizedSSHKey: string;
     autoUpdateEnabled: boolean;
     isDisabledGuestSystemLogs: boolean;
     name: string;
@@ -36,7 +33,6 @@ type QuickCreateVMType = (inputs: {
 export const quickCreateVM: QuickCreateVMType = async ({
   models,
   overrides: {
-    authorizedSSHKey,
     autoUpdateEnabled,
     isDisabledGuestSystemLogs,
     name,
@@ -82,11 +78,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
       : updatedVolumes;
   });
 
-  const vmToCreate = !isEmpty(authorizedSSHKey)
-    ? addSecretToVM(overridedVM, authorizedSSHKey)
-    : overridedVM;
-
-  const { objects } = replaceTemplateVM(processedTemplate, vmToCreate);
+  const { objects } = replaceTemplateVM(processedTemplate, overridedVM);
 
   const createdObjects = await createMultipleResources(objects, models, namespace);
 
