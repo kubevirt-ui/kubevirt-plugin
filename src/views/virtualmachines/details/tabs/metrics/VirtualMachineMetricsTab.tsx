@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';

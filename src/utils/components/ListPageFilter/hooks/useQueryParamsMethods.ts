@@ -1,7 +1,7 @@
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 export const useQueryParamsMethods = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const setAllQueryArguments = (newParams: { [k: string]: string }) => {
     const params = new URLSearchParams(window.location.search);
@@ -16,7 +16,7 @@ export const useQueryParamsMethods = () => {
 
     if (update) {
       const url = new URL(window.location.href);
-      history.replace(`${url.pathname}?${params.toString()}${url.hash}`);
+      navigate(`${url.pathname}?${params.toString()}${url.hash}`, { replace: true });
     }
   };
 
@@ -31,7 +31,7 @@ export const useQueryParamsMethods = () => {
     });
     if (update) {
       const url = new URL(window.location.href);
-      history.replace(`${url.pathname}?${params.toString()}${url.hash}`);
+      navigate(`${url.pathname}?${params.toString()}${url.hash}`, { replace: true });
     }
   };
 

@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,11 +19,11 @@ import EvictionStrategy from './EvictionStrategy/EvictionStrategy';
 import NodeSelector from './NodeSelector/NodeSelector';
 import Tolerations from './Tolerations/Tolerations';
 
-type VirtualMachinesInstancePageSchedulingTabProps = RouteComponentProps & {
+type VirtualMachinesInstancePageSchedulingTabProps = {
   obj: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesInstancePageSchedulingTab: React.FC<
+const VirtualMachinesInstancePageSchedulingTab: FC<
   VirtualMachinesInstancePageSchedulingTabProps
 > = ({ obj: vmi }) => {
   const { t } = useKubevirtTranslation();

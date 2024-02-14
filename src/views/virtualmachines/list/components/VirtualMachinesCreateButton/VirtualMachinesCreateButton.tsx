@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useMemo } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -16,7 +16,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   namespace,
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const createItems = {
     instanceType: t('From InstanceType'),
@@ -34,16 +34,16 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
     (type: string) => {
       switch (type) {
         case 'catalog':
-          return history.push(`${catalogURL}/template`);
+          return navigate(`${catalogURL}/template`);
         case 'instanceType':
-          return history.push(catalogURL);
+          return navigate(catalogURL);
         default:
-          return history.push(
+          return navigate(
             `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${VirtualMachineModelRef}/~new`,
           );
       }
     },
-    [catalogURL, history, namespace],
+    [catalogURL, navigate, namespace],
   );
 
   return (

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';

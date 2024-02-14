@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type NetworkChartsProps = {
 
 const NetworkCharts: FC<NetworkChartsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const interfacesNames = useMemo(() => {
     const interfaces = vmi?.spec?.domain?.devices?.interfaces?.map((nic) => nic?.name);
@@ -43,7 +43,7 @@ const NetworkCharts: FC<NetworkChartsProps> = ({ vmi }) => {
             onClick={(e) => {
               setSelectedNetwork(e?.currentTarget?.innerText);
               setIsDropdownOpen(false);
-              history?.push(
+              navigate(
                 `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/metrics?network=${nic}`,
               );
             }}

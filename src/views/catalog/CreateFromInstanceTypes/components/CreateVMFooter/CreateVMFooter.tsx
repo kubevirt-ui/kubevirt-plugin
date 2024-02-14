@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { generateVM } from '@catalog/CreateFromInstanceTypes/utils/utils';
@@ -35,7 +35,7 @@ import './CreateVMFooter.scss';
 
 const CreateVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [startVM, setStartVM] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
@@ -53,8 +53,8 @@ const CreateVMFooter: FC = () => {
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
 
   const onCancel = useCallback(
-    () => history.push(getResourceUrl({ activeNamespace, model: VirtualMachineModel })),
-    [activeNamespace, history],
+    () => navigate(getResourceUrl({ activeNamespace, model: VirtualMachineModel })),
+    [activeNamespace, navigate],
   );
 
   const [canCreateVM] = useAccessReview({
@@ -97,7 +97,7 @@ const CreateVMFooter: FC = () => {
         if (secretOption === SecretSelectionOption.addNew) {
           createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
         }
-        history.push(getResourceUrl({ model: VirtualMachineModel, resource: vmToCreate }));
+        navigate(getResourceUrl({ model: VirtualMachineModel, resource: vmToCreate }));
       })
       .catch(setError)
       .finally(() => setIsSubmitting(false));

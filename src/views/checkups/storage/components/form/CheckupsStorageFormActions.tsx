@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -15,7 +15,7 @@ type CheckupsStorageFormActionsProps = {
 
 const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({ name, timeOut }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [namespace] = useActiveNamespace();
   const [error, setError] = useState<string>(null);
 
@@ -27,7 +27,7 @@ const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({ name,
             setError(null);
             try {
               await createStorageCheckup(namespace, timeOut, name);
-              history.push(`/k8s/ns/${namespace}/checkups/storage`);
+              navigate(`/k8s/ns/${namespace}/checkups/storage`);
             } catch (e) {
               kubevirtConsole.log(e);
               setError(e?.message);
@@ -38,7 +38,7 @@ const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({ name,
         >
           {t('Run')}
         </Button>
-        <Button onClick={() => history.goBack()} variant={ButtonVariant.secondary}>
+        <Button onClick={() => navigate(-1)} variant={ButtonVariant.secondary}>
           {t('Cancel')}
         </Button>
       </ActionGroup>

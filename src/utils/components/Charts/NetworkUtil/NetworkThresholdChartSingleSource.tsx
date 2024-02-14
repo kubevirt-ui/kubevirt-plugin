@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 import xbytes from 'xbytes';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';

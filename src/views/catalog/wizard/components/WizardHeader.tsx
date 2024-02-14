@@ -1,5 +1,5 @@
 import React, { FC, memo } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
@@ -19,15 +19,16 @@ import {
 export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const { tabsData } = useWizardVMContext();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const templateName = tabsData?.overview?.templateMetadata?.name;
   const templateDisplayName = tabsData?.overview?.templateMetadata?.displayName || templateName;
 
   const onBreadcrumbClick = (url: string) =>
-    confirm(t('Are you sure you want to leave this page?')) && history.push(url);
+    confirm(t('Are you sure you want to leave this page?')) && navigate(url);
 
-  const isSidebarEditorDisplayed = !history.location.pathname.includes(
+  const isSidebarEditorDisplayed = !location.pathname.includes(
     `/catalog/template/review/${VirtualMachineDetailsTab.YAML}`,
   );
 

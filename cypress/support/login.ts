@@ -37,7 +37,7 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
     masthead.username.shouldBeVisible();
 
     // wait for virtualization page
-    cy.contains('.pf-c-nav__link', 'Virtualization').should('be.visible');
+    cy.contains('.pf-v5-c-nav__link', 'Virtualization').should('be.visible');
   });
 });
 

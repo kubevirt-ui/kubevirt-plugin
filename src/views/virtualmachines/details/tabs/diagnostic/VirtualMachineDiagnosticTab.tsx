@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +17,8 @@ import VirtualMachineLogViewer from './VirtualMachineLogViewer/VirtualMachineLog
 import './virtual-machine-diagnostic-tab.scss';
 
 const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ vm }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useKubevirtTranslation();
   const { conditions, dataVolumesStatuses, volumeSnapshotStatuses } = useDiagnosticData(vm);
   const [activeTabKey, setActiveTabKey] = useState<string>();
@@ -27,13 +29,13 @@ const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ vm }) => {
         ? VirtualMachineDetailsTab.Logs
         : VirtualMachineDetailsTab.Tables,
     );
-  }, [history.location.pathname]);
+  }, [location.pathname]);
 
   return (
     <div className="VirtualMachineDiagnosticTab--main">
       <Tabs
         onSelect={(_, key: string) => {
-          history.push(createURLDiagnostic(history.location.pathname, key));
+          navigate(createURLDiagnostic(location.pathname, key));
           setActiveTabKey(key);
         }}
         activeKey={activeTabKey}

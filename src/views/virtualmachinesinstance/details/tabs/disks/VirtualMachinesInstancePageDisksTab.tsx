@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { RouteComponentProps } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
@@ -8,10 +7,7 @@ import FileSystemTable from './table/file-system/FileSystemTable';
 
 import './VirtualMachinesInstancePageDisksTab.scss';
 
-type VirtualMachinesInstancePageDisksTabProps = RouteComponentProps<{
-  name: string;
-  ns: string;
-}> & {
+type VirtualMachinesInstancePageDisksTabProps = {
   obj: V1VirtualMachineInstance;
 };
 

@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import { clearSessionStorageVM } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -18,11 +18,8 @@ import { filterTemplates } from './utils/helpers';
 
 import './TemplatesCatalog.scss';
 
-const TemplatesCatalog: FC<RouteComponentProps<{ ns: string }>> = ({
-  match: {
-    params: { ns: namespace },
-  },
-}) => {
+const TemplatesCatalog: FC = () => {
+  const { ns: namespace } = useParams<{ ns: string }>();
   const [selectedTemplate, setSelectedTemplate] = useState<undefined | V1Template>(undefined);
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();

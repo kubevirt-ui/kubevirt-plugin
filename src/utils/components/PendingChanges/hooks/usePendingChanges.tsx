@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -68,7 +68,7 @@ export const usePendingChanges = (
 ): PendingChange[] => {
   const { t } = useKubevirtTranslation();
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
 
@@ -132,7 +132,7 @@ export const usePendingChanges = (
   return [
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
         ));
@@ -143,7 +143,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <BootOrderModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
         ));
@@ -154,7 +154,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <HostnameModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
         ));
@@ -165,7 +165,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <FirmwareBootloaderModal
             isOpen={isOpen}
@@ -182,7 +182,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Environment));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Environment));
       },
       hasPendingChange: !isEmpty(modifiedEnvDisks),
       label:
@@ -194,7 +194,7 @@ export const usePendingChanges = (
     {
       appliedOnLiveMigration: true,
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Network));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Network));
       },
       hasPendingChange: !isEmpty(hotPlugNICs),
       label: hotPlugNICs?.length > 1 ? hotPlugNICs.join(', ') : hotPlugNICs[0],
@@ -202,7 +202,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Network));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Network));
       },
       hasPendingChange: !isEmpty(nonHotPlugNICs),
       label: nonHotPlugNICs?.length > 1 ? nonHotPlugNICs.join(', ') : nonHotPlugNICs[0],
@@ -211,7 +211,7 @@ export const usePendingChanges = (
 
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesModal
             btnText={t('Add GPU device')}
@@ -235,7 +235,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesModal
             btnText={t('Add Host device')}
@@ -259,7 +259,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <DedicatedResourcesModal
             headerText={t('Dedicated resources')}
@@ -277,7 +277,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <EvictionStrategyModal
             headerText={t('Eviction strategy')}
@@ -312,7 +312,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <NodeSelectorModal
             isOpen={isOpen}
@@ -331,7 +331,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
         createModal(({ isOpen, onClose }) => (
           <CloudinitModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
         ));
@@ -342,7 +342,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <TolerationsModal
             isOpen={isOpen}
@@ -361,7 +361,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <AffinityModal
             isOpen={isOpen}
@@ -380,7 +380,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
         createModal(({ isOpen, onClose }) => (
           <DeschedulerModal
             isOpen={isOpen}
@@ -397,7 +397,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
         createModal(({ isOpen, onClose }) => (
           <VMSSHSecretModal
             authorizedSSHKeys={authorizedSSHKeys}
@@ -415,7 +415,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Disks));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Disks));
       },
       hasPendingChange: !isEmpty(modifiedVolumesHotplug),
       label: `${t('Make persistent disk')} - (${(modifiedVolumesHotplug || [])
@@ -425,7 +425,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesHeadlessModeModal
             isOpen={isOpen}
@@ -442,7 +442,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        history.push(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
       },
       hasPendingChange: modifiedGuestSystemAccessLog,
       label: t('Guest system log access'),

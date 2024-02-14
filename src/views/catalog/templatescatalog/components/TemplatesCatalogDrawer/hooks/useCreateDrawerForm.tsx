@@ -1,5 +1,5 @@
 import { MouseEvent, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 import produce from 'immer';
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from 'src/views/clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 
@@ -30,8 +30,7 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { getMemoryCPU } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-import { useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 
 import { allRequiredParametersAreFulfilled, hasValidSource, uploadFiles } from '../utils';
 
@@ -49,7 +48,7 @@ const useCreateDrawerForm = (
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const {
     cdFile,
     diskFile,
@@ -132,7 +131,7 @@ const useCreateDrawerForm = (
           }),
       });
       setIsQuickCreating(false);
-      history.push(getResourceUrl({ model: VirtualMachineModel, resource: quickCreatedVM }));
+      navigate(getResourceUrl({ model: VirtualMachineModel, resource: quickCreatedVM }));
     } catch (error) {
       setCreateError(error);
     } finally {
@@ -207,7 +206,7 @@ const useCreateDrawerForm = (
         !isEmpty(authorizedSSHKey) ? addSecretToVM(updatedVM, authorizedSSHKey) : updatedVM,
       );
 
-      history.push(`/k8s/ns/${namespace}/catalog/template/review`);
+      navigate(`/k8s/ns/${namespace}/catalog/template/review`);
     } catch (error) {
       setCreateError(error);
     }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,7 +24,7 @@ const CheckupsStorageActions = ({
   jobs: IoK8sApiBatchV1Job[];
 }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [isActionsOpen, setIsActionsOpen] = useState<boolean>(false);
   const Toggle = isKebab ? KebabToggle : DropdownToggle;
   return (
@@ -34,7 +34,7 @@ const CheckupsStorageActions = ({
           onClick={() => {
             setIsActionsOpen(false);
             deleteStorageCheckup(configMap, jobs);
-            history.push(`/k8s/ns/${configMap?.metadata?.namespace}/checkups/storage`);
+            navigate(`/k8s/ns/${configMap?.metadata?.namespace}/checkups/storage`);
           }}
           key="delete"
         >

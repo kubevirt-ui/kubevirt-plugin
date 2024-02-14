@@ -1,5 +1,5 @@
 import React, { FC, memo, ReactNode } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -37,7 +37,7 @@ const DeleteModal: FC<DeleteModalProps> = memo(
     shouldRedirect = true,
   }) => {
     const { t } = useKubevirtTranslation();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const [model] = useK8sModel(getGroupVersionKindForResource(obj));
     const [lastNamespace] = useLastNamespace();
@@ -47,7 +47,7 @@ const DeleteModal: FC<DeleteModalProps> = memo(
       <TabModal<K8sResourceCommon>
         onSubmit={async () => {
           await onDeleteSubmit();
-          shouldRedirect && history.push(url);
+          shouldRedirect && navigate(url);
         }}
         headerText={headerText || t('Delete Resource?')}
         isOpen={isOpen}

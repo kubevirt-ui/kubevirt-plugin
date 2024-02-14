@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
@@ -15,21 +15,22 @@ import './checkups.scss';
 
 const CheckupsList: FC = () => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
-    history?.location?.pathname.endsWith('storage') ? 1 : 0,
+    location?.pathname.endsWith('network') ? 0 : 1,
   );
 
   useEffect(() => {
-    history.push(
-      createURL(activeTabKey === 0 ? 'network' : 'storage', trimLastHistoryPath(history)),
+    navigate(
+      createURL(activeTabKey === 0 ? 'network' : 'storage', trimLastHistoryPath(location.pathname)),
     );
-  }, [activeTabKey, history, history?.location?.pathname]);
+  }, [activeTabKey, location.pathname, navigate]);
 
   return (
     <>
       <ListPageHeader title={t('Checkups')}>
-        <CheckupsRunButton history={history} />
+        <CheckupsRunButton />
       </ListPageHeader>
       <Tabs
         onSelect={(_, tabIndex: number | string) => {

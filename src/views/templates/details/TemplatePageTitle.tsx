@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
@@ -28,11 +28,12 @@ type TemplatePageTitleTitleProps = {
 
 const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const lastNamespacePath = useLastNamespacePath();
   const { hasEditPermission, isCommonTemplate } = useEditTemplateAccessReview(template);
 
-  const isSidebarEditorDisplayed = !history.location.pathname.includes(
+  const isSidebarEditorDisplayed = !location.pathname.includes(
     `/templates/${template?.metadata?.name}/${VirtualMachineDetailsTab.YAML}`,
   );
 
@@ -42,7 +43,7 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
         <BreadcrumbItem>
           <Button
             isInline
-            onClick={() => history.push(`/k8s/${lastNamespacePath}/templates`)}
+            onClick={() => navigate(`/k8s/${lastNamespacePath}/templates`)}
             variant="link"
           >
             {t('Templates')}

@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
@@ -28,7 +28,7 @@ type DeleteVMModalProps = {
 
 const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [deleteOwnedResource, setDeleteOwnedResource] = useState<boolean>(true);
   const [gracePeriodCheckbox, setGracePeriodCheckbox] = useState<boolean>(false);
   const [gracePeriodSeconds, setGracePeriodSeconds] = useState<number>(
@@ -96,7 +96,7 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
       model: VirtualMachineModel,
       resource: updatedVM,
     });
-    history.push(`/k8s/${lastNamespacePath}/${VirtualMachineModelRef}`);
+    navigate(`/k8s/${lastNamespacePath}/${VirtualMachineModelRef}`);
   };
 
   return (

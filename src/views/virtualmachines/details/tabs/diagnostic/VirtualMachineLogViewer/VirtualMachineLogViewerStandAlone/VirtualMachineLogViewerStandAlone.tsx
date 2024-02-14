@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';

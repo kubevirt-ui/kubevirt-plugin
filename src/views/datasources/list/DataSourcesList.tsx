@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -31,7 +31,7 @@ type DataSourcesListProps = {
 const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [dataSources, loaded, loadError] = useK8sWatchResource<V1beta1DataSource[]>({
     isList: true,
@@ -51,7 +51,7 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
   const onCreate = (type: string) => {
     return type === 'form'
       ? createModal((props) => <CreateDataSourceModal namespace={namespace} {...props} />)
-      : history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/~new`);
+      : navigate(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/~new`);
   };
   return (
     <>

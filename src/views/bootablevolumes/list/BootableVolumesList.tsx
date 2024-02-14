@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
@@ -33,7 +33,7 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 const BootableVolumesList: FC = () => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { createModal } = useModal();
   const { bootableVolumes, error, loaded } = useBootableVolumes(namespace);
 
@@ -66,7 +66,7 @@ const BootableVolumesList: FC = () => {
   const onCreate = (type: string) => {
     return type === 'form'
       ? createModal((props) => <AddBootableVolumeModal {...props} />)
-      : history.push(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataVolumeModelRef}/~new`);
+      : navigate(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataVolumeModelRef}/~new`);
   };
 
   return (

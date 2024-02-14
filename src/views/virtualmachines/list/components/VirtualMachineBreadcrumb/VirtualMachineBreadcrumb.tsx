@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +10,7 @@ export const VirtualMachineBreadcrumb: React.FC = React.memo(() => {
   const namespacePath = useLastNamespacePath();
 
   const { t } = useKubevirtTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -18,7 +18,7 @@ export const VirtualMachineBreadcrumb: React.FC = React.memo(() => {
         <BreadcrumbItem>
           <Button
             isInline
-            onClick={() => history.push(`/k8s/${namespacePath}/${VirtualMachineModelRef}`)}
+            onClick={() => navigate(`/k8s/${namespacePath}/${VirtualMachineModelRef}`)}
             variant="link"
           >
             {t('VirtualMachines')}
