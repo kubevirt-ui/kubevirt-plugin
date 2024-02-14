@@ -17,7 +17,7 @@ const useVirtualMachineColumns = (
   namespace: string,
   pagination: { [key: string]: any },
   data: V1VirtualMachine[],
-): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[]] => {
+): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
 
   const [canGetNode] = useAccessReview({
@@ -94,12 +94,12 @@ const useVirtualMachineColumns = (
     [canGetNode, namespace, sorting, t],
   );
 
-  const [activeColumns] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
+  const [activeColumns, , loaded] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
     columnManagementID: VirtualMachineModelRef,
     columns: canGetNode ? columns : columns.filter((column) => column.id !== 'node'),
   });
 
-  return [columns, activeColumns];
+  return [columns, activeColumns, loaded];
 };
 
 export default useVirtualMachineColumns;

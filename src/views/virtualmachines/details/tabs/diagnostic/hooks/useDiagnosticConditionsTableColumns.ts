@@ -17,6 +17,7 @@ type UseDiagnosticConditionsTableColumns = () => [
   columns: TableColumn<DiagnosticColumn>[],
   activeColumns: TableColumn<DiagnosticColumn>[],
   sort: DiagnosticSort,
+  loadedColumns: boolean,
 ];
 
 const useDiagnosticConditionsTableColumns: UseDiagnosticConditionsTableColumns = () => {
@@ -47,12 +48,12 @@ const useDiagnosticConditionsTableColumns: UseDiagnosticConditionsTableColumns =
     },
   ];
 
-  const [activeColumns] = useKubevirtUserSettingsTableColumns<DiagnosticColumn>({
+  const [activeColumns, , loadedColumns] = useKubevirtUserSettingsTableColumns<DiagnosticColumn>({
     columnManagementID: 'diagnostic-tab-status',
     columns,
   });
 
-  return [columns, activeColumns, sort];
+  return [columns, activeColumns, sort, loadedColumns];
 };
 
 export default useDiagnosticConditionsTableColumns;

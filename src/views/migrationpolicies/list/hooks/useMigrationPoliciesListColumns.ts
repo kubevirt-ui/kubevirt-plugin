@@ -10,6 +10,7 @@ import { sortable } from '@patternfly/react-table';
 const useMigrationPoliciesListColumns = (): [
   TableColumn<V1alpha1MigrationPolicy>[],
   TableColumn<V1alpha1MigrationPolicy>[],
+  boolean,
 ] => {
   const { t } = useKubevirtTranslation();
 
@@ -69,12 +70,13 @@ const useMigrationPoliciesListColumns = (): [
     [t],
   );
 
-  const [activeColumns] = useKubevirtUserSettingsTableColumns<V1alpha1MigrationPolicy>({
-    columnManagementID: MigrationPolicyModelRef,
-    columns,
-  });
+  const [activeColumns, , loadedColumns] =
+    useKubevirtUserSettingsTableColumns<V1alpha1MigrationPolicy>({
+      columnManagementID: MigrationPolicyModelRef,
+      columns,
+    });
 
-  return [columns, activeColumns];
+  return [columns, activeColumns, loadedColumns];
 };
 
 export default useMigrationPoliciesListColumns;

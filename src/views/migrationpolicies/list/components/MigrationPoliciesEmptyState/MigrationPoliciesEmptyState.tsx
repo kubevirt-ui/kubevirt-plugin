@@ -18,11 +18,7 @@ import MigrationPoliciesCreateButton from '../MigrationPoliciesCreateButton/Migr
 
 import './MigrationPoliciesEmptyState.scss';
 
-type MigrationPoliciesEmptyStateProps = {
-  kind: string;
-};
-
-const MigrationPoliciesEmptyState: FC<MigrationPoliciesEmptyStateProps> = ({ kind }) => {
+const MigrationPoliciesEmptyState: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -39,7 +35,7 @@ const MigrationPoliciesEmptyState: FC<MigrationPoliciesEmptyStateProps> = ({ kin
         </Trans>
       </EmptyStateBody>
       <EmptyStatePrimary>
-        <MigrationPoliciesCreateButton kind={kind} />
+        <MigrationPoliciesCreateButton />
       </EmptyStatePrimary>
       <EmptyStateSecondaryActions>
         <ExternalLink

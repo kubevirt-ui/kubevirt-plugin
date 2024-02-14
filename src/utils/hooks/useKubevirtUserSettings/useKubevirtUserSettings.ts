@@ -93,12 +93,12 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   }, [configMapError?.code, userName, loadedConfigMap]);
 
   useEffect(() => {
-    if (!isEmpty(userConfigMap) && !userSettings && userName) {
+    if (!isEmpty(userConfigMap) && userName) {
       setUserSettings(
         (<unknown>parseNestedJSON(userConfigMap?.data?.[userName]) || {}) as UserSettingsState,
       );
     }
-  }, [userConfigMap, userSettings, userName]);
+  }, [userConfigMap, userName]);
 
   const pushUserSettingsChanges = async (data, resolve, reject) => {
     setLoading(true);

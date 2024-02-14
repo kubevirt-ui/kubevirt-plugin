@@ -13,6 +13,7 @@ import { sortable } from '@patternfly/react-table';
 type UseUserInstancetypeListColumnsValues = [
   TableColumn<V1beta1VirtualMachineInstancetype>[],
   TableColumn<V1beta1VirtualMachineInstancetype>[],
+  boolean,
 ];
 
 type UseUserInstancetypeListColumns = (
@@ -68,12 +69,13 @@ const useUserInstancetypeListColumns: UseUserInstancetypeListColumns = (paginati
       title: '',
     },
   ];
-  const [activeColumns] = useKubevirtUserSettingsTableColumns<V1beta1VirtualMachineInstancetype>({
-    columnManagementID: VirtualMachineInstancetypeModelRef,
-    columns,
-  });
+  const [activeColumns, , loadedColumns] =
+    useKubevirtUserSettingsTableColumns<V1beta1VirtualMachineInstancetype>({
+      columnManagementID: VirtualMachineInstancetypeModelRef,
+      columns,
+    });
 
-  return [columns, activeColumns];
+  return [columns, activeColumns, loadedColumns];
 };
 
 export default useUserInstancetypeListColumns;

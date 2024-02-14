@@ -15,7 +15,7 @@ const useBootableVolumesColumns = (
   pagination: { [key: string]: any },
   data: BootableResource[],
   preferences: V1beta1VirtualMachineClusterPreference[],
-): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[]] => {
+): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
   const { endIndex, startIndex } = pagination;
 
@@ -96,12 +96,12 @@ const useBootableVolumesColumns = (
     [t, sorting, startIndex, endIndex, preferences],
   );
 
-  const [activeColumns] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
+  const [activeColumns, , loaded] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({
     columnManagementID: DataSourceModelRef,
     columns,
   });
 
-  return [columns, activeColumns];
+  return [columns, activeColumns, loaded];
 };
 
 export default useBootableVolumesColumns;

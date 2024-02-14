@@ -13,6 +13,7 @@ import { sortable } from '@patternfly/react-table';
 type UseUserPreferenceListColumnsValues = [
   TableColumn<V1beta1VirtualMachinePreference>[],
   TableColumn<V1beta1VirtualMachinePreference>[],
+  boolean,
 ];
 
 type UseUserPreferenceListColumns = (
@@ -58,12 +59,13 @@ const useUserPreferenceListColumns: UseUserPreferenceListColumns = (pagination, 
     [activeNamespace, sorting, t],
   );
 
-  const [activeColumns] = useKubevirtUserSettingsTableColumns<V1beta1VirtualMachinePreference>({
-    columnManagementID: VirtualMachinePreferenceModelRef,
-    columns,
-  });
+  const [activeColumns, , loadedColumns] =
+    useKubevirtUserSettingsTableColumns<V1beta1VirtualMachinePreference>({
+      columnManagementID: VirtualMachinePreferenceModelRef,
+      columns,
+    });
 
-  return [columns, activeColumns];
+  return [columns, activeColumns, loadedColumns];
 };
 
 export default useUserPreferenceListColumns;

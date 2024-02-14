@@ -1,16 +1,14 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { columnSorting, isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  ListPageBody,
-  ListPageFilter,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, FlexItem, Pagination, Title } from '@patternfly/react-core';
+import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { Bullseye, Flex, FlexItem, Pagination, Title } from '@patternfly/react-core';
 import { TableComposable, Th, Thead, Tr } from '@patternfly/react-table';
 
 import useDiagnosticConditionsTableColumns from '../hooks/useDiagnosticConditionsTableColumns';
@@ -32,7 +30,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
     ids: new Set(),
   });
 
-  const [columns, activeColumns, sorting] = useDiagnosticConditionsTableColumns();
+  const [columns, activeColumns, sorting, loadedColumns] = useDiagnosticConditionsTableColumns();
   const { onPaginationChange, pagination } = usePagination();
   const sortedData = useMemo(
     () => columnSorting(conditions, sorting?.direction, pagination, sorting?.column),
@@ -50,6 +48,14 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
       }),
     [sortedData],
   );
+
+  if (!loadedColumns) {
+    return (
+      <Bullseye>
+        <Loading />
+      </Bullseye>
+    );
+  }
 
   return (
     <>
@@ -74,7 +80,6 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
                 })),
                 id: 'diagnostic-tab-status',
                 selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-
                 type: t('VirtualMachine'),
               }}
               onFilterChange={(...args) => {
@@ -87,9 +92,9 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
                 });
               }}
               data={unfilteredData}
-              hideLabelFilter
-              loaded={!isEmpty(unfilteredData)}
-              nameFilterPlaceholder={t('Search by reason...')}
+              // hideLabelFilter
+              loaded={!isEmpty(unfilteredData) && loadedColumns}
+              // nameFilterPlaceholder={t('Search by reason...')}
               rowFilters={filters}
             />
           </FlexItem>
