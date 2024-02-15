@@ -7,7 +7,13 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { DescriptionList, Grid, PageSection, Title } from '@patternfly/react-core';
+import {
+  DescriptionList,
+  Grid,
+  PageSection,
+  PageSectionVariants,
+  Title,
+} from '@patternfly/react-core';
 
 import { updateAnnotation, updateLabels } from '../details/utils/utils';
 import { ConfigurationInnerTabProps } from '../utils/types';
@@ -20,7 +26,7 @@ const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
   const { createModal } = useModal();
 
   return (
-    <PageSection>
+    <PageSection variant={PageSectionVariants.light}>
       <Title headingLevel="h2">
         <SearchItem id="metadata">{t('Metadata')}</SearchItem>
       </Title>
