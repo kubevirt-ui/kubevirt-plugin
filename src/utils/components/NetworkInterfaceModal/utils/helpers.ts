@@ -12,6 +12,7 @@ import {
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ABSENT } from '@virtualmachines/details/tabs/configuration/network/utils/constants';
+import { isStopped } from '@virtualmachines/utils';
 
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
@@ -69,7 +70,7 @@ export const markInterfaceAbsent = (interfaces: V1Interface[], nicName: string) 
   });
 };
 
-const removeInterfaceToBeDeleted = (nicName: string, vm: V1VirtualMachine) =>
+const removeInterfaceToBeDeleted = (nicName: string, vm: V1VirtualMachine): V1Interface[] =>
   getInterfaces(vm)?.filter(({ name }) => name !== nicName);
 
 export const updateInterfacesForDeletion = (
@@ -77,9 +78,20 @@ export const updateInterfacesForDeletion = (
   nicName: string,
   vm: V1VirtualMachine,
 ): V1Interface[] => {
-  return isHotPlug
+  return isHotPlug && !isStopped(vm)
     ? markInterfaceAbsent(getInterfaces(vm), nicName)
     : removeInterfaceToBeDeleted(nicName, vm);
+};
+
+const removeNetworkToBeDeleted = (nicName: string, vm: V1VirtualMachine): V1Network[] =>
+  getNetworks(vm)?.filter(({ name }) => name !== nicName);
+
+export const updateNetworksForDeletion = (
+  isHotPlug: boolean,
+  nicName: string,
+  vm: V1VirtualMachine,
+): V1Network[] => {
+  return isHotPlug && !isStopped(vm) ? getNetworks(vm) : removeNetworkToBeDeleted(nicName, vm);
 };
 
 export const createNetwork = (nicName: string, networkName: string): V1Network => {
@@ -127,9 +139,7 @@ export const deleteNetworkInterface = (
   nicPresentation: NetworkPresentation,
 ) => {
   const isHotPlug = Boolean(nicPresentation?.iface?.bridge);
-  const networks = isHotPlug
-    ? getNetworks(vm)
-    : getNetworks(vm)?.filter(({ name }) => name !== nicName);
+  const networks = updateNetworksForDeletion(isHotPlug, nicName, vm);
   const interfaces = updateInterfacesForDeletion(isHotPlug, nicName, vm);
 
   return updateVMNetworkInterfaces(vm, networks, interfaces);
