@@ -3,7 +3,12 @@ import { useLocation } from 'react-router-dom-v5-compat';
 
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-export const useSearchFiltersParameters = (searchFilters: RowFilter[]) => {
+export type TextFiltersType = {
+  labels: string[];
+  name: string;
+} & { [key: string]: string };
+
+export const useSearchFiltersParameters = (searchFilters: RowFilter[]): TextFiltersType => {
   const location = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location]);
 
@@ -26,7 +31,8 @@ export const useSearchFiltersParameters = (searchFilters: RowFilter[]) => {
   }, [queryParams, searchFilters]);
 
   return useMemo(
-    () => ({ labels: labelTextFilters, name: nameTextFilter, ...searchTextFilters }),
+    () =>
+      ({ labels: labelTextFilters, name: nameTextFilter, ...searchTextFilters } as TextFiltersType),
     [labelTextFilters, nameTextFilter, searchTextFilters],
   );
 };

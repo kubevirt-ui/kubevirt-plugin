@@ -10,7 +10,7 @@ import {
   Selector,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
+import { TextFiltersType, useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
 import { STATIC_SEARCH_FILTERS } from './constants';
 
 export type Filter = {
@@ -19,6 +19,23 @@ export type Filter = {
 
 export type FilterKeys = {
   [key: string]: string;
+};
+
+export const getInitialSearchType = (
+  customSearchFilter: RowFilter[],
+  textFilters: TextFiltersType,
+  filterDropdownItems: Record<string, string>,
+): string => {
+  const alreadySearchedCustomParam = customSearchFilter?.find(
+    (searchFilter) => textFilters[searchFilter.type],
+  )?.type;
+
+  const hasNameFilter = 'name' in filterDropdownItems;
+
+  return (
+    alreadySearchedCustomParam ||
+    (hasNameFilter ? STATIC_SEARCH_FILTERS.name : Object.keys(filterDropdownItems)?.[0])
+  );
 };
 
 export const generateRowFilters = (rowFilters: RowFilter[], data: K8sResourceCommon[]) =>
