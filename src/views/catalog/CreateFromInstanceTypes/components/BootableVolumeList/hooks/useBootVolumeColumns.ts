@@ -1,4 +1,3 @@
-import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -9,6 +8,7 @@ type UseBootVolumesColumns = (isModal: boolean) => {
   activeColumns: TableColumn<BootableVolume>[];
   columnLayout: ColumnLayout | null;
   columns: TableColumn<BootableVolume>[];
+  loadedColumns: boolean;
 };
 
 const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
@@ -41,8 +41,8 @@ const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
     },
   ];
 
-  const [activeColumns] = useKubevirtUserSettingsTableColumns<BootableVolume>({
-    columnManagementID: DataSourceModelRef,
+  const [activeColumns, , loadedColumns] = useKubevirtUserSettingsTableColumns<BootableVolume>({
+    columnManagementID: 'BootableVolumeCatalog',
     columns,
   });
 
@@ -52,13 +52,13 @@ const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
       id,
       title,
     })),
-    id: DataSourceModelRef,
+    id: 'BootableVolumeCatalog',
     selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
     showNamespaceOverride: true,
     type: t('Bootable volumes'),
   };
 
-  return { activeColumns, columnLayout: isModal ? null : columnLayout, columns };
+  return { activeColumns, columnLayout: isModal ? null : columnLayout, columns, loadedColumns };
 };
 
 export default useBootVolumeColumns;

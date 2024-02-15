@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import useNADsData from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/useNADsData';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
@@ -9,7 +9,6 @@ import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/uti
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
-  ListPageFilter,
   useActiveNamespace,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -28,7 +27,7 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const CheckupsNetworkList = () => {
   const { t } = useKubevirtTranslation();
-  const [columns, activeColumns] = useCheckupsNetworkCheckupsListColumns();
+  const [columns, activeColumns, loadedColumns] = useCheckupsNetworkCheckupsListColumns();
   const [namespace] = useActiveNamespace();
 
   const { nads } = useNADsData(namespace);
@@ -51,7 +50,7 @@ const CheckupsNetworkList = () => {
               id,
               title,
             })),
-            id: ConfigMapModel.kind,
+            id: 'checkups-network',
             selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
             type: t('Checkups'),
           }}
@@ -65,7 +64,7 @@ const CheckupsNetworkList = () => {
             });
           }}
           data={unfilterData}
-          loaded={loading && !loadingPermissions}
+          loaded={loading && !loadingPermissions && loadedColumns}
           rowFilters={filters}
         />
         {!isEmpty(dataFilters) && loading && !loadingPermissions && (
@@ -85,7 +84,7 @@ const CheckupsNetworkList = () => {
           />
         )}
       </div>
-      {isEmpty(configMaps) && loading && !loadingPermissions && (
+      {isEmpty(configMaps) && loading && !loadingPermissions && loadedColumns && (
         <CheckupsNetworkListEmptyState
           isPermitted={isPermitted}
           nadsInNamespace={nadsInNamespace}
@@ -98,7 +97,7 @@ const CheckupsNetworkList = () => {
         }}
         columns={activeColumns}
         data={dataFilters}
-        loaded={loading && !loadingPermissions}
+        loaded={loading && !loadingPermissions && loadedColumns}
         loadError={error}
         NoDataEmptyMsg={() => null}
         Row={CheckupsNetworkListRow}

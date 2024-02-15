@@ -3,12 +3,12 @@ import React, { FC } from 'react';
 import useClusterInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterInstanceTypes';
 import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import {
   ListPageBody,
-  ListPageFilter,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -25,7 +25,10 @@ const ClusterInstancetypeList: FC = () => {
 
   const { onPaginationChange, pagination } = usePagination();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(instanceTypes);
-  const [columns, activeColumns] = useClusterInstancetypeListColumns(pagination, data);
+  const [columns, activeColumns, loadedColumns] = useClusterInstancetypeListColumns(
+    pagination,
+    data,
+  );
 
   return (
     <ListPageBody>
@@ -51,7 +54,7 @@ const ClusterInstancetypeList: FC = () => {
             });
           }}
           data={unfilteredData}
-          loaded={loaded}
+          loaded={loaded && loadedColumns}
         />
         <Pagination
           onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
@@ -76,7 +79,7 @@ const ClusterInstancetypeList: FC = () => {
         )}
         columns={activeColumns}
         data={data}
-        loaded={loaded}
+        loaded={loaded && loadedColumns}
         loadError={loadError}
         Row={ClusterInstancetypeRow}
         unfilteredData={unfilteredData}

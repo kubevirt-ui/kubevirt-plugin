@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +18,6 @@ import {
   K8sResourceCommon,
   ListPageBody,
   ListPageCreateDropdown,
-  ListPageFilter,
   ListPageHeader,
   useListPageFilter,
   VirtualizedTable,
@@ -47,7 +47,11 @@ const BootableVolumesList: FC = () => {
     useBootableVolumesFilters(),
   );
   const [pagination, setPagination] = useState(paginationInitialState);
-  const [columns, activeColumns] = useBootableVolumesColumns(pagination, filteredData, preferences);
+  const [columns, activeColumns, loadedColumns] = useBootableVolumesColumns(
+    pagination,
+    filteredData,
+    preferences,
+  );
 
   const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({
@@ -105,7 +109,7 @@ const BootableVolumesList: FC = () => {
                 }));
               }}
               data={data}
-              loaded={loaded}
+              loaded={loaded && loadedColumns}
               rowFilters={useBootableVolumesFilters()}
             />
             <Pagination
@@ -135,7 +139,7 @@ const BootableVolumesList: FC = () => {
             }}
             columns={activeColumns}
             data={filteredData}
-            loaded={loaded}
+            loaded={loaded && loadedColumns}
             loadError={error}
             Row={BootableVolumesRow}
             unfilteredData={data}

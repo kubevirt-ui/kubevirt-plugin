@@ -2,12 +2,12 @@ import React, { FC } from 'react';
 
 import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
   ListPageBody,
   ListPageCreate,
-  ListPageFilter,
   ListPageHeader,
   useListPageFilter,
   VirtualizedTable,
@@ -40,7 +40,7 @@ const VirtualMachineTemplatesList: FC<VirtualMachineTemplatesListProps> = ({ nam
   });
   const filters = useVirtualMachineTemplatesFilters(availableTemplatesUID);
   const [data, filteredData, onFilterChange] = useListPageFilter(templates, filters);
-  const [columns, activeColumns] = useVirtualMachineTemplatesColumns(namespace);
+  const [columns, activeColumns, loadedColumns] = useVirtualMachineTemplatesColumns(namespace);
 
   const templatesLoaded = loaded && bootSourcesLoaded;
 
@@ -72,7 +72,7 @@ const VirtualMachineTemplatesList: FC<VirtualMachineTemplatesListProps> = ({ nam
                 type: t('Template'),
               }}
               data={data}
-              loaded={templatesLoaded}
+              loaded={templatesLoaded && loadedColumns}
               onFilterChange={onFilterChange}
               rowFilters={filters}
             />
@@ -91,7 +91,7 @@ const VirtualMachineTemplatesList: FC<VirtualMachineTemplatesListProps> = ({ nam
               )}
               columns={activeColumns}
               data={filteredData}
-              loaded={templatesLoaded}
+              loaded={templatesLoaded && loadedColumns}
               loadError={error}
               Row={VirtualMachineTemplatesRow}
               rowData={{ availableDatasources, availableTemplatesUID, cloneInProgressDatasources }}

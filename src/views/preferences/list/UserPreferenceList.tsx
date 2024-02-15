@@ -5,13 +5,13 @@ import {
   VirtualMachinePreferenceModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
 import { V1beta1VirtualMachinePreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import {
   ListPageBody,
-  ListPageFilter,
   useActiveNamespace,
   useK8sWatchResource,
   useListPageFilter,
@@ -36,7 +36,7 @@ const UserPreferenceList = () => {
     V1beta1VirtualMachinePreference,
     V1beta1VirtualMachinePreference
   >(preferences);
-  const [columns, activeColumns] = useUserPreferenceListColumns(pagination, data);
+  const [columns, activeColumns, loadedColumns] = useUserPreferenceListColumns(pagination, data);
 
   return (
     <ListPageBody>
@@ -62,7 +62,7 @@ const UserPreferenceList = () => {
             });
           }}
           data={unfilteredData}
-          loaded={loaded}
+          loaded={loaded && loadedColumns}
         />
         <Pagination
           onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
@@ -87,7 +87,7 @@ const UserPreferenceList = () => {
         )}
         columns={activeColumns}
         data={data}
-        loaded={loaded}
+        loaded={loaded && loadedColumns}
         loadError={loadError}
         Row={UserPreferenceRow}
         unfilteredData={unfilteredData}

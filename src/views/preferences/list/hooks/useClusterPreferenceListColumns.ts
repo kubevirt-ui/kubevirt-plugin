@@ -12,6 +12,7 @@ import { sortable } from '@patternfly/react-table';
 type UseClusterPreferenceListColumnsValues = [
   TableColumn<V1beta1VirtualMachineClusterPreference>[],
   TableColumn<V1beta1VirtualMachineClusterPreference>[],
+  boolean,
 ];
 
 type UseClusterPreferenceListColumns = (
@@ -47,13 +48,13 @@ const useClusterPreferenceListColumns: UseClusterPreferenceListColumns = (pagina
     [sorting, t],
   );
 
-  const [activeColumns] =
+  const [activeColumns, , loadedColumns] =
     useKubevirtUserSettingsTableColumns<V1beta1VirtualMachineClusterPreference>({
       columnManagementID: VirtualMachineClusterPreferenceModelRef,
       columns,
     });
 
-  return [columns, activeColumns];
+  return [columns, activeColumns, loadedColumns];
 };
 
 export default useClusterPreferenceListColumns;
