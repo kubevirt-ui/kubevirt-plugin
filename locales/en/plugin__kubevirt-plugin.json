@@ -604,6 +604,7 @@
   "KSM is a memory-saving deduplication feature designed to fit more VirtualMachines into physical memory by sharing the data common between them. It is specifically effective for similar VirtualMachines. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.": "KSM is a memory-saving deduplication feature designed to fit more VirtualMachines into physical memory by sharing the data common between them. It is specifically effective for similar VirtualMachines. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.",
   "Kubernetes NMState Operator": "Kubernetes NMState Operator",
   "KV data transfer rate": "KV data transfer rate",
+  "Label": "Label",
   "Label selectors let you select Nodes based on the value of one or more labels.": "Label selectors let you select Nodes based on the value of one or more labels.",
   "Labels": "Labels",
   "Labels cannot be edited for Red Hat templates": "Labels cannot be edited for Red Hat templates",
