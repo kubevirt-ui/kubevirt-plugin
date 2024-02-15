@@ -10,6 +10,7 @@ import {
   Grid,
   GridItem,
   PageSection,
+  PageSectionVariants,
 } from '@patternfly/react-core';
 
 import Affinity from './Affinity/Affinity';
@@ -29,7 +30,7 @@ const VirtualMachinesInstancePageSchedulingTab: FC<
   const { t } = useKubevirtTranslation();
 
   return (
-    <PageSection>
+    <PageSection variant={PageSectionVariants.light}>
       <Grid hasGutter>
         <GridItem span={6}>
           <DescriptionList>

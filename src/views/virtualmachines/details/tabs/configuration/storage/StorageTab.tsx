@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
+import { Divider, Grid, GridItem, PageSection, PageSectionVariants } from '@patternfly/react-core';
 
 import { onSubmitYAML } from '../details/utils/utils';
 import { ConfigurationInnerTabProps } from '../utils/types';
@@ -18,7 +18,7 @@ const StorageTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => (
   >
     <Grid hasGutter>
       <GridItem>
-        <PageSection>
+        <PageSection variant={PageSectionVariants.light}>
           <DiskList vm={vm} vmi={vmi} />
         </PageSection>
       </GridItem>
@@ -26,7 +26,7 @@ const StorageTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => (
         <Divider />
       </GridItem>
       <GridItem>
-        <PageSection>
+        <PageSection variant={PageSectionVariants.light}>
           <EnvironmentForm updateVM={onSubmitYAML} vm={vm} />
         </PageSection>
       </GridItem>

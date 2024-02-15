@@ -4,7 +4,14 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { Grid, GridItem, PageSection, Stack, Title } from '@patternfly/react-core';
+import {
+  Grid,
+  GridItem,
+  PageSection,
+  PageSectionVariants,
+  Stack,
+  Title,
+} from '@patternfly/react-core';
 
 import { onSubmitYAML } from '../details/utils/utils';
 import { ConfigurationInnerTabProps } from '../utils/types';
@@ -21,7 +28,7 @@ const SSHTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
       pathsToHighlight={PATHS_TO_HIGHLIGHT.SCRIPTS_TAB}
       resource={vm}
     >
-      <PageSection>
+      <PageSection variant={PageSectionVariants.light}>
         <Title headingLevel="h2">
           <SearchItem id="ssh">{t('SSH settings')} </SearchItem>
         </Title>
