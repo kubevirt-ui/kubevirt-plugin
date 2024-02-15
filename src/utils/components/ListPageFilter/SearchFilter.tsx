@@ -19,7 +19,7 @@ const SearchFilter = forwardRef<HTMLInputElement, SearchFilterProps>((props, ref
     if (!inputRef || !('current' in inputRef) || !inputRef.current) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === '/') {
+      if (event.key === '/' && inputRef.current !== document.activeElement) {
         inputRef.current.focus();
         event.preventDefault();
       }
