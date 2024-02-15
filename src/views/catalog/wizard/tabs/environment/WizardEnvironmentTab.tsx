@@ -10,7 +10,7 @@ import { Bullseye, PageSection, PageSectionVariants } from '@patternfly/react-co
 
 import './wizard-environment-tab.scss';
 
-const WizardEnvironmentTab: WizardTab = ({ setDisableVmCreate, updateVM, vm }) => {
+const WizardEnvironmentTab: WizardTab = ({ updateVM, vm }) => {
   if (!vm)
     return (
       <Bullseye>
@@ -21,11 +21,11 @@ const WizardEnvironmentTab: WizardTab = ({ setDisableVmCreate, updateVM, vm }) =
   return (
     <PageSection className="wizard-environment-tab" variant={PageSectionVariants.light}>
       <SidebarEditor<V1VirtualMachine>
-        onChange={updateVM}
+        onResourceUpdate={updateVM}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.ENV_TAB}
         resource={vm}
       >
-        <EnvironmentForm onEditChange={setDisableVmCreate} updateVM={updateVM} vm={vm} />
+        <EnvironmentForm updateVM={updateVM} vm={vm} />
       </SidebarEditor>
     </PageSection>
   );
