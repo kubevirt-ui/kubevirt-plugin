@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Bullseye, EmptyState, EmptyStateIcon, Title } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 
-const UsersInstanceTypeEmptyState: FC = () => {
+const UserProvidedInstanceTypesEmptyState: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Bullseye>
@@ -18,4 +18,4 @@ const UsersInstanceTypeEmptyState: FC = () => {
   );
 };
 
-export default UsersInstanceTypeEmptyState;
+export default UserProvidedInstanceTypesEmptyState;

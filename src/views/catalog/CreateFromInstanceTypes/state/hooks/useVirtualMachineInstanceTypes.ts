@@ -3,13 +3,13 @@ import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kub
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseUserInstanceTypes = () => [
+type UseVirtualMachineInstanceTypes = () => [
   instanceTypes: V1beta1VirtualMachineInstancetype[],
   loaded: boolean,
   loadError: Error,
 ];
 
-const useUserInstanceTypes: UseUserInstanceTypes = () => {
+const useVirtualMachineInstanceTypes: UseVirtualMachineInstanceTypes = () => {
   const [activeNamespace] = useActiveNamespace();
   const [instanceTypes, loaded, loadError] = useK8sWatchResource<
     V1beta1VirtualMachineInstancetype[]
@@ -24,4 +24,4 @@ const useUserInstanceTypes: UseUserInstanceTypes = () => {
   return [instanceTypes || [], loaded || !!loadError, loadError];
 };
 
-export default useUserInstanceTypes;
+export default useVirtualMachineInstanceTypes;

@@ -2,7 +2,7 @@ import { animals, colors, NumberDictionary, uniqueNamesGenerator } from 'unique-
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ItemsToFilterProps } from './types';
@@ -143,3 +143,5 @@ export const appendDockerPrefix = (image: string) => {
   return image?.startsWith(DOCKER_PREFIX) ? image : DOCKER_PREFIX.concat(image);
 };
 export const removeDockerPrefix = (image: string) => image?.replace(DOCKER_PREFIX, '');
+export const isAllNamespaces = (namespace: string) =>
+  !namespace || namespace === ALL_NAMESPACES || namespace === ALL_NAMESPACES_SESSION_KEY;

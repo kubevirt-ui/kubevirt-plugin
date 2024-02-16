@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { MouseEvent, useRef, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
@@ -12,7 +12,7 @@ const useInstanceTypeCardMenuSection = (): UseInstanceTypeCardMenuSectionValues 
 
   const { setInstanceTypeVMState } = useInstanceTypeVMStore();
 
-  const onMenuToggle = (event?: React.MouseEvent, menuID?: string) => {
+  const onMenuToggle = (event?: MouseEvent, menuID?: string) => {
     event?.stopPropagation(); // Stop handleClickOutside from handling
     setActiveMenu((prevActiveMenu) => (prevActiveMenu === menuID ? null : menuID));
   };
