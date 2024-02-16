@@ -13,14 +13,14 @@ export type RedHatInstanceTypeSeries = {
   sizes: InstanceTypeSize[];
 };
 
-export type RedHatInstanceType = {
+export type RedHatInstanceTypeMetadata = {
   Icon: ComponentClass;
   id: string;
   items: RedHatInstanceTypeSeries[];
   label: string;
 };
 
-export type UserInstanceType = {
+export type UserInstanceTypeMetadata = {
   Icon: ComponentClass;
   id: string;
   items: string[];
@@ -28,6 +28,6 @@ export type UserInstanceType = {
 };
 
 export type InstanceTypesMenuItemsData = {
-  redHatProvided: RedHatInstanceType;
-  userProvided: UserInstanceType;
+  redHatProvided: RedHatInstanceTypeMetadata;
+  userProvided: UserInstanceTypeMetadata;
 };

@@ -4,9 +4,8 @@ import { Link } from 'react-router-dom-v5-compat';
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
-
-import { isAllNamespaces } from '../vm-statuses-card/utils/utils';
 
 import { getInstanceTypeSeriesLabel } from './utils/utils';
 
