@@ -1,6 +1,5 @@
 import React, { FC, useCallback } from 'react';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
   V1Interface,
   V1Network,
@@ -15,7 +14,6 @@ import {
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 type VirtualMachinesNetworkInterfaceModalProps = {
   headerText: string;
@@ -45,14 +43,8 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
 
         const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
         const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
-        const updatedVM = updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
 
-        return k8sUpdate({
-          data: updatedVM,
-          model: VirtualMachineModel,
-          name: updatedVM.metadata.name,
-          ns: updatedVM.metadata.namespace,
-        });
+        return updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
       },
     [vm],
   );
