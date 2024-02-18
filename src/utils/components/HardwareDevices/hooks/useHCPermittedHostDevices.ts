@@ -2,24 +2,20 @@ import {
   V1KubeVirtConfiguration,
   V1PermittedHostDevices,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { HyperConvergedModelGroupVersionKind } from '@kubevirt-utils/models';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration.ts';
 
 type UseHCPermittedHostDevicesType = () => {
-  errorHcList: Error;
-  loadedHcList: boolean;
+  hcError: Error;
+  hcLoaded: boolean;
   permittedHostDevices: V1PermittedHostDevices;
 };
 
 const useHCPermittedHostDevices: UseHCPermittedHostDevicesType = () => {
-  const [hcList, loadedHcList, errorHcList] = useK8sWatchResource({
-    groupVersionKind: HyperConvergedModelGroupVersionKind,
-    isList: true,
-  });
+  const [hcConfig, hcLoaded, hcError] = useKubevirtHyperconvergeConfiguration();
 
-  const { permittedHostDevices }: V1KubeVirtConfiguration = hcList?.[0]?.spec || {};
+  const { permittedHostDevices }: V1KubeVirtConfiguration = hcConfig?.spec?.configuration || {};
 
-  return { errorHcList, loadedHcList, permittedHostDevices };
+  return { hcError, hcLoaded, permittedHostDevices };
 };
 
 export default useHCPermittedHostDevices;
