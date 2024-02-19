@@ -1,5 +1,6 @@
 import * as fuzzy from 'fuzzysearch';
 
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   K8sResourceCommon,
   MatchExpression,
@@ -11,7 +12,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { TextFiltersType, useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
-import { STATIC_SEARCH_FILTERS } from './constants';
+import { STATIC_SEARCH_FILTERS, STATIC_SEARCH_FILTERS_PLACEHOLDERS } from './constants';
 
 export type Filter = {
   [key: string]: string[];
@@ -147,3 +148,19 @@ export const getInitialSearchText = (
   searchText: ReturnType<typeof useSearchFiltersParameters>,
   searchFilterType: string,
 ) => (searchFilterType !== STATIC_SEARCH_FILTERS.labels ? searchText[searchFilterType] : '');
+
+export const getSearchTextPlaceholder = (
+  searchType: string,
+  selectedSearchFilter: RowFilter,
+  nameFilterPlaceholder: string,
+) => {
+  if (searchType === STATIC_SEARCH_FILTERS.name)
+    return nameFilterPlaceholder || STATIC_SEARCH_FILTERS_PLACEHOLDERS.name;
+
+  return (
+    STATIC_SEARCH_FILTERS_PLACEHOLDERS[searchType] ||
+    t('Search by {{filterName}}...', {
+      filterName: selectedSearchFilter?.filterGroupName,
+    })
+  );
+};

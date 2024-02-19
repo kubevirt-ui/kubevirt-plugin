@@ -130,8 +130,8 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                 }}
                 columnLayout={columnLayout}
                 data={unfilteredData}
-                // hideLabelFilter
-                // hideNameLabelFilters={!displayShowAllButton}
+                hideLabelFilter
+                hideNameLabelFilters={!displayShowAllButton}
                 loaded={Boolean(loaded) && loadedColumns}
                 // nameFilter={!displayShowAllButton && "modal-name"} can remove comment once this merged https://github.com/openshift/console/pull/12438 and build into new SDK version
                 rowFilters={filters}
