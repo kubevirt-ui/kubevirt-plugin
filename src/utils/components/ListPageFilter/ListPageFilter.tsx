@@ -41,6 +41,7 @@ import {
   getFiltersData,
   getInitialSearchText,
   getInitialSearchType,
+  getSearchTextPlaceholder,
 } from './utils';
 
 type ListPageFilterProps = {
@@ -50,6 +51,7 @@ type ListPageFilterProps = {
   hideLabelFilter?: boolean;
   hideNameLabelFilters?: boolean;
   loaded?: boolean;
+  nameFilterPlaceholder?: string;
   onFilterChange?: OnFilterChange;
   rowFilters?: RowFilter[];
   searchFilters?: RowFilter[];
@@ -62,6 +64,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   hideLabelFilter,
   hideNameLabelFilters,
   loaded,
+  nameFilterPlaceholder,
   onFilterChange,
   rowFilters,
   searchFilters = [],
@@ -96,15 +99,9 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
       }),
       {},
     ),
+    ...(!hideLabelFilter && !hideNameLabelFilters ? { labels: t('Label') } : {}),
+    ...(!hideNameLabelFilters ? { name: t('Name') } : {}),
   };
-
-  if (!hideLabelFilter && !hideNameLabelFilters) {
-    filterDropdownItems.labels = t('Label');
-  }
-
-  if (!hideNameLabelFilters) {
-    filterDropdownItems.name = t('Name');
-  }
 
   const [searchType, setSearchType] = useState<string>(
     getInitialSearchType(searchFilters, textFilters, filterDropdownItems),
@@ -136,9 +133,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 
   const selectedSearchFilter = searchFilters?.find((f) => f.type === searchType);
 
-  const showSearchFilters = Object.keys(filterDropdownItems).length !== 0;
-
-  const showSearchFiltersDropdown = Object.keys(filterDropdownItems).length > 1;
+  const filterDropdownKeys = Object.keys(filterDropdownItems);
 
   return (
     <Toolbar
@@ -158,11 +153,11 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
             selectedRowFilters={selectedRowFilters}
             updateRowFilterSelected={updateRowFilterSelected}
           />
-          {showSearchFilters && (
+          {filterDropdownKeys.length !== 0 && (
             <ToolbarItem className="co-filter-search--full-width">
               <ToolbarFilter
-                deleteChip={(f, chip: string) => {
-                  const newLabels = textFilters.labels.filter((label) => label !== chip);
+                deleteChip={(category, chip: string) => {
+                  const newLabels = textFilters?.labels?.filter((label) => label !== chip);
                   applyTextFilters(STATIC_SEARCH_FILTERS.labels, newLabels.join(','));
                 }}
                 deleteChipGroup={() => {
@@ -194,7 +189,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                   chips={textFilters.name ? [textFilters.name] : []}
                 >
                   <div className="pf-c-input-group co-filter-group">
-                    {showSearchFiltersDropdown && (
+                    {filterDropdownKeys.length > 1 && (
                       <Select
                         placeholderText={
                           <span>
@@ -208,9 +203,9 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                         selections={selectedSearchFilter?.filterGroupName || searchType}
                         variant={SelectVariant.single}
                       >
-                        {Object.keys(filterDropdownItems).map((key) => (
+                        {filterDropdownKeys.map((key) => (
                           <SelectOption key={key} value={key}>
-                            {filterDropdownItems[key]}
+                            {filterDropdownItems?.[key]}
                           </SelectOption>
                         ))}
                       </Select>
@@ -238,12 +233,11 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                           setSearchInputText(newSearchInput);
                           applyTextFiltersWithDebounce(searchType, newSearchInput);
                         }}
-                        placeholder={
-                          STATIC_SEARCH_FILTERS_PLACEHOLDERS[searchType] ||
-                          t('Search by {{filterName}}', {
-                            filterName: selectedSearchFilter?.filterGroupName,
-                          })
-                        }
+                        placeholder={getSearchTextPlaceholder(
+                          searchType,
+                          selectedSearchFilter,
+                          nameFilterPlaceholder,
+                        )}
                         data-test={`${searchType}-filter-input`}
                         value={searchInputText || ''}
                       />

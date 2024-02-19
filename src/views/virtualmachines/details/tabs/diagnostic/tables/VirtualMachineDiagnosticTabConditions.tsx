@@ -92,9 +92,9 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
                 });
               }}
               data={unfilteredData}
-              // hideLabelFilter
+              hideLabelFilter
               loaded={!isEmpty(unfilteredData) && loadedColumns}
-              // nameFilterPlaceholder={t('Search by reason...')}
+              nameFilterPlaceholder={t('Search by reason...')}
               rowFilters={filters}
             />
           </FlexItem>
