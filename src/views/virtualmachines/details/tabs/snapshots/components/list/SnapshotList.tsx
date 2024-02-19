@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -9,6 +9,7 @@ import {
 import {
   EmptyState,
   EmptyStateBody,
+  EmptyStateHeader,
   EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
@@ -22,7 +23,7 @@ import SnapshotRow from './SnapshotRow';
 
 type SnapshotsListProps = UseSnapshotData & { isVMRunning?: boolean };
 
-const SnapshotsList: React.FC<SnapshotsListProps> = ({
+const SnapshotsList: FC<SnapshotsListProps> = ({
   error,
   isVMRunning,
   loaded,
@@ -45,7 +46,11 @@ const SnapshotsList: React.FC<SnapshotsListProps> = ({
         NoDataEmptyMsg={() => (
           <>
             <EmptyState variant={EmptyStateVariant.xs}>
-              <EmptyStateIcon className="snapshots-list__empty-state-icon" icon={SearchIcon} />
+              <EmptyStateHeader
+                icon={
+                  <EmptyStateIcon className="snapshots-list__empty-state-icon" icon={SearchIcon} />
+                }
+              />
               <EmptyStateBody>{t('No snapshots found')}</EmptyStateBody>
             </EmptyState>
           </>

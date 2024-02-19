@@ -1,8 +1,9 @@
-import * as React from 'react';
+import React, { FC, MouseEvent } from 'react';
 
 import { TemplateParameter } from '@kubevirt-ui/kubevirt-api/console';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, Select, SelectOption, SelectVariant, TextInput } from '@patternfly/react-core';
+import { FormGroup, SelectOption, TextInput } from '@patternfly/react-core';
 
 import { PARAMETER_VALUE_TYPES } from './constants';
 import { getValueTypeFromParameter } from './utils';
@@ -13,17 +14,16 @@ type ParameterValueEditorProps = {
   parameter: TemplateParameter;
 };
 
-const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
+const SelectParameterValueType: FC<ParameterValueEditorProps> = ({
   isEditDisabled,
   onChange,
   parameter,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
   const { t } = useKubevirtTranslation();
 
   const valueType = getValueTypeFromParameter(parameter);
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
+  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string) => {
     const newParameter = { ...parameter };
     switch (value) {
       case PARAMETER_VALUE_TYPES.GENERATED:
@@ -42,19 +42,15 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
         onChange(newParameter);
         break;
     }
-    setIsOpen(false);
   };
 
   return (
     <>
       <FormGroup fieldId={`${parameter.name}-value-type`} label={t('Default value type')}>
-        <Select
-          isDisabled={isEditDisabled}
-          isOpen={isOpen}
+        <FormPFSelect
           onSelect={handleChange}
-          onToggle={setIsOpen}
-          selections={valueType}
-          variant={SelectVariant.single}
+          selected={valueType}
+          toggleProps={{ isDisabled: isEditDisabled }}
         >
           <SelectOption
             description={t('Value generated using an expression')}
@@ -64,20 +60,17 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
               {t('Generated (expression)')}
             </span>
           </SelectOption>
-
           <SelectOption
             description={t('Default value for this parameter')}
             value={PARAMETER_VALUE_TYPES.VALUE}
           >
             <span data-test-id={PARAMETER_VALUE_TYPES.VALUE}>{t('Value')}</span>
           </SelectOption>
-
           <SelectOption description={t('No default value')} value={PARAMETER_VALUE_TYPES.NONE}>
             <span data-test-id={PARAMETER_VALUE_TYPES.NONE}>{t('None')}</span>
           </SelectOption>
-        </Select>
+        </FormPFSelect>
       </FormGroup>
-
       {valueType === PARAMETER_VALUE_TYPES.VALUE && (
         <FormGroup
           className="form-group-indented"
@@ -87,12 +80,11 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
           <TextInput
             id={`${parameter.name}-value`}
             isDisabled={isEditDisabled}
-            onChange={(value) => onChange({ ...parameter, value })}
+            onChange={(_event, value) => onChange({ ...parameter, value })}
             value={parameter.value}
           />
         </FormGroup>
       )}
-
       {valueType === PARAMETER_VALUE_TYPES.GENERATED && (
         <FormGroup
           className="form-group-indented"
@@ -102,7 +94,7 @@ const SelectParameterValueType: React.FC<ParameterValueEditorProps> = ({
           <TextInput
             id={`${parameter.name}-generated`}
             isDisabled={isEditDisabled}
-            onChange={(expression) => onChange({ ...parameter, from: expression })}
+            onChange={(_event, expression) => onChange({ ...parameter, from: expression })}
             value={parameter.from}
           />
         </FormGroup>

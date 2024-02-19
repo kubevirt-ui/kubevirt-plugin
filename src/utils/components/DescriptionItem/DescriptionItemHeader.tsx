@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -14,7 +14,7 @@ import './DescriptionItem.scss';
 type DescriptionItemHeaderProps = {
   bodyContent: ReactNode;
   breadcrumb?: string;
-  descriptionHeader: ReactElement;
+  descriptionHeader: ReactNode;
   isPopover: boolean;
   label?: ReactNode;
   maxWidth?: string;
@@ -59,7 +59,9 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
         headerContent={descriptionHeader}
         maxWidth={maxWidth || '30rem'}
       >
-        <DescriptionListTermHelpTextButton>{descriptionHeader}</DescriptionListTermHelpTextButton>
+        <DescriptionListTermHelpTextButton className="pf-c-description-list__text">
+          {descriptionHeader}
+        </DescriptionListTermHelpTextButton>
       </Popover>
     );
   }

@@ -26,7 +26,7 @@ const EnablePreallocationCheckbox: React.FC<EnablePreallocationCheckboxProps> = 
       <Flex>
         <FlexItem>
           <Checkbox
-            onChange={(checked) =>
+            onChange={(_event, checked) =>
               dispatchDiskState({
                 payload: checked,
                 type: diskReducerActions.SET_ENABLE_PREALLOCATION,

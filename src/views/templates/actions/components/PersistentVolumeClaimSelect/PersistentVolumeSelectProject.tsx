@@ -1,15 +1,10 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
+import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  FormGroup,
-  Select,
-  SelectOption,
-  SelectVariant,
-  ValidatedOptions,
-} from '@patternfly/react-core';
-
-import { filter } from './utils';
+import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
 type PersistentVolumeSelectProjectProps = {
   onChange: (newProject: string) => void;
@@ -17,55 +12,41 @@ type PersistentVolumeSelectProjectProps = {
   selectedProject: string;
 };
 
-export const PersistentVolumeSelectProject: React.FC<PersistentVolumeSelectProjectProps> = ({
+export const PersistentVolumeSelectProject: FC<PersistentVolumeSelectProjectProps> = ({
   onChange,
   projectsName,
   selectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isNamespacePVCOpen, setNamespaceOpen] = React.useState(false);
-
-  const onSelect = React.useCallback(
-    (event, selection) => {
-      onChange(selection);
-      setNamespaceOpen(false);
-    },
-    [onChange],
-  );
 
   const fieldId = 'pvc-project-select';
+
+  const validated = !selectedProject ? ValidatedOptions.error : ValidatedOptions.default;
 
   return (
     <FormGroup
       className="pvc-selection-formgroup"
       fieldId={fieldId}
-      helperText={t('Location of the existing PVC')}
       id={fieldId}
       isRequired
       label={t('PVC project')}
     >
-      <Select
-        aria-invalid={!selectedProject ? true : false}
-        aria-labelledby={fieldId}
-        hasInlineFilter
-        isOpen={isNamespacePVCOpen}
-        maxHeight={400}
-        menuAppendTo="parent"
-        onFilter={filter(projectsName)}
-        onSelect={onSelect}
-        onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
-        placeholderText={t('--- Select PVC project ---')}
-        selections={selectedProject}
-        validated={!selectedProject ? ValidatedOptions.error : ValidatedOptions.default}
-        variant={SelectVariant.single}
-      >
-        {projectsName.map((projectName) => (
-          <SelectOption key={projectName} value={projectName}>
-            <span className="sr-only">{t('project')}</span>
-            <span className="co-m-resource-icon co-m-resource-project">PR</span> {projectName}
-          </SelectOption>
-        ))}
-      </Select>
+      <FilterSelect
+        options={projectsName?.map((name) => ({
+          children: name,
+          groupVersionKind: modelToGroupVersionKind(ProjectModel),
+          value: name,
+        }))}
+        toggleProps={{
+          isFullHeight: true,
+          placeholder: t('--- Select PVC project ---'),
+        }}
+        selected={selectedProject}
+        setSelected={onChange}
+      />
+      <FormGroupHelperText validated={validated}>
+        {validated === ValidatedOptions.default && t('Location of the existing PVC')}
+      </FormGroupHelperText>
     </FormGroup>
   );
 };

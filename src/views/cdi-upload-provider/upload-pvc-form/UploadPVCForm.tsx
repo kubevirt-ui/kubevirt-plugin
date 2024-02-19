@@ -39,7 +39,8 @@ type UploadPVCFormProps = {
   fileName: string;
   fileValue: File | string;
   goldenPvcs: V1alpha1PersistentVolumeClaim[];
-  handleFileChange: (value, filename, event) => void;
+  handleFileChange: (_, value: string) => void;
+  handleFileNameChange: (event, file: File) => void;
   isLoading: boolean;
   ns: string;
   onChange: (K8sResourceKind) => void;
@@ -55,6 +56,7 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
   fileValue,
   goldenPvcs,
   handleFileChange,
+  handleFileNameChange,
   isLoading,
   ns,
   onChange,
@@ -198,7 +200,7 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
       <div className="form-group">
         <FileUpload
           dropzoneProps={{
-            accept: '.iso,.img,.qcow2,.gz,.xz',
+            accept: { 'text/*': ['.iso,.img,.qcow2,.gz,.xz'] },
             onDropAccepted: () => setIsFileRejected(false),
             onDropRejected: () => setIsFileRejected(true),
           }}
@@ -206,7 +208,9 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
           hideDefaultPreview
           id="file-upload"
           isRequired
-          onChange={handleFileChange}
+          onDataChange={handleFileChange}
+          onFileInputChange={handleFileNameChange}
+          onTextChange={handleFileChange}
           value={fileValue}
         />
         {operatingSystemHaveDV && (
@@ -216,7 +220,7 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
             id="golden-os-switch"
             isChecked={isGolden}
             label={t('Attach this data to a Virtual Machine operating system')}
-            onChange={handleGoldenCheckbox}
+            onChange={(_event, checked: boolean) => handleGoldenCheckbox(checked)}
           />
         )}
       </div>

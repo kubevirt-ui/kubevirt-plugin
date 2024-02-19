@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -25,6 +26,8 @@ const VMNameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, 
     return updatedVM;
   }, [vm, vmName]);
 
+  const validated = !isEmpty(vmName) ? ValidatedOptions.default : ValidatedOptions.error;
+
   return (
     <TabModal
       headerText={t('Edit VirtualMachine name')}
@@ -34,15 +37,18 @@ const VMNameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, 
       onSubmit={onSubmit}
     >
       <Form>
-        <FormGroup
-          fieldId="vm-name"
-          helperText={t('Please provide name to VirtualMachine.')}
-          helperTextInvalid={isEmpty(vmName) && t('VirtualMachine name can not be empty.')}
-          isRequired
-          label={t('VirtualMachine name')}
-          validated={!isEmpty(vmName) ? ValidatedOptions.default : ValidatedOptions.error}
-        >
-          <TextInput id="vm-name" onChange={setVMName} type="text" value={vmName} />
+        <FormGroup fieldId="vm-name" isRequired label={t('VirtualMachine name')}>
+          <TextInput
+            id="vm-name"
+            onChange={(_event, val) => setVMName(val)}
+            type="text"
+            value={vmName}
+          />
+          <FormGroupHelperText validated={validated}>
+            {validated === ValidatedOptions.error
+              ? t('VirtualMachine name can not be empty.')
+              : t('Please provide name to VirtualMachine.')}
+          </FormGroupHelperText>
         </FormGroup>
       </Form>
     </TabModal>

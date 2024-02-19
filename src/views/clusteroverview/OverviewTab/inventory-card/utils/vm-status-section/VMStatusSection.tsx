@@ -1,7 +1,7 @@
 import * as React from 'react';
 import classNames from 'classnames';
 
-import { Flex, FlexItem, Grid, GridItem, TitleSizes } from '@patternfly/react-core';
+import { Flex, FlexItem, Grid, GridItem } from '@patternfly/react-core';
 
 import { K8sResourceKind } from '../../../../utils/types';
 import EmptyStateNoVMs from '../../../vms-per-resource-card/EmptyStateNoVMs';
@@ -39,7 +39,7 @@ const VMStatusSection: React.FC<VMStatusSectionProps> = ({ vms, vmsLoaded }) => 
   }
 
   if (numStatuses === 0) {
-    return <EmptyStateNoVMs titleSize={TitleSizes.md} />;
+    return <EmptyStateNoVMs />;
   } else {
     return (
       <Grid className="kv-inventory-card__statuses-grid" hasGutter>

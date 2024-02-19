@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
@@ -18,16 +18,8 @@ import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
-import {
-  Card,
-  CardActions,
-  CardHeader,
-  CardTitle,
-  Popover,
-  PopoverPosition,
-  SelectOption,
-  SelectVariant,
-} from '@patternfly/react-core';
+import { Card, CardHeader, CardTitle, Popover, PopoverPosition } from '@patternfly/react-core';
+import { SelectOption } from '@patternfly/react-core';
 
 import './AlertsCard.scss';
 
@@ -37,11 +29,7 @@ type AlertsCardProps = {
   sortedAlerts: SimplifiedAlerts;
 };
 
-const AlertsCard: React.FC<AlertsCardProps> = ({
-  className,
-  isOverviewPage = false,
-  sortedAlerts,
-}) => {
+const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, sortedAlerts }) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const [alertScope, setAlertScope] = useLocalStorage(
@@ -49,7 +37,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
     isAdmin ? VIRTUALIZATION_ONLY_ALERTS : ALL_ALERTS, // for admins show the number of virtualization health alerts by default
   );
 
-  const alerts = React.useMemo(() => {
+  const alerts = useMemo(() => {
     return !isOverviewPage || !isAdmin || alertScope === ALL_ALERTS
       ? sortedAlerts
       : removeVMAlerts(sortedAlerts);
@@ -61,62 +49,73 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
 
   return (
     <Card className={classNames('alerts-card', className)}>
-      <CardHeader className="alerts-card__header">
+      <CardHeader
+        {...(isOverviewPage && {
+          actions: {
+            actions: (
+              <>
+                {isAdmin && (
+                  <Link className="alerts-card__view-all-link" to={VIEW_ALL_ALERTS_PATH}>
+                    {t('View all')}
+                  </Link>
+                )}
+                {isAdmin ? (
+                  <FormPFSelect
+                    onSelect={(e, value) => setAlertScope(value)}
+                    popperProps={{ position: 'right' }}
+                    selected={alertScope}
+                    toggleProps={{ id: 'overview-alerts-card' }}
+                  >
+                    {alertScopeOptions().map((scope) => (
+                      <SelectOption
+                        description={scope.description}
+                        key={scope.key}
+                        value={scope.value}
+                      >
+                        {scope.value}
+                      </SelectOption>
+                    ))}
+                  </FormPFSelect>
+                ) : (
+                  <Popover
+                    bodyContent={
+                      <div>{t('Only VM-related alerts in your project will be shown')}</div>
+                    }
+                    aria-label="Only VM-related alerts notification"
+                    className="alerts-card__nonadmin-popover"
+                    enableFlip={false}
+                    hasAutoWidth
+                    maxWidth="250px"
+                    position={PopoverPosition.top}
+                  >
+                    <FormPFSelect
+                      onSelect={(e, value) => setAlertScope(value)}
+                      selected={alertScope}
+                      toggleProps={{ id: 'overview-alerts-card' }}
+                    >
+                      {alertScopeOptions().map((scope) => (
+                        <SelectOption
+                          description={scope.description}
+                          key={scope.key}
+                          value={scope.value}
+                        >
+                          {scope.value}
+                        </SelectOption>
+                      ))}
+                    </FormPFSelect>
+                  </Popover>
+                )}
+              </>
+            ),
+            className: 'co-overview-card__actions alerts-card__actions',
+            hasNoOffset: false,
+          },
+        })}
+        className="alerts-card__header"
+      >
         <CardTitle className="text-muted card-title">
           {t('Alerts ({{alertsQuantity}})', { alertsQuantity })}
         </CardTitle>
-        {isOverviewPage && (
-          <CardActions className="co-overview-card__actions alerts-card__actions">
-            {isAdmin && (
-              <Link className="alerts-card__view-all-link" to={VIEW_ALL_ALERTS_PATH}>
-                {t('View all')}
-              </Link>
-            )}
-            {isAdmin ? (
-              <FormPFSelect
-                isDisabled={!isAdmin}
-                onSelect={(e, value) => setAlertScope(value)}
-                selections={alertScope}
-                toggleId="overview-alerts-card"
-                variant={SelectVariant.single}
-              >
-                {alertScopeOptions().map((scope) => (
-                  <SelectOption
-                    description={scope.description}
-                    key={scope.key}
-                    value={scope.value}
-                  />
-                ))}
-              </FormPFSelect>
-            ) : (
-              <Popover
-                aria-label="Only VM-related alerts notification"
-                bodyContent={<div>{t('Only VM-related alerts in your project will be shown')}</div>}
-                className="alerts-card__nonadmin-popover"
-                enableFlip={false}
-                hasAutoWidth
-                maxWidth="250px"
-                position={PopoverPosition.top}
-              >
-                <FormPFSelect
-                  isDisabled={!isAdmin}
-                  onSelect={(e, value) => setAlertScope(value)}
-                  selections={alertScope}
-                  toggleId="overview-alerts-card"
-                  variant={SelectVariant.single}
-                >
-                  {alertScopeOptions().map((scope) => (
-                    <SelectOption
-                      description={scope.description}
-                      key={scope.key}
-                      value={scope.value}
-                    />
-                  ))}
-                </FormPFSelect>
-              </Popover>
-            )}
-          </CardActions>
-        )}
       </CardHeader>
       <AlertsDrawer sortedAlerts={alerts} />
     </Card>

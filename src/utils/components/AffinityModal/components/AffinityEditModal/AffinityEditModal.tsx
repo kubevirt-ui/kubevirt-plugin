@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
@@ -19,11 +19,11 @@ type AffinityEditModalProps = {
   nodesLoaded: boolean;
   onCancel: () => void;
   onSubmit: (affinity: AffinityRowData) => void;
-  setFocusedAffinity: React.Dispatch<React.SetStateAction<AffinityRowData>>;
+  setFocusedAffinity: Dispatch<SetStateAction<AffinityRowData>>;
   title: string;
 };
 
-const AffinityEditModal: React.FC<AffinityEditModalProps> = ({
+const AffinityEditModal: FC<AffinityEditModalProps> = ({
   focusedAffinity,
   isOpen,
   nodes,
@@ -58,7 +58,7 @@ const AffinityEditModal: React.FC<AffinityEditModalProps> = ({
           >
             {t('Save affinity rule')}
           </Button>
-          <Button isSmall onClick={onCancel} variant="link">
+          <Button onClick={onCancel} size="sm" variant="link">
             {t('Cancel')}
           </Button>
         </ActionGroup>

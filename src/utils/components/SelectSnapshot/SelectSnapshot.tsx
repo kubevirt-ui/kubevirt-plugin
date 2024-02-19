@@ -6,8 +6,10 @@ import {
   VolumeSnapshotModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { FormGroup } from '@patternfly/react-core';
 
-import SelectResourceByName from '../SelectResourceByName/SelectResourceByName';
+import FilterSelect from '../FilterSelect/FilterSelect';
+import Loading from '../Loading/Loading';
 
 import useSnapshots from './useSnapshots';
 
@@ -46,30 +48,52 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
 
   return (
     <div>
-      <SelectResourceByName
-        className="snapshot-selection-formgroup"
-        fieldId="snapshot-project-select"
-        isDisabled={!selectSnapshotNamespace}
-        label={t('VolumeSnapshot project')}
-        nameSelected={snapshotNamespaceSelected}
-        onChange={onSelectProject}
-        placeholder={t('--- Select VolumeSnapshot project ---')}
-        resourceGroupVersionKind={modelToGroupVersionKind(NamespaceModel)}
-        resourceNames={projectsNames}
-        resourcesLoaded={projectsLoaded}
-      />
+      {projectsLoaded ? (
+        <FormGroup
+          className="snapshot-selection-formgroup"
+          fieldId="snapshot-project-select"
+          isRequired
+          label={t('VolumeSnapshot project')}
+        >
+          <FilterSelect
+            options={projectsNames.map((name) => ({
+              children: name,
+              groupVersionKind: modelToGroupVersionKind(NamespaceModel),
+              value: name,
+            }))}
+            toggleProps={{
+              isDisabled: !selectSnapshotNamespace,
+              isFullWidth: true,
+              placeholder: t('--- Select VolumeSnapshot project ---'),
+            }}
+            selected={snapshotNamespaceSelected}
+            setSelected={onSelectProject}
+          />
+        </FormGroup>
+      ) : (
+        <Loading />
+      )}
 
-      <SelectResourceByName
-        fieldId="snapshot-name-select"
-        isDisabled={!snapshotNamespaceSelected}
-        label={t('VolumeSnapshot name')}
-        nameSelected={snapshotNameSelected}
-        onChange={selectSnapshotName}
-        placeholder={t('--- Select VolumeSnapshot name ---')}
-        resourceGroupVersionKind={modelToGroupVersionKind(VolumeSnapshotModel)}
-        resourceNames={snapshotNames}
-        resourcesLoaded={snapshotsLoaded}
-      />
+      {snapshotsLoaded ? (
+        <FormGroup fieldId="snapshot-name-select" isRequired label={t('VolumeSnapshot name')}>
+          <FilterSelect
+            options={snapshotNames.map((name) => ({
+              children: name,
+              groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
+              value: name,
+            }))}
+            toggleProps={{
+              isDisabled: !snapshotNamespaceSelected,
+              isFullWidth: true,
+              placeholder: t('--- Select VolumeSnapshot name ---'),
+            }}
+            selected={snapshotNameSelected}
+            setSelected={selectSnapshotName}
+          />
+        </FormGroup>
+      ) : (
+        <Loading />
+      )}
     </div>
   );
 };

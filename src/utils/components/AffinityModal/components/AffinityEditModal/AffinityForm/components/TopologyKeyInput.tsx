@@ -1,5 +1,6 @@
-import * as React from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
@@ -7,43 +8,44 @@ import { AffinityRowData } from '../../../../utils/types';
 
 type TopologyKeyInputProps = {
   focusedAffinity: AffinityRowData;
-  setFocusedAffinity: React.Dispatch<React.SetStateAction<AffinityRowData>>;
-  setSubmitDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  setFocusedAffinity: Dispatch<SetStateAction<AffinityRowData>>;
+  setSubmitDisabled: Dispatch<SetStateAction<boolean>>;
 };
 
-const TopologyKeyInput: React.FC<TopologyKeyInputProps> = ({
+const TopologyKeyInput: FC<TopologyKeyInputProps> = ({
   focusedAffinity,
   setFocusedAffinity,
   setSubmitDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [error, setError] = React.useState(false);
+  const [validated, setValidated] = useState<ValidatedOptions>(ValidatedOptions.default);
   const { topologyKey } = focusedAffinity || {};
 
   const onChange = (value: string) => {
     setFocusedAffinity({ ...focusedAffinity, topologyKey: value });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!topologyKey || topologyKey?.length === 0) {
-      setError(true);
+      setValidated(ValidatedOptions.error);
       setSubmitDisabled(true);
     } else {
-      setError(false);
+      setValidated(ValidatedOptions.default);
       setSubmitDisabled(false);
     }
   }, [topologyKey, setSubmitDisabled]);
 
   return (
-    <FormGroup
-      fieldId="topology-key"
-      helperText={t('Topology key must not be empty')}
-      helperTextInvalid={t('Topology key must not be empty')}
-      isRequired
-      label={t('Topology key')}
-      validated={error ? ValidatedOptions.error : ValidatedOptions.default}
-    >
-      <TextInput onChange={onChange} type="text" value={topologyKey} />
+    <FormGroup fieldId="topology-key" isRequired label={t('Topology key')}>
+      <TextInput
+        onChange={(_event, value: string) => onChange(value)}
+        type="text"
+        validated={validated}
+        value={topologyKey}
+      />
+      <FormGroupHelperText validated={validated}>
+        {t('Topology key must not be empty')}
+      </FormGroupHelperText>
     </FormGroup>
   );
 };

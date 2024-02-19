@@ -35,7 +35,7 @@ const LabelRow: FC<LabelRowProps> = ({ label, onChange, onDelete }) => {
             aria-label={t('selector key')}
             id={`label-${id}-key-input`}
             isRequired
-            onChange={(newKey) => onChange({ ...label, key: newKey })}
+            onChange={(_event, newKey) => onChange({ ...label, key: newKey })}
             onPaste={handlePasteLabelKey}
             placeholder={t('Key')}
             type="text"
@@ -49,7 +49,7 @@ const LabelRow: FC<LabelRowProps> = ({ label, onChange, onDelete }) => {
             aria-label={t('selector value')}
             id={`label-${id}-value-input`}
             isRequired
-            onChange={(newValue) => onChange({ ...label, value: newValue })}
+            onChange={(_event, newValue) => onChange({ ...label, value: newValue })}
             placeholder={t('Value')}
             type="text"
             value={value}

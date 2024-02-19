@@ -1,11 +1,9 @@
-@import '~@patternfly/patternfly/sass-utilities/colors';
-
 .kv-top-consumers-card__header {
-  border-bottom: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
+  border-bottom: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--light-300);
 }
 
 .kv-top-consumers-card__dropdown--duration {
-  margin-left: var(--pf-global--spacer--lg);
+  margin-left: var(--pf-v5-global--spacer--lg);
 }
 
 div.kv-top-consumers-card__body {

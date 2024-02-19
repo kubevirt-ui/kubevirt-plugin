@@ -2,14 +2,7 @@ import React, { useState } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  SelectOption,
-  SelectVariant,
-} from '@patternfly/react-core';
+import { Card, CardBody, CardHeader, CardTitle, SelectOption } from '@patternfly/react-core';
 
 import { vmsPerResourceOptions } from './utils/constants';
 import VMsPerResourceChart from './VMsPerResourceChart';
@@ -34,12 +27,13 @@ const VMsPerResourceCard = () => {
         <div className="vm-per-resources-dropdown">
           <FormPFSelect
             onSelect={handleSelect}
-            selections={vmResourceOption}
-            toggleId="overview-vms-per-resource-card"
-            variant={SelectVariant.single}
+            selected={vmResourceOption}
+            toggleProps={{ id: 'overview-vms-per-resource-card' }}
           >
             {vmsPerResourceOptions?.map((scope) => (
-              <SelectOption key={scope.type} value={scope.title} />
+              <SelectOption key={scope.type} value={scope.title}>
+                {scope.title}
+              </SelectOption>
             ))}
           </FormPFSelect>
         </div>

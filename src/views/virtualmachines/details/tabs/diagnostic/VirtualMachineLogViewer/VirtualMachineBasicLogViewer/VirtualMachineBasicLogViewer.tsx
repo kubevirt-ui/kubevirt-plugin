@@ -41,12 +41,12 @@ const VirtualMachineBasicLogViewer: FC<VirtualMachineBasicLogViewerProps> = ({
             <ToolbarItem>
               <LogViewerSearch minSearchChars={3} placeholder="Search..." />
             </ToolbarItem>
-            <ToolbarItem alignment={{ default: 'alignRight' }}>
+            <ToolbarItem align={{ default: 'alignRight' }}>
               <Checkbox
                 id="wrap-text-checkbox"
                 isChecked={isTextWrapped}
                 label={t('Wrap text')}
-                onChange={setIsTextWrapped}
+                onChange={(_event, val) => setIsTextWrapped(val)}
               />
             </ToolbarItem>
             {!isExternal && (

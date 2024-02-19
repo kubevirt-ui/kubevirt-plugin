@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { BaseCellProps, Td } from '@patternfly/react-table';
-import { TdFavoritesType } from '@patternfly/react-table/dist/esm/components/Table/base';
+import { TdFavoritesType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
 type TableDataProps = {
   activeColumnIDs: string[];

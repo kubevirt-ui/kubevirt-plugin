@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,14 +10,7 @@ import {
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { HealthBody } from '@openshift-console/dynamic-plugin-sdk-internal';
-import {
-  Card,
-  CardActions,
-  CardHeader,
-  CardTitle,
-  Gallery,
-  GalleryItem,
-} from '@patternfly/react-core';
+import { Card, CardHeader, CardTitle, Gallery, GalleryItem } from '@patternfly/react-core';
 
 import { VIRTUALIZATION } from './utils/constants';
 import useDashboardSubsystems from './utils/hooks/useDashboardSubsystems';
@@ -64,11 +57,14 @@ const StatusCard = () => {
 
   return (
     <Card className="co-overview-card--gradient" data-test-id="kv-overview-status-card">
-      <CardHeader>
+      <CardHeader
+        actions={{
+          actions: <Link to="/monitoring/alerts">{t('View alerts')}</Link>,
+          className: 'co-overview-card__actions',
+          hasNoOffset: false,
+        }}
+      >
         <CardTitle>{t('Status')}</CardTitle>
-        <CardActions className="co-overview-card__actions">
-          <Link to="/monitoring/alerts">{t('View alerts')}</Link>
-        </CardActions>
       </CardHeader>
       <HealthBody>
         <Gallery className="co-overview-status__health" hasGutter>

@@ -9,7 +9,7 @@ import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/uti
 import { columnSorting, isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Flex, FlexItem, Pagination, Title } from '@patternfly/react-core';
-import { TableComposable, Th, Thead, Tr } from '@patternfly/react-table';
+import { Table, Th, Thead, Tr } from '@patternfly/react-table';
 
 import useDiagnosticConditionsTableColumns from '../hooks/useDiagnosticConditionsTableColumns';
 import useDiagnosticFilter from '../hooks/useDiagnosticFilter';
@@ -106,7 +106,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
               onSetPage={(_e, page, perPage, startIndex, endIndex) =>
                 onPaginationChange({ endIndex, page, perPage, startIndex })
               }
-              defaultToFullPage
+              isLastFullPageShown
               itemCount={filteredData?.length}
               page={pagination?.page}
               perPage={pagination?.perPage}
@@ -116,7 +116,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
         </Flex>
       </ListPageBody>
 
-      <TableComposable isExpandable>
+      <Table isExpandable>
         <Thead>
           <Tr>
             <Th
@@ -150,7 +150,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
             setExpend={setExpend}
           />
         ))}
-      </TableComposable>
+      </Table>
     </>
   );
 };

@@ -1,16 +1,8 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  FormGroup,
-  Select,
-  SelectOption,
-  SelectVariant,
-  Skeleton,
-  ValidatedOptions,
-} from '@patternfly/react-core';
-
-import { filter } from './utils';
+import { FormGroup, Skeleton } from '@patternfly/react-core';
 
 type PersistentVolumeSelectNameProps = {
   isDisabled: boolean;
@@ -20,7 +12,7 @@ type PersistentVolumeSelectNameProps = {
   pvcNameSelected: string;
 };
 
-export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProps> = ({
+export const PersistentVolumeSelectName: FC<PersistentVolumeSelectNameProps> = ({
   isDisabled,
   isLoading,
   onChange,
@@ -28,15 +20,6 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
   pvcNameSelected,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setSelectOpen] = React.useState(false);
-
-  const onSelect = React.useCallback(
-    (event, selection) => {
-      onChange(selection);
-      setSelectOpen(false);
-    },
-    [onChange],
-  );
 
   const fieldId = 'pvc-name-select';
 
@@ -58,25 +41,19 @@ export const PersistentVolumeSelectName: React.FC<PersistentVolumeSelectNameProp
       isRequired
       label={t('PVC name')}
     >
-      <Select
-        aria-invalid={!pvcNameSelected ? true : false}
-        aria-labelledby={fieldId}
-        isDisabled={isDisabled}
-        isOpen={isOpen}
-        maxHeight={400}
-        menuAppendTo="parent"
-        onFilter={filter(pvcNames)}
-        onSelect={onSelect}
-        onToggle={() => setSelectOpen(!isOpen)}
-        placeholderText={t('--- Select PVC name ---')}
-        selections={pvcNameSelected}
-        validated={!pvcNameSelected ? ValidatedOptions.error : ValidatedOptions.default}
-        variant={SelectVariant.typeahead}
-      >
-        {pvcNames.map((name) => (
-          <SelectOption key={name} value={name} />
-        ))}
-      </Select>
+      <FilterSelect
+        options={pvcNames?.map((name) => ({
+          children: name,
+          value: name,
+        }))}
+        toggleProps={{
+          isDisabled,
+          isFullHeight: true,
+          placeholder: t('--- Select PVC name ---'),
+        }}
+        selected={pvcNameSelected}
+        setSelected={onChange}
+      />
     </FormGroup>
   );
 };

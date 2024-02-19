@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Flex, FlexItem, FormGroup, Popover } from '@patternfly/react-core';
@@ -6,10 +6,10 @@ import { HelpIcon } from '@patternfly/react-icons';
 
 type CloneStorageCheckboxProps = {
   isChecked: boolean;
-  onChange: (checked: boolean, event: React.FormEvent<HTMLInputElement>) => void;
+  onChange: (checked: boolean) => void;
 };
 
-const CloneStorageCheckbox: React.FC<CloneStorageCheckboxProps> = ({ isChecked, onChange }) => {
+const CloneStorageCheckbox: FC<CloneStorageCheckboxProps> = ({ isChecked, onChange }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -20,7 +20,7 @@ const CloneStorageCheckbox: React.FC<CloneStorageCheckboxProps> = ({ isChecked, 
             id="clone-storage"
             isChecked={isChecked}
             label={t("Copy template's boot source disk")}
-            onChange={onChange}
+            onChange={(_, checked: boolean) => onChange(checked)}
           />
         </FlexItem>
         <FlexItem>

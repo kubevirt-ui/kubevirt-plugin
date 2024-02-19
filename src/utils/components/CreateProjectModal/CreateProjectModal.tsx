@@ -86,7 +86,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
             id="project-name"
             isRequired
             name="project-name"
-            onChange={(value) => setName(value)}
+            onChange={(_event, value) => setName(value)}
             type="text"
             value={name}
           />
@@ -95,7 +95,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
           <TextInput
             id="display-name"
             name="display-name"
-            onChange={(value) => setDisplayName(value)}
+            onChange={(_event, value) => setDisplayName(value)}
             type="text"
             value={displayName}
           />
@@ -104,7 +104,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
           <TextInput
             id="description"
             name="description"
-            onChange={(value) => setDescription(value)}
+            onChange={(_event, value) => setDescription(value)}
             type="text"
             value={description}
           />

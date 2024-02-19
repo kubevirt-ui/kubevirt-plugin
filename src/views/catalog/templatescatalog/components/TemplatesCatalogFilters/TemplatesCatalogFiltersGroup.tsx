@@ -1,16 +1,15 @@
-import * as React from 'react';
+import React, { FC, memo, useMemo, useState } from 'react';
 
 import {
   FilterSidePanelCategory,
   FilterSidePanelCategoryItem,
 } from '@patternfly/react-catalog-view-extension';
-import { Split, SplitItem } from '@patternfly/react-core';
-import { Title } from '@patternfly/react-core/dist/esm/components/Title';
+import { Split, SplitItem, Title } from '@patternfly/react-core';
 import { AngleDownIcon, AngleRightIcon } from '@patternfly/react-icons';
 
 import './TemplatesCatalogFiltersGroup.scss';
 
-export const TemplatesCatalogFiltersGroup: React.FC<{
+export const TemplatesCatalogFiltersGroup: FC<{
   defaultExpanded?: boolean;
   filters: {
     count?: number;
@@ -21,11 +20,11 @@ export const TemplatesCatalogFiltersGroup: React.FC<{
   groupLabel?: string;
   onFilterClick: (type: string, value: string) => void;
   pickedFilters: Set<string>;
-}> = React.memo(
+}> = memo(
   ({ defaultExpanded = true, filters, groupKey, groupLabel, onFilterClick, pickedFilters }) => {
-    const [isExpanded, setIsExpanded] = React.useState(defaultExpanded);
+    const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
-    const memoFilters = React.useMemo(
+    const memoFilters = useMemo(
       () =>
         filters.map(({ count, label, value }) => (
           <FilterSidePanelCategoryItem

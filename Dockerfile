@@ -4,6 +4,7 @@ RUN command -v yarn || npm i -g yarn
 
 COPY . /opt/app-root/src
 WORKDIR /opt/app-root/src
+ENV NODE_OPTIONS=--max-old-space-size=8192
 RUN yarn install --frozen-lockfile --ignore-engines && yarn build
 
 FROM registry.access.redhat.com/ubi8/nginx-120

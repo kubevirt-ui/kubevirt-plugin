@@ -7,14 +7,10 @@ import {
   getCloudInitVolume,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  Stack,
-  StackItem,
-} from '@patternfly/react-core';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
+
+import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 import CloudInitInfoHelper from './CloudinitInfoHelper';
 
@@ -29,23 +25,23 @@ export const CloudInitDescription: FC<{ vm: V1VirtualMachine }> = ({ vm }) => {
         <CloudInitInfoHelper />
       </StackItem>
       <StackItem>
-        <DescriptionList columnModifier={{ lg: '1Col', xl: '3Col' }} isCompact>
-          <DescriptionListGroup>
-            <DescriptionListTerm>{t('User')}</DescriptionListTerm>
-            <DescriptionListDescription>{userData?.user || '-'}</DescriptionListDescription>
-          </DescriptionListGroup>
-          <DescriptionListGroup>
-            <DescriptionListTerm>{t('Password')}</DescriptionListTerm>
-            <DescriptionListDescription>
-              {userData?.password?.toString().replace(/./g, '*') || '-'}
-            </DescriptionListDescription>
-          </DescriptionListGroup>
-          <DescriptionListGroup>
-            <DescriptionListTerm>{t('Network data')}</DescriptionListTerm>
-            <DescriptionListDescription>
-              {cloudInitData?.networkData ? t('Custom') : t('Default')}
-            </DescriptionListDescription>
-          </DescriptionListGroup>
+        <DescriptionList
+          className="pf-c-description-list"
+          columnModifier={{ lg: '1Col', xl: '3Col' }}
+          isCompact
+        >
+          <VirtualMachineDescriptionItem
+            descriptionData={userData?.user || NO_DATA_DASH}
+            descriptionHeader={t('User')}
+          />
+          <VirtualMachineDescriptionItem
+            descriptionData={userData?.password?.toString().replace(/./g, '*') || NO_DATA_DASH}
+            descriptionHeader={t('Password')}
+          />
+          <VirtualMachineDescriptionItem
+            descriptionData={cloudInitData?.networkData ? t('Custom') : t('Default')}
+            descriptionHeader={t('Network data')}
+          />
         </DescriptionList>
       </StackItem>
     </Stack>

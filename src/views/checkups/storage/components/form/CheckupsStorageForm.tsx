@@ -39,7 +39,7 @@ const CheckupsStorageForm = () => {
                 id="name"
                 isRequired
                 name="name"
-                onChange={(value) => setName(value)}
+                onChange={(_event, value) => setName(value)}
                 value={name}
               />
             </FormGroup>
@@ -62,7 +62,7 @@ const CheckupsStorageForm = () => {
                 id="timeout"
                 isRequired
                 name="timeout"
-                onChange={(val) => setTimeOut(val)}
+                onChange={(_event, val) => setTimeOut(val)}
                 type="number"
                 value={timeOut}
               />

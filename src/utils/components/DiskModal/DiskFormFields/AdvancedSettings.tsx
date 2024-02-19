@@ -27,7 +27,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ diskState, dispatchDiskSt
         <StackItem>
           <Split hasGutter>
             <Checkbox
-              onChange={(checked) =>
+              onChange={(_event, checked) =>
                 dispatchDiskState({ payload: checked, type: diskReducerActions.SET_SHARABLE })
               }
               id="sharable-disk"
@@ -41,7 +41,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ diskState, dispatchDiskSt
         <StackItem>
           <Split hasGutter>
             <Checkbox
-              onChange={(checked) =>
+              onChange={(_event, checked) =>
                 dispatchDiskState({
                   payload: checked,
                   type: diskReducerActions.SET_LUN_RESERVATION,

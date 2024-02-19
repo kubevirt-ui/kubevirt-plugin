@@ -16,7 +16,7 @@ type SSHAccessProps = {
 
 const SSHAccess: React.FC<SSHAccessProps> = ({ sshService, sshServiceLoaded, vm, vmi }) => {
   return (
-    <DescriptionList>
+    <DescriptionList className="pf-c-description-list">
       <ConsoleOverVirtctl vm={vm} />
       <SSHCommand sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
     </DescriptionList>

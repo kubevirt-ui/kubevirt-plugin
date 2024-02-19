@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
@@ -14,11 +14,11 @@ type DeleteOwnedResourcesMessageProps = {
   deleteOwnedResource: boolean;
   loaded: boolean;
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  setDeleteOwnedResource: React.Dispatch<React.SetStateAction<boolean>>;
+  setDeleteOwnedResource: Dispatch<SetStateAction<boolean>>;
   snapshots: V1alpha1VirtualMachineSnapshot[];
 };
 
-const DeleteOwnedResourcesMessage: React.FC<DeleteOwnedResourcesMessageProps> = ({
+const DeleteOwnedResourcesMessage: FC<DeleteOwnedResourcesMessageProps> = ({
   dataVolumes,
   deleteOwnedResource,
   loaded,
@@ -56,7 +56,7 @@ const DeleteOwnedResourcesMessage: React.FC<DeleteOwnedResourcesMessageProps> = 
             id="delete-owned-resources"
             isChecked={deleteOwnedResource}
             label={t('Delete disks ({{diskCount}}x)', { diskCount })}
-            onChange={setDeleteOwnedResource}
+            onChange={(_, checked: boolean) => setDeleteOwnedResource(checked)}
           />
         </StackItem>
       )}

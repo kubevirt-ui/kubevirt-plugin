@@ -2,12 +2,14 @@ import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useState }
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getSecretNameErrorMessage } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
-  ResourceLink,
   useActiveNamespace,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -15,13 +17,9 @@ import {
   Alert,
   AlertVariant,
   Bullseye,
-  Form,
   FormGroup,
   Grid,
   GridItem,
-  Select,
-  SelectOption,
-  SelectVariant,
   TextInput,
   ValidatedOptions,
 } from '@patternfly/react-core';
@@ -32,6 +30,7 @@ import SecretDropdown from '../SecretDropdown/SecretDropdown';
 import './SSHOptionUseExisting.scss';
 
 type SSHOptionUseExistingProps = {
+  loadedSecrets: boolean;
   localNSProject: string;
   namespace?: string;
   projectsWithSecrets: { [namespace: string]: IoK8sApiCoreV1Secret[] };
@@ -42,6 +41,7 @@ type SSHOptionUseExistingProps = {
 };
 
 const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
+  loadedSecrets,
   localNSProject,
   namespace,
   projectsWithSecrets,
@@ -52,7 +52,6 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<string>();
   const [projectsData] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
@@ -73,22 +72,8 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
     [namespace, localNSProject, projects, selectedProject, sshDetails?.sshSecretNamespace],
   );
 
-  const onFilterProject = (_: any, value: string) => {
-    const filteredProjects = projects?.filter((project) => project.includes(value));
-
-    return filteredProjects?.map((project) => (
-      <SelectOption key={project} value={project}>
-        <ResourceLink
-          groupVersionKind={modelToGroupVersionKind(ProjectModel)}
-          linkTo={false}
-          name={project}
-        />
-      </SelectOption>
-    ));
-  };
-
   const onSelectProject = useCallback(
-    (_: any, newValue: string) => {
+    (newValue: string) => {
       setSelectedProject(newValue);
       setLocalNSProject(newValue);
       const addNew = namespace ? newValue !== namespace : newValue !== activeNamespace;
@@ -99,8 +84,6 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
         sshSecretName: '',
         sshSecretNamespace: namespace,
       }));
-
-      setIsOpen(false);
     },
     [setLocalNSProject, namespace, activeNamespace, setSSHDetails],
   );
@@ -115,7 +98,6 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
       ...prev,
       sshSecretName: newSecretName,
     }));
-    setIsOpen(false);
   };
 
   return !isEmpty(projects) ? (
@@ -130,29 +112,17 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
       <Grid className="ssh-use-existing__body">
         <GridItem span={6}>
           <FormGroup fieldId="project" label={t('Project')}>
-            <Select
+            <FilterSelect
+              options={projects.map((proj) => ({
+                children: proj,
+                groupVersionKind: modelToGroupVersionKind(ProjectModel),
+                value: proj,
+              }))}
               className="ssh-use-existing__form-group--project"
-              hasInlineFilter
-              inlineFilterPlaceholderText={t('Search project')}
-              isOpen={isOpen}
-              maxHeight={400}
-              menuAppendTo="parent"
-              onFilter={onFilterProject}
-              onSelect={onSelectProject}
-              onToggle={setIsOpen}
-              selections={selectedProject}
-              variant={SelectVariant.single}
-            >
-              {projects?.map((project) => (
-                <SelectOption key={project} value={project}>
-                  <ResourceLink
-                    groupVersionKind={modelToGroupVersionKind(ProjectModel)}
-                    linkTo={false}
-                    name={project}
-                  />
-                </SelectOption>
-              ))}
-            </Select>
+              selected={selectedProject}
+              setSelected={onSelectProject}
+              toggleProps={{ placeholder: t('Search project') }}
+            />
           </FormGroup>
         </GridItem>
         <GridItem span={6}>
@@ -161,37 +131,35 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
             fieldId="secret"
             label={t('Public SSH key')}
           >
-            <SecretDropdown
-              namespace={namespace}
-              onSelectSecret={onSelectSecret}
-              secretsResourceData={projectsWithSecrets?.[selectedProject]}
-              selectedProject={selectedProject}
-              setSSHDetails={setSSHDetails}
-              sshDetails={sshDetails}
-            />
+            {loadedSecrets ? (
+              <SecretDropdown
+                namespace={namespace}
+                onSelectSecret={onSelectSecret}
+                secretsResourceData={projectsWithSecrets?.[selectedProject]}
+                selectedProject={selectedProject}
+                setSSHDetails={setSSHDetails}
+                sshDetails={sshDetails}
+              />
+            ) : (
+              <Loading />
+            )}
           </FormGroup>
         </GridItem>
       </Grid>
       {showNewSecretNameField && (
-        <Form isHorizontal>
-          <FormGroup
-            className="ssh-use-existing__form-group--new-secret-name"
-            helperTextInvalid={nameErrorMessage}
-            isInline
-            isRequired
-            label={t('New secret name')}
+        <FormGroup label={t('New secret name')}>
+          <TextInput
+            id="new-secret-name"
+            onChange={(_event, newSecretName: string) => onChangeSecretName(newSecretName)}
+            type="text"
+            value={sshDetails.sshSecretName}
+          />
+          <FormGroupHelperText
             validated={!nameErrorMessage ? ValidatedOptions.default : ValidatedOptions.error}
           >
-            <TextInput
-              className="ssh-use-existing__text--new-secret-name"
-              id="new-secret-name"
-              isRequired
-              onChange={onChangeSecretName}
-              type="text"
-              value={sshDetails.sshSecretName}
-            />
-          </FormGroup>
-        </Form>
+            {nameErrorMessage && nameErrorMessage}
+          </FormGroupHelperText>
+        </FormGroup>
       )}
     </>
   ) : (

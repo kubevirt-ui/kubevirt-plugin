@@ -1,4 +1,4 @@
-import React, { FC, MouseEventHandler, SyntheticEvent, useState } from 'react';
+import React, { FC, FormEvent, MouseEventHandler, SyntheticEvent, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
@@ -52,7 +52,7 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
       : new Set(defaultColumns.map((col) => col.id)),
   );
 
-  const onColumnChange = (checked: boolean, event: SyntheticEvent): void => {
+  const onColumnChange = (event: FormEvent<HTMLInputElement>): void => {
     const updatedCheckedColumns = new Set<string>(checkedColumns);
     const selectedId = getColumnId(event?.currentTarget?.id);
     updatedCheckedColumns.has(selectedId)

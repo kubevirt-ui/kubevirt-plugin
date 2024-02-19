@@ -1,9 +1,7 @@
-import React, { FC, memo, useState } from 'react';
+import React, { FC, memo } from 'react';
 
-import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
-import { Dropdown, DropdownToggle, KebabToggle } from '@patternfly/react-core';
 
 import './VirtualMachineActions.scss';
 
@@ -13,32 +11,15 @@ type VirtualMachinesInstanceActionsProps = {
 };
 
 const VirtualMachineActions: FC<VirtualMachinesInstanceActionsProps> = ({
-  actions = [],
+  actions,
   isKebabToggle,
-}) => {
-  const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <Dropdown
-      dropdownItems={actions?.map((action) => (
-        <ActionDropdownItem action={action} key={action?.id} setIsOpen={setIsOpen} />
-      ))}
-      toggle={
-        isKebabToggle ? (
-          <KebabToggle onToggle={setIsOpen} />
-        ) : (
-          <DropdownToggle onToggle={setIsOpen}>{t('Actions')}</DropdownToggle>
-        )
-      }
-      className="VirtualMachineActions"
-      data-test-id="virtual-machine-actions"
-      isFlipEnabled
-      isOpen={isOpen}
-      isPlain={isKebabToggle}
-      menuAppendTo="parent"
-    />
-  );
-};
+}) => (
+  <ActionsDropdown
+    actions={actions}
+    className="VirtualMachineActions"
+    id="virtual-machine-actions"
+    isKebabToggle={isKebabToggle}
+  />
+);
 
 export default memo(VirtualMachineActions);

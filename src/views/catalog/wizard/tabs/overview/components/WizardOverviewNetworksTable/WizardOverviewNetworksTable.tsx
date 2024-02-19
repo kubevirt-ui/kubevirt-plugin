@@ -1,17 +1,11 @@
 import * as React from 'react';
 
+import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
-import {
-  DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  Stack,
-  StackItem,
-} from '@patternfly/react-core';
+import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
 export const interfacesTypes = {
   bridge: 'Bridge',
@@ -28,20 +22,23 @@ export const WizardOverviewNetworksTable: React.FC<{
   const networkData = getNetworkInterfaceRowData(networks, interfaces);
 
   return (
-    <DescriptionList columnModifier={{ default: '3Col' }} isInlineGrid={isInlineGrid}>
-      <DescriptionListGroup>
-        <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
-        <DescriptionListDescription>
+    <DescriptionList
+      className="pf-c-description-list"
+      columnModifier={{ default: '3Col' }}
+      isInlineGrid={isInlineGrid}
+    >
+      <WizardDescriptionItem
+        description={
           <Stack>
             {networkData.map((n) => (
               <StackItem key={n.network.name}>{n.network.name}</StackItem>
             ))}
           </Stack>
-        </DescriptionListDescription>
-      </DescriptionListGroup>
-      <DescriptionListGroup>
-        <DescriptionListTerm>{t('Network')}</DescriptionListTerm>
-        <DescriptionListDescription>
+        }
+        title={t('Name')}
+      />
+      <WizardDescriptionItem
+        description={
           <Stack>
             {networkData.map((n) => (
               <StackItem key={n.network.name}>
@@ -49,18 +46,19 @@ export const WizardOverviewNetworksTable: React.FC<{
               </StackItem>
             ))}
           </Stack>
-        </DescriptionListDescription>
-      </DescriptionListGroup>
-      <DescriptionListGroup>
-        <DescriptionListTerm>{t('Type')}</DescriptionListTerm>
-        <DescriptionListDescription>
+        }
+        title={t('Network')}
+      />
+      <WizardDescriptionItem
+        description={
           <Stack>
             {networkData.map((n) => (
               <StackItem key={n.iface.name}>{getPrintableNetworkInterfaceType(n.iface)}</StackItem>
             ))}
           </Stack>
-        </DescriptionListDescription>
-      </DescriptionListGroup>
+        }
+        title={t('Type')}
+      />
     </DescriptionList>
   );
 });

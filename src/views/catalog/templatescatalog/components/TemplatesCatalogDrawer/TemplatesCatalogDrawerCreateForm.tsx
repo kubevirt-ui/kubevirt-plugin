@@ -1,6 +1,7 @@
 import React, { FC, memo } from 'react';
 
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
@@ -10,9 +11,6 @@ import {
   ButtonVariant,
   Checkbox,
   DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
   FormGroup,
   Split,
   SplitItem,
@@ -68,18 +66,18 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                       isDisabled={Boolean(templateLoadingError)}
                       isRequired
                       name="vmname"
-                      onChange={onVMNameChange}
+                      onChange={(_, value: string) => onVMNameChange(value)}
                       type="text"
                       value={nameField}
                     />
                   </FormGroup>
                 </SplitItem>
                 <SplitItem>
-                  <DescriptionList>
-                    <DescriptionListGroup>
-                      <DescriptionListTerm>{t('Project')}</DescriptionListTerm>
-                      <DescriptionListDescription>{namespace}</DescriptionListDescription>
-                    </DescriptionListGroup>
+                  <DescriptionList className="pf-c-description-list">
+                    <VirtualMachineDescriptionItem
+                      descriptionData={namespace}
+                      descriptionHeader={t('Project')}
+                    />
                   </DescriptionList>
                 </SplitItem>
                 <AuthorizedSSHKey authorizedSSHKey={authorizedSSHKey} namespace={namespace} />
@@ -91,7 +89,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                 id="start-after-create-checkbox"
                 isChecked={startVM}
                 label={t('Start this VirtualMachine after creation')}
-                onChange={onChangeStartVM}
+                onChange={(_, checked: boolean) => onChangeStartVM(checked)}
               />
             </StackItem>
           </>

@@ -69,7 +69,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
       <FormGroup isRequired label={t('Volume name')}>
         <TextInput
           id="name"
-          onChange={setBootableVolumeField('bootableVolumeName')}
+          onChange={(_, value: string) => setBootableVolumeField('bootableVolumeName')(value)}
           type="text"
           value={bootableVolumeName}
         />

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
 import { TemplateParameter } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,13 +12,9 @@ type ParameterEditorProps = {
   parameter: TemplateParameter;
 };
 
-const ParameterEditor: React.FC<ParameterEditorProps> = ({
-  isEditDisabled,
-  onChange,
-  parameter,
-}) => {
+const ParameterEditor: FC<ParameterEditorProps> = ({ isEditDisabled, onChange, parameter }) => {
   const { t } = useKubevirtTranslation();
-  const [isExpanded, setExpanded] = React.useState(true);
+  const [isExpanded, setExpanded] = useState(true);
 
   return (
     <ExpandableSection
@@ -29,7 +25,7 @@ const ParameterEditor: React.FC<ParameterEditorProps> = ({
       }
       isExpanded={isExpanded}
       isIndented
-      onToggle={setExpanded}
+      onToggle={(_, expand: boolean) => setExpanded(expand)}
     >
       <FormGroup fieldId={`${parameter.name}-required`}>
         <Checkbox
@@ -37,14 +33,14 @@ const ParameterEditor: React.FC<ParameterEditorProps> = ({
           isChecked={parameter.required}
           isDisabled={isEditDisabled}
           label={t('Required')}
-          onChange={(required) => onChange({ ...parameter, required })}
+          onChange={(_event, required) => onChange({ ...parameter, required })}
         />
       </FormGroup>
       <FormGroup fieldId={`${parameter.name}-description`} label={t('Description')}>
         <TextInput
           id={`${parameter.name}-description`}
           isDisabled={isEditDisabled}
-          onChange={(description) => onChange({ ...parameter, description })}
+          onChange={(_event, description) => onChange({ ...parameter, description })}
           value={parameter.description}
         />
       </FormGroup>

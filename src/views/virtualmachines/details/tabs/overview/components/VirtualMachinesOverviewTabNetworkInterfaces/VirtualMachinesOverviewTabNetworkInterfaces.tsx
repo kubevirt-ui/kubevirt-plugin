@@ -38,7 +38,7 @@ const VirtualMachinesOverviewTabInterfaces: FC<VirtualMachinesOverviewTabInterfa
               location?.pathname,
             )}
           >
-            {t('Network interfaces ({{count}})', { count: data?.length || 0 })}
+            {t('Network interfaces ({{networks}})', { networks: data?.length || 0 })}
           </Link>
         </CardTitle>
         <Divider />

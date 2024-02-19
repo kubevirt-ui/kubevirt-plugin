@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { BootableDeviceType } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import { Button, FormSelect, FormSelectOption } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-export const AddDeviceFormSelect: React.FC<AddDeviceFormSelectProps> = ({
+export const AddDeviceFormSelect: FC<AddDeviceFormSelectProps> = ({
   id,
   label,
   onAdd,
@@ -15,7 +15,7 @@ export const AddDeviceFormSelect: React.FC<AddDeviceFormSelectProps> = ({
     <FormSelect
       className="kubevirt-boot-order__add-device-select"
       id={id}
-      onChange={onAdd}
+      onChange={(_, value: string) => onAdd(value)}
       value=""
     >
       <FormSelectOption label={label} value="" />

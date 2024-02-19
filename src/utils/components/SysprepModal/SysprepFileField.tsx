@@ -1,8 +1,14 @@
-import * as React from 'react';
+import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import { XMLValidator } from 'fast-xml-parser';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FileUpload, Text, TextVariants, ValidatedOptions } from '@patternfly/react-core';
+import {
+  DropEvent,
+  FileUpload,
+  Text,
+  TextVariants,
+  ValidatedOptions,
+} from '@patternfly/react-core';
 
 export type SysprepFile = {
   fileName: string;
@@ -17,19 +23,18 @@ type SysprepFileFieldProps = {
   value?: string;
 };
 
-const SysprepFileField: React.FC<SysprepFileFieldProps> = ({ id, onChange, value }) => {
+const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) => {
   const { t } = useKubevirtTranslation();
-  const [data, setData] = React.useState<SysprepFile>({
+  const [data, setData] = useState<SysprepFile>({
     fileName: '',
     isLoading: false,
     validated: ValidatedOptions.default,
     value,
   });
 
-  const onFieldChange = (newValue: string, fileName: string) => {
+  const onFieldChange = (newValue: string) => {
     setData((currentSysprepFile) => ({
       ...currentSysprepFile,
-      fileName,
       validated:
         XMLValidator.validate(newValue) === true
           ? ValidatedOptions.default
@@ -38,7 +43,7 @@ const SysprepFileField: React.FC<SysprepFileFieldProps> = ({ id, onChange, value
     }));
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (data.validated) {
       onChange(data.value);
     }
@@ -47,11 +52,17 @@ const SysprepFileField: React.FC<SysprepFileFieldProps> = ({ id, onChange, value
   return (
     <>
       <FileUpload
+        onFileInputChange={(event: DropEvent, file: File) => {
+          setData((currentData: SysprepFile) => ({ ...currentData, fileName: file.name }));
+        }}
         onReadFinished={() =>
           setData((currentData: SysprepFile) => ({ ...currentData, isLoading: false }))
         }
         onReadStarted={() =>
           setData((currentData: SysprepFile) => ({ ...currentData, isLoading: true }))
+        }
+        onTextChange={(event: ChangeEvent<HTMLTextAreaElement>, text: string) =>
+          onFieldChange(text)
         }
         validated={
           data.validated !== ValidatedOptions.error
@@ -64,7 +75,7 @@ const SysprepFileField: React.FC<SysprepFileFieldProps> = ({ id, onChange, value
         id={`sysprep-${id}-input`}
         isLoading={data.isLoading}
         isReadOnly={false}
-        onChange={onFieldChange}
+        onDataChange={(event: DropEvent, text: string) => onFieldChange(text)}
         type="text"
         value={data.value}
       />

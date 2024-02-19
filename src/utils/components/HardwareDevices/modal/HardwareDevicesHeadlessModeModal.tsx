@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +17,7 @@ type HardwareDevicesHeadlessModeModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const HardwareDevicesHeadlessModeModal: React.FC<HardwareDevicesHeadlessModeModalProps> = ({
+const HardwareDevicesHeadlessModeModal: FC<HardwareDevicesHeadlessModeModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
@@ -53,19 +54,18 @@ const HardwareDevicesHeadlessModeModal: React.FC<HardwareDevicesHeadlessModeModa
     >
       <Form>
         {vmi && <ModalPendingChangesAlert />}
-        <FormGroup
-          helperText={t(
-            'Applying the headless mode to this Virtual Machine will cause the VNC not be available if checked.',
-          )}
-          fieldId="headless-mode-modal"
-          isInline
-        >
+        <FormGroup fieldId="headless-mode-modal" isInline>
           <Checkbox
             id="headless-mode-checkbox"
             isChecked={checked}
             label={t('Enable headless mode')}
-            onChange={setChecked}
+            onChange={(_event, val) => setChecked(val)}
           />
+          <FormGroupHelperText>
+            {t(
+              'Applying the headless mode to this Virtual Machine will cause the VNC not be available if checked.',
+            )}
+          </FormGroupHelperText>
         </FormGroup>
       </Form>
     </TabModal>

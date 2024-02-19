@@ -4,6 +4,7 @@ import { getWorkloadProfile } from 'src/views/templates/utils/selectors';
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -13,13 +14,6 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { getWorkload } from '@kubevirt-utils/resources/vm';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Button,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
-import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
@@ -68,15 +62,12 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ editable, templat
     ));
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>{t('Workload profile')}</DescriptionListTerm>
-      <DescriptionListDescription>
-        {t(workload)}
-        <Button isDisabled={!editable} isInline onClick={onEditClick} type="button" variant="link">
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </Button>
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+    <VirtualMachineDescriptionItem
+      descriptionData={workload}
+      descriptionHeader={t('Workload profile')}
+      isEdit={editable}
+      onEditClick={onEditClick}
+    />
   );
 };
 

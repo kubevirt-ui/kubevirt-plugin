@@ -1,7 +1,11 @@
+import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1DataVolumeTemplateSpec, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { SelectOptionProps } from '@patternfly/react-core';
 
 import { interfaceTypes, sourceTypes, volumeTypes } from './constants';
 
@@ -11,52 +15,63 @@ type DropdownOptionProps = {
   name: string;
 };
 
+export const sourceOptionTitles = {
+  [sourceTypes.BLANK]: t('Blank (creates PVC)'),
+  [sourceTypes.CLONE_PVC]: t('PVC (creates PVC)'),
+  [sourceTypes.DATA_SOURCE]: t('PVC auto import (use DataSource)'),
+  [sourceTypes.EPHEMERAL]: t('Container (ephemeral)'),
+  [sourceTypes.HTTP]: t('URL (creates PVC)'),
+  [sourceTypes.PVC]: t('Use an existing PVC'),
+  [sourceTypes.REGISTRY]: t('Registry (creates PVC)'),
+  [sourceTypes.UPLOAD]: t('Upload (Upload a new file to PVC)'),
+};
+
 export const getSourceOptions = (isTemplate: boolean): DropdownOptionProps[] => [
   {
     description: t('Create an empty disk.'),
     id: sourceTypes.BLANK,
-    name: t('Blank (creates PVC)'),
+    name: sourceOptionTitles[sourceTypes.BLANK],
   },
   {
     description: t(
       'Select an existing persistent volume claim already available on the cluster and clone it.',
     ),
     id: sourceTypes.CLONE_PVC,
-    name: t('PVC (creates PVC)'),
+    name: sourceOptionTitles[sourceTypes.CLONE_PVC],
   },
   {
     description: t(
       'Upload content from a container located in a registry accessible from the cluster. The container disk is meant to be used only for read-only filesystems such as CD-ROMs or for small short-lived throw-away VMs.',
     ),
     id: sourceTypes.EPHEMERAL,
-    name: t('Container (ephemeral)'),
+    name: sourceOptionTitles[sourceTypes.EPHEMERAL],
   },
   {
     description: t('Select DataSource to use for automatic image upload.'),
     id: sourceTypes.DATA_SOURCE,
-    name: t('PVC auto import (use DataSource)'),
+    name: sourceOptionTitles[sourceTypes.DATA_SOURCE],
   },
   {
     description: t('Import content via URL (HTTP or HTTPS endpoint).'),
     id: sourceTypes.HTTP,
-    name: t('URL (creates PVC)'),
+    name: sourceOptionTitles[sourceTypes.HTTP],
   },
   {
     description: t('Use a persistent volume claim (PVC) already available on the cluster.'),
     id: sourceTypes.PVC,
-    name: t('Use an existing PVC'),
+    name: sourceOptionTitles[sourceTypes.PVC],
   },
   {
     description: t('Import content via container registry.'),
     id: sourceTypes.REGISTRY,
-    name: t('Registry (creates PVC)'),
+    name: sourceOptionTitles[sourceTypes.REGISTRY],
   },
   ...(!isTemplate
     ? [
         {
           description: t('Upload a new file to PVC. a new PVC will be created.'),
           id: sourceTypes.UPLOAD,
-          name: t('Upload (Upload a new file to PVC)'),
+          name: sourceOptionTitles[sourceTypes.UPLOAD],
         },
       ]
     : []),
@@ -94,27 +109,33 @@ export const getURLSourceHelpertText = (os: OS_NAME_TYPES) => {
   }
 };
 
+export const interfaceOptionTitles = {
+  [interfaceTypes.SATA]: t('SATA'),
+  [interfaceTypes.SCSI]: t('SCSI'),
+  [interfaceTypes.VIRTIO]: t('VirtIO'),
+};
+
 export const getInterfaceOptions = (): DropdownOptionProps[] => [
   {
     description: t(
       'Supported by most operating systems including Windows out of the box. Offers lower performance compared to virtio. Consider using it for CD-ROM devices.',
     ),
     id: interfaceTypes.SATA,
-    name: t('SATA'),
+    name: interfaceOptionTitles[interfaceTypes.SATA],
   },
   {
     description: t(
       'Paravirtualized iSCSI HDD driver offers similar functionality to the virtio-block device, with some additional enhancements. In particular, this driver supports adding hundreds of devices, and names devices using the standard SCSI device naming scheme.',
     ),
     id: interfaceTypes.SCSI,
-    name: t('SCSI'),
+    name: interfaceOptionTitles[interfaceTypes.SCSI],
   },
   {
     description: t(
       'Optimized for best performance. Supported by most Linux distributions. Windows requires additional drivers to use this model.',
     ),
     id: interfaceTypes.VIRTIO,
-    name: t('VirtIO'),
+    name: interfaceOptionTitles[interfaceTypes.VIRTIO],
   },
 ];
 
@@ -153,3 +174,21 @@ export const isDefaultStorageClass = (storageClass: IoK8sApiStorageV1StorageClas
 export const getDefaultStorageClass = (
   storageClasses: IoK8sApiStorageV1StorageClass[],
 ): IoK8sApiStorageV1StorageClass => storageClasses?.find(isDefaultStorageClass);
+
+export const getSCSelectOptions = (
+  storageClasses: IoK8sApiStorageV1StorageClass[],
+): SelectOptionProps[] =>
+  storageClasses?.map((sc) => {
+    const scName = getName(sc);
+    const defaultSC = isDefaultStorageClass(sc) ? t('(default) | ') : '';
+    const descriptionAnnotation = getAnnotation(sc, DESCRIPTION_ANNOTATION)?.concat(' | ') || '';
+    const scType = sc?.parameters?.type ? ' | '.concat(sc?.parameters?.type) : '';
+    const description = `${defaultSC}${descriptionAnnotation}${sc?.provisioner}${scType}`;
+
+    return {
+      children: scName,
+      description,
+      groupVersionKind: modelToGroupVersionKind(StorageClassModel),
+      value: scName,
+    };
+  });

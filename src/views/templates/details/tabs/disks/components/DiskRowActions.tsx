@@ -6,15 +6,10 @@ import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessag
 import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import {
-  ButtonVariant,
-  Dropdown,
-  DropdownItem,
-  DropdownPosition,
-  KebabToggle,
-} from '@patternfly/react-core';
+import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import { useEditDiskStates } from '../hooks/useEditDiskState';
 
@@ -90,25 +85,25 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdat
     ));
   };
 
+  const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
+
   return (
     <Dropdown
-      dropdownItems={[
+      isOpen={isDropdownOpen}
+      onOpenChange={(open: boolean) => setIsDropdownOpen(open)}
+      onSelect={() => setIsDropdownOpen(false)}
+      popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
+      toggle={KebabToggle({ id: 'toggle-id-disk', isDisabled, onClick: onToggle })}
+    >
+      <DropdownList>
         <DropdownItem key="disk-edit" onClick={onEditModalToggle}>
           {t('Edit')}
-        </DropdownItem>,
+        </DropdownItem>
         <DropdownItem key="disk-delete" onClick={onDeleteModalToggle}>
           {deleteBtnText}
-        </DropdownItem>,
-      ]}
-      toggle={
-        <KebabToggle id="toggle-id-disk" isDisabled={isDisabled} onToggle={setIsDropdownOpen} />
-      }
-      isOpen={isDropdownOpen}
-      isPlain
-      menuAppendTo={getContentScrollableElement}
-      onSelect={() => setIsDropdownOpen(false)}
-      position={DropdownPosition.right}
-    />
+        </DropdownItem>
+      </DropdownList>
+    </Dropdown>
   );
 };
 

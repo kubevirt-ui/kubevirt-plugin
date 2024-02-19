@@ -50,7 +50,11 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({
 
   return (
     <div className="co-suggestion-box" ref={ref}>
-      <SearchFilter onChange={handleInput} placeholder={placeholder} value={textValue} />
+      <SearchFilter
+        onChange={(_, input: string) => handleInput(input)}
+        placeholder={placeholder}
+        value={textValue}
+      />
       {visible && (
         <div
           className={classNames('co-suggestion-box__suggestions', {

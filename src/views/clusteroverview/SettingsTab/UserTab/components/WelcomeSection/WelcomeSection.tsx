@@ -12,9 +12,11 @@ const WelcomeSection: FC = () => {
   return (
     <ExpandSection toggleText={t('Welcome information')}>
       <Switch
+        onChange={(_event, value) =>
+          setQuickStarts({ ...quickStarts, dontShowWelcomeModal: !value })
+        }
         isChecked={!quickStarts?.dontShowWelcomeModal}
         label={quickStarts?.dontShowWelcomeModal ? t('Hide') : t('Show')}
-        onChange={(value) => setQuickStarts({ ...quickStarts, dontShowWelcomeModal: !value })}
       />
     </ExpandSection>
   );

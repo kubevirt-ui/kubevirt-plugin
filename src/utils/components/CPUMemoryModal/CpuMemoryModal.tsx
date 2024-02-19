@@ -13,15 +13,16 @@ import {
   Alert,
   Button,
   ButtonVariant,
-  Dropdown,
-  DropdownItem,
-  DropdownToggle,
   Modal,
   ModalVariant,
   NumberInput,
+  SelectList,
+  SelectOption,
   Title,
   TitleSizes,
 } from '@patternfly/react-core';
+
+import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
 import { getMemorySize, memorySizesTypes } from './utils/CpuMemoryUtils';
@@ -62,7 +63,6 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
   const [memory, setMemory] = useState<number>();
   const [cpuCores, setCpuCores] = useState<number>();
   const [memoryUnit, setMemoryUnit] = useState<string>();
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
 
@@ -179,26 +179,19 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
             value={memory}
           />
 
-          <Dropdown
-            dropdownItems={memorySizesTypes.map((value) => {
-              return (
-                <DropdownItem component="button" key={value} value={value}>
-                  {toIECUnit(value)}
-                </DropdownItem>
-              );
-            })}
-            onSelect={(e: ChangeEvent<HTMLInputElement>) => {
-              setMemoryUnit(e?.target?.value);
-              setIsDropdownOpen(false);
-            }}
-            toggle={
-              <DropdownToggle onToggle={(toggeld) => setIsDropdownOpen(toggeld)}>
-                {toIECUnit(memoryUnit)}
-              </DropdownToggle>
-            }
+          <FormPFSelect
             className="input-memory--dropdown"
-            isOpen={isDropdownOpen}
-          />
+            selected={memoryUnit}
+            selectedLabel={toIECUnit(memoryUnit)}
+          >
+            <SelectList>
+              {memorySizesTypes.map((value: string) => (
+                <SelectOption key={value} onClick={() => setMemoryUnit(value)} value={value}>
+                  {toIECUnit(value)}
+                </SelectOption>
+              ))}
+            </SelectList>
+          </FormPFSelect>
         </div>
       </div>
       {updateError && (

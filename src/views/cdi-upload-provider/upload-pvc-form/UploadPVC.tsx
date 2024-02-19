@@ -161,13 +161,16 @@ const UploadPVCPage: FC = () => {
     }
   };
 
-  const handleFileChange = (value, filename) => {
-    setFileName(filename);
+  const handleFileChange = (_, value) => {
     setFileValue(value);
 
-    setFileNameExtension(/[.][^.]+$/.exec(filename)?.toString());
     setIsFileRejected(false);
     setError('');
+  };
+
+  const handleFileNameChange = (_, file: File) => {
+    setFileName(file.name);
+    setFileNameExtension(/[.][^.]+$/.exec(file.name)?.toString());
   };
 
   useEffect(() => {
@@ -196,6 +199,7 @@ const UploadPVCPage: FC = () => {
             fileValue={fileValue}
             goldenPvcs={goldenPvcs}
             handleFileChange={handleFileChange}
+            handleFileNameChange={handleFileNameChange}
             isLoading={!loadedTemplates}
             ns={initialNamespace}
             onChange={setDvObj}

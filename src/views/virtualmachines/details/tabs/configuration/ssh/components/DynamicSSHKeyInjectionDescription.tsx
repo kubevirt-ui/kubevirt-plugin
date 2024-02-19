@@ -19,8 +19,8 @@ const DynamicSSHKeyInjectionDescription = ({ isDynamicSSHInjectionEnabled }) => 
         icon={<ExternalLinkSquareAltIcon />}
         iconPosition="right"
         isInline
-        isSmall
         rel="noopener noreferrer"
+        size="sm"
         target="_blank"
         variant="link"
       >

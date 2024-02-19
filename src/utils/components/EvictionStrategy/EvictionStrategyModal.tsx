@@ -10,6 +10,8 @@ import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
 
+import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
+
 import { EVICTION_STRATEGIES } from './constants';
 
 type EvictionStrategyModalProps = {
@@ -69,19 +71,18 @@ const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
     >
       <Form>
         {vmi && <ModalPendingChangesAlert />}
-        <FormGroup
-          helperText={t(
-            'EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.',
-          )}
-          fieldId="eviction-strategy"
-          isInline
-        >
+        <FormGroup fieldId="eviction-strategy" isInline>
           <Checkbox
             id="eviction-strategy"
             isChecked={isChecked}
             label={t('LiveMigrate')}
-            onChange={setIsChecked}
+            onChange={(_event, val) => setIsChecked(val)}
           />
+          <FormGroupHelperText>
+            {t(
+              'EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.',
+            )}
+          </FormGroupHelperText>
         </FormGroup>
       </Form>
     </TabModal>

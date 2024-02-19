@@ -7,7 +7,7 @@ import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
 
-import FilterSelect from '../../../FilterSelect/FilterSelect';
+import FilterSelect from '../../../../../FilterSelect/FilterSelect';
 
 import PreferencePopoverContent from './PreferencePopoverContent';
 
@@ -37,11 +37,16 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
       isRequired
     >
       <FilterSelect
-        groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
-        optionLabelText={t('preference')}
-        options={preferencesNames?.sort((a, b) => a.localeCompare(b))}
+        options={preferencesNames
+          ?.sort((a, b) => a.localeCompare(b))
+          ?.map((opt) => ({
+            children: opt,
+            groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
+            value: opt,
+          }))}
         selected={selectedPreference}
         setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
+        toggleProps={{ isFullWidth: true, placeholder: t('Select preference') }}
       />
     </FormGroup>
   );

@@ -13,9 +13,12 @@ import {
   Form,
   FormGroup,
   InputGroup,
+  InputGroupItem,
   TextInput,
 } from '@patternfly/react-core';
 import { EyeIcon, EyeSlashIcon } from '@patternfly/react-icons';
+
+import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 
 import { CloudInitNetworkData, CloudInitUserData } from './utils/cloudinit-utils';
 import CloudInitEditor from './CloudInitEditor';
@@ -70,7 +73,7 @@ const CloudinitForm: FC<CloudinitFormProps> = ({
             required
           >
             <TextInput
-              onChange={(v) => {
+              onChange={(_event, v) => {
                 setSubmitDisabled(isEmpty(v));
                 updateUserField('user', v);
               }}
@@ -80,7 +83,29 @@ const CloudinitForm: FC<CloudinitFormProps> = ({
             />
           </FormGroup>
           <FormGroup
-            helperText={
+            className="kv-cloudint-advanced-tab--validation-text"
+            fieldId={'cloudinit-password'}
+            label={t('Password')}
+          >
+            <InputGroup>
+              <InputGroupItem isFill>
+                <TextInput
+                  id="cloudinit-password"
+                  onChange={(_event, v) => updateUserField('password', v)}
+                  type={passwordHidden ? 'password' : 'text'}
+                  value={userData?.password || ''}
+                />
+              </InputGroupItem>
+              <InputGroupItem>
+                <Button
+                  onClick={() => setPasswordHidden(!passwordHidden)}
+                  variant={ButtonVariant.link}
+                >
+                  {passwordHidden ? <EyeIcon /> : <EyeSlashIcon />}
+                </Button>
+              </InputGroupItem>
+            </InputGroup>
+            <FormGroupHelperText>
               <Trans ns="plugin__kubevirt-plugin" t={t}>
                 Password for this username -{' '}
                 <Button
@@ -96,25 +121,7 @@ const CloudinitForm: FC<CloudinitFormProps> = ({
                   generate password
                 </Button>
               </Trans>
-            }
-            className="kv-cloudint-advanced-tab--validation-text"
-            fieldId={'cloudinit-password'}
-            label={t('Password')}
-          >
-            <InputGroup>
-              <TextInput
-                id="cloudinit-password"
-                onChange={(v) => updateUserField('password', v)}
-                type={passwordHidden ? 'password' : 'text'}
-                value={userData?.password || ''}
-              />
-              <Button
-                onClick={() => setPasswordHidden(!passwordHidden)}
-                variant={ButtonVariant.link}
-              >
-                {passwordHidden ? <EyeIcon /> : <EyeSlashIcon />}
-              </Button>
-            </InputGroup>
+            </FormGroupHelperText>
           </FormGroup>
           <CloudinitNetworkForm
             enableNetworkData={enableNetworkData}

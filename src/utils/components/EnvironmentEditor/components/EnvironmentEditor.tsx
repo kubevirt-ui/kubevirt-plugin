@@ -6,15 +6,8 @@ import {
   IoK8sApiCoreV1ServiceAccount,
 } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Button,
-  Divider,
-  Select,
-  SelectGroup,
-  SelectVariant,
-  TextInput,
-  Tooltip,
-} from '@patternfly/react-core';
+import { Button, Divider, TextInput, Tooltip } from '@patternfly/react-core';
+import { Select, SelectGroup, SelectVariant } from '@patternfly/react-core/deprecated';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { EnvironmentKind, MapKindToAbbr } from '../constants';
@@ -23,7 +16,6 @@ import { EnvironmentOption } from '../utils';
 import EnvironmentSelectOption from './EnvironmentSelectOption';
 
 import './EnvironmentEditor.scss';
-
 type EnvironmentEditorProps = {
   configMaps: IoK8sApiCoreV1ConfigMap[];
   diskName: string;
@@ -115,7 +107,7 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
           maxHeight={400}
           menuAppendTo="parent"
           onFilter={onFilter}
-          onToggle={(isExpanded) => setOpen(isExpanded)}
+          onToggle={(_, isExpanded) => setOpen(isExpanded)}
           placeholderText={t('Select a resource')}
           selections={new EnvironmentOption(environmentName, kind)}
           variant={SelectVariant.single}
@@ -154,12 +146,11 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
           </SelectGroup>
         </Select>
       </div>
-
       <div className="col-xs-5 pairs-list__name-field">
         <TextInput
           aria-labelledby="environment-serial-header"
           id={`${id}-serial`}
-          onChange={(value) => onChange(diskName, environmentName, value, kind)}
+          onChange={(_, value) => onChange(diskName, environmentName, value, kind)}
           type="text"
           value={serial}
         />
@@ -181,5 +172,4 @@ const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
     </div>
   );
 };
-
 export default EnvironmentEditor;

@@ -2,14 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
+import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownPosition,
-  DropdownToggle,
-  KebabToggle,
-} from '@patternfly/react-core';
+import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import { STATUS_SUCCEEDED } from '../../utils/utils';
 import { deleteNetworkCheckup, rerunNetworkCheckup } from '../utils/utils';
@@ -24,10 +20,18 @@ const CheckupsNetworkActions = ({
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const [isActionsOpen, setIsActionsOpen] = useState<boolean>(false);
-  const Toggle = isKebab ? KebabToggle : DropdownToggle;
+
+  const onToggle = () => setIsActionsOpen((prevIsOpen) => !prevIsOpen);
+  const Toggle = isKebab
+    ? KebabToggle({ isExpanded: isActionsOpen, onClick: onToggle })
+    : DropdownToggle({ isExpanded: isActionsOpen, onClick: onToggle, placeholder: t('Actions') });
   return (
     <Dropdown
-      dropdownItems={[
+      isOpen={isActionsOpen}
+      onOpenChange={(open: boolean) => setIsActionsOpen(open)}
+      toggle={Toggle}
+    >
+      <DropdownList>
         <DropdownItem
           onClick={() => {
             setIsActionsOpen(false);
@@ -37,7 +41,7 @@ const CheckupsNetworkActions = ({
           key="delete"
         >
           {t('Delete')}
-        </DropdownItem>,
+        </DropdownItem>
         <DropdownItem
           onClick={() => {
             setIsActionsOpen(false);
@@ -47,17 +51,9 @@ const CheckupsNetworkActions = ({
           key="rerun"
         >
           {t('Rerun')}
-        </DropdownItem>,
-      ]}
-      toggle={
-        <Toggle id="toggle-actions" onToggle={setIsActionsOpen}>
-          {t('Actions')}
-        </Toggle>
-      }
-      isOpen={isActionsOpen}
-      isPlain
-      position={DropdownPosition.right}
-    />
+        </DropdownItem>
+      </DropdownList>
+    </Dropdown>
   );
 };
 

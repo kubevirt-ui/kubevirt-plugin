@@ -46,6 +46,7 @@ const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
     volumeGroupVersionKind && volumeResourceName && watchVolumeResource,
   );
 
+  volumeResourceModel.verbs;
   if (!volumeResourceModel || !volumeResourceName) {
     return {
       error: error || isCdiConfigError,

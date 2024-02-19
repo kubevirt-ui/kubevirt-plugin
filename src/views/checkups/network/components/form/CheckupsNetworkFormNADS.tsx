@@ -1,9 +1,10 @@
-import React, { ChangeEvent, Dispatch, FC, MouseEvent, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
 
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import useNADsData from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/useNADsData';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 type CheckupsNetworkFormNADSProps = {
   selectedNAD: string;
@@ -16,7 +17,6 @@ const CheckupsNetworkFormNADS: FC<CheckupsNetworkFormNADSProps> = ({
   const { t } = useKubevirtTranslation();
   const [namespace] = useActiveNamespace();
   const { nads } = useNADsData(namespace);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const nadsItems = (nads || [])
     ?.filter((nad) => nad?.metadata?.namespace === namespace)
@@ -24,19 +24,13 @@ const CheckupsNetworkFormNADS: FC<CheckupsNetworkFormNADSProps> = ({
 
   return (
     <FormGroup fieldId="nad" isRequired label={t('NetworkAttachmentDefinition')}>
-      <Select
-        onSelect={(_: ChangeEvent | MouseEvent, value: string) => {
-          setSelectedNAD(value);
-          setIsOpen(false);
-        }}
-        isOpen={isOpen}
-        onToggle={(value) => setIsOpen(value)}
-        placeholderText="Select NetwrokAttachmentDefinition"
-        selections={selectedNAD}
-        variant={SelectVariant.typeahead}
+      <FormPFSelect
+        onSelect={(_: MouseEvent, value: string) => setSelectedNAD(value)}
+        placeholder={t('Select NetwrokAttachmentDefinition')}
+        selected={selectedNAD}
       >
         {nadsItems}
-      </Select>
+      </FormPFSelect>
     </FormGroup>
   );
 };

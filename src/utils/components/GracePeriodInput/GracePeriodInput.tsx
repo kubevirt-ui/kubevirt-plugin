@@ -7,6 +7,7 @@ import {
   Flex,
   FlexItem,
   InputGroup,
+  InputGroupItem,
   InputGroupText,
   Popover,
   StackItem,
@@ -39,7 +40,7 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
             id="grace-period-checkbox"
             isChecked={isChecked}
             label={t('With grace period')}
-            onChange={onCheckboxChange}
+            onChange={(_, checked) => onCheckboxChange(checked)}
           />
         </FlexItem>
         <FlexItem>
@@ -59,14 +60,18 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
         {isChecked && (
           <FlexItem>
             <InputGroup>
-              <TextInput
-                aria-label={t('seconds')}
-                data-test="grace-period-seconds-input"
-                min={0}
-                onChange={(value) => setGracePeriodSeconds(isEmpty(value) ? null : parseInt(value))}
-                type="number"
-                value={gracePeriodSeconds}
-              />
+              <InputGroupItem isFill>
+                <TextInput
+                  onChange={(_event, value) =>
+                    setGracePeriodSeconds(isEmpty(value) ? null : parseInt(value))
+                  }
+                  aria-label={t('seconds')}
+                  data-test="grace-period-seconds-input"
+                  min={0}
+                  type="number"
+                  value={gracePeriodSeconds}
+                />
+              </InputGroupItem>
               <InputGroupText>{t('seconds')}</InputGroupText>
             </InputGroup>
           </FlexItem>

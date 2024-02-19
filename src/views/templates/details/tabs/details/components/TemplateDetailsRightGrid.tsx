@@ -1,5 +1,4 @@
 import React from 'react';
-import DescriptionItem from 'src/views/templates/details/tabs/details/components//DescriptionItem';
 import BootOrderItem from 'src/views/templates/details/tabs/details/components/BootOrderItem';
 import BootSource from 'src/views/templates/details/tabs/details/components/BootSource';
 import { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
@@ -9,6 +8,7 @@ import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AdditionalResources from '@kubevirt-utils/components/AdditionalResources/AdditionalResources';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateSupportLevel,
@@ -39,23 +39,26 @@ const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template
   };
 
   return (
-    <DescriptionList>
+    <DescriptionList className="pf-c-description-list">
       <BootOrderItem template={template} />
       <BootSource template={template} />
-      <DescriptionItem content={providerContent} title={t('Provider')} />
-      <DescriptionItem
-        content={getTemplateSupportLevel(template) || NO_DATA_DASH}
-        title={t('Support')}
+      <VirtualMachineDescriptionItem
+        descriptionData={providerContent}
+        descriptionHeader={t('Provider')}
       />
-      <DescriptionItem
-        content={
+      <VirtualMachineDescriptionItem
+        descriptionData={getTemplateSupportLevel(template) || NO_DATA_DASH}
+        descriptionHeader={t('Support')}
+      />
+      <VirtualMachineDescriptionItem
+        descriptionData={
           <HardwareDevices
             canEdit={isTemplateEditable}
             onSubmit={onSubmit}
             vm={getTemplateVirtualMachineObject(template)}
           />
         }
-        title={t('Hardware devices')}
+        descriptionHeader={t('Hardware devices')}
       />
       <AdditionalResources template={template} />
     </DescriptionList>

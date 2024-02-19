@@ -4,18 +4,10 @@ import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-a
 import SysprepInfo from '@kubevirt-utils/components/SysprepModal/SysprepInfo';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Alert,
-  AlertVariant,
-  DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  Stack,
-  StackItem,
-} from '@patternfly/react-core';
+import { Alert, AlertVariant, DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
 import Loading from '../Loading/Loading';
+import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 export const SysprepDescription: FC<{
   error?: Error;
@@ -43,30 +35,32 @@ export const SysprepDescription: FC<{
         <SysprepInfo />
       </StackItem>
       <StackItem>
-        <DescriptionList columnModifier={{ lg: '1Col', xl: '2Col' }} isCompact>
+        <DescriptionList
+          className="pf-c-description-list"
+          columnModifier={{ lg: '1Col', xl: '2Col' }}
+          isCompact
+        >
           {selectedSysprepName ? (
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Selected sysprep')}</DescriptionListTerm>
-              <DescriptionListDescription>
+            <VirtualMachineDescriptionItem
+              descriptionData={
                 <ResourceLink
                   groupVersionKind={modelToGroupVersionKind(ConfigMapModel)}
                   linkTo={false}
                   name={selectedSysprepName}
                 />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
+              }
+              descriptionHeader={t('Selected sysprep')}
+            />
           ) : (
             <>
-              <DescriptionListGroup>
-                <DescriptionListTerm>{t('Autounattend.xml answer file')}</DescriptionListTerm>
-                <DescriptionListDescription>
-                  {hasAutoUnattend ? t('Available') : t('Not available')}
-                </DescriptionListDescription>
-              </DescriptionListGroup>
-              <DescriptionListGroup>
-                <DescriptionListTerm>{t('Unattend.xml answer file')}</DescriptionListTerm>
-                {hasUnattend ? t('Available') : t('Not available')}
-              </DescriptionListGroup>
+              <VirtualMachineDescriptionItem
+                descriptionData={hasAutoUnattend ? t('Available') : t('Not available')}
+                descriptionHeader={t('Autounattend.xml answer file')}
+              />
+              <VirtualMachineDescriptionItem
+                descriptionData={hasUnattend ? t('Available') : t('Not available')}
+                descriptionHeader={t('Unattend.xml answer file')}
+              />
             </>
           )}
         </DescriptionList>

@@ -7,7 +7,7 @@ import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/uti
 import { columnSorting } from '@kubevirt-utils/utils/utils';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem, Pagination, Title } from '@patternfly/react-core';
-import { TableComposable, Th, Thead, Tr } from '@patternfly/react-table';
+import { Table, Th, Thead, Tr } from '@patternfly/react-table';
 
 import useDiagnosticDataVolumeStatusTableColumns from '../hooks/useDiagnosticDataVolumeStatusTableColumns';
 import { VirtualizationDataVolumeStatus } from '../utils/types';
@@ -66,7 +66,7 @@ const VirtualMachineDiagnosticTabDataVolumeStatus: FC<
               onSetPage={(_e, page, perPage, startIndex, endIndex) =>
                 onPaginationChange({ endIndex, page, perPage, startIndex })
               }
-              defaultToFullPage
+              isLastFullPageShown
               itemCount={sortedData?.length}
               page={pagination?.page}
               perPage={pagination?.perPage}
@@ -76,7 +76,7 @@ const VirtualMachineDiagnosticTabDataVolumeStatus: FC<
         </Flex>
       </ListPageBody>
 
-      <TableComposable isExpandable>
+      <Table isExpandable>
         <Thead>
           <Tr>
             <Th
@@ -110,7 +110,7 @@ const VirtualMachineDiagnosticTabDataVolumeStatus: FC<
             setExpend={setExpend}
           />
         ))}
-      </TableComposable>
+      </Table>
     </>
   );
 };

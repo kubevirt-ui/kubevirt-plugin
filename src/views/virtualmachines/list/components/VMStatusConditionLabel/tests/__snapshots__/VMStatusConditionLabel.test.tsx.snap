@@ -2,19 +2,23 @@
 
 exports[`VMStatusConditionLabel 1`] = `
 <DocumentFragment>
-  <span
-    class="pf-c-label"
+  <div
+    style="display: contents;"
   >
-    <a
-      class="pf-c-label__content"
-      href="#"
+    <span
+      class="pf-v5-c-label"
     >
-      <span
-        class="pf-c-label__text"
+      <a
+        class="pf-v5-c-label__content"
+        href="#"
       >
-        Failure=true
-      </span>
-    </a>
-  </span>
+        <span
+          class="pf-v5-c-label__text"
+        >
+          Failure=true
+        </span>
+      </a>
+    </span>
+  </div>
 </DocumentFragment>
 `;

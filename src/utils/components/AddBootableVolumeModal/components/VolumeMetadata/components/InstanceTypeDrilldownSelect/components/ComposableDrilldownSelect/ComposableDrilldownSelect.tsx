@@ -103,7 +103,6 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
       appendTo={document.getElementById('tab-modal')}
       direction="up"
       isVisible={isOpen}
-      popperMatchesTriggerWidth
     />
   );
 };

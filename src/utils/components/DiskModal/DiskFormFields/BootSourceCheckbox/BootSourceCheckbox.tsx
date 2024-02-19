@@ -38,7 +38,7 @@ const BootSourceCheckbox: React.FC<BootSourceCheckboxProps> = ({
       <Stack hasGutter>
         <Split className="enable-bootsource-checkbox" hasGutter>
           <Checkbox
-            onChange={(checked) =>
+            onChange={(_event, checked) =>
               dispatchDiskState({ payload: checked, type: diskReducerActions.SET_BOOT_SOURCE })
             }
             id="enable-bootsource"

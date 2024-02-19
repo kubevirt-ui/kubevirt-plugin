@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui/kubevirt-api/console';
@@ -9,9 +9,9 @@ import {
   Button,
   ButtonVariant,
   Checkbox,
+  EmptyStateActions,
   EmptyStateBody,
   EmptyStateIcon,
-  EmptyStateSecondaryActions,
   Split,
   SplitItem,
   Stack,
@@ -28,7 +28,7 @@ type CDIInitErrorStatus = {
   pvcName: string;
 };
 
-const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, pvcName }) => {
+const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, pvcName }) => {
   const { t } = useKubevirtTranslation();
   const [shouldKillDv, setShouldKillDv] = useState<boolean>(true);
   const [pod, podLoaded, podError] = useK8sWatchResource<K8sResourceCommon>({
@@ -66,7 +66,7 @@ const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ namespace, onErrorCl
                 id="approve-checkbox"
                 isChecked={shouldKillDv}
                 label={t('Delete Data Volume: {{pvcName}}', { pvcName })}
-                onChange={(checked) => setShouldKillDv(checked)}
+                onChange={(_event, checked) => setShouldKillDv(checked)}
               />
               <SplitItem isFilled />
             </Split>
@@ -77,7 +77,7 @@ const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ namespace, onErrorCl
         {shouldKillDv ? t('Back to form (Deletes DataVolume)') : t('Back to form')}
       </Button>
       {podLoaded && !podError && pod && (
-        <EmptyStateSecondaryActions>
+        <EmptyStateActions>
           <Button
             onClick={() =>
               navigate(`${resourcePath(PodModel, pod?.metadata?.name, namespace)}/logs`)
@@ -87,7 +87,7 @@ const CDIInitErrorStatus: React.FC<CDIInitErrorStatus> = ({ namespace, onErrorCl
           >
             {t('Check logs')}
           </Button>
-        </EmptyStateSecondaryActions>
+        </EmptyStateActions>
       )}
     </>
   );

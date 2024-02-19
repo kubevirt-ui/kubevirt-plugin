@@ -5,11 +5,8 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
+
+import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 type AdditionalResourcesProps = {
   template: V1Template;
@@ -25,16 +22,16 @@ const AdditionalResources: React.FC<AdditionalResourcesProps> = ({ template }) =
   if (isEmpty(additionalResources)) return null;
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>{t('Additional resources')}</DescriptionListTerm>
-      <DescriptionListDescription>
+    <VirtualMachineDescriptionItem
+      descriptionData={
         <ul>
           {additionalResources.map((object) => (
             <li key={`${object?.kind}-${object?.metadata?.name}`}>{object?.kind}</li>
           ))}
         </ul>
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+      }
+      descriptionHeader={t('Additional resources')}
+    />
   );
 };
 

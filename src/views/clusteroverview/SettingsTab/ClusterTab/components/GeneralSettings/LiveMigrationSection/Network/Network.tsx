@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { MouseEvent, useEffect, useState } from 'react';
 
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
-  Select,
   SelectGroup,
   SelectOption,
-  SelectVariant,
   Skeleton,
   Text,
   TextVariants,
@@ -26,12 +26,12 @@ import {
 
 const Network = ({ hyperConverge }) => {
   const { t } = useKubevirtTranslation();
-  const [isSelectOpen, setIsSelectOpen] = useState<boolean>(false);
   const [selectedNetwork, setSelectedNetwork] = useState<string>('');
   const [nads, nadsLoaded, nadsError] = useK8sWatchResource<NetworkAttachmentDefinitionKind[]>({
     groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
     isList: true,
   });
+
   useEffect(() => {
     if (hyperConverge) {
       const network = getLiveMigrationNetwork(hyperConverge);
@@ -39,6 +39,14 @@ const Network = ({ hyperConverge }) => {
     }
   }, [hyperConverge]);
 
+  const onSelect = (_event: MouseEvent<Element>, selectedValue: string) => {
+    updateLiveMigrationConfig(
+      hyperConverge,
+      selectedValue !== PRIMARY_NETWORK ? selectedValue : null,
+      'network',
+    );
+    setSelectedNetwork(selectedValue);
+  };
   return (
     <>
       <Text component={TextVariants.small}>{t('Set live migration network')}</Text>
@@ -46,31 +54,24 @@ const Network = ({ hyperConverge }) => {
         {t('Live migration network')}
       </Title>
       {nadsLoaded ? (
-        <Select
-          onSelect={(_event: React.ChangeEvent<Element>, selectedValue: string) => {
-            setIsSelectOpen(false);
-            updateLiveMigrationConfig(
-              hyperConverge,
-              selectedValue !== PRIMARY_NETWORK ? selectedValue : null,
-              'network',
-            );
-            setSelectedNetwork(selectedValue);
-          }}
-          isDisabled={isEmpty(nads)}
-          isGrouped
-          isOpen={isSelectOpen}
-          onToggle={() => setIsSelectOpen(!isSelectOpen)}
-          selections={selectedNetwork}
-          variant={SelectVariant.single}
-          width={360}
+        <FormPFSelect
+          onSelect={onSelect}
+          popperProps={{ width: '360px' }}
+          selected={selectedNetwork}
+          toggleProps={{ isDisabled: isEmpty(nads) }}
         >
           <SelectOption key="primary" value={t('Primary live migration network')} />
           <SelectGroup key="nad" label={t('Secondary NAD networks')}>
-            {nads?.map((nad) => (
-              <SelectOption key={nad?.metadata?.name} value={nad?.metadata?.name} />
-            ))}
+            {nads?.map((nad) => {
+              const nadName = getName(nad);
+              return (
+                <SelectOption key={nadName} value={nadName}>
+                  {nadName}
+                </SelectOption>
+              );
+            })}
           </SelectGroup>
-        </Select>
+        </FormPFSelect>
       ) : (
         !nadsError && <Skeleton width={'360px'} />
       )}

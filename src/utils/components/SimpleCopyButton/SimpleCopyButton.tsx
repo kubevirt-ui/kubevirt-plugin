@@ -2,7 +2,7 @@ import React, { ClipboardEvent, FC, MouseEventHandler, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, clipboardCopyFunc, Tooltip } from '@patternfly/react-core';
-import CopyIcon from '@patternfly/react-icons/dist/esm/icons/copy-icon';
+import { CopyIcon } from '@patternfly/react-icons';
 
 import './SimpleCopyButton.scss';
 
@@ -29,7 +29,6 @@ const SimpleCopyButton: FC<SimpleCopyButtonProps> = ({ textToCopy }) => {
       maxWidth="150px"
       onTooltipHidden={() => setCopiedState(false)}
       position="top"
-      removeFindDomNode={false}
       trigger="mouseenter focus click"
     >
       <Button

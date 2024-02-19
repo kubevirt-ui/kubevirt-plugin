@@ -52,7 +52,7 @@ const VirtualMachinesOverviewTabActiveUser: FC<VirtualMachinesOverviewTabActiveU
   return (
     <Card>
       <CardTitle className="text-muted">
-        {t('Active users ({{count}})', { count: userList?.length })}
+        {t('Active users ({{users}})', { users: userList?.length })}
       </CardTitle>
       <Divider />
       <CardBody isFilled>{bodyTable}</CardBody>

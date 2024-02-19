@@ -1,17 +1,18 @@
-import React, { ChangeEvent, FC, useState } from 'react';
+import React, { ChangeEvent, FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   FormGroup,
   NumberInput,
-  Select,
-  SelectOption,
-  SelectVariant,
+  SelectList,
   Split,
   SplitItem,
   ValidatedOptions,
 } from '@patternfly/react-core';
-import { ExclamationCircleIcon } from '@patternfly/react-icons';
+import { SelectOption } from '@patternfly/react-core';
+
+import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
+import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
 import { CAPACITY_UNITS, removeByteSuffix } from './utils';
 
@@ -23,7 +24,6 @@ type CapacityInputProps = {
 
 const CapacityInput: FC<CapacityInputProps> = ({ label, onChange, size }) => {
   const { t } = useKubevirtTranslation();
-  const [selectOpen, toggleSelect] = useState<boolean>(false);
   const [unitValue = ''] = size?.match(/[a-zA-Z]+/g) || [];
   const [sizeValue = 0] = size?.match(/[0-9]+/g) || [];
   const unit = !unitValue?.endsWith('B') ? `${unitValue}B` : unitValue;
@@ -31,22 +31,19 @@ const CapacityInput: FC<CapacityInputProps> = ({ label, onChange, size }) => {
 
   const onFormatChange = (_, newUnit: CAPACITY_UNITS) => {
     onChange(`${Number(value)}${removeByteSuffix(newUnit)}`);
-    toggleSelect(false);
   };
   const unitOptions = Object.values(CAPACITY_UNITS);
   if (!unitOptions?.includes(unit as CAPACITY_UNITS)) unitOptions.push(unit as CAPACITY_UNITS);
 
+  const validated: ValidatedOptions =
+    !value || value <= 0 ? ValidatedOptions.error : ValidatedOptions.default;
+
   return (
     <FormGroup
-      helperTextInvalid={t('Size cannot be {{errorValue}}', {
-        errorValue: value < 0 ? 'negative' : 'zero',
-      })}
       className="disk-source-form-group"
       fieldId={`size-required`}
-      helperTextInvalidIcon={<ExclamationCircleIcon color="red" title="Error" />}
       isRequired
       label={label}
-      validated={!value || value <= 0 ? ValidatedOptions.error : ValidatedOptions.default}
     >
       <Split hasGutter>
         <SplitItem>
@@ -68,20 +65,23 @@ const CapacityInput: FC<CapacityInputProps> = ({ label, onChange, size }) => {
           />
         </SplitItem>
         <SplitItem>
-          <Select
-            isOpen={selectOpen}
-            menuAppendTo="parent"
-            onSelect={onFormatChange}
-            onToggle={toggleSelect}
-            selections={unit}
-            variant={SelectVariant.single}
-          >
-            {unitOptions.map((formatOption) => (
-              <SelectOption key={formatOption} value={formatOption} />
-            ))}
-          </Select>
+          <FormPFSelect onSelect={onFormatChange} selected={unit}>
+            <SelectList>
+              {unitOptions.map((formatOption) => (
+                <SelectOption key={formatOption} value={formatOption}>
+                  {formatOption}
+                </SelectOption>
+              ))}
+            </SelectList>
+          </FormPFSelect>
         </SplitItem>
       </Split>
+      <FormGroupHelperText validated={validated}>
+        {validated === ValidatedOptions.error &&
+          t('Size cannot be {{errorValue}}', {
+            errorValue: value < 0 ? 'negative' : 'zero',
+          })}
+      </FormGroupHelperText>
     </FormGroup>
   );
 };

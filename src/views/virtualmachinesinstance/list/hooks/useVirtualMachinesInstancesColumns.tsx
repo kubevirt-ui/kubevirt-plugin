@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -11,7 +11,7 @@ import { sortable } from '@patternfly/react-table';
 const useVirtualMachinesInstancesColumns = (): { id: string; title: string }[] => {
   const { t } = useKubevirtTranslation();
 
-  const columns: TableColumn<K8sResourceCommon>[] = React.useMemo(
+  const columns: TableColumn<K8sResourceCommon>[] = useMemo(
     () => [
       {
         id: 'name',

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, memo, useState } from 'react';
 import { ANNOTATIONS } from 'src/views/templates/utils/constants';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -13,31 +13,29 @@ type DisplayNameModalProps = {
   onSubmit: (displayName: string) => Promise<K8sResourceCommon | void>;
 };
 
-const DisplayNameModal: React.FC<DisplayNameModalProps> = React.memo(
-  ({ isOpen, obj, onClose, onSubmit }) => {
-    const { t } = useKubevirtTranslation();
-    const [displayName, setDisplayName] = React.useState(
-      obj?.metadata?.annotations?.[ANNOTATIONS.displayName],
-    );
+const DisplayNameModal: FC<DisplayNameModalProps> = memo(({ isOpen, obj, onClose, onSubmit }) => {
+  const { t } = useKubevirtTranslation();
+  const [displayName, setDisplayName] = useState(
+    obj?.metadata?.annotations?.[ANNOTATIONS.displayName],
+  );
 
-    return (
-      <TabModal
-        headerText={t('Edit Display name')}
-        isOpen={isOpen}
-        obj={obj}
-        onClose={onClose}
-        onSubmit={() => onSubmit(displayName)}
-      >
-        <TextArea
-          aria-label={t('display name text area')}
-          autoFocus
-          onChange={setDisplayName}
-          resizeOrientation="vertical"
-          value={displayName}
-        />
-      </TabModal>
-    );
-  },
-);
+  return (
+    <TabModal
+      headerText={t('Edit Display name')}
+      isOpen={isOpen}
+      obj={obj}
+      onClose={onClose}
+      onSubmit={() => onSubmit(displayName)}
+    >
+      <TextArea
+        aria-label={t('display name text area')}
+        autoFocus
+        onChange={(_, value: string) => setDisplayName(value)}
+        resizeOrientation="vertical"
+        value={displayName}
+      />
+    </TabModal>
+  );
+});
 
 export default DisplayNameModal;

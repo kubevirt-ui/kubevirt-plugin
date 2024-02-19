@@ -1,11 +1,12 @@
-import React, { FC, MouseEvent, useState } from 'react';
+import React, { FC } from 'react';
 
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, Select, SelectOption } from '@patternfly/react-core';
+import { FormGroup } from '@patternfly/react-core';
 
 type StorageClassSelectProps = {
-  onStorageClassChange: (_: MouseEvent, value: string) => void;
+  onStorageClassChange: (value: string) => void;
   storageClassName: string;
   storageClassRequired: boolean;
 };
@@ -18,8 +19,6 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const [{ sortedStorageClasses }] = useDefaultStorageClass();
 
-  const [isOpenStorageClass, setIsOpenStorageClass] = useState<boolean>(false);
-
   if (!storageClassRequired) return null;
 
   return (
@@ -28,22 +27,12 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
       isRequired
       label={t('Storage class')}
     >
-      <Select
-        onSelect={(event: MouseEvent, value: string) => {
-          onStorageClassChange(event, value);
-          setIsOpenStorageClass(false);
-        }}
-        hasInlineFilter
-        isOpen={isOpenStorageClass}
-        maxHeight={200}
-        onToggle={setIsOpenStorageClass}
-        placeholderText={t('Select storage class')}
-        selections={storageClassName}
-      >
-        {sortedStorageClasses?.map((name) => (
-          <SelectOption key={name} value={name} />
-        ))}
-      </Select>
+      <FilterSelect
+        options={sortedStorageClasses?.map((name) => ({ children: name, value: name }))}
+        selected={storageClassName}
+        setSelected={onStorageClassChange}
+        toggleProps={{ placeholder: t('Select storage class') }}
+      />
     </FormGroup>
   );
 };

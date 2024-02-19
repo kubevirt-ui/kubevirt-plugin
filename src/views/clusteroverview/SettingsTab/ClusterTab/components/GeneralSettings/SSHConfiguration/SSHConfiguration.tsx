@@ -87,7 +87,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
             placeholder={t('Enter node address to access the cluster')}
           >
             <TextInput
-              onChange={(value: string) => {
+              onChange={(_event, value: string) => {
                 setUrl(value);
                 onTextChange(value, NODE_PORT_ADDRESS);
               }}

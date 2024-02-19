@@ -34,7 +34,7 @@ const ExpandSection: FC<ExpandSectionProps> = ({
       className={classNames(className, { 'expand-section__disabled': isDisabled })}
       isExpanded={isExpanded}
       isIndented={isIndented}
-      onToggle={handleToggle}
+      onToggle={(_event, expanded: boolean) => handleToggle(expanded)}
       toggleContent={toggleContent}
       toggleText={toggleText}
     >

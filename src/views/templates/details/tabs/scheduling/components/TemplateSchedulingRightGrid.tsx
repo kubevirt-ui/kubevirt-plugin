@@ -24,7 +24,7 @@ const TemplateSchedulingRightGrid: React.FC<TemplateSchedulingGridProps> = ({
   );
 
   return (
-    <DescriptionList>
+    <DescriptionList className="pf-c-description-list">
       <DedicatedResources editable={editable} onSubmit={onSubmit} template={template} />
       <EvictionStrategy editable={editable} onSubmit={onSubmit} template={template} />
     </DescriptionList>

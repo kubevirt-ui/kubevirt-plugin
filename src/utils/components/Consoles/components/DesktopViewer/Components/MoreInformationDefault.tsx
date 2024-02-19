@@ -1,13 +1,9 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
+import { DescriptionList } from '@patternfly/react-core';
 
 import { MoreInformationDefaultProps } from '../utils/types';
 
@@ -29,13 +25,12 @@ const MoreInformationDefault: React.FC<MoreInformationDefaultProps> = ({ textMor
           </p>
         </Trans>
       )}
-      <DescriptionList isHorizontal>
+      <DescriptionList className="pf-c-description-list" isHorizontal>
         <Detail title={'RHEL, CentOS'} value={'sudo yum install virt-viewer'} />
         <Detail title={'Fedora'} value={'sudo dnf install virt-viewer'} />
         <Detail title={'Ubuntu, Debian'} value={'sudo apt-get install virt-viewer'} />
-        <DescriptionListGroup>
-          <DescriptionListTerm>Windows</DescriptionListTerm>
-          <DescriptionListDescription>
+        <VirtualMachineDescriptionItem
+          descriptionData={
             <div>
               {t('Download the MSI from ')}
               <a
@@ -46,8 +41,9 @@ const MoreInformationDefault: React.FC<MoreInformationDefaultProps> = ({ textMor
                 virt-manager.org
               </a>
             </div>
-          </DescriptionListDescription>
-        </DescriptionListGroup>
+          }
+          descriptionHeader={t('Windows')}
+        />
       </DescriptionList>
     </>
   );

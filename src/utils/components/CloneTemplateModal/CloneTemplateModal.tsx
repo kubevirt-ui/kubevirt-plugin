@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 import produce from 'immer';
 import { LABELS } from 'src/views/templates/utils/constants';
 
@@ -19,6 +19,8 @@ import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Form, FormGroup, TextInput } from '@patternfly/react-core';
 
+import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
+
 import CloneStorageCheckbox from './CloneStorageCheckbox';
 import SelectProject from './SelectProject';
 import { cloneStorage, getTemplateBootSourcePVC } from './utils';
@@ -32,23 +34,21 @@ type CloneTemplateModalProps = {
   onTemplateCloned?: (clonedTemplate: V1Template) => void;
 };
 
-const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
+const CloneTemplateModal: FC<CloneTemplateModalProps> = ({
   isOpen,
   obj,
   onClose,
   onTemplateCloned,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [templateName, setTemplateName] = React.useState(
-    `${obj?.metadata?.name}-${getRandomChars(9)}`,
-  );
+  const [templateName, setTemplateName] = useState(`${obj?.metadata?.name}-${getRandomChars(9)}`);
   const templateVMPVC = getTemplateBootSourcePVC(obj);
   const clonableStorage = !!templateVMPVC;
-  const [pvcName, setPVCName] = React.useState(`${templateVMPVC?.name}-clone`);
-  const [templateProvider, setTemplateProvider] = React.useState('');
-  const [selectedProject, setSelectedProject] = React.useState(obj?.metadata?.namespace);
-  const [isCloneStorageEnabled, setCloneStorage] = React.useState(false);
-  const [templateDisplayName, setTemplateDisplayName] = React.useState(
+  const [pvcName, setPVCName] = useState(`${templateVMPVC?.name}-clone`);
+  const [templateProvider, setTemplateProvider] = useState('');
+  const [selectedProject, setSelectedProject] = useState(obj?.metadata?.namespace);
+  const [isCloneStorageEnabled, setCloneStorage] = useState(false);
+  const [templateDisplayName, setTemplateDisplayName] = useState(
     obj?.metadata?.annotations?.[ANNOTATIONS.displayName] || '',
   );
   const onSubmit = async () => {
@@ -108,40 +108,36 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
       >
         <Form className="clone-template-modal">
           <FormGroup fieldId="name" isRequired label={t('Template name')}>
-            <TextInput id="name" onChange={setTemplateName} type="text" value={templateName} />
+            <TextInput
+              id="name"
+              onChange={(_, value: string) => setTemplateName(value)}
+              type="text"
+              value={templateName}
+            />
           </FormGroup>
-
-          <FormGroup
-            fieldId="namespace"
-            helperText={t('Project name to clone the template to')}
-            label={t('Template project')}
-          >
+          <FormGroup fieldId="namespace" label={t('Template project')}>
             <SelectProject
-              id="namespace"
               selectedProject={selectedProject}
               setSelectedProject={setSelectedProject}
             />
+            <FormGroupHelperText>{t('Project name to clone the template to')}</FormGroupHelperText>
           </FormGroup>
           <FormGroup fieldId="display-name" label={t('Template display name')}>
             <TextInput
               id="display-name"
-              onChange={setTemplateDisplayName}
+              onChange={(_, value: string) => setTemplateDisplayName(value)}
               type="text"
               value={templateDisplayName}
             />
           </FormGroup>
-
-          <FormGroup
-            fieldId="provider"
-            helperText={t('Example: your company name')}
-            label={t('Template provider')}
-          >
+          <FormGroup fieldId="provider" label={t('Template provider')}>
             <TextInput
               id="provider"
-              onChange={setTemplateProvider}
+              onChange={(_, value: string) => setTemplateProvider(value)}
               type="text"
               value={templateProvider}
             />
+            <FormGroupHelperText>{t('Example: your company name')}</FormGroupHelperText>
           </FormGroup>
           {clonableStorage && (
             <CloneStorageCheckbox isChecked={isCloneStorageEnabled} onChange={setCloneStorage} />
@@ -153,7 +149,12 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
               isRequired
               label={t('Name of the template new disk')}
             >
-              <TextInput id="pvc-name" onChange={setPVCName} type="text" value={pvcName} />
+              <TextInput
+                id="pvc-name"
+                onChange={(_, value: string) => setPVCName(value)}
+                type="text"
+                value={pvcName}
+              />
             </FormGroup>
           )}
         </Form>

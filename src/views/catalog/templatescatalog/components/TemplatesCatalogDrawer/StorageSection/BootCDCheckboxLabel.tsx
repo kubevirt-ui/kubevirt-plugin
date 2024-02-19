@@ -1,4 +1,4 @@
-import React, { FC, FormEvent } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Flex, FlexItem, FormGroup, Popover } from '@patternfly/react-core';
@@ -6,7 +6,7 @@ import { HelpIcon } from '@patternfly/react-icons';
 
 type BootCDCheckboxProps = {
   hasCDSource: boolean;
-  onChange: (checked: boolean, event: FormEvent<HTMLInputElement>) => void;
+  onChange: (checked: boolean) => void;
 };
 
 const BootCDCheckbox: FC<BootCDCheckboxProps> = ({ hasCDSource, onChange }) => {
@@ -21,7 +21,7 @@ const BootCDCheckbox: FC<BootCDCheckboxProps> = ({ hasCDSource, onChange }) => {
             id="boot-cd"
             isChecked={hasCDSource}
             label={t('Boot from CD')}
-            onChange={onChange}
+            onChange={(_, checked: boolean) => onChange(checked)}
           />
         </FlexItem>
         <FlexItem>

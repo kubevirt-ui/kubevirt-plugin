@@ -32,8 +32,10 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
       key={action?.id}
       onClick={handleClick}
       {...(isCloneDisabled && {
-        tooltip: t(`You don't have permission to perform this action`),
-        tooltipProps: { position: TooltipPosition.left },
+        tooltipProps: {
+          content: t(`You don't have permission to perform this action`),
+          position: TooltipPosition.left,
+        },
       })}
       className={classNames({ ActionDropdownItem__disabled: isCloneDisabled })}
     >

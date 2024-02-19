@@ -1,11 +1,13 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 
+import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePermissions from '@kubevirt-utils/hooks/usePermissions/usePermissions';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { FormGroup } from '@patternfly/react-core';
+import { Select, SelectOption } from '@patternfly/react-core';
 
-import { DROPDOWN_FORM_SELECTION } from '../../utils/constants';
+import { DROPDOWN_FORM_SELECTION, optionsValueLabelMapper } from '../../utils/constants';
 
 type SourceTypeSelectionProps = {
   formSelection: DROPDOWN_FORM_SELECTION;
@@ -43,15 +45,21 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
     }
   }, [canUploadImage, permissionsLoading, loading, setFormSelection]);
 
+  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+
   return (
     <FormGroup fieldId="source-type" label={t('Source type')}>
       <Select
+        toggle={SelectToggle({
+          isExpanded: isOpen,
+          isFullWidth: true,
+          onClick: onToggle,
+          selected: optionsValueLabelMapper[formSelection],
+        })}
         isOpen={isOpen}
-        menuAppendTo="parent"
+        onOpenChange={(open: boolean) => setIsOpen(open)}
         onSelect={onSelect}
-        onToggle={setIsOpen}
-        selections={formSelection}
-        variant={SelectVariant.single}
+        selected={formSelection}
       >
         <SelectOption
           isDisabled={!canUploadImage}
@@ -60,15 +68,15 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             description: t("You don't have permission to perform this action"),
           })}
         >
-          {t('Upload volume')}
+          {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE]}
         </SelectOption>
 
         <SelectOption isDisabled={!canCreatePVC} value={DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC}>
-          {t('Use existing volume')}
+          {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]}
         </SelectOption>
 
         <SelectOption isDisabled={!canCreateSnapshots} value={DROPDOWN_FORM_SELECTION.USE_SNAPSHOT}>
-          {t('Use existing volume snapshot')}
+          {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]}
         </SelectOption>
 
         <SelectOption
@@ -78,7 +86,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
           isDisabled={!canCreateDS}
           value={DROPDOWN_FORM_SELECTION.USE_REGISTRY}
         >
-          {t('Download from registry')}
+          {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_REGISTRY]}
         </SelectOption>
       </Select>
     </FormGroup>

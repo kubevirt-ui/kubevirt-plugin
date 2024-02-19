@@ -40,7 +40,7 @@ const CheckupsNetworkForm = () => {
                 id="name"
                 isRequired
                 name="name"
-                onChange={(value) => setName(value)}
+                onChange={(_event, value) => setName(value)}
                 value={name}
               />
             </FormGroup>
@@ -49,7 +49,7 @@ const CheckupsNetworkForm = () => {
               <TextInput
                 id="sample-duration"
                 name="sample-duration"
-                onChange={(val) => setSampleDuration(val)}
+                onChange={(_event, val) => setSampleDuration(val)}
                 type="number"
                 value={sampleDuration}
               />

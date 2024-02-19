@@ -1,13 +1,9 @@
 import React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMTemplateSource } from '@kubevirt-utils/resources/template';
-import {
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
 
 type BootSourceProps = {
   template: V1Template;
@@ -18,12 +14,10 @@ const BootSource: React.FC<BootSourceProps> = ({ template }) => {
   const { isBootSourceAvailable } = useVMTemplateSource(template);
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>{t('Boot source')}</DescriptionListTerm>
-      <DescriptionListDescription>
-        {isBootSourceAvailable ? t('Available') : t('Unavailable')}
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+    <VirtualMachineDescriptionItem
+      descriptionData={isBootSourceAvailable ? t('Available') : t('Unavailable')}
+      descriptionHeader={t('Boot source')}
+    />
   );
 };
 

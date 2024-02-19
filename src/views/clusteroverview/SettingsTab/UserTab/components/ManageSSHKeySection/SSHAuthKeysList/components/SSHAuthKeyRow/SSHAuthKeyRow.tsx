@@ -1,7 +1,7 @@
 import React, { FC, useCallback } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
-import FilterSelect from '@kubevirt-utils/components/AddBootableVolumeModal/components/FilterSelect/FilterSelect';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import {
   SecretSelectionOption,
@@ -78,11 +78,14 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
       <GridItem className="ssh-auth-row__project-name" span={5}>
         {isEmpty(secretName) ? (
           <FilterSelect
-            groupVersionKind={modelToGroupVersionKind(ProjectModel)}
-            optionLabelText={t('project...')}
-            options={selectableProjects}
+            options={selectableProjects?.map((opt) => ({
+              children: opt,
+              groupVersionKind: modelToGroupVersionKind(ProjectModel),
+              value: opt,
+            }))}
             selected={projectName}
             setSelected={(newProject) => onAuthKeyChange({ ...row, projectName: newProject })}
+            toggleProps={{ placeholder: t('Select project') }}
           />
         ) : (
           <Truncate content={projectName} />

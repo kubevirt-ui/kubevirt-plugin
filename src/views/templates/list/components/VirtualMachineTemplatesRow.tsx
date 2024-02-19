@@ -67,7 +67,7 @@ const VirtualMachineTemplatesRow: React.FC<
         className="dropdown-kebab-pf pf-v5-c-table__action"
         id=""
       >
-        <VirtualMachineTemplatesActions template={obj} />
+        <VirtualMachineTemplatesActions isKebabToggle template={obj} />
       </TableData>
     </>
   );

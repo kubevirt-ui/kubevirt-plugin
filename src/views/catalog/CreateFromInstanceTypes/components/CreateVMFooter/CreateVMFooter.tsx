@@ -127,7 +127,7 @@ const CreateVMFooter: FC = () => {
             id="start-after-creation-checkbox"
             isChecked={startVM}
             label={t('Start this VirtualMachine after creation')}
-            onChange={setStartVM}
+            onChange={(_event, val) => setStartVM(val)}
           />
         </StackItem>
         <StackItem>

@@ -43,7 +43,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
 
   return (
     <GridItem span={5}>
-      <DescriptionList>
+      <DescriptionList className="pf-c-description-list">
         <VirtualMachineDescriptionItem
           descriptionHeader={
             <SearchItem id="dedicated-resources">{t('Dedicated resources')}</SearchItem>

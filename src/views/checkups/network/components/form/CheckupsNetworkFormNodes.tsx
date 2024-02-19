@@ -1,8 +1,11 @@
-import React, { ChangeEvent, Dispatch, MouseEvent, SetStateAction, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, useMemo } from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
@@ -12,9 +15,6 @@ import {
   FormGroup,
   Popover,
   PopoverPosition,
-  Select,
-  SelectOption,
-  SelectVariant,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
@@ -38,17 +38,18 @@ const CheckupsNetworkFormNodes = ({
   setNodeTarget,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isNodeSourceOpen, setIsNodeSourceOpen] = useState<boolean>(false);
-  const [isNodeTargetOpen, setIsNodeTargetOpen] = useState<boolean>(false);
 
   const [nodes] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
 
-  const nodesDropdownItems = useMemo(
+  const options: EnhancedSelectOptionProps[] = useMemo(
     () =>
-      nodes?.map((node) => <SelectOption key={node?.metadata?.uid} value={node?.metadata?.name} />),
+      nodes?.map((node) => {
+        const name = getName(node);
+        return { children: name, value: name };
+      }),
     [nodes],
   );
 
@@ -60,7 +61,7 @@ const CheckupsNetworkFormNodes = ({
           isChecked={isNodesChecked}
           label={t('Select nodes')}
           name="nodes"
-          onChange={(checked) => setIsNodesChecked(checked)}
+          onChange={(_event, checked) => setIsNodesChecked(checked)}
         />
         <Popover
           bodyContent={t('If no nodes are specified, random nodes are selected.')}
@@ -75,36 +76,22 @@ const CheckupsNetworkFormNodes = ({
         <Stack hasGutter>
           <StackItem>
             <FormGroup fieldId="source-nodes" isRequired label={t('Source node')}>
-              <Select
-                onSelect={(_: ChangeEvent | MouseEvent, value: string) => {
-                  setNodeSource(value);
-                  setIsNodeSourceOpen(false);
-                }}
-                isOpen={isNodeSourceOpen}
-                onToggle={(value) => setIsNodeSourceOpen(value)}
-                placeholderText="Select source node"
-                selections={nodeSource}
-                variant={SelectVariant.typeahead}
-              >
-                {nodesDropdownItems}
-              </Select>
+              <FilterSelect
+                options={options}
+                selected={nodeSource}
+                setSelected={setNodeSource}
+                toggleProps={{ placeholder: t('Select source node') }}
+              />
             </FormGroup>
           </StackItem>
           <StackItem>
             <FormGroup fieldId="target-nodes" isRequired label={t('Target node')}>
-              <Select
-                onSelect={(_: ChangeEvent | MouseEvent, value: string) => {
-                  setNodeTarget(value);
-                  setIsNodeTargetOpen(false);
-                }}
-                isOpen={isNodeTargetOpen}
-                onToggle={(value) => setIsNodeTargetOpen(value)}
-                placeholderText="Select target node"
-                selections={nodeTarget}
-                variant={SelectVariant.typeahead}
-              >
-                {nodesDropdownItems}
-              </Select>
+              <FilterSelect
+                options={options}
+                selected={nodeTarget}
+                setSelected={setNodeTarget}
+                toggleProps={{ placeholder: t('Select target node') }}
+              />
             </FormGroup>
           </StackItem>
         </Stack>

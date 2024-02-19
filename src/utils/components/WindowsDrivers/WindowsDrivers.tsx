@@ -69,7 +69,7 @@ const WindowsDrivers: FC<WindowsDriversProps> = ({ isWindows, updateVM, vm }) =>
           isChecked={isChecked}
           isDisabled={loading || driversImageLoading}
           label={t('Mount Windows drivers disk')}
-          onChange={onChange}
+          onChange={(_, checked: boolean) => onChange(checked)}
         />
       </FlexItem>
 

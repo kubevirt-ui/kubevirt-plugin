@@ -19,12 +19,11 @@ import {
   Button,
   EmptyState,
   EmptyStateBody,
+  EmptyStateFooter,
   Tab,
   Tabs,
   TabTitleText,
 } from '@patternfly/react-core';
-import { css } from '@patternfly/react-styles';
-import styles from '@patternfly/react-styles/css/components/Consoles/VncConsole';
 
 import { sleep } from '../../utils/utils';
 import { ConsoleState, WS, WSS } from '../utils/ConsoleConsts';
@@ -193,7 +192,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
 
   if (disabled) {
     return (
-      <EmptyState className={css(styles.consoleVnc)}>
+      <EmptyState className="pf-c-console__vnc">
         <EmptyStateBody>{CustomDisabledComponent || t('Console is disabled')}</EmptyStateBody>
       </EmptyState>
     );
@@ -228,7 +227,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
           textSendShortcut={textSendShortcut}
         />
       )}
-      <div className={css(styles.consoleVnc)}>
+      <div className="pf-c-console__vnc">
         {children}
         {status === disconnected &&
           (CustomConnectComponent ? (
@@ -238,9 +237,11 @@ export const VncConsole: FC<VncConsoleProps> = ({
               <EmptyStateBody>
                 {textDisconnected || t('Click Connect to open the VNC console.')}
               </EmptyStateBody>
-              <Button onClick={connect} variant="primary">
-                {textConnect || t('Connect')}
-              </Button>
+              <EmptyStateFooter>
+                <Button onClick={connect} variant="primary">
+                  {textConnect || t('Connect')}
+                </Button>
+              </EmptyStateFooter>
             </EmptyState>
           ))}
         {status === connecting && (

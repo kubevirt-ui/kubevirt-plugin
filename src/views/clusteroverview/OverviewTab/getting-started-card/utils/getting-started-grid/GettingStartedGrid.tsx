@@ -1,15 +1,15 @@
-import * as React from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
+import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Card,
-  CardActions,
   CardBody,
   CardHeader,
   CardTitle,
   Dropdown,
   DropdownItem,
-  KebabToggle,
+  DropdownList,
   Popover,
   Title,
   TitleSizes,
@@ -19,14 +19,14 @@ import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 import './GettingStartedGrid.scss';
 
 type GettingStartedGridProps = {
-  children?: React.ReactNode[];
+  children?: ReactNode[];
   onHide?: () => void;
 };
 
-export const GettingStartedGrid: React.FC<GettingStartedGridProps> = ({ children, onHide }) => {
+export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children, onHide }) => {
   const { t } = useKubevirtTranslation();
-  const [menuIsOpen, setMenuIsOpen] = React.useState(false);
-  const onToggle = () => setMenuIsOpen((open) => !open);
+  const [isOpen, setIsOpen] = useState(false);
+  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
 
   const actionDropdownItem: any[] = [];
 
@@ -55,7 +55,28 @@ export const GettingStartedGrid: React.FC<GettingStartedGridProps> = ({ children
 
   return (
     <Card className="kv-getting-started-grid" data-test="getting-started">
-      <CardHeader className="kv-getting-started-grid__header">
+      <CardHeader
+        actions={
+          actionDropdownItem.length > 0
+            ? {
+                actions: (
+                  <Dropdown
+                    className="ocs-getting-started-grid__action-dropdown"
+                    isOpen={isOpen}
+                    onOpenChange={(open: boolean) => setIsOpen(open)}
+                    popperProps={{ position: 'right' }}
+                    toggle={KebabToggle({ isExpanded: isOpen, onClick: onToggle })}
+                  >
+                    <DropdownList>{actionDropdownItem}</DropdownList>
+                  </Dropdown>
+                ),
+                className: null,
+                hasNoOffset: false,
+              }
+            : null
+        }
+        className="kv-getting-started-grid__header"
+      >
         <CardTitle>
           <Title data-test="title" headingLevel="h2" size={TitleSizes.lg}>
             {title}{' '}
@@ -70,18 +91,6 @@ export const GettingStartedGrid: React.FC<GettingStartedGridProps> = ({ children
             </Popover>
           </Title>
         </CardTitle>
-        {actionDropdownItem.length > 0 ? (
-          <CardActions>
-            <Dropdown
-              className="ocs-getting-started-grid__action-dropdown"
-              dropdownItems={actionDropdownItem}
-              isOpen={menuIsOpen}
-              isPlain
-              position="right"
-              toggle={<KebabToggle data-test="actions" onToggle={onToggle} />}
-            />
-          </CardActions>
-        ) : null}
       </CardHeader>
       <CardBody className="kv-getting-started-grid__content">{children}</CardBody>
     </Card>

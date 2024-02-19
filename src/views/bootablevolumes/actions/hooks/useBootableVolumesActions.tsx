@@ -22,16 +22,17 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferen
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const [canUpdatePVC] = useAccessReview(
-    asAccessReview(PersistentVolumeClaimModel, source, 'update' as K8sVerb) || {},
-  );
+  const updateAccessReview =
+    asAccessReview(PersistentVolumeClaimModel, source, 'update' as K8sVerb) || {};
+  const [canUpdatePVC] = useAccessReview(updateAccessReview);
 
-  const [canDeletePVC] = useAccessReview(
-    asAccessReview(PersistentVolumeClaimModel, source, 'delete' as K8sVerb) || {},
-  );
+  const deleteAccessReview =
+    asAccessReview(PersistentVolumeClaimModel, source, 'delete' as K8sVerb) || {};
+  const [canDeletePVC] = useAccessReview(deleteAccessReview);
 
-  const actions = [
+  const actions: Action[] = [
     {
+      accessReview: updateAccessReview,
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <EditBootableVolumesModal
@@ -47,6 +48,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferen
       label: t('Edit'),
     },
     {
+      accessReview: updateAccessReview,
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <RemoveBootableVolumesModal isOpen={isOpen} onClose={onClose} source={source} />
@@ -56,6 +58,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferen
       label: t('Remove from list'),
     },
     {
+      accessReview: deleteAccessReview,
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <DeleteModal

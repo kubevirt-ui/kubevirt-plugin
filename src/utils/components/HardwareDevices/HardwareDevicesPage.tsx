@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { V1PciHostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ import { HelpIcon } from '@patternfly/react-icons';
 import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
 import HardwareDevicesPageTable from './HardwareDevicesPageTable';
 
-const HardwareDevicesPage: React.FC<any> = (props) => {
+const HardwareDevicesPage: FC<any> = (props) => {
   const { t } = useKubevirtTranslation();
   const { hcError, hcLoaded, permittedHostDevices } = useHCPermittedHostDevices();
 
@@ -67,7 +67,7 @@ const HardwareDevicesPage: React.FC<any> = (props) => {
             )}
           >
             <Button aria-label="Action" variant="plain">
-              <HelpIcon noVerticalAlign />
+              <HelpIcon />
             </Button>
           </Popover>
         </h1>

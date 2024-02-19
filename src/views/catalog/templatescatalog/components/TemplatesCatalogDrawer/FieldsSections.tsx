@@ -25,7 +25,7 @@ const FieldsSections: FC = () => {
         <ExpandableSection
           isExpanded={requiredSectionOpen}
           isIndented
-          onToggle={setRequiredSectionOpen}
+          onToggle={(_event, val) => setRequiredSectionOpen(val)}
           toggleText={t('Required parameters')}
         >
           {requiredParameters.map((param) => (

@@ -45,7 +45,7 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
       <Card>
         <CardTitle className="text-muted">
           <Link to={snapshotsTabLink}>
-            {t('Snapshots ({{count}})', { count: snapshots.length || 0 })}
+            {t('Snapshots ({{snapshots}})', { snapshots: snapshots.length || 0 })}
           </Link>
 
           <Button

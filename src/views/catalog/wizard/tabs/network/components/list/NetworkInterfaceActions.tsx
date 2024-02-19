@@ -1,20 +1,14 @@
-import * as React from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import { produceVMNetworks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import {
-  ButtonVariant,
-  Dropdown,
-  DropdownItem,
-  DropdownPosition,
-  KebabToggle,
-} from '@patternfly/react-core';
+import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import WizardEditNetworkInterfaceModal from '../modal/WizardEditNetworkInterfaceModal';
 
@@ -23,7 +17,7 @@ type NetworkInterfaceActionsProps = {
   nicPresentation: NetworkPresentation;
 };
 
-const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
+const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   nicName,
   nicPresentation,
 }) => {
@@ -31,7 +25,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
   const { updateVM, vm } = useWizardVMContext();
   const { createModal } = useModal();
 
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const label = t('Delete NIC?');
   const editBtnText = t('Edit');
   const submitBtnText = t('Delete');
@@ -50,7 +44,7 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
     setIsDropdownOpen(false);
   };
 
-  const onDelete = React.useCallback(() => {
+  const onDelete = useCallback(() => {
     const updatedVM = produceVMNetworks(vm, (draftVM) => {
       draftVM.spec.template.spec.networks = draftVM.spec.template.spec.networks.filter(
         ({ name }) => name !== nicName,
@@ -80,27 +74,23 @@ const NetworkInterfaceActions: React.FC<NetworkInterfaceActionsProps> = ({
     setIsDropdownOpen(false);
   };
 
-  const items = [
-    <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
-      {editBtnText}
-    </DropdownItem>,
-    <DropdownItem key="network-interface-delete" onClick={onDeleteModalToggle}>
-      {submitBtnText}
-    </DropdownItem>,
-  ];
-
+  const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
   return (
-    <>
-      <Dropdown
-        dropdownItems={items}
-        isOpen={isDropdownOpen}
-        isPlain
-        menuAppendTo={getContentScrollableElement}
-        onSelect={() => setIsDropdownOpen(false)}
-        position={DropdownPosition.right}
-        toggle={<KebabToggle id="toggle-id-6" onToggle={setIsDropdownOpen} />}
-      />
-    </>
+    <Dropdown
+      isOpen={isDropdownOpen}
+      onOpenChange={(open: boolean) => setIsDropdownOpen(open)}
+      onSelect={() => setIsDropdownOpen(false)}
+      toggle={KebabToggle({ id: 'toggle-id-network', onClick: onToggle })}
+    >
+      <DropdownList>
+        <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
+          {editBtnText}
+        </DropdownItem>
+        <DropdownItem key="network-interface-delete" onClick={onDeleteModalToggle}>
+          {submitBtnText}
+        </DropdownItem>
+      </DropdownList>
+    </Dropdown>
   );
 };
 

@@ -1,21 +1,12 @@
 import React, { FC, useState } from 'react';
-import { Trans } from 'react-i18next';
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  DescriptionListDescription,
-  DescriptionListTermHelpText,
-  DescriptionListTermHelpTextButton,
-  Flex,
-  FlexItem,
-  Popover,
-  Switch,
-} from '@patternfly/react-core';
+import { Flex, FlexItem, Switch } from '@patternfly/react-core';
+
+import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 type HardwareDevicesHeadlessModeProps = {
   onSubmit: (vm: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
@@ -46,44 +37,28 @@ const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({ onS
 
   return (
     <>
-      <DescriptionListTermHelpText>
-        <Popover
-          bodyContent={
-            <Trans ns="plugin__kubevirt-plugin">
-              Whether to attach the default graphics device or not. VNC will not be available if
-              checked{' '}
-              <Breadcrumb>
-                <BreadcrumbItem>VirtualMachine</BreadcrumbItem>
-                <BreadcrumbItem>spec</BreadcrumbItem>
-                <BreadcrumbItem>template</BreadcrumbItem>
-                <BreadcrumbItem>devices</BreadcrumbItem>
-                <BreadcrumbItem>autoattachGraphicsDevice</BreadcrumbItem>
-              </Breadcrumb>
-            </Trans>
-          }
-          hasAutoWidth
-          headerContent={t('Headless mode')}
-          maxWidth="30rem"
-        >
-          <DescriptionListTermHelpTextButton>
-            {t('Headless mode')}
-          </DescriptionListTermHelpTextButton>
-        </Popover>
-      </DescriptionListTermHelpText>
-      <DescriptionListDescription>
-        <Flex spaceItems={{ default: 'spaceItemsNone' }}>
-          <FlexItem>
-            <Switch
-              onChange={(checked) => {
-                setIsChecked(checked);
-                updateHeadlessMode(checked);
-              }}
-              id="headless-mode"
-              isChecked={isChecked}
-            />
-          </FlexItem>
-        </Flex>
-      </DescriptionListDescription>
+      <VirtualMachineDescriptionItem
+        bodyContent={t(
+          'Whether to attach the default graphics device or not. VNC will not be available if checked',
+        )}
+        descriptionData={
+          <Flex spaceItems={{ default: 'spaceItemsNone' }}>
+            <FlexItem>
+              <Switch
+                onChange={(_event, checked) => {
+                  setIsChecked(checked);
+                  updateHeadlessMode(checked);
+                }}
+                id="headless-mode"
+                isChecked={isChecked}
+              />
+            </FlexItem>
+          </Flex>
+        }
+        breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
+        descriptionHeader={t('Headless mode')}
+        isPopover
+      />
     </>
   );
 };

@@ -35,7 +35,7 @@ const CheckupsNetworkFormLatency: FC<CheckupsNetworkFormLatencyProps> = ({
           isChecked={isDesiredLatency}
           label={t('Set maximum desired latency (milliseconds)')}
           name="desired-latency"
-          onChange={(check) => setIsDesiredLatency(check)}
+          onChange={(_event, check) => setIsDesiredLatency(check)}
         />
         <Popover
           bodyContent={t('If the measured latency exceeds this value, the checkup fails.')}
@@ -51,7 +51,7 @@ const CheckupsNetworkFormLatency: FC<CheckupsNetworkFormLatencyProps> = ({
         <TextInput
           id="desired-latency-value"
           name="desired-latency-value"
-          onChange={(value) => setDesiredLatency(value)}
+          onChange={(_event, value) => setDesiredLatency(value)}
           type="number"
           value={desiredLatency}
         />

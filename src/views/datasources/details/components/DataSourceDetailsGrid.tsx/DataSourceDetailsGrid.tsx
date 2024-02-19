@@ -11,11 +11,11 @@ import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevir
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import PreferencePopoverContent from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/PreferencePopoverContent';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
-import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DEFAULT_INSTANCETYPE_LABEL,
@@ -42,8 +42,8 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
   return (
     <Grid hasGutter>
       <GridItem span={5}>
-        <DescriptionList>
-          <DescriptionItem
+        <DescriptionList className="pf-c-description-list">
+          <VirtualMachineDescriptionItem
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L96
             bodyContent={t(
               'Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. ',
@@ -55,7 +55,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             isPopover
             moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
           />
-          <DescriptionItem
+          <VirtualMachineDescriptionItem
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L102-L104
             bodyContent={t(
               'Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated. ',
@@ -68,7 +68,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             isPopover
             moreInfoURL="http://kubernetes.io/docs/user-guide/namespaces"
           />
-          <DescriptionItem
+          <VirtualMachineDescriptionItem
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L84
             bodyContent={t(
               'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ',
@@ -104,7 +104,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
             showEditOnTitle
           />
-          <DescriptionItem
+          <VirtualMachineDescriptionItem
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L32
             bodyContent={t(
               'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. ',
@@ -140,7 +140,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             isPopover
             moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
           />
-          <DescriptionItem
+          <VirtualMachineDescriptionItem
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L84
             bodyContent={t(
               'Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.',
@@ -155,7 +155,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
       </GridItem>
       <GridItem span={1} />
       <GridItem span={5}>
-        <DescriptionList>
+        <DescriptionList className="pf-c-description-list">
           {dataImportCron && (
             <DataSourceImportCronDescription
               dataImportCronName={dataImportCron}
@@ -163,7 +163,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             />
           )}
           {pvcSourceName && pvcSourceNamespace && (
-            <DescriptionItem
+            <VirtualMachineDescriptionItem
               descriptionData={
                 <ResourceLink
                   kind={PersistentVolumeClaimModel.kind}
@@ -174,7 +174,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
               descriptionHeader={t('Source')}
             />
           )}
-          <DescriptionItem
+          <VirtualMachineDescriptionItem
             descriptionData={
               <ResourceLink
                 groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
@@ -185,7 +185,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             descriptionHeader={t('Default InstanceType')}
             isPopover
           />
-          <DescriptionItem
+          <VirtualMachineDescriptionItem
             descriptionData={
               <ResourceLink
                 groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}

@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import classnames from 'classnames';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
@@ -24,7 +25,7 @@ type ConsoleOverVirtctlProps = {
 const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <DescriptionListGroup>
+    <DescriptionListGroup className="pf-c-description-list__group">
       <DescriptionListTerm className="pf-u-font-size-xs">
         {t('SSH using virtctl')}{' '}
         <Popover
@@ -37,22 +38,24 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
               </div>
               <br />
               <Grid>
-                <GridItem span={2}>{t('Example: ')}</GridItem>
-                <GridItem id="ssh-using-virtctl--example" span={10}>
+                <GridItem span={3}>{t('Example: ')}</GridItem>
+                <GridItem id="ssh-using-virtctl--example" span={9}>
                   {getConsoleVirtctlCommand(vm)}
                 </GridItem>
               </Grid>
             </>
           }
           aria-label={'Help'}
-          minWidth="585px"
+          minWidth="585px" // FIX
           position="right"
         >
           <HelpIcon />
         </Popover>
       </DescriptionListTerm>
 
-      <DescriptionListDescription className="sshcommand-body">
+      <DescriptionListDescription
+        className={classnames('pf-c-description-list__description', 'sshcommand-body')}
+      >
         <VirtctlSSHCommandClipboardCopy vm={vm} />
       </DescriptionListDescription>
     </DescriptionListGroup>

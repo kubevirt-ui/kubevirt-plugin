@@ -1,10 +1,11 @@
-import * as React from 'react';
+import React, { FC, ReactNode, useCallback } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
-import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
+import { FormGroup, SelectOption } from '@patternfly/react-core';
+import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
 
@@ -68,25 +69,22 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string) => {
 };
 
 type SelectSourceOptionProps = {
-  label: React.ReactNode;
+  label: ReactNode;
   onSelectSource: (selection: SOURCE_OPTIONS_IDS) => void;
   options: SOURCE_OPTIONS_IDS[];
   selectedSource: SOURCE_OPTIONS_IDS;
 };
 
-const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
+const SelectSourceOption: FC<SelectSourceOptionProps> = ({
   label,
   onSelectSource,
   options,
   selectedSource,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
   const { ns } = useParams<{ ns: string }>();
 
-  const onSelect = React.useCallback(
-    (event, selection) => {
-      setIsOpen(false);
-
+  const onSelect = useCallback(
+    (_, selection) => {
       if (selection !== SOURCE_TYPES.uploadSource) onSelectSource(selection);
     },
     [onSelectSource],
@@ -99,19 +97,16 @@ const SelectSourceOption: React.FC<SelectSourceOptionProps> = ({
       isRequired
       label={label}
     >
-      <Select
-        isOpen={isOpen}
-        maxHeight={400}
-        menuAppendTo="parent"
+      <FormPFSelect
         onSelect={onSelect}
-        onToggle={setIsOpen}
-        placeholderText={t('Select boot source')}
-        selections={selectedSource}
-        variant={SelectVariant.single}
+        placeholder={t('Select boot source')}
+        selected={selectedSource}
       >
-        {<SelectOption isPlaceholder key={0} value="Select a title" /> &&
-          options.map((option) => getSourceOption(option, ns))}
-      </Select>
+        <SelectOption isDisabled key={0} value="Select a title">
+          Select a title
+        </SelectOption>
+        {options.map((option) => getSourceOption(option, ns))}
+      </FormPFSelect>
     </FormGroup>
   );
 };

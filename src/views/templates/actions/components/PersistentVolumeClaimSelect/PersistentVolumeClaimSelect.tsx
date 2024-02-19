@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { PersistentVolumeClainSelectSkeleton } from './PersistentVolumeClainSelectSkeleton';
 import { PersistentVolumeSelectName } from './PersistentVolumeSelectName';
 import { PersistentVolumeSelectProject } from './PersistentVolumeSelectProject';
-import { useProjectsAndPVCs } from './utils';
+import { useProjectsAndPVCs } from './useProjectsAndPVCs';
 
 import './PersistentVolumeClaimSelect.scss';
 
@@ -13,7 +13,7 @@ type PersistentVolumeClaimSelectProps = {
   selectPVC: (pvcNamespace: string, pvcName?: string) => void;
 };
 
-export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectProps> = ({
+export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> = ({
   projectSelected,
   pvcNameSelected,
   selectPVC,
@@ -21,14 +21,14 @@ export const PersistentVolumeClaimSelect: React.FC<PersistentVolumeClaimSelectPr
   const { filteredPVCNames, projectsLoaded, projectsNames, pvcsLoaded } =
     useProjectsAndPVCs(projectSelected);
 
-  const onSelectProject = React.useCallback(
+  const onSelectProject = useCallback(
     (newProject) => {
       selectPVC(newProject);
     },
     [selectPVC],
   );
 
-  const onPVCSelected = React.useCallback(
+  const onPVCSelected = useCallback(
     (selection) => {
       selectPVC(projectSelected, selection);
     },

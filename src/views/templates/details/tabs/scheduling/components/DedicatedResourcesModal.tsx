@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 import produce from 'immer';
 import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
@@ -34,20 +34,20 @@ type DedicatedResourcesModalProps = {
   template: V1Template;
 };
 
-const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
+const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
   template,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [checked, setChecked] = React.useState<boolean>(isDedicatedCPUPlacement(template));
+  const [checked, setChecked] = useState<boolean>(isDedicatedCPUPlacement(template));
   const [nodes, nodesLoaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
 
-  const { hasNodes, qualifiedNodes } = React.useMemo(() => {
+  const { hasNodes, qualifiedNodes } = useMemo(() => {
     const filteredNodes = nodes?.filter(
       (node) => node?.metadata?.labels?.[cpuManagerLabelKey] === cpuManagerLabelValue,
     );
@@ -57,7 +57,7 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
     };
   }, [nodes]);
 
-  const updatedTemplate = React.useMemo(() => {
+  const updatedTemplate = useMemo(() => {
     return produce<V1Template>(template, (templateDraft: V1Template) => {
       const draftVM = getTemplateVirtualMachineObject(templateDraft);
       ensurePath(draftVM, ['spec.template.spec.domain.cpu']);
@@ -96,7 +96,7 @@ const DedicatedResourcesModal: React.FC<DedicatedResourcesModalProps> = ({
             id="dedicated-resources"
             isChecked={checked}
             label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
-            onChange={setChecked}
+            onChange={(_, check: boolean) => setChecked(check)}
           />
         </FormGroup>
         <FormGroup fieldId="dedicated-resources-node">

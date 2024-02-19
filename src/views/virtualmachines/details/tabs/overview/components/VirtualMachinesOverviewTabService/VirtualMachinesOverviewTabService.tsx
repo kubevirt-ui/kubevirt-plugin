@@ -30,7 +30,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
   return (
     <Card>
       <CardTitle className="text-muted">
-        {t('Services ({{count}})', { count: data?.length })}
+        {t('Services ({{services}})', { services: data?.length })}
       </CardTitle>
       <Divider />
       <CardBody isFilled>
