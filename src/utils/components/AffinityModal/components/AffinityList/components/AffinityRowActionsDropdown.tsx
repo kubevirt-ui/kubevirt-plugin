@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
+import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Dropdown, DropdownItem, DropdownPosition, KebabToggle } from '@patternfly/react-core';
+import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import { AffinityRowData } from '../../../utils/types';
 
@@ -11,34 +12,34 @@ type AffinityRowActionsDropdownProps = {
   onEdit: (affinity: AffinityRowData) => void;
 };
 
-const AffinityRowActionsDropdown: React.FC<AffinityRowActionsDropdownProps> = ({
+const AffinityRowActionsDropdown: FC<AffinityRowActionsDropdownProps> = ({
   affinity,
   onDelete,
   onEdit,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
+  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
   const handleDelete = () => {
     onDelete(affinity);
     setIsOpen(false);
   };
   return (
     <Dropdown
-      dropdownItems={[
+      isOpen={isOpen}
+      onOpenChange={(open: boolean) => setIsOpen(open)}
+      toggle={KebabToggle({ isExpanded: isOpen, onClick: onToggle })}
+    >
+      <DropdownList>
         <DropdownItem key="edit" onClick={() => onEdit(affinity)}>
           {t('Edit')}
-        </DropdownItem>,
+        </DropdownItem>
         <DropdownItem key="delete" onClick={() => handleDelete()}>
           {t('Delete')}
-        </DropdownItem>,
-      ]}
-      isOpen={isOpen}
-      isPlain
-      menuAppendTo={document.getElementById('tab-modal')}
-      position={DropdownPosition.right}
-      toggle={<KebabToggle onToggle={setIsOpen} />}
-    />
+        </DropdownItem>
+      </DropdownList>
+    </Dropdown>
   );
 };
 

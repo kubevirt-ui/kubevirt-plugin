@@ -1,19 +1,20 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Badge,
-  Select,
+  Icon,
   SelectGroup,
   SelectOption,
-  SelectVariant,
   ToolbarChip,
   ToolbarFilter,
   ToolbarItem,
 } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
+
+import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
 import { Filter, FilterKeys, generateRowFilters, intersection } from './utils';
 
@@ -35,13 +36,12 @@ const RowFilters: FC<RowFiltersProps> = ({
   updateRowFilterSelected,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isSelectOpen, setIsSelectOpen] = useState<boolean>(false);
   const clearAllRowFilter = (f: string) => {
     updateRowFilterSelected(intersection(filters[f], selectedRowFilters));
   };
 
-  const onRowFilterSelect = (event) => {
-    updateRowFilterSelected([event?.target?.id]);
+  const onRowFilterSelect = (_, filterID: string) => {
+    updateRowFilterSelected([filterID]);
   };
 
   if (isEmpty(rowFilters)) return null;
@@ -70,23 +70,18 @@ const RowFilters: FC<RowFiltersProps> = ({
           </ToolbarFilter>
         ),
         <div data-test-id="filter-dropdown-toggle">
-          <Select
-            onToggle={() => {
-              setIsSelectOpen(!isSelectOpen);
+          <FormPFSelect
+            toggleProps={{
+              icon: (
+                <Icon className="span--icon__right-margin">
+                  <FilterIcon />
+                </Icon>
+              ),
             }}
-            placeholderText={
-              <>
-                <FilterIcon className="span--icon__right-margin" />
-                {t('Filter')}
-              </>
-            }
-            isCheckboxSelectionBadgeHidden
-            isGrouped
-            isOpen={isSelectOpen}
-            maxHeight="60vh"
+            closeOnSelect={false}
             onSelect={onRowFilterSelect}
-            selections={selectedRowFilters}
-            variant={SelectVariant.checkbox}
+            selected={selectedRowFilters}
+            selectedLabel={t('Filter')}
           >
             {generatedRowFilters.map((rowFilter) => (
               <SelectGroup key={rowFilter.filterGroupName} label={rowFilter.filterGroupName}>
@@ -94,12 +89,7 @@ const RowFilters: FC<RowFiltersProps> = ({
                   item.hideIfEmpty && (item.count === 0 || item.count === '0') ? (
                     <></>
                   ) : (
-                    <SelectOption
-                      data-test-row-filter={item.id}
-                      inputId={item.id}
-                      key={item.id}
-                      value={item.id}
-                    >
+                    <SelectOption data-test-row-filter={item.id} key={item.id} value={item.id}>
                       <span className="co-filter-dropdown-item__name">{item.title}</span>
                       <Badge isRead key={item.id}>
                         {item.count}
@@ -109,7 +99,7 @@ const RowFilters: FC<RowFiltersProps> = ({
                 )}
               </SelectGroup>
             ))}
-          </Select>
+          </FormPFSelect>
         </div>,
       )}
     </ToolbarItem>

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Bullseye, EmptyState, EmptyStateIcon, Title } from '@patternfly/react-core';
+import { Bullseye, EmptyState, EmptyStateHeader, EmptyStateIcon } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 
 const UserProvidedInstanceTypesEmptyState: FC = () => {
@@ -9,10 +9,11 @@ const UserProvidedInstanceTypesEmptyState: FC = () => {
   return (
     <Bullseye>
       <EmptyState>
-        <EmptyStateIcon icon={SearchIcon} />
-        <Title headingLevel="h2" size="lg">
-          {t('No InstanceTypes found')}
-        </Title>
+        <EmptyStateHeader
+          headingLevel="h2"
+          icon={<EmptyStateIcon icon={SearchIcon} />}
+          titleText={<>{t('No InstanceTypes found')}</>}
+        />
       </EmptyState>
     </Bullseye>
   );

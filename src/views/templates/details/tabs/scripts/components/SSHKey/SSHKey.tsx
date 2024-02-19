@@ -12,6 +12,7 @@ import {
   SecretSelectionOption,
   SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -22,10 +23,6 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  DescriptionListTermHelpText,
   Flex,
   FlexItem,
   Stack,
@@ -114,49 +111,47 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
   };
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>
-        <DescriptionListTermHelpText>
-          <Flex className="vm-description-item__title">
-            <FlexItem>
-              <Title headingLevel="h2">
-                {t('Public SSH key')} {<LinuxLabel />}
-              </Title>
-            </FlexItem>
-            <FlexItem>
-              <Button
-                onClick={() =>
-                  createModal((modalProps) => (
-                    <SSHSecretModal
-                      {...modalProps}
-                      initialSSHSecretDetails={initialSSHDetails}
-                      isTemplate
-                      namespace={getNamespace(template)}
-                      onSubmit={onSubmit}
-                    />
-                  ))
-                }
-                isDisabled={!isTemplateEditable}
-                isInline
-                type="button"
-                variant={ButtonVariant.link}
-              >
-                {t('Edit')}
-                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-              </Button>
-            </FlexItem>
-          </Flex>
-        </DescriptionListTermHelpText>
-      </DescriptionListTerm>
-      <DescriptionListDescription>
+    <VirtualMachineDescriptionItem
+      descriptionData={
         <Stack hasGutter>
           <div data-test="ssh-popover">
             <Text component={TextVariants.p}>{t('Select an available secret')}</Text>
           </div>
           <SecretNameLabel secretName={vmAttachedSecretName} />
         </Stack>
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+      }
+      descriptionHeader={
+        <Flex className="vm-description-item__title">
+          <FlexItem>
+            <Title headingLevel="h2">
+              {t('Public SSH key')} {<LinuxLabel />}
+            </Title>
+          </FlexItem>
+          <FlexItem>
+            <Button
+              onClick={() =>
+                createModal((modalProps) => (
+                  <SSHSecretModal
+                    {...modalProps}
+                    initialSSHSecretDetails={initialSSHDetails}
+                    isTemplate
+                    namespace={getNamespace(template)}
+                    onSubmit={onSubmit}
+                  />
+                ))
+              }
+              isDisabled={!isTemplateEditable}
+              isInline
+              type="button"
+              variant={ButtonVariant.link}
+            >
+              {t('Edit')}
+              <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+            </Button>
+          </FlexItem>
+        </Flex>
+      }
+    />
   );
 };
 

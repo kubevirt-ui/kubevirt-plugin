@@ -4,14 +4,8 @@ import { getEvictionStrategy } from 'src/views/templates/utils/selectors';
 
 import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/ShowEvictionStrategy';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Button,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
-import { PencilAltIcon } from '@patternfly/react-icons';
 
 import EvictionStrategyModal from './EvictionStrategyModal';
 
@@ -35,22 +29,12 @@ const EvictionStrategy: React.FC<TemplateSchedulingGridProps> = ({
     ));
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>{t('Eviction strategy')}</DescriptionListTerm>
-      <DescriptionListDescription>
-        <Button
-          data-test-id="eviction-strategy"
-          isDisabled={!editable}
-          isInline
-          onClick={onEditClick}
-          type="button"
-          variant="link"
-        >
-          <ShowEvictionStrategy evictionStrategy={strategy} />
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </Button>
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+    <VirtualMachineDescriptionItem
+      descriptionData={<ShowEvictionStrategy evictionStrategy={strategy} />}
+      descriptionHeader={t('Eviction strategy')}
+      isEdit={editable}
+      onEditClick={onEditClick}
+    />
   );
 };
 

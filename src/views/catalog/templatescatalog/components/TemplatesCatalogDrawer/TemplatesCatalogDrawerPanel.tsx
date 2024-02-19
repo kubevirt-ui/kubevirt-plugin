@@ -43,8 +43,8 @@ export const TemplatesCatalogDrawerPanel: FC = memo(() => {
                       <TemplateInfoSection />
                       {hardwareDevicesCount !== 0 && (
                         <ExpandableSection
-                          toggleText={t('Hardware devices ({{count}})', {
-                            count: hardwareDevicesCount,
+                          toggleText={t('Hardware devices ({{devices}})', {
+                            devices: hardwareDevicesCount,
                           })}
                           isIndented
                         >

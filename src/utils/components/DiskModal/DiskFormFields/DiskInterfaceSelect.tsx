@@ -1,14 +1,16 @@
-import React, { ChangeEvent, Dispatch, FC, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, FC, MouseEvent, useEffect, useMemo } from 'react';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import { diskReducerActions, DiskReducerActionType } from '../state/actions';
 import { DiskFormState } from '../state/initialState';
 
 import { interfaceTypes } from './utils/constants';
-import { getInterfaceOptions } from './utils/helpers';
+import { getInterfaceOptions, interfaceOptionTitles } from './utils/helpers';
 
 type DiskInterfaceSelectProps = {
   diskState: DiskFormState;
@@ -24,12 +26,10 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const { diskInterface, diskType } = diskState || {};
   const isCDROMType = diskType === diskTypes.cdrom;
-  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const interfaceOptions = useMemo(() => getInterfaceOptions(), []);
 
-  const onSelect = (event: ChangeEvent<HTMLSelectElement>, value: string) => {
-    setIsOpen(false);
+  const onSelect = (event: MouseEvent<HTMLSelectElement>, value: string) => {
     dispatchDiskState({ payload: value, type: diskReducerActions.SET_DISK_INTERFACE });
   };
 
@@ -54,22 +54,13 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({
   }, [diskInterface, dispatchDiskState, isCDROMType]);
 
   return (
-    <FormGroup
-      fieldId="disk-interface"
-      helperText={t('Hot plug is enabled only for "SCSI" interface')}
-      isRequired
-      label={t('Interface')}
-    >
+    <FormGroup fieldId="disk-interface" isRequired label={t('Interface')}>
       <div data-test-id="disk-interface-select">
-        <Select
-          direction="up"
-          isDisabled={isVMRunning}
-          isOpen={isOpen}
-          menuAppendTo="parent"
+        <FormPFSelect
           onSelect={onSelect}
-          onToggle={setIsOpen}
-          selections={diskInterface}
-          variant={SelectVariant.single}
+          selected={diskInterface}
+          selectedLabel={interfaceOptionTitles[diskInterface]}
+          toggleProps={{ isDisabled: isVMRunning, isFullWidth: true }}
         >
           {interfaceOptions.map(({ description, id, name }) => {
             const isDisabled = isCDROMType && id === interfaceTypes.VIRTIO;
@@ -85,7 +76,10 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({
               </SelectOption>
             );
           })}
-        </Select>
+        </FormPFSelect>
+        <FormGroupHelperText>
+          {t('Hot plug is enabled only for "SCSI" interface')}
+        </FormGroupHelperText>
       </div>
     </FormGroup>
   );

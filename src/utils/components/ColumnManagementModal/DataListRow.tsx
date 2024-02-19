@@ -1,4 +1,4 @@
-import React, { FC, SyntheticEvent } from 'react';
+import React, { FC, FormEvent } from 'react';
 
 import { ManagedColumn } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -16,7 +16,7 @@ type DataListRowProps = {
   column: ManagedColumn;
   disableUncheckedRow: boolean;
   inputId: string;
-  onChange: (checked: boolean, event: SyntheticEvent) => void;
+  onChange: (event: FormEvent<HTMLInputElement>, checked: boolean) => void;
 };
 
 const DataListRow: FC<DataListRowProps> = ({

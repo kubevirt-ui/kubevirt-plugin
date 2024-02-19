@@ -126,7 +126,7 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({ isOpen, onClose, vm, volume
                 })}
                 id="delete-owned-resource"
                 isChecked={deleteOwnedResource}
-                onChange={setDeleteOwnedResource}
+                onChange={(_event, val) => setDeleteOwnedResource(val)}
               />
             )}
           </StackItem>

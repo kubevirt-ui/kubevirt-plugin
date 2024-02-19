@@ -1,4 +1,4 @@
-import React, { FC, FormEvent, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -19,7 +19,7 @@ type SectionWithSwitchProps = {
   newBadge?: boolean;
   switchIsOn: boolean;
   title?: ReactNode;
-  turnOnSwitch: (checked: boolean, event: FormEvent<HTMLInputElement>) => void;
+  turnOnSwitch: (checked: boolean) => void;
 };
 const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
   children,
@@ -52,7 +52,12 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
         )}
       </div>
       <SplitItem className={classNames({ 'section-with-switch__inline': inlineCheckbox })}>
-        {children} <Switch isChecked={switchIsOn} isDisabled={isDisabled} onChange={turnOnSwitch} />
+        {children}{' '}
+        <Switch
+          isChecked={switchIsOn}
+          isDisabled={isDisabled}
+          onChange={(_, checked: boolean) => turnOnSwitch(checked)}
+        />
       </SplitItem>
     </Wrapper>
   );

@@ -24,11 +24,11 @@ export const getChildTypeName = (child: any) =>
     ? child.props.type
     : (child && child.type && child.type.displayName) || null;
 
-export const getConsoleForType = (consoleType: any, children) =>
+export const getConsoleForType = (consoleType: string, children) =>
   React.Children.map(children as React.ReactElement[], (child: any) => {
-    if (getChildTypeName(child) === consoleType?.value) {
+    if (getChildTypeName(child) === consoleType) {
       return <React.Fragment key={getChildTypeName(child)}>{child}</React.Fragment>;
-    } else {
-      return null;
     }
+
+    return null;
   });

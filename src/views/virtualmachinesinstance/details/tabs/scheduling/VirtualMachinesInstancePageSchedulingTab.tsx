@@ -1,12 +1,10 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
   Grid,
   GridItem,
   PageSection,
@@ -33,47 +31,35 @@ const VirtualMachinesInstancePageSchedulingTab: FC<
     <PageSection variant={PageSectionVariants.light}>
       <Grid hasGutter>
         <GridItem span={6}>
-          <DescriptionList>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Node selector')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <NodeSelector vmi={vmi} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Tolerations')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <Tolerations vmi={vmi} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Affinity rules')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <Affinity vmi={vmi} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Descheduler')}</DescriptionListTerm>
-              <DescriptionListDescription className="list-description">
-                <Descheduler vmi={vmi} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
+          <DescriptionList className="pf-c-description-list">
+            <VirtualMachineDescriptionItem
+              descriptionData={<NodeSelector vmi={vmi} />}
+              descriptionHeader={t('Node selector')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<Tolerations vmi={vmi} />}
+              descriptionHeader={t('Tolerations')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<Affinity vmi={vmi} />}
+              descriptionHeader={t('Affinity rules')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<Descheduler vmi={vmi} />}
+              descriptionHeader={t('Descheduler')}
+            />
           </DescriptionList>
         </GridItem>
         <GridItem span={6}>
-          <DescriptionList>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Dedicated resources')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <DedicatedResources vmi={vmi} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Eviction strategy')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <EvictionStrategy vmi={vmi} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
+          <DescriptionList className="pf-c-description-list">
+            <VirtualMachineDescriptionItem
+              descriptionData={<DedicatedResources vmi={vmi} />}
+              descriptionHeader={t('Dedicated resources')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<EvictionStrategy vmi={vmi} />}
+              descriptionHeader={t('Eviction strategy')}
+            />
           </DescriptionList>
         </GridItem>
       </Grid>

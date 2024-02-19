@@ -76,7 +76,11 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
         </SplitItem>
         {hyperLoaded && (
           <SplitItem>
-            <Switch id="guest-system-log-access" isChecked={isChecked} onChange={onChange} />
+            <Switch
+              id="guest-system-log-access"
+              isChecked={isChecked}
+              onChange={(_, checked: boolean) => onChange(checked)}
+            />
           </SplitItem>
         )}
       </Split>

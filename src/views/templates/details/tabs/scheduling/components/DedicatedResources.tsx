@@ -3,14 +3,8 @@ import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/sc
 import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Button,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
-import { PencilAltIcon } from '@patternfly/react-icons';
 
 import DedicatedResourcesModal from './DedicatedResourcesModal';
 
@@ -36,22 +30,12 @@ const DedicatedResources: React.FC<TemplateSchedulingGridProps> = ({
     ));
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>{t('Dedicated resources')}</DescriptionListTerm>
-      <DescriptionListDescription>
-        <Button
-          data-test-id="dedicated-resources"
-          isDisabled={!editable}
-          isInline
-          onClick={onEditClick}
-          type="button"
-          variant="link"
-        >
-          {dedicatedResourcesText}
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </Button>
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+    <VirtualMachineDescriptionItem
+      descriptionData={dedicatedResourcesText}
+      descriptionHeader={t('Dedicated resources')}
+      isEdit={editable}
+      onEditClick={onEditClick}
+    />
   );
 };
 

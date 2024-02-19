@@ -63,7 +63,7 @@ const SSHTabAuthorizedSSHKey = ({ vm }) => {
       }
       isExpanded={isExpanded}
       isIndented
-      onToggle={setIsExpanded}
+      onToggle={(_event, val) => setIsExpanded(val)}
     >
       <Stack hasGutter>
         <SecretNameLabel secretName={secretName} />

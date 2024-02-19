@@ -12,12 +12,12 @@ import {
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Action, k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-import { Loading } from '@patternfly/quickstarts';
 import { Split, SplitItem } from '@patternfly/react-core';
 
 import { isDataResourceOwnedBySSP } from '../../utils';

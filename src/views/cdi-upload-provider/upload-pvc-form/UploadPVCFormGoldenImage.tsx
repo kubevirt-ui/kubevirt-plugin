@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -25,7 +25,7 @@ type UploadPVCFormGoldenImageProps = {
   pvcSizeFromTemplate: boolean;
 };
 
-const UploadPVCFormGoldenImage: React.FC<UploadPVCFormGoldenImageProps> = ({
+const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
   goldenPvcs,
   handleCDROMChange,
   handleOs,
@@ -49,7 +49,7 @@ const UploadPVCFormGoldenImage: React.FC<UploadPVCFormGoldenImageProps> = ({
           id="golden-os-select"
           isDisabled={isLoading}
           isRequired
-          onChange={handleOs}
+          onChange={(_, val) => handleOs(val)}
           value={os?.id || ''}
         >
           <FormSelectOption
@@ -88,7 +88,7 @@ const UploadPVCFormGoldenImage: React.FC<UploadPVCFormGoldenImageProps> = ({
               id="golden-os-checkbox-pvc-size-template"
               isChecked={pvcSizeFromTemplate}
               label={t('Use template size PVC')}
-              onChange={handlePvcSizeTemplate}
+              onChange={(_, checked: boolean) => handlePvcSizeTemplate(checked)}
             />
             <Checkbox
               className="kv--create-upload__golden-switch"
@@ -96,7 +96,7 @@ const UploadPVCFormGoldenImage: React.FC<UploadPVCFormGoldenImageProps> = ({
               id="golden-os-checkbox-cdrom-boot-source-template"
               isChecked={!!mountAsCDROM}
               label={t('This is a CD-ROM boot source')}
-              onChange={handleCDROMChange}
+              onChange={(_, checked: boolean) => handleCDROMChange(checked)}
             />
           </>
         )}

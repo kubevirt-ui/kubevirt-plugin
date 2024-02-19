@@ -1,8 +1,10 @@
-import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
+import React, { Dispatch, FC, MouseEvent, SetStateAction, useMemo } from 'react';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import { networkNameStartWithPod } from '../utils/helpers';
 
@@ -21,7 +23,6 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const isPodNetworkName = useMemo(() => networkNameStartWithPod(networkName), [networkName]);
-  const [isOpen, setIsOpen] = useState(false);
 
   const interfaceTypeOptions = {
     bridge: {
@@ -57,28 +58,18 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
     },
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
+  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string) => {
     event.preventDefault();
     setInterfaceType(value);
-    setIsOpen(false);
   };
 
   return (
-    <FormGroup
-      helperText={
-        showTypeHelperText && t('Hot plug is enabled only for "Bridge" and "SR-IOV" types')
-      }
-      fieldId="type"
-      label={t('Type')}
-    >
+    <FormGroup fieldId="type" label={t('Type')}>
       <div data-test-id="network-interface-type-select">
-        <Select
-          isOpen={isOpen}
-          menuAppendTo="parent"
+        <FormPFSelect
           onSelect={handleChange}
-          onToggle={setIsOpen}
-          selections={interfaceType}
-          variant={SelectVariant.single}
+          selected={interfaceType}
+          toggleProps={{ isFullWidth: true }}
         >
           {Object.values(interfaceTypeOptions)
             ?.filter(({ allowOption }) => allowOption)
@@ -92,7 +83,10 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
                 {name}
               </SelectOption>
             ))}
-        </Select>
+        </FormPFSelect>
+        <FormGroupHelperText>
+          {showTypeHelperText && t('Hot plug is enabled only for "Bridge" and "SR-IOV" types')}
+        </FormGroupHelperText>
       </div>
     </FormGroup>
   );

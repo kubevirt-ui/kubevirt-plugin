@@ -5,10 +5,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   Button,
   EmptyState,
+  EmptyStateActions,
   EmptyStateBody,
-  EmptyStateSecondaryActions,
+  EmptyStateFooter,
+  EmptyStateHeader,
   EmptyStateVariant,
-  Title,
 } from '@patternfly/react-core';
 
 export const TemplatesCatalogEmptyState: React.FC<{
@@ -19,10 +20,11 @@ export const TemplatesCatalogEmptyState: React.FC<{
 
   if (!bootSourcesLoaded) {
     return (
-      <EmptyState variant={EmptyStateVariant.large}>
-        <Title headingLevel="h4" size="lg">
-          {t('Loading Templates with available boot source')}
-        </Title>
+      <EmptyState variant={EmptyStateVariant.lg}>
+        <EmptyStateHeader
+          headingLevel="h4"
+          titleText={<>{t('Loading Templates with available boot source')}</>}
+        />
         <EmptyStateBody>
           <Loading />
         </EmptyStateBody>
@@ -31,18 +33,21 @@ export const TemplatesCatalogEmptyState: React.FC<{
   }
 
   return (
-    <EmptyState variant={EmptyStateVariant.small}>
-      <Title headingLevel="h4" size="lg">
-        {t('No Results Match the Filter Criteria')}
-      </Title>
+    <EmptyState variant={EmptyStateVariant.sm}>
+      <EmptyStateHeader
+        headingLevel="h4"
+        titleText={<>{t('No Results Match the Filter Criteria')}</>}
+      />
       <EmptyStateBody>
         {t('No Template items are being shown due to the filters being applied.')}
       </EmptyStateBody>
-      <EmptyStateSecondaryActions>
-        <Button onClick={() => onClearFilters()} variant="link">
-          {t('Clear all filters')}
-        </Button>
-      </EmptyStateSecondaryActions>
+      <EmptyStateFooter>
+        <EmptyStateActions>
+          <Button onClick={() => onClearFilters()} variant="link">
+            {t('Clear all filters')}
+          </Button>
+        </EmptyStateActions>
+      </EmptyStateFooter>
     </EmptyState>
   );
 });

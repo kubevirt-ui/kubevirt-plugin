@@ -13,7 +13,7 @@ import {
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
-import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base';
+import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
 type UseBootVolumeSortColumns = (
   unsortedData: BootableVolume[],

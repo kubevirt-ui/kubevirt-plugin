@@ -9,7 +9,6 @@ import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Bullseye,
   Card,
-  CardActions,
   CardBody,
   CardHeader,
   CardTitle,
@@ -48,23 +47,38 @@ const MigrationsTab: React.FC = () => {
   return (
     <Overview>
       <Card data-test="kv-monitoring-card">
-        <CardHeader className="kv-monitoring-card__header">
+        <CardHeader
+          actions={{
+            actions: (
+              <>
+                <div className="kv-top-consumers-card__dropdown--duration">
+                  <DurationDropdown selectedDuration={duration} selectHandler={onDurationSelect} />
+                </div>
+              </>
+            ),
+            className: 'co-overview-card__actions',
+            hasNoOffset: false,
+          }}
+          className="kv-monitoring-card__header"
+        >
           <CardTitle>{t('VirtualMachineInstanceMigrations information')} </CardTitle>
-          <CardActions className="co-overview-card__actions">
-            <div className="kv-top-consumers-card__dropdown--duration">
-              <DurationDropdown selectedDuration={duration} selectHandler={onDurationSelect} />
-            </div>
-          </CardActions>
         </CardHeader>
         <CardBody className="kv-monitoring-card__body">
           {!isEmpty(filteredVMIMS) ? (
             <Grid>
               <GridItem className="kv-monitoring-card__graph-separator" span={6}>
-                <CardHeader>
+                <CardHeader
+                  actions={{
+                    actions: (
+                      <>
+                        <MigrationsLimitionsPopover />
+                      </>
+                    ),
+                    className: 'co-overview-card__actions',
+                    hasNoOffset: false,
+                  }}
+                >
                   <CardTitle>{t('Migrations')}</CardTitle>
-                  <CardActions className="co-overview-card__actions">
-                    <MigrationsLimitionsPopover />
-                  </CardActions>
                 </CardHeader>
                 <CardBody className="kv-monitoring-card__body">
                   <MigrationsChartDonut onFilterChange={onFilterChange} vmims={filteredVMIMS} />

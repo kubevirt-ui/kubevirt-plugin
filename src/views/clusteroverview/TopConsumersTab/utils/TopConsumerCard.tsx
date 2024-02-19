@@ -6,7 +6,7 @@ import {
   SetTopConsumerData,
   TopConsumersData,
 } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
-import { Card, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { Card, SelectOption } from '@patternfly/react-core';
 
 import { TopConsumerMetric } from './topConsumerMetric';
 import { TopConsumersChartList } from './TopConsumersChartList';
@@ -61,27 +61,27 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
       <div className="kv-top-consumer-card__header">
         <div>
           <FormPFSelect
-            isCheckboxSelectionBadgeHidden
             onSelect={(e, value) => onMetricSelect(value)}
-            selections={t(TopConsumerMetric.fromString(metricKey)?.getDropdownLabel())}
-            toggleId="kv-top-consumers-card-metric-select"
-            variant={SelectVariant.single}
+            selected={t(TopConsumerMetric.fromString(metricKey)?.getDropdownLabel())}
+            toggleProps={{ id: 'kv-top-consumers-card-metric-select' }}
           >
             {TopConsumerMetric.getAll().map((metric) => (
-              <SelectOption key={metric?.getValue()} value={t(metric?.getDropdownLabel())} />
+              <SelectOption key={metric?.getValue()} value={t(metric?.getDropdownLabel())}>
+                {t(metric?.getDropdownLabel())}
+              </SelectOption>
             ))}
           </FormPFSelect>
         </div>
         <div className="kv-top-consumer-card__scope-select">
           <FormPFSelect
-            isCheckboxSelectionBadgeHidden
             onSelect={(e, value) => onScopeSelect(value)}
-            selections={t(TopConsumerScope.fromString(scopeKey)?.getDropdownLabel())}
-            toggleId="kv-top-consumers-card-scope-select"
-            variant={SelectVariant.single}
+            selected={t(TopConsumerScope.fromString(scopeKey)?.getDropdownLabel())}
+            toggleProps={{ id: 'kv-top-consumers-card-scope-select' }}
           >
             {TopConsumerScope.getAll().map((scope) => (
-              <SelectOption key={scope?.getValue()} value={t(scope?.getDropdownLabel())} />
+              <SelectOption key={scope?.getValue()} value={t(scope?.getDropdownLabel())}>
+                {t(scope?.getDropdownLabel())}
+              </SelectOption>
             ))}
           </FormPFSelect>
         </div>

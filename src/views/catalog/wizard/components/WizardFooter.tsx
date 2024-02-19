@@ -88,7 +88,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
             isChecked={startVM}
             isDisabled={!loaded || disableVmCreate || !isBootSourceAvailable}
             label={t('Start this VirtualMachine after creation')}
-            onChange={onChangeStartVM}
+            onChange={(_, checked: boolean) => onChangeStartVM(checked)}
           />
         </StackItem>
         <StackItem />

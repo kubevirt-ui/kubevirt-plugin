@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -23,7 +23,7 @@ type VirtualMachineDescriptionItemProps = {
   className?: string;
   'data-test-id'?: string;
   descriptionData: any;
-  descriptionHeader?: ReactElement;
+  descriptionHeader?: ReactNode;
   editOnTitleJustify?: boolean;
   isDisabled?: boolean;
   isEdit?: boolean;
@@ -67,13 +67,12 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   );
 
   return (
-    <DescriptionListGroup className={`virtual-machine-description-list ${className}`}>
-      <DescriptionListTermHelpText>
+    <DescriptionListGroup className={`pf-c-description-list__group ${className && className}`}>
+      <DescriptionListTermHelpText className="pf-c-description-list__term">
         <Flex
           justifyContent={{
             default: editOnTitleJustify ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
           }}
-          className="vm-description-item__title"
         >
           <FlexItem>
             <DescriptionItemHeader
@@ -96,14 +95,17 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
                 variant="link"
               >
                 {t('Edit')}
-                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+                <PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />
               </Button>
             </FlexItem>
           )}
         </Flex>
       </DescriptionListTermHelpText>
 
-      <DescriptionListDescription data-test-id={testId}>
+      <DescriptionListDescription
+        className="pf-c-description-list__description"
+        data-test-id={testId}
+      >
         {isEdit && !showEditOnTitle ? description : descriptionData}
       </DescriptionListDescription>
     </DescriptionListGroup>

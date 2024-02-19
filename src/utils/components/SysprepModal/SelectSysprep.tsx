@@ -1,19 +1,13 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Alert,
-  AlertVariant,
-  Button,
-  ButtonVariant,
-  Select,
-  SelectOption,
-  SelectVariant,
-} from '@patternfly/react-core';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
+import FilterSelect from '../FilterSelect/FilterSelect';
 import Loading from '../Loading/Loading';
 
 import { AUTOUNATTEND, UNATTEND } from './sysprep-utils';
@@ -25,17 +19,15 @@ type SelectSysprepProps = {
   selectedSysprepName: string;
 };
 
-const SelectSysprep: React.FC<SelectSysprepProps> = ({
+const SelectSysprep: FC<SelectSysprepProps> = ({
   id,
   namespace,
   onSelectSysprep,
   selectedSysprepName,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isSecretSelectOpen, setSecretSelectOpen] = React.useState(false);
-
   const [configmaps, configmapsLoaded, configmapsError] = useK8sWatchResource<
-    IoK8sApiCoreV1Secret[]
+    IoK8sApiCoreV1ConfigMap[]
   >({
     groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
     isList: true,
@@ -47,26 +39,6 @@ const SelectSysprep: React.FC<SelectSysprepProps> = ({
     (configmap) => configmap?.data?.[AUTOUNATTEND] || configmap?.data?.[UNATTEND],
   );
 
-  const filterSecrets = (_, value: string): React.ReactElement[] => {
-    let filteredSecrets = sysprepConfigMaps;
-
-    if (value) {
-      const regex = new RegExp(value, 'i');
-      filteredSecrets = sysprepConfigMaps.filter((secret) => regex.test(secret?.metadata?.name));
-    }
-
-    return filteredSecrets.map((sysprep) => (
-      <SelectOption key={sysprep?.metadata?.name} value={sysprep?.metadata?.name}>
-        <ResourceLink kind={ConfigMapModel.kind} linkTo={false} name={sysprep?.metadata?.name} />
-      </SelectOption>
-    )) as React.ReactElement[];
-  };
-
-  const onSelect = (event, newValue) => {
-    onSelectSysprep(newValue);
-    setSecretSelectOpen(false);
-  };
-
   if (configmapsError)
     return (
       <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
@@ -77,29 +49,19 @@ const SelectSysprep: React.FC<SelectSysprepProps> = ({
   return (
     <>
       {configmapsLoaded ? (
-        <Select
-          hasInlineFilter
-          id={id || 'select-sysprep'}
-          isOpen={isSecretSelectOpen}
-          maxHeight={400}
-          menuAppendTo="parent"
-          onFilter={filterSecrets}
-          onSelect={onSelect}
-          onToggle={() => setSecretSelectOpen(!isSecretSelectOpen)}
-          placeholderText={t('--- Select sysprep ---')}
-          selections={selectedSysprepName}
-          variant={SelectVariant.single}
-        >
-          {sysprepConfigMaps?.map((sysprep) => (
-            <SelectOption key={sysprep?.metadata?.name} value={sysprep?.metadata?.name}>
-              <ResourceLink
-                kind={ConfigMapModel.kind}
-                linkTo={false}
-                name={sysprep?.metadata?.name}
-              />
-            </SelectOption>
-          ))}
-        </Select>
+        <FilterSelect
+          options={sysprepConfigMaps?.map((configMap) => {
+            const name = getName(configMap);
+            return {
+              children: name,
+              groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
+              value: name,
+            };
+          })}
+          selected={selectedSysprepName}
+          setSelected={onSelectSysprep}
+          toggleProps={{ id, placeholder: t('--- Select sysprep ---') }}
+        />
       ) : (
         <Loading />
       )}

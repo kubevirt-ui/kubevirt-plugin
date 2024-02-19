@@ -11,7 +11,7 @@ const Tolerations: React.FC<TolerationsProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const tolerations = vm?.spec?.template?.spec?.tolerations;
 
-  return <>{t('{{count}} Tolerations rules', { count: tolerations?.length ?? 0 })}</>;
+  return <>{t('{{rules}} Tolerations rules', { rules: tolerations?.length ?? 0 })}</>;
 };
 
 export default Tolerations;

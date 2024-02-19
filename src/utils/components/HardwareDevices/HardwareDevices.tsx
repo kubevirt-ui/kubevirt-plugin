@@ -71,35 +71,31 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
   };
 
   return (
-    <DescriptionList>
-      <DescriptionListGroup>
+    <DescriptionList className="pf-c-description-list">
+      <DescriptionListGroup className="pf-c-description-list__group">
         <HardwareDeviceTitle
           canEdit={canEdit}
           hideEdit={hideEdit}
           onClick={onEditGPU}
           title={t('GPU devices')}
         />
-        <DescriptionListDescription>
+        <DescriptionListDescription className="pf-c-description-list__description">
           <HardwareDevicesTable devices={gpus} />
         </DescriptionListDescription>
       </DescriptionListGroup>
 
-      <DescriptionListGroup>
+      <DescriptionListGroup className="pf-c-description-list__group">
         <HardwareDeviceTitle
           canEdit={canEdit}
           hideEdit={hideEdit}
           onClick={onEditHostDevices}
           title={t('Host devices')}
         />
-        <DescriptionListDescription>
+        <DescriptionListDescription className="pf-c-description-list__description">
           <HardwareDevicesTable devices={hostDevices} />
         </DescriptionListDescription>
       </DescriptionListGroup>
-      {canEdit && !hideEdit && (
-        <DescriptionListGroup>
-          <HardwareDevicesHeadlessMode onSubmit={onSubmit} vm={vm} />
-        </DescriptionListGroup>
-      )}
+      {canEdit && !hideEdit && <HardwareDevicesHeadlessMode onSubmit={onSubmit} vm={vm} />}
     </DescriptionList>
   );
 };

@@ -7,12 +7,12 @@ import {
   Button,
   ButtonVariant,
   EmptyState,
+  EmptyStateActions,
   EmptyStateBody,
+  EmptyStateFooter,
+  EmptyStateHeader,
   EmptyStateIcon,
-  EmptyStatePrimary,
-  EmptyStateSecondaryActions,
   EmptyStateVariant,
-  Title,
 } from '@patternfly/react-core';
 import { RocketIcon, VirtualMachineIcon } from '@patternfly/react-icons';
 
@@ -26,11 +26,12 @@ const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps
   const navigate = useNavigate();
 
   return (
-    <EmptyState variant={EmptyStateVariant.large}>
-      <EmptyStateIcon icon={VirtualMachineIcon} />
-      <Title headingLevel="h4" size="lg">
-        {t('No VirtualMachinesInstances found')}
-      </Title>
+    <EmptyState variant={EmptyStateVariant.lg}>
+      <EmptyStateHeader
+        headingLevel="h4"
+        icon={<EmptyStateIcon icon={VirtualMachineIcon} />}
+        titleText={<>{t('No VirtualMachinesInstances found')}</>}
+      />
       <EmptyStateBody>
         <Trans ns="plugin__kubevirt-plugin" t={t}>
           See the{' '}
@@ -40,20 +41,24 @@ const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps
           to quickly create a VirtualMachine from the available Templates.
         </Trans>
       </EmptyStateBody>
-      <EmptyStatePrimary>
-        <Button onClick={() => navigate(catalogURL)} variant={ButtonVariant.primary}>
-          {t('Create VirtualMachine')}
-        </Button>
-      </EmptyStatePrimary>
-      <EmptyStateSecondaryActions>
-        <Button
-          icon={<RocketIcon />}
-          onClick={() => navigate({ pathname: '/quickstart', search: '?keyword=virtual+machine' })}
-          variant={ButtonVariant.secondary}
-        >
-          {t('Learn how to use VirtualMachines')}
-        </Button>
-      </EmptyStateSecondaryActions>
+      <EmptyStateFooter>
+        <EmptyStateActions>
+          <Button onClick={() => navigate(catalogURL)} variant={ButtonVariant.primary}>
+            {t('Create VirtualMachine')}
+          </Button>
+        </EmptyStateActions>
+        <EmptyStateActions>
+          <Button
+            onClick={() =>
+              navigate({ pathname: '/quickstart', search: '?keyword=virtual+machine' })
+            }
+            icon={<RocketIcon />}
+            variant={ButtonVariant.secondary}
+          >
+            {t('Learn how to use VirtualMachines')}
+          </Button>
+        </EmptyStateActions>
+      </EmptyStateFooter>
     </EmptyState>
   );
 };

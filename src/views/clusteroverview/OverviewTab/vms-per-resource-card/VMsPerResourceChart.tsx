@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ChartDonut } from '@patternfly/react-charts';
-import { CardBody, TitleSizes } from '@patternfly/react-core';
+import { CardBody } from '@patternfly/react-core';
 
 import useVMsPerResource from './hooks/useVMsPerResource';
 import {
@@ -32,7 +32,6 @@ const VMsPerResourceChart: FC<VMsPerResourceChartProps> = ({ type }) => {
 
   const chartData = getChartData(resourceToVMCountMap);
   const legendItems = getResourceLegendItems(resourceToVMCountMap);
-  const numVMs = vms?.length;
   const vmsPerResourcesCount = vmsPerResourceCount(resourceToVMCountMap);
 
   const RunningVMsChart = (
@@ -45,9 +44,6 @@ const VMsPerResourceChart: FC<VMsPerResourceChartProps> = ({ type }) => {
           top: 20,
         }}
         style={{
-          data: {
-            fill: ({ datum }) => datum.fill,
-          },
           labels: {
             fontSize: 5,
           },
@@ -57,7 +53,6 @@ const VMsPerResourceChart: FC<VMsPerResourceChartProps> = ({ type }) => {
         data={chartData}
         height={150}
         labels={({ datum }) => `${getInstanceTypeSeriesLabel(datum.x)}: ${datum.y}%`}
-        legendPosition="bottom"
         subTitle={t('VMs')}
         title={vmsPerResourcesCount?.toString()}
         width={300}
@@ -68,8 +63,8 @@ const VMsPerResourceChart: FC<VMsPerResourceChartProps> = ({ type }) => {
   let body: ReactNode = null;
   if (!loaded) {
     body = <LoadingEmptyState />;
-  } else if (!numVMs) {
-    body = <EmptyStateNoVMs titleSize={TitleSizes.md} />;
+  } else if (!vmsPerResourcesCount) {
+    body = <EmptyStateNoVMs />;
   } else {
     body = (
       <>

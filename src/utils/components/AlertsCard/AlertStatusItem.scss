@@ -1,9 +1,9 @@
 .alert-name {
-  color: var(--pf-global--Color--100);
-  font-size: var(--pf-global--FontSize--md);
-  font-weight: var(--pf-global--FontWeight--semi-bold);
-  margin-top: var(--pf-global--spacer--xs);
-  margin-bottom: var(--pf-global--spacer--xs);
+  color: var(--pf-v5-global--Color--100);
+  font-size: var(--pf-v5-global--FontSize--md);
+  font-weight: var(--pf-v5-global--FontWeight--semi-bold);
+  margin-top: var(--pf-v5-global--spacer--xs);
+  margin-bottom: var(--pf-v5-global--spacer--xs);
 }
 
 .alert-item {
@@ -12,7 +12,7 @@
 
   &__icon {
     display: flex;
-    margin-right: var(--pf-global--spacer--md);
+    margin-right: var(--pf-v5-global--spacer--md);
   }
 
   &__message {
@@ -24,7 +24,7 @@
     display: flex;
     flex-shrink: 0;
     justify-content: flex-end;
-    padding-left: var(--pf-c-card--child--PaddingLeft);
+    padding-left: var(--pf-v5-c-card--child--PaddingLeft);
   }
 
   &__text {
@@ -38,7 +38,7 @@
   }
 
   &__resource-icon {
-    margin-right: var(--pf-global--spacer--sm);
+    margin-right: var(--pf-v5-global--spacer--sm);
   }
 
   &__timestamp {
@@ -46,10 +46,10 @@
   }
 
   .alert-item:first-of-type {
-    padding-top: var(--pf-c-card--first-child--PaddingTop);
+    padding-top: var(--pf-v5-c-card--first-child--PaddingTop);
   }
 
   .alert-item:last-of-type {
-    padding-bottom: var(--pf-c-card--child--PaddingBottom);
+    padding-bottom: var(--pf-v5-c-card--child--PaddingBottom);
   }
 }

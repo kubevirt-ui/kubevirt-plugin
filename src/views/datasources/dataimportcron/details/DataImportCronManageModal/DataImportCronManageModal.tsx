@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isDataImportCronAutoUpdated } from 'src/views/datasources/utils';
 
@@ -7,16 +7,17 @@ import {
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Checkbox,
   Divider,
   Form,
   FormGroup,
+  Icon,
   NumberInput,
   Popover,
   Stack,
@@ -40,14 +41,14 @@ type DataImportCronManageModalProps = {
   onClose: () => void;
 };
 
-export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps> = ({
+export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
   dataImportCron,
   dataSource,
   isOpen,
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [allowAutoUpdate, setAllowAutoUpdate] = React.useState(
+  const [allowAutoUpdate, setAllowAutoUpdate] = useState(
     isDataImportCronAutoUpdated(dataSource, dataImportCron),
   );
   const {
@@ -94,15 +95,9 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
         <StackItem>
           <Form>
             <FormGroup
-              helperText={t('Example: {{exampleURL}}', {
-                exampleURL: 'docker://quay.io/containerdisks/centos:7-2009',
-              })}
               fieldId="dataimportcron-manage-source-url"
-              helperTextInvalid={t('This field is required')}
-              helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
               isRequired
               label={t('Registry URL')}
-              validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
             >
               <FormTextInput
                 {...register('url', { required: true })}
@@ -113,6 +108,15 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
                 type="text"
                 validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
               />
+              <FormGroupHelperText
+                validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
+              >
+                {errors?.['url']
+                  ? t('This field is required')
+                  : t('Example: {{exampleURL}}', {
+                      exampleURL: 'docker://quay.io/containerdisks/centos:7-2009',
+                    })}
+              </FormGroupHelperText>
             </FormGroup>
             <Divider />
             <FormGroup fieldId="dataimportcron-manage-allow-checkbox">
@@ -126,20 +130,6 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
             {allowAutoUpdate && (
               <>
                 <FormGroup
-                  helperText={
-                    <Stack>
-                      <StackItem>
-                        <MutedTextSpan
-                          text={t('Specify the number of revisions that should be retained.')}
-                        />
-                      </StackItem>
-                      <StackItem>
-                        <MutedTextSpan
-                          text={t('A value of X means that the X latest versions will be kept')}
-                        />
-                      </StackItem>
-                    </Stack>
-                  }
                   labelIcon={
                     <Popover
                       bodyContent={t(
@@ -153,7 +143,9 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
                         onClick={(e) => e.preventDefault()}
                         type="button"
                       >
-                        <HelpIcon noVerticalAlign />
+                        <Icon>
+                          <HelpIcon />
+                        </Icon>
                       </button>
                     </Popover>
                   }
@@ -169,31 +161,35 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
                     onPlus={() => setValue('importsToKeep', importsToKeep + 1)}
                     value={importsToKeep}
                   />
+                  <FormGroupHelperText>
+                    <Stack>
+                      <StackItem>
+                        <MutedTextSpan
+                          text={t('Specify the number of revisions that should be retained.')}
+                        />
+                      </StackItem>
+                      <StackItem>
+                        <MutedTextSpan
+                          text={t('A value of X means that the X latest versions will be kept')}
+                        />
+                      </StackItem>
+                    </Stack>
+                  </FormGroupHelperText>
                 </FormGroup>
                 <FormGroup
-                  helperText={
+                  fieldId="dataimportcron-manage-schedule"
+                  label={t('Scheduling settings')}
+                >
+                  <FormGroupHelperText>
                     <>
                       {t(
                         'Schedule specifies in cron format when and how often to look for new imports.',
                       )}
                       <ExternalLink href={CRON_DOC_URL} text={t('Learn more')} />
                     </>
-                  }
-                  fieldId="dataimportcron-manage-schedule"
-                  label={t('Scheduling settings')}
-                />
-                <FormGroup
-                  helperText={t('Example (At 00:00 on Tuesday): {{exampleCron}}', {
-                    exampleCron: '0 0 * * 2',
-                  })}
-                  validated={
-                    errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default
-                  }
-                  fieldId="dataimportcron-manage-cron"
-                  helperTextInvalid={t('This field is required')}
-                  helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
-                  label={t('Cron expression')}
-                >
+                  </FormGroupHelperText>
+                </FormGroup>
+                <FormGroup fieldId="dataimportcron-manage-cron" label={t('Cron expression')}>
                   <FormTextInput
                     {...register('schedule', {
                       validate: {
@@ -214,6 +210,17 @@ export const DataImportCronManageModal: React.FC<DataImportCronManageModalProps>
                     id={'dataimportcron-manage-source-cron'}
                     type="text"
                   />
+                  <FormGroupHelperText
+                    validated={
+                      errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default
+                    }
+                  >
+                    {errors?.['schedule']
+                      ? t('This field is required')
+                      : t('Example (At 00:00 on Tuesday): {{exampleCron}}', {
+                          exampleCron: '0 0 * * 2',
+                        })}
+                  </FormGroupHelperText>
                 </FormGroup>
               </>
             )}

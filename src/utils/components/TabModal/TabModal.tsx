@@ -33,7 +33,7 @@ type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   positionTop?: boolean;
   submitBtnText?: string;
   submitBtnVariant?: ButtonVariant;
-  titleIconVariant?: 'danger' | 'default' | 'info' | 'success' | 'warning' | ComponentType<any>;
+  titleIconVariant?: 'custom' | 'danger' | 'info' | 'success' | 'warning' | ComponentType<any>;
 };
 
 export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(

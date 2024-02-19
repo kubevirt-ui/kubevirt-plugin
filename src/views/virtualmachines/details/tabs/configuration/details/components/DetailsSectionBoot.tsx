@@ -46,7 +46,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
     <ExpandableSection
       isExpanded={isExpanded}
       isIndented
-      onToggle={setIsExpanded}
+      onToggle={(_event, val) => setIsExpanded(val)}
       toggleContent={<SearchItem id="boot-management">{t('Boot management')}</SearchItem>}
     >
       <VirtualMachineDescriptionItem
@@ -89,7 +89,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
         )}
         descriptionData={
           <Switch
-            onChange={(checked) => {
+            onChange={(_event, checked) => {
               setIsChecked(checked);
               updateStartStrategy(checked, vm);
             }}

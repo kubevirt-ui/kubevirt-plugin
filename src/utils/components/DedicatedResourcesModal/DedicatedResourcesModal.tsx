@@ -100,7 +100,7 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
             id="dedicated-resources"
             isChecked={checked}
             label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
-            onChange={setChecked}
+            onChange={(_event, val) => setChecked(val)}
           />
         </FormGroup>
         <FormGroup fieldId="dedicated-resources-node">

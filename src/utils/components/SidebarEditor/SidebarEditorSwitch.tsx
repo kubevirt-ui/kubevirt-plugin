@@ -17,7 +17,7 @@ const SidebarEditorSwitch: FC = memo(() => {
       id="sidebar-editor-switch"
       isChecked={showEditor}
       label={t('YAML')}
-      onChange={setEditorVisible}
+      onChange={(_, checked: boolean) => setEditorVisible(checked)}
     />
   );
 });

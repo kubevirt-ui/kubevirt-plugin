@@ -3,18 +3,10 @@ import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/sc
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  Button,
-  ButtonVariant,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  Label,
-  LabelGroup,
-} from '@patternfly/react-core';
-import { PencilAltIcon } from '@patternfly/react-icons';
+import { Label, LabelGroup } from '@patternfly/react-core';
 
 import NodeSelectorModal from './NodeSelectorModal';
 
@@ -43,22 +35,12 @@ const NodeSelector: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, tem
     ));
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>{t('Node selector')}</DescriptionListTerm>
-      <DescriptionListDescription>
-        <Button
-          data-test-id="node-selector"
-          isDisabled={!editable}
-          isInline
-          onClick={onEditClick}
-          type="button"
-          variant={ButtonVariant.link}
-        >
-          {nodeSelectorLabels}
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </Button>
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+    <VirtualMachineDescriptionItem
+      descriptionData={nodeSelectorLabels}
+      descriptionHeader={t('Node selector')}
+      isEdit={editable}
+      onEditClick={onEditClick}
+    />
   );
 };
 

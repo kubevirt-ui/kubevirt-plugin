@@ -3,22 +3,16 @@ import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/sc
 import { getTolerations } from 'src/views/templates/utils/selectors';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Button,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
-import { PencilAltIcon } from '@patternfly/react-icons';
 
 import TolerationsModal from './TolerationsModal';
 
 const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
-  const tolerationsCount = t('{{count}} Toleration rules', {
-    count: getTolerations(template)?.length ?? 0,
+  const tolerationsCount = t('{{tolerations}} Toleration rules', {
+    tolerations: getTolerations(template)?.length ?? 0,
   });
 
   const onEditClick = () =>
@@ -27,22 +21,12 @@ const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ editable, onSubmit
     ));
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>{t('Tolerations')}</DescriptionListTerm>
-      <DescriptionListDescription>
-        <Button
-          data-test-id="tolerations"
-          isDisabled={!editable}
-          isInline
-          onClick={onEditClick}
-          type="button"
-          variant="link"
-        >
-          {tolerationsCount}
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </Button>
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+    <VirtualMachineDescriptionItem
+      descriptionData={tolerationsCount}
+      descriptionHeader={t('Tolerations')}
+      isEdit={editable}
+      onEditClick={onEditClick}
+    />
   );
 };
 

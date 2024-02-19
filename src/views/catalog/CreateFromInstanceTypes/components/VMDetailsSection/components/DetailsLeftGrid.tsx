@@ -35,11 +35,11 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
     : null;
 
   return (
-    <DescriptionList isHorizontal>
+    <DescriptionList className="pf-c-description-list" isHorizontal>
       <VirtualMachineDescriptionItem
         descriptionData={
           <TextInput
-            onChange={(newVMName) =>
+            onChange={(_event, newVMName) =>
               setInstanceTypeVMState({ payload: newVMName, type: instanceTypeActionType.setVMName })
             }
             aria-label="instancetypes virtualmachine name"

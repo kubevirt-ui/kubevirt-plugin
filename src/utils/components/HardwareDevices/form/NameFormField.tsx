@@ -16,7 +16,12 @@ const NameFormField: FC<NameFormFieldProps> = ({ index, name, setName }) => {
     <>
       <GridItem span={5}>
         <FormGroup fieldId="name" label={!index && t('Name')}>
-          <TextInput id="name" onChange={setName} type="text" value={name} />
+          <TextInput
+            id="name"
+            onChange={(_, value: string) => setName(value)}
+            type="text"
+            value={name}
+          />
         </FormGroup>
       </GridItem>
     </>

@@ -64,7 +64,7 @@ const ClusterInstancetypeList: FC = () => {
             onPaginationChange({ endIndex, page, perPage, startIndex })
           }
           className="list-managment-group__pagination"
-          defaultToFullPage
+          isLastFullPageShown
           itemCount={data?.length}
           page={pagination?.page}
           perPage={pagination?.perPage}

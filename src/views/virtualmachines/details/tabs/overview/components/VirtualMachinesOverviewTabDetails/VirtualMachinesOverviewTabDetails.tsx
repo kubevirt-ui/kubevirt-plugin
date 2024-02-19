@@ -7,11 +7,12 @@ import {
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
-import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOsNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
@@ -22,10 +23,6 @@ import {
   CardBody,
   CardTitle,
   DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  DescriptionListTermHelpText,
   Divider,
   Grid,
   GridItem,
@@ -112,17 +109,14 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
         <CardBody isFilled>
           <Grid>
             <GridItem span={5}>
-              <DescriptionList isHorizontal>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
-                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-name">
-                    {vm?.metadata?.name || NO_DATA_DASH}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
-                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-status">
+              <DescriptionList className="pf-c-description-list" isHorizontal>
+                <VirtualMachineDescriptionItem
+                  data-test-id="virtual-machine-overview-details-name"
+                  descriptionData={getName(vm)}
+                  descriptionHeader={t('Name')}
+                />
+                <VirtualMachineDescriptionItem
+                  descriptionData={
                     <Split hasGutter isWrappable>
                       <SplitItem>
                         {vmPrintableStatus !== printableVMStatus.Migrating ? (
@@ -138,68 +132,57 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                       </SplitItem>
                       <VMNotMigratableLabel vm={vm} />
                     </Split>
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Created')}</DescriptionListTerm>
-                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-created">
-                    {timestamp !== NO_DATA_DASH ? (
+                  }
+                  data-test-id="virtual-machine-overview-details-status"
+                  descriptionHeader={t('Status')}
+                />
+                <VirtualMachineDescriptionItem
+                  descriptionData={
+                    timestamp !== NO_DATA_DASH ? (
                       <>
                         <Timestamp simple timestamp={vm?.metadata?.creationTimestamp} /> (
                         {t('{{timestampPluralized}} ago', { timestampPluralized })})
                       </>
                     ) : (
                       NO_DATA_DASH
-                    )}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Operating system')}</DescriptionListTerm>
-                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-os">
-                    {osName ?? fallback}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('CPU | Memory')}</DescriptionListTerm>
-                  <DescriptionListDescription>
-                    <CPUMemory vm={instanceTypeExpandedSpec || vm} vmi={vmi} />
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Hostname')}</DescriptionListTerm>
-                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-host">
-                    {hostname ?? fallback}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-
+                    )
+                  }
+                  data-test-id="virtual-machine-overview-details-created"
+                  descriptionHeader={t('Created')}
+                />
+                <VirtualMachineDescriptionItem
+                  data-test-id="virtual-machine-overview-details-os"
+                  descriptionData={osName ?? fallback}
+                  descriptionHeader={t('Operating system')}
+                />
+                <VirtualMachineDescriptionItem
+                  descriptionData={<CPUMemory vm={instanceTypeExpandedSpec || vm} vmi={vmi} />}
+                  descriptionHeader={t('CPU | Memory')}
+                />
+                <VirtualMachineDescriptionItem
+                  data-test-id="virtual-machine-overview-details-timezone"
+                  descriptionData={guestAgentData?.timezone?.split(',')[0] || NO_DATA_DASH}
+                  descriptionHeader={t('Hostname')}
+                />
                 {getInstanceTypeMatcher(vm) ? (
                   <InstanceTypeDescription vm={vm} />
                 ) : (
                   <TemplateDescription vm={vm} />
                 )}
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Time zone')}</DescriptionListTerm>
-                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-timezone">
-                    {guestAgentData?.timezone?.split(',')[0] || NO_DATA_DASH}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTermHelpText>
-                    <DescriptionItemHeader
-                      bodyContent={t(
-                        'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
-                      )}
-                      descriptionHeader={t('Machine type')}
-                      isPopover
-                    />
-                  </DescriptionListTermHelpText>
-                  <DescriptionListDescription data-test-id="virtual-machine-overview-details-timezone">
-                    {getMachineType(vm) || NO_DATA_DASH}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
+                <VirtualMachineDescriptionItem
+                  data-test-id="virtual-machine-overview-details-host"
+                  descriptionData={hostname ?? fallback}
+                  descriptionHeader={t('Time zone')}
+                />
+                <VirtualMachineDescriptionItem
+                  bodyContent={t(
+                    'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
+                  )}
+                  data-test-id="virtual-machine-overview-details-machine-type"
+                  descriptionData={getMachineType(vm) || NO_DATA_DASH}
+                  descriptionHeader={t('Machine type')}
+                  isPopover
+                />
               </DescriptionList>
             </GridItem>
             <GridItem span={1} />

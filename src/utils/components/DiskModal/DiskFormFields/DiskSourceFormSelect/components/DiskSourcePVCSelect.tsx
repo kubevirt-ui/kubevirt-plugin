@@ -53,8 +53,8 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
       <DiskSourcePVCSelectNamespace
         isDisabled={!selectPVCNamespace}
         onChange={onSelectProject}
+        projectNames={projectsNames}
         projectsLoaded={projectsLoaded}
-        projectsName={projectsNames}
         selectedProject={pvcNamespaceSelected}
       />
       <DiskSourcePVCSelectName

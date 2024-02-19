@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { ServicesList } from '@openshift-console/dynamic-plugin-sdk-internal';
-import { Title } from '@patternfly/react-core';
+import { Icon, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
 const Services = ({ pathname, vmi }) => {
@@ -23,7 +23,9 @@ const Services = ({ pathname, vmi }) => {
   return (
     <div>
       <a className="link-icon" href={`${pathname}#services`}>
-        <LinkIcon size="sm" />
+        <Icon size="sm">
+          <LinkIcon />
+        </Icon>
       </a>
       <Title className="co-section-heading" headingLevel="h2">
         {t('Services')}

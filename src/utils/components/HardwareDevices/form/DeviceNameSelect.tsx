@@ -1,16 +1,11 @@
-import * as React from 'react';
+import React, { FC, MouseEvent, useState } from 'react';
 
 import { V1PermittedHostDevices } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  FormGroup,
-  GridItem,
-  Select,
-  SelectGroup,
-  SelectOption,
-  SelectVariant,
-} from '@patternfly/react-core';
+import { FormGroup, GridItem } from '@patternfly/react-core';
+import { Select, SelectGroup, SelectOption } from '@patternfly/react-core';
 
 type DeviceNameSelectProps = {
   deviceName: string;
@@ -19,31 +14,31 @@ type DeviceNameSelectProps = {
   setDeviceName: (resourceName: string) => void;
 };
 
-const DeviceNameSelect: React.FC<DeviceNameSelectProps> = ({
+const DeviceNameSelect: FC<DeviceNameSelectProps> = ({
   deviceName,
   index,
   permittedHostDevices,
   setDeviceName,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isSelectOpen, setIsSelectOpen] = React.useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const onSelect = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
-    setIsSelectOpen(false);
+  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const onSelect = (event: MouseEvent<HTMLSelectElement>, value: string) => {
     setDeviceName(value);
+    setIsOpen(false);
   };
-
   return (
     <GridItem span={5}>
       <FormGroup fieldId="deviceName" isRequired label={!index && t('Device name')}>
         <Select
           id="deviceName"
-          isOpen={isSelectOpen}
-          menuAppendTo={() => document.getElementById('tab-modal')}
+          isOpen={isOpen}
+          onOpenChange={(open: boolean) => setIsOpen(open)}
           onSelect={onSelect}
-          onToggle={setIsSelectOpen}
-          selections={deviceName}
-          variant={SelectVariant.single}
+          popperProps={{ appendTo: () => document.getElementById('tab-modal') }}
+          selected={deviceName}
+          toggle={SelectToggle({ isExpanded: isOpen, onClick: onToggle, selected: deviceName })}
         >
           <SelectGroup
             hidden={isEmpty(permittedHostDevices?.mediatedDevices)}
@@ -67,11 +62,12 @@ const DeviceNameSelect: React.FC<DeviceNameSelectProps> = ({
               </SelectOption>
             ))}
           </SelectGroup>
-          <SelectGroup
+          <SelectOption
             hidden={
               !isEmpty(permittedHostDevices?.mediatedDevices) ||
               !isEmpty(permittedHostDevices?.pciHostDevices)
             }
+            isDisabled
             key="noDevices"
             label={t('No host devices exists')}
           />

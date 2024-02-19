@@ -109,7 +109,6 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
       }
       direction="down"
       isVisible={isMenuExpanded}
-      popperMatchesTriggerWidth={false}
     />
   );
 };

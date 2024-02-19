@@ -1,21 +1,15 @@
-import React, { useCallback, useState } from 'react';
+import React, { ChangeEvent, Dispatch, FC, SetStateAction, useCallback } from 'react';
 
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BinaryUnit, toIECUnit } from '@kubevirt-utils/utils/units';
-import {
-  NumberInput,
-  Select,
-  SelectOption,
-  SelectVariant,
-  Split,
-  SplitItem,
-} from '@patternfly/react-core';
+import { NumberInput, SelectOption, Split, SplitItem } from '@patternfly/react-core';
 
 import { fromIECUnit } from '../../../MigrationPolicyEditModal/utils/utils';
 
 type BandwidthInputProps = {
-  setState: React.Dispatch<
-    React.SetStateAction<{
+  setState: Dispatch<
+    SetStateAction<{
       unit: BinaryUnit;
       value: number;
     }>
@@ -28,17 +22,12 @@ type BandwidthInputProps = {
 
 const unitOptions = [BinaryUnit.Ki, BinaryUnit.Mi, BinaryUnit.Gi];
 
-const BandwidthInput: React.FC<BandwidthInputProps> = ({ setState, state }) => {
+const BandwidthInput: FC<BandwidthInputProps> = ({ setState, state }) => {
   const { t } = useKubevirtTranslation();
-  const [isQuantitySelectOpen, setIsQuantitySelectOpen] = useState<boolean>(false);
 
   const onSelectUnit = useCallback(
-    (
-      event: React.ChangeEvent<Element> | React.MouseEvent<Element, MouseEvent>,
-      newUnit: BinaryUnit,
-    ) => {
+    (_, newUnit: BinaryUnit) => {
       setState((prev) => ({ ...prev, unit: fromIECUnit(newUnit) }));
-      setIsQuantitySelectOpen(false);
     },
     [setState],
   );
@@ -47,7 +36,7 @@ const BandwidthInput: React.FC<BandwidthInputProps> = ({ setState, state }) => {
     <Split hasGutter>
       <SplitItem>
         <NumberInput
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
             +event.target.value >= 0 &&
             setState((prev) => ({ ...prev, value: +event.target.value }))
           }
@@ -60,18 +49,17 @@ const BandwidthInput: React.FC<BandwidthInputProps> = ({ setState, state }) => {
         />
       </SplitItem>
       <SplitItem>
-        <Select
-          isOpen={isQuantitySelectOpen}
-          menuAppendTo="parent"
+        <FormPFSelect
           onSelect={onSelectUnit}
-          onToggle={setIsQuantitySelectOpen}
-          selections={toIECUnit(state?.unit)}
-          variant={SelectVariant.single}
+          selected={state?.unit}
+          selectedLabel={toIECUnit(state?.unit)}
         >
           {unitOptions.map((unitOption) => (
-            <SelectOption key={unitOption} value={toIECUnit(unitOption)} />
+            <SelectOption key={unitOption} value={unitOption}>
+              {toIECUnit(unitOption)}
+            </SelectOption>
           ))}
-        </Select>
+        </FormPFSelect>
       </SplitItem>
     </Split>
   );

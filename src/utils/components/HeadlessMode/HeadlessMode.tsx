@@ -15,7 +15,7 @@ const HeadlessMode: FC<HeadlessModeProps> = ({ updateHeadlessMode, vm }) => {
   );
   return (
     <Switch
-      onChange={(checked: boolean) => {
+      onChange={(_event, checked: boolean) => {
         setIsChecked(checked);
         updateHeadlessMode(checked);
       }}

@@ -1,38 +1,28 @@
-import * as React from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
-import { ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
-
-import { FilterPVCSelect } from '../../utils/Filters';
+import { FormGroup } from '@patternfly/react-core';
 
 type DiskSourcePVCSelectNamespaceProps = {
   isDisabled?: boolean;
-  onChange: React.Dispatch<React.SetStateAction<string>>;
+  onChange: Dispatch<SetStateAction<string>>;
+  projectNames: string[];
   projectsLoaded: boolean;
-  projectsName: string[];
   selectedProject: string;
 };
 
-const DiskSourcePVCSelectNamespace: React.FC<DiskSourcePVCSelectNamespaceProps> = ({
+const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({
   isDisabled,
   onChange,
+  projectNames,
   projectsLoaded,
-  projectsName,
   selectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isNamespacePVCOpen, setNamespaceOpen] = React.useState(false);
-
-  const onSelect = React.useCallback(
-    (event, selection) => {
-      onChange(selection);
-      setNamespaceOpen(false);
-    },
-    [onChange],
-  );
 
   const fieldId = 'pvc-project-select';
 
@@ -40,32 +30,28 @@ const DiskSourcePVCSelectNamespace: React.FC<DiskSourcePVCSelectNamespaceProps> 
     <FormGroup
       className="pvc-selection-formgroup"
       fieldId={fieldId}
-      helperText={t('Location of the existing PVC')}
       id={fieldId}
       isRequired
       label={t('PVC project')}
     >
       {projectsLoaded ? (
-        <Select
-          aria-labelledby={fieldId}
-          hasInlineFilter
-          isDisabled={isDisabled}
-          isOpen={isNamespacePVCOpen}
-          maxHeight={400}
-          menuAppendTo="parent"
-          onFilter={FilterPVCSelect(projectsName)}
-          onSelect={onSelect}
-          onToggle={() => setNamespaceOpen(!isNamespacePVCOpen)}
-          placeholderText={t('--- Select PVC project ---')}
-          selections={selectedProject}
-          variant={SelectVariant.single}
-        >
-          {projectsName.map((projectName) => (
-            <SelectOption key={projectName} value={projectName}>
-              <ResourceLink kind={ProjectModel.kind} linkTo={false} name={projectName} />
-            </SelectOption>
-          ))}
-        </Select>
+        <>
+          <FilterSelect
+            options={projectNames?.map((name) => ({
+              children: name,
+              groupVersionKind: modelToGroupVersionKind(ProjectModel),
+              value: name,
+            }))}
+            toggleProps={{
+              isDisabled,
+              isFullWidth: true,
+              placeholder: t('--- Select PVC project ---'),
+            }}
+            selected={selectedProject}
+            setSelected={onChange}
+          />
+          <FormGroupHelperText>{t('Location of the existing PVC')}</FormGroupHelperText>
+        </>
       ) : (
         <Loading />
       )}

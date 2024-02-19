@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -17,16 +17,17 @@ import {
   Title,
 } from '@patternfly/react-core';
 
+import VirtualMachineTemplatesActions from '../actions/VirtualMachineTemplatesActions';
+
 import useEditTemplateAccessReview from './hooks/useIsTemplateEditable';
 import CommonTemplateAlert from './CommonTemplateAlert';
 import NoPermissionTemplateAlert from './NoPermissionTemplateAlert';
-import TemplateActions from './TemplateActions';
 
 type TemplatePageTitleTitleProps = {
   template: V1Template;
 };
 
-const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) => {
+const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,7 +68,7 @@ const TemplatePageTitle: React.FC<TemplatePageTitleTitleProps> = ({ template }) 
             </SplitItem>
           )}
           <SplitItem>
-            <TemplateActions template={template} />
+            <VirtualMachineTemplatesActions template={template} />
           </SplitItem>
         </Split>
       </Title>

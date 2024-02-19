@@ -1,7 +1,8 @@
-import React, { FC, MouseEvent, useState } from 'react';
+import React, { FC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
@@ -11,7 +12,7 @@ import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useD
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import { DescriptionList, Select, SelectOption } from '@patternfly/react-core';
+import { DescriptionList } from '@patternfly/react-core';
 
 import DynamicSSHKeyInjectionInstanceType from './DynamicSSHKeyInjectionInstanceType';
 
@@ -20,8 +21,7 @@ import './details-right-grid.scss';
 const DetailsRightGrid: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const [isOpenStorageClass, setIsOpenStorageClass] = useState<boolean>(false);
-  const [{ clusterDefaultStorageClass, sortedStorageClasses, virtDefaultStorageClass }] =
+  const [{ clusterDefaultStorageClass, sortedStorageClasses, virtDefaultStorageClass }, loaded] =
     useDefaultStorageClass();
 
   const {
@@ -46,7 +46,7 @@ const DetailsRightGrid: FC = () => {
   };
 
   return (
-    <DescriptionList isHorizontal>
+    <DescriptionList className="pf-c-description-list" isHorizontal>
       <VirtualMachineDescriptionItem
         descriptionData={isChangingNamespace ? <Loading /> : vmNamespaceTarget}
         descriptionHeader={t('Project')}
@@ -57,26 +57,22 @@ const DetailsRightGrid: FC = () => {
       />
       <VirtualMachineDescriptionItem
         descriptionData={
-          <Select
-            onSelect={(_: MouseEvent, value: string) => {
-              setSelectedStorageClass(value);
-              setIsOpenStorageClass(false);
-            }}
-            selections={
-              instanceTypeVMState.selectedStorageClass ||
-              pvcSource?.spec?.storageClassName ||
-              getName(virtDefaultStorageClass) ||
-              getName(clusterDefaultStorageClass)
-            }
-            className="storageclass-select__dropdown"
-            hasInlineFilter
-            isOpen={isOpenStorageClass}
-            onToggle={setIsOpenStorageClass}
-          >
-            {sortedStorageClasses?.map((name) => (
-              <SelectOption key={name} value={name} />
-            ))}
-          </Select>
+          loaded ? (
+            <FilterSelect
+              selected={
+                instanceTypeVMState.selectedStorageClass ||
+                pvcSource?.spec?.storageClassName ||
+                getName(virtDefaultStorageClass) ||
+                getName(clusterDefaultStorageClass)
+              }
+              className="storageclass-select__dropdown"
+              options={sortedStorageClasses?.map((scName) => ({ children: scName, value: scName }))}
+              setSelected={setSelectedStorageClass}
+              toggleProps={{ placeholder: t('Select StorageClass') }}
+            />
+          ) : (
+            <Loading />
+          )
         }
         descriptionHeader={t('Storage class')}
       />

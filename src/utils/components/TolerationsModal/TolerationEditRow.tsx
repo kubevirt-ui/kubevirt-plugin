@@ -29,7 +29,7 @@ const TolerationEditRow: React.FC<TolerationEditRowProps> = ({ label, onChange, 
         <TextInput
           id={`toleration-${id}-key-input`}
           isRequired
-          onChange={(newKey) => onChange({ ...label, key: newKey })}
+          onChange={(_event, newKey) => onChange({ ...label, key: newKey })}
           placeholder={t('Taint key')}
           type="text"
           value={key}
@@ -39,7 +39,7 @@ const TolerationEditRow: React.FC<TolerationEditRowProps> = ({ label, onChange, 
         <TextInput
           id={`toleration-${id}-value-input`}
           isRequired
-          onChange={(newValue) => onChange({ ...label, value: newValue })}
+          onChange={(_event, newValue) => onChange({ ...label, value: newValue })}
           placeholder={t('Taint value')}
           type="text"
           value={value}
@@ -47,7 +47,7 @@ const TolerationEditRow: React.FC<TolerationEditRowProps> = ({ label, onChange, 
       </GridItem>
       <GridItem span={3}>
         <FormSelect
-          onChange={(newEffect) =>
+          onChange={(_event, newEffect) =>
             onChange({ ...label, effect: newEffect as K8sIoApiCoreV1TolerationEffectEnum })
           }
           id={`toleration-${id}-effect-select`}

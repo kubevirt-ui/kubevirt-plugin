@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 
 import { useDataSourcesTypeResources } from '../../hooks/useProjectsAndDataSources';
 
@@ -12,7 +12,7 @@ type DiskSourceDataSourceSelectProps = {
   selectDataSourceNamespace: (value: string) => void;
 };
 
-const DiskSourceDataSourceSelect: React.FC<DiskSourceDataSourceSelectProps> = ({
+const DiskSourceDataSourceSelect: FC<DiskSourceDataSourceSelectProps> = ({
   dataSourceNameSelected,
   dataSourceNamespaceSelected,
   selectDataSourceName,
@@ -23,7 +23,7 @@ const DiskSourceDataSourceSelect: React.FC<DiskSourceDataSourceSelectProps> = ({
 
   const isTemplateParameter = /\$\{(.*?)\}/.test(dataSourceNamespaceSelected);
 
-  const onSelectProject = React.useCallback(
+  const onSelectProject = useCallback(
     (newProject) => {
       selectDataSourceNamespace(newProject);
       selectDataSourceName(undefined);
@@ -31,7 +31,7 @@ const DiskSourceDataSourceSelect: React.FC<DiskSourceDataSourceSelectProps> = ({
     [selectDataSourceNamespace, selectDataSourceName],
   );
 
-  const dataSourceNames = React.useMemo(() => {
+  const dataSourceNames = useMemo(() => {
     return dataSources?.map((ds) => ds?.metadata?.name);
   }, [dataSources]);
 

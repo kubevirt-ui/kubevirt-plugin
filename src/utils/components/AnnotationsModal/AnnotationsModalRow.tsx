@@ -1,14 +1,14 @@
-import * as React from 'react';
+import React, { FC, memo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, GridItem, TextInput } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-export const AnnotationsModalRow: React.FC<{
+export const AnnotationsModalRow: FC<{
   annotation: { key: string; value: string };
   onChange: ({ key, value }: { key: string; value: string }) => void;
   onDelete: () => void;
-}> = React.memo(({ annotation, onChange, onDelete }) => {
+}> = memo(({ annotation, onChange, onDelete }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>
@@ -19,7 +19,7 @@ export const AnnotationsModalRow: React.FC<{
           className="annotation-form-input"
           isRequired
           maxLength={255}
-          onChange={(newKey) => onChange({ ...annotation, key: newKey })}
+          onChange={(_event, newKey) => onChange({ ...annotation, key: newKey })}
           placeholder={t('annotation key')}
           size={1}
           type="text"
@@ -32,7 +32,7 @@ export const AnnotationsModalRow: React.FC<{
           className="annotation-form-input"
           isRequired
           maxLength={255}
-          onChange={(newValue) => onChange({ ...annotation, value: newValue })}
+          onChange={(_event, newValue) => onChange({ ...annotation, value: newValue })}
           placeholder={t('annotation value')}
           type="text"
           value={annotation.value}

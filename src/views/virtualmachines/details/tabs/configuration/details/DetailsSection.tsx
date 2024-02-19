@@ -87,7 +87,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) =>
       </Title>
       <Grid>
         <GridItem span={5}>
-          <DescriptionList>
+          <DescriptionList className="pf-c-description-list">
             <VirtualMachineDescriptionItem
               descriptionData={
                 getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
@@ -193,7 +193,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) =>
               )}
               descriptionData={
                 <Switch
-                  onChange={(checked) => {
+                  onChange={(_event, checked) => {
                     setIsCheckedGuestSystemAccessLog(checked);
                     updateGuestSystemAccessLog(vm, checked);
                   }}
@@ -211,7 +211,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) =>
           </DescriptionList>
         </GridItem>
         <GridItem span={5}>
-          <DescriptionList>
+          <DescriptionList className="pf-c-description-list">
             <DetailsSectionHardware vm={vm} vmi={vmi} />
             <DetailsSectionBoot
               canUpdateVM={canUpdateVM}

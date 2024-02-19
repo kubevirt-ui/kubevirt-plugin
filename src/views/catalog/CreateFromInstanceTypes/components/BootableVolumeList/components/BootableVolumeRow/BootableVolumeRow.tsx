@@ -61,7 +61,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
 
   return (
     <Tr
-      isHoverable
+      isClickable
       isRowSelected={getName(selectedBootableVolume) === bootVolumeName}
       isSelectable
       onClick={() => setSelectedBootableVolume(bootableVolume, pvcSource)}

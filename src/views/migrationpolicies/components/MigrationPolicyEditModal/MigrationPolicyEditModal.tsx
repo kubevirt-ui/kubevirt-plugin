@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import MigrationPolicyModel from '@kubevirt-ui/kubevirt-api/console/models/MigrationPolicyModel';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sCreate, k8sDelete, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
@@ -23,11 +24,7 @@ type MigrationPolicyEditModalProps = {
   onClose: () => void;
 };
 
-const MigrationPolicyEditModal: React.FC<MigrationPolicyEditModalProps> = ({
-  isOpen,
-  mp,
-  onClose,
-}) => {
+const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, mp, onClose }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -79,16 +76,12 @@ const MigrationPolicyEditModal: React.FC<MigrationPolicyEditModalProps> = ({
       onSubmit={onSubmit}
     >
       <Form>
-        <FormGroup
-          fieldId="migration-policy-name"
-          helperText={t('Unique name of the MigrationPolicy')}
-          isRequired
-          label={t('MigrationPolicy name')}
-        >
+        <FormGroup fieldId="migration-policy-name" isRequired label={t('MigrationPolicy name')}>
           <TextInput
             onChange={setStateField('migrationPolicyName')}
             value={state?.migrationPolicyName}
           />
+          <FormGroupHelperText>{t('Unique name of the MigrationPolicy')}</FormGroupHelperText>
         </FormGroup>
         <MigrationPolicyConfigurations
           setState={setState}

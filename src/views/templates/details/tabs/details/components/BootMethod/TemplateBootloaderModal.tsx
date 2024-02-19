@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -8,10 +8,11 @@ import {
   getBootloaderFromVM,
   updatedVMBootMode,
 } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { Form, FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { Form, FormGroup, SelectOption } from '@patternfly/react-core';
 
 type TemplateBootloaderModalProps = {
   isOpen: boolean;
@@ -27,14 +28,12 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
   template,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
     useState<BootloaderOptionValue>(getBootloaderFromVM(getTemplateVirtualMachineObject(template)));
 
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>, value: BootloaderOptionValue) => {
+  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: BootloaderOptionValue) => {
     event.preventDefault();
     setSelectedFirmwareBootloader(value);
-    setIsDropdownOpen(false);
   };
 
   const updatedTemplate = useMemo(() => {
@@ -56,20 +55,13 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
     >
       <Form>
         <FormGroup fieldId="template-firmware-bootloader" label={t('Boot mode')}>
-          <Select
-            isOpen={isDropdownOpen}
-            menuAppendTo="parent"
-            onSelect={handleChange}
-            onToggle={setIsDropdownOpen}
-            selections={selectedFirmwareBootloader}
-            variant={SelectVariant.single}
-          >
+          <FormPFSelect onSelect={handleChange} selected={selectedFirmwareBootloader}>
             {bootloaderOptions.map(({ description, title, value }) => (
               <SelectOption description={description} key={value} value={value}>
                 {title}
               </SelectOption>
             ))}
-          </Select>
+          </FormPFSelect>
         </FormGroup>
       </Form>
     </TabModal>

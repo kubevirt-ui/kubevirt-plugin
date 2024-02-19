@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base';
+import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
 type GetSorting = (column: string, columnIndex: number) => ThSortType;
 

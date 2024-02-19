@@ -7,7 +7,7 @@ import {
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, Title } from '@patternfly/react-core';
+import { Bullseye, Icon, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
 import useGuestOS from '../../../../hooks/useGuestOS';
@@ -28,7 +28,9 @@ const ActiveUserList: React.FC<ActiveUserListProps> = ({ pathname, vmi }) => {
   return (
     <div>
       <a className="link-icon" href={`${pathname}#logged-in-users`}>
-        <LinkIcon size="sm" />
+        <Icon size="sm">
+          <LinkIcon />
+        </Icon>
       </a>
       <Title className="co-section-heading" headingLevel="h2">
         {t('Active users')}

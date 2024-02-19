@@ -1,38 +1,45 @@
-import * as React from 'react';
+import React, { Dispatch, FC, MouseEvent, SetStateAction, useState } from 'react';
 
+import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { FormGroup, Select, SelectOption } from '@patternfly/react-core';
 
 import { AffinityCondition, AffinityRowData } from '../../../../utils/types';
 import { AFFINITY_CONDITION_LABELS } from '../../../AffinityList/utils/constants';
 
 type AffinityConditionSelectProps = {
   focusedAffinity: AffinityRowData;
-  setFocusedAffinity: React.Dispatch<React.SetStateAction<AffinityRowData>>;
+  setFocusedAffinity: Dispatch<SetStateAction<AffinityRowData>>;
 };
 
-const AffinityConditionSelect: React.FC<AffinityConditionSelectProps> = ({
+const AffinityConditionSelect: FC<AffinityConditionSelectProps> = ({
   focusedAffinity,
   setFocusedAffinity,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, value: AffinityCondition) => {
+  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: AffinityCondition) => {
     event.preventDefault();
     setFocusedAffinity({ ...focusedAffinity, condition: value });
     setIsOpen(false);
   };
+
+  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+
   return (
     <FormGroup fieldId="condition" isRequired label={t('Condition')}>
       <Select
+        toggle={SelectToggle({
+          isExpanded: isOpen,
+          onClick: onToggle,
+          selected: AFFINITY_CONDITION_LABELS[focusedAffinity?.condition],
+        })}
         isOpen={isOpen}
-        menuAppendTo="parent"
+        onOpenChange={(open: boolean) => setIsOpen(open)}
         onSelect={handleChange}
-        onToggle={setIsOpen}
-        selections={focusedAffinity?.condition}
-        variant={SelectVariant.single}
+        selected={focusedAffinity?.condition}
       >
         {Object.entries(AFFINITY_CONDITION_LABELS).map(([key, value]) => (
           <SelectOption key={key} value={key}>

@@ -5,6 +5,7 @@ import {
   Bullseye,
   EmptyState,
   EmptyStateBody,
+  EmptyStateHeader,
   EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
@@ -21,8 +22,8 @@ const AutoAttachedNetworkEmptyState: FC<AutoAttachedNetworkEmptyStateProps> = ({
 
   return (
     <Bullseye>
-      <EmptyState variant={EmptyStateVariant.small}>
-        <EmptyStateIcon icon={NetworkIcon} />
+      <EmptyState variant={EmptyStateVariant.sm}>
+        <EmptyStateHeader icon={<EmptyStateIcon icon={NetworkIcon} />} />
         <EmptyStateBody>
           {isAutoAttached
             ? t(

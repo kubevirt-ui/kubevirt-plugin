@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { FormEvent } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Divider, FormGroup, TextInput } from '@patternfly/react-core';
+
+import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 
 import { CloudInitNetworkData } from './utils/cloudinit-utils';
 
@@ -28,11 +30,13 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
 
       <FormGroup fieldId="custom-network-checkbox">
         <Checkbox
+          onChange={(event: FormEvent<HTMLInputElement>, checked: boolean) =>
+            setEnableNetworkData(checked)
+          }
           description={t('check this option to add network data section to the cloud-init script.')}
           id="custom-network-checkbox"
           isChecked={enableNetworkData}
           label={t('Add network data')}
-          onChange={setEnableNetworkData}
         />
       </FormGroup>
       {enableNetworkData && (
@@ -44,7 +48,7 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
           >
             <TextInput
               id={'ethernet-name'}
-              onChange={(v) => updateNetworkField('name', v)}
+              onChange={(_event, v) => updateNetworkField('name', v)}
               type="text"
               value={networkData?.name || ''}
             />
@@ -52,15 +56,17 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
           <FormGroup
             className="kv-cloudint-advanced-tab--validation-text"
             fieldId={'address'}
-            helperText={t('Use commas to separate between IP addresses')}
             label={t('IP addresses')}
           >
             <TextInput
               id={'address'}
-              onChange={(v) => updateNetworkField('addresses', v)}
+              onChange={(_event, v) => updateNetworkField('addresses', v)}
               type="text"
               value={networkData?.addresses || ''}
             />
+            <FormGroupHelperText>
+              {t('Use commas to separate between IP addresses')}
+            </FormGroupHelperText>
           </FormGroup>
           <FormGroup
             className="kv-cloudint-advanced-tab--validation-text"
@@ -69,7 +75,7 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
           >
             <TextInput
               id={'gateway'}
-              onChange={(v) => updateNetworkField('gateway4', v)}
+              onChange={(_event, v) => updateNetworkField('gateway4', v)}
               type="text"
               value={networkData?.gateway4 || ''}
             />

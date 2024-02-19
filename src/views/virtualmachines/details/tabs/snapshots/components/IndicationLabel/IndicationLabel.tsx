@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { Label } from '@patternfly/react-core';
 
@@ -8,12 +8,8 @@ type IndicationLabelProps = {
   indication: string;
 };
 
-const IndicationLabel: React.FC<IndicationLabelProps> = ({ indication }) => {
-  return (
-    <Label color="purple" isTruncated>
-      {indication}
-    </Label>
-  );
-};
+const IndicationLabel: FC<IndicationLabelProps> = ({ indication }) => (
+  <Label color="purple">{indication}</Label>
+);
 
 export default IndicationLabel;

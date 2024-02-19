@@ -1,10 +1,17 @@
-import React, { FC } from 'react';
+import React, { ChangeEvent, FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
-import { FileUpload, FormGroup, Stack, StackItem, ValidatedOptions } from '@patternfly/react-core';
+import {
+  DropEvent,
+  FileUpload,
+  FormGroup,
+  Stack,
+  StackItem,
+  ValidatedOptions,
+} from '@patternfly/react-core';
 
 import { UPLOAD_SOURCE_NAME } from '../../constants';
 
@@ -24,15 +31,13 @@ const UploadSource: FC<UploadSourceProps> = ({ onFileSelected, relevantUpload, t
     formState: { errors },
   } = useFormContext();
 
+  const validated = errors?.[`${testId}-uploadFile`]
+    ? ValidatedOptions.error
+    : ValidatedOptions.default;
   return (
     <FormGroup
-      validated={
-        errors?.[`${testId}-uploadFile`] ? ValidatedOptions.error : ValidatedOptions.default
-      }
       className="disk-source-form-group"
       fieldId={`${testId}-${UPLOAD_SOURCE_NAME}`}
-      helperTextInvalid={t('This field is required')}
-      helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
       isRequired
       label={t('Upload data')}
     >
@@ -41,9 +46,16 @@ const UploadSource: FC<UploadSourceProps> = ({ onFileSelected, relevantUpload, t
           <Controller
             render={({ field: { onChange, value: fileValue }, fieldState: { error } }) => (
               <FileUpload
-                onChange={(value, filename) => {
-                  onChange({ filename, value });
-                  onFileSelected(value);
+                onDataChange={(event: DropEvent, data: string) => {
+                  onFileSelected(data);
+                  onChange({ value: data });
+                }}
+                onFileInputChange={(event: DropEvent, file: File) => {
+                  onChange({ filename: file.name });
+                }}
+                onTextChange={(event: ChangeEvent, text: string) => {
+                  onFileSelected(text);
+                  onChange({ value: text });
                 }}
                 data-test-id="disk-source-upload-pvc-file"
                 filename={fileValue?.filename}
@@ -60,6 +72,9 @@ const UploadSource: FC<UploadSourceProps> = ({ onFileSelected, relevantUpload, t
             rules={{ required: true }}
             shouldUnregister
           />
+          <FormGroupHelperText validated={validated}>
+            {validated === ValidatedOptions.error && t('This field is required')}
+          </FormGroupHelperText>
         </StackItem>
         <StackItem>
           {relevantUpload && <SelectSourceUploadPVCProgress upload={relevantUpload} />}

@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -89,7 +89,7 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
     [vm, setVM],
   );
 
-  const onStorageClassChange = (_: MouseEvent, value: string) => {
+  const onStorageClassChange = (value: string) => {
     setStorageClassName(value);
 
     const source: V1beta1DataVolumeSpec = { ...(diskSource as V1beta1DataVolumeSpec) };

@@ -17,7 +17,7 @@ const NameFormField: FC<NameFormFieldProps> = ({ isDisabled, objName, setObjName
       <TextInput
         id="name"
         isDisabled={isDisabled}
-        onChange={setObjName}
+        onChange={(_, value: string) => setObjName(value)}
         type="text"
         value={objName}
       />

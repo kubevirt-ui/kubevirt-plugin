@@ -1,25 +1,19 @@
-import React, { ChangeEvent, FC, MouseEvent, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import {
-  K8sResourceCommon,
-  ResourceLink,
-  useK8sWatchResource,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
-  Button,
-  ButtonVariant,
-  Select,
   SelectOption,
-  SelectVariant,
   Skeleton,
   Spinner,
   Text,
@@ -44,7 +38,6 @@ const TemplatesProjectSection: FC<TemplatesProjectSectionProps> = ({
   hyperConvergeConfiguration,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<string>();
   const [error, setError] = useState<string>();
@@ -66,21 +59,11 @@ const TemplatesProjectSection: FC<TemplatesProjectSectionProps> = ({
     }
   }, [hyperConverge, selectedProject]);
 
-  const onSelect = (_event: ChangeEvent | MouseEvent, value: string) => {
-    setIsOpen(false);
+  const onSelect = (value: string) => {
     setSelectedProject(value);
     updateHCOCommonTemplatesNamespace(hyperConverge, value, setError, setLoading).catch((e) =>
       kubevirtConsole.log(e),
     );
-  };
-
-  const onFilter = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
-    const filteredProjects = projects.filter((project) => project?.metadata?.name?.includes(value));
-    return filteredProjects?.map((project) => (
-      <SelectOption key={project?.metadata?.name} value={project?.metadata?.name}>
-        <ResourceLink kind={ProjectModel.kind} linkTo={false} name={project?.metadata?.name} />
-      </SelectOption>
-    ));
   };
 
   return (
@@ -98,9 +81,13 @@ const TemplatesProjectSection: FC<TemplatesProjectSectionProps> = ({
         {t('Project')}
       </Text>
       {projectsLoaded && hyperLoaded ? (
-        <Select
-          footer={
-            <Button
+        <FilterSelect
+          options={[
+            ...projects?.map((proj) => ({
+              groupVersionKind: modelToGroupVersionKind(ProjectModel),
+              value: getName(proj),
+            })),
+            <SelectOption
               onClick={() =>
                 createModal((props) => (
                   <CreateProjectModal
@@ -111,35 +98,19 @@ const TemplatesProjectSection: FC<TemplatesProjectSectionProps> = ({
                   />
                 ))
               }
-              variant={ButtonVariant.secondary}
+              key="create-project"
             >
               {t('Create project')}
-            </Button>
-          }
-          hasInlineFilter
-          id="project"
-          inlineFilterPlaceholderText={t('Search project')}
-          isDisabled={loading}
-          isOpen={isOpen}
-          maxHeight={400}
-          onFilter={onFilter}
-          onSelect={onSelect}
-          onToggle={setIsOpen}
-          selections={selectedProject}
-          toggleIcon={loading && <Spinner isSVG size="sm" />}
-          variant={SelectVariant.single}
-          width={300}
-        >
-          {projects?.map((project) => (
-            <SelectOption key={project?.metadata?.name} value={project?.metadata?.name}>
-              <ResourceLink
-                kind={ProjectModel.kind}
-                linkTo={false}
-                name={project?.metadata?.name}
-              />
-            </SelectOption>
-          ))}
-        </Select>
+            </SelectOption>,
+          ]}
+          toggleProps={{
+            icon: loading && <Spinner size="sm" />,
+            isDisabled: loading,
+            placeholder: t('Search project'),
+          }}
+          selected={selectedProject}
+          setSelected={onSelect}
+        />
       ) : (
         <Skeleton width={'300px'} />
       )}

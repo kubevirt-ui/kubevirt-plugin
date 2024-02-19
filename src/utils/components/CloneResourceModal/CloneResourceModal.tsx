@@ -49,7 +49,7 @@ const CloneResourceModal: FC<CloneResourceModalProps> = ({
     >
       <Form>
         <FormGroup isRequired label={t('Name')}>
-          <TextInput onChange={setNewName} value={newName} />
+          <TextInput onChange={(_event, val) => setNewName(val)} value={newName} />
         </FormGroup>
       </Form>
     </TabModal>

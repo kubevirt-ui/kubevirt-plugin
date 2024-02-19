@@ -9,6 +9,7 @@ import {
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export enum DROPDOWN_FORM_SELECTION {
   UPLOAD_IMAGE = 'upload',
@@ -16,6 +17,13 @@ export enum DROPDOWN_FORM_SELECTION {
   USE_REGISTRY = 'registry',
   USE_SNAPSHOT = 'snapshot',
 }
+
+export const optionsValueLabelMapper = {
+  [DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE]: t('Upload volume'),
+  [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: t('Use existing volume'),
+  [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: t('Download from registry'),
+  [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: t('Use existing volume snapshot'),
+};
 
 export type AddBootableVolumeState = {
   annotations: { [key: string]: string };

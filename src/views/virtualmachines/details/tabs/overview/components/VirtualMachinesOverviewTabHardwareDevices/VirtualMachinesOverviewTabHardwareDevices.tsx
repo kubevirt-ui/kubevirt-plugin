@@ -44,7 +44,7 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
     <div className="VirtualMachinesOverviewTabHardware--main">
       <Card>
         <CardTitle className="text-muted">
-          {t('Hardware devices ({{count}})', { count: hostDevicesCount + gpusCount })}
+          {t('Hardware devices ({{devices}})', { devices: hostDevicesCount + gpusCount })}
         </CardTitle>
         <Divider />
         <CardBody isFilled>

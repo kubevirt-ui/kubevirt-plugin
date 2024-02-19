@@ -6,6 +6,7 @@ import {
   EVICTION_STRATEGIES,
   EVICTION_STRATEGY_DEFAULT,
 } from '@kubevirt-utils/components/EvictionStrategy/constants';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -64,19 +65,18 @@ const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
       onSubmit={onSubmit}
     >
       <Form>
-        <FormGroup
-          helperText={t(
-            'EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.',
-          )}
-          fieldId="eviction-strategy"
-          isInline
-        >
+        <FormGroup fieldId="eviction-strategy" isInline>
           <Checkbox
             id="eviction-strategy"
             isChecked={isChecked}
             label={t('LiveMigrate')}
-            onChange={setIsChecked}
+            onChange={(_event, val) => setIsChecked(val)}
           />
+          <FormGroupHelperText>
+            {t(
+              'EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.',
+            )}
+          </FormGroupHelperText>
         </FormGroup>
       </Form>
     </TabModal>

@@ -1,34 +1,31 @@
-import * as React from 'react';
+import React, { FC, memo } from 'react';
 
 import { V1VirtualMachineCondition } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { Label, LabelGroup, Popover, PopoverPosition } from '@patternfly/react-core';
 
-export const VMStatusConditionLabel: React.FC<V1VirtualMachineCondition> = React.memo(
-  (condition) => {
-    return (
-      <Popover
-        aria-label="Condition Popover"
-        bodyContent={() => <div>{condition?.message ?? condition?.reason}</div>}
-        position={PopoverPosition.top}
+export const VMStatusConditionLabel: FC<V1VirtualMachineCondition> = memo((condition) => {
+  return (
+    <Popover
+      aria-label="Condition Popover"
+      bodyContent={() => <div>{condition?.message ?? condition?.reason}</div>}
+      position={PopoverPosition.top}
+    >
+      <Label
+        onClick={(e) => {
+          e.preventDefault();
+        }}
+        color="grey"
+        href="#"
       >
-        <Label
-          onClick={(e) => {
-            e.preventDefault();
-          }}
-          color="grey"
-          href="#"
-          isTruncated
-        >
-          {condition?.type}={condition?.status}
-        </Label>
-      </Popover>
-    );
-  },
-);
+        {condition?.type}={condition?.status}
+      </Label>
+    </Popover>
+  );
+});
 VMStatusConditionLabel.displayName = 'VMStatusConditionLabel';
 
-export const VMStatusConditionLabelList: React.FC<{ conditions: V1VirtualMachineCondition[] }> =
-  React.memo(({ conditions }) => {
+export const VMStatusConditionLabelList: FC<{ conditions: V1VirtualMachineCondition[] }> = memo(
+  ({ conditions }) => {
     return (
       <LabelGroup>
         {conditions?.map(({ message, reason, status, type }) => (
@@ -42,5 +39,6 @@ export const VMStatusConditionLabelList: React.FC<{ conditions: V1VirtualMachine
         ))}
       </LabelGroup>
     );
-  });
+  },
+);
 VMStatusConditionLabelList.displayName = 'VMStatusConditionLabelList';

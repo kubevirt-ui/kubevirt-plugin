@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useCallback, useMemo, useState } from 'react';
 
 import {
   CategoryDetails,
@@ -7,8 +7,9 @@ import {
 import { categoryDetailsMap } from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/utils/utils';
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import FilterSelect from '@kubevirt-utils/components/AddBootableVolumeModal/components/FilterSelect/FilterSelect';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { INSTANCE_TYPES_USER_GUIDE_LINK } from '@kubevirt-utils/constants/url-constants';
@@ -27,9 +28,7 @@ import {
   Grid,
   GridItem,
   PopoverPosition,
-  Select,
   SelectOption,
-  SelectVariant,
   TextArea,
 } from '@patternfly/react-core';
 
@@ -71,9 +70,7 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
   }, [source]);
 
   const [preference, setPreference] = useState<string>(initialParams.preference);
-  const [isInstanceTypeOpen, setIsInstanceTypeOpen] = useState(false);
   const [instanceType, setInstanceType] = useState<string>(initialParams.instanceType?.[0]);
-  const [isSizeOpen, setIsSizeOpen] = useState(false);
   const [size, setSize] = useState<string>(initialParams.size);
   const [description, setDescription] = useState<string>(initialParams.description);
 
@@ -83,21 +80,16 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
     [instanceType],
   );
 
-  const onInstanceTypeSelect = (
-    _event: ChangeEvent<HTMLSelectElement>,
-    newInstanceType: string,
-  ) => {
+  const onInstanceTypeSelect = (_event: MouseEvent<HTMLSelectElement>, newInstanceType: string) => {
     setInstanceType(newInstanceType);
-    setIsInstanceTypeOpen(false);
 
     const newCategoryObject = categoryDetailsMap[newInstanceType];
     const newCategorySize = newCategoryObject.instanceTypes[0].label;
     setSize(newCategorySize);
   };
 
-  const onSizeSelect = (_event: ChangeEvent<HTMLSelectElement>, newSize: string) => {
+  const onSizeSelect = (_event: MouseEvent<HTMLSelectElement>, newSize: string) => {
     setSize(newSize);
-    setIsSizeOpen(false);
   };
 
   const onSubmitVolumeParams = useCallback(() => {
@@ -159,11 +151,14 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
           isRequired
         >
           <FilterSelect
-            groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
-            optionLabelText={t('preference')}
-            options={preferencesNames}
+            options={preferencesNames?.map((opt) => ({
+              children: opt,
+              groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
+              value: opt,
+            }))}
             selected={preference}
             setSelected={setPreference}
+            toggleProps={{ placeholder: t('Select preference') }}
           />
         </FormGroup>
         <Grid hasGutter>
@@ -179,15 +174,7 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
                 </>
               }
             >
-              <Select
-                isOpen={isInstanceTypeOpen}
-                menuAppendTo="parent"
-                onSelect={onInstanceTypeSelect}
-                onToggle={setIsInstanceTypeOpen}
-                placeholderText={t('Select InstanceType')}
-                selections={instanceType}
-                variant={SelectVariant.single}
-              >
+              <FormPFSelect onSelect={onInstanceTypeSelect} selected={instanceType}>
                 {Object.keys(InstanceTypeCategory)?.map((instanceTypeCategory) => {
                   const { seriesLabel, title }: CategoryDetails =
                     categoryDetailsMap[instanceTypeCategory];
@@ -201,20 +188,12 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
                     </SelectOption>
                   );
                 })}
-              </Select>
+              </FormPFSelect>
             </FormGroup>
           </GridItem>
           <GridItem span={6}>
             <FormGroup label={t('Size')}>
-              <Select
-                isOpen={isSizeOpen}
-                menuAppendTo="parent"
-                onSelect={onSizeSelect}
-                onToggle={setIsSizeOpen}
-                placeholderText={t('Select size')}
-                selections={size}
-                variant={SelectVariant.single}
-              >
+              <FormPFSelect onSelect={onSizeSelect} selected={size}>
                 {instanceTypes?.map(({ cpus, label, memory }) => (
                   <SelectOption
                     description={t('{{cpus}} CPUs, {{memory}} Memory', {
@@ -227,14 +206,14 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
                     {label}
                   </SelectOption>
                 ))}
-              </Select>
+              </FormPFSelect>
             </FormGroup>
           </GridItem>
         </Grid>
         <FormGroup label={t('Description')}>
           <TextArea
             aria-label={t('description text area')}
-            onChange={setDescription}
+            onChange={(_event, val) => setDescription(val)}
             resizeOrientation="vertical"
             value={description}
           />

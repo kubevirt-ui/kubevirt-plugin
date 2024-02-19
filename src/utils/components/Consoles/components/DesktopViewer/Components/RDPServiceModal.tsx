@@ -44,7 +44,7 @@ const RDPServiceModal: FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi })
             id="rdp-service-checkbox"
             isChecked={isChecked}
             label={t('Expose RDP Service')}
-            onChange={setChecked}
+            onChange={(_event, val) => setChecked(val)}
           />
         </StackItem>
         <StackItem>

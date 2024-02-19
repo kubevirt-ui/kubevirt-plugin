@@ -3,7 +3,13 @@ import classNames from 'classnames';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, EmptyState, EmptyStateBody } from '@patternfly/react-core';
+import {
+  Button,
+  ButtonVariant,
+  EmptyState,
+  EmptyStateBody,
+  EmptyStateFooter,
+} from '@patternfly/react-core';
 import { PasteIcon } from '@patternfly/react-icons';
 import { css } from '@patternfly/react-styles';
 import styles from '@patternfly/react-styles/css/components/Consoles/SerialConsole';
@@ -98,7 +104,9 @@ const SerialConsole: FunctionComponent<SerialConsoleProps> = ({
           <EmptyStateBody>
             {textDisconnected || t('Click Connect to open serial console.')}
           </EmptyStateBody>
-          <Button onClick={onConnectClick}>{textConnect || t('Connect')}</Button>
+          <EmptyStateFooter>
+            <Button onClick={onConnectClick}>{textConnect || t('Connect')}</Button>
+          </EmptyStateFooter>
         </EmptyState>
       );
       break;

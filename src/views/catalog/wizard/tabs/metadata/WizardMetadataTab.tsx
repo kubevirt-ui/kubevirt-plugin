@@ -1,4 +1,5 @@
 import * as React from 'react';
+import classnames from 'classnames';
 
 import { WizardTab } from '@catalog/wizard/tabs';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
@@ -33,7 +34,12 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
       >
         {(resource) => (
           <>
-            <DescriptionList className="wizard-metadata-tab__description-list">
+            <DescriptionList
+              className={classnames(
+                'pf-c-description-list',
+                'wizard-metadata-tab__description-list',
+              )}
+            >
               <WizardDescriptionItem
                 helperPopover={{
                   content: t(

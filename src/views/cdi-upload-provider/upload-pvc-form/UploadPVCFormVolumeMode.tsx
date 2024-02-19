@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
 import {
@@ -18,7 +18,7 @@ type UploadPVCFormModeVolumeModeVolumeModeProps = {
   volumeMode: string;
 };
 
-const UploadPVCFormModeVolumeMode: React.FC<UploadPVCFormModeVolumeModeVolumeModeProps> = ({
+const UploadPVCFormModeVolumeMode: FC<UploadPVCFormModeVolumeModeVolumeModeProps> = ({
   accessMode,
   loaded,
   onChange,
@@ -53,7 +53,7 @@ const UploadPVCFormModeVolumeMode: React.FC<UploadPVCFormModeVolumeModeVolumeMod
             key={value}
             label={label}
             name="volumeMode"
-            onChange={(_, event) => onChange(event?.currentTarget?.value)}
+            onChange={(event) => onChange(event?.currentTarget?.value)}
             value={value}
           />
         ))

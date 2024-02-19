@@ -11,9 +11,15 @@ export type FormTextInputProps = Omit<ComponentProps<typeof TextInput>, 'onChang
 
 export const FormTextInput = forwardRef<HTMLInputElement, FormTextInputProps>(
   ({ onChange, ...props }, ref) => {
-    const onChangeForward: TextInputProps['onChange'] = (_, event) => onChange?.(event);
+    const onChangeForward: TextInputProps['onChange'] = (event) => onChange?.(event);
 
-    return <TextInput {...props} onChange={onChangeForward} ref={ref} />;
+    return (
+      <TextInput
+        {...props}
+        onChange={(event, _value) => onChangeForward(event, _value)}
+        ref={ref}
+      />
+    );
   },
 );
 

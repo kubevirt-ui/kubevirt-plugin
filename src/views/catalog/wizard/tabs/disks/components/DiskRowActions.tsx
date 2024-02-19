@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
@@ -7,20 +7,11 @@ import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessag
 import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ensurePath,
-  getContentScrollableElement,
-  kubevirtConsole,
-} from '@kubevirt-utils/utils/utils';
+import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  ButtonVariant,
-  Dropdown,
-  DropdownItem,
-  DropdownPosition,
-  KebabToggle,
-} from '@patternfly/react-core';
+import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import { useEditDiskStates } from '../hooks/useEditDiskState';
 
@@ -28,16 +19,16 @@ type DiskRowActionsProps = {
   diskName: string;
 };
 
-const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
+const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
   const { t } = useKubevirtTranslation();
   const { tabsData, updateTabsData, updateVM, vm } = useWizardVMContext();
   const { createModal } = useModal();
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const deleteBtnText = t('Detach');
 
   const { initialDiskSourceState, initialDiskState } = useEditDiskStates(vm, diskName);
 
-  const onDelete = React.useCallback(() => {
+  const onDelete = useCallback(() => {
     const volumeToDelete = vm.spec.template.spec.volumes.find((volume) => volume.name === diskName);
 
     const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
@@ -116,23 +107,24 @@ const DiskRowActions: React.FC<DiskRowActionsProps> = ({ diskName }) => {
     ));
   };
 
+  const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
+
   return (
     <Dropdown
-      dropdownItems={[
+      isOpen={isDropdownOpen}
+      onOpenChange={(open: boolean) => setIsDropdownOpen(open)}
+      onSelect={() => setIsDropdownOpen(false)}
+      toggle={KebabToggle({ id: 'toggle-id-disk', onClick: onToggle })}
+    >
+      <DropdownList>
         <DropdownItem key="disk-edit" onClick={onEditModalToggle}>
           {t('Edit')}
-        </DropdownItem>,
+        </DropdownItem>
         <DropdownItem key="disk-delete" onClick={onDeleteModalToggle}>
           {deleteBtnText}
-        </DropdownItem>,
-      ]}
-      isOpen={isDropdownOpen}
-      isPlain
-      menuAppendTo={getContentScrollableElement}
-      onSelect={() => setIsDropdownOpen(false)}
-      position={DropdownPosition.right}
-      toggle={<KebabToggle id="toggle-id-disk" onToggle={setIsDropdownOpen} />}
-    />
+        </DropdownItem>
+      </DropdownList>
+    </Dropdown>
   );
 };
 

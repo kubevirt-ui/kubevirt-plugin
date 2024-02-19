@@ -5,7 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
-import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base';
+import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
 type UseInstanceTypeListColumnsValues = {
   columns: TableColumn<V1beta1VirtualMachineClusterInstancetype>[];

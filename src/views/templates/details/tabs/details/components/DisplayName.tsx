@@ -5,16 +5,10 @@ import { ANNOTATIONS } from 'src/views/templates/utils/constants';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Button,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
-import { PencilAltIcon } from '@patternfly/react-icons';
 
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
@@ -56,15 +50,12 @@ const DisplayName: React.FC<TemplateDetailsGridProps> = ({ editable, template })
     ));
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>{t('Display name')}</DescriptionListTerm>
-      <DescriptionListDescription>
-        {displayName || <MutedTextSpan text={t('No display name')} />}
-        <Button isDisabled={!editable} isInline onClick={onEditClick} type="button" variant="link">
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </Button>
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+    <VirtualMachineDescriptionItem
+      descriptionData={displayName || <MutedTextSpan text={t('No display name')} />}
+      descriptionHeader={t('Display name')}
+      isEdit={editable}
+      onEditClick={onEditClick}
+    />
   );
 };
 

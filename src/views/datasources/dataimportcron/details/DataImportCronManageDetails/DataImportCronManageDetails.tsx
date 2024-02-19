@@ -1,11 +1,12 @@
 import React from 'react';
+import classnames from 'classnames';
 
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ClipboardCopy,
@@ -38,29 +39,26 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataImportCron);
 
   return (
-    <DescriptionItem
+    <VirtualMachineDescriptionItem
       descriptionData={
-        <DescriptionList className="kv-dataimportcron-managed-details">
-          <DescriptionListGroup>
-            <DescriptionListTerm>{t('Automatic updates')}</DescriptionListTerm>
-            <DescriptionListDescription>
-              {isAutoUpdated ? t('On') : t('Off')}
-            </DescriptionListDescription>
-          </DescriptionListGroup>
-          <DescriptionListGroup>
-            <DescriptionListTerm>{t('Source')}</DescriptionListTerm>
-            <DescriptionListDescription>
-              {source ?? <MutedTextSpan text={t('Not available')} />}
-            </DescriptionListDescription>
-          </DescriptionListGroup>
-          <DescriptionListGroup>
-            <DescriptionListTerm>{t('Retain revisions')}</DescriptionListTerm>
-            <DescriptionListDescription>{importsToKeep}</DescriptionListDescription>
-          </DescriptionListGroup>
-          <DescriptionListGroup>
-            <DescriptionListTerm>{t('Scheduling settings')}</DescriptionListTerm>
-            <DescriptionListDescription>
-              <DescriptionList isHorizontal>
+        <DescriptionList
+          className={classnames('pf-c-description-list', 'kv-dataimportcron-managed-details')}
+        >
+          <VirtualMachineDescriptionItem
+            descriptionData={isAutoUpdated ? t('On') : t('Off')}
+            descriptionHeader={t('Automatic updates')}
+          />
+          <VirtualMachineDescriptionItem
+            descriptionData={source ?? <MutedTextSpan text={t('Not available')} />}
+            descriptionHeader={t('Source')}
+          />
+          <VirtualMachineDescriptionItem
+            descriptionData={importsToKeep}
+            descriptionHeader={t('Retain revisions')}
+          />
+          <VirtualMachineDescriptionItem
+            descriptionData={
+              <DescriptionList className="pf-c-description-list" isHorizontal>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Cron expression')}</DescriptionListTerm>
                   <DescriptionListDescription>
@@ -75,8 +73,9 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
                   </DescriptionListDescription>
                 </DescriptionListGroup>
               </DescriptionList>
-            </DescriptionListDescription>
-          </DescriptionListGroup>
+            }
+            descriptionHeader={t('Scheduling settings')}
+          />
         </DescriptionList>
       }
       data-test-id="dataimportcron-manage-details"

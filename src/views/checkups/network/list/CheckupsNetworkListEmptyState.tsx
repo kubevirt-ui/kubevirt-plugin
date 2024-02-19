@@ -9,10 +9,11 @@ import {
   Button,
   ButtonVariant,
   EmptyState,
+  EmptyStateActions,
   EmptyStateBody,
+  EmptyStateFooter,
+  EmptyStateHeader,
   EmptyStateIcon,
-  EmptyStatePrimary,
-  EmptyStateSecondaryActions,
   EmptyStateVariant,
   Title,
 } from '@patternfly/react-core';
@@ -30,54 +31,59 @@ const CheckupsNetworkListEmptyState = ({ isPermitted, nadsInNamespace }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   return (
-    <EmptyState variant={EmptyStateVariant.large}>
-      <EmptyStateIcon icon={NetworkIcon} />
-      <Title headingLevel="h4" size="lg">
-        {t('No network latency checkups yet')}
-      </Title>
+    <EmptyState variant={EmptyStateVariant.lg}>
+      <EmptyStateHeader
+        headingLevel="h4"
+        icon={<EmptyStateIcon icon={NetworkIcon} />}
+        titleText={<>{t('No network latency checkups yet')}</>}
+      />
       <EmptyStateBody>
         {t('To get started, install permissions and then run a checkup')}
       </EmptyStateBody>
-      <EmptyStatePrimary>
-        <Button
-          isDisabled={
-            !isPermitted ||
-            !nadsInNamespace ||
-            isLoading ||
-            namespace === ALL_NAMESPACES_SESSION_KEY
-          }
-          onClick={() => navigate(createURL('form', location.pathname))}
-        >
-          {t('Run checkup')}
-        </Button>
-      </EmptyStatePrimary>
-      <EmptyStateSecondaryActions>
-        <Button
-          onClick={async () => {
-            setIsLoading(true);
-            await installOrRemoveCheckupsNetworkPermissions(namespace, isPermitted);
-            setIsLoading(false);
-          }}
-          isDisabled={!nadsInNamespace || isLoading}
-          isLoading={isLoading}
-          variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
-        >
-          {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
-        </Button>
-      </EmptyStateSecondaryActions>
-      {!nadsInNamespace && (
-        <Title className="CheckupsNetworkListEmptyState--title__namespace" headingLevel="h5">
-          {t('Please add a NetworkAttachmentDefinition to this namespace in order to use checkups')}
-        </Title>
-      )}
-      <EmptyStateSecondaryActions>
-        <ExternalLink
-          href={
-            'https://docs.openshift.com/container-platform/4.13/virt/support/monitoring/virt-running-cluster-checkups.html#virt-measuring-latency-vm-secondary-network_virt-running-cluster-checkups'
-          }
-          text={t('Learn about network checkups')}
-        />
-      </EmptyStateSecondaryActions>
+      <EmptyStateFooter>
+        <EmptyStateActions>
+          <Button
+            isDisabled={
+              !isPermitted ||
+              !nadsInNamespace ||
+              isLoading ||
+              namespace === ALL_NAMESPACES_SESSION_KEY
+            }
+            onClick={() => navigate(createURL('form', location.pathname))}
+          >
+            {t('Run checkup')}
+          </Button>
+        </EmptyStateActions>
+        <EmptyStateActions>
+          <Button
+            onClick={async () => {
+              setIsLoading(true);
+              await installOrRemoveCheckupsNetworkPermissions(namespace, isPermitted);
+              setIsLoading(false);
+            }}
+            isDisabled={!nadsInNamespace || isLoading}
+            isLoading={isLoading}
+            variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
+          >
+            {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
+          </Button>
+        </EmptyStateActions>
+        {!nadsInNamespace && (
+          <Title className="CheckupsNetworkListEmptyState--title__namespace" headingLevel="h5">
+            {t(
+              'Please add a NetworkAttachmentDefinition to this namespace in order to use checkups',
+            )}
+          </Title>
+        )}
+        <EmptyStateActions>
+          <ExternalLink
+            href={
+              'https://docs.openshift.com/container-platform/4.13/virt/support/monitoring/virt-running-cluster-checkups.html#virt-measuring-latency-vm-secondary-network_virt-running-cluster-checkups'
+            }
+            text={t('Learn about network checkups')}
+          />
+        </EmptyStateActions>
+      </EmptyStateFooter>
     </EmptyState>
   );
 };

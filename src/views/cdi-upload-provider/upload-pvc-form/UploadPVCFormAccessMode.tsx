@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import {
   ACCESS_MODE_RADIO_OPTIONS,
@@ -14,7 +14,7 @@ type UploadPVCFormAccessModeProps = {
   onChange: (accessMode: string) => void;
   provisioner: string;
 };
-const UploadPVCFormAccessMode: React.FC<UploadPVCFormAccessModeProps> = ({
+const UploadPVCFormAccessMode: FC<UploadPVCFormAccessModeProps> = ({
   availableAccessModes = [],
   initialAccessMode,
   loaded,
@@ -63,7 +63,7 @@ const UploadPVCFormAccessMode: React.FC<UploadPVCFormAccessModeProps> = ({
               key={value}
               label={label}
               name="accessMode"
-              onChange={(_, event) => changeAccessMode(event?.currentTarget?.value)}
+              onChange={(event) => changeAccessMode(event?.currentTarget?.value)}
               value={value}
             />
           );

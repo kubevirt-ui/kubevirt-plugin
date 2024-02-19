@@ -18,7 +18,7 @@ import {
   Pagination,
   SearchInput,
 } from '@patternfly/react-core';
-import { TableComposable, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
+import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
 import UserProvidedInstanceTypesEmptyState from './components/UserProvidedInstanceTypesEmptyState';
 import useInstanceTypeListColumns from './hooks/useInstanceTypeListColumn';
@@ -109,7 +109,7 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
       {isEmpty(userProvidedInstanceTypes) || isEmpty(filteredItems) ? (
         <UserProvidedInstanceTypesEmptyState />
       ) : (
-        <TableComposable variant={TableVariant.compact}>
+        <Table variant={TableVariant.compact}>
           <Thead>
             <Tr>
               {columns.map(({ id, title }, columnIndex) => (
@@ -135,7 +135,7 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
                       type: instanceTypeActionType.setSelectedInstanceType,
                     })
                   }
-                  isHoverable
+                  isClickable
                   isSelectable
                   key={itName}
                 >
@@ -154,7 +154,7 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
               );
             })}
           </Tbody>
-        </TableComposable>
+        </Table>
       )}
     </>
   );

@@ -1,14 +1,14 @@
-import * as React from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
 type StartClonedVMCheckboxProps = {
-  setStartCloneVM: React.Dispatch<React.SetStateAction<boolean>>;
+  setStartCloneVM: Dispatch<SetStateAction<boolean>>;
   startCloneVM: boolean;
 };
 
-const StartClonedVMCheckbox: React.FC<StartClonedVMCheckboxProps> = ({
+const StartClonedVMCheckbox: FC<StartClonedVMCheckboxProps> = ({
   setStartCloneVM,
   startCloneVM,
 }) => {
@@ -19,7 +19,7 @@ const StartClonedVMCheckbox: React.FC<StartClonedVMCheckboxProps> = ({
         id="start-clone"
         isChecked={startCloneVM}
         label={t('Start VirtualMachine on clone')}
-        onChange={setStartCloneVM}
+        onChange={(_, checked: boolean) => setStartCloneVM(checked)}
       />
     </FormGroup>
   );

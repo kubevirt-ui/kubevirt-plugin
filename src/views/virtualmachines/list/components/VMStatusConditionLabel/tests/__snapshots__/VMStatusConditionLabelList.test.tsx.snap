@@ -3,51 +3,59 @@
 exports[`Render VMStatusConditionLabelList 1`] = `
 <DocumentFragment>
   <div
-    class="pf-c-label-group"
+    class="pf-v5-c-label-group"
   >
     <div
-      class="pf-c-label-group__main"
+      class="pf-v5-c-label-group__main"
     >
       <ul
         aria-label="Label group category"
-        class="pf-c-label-group__list"
+        class="pf-v5-c-label-group__list"
         role="list"
       >
         <li
-          class="pf-c-label-group__list-item"
+          class="pf-v5-c-label-group__list-item"
         >
-          <span
-            class="pf-c-label"
+          <div
+            style="display: contents;"
           >
-            <a
-              class="pf-c-label__content"
-              href="#"
+            <span
+              class="pf-v5-c-label"
             >
-              <span
-                class="pf-c-label__text"
+              <a
+                class="pf-v5-c-label__content"
+                href="#"
               >
-                Failure=true
-              </span>
-            </a>
-          </span>
+                <span
+                  class="pf-v5-c-label__text"
+                >
+                  Failure=true
+                </span>
+              </a>
+            </span>
+          </div>
         </li>
         <li
-          class="pf-c-label-group__list-item"
+          class="pf-v5-c-label-group__list-item"
         >
-          <span
-            class="pf-c-label"
+          <div
+            style="display: contents;"
           >
-            <a
-              class="pf-c-label__content"
-              href="#"
+            <span
+              class="pf-v5-c-label"
             >
-              <span
-                class="pf-c-label__text"
+              <a
+                class="pf-v5-c-label__content"
+                href="#"
               >
-                Ready=true
-              </span>
-            </a>
-          </span>
+                <span
+                  class="pf-v5-c-label__text"
+                >
+                  Ready=true
+                </span>
+              </a>
+            </span>
+          </div>
         </li>
       </ul>
     </div>

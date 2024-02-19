@@ -120,7 +120,7 @@ const BootableVolumesList: FC = () => {
                 onPageChange({ endIndex, page, perPage, startIndex })
               }
               className="list-managment-group__pagination"
-              defaultToFullPage
+              isLastFullPageShown
               itemCount={filteredData?.length}
               page={pagination?.page}
               perPage={pagination?.perPage}

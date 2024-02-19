@@ -1,15 +1,11 @@
 import * as React from 'react';
+import classnames from 'classnames';
 
 import { V1GPU, V1HostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  Stack,
-  StackItem,
-} from '@patternfly/react-core';
+import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
+
+import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 import './hardware-devices-table.scss';
 
@@ -23,20 +19,12 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
   if (!devices?.length) return <span className="text-muted">{t('Not available')}</span>;
 
   return (
-    <DescriptionList className="hardware-devices-table" columnModifier={{ default: '2Col' }}>
-      <DescriptionListGroup>
-        <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
-        <DescriptionListDescription>
-          <Stack>
-            {devices.map((device) => (
-              <StackItem key={device.name}>{device.name}</StackItem>
-            ))}
-          </Stack>
-        </DescriptionListDescription>
-      </DescriptionListGroup>
-      <DescriptionListGroup>
-        <DescriptionListTerm>{t('Device name')}</DescriptionListTerm>
-        <DescriptionListDescription>
+    <DescriptionList
+      className={classnames('pf-c-description-list', 'hardware-devices-table')}
+      columnModifier={{ default: '2Col' }}
+    >
+      <VirtualMachineDescriptionItem
+        descriptionData={
           <Stack>
             {devices.map((device: { deviceName: string; index: number; name: string }) => (
               <StackItem key={`${device?.name}-${device?.deviceName}`}>
@@ -44,8 +32,19 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
               </StackItem>
             ))}
           </Stack>
-        </DescriptionListDescription>
-      </DescriptionListGroup>
+        }
+        descriptionHeader={t('Name')}
+      />
+      <VirtualMachineDescriptionItem
+        descriptionData={
+          <Stack>
+            {devices.map((device) => (
+              <StackItem key={device.name}>{device.name}</StackItem>
+            ))}
+          </Stack>
+        }
+        descriptionHeader={t('Device name')}
+      />
     </DescriptionList>
   );
 };

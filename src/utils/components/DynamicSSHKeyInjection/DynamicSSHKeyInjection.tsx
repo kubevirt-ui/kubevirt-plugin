@@ -18,7 +18,7 @@ export const DynamicSSHKeyInjection: FC<DynamicSSHKeyInjectionProps> = ({
 
   return (
     <Switch
-      onChange={(checked) => {
+      onChange={(_event, checked) => {
         setIsChecked(checked);
         onSubmit(checked);
       }}

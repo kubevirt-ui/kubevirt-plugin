@@ -22,7 +22,7 @@ const SSHTabSSHAccess = ({ vm, vmi }) => {
       }
       isExpanded={isExpanded}
       isIndented
-      onToggle={setIsExpanded}
+      onToggle={(_event, val) => setIsExpanded(val)}
     >
       <SSHAccess sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
     </ExpandableSection>

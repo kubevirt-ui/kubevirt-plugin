@@ -1,8 +1,9 @@
-import * as React from 'react';
+import React, { Children, FC, useState } from 'react';
 
-import { Select, SelectOption, SelectOptionObject, SelectVariant } from '@patternfly/react-core';
+import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
+import { Select, SelectOption } from '@patternfly/react-core';
+import { SelectList } from '@patternfly/react-core';
 import { css } from '@patternfly/react-styles';
-import styles from '@patternfly/react-styles/css/components/Consoles/AccessConsoles';
 
 import {
   DESKTOP_VIEWER_CONSOLE_TYPE,
@@ -16,7 +17,7 @@ import { AccessConsolesProps, getChildTypeName, getConsoleForType } from './util
 import '@patternfly/react-styles/css/components/Consoles/AccessConsoles.css';
 import './access-consoles.scss';
 
-export const AccessConsoles: React.FC<AccessConsolesProps> = ({
+export const AccessConsoles: FC<AccessConsolesProps> = ({
   children,
   preselectedType = null,
   textDesktopViewerConsole = 'Desktop viewer',
@@ -30,48 +31,45 @@ export const AccessConsoles: React.FC<AccessConsolesProps> = ({
     [VNC_CONSOLE_TYPE]: textVncConsole,
   };
 
-  const [type, setType] = React.useState(
-    preselectedType !== NONE_TYPE
-      ? ({ toString: () => typeMap[preselectedType], value: preselectedType } as SelectOptionObject)
-      : null,
+  const [type, setType] = useState<null | string>(
+    preselectedType !== NONE_TYPE ? preselectedType : null,
   );
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const selectOptions = React.Children.toArray(children as React.ReactElement[]).map(
-    (child: any) => {
-      const typeText = getChildTypeName(child);
-      const childType = typeMap[typeText] || typeText;
-      return (
-        <SelectOption
-          id={childType}
-          key={childType}
-          value={{ toString: () => childType, value: childType } as SelectOptionObject}
-        />
-      );
-    },
-  ) as React.ReactElement[];
+  const selectOptions = Children.toArray(children).map((child: any) => {
+    const typeText = getChildTypeName(child);
+    const childType = typeMap[typeText] || typeText;
+    return (
+      <SelectOption id={childType} key={childType} value={childType}>
+        {childType}
+      </SelectOption>
+    );
+  });
 
+  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
   return (
-    <div className={css(styles.console)}>
-      {React.Children.toArray(children).length > 1 && (
-        <div className={css(styles.consoleActions, 'pf-u-w-0', 'access-consoles')}>
+    <div className="pf-c-console">
+      {Children.toArray(children).length > 1 && (
+        <div className={css('pf-c-console__actions', 'pf-u-w-0', 'access-consoles')}>
           <Select
-            onSelect={(_, selection) => {
-              setType(selection as SelectOptionObject);
+            onSelect={(_, selection: string) => {
+              setType(selection);
               setIsOpen(false);
             }}
-            onToggle={(open: boolean) => {
-              setIsOpen(open);
-            }}
+            toggle={SelectToggle({
+              id: 'pf-c-console__type-selector',
+              isExpanded: isOpen,
+              onClick: onToggle,
+              selected: type,
+            })}
             aria-label={textSelectConsoleType}
             isOpen={isOpen}
-            placeholderText={textSelectConsoleType}
-            selections={type}
-            toggleId="pf-c-console__type-selector"
-            variant={SelectVariant.single}
+            onOpenChange={(open: boolean) => setIsOpen(open)}
+            placeholder={textSelectConsoleType}
+            selected={type}
           >
-            {selectOptions}
+            <SelectList>{selectOptions}</SelectList>
           </Select>
         </div>
       )}

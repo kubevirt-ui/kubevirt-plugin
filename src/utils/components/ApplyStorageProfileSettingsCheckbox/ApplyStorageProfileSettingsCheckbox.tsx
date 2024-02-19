@@ -5,6 +5,8 @@ import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
+import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
+
 type ApplyStorageProfileSettingsCheckboxProps = {
   claimPropertySets: ClaimPropertySets;
   disabled?: boolean;
@@ -21,25 +23,22 @@ const ApplyStorageProfileSettingsCheckbox: FC<ApplyStorageProfileSettingsCheckbo
   const { t } = useKubevirtTranslation();
 
   return (
-    <FormGroup
-      helperText={
-        isEmpty(claimPropertySets)
-          ? t('No optimized StorageProfile settings for this StorageClass.')
-          : t('Optimized values Access mode: {{accessMode}}, Volume mode: {{volumeMode}}.', {
-              accessMode: claimPropertySets?.[0]?.accessModes[0],
-              volumeMode: claimPropertySets?.[0]?.volumeMode,
-            })
-      }
-      fieldId="apply-storage-profile-settings"
-      isInline
-    >
+    <FormGroup fieldId="apply-storage-profile-settings" isInline>
       <Checkbox
         id="apply-storage-profile-settings"
         isChecked={isChecked}
         isDisabled={disabled}
         label={t('Apply optimized StorageProfile settings')}
-        onChange={handleChange}
+        onChange={(_, checked: boolean) => handleChange(checked)}
       />
+      <FormGroupHelperText>
+        {isEmpty(claimPropertySets)
+          ? t('No optimized StorageProfile settings for this StorageClass.')
+          : t('Optimized values Access mode: {{accessMode}}, Volume mode: {{volumeMode}}.', {
+              accessMode: claimPropertySets?.[0]?.accessModes[0],
+              volumeMode: claimPropertySets?.[0]?.volumeMode,
+            })}
+      </FormGroupHelperText>
     </FormGroup>
   );
 };

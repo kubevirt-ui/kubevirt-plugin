@@ -8,18 +8,11 @@ import {
   NodeModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  Grid,
-  GridItem,
-  Title,
-} from '@patternfly/react-core';
+import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
 
 import CheckupsNetworkStatusIcon from '../../CheckupsNetworkStatusIcon';
 import {
@@ -55,128 +48,122 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
       </Title>
       <Grid>
         <GridItem span={6}>
-          <DescriptionList>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
-              <DescriptionListDescription>{configMap?.metadata?.name}</DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
-              <CheckupsNetworkStatusIcon configMap={configMap} job={job} />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Namespace')}</DescriptionListTerm>
-              <DescriptionListDescription>
+          <DescriptionList className="pf-c-description-list">
+            <VirtualMachineDescriptionItem
+              descriptionData={configMap?.metadata?.name}
+              descriptionHeader={t('Name')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<CheckupsNetworkStatusIcon configMap={configMap} job={job} />}
+              descriptionHeader={t('Status')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={
                 <ResourceLink
                   groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
                   name={configMap?.metadata?.namespace}
                 />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Average latency')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {configMap?.data?.[STATUS_AVG_LATENCY_NANO]
+              }
+              descriptionHeader={t('Namespace')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={
+                configMap?.data?.[STATUS_AVG_LATENCY_NANO]
                   ? t('{{time}} Nanoseconds', {
                       time: configMap?.data?.[STATUS_AVG_LATENCY_NANO],
                     })
-                  : NO_DATA_DASH}
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Maximum latency')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {configMap?.data?.[STATUS_MAX_LATENCY_NANO]
+                  : NO_DATA_DASH
+              }
+              descriptionHeader={t('Average latency')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={
+                configMap?.data?.[STATUS_MAX_LATENCY_NANO]
                   ? t('{{time}} Nanoseconds', {
                       time: configMap?.data?.[STATUS_MIN_LATENCY_NANO],
                     })
-                  : NO_DATA_DASH}
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Start time')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {configMap?.data?.[STATUS_START_TIME_STAMP] || NO_DATA_DASH}
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Complete time')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {configMap?.data?.[STATUS_COMPILATION_TIME_STAMP] || NO_DATA_DASH}
-              </DescriptionListDescription>
-            </DescriptionListGroup>
+                  : NO_DATA_DASH
+              }
+              descriptionHeader={t('Maximum latency')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={configMap?.data?.[STATUS_START_TIME_STAMP] || NO_DATA_DASH}
+              descriptionHeader={t('Start time')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={configMap?.data?.[STATUS_COMPILATION_TIME_STAMP] || NO_DATA_DASH}
+              descriptionHeader={t('Complete time')}
+            />
           </DescriptionList>
         </GridItem>
         <GridItem span={6}>
-          <DescriptionList>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('NetworkAttachmentDefinition')}</DescriptionListTerm>
-              <DescriptionListDescription>
+          <DescriptionList className="pf-c-description-list">
+            <VirtualMachineDescriptionItem
+              descriptionData={
                 <ResourceLink
                   groupVersionKind={NetworkAttachmentDefinitionModelGroupVersionKind}
                   name={configMap?.data?.[STATUS_NAD_NAME]}
                   namespace={configMap?.data?.[STATUS_NAD_NAMESPACE]}
                 />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Failure reason')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {configMap?.data?.[STATUS_FAILURE_REASON] || t('None')}
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Measurement duration')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {t('{{time}} seconds', { time: configMap?.data?.[STATUS_SAMPLE_DURATION] })}
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Minimum latency')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {configMap?.data?.[STATUS_MIN_LATENCY_NANO]
+              }
+              descriptionHeader={t('NetworkAttachmentDefinition')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={configMap?.data?.[STATUS_FAILURE_REASON] || t('None')}
+              descriptionHeader={t('Failure reason')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={t('{{time}} seconds', {
+                time: configMap?.data?.[STATUS_SAMPLE_DURATION],
+              })}
+              descriptionHeader={t('Measurement duration')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={
+                configMap?.data?.[STATUS_MIN_LATENCY_NANO]
                   ? t('{{time}} Nanoseconds', {
                       time: configMap?.data?.[STATUS_MIN_LATENCY_NANO],
                     })
-                  : NO_DATA_DASH}
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Source node')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {configMap?.data?.[STATUS_SOURCE_NODE] ? (
+                  : NO_DATA_DASH
+              }
+              descriptionHeader={t('Minimum latency')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={
+                configMap?.data?.[STATUS_SOURCE_NODE] ? (
                   <ResourceLink
                     groupVersionKind={modelToGroupVersionKind(NodeModel)}
                     name={configMap?.data?.[STATUS_SOURCE_NODE]}
                   />
                 ) : (
                   NO_DATA_DASH
-                )}
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Target node')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                {configMap?.data?.[STATUS_TARGET_NODE] ? (
+                )
+              }
+              descriptionHeader={t('Source node')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={
+                configMap?.data?.[STATUS_TARGET_NODE] ? (
                   <ResourceLink
                     groupVersionKind={modelToGroupVersionKind(NodeModel)}
                     name={configMap?.data?.[STATUS_TARGET_NODE]}
                   />
                 ) : (
                   NO_DATA_DASH
-                )}
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Job')}</DescriptionListTerm>
-              <DescriptionListDescription>
+                )
+              }
+              descriptionHeader={t('Target node')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={
                 <ResourceLink
                   groupVersionKind={modelToGroupVersionKind(JobModel)}
                   name={job?.metadata?.name}
                   namespace={job?.metadata?.namespace}
                 />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
+              }
+              descriptionHeader={t('Job')}
+            />
           </DescriptionList>
         </GridItem>
       </Grid>
