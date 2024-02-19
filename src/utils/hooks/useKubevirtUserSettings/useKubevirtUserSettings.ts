@@ -14,7 +14,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sGet, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
@@ -27,24 +27,15 @@ import { parseNestedJSON, patchUserConfigMap } from './utils/utils';
 
 const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   const [error, setError] = useState<Error>();
-  const [userName, setUserName] = useState<string>();
   const [userSettings, setUserSettings] = useState<UserSettingsState>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [loadingUserName, setLoadingUserName] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchUserName = async () => {
-      setError(null);
-      try {
-        const user = await k8sGet({ model: UserModel, path: '~' });
-        setUserName(user?.metadata?.uid || user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-'));
-      } catch (e) {
-        setError(e);
-      }
-      setLoadingUserName(false);
-    };
-    fetchUserName();
-  }, []);
+  const [user, loadedUser, errorUser] = useK8sWatchResource<IoK8sApiCoreV1ConfigMap>({
+    groupVersionKind: modelToGroupVersionKind(UserModel),
+    name: '~',
+  });
+
+  const userName = user?.metadata?.uid || user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
 
   const [userConfigMap, loadedConfigMap, configMapError] =
     useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
@@ -129,8 +120,8 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   return [
     key ? userSettings?.[key] : userSettings,
     userSettings && updateUserSetting,
-    !loading && !loadingUserName && loadedConfigMap,
-    error || configMapError,
+    !loading && loadedUser && loadedConfigMap,
+    error || errorUser || configMapError,
   ];
 };
 
