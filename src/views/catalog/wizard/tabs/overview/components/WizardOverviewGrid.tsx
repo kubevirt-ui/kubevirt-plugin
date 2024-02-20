@@ -316,7 +316,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             }
             helperPopover={{
               content: isDisabledGuestSystemLogs
-                ? t('Guest system access logs disabled at cluster')
+                ? t('Guest system logs disabled at cluster')
                 : t(
                     'Enables access to the VirtualMachine guest system log. Wait a few seconds for logging to start before viewing the log.',
                   ),
