@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
+import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { GridItem } from '@patternfly/react-core';
 
-import { isAllNamespaces, vmStatusIcon } from './utils/utils';
+import { vmStatusIcon } from './utils/utils';
 
 import './VMStatusesCard.scss';
 

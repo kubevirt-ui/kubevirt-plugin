@@ -20,7 +20,7 @@ import {
 } from '@patternfly/react-core';
 import { AngleDownIcon } from '@patternfly/react-icons';
 
-import { UseInstanceTypeCardMenuSectionValues } from '../../utils/types';
+import { UseInstanceTypeCardMenuSectionValues } from '../../../../utils/types';
 
 import './RedHatSeriesMenuCard.scss';
 

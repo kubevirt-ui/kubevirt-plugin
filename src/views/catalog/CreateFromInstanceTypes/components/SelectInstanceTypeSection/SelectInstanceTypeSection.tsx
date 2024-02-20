@@ -1,15 +1,14 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
+import RedHatProvidedInstanceTypesSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/RedHatProvidedInstanceTypesSection';
+import UserProvidedInstanceTypesList from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/UserProvidedInstanceTypeList';
+import { getUserProvidedInstanceTypes } from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/utils/utils';
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseInstanceTypeAndPreferencesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { Flex, Tab, Tabs } from '@patternfly/react-core';
+import { Tab, Tabs } from '@patternfly/react-core';
 
-import RedHatSeriesMenuCard from './components/RedHatSeriesMenuCard/RedHatSeriesMenuCard';
-import UsersInstanceTypesList from './components/UsersInstanceTypeList/UsersInstanceTypeList';
-import useInstanceTypeCardMenuSection from './hooks/useInstanceTypeCardMenuSection';
 import { TabKey } from './utils/constants';
 
 type SelectInstanceTypeSectionProps = {
@@ -20,16 +19,13 @@ const SelectInstanceTypeSection: FC<SelectInstanceTypeSectionProps> = ({
   instanceTypesAndPreferencesData,
 }) => {
   const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);
-  const { clusterInstanceTypes, loaded, userInstanceTypes } = instanceTypesAndPreferencesData;
+  const { allInstanceTypes, loaded } = instanceTypesAndPreferencesData;
+
   const {
     instanceTypeVMState: { selectedInstanceType },
   } = useInstanceTypeVMStore();
-  const menuItems = useMemo(
-    () => getInstanceTypeMenuItems([...clusterInstanceTypes, ...userInstanceTypes]),
-    [clusterInstanceTypes, userInstanceTypes],
-  );
 
-  const menuProps = useInstanceTypeCardMenuSection();
+  const menuItems = useMemo(() => getInstanceTypeMenuItems(allInstanceTypes), [allInstanceTypes]);
 
   useEffect(() => {
     // This effect is meant to focus the tab an IT was defined as default by the selected volume
@@ -48,20 +44,11 @@ const SelectInstanceTypeSection: FC<SelectInstanceTypeSectionProps> = ({
   return (
     <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
       <Tab eventKey={TabKey.RedHat} title={menuItems.redHatProvided.label}>
-        <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
-          {menuItems.redHatProvided.items.map((rhSeriesItem) => {
-            const seriesName = rhSeriesItem?.seriesName;
-            return (
-              !instanceTypeSeriesNameMapper[seriesName]?.disabled && (
-                <RedHatSeriesMenuCard key={seriesName} rhSeriesItem={rhSeriesItem} {...menuProps} />
-              )
-            );
-          })}
-        </Flex>
+        <RedHatProvidedInstanceTypesSection redHatMenuItems={menuItems?.redHatProvided} />
       </Tab>
       <Tab eventKey={TabKey.Users} title={menuItems.userProvided.label}>
-        <UsersInstanceTypesList
-          userInstanceTypes={instanceTypesAndPreferencesData.userInstanceTypes}
+        <UserProvidedInstanceTypesList
+          userProvidedInstanceTypes={getUserProvidedInstanceTypes(allInstanceTypes)}
         />
       </Tab>
     </Tabs>

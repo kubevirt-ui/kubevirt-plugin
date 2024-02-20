@@ -1,6 +1,9 @@
 import { parseSize } from 'xbytes';
 
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1VirtualMachineClusterInstancetype,
+  V1beta1VirtualMachineInstancetype,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { APP_NAME_LABEL } from '@kubevirt-utils/resources/template';
@@ -40,11 +43,9 @@ const getRedHatInstanceTypeSeriesAndSize = (
   };
 };
 
-export const isRedHatInstanceType = (
-  instanceType: V1beta1VirtualMachineClusterInstancetype,
-): boolean => {
-  if (getLabel(instanceType, APP_NAME_LABEL) !== COMMON_INSTANCETYPES) return false;
-
+const hasRedHatSeriesSizeLabel = (
+  instanceType: V1beta1VirtualMachineClusterInstancetype | V1beta1VirtualMachineInstancetype,
+) => {
   const [seriesName, sizeLabel = ''] = getName(instanceType).split('.');
 
   const rhInstanceTypeSize = instanceTypeSeriesNameMapper[seriesName]?.possibleSizes?.find(
@@ -52,6 +53,13 @@ export const isRedHatInstanceType = (
   );
 
   return !isEmpty(rhInstanceTypeSize);
+};
+
+export const isRedHatInstanceType = (
+  instanceType: V1beta1VirtualMachineClusterInstancetype | V1beta1VirtualMachineInstancetype,
+): boolean => {
+  if (getLabel(instanceType, APP_NAME_LABEL) !== COMMON_INSTANCETYPES) return false;
+  return hasRedHatSeriesSizeLabel(instanceType);
 };
 
 export const getInstanceTypeMenuItems = (

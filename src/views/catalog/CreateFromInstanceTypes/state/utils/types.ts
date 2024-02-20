@@ -10,12 +10,17 @@ import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/ty
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 
+export type InstanceTypes = (
+  | V1beta1VirtualMachineClusterInstancetype
+  | V1beta1VirtualMachineInstancetype
+)[];
+
 export type UseInstanceTypeAndPreferencesValues = {
+  allInstanceTypes: InstanceTypes;
   clusterInstanceTypes: V1beta1VirtualMachineClusterInstancetype[];
   loaded: boolean;
   loadError: any;
   preferences: V1beta1VirtualMachineClusterPreference[];
-  userInstanceTypes: V1beta1VirtualMachineInstancetype[];
 };
 
 export type UseBootableVolumesValues = {

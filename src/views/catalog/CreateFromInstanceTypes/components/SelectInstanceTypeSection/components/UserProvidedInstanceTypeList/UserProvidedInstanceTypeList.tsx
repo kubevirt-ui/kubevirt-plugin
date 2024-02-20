@@ -1,14 +1,15 @@
 import React, { FC, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import {
+  instanceTypeActionType,
+  InstanceTypes,
+} from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { groupVersionKindFromCommonResource } from '@catalog/CreateFromInstanceTypes/utils/utils';
-import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, Timestamp, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionList,
@@ -19,17 +20,19 @@ import {
 } from '@patternfly/react-core';
 import { TableComposable, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
-import UsersInstanceTypeEmptyState from './components/UsersInstanceTypeEmptyState';
+import UserProvidedInstanceTypesEmptyState from './components/UserProvidedInstanceTypesEmptyState';
 import useInstanceTypeListColumns from './hooks/useInstanceTypeListColumn';
 import { paginationDefaultValues, paginationInitialState } from './utils/constants';
 
-import './UsersInstanceTypeList.scss';
+import './UserProvidedInstanceTypeList.scss';
 
-type UsersInstanceTypesListProps = {
-  userInstanceTypes: V1beta1VirtualMachineInstancetype[];
+type UserProvidedInstanceTypesListProps = {
+  userProvidedInstanceTypes: InstanceTypes;
 };
 
-const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({ userInstanceTypes }) => {
+const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
+  userProvidedInstanceTypes,
+}) => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
 
@@ -51,29 +54,29 @@ const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({ userInstanceT
   };
 
   const filteredItems = useMemo(() => {
-    return userInstanceTypes.filter(
+    return userProvidedInstanceTypes.filter(
       (opt) =>
         isEmpty(searchInput) ||
         getName(opt).toLowerCase().includes(searchInput.toString().toLowerCase()),
     );
-  }, [searchInput, userInstanceTypes]);
+  }, [searchInput, userProvidedInstanceTypes]);
 
   const { columns, getSortType, sortedData } = useInstanceTypeListColumns(
     filteredItems,
     pagination,
   );
 
-  if (activeNamespace === ALL_NAMESPACES_SESSION_KEY) {
+  if (isAllNamespaces(activeNamespace) && isEmpty(userProvidedInstanceTypes)) {
     return (
       <Bullseye className={'instance-type-list__all-projects'}>
-        {t('Select project in order to see user provided instancetypes')}
+        {t('Select a project in order to see user-provided InstanceTypes')}
       </Bullseye>
     );
   }
 
   return (
     <>
-      {!isEmpty(userInstanceTypes) && (
+      {!isEmpty(userProvidedInstanceTypes) && (
         <ActionList className="instance-type-list__action-list">
           <ActionListItem>
             <SearchInput
@@ -103,8 +106,8 @@ const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({ userInstanceT
           </ActionListItem>
         </ActionList>
       )}
-      {isEmpty(userInstanceTypes) || isEmpty(filteredItems) ? (
-        <UsersInstanceTypeEmptyState />
+      {isEmpty(userProvidedInstanceTypes) || isEmpty(filteredItems) ? (
+        <UserProvidedInstanceTypesEmptyState />
       ) : (
         <TableComposable variant={TableVariant.compact}>
           <Thead>
@@ -157,4 +160,4 @@ const UsersInstanceTypesList: FC<UsersInstanceTypesListProps> = ({ userInstanceT
   );
 };
 
-export default UsersInstanceTypesList;
+export default UserProvidedInstanceTypesList;

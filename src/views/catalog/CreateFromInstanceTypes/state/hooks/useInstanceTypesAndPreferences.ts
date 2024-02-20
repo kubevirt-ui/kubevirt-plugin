@@ -1,4 +1,4 @@
-import useUserInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useUserInstanceTypes';
+import useVirtualMachineInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useVirtualMachineInstanceTypes';
 
 import { UseInstanceTypeAndPreferencesValues } from '../utils/types';
 
@@ -10,7 +10,7 @@ type UseInstanceTypeAndPreferences = () => UseInstanceTypeAndPreferencesValues;
 const useInstanceTypesAndPreferences: UseInstanceTypeAndPreferences = () => {
   const [clusterInstanceTypes, clusterITsLoaded, clusterITsLoadError] = useClusterInstanceTypes();
 
-  const [userInstanceTypes, userITsLoaded, userITsLoadError] = useUserInstanceTypes();
+  const [vmInstanceTypes, userITsLoaded, userITsLoadError] = useVirtualMachineInstanceTypes();
 
   const [preferences, preferencesLoaded, preferencesLoadError] = useClusterPreferences();
 
@@ -18,11 +18,11 @@ const useInstanceTypesAndPreferences: UseInstanceTypeAndPreferences = () => {
   const loadError = preferencesLoadError || clusterITsLoadError || userITsLoadError;
 
   return {
+    allInstanceTypes: [...clusterInstanceTypes, ...vmInstanceTypes],
     clusterInstanceTypes,
     loaded: loaded || Boolean(loadError),
     loadError,
     preferences,
-    userInstanceTypes,
   };
 };
 
