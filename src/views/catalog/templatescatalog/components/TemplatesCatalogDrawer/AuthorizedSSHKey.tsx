@@ -71,14 +71,14 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
 
       if (
         secretOption === SecretSelectionOption.none &&
-        sshDetails.secretOption !== SecretSelectionOption.none
+        sshDetails?.secretOption !== SecretSelectionOption.none
       ) {
         setVM(removeSecretToVM(vm));
       }
 
       if (
         secretOption === SecretSelectionOption.useExisting &&
-        sshDetails.sshSecretName !== sshSecretName &&
+        sshDetails?.sshSecretName !== sshSecretName &&
         !isEmpty(sshSecretName)
       ) {
         setVM(addSecretToVM(vm, sshSecretName));
