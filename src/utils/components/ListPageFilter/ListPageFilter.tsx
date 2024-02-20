@@ -40,13 +40,18 @@ import {
   generateRowFilters,
   getFiltersData,
   getInitialSearchText,
+  getInitialSearchType,
+  getSearchTextPlaceholder,
 } from './utils';
 
 type ListPageFilterProps = {
   columnLayout?: ColumnLayout;
   data?: K8sResourceCommon[];
   hideColumnManagement?: boolean;
+  hideLabelFilter?: boolean;
+  hideNameLabelFilters?: boolean;
   loaded?: boolean;
+  nameFilterPlaceholder?: string;
   onFilterChange?: OnFilterChange;
   rowFilters?: RowFilter[];
   searchFilters?: RowFilter[];
@@ -56,7 +61,10 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   columnLayout,
   data,
   hideColumnManagement,
+  hideLabelFilter,
+  hideNameLabelFilters,
   loaded,
+  nameFilterPlaceholder,
   onFilterChange,
   rowFilters,
   searchFilters = [],
@@ -83,12 +91,20 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 
   const textFilters = useSearchFiltersParameters(searchFilters);
 
-  const alreadySearchedParam = searchFilters?.find(
-    (searchFilter) => textFilters[searchFilter.type],
-  )?.type;
+  const filterDropdownItems: Record<string, string> = {
+    ...searchFilters.reduce(
+      (acc, filter) => ({
+        ...acc,
+        [filter.type]: filter.filterGroupName,
+      }),
+      {},
+    ),
+    ...(!hideLabelFilter && !hideNameLabelFilters ? { labels: t('Label') } : {}),
+    ...(!hideNameLabelFilters ? { name: t('Name') } : {}),
+  };
 
   const [searchType, setSearchType] = useState<string>(
-    alreadySearchedParam || STATIC_SEARCH_FILTERS.name,
+    getInitialSearchType(searchFilters, textFilters, filterDropdownItems),
   );
 
   const [searchInputText, setSearchInputText] = useState<string>(
@@ -117,6 +133,8 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 
   const selectedSearchFilter = searchFilters?.find((f) => f.type === searchType);
 
+  const filterDropdownKeys = Object.keys(filterDropdownItems);
+
   return (
     <Toolbar
       className="co-toolbar-no-padding pf-m-toggle-group-container"
@@ -135,107 +153,100 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
             selectedRowFilters={selectedRowFilters}
             updateRowFilterSelected={updateRowFilterSelected}
           />
-          <ToolbarItem className="co-filter-search--full-width">
-            <ToolbarFilter
-              deleteChip={(f, chip: string) => {
-                const newLabels = textFilters.labels.filter((label) => label !== chip);
-                applyTextFilters(STATIC_SEARCH_FILTERS.labels, newLabels.join(','));
-              }}
-              deleteChipGroup={() => {
-                applyTextFilters(STATIC_SEARCH_FILTERS.labels);
-              }}
-              categoryName={STATIC_SEARCH_FILTERS_LABELS.labels}
-              chips={textFilters.labels ?? []}
-            >
-              {searchFilters.map((filter) => (
+          {filterDropdownKeys.length !== 0 && (
+            <ToolbarItem className="co-filter-search--full-width">
+              <ToolbarFilter
+                deleteChip={(category, chip: string) => {
+                  const newLabels = textFilters?.labels?.filter((label) => label !== chip);
+                  applyTextFilters(STATIC_SEARCH_FILTERS.labels, newLabels.join(','));
+                }}
+                deleteChipGroup={() => {
+                  applyTextFilters(STATIC_SEARCH_FILTERS.labels);
+                }}
+                categoryName={STATIC_SEARCH_FILTERS_LABELS.labels}
+                chips={textFilters.labels ?? []}
+              >
+                {searchFilters.map((filter) => (
+                  <ToolbarFilter
+                    deleteChip={() => {
+                      applyTextFilters(filter.type);
+                      searchType === filter.type && setSearchInputText('');
+                    }}
+                    categoryName={filter.filterGroupName}
+                    chips={textFilters[filter.type] ? [textFilters[filter.type]] : []}
+                    key={filter.type}
+                  >
+                    <></>
+                  </ToolbarFilter>
+                ))}
+
                 <ToolbarFilter
                   deleteChip={() => {
-                    applyTextFilters(filter.type);
-                    searchType === filter.type && setSearchInputText('');
+                    applyTextFilters('name');
+                    searchType === STATIC_SEARCH_FILTERS.name && setSearchInputText('');
                   }}
-                  categoryName={filter.type}
-                  chips={textFilters[filter.type] ? [textFilters[filter.type]] : []}
-                  key={filter.type}
+                  categoryName={t('Name')}
+                  chips={textFilters.name ? [textFilters.name] : []}
                 >
-                  <></>
+                  <div className="pf-c-input-group co-filter-group">
+                    {filterDropdownKeys.length > 1 && (
+                      <Select
+                        placeholderText={
+                          <span>
+                            <FilterIcon className="span--icon__right-margin" />
+                            {t('Filter')}
+                          </span>
+                        }
+                        isOpen={isDropdownOpen}
+                        onSelect={onSelect}
+                        onToggle={setIsDropdownOpen}
+                        selections={selectedSearchFilter?.filterGroupName || searchType}
+                        variant={SelectVariant.single}
+                      >
+                        {filterDropdownKeys.map((key) => (
+                          <SelectOption key={key} value={key}>
+                            {filterDropdownItems?.[key]}
+                          </SelectOption>
+                        ))}
+                      </Select>
+                    )}
+
+                    {searchType === STATIC_SEARCH_FILTERS.labels ? (
+                      <AutocompleteInput
+                        onSuggestionSelect={(selected) => {
+                          const newLabels = new Set([...textFilters.labels, selected]);
+                          applyTextFilters(
+                            STATIC_SEARCH_FILTERS.labels,
+                            Array.from(newLabels).join(','),
+                          );
+                          setSearchInputText('');
+                        }}
+                        className="co-text-node"
+                        data={data}
+                        placeholder={STATIC_SEARCH_FILTERS_PLACEHOLDERS.labels}
+                        setTextValue={setSearchInputText}
+                        textValue={searchInputText}
+                      />
+                    ) : (
+                      <SearchFilter
+                        onChange={(newSearchInput: string) => {
+                          setSearchInputText(newSearchInput);
+                          applyTextFiltersWithDebounce(searchType, newSearchInput);
+                        }}
+                        placeholder={getSearchTextPlaceholder(
+                          searchType,
+                          selectedSearchFilter,
+                          nameFilterPlaceholder,
+                        )}
+                        data-test={`${searchType}-filter-input`}
+                        value={searchInputText || ''}
+                      />
+                    )}
+                  </div>
                 </ToolbarFilter>
-              ))}
-
-              <ToolbarFilter
-                deleteChip={() => {
-                  applyTextFilters('name');
-                  searchType === STATIC_SEARCH_FILTERS.name && setSearchInputText('');
-                }}
-                categoryName={t('Name')}
-                chips={textFilters.name ? [textFilters.name] : []}
-              >
-                <div className="pf-c-input-group co-filter-group">
-                  <Select
-                    placeholderText={
-                      <span>
-                        <FilterIcon className="span--icon__right-margin" />
-                        {t('Filter')}
-                      </span>
-                    }
-                    isOpen={isDropdownOpen}
-                    onSelect={onSelect}
-                    onToggle={setIsDropdownOpen}
-                    selections={selectedSearchFilter?.filterGroupName || searchType}
-                    variant={SelectVariant.single}
-                  >
-                    <SelectOption value={STATIC_SEARCH_FILTERS.name}>
-                      {STATIC_SEARCH_FILTERS_LABELS.name}
-                    </SelectOption>
-
-                    <SelectOption value={STATIC_SEARCH_FILTERS.labels}>
-                      {STATIC_SEARCH_FILTERS_LABELS.labels}
-                    </SelectOption>
-
-                    <>
-                      {searchFilters.map((filter) => (
-                        <SelectOption key={filter.type} value={filter.type}>
-                          {filter.filterGroupName}
-                        </SelectOption>
-                      ))}
-                    </>
-                  </Select>
-
-                  {searchType === STATIC_SEARCH_FILTERS.labels ? (
-                    <AutocompleteInput
-                      onSuggestionSelect={(selected) => {
-                        const newLabels = new Set([...textFilters.labels, selected]);
-                        applyTextFilters(
-                          STATIC_SEARCH_FILTERS.labels,
-                          Array.from(newLabels).join(','),
-                        );
-                        setSearchInputText('');
-                      }}
-                      className="co-text-node"
-                      data={data}
-                      placeholder={STATIC_SEARCH_FILTERS_PLACEHOLDERS.labels}
-                      setTextValue={setSearchInputText}
-                      textValue={searchInputText}
-                    />
-                  ) : (
-                    <SearchFilter
-                      onChange={(newSearchInput: string) => {
-                        setSearchInputText(newSearchInput);
-                        applyTextFiltersWithDebounce(searchType, newSearchInput);
-                      }}
-                      placeholder={
-                        STATIC_SEARCH_FILTERS_PLACEHOLDERS[searchType] ||
-                        t('Search by {{filterName}}', {
-                          filterName: selectedSearchFilter?.filterGroupName,
-                        })
-                      }
-                      data-test={`${searchType}-filter-input`}
-                      value={searchInputText}
-                    />
-                  )}
-                </div>
               </ToolbarFilter>
-            </ToolbarFilter>
-          </ToolbarItem>
+            </ToolbarItem>
+          )}
         </ToolbarToggleGroup>
         <ColumnManagement columnLayout={columnLayout} hideColumnManagement={hideColumnManagement} />
       </ToolbarContent>
