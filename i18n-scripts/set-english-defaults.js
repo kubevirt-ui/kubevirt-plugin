@@ -38,6 +38,7 @@ function updateFile(fileName) {
   const keys = Object.keys(file);
 
   let originalKey;
+  let wordWithNoCount
 
   for (let i = 0; i < keys.length; i++) {
       // translations
@@ -48,11 +49,14 @@ function updateFile(fileName) {
       switch (determineRule(keys[i])) {
         case 0:
           [originalKey] = keys[i].split('_other');
-          updatedFile[keys[i]] = `{{count}} ${pluralize(originalKey)}`;
+
+          wordWithNoCount = originalKey.replace('{{count}}', '').trim()
+          updatedFile[keys[i]] = `{{count}} ${pluralize(wordWithNoCount)}`;
           break;
         case 1:
           [originalKey] = keys[i].split('_one');
-          updatedFile[keys[i]] = `{{count}} ${originalKey}`;
+          wordWithNoCount = originalKey.replace('{{count}}', '').trim()
+          updatedFile[keys[i]] = `{{count}} ${pluralize.singular(wordWithNoCount)}`;
           break;
         case 2:
           [originalKey] = keys[i].split('_other');
