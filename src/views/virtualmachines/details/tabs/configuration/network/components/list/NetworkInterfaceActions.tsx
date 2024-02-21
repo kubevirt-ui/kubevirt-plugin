@@ -41,6 +41,8 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const editBtnText = t('Edit');
   const deleteBtnText = t('Delete');
 
+  const isHotPlugNIC = Boolean(nicPresentation?.iface?.bridge);
+
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <VirtualMachinesEditNetworkInterfaceModal
@@ -64,10 +66,10 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         submitBtnVariant={ButtonVariant.danger}
       >
         <span>
-          {isRunning(vm) && (
+          {isRunning(vm) && isHotPlugNIC && (
             <Alert
               title={t(
-                'Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13 or for network interfaces that were added to the VirtualMachine in these versions.',
+                'Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13.',
               )}
               component={'h6'}
               isInline
