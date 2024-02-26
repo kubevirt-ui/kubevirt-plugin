@@ -1,24 +1,30 @@
-import React, { useMemo } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import { modelToGroupVersionKind, PodModel, ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Pod, IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Dropdown, DropdownItem, DropdownToggle, Form, FormGroup } from '@patternfly/react-core';
+import { Form, FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
 
 import MultusNetwork from './Components/MultusNetwork';
 import RDPConnector from './Components/RDPConnector';
+import { MULTUS, POD } from './utils/constants';
 import { DesktopViewerProps, Network } from './utils/types';
 import { getDefaultNetwork, getRdpAddressPort, getVmRdpNetworks } from './utils/utils';
 
-const DesktopViewer: React.FC<DesktopViewerProps> = ({ vm, vmi }) => {
+const DesktopViewer: FC<DesktopViewerProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
+
+  const networks = getVmRdpNetworks(vm, vmi);
+  const [selectedNetwork, setSelectedNetwork] = useState<Network>(getDefaultNetwork(networks));
+
   const [pods, podsLoaded] = useK8sWatchResource<IoK8sApiCoreV1Pod[]>({
     groupVersionKind: modelToGroupVersionKind(PodModel),
     isList: true,
-    namespace: vm.metadata.namespace,
+    namespace: getNamespace(vm),
   });
 
   const vmPod = useMemo(() => getVMIPod(vmi, pods), [vmi, pods]);
@@ -26,52 +32,41 @@ const DesktopViewer: React.FC<DesktopViewerProps> = ({ vm, vmi }) => {
   const [services, servicesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Service[]>({
     groupVersionKind: modelToGroupVersionKind(ServiceModel),
     isList: true,
-    namespace: vm?.metadata?.namespace,
+    namespace: getNamespace(vm),
   });
+
   const rdpServiceAddressPort = getRdpAddressPort(vmi, services, vmPod);
-  const networks = getVmRdpNetworks(vm, vmi);
-  const [selectedNetwork, setSelectedNetwork] = React.useState<Network>(
-    getDefaultNetwork(networks),
-  );
+  const networkType = selectedNetwork?.type;
 
   const networkItems = networks?.map((network) => {
     return (
-      <DropdownItem
+      <SelectOption
         onClick={() => {
           setSelectedNetwork(network);
-          setIsDropdownOpen(false);
         }}
         key={network?.name}
+        value={network?.name}
       >
         {network?.name}
-      </DropdownItem>
+      </SelectOption>
     );
   });
-
-  const networkType = selectedNetwork?.type;
 
   return (
     <>
       <Form className="kv-vm-consoles__rdp-actions" isHorizontal>
         <FormGroup fieldId="network-dropdown" label={t('Network interface')}>
-          <Dropdown
-            toggle={
-              <DropdownToggle
-                id="pf-c-console__actions-desktop-toggle-id"
-                onToggle={() => setIsDropdownOpen((isOpen) => !isOpen)}
-              >
-                {selectedNetwork?.name}
-              </DropdownToggle>
-            }
-            dropdownItems={networkItems}
+          <FormPFSelect
             id="network-dropdown"
-            isOpen={isDropdownOpen}
-            onSelect={() => setIsDropdownOpen(false)}
-            title={t('--- Select network interface ---')}
-          />
+            placeholder={t('--- Select network interface ---')}
+            selected={selectedNetwork?.name}
+            toggleProps={{ id: 'pf-c-console__actions-desktop-toggle-id' }}
+          >
+            <SelectList>{networkItems}</SelectList>
+          </FormPFSelect>
         </FormGroup>
       </Form>
-      {networkType === 'POD' && (
+      {networkType === POD && (
         <RDPConnector
           isLoading={!podsLoaded || !servicesLoaded}
           rdpServiceAddressPort={rdpServiceAddressPort}
@@ -79,7 +74,7 @@ const DesktopViewer: React.FC<DesktopViewerProps> = ({ vm, vmi }) => {
           vmi={vmi}
         />
       )}
-      {networkType === 'MULTUS' && <MultusNetwork selectedNetwork={selectedNetwork} vmi={vmi} />}
+      {networkType === MULTUS && <MultusNetwork selectedNetwork={selectedNetwork} vmi={vmi} />}
     </>
   );
 };

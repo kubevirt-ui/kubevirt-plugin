@@ -7,15 +7,10 @@ import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sDelete, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  ButtonVariant,
-  Dropdown,
-  DropdownItem,
-  DropdownPosition,
-  KebabToggle,
-} from '@patternfly/react-core';
+import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import RestoreModal from '../modal/RestoreModal';
 
@@ -72,39 +67,37 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
     setIsDropdownOpen(false);
   }, [createModal, deleteLabel, snapshot, t]);
 
-  const items = [
-    <DropdownItem
-      description={t('Clone this snapshot to create a VirtualMachine from it')}
-      isDisabled={!canClone}
-      key="snapshot-clone"
-      onClick={onClone}
-    >
-      {t('Clone')}
-    </DropdownItem>,
-    <DropdownItem
-      description={t('Restore is enabled only for offline VirtualMachine.')}
-      isDisabled={isRestoreDisabled}
-      key="snapshot-restore"
-      onClick={onRestoreModalToggle}
-    >
-      {t('Restore')}
-    </DropdownItem>,
-    <DropdownItem key="snapshot-delete" onClick={onDeleteModalToggle}>
-      {deleteLabel}
-    </DropdownItem>,
-  ];
+  const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
 
   return (
-    <>
-      <Dropdown
-        dropdownItems={items}
-        isOpen={isDropdownOpen}
-        isPlain
-        onSelect={() => setIsDropdownOpen(false)}
-        position={DropdownPosition.right}
-        toggle={<KebabToggle id="toggle-id-6" onToggle={setIsDropdownOpen} />}
-      />
-    </>
+    <Dropdown
+      isOpen={isDropdownOpen}
+      onSelect={() => setIsDropdownOpen(false)}
+      popperProps={{ position: 'right' }}
+      toggle={KebabToggle({ id: 'toggle-id-6', isExpanded: isDropdownOpen, onClick: onToggle })}
+    >
+      <DropdownList>
+        <DropdownItem
+          description={t('Clone this snapshot to create a VirtualMachine from it')}
+          isDisabled={!canClone}
+          key="snapshot-clone"
+          onClick={onClone}
+        >
+          {t('Clone')}
+        </DropdownItem>
+        <DropdownItem
+          description={t('Restore is enabled only for offline VirtualMachine.')}
+          isDisabled={isRestoreDisabled}
+          key="snapshot-restore"
+          onClick={onRestoreModalToggle}
+        >
+          {t('Restore')}
+        </DropdownItem>
+        <DropdownItem key="snapshot-delete" onClick={onDeleteModalToggle}>
+          {deleteLabel}
+        </DropdownItem>
+      </DropdownList>
+    </Dropdown>
   );
 };
 

@@ -6,6 +6,7 @@ import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, k8sDelete, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import MigrationPolicyEditModal from '../../components/MigrationPolicyEditModal/MigrationPolicyEditModal';
@@ -25,6 +26,7 @@ const useMigrationPoliciesActionsProvider: UseMigrationPoliciesActionsProvider =
   const actions: Action[] = useMemo(() => {
     return [
       {
+        accessReview: asAccessReview(MigrationPolicyModel, mp, 'patch'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <MigrationPolicyEditModal isOpen={isOpen} mp={mp} onClose={onClose} />
@@ -34,6 +36,7 @@ const useMigrationPoliciesActionsProvider: UseMigrationPoliciesActionsProvider =
         label: t('Edit'),
       },
       {
+        accessReview: asAccessReview(MigrationPolicyModel, mp, 'delete'),
         cta: () =>
           createModal(({ isOpen, onClose }) => {
             return (

@@ -1,14 +1,13 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Popover, Text, TextVariants } from '@patternfly/react-core';
-import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
-import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
+import { ExternalLinkSquareAltIcon, OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
 import { SYSPREP_DOC_URL } from '../consts';
 
-const SysprepUnattendHelperPopup: React.FC = () => {
+const SysprepUnattendHelperPopup: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Popover
@@ -24,7 +23,7 @@ const SysprepUnattendHelperPopup: React.FC = () => {
               icon={<ExternalLinkSquareAltIcon />}
               iconPosition="right"
               isInline
-              isSmall
+              size="sm"
               variant="link"
             >
               <a href={SYSPREP_DOC_URL} rel="noopener noreferrer" target="_blank">

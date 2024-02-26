@@ -79,7 +79,11 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
         </SplitItem>
         {hyperLoaded && (
           <SplitItem>
-            <Switch id="kernel-samepage-merging" isChecked={isEnabled} onChange={onKSMchange} />
+            <Switch
+              id="kernel-samepage-merging"
+              isChecked={isEnabled}
+              onChange={(_, checked: boolean) => onKSMchange(checked)}
+            />
           </SplitItem>
         )}
       </Split>

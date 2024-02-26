@@ -56,7 +56,7 @@ const WelcomeModal: FC = () => {
               <WelcomeButtons onClose={onClose} />
 
               <Checkbox
-                onChange={(value) =>
+                onChange={(_event, value) =>
                   setQuickStarts({ ...quickStarts, dontShowWelcomeModal: value })
                 }
                 className="WelcomeModal__checkbox"

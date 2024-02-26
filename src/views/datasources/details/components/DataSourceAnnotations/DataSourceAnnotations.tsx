@@ -10,7 +10,7 @@ type DataSourceAnnotationsProps = {
 const DataSourceAnnotations: React.FC<DataSourceAnnotationsProps> = ({ annotations }) => {
   const { t } = useKubevirtTranslation();
   const keys = Object.keys(annotations || {});
-  return <Link to="#">{t('{{count}} Annotations', { count: keys?.length })}</Link>;
+  return <Link to="#">{t('{{annotations}} Annotations', { annotations: keys?.length })}</Link>;
 };
 
 export default DataSourceAnnotations;

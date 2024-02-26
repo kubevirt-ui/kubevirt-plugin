@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
@@ -13,7 +14,7 @@ import { initialMigrationPolicyState, produceMigrationPolicy } from './utils/uti
 
 import './MigrationPolicyCreateForm.scss';
 
-const MigrationPolicyCreateForm: React.FC = () => {
+const MigrationPolicyCreateForm: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const [state, setState] = useState(initialMigrationPolicyState);
@@ -34,16 +35,12 @@ const MigrationPolicyCreateForm: React.FC = () => {
         <FormGroup fieldId="create-description">
           <MigrationPolicyFormDescription />
         </FormGroup>
-        <FormGroup
-          fieldId="migration-policy-name"
-          helperText={t('Unique name of the MigrationPolicy')}
-          isRequired
-          label={t('MigrationPolicy name')}
-        >
+        <FormGroup fieldId="migration-policy-name" isRequired label={t('MigrationPolicy name')}>
           <TextInput
             onChange={setStateField('migrationPolicyName')}
             value={state?.migrationPolicyName}
           />
+          <FormGroupHelperText>{t('Unique name of the MigrationPolicy')}</FormGroupHelperText>
         </FormGroup>
         <FormGroup fieldId="migration-policy-description" label={t('Description')}>
           <TextInput onChange={setStateField('description')} value={state?.description} />

@@ -1,9 +1,12 @@
 import React, { FC, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
+import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Dropdown, DropdownItem, DropdownToggle, Title } from '@patternfly/react-core';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { SelectOption, Title } from '@patternfly/react-core';
 
 import { ALL_NETWORKS } from '../utils/constants';
 
@@ -27,7 +30,6 @@ const NetworkCharts: FC<NetworkChartsProps> = ({ vmi }) => {
   }, [vmi]);
 
   const query = useQuery();
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [selectedNetwork, setSelectedNetwork] = useState<string>(
     query?.get('network') || ALL_NETWORKS,
   );
@@ -37,31 +39,27 @@ const NetworkCharts: FC<NetworkChartsProps> = ({ vmi }) => {
       <Title className="networkcharts-by-nic--title" headingLevel="h4">
         {t('Network interface:')}
       </Title>{' '}
-      <Dropdown
-        dropdownItems={interfacesNames?.map((nic) => (
-          <DropdownItem
-            onClick={(e) => {
-              setSelectedNetwork(e?.currentTarget?.innerText);
-              setIsDropdownOpen(false);
+      <FormPFSelect
+        className="network ul.pf-c-dropdown__menu"
+        onSelect={(_, network: string) => setSelectedNetwork(network)}
+        selected={selectedNetwork}
+      >
+        {interfacesNames?.map((nic) => (
+          <SelectOption
+            onClick={() => {
               navigate(
-                `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/metrics?network=${nic}`,
+                `/k8s/ns/${getNamespace(vmi)}/${VirtualMachineModelRef}/${getName(
+                  vmi,
+                )}/metrics?network=${nic}`,
               );
             }}
             key={nic}
+            value={nic}
           >
             {nic}
-          </DropdownItem>
+          </SelectOption>
         ))}
-        toggle={
-          <DropdownToggle onToggle={(toogle) => setIsDropdownOpen(toogle)}>
-            {selectedNetwork}
-          </DropdownToggle>
-        }
-        className="network ul.pf-c-dropdown__menu"
-        isOpen={isDropdownOpen}
-        isPlain
-        isText
-      ></Dropdown>
+      </FormPFSelect>
       <NetworkChartsByNIC nic={selectedNetwork} vmi={vmi} />
     </div>
   );

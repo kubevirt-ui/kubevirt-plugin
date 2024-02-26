@@ -9,6 +9,7 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Bullseye,
+  Icon,
   Menu,
   MenuContent,
   MenuItem,
@@ -112,7 +113,9 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
               ))}
               {isEmpty(autocompleteOptions) && (
                 <Bullseye className="VirtualMachineConfigurationTanSearch--main__no-results">
-                  <SearchIcon color="grey" size="xl" />
+                  <Icon color="grey" size="xl">
+                    <SearchIcon />
+                  </Icon>
                   <Title headingLevel="h5">
                     <MutedTextSpan text={t('No configurable settings found')} />
                   </Title>

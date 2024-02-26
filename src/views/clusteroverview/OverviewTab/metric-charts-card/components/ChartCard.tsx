@@ -18,7 +18,7 @@ const ChartCard: React.FC<ChartCardProps> = ({ metric }) => {
   const metricChartData = useMetricChartData(metric);
   const { chartData, isReady, numberOfTicks, unit } = metricChartData;
   const currentValue = getCurrentValue(chartData);
-  const chartLabel = t("Last {{count}} days' trend", { count: numberOfTicks });
+  const chartLabel = t("Last {{numOfDays}} days' trend", { numOfDays: numberOfTicks });
   const metricLabel = unit && isReady ? `${metric} (${unit})` : metric;
   const metricValue = currentValue && !isNaN(currentValue) ? currentValue?.toLocaleString() : 0;
 

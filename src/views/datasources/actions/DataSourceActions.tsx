@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
+import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
@@ -9,9 +11,7 @@ import {
   Dropdown,
   DropdownGroup,
   DropdownItem,
-  DropdownPosition,
-  DropdownToggle,
-  KebabToggle,
+  DropdownList,
 } from '@patternfly/react-core';
 
 import { useDataSourceActionsProvider } from '../hooks/useDataSourceActions';
@@ -23,13 +23,25 @@ type DataSourceActionProps = {
   isKebabToggle?: boolean;
 };
 
-const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKebabToggle }) => {
+const DataSourceActions: FC<DataSourceActionProps> = ({ dataSource, isKebabToggle }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [actions, onLazyOpen] = useDataSourceActionsProvider(dataSource);
 
   const dsActions = actions.filter((a) => a.id !== 'datasource-action-manage-source');
   const manageAction = actions.find((a) => a.id === 'datasource-action-manage-source');
+
+  const onToggle = () => {
+    setIsOpen((prevIsOpen) => {
+      if (!prevIsOpen) onLazyOpen();
+
+      return !prevIsOpen;
+    });
+  };
+
+  const Toggle = isKebabToggle
+    ? KebabToggle({ isExpanded: isOpen, onClick: onToggle })
+    : DropdownToggle({ children: t('Actions'), isExpanded: isOpen, onClick: onToggle });
 
   const handleClick = (action: Action) => {
     if (typeof action?.cta === 'function') {
@@ -38,14 +50,16 @@ const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKeba
     setIsOpen(false);
   };
 
-  const onDropDownToggle = (value: boolean) => {
-    setIsOpen(value);
-    if (value) onLazyOpen();
-  };
-
   return (
     <Dropdown
-      dropdownItems={[
+      className="kubevirt-data-source-actions"
+      data-test-id="data-source-actions"
+      isOpen={isOpen}
+      onOpenChange={(open: boolean) => setIsOpen(open)}
+      popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
+      toggle={Toggle}
+    >
+      <DropdownList>
         <DropdownGroup key="datasource-actions" label={t('DataSource')}>
           {dsActions?.map((action) => (
             <DropdownItem
@@ -58,7 +72,7 @@ const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKeba
               {action?.label}
             </DropdownItem>
           ))}
-        </DropdownGroup>,
+        </DropdownGroup>
         <Divider key="divider" />,
         <DropdownGroup key="datasource-manage" label={t('DataImportCron')}>
           <DropdownItem
@@ -70,23 +84,9 @@ const DataSourceActions: React.FC<DataSourceActionProps> = ({ dataSource, isKeba
           >
             {manageAction?.label}
           </DropdownItem>
-        </DropdownGroup>,
-      ]}
-      toggle={
-        isKebabToggle ? (
-          <KebabToggle onToggle={onDropDownToggle} />
-        ) : (
-          <DropdownToggle onToggle={onDropDownToggle}>{t('Actions')}</DropdownToggle>
-        )
-      }
-      className="kubevirt-data-source-actions"
-      data-test-id="data-source-actions"
-      isGrouped
-      isOpen={isOpen}
-      isPlain={isKebabToggle}
-      menuAppendTo={getContentScrollableElement}
-      position={DropdownPosition.right}
-    />
+        </DropdownGroup>
+      </DropdownList>
+    </Dropdown>
   );
 };
 

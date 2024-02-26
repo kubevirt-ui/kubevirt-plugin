@@ -24,16 +24,8 @@ import {
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getCPU, getDisks } from '@kubevirt-utils/resources/vm';
-import {
-  Button,
-  ButtonVariant,
-  DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  ExpandableSection,
-} from '@patternfly/react-core';
-import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
+import { Button, ButtonVariant, DescriptionList, ExpandableSection } from '@patternfly/react-core';
+import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 
 import { useDrawerContext } from './hooks/useDrawerContext';
 import TemplateExpandableDescription from './TemplateExpandableDescription';
@@ -60,35 +52,32 @@ export const TemplateInfoSection: FC = memo(() => {
     <ExpandableSection
       isExpanded={isTemplateInfoExpanded}
       isIndented
-      onToggle={setIsTemplateInfoExpanded}
+      onToggle={(_event, val) => setIsTemplateInfoExpanded(val)}
       toggleText={t('Template info')}
     >
-      <DescriptionList>
-        <DescriptionListGroup>
-          <DescriptionListTerm>{t('Operating system')}</DescriptionListTerm>
-          <DescriptionListDescription>{displayName}</DescriptionListDescription>
-        </DescriptionListGroup>
-        <DescriptionListGroup>
-          <DescriptionListTerm>{t('Workload type')}</DescriptionListTerm>
-          <DescriptionListDescription>
-            {WORKLOADS_LABELS[workload] ?? t('Other')} {isDefaultTemplate && t('(default)')}
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-        <DescriptionListGroup>
-          <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
-          <DescriptionListDescription>
-            {<TemplateExpandableDescription description={description} />}
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-        <DescriptionListGroup>
-          <DescriptionListTerm>{t('Documentation')}</DescriptionListTerm>
-          <DescriptionListDescription>
-            {documentationUrl ? (
+      <DescriptionList className="pf-c-description-list">
+        <VirtualMachineDescriptionItem
+          descriptionData={displayName}
+          descriptionHeader={t('Operating system')}
+        />
+        <VirtualMachineDescriptionItem
+          descriptionData={`${WORKLOADS_LABELS[workload] ?? t('Other')} ${
+            isDefaultTemplate && t('(default)')
+          }`}
+          descriptionHeader={t('Workload type')}
+        />
+        <VirtualMachineDescriptionItem
+          descriptionData={<TemplateExpandableDescription description={description} />}
+          descriptionHeader={t('Description')}
+        />
+        <VirtualMachineDescriptionItem
+          descriptionData={
+            documentationUrl ? (
               <Button
                 icon={<ExternalLinkSquareAltIcon />}
                 iconPosition="right"
                 isInline
-                isSmall
+                size="sm"
                 variant={ButtonVariant.link}
               >
                 <a href={documentationUrl} rel="noopener noreferrer" target="_blank">
@@ -97,9 +86,10 @@ export const TemplateInfoSection: FC = memo(() => {
               </Button>
             ) : (
               notAvailable
-            )}
-          </DescriptionListDescription>
-        </DescriptionListGroup>
+            )
+          }
+          descriptionHeader={t('Documentation')}
+        />
         <AdditionalResources template={template} />
         <VirtualMachineDescriptionItem
           bodyContent={
@@ -124,22 +114,16 @@ export const TemplateInfoSection: FC = memo(() => {
           isEdit
           isPopover
         />
-        <DescriptionListGroup>
-          <DescriptionListTerm>
-            {t('Network interfaces ({{count}})', { count: networks?.length })}
-          </DescriptionListTerm>
-          <DescriptionListDescription>
+        <VirtualMachineDescriptionItem
+          descriptionData={
             <WizardOverviewNetworksTable interfaces={interfaces} networks={networks} />
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-        <DescriptionListGroup>
-          <DescriptionListTerm>
-            {t('Disks ({{count}})', { count: disks?.length })}
-          </DescriptionListTerm>
-          <DescriptionListDescription>
-            <WizardOverviewDisksTable vm={vm} />
-          </DescriptionListDescription>
-        </DescriptionListGroup>
+          }
+          descriptionHeader={t('Network interfaces ({{networks}})', { networks: networks?.length })}
+        />
+        <VirtualMachineDescriptionItem
+          descriptionData={<WizardOverviewDisksTable vm={vm} />}
+          descriptionHeader={t('Disks ({{disks}})', { disks: disks?.length })}
+        />
       </DescriptionList>
     </ExpandableSection>
   );

@@ -14,8 +14,7 @@ import {
   BlueInfoCircleIcon,
   RedExclamationCircleIcon,
 } from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/icons';
-import ExclamationCircleIcon from '@patternfly/react-icons/dist/js/icons/exclamation-circle-icon';
-import ExclamationTriangleIcon from '@patternfly/react-icons/dist/js/icons/exclamation-triangle-icon';
+import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@patternfly/react-icons';
 
 export const labelColor = {
   [AlertType.critical]: 'red',

@@ -2,30 +2,23 @@ import React, { FC, useCallback } from 'react';
 
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Button,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
-import { PencilAltIcon } from '@patternfly/react-icons';
-
-import useEditTemplateAccessReview from '../../../../..//details/hooks/useIsTemplateEditable';
 
 import TemplateBootloaderModal from './TemplateBootloaderModal';
 
 type BootMethodProps = {
+  editable: boolean;
   template: V1Template;
 };
 
-const BootMethod: FC<BootMethodProps> = ({ template }) => {
+const BootMethod: FC<BootMethodProps> = ({ editable, template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { isTemplateEditable } = useEditTemplateAccessReview(template);
+
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(
     getTemplateVirtualMachineObject(template),
   );
@@ -51,21 +44,12 @@ const BootMethod: FC<BootMethodProps> = ({ template }) => {
     ));
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>{t('Boot mode')}</DescriptionListTerm>
-      <DescriptionListDescription>
-        <Button
-          isDisabled={!isTemplateEditable}
-          isInline
-          onClick={onEditClick}
-          type="button"
-          variant="link"
-        >
-          {firmwareBootloaderTitle}
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </Button>
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+    <VirtualMachineDescriptionItem
+      descriptionData={firmwareBootloaderTitle}
+      descriptionHeader={t('Boot mode')}
+      isEdit={editable}
+      onEditClick={onEditClick}
+    />
   );
 };
 

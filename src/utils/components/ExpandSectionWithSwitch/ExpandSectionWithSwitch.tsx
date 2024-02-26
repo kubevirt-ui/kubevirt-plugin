@@ -1,4 +1,4 @@
-import React, { FC, FormEvent, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { PopoverPosition, Split, SplitItem, Switch } from '@patternfly/react-core';
@@ -17,7 +17,7 @@ type ExpandSectionWithSwitchProps = {
   switchIsOn: boolean;
   toggleContent?: ReactNode;
   toggleText?: string;
-  turnOnSwitch: (checked: boolean, event: FormEvent<HTMLInputElement>) => void;
+  turnOnSwitch: (checked: boolean) => void;
 };
 
 const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
@@ -48,7 +48,11 @@ const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
       </SplitItem>
     )}
     <SplitItem>
-      <Switch isChecked={switchIsOn} isDisabled={isDisabled} onChange={turnOnSwitch} />
+      <Switch
+        isChecked={switchIsOn}
+        isDisabled={isDisabled}
+        onChange={(_, checked: boolean) => turnOnSwitch(checked)}
+      />
     </SplitItem>
   </Split>
 );

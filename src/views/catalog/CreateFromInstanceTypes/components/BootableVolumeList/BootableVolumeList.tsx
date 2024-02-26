@@ -13,7 +13,7 @@ import { convertResourceArrayToMap, getLabel, getName } from '@kubevirt-utils/re
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/react-core';
-import { TableComposable, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
+import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 
 import { DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
 import BootableVolumeEmptyState from '../BootableVolumeEmptyState/BootableVolumeEmptyState';
@@ -105,13 +105,11 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     <>
       <Split className="bootable-volume-list-bar" hasGutter>
         <SplitItem>
-          <FormGroup label={t('Volumes project')}>
-            <TextInput
-              aria-label="bootable volume list"
-              className="bootable-volume-list-bar__volume-namespace"
-              isDisabled
-              value={getOSImagesNS()}
-            />
+          <FormGroup
+            className="bootable-volume-list-bar__volume-namespace"
+            label={t('Volumes project')}
+          >
+            <TextInput aria-label="bootable volume list" isDisabled value={getOSImagesNS()} />
           </FormGroup>
         </SplitItem>
 
@@ -149,8 +147,8 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                 perPageOptions={
                   displayShowAllButton ? paginationDefaultValuesForm : paginationDefaultValuesModal
                 }
-                defaultToFullPage
                 isCompact={displayShowAllButton}
+                isLastFullPageShown
                 itemCount={data?.length}
                 page={pagination?.page}
                 perPage={pagination?.perPage}
@@ -168,7 +166,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
       </Split>
 
       {displayVolumes ? (
-        <TableComposable className="BootableVolumeList-table" variant={TableVariant.compact}>
+        <Table className="BootableVolumeList-table" variant={TableVariant.compact}>
           <Thead>
             <Tr>
               {activeColumns.map((col, columnIndex) => (
@@ -212,7 +210,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               />
             ))}
           </Tbody>
-        </TableComposable>
+        </Table>
       ) : (
         <BootableVolumeEmptyState />
       )}

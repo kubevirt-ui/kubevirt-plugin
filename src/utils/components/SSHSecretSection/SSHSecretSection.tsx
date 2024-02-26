@@ -10,9 +10,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, AlertVariant, Bullseye, Checkbox, Grid, GridItem } from '@patternfly/react-core';
-
-import Loading from '../Loading/Loading';
+import { Alert, AlertVariant, Checkbox, Grid, GridItem } from '@patternfly/react-core';
 
 import SSHOptionUseExisting from './components/SSHOptionUseExisting/SSHOptionUseExisting';
 import { getMappedProjectsWithKeys } from './utils/utils';
@@ -50,14 +48,6 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({
     (secretSelectionOption === SecretSelectionOption.addNew && !isTemplate) ||
     (!isEmpty(projectsWithSecrets) && secretSelectionOption === SecretSelectionOption.useExisting);
 
-  if (!loadedSecrets) {
-    return (
-      <Bullseye>
-        <Loading />
-      </Bullseye>
-    );
-  }
-
   return (
     <Grid span={12}>
       <GridItem>
@@ -70,6 +60,7 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({
       <GridItem className="ssh-secret-section__body">
         {secretSelectionOption === SecretSelectionOption.useExisting && (
           <SSHOptionUseExisting
+            loadedSecrets={loadedSecrets}
             localNSProject={localNSProject}
             namespace={namespace}
             projectsWithSecrets={projectsWithSecrets}

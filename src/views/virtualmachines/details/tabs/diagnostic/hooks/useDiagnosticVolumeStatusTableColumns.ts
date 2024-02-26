@@ -1,7 +1,7 @@
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
-import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base';
+import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
 import { DiagnosticSort } from '../utils/types';
 

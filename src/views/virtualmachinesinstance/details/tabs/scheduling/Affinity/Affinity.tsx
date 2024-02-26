@@ -12,7 +12,7 @@ const Affinity: React.FC<AffinityProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const affinity = vmi?.spec?.affinity;
 
-  return <>{t('{{count}} Affinity rules', { count: getAffinityRules(affinity)?.length ?? 0 })}</>;
+  return <>{t('{{rules}} Affinity rules', { rules: getAffinityRules(affinity)?.length ?? 0 })}</>;
 };
 
 export default Affinity;

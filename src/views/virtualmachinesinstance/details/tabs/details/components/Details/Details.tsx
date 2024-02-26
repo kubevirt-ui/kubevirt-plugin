@@ -2,23 +2,15 @@ import * as React from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
+import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  DescriptionListTermHelpText,
-  DescriptionListTermHelpTextButton,
-  Grid,
-  GridItem,
-  Popover,
-  Title,
-} from '@patternfly/react-core';
+import { DescriptionList, Grid, GridItem, Icon, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
 import VirtualMachinesInstancesStatus from '../../../../../components/VirtualMachinesInstancesStatus';
@@ -37,9 +29,7 @@ import Name from './Name/Name';
 import Namespace from './Namespace/Namespace';
 import Node from './Node/Node';
 import OperatingSystem from './OperatingSystem/OperatingSystem';
-import Owner from './Owner/Owner';
 import Pods from './Pods/Pods';
-import SSHDetails from './SSHDetails/SSHDetails';
 import Timezone from './Timezone/Timezone';
 import WorkloadProfile from './WorkloadProfile/WorkloadProfile';
 
@@ -61,137 +51,94 @@ const Details: React.FC<DetailsProps> = ({ pathname, vmi }) => {
   return (
     <div>
       <a className="link-icon" href={`${pathname}#details`}>
-        <LinkIcon size="sm" />
+        <Icon size="sm">
+          <LinkIcon />
+        </Icon>
       </a>
       <Title className="co-section-heading" headingLevel="h2">
         {t('VirtualMachineInstance Details')}
       </Title>
       <Grid hasGutter>
         <GridItem span={5}>
-          <DescriptionList>
-            <DescriptionListGroup>
-              <Name name={vmi?.metadata?.name} />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <Namespace namespace={vmi?.metadata?.namespace} />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <Labels vmi={vmi} />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <Annotations vmi={vmi} />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <Description vmi={vmi} />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <OperatingSystem
-                guestAgentData={guestAgentData}
-                loadedGuestAgent={loadedGuestAgent}
-                vmi={vmi}
-              />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <CPUMemory vmi={vmi} />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTermHelpText>
-                <Popover
-                  bodyContent={t(
-                    'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
-                  )}
-                  hasAutoWidth
-                  headerContent={t('Machine type')}
-                  maxWidth="30rem"
-                >
-                  <DescriptionListTermHelpTextButton>
-                    {t('Machine type')}
-                  </DescriptionListTermHelpTextButton>
-                </Popover>
-              </DescriptionListTermHelpText>
-              <DescriptionListDescription>
-                {getMachineType(vm) || NO_DATA_DASH}
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <CreateAt timestamp={vmi?.metadata?.creationTimestamp} />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <Owner
-                namespace={vmi?.metadata?.namespace}
-                ownerReferences={vmi?.metadata?.ownerReferences}
-              />
-            </DescriptionListGroup>
+          <DescriptionList className="pf-c-description-list">
+            <Name name={vmi?.metadata?.name} />
+            <Namespace namespace={vmi?.metadata?.namespace} />
+            <Labels vmi={vmi} />
+            <Annotations vmi={vmi} />
+            <Description vmi={vmi} />
+            <OperatingSystem
+              guestAgentData={guestAgentData}
+              loadedGuestAgent={loadedGuestAgent}
+              vmi={vmi}
+            />
+            <CPUMemory vmi={vmi} />
+            <VirtualMachineDescriptionItem
+              bodyContent={t(
+                'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
+              )}
+              descriptionData={getMachineType(vm) || NO_DATA_DASH}
+              descriptionHeader={t('Machine type')}
+              isPopover
+            />
+            <CreateAt timestamp={vmi?.metadata?.creationTimestamp} />
+            <OwnerDetailsItem obj={vmi} />
           </DescriptionList>
         </GridItem>
         <GridItem span={1}></GridItem>
         <GridItem span={5}>
-          <DescriptionList>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <VirtualMachinesInstancesStatus status={vmi?.status?.phase} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Pod')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <Pods vmi={vmi} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Boot order')}</DescriptionListTerm>
-              <DescriptionListDescription>
+          <DescriptionList className="pf-c-description-list">
+            <VirtualMachineDescriptionItem
+              descriptionData={<VirtualMachinesInstancesStatus status={vmi?.status?.phase} />}
+              descriptionHeader={t('Status')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<Pods vmi={vmi} />}
+              descriptionHeader={t('Pod')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={
                 <BootOrder
                   disks={vmi?.spec?.domain?.devices?.disks}
                   interfaces={vmi?.spec?.domain?.devices?.interfaces}
                 />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('IP address')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <IP vmi={vmi} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Hostname')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <Hostname guestAgentData={guestAgentData} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Time zone')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <Timezone guestAgentData={guestAgentData} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Node')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <Node nodeName={vmi?.status?.nodeName} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Workload profile')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <WorkloadProfile annotations={vmi?.metadata?.annotations} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <SSHDetails
-                sshService={sshService}
-                sshServiceLoaded={sshServiceLoaded}
-                vm={vm}
-                vmi={vmi}
-              />
-            </DescriptionListGroup>
-            <DescriptionListGroup>
-              <DescriptionListTerm>{t('Hardware devices')}</DescriptionListTerm>
-              <DescriptionListDescription>
-                <HardwareDevices devices={vmi?.spec?.domain?.devices} />
-              </DescriptionListDescription>
-            </DescriptionListGroup>
+              }
+              descriptionHeader={t('Boot order')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<IP vmi={vmi} />}
+              descriptionHeader={t('IP address')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<Hostname guestAgentData={guestAgentData} />}
+              descriptionHeader={'Hostname'}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<Timezone guestAgentData={guestAgentData} />}
+              descriptionHeader={t('Time zone')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<Node nodeName={vmi?.status?.nodeName} />}
+              descriptionHeader={t('Node')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<WorkloadProfile annotations={vmi?.metadata?.annotations} />}
+              descriptionHeader={t('Workload profile')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={
+                <SSHAccess
+                  sshService={sshService}
+                  sshServiceLoaded={sshServiceLoaded}
+                  vm={vm}
+                  vmi={vmi}
+                />
+              }
+              descriptionHeader={t('SSH access')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={<HardwareDevices devices={vmi?.spec?.domain?.devices} />}
+              descriptionHeader={t('Hardware devices')}
+            />
           </DescriptionList>
         </GridItem>
       </Grid>

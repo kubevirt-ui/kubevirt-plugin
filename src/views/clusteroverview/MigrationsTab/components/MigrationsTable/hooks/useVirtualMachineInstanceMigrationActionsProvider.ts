@@ -1,8 +1,10 @@
-import * as React from 'react';
+import { useCallback, useMemo } from 'react';
 
+import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
+import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { cancelMigration } from '@virtualmachines/actions/actions';
@@ -17,7 +19,7 @@ const useVirtualMachineInstanceMigrationActionsProvider: UseVirtualMachineInstan
 
     const [, inFlight] = useK8sModel(VirtualMachineModelRef);
 
-    const cancelMigrationDescription = React.useCallback(() => {
+    const cancelMigrationDescription = useCallback(() => {
       if ([vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase))
         return t('Cannot cancel migration for "{{ status }}" status', {
           status: vmim?.status?.phase,
@@ -25,9 +27,10 @@ const useVirtualMachineInstanceMigrationActionsProvider: UseVirtualMachineInstan
       return null;
     }, [t, vmim?.status?.phase]);
 
-    const actions: Action[] = React.useMemo(() => {
+    const actions: Action[] = useMemo(() => {
       return [
         {
+          accessReview: asAccessReview(VirtualMachineInstanceMigrationModel, vmim, 'delete'),
           cta: () => cancelMigration(vmim),
           description: cancelMigrationDescription(),
           disabled:
@@ -38,7 +41,7 @@ const useVirtualMachineInstanceMigrationActionsProvider: UseVirtualMachineInstan
       ];
     }, [vmim, t, cancelMigrationDescription]);
 
-    return React.useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
+    return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
   };
 
 export default useVirtualMachineInstanceMigrationActionsProvider;

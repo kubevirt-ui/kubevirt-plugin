@@ -14,8 +14,8 @@ const SnapshotSupportedVolumeList: React.FC<SupportedSnapshotVolumesListProps> =
   const { t } = useKubevirtTranslation();
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
   const volumesCount = !isEmpty(supportedVolumes) ? supportedVolumes?.length : 0;
-  const volumeCountMsg = t('Disks included in this snapshot ({{count}})', {
-    count: volumesCount,
+  const volumeCountMsg = t('Disks included in this snapshot ({{volumes}})', {
+    volumes: volumesCount,
   });
 
   return (

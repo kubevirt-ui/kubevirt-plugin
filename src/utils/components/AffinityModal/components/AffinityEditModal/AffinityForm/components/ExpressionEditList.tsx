@@ -1,5 +1,6 @@
-import * as React from 'react';
+import React, { FC, ReactNode } from 'react';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup } from '@patternfly/react-core';
@@ -11,13 +12,13 @@ import AffinityEditList from './AffinityEditList';
 import ErrorHelperText from './ErrorHelperText';
 
 type ExpressionEditListProps = {
-  errorHelperText: React.ReactNode;
+  errorHelperText: ReactNode;
   expressions: useIDEntitiesValue;
-  helperText: React.ReactNode;
+  helperText: ReactNode;
   label: string;
 };
 
-const ExpressionEditList: React.FC<ExpressionEditListProps> = ({
+const ExpressionEditList: FC<ExpressionEditListProps> = ({
   errorHelperText,
   expressions,
   helperText,
@@ -34,12 +35,9 @@ const ExpressionEditList: React.FC<ExpressionEditListProps> = ({
 
   return (
     <>
-      <FormGroup
-        fieldId="expression-selector"
-        helperText={helperText}
-        isHelperTextBeforeField
-        label={label}
-      />
+      <FormGroup fieldId="expression-selector" label={label}>
+        <FormGroupHelperText>{helperText}</FormGroupHelperText>
+      </FormGroup>
       <AffinityEditList
         addRowText={t('Add expression')}
         expressions={affinityExpressions}

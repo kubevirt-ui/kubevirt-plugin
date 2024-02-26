@@ -1,5 +1,6 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { FormGroup, TextInput } from '@patternfly/react-core';
@@ -12,7 +13,7 @@ type DiskSourceUrlInputProps = {
   url: string;
 };
 
-const DiskSourceContainer: React.FC<DiskSourceUrlInputProps> = ({ onChange, os, url }) => {
+const DiskSourceContainer: FC<DiskSourceUrlInputProps> = ({ onChange, os, url }) => {
   const { t } = useKubevirtTranslation();
   const isUpstream = (window as any).SERVER_FLAGS.branding === 'okd';
   const isRHELOS = os?.includes(OS_NAME_TYPES.rhel);
@@ -23,24 +24,22 @@ const DiskSourceContainer: React.FC<DiskSourceUrlInputProps> = ({ onChange, os, 
       : OS_REGISTERY_LINKS[os] || OS_REGISTERY_LINKS.fedora;
 
   return (
-    <FormGroup
-      helperText={
-        <>
-          {t('Example: ')}
-          {exampleURL}
-        </>
-      }
-      fieldId="disk-source-container"
-      isRequired
-      label={t('Container')}
-    >
+    <FormGroup fieldId="disk-source-container" isRequired label={t('Container')}>
       <TextInput
         data-test-id="disk-source-container"
         id="disk-source-container"
-        onChange={onChange}
+        onChange={(_, value: string) => onChange(value)}
         type="text"
         value={url}
       />
+      <FormGroupHelperText>
+        {
+          <>
+            {t('Example: ')}
+            {exampleURL}
+          </>
+        }
+      </FormGroupHelperText>
     </FormGroup>
   );
 };

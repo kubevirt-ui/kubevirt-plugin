@@ -66,12 +66,12 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
   }, [initialSSHService]);
 
   return (
-    <DescriptionListGroup>
+    <DescriptionListGroup className="pf-c-description-list__group">
       <DescriptionListTerm className="pf-u-font-size-xs">
         {t('SSH service type')}
       </DescriptionListTerm>
 
-      <DescriptionListDescription>
+      <DescriptionListDescription className="pf-c-description-list__description">
         <Stack hasGutter>
           {sshServiceLoaded && !loading ? (
             <>

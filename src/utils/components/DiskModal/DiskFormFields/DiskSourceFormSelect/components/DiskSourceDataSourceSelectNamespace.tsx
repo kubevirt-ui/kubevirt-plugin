@@ -1,23 +1,21 @@
-import * as React from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
-import { ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
-
-import { FilterPVCSelect as FilterProjectSelect } from '../../utils/Filters';
+import { FormGroup } from '@patternfly/react-core';
 
 type DiskSourceDataSourceSelectNamespaceProps = {
   isDisabled?: boolean;
-  onChange: React.Dispatch<React.SetStateAction<string>>;
+  onChange: Dispatch<SetStateAction<string>>;
   projectsLoaded: boolean;
   projectsNames: string[];
   selectedProject: string;
 };
 
-const DiskSourceDataSourceSelectNamespace: React.FC<DiskSourceDataSourceSelectNamespaceProps> = ({
+const DiskSourceDataSourceSelectNamespace: FC<DiskSourceDataSourceSelectNamespaceProps> = ({
   isDisabled,
   onChange,
   projectsLoaded,
@@ -25,15 +23,6 @@ const DiskSourceDataSourceSelectNamespace: React.FC<DiskSourceDataSourceSelectNa
   selectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const onSelect = React.useCallback(
-    (event, selection) => {
-      onChange(selection);
-      setIsOpen(false);
-    },
-    [onChange],
-  );
 
   const fieldId = 'ds-project-select';
   const dsLabel = DataSourceModel.label;
@@ -47,26 +36,20 @@ const DiskSourceDataSourceSelectNamespace: React.FC<DiskSourceDataSourceSelectNa
       label={t('{{dsLabel}} project', { dsLabel })}
     >
       {projectsLoaded ? (
-        <Select
-          aria-labelledby={fieldId}
-          hasInlineFilter
-          isDisabled={isDisabled}
-          isOpen={isOpen}
-          maxHeight={400}
-          menuAppendTo="parent"
-          onFilter={FilterProjectSelect(projectsNames)}
-          onSelect={onSelect}
-          onToggle={setIsOpen}
-          placeholderText={t('--- Select {{dsLabel}} project ---', { dsLabel })}
-          selections={selectedProject}
-          variant={SelectVariant.single}
-        >
-          {projectsNames.map((projectName) => (
-            <SelectOption key={projectName} value={projectName}>
-              <ResourceLink kind={ProjectModel.kind} linkTo={false} name={projectName} />
-            </SelectOption>
-          ))}
-        </Select>
+        <FilterSelect
+          options={projectsNames?.map((name) => ({
+            children: name,
+            groupVersionKind: modelToGroupVersionKind(ProjectModel),
+            value: name,
+          }))}
+          toggleProps={{
+            isDisabled,
+            isFullWidth: true,
+            placeholder: t('--- Select {{dsLabel}} project ---', { dsLabel }),
+          }}
+          selected={selectedProject}
+          setSelected={onChange}
+        />
       ) : (
         <Loading />
       )}

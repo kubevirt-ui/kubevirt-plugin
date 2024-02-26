@@ -5,9 +5,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   Button,
   EmptyState,
+  EmptyStateActions,
   EmptyStateBody,
-  EmptyStateSecondaryActions,
-  Title,
+  EmptyStateFooter,
+  EmptyStateHeader,
 } from '@patternfly/react-core';
 
 export const WizardEmptyState: React.FC<{ namespace: string }> = ({ namespace }) => {
@@ -16,17 +17,17 @@ export const WizardEmptyState: React.FC<{ namespace: string }> = ({ namespace })
 
   return (
     <EmptyState>
-      <Title headingLevel="h4" size="lg">
-        {t('No Template found')}
-      </Title>
+      <EmptyStateHeader headingLevel="h4" titleText={<>{t('No Template found')}</>} />
       <EmptyStateBody>
         {t('No Template was selected for review, please go to the catalog and select one.')}
       </EmptyStateBody>
-      <EmptyStateSecondaryActions>
-        <Button onClick={() => navigate(`/k8s/ns/${namespace}/catalog/template`)}>
-          {t('Go to catalog')}
-        </Button>
-      </EmptyStateSecondaryActions>
+      <EmptyStateFooter>
+        <EmptyStateActions>
+          <Button onClick={() => navigate(`/k8s/ns/${namespace}/catalog/template`)}>
+            {t('Go to catalog')}
+          </Button>
+        </EmptyStateActions>
+      </EmptyStateFooter>
     </EmptyState>
   );
 };

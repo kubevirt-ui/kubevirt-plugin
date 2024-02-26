@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 import classNames from 'classnames';
 
 import { TemplateParameter } from '@kubevirt-ui/kubevirt-api/console';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/icons';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 type FieldGroupProps = {
@@ -29,23 +29,22 @@ export const FieldGroup: FC<FieldGroupProps> = ({ className, field, onChange, sh
     <FormGroup
       className={classNames('field-group', className)}
       fieldId={fieldId}
-      helperText={description}
-      helperTextInvalid={t('This field is required')}
-      helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
       isRequired={required}
       label={displayName || name}
-      validated={validated}
     >
       <TextInput
         data-test-id={fieldId}
         id={fieldId}
         isRequired={required}
         name={name}
-        onChange={onFieldChange}
+        onChange={(_event, newValue: string) => onFieldChange(newValue)}
         type="text"
         validated={validated}
         value={value}
       />
+      <FormGroupHelperText validated={validated}>
+        {showError && !value ? t('This field is required') : description}
+      </FormGroupHelperText>
     </FormGroup>
   );
 };

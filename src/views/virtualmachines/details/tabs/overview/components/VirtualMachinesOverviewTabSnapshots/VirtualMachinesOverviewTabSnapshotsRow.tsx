@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
+import classnames from 'classnames';
 
 import {
   V1alpha1VirtualMachineSnapshot,
@@ -6,16 +7,16 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
+import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DescriptionList,
-  DescriptionListDescription,
-  DescriptionListTerm,
   DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
   Dropdown,
   DropdownItem,
-  KebabToggle,
+  DropdownList,
   Popover,
   PopoverPosition,
 } from '@patternfly/react-core';
@@ -34,28 +35,13 @@ type VirtualMachinesOverviewTabSnapshotsRowProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachinesOverviewTabSnapshotsRow: React.FC<
-  VirtualMachinesOverviewTabSnapshotsRowProps
-> = ({ snapshot, vm }) => {
+const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnapshotsRowProps> = ({
+  snapshot,
+  vm,
+}) => {
   const { t } = useKubevirtTranslation();
-  const [isKebabOpen, setIsKebabOpen] = React.useState(false);
+  const [isKebabOpen, setIsKebabOpen] = useState(false);
   const { createModal } = useModal();
-
-  const dropdownItems = [
-    <DropdownItem
-      isDisabled={vm?.status?.printableStatus !== printableVMStatus.Stopped}
-      key="restore"
-      onClick={() => createModal((props) => <RestoreModal snapshot={snapshot} {...props} />)}
-    >
-      {t('Restore')}
-    </DropdownItem>,
-    <DropdownItem
-      key="delete"
-      onClick={() => createModal((props) => <SnapshotDeleteModal snapshot={snapshot} {...props} />)}
-    >
-      {t('Delete')}
-    </DropdownItem>,
-  ];
 
   const timestamp = timestampFor(
     new Date(snapshot?.metadata?.creationTimestamp),
@@ -65,31 +51,41 @@ const VirtualMachinesOverviewTabSnapshotsRow: React.FC<
 
   const Icon = icon[snapshot?.status?.phase];
 
+  const onToggle = () => setIsKebabOpen((prevIsOpen) => !prevIsOpen);
+
   return (
     <div className="VirtualMachinesOverviewTabSnapshotsRow--main">
       <div className="name">
         <Icon />
-        <DescriptionListTermHelpText>
+        <DescriptionListTermHelpText className="pf-c-description-list__term">
           <Popover
             bodyContent={
-              <DescriptionList columnModifier={{ default: '2Col' }} isHorizontal>
-                <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
-                <DescriptionListDescription>
-                  <Icon />
-                  <span className="icon-spacer">{snapshot?.status?.phase}</span>
-                </DescriptionListDescription>
-                <DescriptionListTerm>{t('Created')}</DescriptionListTerm>
-                <DescriptionListDescription>{timestamp}</DescriptionListDescription>
-                <DescriptionListTerm>{t('Indications')}</DescriptionListTerm>
-                <DescriptionListDescription>
-                  <IndicationLabelList snapshot={snapshot} />
-                </DescriptionListDescription>
+              <DescriptionList className="pf-c-description-list" isHorizontal>
+                <VirtualMachineDescriptionItem
+                  descriptionData={
+                    <>
+                      <Icon />
+                      <span className="icon-spacer">{snapshot?.status?.phase}</span>
+                    </>
+                  }
+                  descriptionHeader={t('Status')}
+                />
+                <VirtualMachineDescriptionItem
+                  descriptionData={timestamp}
+                  descriptionHeader={t('Created')}
+                />
+                <VirtualMachineDescriptionItem
+                  descriptionData={<IndicationLabelList snapshot={snapshot} />}
+                  descriptionHeader={t('Indications')}
+                />
               </DescriptionList>
             }
             headerContent={snapshot?.metadata?.name}
             position={PopoverPosition.left}
           >
-            <DescriptionListTermHelpTextButton className="icon-spacer__offset">
+            <DescriptionListTermHelpTextButton
+              className={classnames('pf-c-description-list__text', 'icon-spacer__offset')}
+            >
               {snapshot?.metadata?.name}
             </DescriptionListTermHelpTextButton>
           </Popover>
@@ -97,13 +93,30 @@ const VirtualMachinesOverviewTabSnapshotsRow: React.FC<
         <span className="text-muted timestamp">{`(${timestamp})`}</span>
       </div>
       <Dropdown
-        dropdownItems={dropdownItems}
         isOpen={isKebabOpen}
-        isPlain
+        onOpenChange={(open: boolean) => setIsKebabOpen(open)}
         onSelect={() => setIsKebabOpen(false)}
-        position="right"
-        toggle={<KebabToggle onToggle={(isOpen) => setIsKebabOpen(isOpen)} />}
-      />
+        popperProps={{ position: 'right' }}
+        toggle={KebabToggle({ isExpanded: isKebabOpen, onClick: onToggle })}
+      >
+        <DropdownList>
+          <DropdownItem
+            isDisabled={vm?.status?.printableStatus !== printableVMStatus.Stopped}
+            key="restore"
+            onClick={() => createModal((props) => <RestoreModal snapshot={snapshot} {...props} />)}
+          >
+            {t('Restore')}
+          </DropdownItem>
+          <DropdownItem
+            onClick={() =>
+              createModal((props) => <SnapshotDeleteModal snapshot={snapshot} {...props} />)
+            }
+            key="delete"
+          >
+            {t('Delete')}
+          </DropdownItem>
+        </DropdownList>
+      </Dropdown>
     </div>
   );
 };

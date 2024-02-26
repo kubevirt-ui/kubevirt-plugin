@@ -1,23 +1,23 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { EmptyState, EmptyStateIcon, Title, TitleSizes } from '@patternfly/react-core';
+import { EmptyState, EmptyStateHeader, EmptyStateIcon } from '@patternfly/react-core';
 import { VirtualMachineIcon } from '@patternfly/react-icons';
 
 type EmptyStateNoVMsProps = {
   className?: string;
-  titleSize: TitleSizes;
 };
 
-const EmptyStateNoVMs: React.FC<EmptyStateNoVMsProps> = ({ className, titleSize }) => {
+const EmptyStateNoVMs: FC<EmptyStateNoVMsProps> = ({ className }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <EmptyState className={className}>
-      <EmptyStateIcon icon={VirtualMachineIcon} />
-      <Title headingLevel="h4" size={titleSize}>
-        {t('No VirtualMachines found')}
-      </Title>
+      <EmptyStateHeader
+        headingLevel="h4"
+        icon={<EmptyStateIcon icon={VirtualMachineIcon} />}
+        titleText={<>{t('No VirtualMachines found')}</>}
+      />
     </EmptyState>
   );
 };

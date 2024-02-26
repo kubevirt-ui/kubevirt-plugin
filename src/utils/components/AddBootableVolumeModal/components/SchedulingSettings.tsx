@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, NumberInput, Text, TextInput, Title } from '@patternfly/react-core';
 
@@ -22,9 +23,6 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
   return (
     <>
       <FormGroup
-        helperText={t(
-          'Specify the number of revisions that should be retained. A value of X means that the X latest versions will be kept.',
-        )}
         fieldId="volume-registry-retain-revisions"
         isRequired
         label={t('Retain revisions')}
@@ -41,8 +39,12 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
           plusBtnAriaLabel={t('Increment')}
           value={retainRevisions}
         />
+        <FormGroupHelperText>
+          {t(
+            'Specify the number of revisions that should be retained. A value of X means that the X latest versions will be kept.',
+          )}
+        </FormGroupHelperText>
       </FormGroup>
-
       <div>
         <Title headingLevel="h2" size="md">
           {t('Scheduling settings')}
@@ -57,17 +59,17 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
       </div>
       <FormGroup
         fieldId="volume-registry-retain-cron-expression"
-        helperText={t('Example (At 00:00 on Tuesday): 0 0 * * 2.')}
         isRequired
         label={t('Cron expression')}
       >
         <TextInput
           data-test-id="volume-registry-retain-cron-expression"
           id="volume-registry-retain-cron-expression"
-          onChange={setBootableVolumeField('cronExpression')}
+          onChange={(_, value: string) => setBootableVolumeField('cronExpression')(value)}
           type="text"
           value={cronExpression}
         />
+        <FormGroupHelperText>{t('Example (At 00:00 on Tuesday): 0 0 * * 2.')}</FormGroupHelperText>
       </FormGroup>
     </>
   );

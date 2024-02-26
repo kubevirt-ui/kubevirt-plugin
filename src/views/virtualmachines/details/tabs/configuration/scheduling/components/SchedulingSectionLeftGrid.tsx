@@ -50,7 +50,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
 
   return (
     <GridItem span={5}>
-      <DescriptionList>
+      <DescriptionList className="pf-c-description-list">
         <VirtualMachineDescriptionItem
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (

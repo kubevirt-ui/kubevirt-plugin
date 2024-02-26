@@ -73,7 +73,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
               id="persistent-reservation-section"
               isChecked={persistentReservation}
               isDisabled={isLoading}
-              onChange={onChange}
+              onChange={(_, checked: boolean) => onChange(checked)}
             />
           </SplitItem>
         )}

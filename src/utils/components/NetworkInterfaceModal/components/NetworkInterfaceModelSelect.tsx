@@ -1,7 +1,8 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
 
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import { interfaceModelType } from '../utils/constants';
 
@@ -15,7 +16,6 @@ const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
   setInterfaceModel,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = useState(false);
 
   const interfaceModelOptions = {
     e1000e: {
@@ -34,22 +34,19 @@ const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
     },
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
+  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string) => {
     event.preventDefault();
     setInterfaceModel(value);
-    setIsOpen(false);
   };
 
   return (
     <FormGroup fieldId="model" label={t('Model')}>
       <div data-test-id="model-select">
-        <Select
-          isOpen={isOpen}
-          menuAppendTo="parent"
+        <FormPFSelect
           onSelect={handleChange}
-          onToggle={setIsOpen}
-          selections={interfaceModel}
-          variant={SelectVariant.single}
+          selected={interfaceModel}
+          selectedLabel={interfaceModelOptions[interfaceModel].name}
+          toggleProps={{ isFullWidth: true }}
         >
           {Object.values(interfaceModelOptions)?.map(({ description, id, name }) => (
             <SelectOption
@@ -61,7 +58,7 @@ const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
               {name}
             </SelectOption>
           ))}
-        </Select>
+        </FormPFSelect>
       </div>
     </FormGroup>
   );

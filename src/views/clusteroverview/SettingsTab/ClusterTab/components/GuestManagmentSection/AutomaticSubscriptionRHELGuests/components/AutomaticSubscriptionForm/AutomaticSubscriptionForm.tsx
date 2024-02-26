@@ -58,7 +58,7 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
         >
           <Grid hasGutter>
             <GridItem span={7}>
-              <TextInput onChange={setActivationKey} value={activationKey} />
+              <TextInput onChange={(_event, val) => setActivationKey(val)} value={activationKey} />
             </GridItem>
             <GridItem span={5}>
               <Button
@@ -79,7 +79,10 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
         >
           <Grid hasGutter>
             <GridItem span={7}>
-              <TextInput onChange={setOrganizationID} value={organizationID} />
+              <TextInput
+                onChange={(_event, val) => setOrganizationID(val)}
+                value={organizationID}
+              />
             </GridItem>
           </Grid>
         </FormGroup>

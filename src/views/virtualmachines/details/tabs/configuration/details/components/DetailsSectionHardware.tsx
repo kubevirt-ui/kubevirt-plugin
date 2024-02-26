@@ -72,14 +72,14 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({ vm, vmi }) =>
     <ExpandableSection
       toggleContent={
         <SearchItem id="hardware-devices">
-          {t('Hardware devices ({{count}})', {
-            count: gpus?.length + hostDevices?.length || 0,
+          {t('Hardware devices ({{devices}})', {
+            devices: gpus?.length + hostDevices?.length || 0,
           })}
         </SearchItem>
       }
       isExpanded={isExpanded}
       isIndented
-      onToggle={setIsExpanded}
+      onToggle={(_event, val) => setIsExpanded(val)}
     >
       <Grid>
         <GridItem span={4}>

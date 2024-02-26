@@ -31,7 +31,7 @@ const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
         <SearchItem id="metadata">{t('Metadata')}</SearchItem>
       </Title>
       <Grid span={6}>
-        <DescriptionList>
+        <DescriptionList className="pf-c-description-list">
           <VirtualMachineDescriptionItem
             bodyContent={t(
               'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ',

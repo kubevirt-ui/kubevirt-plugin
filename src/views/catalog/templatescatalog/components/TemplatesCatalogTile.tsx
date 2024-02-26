@@ -44,17 +44,13 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [template?.metadata?.annotations?.iconClass]);
 
+    const iconSize = isBootSourceAvailable ? '40%' : '20%';
     return (
       <CatalogTile
         badges={
           bootSourcesLoaded
             ? isBootSourceAvailable && [<Badge key="available-boot">{t('Source available')}</Badge>]
             : [<Skeleton className="badgeload" height="18px" key="loading-sources" width="105px" />]
-        }
-        icon={
-          <div>
-            <img alt="os-icon" src={icon} />
-          </div>
         }
         title={
           <Stack>
@@ -66,6 +62,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
         }
         className="vm-catalog-grid-tile"
         data-test-id={template.metadata.name}
+        icon={<img alt="os-icon" height={iconSize} src={icon} width={iconSize} />}
         onClick={() => onClick(template)}
       >
         <Stack hasGutter>

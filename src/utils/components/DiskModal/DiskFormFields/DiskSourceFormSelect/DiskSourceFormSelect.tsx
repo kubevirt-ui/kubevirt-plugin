@@ -1,6 +1,7 @@
-import React, { ChangeEvent, Dispatch, FC, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, FC, MouseEvent, useEffect, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -9,7 +10,7 @@ import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { hasSizeUnit as getOSNameWithoutVersionNumber } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { appendDockerPrefix, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
+import { FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
 
 import {
   diskReducerActions,
@@ -19,7 +20,7 @@ import {
 } from '../../state/actions';
 import { DEFAULT_DISK_SIZE, DiskFormState, DiskSourceState } from '../../state/initialState';
 import { DYNAMIC, OTHER, sourceTypes } from '../utils/constants';
-import { getSourceOptions } from '../utils/helpers';
+import { getSourceOptions, sourceOptionTitles } from '../utils/helpers';
 
 import DiskSourceContainer from './components/DiskSourceContainer';
 import DiskSourceDataSourceSelect from './components/DiskSourceDataSourceSelect';
@@ -51,7 +52,6 @@ const DiskSourceFormSelect: FC<DiskSourceFormSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const { diskSize, diskSource, diskType } = diskState || {};
   const isCDROMType = diskType === diskTypes.cdrom;
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const {
     dataSourceName,
     dataSourceNamespace,
@@ -69,14 +69,13 @@ const DiskSourceFormSelect: FC<DiskSourceFormSelectProps> = ({
 
   const sourceOptions = useMemo(() => getSourceOptions(isTemplate), [isTemplate]);
 
-  const onSelect = (event: ChangeEvent<HTMLSelectElement>, value: string) => {
+  const onSelect = (event: MouseEvent<HTMLSelectElement>, value: string) => {
     event.preventDefault();
 
     if (diskSize === DYNAMIC && value !== sourceTypes.EPHEMERAL)
       dispatchDiskState({ payload: DEFAULT_DISK_SIZE, type: diskReducerActions.SET_DISK_SIZE });
 
     dispatchDiskState({ payload: value, type: diskReducerActions.SET_DISK_SOURCE });
-    setIsOpen(false);
   };
 
   useEffect(() => {
@@ -86,38 +85,37 @@ const DiskSourceFormSelect: FC<DiskSourceFormSelectProps> = ({
       dispatchDiskState({ payload: sourceTypes.HTTP, type: diskReducerActions.SET_DISK_SOURCE });
     }
   }, [dispatchDiskState, isCDROMType, diskSource]);
+
   return (
     <>
       <FormGroup fieldId="disk-source" isRequired label={t('Source')}>
         <div data-test-id="disk-source-select">
-          <Select
-            data-test-id="disk-source-select"
-            isDisabled={diskSource === OTHER}
-            isOpen={isOpen}
-            menuAppendTo="parent"
+          <FormPFSelect
             onSelect={onSelect}
-            onToggle={setIsOpen}
-            selections={diskSource}
-            variant={SelectVariant.single}
+            selected={diskSource}
+            selectedLabel={sourceOptionTitles[diskSource]}
+            toggleProps={{ isDisabled: diskSource === OTHER, isFullWidth: true }}
           >
-            {sourceOptions.map(({ description, id, name }) => {
-              const isDisabled =
-                (isVMRunning && id === sourceTypes.EPHEMERAL) ||
-                (isCDROMType && id === sourceTypes.BLANK) ||
-                (isTemplate && id === sourceTypes.UPLOAD);
-              return (
-                <SelectOption
-                  data-test-id={`disk-source-select-${id}`}
-                  description={description}
-                  isDisabled={isDisabled}
-                  key={id}
-                  value={id}
-                >
-                  {name}
-                </SelectOption>
-              );
-            })}
-          </Select>
+            <SelectList>
+              {sourceOptions.map(({ description, id, name }) => {
+                const isDisabled =
+                  (isVMRunning && id === sourceTypes.EPHEMERAL) ||
+                  (isCDROMType && id === sourceTypes.BLANK) ||
+                  (isTemplate && id === sourceTypes.UPLOAD);
+                return (
+                  <SelectOption
+                    data-test-id={`disk-source-select-${id}`}
+                    description={description}
+                    isDisabled={isDisabled}
+                    key={id}
+                    value={id}
+                  >
+                    {name}
+                  </SelectOption>
+                );
+              })}
+            </SelectList>
+          </FormPFSelect>
         </div>
       </FormGroup>
       {diskSource === sourceTypes.HTTP && (

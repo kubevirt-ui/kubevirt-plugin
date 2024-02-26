@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -17,19 +17,13 @@ type DeschedulerModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DeschedulerModal: React.FC<DeschedulerModalProps> = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  vm,
-  vmi,
-}) => {
+const DeschedulerModal: FC<DeschedulerModalProps> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [checked, setChecked] = React.useState<boolean>(
+  const [checked, setChecked] = useState<boolean>(
     vm?.spec?.template?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL] === 'true',
   );
 
-  const updatedVirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, 'spec.template.metadata.annotations');
       if (!vmDraft.spec.template.metadata.annotations)
@@ -59,7 +53,7 @@ const DeschedulerModal: React.FC<DeschedulerModalProps> = ({
             id="descheduler"
             isChecked={checked}
             label={t('Enable Descheduler')}
-            onChange={setChecked}
+            onChange={(_, check: boolean) => setChecked(check)}
           />
         </FormGroup>
         {checked && (

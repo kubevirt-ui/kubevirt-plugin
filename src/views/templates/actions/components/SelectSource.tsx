@@ -3,6 +3,7 @@ import React, { FC, ReactNode } from 'react';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
@@ -113,13 +114,6 @@ export const SelectSource: FC<SelectSourceProps> = ({
 
       {selectedSourceType === SOURCE_TYPES.registrySource && (
         <FormGroup
-          helperText={
-            <>
-              {t('Example: {{exampleURL}}', {
-                exampleURL: 'quay.io/containerdisks/fedora:latest',
-              })}
-            </>
-          }
           className="disk-source-form-group"
           fieldId={`disk-source-required-${selectedSourceType}`}
           isRequired
@@ -127,10 +121,15 @@ export const SelectSource: FC<SelectSourceProps> = ({
         >
           <TextInput
             aria-label={t('Container Image')}
-            onChange={onContainerChange}
+            onChange={(_event, newContainerURL) => onContainerChange(newContainerURL)}
             type="text"
             value={containerImage}
           />
+          <FormGroupHelperText>
+            {t('Example: {{exampleURL}}', {
+              exampleURL: 'quay.io/containerdisks/fedora:latest',
+            })}
+          </FormGroupHelperText>
         </FormGroup>
       )}
 
@@ -138,17 +137,17 @@ export const SelectSource: FC<SelectSourceProps> = ({
         <FormGroup
           className="disk-source-form-group"
           fieldId={`disk-source-required-${selectedSourceType}`}
-          helperText={httpSourceHelperText}
           isRequired
           label={t('Image URL')}
         >
           <TextInput
             aria-label={t('Image URL')}
-            onChange={onURLChange}
+            onChange={(_event, newUrl) => onURLChange(newUrl)}
             type="text"
             validated={!httpURL ? ValidatedOptions.error : ValidatedOptions.default}
             value={httpURL}
           />
+          <FormGroupHelperText>{httpSourceHelperText}</FormGroupHelperText>
         </FormGroup>
       )}
 

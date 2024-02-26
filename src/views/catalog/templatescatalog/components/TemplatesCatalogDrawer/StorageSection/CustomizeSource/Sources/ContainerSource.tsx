@@ -1,9 +1,9 @@
 import React, { FC, FormEventHandler } from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
 type ContainerSourceProps = {
@@ -25,30 +25,31 @@ const ContainerSource: FC<ContainerSourceProps> = ({
     register,
   } = useFormContext();
 
+  const validated = errors?.[`${testId}-containerImage`]
+    ? ValidatedOptions.error
+    : ValidatedOptions.default;
+
   return (
     <FormGroup
-      validated={
-        errors?.[`${testId}-containerImage`] ? ValidatedOptions.error : ValidatedOptions.default
-      }
       className="disk-source-form-group"
       fieldId={`${testId}-${selectedSourceType}`}
-      helperText={registrySourceHelperText}
-      helperTextInvalid={t('This field is required')}
-      helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
       isRequired
       label={t('Container Image')}
     >
       <FormTextInput
         {...register(`${testId}-containerImage`, { required: true })}
-        validated={
-          errors?.[`${testId}-containerImage`] ? ValidatedOptions.error : ValidatedOptions.default
-        }
         aria-label={t('Container Image')}
         data-test-id={`${testId}-container-source-input`}
         id={`${testId}-${selectedSourceType}`}
         onChange={onInputValueChange}
         type="text"
+        validated={validated}
       />
+      <FormGroupHelperText validated={validated}>
+        {errors?.[`${testId}-containerImage`]
+          ? t('This field is required')
+          : registrySourceHelperText}
+      </FormGroupHelperText>
     </FormGroup>
   );
 };

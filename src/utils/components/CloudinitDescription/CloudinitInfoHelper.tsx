@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Stack, StackItem } from '@patternfly/react-core';
-import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
+import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 
 const CLOUD_INIT_DOC_LINK = 'https://cloudinit.readthedocs.io/en/latest/index.html';
 
@@ -22,7 +22,7 @@ const CloudInitInfoHelper = () => {
             icon={<ExternalLinkSquareAltIcon />}
             iconPosition="right"
             isInline
-            isSmall
+            size="sm"
             variant="link"
           >
             <a href={CLOUD_INIT_DOC_LINK} rel="noopener noreferrer" target="_blank">

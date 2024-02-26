@@ -12,22 +12,14 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { AUTOUNATTEND, UNATTEND } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/SysprepDescription';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Button,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  DescriptionListTermHelpText,
-  Flex,
-  FlexItem,
-  Title,
-} from '@patternfly/react-core';
+import { Button, Flex, FlexItem, Title } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
@@ -91,51 +83,49 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
   };
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTerm>
-        <DescriptionListTermHelpText>
-          <Flex className="vm-description-item__title">
-            <FlexItem>
-              <Title headingLevel="h2">
-                {t('Sysprep')} {<WindowsLabel />}
-              </Title>
-            </FlexItem>
-            <FlexItem>
-              <Button
-                onClick={() =>
-                  createModal((modalProps) => (
-                    <SysprepModal
-                      {...modalProps}
-                      autoUnattend={autoUnattend}
-                      namespace={vm?.metadata?.namespace || DEFAULT_NAMESPACE}
-                      onSysprepCreation={onSysprepCreation}
-                      onSysprepSelected={onSysprepSelected}
-                      sysprepSelected={externalSysprepSelected}
-                      unattend={unattend}
-                    />
-                  ))
-                }
-                isDisabled={!isTemplateEditable}
-                isInline
-                type="button"
-                variant="link"
-              >
-                {t('Edit')}
-                <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-              </Button>
-            </FlexItem>
-          </Flex>
-        </DescriptionListTermHelpText>
-      </DescriptionListTerm>
-      <DescriptionListDescription>
+    <VirtualMachineDescriptionItem
+      descriptionData={
         <SysprepDescription
           error={sysprepLoadError}
           hasAutoUnattend={!!autoUnattend}
           hasUnattend={!!unattend}
           loaded={sysprepLoaded}
         />
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+      }
+      descriptionHeader={
+        <Flex className="vm-description-item__title">
+          <FlexItem>
+            <Title headingLevel="h2">
+              {t('Sysprep')} {<WindowsLabel />}
+            </Title>
+          </FlexItem>
+          <FlexItem>
+            <Button
+              onClick={() =>
+                createModal((modalProps) => (
+                  <SysprepModal
+                    {...modalProps}
+                    autoUnattend={autoUnattend}
+                    namespace={vm?.metadata?.namespace || DEFAULT_NAMESPACE}
+                    onSysprepCreation={onSysprepCreation}
+                    onSysprepSelected={onSysprepSelected}
+                    sysprepSelected={externalSysprepSelected}
+                    unattend={unattend}
+                  />
+                ))
+              }
+              isDisabled={!isTemplateEditable}
+              isInline
+              type="button"
+              variant="link"
+            >
+              {t('Edit')}
+              <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+            </Button>
+          </FlexItem>
+        </Flex>
+      }
+    />
   );
 };
 

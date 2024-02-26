@@ -1,6 +1,6 @@
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { SelectOptionObject } from '@patternfly/react-core';
+import { SelectOptionObject } from '@patternfly/react-core/deprecated';
 
 import { EnvironmentKind, EnvironmentVariable } from './constants';
 

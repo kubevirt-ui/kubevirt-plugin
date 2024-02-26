@@ -1,24 +1,16 @@
-import React, {
-  ChangeEvent,
-  Dispatch,
-  FC,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, Select, SelectVariant } from '@patternfly/react-core';
+import { FormGroup } from '@patternfly/react-core';
 
-import { FilterSCSelect, getSCSelectOptions } from '../utils/Filters';
-import { getDefaultStorageClass } from '../utils/helpers';
+import { getDefaultStorageClass, getSCSelectOptions } from '../utils/helpers';
 
 import { AlertedStorageClassSelectProps } from './AlertedStorageClassSelect';
 
@@ -34,7 +26,6 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
   storageClass,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const [storageClasses, loaded] = useK8sWatchResource<IoK8sApiStorageV1StorageClass[]>({
     groupVersionKind: modelToGroupVersionKind(StorageClassModel),
@@ -44,12 +35,11 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
   const defaultSC = useMemo(() => getDefaultStorageClass(storageClasses), [storageClasses]);
 
   const onSelect = useCallback(
-    (event: ChangeEvent<Element>, selection: string) => {
+    (selection: string) => {
       setShowSCAlert(checkSC ? checkSC(selection) : false);
       setStorageClassName(selection);
-      setIsOpen(false);
       setStorageClassProvisioner?.(
-        (storageClasses || []).find((sc) => sc?.metadata?.name === selection)?.provisioner,
+        (storageClasses || []).find((sc) => getName(sc) === selection)?.provisioner,
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,20 +58,16 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
       <FormGroup fieldId="storage-class" label={t('StorageClass')}>
         <div data-test-id="storage-class-select">
           {loaded ? (
-            <Select
-              hasInlineFilter
-              isOpen={isOpen}
-              maxHeight={200}
-              menuAppendTo="parent"
-              onFilter={FilterSCSelect(storageClasses)}
-              onSelect={onSelect}
-              onToggle={setIsOpen}
-              placeholderText={t('Select StorageClass')}
-              selections={storageClass}
-              variant={SelectVariant.single}
-            >
-              {getSCSelectOptions(storageClasses)}
-            </Select>
+            <FilterSelect
+              toggleProps={{
+                isFullWidth: true,
+                placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
+              }}
+              options={getSCSelectOptions(storageClasses)}
+              popperProps={{ enableFlip: true }}
+              selected={storageClass}
+              setSelected={onSelect}
+            />
           ) : (
             <Loading />
           )}

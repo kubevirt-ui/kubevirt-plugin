@@ -81,7 +81,7 @@ const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
               }
               id="delete-pvc-checkbox"
               isChecked={deletePVC}
-              onChange={setDeletePVC}
+              onChange={(_event, val) => setDeletePVC(val)}
             />
           </StackItem>
         )}

@@ -1,29 +1,46 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
-import { Select, SelectProps } from '@patternfly/react-core';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { MenuToggleProps, Select, SelectProps } from '@patternfly/react-core';
 
-type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'onToggle'> & {
+import SelectToggle from '../toggles/SelectToggle';
+
+type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'toggle'> & {
   closeOnSelect?: boolean;
+  selectedLabel?: any;
+  toggleProps?: MenuToggleProps;
 };
 
-const FormPFSelect: React.FC<FormPFSelectProps> = ({
+const FormPFSelect: FC<FormPFSelectProps> = ({
   children,
+  className,
   closeOnSelect = true,
-  menuAppendTo = 'parent',
   onSelect,
+  selected,
+  selectedLabel,
+  toggleProps,
   ...props
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
 
   return (
     <Select
-      onSelect={(e, v, i) => {
-        onSelect(e, v, i);
+      onSelect={(event, value) => {
+        onSelect && onSelect(event, value);
         closeOnSelect && setIsOpen(false);
       }}
+      toggle={SelectToggle({
+        className,
+        isExpanded: isOpen,
+        onClick: onToggle,
+        selected: !isEmpty(selectedLabel) ? selectedLabel : selected,
+        ...toggleProps,
+      })}
       isOpen={isOpen}
-      menuAppendTo={menuAppendTo}
-      onToggle={(isExpanded) => setIsOpen(isExpanded)}
+      onOpenChange={(open: boolean) => setIsOpen(open)}
+      selected={selected}
       {...props}
     >
       {children}

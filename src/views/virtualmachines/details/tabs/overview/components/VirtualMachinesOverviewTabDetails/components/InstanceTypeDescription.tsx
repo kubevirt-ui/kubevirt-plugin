@@ -7,16 +7,12 @@ import {
 import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInstanceTypeModelFromMatcher } from '@kubevirt-utils/resources/instancetype/helper';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getPreferenceMatcher } from '@kubevirt-utils/resources/vm';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
 
 type InstanceTypeDescriptionProps = {
   vm: V1VirtualMachine;
@@ -33,10 +29,9 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
 
   return (
     <>
-      <DescriptionListGroup>
-        <DescriptionListTerm>{t('InstanceType')}</DescriptionListTerm>
-        <DescriptionListDescription data-test-id="virtual-machine-overview-details-instance-type">
-          {itMatcher ? (
+      <VirtualMachineDescriptionItem
+        descriptionData={
+          itMatcher ? (
             <ResourceLink
               groupVersionKind={modelToGroupVersionKind(itModel)}
               name={itMatcher.name}
@@ -44,23 +39,25 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
             />
           ) : (
             None
-          )}
-        </DescriptionListDescription>
-      </DescriptionListGroup>
-
-      <DescriptionListGroup>
-        <DescriptionListTerm>{t('Preference')}</DescriptionListTerm>
-        <DescriptionListDescription data-test-id="virtual-machine-overview-details-preference">
-          {preferenceMatcher ? (
+          )
+        }
+        data-test-id="virtual-machine-overview-details-instance-type"
+        descriptionHeader={t('InstanceType')}
+      />
+      <VirtualMachineDescriptionItem
+        descriptionData={
+          preferenceMatcher ? (
             <ResourceLink
               groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
               name={preferenceMatcher.name}
             />
           ) : (
             None
-          )}
-        </DescriptionListDescription>
-      </DescriptionListGroup>
+          )
+        }
+        data-test-id="virtual-machine-overview-details-preference"
+        descriptionHeader={t('Preference')}
+      />
     </>
   );
 };

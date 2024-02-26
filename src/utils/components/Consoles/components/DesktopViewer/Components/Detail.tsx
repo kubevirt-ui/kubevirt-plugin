@@ -1,18 +1,11 @@
-import React from 'react';
+import React, { FC } from 'react';
 
-import {
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-} from '@patternfly/react-core';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 import { DetailProps } from '../utils/types';
 
-const Detail: React.FC<DetailProps> = ({ title, value }: DetailProps) => (
-  <DescriptionListGroup>
-    <DescriptionListTerm>{title}</DescriptionListTerm>
-    <DescriptionListDescription>{value}</DescriptionListDescription>
-  </DescriptionListGroup>
+const Detail: FC<DetailProps> = ({ title, value }: DetailProps) => (
+  <VirtualMachineDescriptionItem descriptionData={value} descriptionHeader={title} />
 );
 
 export default Detail;

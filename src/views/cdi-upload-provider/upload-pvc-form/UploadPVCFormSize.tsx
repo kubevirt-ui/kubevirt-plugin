@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { MouseEvent, ReactEventHandler, useState } from 'react';
 
+import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Dropdown, DropdownItem, DropdownToggle, NumberInput } from '@patternfly/react-core';
+import { Dropdown, DropdownItem, DropdownList, NumberInput } from '@patternfly/react-core';
 
 import { dropdownUnits } from '../utils/consts';
 
@@ -19,7 +20,7 @@ const UploadPVCFormSize = ({
     setRequestSizeUnit(obj?.unit);
   };
 
-  const onValueChange: React.ReactEventHandler<HTMLInputElement> = (event) => {
+  const onValueChange: ReactEventHandler<HTMLInputElement> = (event) => {
     handleRequestSizeInputChange({
       unit: requestSizeUnit,
       value: Number(event?.currentTarget?.value),
@@ -32,10 +33,10 @@ const UploadPVCFormSize = ({
     handleRequestSizeInputChange({ unit: requestSizeUnit, value: newValue });
   };
 
-  const onUnitChange = (newUnit: React.ChangeEvent<HTMLInputElement>) => {
+  const onUnitChange = (event: MouseEvent<HTMLInputElement>, value: string) => {
     setIsOpen((open) => !open);
     handleRequestSizeInputChange({
-      unit: newUnit?.target?.innerHTML?.slice(0, -1),
+      unit: value,
       value: requestSizeValue,
     });
   };
@@ -61,22 +62,21 @@ const UploadPVCFormSize = ({
           />
         </div>
         <Dropdown
-          dropdownItems={Object.values(dropdownUnits)?.map((unit) => (
-            <DropdownItem key={unit}>{unit}</DropdownItem>
-          ))}
-          toggle={
-            <DropdownToggle
-              id="pf-c-console__actions-vnc-toggle-id"
-              onToggle={() => setIsOpen(!isOpen)}
-            >
-              {dropdownUnits?.[requestSizeUnit]}
-            </DropdownToggle>
-          }
+          toggle={DropdownToggle({
+            id: 'pf-c-console__actions-vnc-toggle-id',
+            onClick: () => setIsOpen((prevIsOpen) => !prevIsOpen),
+          })}
           className="request-size-input__unit"
           isOpen={isOpen}
-          name={`requestSizeValueUnit`}
+          onOpenChange={(open: boolean) => setIsOpen(open)}
           onSelect={onUnitChange}
-        />
+        >
+          <DropdownList>
+            {Object.values(dropdownUnits)?.map((unit) => (
+              <DropdownItem key={unit}>{unit}</DropdownItem>
+            ))}
+          </DropdownList>
+        </Dropdown>
       </div>
 
       <p className="help-block" id="request-size-help">

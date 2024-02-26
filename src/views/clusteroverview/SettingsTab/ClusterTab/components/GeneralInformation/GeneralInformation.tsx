@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { OverviewDetailItem } from '@openshift-console/plugin-shared';
@@ -8,13 +9,7 @@ import {
   Alert,
   AlertVariant,
   DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTermHelpText,
-  DescriptionListTermHelpTextButton,
   Divider,
-  Popover,
-  PopoverPosition,
   Skeleton,
   Split,
   SplitItem,
@@ -66,26 +61,19 @@ const GeneralInformation: FC<GeneralInformationProps> = ({
       </SplitItem>
       <Divider orientation={{ default: 'vertical' }} />
       <SplitItem>
-        <DescriptionList>
-          <DescriptionListGroup>
-            <DescriptionListTermHelpText>
-              <Popover
-                bodyContent={t('The channel to track and receive the updates from.')}
-                position={PopoverPosition.right}
-              >
-                <DescriptionListTermHelpTextButton>
-                  {t('Channel')}
-                </DescriptionListTermHelpTextButton>
-              </Popover>
-            </DescriptionListTermHelpText>
-            <DescriptionListDescription>
-              {loaded ? (
+        <DescriptionList className="pf-c-description-list">
+          <VirtualMachineDescriptionItem
+            descriptionData={
+              loaded ? (
                 <ExternalLink href={operatorLink}>{updateChannel}</ExternalLink>
               ) : (
                 <Skeleton />
-              )}
-            </DescriptionListDescription>
-          </DescriptionListGroup>
+              )
+            }
+            bodyContent={t('The channel to track and receive the updates from.')}
+            descriptionHeader={t('Channel')}
+            isPopover
+          />
         </DescriptionList>
       </SplitItem>
       {!isEmpty(loadErrors) && loaded && (

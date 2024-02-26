@@ -1,5 +1,4 @@
-@import '~@patternfly/patternfly/sass-utilities/colors';
-$BORDER: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
+$BORDER: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--100);
 
 .kv-monitoring-card {
   &__body {

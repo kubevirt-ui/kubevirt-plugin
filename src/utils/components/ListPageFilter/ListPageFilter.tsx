@@ -10,9 +10,7 @@ import {
   RowFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  Select,
   SelectOption,
-  SelectVariant,
   Toolbar,
   ToolbarContent,
   ToolbarFilter,
@@ -22,6 +20,7 @@ import {
 import { FilterIcon } from '@patternfly/react-icons';
 
 import ColumnManagement from '../ColumnManagementModal/ColumnManagement';
+import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
 import useListPageFiltersMethods from './hooks/useListPageFiltersMethods';
 import { useRowFiltersParameters } from './hooks/useRowFiltersParametersType';
@@ -71,9 +70,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-
-  const toolbarFilters = rowFilters?.filter((filter) => 'items' in filter);
+  const toolbarFilters = rowFilters.filter((filter) => 'items' in filter);
 
   // Generate rowFilter items and counts. Memoize to minimize re-renders.
   const generatedRowFilters = useDeepCompareMemoize(generateRowFilters(toolbarFilters ?? [], data));
@@ -111,10 +108,9 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
     getInitialSearchText(textFilters, searchType),
   );
 
-  const onSelect = (event, value) => {
+  const onSelect = (_, value: string) => {
     setSearchInputText(getInitialSearchText(textFilters, value));
     setSearchType(value);
-    setIsDropdownOpen(false);
   };
 
   const applyFilters = (type: string, input: FilterValue) => onFilterChange?.(type, input);
@@ -190,25 +186,20 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                 >
                   <div className="pf-c-input-group co-filter-group">
                     {filterDropdownKeys.length > 1 && (
-                      <Select
-                        placeholderText={
-                          <span>
-                            <FilterIcon className="span--icon__right-margin" />
-                            {t('Filter')}
-                          </span>
-                        }
-                        isOpen={isDropdownOpen}
+                      <FormPFSelect
+                        toggleProps={{
+                          icon: <FilterIcon className="span--icon__right-margin" />,
+                          placeholder: t('Filter'),
+                        }}
                         onSelect={onSelect}
-                        onToggle={setIsDropdownOpen}
-                        selections={selectedSearchFilter?.filterGroupName || searchType}
-                        variant={SelectVariant.single}
+                        selected={selectedSearchFilter?.filterGroupName || searchType}
                       >
                         {filterDropdownKeys.map((key) => (
                           <SelectOption key={key} value={key}>
                             {filterDropdownItems?.[key]}
                           </SelectOption>
                         ))}
-                      </Select>
+                      </FormPFSelect>
                     )}
 
                     {searchType === STATIC_SEARCH_FILTERS.labels ? (
@@ -229,7 +220,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                       />
                     ) : (
                       <SearchFilter
-                        onChange={(newSearchInput: string) => {
+                        onChange={(_, newSearchInput: string) => {
                           setSearchInputText(newSearchInput);
                           applyTextFiltersWithDebounce(searchType, newSearchInput);
                         }}

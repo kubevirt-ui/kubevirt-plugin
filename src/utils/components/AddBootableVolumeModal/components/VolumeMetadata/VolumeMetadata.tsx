@@ -42,8 +42,10 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
       />
       <FormGroup label={t('Description')}>
         <TextInput
+          onChange={(_, value: string) =>
+            setBootableVolumeField('annotations', ANNOTATIONS.description)(value)
+          }
           id="description"
-          onChange={setBootableVolumeField('annotations', ANNOTATIONS.description)}
           value={annotations?.description}
         />
       </FormGroup>

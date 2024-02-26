@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
+import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Dropdown, DropdownItem, DropdownToggle } from '@patternfly/react-core';
+import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import { InitialMigrationPolicyState } from '../../../../list/components/MigrationPolicyCreateForm/utils/utils';
 import {
@@ -13,13 +14,11 @@ import { MigrationPolicyConfigurationOption } from '../../utils/constants';
 type MigrationPolicyConfigurationDropdownProps = {
   isDisabled: boolean;
   options: MigrationPolicyConfigurationOption;
-  setState: React.Dispatch<
-    React.SetStateAction<EditMigrationPolicyInitialState | InitialMigrationPolicyState>
-  >;
+  setState: Dispatch<SetStateAction<EditMigrationPolicyInitialState | InitialMigrationPolicyState>>;
   state: EditMigrationPolicyInitialState | InitialMigrationPolicyState;
 };
 
-const MigrationPolicyConfigurationDropdown: React.FC<MigrationPolicyConfigurationDropdownProps> = ({
+const MigrationPolicyConfigurationDropdown: FC<MigrationPolicyConfigurationDropdownProps> = ({
   isDisabled,
   options,
   setState,
@@ -32,29 +31,35 @@ const MigrationPolicyConfigurationDropdown: React.FC<MigrationPolicyConfiguratio
     setState((prev) => ({ ...prev, [key]: defaultValue }));
     setIsOpen(false);
   };
+
+  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
   return (
     <Dropdown
-      dropdownItems={Object.entries(options).map(([key, { defaultValue, description, label }]) => (
-        <DropdownItem
-          data-test-id={key}
-          description={description}
-          isDisabled={key in state}
-          key={key}
-          onClick={() => handleOptionClick(key, defaultValue)}
-        >
-          {label}
-        </DropdownItem>
-      ))}
-      toggle={
-        <DropdownToggle isDisabled={isDisabled} onToggle={setIsOpen}>
-          {t('Add configuration')}
-        </DropdownToggle>
-      }
+      toggle={DropdownToggle({
+        children: t('Add configuration'),
+        isDisabled,
+        isExpanded: isOpen,
+        onClick: onToggle,
+      })}
       className="migration-policy__form-config-dropdown"
       data-test-id="migration-policies-configurations"
       isOpen={isOpen}
-      menuAppendTo="parent"
-    />
+      onOpenChange={(open: boolean) => setIsOpen(open)}
+    >
+      <DropdownList>
+        {Object.entries(options).map(([key, { defaultValue, description, label }]) => (
+          <DropdownItem
+            data-test-id={key}
+            description={description}
+            isDisabled={key in state}
+            key={key}
+            onClick={() => handleOptionClick(key, defaultValue)}
+          >
+            {label}
+          </DropdownItem>
+        ))}
+      </DropdownList>
+    </Dropdown>
   );
 };
 

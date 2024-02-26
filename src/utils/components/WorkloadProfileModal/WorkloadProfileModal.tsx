@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useState } from 'react';
+import React, { FC, MouseEvent, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,10 @@ import {
   WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, Select, SelectOption } from '@patternfly/react-core';
+import { Form, FormGroup } from '@patternfly/react-core';
+import { SelectOption } from '@patternfly/react-core';
+
+import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
 type WorkloadProfileModalProps = {
   initialWorkload: WORKLOADS;
@@ -24,13 +27,11 @@ const WorkloadProfileModal: FC<WorkloadProfileModalProps> = ({
   onSubmit,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [workload, setWorkload] = useState<WORKLOADS>(initialWorkload || WORKLOADS.desktop);
 
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>, value: WORKLOADS) => {
+  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: WORKLOADS) => {
     event.preventDefault();
     setWorkload(value);
-    setIsDropdownOpen(false);
   };
 
   return (
@@ -42,19 +43,18 @@ const WorkloadProfileModal: FC<WorkloadProfileModalProps> = ({
     >
       <Form>
         <FormGroup fieldId="template-firmware-bootloader" label={t('Workload profile')}>
-          <Select
-            isOpen={isDropdownOpen}
-            menuAppendTo="parent"
+          <FormPFSelect
             onSelect={handleChange}
-            onToggle={setIsDropdownOpen}
-            selections={workload}
+            selected={workload}
+            selectedLabel={WORKLOADS_LABELS[workload]}
+            toggleProps={{ isFullWidth: true }}
           >
             {Object.entries(WORKLOADS_LABELS).map(([key, value]) => (
               <SelectOption description={t(WORKLOADS_DESCRIPTIONS[key])} key={key} value={key}>
-                {t(value)}
+                {value}
               </SelectOption>
             ))}
-          </Select>
+          </FormPFSelect>
         </FormGroup>
       </Form>
     </TabModal>

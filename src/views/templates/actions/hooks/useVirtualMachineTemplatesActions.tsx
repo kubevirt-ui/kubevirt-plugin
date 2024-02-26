@@ -94,6 +94,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
 
   const actions = [
     {
+      accessReview: asAccessReview(TemplateModel, template, 'patch'),
       cta: () =>
         // lead to the template details page
         navigate(`/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}`),
@@ -101,6 +102,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       label: t('Edit'),
     },
     {
+      accessReview: asAccessReview(TemplateModel, template, 'create'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <CloneTemplateModal
@@ -114,6 +116,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       label: t('Clone'),
     },
     {
+      accessReview: asAccessReview(TemplateModel, template, 'patch'),
       cta: () =>
         navigate(
           `/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}/disks`,
@@ -126,6 +129,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       label: t('Edit boot source'),
     },
     {
+      accessReview: asAccessReview(TemplateModel, template, 'patch'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <EditBootSourceModal
@@ -147,6 +151,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       ),
     },
     {
+      accessReview: asAccessReview(TemplateModel, template, 'patch'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <LabelsModal
@@ -176,6 +181,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       label: t('Edit labels'),
     },
     {
+      accessReview: asAccessReview(TemplateModel, template, 'patch'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <AnnotationsModal
@@ -205,6 +211,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       label: t('Edit annotations'),
     },
     {
+      accessReview: asAccessReview(TemplateModel, template, 'delete'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <DeleteModal

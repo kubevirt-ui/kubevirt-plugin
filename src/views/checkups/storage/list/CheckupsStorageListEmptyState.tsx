@@ -10,12 +10,12 @@ import {
   Button,
   ButtonVariant,
   EmptyState,
+  EmptyStateActions,
   EmptyStateBody,
+  EmptyStateFooter,
+  EmptyStateHeader,
   EmptyStateIcon,
-  EmptyStatePrimary,
-  EmptyStateSecondaryActions,
   EmptyStateVariant,
-  Title,
 } from '@patternfly/react-core';
 import { StorageDomainIcon } from '@patternfly/react-icons';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
@@ -40,46 +40,49 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(loadingPermissions);
 
   return (
-    <EmptyState variant={EmptyStateVariant.large}>
-      <EmptyStateIcon icon={StorageDomainIcon} />
-      <Title headingLevel="h4" size="lg">
-        {t('No storage checkups yet')}
-      </Title>
+    <EmptyState variant={EmptyStateVariant.lg}>
+      <EmptyStateHeader
+        headingLevel="h4"
+        icon={<EmptyStateIcon icon={StorageDomainIcon} />}
+        titleText={<>{t('No storage checkups yet')}</>}
+      />
       <EmptyStateBody>
         {t('To get started, install permissions and then run a checkup')}
       </EmptyStateBody>
-      <EmptyStatePrimary>
-        <Button
-          isDisabled={!isPermitted || isLoading || namespace === ALL_NAMESPACES_SESSION_KEY}
-          onClick={() => navigate(createURL('form', location.pathname))}
-        >
-          {t('Run checkup')}
-        </Button>
-      </EmptyStatePrimary>
-      <EmptyStateSecondaryActions>
-        <Button
-          onClick={async () => {
-            setIsLoading(true);
-            try {
-              await installOrRemoveCheckupsStoragePermissions(
-                namespace,
-                isPermitted,
-                clusterRoleBinding,
-              );
-            } finally {
-              setIsLoading(false);
-            }
-          }}
-          isDisabled={isLoading || namespace === ALL_NAMESPACES_SESSION_KEY}
-          isLoading={isLoading}
-          variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
-        >
-          {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
-        </Button>
-      </EmptyStateSecondaryActions>
-      <EmptyStateSecondaryActions>
-        <ExternalLink href={'#'} text={t('Learn about storage checkups')} />
-      </EmptyStateSecondaryActions>
+      <EmptyStateFooter>
+        <EmptyStateActions>
+          <Button
+            isDisabled={!isPermitted || isLoading || namespace === ALL_NAMESPACES_SESSION_KEY}
+            onClick={() => navigate(createURL('form', location.pathname))}
+          >
+            {t('Run checkup')}
+          </Button>
+        </EmptyStateActions>
+        <EmptyStateActions>
+          <Button
+            onClick={async () => {
+              setIsLoading(true);
+              try {
+                await installOrRemoveCheckupsStoragePermissions(
+                  namespace,
+                  isPermitted,
+                  clusterRoleBinding,
+                );
+              } finally {
+                setIsLoading(false);
+              }
+            }}
+            isDisabled={isLoading || namespace === ALL_NAMESPACES_SESSION_KEY}
+            isLoading={isLoading}
+            variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
+          >
+            {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
+          </Button>
+        </EmptyStateActions>
+        <EmptyStateActions>
+          <ExternalLink href={'#'} text={t('Learn about storage checkups')} />
+        </EmptyStateActions>
+      </EmptyStateFooter>
     </EmptyState>
   );
 };

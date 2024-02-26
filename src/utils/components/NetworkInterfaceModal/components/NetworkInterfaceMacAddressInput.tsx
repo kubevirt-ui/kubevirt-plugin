@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, FormEvent, SetStateAction, useState } from 'react';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 import { validateMACAddress } from '../utils/mac-validation';
@@ -31,21 +31,17 @@ const NetworkInterfaceMacAddressInput: FC<NetworkInterfaceMacAddressInputProps> 
     setInterfaceMACAddress(value);
   };
 
+  const validated = nameError ? ValidatedOptions.error : ValidatedOptions.default;
   return (
-    <FormGroup
-      fieldId="mac-address"
-      helperTextInvalid={nameError}
-      helperTextInvalidIcon={nameError && <RedExclamationCircleIcon title={t('Error')} />}
-      label={t('MAC address')}
-      validated={nameError ? ValidatedOptions.error : ValidatedOptions.default}
-    >
+    <FormGroup fieldId="mac-address" label={t('MAC address')}>
       <TextInput
         id="mac-address"
         isDisabled={isDisabled}
-        onChange={handleNameChange}
+        onChange={(event, value: string) => handleNameChange(value, event)}
         type="text"
         value={interfaceMACAddress}
       />
+      <FormGroupHelperText validated={validated}>{nameError && nameError}</FormGroupHelperText>
     </FormGroup>
   );
 };

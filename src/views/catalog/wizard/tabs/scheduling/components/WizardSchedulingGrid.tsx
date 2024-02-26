@@ -42,7 +42,7 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
   return (
     <Grid className="wizard-scheduling-tab__grid" hasGutter>
       <GridItem rowSpan={4} span={6}>
-        <DescriptionList>
+        <DescriptionList className="pf-c-description-list">
           <WizardDescriptionItem
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
@@ -113,7 +113,7 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
       </GridItem>
 
       <GridItem rowSpan={4} span={6}>
-        <DescriptionList>
+        <DescriptionList className="pf-c-description-list">
           <WizardDescriptionItem
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (

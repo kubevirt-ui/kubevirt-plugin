@@ -45,13 +45,10 @@ export enum WORKLOADS {
   server = 'server',
 }
 
-// t('Desktop')
-// t('Server')
-// t('High performance')
 export const WORKLOADS_LABELS = {
-  [WORKLOADS.desktop]: 'Desktop',
-  [WORKLOADS.highperformance]: 'High performance',
-  [WORKLOADS.server]: 'Server',
+  [WORKLOADS.desktop]: t('Desktop'),
+  [WORKLOADS.highperformance]: t('High performance'),
+  [WORKLOADS.server]: t('Server'),
 };
 
 export const WORKLOADS_DESCRIPTIONS = {

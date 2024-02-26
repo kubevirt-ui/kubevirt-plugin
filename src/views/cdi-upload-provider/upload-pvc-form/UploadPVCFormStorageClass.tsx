@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import {
-  FilterSCSelect,
-  getSCSelectOptions,
-} from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/Filters';
+import { StorageClassModel } from '@kubevirt-ui/kubevirt-api/console';
+import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/helpers';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Checkbox, Select, SelectVariant, Stack, StackItem } from '@patternfly/react-core';
+import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
 const UploadPVCFormStorageClass = ({
   applySP,
@@ -15,29 +14,17 @@ const UploadPVCFormStorageClass = ({
   storageClassName,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
     <Stack hasGutter>
       <StackItem>
         <label className="control-label co-required">{t('StorageClass')}</label>
-        <Select
-          onSelect={(e, sc) => {
-            setStorageClassName(sc);
-            setIsOpen(false);
-          }}
-          direction="up"
-          hasInlineFilter
-          isOpen={isOpen}
-          maxHeight={200}
-          menuAppendTo="parent"
-          onFilter={FilterSCSelect(storageClasses)}
-          onToggle={setIsOpen}
-          selections={storageClassName}
-          variant={SelectVariant.single}
-        >
-          {getSCSelectOptions(storageClasses)}
-        </Select>
+        <FilterSelect
+          options={getSCSelectOptions(storageClasses)}
+          selected={storageClassName}
+          setSelected={(scName: string) => setStorageClassName(scName)}
+          toggleProps={{ placeholder: t('Select {{label}}', { label: StorageClassModel.label }) }}
+        />
       </StackItem>
       <StackItem>
         <Checkbox

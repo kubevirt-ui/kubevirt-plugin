@@ -1,8 +1,5 @@
 import React from 'react';
 
-import { css } from '@patternfly/react-styles';
-import styles from '@patternfly/react-styles/css/components/Consoles/DesktopViewer';
-
 import { RDPProps } from '../utils/types';
 
 import ManualConnection from './ManualConnection';
@@ -17,7 +14,7 @@ const RDP: React.FunctionComponent<RDPProps> = ({
   vnc = null,
   ...props
 }) => (
-  <div className={css(styles?.consoleDesktopViewer)}>
+  <div className="pf-c-console__desktop-viewer">
     <RemoteViewer
       onDownload={props?.onDownload}
       onGenerate={props?.onGenerate}

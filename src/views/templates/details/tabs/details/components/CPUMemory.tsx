@@ -4,33 +4,23 @@ import { useVirtualMachineTemplatesCPUMemory } from 'src/views/templates/list/ho
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineCPU } from '@kubevirt-utils/resources/template';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Button,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTermHelpText,
-  DescriptionListTermHelpTextButton,
-  Popover,
-} from '@patternfly/react-core';
-import { PencilAltIcon } from '@patternfly/react-icons';
-
-import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
 
 import CPUMemoryModal from './CPUMemoryModal';
 
 type CPUMemoryProps = {
+  editable: boolean;
   template: V1Template;
 };
 
-const CPUMemory: FC<CPUMemoryProps> = ({ template }) => {
+const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {
   const { t } = useKubevirtTranslation();
   const CPUMemData = useVirtualMachineTemplatesCPUMemory(template);
   const { createModal } = useModal();
-  const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
   const onSubmitCPU = useCallback(
     (updatedTemplate: V1Template) =>
@@ -54,35 +44,19 @@ const CPUMemory: FC<CPUMemoryProps> = ({ template }) => {
     ));
 
   return (
-    <DescriptionListGroup>
-      <DescriptionListTermHelpText>
-        <Popover
-          bodyContent={
-            <CPUDescription
-              cpu={getTemplateVirtualMachineCPU(template)}
-              helperTextResource={CpuMemHelperTextResources.Template}
-            />
-          }
-          hasAutoWidth
-          headerContent={t('CPU | Memory')}
-          maxWidth="30rem"
-        >
-          <DescriptionListTermHelpTextButton>{t('CPU | Memory')}</DescriptionListTermHelpTextButton>
-        </Popover>
-      </DescriptionListTermHelpText>
-      <DescriptionListDescription>
-        <Button
-          isDisabled={!isTemplateEditable}
-          isInline
-          onClick={onEditClick}
-          type="button"
-          variant="link"
-        >
-          {CPUMemData}
-          <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-        </Button>
-      </DescriptionListDescription>
-    </DescriptionListGroup>
+    <VirtualMachineDescriptionItem
+      bodyContent={
+        <CPUDescription
+          cpu={getTemplateVirtualMachineCPU(template)}
+          helperTextResource={CpuMemHelperTextResources.Template}
+        />
+      }
+      descriptionData={CPUMemData}
+      descriptionHeader={t('CPU | Memory')}
+      isEdit={editable}
+      isPopover
+      onEditClick={onEditClick}
+    />
   );
 };
 

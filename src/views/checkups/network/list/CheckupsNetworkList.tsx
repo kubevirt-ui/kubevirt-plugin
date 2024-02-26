@@ -76,7 +76,7 @@ const CheckupsNetworkList = () => {
               onPaginationChange({ endIndex, page, perPage, startIndex })
             }
             className="list-managment-group__pagination"
-            defaultToFullPage
+            isLastFullPageShown
             itemCount={dataFilters?.length}
             page={pagination?.page}
             perPage={pagination?.perPage}

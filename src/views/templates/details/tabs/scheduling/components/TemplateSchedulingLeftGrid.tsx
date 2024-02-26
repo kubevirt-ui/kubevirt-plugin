@@ -30,7 +30,7 @@ const TemplateSchedulingLeftGrid: React.FC<TemplateSchedulingGridProps> = ({
   );
 
   return (
-    <DescriptionList>
+    <DescriptionList className="pf-c-description-list">
       <NodeSelector editable={editable} onSubmit={onSubmit} template={template} />
       <Tolerations editable={editable} onSubmit={onSubmit} template={template} />
       <AffinityRules editable={editable} onSubmit={onSubmit} template={template} />

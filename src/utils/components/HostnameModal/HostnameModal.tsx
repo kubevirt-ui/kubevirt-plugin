@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -8,6 +8,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
+import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
+
 type HostnameModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -16,7 +18,7 @@ type HostnameModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const HostnameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
+const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [newHostname, setHostname] = useState<string>(vm?.spec?.template?.spec?.hostname);
 
@@ -37,12 +39,14 @@ const HostnameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit
     >
       <Form>
         {vmi && <ModalPendingChangesAlert />}
-        <FormGroup
-          fieldId="hostname"
-          helperText={t('Please provide hostname.')}
-          label={t('Hostname')}
-        >
-          <TextInput id="hostname" onChange={setHostname} type="text" value={newHostname} />
+        <FormGroup fieldId="hostname" label={t('Hostname')}>
+          <TextInput
+            id="hostname"
+            onChange={(_event, val) => setHostname(val)}
+            type="text"
+            value={newHostname}
+          />
+          <FormGroupHelperText>{t('Please provide hostname.')}</FormGroupHelperText>
         </FormGroup>
       </Form>
     </TabModal>

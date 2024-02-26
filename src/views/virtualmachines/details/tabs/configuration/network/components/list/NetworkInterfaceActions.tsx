@@ -6,6 +6,7 @@ import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessag
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { deleteNetworkInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
@@ -14,8 +15,7 @@ import {
   ButtonVariant,
   Dropdown,
   DropdownItem,
-  DropdownPosition,
-  KebabToggle,
+  DropdownList,
 } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -82,24 +82,28 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
     setIsDropdownOpen(false);
   };
 
-  const items = [
-    <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
-      {editBtnText}
-    </DropdownItem>,
-    <DropdownItem key="network-interface-delete" onClick={onDeleteModalOpen}>
-      {deleteBtnText}
-    </DropdownItem>,
-  ];
-
+  const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
   return (
     <Dropdown
-      dropdownItems={items}
+      toggle={KebabToggle({
+        id: 'toggle-id-6',
+        isExpanded: isDropdownOpen,
+        onClick: onToggle,
+      })}
       isOpen={isDropdownOpen}
-      isPlain
+      onOpenChange={(open: boolean) => setIsDropdownOpen(open)}
       onSelect={() => setIsDropdownOpen(false)}
-      position={DropdownPosition.right}
-      toggle={<KebabToggle id="toggle-id-6" onToggle={setIsDropdownOpen} />}
-    />
+      popperProps={{ position: 'right' }}
+    >
+      <DropdownList>
+        <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
+          {editBtnText}
+        </DropdownItem>
+        <DropdownItem key="network-interface-delete" onClick={onDeleteModalOpen}>
+          {deleteBtnText}
+        </DropdownItem>
+      </DropdownList>
+    </Dropdown>
   );
 };
 

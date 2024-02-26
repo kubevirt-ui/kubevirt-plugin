@@ -11,8 +11,6 @@ import {
   ChartArea,
   ChartAxis,
   ChartGroup,
-  ChartLegendOrientation,
-  ChartLegendPosition,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
@@ -124,8 +122,8 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
               { name: t('Memory Dirty Rate'), symbol: { fill: chart_color_orange_300.value } },
             ]}
             height={height}
-            legendOrientation={ChartLegendOrientation.horizontal}
-            legendPosition={ChartLegendPosition.bottom}
+            legendOrientation="horizontal"
+            legendPosition="bottom"
             padding={{ bottom: 55, left: 35, right: 35, top: 25 }}
             scale={{ x: 'time', y: 'linear' }}
             width={width}

@@ -1,4 +1,5 @@
 import React, { FC, ReactNode } from 'react';
+import classnames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -74,7 +75,10 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
       if (helperPopover) {
         return (
           <Popover bodyContent={helperPopover?.content} headerContent={helperPopover?.header}>
-            <DescriptionListTermHelpTextButton> {title} </DescriptionListTermHelpTextButton>
+            <DescriptionListTermHelpTextButton className="pf-c-description-list__text">
+              {' '}
+              {title}{' '}
+            </DescriptionListTermHelpTextButton>
           </Popover>
         );
       }
@@ -87,8 +91,8 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
     };
 
     return (
-      <DescriptionListGroup className={className}>
-        <DescriptionListTermHelpText>
+      <DescriptionListGroup className={classnames('pf-c-description-list__group', className)}>
+        <DescriptionListTermHelpText className="pf-c-description-list__term">
           <Flex
             className="wizard-description-item__title"
             justifyContent={{ default: 'justifyContentFlexStart' }}
@@ -105,7 +109,7 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
                   variant="link"
                 >
                   {t('Edit')}
-                  <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+                  <PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />
                 </Button>
               </FlexItem>
             )}
@@ -114,6 +118,7 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
         {isEdit && !showEditOnTitle ? (
           <DescriptionListDescription>
             <Button
+              className="pf-c-description-list__description"
               data-test-id={`${testId}-edit`}
               isDisabled={isDisabled}
               isInline
@@ -122,12 +127,12 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
               variant="link"
             >
               {description ?? <span className="text-muted">{t('Not available')}</span>}
-              <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+              <PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />
             </Button>
           </DescriptionListDescription>
         ) : (
           <div data-test-id={testId}>
-            <DescriptionListDescription>
+            <DescriptionListDescription className="pf-c-description-list__description">
               {description ?? <span className="text-muted">{t('Not available')}</span>}
             </DescriptionListDescription>
           </div>

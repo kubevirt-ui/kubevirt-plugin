@@ -1,4 +1,5 @@
 import React, { FC, useCallback } from 'react';
+import classnames from 'classnames';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -6,6 +7,7 @@ import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescri
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
@@ -15,10 +17,6 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  DescriptionListTermHelpText,
   Divider,
   Flex,
   FlexItem,
@@ -67,43 +65,40 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
   return (
     <PageSection variant={PageSectionVariants.light}>
       <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
-        <DescriptionList className="template-scripts-tab__description-list">
-          <DescriptionListGroup>
-            <DescriptionListTerm>
-              <DescriptionListTermHelpText>
-                <Flex className="vm-description-item__title">
-                  <FlexItem>
-                    <Title headingLevel="h2">{t('Cloud-init')}</Title>
-                  </FlexItem>
-                  <FlexItem>
-                    <Button
-                      onClick={() =>
-                        createModal(({ isOpen, onClose }) => (
-                          <CloudinitModal
-                            isOpen={isOpen}
-                            onClose={onClose}
-                            onSubmit={onUpdate}
-                            vm={vm}
-                          />
-                        ))
-                      }
-                      isDisabled={!isTemplateEditable}
-                      isInline
-                      type="button"
-                      variant="link"
-                    >
-                      {t('Edit')}
-                      <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
-                    </Button>
-                  </FlexItem>
-                </Flex>
-              </DescriptionListTermHelpText>
-            </DescriptionListTerm>
-            <DescriptionListDescription>
-              <CloudInitDescription vm={vm} />
-            </DescriptionListDescription>
-          </DescriptionListGroup>
-
+        <DescriptionList
+          className={classnames('pf-c-description-list', 'template-scripts-tab__description-list')}
+        >
+          <VirtualMachineDescriptionItem
+            descriptionHeader={
+              <Flex className="vm-description-item__title">
+                <FlexItem>
+                  <Title headingLevel="h2">{t('Cloud-init')}</Title>
+                </FlexItem>
+                <FlexItem>
+                  <Button
+                    onClick={() =>
+                      createModal(({ isOpen, onClose }) => (
+                        <CloudinitModal
+                          isOpen={isOpen}
+                          onClose={onClose}
+                          onSubmit={onUpdate}
+                          vm={vm}
+                        />
+                      ))
+                    }
+                    isDisabled={!isTemplateEditable}
+                    isInline
+                    type="button"
+                    variant="link"
+                  >
+                    {t('Edit')}
+                    <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+                  </Button>
+                </FlexItem>
+              </Flex>
+            }
+            descriptionData={<CloudInitDescription vm={vm} />}
+          />
           <Divider />
           <SSHKey template={template} />
           <Divider />

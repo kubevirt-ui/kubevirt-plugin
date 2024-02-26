@@ -48,7 +48,7 @@ const Descheduler: FC<DeschedulerProps> = ({ vm }) => {
   return (
     <>
       <Switch
-        onChange={(checked) => {
+        onChange={(_event, checked) => {
           setChecked(checked);
           updatedDescheduler(checked);
         }}

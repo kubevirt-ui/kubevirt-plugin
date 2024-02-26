@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourceUploadPVC';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
@@ -44,19 +45,17 @@ const VolumeSource: FC<VolumeSourceProps> = ({
       <PVCSource bootableVolume={bootableVolume} setBootableVolumeField={setBootableVolumeField} />
     ),
     [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: (
-      <FormGroup
-        fieldId="volume-registry-url"
-        helperText={t('Example: quay.io/containerdisks/centos:7-2009')}
-        isRequired
-        label={t('Registry URL')}
-      >
+      <FormGroup fieldId="volume-registry-url" isRequired label={t('Registry URL')}>
         <TextInput
           data-test-id="volume-registry-url"
           id="volume-registry-url"
-          onChange={setBootableVolumeField('registryURL')}
+          onChange={(_, value: string) => setBootableVolumeField('registryURL')(value)}
           type="text"
           value={registryURL}
         />
+        <FormGroupHelperText>
+          {t('Example: quay.io/containerdisks/centos:7-2009')}
+        </FormGroupHelperText>
       </FormGroup>
     ),
     [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: (

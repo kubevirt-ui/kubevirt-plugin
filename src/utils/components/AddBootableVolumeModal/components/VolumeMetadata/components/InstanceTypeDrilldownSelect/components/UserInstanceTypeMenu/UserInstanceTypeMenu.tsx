@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
-import { MenuInput, MenuItem, SearchInput } from '@patternfly/react-core';
+import { MenuItem, MenuSearch, MenuSearchInput, SearchInput } from '@patternfly/react-core';
 
 type UserInstanceTypeMenuProps = {
   items: string[];
@@ -31,14 +31,16 @@ const UserInstanceTypeMenu: FC<UserInstanceTypeMenuProps> = ({ items, selected, 
   return (
     <>
       {items.length > 5 && (
-        <MenuInput>
-          <SearchInput
-            aria-label="Filter menu items"
-            onChange={(_, value) => setSearchInput(value)}
-            type="search"
-            value={searchInput}
-          />
-        </MenuInput>
+        <MenuSearch>
+          <MenuSearchInput>
+            <SearchInput
+              aria-label="Filter menu items"
+              onChange={(_, value) => setSearchInput(value)}
+              type="search"
+              value={searchInput}
+            />
+          </MenuSearchInput>
+        </MenuSearch>
       )}
       {filteredItems.map((userITName) => (
         <MenuItem

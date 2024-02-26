@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import {
@@ -53,7 +53,7 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
     await editBootSource(dataSource, bootSource);
   };
 
-  const popoverRef = React.useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
@@ -84,7 +84,7 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
             />
           ))}
           headerContent={t('Affected templates')}
-          reference={popoverRef}
+          triggerRef={popoverRef}
         />
 
         <Form>

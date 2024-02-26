@@ -1,11 +1,19 @@
-import * as React from 'react';
+import React, {
+  ChangeEvent,
+  DetailedHTMLProps,
+  FC,
+  HTMLAttributes,
+  memo,
+  useMemo,
+  useState,
+} from 'react';
 import TagsInput from 'react-tagsinput';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Label as PFLabel, Stack, StackItem } from '@patternfly/react-core';
+import { Label as PFLabel, Stack, StackItem, Truncate } from '@patternfly/react-core';
 
 import { isLabelValid, labelsArrayToObject, labelsToArray } from './utils';
 
@@ -23,7 +31,7 @@ type LabelsModalProps = {
   onLabelsSubmit: (labels: { [key: string]: string }) => Promise<K8sResourceCommon | void>;
 };
 
-export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
+export const LabelsModal: FC<LabelsModalProps> = memo(
   ({
     initialLabels,
     isOpen,
@@ -34,17 +42,17 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
     onLabelsSubmit,
   }) => {
     const { t } = useKubevirtTranslation();
-    const [inputValue, setInputValue] = React.useState('');
-    const [isInputValid, setIsInputValid] = React.useState(true);
+    const [inputValue, setInputValue] = useState('');
+    const [isInputValid, setIsInputValid] = useState(true);
 
-    const initLabels = React.useMemo(() => {
+    const initLabels = useMemo(() => {
       if (!isEmpty(initialLabels)) return initialLabels;
       if (!isEmpty(obj?.metadata?.labels)) return obj?.metadata?.labels;
       return {};
     }, [initialLabels, obj?.metadata?.labels]);
-    const [labels, setLabels] = React.useState<string[]>(labelsToArray(initLabels));
+    const [labels, setLabels] = useState<string[]>(labelsToArray(initLabels));
 
-    const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
 
       if (value === '') {
@@ -85,11 +93,10 @@ export const LabelsModal: React.FC<LabelsModalProps> = React.memo(
       return (
         <PFLabel
           className={'co-label tag-item-content'.concat(labelClassName || '')}
-          isTruncated
           key={key}
           onClose={() => onRemove(key)}
         >
-          {getTagDisplayValue(tag)}
+          <Truncate content={getTagDisplayValue(tag)} />
         </PFLabel>
       );
     };
@@ -152,7 +159,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
-      'tags-input': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+      'tags-input': DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
     }
   }
 }

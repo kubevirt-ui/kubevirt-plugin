@@ -1,21 +1,20 @@
-import * as React from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
-
-import { FilterPVCSelect as FilterDataSourcesSelect } from '../../utils/Filters';
+import { FormGroup } from '@patternfly/react-core';
 
 type DiskSourcePVCSelectNameProps = {
   dataSourceNames: string[];
   dataSourceNameSelected: string;
   dataSourcesLoaded: boolean;
   isDisabled?: boolean;
-  onChange: React.Dispatch<React.SetStateAction<string>>;
+  onChange: Dispatch<SetStateAction<string>>;
 };
 
-const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
+const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({
   dataSourceNames,
   dataSourceNameSelected,
   dataSourcesLoaded,
@@ -23,15 +22,6 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
   onChange,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const onSelect = React.useCallback(
-    (event, selection) => {
-      onChange(selection);
-      setIsOpen(false);
-    },
-    [onChange],
-  );
 
   const fieldId = 'ds-name-select';
   const dsLabel = DataSourceModel.label;
@@ -39,24 +29,16 @@ const DiskSourcePVCSelectName: React.FC<DiskSourcePVCSelectNameProps> = ({
   return (
     <FormGroup fieldId={fieldId} id={fieldId} isRequired label={t('{{dsLabel}} name', { dsLabel })}>
       {dataSourcesLoaded || isDisabled ? (
-        <Select
-          aria-labelledby={fieldId}
-          hasInlineFilter
-          isDisabled={isDisabled}
-          isOpen={isOpen}
-          maxHeight={400}
-          menuAppendTo="parent"
-          onFilter={FilterDataSourcesSelect(dataSourceNames)}
-          onSelect={onSelect}
-          onToggle={setIsOpen}
-          placeholderText={t('--- Select {{ dsLabel }} name ---', { dsLabel })}
-          selections={dataSourceNameSelected}
-          variant={SelectVariant.single}
-        >
-          {dataSourceNames.map((name) => (
-            <SelectOption key={name} value={name} />
-          ))}
-        </Select>
+        <FilterSelect
+          toggleProps={{
+            isDisabled,
+            isFullWidth: true,
+            placeholder: t('--- Select {{ dsLabel }} name ---', { dsLabel }),
+          }}
+          options={dataSourceNames.map((name) => ({ children: name, value: name }))}
+          selected={dataSourceNameSelected}
+          setSelected={onChange}
+        />
       ) : (
         <Loading />
       )}

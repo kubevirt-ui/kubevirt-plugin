@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { FieldError, UseFormRegister, UseFormSetValue } from 'react-hook-form';
 
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Form,
   FormGroup,
+  Icon,
   NumberInput,
   Popover,
   Stack,
@@ -32,7 +33,7 @@ type CreateDataSourceFormProps = {
   size: string;
 };
 
-export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
+export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
   errors,
   importsToKeep,
   register,
@@ -42,14 +43,7 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
   const { t } = useKubevirtTranslation();
   return (
     <Form>
-      <FormGroup
-        fieldId="datasource-create-name"
-        helperTextInvalid={t('This field is required')}
-        helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
-        isRequired
-        label={t('Name')}
-        validated={errors?.['name'] ? ValidatedOptions.error : ValidatedOptions.default}
-      >
+      <FormGroup fieldId="datasource-create-name" isRequired label={t('Name')}>
         <FormTextInput
           {...register('name', { required: true })}
           aria-label={t('Name')}
@@ -58,18 +52,17 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
           type="text"
           validated={errors?.['name'] ? ValidatedOptions.error : ValidatedOptions.default}
         />
+        <FormGroupHelperText
+          validated={errors?.['name'] ? ValidatedOptions.error : ValidatedOptions.default}
+        >
+          {errors?.['name'] && t('This field is required')}
+        </FormGroupHelperText>
       </FormGroup>
       <FormGroup
-        helperText={t('Example: {{exampleURL}}', {
-          exampleURL: 'quay.io/containerdisks/centos:7-2009',
-        })}
         aria-label={t('Registry URL')}
         fieldId="datasource-create-source-url"
-        helperTextInvalid={t('This field is required')}
-        helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
         isRequired
         label={t('Registry URL')}
-        validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
       >
         <FormTextInput
           {...register('url', { required: true })}
@@ -79,6 +72,15 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
           type="text"
           validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
         />
+        <FormGroupHelperText
+          validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
+        >
+          {errors?.['url']
+            ? t('This field is required')
+            : t('Example: {{exampleURL}}', {
+                exampleURL: 'quay.io/containerdisks/centos:7-2009',
+              })}
+        </FormGroupHelperText>
       </FormGroup>
       <CapacityInput
         label={t('Disk size')}
@@ -86,18 +88,6 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
         size={size}
       />
       <FormGroup
-        helperText={
-          <Stack>
-            <StackItem>
-              <MutedTextSpan text={t('Specify the number of revisions that should be retained.')} />
-            </StackItem>
-            <StackItem>
-              <MutedTextSpan
-                text={t('A value of X means that the X latest versions will be kept')}
-              />
-            </StackItem>
-          </Stack>
-        }
         labelIcon={
           <Popover
             bodyContent={t(
@@ -111,7 +101,9 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
               onClick={(e) => e.preventDefault()}
               type="button"
             >
-              <HelpIcon noVerticalAlign />
+              <Icon>
+                <HelpIcon />
+              </Icon>
             </button>
           </Popover>
         }
@@ -127,28 +119,28 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
           onPlus={() => setValue('importsToKeep', importsToKeep + 1)}
           value={importsToKeep}
         />
+        <FormGroupHelperText>
+          <Stack>
+            <StackItem>
+              <MutedTextSpan text={t('Specify the number of revisions that should be retained.')} />
+            </StackItem>
+            <StackItem>
+              <MutedTextSpan
+                text={t('A value of X means that the X latest versions will be kept')}
+              />
+            </StackItem>
+          </Stack>
+        </FormGroupHelperText>
       </FormGroup>
-      <FormGroup
-        helperText={
+      <FormGroup fieldId="datasource-create-schedule" label={t('Scheduling settings')}>
+        <FormGroupHelperText>
           <>
             {t('Schedule specifies in cron format when and how often to look for new imports.')}
             <ExternalLink href={CRON_DOC_URL} text={t('Learn more')} />
           </>
-        }
-        fieldId="datasource-create-schedule"
-        label={t('Scheduling settings')}
-      />
-      <FormGroup
-        helperText={t('Example (At 00:00 on Tuesday): {{exampleCron}}', {
-          exampleCron: '0 0 * * 2',
-        })}
-        fieldId="datasource-create-cron"
-        helperTextInvalid={t('This field is required')}
-        helperTextInvalidIcon={<RedExclamationCircleIcon title="Error" />}
-        isRequired
-        label={t('Cron expression')}
-        validated={errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default}
-      >
+        </FormGroupHelperText>
+      </FormGroup>
+      <FormGroup fieldId="datasource-create-cron" isRequired label={t('Cron expression')}>
         <FormTextInput
           {...register('schedule', {
             validate: {
@@ -167,6 +159,15 @@ export const CreateDataSourceForm: React.FC<CreateDataSourceFormProps> = ({
           type="text"
           validated={errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default}
         />
+        <FormGroupHelperText
+          validated={errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default}
+        >
+          {errors?.['schedule']
+            ? t('This field is required')
+            : t('Example (At 00:00 on Tuesday): {{exampleCron}}', {
+                exampleCron: '0 0 * * 2',
+              })}
+        </FormGroupHelperText>
       </FormGroup>
     </Form>
   );

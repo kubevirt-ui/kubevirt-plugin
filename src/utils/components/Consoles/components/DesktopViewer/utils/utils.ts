@@ -19,6 +19,8 @@ import {
   DEFAULT_RDP_MIMETYPE,
   DEFAULT_RDP_PORT,
   DEFAULT_VV_MIMETYPE,
+  MULTUS,
+  POD,
   TEMPLATE_VM_NAME_LABEL,
   VMI_LABEL_AS_RDP_SERVICE_SELECTOR,
 } from './constants';
@@ -206,7 +208,7 @@ export const getVmRdpNetworks = (
       return {
         ip,
         name: i?.name,
-        type: network?.multus ? 'MULTUS' : 'POD',
+        type: network?.multus ? MULTUS : POD,
       };
     });
 };
@@ -217,8 +219,7 @@ export const getDefaultNetwork = (networks: Network[]) => {
   }
   if (networks?.length > 1) {
     return (
-      networks?.find((n) => n?.type === 'POD' && n?.ip) ||
-      networks?.find((n) => n?.type === 'MULTUS')
+      networks?.find((n) => n?.type === POD && n?.ip) || networks?.find((n) => n?.type === MULTUS)
     );
   }
   return null;

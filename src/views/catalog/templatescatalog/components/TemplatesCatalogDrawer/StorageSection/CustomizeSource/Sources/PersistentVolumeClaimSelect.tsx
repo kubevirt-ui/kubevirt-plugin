@@ -6,8 +6,10 @@ import {
   ProjectModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import SelectResourceByName from '@kubevirt-utils/components/SelectResourceByName/SelectResourceByName';
+import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { FormGroup } from '@patternfly/react-core';
 
 import { useProjectsAndPVCs } from '../useProjectsAndPVCs';
 import { getPVCSource } from '../utils';
@@ -50,28 +52,53 @@ export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> =
 
   return (
     <div>
-      <SelectResourceByName
-        className="pvc-selection-formgroup"
-        fieldId={`${testId}-project-select`}
-        label={t('PVC project')}
-        nameSelected={projectSelected}
-        onChange={onSelectProject}
-        placeholder={t('--- Select PVC project ---')}
-        resourceGroupVersionKind={modelToGroupVersionKind(ProjectModel)}
-        resourceNames={projectsNames}
-        resourcesLoaded={projectsLoaded}
-      />
-      <SelectResourceByName
-        className="pvc-selection-formgroup"
-        fieldId={`${testId}-pvc-name-select`}
-        label={t('PVC name')}
-        nameSelected={pvcNameSelected}
-        onChange={onPVCSelected}
-        placeholder={t('--- Select PVC name ---')}
-        resourceGroupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
-        resourceNames={filteredPVCNames}
-        resourcesLoaded={pvcsLoaded}
-      />
+      {projectsLoaded ? (
+        <FormGroup
+          className="pvc-selection-formgroup"
+          fieldId={`${testId}-project-select`}
+          isRequired
+          label={t('PVC project')}
+        >
+          <FilterSelect
+            options={projectsNames.map((name) => ({
+              children: name,
+              groupVersionKind: modelToGroupVersionKind(ProjectModel),
+              value: name,
+            }))}
+            toggleProps={{
+              placeholder: t('--- Select PVC project ---'),
+            }}
+            selected={projectSelected}
+            setSelected={onSelectProject}
+          />
+        </FormGroup>
+      ) : (
+        <Loading />
+      )}
+
+      {pvcsLoaded ? (
+        <FormGroup
+          className="pvc-selection-formgroup"
+          fieldId={`${testId}-pvc-name-select`}
+          isRequired
+          label={t('PVC name')}
+        >
+          <FilterSelect
+            options={filteredPVCNames.map((name) => ({
+              children: name,
+              groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
+              value: name,
+            }))}
+            toggleProps={{
+              placeholder: t('--- Select PVC name ---'),
+            }}
+            selected={pvcNameSelected}
+            setSelected={onPVCSelected}
+          />
+        </FormGroup>
+      ) : (
+        <Loading />
+      )}
     </div>
   );
 };
