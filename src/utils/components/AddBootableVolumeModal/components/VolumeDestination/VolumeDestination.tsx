@@ -37,14 +37,14 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
   return (
     <>
       <Grid hasGutter span={12}>
-        <GridItem span={6}>
+        <GridItem>
           <StorageClassSelect
             setShowSCAlert={setShowSCAlert}
             setStorageClassName={setBootableVolumeField('storageClassName')}
             storageClass={storageClassName}
           />
         </GridItem>
-        <GridItem span={12}>
+        <GridItem>
           <ApplyStorageProfileSettingsCheckbox
             claimPropertySets={claimPropertySets}
             disabled={!storageProfileLoaded}

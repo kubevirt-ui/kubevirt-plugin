@@ -44,51 +44,60 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [template?.metadata?.annotations?.iconClass]);
 
-    const iconSize = isBootSourceAvailable ? '40%' : '20%';
     return (
-      <CatalogTile
-        badges={
-          bootSourcesLoaded
-            ? isBootSourceAvailable && [<Badge key="available-boot">{t('Source available')}</Badge>]
-            : [<Skeleton className="badgeload" height="18px" key="loading-sources" width="105px" />]
-        }
-        title={
-          <Stack>
-            <StackItem>
-              <b>{displayName}</b>
-            </StackItem>
-            <StackItem className="text-secondary">{template.metadata.name}</StackItem>
-          </Stack>
-        }
-        className="vm-catalog-grid-tile"
-        data-test-id={template.metadata.name}
-        icon={<img alt="os-icon" height={iconSize} src={icon} width={iconSize} />}
-        onClick={() => onClick(template)}
-      >
-        <Stack hasGutter>
-          <StackItem>
+      <div onClick={() => onClick(template)}>
+        <CatalogTile
+          badges={
+            bootSourcesLoaded
+              ? isBootSourceAvailable && [
+                  <Badge key="available-boot">{t('Source available')}</Badge>,
+                ]
+              : [
+                  <Skeleton
+                    className="badgeload"
+                    height="18px"
+                    key="loading-sources"
+                    width="105px"
+                  />,
+                ]
+          }
+          title={
             <Stack>
               <StackItem>
-                <b>{t('Project')}</b> {template.metadata.namespace}
+                <b>{displayName}</b>
               </StackItem>
-              <StackItem>
-                <b>{t('Boot source')}</b> {getVMBootSourceLabel(bootSource?.type, dataSource)}
-              </StackItem>
-              <StackItem>
-                <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload] ?? t('Other')}
-              </StackItem>
-              <StackItem>
-                <StackItem>
-                  <b>{t('CPU')}</b> {cpuCount}
-                </StackItem>
-                <StackItem>
-                  <b>{t('Memory')}</b> {readableSizeUnit(memory)}
-                </StackItem>
-              </StackItem>
+              <StackItem className="text-secondary">{template.metadata.name}</StackItem>
             </Stack>
-          </StackItem>
-        </Stack>
-      </CatalogTile>
+          }
+          className="vm-catalog-grid-tile"
+          data-test-id={template.metadata.name}
+          iconImg={icon}
+        >
+          <Stack hasGutter>
+            <StackItem>
+              <Stack>
+                <StackItem>
+                  <b>{t('Project')}</b> {template.metadata.namespace}
+                </StackItem>
+                <StackItem>
+                  <b>{t('Boot source')}</b> {getVMBootSourceLabel(bootSource?.type, dataSource)}
+                </StackItem>
+                <StackItem>
+                  <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload] ?? t('Other')}
+                </StackItem>
+                <StackItem>
+                  <StackItem>
+                    <b>{t('CPU')}</b> {cpuCount}
+                  </StackItem>
+                  <StackItem>
+                    <b>{t('Memory')}</b> {readableSizeUnit(memory)}
+                  </StackItem>
+                </StackItem>
+              </Stack>
+            </StackItem>
+          </Stack>
+        </CatalogTile>
+      </div>
     );
   },
 );

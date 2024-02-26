@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -36,7 +36,7 @@ const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({
     >
       {projectsLoaded ? (
         <>
-          <FilterSelect
+          <InlineFilterSelect
             options={projectNames?.map((name) => ({
               children: name,
               groupVersionKind: modelToGroupVersionKind(ProjectModel),

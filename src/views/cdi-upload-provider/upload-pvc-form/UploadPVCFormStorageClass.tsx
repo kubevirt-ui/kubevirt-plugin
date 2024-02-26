@@ -2,7 +2,7 @@ import React from 'react';
 
 import { StorageClassModel } from '@kubevirt-ui/kubevirt-api/console';
 import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/helpers';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
@@ -19,7 +19,7 @@ const UploadPVCFormStorageClass = ({
     <Stack hasGutter>
       <StackItem>
         <label className="control-label co-required">{t('StorageClass')}</label>
-        <FilterSelect
+        <InlineFilterSelect
           options={getSCSelectOptions(storageClasses)}
           selected={storageClassName}
           setSelected={(scName: string) => setStorageClassName(scName)}

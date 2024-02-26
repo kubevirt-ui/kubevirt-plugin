@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Skeleton } from '@patternfly/react-core';
 
@@ -41,7 +41,7 @@ export const PersistentVolumeSelectName: FC<PersistentVolumeSelectNameProps> = (
       isRequired
       label={t('PVC name')}
     >
-      <FilterSelect
+      <InlineFilterSelect
         options={pvcNames?.map((name) => ({
           children: name,
           value: name,

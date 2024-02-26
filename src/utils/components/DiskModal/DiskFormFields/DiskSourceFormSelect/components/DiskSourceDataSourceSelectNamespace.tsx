@@ -2,7 +2,7 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
@@ -36,7 +36,7 @@ const DiskSourceDataSourceSelectNamespace: FC<DiskSourceDataSourceSelectNamespac
       label={t('{{dsLabel}} project', { dsLabel })}
     >
       {projectsLoaded ? (
-        <FilterSelect
+        <InlineFilterSelect
           options={projectsNames?.map((name) => ({
             children: name,
             groupVersionKind: modelToGroupVersionKind(ProjectModel),

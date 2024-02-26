@@ -70,7 +70,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const toolbarFilters = rowFilters.filter((filter) => 'items' in filter);
+  const toolbarFilters = rowFilters?.filter((filter) => 'items' in filter);
 
   // Generate rowFilter items and counts. Memoize to minimize re-renders.
   const generatedRowFilters = useDeepCompareMemoize(generateRowFilters(toolbarFilters ?? [], data));
@@ -192,7 +192,8 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                           placeholder: t('Filter'),
                         }}
                         onSelect={onSelect}
-                        selected={selectedSearchFilter?.filterGroupName || searchType}
+                        selected={searchType}
+                        selectedLabel={filterDropdownItems?.[searchType]}
                       >
                         {filterDropdownKeys.map((key) => (
                           <SelectOption key={key} value={key}>

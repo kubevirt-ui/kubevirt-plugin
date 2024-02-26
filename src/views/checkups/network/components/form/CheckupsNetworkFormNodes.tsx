@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction, useMemo } from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -76,7 +76,7 @@ const CheckupsNetworkFormNodes = ({
         <Stack hasGutter>
           <StackItem>
             <FormGroup fieldId="source-nodes" isRequired label={t('Source node')}>
-              <FilterSelect
+              <InlineFilterSelect
                 options={options}
                 selected={nodeSource}
                 setSelected={setNodeSource}
@@ -86,7 +86,7 @@ const CheckupsNetworkFormNodes = ({
           </StackItem>
           <StackItem>
             <FormGroup fieldId="target-nodes" isRequired label={t('Target node')}>
-              <FilterSelect
+              <InlineFilterSelect
                 options={options}
                 selected={nodeTarget}
                 setSelected={setNodeTarget}

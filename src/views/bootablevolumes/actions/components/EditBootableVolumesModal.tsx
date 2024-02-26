@@ -8,7 +8,7 @@ import { categoryDetailsMap } from '@catalog/CreateFromInstanceTypes/components/
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -150,7 +150,7 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
           }
           isRequired
         >
-          <FilterSelect
+          <InlineFilterSelect
             options={preferencesNames?.map((opt) => ({
               children: opt,
               groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,

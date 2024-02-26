@@ -6,7 +6,7 @@ import {
   ProjectModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
@@ -59,7 +59,7 @@ export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> =
           isRequired
           label={t('PVC project')}
         >
-          <FilterSelect
+          <InlineFilterSelect
             options={projectsNames.map((name) => ({
               children: name,
               groupVersionKind: modelToGroupVersionKind(ProjectModel),
@@ -83,7 +83,7 @@ export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> =
           isRequired
           label={t('PVC name')}
         >
-          <FilterSelect
+          <InlineFilterSelect
             options={filteredPVCNames.map((name) => ({
               children: name,
               groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),

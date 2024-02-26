@@ -46,6 +46,10 @@
     border-left: 1px solid var(--pf-global--BorderColor--300);
   }
 
+  .vm-catalog-grid-tile:hover {
+    box-shadow: var(--pf-v5-c-card--m-selectable--hover--BoxShadow);
+    cursor: pointer;
+  }
   .badgeload {
     border-radius: var(--pf-global--BorderRadius--lg);
   }

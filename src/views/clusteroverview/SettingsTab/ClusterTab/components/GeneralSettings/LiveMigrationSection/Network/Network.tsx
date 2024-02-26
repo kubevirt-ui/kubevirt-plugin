@@ -60,7 +60,9 @@ const Network = ({ hyperConverge }) => {
           selected={selectedNetwork}
           toggleProps={{ isDisabled: isEmpty(nads) }}
         >
-          <SelectOption key="primary" value={t('Primary live migration network')} />
+          <SelectOption key="primary" value={PRIMARY_NETWORK}>
+            {t('Primary live migration network')}
+          </SelectOption>
           <SelectGroup key="nad" label={t('Secondary NAD networks')}>
             {nads?.map((nad) => {
               const nadName = getName(nad);
