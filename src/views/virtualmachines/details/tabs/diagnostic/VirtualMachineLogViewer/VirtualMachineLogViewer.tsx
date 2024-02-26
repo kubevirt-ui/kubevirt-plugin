@@ -33,15 +33,15 @@ const VirtualMachineLogViewer = ({ connect, vm }) => {
   }
 
   if (isNeededRestart) {
-    return <Bullseye>{t('Guest system access logs not ready. a restart required')}</Bullseye>;
+    return <Bullseye>{t('Guest system logs not ready. Restart required')}</Bullseye>;
   }
 
   if (isClusterDisabledGuestSystemLogs) {
-    return <Bullseye>{t('Guest system access logs are disabled at cluster')}</Bullseye>;
+    return <Bullseye>{t('Guest system logs are disabled at cluster')}</Bullseye>;
   }
 
   if (isDisabledAtVM) {
-    return <Bullseye>{t('Guest system access logs are disabled at VirtualMachine')}</Bullseye>;
+    return <Bullseye>{t('Guest system logs are disabled at VirtualMachine')}</Bullseye>;
   }
 
   return <VirtualMachineBasicLogViewer data={data} vmi={vmi} />;
