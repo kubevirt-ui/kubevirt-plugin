@@ -1,7 +1,7 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { generateSSHKeySecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';

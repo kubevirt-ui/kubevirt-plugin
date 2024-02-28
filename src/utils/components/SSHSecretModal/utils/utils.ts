@@ -18,14 +18,32 @@ import {
 import {
   MAX_NAME_LENGTH,
   MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/constants';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { decodeSecret, encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { generatePrettyName, isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, K8sResourceCommon, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  k8sCreate,
+  K8sResourceCommon,
+  k8sUpdate,
+  WatchK8sResults,
+} from '@openshift-console/dynamic-plugin-sdk';
+
+export const getAllSecrets = (
+  secretsData: WatchK8sResults<{ [p: string]: IoK8sApiCoreV1Secret[] }>,
+): IoK8sApiCoreV1Secret[] => {
+  const secretsArrays = Object.values(secretsData)?.map((watchedResource) => watchedResource?.data);
+  return secretsArrays?.reduce((acc, secretsArray) => {
+    return [...acc, ...secretsArray];
+  }, []);
+};
+
+export const getSecretsLoaded = (
+  secretsData: WatchK8sResults<{ [p: string]: IoK8sApiCoreV1Secret[] }>,
+) => Object.values(secretsData)?.every((data) => data.loaded);
 
 export const validateSecretNameLength = (secretName: string): boolean =>
   secretName.length <= MAX_NAME_LENGTH;
@@ -186,3 +204,9 @@ export const generateValidSecretName = (secretName: string) =>
   secretName.length > MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX
     ? generatePrettyName()
     : generatePrettyName(secretName);
+
+export const addNewSecret = (
+  namespace: string,
+  targetProject: string,
+  activeNamespace: string,
+): boolean => (namespace ? targetProject !== namespace : targetProject !== activeNamespace);

@@ -12,7 +12,7 @@ import DynamicSSHKeyInjectionHelpTextIcon from '@kubevirt-utils/components/Dynam
 import {
   getCloudInitConfigDrive,
   getCloudInitPropagationMethod,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { getAccessCredentials, getVMSSHSecretName, getVolumes } from '@kubevirt-utils/resources/vm';

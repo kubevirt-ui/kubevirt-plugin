@@ -1,13 +1,10 @@
 import React, { Dispatch, FC, SetStateAction, useCallback } from 'react';
 
-import {
-  SecretSelectionOption,
-  SSHSecretDetails,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Split, SplitItem } from '@patternfly/react-core';
 
 import { initialSSHCredentials } from '../utils/constants';
+import { SecretSelectionOption, SSHSecretDetails } from '../utils/types';
 
 type SecretSelectionRadioGroupProps = {
   selectedOption: SecretSelectionOption;

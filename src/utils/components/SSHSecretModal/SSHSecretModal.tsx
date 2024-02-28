@@ -1,14 +1,15 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 
 import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import TabModal from '../TabModal/TabModal';
 
+import SSHSecretModalBody from './components/SSHSecretModalBody/SSHSecretModalBody';
 import useSecretsData from './hooks/useSecretsData';
 import { SecretSelectionOption, SSHSecretDetails } from './utils/types';
-import { createSSHSecret } from './utils/utils';
-import SSHSecretSection from './SSHSecretSection';
+import { createSSHSecret, validateSecretNameLength, validateSecretNameUnique } from './utils/utils';
 
 type SSHSecretModalProps = {
   initialSSHSecretDetails: SSHSecretDetails;
@@ -33,7 +34,23 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
 
   const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(initialSSHSecretDetails);
   const [localNSProject, setLocalNSProject] = useState<string>(namespace);
-  const { isDisabled, secretsData } = useSecretsData(sshDetails, localNSProject, namespace);
+  const secretsData = useSecretsData(localNSProject, namespace);
+
+  const isDisabled = useMemo(() => {
+    const { allSecrets, secretsLoaded } = secretsData;
+    const { secretOption, sshPubKey, sshSecretName } = sshDetails;
+
+    return (
+      !secretsLoaded ||
+      (secretOption === SecretSelectionOption.useExisting && isEmpty(sshSecretName)) ||
+      (secretOption === SecretSelectionOption.addNew &&
+        (isEmpty(sshPubKey) ||
+          isEmpty(sshSecretName) ||
+          !validateSSHPublicKey(sshPubKey) ||
+          !validateSecretNameUnique(sshSecretName, localNSProject, allSecrets) ||
+          !validateSecretNameLength(sshSecretName)))
+    );
+  }, [localNSProject, secretsData, sshDetails]);
 
   return (
     <TabModal
@@ -51,7 +68,7 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
       onClose={onClose}
     >
       <MutedTextSpan text={t('SSH key is saved in the project as a secret')} />
-      <SSHSecretSection
+      <SSHSecretModalBody
         isTemplate={isTemplate}
         isUserTab={isUserTab}
         localNSProject={localNSProject}

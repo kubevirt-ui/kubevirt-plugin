@@ -5,8 +5,8 @@ import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/u
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
-import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
+import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

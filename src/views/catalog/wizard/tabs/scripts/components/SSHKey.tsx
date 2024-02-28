@@ -6,16 +6,16 @@ import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescript
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import SecretNameLabel from '@kubevirt-utils/components/SSHSecretSection/components/SecretNameLabel/SecretNameLabel';
-import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
+import SecretNameLabel from '@kubevirt-utils/components/SSHSecretModal/components/SecretNameLabel';
+import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import {
   addSecretToVM,
   removeSecretToVM,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SecretModel } from '@kubevirt-utils/models';
 import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';

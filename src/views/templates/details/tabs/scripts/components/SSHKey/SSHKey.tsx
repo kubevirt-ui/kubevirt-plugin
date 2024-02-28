@@ -6,12 +6,12 @@ import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import SecretNameLabel from '@kubevirt-utils/components/SSHSecretSection/components/SecretNameLabel/SecretNameLabel';
-import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
+import SecretNameLabel from '@kubevirt-utils/components/SSHSecretModal/components/SecretNameLabel';
+import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';

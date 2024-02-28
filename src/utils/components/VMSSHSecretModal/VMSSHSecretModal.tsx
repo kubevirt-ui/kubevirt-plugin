@@ -7,10 +7,9 @@ import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { isEqualObject } from '../NodeSelectorModal/utils/helpers';
-
-import { SecretSelectionOption, SSHSecretDetails } from './utils/types';
-import { addSecretToVM, createSSHSecret, detachVMSecret } from './utils/utils';
-import SSHSecretModal from './SSHSecretModal';
+import SSHSecretModal from '../SSHSecretModal/SSHSecretModal';
+import { SecretSelectionOption, SSHSecretDetails } from '../SSHSecretModal/utils/types';
+import { addSecretToVM, createSSHSecret, detachVMSecret } from '../SSHSecretModal/utils/utils';
 
 type VMSSHSecretModalProps = {
   authorizedSSHKeys: { [namespace: string]: string };

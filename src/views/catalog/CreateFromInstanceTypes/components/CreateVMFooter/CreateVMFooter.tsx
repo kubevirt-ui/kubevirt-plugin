@@ -5,8 +5,8 @@ import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/u
 import { generateVM } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
-import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
+import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';

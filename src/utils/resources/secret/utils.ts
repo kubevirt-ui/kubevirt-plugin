@@ -6,7 +6,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { getName } from '../shared';

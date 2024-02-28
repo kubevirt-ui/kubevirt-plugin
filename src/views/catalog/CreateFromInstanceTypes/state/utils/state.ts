@@ -1,4 +1,4 @@
-import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretSection/utils/constants';
+import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 
 import { InstanceTypeVMState, InstanceTypeVMStoreState } from './types';
 

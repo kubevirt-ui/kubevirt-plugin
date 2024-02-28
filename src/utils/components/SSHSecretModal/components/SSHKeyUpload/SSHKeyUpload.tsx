@@ -2,7 +2,6 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
-import { getSecretNameErrorMessage } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -17,6 +16,7 @@ import {
 } from '@patternfly/react-core';
 
 import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
+import { getSecretNameErrorMessage } from '../../utils/utils';
 
 import './SSHKeyUpload.scss';
 

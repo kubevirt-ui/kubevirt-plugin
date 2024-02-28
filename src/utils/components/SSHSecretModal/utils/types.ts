@@ -1,3 +1,5 @@
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+
 export enum SecretSelectionOption {
   addNew = 'addNew',
   none = 'none',
@@ -17,4 +19,11 @@ export type SSHSecretDetails = {
   sshSecretName: string;
   // The namespace of secret
   sshSecretNamespace: string;
+};
+
+export type SecretsData = {
+  allSecrets: IoK8sApiCoreV1Secret[];
+  projectsWithSecrets: { [p: string]: IoK8sApiCoreV1Secret[] };
+  secretsLoaded: boolean;
+  secretsLoadError: Error;
 };

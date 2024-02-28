@@ -4,15 +4,15 @@ import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
+import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import {
   addSecretToVM,
   removeSecretToVM,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
