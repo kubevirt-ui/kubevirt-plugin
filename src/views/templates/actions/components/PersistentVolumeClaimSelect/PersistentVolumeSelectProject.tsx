@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
@@ -31,7 +31,7 @@ export const PersistentVolumeSelectProject: FC<PersistentVolumeSelectProjectProp
       isRequired
       label={t('PVC project')}
     >
-      <FilterSelect
+      <InlineFilterSelect
         options={projectsName?.map((name) => ({
           children: name,
           groupVersionKind: modelToGroupVersionKind(ProjectModel),

@@ -11,7 +11,6 @@ import {
   Button,
   ButtonVariant,
   DataList,
-  Form,
   Modal,
   ModalVariant,
   Stack,
@@ -126,23 +125,18 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
       onClose={onClose}
       position="top"
       title={t('Manage columns')}
-      variant={ModalVariant.medium}
+      variant={ModalVariant.small}
     >
-      <Form className="modal-content" name="form">
-        <div>
-          <p>{t('Selected columns will appear in the table.')}</p>
-        </div>
-        <div>
-          <Alert
-            className="co-alert"
-            isInline
-            title={t('You can select up to {{MAX_VIEW_COLS}} columns', { MAX_VIEW_COLS })}
-            variant={AlertVariant.info}
-          >
-            {!showNamespaceOverride &&
-              t('The namespace column is only shown when in "All projects"')}
-          </Alert>
-        </div>
+      <>
+        <p className="co-m-form-row">{t('Selected columns will appear in the table.')}</p>
+        <Alert
+          className="co-alert"
+          isInline
+          title={t('You can select up to {{MAX_VIEW_COLS}} columns', { MAX_VIEW_COLS })}
+          variant={AlertVariant.info}
+        >
+          {!showNamespaceOverride && t('The namespace column is only shown when in "All projects"')}
+        </Alert>
         <div className="row co-m-form-row">
           <div className="col-sm-12">
             <span className="col-sm-6">
@@ -187,7 +181,7 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
             </span>
           </div>
         </div>
-      </Form>
+      </>
     </Modal>
   );
 };

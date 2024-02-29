@@ -19,7 +19,7 @@ export const SerialConsoleActions: React.FunctionComponent<SerialConsoleActionsP
   textReset = t('Reset'),
 }: SerialConsoleActionsProps) => (
   <div className={css(styles.consoleActionsSerial)}>
-    <Button onClick={onDisconnect} variant="secondary">
+    <Button className="btn-margin" onClick={onDisconnect} variant="secondary">
       {textDisconnect}
     </Button>
     <Button onClick={onReset} variant="secondary">

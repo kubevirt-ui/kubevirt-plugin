@@ -8,7 +8,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
 
-import FilterSelect from '../FilterSelect/FilterSelect';
+import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
 
 import useSnapshots from './useSnapshots';
@@ -55,7 +55,7 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
           isRequired
           label={t('VolumeSnapshot project')}
         >
-          <FilterSelect
+          <InlineFilterSelect
             options={projectsNames.map((name) => ({
               children: name,
               groupVersionKind: modelToGroupVersionKind(NamespaceModel),
@@ -76,7 +76,7 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
 
       {snapshotsLoaded ? (
         <FormGroup fieldId="snapshot-name-select" isRequired label={t('VolumeSnapshot name')}>
-          <FilterSelect
+          <InlineFilterSelect
             options={snapshotNames.map((name) => ({
               children: name,
               groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),

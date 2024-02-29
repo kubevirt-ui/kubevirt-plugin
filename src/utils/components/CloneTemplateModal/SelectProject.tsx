@@ -5,7 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import FilterSelect from '../FilterSelect/FilterSelect';
+import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
 
 type SelectProjectProps = {
@@ -25,7 +25,7 @@ const SelectProject: FC<SelectProjectProps> = ({ selectedProject, setSelectedPro
   if (!projectsLoaded) return <Loading />;
 
   return (
-    <FilterSelect
+    <InlineFilterSelect
       options={projects?.map((project) => ({
         children: getName(project),
         groupVersionKind: modelToGroupVersionKind(ProjectModel),

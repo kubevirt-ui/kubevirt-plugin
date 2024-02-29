@@ -3,7 +3,7 @@ import { Trans } from 'react-i18next';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,9 @@ import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynam
 import {
   Alert,
   AlertVariant,
-  SelectOption,
+  Button,
+  ButtonVariant,
+  MenuFooter,
   Skeleton,
   Spinner,
   Text,
@@ -81,27 +83,32 @@ const TemplatesProjectSection: FC<TemplatesProjectSectionProps> = ({
         {t('Project')}
       </Text>
       {projectsLoaded && hyperLoaded ? (
-        <FilterSelect
+        <InlineFilterSelect
+          menuFooter={
+            <MenuFooter>
+              <Button
+                onClick={() =>
+                  createModal((props) => (
+                    <CreateProjectModal
+                      {...props}
+                      createdProject={(value) =>
+                        value?.metadata?.name && setSelectedProject(value?.metadata?.name)
+                      }
+                    />
+                  ))
+                }
+                key="create-project"
+                variant={ButtonVariant.secondary}
+              >
+                {t('Create project')}
+              </Button>
+            </MenuFooter>
+          }
           options={[
             ...projects?.map((proj) => ({
               groupVersionKind: modelToGroupVersionKind(ProjectModel),
               value: getName(proj),
             })),
-            <SelectOption
-              onClick={() =>
-                createModal((props) => (
-                  <CreateProjectModal
-                    {...props}
-                    createdProject={(value) =>
-                      value?.metadata?.name && setSelectedProject(value?.metadata?.name)
-                    }
-                  />
-                ))
-              }
-              key="create-project"
-            >
-              {t('Create project')}
-            </SelectOption>,
           ]}
           toggleProps={{
             icon: loading && <Spinner size="sm" />,

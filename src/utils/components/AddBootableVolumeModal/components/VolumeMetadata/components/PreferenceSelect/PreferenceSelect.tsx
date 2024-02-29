@@ -3,11 +3,10 @@ import React, { FC } from 'react';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
-
-import FilterSelect from '../../../../../FilterSelect/FilterSelect';
 
 import PreferencePopoverContent from './PreferencePopoverContent';
 
@@ -36,7 +35,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
       }
       isRequired
     >
-      <FilterSelect
+      <InlineFilterSelect
         options={preferencesNames
           ?.sort((a, b) => a.localeCompare(b))
           ?.map((opt) => ({

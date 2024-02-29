@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
@@ -58,14 +58,14 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
       <FormGroup fieldId="storage-class" label={t('StorageClass')}>
         <div data-test-id="storage-class-select">
           {loaded ? (
-            <FilterSelect
+            <InlineFilterSelect
               toggleProps={{
                 isFullWidth: true,
                 placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
               }}
               options={getSCSelectOptions(storageClasses)}
               popperProps={{ enableFlip: true }}
-              selected={storageClass}
+              selected={storageClass || defaultSC?.metadata?.name}
               setSelected={onSelect}
             />
           ) : (

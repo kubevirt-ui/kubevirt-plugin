@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
@@ -58,7 +58,7 @@ const DetailsRightGrid: FC = () => {
       <VirtualMachineDescriptionItem
         descriptionData={
           loaded ? (
-            <FilterSelect
+            <InlineFilterSelect
               selected={
                 instanceTypeVMState.selectedStorageClass ||
                 pvcSource?.spec?.storageClassName ||

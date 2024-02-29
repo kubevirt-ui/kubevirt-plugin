@@ -22,21 +22,24 @@ const VMsPerResourceCard = () => {
 
   return (
     <Card className="vms-per-resource-card__gradient" data-test-id="vms-per-template-card">
-      <CardHeader>
+      <CardHeader
+        actions={{
+          actions: (
+            <FormPFSelect
+              onSelect={handleSelect}
+              selected={vmResourceOption}
+              toggleProps={{ id: 'overview-vms-per-resource-card' }}
+            >
+              {vmsPerResourceOptions?.map((scope) => (
+                <SelectOption key={scope.type} value={scope.title}>
+                  {scope.title}
+                </SelectOption>
+              ))}
+            </FormPFSelect>
+          ),
+        }}
+      >
         <CardTitle>{t('VirtualMachines per resource')}</CardTitle>
-        <div className="vm-per-resources-dropdown">
-          <FormPFSelect
-            onSelect={handleSelect}
-            selected={vmResourceOption}
-            toggleProps={{ id: 'overview-vms-per-resource-card' }}
-          >
-            {vmsPerResourceOptions?.map((scope) => (
-              <SelectOption key={scope.type} value={scope.title}>
-                {scope.title}
-              </SelectOption>
-            ))}
-          </FormPFSelect>
-        </div>
       </CardHeader>
       <CardBody>
         <VMsPerResourceChart type={type} />

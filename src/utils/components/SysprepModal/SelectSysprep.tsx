@@ -7,7 +7,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
-import FilterSelect from '../FilterSelect/FilterSelect';
+import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
 
 import { AUTOUNATTEND, UNATTEND } from './sysprep-utils';
@@ -49,7 +49,7 @@ const SelectSysprep: FC<SelectSysprepProps> = ({
   return (
     <>
       {configmapsLoaded ? (
-        <FilterSelect
+        <InlineFilterSelect
           options={sysprepConfigMaps?.map((configMap) => {
             const name = getName(configMap);
             return {

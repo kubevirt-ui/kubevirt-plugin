@@ -57,6 +57,7 @@ export const VncConsoleActions: FC<VncConsoleActionsProps> = ({
               <PasteIcon /> {t('Paste')}
             </span>
           }
+          className="vnc-paste-button"
           onClick={onInjectTextFromClipboard}
           variant={ButtonVariant.link}
         />

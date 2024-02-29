@@ -1,7 +1,7 @@
 import React, { FC, memo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -34,7 +34,7 @@ export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdo
         <Text className="templates-catalog-project-dropdown-label" component={TextVariants.h6}>
           {t('Template project')}
         </Text>
-        <FilterSelect
+        <InlineFilterSelect
           options={[
             { children: ALL_PROJECTS_SELECTOR, value: ALL_PROJECTS_SELECTOR },
             ...projects
@@ -46,6 +46,7 @@ export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdo
           ]}
           selected={selectedProject || ALL_PROJECTS_SELECTOR}
           setSelected={onSelect}
+          toggleProps={{ isFullWidth: true }}
         />
       </div>
     );

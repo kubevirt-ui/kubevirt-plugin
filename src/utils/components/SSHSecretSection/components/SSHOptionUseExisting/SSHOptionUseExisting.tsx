@@ -2,7 +2,7 @@ import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useState }
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getSecretNameErrorMessage } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
@@ -52,7 +52,9 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
-  const [selectedProject, setSelectedProject] = useState<string>();
+  const [selectedProject, setSelectedProject] = useState<string>(
+    localNSProject || namespace || sshDetails?.sshSecretNamespace,
+  );
   const [projectsData] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
     isList: true,
@@ -112,7 +114,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
       <Grid className="ssh-use-existing__body">
         <GridItem span={6}>
           <FormGroup fieldId="project" label={t('Project')}>
-            <FilterSelect
+            <InlineFilterSelect
               options={projects.map((proj) => ({
                 children: proj,
                 groupVersionKind: modelToGroupVersionKind(ProjectModel),
@@ -121,7 +123,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
               className="ssh-use-existing__form-group--project"
               selected={selectedProject}
               setSelected={onSelectProject}
-              toggleProps={{ placeholder: t('Search project') }}
+              toggleProps={{ isFullWidth: true, placeholder: t('Search project') }}
             />
           </FormGroup>
         </GridItem>

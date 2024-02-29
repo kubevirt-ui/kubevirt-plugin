@@ -1,9 +1,9 @@
 .kv-top-consumers-card__top-grid {
-  border-bottom: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--100);
+  border-bottom: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--light-300);
 }
 
 .kv-top-consumers-card__card-grid-item {
   &:not(:last-child) {
-    border-right: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--100);
+    border-right: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--light-300);
   }
 }

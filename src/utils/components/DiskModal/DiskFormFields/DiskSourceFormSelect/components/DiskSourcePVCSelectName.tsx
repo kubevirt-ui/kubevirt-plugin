@@ -4,7 +4,7 @@ import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
@@ -31,7 +31,7 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({
   return (
     <FormGroup fieldId={fieldId} id={fieldId} isRequired label={t('PVC name')}>
       {pvcsLoaded ? (
-        <FilterSelect
+        <InlineFilterSelect
           options={pvcNames?.map((name) => ({
             children: name,
             groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),

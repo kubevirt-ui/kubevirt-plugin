@@ -22,6 +22,8 @@ import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 import { installOrRemoveCheckupsStoragePermissions } from '../utils/utils';
 
+import './CheckupsStorageListEmptyState.scss';
+
 type CheckupsStorageListEmptyStateProps = {
   clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding;
   isPermitted: boolean;
@@ -79,7 +81,7 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
             {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
           </Button>
         </EmptyStateActions>
-        <EmptyStateActions>
+        <EmptyStateActions className="empty-state-secondary-action">
           <ExternalLink href={'#'} text={t('Learn about storage checkups')} />
         </EmptyStateActions>
       </EmptyStateFooter>

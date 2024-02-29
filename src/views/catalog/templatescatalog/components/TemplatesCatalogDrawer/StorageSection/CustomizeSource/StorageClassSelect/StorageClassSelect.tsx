@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
@@ -27,7 +27,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
       isRequired
       label={t('Storage class')}
     >
-      <FilterSelect
+      <InlineFilterSelect
         options={sortedStorageClasses?.map((name) => ({ children: name, value: name }))}
         selected={storageClassName}
         setSelected={onStorageClassChange}

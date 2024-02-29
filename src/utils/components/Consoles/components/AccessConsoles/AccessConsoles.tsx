@@ -49,31 +49,34 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
 
   const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
   return (
-    <div className="pf-c-console">
-      {Children.toArray(children).length > 1 && (
-        <div className={css('pf-c-console__actions', 'pf-u-w-0', 'access-consoles')}>
-          <Select
-            onSelect={(_, selection: string) => {
-              setType(selection);
-              setIsOpen(false);
-            }}
-            toggle={SelectToggle({
-              id: 'pf-c-console__type-selector',
-              isExpanded: isOpen,
-              onClick: onToggle,
-              selected: type,
-            })}
-            aria-label={textSelectConsoleType}
-            isOpen={isOpen}
-            onOpenChange={(open: boolean) => setIsOpen(open)}
-            placeholder={textSelectConsoleType}
-            selected={type}
-          >
-            <SelectList>{selectOptions}</SelectList>
-          </Select>
-        </div>
-      )}
-      {type && getConsoleForType(type, children)}
+    <div className="kv-console">
+      <div className="pf-v5-c-console">
+        {Children.toArray(children).length > 1 && (
+          <div className={css('pf-v5-c-console__actions', 'pf-u-w-0', 'access-consoles')}>
+            <Select
+              onSelect={(_, selection: string) => {
+                setType(selection);
+                setIsOpen(false);
+              }}
+              toggle={SelectToggle({
+                id: 'pf-c-console__type-selector',
+                isExpanded: isOpen,
+                onClick: onToggle,
+                selected: type,
+                style: { minWidth: '250px' },
+              })}
+              aria-label={textSelectConsoleType}
+              isOpen={isOpen}
+              onOpenChange={(open: boolean) => setIsOpen(open)}
+              placeholder={textSelectConsoleType}
+              selected={type}
+            >
+              <SelectList>{selectOptions}</SelectList>
+            </Select>
+          </div>
+        )}
+        {type && getConsoleForType(type, children)}
+      </div>
     </div>
   );
 };

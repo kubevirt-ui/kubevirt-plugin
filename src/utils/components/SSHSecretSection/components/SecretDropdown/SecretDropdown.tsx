@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import FilterSelect from '@kubevirt-utils/components/FilterSelect/FilterSelect';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { generateValidSecretName } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
@@ -49,7 +49,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
       ...prev,
       secretOption: addNew ? SecretSelectionOption.addNew : SecretSelectionOption.useExisting,
       sshPubKey,
-      sshSecretName: generatedSecretName,
+      sshSecretName: addNew ? generatedSecretName : newSecretName,
       sshSecretNamespace: selectedSecret?.metadata?.namespace,
     }));
     setSecretName(newSecretName);
@@ -57,14 +57,14 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
   };
 
   return (
-    <FilterSelect
+    <InlineFilterSelect
       options={secretsResourceData?.map((secret: IoK8sApiCoreV1Secret) => {
         const name = getName(secret);
         return { children: name, value: name };
       })}
       selected={secretName}
       setSelected={onSelect}
-      toggleProps={{ placeholder: t('--- Select secret ---') }}
+      toggleProps={{ isFullWidth: true, placeholder: t('--- Select secret ---') }}
     />
   );
 };
