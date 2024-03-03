@@ -51,6 +51,7 @@ const UploadSource: FC<UploadSourceProps> = ({ onFileSelected, relevantUpload, t
                   onChange({ value: data });
                 }}
                 onFileInputChange={(event: DropEvent, file: File) => {
+                  onFileSelected(file);
                   onChange({ filename: file.name });
                 }}
                 onTextChange={(event: ChangeEvent, text: string) => {
