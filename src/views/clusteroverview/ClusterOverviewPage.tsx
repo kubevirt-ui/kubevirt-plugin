@@ -26,11 +26,6 @@ const ClusterOverviewPage: FC = () => {
         href: 'top-consumers',
         name: t('Top consumers'),
       },
-      {
-        component: MigrationsTab,
-        href: 'migrations',
-        name: t('Migrations'),
-      },
     ];
 
     return [
@@ -40,6 +35,11 @@ const ClusterOverviewPage: FC = () => {
         name: t('Overview'),
       },
       ...(isAdmin ? [...adminPages] : []),
+      {
+        component: MigrationsTab,
+        href: 'migrations',
+        name: t('Migrations'),
+      },
       {
         component: SettingsTab,
         href: 'settings',
