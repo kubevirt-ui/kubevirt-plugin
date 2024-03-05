@@ -39,7 +39,10 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
   const [error, setError] = useState<Error>(null);
   const [isChecked, setIsChecked] = useState<boolean>();
 
-  useEffect(() => setIsChecked(!disableSerialConsoleLog), [disableSerialConsoleLog]);
+  useEffect(() => {
+    guestSystemLogsAccessToggle(!!disableSerialConsoleLog);
+    setIsChecked(!disableSerialConsoleLog);
+  }, [disableSerialConsoleLog, guestSystemLogsAccessToggle]);
 
   const onChange = async (checked: boolean) => {
     try {
