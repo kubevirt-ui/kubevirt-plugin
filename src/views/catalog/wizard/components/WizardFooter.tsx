@@ -8,6 +8,7 @@ import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeat
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import {
   Alert,
   Button,
@@ -46,6 +47,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
     createVM({
       isDisableGuestSystemAccessLog,
       onFullfilled: (createdVM) => {
+        createHeadlessService(createdVM);
         clearSessionStorageVM();
         navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
       },

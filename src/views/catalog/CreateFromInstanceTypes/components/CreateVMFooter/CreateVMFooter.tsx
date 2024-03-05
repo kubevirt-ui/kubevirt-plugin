@@ -12,6 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -93,10 +94,11 @@ const CreateVMFooter: FC = () => {
       data: vmToCreate,
       model: VirtualMachineModel,
     })
-      .then(() => {
+      .then((createdVM) => {
         if (secretOption === SecretSelectionOption.addNew) {
           createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
         }
+        createHeadlessService(createdVM);
         navigate(getResourceUrl({ model: VirtualMachineModel, resource: vmToCreate }));
       })
       .catch(setError)

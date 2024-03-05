@@ -12,6 +12,7 @@ import {
   LABEL_USED_TEMPLATE_NAMESPACE,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
+import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { k8sCreate, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createMultipleResources, isRHELTemplate } from './utils';
@@ -85,6 +86,8 @@ export const quickCreateVM: QuickCreateVMType = async ({
   const createdVM = createdObjects.find(
     (object) => object.kind === VirtualMachineModel.kind,
   ) as V1VirtualMachine;
+
+  createHeadlessService(createdVM);
 
   return createdVM;
 };

@@ -9,6 +9,7 @@ import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
 
 import { createURL } from '../../utils/utils';
 
+import VirtualMachinesOverviewTabNetworkFQDN from './components/VirtualMachinesOverviewTabNetworkFQDN';
 import useVirtualMachinesOverviewTabInterfacesColumns from './hooks/useVirtualMachinesOverviewTabInterfacesColumns';
 import useVirtualMachinesOverviewTabInterfacesData from './hooks/useVirtualMachinesOverviewTabInterfacesData';
 import { InterfacesData } from './utils/types';
@@ -38,7 +39,7 @@ const VirtualMachinesOverviewTabInterfaces: FC<VirtualMachinesOverviewTabInterfa
               location?.pathname,
             )}
           >
-            {t('Network interfaces ({{networks}})', { networks: data?.length || 0 })}
+            {t('Network ({{count}})', { count: data?.length || 0 })}
           </Link>
         </CardTitle>
         <Divider />
@@ -56,6 +57,7 @@ const VirtualMachinesOverviewTabInterfaces: FC<VirtualMachinesOverviewTabInterfa
             Row={VirtualMachinesOverviewTabNetworkInterfacesRow}
             unfilteredData={data}
           />
+          <VirtualMachinesOverviewTabNetworkFQDN vm={vm} />
         </CardBody>
       </Card>
     </div>
