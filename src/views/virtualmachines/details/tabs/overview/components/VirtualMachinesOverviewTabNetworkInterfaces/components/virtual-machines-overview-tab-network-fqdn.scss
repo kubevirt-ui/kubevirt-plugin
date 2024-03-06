@@ -1,0 +1,17 @@
+.VirtualMachinesOverviewTabNetworkFQDN {
+  &--main {
+    padding: var(--pf-global--spacer--md) 0 var(--pf-global--spacer--md)
+      var(--pf-global--spacer--lg);
+    .pf-v5-c-clipboard-copy__text {
+      max-width: 85%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-block;
+      vertical-align: bottom;
+    }
+    .pf-v5-c-description-list__text {
+      font-weight: normal;
+    }
+  }
+}

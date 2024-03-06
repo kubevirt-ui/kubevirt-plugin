@@ -30,9 +30,14 @@ import {
   LABEL_USED_TEMPLATE_NAMESPACE,
 } from '@kubevirt-utils/resources/template';
 import { getMemoryCPU } from '@kubevirt-utils/resources/vm';
+import {
+  HEADLESS_SERVICE_LABEL,
+  HEADLESS_SERVICE_NAME,
+} from '@kubevirt-utils/utils/headless-service';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 
+import { getLabels } from '../../../../../clusteroverview/OverviewTab/inventory-card/utils/flattenTemplates';
 import { allRequiredParametersAreFulfilled, hasValidSource, uploadFiles } from '../utils';
 
 import useCreateVMName from './useCreateVMName';
@@ -97,6 +102,9 @@ const useCreateDrawerForm = (
         const { cpu, memory } = getMemoryCPU(vm);
         vmObject.spec.template.spec.domain.cpu.cores = cpu?.cores;
         vmObject.spec.template.spec.domain.memory.guest = memory;
+
+        if (!getLabels(vmObject.spec.template)) vmObject.spec.template.metadata.labels = {};
+        vmObject.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
 
         const modifiedTemplateObjects = template?.objects?.map((obj) =>
           obj.kind === VirtualMachineModel.kind ? vmObject : obj,

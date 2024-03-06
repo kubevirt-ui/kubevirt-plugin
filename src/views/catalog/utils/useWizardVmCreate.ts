@@ -4,7 +4,13 @@ import produce from 'immer';
 import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import {
+  HEADLESS_SERVICE_LABEL,
+  HEADLESS_SERVICE_NAME,
+} from '@kubevirt-utils/utils/headless-service';
 import { K8sResourceCommon, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
+
+import { getLabels } from '../../clusteroverview/OverviewTab/inventory-card/utils/flattenTemplates';
 
 import { createMultipleResources } from './utils';
 import { useWizardVMContext } from './WizardVMContext';
@@ -52,6 +58,9 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
           devices.logSerialConsole = false;
           vmDraft.spec.template.spec.domain.devices = devices;
         }
+
+        if (!getLabels(vmDraft.spec.template)) vmDraft.spec.template.metadata.labels = {};
+        vmDraft.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
       });
 
       const createdObjects = await createMultipleResources(

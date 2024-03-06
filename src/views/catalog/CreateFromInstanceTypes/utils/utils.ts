@@ -15,6 +15,10 @@ import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAuto
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import {
+  HEADLESS_SERVICE_LABEL,
+  HEADLESS_SERVICE_NAME,
+} from '@kubevirt-utils/utils/headless-service';
 import { generatePrettyName, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sGroupVersionKind, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -125,6 +129,11 @@ export const generateVM = (
       },
       running: startVM,
       template: {
+        metadata: {
+          labels: {
+            [HEADLESS_SERVICE_LABEL]: HEADLESS_SERVICE_NAME,
+          },
+        },
         spec: {
           domain: {
             devices: {
@@ -146,6 +155,7 @@ export const generateVM = (
             },
           },
           networks: [{ name: 'default', pod: {} }],
+          subdomain: HEADLESS_SERVICE_NAME,
           volumes: [
             {
               dataVolume: { name: `${virtualmachineName}-volume` },
