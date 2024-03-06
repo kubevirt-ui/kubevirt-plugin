@@ -109,7 +109,7 @@ export const generateVM = (
                   },
                 }),
             storage: {
-              resources: { requests: { storage: pvcSource?.spec?.resources?.requests?.storage } },
+              resources: {},
               storageClassName:
                 instanceTypeState.selectedStorageClass || pvcSource?.spec?.storageClassName,
             },
@@ -136,25 +136,8 @@ export const generateVM = (
         },
         spec: {
           domain: {
-            devices: {
-              disks: [
-                {
-                  disk: {
-                    bus: 'virtio',
-                  },
-                  name: ROOTDISK,
-                },
-                {
-                  disk: {
-                    bus: 'virtio',
-                  },
-                  name: 'cloudinitdisk',
-                },
-              ],
-              interfaces: [{ masquerade: {}, name: 'default' }],
-            },
+            devices: {},
           },
-          networks: [{ name: 'default', pod: {} }],
           subdomain: HEADLESS_SERVICE_NAME,
           volumes: [
             {
