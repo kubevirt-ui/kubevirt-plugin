@@ -78,7 +78,7 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
       <GridItem className="ssh-auth-row__project-name" span={5}>
         {isEmpty(secretName) ? (
           <InlineFilterSelect
-            options={selectableProjects?.map((opt) => ({
+            options={selectableProjects?.sort().map((opt) => ({
               children: opt,
               groupVersionKind: modelToGroupVersionKind(ProjectModel),
               value: opt,

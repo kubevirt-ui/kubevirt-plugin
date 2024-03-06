@@ -34,7 +34,7 @@ const useSSHAuthProjects: UseSSHAuthProjects = (authKeyRows) => {
   const selectedProjects = useMemo(
     () =>
       authKeyRows.reduce((acc, row) => {
-        !isEmpty(row.projectName) && acc.push(row.projectName);
+        !isEmpty(row.projectName) && !isEmpty(row.secretName) && acc.push(row.projectName);
         return acc;
       }, []) || [],
     [authKeyRows],

@@ -143,15 +143,7 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
               value={option.value}
               {...option}
             >
-              {!isEmpty(option.groupVersionKind) ? (
-                <ResourceLink
-                  groupVersionKind={option.groupVersionKind}
-                  linkTo={false}
-                  name={option.value}
-                />
-              ) : (
-                option.children
-              )}
+              {getOptionComponent(option)}
             </SelectOption>
           );
         })}
