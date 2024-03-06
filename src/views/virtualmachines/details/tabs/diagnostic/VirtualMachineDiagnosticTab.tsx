@@ -54,7 +54,7 @@ const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ vm }) => {
         <Tab
           className="VirtualMachineDiagnosticTab--main__content"
           eventKey={VirtualMachineDetailsTab.Logs}
-          title={<TabTitleText>{t('Guest system access log')}</TabTitleText>}
+          title={<TabTitleText>{t('Guest system log')}</TabTitleText>}
         >
           <VirtualMachineLogViewer
             connect={activeTabKey === VirtualMachineDetailsTab.Logs}
