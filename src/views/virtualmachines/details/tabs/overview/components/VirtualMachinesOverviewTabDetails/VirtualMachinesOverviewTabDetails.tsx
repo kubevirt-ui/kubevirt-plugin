@@ -162,7 +162,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                 <VirtualMachineDescriptionItem
                   data-test-id="virtual-machine-overview-details-timezone"
                   descriptionData={guestAgentData?.timezone?.split(',')[0] || NO_DATA_DASH}
-                  descriptionHeader={t('Hostname')}
+                  descriptionHeader={t('Time zone')}
                 />
                 {getInstanceTypeMatcher(vm) ? (
                   <InstanceTypeDescription vm={vm} />
@@ -172,7 +172,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                 <VirtualMachineDescriptionItem
                   data-test-id="virtual-machine-overview-details-host"
                   descriptionData={hostname ?? fallback}
-                  descriptionHeader={t('Time zone')}
+                  descriptionHeader={t('Hostname')}
                 />
                 <VirtualMachineDescriptionItem
                   bodyContent={t(
