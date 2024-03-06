@@ -48,7 +48,7 @@ import {
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isPendingHotPlugNIC } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
-import { getBootloader } from '../../../resources/vm/utils/selectors';
+import { getBootloader, getDisks } from '../../../resources/vm/utils/selectors';
 
 import { PendingChange } from './types';
 
@@ -72,7 +72,7 @@ export const checkBootOrderChanged = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
 ): boolean => {
-  if (isEmpty(vm) || isEmpty(vmi)) {
+  if (isEmpty(vm) || isEmpty(vmi) || isEmpty(getDisks(vm))) {
     return false;
   }
 
