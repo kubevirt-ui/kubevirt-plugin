@@ -38,6 +38,7 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
         ...toggleProps,
       })}
       isOpen={isOpen}
+      isScrollable
       onOpenChange={(open: boolean) => setIsOpen(open)}
       selected={selected}
       {...props}

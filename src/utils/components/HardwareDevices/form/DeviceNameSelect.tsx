@@ -32,45 +32,43 @@ const DeviceNameSelect: FC<DeviceNameSelectProps> = ({
     <GridItem span={5}>
       <FormGroup fieldId="deviceName" isRequired label={!index && t('Device name')}>
         <Select
+          toggle={SelectToggle({
+            isExpanded: isOpen,
+            isFullWidth: true,
+            onClick: onToggle,
+            selected: deviceName,
+          })}
           id="deviceName"
           isOpen={isOpen}
           onOpenChange={(open: boolean) => setIsOpen(open)}
           onSelect={onSelect}
           popperProps={{ appendTo: () => document.getElementById('tab-modal') }}
           selected={deviceName}
-          toggle={SelectToggle({ isExpanded: isOpen, onClick: onToggle, selected: deviceName })}
         >
-          <SelectGroup
-            hidden={isEmpty(permittedHostDevices?.mediatedDevices)}
-            key="mediated"
-            label={t('Mediated devices')}
-          >
-            {permittedHostDevices?.mediatedDevices?.map(({ resourceName }) => (
-              <SelectOption key={resourceName} value={resourceName}>
-                {resourceName}
+          {!isEmpty(permittedHostDevices?.mediatedDevices) && (
+            <SelectGroup key="mediated" label={t('Mediated devices')}>
+              {permittedHostDevices?.mediatedDevices?.map(({ resourceName }) => (
+                <SelectOption key={resourceName} value={resourceName}>
+                  {resourceName}
+                </SelectOption>
+              ))}
+            </SelectGroup>
+          )}
+          {!isEmpty(permittedHostDevices?.pciHostDevices) && (
+            <SelectGroup key="pciHost" label={t('PCI host devices')}>
+              {permittedHostDevices?.pciHostDevices?.map(({ resourceName }) => (
+                <SelectOption key={resourceName} value={resourceName}>
+                  {resourceName}
+                </SelectOption>
+              ))}
+            </SelectGroup>
+          )}
+          {isEmpty(permittedHostDevices?.mediatedDevices) &&
+            isEmpty(permittedHostDevices?.pciHostDevices) && (
+              <SelectOption isDisabled key="noDevices">
+                {t('No host devices exists')}
               </SelectOption>
-            ))}
-          </SelectGroup>
-          <SelectGroup
-            hidden={isEmpty(permittedHostDevices?.pciHostDevices)}
-            key="pciHost"
-            label={t('PCI host devices')}
-          >
-            {permittedHostDevices?.pciHostDevices?.map(({ resourceName }) => (
-              <SelectOption key={resourceName} value={resourceName}>
-                {resourceName}
-              </SelectOption>
-            ))}
-          </SelectGroup>
-          <SelectOption
-            hidden={
-              !isEmpty(permittedHostDevices?.mediatedDevices) ||
-              !isEmpty(permittedHostDevices?.pciHostDevices)
-            }
-            isDisabled
-            key="noDevices"
-            label={t('No host devices exists')}
-          />
+            )}
         </Select>
       </FormGroup>
     </GridItem>

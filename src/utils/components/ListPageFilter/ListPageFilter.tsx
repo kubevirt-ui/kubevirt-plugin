@@ -187,10 +187,6 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                   <div className="pf-c-input-group co-filter-group">
                     {filterDropdownKeys.length > 1 && (
                       <FormPFSelect
-                        toggleProps={{
-                          icon: <FilterIcon className="span--icon__right-margin" />,
-                          placeholder: t('Filter'),
-                        }}
                         onSelect={onSelect}
                         selected={searchType}
                         selectedLabel={filterDropdownItems?.[searchType]}
