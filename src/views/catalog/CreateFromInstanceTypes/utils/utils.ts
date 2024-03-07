@@ -1,4 +1,3 @@
-import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -117,9 +116,9 @@ export const generateVM = (
         },
       ],
       instancetype: {
-        kind: instanceTypeState?.selectedInstanceType?.namespace
-          ? VirtualMachineInstancetypeModel.kind
-          : VirtualMachineClusterInstancetypeModelGroupVersionKind?.kind,
+        ...(instanceTypeState?.selectedInstanceType?.namespace && {
+          kind: VirtualMachineInstancetypeModel.kind,
+        }),
         name:
           selectedInstanceType?.name ||
           selectedBootableVolume?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL],
