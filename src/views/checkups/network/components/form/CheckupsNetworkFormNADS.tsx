@@ -20,14 +20,19 @@ const CheckupsNetworkFormNADS: FC<CheckupsNetworkFormNADSProps> = ({
 
   const nadsItems = (nads || [])
     ?.filter((nad) => nad?.metadata?.namespace === namespace)
-    ?.map((nad) => <SelectOption key={nad?.metadata?.uid} value={nad.metadata.name} />);
+    ?.map((nad) => (
+      <SelectOption key={nad?.metadata?.uid} value={nad.metadata.name}>
+        {nad.metadata.name}
+      </SelectOption>
+    ));
 
   return (
     <FormGroup fieldId="nad" isRequired label={t('NetworkAttachmentDefinition')}>
       <FormPFSelect
+        className="placeholder"
         onSelect={(_: MouseEvent, value: string) => setSelectedNAD(value)}
-        placeholder={t('Select NetwrokAttachmentDefinition')}
         selected={selectedNAD}
+        toggleProps={{ isFullWidth: true, placeholder: t('Select NetwrokAttachmentDefinition') }}
       >
         {nadsItems}
       </FormPFSelect>

@@ -1,6 +1,5 @@
 import React, { FC, useState } from 'react';
 
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { MenuToggleProps, Select, SelectProps } from '@patternfly/react-core';
 
 import SelectToggle from '../toggles/SelectToggle';
@@ -35,7 +34,7 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
         className,
         isExpanded: isOpen,
         onClick: onToggle,
-        selected: !isEmpty(selectedLabel) ? selectedLabel : selected,
+        selected: selectedLabel || selected || toggleProps?.placeholder,
         ...toggleProps,
       })}
       isOpen={isOpen}
