@@ -89,7 +89,13 @@ const RowFilters: FC<RowFiltersProps> = ({
                   item.hideIfEmpty && (item.count === 0 || item.count === '0') ? (
                     <></>
                   ) : (
-                    <SelectOption data-test-row-filter={item.id} key={item.id} value={item.id}>
+                    <SelectOption
+                      data-test-row-filter={item.id}
+                      hasCheckbox
+                      isSelected={selectedRowFilters?.includes(item.id)}
+                      key={item.id}
+                      value={item.id}
+                    >
                       <span className="co-filter-dropdown-item__name">{item.title}</span>
                       <Badge isRead key={item.id}>
                         {item.count}
