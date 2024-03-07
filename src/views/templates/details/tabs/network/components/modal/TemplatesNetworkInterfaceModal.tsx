@@ -1,7 +1,7 @@
 import React, { FC, useCallback } from 'react';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import SharedNetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
+import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
 import {
   createInterface,
   createNetwork,
@@ -53,7 +53,7 @@ const TemplatesNetworkInterfaceModal: FC<TemplatesNetworkInterfaceModalProps> = 
   );
 
   return (
-    <SharedNetworkInterfaceModal
+    <NetworkInterfaceModal
       headerText={headerText}
       isOpen={isOpen}
       namespace={template?.metadata?.namespace}
