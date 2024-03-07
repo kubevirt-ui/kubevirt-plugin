@@ -3,14 +3,14 @@ import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import {
+  getCloudInitPropagationMethod,
+  getPropagationMethod,
+} from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
 
 import CloudInitInfoHelper from '../CloudinitDescription/CloudinitInfoHelper';
-import {
-  getCloudInitPropagationMethod,
-  getPropagationMethod,
-} from '../SSHSecretSection/utils/utils';
 import TabModal from '../TabModal/TabModal';
 
 import { useCloudInit } from './utils/useCloudInit';

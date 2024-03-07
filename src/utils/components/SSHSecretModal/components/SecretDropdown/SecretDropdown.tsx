@@ -2,7 +2,10 @@ import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react'
 
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
-import { generateValidSecretName } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import {
+  addNewSecret,
+  generateValidSecretName,
+} from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -14,8 +17,8 @@ import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
 type SecretDropdownProps = {
   namespace: string;
   onSelectSecret: (generatedSecretName: string) => void;
-  secretsResourceData: IoK8sApiCoreV1Secret[];
   selectedProject: string;
+  selectedProjectSecrets: IoK8sApiCoreV1Secret[];
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   sshDetails: SSHSecretDetails;
 };
@@ -23,8 +26,8 @@ type SecretDropdownProps = {
 const SecretDropdown: FC<SecretDropdownProps> = ({
   namespace,
   onSelectSecret,
-  secretsResourceData,
   selectedProject,
+  selectedProjectSecrets,
   setSSHDetails,
   sshDetails,
 }) => {
@@ -38,10 +41,10 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
   );
 
   const onSelect = (newSecretName: string) => {
-    const selectedSecret = secretsResourceData.find(
+    const selectedSecret = selectedProjectSecrets.find(
       (secret: IoK8sApiCoreV1Secret) => getName(secret) === newSecretName,
     );
-    const addNew = namespace ? selectedProject !== namespace : selectedProject !== activeNamespace;
+    const addNew = addNewSecret(namespace, selectedProject, activeNamespace);
     const sshPubKey = decodeSecret(selectedSecret);
     const generatedSecretName = generateValidSecretName(newSecretName);
 
@@ -58,7 +61,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
 
   return (
     <InlineFilterSelect
-      options={secretsResourceData?.map((secret: IoK8sApiCoreV1Secret) => {
+      options={selectedProjectSecrets?.map((secret: IoK8sApiCoreV1Secret) => {
         const name = getName(secret);
         return { children: name, value: name };
       })}

@@ -11,7 +11,7 @@ import { Updater, useImmer } from 'use-immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import {
   DataUpload,

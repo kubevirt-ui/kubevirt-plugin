@@ -20,9 +20,9 @@ import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
-import VMSSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/VMSSHSecretModal';
 import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
+import VMSSHSecretModal from '@kubevirt-utils/components/VMSSHSecretModal/VMSSHSecretModal';
 import {
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,

@@ -16,7 +16,7 @@ import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/Clou
 import {
   addSecretToVM,
   applyCloudDriveCloudInitVolume,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';

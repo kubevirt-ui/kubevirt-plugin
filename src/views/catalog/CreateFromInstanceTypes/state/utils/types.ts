@@ -7,7 +7,7 @@ import {
   V1beta1VirtualMachineInstancetype,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
-import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 
 export type InstanceTypes = (

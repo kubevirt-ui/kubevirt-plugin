@@ -8,6 +8,8 @@ import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { Skeleton } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
+import './CPUMemory.scss';
+
 type CPUMemoryProps = {
   fetchVMI?: boolean;
   vm: V1VirtualMachine;
@@ -25,7 +27,10 @@ const CPUMemory: FC<CPUMemoryProps> = ({ vm, vmi }) => {
   const memory = readableSizeUnit(getMemory(vm) || getMemory(vmi));
 
   return (
-    <span data-test-id="virtual-machine-overview-details-cpu-memory">
+    <span
+      data-test-id="virtual-machine-overview-details-cpu-memory"
+      id="virtual-machine-overview-details-cpu-memory"
+    >
       {t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}
     </span>
   );

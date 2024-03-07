@@ -1,39 +1,37 @@
-import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import SecretSelectionRadioGroup from '@kubevirt-utils/components/SSHSecretSection/components/SecretSelectionRadioGroup';
-import SSHKeyUpload from '@kubevirt-utils/components/SSHSecretSection/components/SSHKeyUpload/SSHKeyUpload';
+import SecretSelectionRadioGroup from '@kubevirt-utils/components/SSHSecretModal/components/SecretSelectionRadioGroup';
+import SSHKeyUpload from '@kubevirt-utils/components/SSHSecretModal/components/SSHKeyUpload/SSHKeyUpload';
 import {
+  SecretsData,
   SecretSelectionOption,
   SSHSecretDetails,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Checkbox, Grid, GridItem } from '@patternfly/react-core';
 
-import SSHOptionUseExisting from './components/SSHOptionUseExisting/SSHOptionUseExisting';
-import { getMappedProjectsWithKeys } from './utils/utils';
+import SSHOptionUseExisting from '../SSHOptionUseExisting/SSHOptionUseExisting';
 
-import './SSHSecretSection.scss';
+import './SSHSecretModalBody.scss';
 
-type SSHSecretSectionProps = {
+type SSHSecretModalBodyProps = {
   isTemplate: boolean;
   isUserTab: boolean;
   localNSProject: string;
   namespace?: string;
-  secretsData: WatchK8sResult<IoK8sApiCoreV1Secret[]>;
+  secretsData: SecretsData;
   setLocalNSProject: Dispatch<SetStateAction<string>>;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   sshDetails: SSHSecretDetails;
 };
 
-const SSHSecretSection: FC<SSHSecretSectionProps> = ({
+const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
   isTemplate,
   isUserTab,
   localNSProject,
   namespace,
-  secretsData: [secrets, loadedSecrets, errorLoadingSecrets],
+  secretsData,
   setLocalNSProject,
   setSSHDetails,
   sshDetails,
@@ -42,7 +40,8 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({
   const [secretSelectionOption, setSecretSelectionOption] = useState<SecretSelectionOption>(
     sshDetails.secretOption,
   );
-  const projectsWithSecrets = useMemo(() => getMappedProjectsWithKeys(secrets), [secrets]);
+
+  const { allSecrets, projectsWithSecrets, secretsLoaded, secretsLoadError } = secretsData;
 
   const showDefaultCheckbox =
     (secretSelectionOption === SecretSelectionOption.addNew && !isTemplate) ||
@@ -60,18 +59,22 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({
       <GridItem className="ssh-secret-section__body">
         {secretSelectionOption === SecretSelectionOption.useExisting && (
           <SSHOptionUseExisting
-            loadedSecrets={loadedSecrets}
             localNSProject={localNSProject}
             namespace={namespace}
             projectsWithSecrets={projectsWithSecrets}
-            secrets={secrets}
+            secrets={allSecrets}
+            secretsLoaded={secretsLoaded}
             setLocalNSProject={setLocalNSProject}
             setSSHDetails={setSSHDetails}
             sshDetails={sshDetails}
           />
         )}
         {secretSelectionOption === SecretSelectionOption.addNew && (
-          <SSHKeyUpload secrets={secrets} setSSHDetails={setSSHDetails} sshDetails={sshDetails} />
+          <SSHKeyUpload
+            secrets={allSecrets}
+            setSSHDetails={setSSHDetails}
+            sshDetails={sshDetails}
+          />
         )}
       </GridItem>
       {showDefaultCheckbox && (
@@ -88,13 +91,13 @@ const SSHSecretSection: FC<SSHSecretSectionProps> = ({
           isDisabled={isUserTab}
         />
       )}
-      {errorLoadingSecrets && (
+      {secretsLoadError && (
         <Alert title={t('Error')} variant={AlertVariant.danger}>
-          {errorLoadingSecrets}
+          {secretsLoadError}
         </Alert>
       )}
     </Grid>
   );
 };
 
-export default SSHSecretSection;
+export default SSHSecretModalBody;

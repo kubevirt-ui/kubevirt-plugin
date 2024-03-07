@@ -6,8 +6,8 @@ import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/util
 import {
   SecretSelectionOption,
   SSHSecretDetails,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/types';
-import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/types';
+import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, Grid, GridItem, Truncate } from '@patternfly/react-core';

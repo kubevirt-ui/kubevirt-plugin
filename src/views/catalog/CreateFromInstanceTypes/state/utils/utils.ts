@@ -1,10 +1,10 @@
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretSection/utils/constants';
+import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';

@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import SSHSecretModal from '@kubevirt-utils/components/SSHSecretSection/SSHSecretModal';
-import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretSection/utils/constants';
+import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
+import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
-} from '@kubevirt-utils/components/SSHSecretSection/utils/types';
+} from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button } from '@patternfly/react-core';
