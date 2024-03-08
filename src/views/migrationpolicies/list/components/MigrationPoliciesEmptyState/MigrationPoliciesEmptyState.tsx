@@ -5,6 +5,7 @@ import migrationPoliciesEmptyState from 'images/migrationPoliciesEmptyState.svg'
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  Button,
   EmptyState,
   EmptyStateActions,
   EmptyStateBody,
@@ -12,13 +13,21 @@ import {
   EmptyStateHeader,
   EmptyStateIcon,
   EmptyStateVariant,
+  Popover,
+  PopoverPosition,
 } from '@patternfly/react-core';
 
 import MigrationPoliciesCreateButton from '../MigrationPoliciesCreateButton/MigrationPoliciesCreateButton';
 
 import './MigrationPoliciesEmptyState.scss';
 
-const MigrationPoliciesEmptyState: FC = () => {
+export type MigrationPoliciesEmptyStateProps = {
+  loadError?: boolean;
+};
+
+const MigrationPoliciesEmptyState: FC<MigrationPoliciesEmptyStateProps> = ({
+  loadError = false,
+}) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -39,6 +48,21 @@ const MigrationPoliciesEmptyState: FC = () => {
       </EmptyStateBody>
       <EmptyStateFooter>
         <EmptyStateActions>
+          {loadError && (
+            <Popover
+              bodyContent={() =>
+                t(
+                  'To perform this action you must get permission from your Organization Administrator.',
+                )
+              }
+              aria-label={'Help'}
+              position={PopoverPosition.right}
+            >
+              <div className="MigrationPoliciesEmptyState__button">
+                <Button>{t('Create MigrationPolicy')}</Button>
+              </div>
+            </Popover>
+          )}
           <MigrationPoliciesCreateButton />
         </EmptyStateActions>
         <EmptyStateActions>

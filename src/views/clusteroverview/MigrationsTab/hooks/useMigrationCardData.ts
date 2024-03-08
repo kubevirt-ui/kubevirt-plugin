@@ -40,6 +40,13 @@ export type UseMigrationCardDataAndFiltersValues = {
 
 type UseMigrationCardDataAndFilters = (duration: string) => UseMigrationCardDataAndFiltersValues;
 
+export const useMigrationPolicies = () =>
+  useK8sWatchResource<V1alpha1MigrationPolicy[]>({
+    groupVersionKind: MigrationPolicyModelGroupVersionKind,
+    isList: true,
+    namespaced: false,
+  });
+
 const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration: string) => {
   const migrationsDefaultConfigurations = useHCMigrations();
   const [activeNamespace] = useActiveNamespace();
@@ -59,10 +66,7 @@ const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration
     namespace,
   });
 
-  const [mps] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
-    groupVersionKind: MigrationPolicyModelGroupVersionKind,
-    isList: true,
-  });
+  const [mps] = useMigrationPolicies();
 
   const migrationsData = getMigrationsTableData(
     vmims,
