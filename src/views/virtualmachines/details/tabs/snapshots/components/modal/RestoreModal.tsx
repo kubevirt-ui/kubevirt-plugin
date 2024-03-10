@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Trans } from 'react-i18next';
 
 import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
 import {
@@ -10,6 +11,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getVMRestoreSnapshotResource } from '../../utils/helpers';
+
+import './restore-modal.scss';
 
 type DeleteResourceModalProps = {
   isOpen: boolean;
@@ -39,9 +42,15 @@ const RestoreModal: React.FC<DeleteResourceModalProps> = ({ isOpen, onClose, sna
       onClose={onClose}
       submitBtnText={t('Restore')}
     >
-      {t('Are you sure you want to restore {{name}}?', {
-        name: snapshot.metadata.name,
-      })}
+      <Trans t={t}>
+        Are you sure you want to restore {{ snapshotNAme: snapshot?.spec?.source?.name }} from
+        snapshot {{ vmName: snapshot.metadata.name }}?
+        <div className="RestoreModal--note_text">
+          <b>Note: </b>
+          Data from the last snapshot taken will be lost. To prevent losing current data, take
+          another snapshot before restoring from this one.
+        </div>
+      </Trans>
     </TabModal>
   );
 };

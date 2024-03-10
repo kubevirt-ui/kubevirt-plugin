@@ -23,12 +23,13 @@ import { CLONING_STATUSES } from './utils/constants';
 import { cloneVM, isVM, runVM, vmExist } from './utils/helpers';
 
 type CloneVMModalProps = {
+  headerText?: string;
   isOpen: boolean;
   onClose: () => void;
   source: V1alpha1VirtualMachineSnapshot | V1VirtualMachine;
 };
 
-const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, source }) => {
+const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const namespace = source?.metadata?.namespace;
@@ -71,7 +72,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, source }) => {
   return (
     <TabModal
       closeOnSubmit={false}
-      headerText={t('Clone {{sourceKind}}', { sourceKind: source.kind })}
+      headerText={headerText ?? t('Clone {{sourceKind}}', { sourceKind: source.kind })}
       isDisabled={Boolean(initialCloneRequest)}
       isLoading={Boolean(initialCloneRequest)}
       isOpen={isOpen}
@@ -79,7 +80,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ isOpen, onClose, source }) => {
       obj={source}
       onClose={onClose}
       onSubmit={sendCloneRequest}
-      submitBtnText={t('Clone')}
+      submitBtnText={t('Create')}
     >
       <Form className="pf-u-w-75-on-md pf-u-w-66-on-lg pf-u-m-auto" isHorizontal>
         <NameInput name={cloneName} setName={setCloneName} />

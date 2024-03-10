@@ -18,7 +18,7 @@ const StartClonedVMCheckbox: FC<StartClonedVMCheckboxProps> = ({
       <Checkbox
         id="start-clone"
         isChecked={startCloneVM}
-        label={t('Start VirtualMachine on clone')}
+        label={t('Start VirtualMachine once created')}
         onChange={(_, checked: boolean) => setStartCloneVM(checked)}
       />
     </FormGroup>
