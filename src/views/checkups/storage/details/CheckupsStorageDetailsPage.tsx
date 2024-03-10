@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,12 +16,14 @@ import CheckupsStorageDetailsPageSection from './CheckupsStorageDetailsPageSecti
 import './checkups-storage-details-page.scss';
 
 const CheckupsStorageDetailsPage = () => {
-  const { vmName } = useParams<{ vmName: string }>();
+  const location = useLocation();
   const { t } = useKubevirtTranslation();
   const { configMaps, error, jobs, loading } = useCheckupsStorageData();
   const [activeTabKey, setActiveTabKey] = useState<number>(0);
 
-  const configMap = configMaps.find((cm) => cm.metadata.name === vmName);
+  const configMap = configMaps.find(
+    (cm) => cm.metadata.name === location.pathname.split('/').pop(),
+  );
   const jobMatches = getJobByName(jobs, configMap?.metadata?.name);
 
   if (!configMap)
