@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
-import { useMigrationPolicies } from 'src/views/clusteroverview/MigrationsTab/hooks/useMigrationCardData';
 
 import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
@@ -47,18 +47,15 @@ const MigrationPoliciesList: FC = () => {
           loaded={loaded && loadedColumns}
           onFilterChange={onFilterChange}
         />
-        {isEmpty(mps) && <MigrationPoliciesEmptyState loadError={!loaded && loadError} />}
-        {loaded && (
-          <VirtualizedTable<V1alpha1MigrationPolicy>
-            columns={activeColumns}
-            data={data}
-            EmptyMsg={() => <></>}
-            loaded={loaded && loadedColumns}
-            loadError={loadError}
-            Row={MigrationPoliciesRow}
-            unfilteredData={unfilteredData}
-          />
-        )}
+        <VirtualizedTable<V1alpha1MigrationPolicy>
+          columns={activeColumns}
+          data={data}
+          EmptyMsg={() => <MigrationPoliciesEmptyState />}
+          loaded={loaded && loadedColumns}
+          loadError={loadError}
+          Row={MigrationPoliciesRow}
+          unfilteredData={unfilteredData}
+        />
       </ListPageBody>
     </>
   );
