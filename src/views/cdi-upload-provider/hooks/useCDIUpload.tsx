@@ -84,7 +84,7 @@ const useCDIUpload = (): CDIUploadContextProps => {
         ...newUpload,
         uploadStatus: isCancel ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR,
         ...(isCancel && {
-          uploadError: { message: `${err.message}: ${err.response?.data}` },
+          uploadError: { message: `${err.message}` },
         }),
       });
     }
