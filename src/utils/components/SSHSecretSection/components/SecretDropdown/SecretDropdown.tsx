@@ -61,7 +61,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
       ...prev,
       secretOption: addNew ? SecretSelectionOption.addNew : SecretSelectionOption.useExisting,
       sshPubKey,
-      sshSecretName: generatedSecretName,
+      sshSecretName: addNew ? generatedSecretName : newSecretName,
       sshSecretNamespace: selectedSecret?.metadata?.namespace,
     }));
     setSecretName(newSecretName);
