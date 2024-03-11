@@ -73,7 +73,7 @@ const DataSourceActions: FC<DataSourceActionProps> = ({ dataSource, isKebabToggl
             </DropdownItem>
           ))}
         </DropdownGroup>
-        <Divider key="divider" />,
+        <Divider key="divider" />
         <DropdownGroup key="datasource-manage" label={t('DataImportCron')}>
           <DropdownItem
             data-test-id="datasource-manage"
