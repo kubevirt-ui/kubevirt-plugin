@@ -3,26 +3,50 @@ import React, { FC } from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Label, Stack, StackItem } from '@patternfly/react-core';
+import { Label, Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
 
 import { isPVCSource } from './utils/helpers';
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
 
 const DiskRow: FC<
-  RowProps<DiskRowDataLayout, { vm: V1VirtualMachine; vmi?: V1VirtualMachineInstance }>
-> = ({ activeColumnIDs, obj, rowData: { vm, vmi } }) => {
+  RowProps<
+    DiskRowDataLayout,
+    {
+      provisioningPercentages: NameWithPercentages;
+      vm: V1VirtualMachine;
+      vmi?: V1VirtualMachineInstance;
+    }
+  >
+> = ({ activeColumnIDs, obj, rowData: { provisioningPercentages, vm, vmi } }) => {
   const { t } = useKubevirtTranslation();
+
+  const provisioningPercentage = provisioningPercentages?.[obj?.source];
 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
         <Stack>
           <StackItem>
-            {obj?.name} <HotplugLabel diskName={obj?.name} vm={vm} vmi={vmi} />
+            {provisioningPercentage ? (
+              <Popover
+                bodyContent={
+                  <>
+                    {t('Provisioning')} {provisioningPercentage}
+                  </>
+                }
+                position={PopoverPosition.right}
+              >
+                <span className="provisioning-popover-button">{obj?.name}</span>
+              </Popover>
+            ) : (
+              obj?.name
+            )}{' '}
+            <HotplugLabel diskName={obj?.name} vm={vm} vmi={vmi} />
           </StackItem>
           {obj?.isBootDisk && (
             <StackItem>

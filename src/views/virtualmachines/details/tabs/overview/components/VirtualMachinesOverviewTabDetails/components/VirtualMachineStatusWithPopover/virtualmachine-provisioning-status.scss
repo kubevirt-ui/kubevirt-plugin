@@ -1,0 +1,5 @@
+.virtualmachine-privisioning-status {
+  .progress:not(:first-child) {
+    margin-top: var(--pf-global--spacer--sm);
+  }
+}

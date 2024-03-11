@@ -43,6 +43,7 @@ const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ chi
       setMinutes(0);
     }
   }, [vmi?.status?.migrationState?.endTimestamp, vmi?.status?.migrationState?.startTimestamp]);
+
   return (
     <Popover
       bodyContent={

@@ -1,0 +1,12 @@
+.kv-configuration-vm-disk-list {
+  .provisioning-popover-button {
+    text-decoration: underline;
+    cursor: pointer;
+    text-decoration-style: dashed;
+    text-decoration-thickness: var(
+      --pf-c-description-list__text--m-help-text--TextDecorationThickness
+    );
+    text-underline-offset: var(--pf-c-description-list__text--m-help-text--TextDecorationOffset);
+    text-decoration-color: var(--pf-c-description-list__text--m-hel);
+  }
+}
