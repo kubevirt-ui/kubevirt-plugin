@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
+import { Trans } from 'react-i18next';
 
 import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
 import {
@@ -11,16 +12,18 @@ import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getVMRestoreSnapshotResource } from '../../utils/helpers';
 
+import './restore-modal.scss';
+
 type DeleteResourceModalProps = {
   isOpen: boolean;
   onClose: () => void;
   snapshot: V1alpha1VirtualMachineSnapshot;
 };
 
-const RestoreModal: React.FC<DeleteResourceModalProps> = ({ isOpen, onClose, snapshot }) => {
+const RestoreModal: FC<DeleteResourceModalProps> = ({ isOpen, onClose, snapshot }) => {
   const { t } = useKubevirtTranslation();
 
-  const resultRestore = React.useMemo(() => {
+  const resultRestore = useMemo(() => {
     const restore: V1alpha1VirtualMachineRestore = getVMRestoreSnapshotResource(snapshot);
     return restore;
   }, [snapshot]);
@@ -39,9 +42,15 @@ const RestoreModal: React.FC<DeleteResourceModalProps> = ({ isOpen, onClose, sna
       onClose={onClose}
       submitBtnText={t('Restore')}
     >
-      {t('Are you sure you want to restore {{name}}?', {
-        name: snapshot.metadata.name,
-      })}
+      <Trans t={t}>
+        Are you sure you want to restore {{ vmName: snapshot?.spec?.source?.name }} from snapshot{' '}
+        {{ snapshotName: snapshot.metadata.name }}?
+        <div className="RestoreModal--note_text">
+          <b>Note: </b>
+          Data from the last snapshot taken will be lost. To prevent losing current data, take
+          another snapshot before restoring from this one.
+        </div>
+      </Trans>
     </TabModal>
   );
 };
