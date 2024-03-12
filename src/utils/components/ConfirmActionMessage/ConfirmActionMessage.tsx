@@ -22,7 +22,7 @@ const ConfirmActionMessage: React.FC<ConfirmActionMessageProps> = ({ action = 'd
       {objNamespace && (
         <Trans t={t}>
           {' '}
-          in namespace <strong>{{ objNamespace }}</strong>
+          in namespace <strong>{{ objNamespace }}</strong>?
         </Trans>
       )}
     </>

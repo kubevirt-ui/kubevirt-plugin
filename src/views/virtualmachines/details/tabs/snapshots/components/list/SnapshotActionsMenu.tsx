@@ -29,7 +29,7 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
     verb: 'create',
   });
 
-  const deleteLabel = t('Delete');
+  const deleteLabel = t('Delete snapshot');
 
   const onRestoreModalToggle = useCallback(() => {
     createModal(({ isOpen, onClose }) => (
@@ -40,10 +40,15 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
 
   const onClone = useCallback(() => {
     createModal(({ isOpen, onClose }) => (
-      <CloneVMModal isOpen={isOpen} onClose={onClose} source={snapshot} />
+      <CloneVMModal
+        headerText={t('Create VirtualMachine from snapshot')}
+        isOpen={isOpen}
+        onClose={onClose}
+        source={snapshot}
+      />
     ));
     setIsDropdownOpen(false);
-  }, [createModal, snapshot]);
+  }, [createModal, snapshot, t]);
 
   const onDeleteModalToggle = useCallback(() => {
     createModal(({ isOpen, onClose }) => (
@@ -78,20 +83,20 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
     >
       <DropdownList>
         <DropdownItem
-          description={t('Clone this snapshot to create a VirtualMachine from it')}
+          description={t('Create a copy of the VirtualMachine from snapshot')}
           isDisabled={!canClone}
           key="snapshot-clone"
           onClick={onClone}
         >
-          {t('Clone')}
+          {t('Create VirtualMachine')}
         </DropdownItem>
         <DropdownItem
-          description={t('Restore is enabled only for offline VirtualMachine.')}
+          description={t('Restore the VirtualMachine to this snapshot`s state')}
           isDisabled={isRestoreDisabled}
           key="snapshot-restore"
           onClick={onRestoreModalToggle}
         >
-          {t('Restore')}
+          {t('Restore VirtualMachine from snapshot')}
         </DropdownItem>
         <DropdownItem key="snapshot-delete" onClick={onDeleteModalToggle}>
           {deleteLabel}
