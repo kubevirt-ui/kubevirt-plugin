@@ -4,6 +4,7 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import NICHotPlugModalAlert from '@kubevirt-utils/components/BridgedNICHotPlugModalAlert/NICHotPlugModalAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   interfacesTypes,
   NetworkPresentation,
@@ -11,16 +12,17 @@ import {
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Form } from '@patternfly/react-core';
+import { ExpandableSection, Form } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import NameFormField from './components/NameFormField';
 import NetworkInterfaceMACAddressInput from './components/NetworkInterfaceMacAddressInput';
 import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
-import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect';
-import NetworkInterfaceTypeSelect from './components/NetworkInterfaceTypeSelect';
+import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect/NetworkInterfaceNetworkSelect';
 import { interfaceModelType } from './utils/constants';
 import { getNetworkName, networkNameStartWithPod, podNetworkExists } from './utils/helpers';
+
+import './NetworkInterfaceModal.scss';
 
 type NetworkInterfaceModalOnSubmit = {
   interfaceMACAddress: string;
@@ -51,7 +53,6 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   fixedName = false,
   Header = null,
   headerText,
-  isEdit = false,
   isOpen,
   namespace,
   nicPresentation = { iface: null, network: null },
@@ -59,6 +60,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   onSubmit,
   vm,
 }) => {
+  const { t } = useKubevirtTranslation();
   const { iface = null, network = null } = nicPresentation;
   const [nicName, setNicName] = useState(network?.name || generatePrettyName('nic'));
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
@@ -69,6 +71,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   );
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
   const [submitDisabled, setSubmitDisabled] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const onSubmitModal = useCallback(() => {
     return (
@@ -101,6 +104,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           setInterfaceModel={setInterfaceModel}
         />
         <NetworkInterfaceNetworkSelect
+          interfaceType={interfaceType}
           isEditing={Boolean(network) && Boolean(iface)}
           namespace={namespace}
           networkName={networkName}
@@ -109,18 +113,19 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           setSubmitDisabled={setSubmitDisabled}
           vm={vm}
         />
-        <NetworkInterfaceTypeSelect
-          interfaceType={interfaceType}
-          networkName={networkName}
-          setInterfaceType={setInterfaceType}
-          showTypeHelperText={vmIsRunning && !isEdit}
-        />
-        <NetworkInterfaceMACAddressInput
-          interfaceMACAddress={interfaceMACAddress}
-          isDisabled={!networkName || networkNameStartWithPod(networkName)}
-          setInterfaceMACAddress={setInterfaceMACAddress}
-          setIsError={setSubmitDisabled}
-        />
+        <ExpandableSection
+          className="NetworkInterfaceModal__advanced"
+          isExpanded={isExpanded}
+          onToggle={(_, expand) => setIsExpanded(expand)}
+          toggleText={t('Advanced')}
+        >
+          <NetworkInterfaceMACAddressInput
+            interfaceMACAddress={interfaceMACAddress}
+            isDisabled={!networkName || networkNameStartWithPod(networkName)}
+            setInterfaceMACAddress={setInterfaceMACAddress}
+            setIsError={setSubmitDisabled}
+          />
+        </ExpandableSection>
       </Form>
     </TabModal>
   );

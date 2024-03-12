@@ -6,14 +6,22 @@ import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { FormGroup, SelectList, SelectOption, ValidatedOptions } from '@patternfly/react-core';
+import {
+  FormGroup,
+  Label,
+  SelectList,
+  SelectOption,
+  ValidatedOptions,
+} from '@patternfly/react-core';
 
-import { getNadType, networkNameStartWithPod, podNetworkExists } from '../utils/helpers';
+import { getNadType, networkNameStartWithPod, podNetworkExists } from '../../utils/helpers';
+import useNADsData from '../hooks/useNADsData';
 
-import useNADsData from './hooks/useNADsData';
+import NetworkSelectHelperPopover from './components/NetworkSelectHelperPopover/NetworkSelectHelperPopover';
 
 type NetworkInterfaceNetworkSelectProps = {
   editInitValueNetworkName?: string | undefined;
+  interfaceType: string;
   isEditing?: boolean | undefined;
   namespace?: string;
   networkName: string;
@@ -25,6 +33,7 @@ type NetworkInterfaceNetworkSelectProps = {
 
 const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   editInitValueNetworkName,
+  interfaceType,
   isEditing,
   namespace,
   networkName,
@@ -37,7 +46,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   const { loaded, loadError, nads } = useNADsData(vm?.metadata?.namespace || namespace);
 
   const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
-  const hasNads = useMemo(() => nads && nads.length > 0, [nads]);
+  const hasNads = useMemo(() => nads?.length > 0, [nads]);
   const isPodNetworkingOptionExists =
     !hasPodNetwork || (isEditing && networkNameStartWithPod(editInitValueNetworkName));
 
@@ -57,6 +66,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
         value: `${nadNamespace}/${name}`,
       };
     });
+
     if (isPodNetworkingOptionExists) {
       options.unshift({
         key: 'pod-networking',
@@ -98,50 +108,50 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     else if (loaded && (loadError || !canCreateNetworkInterface)) {
       setSubmitDisabled(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    loadError,
-    canCreateNetworkInterface,
-    loaded,
-    networkName,
-    nads,
-    hasNads,
-    hasPodNetwork,
-    podNetworkingText,
-  ]);
+  }, [loadError, canCreateNetworkInterface, loaded, networkName]);
 
   return (
-    <FormGroup fieldId="network-attachment-definition" isRequired label={t('Network')}>
+    <FormGroup
+      fieldId="network-attachment-definition"
+      isRequired
+      label={t('Network')}
+      labelIcon={<NetworkSelectHelperPopover />}
+    >
       <div data-test-id="network-attachment-definition-select">
         {hasPodNetwork && !loaded ? (
           <Loading />
         ) : (
           <FormPFSelect
+            selectedLabel={
+              <>
+                {networkName} <Label isCompact>{interfaceType} Binding</Label>
+              </>
+            }
             onSelect={handleChange}
             selected={networkName}
             toggleProps={{ isDisabled: !canCreateNetworkInterface, isFullWidth: true }}
           >
             <SelectList>
-              {networkOptions?.map(({ key, value }) => (
+              {networkOptions?.map(({ key, type, value }) => (
                 <SelectOption
                   data-test-id={`network-attachment-definition-select-${key}`}
                   key={key}
                   value={value}
                 >
-                  {value}
+                  {value} <Label isCompact>{type} Binding</Label>
                 </SelectOption>
               ))}
             </SelectList>
           </FormPFSelect>
         )}
       </div>
-      <FormGroupHelperText validated={validated}>
-        {loaded &&
-          validated === ValidatedOptions.error &&
-          t(
+      {loaded && validated === ValidatedOptions.error && (
+        <FormGroupHelperText validated={validated}>
+          {t(
             'No NetworkAttachmentDefinitions available. Contact your system administrator for additional support.',
           )}
-      </FormGroupHelperText>
+        </FormGroupHelperText>
+      )}
     </FormGroup>
   );
 };
