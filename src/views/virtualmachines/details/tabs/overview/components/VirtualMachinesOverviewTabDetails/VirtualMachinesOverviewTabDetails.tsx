@@ -12,7 +12,7 @@ import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetim
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getVMStatus } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOsNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
@@ -36,12 +36,10 @@ import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratab
 import { printableVMStatus } from '@virtualmachines/utils';
 
 import InstanceTypeDescription from './components/InstanceTypeDescription';
-import MigrationProgressPopover from './components/MigrationProgressPopover/MigrationProgressPopover';
-import StatusPopoverButton from './components/StatusPopoverButton/StatusPopoverButton';
 import TemplateDescription from './components/TemplateDescription';
 import VirtualMachineMigrationPercentage from './components/VirtualMachineMigrationPercentage';
-import VirtualMachineOverviewStatus from './components/VirtualMachineOverviewStatus/VirtualMachineOverviewStatus';
 import VirtualMachinesOverviewTabDetailsConsole from './components/VirtualMachinesOverviewTabDetailsConsole';
+import StatusPopover from './components/VirtualMachineStatusWithPopover/VirtualMachineStatusWithPopover';
 
 import './virtual-machines-overview-tab-details.scss';
 
@@ -90,7 +88,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
     };
   }, [loaded, error, guestAgentDataLoaded, guestAgentData, vmi]);
 
-  const vmPrintableStatus = vm?.status?.printableStatus;
+  const vmPrintableStatus = getVMStatus(vm);
 
   return (
     <div className="VirtualMachinesOverviewTabDetails--details">
@@ -119,15 +117,9 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   descriptionData={
                     <Split hasGutter isWrappable>
                       <SplitItem>
-                        {vmPrintableStatus !== printableVMStatus.Migrating ? (
-                          <VirtualMachineOverviewStatus vmPrintableStatus={vmPrintableStatus} />
-                        ) : (
-                          <>
-                            <MigrationProgressPopover vmi={vmi}>
-                              <StatusPopoverButton vmPrintableStatus={vmPrintableStatus} />
-                            </MigrationProgressPopover>
-                            <VirtualMachineMigrationPercentage vm={vm} />
-                          </>
+                        <StatusPopover vm={vm} vmi={vmi} />
+                        {vmPrintableStatus === printableVMStatus.Migrating && (
+                          <VirtualMachineMigrationPercentage vm={vm} />
                         )}
                       </SplitItem>
                       <VMNotMigratableLabel vm={vm} />

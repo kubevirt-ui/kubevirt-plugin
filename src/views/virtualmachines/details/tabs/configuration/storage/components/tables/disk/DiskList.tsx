@@ -8,6 +8,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
+import useProvisioningPercentage from '@kubevirt-utils/resources/vm/hooks/useProvisioningPercentage';
 import {
   ListPageCreateButton,
   ListPageFilter,
@@ -22,6 +23,8 @@ import useDisksFilters from '../../hooks/useDisksFilters';
 
 import DiskRow from './DiskRow';
 
+import './disklist.scss';
+
 type DiskListProps = {
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
@@ -34,13 +37,16 @@ const DiskList: FC<DiskListProps> = ({ vm, vmi }) => {
   const [disks, loaded, loadError] = useDisksTableData(vm, vmi);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
+
+  const { percentages: provisioningPercentages } = useProvisioningPercentage(vm);
+
   const headerText =
     vm?.status?.printableStatus === printableVMStatus.Running
       ? t('Add disk (hot plugged)')
       : t('Add disk');
 
   return (
-    <>
+    <div className="kv-configuration-vm-disk-list">
       <DiskListTitle />
       <ListPageCreateButton
         onClick={() =>
@@ -80,10 +86,10 @@ const DiskList: FC<DiskListProps> = ({ vm, vmi }) => {
         loaded={loaded}
         loadError={loadError}
         Row={DiskRow}
-        rowData={{ vm, vmi }}
+        rowData={{ provisioningPercentages, vm, vmi }}
         unfilteredData={data}
       />
-    </>
+    </div>
   );
 };
 
