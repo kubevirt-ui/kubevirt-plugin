@@ -72,6 +72,7 @@ const DetailsRightGrid: FC = () => {
             hasInlineFilter
             isOpen={isOpenStorageClass}
             onToggle={setIsOpenStorageClass}
+            placeholderText={t('Select StorageClass')}
           >
             {sortedStorageClasses?.map((name) => (
               <SelectOption key={name} value={name} />
