@@ -67,7 +67,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
       })}
       selected={secretName}
       setSelected={onSelect}
-      toggleProps={{ isFullWidth: true, placeholder: t('--- Select secret ---') }}
+      toggleProps={{ isFullWidth: true, placeholder: t('Select secret') }}
     />
   );
 };

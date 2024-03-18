@@ -113,7 +113,7 @@ const TemplatesProjectSection: FC<TemplatesProjectSectionProps> = ({
           toggleProps={{
             icon: loading && <Spinner size="sm" />,
             isDisabled: loading,
-            placeholder: t('Search project'),
+            placeholder: t('Select project'),
           }}
           selected={selectedProject}
           setSelected={onSelect}
