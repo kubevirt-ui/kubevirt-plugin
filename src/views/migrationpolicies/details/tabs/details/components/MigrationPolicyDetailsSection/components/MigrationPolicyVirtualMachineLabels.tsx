@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import MigrationPolicyModel from '@kubevirt-ui/kubevirt-api/console/models/MigrationPolicyModel';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -22,7 +22,7 @@ import { ensureMigrationPolicyMatchLabels } from '../utils/utils';
 type MigrationPolicyVirtualMachineLabelsProps = {
   mp: V1alpha1MigrationPolicy;
 };
-const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachineLabelsProps> = ({
+const MigrationPolicyVirtualMachineLabels: FC<MigrationPolicyVirtualMachineLabelsProps> = ({
   mp,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -33,7 +33,7 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
   return (
     <DescriptionListGroup>
       <DescriptionListTermHelpText className="migration-policy-description-item-header">
-        {t('VirtualMachine labels')}
+        {t('VirtualMachineInstance labels')}
         <Button
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
