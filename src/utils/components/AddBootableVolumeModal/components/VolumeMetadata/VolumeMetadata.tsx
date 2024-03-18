@@ -15,13 +15,13 @@ import PreferenceSelect from './components/PreferenceSelect/PreferenceSelect';
 
 type VolumeMetadataProps = {
   bootableVolume: AddBootableVolumeState;
-  preferencesNames: string[];
+  deleteLabel: (labelKey: string) => void;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const VolumeMetadata: FC<VolumeMetadataProps> = ({
   bootableVolume,
-  preferencesNames,
+  deleteLabel,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -31,7 +31,7 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
   return (
     <>
       <PreferenceSelect
-        preferencesNames={preferencesNames}
+        deleteLabel={deleteLabel}
         selectedPreference={labels?.[DEFAULT_PREFERENCE_LABEL]}
         setBootableVolumeField={setBootableVolumeField}
       />

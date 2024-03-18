@@ -12,7 +12,7 @@ import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/u
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import {
   HEADLESS_SERVICE_LABEL,
@@ -23,7 +23,11 @@ import { K8sGroupVersionKind, K8sResourceCommon } from '@openshift-console/dynam
 
 import { InstanceTypeVMState } from '../state/utils/types';
 
-import { DEFAULT_INSTANCETYPE_LABEL, DEFAULT_PREFERENCE_LABEL } from './constants';
+import {
+  DEFAULT_INSTANCETYPE_LABEL,
+  DEFAULT_PREFERENCE_KIND_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from './constants';
 
 const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
@@ -78,7 +82,12 @@ export const generateVM = (
     namespace: getNamespace(selectedBootableVolume),
   };
 
-  const selectedPreference = selectedBootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL];
+  const selectedPreference = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
+  const selectPreferenceKind = getLabel(
+    selectedBootableVolume,
+    DEFAULT_PREFERENCE_KIND_LABEL,
+    null,
+  );
   const isDynamic = instanceTypeState?.isDynamicSSHInjection;
 
   const emptyVM: V1VirtualMachine = {
@@ -125,6 +134,7 @@ export const generateVM = (
       },
       preference: {
         name: selectedPreference,
+        ...(selectPreferenceKind && { kind: selectPreferenceKind }),
       },
       running: startVM,
       template: {
