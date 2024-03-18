@@ -22,12 +22,12 @@ const FeatureHighlightsSection: React.FC = () => {
   const links: GettingStartedLink[] = [
     {
       external: true,
-      href: 'https://www.openshift.com/blog/automatic-installation-of-a-windows-vm-using-openshift-virtualization',
+      href: 'https://developers.redhat.com/articles/2024/03/13/save-memory-openshift-virtualization-using-free-page-reporting',
       id: 'item1',
       title: (
         <FeatureHighlightsTitle
           readTime={t('8 min')}
-          title={t('Automatic Windows VirtualMachine installation')}
+          title={t('Save memory with OpenShift Virtualization using Free Page Reporting')}
         />
       ),
     },
