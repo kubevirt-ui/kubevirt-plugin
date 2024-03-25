@@ -1319,7 +1319,6 @@
   "VirtualMachine is currently provisioning": "VirtualMachine is currently provisioning",
   "VirtualMachine is not running": "VirtualMachine is not running",
   "VirtualMachine is not running.": "VirtualMachine is not running.",
-  "VirtualMachine labels": "VirtualMachine labels",
   "VirtualMachine live migration": "VirtualMachine live migration",
   "VirtualMachine name": "VirtualMachine name",
   "VirtualMachine name can not be empty.": "VirtualMachine name can not be empty.",
