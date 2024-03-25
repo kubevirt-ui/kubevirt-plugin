@@ -1,12 +1,10 @@
 import { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 const metadata: ConsolePluginBuildMetadata = {
-  name: 'kubevirt-plugin',
-  version: '0.0.0',
-  displayName: 'Kubevirt Plugin',
   dependencies: {
     '@console/pluginAPI': '*',
   },
+  displayName: 'Kubevirt Plugin',
   exposedModules: {
     BootableVolumesList: './views/bootablevolumes/list/BootableVolumesList.tsx',
     Catalog: './views/catalog/Catalog.tsx',
@@ -60,6 +58,8 @@ const metadata: ConsolePluginBuildMetadata = {
     VirtualMachineTemplatesList: './views/templates/list/VirtualMachineTemplatesList.tsx',
     yamlTemplates: 'src/templates/index.ts',
   },
+  name: 'kubevirt-plugin',
+  version: '0.0.0',
 };
 
 export default metadata;
