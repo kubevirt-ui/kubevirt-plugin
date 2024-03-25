@@ -1203,6 +1203,7 @@
   "To enable Quick create button, fill all the required parameters and storage fields": "To enable Quick create button, fill all the required parameters and storage fields",
   "To gain unlimited bandwidth, set to 0": "To gain unlimited bandwidth, set to 0",
   "To get started, install permissions and then run a checkup": "To get started, install permissions and then run a checkup",
+  "To perform this action you must get permission from your Organization Administrator.": "To perform this action you must get permission from your Organization Administrator.",
   "To see the vCPU metric, you must set the schedstats=enable kernel argument in the MachineConfig object.": "To see the vCPU metric, you must set the schedstats=enable kernel argument in the MachineConfig object.",
   "Today": "Today",
   "Tolerations": "Tolerations",

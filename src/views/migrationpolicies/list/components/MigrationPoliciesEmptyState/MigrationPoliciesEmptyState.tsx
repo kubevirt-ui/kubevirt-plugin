@@ -16,8 +16,6 @@ import {
 
 import MigrationPoliciesCreateButton from '../MigrationPoliciesCreateButton/MigrationPoliciesCreateButton';
 
-import './MigrationPoliciesEmptyState.scss';
-
 const MigrationPoliciesEmptyState: FC = () => {
   const { t } = useKubevirtTranslation();
 

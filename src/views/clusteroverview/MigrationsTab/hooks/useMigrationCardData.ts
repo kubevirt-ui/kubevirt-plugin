@@ -1,14 +1,13 @@
 import {
-  MigrationPolicyModelGroupVersionKind,
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineInstanceModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import {
-  V1alpha1MigrationPolicy,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
 import {
   OnFilterChange,
   RowFilter,
@@ -59,10 +58,7 @@ const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration
     namespace,
   });
 
-  const [mps] = useK8sWatchResource<V1alpha1MigrationPolicy[]>({
-    groupVersionKind: MigrationPolicyModelGroupVersionKind,
-    isList: true,
-  });
+  const [mps] = useMigrationPolicies();
 
   const migrationsData = getMigrationsTableData(
     vmims,
