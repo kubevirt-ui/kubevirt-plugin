@@ -1,6 +1,5 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
-import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import useStorageProfileClaimPropertySets from '@kubevirt-utils/components/DiskModal/DiskFormFields/hooks/useStorageProfileClaimPropertySets';
@@ -12,7 +11,6 @@ import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
@@ -63,9 +61,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   );
   const applyStorageProfileState = useState<boolean>(true);
 
-  const [preferences] = useClusterPreferences();
-  const preferencesNames = useMemo(() => preferences.map(getName), [preferences]);
-
   const { upload, uploadData } = useCDIUpload();
 
   const claimPropertySetsData = useStorageProfileClaimPropertySets(
@@ -85,6 +80,14 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     [],
   );
 
+  const deleteLabel = (labelKey: string) => {
+    setBootableVolume((prev) => {
+      const updatedLabels = { ...prev?.labels };
+      delete updatedLabels[labelKey];
+
+      return { ...prev, labels: updatedLabels };
+    });
+  };
   return (
     <TabModal
       onClose={() => {
@@ -151,7 +154,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         </Title>
         <VolumeMetadata
           bootableVolume={bootableVolume}
-          preferencesNames={preferencesNames}
+          deleteLabel={deleteLabel}
           setBootableVolumeField={setBootableVolumeField}
         />
       </Form>
