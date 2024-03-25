@@ -17,8 +17,13 @@ type HorizontalNavbarProps = {
 
 const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec, pages, vm }) => {
   const location = useLocation();
+
+  const initialActiveTab =
+    pages.find(({ name = '' }) => location?.pathname.includes('/' + name.toLowerCase())) ||
+    pages?.[0];
+
   const [activeItem, setActiveItem] = useState<number | string>(
-    location?.pathname.endsWith('/') ? null : pages?.[0]?.name.toLowerCase(),
+    initialActiveTab?.name?.toLowerCase(),
   );
   const paths = pages.map((page) => page.href);
 
@@ -38,7 +43,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec,
                 id={`horizontal-pageHeader-${item.name}`}
                 key={item.name}
                 onClick={() => setActiveItem(item.name.toLowerCase())}
-                to={trimLastHistoryPath(location, paths) + '/' + item.href}
+                to={trimLastHistoryPath(location, paths) + item.href}
               >
                 {item.name}
               </NavLink>

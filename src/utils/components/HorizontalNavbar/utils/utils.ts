@@ -8,15 +8,16 @@ export const trimLastHistoryPath = (location: Location, paths: string[]): string
   const pathName = location?.pathname;
   let relativeUrl: string;
   for (const path of paths) {
-    if (pathName.endsWith(path)) {
+    if (pathName.endsWith('/' + path)) {
       if (path !== '') {
-        relativeUrl = pathName.slice(0, pathName.length - path.length - 1);
+        relativeUrl = pathName.slice(0, pathName.length - path.length);
       }
       if (path === '') {
-        relativeUrl = pathName.endsWith('/') ? pathName.slice(0, -1) : pathName;
+        relativeUrl = pathName;
       }
     }
   }
+  if (!relativeUrl) relativeUrl = pathName + '/';
 
   return relativeUrl;
 };
