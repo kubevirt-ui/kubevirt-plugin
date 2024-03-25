@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 
 import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -14,7 +14,7 @@ const useMigrationPoliciesListColumns = (): [
 ] => {
   const { t } = useKubevirtTranslation();
 
-  const columns: TableColumn<V1alpha1MigrationPolicy>[] = React.useMemo(
+  const columns: TableColumn<V1alpha1MigrationPolicy>[] = useMemo(
     () => [
       {
         id: 'name',
@@ -59,7 +59,7 @@ const useMigrationPoliciesListColumns = (): [
       {
         additional: true,
         id: 'vm-labels',
-        title: t('VirtualMachine labels'),
+        title: t('VirtualMachineInstance labels'),
       },
       {
         id: '',

@@ -58,7 +58,10 @@ const MigrationPolicyCreateForm: FC = () => {
             setLabels={setStateField('namespaceSelectorMatchLabel')}
           />
         </FormGroup>
-        <FormGroup fieldId="migration-policy-vmi-selector" label={t('VirtualMachine labels')}>
+        <FormGroup
+          fieldId="migration-policy-vmi-selector"
+          label={t('VirtualMachineInstance labels')}
+        >
           <SelectorLabelMatchGroup
             isVMILabel
             labels={state?.vmiSelectorMatchLabel}
