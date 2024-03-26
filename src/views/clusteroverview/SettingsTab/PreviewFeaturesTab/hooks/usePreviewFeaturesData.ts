@@ -38,7 +38,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
       externalLink: AUTOCOMPUTE_CPU_LIMITS_LINK,
       featureEnabled: isEnabledCpuLimits,
       id: AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED,
-      label: t('Enable CPU limit'),
+      label: t('Enable CPU limits'),
       loading: loadingCpuLimits,
       toggleFeature: toggleCpuLimits,
     },
