@@ -1,3 +1,6 @@
+import { bytesFromHumanReadable } from '@catalog/utils/quantity';
+import { MAX_MEMORY } from '@kubevirt-utils/components/CPUMemoryModal/utils/constants';
+
 const GI = 'Gi';
 const MI = 'Mi';
 const TI = 'Ti';
@@ -27,3 +30,10 @@ export const getMemorySize = (
 };
 
 export const memorySizesTypes = [GI, MI, TI];
+
+export const requestedMemExceedsMaxMemory = (memorySize: number, memoryUnit: string) => {
+  const maxBytes = bytesFromHumanReadable(MAX_MEMORY);
+  const requestedBytes = bytesFromHumanReadable(`${memorySize}${memoryUnit}`);
+
+  return requestedBytes > maxBytes;
+};

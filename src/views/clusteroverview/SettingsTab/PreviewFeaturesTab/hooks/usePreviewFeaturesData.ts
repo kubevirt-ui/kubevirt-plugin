@@ -1,6 +1,14 @@
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { AUTOCOMPUTE_CPU_LIMITS_LINK } from '@kubevirt-utils/constants/url-constants';
-import { AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
+import {
+  AUTOCOMPUTE_CPU_LIMITS_LINK,
+  CPU_HOT_PLUG_USER_GUIDE_LINK,
+  MEMORY_HOT_PLUG_USER_GUIDE_LINK,
+} from '@kubevirt-utils/constants/url-constants';
+import {
+  AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED,
+  CPU_HOT_PLUG_ENABLED,
+  MEMORY_HOT_PLUG_ENABLED,
+} from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -26,21 +34,53 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const { t } = useKubevirtTranslation();
 
   const {
-    canEdit: canEditCpuLimits,
-    featureEnabled: isEnabledCpuLimits,
-    loading: loadingCpuLimits,
-    toggleFeature: toggleCpuLimits,
+    canEdit: canEditCPULimits,
+    featureEnabled: isEnabledCPULimits,
+    loading: loadingCPULimits,
+    toggleFeature: toggleCPULimits,
   } = useFeatures(AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED);
+
+  const {
+    canEdit: canEditCPUHotPlug,
+    featureEnabled: isEnabledCPUHotPlug,
+    loading: loadingCPUHotPlug,
+    toggleFeature: toggleCPUHotPlug,
+  } = useFeatures(CPU_HOT_PLUG_ENABLED);
+
+  const {
+    canEdit: canEditMemoryHotPlug,
+    featureEnabled: isEnabledMemoryHotPlug,
+    loading: loadingMemoryHotPlug,
+    toggleFeature: toggleMemoryHotPlug,
+  } = useFeatures(MEMORY_HOT_PLUG_ENABLED);
 
   const features = [
     {
-      canEdit: canEditCpuLimits,
+      canEdit: canEditCPULimits,
       externalLink: AUTOCOMPUTE_CPU_LIMITS_LINK,
-      featureEnabled: isEnabledCpuLimits,
+      featureEnabled: isEnabledCPULimits,
       id: AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED,
       label: t('Enable CPU limit'),
-      loading: loadingCpuLimits,
-      toggleFeature: toggleCpuLimits,
+      loading: loadingCPULimits,
+      toggleFeature: toggleCPULimits,
+    },
+    {
+      canEdit: canEditCPUHotPlug,
+      externalLink: CPU_HOT_PLUG_USER_GUIDE_LINK,
+      featureEnabled: isEnabledCPUHotPlug,
+      id: CPU_HOT_PLUG_ENABLED,
+      label: t('Enable CPU hot-plug'),
+      loading: loadingCPUHotPlug,
+      toggleFeature: toggleCPUHotPlug,
+    },
+    {
+      canEdit: canEditMemoryHotPlug,
+      externalLink: MEMORY_HOT_PLUG_USER_GUIDE_LINK,
+      featureEnabled: isEnabledMemoryHotPlug,
+      id: MEMORY_HOT_PLUG_ENABLED,
+      label: t('Enable memory hot-plug'),
+      loading: loadingMemoryHotPlug,
+      toggleFeature: toggleMemoryHotPlug,
     },
   ];
 

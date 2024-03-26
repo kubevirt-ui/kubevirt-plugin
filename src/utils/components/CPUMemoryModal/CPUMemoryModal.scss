@@ -2,17 +2,30 @@
   .pf-v5-c-modal-box__body {
     display: table;
   }
+
   .inputs {
     display: flex;
     margin-top: var(--pf-v5-global--spacer--xl);
     margin-bottom: var(--pf-v5-global--spacer--2xl);
+
     .input-memory {
       &--dropdown {
         margin-left: var(--pf-v5-global--spacer--md);
       }
     }
+
     .input-cpu {
       margin-right: var(--pf-v5-global--spacer--xl);
+    }
+  }
+
+  &__title {
+    display: inline-block;
+
+    &--button {
+      vertical-align: top;
+      padding-top: 0;
+      padding-left: var(--pf-global--spacer--xs);
     }
   }
 }

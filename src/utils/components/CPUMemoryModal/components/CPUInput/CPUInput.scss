@@ -1,0 +1,12 @@
+.cpu-input {
+  margin-right: var(--pf-global--spacer--xl);
+
+  &__help-text-button {
+    padding-top: 0;
+    padding-left: var(--pf-global--spacer--xs);
+  }
+
+  &__number-input {
+    padding-bottom: var(--pf-global--spacer--xs);
+  }
+}
