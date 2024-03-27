@@ -168,9 +168,9 @@ const UploadPVCPage: FC = () => {
     setError('');
   };
 
-  const handleFileNameChange = (_, file: File) => {
-    setFileName(file.name);
-    setFileNameExtension(/[.][^.]+$/.exec(file.name)?.toString());
+  const handleFileNameChange = (_, filename: string) => {
+    setFileName(filename);
+    setFileNameExtension(/[.][^.]+$/.exec(filename)?.toString());
   };
 
   useEffect(() => {
@@ -236,7 +236,7 @@ const UploadPVCPage: FC = () => {
                 </p>
               </Alert>
             )}
-            <ActionGroup className="pf-c-form">
+            <ActionGroup className="pf-v5-c-form">
               <Button
                 id="save-changes"
                 isDisabled={disableFormSubmit || isCheckingCertificate}

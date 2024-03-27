@@ -39,8 +39,8 @@ type UploadPVCFormProps = {
   fileName: string;
   fileValue: File | string;
   goldenPvcs: V1alpha1PersistentVolumeClaim[];
-  handleFileChange: (_, value: string) => void;
-  handleFileNameChange: (event, file: File) => void;
+  handleFileChange: (_, value: File) => void;
+  handleFileNameChange: (event, file: string) => void;
   isLoading: boolean;
   ns: string;
   onChange: (K8sResourceKind) => void;
@@ -200,17 +200,23 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
       <div className="form-group">
         <FileUpload
           dropzoneProps={{
-            accept: { 'text/*': ['.iso,.img,.qcow2,.gz,.xz'] },
+            accept: { 'application/*': ['.iso,.img,.qcow2,.gz,.xz'] },
             onDropAccepted: () => setIsFileRejected(false),
             onDropRejected: () => setIsFileRejected(true),
           }}
+          onClearClick={(event) => {
+            handleFileChange(event, null);
+            handleFileNameChange(event, '');
+          }}
+          onFileInputChange={(event, file: File) => {
+            handleFileChange(event, file);
+            handleFileNameChange(event, file.name);
+          }}
+          browseButtonText="Upload"
           filename={fileName}
+          filenamePlaceholder="Drag and drop a file or upload one"
           hideDefaultPreview
           id="file-upload"
-          isRequired
-          onDataChange={handleFileChange}
-          onFileInputChange={handleFileNameChange}
-          onTextChange={handleFileChange}
           value={fileValue}
         />
         {operatingSystemHaveDV && (
