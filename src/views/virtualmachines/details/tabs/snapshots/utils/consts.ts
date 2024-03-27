@@ -11,8 +11,11 @@ export const snapshotStatuses = {
 };
 
 export const iconMapper = {
+  default: GreenCheckCircleIcon,
+  Error: RedExclamationCircleIcon,
   Failed: RedExclamationCircleIcon,
   InProgress: YellowExclamationTriangleIcon,
+  'Not ready': YellowExclamationTriangleIcon,
   Succeeded: GreenCheckCircleIcon,
 };
 

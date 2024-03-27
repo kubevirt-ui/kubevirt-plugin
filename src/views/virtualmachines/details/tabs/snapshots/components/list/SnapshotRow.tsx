@@ -22,6 +22,7 @@ const SnapshotRow: React.FC<
 > = ({ activeColumnIDs, obj: snapshot, rowData: { isVMRunning, restores } }) => {
   const relevantRestore: V1alpha1VirtualMachineRestore = restores?.[snapshot?.metadata?.name];
   const isRestoreDisabled = isVMRunning || snapshot?.status?.phase !== snapshotStatuses.Succeeded;
+  const readyCondition = snapshot?.status?.conditions?.find(({ type }) => type === 'Ready');
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
@@ -35,7 +36,7 @@ const SnapshotRow: React.FC<
         <Timestamp timestamp={snapshot?.metadata?.creationTimestamp} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="status">
-        <SnapshotStatusIcon phase={snapshot?.status?.phase} />
+        <SnapshotStatusIcon phase={readyCondition?.reason || readyCondition?.status} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="last-restored">
         <Timestamp timestamp={relevantRestore?.status?.restoreTime} />
