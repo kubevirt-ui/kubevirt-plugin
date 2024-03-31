@@ -11,6 +11,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import {
@@ -97,7 +98,8 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
                 pod?.metadata?.name ? (
                   <ResourceLink
                     groupVersionKind={modelToGroupVersionKind(PodModel)}
-                    name={pod?.metadata?.name}
+                    name={getName(pod)}
+                    namespace={getNamespace(pod)}
                   />
                 ) : (
                   NO_DATA_DASH
