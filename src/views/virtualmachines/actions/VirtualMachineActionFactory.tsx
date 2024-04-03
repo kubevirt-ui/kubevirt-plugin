@@ -164,9 +164,7 @@ export const VirtualMachineActionFactory = {
         stopVM(vm, {
           gracePeriod: 0,
         }),
-      disabled: [Migrating, Provisioning, Stopped, Terminating, Unknown].includes(
-        vm?.status?.printableStatus,
-      ),
+      disabled: [Migrating, Provisioning, Stopped, Unknown].includes(vm?.status?.printableStatus),
       id: 'vm-action-force-stop',
       label: t('Force stop'),
     };
