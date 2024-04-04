@@ -36,7 +36,7 @@ export const TemplatesCatalogFilters: FC<{
           data-test-id="catalog-template-filter-all-items"
           id={'all-templates'}
           onActivate={() => onFilterChange(CATALOG_FILTERS.ALL_ITEMS, true)}
-          title={t('All items')}
+          title={t('All templates')}
         />
         <VerticalTabsTab
           active={filters?.onlyDefault || hasNoDefaultUserAllFilters(filters)}
