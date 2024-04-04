@@ -49,7 +49,7 @@ const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({
       type: diskReducerActions.SET_VOLUME_MODE,
     });
     dispatchDiskState({
-      payload: claimPropertySets?.[0]?.accessModes[0],
+      payload: claimPropertySets?.[0]?.accessModes?.[0],
       type: diskReducerActions.SET_ACCESS_MODE,
     });
   };

@@ -48,7 +48,7 @@ const AccessMode: FC<AccessModeProps> = ({ diskState, dispatchDiskState, spAcces
       }
     } else if (!allowedAccessModes?.includes(accessMode)) {
       dispatchDiskState({
-        payload: allowedAccessModes[0],
+        payload: allowedAccessModes?.[0],
         type: diskReducerActions.SET_ACCESS_MODE,
       });
     }
