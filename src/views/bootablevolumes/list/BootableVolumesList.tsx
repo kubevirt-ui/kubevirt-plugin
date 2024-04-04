@@ -1,10 +1,11 @@
 import React, { FC, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   paginationDefaultValues,
@@ -19,6 +20,7 @@ import {
   ListPageCreateDropdown,
   ListPageFilter,
   ListPageHeader,
+  useActiveNamespace,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -31,7 +33,9 @@ import useBootableVolumesFilters from './hooks/useBootableVolumesFilters';
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const BootableVolumesList: FC = () => {
-  const { ns: namespace } = useParams<{ ns: string }>();
+  const [activeNamespace] = useActiveNamespace();
+  const namespace = activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : null;
+
   const { t } = useKubevirtTranslation();
   const history = useHistory();
   const { createModal } = useModal();
