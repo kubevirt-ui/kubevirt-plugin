@@ -6,13 +6,13 @@ import {
   Card,
   CardBody,
   CardHeader,
-  CardTitle,
   Dropdown,
   DropdownItem,
   DropdownList,
-  Popover,
+  ExpandableSection,
   Title,
   TitleSizes,
+  Tooltip,
 } from '@patternfly/react-core';
 import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
@@ -47,40 +47,17 @@ export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children, onHi
   }
 
   const title = t('Getting started resources');
-  const titleTooltip = (
-    <span className="kv-getting-started-grid__tooltip">
-      {t('Use our collection of resources to help you get started with virtualization.')}
-    </span>
+  const titleTooltip = t(
+    'Use our collection of resources to help you get started with virtualization.',
   );
 
   return (
     <Card className="kv-getting-started-grid" data-test="getting-started">
-      <CardHeader
-        actions={
-          actionDropdownItem.length > 0
-            ? {
-                actions: (
-                  <Dropdown
-                    className="ocs-getting-started-grid__action-dropdown"
-                    isOpen={isOpen}
-                    onOpenChange={(open: boolean) => setIsOpen(open)}
-                    popperProps={{ position: 'right' }}
-                    toggle={KebabToggle({ isExpanded: isOpen, onClick: onToggle })}
-                  >
-                    <DropdownList>{actionDropdownItem}</DropdownList>
-                  </Dropdown>
-                ),
-                className: null,
-                hasNoOffset: false,
-              }
-            : null
-        }
-        className="kv-getting-started-grid__header"
-      >
-        <CardTitle>
+      <ExpandableSection
+        toggleContent={
           <Title data-test="title" headingLevel="h2" size={TitleSizes.lg}>
             {title}{' '}
-            <Popover bodyContent={titleTooltip}>
+            <Tooltip className="kv-getting-started-grid__tooltip" content={titleTooltip}>
               <span
                 aria-label={t('More info')}
                 className="kv-getting-started-grid__tooltip-icon"
@@ -88,11 +65,35 @@ export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children, onHi
               >
                 <OutlinedQuestionCircleIcon />
               </span>
-            </Popover>
+            </Tooltip>
           </Title>
-        </CardTitle>
-      </CardHeader>
-      <CardBody className="kv-getting-started-grid__content">{children}</CardBody>
+        }
+        className="kv-getting-started-grid__expandable pf-m-display-lg"
+      >
+        <CardHeader
+          actions={
+            actionDropdownItem.length > 0
+              ? {
+                  actions: (
+                    <Dropdown
+                      className="ocs-getting-started-grid__action-dropdown"
+                      isOpen={isOpen}
+                      onOpenChange={setIsOpen}
+                      popperProps={{ position: 'right' }}
+                      toggle={KebabToggle({ isExpanded: isOpen, onClick: onToggle })}
+                    >
+                      <DropdownList>{actionDropdownItem}</DropdownList>
+                    </Dropdown>
+                  ),
+                  className: null,
+                  hasNoOffset: false,
+                }
+              : null
+          }
+          className="kv-getting-started-grid__header"
+        />
+        <CardBody className="kv-getting-started-grid__content">{children}</CardBody>
+      </ExpandableSection>
     </Card>
   );
 };

@@ -5,12 +5,11 @@
   &__header.pf-v5-c-card__header {
     // Use padding sm instead of lg to fix alignment of the KebabToggle action button.
     padding-right: var(--pf-global--spacer--sm);
+    padding-block-start: 0;
   }
-  &__tooltip {
-    white-space: pre-line;
-  }
+
   &__tooltip-icon {
-    padding-left: var(--pf-global--spacer--sm);
+    margin-left: var(--pf-global--spacer--sm);
   }
 
   &__action-dropdown {
@@ -42,6 +41,18 @@
       padding-bottom: calc(var(--pf-v5-c-card--child--PaddingBottom) / 2);
       padding-left: var(--pf-v5-c-card--child--PaddingLeft);
       padding-right: var(--pf-v5-c-card--child--PaddingRight);
+    }
+  }
+
+  &__tooltip {
+    background: var(--pf-c-page__main-section--m-light--BackgroundColor);
+  }
+
+  &__expandable {
+    background: var(--pf-c-page__main-section--m-light--BackgroundColor);
+
+    .pf-v5-c-expandable-section__toggle-text {
+      color: var(--pf-v5-global--Color--dark-100);
     }
   }
 }
