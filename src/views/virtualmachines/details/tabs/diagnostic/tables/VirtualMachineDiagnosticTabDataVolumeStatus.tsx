@@ -54,7 +54,7 @@ const VirtualMachineDiagnosticTabDataVolumeStatus: FC<
                 bodyContent={t(
                   'DataVolume Status is a mechanism for reporting if a volume succeed.',
                 )}
-                helpIconClassName="title-help-text-icon"
+                helpIconClassName="VirtualMachineDiagnosticTab--HelpTextIcon"
               />
             </Title>
           </FlexItem>

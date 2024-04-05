@@ -66,7 +66,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
             bodyContent={t(
               'Conditions provide a standard mechanism for status reporting. Conditions are reported for all aspects of a VM.',
             )}
-            helpIconClassName="title-help-text-icon"
+            helpIconClassName="VirtualMachineDiagnosticTab--HelpTextIcon"
           />
         </Title>
 
