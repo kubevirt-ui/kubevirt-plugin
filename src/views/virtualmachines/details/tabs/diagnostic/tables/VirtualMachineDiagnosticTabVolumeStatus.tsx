@@ -54,7 +54,7 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
                 bodyContent={t(
                   'Volume Snapshot Status is a mechanism for reporting if a volume can be snapshotted or not.',
                 )}
-                helpIconClassName="title-help-text-icon"
+                helpIconClassName="VirtualMachineDiagnosticTab--HelpTextIcon"
               />
             </Title>
           </FlexItem>

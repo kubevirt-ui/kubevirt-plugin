@@ -14,6 +14,10 @@
   &--header {
     margin-top: var(--pf-global--spacer--lg);
   }
+
+  &--HelpTextIcon {
+    font-size: var(--pf-global--FontSize--md);
+  }
 }
 
 .VirtualMachineDiagnosticTabRow--expanded {
