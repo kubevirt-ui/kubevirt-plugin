@@ -1,5 +1,7 @@
 import React, { FC, memo, useEffect, useState } from 'react';
 
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   pluralize,
@@ -41,9 +43,26 @@ export const TemplatesCatalogHeader: FC<{
   return (
     <div className="co-catalog-page__header">
       <div className="co-catalog-page__heading text-capitalize">
-        {(filters?.onlyDefault || hasNoDefaultUserAllFilters(filters)) && t('Default templates')}
+        {(filters?.onlyDefault || hasNoDefaultUserAllFilters(filters)) && (
+          <>
+            {t('Default templates')}{' '}
+            <HelpTextIcon
+              bodyContent={
+                <>
+                  {t('Red Hat recommended configuration for each OS.')}{' '}
+                  <ExternalLink
+                    href={
+                      'https://docs.openshift.com/container-platform/4.15/virt/virtual_machines/creating_vms_rh/virt-creating-vms-from-templates.html'
+                    }
+                    text={t('Learn more')}
+                  />
+                </>
+              }
+            />
+          </>
+        )}
         {filters?.onlyUser && t('User templates')}
-        {filters?.allItems && t('All items')}
+        {filters?.allItems && t('All templates')}
       </div>
       <div className="co-catalog-page__filter">
         <div>
