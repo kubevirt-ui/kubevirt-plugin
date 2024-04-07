@@ -7,6 +7,7 @@ import { Stack, StackItem } from '@patternfly/react-core';
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
 import LiveMigrationSection from './LiveMigrationSection/LiveMigrationSection';
+import MemoryDensity from './MemoryDensity/MemoryDensity';
 import SSHConfiguration from './SSHConfiguration/SSHConfiguration';
 import TemplatesProjectSection from './TemplatesProjectSection/TemplatesProjectSection';
 
@@ -29,6 +30,12 @@ const GeneralSettings: FC<GeneralSettingsProps> = ({ hyperConvergeConfiguration,
         </StackItem>
         <StackItem isFilled>
           <TemplatesProjectSection hyperConvergeConfiguration={hyperConvergeConfiguration} />
+        </StackItem>
+        <StackItem isFilled>
+          <MemoryDensity
+            hyperConvergeConfiguration={hyperConvergeConfiguration}
+            newBadge={newBadge}
+          />
         </StackItem>
       </Stack>
     </ExpandSection>
