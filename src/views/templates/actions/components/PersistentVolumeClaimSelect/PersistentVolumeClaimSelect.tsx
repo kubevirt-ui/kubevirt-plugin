@@ -1,9 +1,12 @@
 import React, { FC, useCallback } from 'react';
 
+import useProjects from '@kubevirt-utils/hooks/useProjects';
+import usePVCs from '@kubevirt-utils/hooks/usePVCs';
+import { getName } from '@kubevirt-utils/resources/shared';
+
 import { PersistentVolumeClainSelectSkeleton } from './PersistentVolumeClainSelectSkeleton';
 import { PersistentVolumeSelectName } from './PersistentVolumeSelectName';
 import { PersistentVolumeSelectProject } from './PersistentVolumeSelectProject';
-import { useProjectsAndPVCs } from './useProjectsAndPVCs';
 
 import './PersistentVolumeClaimSelect.scss';
 
@@ -18,8 +21,9 @@ export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> =
   pvcNameSelected,
   selectPVC,
 }) => {
-  const { filteredPVCNames, projectsLoaded, projectsNames, pvcsLoaded } =
-    useProjectsAndPVCs(projectSelected);
+  const [projectsNames, projectsLoaded] = useProjects();
+  const [pvcs, pvcsLoaded] = usePVCs(projectSelected);
+  const filteredPVCNames = pvcs?.map(getName);
 
   const onSelectProject = useCallback(
     (newProject) => {

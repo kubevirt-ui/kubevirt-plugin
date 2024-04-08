@@ -2,13 +2,14 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import ApplyStorageProfileSettingsCheckbox from '@kubevirt-utils/components/ApplyStorageProfileSettingsCheckbox/ApplyStorageProfileSettingsCheckbox';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
-import { UseStorageProfileClaimPropertySetsValue } from '@kubevirt-utils/components/DiskModal/DiskFormFields/hooks/useStorageProfileClaimPropertySets';
-import DefaultStorageClassAlert from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClass/DefaultStorageClassAlert';
-import StorageClassSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/StorageClass/StorageClassSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { UseStorageProfileClaimPropertySetsValue } from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
 import { FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
+
+import DefaultStorageClassAlert from './StorageClass/DefaultStorageClassAlert';
+import StorageClassSelect from './StorageClass/StorageClassSelect';
 
 type VolumeDestinationProps = {
   applyStorageProfileState: [boolean, Dispatch<SetStateAction<boolean>>];

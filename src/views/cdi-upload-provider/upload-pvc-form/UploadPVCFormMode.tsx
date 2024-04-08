@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { initialAccessModes } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/modesMapping';
+import { initialAccessModes } from '@kubevirt-utils/components/DiskModal/components/utils/modesMapping';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import UploadPVCFormAccessMode from './UploadPVCFormAccessMode';

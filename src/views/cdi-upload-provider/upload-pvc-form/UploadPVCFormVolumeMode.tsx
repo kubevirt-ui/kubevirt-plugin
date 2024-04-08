@@ -2,15 +2,15 @@ import React, { FC, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
 import {
-  AccessMode,
+  ACCESS_MODES,
   getVolumeModeForProvisioner,
   VOLUME_MODE_RADIO_OPTIONS,
-} from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/modesMapping';
+} from '@kubevirt-utils/components/DiskModal/components/utils/modesMapping';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
 type UploadPVCFormModeVolumeModeVolumeModeProps = {
-  accessMode: AccessMode;
+  accessMode: ACCESS_MODES;
   loaded: boolean;
   onChange: (volumeMode: string) => void;
   provisioner: string;

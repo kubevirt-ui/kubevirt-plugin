@@ -4,7 +4,8 @@ import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMConte
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
-import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
+import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
+import { getEditDiskState } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
@@ -12,8 +13,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
-
-import { useEditDiskStates } from '../hooks/useEditDiskState';
 
 type DiskRowActionsProps = {
   diskName: string;
@@ -26,7 +25,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const deleteBtnText = t('Detach');
 
-  const { initialDiskSourceState, initialDiskState } = useEditDiskStates(vm, diskName);
+  const initialFormState = getEditDiskState(vm, diskName);
 
   const onDelete = useCallback(() => {
     const volumeToDelete = vm.spec.template.spec.volumes.find((volume) => volume.name === diskName);
@@ -83,7 +82,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
 
   const onEditModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
-      <EditDiskModal
+      <DiskModal
         onUploadedDataVolume={(dataVolume) =>
           updateTabsData((draft) => {
             ensurePath(draft, 'disks.dataVolumesToAddOwnerRef');
@@ -97,8 +96,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
         }
         createOwnerReference={false}
         headerText={t('Edit disk')}
-        initialDiskSourceState={initialDiskSourceState}
-        initialDiskState={initialDiskState}
+        initialFormData={initialFormState}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={updateVM}

@@ -1,7 +1,7 @@
 import React, { FC, useMemo, useState } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
+import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -37,8 +37,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, vm, vmi }) => {
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
   const isEditDisabled = isVMRunning || pvcResourceExists;
 
-  const { initialDiskSourceState, initialDiskState } =
-    !isEditDisabled && getEditDiskStates(vm, diskName, vmi);
+  const initialFormState = !isEditDisabled && getEditDiskStates(vm, diskName, vmi);
   const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
   const volume = volumes?.find(({ name }) => name === diskName);
 
@@ -58,10 +57,9 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, vm, vmi }) => {
 
   const createEditDiskModal = () =>
     createModal(({ isOpen, onClose }) => (
-      <EditDiskModal
+      <DiskModal
         headerText={t('Edit disk')}
-        initialDiskSourceState={initialDiskSourceState}
-        initialDiskState={initialDiskState}
+        initialFormData={initialFormState}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={updateDisks}

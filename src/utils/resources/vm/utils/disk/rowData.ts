@@ -3,9 +3,8 @@ import {
   CONTAINER_EPHERMAL,
   DYNAMIC,
   OTHER,
-  sourceTypes,
-} from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+} from '@kubevirt-utils/components/DiskModal/components/utils/constants';
+import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import {
   getPrintableDiskDrive,
@@ -40,7 +39,7 @@ export const getDiskRowDataLayout = (
       name: device?.volume?.name,
       namespace: device?.pvc?.metadata?.namespace,
       size: NO_DATA_DASH,
-      source: t(OTHER),
+      source: OTHER,
       storageClass: NO_DATA_DASH,
     };
 
@@ -51,9 +50,9 @@ export const getDiskRowDataLayout = (
       diskRowDataObject.storageClass = device?.pvc?.spec?.storageClassName;
     }
 
-    if (volumeSource === sourceTypes.EPHEMERAL) {
-      diskRowDataObject.source = t(CONTAINER_EPHERMAL);
-      diskRowDataObject.size = t(DYNAMIC);
+    if (volumeSource === SourceTypes.EPHEMERAL) {
+      diskRowDataObject.source = CONTAINER_EPHERMAL;
+      diskRowDataObject.size = DYNAMIC;
     }
 
     return diskRowDataObject;

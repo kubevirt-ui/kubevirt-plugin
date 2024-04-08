@@ -3,10 +3,10 @@ import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react'
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import useStorageProfileClaimPropertySets from '@kubevirt-utils/components/DiskModal/DiskFormFields/hooks/useStorageProfileClaimPropertySets';
-import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/helpers';
+import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useStorageProfileClaimPropertySets from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
 import { BinaryUnit } from '@kubevirt-utils/utils/units';
 import {
   Alert,
