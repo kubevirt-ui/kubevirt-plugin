@@ -415,7 +415,7 @@ export const usePendingChanges = (
     },
     {
       handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Disks));
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Storage));
       },
       hasPendingChange: !isEmpty(modifiedVolumesHotplug),
       label: `${t('Make persistent disk')} - (${(modifiedVolumesHotplug || [])
