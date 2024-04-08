@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { interfacesTypes, typeLabels } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { FormGroup, Select, SelectOption, SelectVariant } from '@patternfly/react-core';
 
 import { networkNameStartWithPod } from '../utils/helpers';
@@ -33,7 +33,7 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
         'The VirtualMachine will be bridged to the selected network, ideal for L2 devices',
       ),
       id: interfacesTypes.bridge,
-      name: t('Bridge'),
+      name: typeLabels[interfacesTypes.bridge],
     },
     masquerade: {
       // in case of pod network, networkName is undefined
@@ -42,7 +42,7 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
         'Put the VirtualMachine behind a NAT Proxy for high compatibility with different network providers. The VirtualMachines IP will differ from the IP seen on the pod network',
       ),
       id: interfacesTypes.masquerade,
-      name: t('Masquerade'),
+      name: typeLabels[interfacesTypes.masquerade],
     },
     sriov: {
       // in case of NAD network, networkName should be a string - enabled if nad type is sriov or undefined or no nad
@@ -53,14 +53,8 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
         'Attach a virtual function network device to the VirtualMachine for high performance',
       ),
       id: interfacesTypes.sriov,
-      name: t('SR-IOV'),
+      name: typeLabels[interfacesTypes.sriov],
     },
-  };
-
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
-    event.preventDefault();
-    setInterfaceType(value);
-    setIsOpen(false);
   };
 
   return (
@@ -73,9 +67,9 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
         <Select
           isOpen={isOpen}
           menuAppendTo="parent"
-          onSelect={handleChange}
+          onSelect={() => setIsOpen(false)}
           onToggle={setIsOpen}
-          selections={interfaceType}
+          selections={typeLabels[interfaceType] || typeLabels.bridge}
           variant={SelectVariant.single}
         >
           {Object.values(interfaceTypeOptions)
@@ -85,7 +79,8 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
                 data-test-id={`network-interface-type-select-${id}`}
                 description={description}
                 key={id}
-                value={id}
+                onClick={() => setInterfaceType(id)}
+                value={name}
               >
                 {name}
               </SelectOption>
