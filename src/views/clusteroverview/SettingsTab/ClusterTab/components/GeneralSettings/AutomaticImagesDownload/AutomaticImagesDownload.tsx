@@ -6,7 +6,6 @@ import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfigurat
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 
@@ -79,7 +78,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
       <SectionWithSwitch
         helpTextIconContent={t('Enable automatic images download and update')}
         id="auto-image-download"
-        isDisabled={!loaded || !isAdmin || !isEmpty(isEnabledAutomaticImagesDownload)}
+        isDisabled={!loaded || !isAdmin || isEnabledAutomaticImagesDownload === undefined}
         newBadge={newBadge}
         switchIsOn={Boolean(isEnabledAutomaticImagesDownload)}
         title={t('Automatic images download')}
