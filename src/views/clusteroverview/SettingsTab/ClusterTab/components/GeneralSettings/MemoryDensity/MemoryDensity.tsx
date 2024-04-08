@@ -5,7 +5,6 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Skeleton } from '@patternfly/react-core';
 
@@ -52,7 +51,7 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, new
       <SectionWithSwitch
         helpTextIconContent={t('Configures the VM workloads to use swap for higher density')}
         id="memory-density-feature"
-        isDisabled={!hyperLoaded || !isAdmin || !isEmpty(higherDensity)}
+        isDisabled={!hyperLoaded || !isAdmin || higherDensity === undefined}
         newBadge={newBadge}
         switchIsOn={Boolean(higherDensity)}
         title={t('Enable memory density')}

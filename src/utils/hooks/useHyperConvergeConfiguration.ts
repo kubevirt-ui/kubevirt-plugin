@@ -9,6 +9,7 @@ import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynam
 export type HyperConverged = K8sResourceCommon & {
   spec: {
     commonTemplatesNamespace?: string;
+    dataImportCronTemplates: K8sResourceCommon[];
     evictionStrategy?: string;
     featureGates: {
       deployKubeSecondaryDNS?: boolean;
@@ -27,6 +28,9 @@ export type HyperConverged = K8sResourceCommon & {
       autoCPULimitNamespaceLabelSelector: V1LabelSelector;
     };
     virtualMachineOptions: { disableSerialConsoleLog: string };
+  };
+  status: {
+    dataImportCronTemplates: K8sResourceCommon[];
   };
 };
 
