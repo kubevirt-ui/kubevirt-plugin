@@ -43,15 +43,14 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [filterValue, setFilterValue] = useState<string>('');
-  const [selectOptions, setSelectOptions] = useState<EnhancedSelectOptionProps[]>(options);
   const [focusedItemIndex, setFocusedItemIndex] = useState<null | number>(null);
 
   const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
 
   const onSelect = (_event: React.MouseEvent<Element, MouseEvent> | undefined, value: string) => {
     if (value && value !== NO_RESULTS) {
-      setFilterValue('');
       setSelected(value);
+      setFilterValue('');
     }
     setIsOpen(false);
     setFocusedItemIndex(null);
@@ -70,6 +69,12 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
     const selectOption = options?.find((opt) => opt?.value === selected);
     return getOptionComponent(selectOption);
   }, [selected, toggleProps?.placeholder, options]);
+
+  const filterOptions = useMemo(
+    () =>
+      options.filter((option) => option.value.toLowerCase().includes(filterValue.toLowerCase())),
+    [options, filterValue],
+  );
 
   const toggle = SelectToggle({
     isExpanded: isOpen,
@@ -97,32 +102,11 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
               if (filterValue !== newFilterValue) {
                 setFilterValue(newFilterValue);
               }
-              let newSelectOptions: EnhancedSelectOptionProps[] = [...options];
 
-              if (!isEmpty(newFilterValue)) {
-                newSelectOptions = options.filter((option) =>
-                  option.value.toLowerCase().includes(newFilterValue.toLowerCase()),
-                );
-
-                if (isEmpty(newSelectOptions)) {
-                  newSelectOptions = [
-                    {
-                      children: t('No results found for "{{value}}"', {
-                        value: newFilterValue,
-                      }),
-                      isDisabled: true,
-                      value: NO_RESULTS,
-                    },
-                  ];
-                }
-              }
-
-              setSelectOptions(newSelectOptions);
               setFocusedItemIndex(null);
             }}
             onClear={(e: SyntheticEvent<HTMLButtonElement>) => {
               e.stopPropagation();
-              setSelectOptions(options);
               setFilterValue('');
             }}
             placeholder={toggleProps?.placeholder}
@@ -132,21 +116,29 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
       </MenuSearch>
       <Divider />
       <SelectList id="select-inline-filter-listbox">
-        {selectOptions.map((option, index) => {
-          return (
-            <SelectOption
-              data-test-id={`select-option-${option.value}`}
-              id={`select-inline-filter-${option.value?.replace(' ', '-')}`}
-              isFocused={focusedItemIndex === index}
-              key={option.value}
-              onClick={() => setSelected(option.value)}
-              value={option.value}
-              {...option}
-            >
-              {getOptionComponent(option)}
-            </SelectOption>
-          );
-        })}
+        {!isEmpty(filterOptions) ? (
+          filterOptions.map((option, index) => {
+            return (
+              <SelectOption
+                data-test-id={`select-option-${option.value}`}
+                id={`select-inline-filter-${option.value?.replace(' ', '-')}`}
+                isFocused={focusedItemIndex === index}
+                key={option.value}
+                onClick={() => setSelected(option.value)}
+                value={option.value}
+                {...option}
+              >
+                {getOptionComponent(option)}
+              </SelectOption>
+            );
+          })
+        ) : (
+          <SelectOption isDisabled value={NO_RESULTS}>
+            {t('No results found for "{{value}}"', {
+              value: filterValue,
+            })}
+          </SelectOption>
+        )}
       </SelectList>
       {menuFooter && menuFooter}
     </Select>
