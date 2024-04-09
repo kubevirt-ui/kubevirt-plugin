@@ -5,17 +5,17 @@ import {
   V1beta1VirtualMachineInstancetype,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
-import { APP_NAME_LABEL } from '@kubevirt-utils/resources/template';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
-  COMMON_INSTANCETYPES,
   initialMenuItems,
   INSTANCETYPE_CLASS_ANNOTATION,
   INSTANCETYPE_DESCRIPTION_ANNOTATION,
   instanceTypeSeriesNameMapper,
+  REDHAT_COM,
 } from './constants';
 import { InstanceTypeSize, InstanceTypesMenuItemsData, RedHatInstanceTypeSeries } from './types';
 
@@ -58,7 +58,7 @@ const hasRedHatSeriesSizeLabel = (
 export const isRedHatInstanceType = (
   instanceType: V1beta1VirtualMachineClusterInstancetype | V1beta1VirtualMachineInstancetype,
 ): boolean => {
-  if (getLabel(instanceType, APP_NAME_LABEL) !== COMMON_INSTANCETYPES) return false;
+  if (getLabel(instanceType, VENDOR_LABEL) !== REDHAT_COM) return false;
   return hasRedHatSeriesSizeLabel(instanceType);
 };
 
