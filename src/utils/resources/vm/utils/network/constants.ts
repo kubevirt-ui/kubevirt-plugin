@@ -1,5 +1,6 @@
 /* eslint-disable require-jsdoc */
 import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export type NetworkPresentation = {
   iface: V1Interface;
@@ -13,9 +14,15 @@ const typeHandler = {
 };
 
 const types = {
-  bridge: 'Bridge',
-  masquerade: 'Masquerade',
-  sriov: 'SR-IOV',
+  bridge: 'bridge',
+  masquerade: 'masquerade',
+  sriov: 'sriov',
+};
+
+export const typeLabels = {
+  [types.bridge]: t('Bridge'),
+  [types.masquerade]: t('Masquerade'),
+  [types.sriov]: t('SR-IOV'),
 };
 
 export const interfacesTypes = new Proxy(types, typeHandler);

@@ -98,7 +98,7 @@ export const createInterface = (
   interfaceType: string,
 ): V1Interface => {
   return {
-    [interfaceType.toLowerCase()]: {},
+    [interfaceType]: {},
     macAddress: interfaceMACAddress,
     model: interfaceModel,
     name: nicName,

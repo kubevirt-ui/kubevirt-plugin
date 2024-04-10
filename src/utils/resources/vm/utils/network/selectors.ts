@@ -2,7 +2,7 @@ import { V1Interface } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 import { NO_DATA_DASH } from '../constants';
 
-import { interfacesTypes } from './constants';
+import { interfacesTypes, typeLabels } from './constants';
 
 /**
  * function to get network interface type
@@ -20,4 +20,4 @@ export const getNetworkInterfaceType = (iface: V1Interface): string => {
  * @returns interface type
  */
 export const getPrintableNetworkInterfaceType = (iface: V1Interface): string =>
-  interfacesTypes[getNetworkInterfaceType(iface)];
+  typeLabels[getNetworkInterfaceType(iface)];
