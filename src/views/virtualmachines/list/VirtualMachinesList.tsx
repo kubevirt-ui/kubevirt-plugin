@@ -145,11 +145,15 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     !loadingFeatureProxy &&
     loadedColumns;
 
+  if (loaded && isEmpty(unfilteredData)) {
+    return <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />;
+  }
+
   return (
     <>
       {/* All of this table and components should be replaced to our own fitted components */}
       <ListPageHeader title={t('VirtualMachines')}>
-        {!isEmpty(vms) && <VirtualMachinesCreateButton namespace={namespace} />}
+        <VirtualMachinesCreateButton namespace={namespace} />
       </ListPageHeader>
       <ListPageBody>
         <div className="list-managment-group">
@@ -178,7 +182,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
             rowFilters={filters}
             searchFilters={searchFilters}
           />
-          {!isEmpty(vms) && (
+          {!isEmpty(dataFilters) && (
             <Pagination
               onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
                 onPageChange({ endIndex, page, perPage, startIndex })
@@ -195,10 +199,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
             />
           )}
         </div>
-        {loaded && isEmpty(data) && (
-          <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
-        )}
         <VirtualizedTable<K8sResourceCommon>
+          EmptyMsg={() => (
+            <div className="pf-u-text-align-center">{t('No VirtualMachines found')}</div>
+          )}
           rowData={{
             getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
             getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
@@ -207,7 +211,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
           }}
           columns={activeColumns}
           data={data}
-          EmptyMsg={() => <></>}
           loaded={loaded}
           loadError={loadError}
           Row={VirtualMachineRow}

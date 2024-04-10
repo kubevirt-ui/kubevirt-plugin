@@ -4,16 +4,18 @@ import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
   ListPageBody,
-  ListPageCreate,
   ListPageHeader,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem } from '@patternfly/react-core';
 
+import VirtualMachineTemplatesCreateButton from './components/VirtualMachineTemplatesCreateButton/VirtualMachineTemplatesCreateButton';
+import VirtualMachineTemplatesEmptyState from './components/VirtualMachineTemplatesEmptyState/VirtualMachineTemplatesEmptyState';
 import VirtualMachineTemplatesRow from './components/VirtualMachineTemplatesRow';
 import VirtualMachineTemplateSupport from './components/VirtualMachineTemplateSupport/VirtualMachineTemplateSupport';
 import { useTemplatesWithAvailableSource } from './hooks/useTemplatesWithAvailableSource';
@@ -44,15 +46,14 @@ const VirtualMachineTemplatesList: FC<VirtualMachineTemplatesListProps> = ({ nam
 
   const templatesLoaded = loaded && bootSourcesLoaded;
 
+  if (templatesLoaded && isEmpty(data)) {
+    return <VirtualMachineTemplatesEmptyState namespace={namespace} />;
+  }
+
   return (
     <>
       <ListPageHeader title={t('VirtualMachine Templates')}>
-        <ListPageCreate
-          createAccessReview={{ groupVersionKind: modelToRef(TemplateModel), namespace }}
-          groupVersionKind={modelToRef(TemplateModel)}
-        >
-          {t('Create Template')}
-        </ListPageCreate>
+        <VirtualMachineTemplatesCreateButton namespace={namespace} />
       </ListPageHeader>
       <ListPageBody>
         <Stack hasGutter>
