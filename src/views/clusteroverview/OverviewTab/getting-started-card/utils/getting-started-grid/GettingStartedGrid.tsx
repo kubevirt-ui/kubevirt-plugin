@@ -27,6 +27,7 @@ export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children, onHi
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const actionDropdownItem: any[] = [];
 
@@ -69,6 +70,8 @@ export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children, onHi
           </Title>
         }
         className="kv-getting-started-grid__expandable pf-m-display-lg"
+        isExpanded={isExpanded}
+        onToggle={(_, expand) => setIsExpanded(expand)}
       >
         <CardHeader
           actions={
