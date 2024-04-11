@@ -15,7 +15,6 @@ import {
   EmptyStateHeader,
   EmptyStateIcon,
   EmptyStateVariant,
-  Title,
 } from '@patternfly/react-core';
 import { NetworkIcon } from '@patternfly/react-icons';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
@@ -35,11 +34,13 @@ const CheckupsNetworkListEmptyState = ({ isPermitted, nadsInNamespace }) => {
       <EmptyStateHeader
         headingLevel="h4"
         icon={<EmptyStateIcon icon={NetworkIcon} />}
-        titleText={<>{t('No network latency checkups yet')}</>}
+        titleText={<>{t('No network latency checkups found')}</>}
       />
+
       <EmptyStateBody>
         {t('To get started, install permissions and then run a checkup')}
       </EmptyStateBody>
+
       <EmptyStateFooter>
         <EmptyStateActions>
           <Button
@@ -69,18 +70,14 @@ const CheckupsNetworkListEmptyState = ({ isPermitted, nadsInNamespace }) => {
           </Button>
         </EmptyStateActions>
         {!nadsInNamespace && (
-          <Title className="CheckupsNetworkListEmptyState--title__namespace" headingLevel="h5">
-            {t(
-              'Please add a NetworkAttachmentDefinition to this namespace in order to use checkups',
-            )}
-          </Title>
+          <p className="CheckupsNetworkListEmptyState--title__namespace text-muted">
+            {t('Add a NetworkAttachmentDefinition to this namespace in order to use checkups')}
+          </p>
         )}
         <EmptyStateActions>
           <ExternalLink
-            href={
-              'https://docs.openshift.com/container-platform/4.13/virt/support/monitoring/virt-running-cluster-checkups.html#virt-measuring-latency-vm-secondary-network_virt-running-cluster-checkups'
-            }
-            text={t('Learn about network checkups')}
+            href="https://docs.openshift.com/container-platform/4.15/virt/monitoring/virt-running-cluster-checkups.html#virt-measuring-latency-vm-secondary-network_virt-running-cluster-checkups"
+            text={t('Learn more about network latency checkups')}
           />
         </EmptyStateActions>
       </EmptyStateFooter>

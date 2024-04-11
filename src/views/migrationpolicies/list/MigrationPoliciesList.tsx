@@ -32,25 +32,28 @@ const MigrationPoliciesList: FC = () => {
       </ListPageHeader>
 
       <ListPageBody>
-        <ListPageFilter
-          columnLayout={{
-            columns: columns?.map(({ additional, id, title }) => ({
-              additional,
-              id,
-              title,
-            })),
-            id: MigrationPolicyModelRef,
-            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-            type: t('MigrationPolicy'),
-          }}
-          data={unfilteredData}
-          loaded={loaded && loadedColumns}
-          onFilterChange={onFilterChange}
-        />
+        {!isEmpty(mps) && (
+          <ListPageFilter
+            columnLayout={{
+              columns: columns?.map(({ additional, id, title }) => ({
+                additional,
+                id,
+                title,
+              })),
+              id: MigrationPolicyModelRef,
+              selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+              type: t('MigrationPolicy'),
+            }}
+            data={unfilteredData}
+            loaded={loaded && loadedColumns}
+            onFilterChange={onFilterChange}
+          />
+        )}
+        {loaded && isEmpty(data) && <MigrationPoliciesEmptyState />}
         <VirtualizedTable<V1alpha1MigrationPolicy>
           columns={activeColumns}
           data={data}
-          EmptyMsg={() => <MigrationPoliciesEmptyState />}
+          EmptyMsg={() => <></>}
           loaded={loaded && loadedColumns}
           loadError={loadError}
           Row={MigrationPoliciesRow}
