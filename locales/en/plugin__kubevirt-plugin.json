@@ -1099,7 +1099,6 @@
   "SSH settings": "SSH settings",
   "SSH using virtctl": "SSH using virtctl",
   "Start": "Start",
-  "Start cloned VM": "Start cloned VM",
   "Start in pause mode": "Start in pause mode",
   "Start this VirtualMachine after creation": "Start this VirtualMachine after creation",
   "Start this VirtualMachine in pause mode": "Start this VirtualMachine in pause mode",
