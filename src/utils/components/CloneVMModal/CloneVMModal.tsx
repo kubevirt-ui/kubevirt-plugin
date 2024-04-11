@@ -80,7 +80,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       obj={source}
       onClose={onClose}
       onSubmit={sendCloneRequest}
-      submitBtnText={t('Create')}
+      submitBtnText={isVM(source) ? t('Clone') : t('Create')}
     >
       <Form className="pf-u-w-75-on-md pf-u-w-66-on-lg pf-u-m-auto" isHorizontal>
         <NameInput name={cloneName} setName={setCloneName} />
