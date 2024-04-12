@@ -17,7 +17,7 @@ import CloningStatus from './components/CloningStatus';
 import ConfigurationSummary from './components/ConfigurationSummary';
 import NameInput from './components/NameInput';
 import SnapshotContentConfigurationSummary from './components/SnapshotContentConfigurationSummary';
-import StartClonedVMCheckbox from './components/StartClonedVMCheckbox';
+import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
 import useCloneVMModal from './hooks/useCloneVMModal';
 import { CLONING_STATUSES } from './utils/constants';
 import { cloneVM, isVM, runVM, vmExist } from './utils/helpers';
@@ -35,7 +35,10 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   const namespace = source?.metadata?.namespace;
 
   const [cloneName, setCloneName] = useState(
-    `${source?.metadata?.name}-clone-${getRandomChars()}`.substring(0, MAX_K8S_NAME_LENGTH),
+    `${source?.metadata?.name}-${isVM(source) && 'clone-'}${getRandomChars()}`.substring(
+      0,
+      MAX_K8S_NAME_LENGTH,
+    ),
   );
 
   const [startCloneVM, setStartCloneVM] = useState(false);

@@ -1,0 +1,15 @@
+.StartClonedVMCheckbox {
+  .pf-v5-c-check__label {
+    //we want to apply this rule only for Firefox to achieve expected look
+    @supports (-moz-appearance: none) {
+      align-self: center;
+      margin-top: 0;
+    }
+  }
+  .pf-v5-c-check__input {
+    //we want to apply this rule only for Firefox to achieve expected look
+    @supports (-moz-appearance: none) {
+      margin-top: 0;
+    }
+  }
+}
