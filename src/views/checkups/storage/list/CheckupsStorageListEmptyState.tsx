@@ -46,11 +46,13 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
       <EmptyStateHeader
         headingLevel="h4"
         icon={<EmptyStateIcon icon={StorageDomainIcon} />}
-        titleText={<>{t('No storage checkups yet')}</>}
+        titleText={<>{t('No storage checkups found')}</>}
       />
+
       <EmptyStateBody>
         {t('To get started, install permissions and then run a checkup')}
       </EmptyStateBody>
+
       <EmptyStateFooter>
         <EmptyStateActions>
           <Button
@@ -82,7 +84,7 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
           </Button>
         </EmptyStateActions>
         <EmptyStateActions className="empty-state-secondary-action">
-          <ExternalLink href={'#'} text={t('Learn about storage checkups')} />
+          <ExternalLink href={'#'} text={t('Learn more about storage checkups')} />
         </EmptyStateActions>
       </EmptyStateFooter>
     </EmptyState>

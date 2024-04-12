@@ -36,30 +36,32 @@ const CheckupsStorageList = () => {
   return (
     <ListPageBody>
       <div className="list-managment-group">
-        <ListPageFilter
-          columnLayout={{
-            columns: columns?.map(({ additional, id, title }) => ({
-              additional,
-              id,
-              title,
-            })),
-            id: 'checkups-storage',
-            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-            type: t('Checkups'),
-          }}
-          onFilterChange={(...args) => {
-            onFilterChange(...args);
-            onPaginationChange({
-              ...pagination,
-              endIndex: pagination?.perPage,
-              page: 1,
-              startIndex: 0,
-            });
-          }}
-          data={unfilterData}
-          loaded={loading && !loadingPermissions && loadedColumns}
-          rowFilters={filters}
-        />
+        {!isEmpty(unfilterData) && (
+          <ListPageFilter
+            columnLayout={{
+              columns: columns?.map(({ additional, id, title }) => ({
+                additional,
+                id,
+                title,
+              })),
+              id: 'checkups-storage',
+              selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+              type: t('Checkups'),
+            }}
+            onFilterChange={(...args) => {
+              onFilterChange(...args);
+              onPaginationChange({
+                ...pagination,
+                endIndex: pagination?.perPage,
+                page: 1,
+                startIndex: 0,
+              });
+            }}
+            data={unfilterData}
+            loaded={loading && !loadingPermissions && loadedColumns}
+            rowFilters={filters}
+          />
+        )}
         {!isEmpty(dataFilters) && loading && !loadingPermissions && (
           <Pagination
             onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
