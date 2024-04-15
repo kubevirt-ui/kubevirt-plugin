@@ -64,7 +64,6 @@ const DiskList: FC<DiskListProps> = ({ vm, vmi }) => {
       >
         {t('Add disk')}
       </ListPageCreateButton>
-
       <Flex>
         <FlexItem>
           <ListPageFilter

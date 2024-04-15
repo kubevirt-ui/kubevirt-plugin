@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { StorageClassModel } from '@kubevirt-ui/kubevirt-api/console';
-import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/helpers';
+import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';

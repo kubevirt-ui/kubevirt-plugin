@@ -2,7 +2,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import {
   CONTAINER_EPHERMAL,
   OTHER,
-} from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
+} from '@kubevirt-utils/components/DiskModal/components/utils/constants';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 

@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 
-import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourceUploadPVC';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,6 +7,7 @@ import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, DROPDOWN_FORM_SELECTION } from '../../utils/constants';
 
+import DiskSourceUploadPVC from './components/DiskSourceUploadPVC';
 import PVCSource from './components/PVCSource';
 import SnapshotSource from './components/SnapshotSource';
 

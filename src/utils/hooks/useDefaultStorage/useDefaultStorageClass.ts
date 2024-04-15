@@ -17,6 +17,7 @@ type UseDefaultStorageClass = () => [
   {
     clusterDefaultStorageClass: IoK8sApiStorageV1StorageClass;
     sortedStorageClasses: string[];
+    storageClasses: IoK8sApiStorageV1StorageClass[];
     virtDefaultStorageClass: IoK8sApiStorageV1StorageClass;
   },
   boolean,
@@ -50,7 +51,7 @@ const useDefaultStorageClass: UseDefaultStorageClass = () => {
     [storageClasses],
   );
 
-  return [{ ...defaultStorageClass, sortedStorageClasses }, loaded];
+  return [{ ...defaultStorageClass, sortedStorageClasses, storageClasses }, loaded];
 };
 
 export default useDefaultStorageClass;

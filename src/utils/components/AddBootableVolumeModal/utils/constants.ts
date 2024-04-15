@@ -6,7 +6,7 @@ import {
   V1beta1DataSource,
   V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
+import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';

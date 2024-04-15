@@ -6,11 +6,12 @@ import {
   SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
-import DiskSourcePVCSelect from '@kubevirt-utils/components/DiskModal/DiskFormFields/DiskSourceFormSelect/components/DiskSourcePVCSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { Checkbox, PopoverPosition, Split, SplitItem } from '@patternfly/react-core';
+
+import DiskSourcePVCSelect from './DiskSourcePVCSelect';
 
 type PVCSourceProps = {
   bootableVolume: AddBootableVolumeState;

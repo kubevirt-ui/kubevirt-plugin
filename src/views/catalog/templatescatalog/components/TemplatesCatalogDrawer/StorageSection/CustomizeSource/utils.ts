@@ -7,7 +7,7 @@ import {
   V1ContainerDiskSource,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
-import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/state/initialState';
+import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateContainerDisks } from '@kubevirt-utils/resources/template';
 import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';

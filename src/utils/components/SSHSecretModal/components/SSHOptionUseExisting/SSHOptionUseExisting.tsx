@@ -56,7 +56,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   const [selectedProject, setSelectedProject] = useState<string>(
     localNSProject || namespace || sshDetails?.sshSecretNamespace,
   );
-  const projects = useProjects();
+  const [projects] = useProjects();
 
   useEffect(
     () =>

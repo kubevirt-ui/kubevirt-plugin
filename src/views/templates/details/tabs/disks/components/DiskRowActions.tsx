@@ -3,15 +3,14 @@ import React, { FC, useCallback, useState } from 'react';
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
-import EditDiskModal from '@kubevirt-utils/components/DiskModal/EditDiskModal';
+import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
+import { getEditDiskState } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
-
-import { useEditDiskStates } from '../hooks/useEditDiskState';
 
 type DiskRowActionsProps = {
   diskName: string;
@@ -26,7 +25,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdat
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const deleteBtnText = t('Detach');
 
-  const { initialDiskSourceState, initialDiskState } = useEditDiskStates(vm, diskName);
+  const initialFormState = getEditDiskState(vm, diskName);
 
   const onDelete = useCallback(() => {
     const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
@@ -71,11 +70,10 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdat
 
   const onEditModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
-      <EditDiskModal
+      <DiskModal
         createOwnerReference={false}
         headerText={t('Edit disk')}
-        initialDiskSourceState={initialDiskSourceState}
-        initialDiskState={initialDiskState}
+        initialFormData={initialFormState}
         isOpen={isOpen}
         isTemplate
         onClose={onClose}

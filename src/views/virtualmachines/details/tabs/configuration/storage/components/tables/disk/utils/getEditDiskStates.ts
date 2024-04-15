@@ -1,42 +1,38 @@
+import produce from 'immer';
+
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  DYNAMIC,
-  interfaceTypes,
-  OTHER,
-  sourceTypes,
-  volumeTypes,
-} from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
-import {
-  DiskFormState,
-  DiskSourceState,
-  initialStateDiskSource,
-} from '@kubevirt-utils/components/DiskModal/state/initialState';
+import { getInitialStateDiskForm } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import {
   getRunningVMMissingDisksFromVMI,
   getRunningVMMissingVolumesFromVMI,
+  getVolumeSource,
+  setEditStateFromDisk,
+  setEphemeralURL,
+  setOtherSource,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { DiskFormState, SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { getBootDisk, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import { getDiskDrive, getDiskInterface } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 type UseEditDiskStates = (
   vm: V1VirtualMachine,
   diskName: string,
   vmi?: V1VirtualMachineInstance,
-) => {
-  initialDiskSourceState: DiskSourceState;
-  initialDiskState: DiskFormState;
-};
+) => DiskFormState;
 
 export const getEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
-  const initialDiskSourceState: DiskSourceState = { ...initialStateDiskSource };
-  const disks = !vmi
-    ? getDisks(vm)
-    : [...(getDisks(vm) || []), ...getRunningVMMissingDisksFromVMI(getDisks(vm) || [], vmi)];
-  const disk = disks?.find(({ name }) => name === diskName);
+  const state = produce(getInitialStateDiskForm(), (draftState) => {
+    draftState.isBootSource = getBootDisk(vm)?.name === diskName;
 
-  const getDiskDetails = () => {
+    const disks = !vmi
+      ? getDisks(vm)
+      : [...(getDisks(vm) || []), ...getRunningVMMissingDisksFromVMI(getDisks(vm) || [], vmi)];
+    const disk = disks?.find(({ name }) => name === diskName);
+
+    if (!isEmpty(disk)) {
+      setEditStateFromDisk(disk, draftState);
+    }
+
     const volumes = !vmi
       ? getVolumes(vm)
       : [
@@ -44,42 +40,14 @@ export const getEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
           ...getRunningVMMissingVolumesFromVMI(getVolumes(vm) || [], vmi),
         ];
     const volume = volumes?.find(({ name }) => name === diskName);
-    // volume consists of 2 keys:
-    // name and one of: containerDisk/cloudInitNoCloud
-    const volumeSource = Object.keys(volume).find((key) =>
-      [
-        volumeTypes.CONTAINER_DISK,
-        volumeTypes.DATA_VOLUME,
-        volumeTypes.PERSISTENT_VOLUME_CLAIM,
-      ].includes(key),
-    );
+    const volumeSource = getVolumeSource(volume);
 
-    const isBootDisk = diskName === getBootDisk(vm)?.name;
-
-    if (volumeSource === sourceTypes.EPHEMERAL) {
-      initialDiskSourceState.ephemeralSource = volume.containerDisk?.image;
-      return { diskSize: DYNAMIC, diskSource: sourceTypes.EPHEMERAL, isBootDisk };
+    if (volumeSource === SourceTypes.EPHEMERAL) {
+      setEphemeralURL(volume, draftState);
     }
-    return { diskSize: null, diskSource: OTHER, isBootDisk };
-  };
 
-  const { diskSize, diskSource, isBootDisk: asBootSource } = getDiskDetails();
+    setOtherSource(draftState);
+  });
 
-  const initialDiskState: DiskFormState = {
-    accessMode: null,
-    applyStorageProfileSettings: true,
-    asBootSource,
-    diskInterface: isEmpty(disk) ? interfaceTypes.VIRTIO : getDiskInterface(disk),
-    diskName,
-    diskSize,
-    diskSource,
-    diskType: isEmpty(disk) ? diskTypes.disk : diskTypes[getDiskDrive(disk)],
-    enablePreallocation: false,
-    storageClass: null,
-    storageClassProvisioner: null,
-    storageProfileSettingsCheckboxDisabled: false,
-    volumeMode: null,
-  };
-
-  return { initialDiskSourceState: initialStateDiskSource, initialDiskState };
+  return { ...state, diskName };
 };

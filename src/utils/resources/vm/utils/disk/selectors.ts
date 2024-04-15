@@ -1,5 +1,5 @@
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { interfaceTypes } from '@kubevirt-utils/components/DiskModal/DiskFormFields/utils/constants';
+import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 
 import { diskTypes, diskTypesLabels } from './constants';
 
@@ -34,7 +34,7 @@ export const getDiskInterface = (disk: V1Disk): string => disk?.[getDiskDrive(di
  */
 export const getPrintableDiskInterface = (disk: V1Disk): string => {
   const diskInterface = getDiskInterface(disk);
-  if (diskInterface === interfaceTypes.SCSI || diskInterface === interfaceTypes.SATA) {
+  if (diskInterface === InterfaceTypes.SCSI || diskInterface === InterfaceTypes.SATA) {
     return diskInterface.toUpperCase();
   }
   return diskInterface ?? '';

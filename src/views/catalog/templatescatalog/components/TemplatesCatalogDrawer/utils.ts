@@ -10,7 +10,7 @@ import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   DEFAULT_CDROM_DISK_SIZE,
   DEFAULT_DISK_SIZE,
-} from '@kubevirt-utils/components/DiskModal/state/initialState';
+} from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import {
