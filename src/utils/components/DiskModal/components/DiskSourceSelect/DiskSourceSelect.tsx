@@ -1,20 +1,20 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import { FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
+import { FormGroup } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import { DEFAULT_DISK_SIZE } from '../../utils/constants';
 import { DiskFormState, SourceTypes } from '../../utils/types';
 import { diskSizeField, diskSourceField, DYNAMIC, OTHER } from '../utils/constants';
 
-import { diskSourceFieldID } from './utils/constants';
-import { getDiskSourceOptions, getSelectedDiskSourceComponent } from './utils/utils';
+import DiskSourceSelectOptionGroups from './components/DiskSourceSelectOptions/DiskSourceSelectOptionGroups';
+import { diskSourceFieldID, optionLabelMapper } from './utils/constants';
+import { getSelectedDiskSourceComponent } from './utils/utils';
 
 type DiskSourceSelectProps = {
   isTemplate: boolean;
@@ -26,10 +26,7 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ isTemplate, relevantUploa
   const { t } = useKubevirtTranslation();
   const { control, setValue, watch } = useFormContext<DiskFormState>();
 
-  const { diskSize, diskSource, diskType } = watch();
-  const isCDROMType = diskType === diskTypes.cdrom;
-
-  const sourceOptions = useMemo(() => getDiskSourceOptions(isTemplate), [isTemplate]);
+  const { diskSize, diskSource } = watch();
 
   return (
     <>
@@ -46,28 +43,10 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ isTemplate, relevantUploa
                   onChange(val);
                 }}
                 selected={value}
-                selectedLabel={sourceOptions[value]?.label}
+                selectedLabel={optionLabelMapper[value]}
                 toggleProps={{ isDisabled: value === OTHER, isFullWidth: true }}
               >
-                <SelectList>
-                  {Object.entries(sourceOptions).map(([id, { description, label }]) => {
-                    const isDisabled =
-                      (isRunning(vm) && id === SourceTypes.EPHEMERAL) ||
-                      (isCDROMType && id === SourceTypes.BLANK) ||
-                      (isTemplate && id === SourceTypes.UPLOAD);
-                    return (
-                      <SelectOption
-                        data-test-id={`${diskSourceFieldID}-select-${id}`}
-                        description={description}
-                        isDisabled={isDisabled}
-                        key={id}
-                        value={id}
-                      >
-                        {label}
-                      </SelectOption>
-                    );
-                  })}
-                </SelectList>
+                <DiskSourceSelectOptionGroups isTemplate={isTemplate} isVMRunning={isRunning(vm)} />
               </FormPFSelect>
             </div>
           </FormGroup>
