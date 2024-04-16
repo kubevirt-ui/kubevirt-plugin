@@ -4,7 +4,6 @@ import { FLAG_CONSOLE_CLI_DOWNLOAD } from '@kubevirt-utils/flags/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 
-import RestoreGettingStartedButton from './RestoreGettingStartedButton';
 import VirtctlPopup from './VirtctlPopup';
 
 type ClusterOverviewPageHeaderProps = {
@@ -26,9 +25,6 @@ const ClusterOverviewPageHeader: React.FC<ClusterOverviewPageHeaderProps> = ({ c
         <span>
           {hasConsoleTools && <VirtctlPopup />}
           {children}
-          <span className="co-m-pane__heading-badge">
-            <RestoreGettingStartedButton />
-          </span>
         </span>
       </h1>
     </div>
