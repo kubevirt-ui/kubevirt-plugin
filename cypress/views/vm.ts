@@ -82,7 +82,7 @@ export const vm = {
     }
   },
   createVMFromYAML: () => {
-    cy.byButtonText('Create').click();
+    cy.byTestID('item-create').click();
     cy.byButtonText('With YAML').click();
     cy.get(vmView.saveBtn).click();
   },

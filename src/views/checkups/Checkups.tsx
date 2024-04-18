@@ -18,7 +18,7 @@ const CheckupsList: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
-    location?.pathname.endsWith('network') ? 0 : 1,
+    location?.pathname.endsWith('storage') ? 1 : 0,
   );
 
   useEffect(() => {
