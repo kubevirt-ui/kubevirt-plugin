@@ -15,5 +15,7 @@ const instanceTypeVMInitialState: InstanceTypeVMState = {
 export const instanceTypeVMStoreInitialState: InstanceTypeVMStoreState = {
   instanceTypeVMState: instanceTypeVMInitialState,
   isChangingNamespace: true,
+  startVM: true,
+  vm: null,
   vmNamespaceTarget: '',
 };
