@@ -47,6 +47,7 @@ const CheckupsNetworkForm = () => {
             <CheckupsNetworkFormNADS selectedNAD={selectedNAD} setSelectedNAD={setSelectedNAD} />
             <FormGroup fieldId="sample-duration" label={t('Sample duration (seconds)')}>
               <TextInput
+                className="CheckupsNetworkForm--main__number-input"
                 id="sample-duration"
                 name="sample-duration"
                 onChange={(_event, val) => setSampleDuration(val)}

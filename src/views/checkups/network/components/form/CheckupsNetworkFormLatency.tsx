@@ -49,6 +49,7 @@ const CheckupsNetworkFormLatency: FC<CheckupsNetworkFormLatencyProps> = ({
 
       {isDesiredLatency && (
         <TextInput
+          className="CheckupsNetworkForm--main__number-input"
           id="desired-latency-value"
           name="desired-latency-value"
           onChange={(_event, value) => setDesiredLatency(value)}

@@ -59,6 +59,7 @@ const CheckupsStorageForm = () => {
               label={t('Timeout (minutes)')}
             >
               <TextInput
+                className="CheckupsStorageForm--main__number-input"
                 id="timeout"
                 isRequired
                 name="timeout"
