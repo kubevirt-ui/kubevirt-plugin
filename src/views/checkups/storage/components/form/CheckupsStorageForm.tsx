@@ -23,7 +23,7 @@ import './checkups-storage-form.scss';
 const CheckupsStorageForm = () => {
   const { t } = useKubevirtTranslation();
   const [name, setName] = useState<string>(generatePrettyName('kubevirt-storage-checkup'));
-  const [timeOut, setTimeOut] = useState<string>();
+  const [timeOut, setTimeOut] = useState<string>('10');
 
   return (
     <Grid>
