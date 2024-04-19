@@ -1,24 +1,22 @@
 import React, { FC } from 'react';
 
-import {
-  VirtualMachineInstancetypeModelGroupVersionKind,
-  VirtualMachineInstancetypeModelRef,
-} from '@kubevirt-ui/kubevirt-api/console';
+import useVirtualMachineInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useVirtualMachineInstanceTypes';
+import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   useActiveNamespace,
-  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
+import UserInstancetypeEmptyState from './components/UserInstancetypeEmptyState/UserInstancetypeEmptyState';
 import UserInstancetypeRow from './components/UserInstancetypeRow';
 import useUserInstancetypeListColumns from './hooks/useUserInstancetypeListColumns';
 
@@ -27,19 +25,17 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 const UserInstancetypeList: FC = () => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
-  const [instanceTypes, loaded, loadError] = useK8sWatchResource<
-    V1beta1VirtualMachineInstancetype[]
-  >({
-    groupVersionKind: VirtualMachineInstancetypeModelGroupVersionKind,
-    isList: true,
-    ...(activeNamespace !== ALL_NAMESPACES_SESSION_KEY && { namespace: activeNamespace }),
-  });
+  const [instanceTypes, loaded, loadError] = useVirtualMachineInstanceTypes();
   const { onPaginationChange, pagination } = usePagination();
   const [unfilteredData, data, onFilterChange] = useListPageFilter<
     V1beta1VirtualMachineInstancetype,
     V1beta1VirtualMachineInstancetype
   >(instanceTypes);
   const [columns, activeColumns, loadedColumns] = useUserInstancetypeListColumns(pagination, data);
+
+  if (loaded && isEmpty(unfilteredData)) {
+    return <UserInstancetypeEmptyState namespace={activeNamespace} />;
+  }
 
   return (
     <ListPageBody>
@@ -67,25 +63,27 @@ const UserInstancetypeList: FC = () => {
           data={unfilteredData}
           loaded={loaded && loadedColumns}
         />
-        <Pagination
-          onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-            onPaginationChange({ endIndex, page, perPage, startIndex })
-          }
-          onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-            onPaginationChange({ endIndex, page, perPage, startIndex })
-          }
-          className="list-managment-group__pagination"
-          isLastFullPageShown
-          itemCount={data?.length}
-          page={pagination?.page}
-          perPage={pagination?.perPage}
-          perPageOptions={paginationDefaultValues}
-        />
+        {!isEmpty(data) && (
+          <Pagination
+            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+              onPaginationChange({ endIndex, page, perPage, startIndex })
+            }
+            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+              onPaginationChange({ endIndex, page, perPage, startIndex })
+            }
+            className="list-managment-group__pagination"
+            isLastFullPageShown
+            itemCount={data?.length}
+            page={pagination?.page}
+            perPage={pagination?.perPage}
+            perPageOptions={paginationDefaultValues}
+          />
+        )}
       </div>
       <VirtualizedTable<V1beta1VirtualMachineInstancetype>
         EmptyMsg={() => (
           <div className="pf-u-text-align-center" id="no-instancetype-msg">
-            {t('No VirtualMachineInstanceType found')}
+            {t('No VirtualMachineInstanceTypes found')}
           </div>
         )}
         columns={activeColumns}

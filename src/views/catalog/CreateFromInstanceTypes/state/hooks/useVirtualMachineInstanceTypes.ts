@@ -17,7 +17,7 @@ const useVirtualMachineInstanceTypes: UseVirtualMachineInstanceTypes = () => {
     activeNamespace !== ALL_NAMESPACES_SESSION_KEY && {
       groupVersionKind: VirtualMachineInstancetypeModelGroupVersionKind,
       isList: true,
-      namespace: activeNamespace,
+      ...(activeNamespace !== ALL_NAMESPACES_SESSION_KEY && { namespace: activeNamespace }),
     },
   );
 

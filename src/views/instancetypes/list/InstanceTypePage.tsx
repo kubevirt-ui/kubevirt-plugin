@@ -2,19 +2,18 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
+import useVirtualMachineInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useVirtualMachineInstanceTypes';
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineClusterInstancetypeModel, {
   VirtualMachineClusterInstancetypeModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ListPageCreate,
-  ListPageHeader,
-  useActiveNamespace,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { ListPageHeader, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
+import InstancetypeCreateButton from './components/InstancetypeCreateButton/InstancetypeCreateButton';
 import ClusterInstancetypeList from './ClusterInstancetypeList';
 import UserInstancetypeList from './UserInstancetypeList';
 
@@ -28,6 +27,7 @@ const InstanceTypePage = () => {
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     location?.pathname.includes(VirtualMachineClusterInstancetypeModel.kind) ? 0 : 1,
   );
+  const [instanceTypes, loaded, loadError] = useVirtualMachineInstanceTypes();
 
   const urlUserPreference = useMemo(
     () =>
@@ -35,14 +35,6 @@ const InstanceTypePage = () => {
         ? `/k8s/all-namespaces/${VirtualMachineInstancetypeModelRef}`
         : `/k8s/ns/${activeNamespace}/${VirtualMachineInstancetypeModelRef}`,
     [activeNamespace],
-  );
-
-  const groupVersionKind = useMemo(
-    () =>
-      activeTabKey === 0
-        ? VirtualMachineClusterInstancetypeModelRef
-        : VirtualMachineInstancetypeModelRef,
-    [activeTabKey],
   );
 
   useEffect(() => {
@@ -59,19 +51,13 @@ const InstanceTypePage = () => {
         <ListPageHeader
           title={
             activeTabKey === 0
-              ? t('VirtualMachineClusterInstancetypes')
-              : t('VirtualMachineInstancetypes')
+              ? t('VirtualMachineClusterInstanceTypes')
+              : t('VirtualMachineInstanceTypes')
           }
         >
-          <ListPageCreate
-            createAccessReview={{
-              groupVersionKind,
-              ...(activeTabKey !== 0 && { namespace: activeNamespace }),
-            }}
-            groupVersionKind={groupVersionKind}
-          >
-            {t('Create')}
-          </ListPageCreate>
+          {(activeTabKey === 0 || (!isEmpty(instanceTypes) && loaded && !loadError)) && (
+            <InstancetypeCreateButton namespace={activeNamespace} />
+          )}
         </ListPageHeader>
       </div>
       <Tabs
