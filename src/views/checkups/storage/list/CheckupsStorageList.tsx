@@ -33,35 +33,43 @@ const CheckupsStorageList = () => {
   const [unfilterData, dataFilters, onFilterChange, filters] =
     useCheckupsStorageListFilters(configMaps);
 
+  if (isEmpty(configMaps) && loading && !loadingPermissions && loadedColumns) {
+    return (
+      <CheckupsStorageListEmptyState
+        clusterRoleBinding={clusterRoleBinding}
+        isPermitted={isPermitted}
+        loadingPermissions={loadingPermissions}
+      />
+    );
+  }
+
   return (
     <ListPageBody>
       <div className="list-managment-group">
-        {!isEmpty(unfilterData) && (
-          <ListPageFilter
-            columnLayout={{
-              columns: columns?.map(({ additional, id, title }) => ({
-                additional,
-                id,
-                title,
-              })),
-              id: 'checkups-storage',
-              selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-              type: t('Checkups'),
-            }}
-            onFilterChange={(...args) => {
-              onFilterChange(...args);
-              onPaginationChange({
-                ...pagination,
-                endIndex: pagination?.perPage,
-                page: 1,
-                startIndex: 0,
-              });
-            }}
-            data={unfilterData}
-            loaded={loading && !loadingPermissions && loadedColumns}
-            rowFilters={filters}
-          />
-        )}
+        <ListPageFilter
+          columnLayout={{
+            columns: columns?.map(({ additional, id, title }) => ({
+              additional,
+              id,
+              title,
+            })),
+            id: 'checkups-storage',
+            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+            type: t('Checkups'),
+          }}
+          onFilterChange={(...args) => {
+            onFilterChange(...args);
+            onPaginationChange({
+              ...pagination,
+              endIndex: pagination?.perPage,
+              page: 1,
+              startIndex: 0,
+            });
+          }}
+          data={unfilterData}
+          loaded={loading && !loadingPermissions && loadedColumns}
+          rowFilters={filters}
+        />
         {!isEmpty(dataFilters) && loading && !loadingPermissions && (
           <Pagination
             onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
@@ -79,14 +87,10 @@ const CheckupsStorageList = () => {
           />
         )}
       </div>
-      {isEmpty(configMaps) && loading && !loadingPermissions && loadedColumns && (
-        <CheckupsStorageListEmptyState
-          clusterRoleBinding={clusterRoleBinding}
-          isPermitted={isPermitted}
-          loadingPermissions={loadingPermissions}
-        />
-      )}
       <VirtualizedTable<IoK8sApiCoreV1ConfigMap>
+        EmptyMsg={() => (
+          <div className="pf-u-text-align-center">{t('No storage checkups found')}</div>
+        )}
         rowData={{
           getJobByName: (configMapName: string): IoK8sApiBatchV1Job[] =>
             getJobByName(jobs, configMapName),
@@ -95,7 +99,6 @@ const CheckupsStorageList = () => {
         data={dataFilters}
         loaded={loading && !loadingPermissions && loadedColumns}
         loadError={error}
-        NoDataEmptyMsg={() => null}
         Row={CheckupsStorageListRow}
         unfilteredData={unfilterData}
       />
