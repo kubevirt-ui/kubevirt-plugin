@@ -25,35 +25,38 @@ const MigrationPoliciesList: FC = () => {
   const [columns, activeColumns, loadedColumns] = useMigrationPoliciesListColumns();
   const [unfilteredData, data, onFilterChange] = useListPageFilter(mps);
 
+  if (loaded && isEmpty(unfilteredData)) {
+    return <MigrationPoliciesEmptyState />;
+  }
+
   return (
     <>
       <ListPageHeader title={t('MigrationPolicies')}>
-        {!isEmpty(mps) && <MigrationPoliciesCreateButton />}
+        <MigrationPoliciesCreateButton />
       </ListPageHeader>
 
       <ListPageBody>
-        {!isEmpty(mps) && (
-          <ListPageFilter
-            columnLayout={{
-              columns: columns?.map(({ additional, id, title }) => ({
-                additional,
-                id,
-                title,
-              })),
-              id: MigrationPolicyModelRef,
-              selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-              type: t('MigrationPolicy'),
-            }}
-            data={unfilteredData}
-            loaded={loaded && loadedColumns}
-            onFilterChange={onFilterChange}
-          />
-        )}
-        {loaded && isEmpty(data) && <MigrationPoliciesEmptyState />}
+        <ListPageFilter
+          columnLayout={{
+            columns: columns?.map(({ additional, id, title }) => ({
+              additional,
+              id,
+              title,
+            })),
+            id: MigrationPolicyModelRef,
+            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+            type: t('MigrationPolicy'),
+          }}
+          data={unfilteredData}
+          loaded={loaded && loadedColumns}
+          onFilterChange={onFilterChange}
+        />
         <VirtualizedTable<V1alpha1MigrationPolicy>
+          EmptyMsg={() => (
+            <div className="pf-u-text-align-center">{t('No MigrationPolicies found')}</div>
+          )}
           columns={activeColumns}
           data={data}
-          EmptyMsg={() => <></>}
           loaded={loaded && loadedColumns}
           loadError={loadError}
           Row={MigrationPoliciesRow}
