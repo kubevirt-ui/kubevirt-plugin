@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 const bsd = require('./svg/bsd.svg') as string;
@@ -33,3 +34,6 @@ export const getVolumeNameOSIcon = (volumeName: string): string => {
   const icon = 'icon-'.concat(volumeName.replace(/\d/, '').split('-')[0]);
   return iconMap[icon];
 };
+
+export const getIconByOSName = (osName: OS_NAME_TYPES | string): string =>
+  iconMap['icon-'.concat(osName)];

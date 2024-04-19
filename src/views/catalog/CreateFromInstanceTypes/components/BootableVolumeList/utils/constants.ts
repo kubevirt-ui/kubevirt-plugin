@@ -25,3 +25,5 @@ export const paginationInitialStateModal: PaginationState = {
   perPage: 16,
   startIndex: 0,
 };
+
+export const WINDOWS_BOOTSOURCE_PIPELINE = 'windows-bootsource-pipeline';
