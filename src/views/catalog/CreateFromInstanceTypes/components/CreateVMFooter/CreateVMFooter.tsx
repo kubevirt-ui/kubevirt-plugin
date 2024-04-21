@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { generateVM } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
@@ -17,8 +19,6 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  Alert,
-  AlertVariant,
   Button,
   ButtonVariant,
   Checkbox,
@@ -37,7 +37,6 @@ import './CreateVMFooter.scss';
 const CreateVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const [startVM, setStartVM] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();
@@ -48,7 +47,8 @@ const CreateVMFooter: FC = () => {
   const { subscriptionData } = useRHELAutomaticSubscription();
 
   const [activeNamespace] = useActiveNamespace();
-  const { instanceTypeVMState, vmNamespaceTarget } = useInstanceTypeVMStore();
+  const { instanceTypeVMState, setStartVM, setVM, startVM, vmNamespaceTarget } =
+    useInstanceTypeVMStore();
   const { selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
     instanceTypeVMState;
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
@@ -105,23 +105,36 @@ const CreateVMFooter: FC = () => {
       .finally(() => setIsSubmitting(false));
   };
 
+  const handleCustomize = async () => {
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await setVM(
+        generateVM(
+          instanceTypeVMState,
+          vmNamespaceTarget,
+          startVM,
+          subscriptionData,
+          autoUpdateEnabled,
+        ),
+      );
+
+      navigate(
+        `/k8s/ns/${vmNamespaceTarget}/catalog/review/${VirtualMachineDetailsTab.Configurations}`,
+      );
+    } catch (err) {
+      setError(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <footer className="create-vm-instance-type-footer">
       <Stack hasGutter>
         {error && (
           <StackItem>
-            <Alert isInline title={t('An error occurred')} variant={AlertVariant.danger}>
-              <Stack hasGutter>
-                <StackItem>{error.message}</StackItem>
-                {error?.href && (
-                  <StackItem>
-                    <a href={error.href} rel="noreferrer" target="_blank">
-                      {error.href}
-                    </a>
-                  </StackItem>
-                )}
-              </Stack>
-            </Alert>
+            <ErrorAlert error={error} />
           </StackItem>
         )}
         <StackItem>
@@ -151,6 +164,28 @@ const CreateVMFooter: FC = () => {
             </SplitItem>
             <SplitItem>
               <Button
+                isDisabled={
+                  isSubmitting ||
+                  isEmpty(selectedBootableVolume) ||
+                  !canCreateVM ||
+                  !hasNameAndInstanceType
+                }
+                isLoading={isSubmitting}
+                onClick={handleCustomize}
+                variant={ButtonVariant.secondary}
+              >
+                {t('Customize VirtualMachine')}
+              </Button>
+            </SplitItem>
+
+            <SplitItem>
+              <Button onClick={onCancel} variant={ButtonVariant.link}>
+                {t('Cancel')}
+              </Button>
+            </SplitItem>
+            <SplitItem isFilled />
+            <SplitItem>
+              <Button
                 onClick={() =>
                   createModal((props) => (
                     <YamlAndCLIViewerModal
@@ -169,11 +204,6 @@ const CreateVMFooter: FC = () => {
                 variant={ButtonVariant.secondary}
               >
                 {t('View YAML & CLI')}
-              </Button>
-            </SplitItem>
-            <SplitItem>
-              <Button onClick={onCancel} variant={ButtonVariant.link}>
-                {t('Cancel')}
               </Button>
             </SplitItem>
           </Split>

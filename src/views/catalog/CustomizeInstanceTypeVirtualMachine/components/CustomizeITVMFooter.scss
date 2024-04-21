@@ -1,0 +1,9 @@
+.customize-it-vm-footer {
+  padding: var(--pf-global--spacer--lg);
+  border-top: var(--pf-global--BorderWidth--sm) solid var(--pf-global--BorderColor--100);
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  background: var(--pf-c-page__main-section--m-light--BackgroundColor);
+  z-index: 1000;
+}

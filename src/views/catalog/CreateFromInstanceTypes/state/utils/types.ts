@@ -5,6 +5,7 @@ import {
   V1beta1VirtualMachineClusterInstancetype,
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachineInstancetype,
+  V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
@@ -65,6 +66,8 @@ type InstanceTypeAction = {
 export type InstanceTypeVMStoreState = {
   instanceTypeVMState: InstanceTypeVMState;
   isChangingNamespace: boolean;
+  startVM: boolean;
+  vm: V1VirtualMachine; // vm object for customization flow
   vmNamespaceTarget: string;
 };
 
@@ -78,6 +81,8 @@ type InstanceTypeVMStoreActions = {
   setInstanceTypeVMState: Dispatch<InstanceTypeAction>;
   setIsChangingNamespace: () => void;
   setSelectedStorageClass: (storageClass: string) => void;
+  setStartVM: (checked: boolean) => void;
+  setVM: (vm: V1VirtualMachine) => Promise<void>;
   setVMNamespaceTarget: (sshSecretName: string, targetNamespace: string) => void;
 };
 

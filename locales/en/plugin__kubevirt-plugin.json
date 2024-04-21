@@ -192,6 +192,7 @@
   "Boot source reference cannot be edited": "Boot source reference cannot be edited",
   "Boot source type": "Boot source type",
   "bootable": "bootable",
+  "Bootable volume: {{bootableVolumeName}}": "Bootable volume: {{bootableVolumeName}}",
   "Bootable volumes": "Bootable volumes",
   "Breakdown by network": "Breakdown by network",
   "Bridge": "Bridge",
