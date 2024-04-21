@@ -1,29 +1,27 @@
 import React, { FC, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom-v5-compat';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
-import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { DataSourceModelRef, DataVolumeModelRef } from '@kubevirt-utils/models';
+import { DataSourceModelRef } from '@kubevirt-utils/models';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
-import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
   ListPageBody,
-  ListPageCreateDropdown,
   ListPageHeader,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination, Stack, StackItem } from '@patternfly/react-core';
 
+import BootableVolumeAddButton from './components/BootableVolumeAddButton';
+import BootableVolumesEmptyState from './components/BootableVolumesEmptyState';
 import BootableVolumesRow from './components/BootableVolumesRow';
 import useBootableVolumesColumns from './hooks/useBootableVolumesColumns';
 import useBootableVolumesFilters from './hooks/useBootableVolumesFilters';
@@ -33,19 +31,12 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 const BootableVolumesList: FC = () => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
-  const navigate = useNavigate();
-  const { createModal } = useModal();
+
   const { bootableVolumes, error, loaded } = useBootableVolumes(namespace);
-
-  const { canCreateDS, canCreatePVC, canListInstanceTypesPrefernce } =
-    useCanCreateBootableVolume(namespace);
-
   const [preferences] = useClusterPreferences();
 
-  const [data, filteredData, onFilterChange] = useListPageFilter(
-    bootableVolumes,
-    useBootableVolumesFilters(),
-  );
+  const rowFilters = useBootableVolumesFilters();
+  const [data, filteredData, onFilterChange] = useListPageFilter(bootableVolumes, rowFilters);
   const [pagination, setPagination] = useState(paginationInitialState);
   const [columns, activeColumns, loadedColumns] = useBootableVolumesColumns(
     pagination,
@@ -62,25 +53,14 @@ const BootableVolumesList: FC = () => {
     }));
   };
 
-  const createItems = {
-    form: t('With form'),
-    yaml: t('With YAML'),
-  };
-
-  const onCreate = (type: string) => {
-    return type === 'form'
-      ? createModal((props) => <AddBootableVolumeModal {...props} />)
-      : navigate(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataVolumeModelRef}/~new`);
-  };
+  if (loaded && isEmpty(bootableVolumes)) {
+    return <BootableVolumesEmptyState namespace={namespace} />;
+  }
 
   return (
     <>
       <ListPageHeader title={t('Bootable volumes')}>
-        {(canCreateDS || canCreatePVC) && canListInstanceTypesPrefernce && (
-          <ListPageCreateDropdown items={createItems} onClick={onCreate}>
-            {t('Add volume')}
-          </ListPageCreateDropdown>
-        )}
+        <BootableVolumeAddButton namespace={namespace} />
       </ListPageHeader>
 
       <ListPageBody>
@@ -110,22 +90,24 @@ const BootableVolumesList: FC = () => {
               }}
               data={data}
               loaded={loaded && loadedColumns}
-              rowFilters={useBootableVolumesFilters()}
+              rowFilters={rowFilters}
             />
-            <Pagination
-              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                onPageChange({ endIndex, page, perPage, startIndex })
-              }
-              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                onPageChange({ endIndex, page, perPage, startIndex })
-              }
-              className="list-managment-group__pagination"
-              isLastFullPageShown
-              itemCount={filteredData?.length}
-              page={pagination?.page}
-              perPage={pagination?.perPage}
-              perPageOptions={paginationDefaultValues}
-            />
+            {!isEmpty(filteredData) && (
+              <Pagination
+                onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                  onPageChange({ endIndex, page, perPage, startIndex })
+                }
+                onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                  onPageChange({ endIndex, page, perPage, startIndex })
+                }
+                className="list-managment-group__pagination"
+                isLastFullPageShown
+                itemCount={filteredData?.length}
+                page={pagination?.page}
+                perPage={pagination?.perPage}
+                perPageOptions={paginationDefaultValues}
+              />
+            )}
           </StackItem>
 
           <VirtualizedTable<K8sResourceCommon>
