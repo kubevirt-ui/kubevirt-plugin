@@ -3,6 +3,7 @@ import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import {
   EmptyState,
   EmptyStateActions,
@@ -20,32 +21,38 @@ const MigrationPoliciesEmptyState: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <EmptyState variant={EmptyStateVariant.lg}>
-      <EmptyStateHeader
-        headingLevel="h4"
-        icon={<EmptyStateIcon icon={MigrationIcon} />}
-        titleText={<>{t('No MigrationPolicies found')}</>}
-      />
+    <>
+      <ListPageHeader title={t('MigrationPolicies')} />
 
-      <EmptyStateBody>
-        <Trans ns="plugin__kubevirt-plugin" t={t}>
-          Click <b>Create MigrationPolicy</b> to create your first policy
-        </Trans>
-      </EmptyStateBody>
-
-      <EmptyStateFooter>
-        <EmptyStateActions>
-          <MigrationPoliciesCreateButton />
-        </EmptyStateActions>
-        <br />
-        <EmptyStateActions>
-          <ExternalLink
-            href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.15/html/virtualization/live-migration#live-migration-policies"
-            text={t('Learn more about MigrationPolicies')}
+      <ListPageBody>
+        <EmptyState variant={EmptyStateVariant.lg}>
+          <EmptyStateHeader
+            headingLevel="h4"
+            icon={<EmptyStateIcon icon={MigrationIcon} />}
+            titleText={<>{t('No MigrationPolicies found')}</>}
           />
-        </EmptyStateActions>
-      </EmptyStateFooter>
-    </EmptyState>
+
+          <EmptyStateBody>
+            <Trans ns="plugin__kubevirt-plugin" t={t}>
+              Click <b>Create MigrationPolicy</b> to create your first policy
+            </Trans>
+          </EmptyStateBody>
+
+          <EmptyStateFooter>
+            <EmptyStateActions>
+              <MigrationPoliciesCreateButton />
+            </EmptyStateActions>
+            <br />
+            <EmptyStateActions>
+              <ExternalLink
+                href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.15/html/virtualization/live-migration#live-migration-policies"
+                text={t('Learn more about MigrationPolicies')}
+              />
+            </EmptyStateActions>
+          </EmptyStateFooter>
+        </EmptyState>
+      </ListPageBody>
+    </>
   );
 };
 
