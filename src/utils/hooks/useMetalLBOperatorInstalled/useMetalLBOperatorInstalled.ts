@@ -8,7 +8,7 @@ import { useFeatures } from '../useFeatures/useFeatures';
 import { METAL_LB_DEPLOYMENT_NAME, METAL_LB_DEPLOYMENT_NAMESPACE } from './constants';
 
 export const useMetalLBOperatorInstalled = (): boolean => {
-  const { featureEnabled, toggleFeature } = useFeatures(LOAD_BALANCER_ENABLED);
+  const { featureEnabled, loading, toggleFeature } = useFeatures(LOAD_BALANCER_ENABLED);
   const [metalLBDeployment] = useK8sWatchResource({
     groupVersionKind: modelToGroupVersionKind(DeploymentModel),
     isList: false,
@@ -18,7 +18,7 @@ export const useMetalLBOperatorInstalled = (): boolean => {
 
   const metalLBOperatorInstalled = !isEmpty(metalLBDeployment);
 
-  if (!featureEnabled && metalLBOperatorInstalled) toggleFeature(true);
+  if (!featureEnabled && !loading && metalLBOperatorInstalled) toggleFeature(true);
 
   return metalLBOperatorInstalled;
 };
