@@ -12,7 +12,7 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { OPENSHIFT_CNV } from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -42,7 +42,7 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
       userName && {
         groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
         name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
-        namespace: DEFAULT_NAMESPACE,
+        namespace: OPENSHIFT_CNV,
       },
     );
 
@@ -55,7 +55,7 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
               data: { [userName]: JSON.stringify(userSettingsInitialState) },
               metadata: {
                 name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
-                namespace: DEFAULT_NAMESPACE,
+                namespace: OPENSHIFT_CNV,
               },
             },
             model: ConfigMapModel,
