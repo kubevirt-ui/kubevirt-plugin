@@ -57,6 +57,8 @@
   "5 min": "5 min",
   "8 min": "8 min",
   "8xlarge": "8xlarge",
+  "A ControllerRevision resource is cloned from the InstanceType when creating the VirtualMachine": "A ControllerRevision resource is cloned from the InstanceType when creating the VirtualMachine",
+  "A ControllerRevision resource is cloned from the Preference when creating the VirtualMachine": "A ControllerRevision resource is cloned from the Preference when creating the VirtualMachine",
   "A list of matching Nodes will be provided on label input below.": "A list of matching Nodes will be provided on label input below.",
   "A Project name must consist of lower case alphanumeric characters or ', and must start and end with an alphanumeric character (e.g. 'my-name' or '123-abc'). You must create a Namespace to be able to create projects that begin with 'openshift-', 'kubernetes-', or 'kube-'.": "A Project name must consist of lower case alphanumeric characters or ', and must start and end with an alphanumeric character (e.g. 'my-name' or '123-abc'). You must create a Namespace to be able to create projects that begin with 'openshift-', 'kubernetes-', or 'kube-'.",
   "A unique name for the storage claim within the project": "A unique name for the storage claim within the project",
