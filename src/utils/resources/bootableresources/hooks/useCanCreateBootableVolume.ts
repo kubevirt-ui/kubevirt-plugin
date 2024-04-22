@@ -8,7 +8,7 @@ type UseCanCreateBootableVolume = (namespace: string) => {
   canCreateDS: boolean;
   canCreatePVC: boolean;
   canCreateSnapshots: boolean;
-  canListInstanceTypesPrefernce: boolean;
+  canListInstanceTypesPreference: boolean;
   loading: boolean;
 };
 
@@ -40,7 +40,7 @@ const useCanCreateBootableVolume: UseCanCreateBootableVolume = (namespace) => {
     verb: 'create' as K8sVerb,
   });
 
-  const [canListInstanceTypesPrefernce, loadingInstanceTypesPrefernce] = useAccessReview({
+  const [canListInstanceTypesPreference, loadingInstanceTypesPreference] = useAccessReview({
     group: VirtualMachineClusterPreferenceModel.apiGroup,
     resource: VirtualMachineClusterPreferenceModel.plural,
     verb: 'list' as K8sVerb,
@@ -50,9 +50,9 @@ const useCanCreateBootableVolume: UseCanCreateBootableVolume = (namespace) => {
     canCreateDS: canCreateDS && canCreateDIC,
     canCreatePVC,
     canCreateSnapshots,
-    canListInstanceTypesPrefernce,
+    canListInstanceTypesPreference,
     loading:
-      loadingPVC || loadingDS || loadingDIC || loadingInstanceTypesPrefernce || loadingShapshots,
+      loadingPVC || loadingDS || loadingDIC || loadingInstanceTypesPreference || loadingShapshots,
   };
 };
 
