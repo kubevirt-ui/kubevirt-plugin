@@ -5,18 +5,16 @@ import classNames from 'classnames';
 import {
   VirtualMachineClusterPreferenceModelGroupVersionKind,
   VirtualMachineClusterPreferenceModelRef,
-  VirtualMachinePreferenceModelGroupVersionKind,
   VirtualMachinePreferenceModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ListPageCreate,
-  ListPageHeader,
-  useActiveNamespace,
-} from '@openshift-console/dynamic-plugin-sdk';
+import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { ListPageHeader, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
+import PreferenceCreateButton from './components/PreferenceCreateButton';
 import ClusterPreferenceList from './ClusterPreferenceList';
 import UserPreferenceList from './UserPreferenceList';
 
@@ -30,6 +28,7 @@ const PreferencePage = () => {
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     location?.pathname.includes(VirtualMachineClusterPreferenceModelGroupVersionKind.kind) ? 0 : 1,
   );
+  const [userPreferences, loaded, loadError] = useUserPreferences(activeNamespace);
 
   const urlUserPreference = useMemo(
     () =>
@@ -37,14 +36,6 @@ const PreferencePage = () => {
         ? `/k8s/all-namespaces/${VirtualMachinePreferenceModelRef}`
         : `/k8s/ns/${activeNamespace}/${VirtualMachinePreferenceModelRef}`,
     [activeNamespace],
-  );
-
-  const groupVersionKind = useMemo(
-    () =>
-      activeTabKey === 0
-        ? VirtualMachineClusterPreferenceModelGroupVersionKind
-        : VirtualMachinePreferenceModelGroupVersionKind,
-    [activeTabKey],
   );
 
   useEffect(() => {
@@ -65,15 +56,9 @@ const PreferencePage = () => {
               : t('VirtualMachinePreferences')
           }
         >
-          <ListPageCreate
-            createAccessReview={{
-              groupVersionKind,
-              ...(activeTabKey !== 0 && { namespace: activeNamespace }),
-            }}
-            groupVersionKind={groupVersionKind}
-          >
-            {t('Create')}
-          </ListPageCreate>
+          {(activeTabKey === 0 || (!isEmpty(userPreferences) && loaded && !loadError)) && (
+            <PreferenceCreateButton namespace={activeNamespace} />
+          )}
         </ListPageHeader>
       </div>
       <Tabs

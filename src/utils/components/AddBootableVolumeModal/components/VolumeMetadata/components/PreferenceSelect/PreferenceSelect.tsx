@@ -9,15 +9,14 @@ import {
   VirtualMachineClusterPreferenceModelGroupVersionKind,
   VirtualMachinePreferenceModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1VirtualMachinePreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
 
 import { getResourceDropdownOptions } from './utils/utils';
@@ -38,15 +37,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
   const [activeNamespace] = useActiveNamespace();
 
   const [preferences, preferencesLoaded] = useClusterPreferences();
-  const [userPreferences = [], userPreferencesLoaded] = useK8sWatchResource<
-    V1beta1VirtualMachinePreference[]
-  >(
-    activeNamespace !== ALL_NAMESPACES_SESSION_KEY && {
-      groupVersionKind: VirtualMachinePreferenceModelGroupVersionKind,
-      isList: true,
-      namespace: activeNamespace,
-    },
-  );
+  const [userPreferences = [], userPreferencesLoaded] = useUserPreferences(activeNamespace);
 
   const options = useMemo(() => {
     const preferenceOptions: EnhancedSelectOptionProps[] = getResourceDropdownOptions(

@@ -1,35 +1,29 @@
 import React from 'react';
 
-import {
-  VirtualMachinePreferenceModelGroupVersionKind,
-  VirtualMachinePreferenceModelRef,
-} from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
+import { VirtualMachinePreferenceModelRef } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
 import { V1beta1VirtualMachinePreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   useActiveNamespace,
-  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
 import UserPreferenceRow from './components/UserPreferenceRow';
+import UserPreferencesEmptyState from './components/UserPreferencesEmptyState';
 import useUserPreferenceListColumns from './hooks/useUserPreferenceListColumns';
 
 const UserPreferenceList = () => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
-  const [preferences, loaded, loadError] = useK8sWatchResource<V1beta1VirtualMachinePreference[]>({
-    groupVersionKind: VirtualMachinePreferenceModelGroupVersionKind,
-    isList: true,
-    ...(activeNamespace !== ALL_NAMESPACES_SESSION_KEY && { namespace: activeNamespace }),
-  });
+  const [preferences, loaded, loadError] = useUserPreferences(activeNamespace);
 
   const { onPaginationChange, pagination } = usePagination();
   const [unfilteredData, data, onFilterChange] = useListPageFilter<
@@ -37,6 +31,10 @@ const UserPreferenceList = () => {
     V1beta1VirtualMachinePreference
   >(preferences);
   const [columns, activeColumns, loadedColumns] = useUserPreferenceListColumns(pagination, data);
+
+  if (loaded && isEmpty(unfilteredData)) {
+    return <UserPreferencesEmptyState namespace={activeNamespace} />;
+  }
 
   return (
     <ListPageBody>
@@ -64,23 +62,25 @@ const UserPreferenceList = () => {
           data={unfilteredData}
           loaded={loaded && loadedColumns}
         />
-        <Pagination
-          onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-            onPaginationChange({ endIndex, page, perPage, startIndex })
-          }
-          onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-            onPaginationChange({ endIndex, page, perPage, startIndex })
-          }
-          className="list-managment-group__pagination"
-          isLastFullPageShown
-          itemCount={data?.length}
-          page={pagination?.page}
-          perPage={pagination?.perPage}
-          perPageOptions={paginationDefaultValues}
-        />
+        {!isEmpty(data) && (
+          <Pagination
+            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+              onPaginationChange({ endIndex, page, perPage, startIndex })
+            }
+            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+              onPaginationChange({ endIndex, page, perPage, startIndex })
+            }
+            className="list-managment-group__pagination"
+            isLastFullPageShown
+            itemCount={data?.length}
+            page={pagination?.page}
+            perPage={pagination?.perPage}
+            perPageOptions={paginationDefaultValues}
+          />
+        )}
       </div>
       <VirtualizedTable<V1beta1VirtualMachinePreference>
-        NoDataEmptyMsg={() => (
+        EmptyMsg={() => (
           <div className="pf-u-text-align-center" id="no-preference-msg">
             {t('No preferences found')}
           </div>
