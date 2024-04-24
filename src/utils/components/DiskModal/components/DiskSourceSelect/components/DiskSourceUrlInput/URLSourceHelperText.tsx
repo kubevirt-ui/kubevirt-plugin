@@ -7,7 +7,9 @@ import { urlSourceHelperTextMapper } from './utils/constants';
 import { DiskSourceUrlInputProps } from './utils/types';
 
 const URLSourceHelperText: FC<DiskSourceUrlInputProps> = ({ os }) => {
-  const { afterLabelText, beforeLabelText, label } = urlSourceHelperTextMapper[os];
+  const { afterLabelText, beforeLabelText, label } =
+    urlSourceHelperTextMapper[os || OS_NAME_TYPES.fedora];
+
   return (
     <>
       {beforeLabelText}
