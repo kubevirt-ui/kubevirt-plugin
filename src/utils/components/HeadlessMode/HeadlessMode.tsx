@@ -11,7 +11,8 @@ type HeadlessModeProps = {
 const HeadlessMode: FC<HeadlessModeProps> = ({ updateHeadlessMode, vm }) => {
   const devices = vm?.spec?.template?.spec?.domain?.devices;
   const [isChecked, setIsChecked] = useState<boolean>(
-    devices?.hasOwnProperty('autoattachGraphicsDevice') && !devices?.autoattachGraphicsDevice,
+    devices?.hasOwnProperty('autoattachGraphicsDevice') &&
+      devices?.autoattachGraphicsDevice === false,
   );
   return (
     <Switch

@@ -1003,6 +1003,19 @@
   resolved "https://registry.yarnpkg.com/@patternfly/react-tokens/-/react-tokens-5.1.1.tgz#098b70b4ed4d05217004395abc7395a46acc9abe"
   integrity sha512-cHuNkzNA9IY9aDwfjSEkitQoVEvRhOJRKhH0yIRlRByEkbdoV9jJZ9xj20hNShE+bxmNuom+MCTQSkpkN1bV8A==
 
+"@preact/signals-core@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@preact/signals-core/-/signals-core-1.6.0.tgz#f3e47b7cddab60e61a087c9b422a28f52e58ce20"
+  integrity sha512-O/XGxwP85h1F7+ouqTMOIZ3+V1whfaV9ToIVcuyGriD4JkSD00cQo54BKdqjvBJxbenvp7ynfqRHEwI6e+NIhw==
+
+"@preact/signals-react@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@preact/signals-react/-/signals-react-2.0.1.tgz#c42db9fc8efed599a836ddf5a026c0681fda07cb"
+  integrity sha512-QQoxAPiliH6oeZPF5OZHmyala5zyFya0ZCp/A0lR4y6R9wO4lT7GdtYg5UFlmKNWMcFN6PiAjNPMTiNFMmnCpw==
+  dependencies:
+    "@preact/signals-core" "^1.6.0"
+    use-sync-external-store "^1.2.0"
+
 "@remix-run/router@1.15.0":
   version "1.15.0"
   resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.15.0.tgz#461a952c2872dd82c8b2e9b74c4dfaff569123e2"
@@ -8470,7 +8483,7 @@ use-immer@^0.6.0:
   resolved "https://registry.yarnpkg.com/use-immer/-/use-immer-0.6.0.tgz#ca6aa5ade93018e2c65cf128d19ada54fc23f70d"
   integrity sha512-dFGRfvWCqPDTOt/S431ETYTg6+uxbpb7A1pptufwXVzGJY3RlXr38+3wyLNpc6SbbmAKjWl6+EP6uW74fkEsXQ==
 
-use-sync-external-store@1.2.0:
+use-sync-external-store@1.2.0, use-sync-external-store@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
   integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==

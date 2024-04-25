@@ -3,58 +3,58 @@ import {
   VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/constants/tabs-constants';
 
-import ConfigurationTab from '../tabs/configuration/ConfigurationTab';
-import YamlTab from '../tabs/yaml/YamlTab';
+import CustomizeInstanceTypeConfigurationTab from '../tabs/configuration/CustomizeInstanceTypeConfigurationTab';
+import CustomizeInstanceTypeYamlTab from '../tabs/yaml/CustomizeInstanceTypeYamlTab';
 
 export const pages = [
   {
-    component: YamlTab,
+    component: CustomizeInstanceTypeYamlTab,
     href: '',
     name: VirtualMachineDetailsTabLabel.YAML,
   },
   {
-    component: ConfigurationTab,
+    component: CustomizeInstanceTypeConfigurationTab,
     href: VirtualMachineDetailsTab.Configurations,
     name: VirtualMachineDetailsTabLabel.Configuration,
   },
   {
-    component: ConfigurationTab,
+    component: CustomizeInstanceTypeConfigurationTab,
     href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.SSH}`,
     isHidden: true,
     name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.SSH}`,
   },
   {
-    component: ConfigurationTab,
+    component: CustomizeInstanceTypeConfigurationTab,
     href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab['Initial-run']}`,
     isHidden: true,
     name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab['Initial-run']}`,
   },
   {
-    component: ConfigurationTab,
+    component: CustomizeInstanceTypeConfigurationTab,
     href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Storage}`,
     isHidden: true,
     name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Storage}`,
   },
   {
-    component: ConfigurationTab,
+    component: CustomizeInstanceTypeConfigurationTab,
     href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Details}`,
     isHidden: true,
     name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Details}`,
   },
   {
-    component: ConfigurationTab,
+    component: CustomizeInstanceTypeConfigurationTab,
     href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Metadata}`,
     isHidden: true,
     name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Metadata}`,
   },
   {
-    component: ConfigurationTab,
+    component: CustomizeInstanceTypeConfigurationTab,
     href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Network}`,
     isHidden: true,
     name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Network}`,
   },
   {
-    component: ConfigurationTab,
+    component: CustomizeInstanceTypeConfigurationTab,
     href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scheduling}`,
     isHidden: true,
     name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scheduling}`,

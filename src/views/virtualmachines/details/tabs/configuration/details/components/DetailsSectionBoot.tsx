@@ -20,9 +20,9 @@ import { updateBootLoader, updatedBootOrder, updateStartStrategy } from '../util
 
 type DetailsSectionBootProps = {
   canUpdateVM: boolean;
-  instanceTypeVM: V1VirtualMachine;
+  instanceTypeVM?: V1VirtualMachine;
   vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({

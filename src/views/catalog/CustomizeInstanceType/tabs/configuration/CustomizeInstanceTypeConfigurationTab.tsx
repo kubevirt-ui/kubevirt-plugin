@@ -12,9 +12,9 @@ import {
 
 import { tabs } from './utils/constants';
 
-import './ConfigurationTab.scss';
+import './CustomizeInstanceTypeConfigurationTab.scss';
 
-const ConfigurationTab: FC = () => {
+const CustomizeInstanceTypeConfigurationTab: FC = () => {
   const { vm } = useInstanceTypeVMStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,7 +52,7 @@ const ConfigurationTab: FC = () => {
               onClick={() => redirectTab(name)}
               title={<TabTitleText>{title}</TabTitleText>}
             >
-              {activeTabKey === name && <Component>{title} Placeholder</Component>}
+              {activeTabKey === name && <Component />}
             </Tab>
           ))}
         </Tabs>
@@ -61,4 +61,4 @@ const ConfigurationTab: FC = () => {
   );
 };
 
-export default ConfigurationTab;
+export default CustomizeInstanceTypeConfigurationTab;
