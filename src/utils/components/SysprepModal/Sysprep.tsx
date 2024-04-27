@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { Form } from '@patternfly/react-core';
 
@@ -15,19 +15,17 @@ type SysprepProps = {
   unattend: string;
 };
 
-const Sysprep: React.FC<SysprepProps> = ({
+const Sysprep: FC<SysprepProps> = ({
   autoUnattend,
   onAutoUnattendChange,
   onUnattendChange,
   unattend,
-}) => {
-  return (
-    <Form className="kv-sysprep--main">
-      <SysprepInfo />
-      <SysprepAutounattend onChange={onAutoUnattendChange} value={autoUnattend} />
-      <SysprepUnattend onChange={onUnattendChange} value={unattend} />
-    </Form>
-  );
-};
+}) => (
+  <Form className="kv-sysprep--main">
+    <SysprepInfo />
+    <SysprepAutounattend onChange={onAutoUnattendChange} value={autoUnattend} />
+    <SysprepUnattend onChange={onUnattendChange} value={unattend} />
+  </Form>
+);
 
 export default Sysprep;

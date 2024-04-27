@@ -8,6 +8,7 @@ import { SYSPREP_DOC_URL } from './consts';
 
 const SysprepInfo: FC = () => {
   const { t } = useKubevirtTranslation();
+
   return (
     <div data-test="sysprep-info">
       <Stack>

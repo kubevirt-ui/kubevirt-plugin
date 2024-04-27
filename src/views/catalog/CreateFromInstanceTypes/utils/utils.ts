@@ -14,6 +14,7 @@ import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAuto
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import {
   HEADLESS_SERVICE_LABEL,
   HEADLESS_SERVICE_NAME,
@@ -21,6 +22,7 @@ import {
 import { generatePrettyName, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sGroupVersionKind, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
+import { useInstanceTypeVMStore } from '../state/useInstanceTypeVMStore';
 import { InstanceTypeVMState } from '../state/utils/types';
 
 import {
@@ -178,4 +180,12 @@ export const groupVersionKindFromCommonResource = (
   const [group, version] = resource.apiVersion.split('/');
   const kind = resource.kind;
   return { group, kind, version };
+};
+
+export const useIsWindowsBootableVolume = (): boolean => {
+  const { instanceTypeVMState } = useInstanceTypeVMStore();
+  const { selectedBootableVolume } = instanceTypeVMState;
+  const defaultPreferenceName = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
+
+  return defaultPreferenceName?.startsWith(OS_WINDOWS_PREFIX) || false;
 };

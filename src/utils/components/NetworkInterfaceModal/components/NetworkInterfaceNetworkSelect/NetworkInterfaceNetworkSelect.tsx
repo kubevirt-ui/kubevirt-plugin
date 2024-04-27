@@ -108,7 +108,15 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     else if (loaded && (loadError || !canCreateNetworkInterface)) {
       setSubmitDisabled(true);
     }
-  }, [loadError, canCreateNetworkInterface, loaded, networkName]);
+  }, [
+    loadError,
+    canCreateNetworkInterface,
+    loaded,
+    networkName,
+    networkOptions,
+    setNetworkName,
+    setSubmitDisabled,
+  ]);
 
   return (
     <FormGroup

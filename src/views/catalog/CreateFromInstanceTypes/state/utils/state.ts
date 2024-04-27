@@ -2,13 +2,14 @@ import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretModal
 
 import { InstanceTypeVMState, InstanceTypeVMStoreState } from './types';
 
-const instanceTypeVMInitialState: InstanceTypeVMState = {
+export const instanceTypeVMInitialState: InstanceTypeVMState = {
   isDynamicSSHInjection: false,
   pvcSource: null,
   selectedBootableVolume: null,
   selectedInstanceType: { name: '', namespace: null },
   selectedStorageClass: null,
   sshSecretCredentials: initialSSHCredentials,
+  sysprepConfigMapData: { data: {}, name: '' },
   vmName: '',
 };
 
