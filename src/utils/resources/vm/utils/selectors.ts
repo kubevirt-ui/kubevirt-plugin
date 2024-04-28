@@ -8,6 +8,7 @@ import {
   V1InstancetypeMatcher,
   V1PreferenceMatcher,
   V1VirtualMachine,
+  V1VirtualMachineCondition,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -203,6 +204,13 @@ export const getMemoryCPU = <T>(obj: T): { cpu: V1CPU; memory: string } => ({
 export const getCPUcores = <T>(obj: T): number => getCPU(obj)?.cores || 1;
 
 /**
+ * A selector that returns number of CPU sockets of the resource
+ * @param {T} obj resource such as VMI or VMI
+ * @returns {number} the number of CPU sockets
+ */
+export const getCPUSockets = <T>(obj: T): number => getCPU(obj)?.sockets || 1;
+
+/**
  * A selector that returns virtual machine evictionStrategy
  * @param {V1VirtualMachine} vm the virtual machine
  * @returns {string} the evictionStrategy
@@ -223,3 +231,11 @@ export const getInstanceTypeMatcher = (vm: V1VirtualMachine): V1InstancetypeMatc
 
 export const getPreferenceMatcher = (vm: V1VirtualMachine): V1PreferenceMatcher =>
   vm?.spec?.preference;
+
+/**
+ * A selector that returns the VM's status conditions
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns {V1VirtualMachineCondition[]} the VM's status conditions
+ */
+export const getStatusConditions = (vm: V1VirtualMachine): V1VirtualMachineCondition[] =>
+  vm?.status?.conditions;

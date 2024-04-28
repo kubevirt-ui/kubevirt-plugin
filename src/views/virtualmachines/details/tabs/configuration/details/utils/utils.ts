@@ -6,7 +6,7 @@ import { WORKLOADS } from '@kubevirt-utils/resources/template';
 import {
   DESCRIPTION_ANNOTATION,
   getBootloader,
-  getCPUcores,
+  getCPUSockets,
   getDataVolumeTemplates,
   getDevices,
   getDisks,
@@ -160,8 +160,8 @@ export const updatedVirtualMachine = (updatedVM: V1VirtualMachine) =>
     data: [
       {
         op: 'replace',
-        path: `/spec/template/spec/domain/cpu/cores`,
-        value: getCPUcores(updatedVM),
+        path: `/spec/template/spec/domain/cpu/sockets`,
+        value: getCPUSockets(updatedVM),
       },
       {
         op: 'replace',
