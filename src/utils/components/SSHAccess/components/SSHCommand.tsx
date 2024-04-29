@@ -11,15 +11,18 @@ import {
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
+  Flex,
+  FlexItem,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
 
 import { SERVICE_TYPES } from '../constants';
-import useSSHCommand from '../useSSHCommand';
+import useSSHCommand, { isLoadBalancerBonded } from '../useSSHCommand';
 import { createSSHService, deleteSSHService } from '../utils';
 
 import SSHServiceSelect from './SSHServiceSelect';
+import SSHServiceStateIcon from './SSHServiceState';
 
 type SSHCommandProps = {
   sshService: IoK8sApiCoreV1Service;
@@ -65,6 +68,9 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
     setError(undefined);
   }, [initialSSHService]);
 
+  const showBondingWarning =
+    sshService?.spec?.type === SERVICE_TYPES.LOAD_BALANCER && !isLoadBalancerBonded(sshService);
+
   return (
     <DescriptionListGroup className="pf-c-description-list__group">
       <DescriptionListTerm className="pf-u-font-size-xs">
@@ -76,14 +82,23 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
           {sshServiceLoaded && !loading ? (
             <>
               <StackItem>
-                <SSHServiceSelect
-                  onSSHChange={onSSHChange}
-                  sshService={sshService}
-                  sshServiceLoaded={sshServiceLoaded}
-                />
+                <Flex direction={{ default: 'row' }}>
+                  <FlexItem flex={{ default: 'flex_1' }}>
+                    <SSHServiceSelect
+                      onSSHChange={onSSHChange}
+                      sshService={sshService}
+                      sshServiceLoaded={sshServiceLoaded}
+                    />
+                  </FlexItem>
+
+                  <SSHServiceStateIcon
+                    sshService={sshService}
+                    sshServiceLoaded={sshServiceLoaded}
+                  />
+                </Flex>
               </StackItem>
 
-              {sshServiceRunning && (
+              {sshServiceRunning && !showBondingWarning && (
                 <StackItem>
                   <ClipboardCopy
                     clickTip={t('Copied')}
