@@ -18,7 +18,7 @@ const LiveMigratePendingChanges: FC<LiveMigratePendingChangesProps> = ({ pending
   return (
     <>
       {t(
-        'The following areas have pending changes that will be applied when this VirtualMachine is live migrated or restarted.',
+        'The following areas have pending changes that will be applied when this VirtualMachine is restarted.',
       )}
       <List>
         <PendingChangesBreadcrumb pendingChanges={pendingChangesNICsTab} />
