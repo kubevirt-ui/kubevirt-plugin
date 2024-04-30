@@ -17,16 +17,21 @@ import { expandURLHash, getDetailsTabHardwareIds } from '../../utils/search';
 import { updateHardwareDevices } from '../utils/utils';
 
 type DetailsSectionHardwareProps = {
+  onSubmit?: (type: HARDWARE_DEVICE_TYPE, updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
-const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({ vm, vmi }) => {
+const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
+  onSubmit: onSubmitProp,
+  vm,
+  vmi,
+}) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const location = useLocation();
   const [isExpanded, setIsExpanded] = useState<boolean>();
-
+  const onSubmit = onSubmitProp || updateHardwareDevices;
   const hostDevices = getHostDevices(vm);
   const gpus = getGPUDevices(vm);
 
@@ -37,14 +42,12 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({ vm, vmi }) =>
   const onEditHostDevices = () => {
     createModal(({ isOpen, onClose }) => (
       <HardwareDevicesModal
-        onSubmit={(updatedVM) =>
-          updateHardwareDevices(HARDWARE_DEVICE_TYPE.HOST_DEVICES, updatedVM)
-        }
         btnText={t('Add Host device')}
         headerText={t('Host devices')}
         initialDevices={hostDevices}
         isOpen={isOpen}
         onClose={onClose}
+        onSubmit={(updatedVM) => onSubmit(HARDWARE_DEVICE_TYPE.HOST_DEVICES, updatedVM)}
         type={HARDWARE_DEVICE_TYPE.HOST_DEVICES}
         vm={vm}
         vmi={vmi}
@@ -60,7 +63,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({ vm, vmi }) =>
         initialDevices={gpus}
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={(updatedVM) => updateHardwareDevices(HARDWARE_DEVICE_TYPE.GPUS, updatedVM)}
+        onSubmit={(updatedVM) => onSubmit(HARDWARE_DEVICE_TYPE.GPUS, updatedVM)}
         type={HARDWARE_DEVICE_TYPE.GPUS}
         vm={vm}
         vmi={vmi}

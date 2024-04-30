@@ -14,6 +14,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -117,6 +118,13 @@ const CreateVMFooter: FC = () => {
           subscriptionData,
           autoUpdateEnabled,
         ),
+      );
+      vmSignal.value = generateVM(
+        instanceTypeVMState,
+        vmNamespaceTarget,
+        startVM,
+        subscriptionData,
+        autoUpdateEnabled,
       );
 
       navigate(

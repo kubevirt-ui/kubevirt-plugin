@@ -9,7 +9,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Bullseye } from '@patternfly/react-core';
 
-import './YamlTab.scss';
+import './CustomizeInstanceTypeYamlTab.scss';
 
 const YamlTab: FC = () => {
   const { t } = useKubevirtTranslation();

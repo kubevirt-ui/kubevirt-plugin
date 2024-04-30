@@ -5,9 +5,11 @@ import {
   VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/constants/tabs-constants';
 
+import CustomizeInstanceTypeDetailsTab from './tabs/CustomizeInstanceTypeDetailsTab';
+
 export const tabs = [
   {
-    Component: Fragment,
+    Component: CustomizeInstanceTypeDetailsTab,
     name: VirtualMachineDetailsTab.Details,
     title: VirtualMachineDetailsTabLabel.Details,
   },
