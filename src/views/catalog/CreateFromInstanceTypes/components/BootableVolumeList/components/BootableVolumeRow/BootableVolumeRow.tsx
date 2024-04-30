@@ -1,5 +1,6 @@
 import React, { FC, MouseEvent } from 'react';
 
+import { InstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { getTemplateOSIcon, getVolumeNameOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
@@ -28,10 +29,7 @@ type BootableVolumeRowProps = {
   activeColumnIDs: string[];
   bootableVolume: BootableVolume;
   rowData: {
-    bootableVolumeSelectedState: [
-      BootableVolume,
-      (selectedVolume: BootableVolume, pvcSource: IoK8sApiCoreV1PersistentVolumeClaim) => void,
-    ];
+    bootableVolumeSelectedState: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
     favorites: [isFavorite: boolean, updaterFavorites: (val: boolean) => void];
     preference: V1beta1VirtualMachineClusterPreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
@@ -64,7 +62,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       isClickable
       isRowSelected={getName(selectedBootableVolume) === bootVolumeName}
       isSelectable
-      onClick={() => setSelectedBootableVolume(bootableVolume, pvcSource)}
+      onClick={() => setSelectedBootableVolume(bootableVolume, pvcSource, volumeSnapshotSource)}
     >
       <TableData
         favorites={{

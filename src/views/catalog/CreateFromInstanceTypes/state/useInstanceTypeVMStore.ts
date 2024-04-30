@@ -5,6 +5,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
+import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel } from '@kubevirt-utils/resources/shared';
@@ -32,11 +33,13 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
     onSelectCreatedVolume: (
       selectedVolume: BootableVolume,
       pvcSource: IoK8sApiCoreV1PersistentVolumeClaim,
+      volumeSnapshotSource: VolumeSnapshotKind,
     ) =>
       set(
         produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
           instanceTypeVMState.selectedBootableVolume = selectedVolume;
           instanceTypeVMState.pvcSource = pvcSource;
+          instanceTypeVMState.volumeSnapshotSource = volumeSnapshotSource;
           instanceTypeVMState.selectedInstanceType = {
             name: getInstanceTypeFromVolume(selectedVolume),
             namespace: null,

@@ -10,6 +10,7 @@ import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/util
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getVolumeSnapshotSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { DescriptionList } from '@patternfly/react-core';
@@ -32,8 +33,10 @@ const DetailsRightGrid: FC = () => {
     vmNamespaceTarget,
   } = useInstanceTypeVMStore();
 
-  const { pvcSource, sshSecretCredentials } = instanceTypeVMState;
-  const pvcDiskSize = pvcSource?.spec?.resources?.requests?.storage;
+  const { pvcSource, sshSecretCredentials, volumeSnapshotSource } = instanceTypeVMState;
+
+  const pvcDiskSize =
+    pvcSource?.spec?.resources?.requests?.storage || getVolumeSnapshotSize(volumeSnapshotSource);
   const sizeData = formatBytes(pvcDiskSize);
 
   const setSSHCredentials = (credentials: SSHSecretDetails) => {

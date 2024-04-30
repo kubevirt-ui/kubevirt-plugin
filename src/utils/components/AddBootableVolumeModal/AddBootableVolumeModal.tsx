@@ -15,6 +15,8 @@ import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
 
+import { VolumeSnapshotKind } from '../SelectSnapshot/types';
+
 import SchedulingSettings from './components/SchedulingSettings';
 import SourceTypeSelection from './components/SourceTypeSelection/SourceTypeSelection';
 import VolumeDestination from './components/VolumeDestination/VolumeDestination';
@@ -38,6 +40,7 @@ type AddBootableVolumeModalProps = {
   onCreateVolume?: (
     source: BootableVolume,
     pvcSource?: IoK8sApiCoreV1PersistentVolumeClaim,
+    volumeSnapshotSource?: VolumeSnapshotKind,
   ) => void;
 };
 
