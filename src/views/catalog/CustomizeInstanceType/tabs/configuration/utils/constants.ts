@@ -7,6 +7,7 @@ import {
 
 import CustomizeInstanceTypeDetailsTab from './tabs/CustomizeInstanceTypeDetailsTab';
 import CustomizeInstanceTypeNetworkTab from './tabs/CustomizeInstanceTypeNetworkTab';
+import CustomizeInstanceTypeSchedulingTab from './tabs/CustomizeInstanceTypeScheduling';
 import CustomizeInstanceTypeStorageTab from './tabs/CustomizeInstanceTypeStorageTab';
 
 export const tabs = [
@@ -26,7 +27,7 @@ export const tabs = [
     title: VirtualMachineDetailsTabLabel.Network,
   },
   {
-    Component: Fragment,
+    Component: CustomizeInstanceTypeSchedulingTab,
     name: VirtualMachineDetailsTab.Scheduling,
     title: VirtualMachineDetailsTabLabel.Scheduling,
   },

@@ -18,12 +18,14 @@ import DedicatedResources from './DedicatedResources';
 
 type SchedulingSectionRightGridProps = {
   canUpdateVM: boolean;
+  onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
   canUpdateVM,
+  onUpdateVM,
   vm,
   vmi,
 }) => {
@@ -32,13 +34,15 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
 
   const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
-      k8sUpdate({
-        data: updatedVM,
-        model: VirtualMachineModel,
-        name: updatedVM?.metadata?.name,
-        ns: updatedVM?.metadata?.namespace,
-      }),
-    [],
+      onUpdateVM
+        ? onUpdateVM(updatedVM)
+        : k8sUpdate({
+            data: updatedVM,
+            model: VirtualMachineModel,
+            name: updatedVM?.metadata?.name,
+            ns: updatedVM?.metadata?.namespace,
+          }),
+    [onUpdateVM],
   );
 
   return (
