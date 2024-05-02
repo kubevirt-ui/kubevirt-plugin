@@ -28,11 +28,11 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
   const { t } = useKubevirtTranslation();
 
   const { instanceTypeVMState, onSelectCreatedVolume } = useInstanceTypeVMStore();
-  const { pvcSource, selectedBootableVolume } = instanceTypeVMState;
+  const { pvcSource, selectedBootableVolume, volumeSnapshotSource } = instanceTypeVMState;
   const selectedBootableVolumeState = useState<BootableVolume>(selectedBootableVolume);
 
   const onSave = () => {
-    onSelectCreatedVolume(selectedBootableVolumeState[0], pvcSource);
+    onSelectCreatedVolume(selectedBootableVolumeState[0], pvcSource, volumeSnapshotSource);
     onClose();
   };
   return (

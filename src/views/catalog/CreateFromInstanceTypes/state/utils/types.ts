@@ -42,6 +42,7 @@ export type InstanceTypeVMState = {
   selectedStorageClass: string;
   sshSecretCredentials: SSHSecretDetails;
   vmName: string;
+  volumeSnapshotSource: VolumeSnapshotKind;
 };
 
 export enum instanceTypeActionType {
@@ -76,6 +77,7 @@ type InstanceTypeVMStoreActions = {
   onSelectCreatedVolume: (
     selectedVolume: BootableVolume,
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim,
+    volumeSnapshotSource: VolumeSnapshotKind,
   ) => void;
   resetInstanceTypeVMState: () => void;
   setInstanceTypeVMState: Dispatch<InstanceTypeAction>;

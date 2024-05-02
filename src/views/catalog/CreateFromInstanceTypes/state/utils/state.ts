@@ -10,6 +10,7 @@ const instanceTypeVMInitialState: InstanceTypeVMState = {
   selectedStorageClass: null,
   sshSecretCredentials: initialSSHCredentials,
   vmName: '',
+  volumeSnapshotSource: null,
 };
 
 export const instanceTypeVMStoreInitialState: InstanceTypeVMStoreState = {
