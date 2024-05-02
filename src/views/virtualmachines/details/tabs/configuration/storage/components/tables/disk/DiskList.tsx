@@ -26,11 +26,12 @@ import DiskRow from './DiskRow';
 import './disklist.scss';
 
 type DiskListProps = {
+  onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
-const DiskList: FC<DiskListProps> = ({ vm, vmi }) => {
+const DiskList: FC<DiskListProps> = ({ onDiskUpdate, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
@@ -45,6 +46,8 @@ const DiskList: FC<DiskListProps> = ({ vm, vmi }) => {
       ? t('Add disk (hot plugged)')
       : t('Add disk');
 
+  const onSubmit = onDiskUpdate || updateDisks;
+
   return (
     <div className="kv-configuration-vm-disk-list">
       <DiskListTitle />
@@ -55,7 +58,7 @@ const DiskList: FC<DiskListProps> = ({ vm, vmi }) => {
               headerText={headerText}
               isOpen={isOpen}
               onClose={onClose}
-              onSubmit={updateDisks}
+              onSubmit={onSubmit}
               vm={vm}
             />
           ))
@@ -76,7 +79,7 @@ const DiskList: FC<DiskListProps> = ({ vm, vmi }) => {
         </FlexItem>
 
         <FlexItem>
-          <WindowsDrivers updateVM={updateDisks} vm={vm} />
+          <WindowsDrivers updateVM={onSubmit} vm={vm} />
         </FlexItem>
       </Flex>
       <VirtualizedTable

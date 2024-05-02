@@ -20,19 +20,37 @@ effect(() => {
   vmSignal.value = vmSessionStorage;
 });
 
-export const updateCustomizeInstanceType = ({ data, merge = false, path }): V1VirtualMachine => {
-  vmSignal.value = produce(vmSignal.value, (vmDraft) => {
-    const pathParts = path.split('.');
-    let obj = vmDraft;
+type UpdateCustomizeInstanceTypeArgs = {
+  data: any;
+  merge?: boolean;
+  path?: string;
+}[];
+type UpdateCustomizeInstanceType = (args: UpdateCustomizeInstanceTypeArgs) => V1VirtualMachine;
 
-    pathParts.forEach((part: string, index: number) => {
-      if (index < pathParts.length - 1) {
-        obj = obj?.[part] ? obj[part] : Object.assign(obj, { [part]: {} })[part];
-        return;
-      }
-      obj[part] = merge ? { ...obj[part], ...data } : data;
+export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
+  updateValues,
+): V1VirtualMachine => {
+  let vm = vmSignal.value;
+  updateValues.forEach(({ data, merge = false, path }) => {
+    //replace complete vm obj
+    if (isEmpty(path)) {
+      vm = data;
+      return;
+    }
+    vm = produce(vm, (vmDraft) => {
+      const pathParts = path.split('.');
+      let obj = vmDraft;
+
+      pathParts.forEach((part: string, index: number) => {
+        if (index < pathParts.length - 1) {
+          obj = obj?.[part] ? obj[part] : Object.assign(obj, { [part]: {} })[part];
+          return;
+        }
+        obj[part] = merge ? { ...obj[part], ...data } : data;
+      });
     });
   });
 
+  vmSignal.value = vm;
   return vmSignal.value;
 };

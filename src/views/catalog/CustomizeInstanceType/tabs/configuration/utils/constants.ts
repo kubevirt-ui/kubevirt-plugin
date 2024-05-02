@@ -6,6 +6,7 @@ import {
 } from '@kubevirt-utils/constants/tabs-constants';
 
 import CustomizeInstanceTypeDetailsTab from './tabs/CustomizeInstanceTypeDetailsTab';
+import CustomizeInstanceTypeStorageTab from './tabs/CustomizeInstanceTypeStorageTab';
 
 export const tabs = [
   {
@@ -14,7 +15,7 @@ export const tabs = [
     title: VirtualMachineDetailsTabLabel.Details,
   },
   {
-    Component: Fragment,
+    Component: CustomizeInstanceTypeStorageTab,
     name: VirtualMachineDetailsTab.Storage,
     title: VirtualMachineDetailsTabLabel.Storage,
   },
