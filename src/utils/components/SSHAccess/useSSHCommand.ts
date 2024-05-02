@@ -14,6 +14,9 @@ export type useSSHCommandResult = {
   user: string;
 };
 
+export const isLoadBalancerBonded = (sshService: IoK8sApiCoreV1Service) =>
+  Boolean(sshService?.status?.loadBalancer?.ingress?.[0]?.ip);
+
 // SSH over NodePort
 const useSSHCommand = (
   vm: V1VirtualMachine,
