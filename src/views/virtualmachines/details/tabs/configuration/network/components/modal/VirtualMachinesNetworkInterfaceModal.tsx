@@ -18,6 +18,10 @@ import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 type VirtualMachinesNetworkInterfaceModalProps = {
   headerText: string;
   isOpen: boolean;
+  onAddNetworkInterface: (
+    updatedNetworks: V1Network[],
+    updatedInterfaces: V1Interface[],
+  ) => Promise<V1VirtualMachine>;
   onClose: () => void;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
@@ -26,6 +30,7 @@ type VirtualMachinesNetworkInterfaceModalProps = {
 const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceModalProps> = ({
   headerText,
   isOpen,
+  onAddNetworkInterface,
   onClose,
   vm,
   vmi,
@@ -43,10 +48,11 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
 
         const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
         const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
-
-        return updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
+        return onAddNetworkInterface
+          ? onAddNetworkInterface(updatedNetworks, updatedInterfaces)
+          : updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
       },
-    [vm],
+    [onAddNetworkInterface, vm],
   );
 
   return (

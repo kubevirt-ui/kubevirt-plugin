@@ -6,6 +6,7 @@ import {
 } from '@kubevirt-utils/constants/tabs-constants';
 
 import CustomizeInstanceTypeDetailsTab from './tabs/CustomizeInstanceTypeDetailsTab';
+import CustomizeInstanceTypeNetworkTab from './tabs/CustomizeInstanceTypeNetworkTab';
 import CustomizeInstanceTypeStorageTab from './tabs/CustomizeInstanceTypeStorageTab';
 
 export const tabs = [
@@ -20,7 +21,7 @@ export const tabs = [
     title: VirtualMachineDetailsTabLabel.Storage,
   },
   {
-    Component: Fragment,
+    Component: CustomizeInstanceTypeNetworkTab,
     name: VirtualMachineDetailsTab.Network,
     title: VirtualMachineDetailsTabLabel.Network,
   },

@@ -25,6 +25,7 @@ type UpdateCustomizeInstanceTypeArgs = {
   merge?: boolean;
   path?: string;
 }[];
+
 type UpdateCustomizeInstanceType = (args: UpdateCustomizeInstanceTypeArgs) => V1VirtualMachine;
 
 export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
