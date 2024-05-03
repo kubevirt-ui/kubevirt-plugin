@@ -3,7 +3,7 @@ import produce from 'immer';
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   addSysprepConfig,
   AUTOUNATTEND,
@@ -108,5 +108,3 @@ export const updateSysprepObject = (
     return generateNewSysprepConfig({ data, vm });
   }
 };
-
-export const getSysprepConfigMapName = (volume: V1Volume) => volume?.sysprep?.configMap?.name;

@@ -187,5 +187,5 @@ export const useIsWindowsBootableVolume = (): boolean => {
   const { selectedBootableVolume } = instanceTypeVMState;
   const defaultPreferenceName = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
 
-  return defaultPreferenceName?.startsWith(OS_WINDOWS_PREFIX) || false;
+  return defaultPreferenceName?.startsWith(OS_WINDOWS_PREFIX);
 };

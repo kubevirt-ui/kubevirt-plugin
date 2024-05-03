@@ -13,7 +13,6 @@ const useSysprepConfigMaps = (namespace: string): WatchK8sResult<IoK8sApiCoreV1C
     namespace,
     namespaced: true,
   });
-
   const sysprepConfigMaps = configmaps?.filter(
     (configmap) => configmap?.data?.[AUTOUNATTEND] || configmap?.data?.[UNATTEND],
   );
