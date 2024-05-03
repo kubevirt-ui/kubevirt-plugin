@@ -35,7 +35,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, vm, vmi }) => {
 
   const isVMRunning = isRunning(vm);
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
-  const isEditDisabled = isVMRunning || pvcResourceExists;
+  const isEditDisabled = isVMRunning;
 
   const initialFormState = !isEditDisabled && getEditDiskStates(vm, diskName, vmi);
   const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
@@ -49,17 +49,15 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, vm, vmi }) => {
     if (isVMRunning) {
       return t('Can edit only when VirtualMachine is stopped');
     }
-    if (pvcResourceExists) {
-      return t('Cannot edit resources that already created');
-    }
     return null;
-  }, [isVMRunning, pvcResourceExists, t]);
+  }, [isVMRunning, t]);
 
   const createEditDiskModal = () =>
     createModal(({ isOpen, onClose }) => (
       <DiskModal
         headerText={t('Edit disk')}
         initialFormData={initialFormState}
+        isEditingCreatedDisk={pvcResourceExists}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={updateDisks}

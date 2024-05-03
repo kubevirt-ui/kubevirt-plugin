@@ -17,12 +17,18 @@ import { diskSourceFieldID, optionLabelMapper } from './utils/constants';
 import { getSelectedDiskSourceComponent } from './utils/utils';
 
 type DiskSourceSelectProps = {
+  isEditingCreatedDisk?: boolean;
   isTemplate: boolean;
   relevantUpload?: DataUpload;
   vm: V1VirtualMachine;
 };
 
-const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ isTemplate, relevantUpload, vm }) => {
+const DiskSourceSelect: FC<DiskSourceSelectProps> = ({
+  isEditingCreatedDisk,
+  isTemplate,
+  relevantUpload,
+  vm,
+}) => {
   const { t } = useKubevirtTranslation();
   const { control, setValue, watch } = useFormContext<DiskFormState>();
 
@@ -46,7 +52,11 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ isTemplate, relevantUploa
                 selectedLabel={optionLabelMapper[value]}
                 toggleProps={{ isDisabled: value === OTHER, isFullWidth: true }}
               >
-                <DiskSourceSelectOptionGroups isTemplate={isTemplate} isVMRunning={isRunning(vm)} />
+                <DiskSourceSelectOptionGroups
+                  isEditingCreatedDisk={isEditingCreatedDisk}
+                  isTemplate={isTemplate}
+                  isVMRunning={isRunning(vm)}
+                />
               </FormPFSelect>
             </div>
           </FormGroup>

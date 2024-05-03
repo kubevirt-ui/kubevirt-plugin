@@ -9,12 +9,14 @@ import { diskSourceFieldID } from '../../utils/constants';
 import { DiskSourceOptionGroupItem } from '../../utils/types';
 
 type DiskSourceSelectOptionsProps = {
+  isEditingCreatedDisk?: boolean;
   isTemplate?: boolean;
   isVMRunning: boolean;
   items: DiskSourceOptionGroupItem[];
 };
 
 const DiskSourceSelectOptions: FC<DiskSourceSelectOptionsProps> = ({
+  isEditingCreatedDisk,
   isTemplate,
   isVMRunning,
   items,
@@ -34,7 +36,7 @@ const DiskSourceSelectOptions: FC<DiskSourceSelectOptionsProps> = ({
           <SelectOption
             data-test-id={`${diskSourceFieldID}-select-${id}`}
             description={description}
-            isDisabled={isDisabled}
+            isDisabled={isDisabled || isEditingCreatedDisk}
             key={id}
             value={id}
           >

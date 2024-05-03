@@ -70,6 +70,7 @@ export type DiskModalProps = {
   createOwnerReference?: boolean;
   headerText: string;
   initialFormData?: DiskFormState;
+  isEditingCreatedDisk?: boolean;
   isOpen: boolean;
   isTemplate?: boolean;
   onClose: () => void;

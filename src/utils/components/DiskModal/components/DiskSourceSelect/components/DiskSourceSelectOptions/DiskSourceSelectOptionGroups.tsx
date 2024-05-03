@@ -8,11 +8,13 @@ import { getDiskSourceOptionGroups } from '../../utils/utils';
 import DiskSourceSelectOptions from './DiskSourceSelectOptions';
 
 type DiskSourceSelectOptionGroupsProps = {
+  isEditingCreatedDisk?: boolean;
   isTemplate?: boolean;
   isVMRunning: boolean;
 };
 
 const DiskSourceSelectOptionGroups: FC<DiskSourceSelectOptionGroupsProps> = ({
+  isEditingCreatedDisk,
   isTemplate,
   isVMRunning,
 }) => {
@@ -25,6 +27,7 @@ const DiskSourceSelectOptionGroups: FC<DiskSourceSelectOptionGroupsProps> = ({
 
         const children = (
           <DiskSourceSelectOptions
+            isEditingCreatedDisk={isEditingCreatedDisk}
             isTemplate={isTemplate}
             isVMRunning={isVMRunning}
             items={items}

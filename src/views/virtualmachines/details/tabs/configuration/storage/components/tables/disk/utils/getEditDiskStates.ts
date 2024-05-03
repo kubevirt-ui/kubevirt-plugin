@@ -44,6 +44,7 @@ export const getEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
 
     if (volumeSource === SourceTypes.EPHEMERAL) {
       setEphemeralURL(volume, draftState);
+      return;
     }
 
     setOtherSource(draftState);

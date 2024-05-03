@@ -9,7 +9,9 @@ import { diskSizeField, diskSourceField } from '../utils/constants';
 
 import DynamicSize from './DynamicSize';
 
-const DiskSizeInput: FC = () => {
+type DiskSizeInputProps = { isEditingCreatedDisk: boolean };
+
+const DiskSizeInput: FC<DiskSizeInputProps> = ({ isEditingCreatedDisk }) => {
   const { t } = useKubevirtTranslation();
   const { control, watch } = useFormContext<DiskFormState>();
   const diskSource = watch(diskSourceField);
@@ -23,7 +25,12 @@ const DiskSizeInput: FC = () => {
   return (
     <Controller
       render={({ field: { onChange, value } }) => (
-        <CapacityInput label={t('PersistentVolumeClaim size')} onChange={onChange} size={value} />
+        <CapacityInput
+          isEditingCreatedDisk={isEditingCreatedDisk}
+          label={t('PersistentVolumeClaim size')}
+          onChange={onChange}
+          size={value}
+        />
       )}
       control={control}
       name={diskSizeField}

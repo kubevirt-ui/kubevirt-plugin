@@ -12,9 +12,13 @@ import StorageClassSelect from './StorageClassSelect';
 
 type StorageClassAndPreallocationProps = {
   checkSC?: (selectedStorageClass: string) => boolean;
+  isEditingCreatedDisk?: boolean;
 };
 
-const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({ checkSC }) => {
+const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({
+  checkSC,
+  isEditingCreatedDisk,
+}) => {
   const [showSCAlert, setShowSCAlert] = useState(false);
   const { watch } = useFormContext<DiskFormState>();
 
@@ -22,7 +26,8 @@ const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({ c
 
   const sourceRequiresDataVolume = useMemo(() => requiresDataVolume(diskSource), [diskSource]);
 
-  if (!sourceRequiresDataVolume && diskSource !== SourceTypes.UPLOAD) return null;
+  if ((!sourceRequiresDataVolume && diskSource !== SourceTypes.UPLOAD) || isEditingCreatedDisk)
+    return null;
 
   return (
     <>
