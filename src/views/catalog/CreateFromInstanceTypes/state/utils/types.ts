@@ -9,6 +9,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
+import { SysprepData } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 
 export type InstanceTypes = (
@@ -34,6 +35,11 @@ export type UseBootableVolumesValues = {
   volumeSnapshotSources: { [dataSourceName: string]: VolumeSnapshotKind };
 };
 
+export type SysprepConfigMapData = {
+  data: SysprepData;
+  name: string;
+};
+
 export type InstanceTypeVMState = {
   isDynamicSSHInjection: boolean;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
@@ -41,6 +47,7 @@ export type InstanceTypeVMState = {
   selectedInstanceType: { name: string; namespace: string };
   selectedStorageClass: string;
   sshSecretCredentials: SSHSecretDetails;
+  sysprepConfigMapData: SysprepConfigMapData;
   vmName: string;
   volumeSnapshotSource: VolumeSnapshotKind;
 };
@@ -51,6 +58,7 @@ export enum instanceTypeActionType {
   setSelectedBootableVolume = 'selectedBootableVolume',
   setSelectedInstanceType = 'selectedInstanceType',
   setSSHCredentials = 'sshSecretCredentials',
+  setSysprepConfigMapData = 'sysprepConfigMapData',
   setVMName = 'vmName',
 }
 
@@ -60,7 +68,8 @@ type InstanceTypeAction = {
     | boolean
     | BootableVolume
     | SSHSecretDetails
-    | string;
+    | string
+    | SysprepConfigMapData;
   type: string;
 };
 

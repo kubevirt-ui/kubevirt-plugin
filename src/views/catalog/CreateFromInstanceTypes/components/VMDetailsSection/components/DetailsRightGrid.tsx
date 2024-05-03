@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { useIsWindowsBootableVolume } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -16,6 +17,7 @@ import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { DescriptionList } from '@patternfly/react-core';
 
 import DynamicSSHKeyInjectionInstanceType from './DynamicSSHKeyInjectionInstanceType';
+import SysprepDescriptionItem from './SysprepDescriptionItem';
 
 import './details-right-grid.scss';
 
@@ -24,6 +26,7 @@ const DetailsRightGrid: FC = () => {
   const { createModal } = useModal();
   const [{ clusterDefaultStorageClass, sortedStorageClasses, virtDefaultStorageClass }, loaded] =
     useDefaultStorageClass();
+  const isWindowsOSVolume = useIsWindowsBootableVolume();
 
   const {
     instanceTypeVMState,
@@ -79,28 +82,34 @@ const DetailsRightGrid: FC = () => {
         }
         descriptionHeader={t('Storage class')}
       />
-      <VirtualMachineDescriptionItem
-        descriptionData={
-          isChangingNamespace ? (
-            <Loading />
-          ) : (
-            sshSecretCredentials?.sshSecretName || t('Not configured')
-          )
-        }
-        onEditClick={() =>
-          createModal((modalProps) => (
-            <SSHSecretModal
-              {...modalProps}
-              initialSSHSecretDetails={sshSecretCredentials}
-              namespace={vmNamespaceTarget}
-              onSubmit={setSSHCredentials}
-            />
-          ))
-        }
-        descriptionHeader={t('Public SSH key')}
-        isEdit={!isChangingNamespace}
-      />
-      <DynamicSSHKeyInjectionInstanceType />
+      {isWindowsOSVolume ? (
+        <SysprepDescriptionItem />
+      ) : (
+        <>
+          <VirtualMachineDescriptionItem
+            descriptionData={
+              isChangingNamespace ? (
+                <Loading />
+              ) : (
+                sshSecretCredentials?.sshSecretName || t('Not configured')
+              )
+            }
+            onEditClick={() =>
+              createModal((modalProps) => (
+                <SSHSecretModal
+                  {...modalProps}
+                  initialSSHSecretDetails={sshSecretCredentials}
+                  namespace={vmNamespaceTarget}
+                  onSubmit={setSSHCredentials}
+                />
+              ))
+            }
+            descriptionHeader={t('Public SSH key')}
+            isEdit={!isChangingNamespace}
+          />
+          <DynamicSSHKeyInjectionInstanceType />
+        </>
+      )}
     </DescriptionList>
   );
 };

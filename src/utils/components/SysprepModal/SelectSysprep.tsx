@@ -1,16 +1,14 @@
 import React, { FC } from 'react';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
 
-import { AUTOUNATTEND, UNATTEND } from './sysprep-utils';
+import useSysprepConfigMaps from './hooks/useConfigMaps';
 
 type SelectSysprepProps = {
   id?: string;
@@ -26,18 +24,7 @@ const SelectSysprep: FC<SelectSysprepProps> = ({
   selectedSysprepName,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [configmaps, configmapsLoaded, configmapsError] = useK8sWatchResource<
-    IoK8sApiCoreV1ConfigMap[]
-  >({
-    groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-    isList: true,
-    namespace,
-    namespaced: true,
-  });
-
-  const sysprepConfigMaps = configmaps?.filter(
-    (configmap) => configmap?.data?.[AUTOUNATTEND] || configmap?.data?.[UNATTEND],
-  );
+  const [sysprepConfigMaps, configmapsLoaded, configmapsError] = useSysprepConfigMaps(namespace);
 
   if (configmapsError)
     return (

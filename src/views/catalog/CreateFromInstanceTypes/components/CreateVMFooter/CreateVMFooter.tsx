@@ -2,18 +2,27 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { generateVM } from '@catalog/CreateFromInstanceTypes/utils/utils';
+import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import {
+  addSysprepConfig,
+  AUTOUNATTEND,
+  generateNewSysprepConfig,
+  UNATTEND,
+} from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
-import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -50,9 +59,16 @@ const CreateVMFooter: FC = () => {
   const [activeNamespace] = useActiveNamespace();
   const { instanceTypeVMState, setStartVM, setVM, startVM, vmNamespaceTarget } =
     useInstanceTypeVMStore();
-  const { selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
-    instanceTypeVMState;
+  const {
+    selectedBootableVolume,
+    selectedInstanceType,
+    sshSecretCredentials,
+    sysprepConfigMapData,
+    vmName,
+  } = instanceTypeVMState;
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
+  const defaultPreferenceName = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
+  const isWindowsOSVolume = defaultPreferenceName?.startsWith(OS_WINDOWS_PREFIX) || false;
 
   const onCancel = useCallback(
     () => navigate(getResourceUrl({ activeNamespace, model: VirtualMachineModel })),
@@ -99,6 +115,29 @@ const CreateVMFooter: FC = () => {
         if (secretOption === SecretSelectionOption.addNew) {
           createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
         }
+
+        // create appropriate ConfigMap and/or add it to the Windows VM if sysprep configured
+        if (isWindowsOSVolume) {
+          const { data, name } = sysprepConfigMapData;
+          const { autounattend, unattended } = data;
+
+          if (!isEmpty(data) && !name) {
+            // the user has chosen to add new ConfigMap with new data
+            const configMap = generateNewSysprepConfig({
+              data: { [AUTOUNATTEND]: autounattend, [UNATTEND]: unattended },
+              vm: createdVM,
+            });
+
+            k8sCreate({ data: configMap, model: ConfigMapModel });
+            addSysprepConfig(createdVM, configMap.metadata.name); // add ConfigMap and related volume and disk to the new VM
+          }
+
+          if (name) {
+            // if user has chosen some existing ConfigMap from the list
+            addSysprepConfig(createdVM, name);
+          }
+        }
+
         createHeadlessService(createdVM);
         navigate(getResourceUrl({ model: VirtualMachineModel, resource: vmToCreate }));
       })

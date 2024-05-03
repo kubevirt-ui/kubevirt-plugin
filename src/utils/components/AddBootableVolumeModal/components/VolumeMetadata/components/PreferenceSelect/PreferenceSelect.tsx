@@ -56,7 +56,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
         )(VirtualMachinePreferenceModelGroupVersionKind.kind),
     );
     return [...userPreferenceOptions, ...preferenceOptions];
-  }, [preferences, userPreferences]);
+  }, [preferences, userPreferences, deleteLabel, setBootableVolumeField]);
 
   if (!preferencesLoaded || !userPreferencesLoaded) return <Loading />;
 

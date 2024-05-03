@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { FC } from 'react';
+import { getSysprepConfigMapName } from 'src/views/templates/details/tabs/scripts/components/SysPrepItem/sysprep-utils';
 
 import { produceVMSysprep, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
@@ -24,14 +25,14 @@ import {
   removeSysprepObject,
 } from './sysprep-utils';
 
-const Sysprep: React.FC = () => {
+const Sysprep: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const { createModal } = useModal();
   const { tabsData, updateTabsData, updateVM, vm } = useWizardVMContext();
 
   const currentSysprepVolume = getVolumes(vm)?.find((volume) => volume?.sysprep?.configMap?.name);
-  const currentVMSysprepName = currentSysprepVolume?.sysprep?.configMap?.name;
+  const currentVMSysprepName = getSysprepConfigMapName(currentSysprepVolume);
 
   const filterSysprepByName = isSysprepConfig(currentVMSysprepName);
 
