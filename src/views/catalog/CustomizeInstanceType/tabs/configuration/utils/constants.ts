@@ -1,11 +1,15 @@
-import { Fragment } from 'react';
-
 import {
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/constants/tabs-constants';
 
 import CustomizeInstanceTypeDetailsTab from './tabs/CustomizeInstanceTypeDetailsTab';
+import CustomizeInstanceTypeInitialRunTab from './tabs/CustomizeInstanceTypeInitialRunTab';
+import CustomizeInstanceTypeMetadataTab from './tabs/CustomizeInstanceTypeMetadataTab';
+import CustomizeInstanceTypeNetworkTab from './tabs/CustomizeInstanceTypeNetworkTab';
+import CustomizeInstanceTypeSchedulingTab from './tabs/CustomizeInstanceTypeSchedulingTab';
+import CustomizeInstanceTypeSSHTab from './tabs/CustomizeInstanceTypeSSHTab';
+import CustomizeInstanceTypeStorageTab from './tabs/CustomizeInstanceTypeStorageTab';
 
 export const tabs = [
   {
@@ -14,32 +18,32 @@ export const tabs = [
     title: VirtualMachineDetailsTabLabel.Details,
   },
   {
-    Component: Fragment,
+    Component: CustomizeInstanceTypeStorageTab,
     name: VirtualMachineDetailsTab.Storage,
     title: VirtualMachineDetailsTabLabel.Storage,
   },
   {
-    Component: Fragment,
+    Component: CustomizeInstanceTypeNetworkTab,
     name: VirtualMachineDetailsTab.Network,
     title: VirtualMachineDetailsTabLabel.Network,
   },
   {
-    Component: Fragment,
+    Component: CustomizeInstanceTypeSchedulingTab,
     name: VirtualMachineDetailsTab.Scheduling,
     title: VirtualMachineDetailsTabLabel.Scheduling,
   },
   {
-    Component: Fragment,
+    Component: CustomizeInstanceTypeSSHTab,
     name: VirtualMachineDetailsTab.SSH,
     title: VirtualMachineDetailsTabLabel.SSH,
   },
   {
-    Component: Fragment,
+    Component: CustomizeInstanceTypeInitialRunTab,
     name: VirtualMachineDetailsTab['Initial-run'],
     title: VirtualMachineDetailsTabLabel['Initial-run'],
   },
   {
-    Component: Fragment,
+    Component: CustomizeInstanceTypeMetadataTab,
     name: VirtualMachineDetailsTab.Metadata,
     title: VirtualMachineDetailsTabLabel.Metadata,
   },

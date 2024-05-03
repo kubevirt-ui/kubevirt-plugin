@@ -23,6 +23,7 @@ type SchedulingSectionLeftGridProps = {
   canUpdateVM: boolean;
   nodes: IoK8sApiCoreV1Node[];
   nodesLoaded: boolean;
+  onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
@@ -31,6 +32,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
   canUpdateVM,
   nodes,
   nodesLoaded,
+  onUpdateVM,
   vm,
   vmi,
 }) => {
@@ -39,13 +41,15 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
 
   const onSubmit = useCallback(
     (updatedVM: V1VirtualMachine) =>
-      k8sUpdate({
-        data: updatedVM,
-        model: VirtualMachineModel,
-        name: updatedVM?.metadata?.name,
-        ns: updatedVM?.metadata?.namespace,
-      }),
-    [],
+      onUpdateVM
+        ? onUpdateVM(updatedVM)
+        : k8sUpdate({
+            data: updatedVM,
+            model: VirtualMachineModel,
+            name: updatedVM?.metadata?.name,
+            ns: updatedVM?.metadata?.namespace,
+          }),
+    [onUpdateVM],
   );
 
   return (

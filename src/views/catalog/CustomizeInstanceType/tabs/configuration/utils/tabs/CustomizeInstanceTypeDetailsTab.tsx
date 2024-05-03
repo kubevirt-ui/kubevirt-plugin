@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-//will be used
-// import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
@@ -25,7 +23,6 @@ import DetailsSectionBoot from '@virtualmachines/details/tabs/configuration/deta
 import DetailsSectionHardware from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionHardware';
 
 const CustomizeInstanceTypeDetailsTab = () => {
-  //   const store = useInstanceTypeVMStore();
   const vm = vmSignal.value;
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
@@ -69,10 +66,12 @@ const CustomizeInstanceTypeDetailsTab = () => {
                   <DescriptionModal
                     onSubmit={(description) =>
                       Promise.resolve(
-                        updateCustomizeInstanceType({
-                          data: description,
-                          path: `metadata.annotations.${DESCRIPTION_ANNOTATION}`,
-                        }),
+                        updateCustomizeInstanceType([
+                          {
+                            data: description,
+                            path: `metadata.annotations.${DESCRIPTION_ANNOTATION}`,
+                          },
+                        ]),
                       )
                     }
                     isOpen={isOpen}
@@ -91,10 +90,12 @@ const CustomizeInstanceTypeDetailsTab = () => {
                   <HostnameModal
                     onSubmit={(updatedVM) =>
                       Promise.resolve(
-                        updateCustomizeInstanceType({
-                          data: getHostname(updatedVM),
-                          path: `spec.template.spec.hostname`,
-                        }),
+                        updateCustomizeInstanceType([
+                          {
+                            data: getHostname(updatedVM),
+                            path: `spec.template.spec.hostname`,
+                          },
+                        ]),
                       )
                     }
                     isOpen={isOpen}
@@ -116,10 +117,12 @@ const CustomizeInstanceTypeDetailsTab = () => {
                 <HeadlessMode
                   updateHeadlessMode={(checked) => {
                     return Promise.resolve(
-                      updateCustomizeInstanceType({
-                        data: checked ? false : null,
-                        path: `spec.template.spec.domain.devices.autoattachGraphicsDevice`,
-                      }),
+                      updateCustomizeInstanceType([
+                        {
+                          data: checked ? false : null,
+                          path: `spec.template.spec.domain.devices.autoattachGraphicsDevice`,
+                        },
+                      ]),
                     );
                   }}
                   vm={vm}
@@ -138,10 +141,12 @@ const CustomizeInstanceTypeDetailsTab = () => {
                 <Switch
                   onChange={(_event, checked) => {
                     setIsCheckedGuestSystemAccessLog(checked);
-                    updateCustomizeInstanceType({
-                      data: checked,
-                      path: `spec.template.spec.domain.devices.logSerialConsole`,
-                    });
+                    updateCustomizeInstanceType([
+                      {
+                        data: checked,
+                        path: `spec.template.spec.domain.devices.logSerialConsole`,
+                      },
+                    ]);
                   }}
                   id="guest-system-log-access"
                   isChecked={isCheckedGuestSystemAccessLog}
@@ -161,10 +166,12 @@ const CustomizeInstanceTypeDetailsTab = () => {
             <DetailsSectionHardware
               onSubmit={(type: HARDWARE_DEVICE_TYPE, updatedVM: V1VirtualMachine) =>
                 Promise.resolve(
-                  updateCustomizeInstanceType({
-                    data: getDevices(updatedVM)?.[type],
-                    path: `spec.template.spec.domain.devices.${type}`,
-                  }),
+                  updateCustomizeInstanceType([
+                    {
+                      data: getDevices(updatedVM)?.[type],
+                      path: `spec.template.spec.domain.devices.${type}`,
+                    },
+                  ]),
                 )
               }
               vm={vm}

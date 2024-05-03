@@ -9,6 +9,7 @@ import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
@@ -70,12 +71,13 @@ const CustomizeITVMFooter: FC = () => {
 
                   try {
                     const createdVM = await k8sCreate({
-                      data: vm,
+                      data: vmSignal.value || vm,
                       model: VirtualMachineModel,
                     });
                     if (secretOption === SecretSelectionOption.addNew) {
                       createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
                     }
+                    clearCustomizeInstanceType();
                     createHeadlessService(createdVM);
                     navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
                   } catch (err) {
