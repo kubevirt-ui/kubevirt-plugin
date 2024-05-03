@@ -86,8 +86,8 @@ export const addSSHSelectorLabelToVM = async (
 
 export const createSSHService = async (
   vm: V1VirtualMachine,
-  vmi: V1VirtualMachineInstance,
   type: SERVICE_TYPES,
+  vmi?: V1VirtualMachineInstance,
 ): Promise<K8sResourceCommon> => {
   const { name, namespace } = vm?.metadata || {};
   const vmiLabels = vm?.spec?.template?.metadata?.labels;

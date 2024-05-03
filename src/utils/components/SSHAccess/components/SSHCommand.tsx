@@ -25,7 +25,7 @@ type SSHCommandProps = {
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded?: boolean;
   vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const SSHCommand: React.FC<SSHCommandProps> = ({
@@ -50,7 +50,7 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
       }
 
       if (newServiceType && newServiceType !== SERVICE_TYPES.NONE) {
-        const newService = await createSSHService(vm, vmi, newServiceType);
+        const newService = await createSSHService(vm, newServiceType, vmi);
         setSSHService(newService);
       }
     } catch (apiError) {

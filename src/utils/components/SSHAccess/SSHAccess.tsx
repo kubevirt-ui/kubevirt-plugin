@@ -11,7 +11,7 @@ type SSHAccessProps = {
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded?: boolean;
   vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const SSHAccess: React.FC<SSHAccessProps> = ({ sshService, sshServiceLoaded, vm, vmi }) => {

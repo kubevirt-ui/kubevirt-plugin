@@ -12,7 +12,7 @@ type InitialRunTabCloudInitProps = {
   canUpdateVM: boolean;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({

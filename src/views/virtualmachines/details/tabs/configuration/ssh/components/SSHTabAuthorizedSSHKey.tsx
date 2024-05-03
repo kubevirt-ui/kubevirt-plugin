@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -19,7 +19,11 @@ import { useDynamicSSHInjection } from '../hooks/useDynamicSSHInjection';
 
 import DynamicSSHKeyInjectionDescription from './DynamicSSHKeyInjectionDescription';
 
-const SSHTabAuthorizedSSHKey = ({ vm }) => {
+type SSHTabAuthorizedSSHKeyProps = {
+  onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+  vm: V1VirtualMachine;
+};
+const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({ onUpdateVM, vm }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -30,12 +34,14 @@ const SSHTabAuthorizedSSHKey = ({ vm }) => {
   const isDynamicSSHInjectionEnabled = useDynamicSSHInjection(vm);
 
   const onSubmit = (updatedVM: V1VirtualMachine) =>
-    k8sUpdate({
-      data: updatedVM,
-      model: VirtualMachineModel,
-      name: updatedVM?.metadata?.name,
-      ns: updatedVM?.metadata?.namespace,
-    });
+    onUpdateVM
+      ? onUpdateVM(updatedVM)
+      : k8sUpdate({
+          data: updatedVM,
+          model: VirtualMachineModel,
+          name: updatedVM?.metadata?.name,
+          ns: updatedVM?.metadata?.namespace,
+        });
 
   return (
     <ExpandableSection

@@ -28,6 +28,11 @@ type UpdateCustomizeInstanceTypeArgs = {
 
 type UpdateCustomizeInstanceType = (args: UpdateCustomizeInstanceTypeArgs) => V1VirtualMachine;
 
+export const clearCustomizeInstanceType = () => {
+  vmSignal.value = null;
+  saveCustomizeInstanceTypeSessionStorage(null);
+};
+
 export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
   updateValues,
 ): V1VirtualMachine => {
