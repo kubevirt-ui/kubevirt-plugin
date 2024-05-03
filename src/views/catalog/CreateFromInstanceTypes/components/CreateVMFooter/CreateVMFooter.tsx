@@ -2,8 +2,10 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { generateVM } from '@catalog/CreateFromInstanceTypes/utils/utils';
+import {
+  generateVM,
+  useIsWindowsBootableVolume,
+} from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -21,8 +23,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
-import { getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -67,8 +68,7 @@ const CreateVMFooter: FC = () => {
     vmName,
   } = instanceTypeVMState;
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
-  const defaultPreferenceName = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
-  const isWindowsOSVolume = defaultPreferenceName?.startsWith(OS_WINDOWS_PREFIX) || false;
+  const isWindowsOSVolume = useIsWindowsBootableVolume();
 
   const onCancel = useCallback(
     () => navigate(getResourceUrl({ activeNamespace, model: VirtualMachineModel })),

@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { getSysprepConfigMapName } from 'src/views/templates/details/tabs/scripts/components/SysPrepItem/sysprep-utils';
 
 import { produceVMSysprep, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
@@ -8,6 +7,7 @@ import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import {
   AUTOUNATTEND,
+  getSysprepConfigMapName,
   removeSysprepConfig,
   UNATTEND,
   WINDOWS,
