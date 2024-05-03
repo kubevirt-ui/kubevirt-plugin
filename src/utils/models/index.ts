@@ -14,3 +14,16 @@ export const UploadTokenRequestModel: K8sModel = {
   namespaced: true,
   plural: 'uploadtokenrequests',
 };
+
+export const QuickStartModel: K8sModel = {
+  abbr: 'CQS',
+  apiGroup: 'console.openshift.io',
+  apiVersion: 'v1',
+  crd: true,
+  kind: 'ConsoleQuickStart',
+  label: 'ConsoleQuickStart',
+  labelPlural: 'ConsoleQuickStarts',
+  namespaced: false,
+  plural: 'consolequickstarts',
+  propagationPolicy: 'Background',
+};

@@ -19,6 +19,7 @@ import { DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
 import BootableVolumeEmptyState from '../BootableVolumeEmptyState/BootableVolumeEmptyState';
 
 import BootableVolumeRow from './components/BootableVolumeRow/BootableVolumeRow';
+import BootableVolumesPipelinesHint from './components/BootableVolumesPipelinesHint/BootableVolumesPipelinesHint';
 import ShowAllBootableVolumesButton from './components/ShowAllBootableVolumesButton/ShowAllBootableVolumesButton';
 import useBootVolumeColumns from './hooks/useBootVolumeColumns';
 import useBootVolumeFilters from './hooks/useBootVolumeFilters';
@@ -166,51 +167,54 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
       </Split>
 
       {displayVolumes ? (
-        <Table className="BootableVolumeList-table" variant={TableVariant.compact}>
-          <Thead>
-            <Tr>
-              {activeColumns.map((col, columnIndex) => (
-                <Th
-                  sort={
-                    columnIndex === 0
-                      ? { ...getSortType(columnIndex), isFavorites: true }
-                      : getSortType(columnIndex)
-                  }
-                  id={col?.id}
-                  key={col?.id}
-                >
-                  {col?.title}
-                </Th>
+        <>
+          <Table className="BootableVolumeList-table" variant={TableVariant.compact}>
+            <Thead>
+              <Tr>
+                {activeColumns.map((col, columnIndex) => (
+                  <Th
+                    sort={
+                      columnIndex === 0
+                        ? { ...getSortType(columnIndex), isFavorites: true }
+                        : getSortType(columnIndex)
+                    }
+                    id={col?.id}
+                    key={col?.id}
+                  >
+                    {col?.title}
+                  </Th>
+                ))}
+              </Tr>
+            </Thead>
+            <Tbody>
+              {sortedData.map((bs) => (
+                <BootableVolumeRow
+                  rowData={{
+                    bootableVolumeSelectedState: !displayShowAllButton
+                      ? selectedBootableVolumeState
+                      : [selectedBootableVolume, onSelectCreatedVolume],
+                    favorites: [
+                      volumeFavorites?.includes(bs?.metadata?.name),
+                      (addTofavorites: boolean) =>
+                        updateFavorites(
+                          addTofavorites
+                            ? [...volumeFavorites, bs?.metadata?.name]
+                            : volumeFavorites.filter((fav: string) => fav !== bs?.metadata?.name),
+                        ),
+                    ],
+                    preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
+                    pvcSource: getBootableVolumePVCSource(bs, pvcSources),
+                    volumeSnapshotSource: volumeSnapshotSources?.[bs?.metadata?.name],
+                  }}
+                  activeColumnIDs={activeColumns?.map((col) => col?.id)}
+                  bootableVolume={bs}
+                  key={getName(bs)}
+                />
               ))}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {sortedData.map((bs) => (
-              <BootableVolumeRow
-                rowData={{
-                  bootableVolumeSelectedState: !displayShowAllButton
-                    ? selectedBootableVolumeState
-                    : [selectedBootableVolume, onSelectCreatedVolume],
-                  favorites: [
-                    volumeFavorites?.includes(bs?.metadata?.name),
-                    (addTofavorites: boolean) =>
-                      updateFavorites(
-                        addTofavorites
-                          ? [...volumeFavorites, bs?.metadata?.name]
-                          : volumeFavorites.filter((fav: string) => fav !== bs?.metadata?.name),
-                      ),
-                  ],
-                  preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
-                  pvcSource: getBootableVolumePVCSource(bs, pvcSources),
-                  volumeSnapshotSource: volumeSnapshotSources?.[bs?.metadata?.name],
-                }}
-                activeColumnIDs={activeColumns?.map((col) => col?.id)}
-                bootableVolume={bs}
-                key={getName(bs)}
-              />
-            ))}
-          </Tbody>
-        </Table>
+            </Tbody>
+          </Table>
+          <BootableVolumesPipelinesHint bootableVolumes={bootableVolumes} />
+        </>
       ) : (
         <BootableVolumeEmptyState />
       )}

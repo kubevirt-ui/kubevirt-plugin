@@ -1,10 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Trans } from 'react-i18next';
 import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-card/utils/utils';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -12,18 +10,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Bullseye,
-  Card,
-  Divider,
-  Grid,
-  GridItem,
-  List,
-  PopoverPosition,
-} from '@patternfly/react-core';
+import { Bullseye, Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBootableVolumeButton';
 import BootableVolumeList from './components/BootableVolumeList/BootableVolumeList';
+import CreateFromInstanceTypeTitle from './components/CreateFromInstanceTypeTitle/CreateFromInstanceTypeTitle';
 import CreateVMFooter from './components/CreateVMFooter/CreateVMFooter';
 import SectionListItem from './components/SectionListItem/SectionListItem';
 import useInstanceTypesAndPreferences from './state/hooks/useInstanceTypesAndPreferences';
@@ -80,24 +71,9 @@ const CreateFromInstanceType: FC = () => {
                   <AddBootableVolumeButton loadError={instanceTypesAndPreferencesData.loadError} />
                 }
                 headerText={
-                  <>
-                    {t('Select volume to boot from')}{' '}
-                    <HelpTextIcon
-                      bodyContent={
-                        <>
-                          <Trans ns="plugin__kubevirt-plugin" t={t}>
-                            The Volume table displays DataSources and PersistentVolumeClaims that
-                            VirtualMachines can boot from.
-                            <div>
-                              Click <b> Add volume</b> to boot from a volume that is not listed.
-                            </div>
-                          </Trans>
-                        </>
-                      }
-                      className="create-vm-instance-type-section__HelpTextIcon"
-                      position={PopoverPosition.right}
-                    />
-                  </>
+                  <CreateFromInstanceTypeTitle
+                    instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+                  />
                 }
                 sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_VOLUME}
                 sectionState={sectionState}
