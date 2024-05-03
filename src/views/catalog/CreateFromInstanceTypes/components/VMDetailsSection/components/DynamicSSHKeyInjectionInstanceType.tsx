@@ -25,6 +25,7 @@ const DynamicSSHKeyInjectionInstanceType = () => {
               type: instanceTypeActionType.setIsDynamicSSHInjection,
             });
           }}
+          hasDynamicSSHLabel={Boolean(hasDynamicSSHLabel)}
           isDisabled={isDisabled}
         />
       }
