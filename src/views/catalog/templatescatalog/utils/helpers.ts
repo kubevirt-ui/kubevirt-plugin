@@ -11,7 +11,7 @@ import {
   getTemplateWorkload,
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
-import { getMemoryCPU } from '@kubevirt-utils/resources/vm';
+import { getCPUSockets, getMemory } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 import { TemplateFilters } from './types';
@@ -70,9 +70,8 @@ export const updateVMCPUMemory = (
       ]);
 
       vmDraft.metadata.namespace = ns || DEFAULT_NAMESPACE;
-      const { cpu, memory } = getMemoryCPU(vm);
-      vmDraft.spec.template.spec.domain.cpu.cores = cpu?.cores;
-      vmDraft.spec.template.spec.domain.memory.guest = memory;
+      vmDraft.spec.template.spec.domain.cpu.sockets = getCPUSockets(vm);
+      vmDraft.spec.template.spec.domain.memory.guest = getMemory(vm);
     });
 
     setUpdatedVM(updatedVM);

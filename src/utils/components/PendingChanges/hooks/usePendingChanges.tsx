@@ -8,7 +8,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
-import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
+import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
 import { EVICTION_STRATEGY_DEFAULT } from '@kubevirt-utils/components/EvictionStrategy/constants';
@@ -59,6 +59,7 @@ import {
   getChangedVolumesHotplug,
   getSortedNICs,
   getTabURL,
+  restartRequired,
 } from '../utils/helpers';
 import { PendingChange } from '../utils/types';
 
@@ -134,10 +135,10 @@ export const usePendingChanges = (
       handleAction: () => {
         navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
-          <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
+          <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
         ));
       },
-      hasPendingChange: !isInstanceTypeVM(vm) && cpuMemoryChanged,
+      hasPendingChange: !isInstanceTypeVM(vm) && cpuMemoryChanged && restartRequired(vm),
       label: t('CPU | Memory'),
       tabLabel: VirtualMachineDetailsTabLabel.Details,
     },

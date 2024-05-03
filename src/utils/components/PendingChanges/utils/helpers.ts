@@ -16,6 +16,7 @@ import {
   getCloudInitVolume,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import { RESTART_REQUIRED } from '@kubevirt-utils/components/PendingChanges/utils/constants';
 import {
   VirtualMachineConfigurationTabInner,
   VirtualMachineDetailsTab,
@@ -24,7 +25,7 @@ import {
 import {
   getAffinity,
   getCPU,
-  getCPUcores,
+  getCPUSockets,
   getDevices,
   getEvictionStrategy,
   getGPUDevices,
@@ -32,6 +33,7 @@ import {
   getInterfaces,
   getMemory,
   getNodeSelector,
+  getStatusConditions,
   getTolerations,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
@@ -60,12 +62,12 @@ export const checkCPUMemoryChanged = (
     return false;
   }
   const vmMemory = getMemory(vm);
-  const vmCPU = getCPUcores(vm);
+  const vmCPUSockets = getCPUSockets(vm);
 
   const vmiMemory = getMemory(vmi) || '';
-  const vmiCPU = getCPUcores(vmi);
+  const vmiCPUSockets = getCPUSockets(vmi);
 
-  return vmMemory !== vmiMemory || vmCPU !== vmiCPU;
+  return vmMemory !== vmiMemory || vmCPUSockets !== vmiCPUSockets;
 };
 
 export const checkBootOrderChanged = (
@@ -490,3 +492,8 @@ export const getPendingChangesByTab = (pendingChanges: PendingChange[]) => {
     pendingChangesScriptsTab,
   };
 };
+
+export const restartRequired = (vm: V1VirtualMachine): boolean =>
+  getStatusConditions(vm).some(
+    (condition) => condition?.type === RESTART_REQUIRED && condition?.status === 'True',
+  );

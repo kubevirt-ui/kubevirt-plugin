@@ -8,7 +8,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
-import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CpuMemoryModal';
+import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
@@ -143,7 +143,6 @@ const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) =>
                     onClose={onClose}
                     onSubmit={updatedVirtualMachine}
                     vm={vm}
-                    vmi={vmi}
                   />
                 ))
               }
