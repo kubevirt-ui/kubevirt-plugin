@@ -17,12 +17,13 @@ import FormPFSelect from '../FormPFSelect/FormPFSelect';
 import { CAPACITY_UNITS, removeByteSuffix } from './utils';
 
 type CapacityInputProps = {
+  isEditingCreatedDisk?: boolean;
   label: string;
   onChange: (quantity: string) => void;
   size: string;
 };
 
-const CapacityInput: FC<CapacityInputProps> = ({ label, onChange, size }) => {
+const CapacityInput: FC<CapacityInputProps> = ({ isEditingCreatedDisk, label, onChange, size }) => {
   const { t } = useKubevirtTranslation();
   const [unitValue = ''] = size?.match(/[a-zA-Z]+/g) || [];
   const [sizeValue = 0] = size?.match(/[0-9]+/g) || [];
@@ -56,6 +57,7 @@ const CapacityInput: FC<CapacityInputProps> = ({ label, onChange, size }) => {
               Number(value) < Number.MAX_SAFE_INTEGER &&
               onChange(`${Number(value) + 1}${removeByteSuffix(unit)}`)
             }
+            isDisabled={isEditingCreatedDisk}
             max={Number.MAX_SAFE_INTEGER}
             min={1}
             minusBtnAriaLabel={t('Decrement')}
@@ -68,7 +70,11 @@ const CapacityInput: FC<CapacityInputProps> = ({ label, onChange, size }) => {
           <FormPFSelect onSelect={onFormatChange} selected={unit}>
             <SelectList>
               {unitOptions.map((formatOption) => (
-                <SelectOption key={formatOption} value={formatOption}>
+                <SelectOption
+                  isDisabled={isEditingCreatedDisk}
+                  key={formatOption}
+                  value={formatOption}
+                >
                   {formatOption}
                 </SelectOption>
               ))}

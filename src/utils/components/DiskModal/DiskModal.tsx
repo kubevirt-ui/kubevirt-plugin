@@ -21,13 +21,19 @@ import DiskSourceSelect from './components/DiskSourceSelect/DiskSourceSelect';
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
 import StorageClassAndPreallocation from './components/StorageClassAndPreallocation/StorageClassAndPreallocation';
 import { getInitialStateDiskForm } from './utils/constants';
-import { addDisk, checkDifferentStorageClassFromBootPVC, editDisk } from './utils/helpers';
+import {
+  addDisk,
+  checkDifferentStorageClassFromBootPVC,
+  editDisk,
+  editVMDisk,
+} from './utils/helpers';
 import { DiskFormState, DiskModalProps } from './utils/types';
 
 const DiskModal: FC<DiskModalProps> = ({
   createOwnerReference = true,
   headerText,
   initialFormData = null,
+  isEditingCreatedDisk = false,
   isOpen,
   isTemplate = false,
   onClose,
@@ -62,21 +68,24 @@ const DiskModal: FC<DiskModalProps> = ({
           onClose();
         }}
         onSubmit={() =>
-          handleSubmit((data) =>
-            !isEmpty(initialFormData)
-              ? editDisk(initialFormData, data, uploadData, {
-                  createOwnerReference,
-                  onSubmit,
-                  onUploadedDataVolume,
-                  vm,
-                })
-              : addDisk(data, uploadData, {
-                  createOwnerReference,
-                  onSubmit,
-                  onUploadedDataVolume,
-                  vm,
-                }),
-          )()
+          handleSubmit((data) => {
+            if (isEditingCreatedDisk) return editVMDisk(vm, initialFormData, data, onSubmit);
+
+            if (!isEmpty(initialFormData))
+              return editDisk(initialFormData, data, uploadData, {
+                createOwnerReference,
+                onSubmit,
+                onUploadedDataVolume,
+                vm,
+              });
+
+            return addDisk(data, uploadData, {
+              createOwnerReference,
+              onSubmit,
+              onUploadedDataVolume,
+              vm,
+            });
+          })()
         }
         closeOnSubmit={isValid}
         headerText={headerText}
@@ -96,8 +105,13 @@ const DiskModal: FC<DiskModalProps> = ({
             isDisabled={isVMRunning}
           />
           <DiskNameInput />
-          <DiskSourceSelect isTemplate={isTemplate} relevantUpload={upload} vm={vm} />
-          <DiskSizeInput />
+          <DiskSourceSelect
+            isEditingCreatedDisk={isEditingCreatedDisk}
+            isTemplate={isTemplate}
+            relevantUpload={upload}
+            vm={vm}
+          />
+          <DiskSizeInput isEditingCreatedDisk={isEditingCreatedDisk} />
           <DiskTypeSelect isVMRunning={isVMRunning} />
           <DiskInterfaceSelect isVMRunning={isVMRunning} />
           <StorageClassAndPreallocation

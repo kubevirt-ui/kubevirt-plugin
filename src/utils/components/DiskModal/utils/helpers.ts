@@ -665,3 +665,37 @@ export const getEditDiskState = (vm: V1VirtualMachine, diskName: string): DiskFo
     diskName,
   };
 };
+
+export const editVMDisk = (
+  vm: V1VirtualMachine,
+  initialDiskFormState: DiskFormState,
+  newDiskFormState: DiskFormState,
+  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>,
+) => {
+  const updatedVM = produceVMDisks(vm, (vmDraft) => {
+    const vmDisks = getDisks(vmDraft);
+
+    const vmVolumes = getVolumes(vmDraft);
+    const diskIndexEdited = vmDisks.findIndex(
+      (disk) => disk.name === initialDiskFormState.diskName,
+    );
+    const volumeEdited = vmVolumes.find((volume) => volume.name === initialDiskFormState.diskName);
+
+    vmDisks.splice(diskIndexEdited, 1, buildDisk(newDiskFormState));
+    volumeEdited.name = newDiskFormState.diskName;
+
+    if (newDiskFormState.isBootSource && !initialDiskFormState.isBootSource) {
+      vmDisks.forEach((disk) => delete disk.bootOrder);
+
+      vmDisks[diskIndexEdited].bootOrder = 1;
+    }
+
+    if (!newDiskFormState.isBootSource && initialDiskFormState.isBootSource) {
+      delete vmDisks[diskIndexEdited].bootOrder;
+    }
+
+    return vmDraft;
+  });
+
+  return onSubmit(updatedVM);
+};
