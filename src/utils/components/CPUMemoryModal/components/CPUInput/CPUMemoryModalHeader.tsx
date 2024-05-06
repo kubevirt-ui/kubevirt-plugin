@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, Popover, Title, TitleSizes } from '@patternfly/react-core';
+import { Button, ButtonVariant, Popover, Title } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 import './CPUMemoryModalHeader.scss';
@@ -15,7 +15,6 @@ const CPUMemoryModalHeader: FC = ({}) => {
         className="cpu-memory-modal-header"
         headingLevel="h4"
         id="cpu-memory-modal-title"
-        size={TitleSizes.md}
         title={t('Edit CPU | Memory')}
       >
         {t('Edit CPU | Memory')}
