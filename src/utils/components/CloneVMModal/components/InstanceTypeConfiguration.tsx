@@ -26,10 +26,10 @@ const InstanceTypeConfiguration: FC<InstanceTypeConfigurationProps> = ({ itMatch
         {instanceTypeLoaded ? (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(getInstanceTypeModelFromMatcher(itMatcher))}
-            linkTo={true}
-            name={instanceType.metadata.name}
             namespace={instanceType.metadata.namespace}
-          />
+          >
+            {instanceType.metadata.name}
+          </ResourceLink>
         ) : (
           <Skeleton className="pf-m-width-sm" />
         )}
