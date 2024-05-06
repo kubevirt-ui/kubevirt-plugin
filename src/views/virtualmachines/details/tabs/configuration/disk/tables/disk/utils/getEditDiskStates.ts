@@ -81,5 +81,5 @@ export const getEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
     volumeMode: null,
   };
 
-  return { initialDiskSourceState: initialStateDiskSource, initialDiskState };
+  return { initialDiskSourceState, initialDiskState };
 };

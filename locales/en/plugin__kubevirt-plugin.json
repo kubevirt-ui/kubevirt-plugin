@@ -213,7 +213,6 @@
   "Canceling ongoing migration": "Canceling ongoing migration",
   "Cancelling upload": "Cancelling upload",
   "Cannot cancel migration for \"{{ status }}\" status": "Cannot cancel migration for \"{{ status }}\" status",
-  "Cannot edit resources that already created": "Cannot edit resources that already created",
   "Cannot update": "Cannot update",
   "Catalog": "Catalog",
   "CatalogSource not found": "CatalogSource not found",
