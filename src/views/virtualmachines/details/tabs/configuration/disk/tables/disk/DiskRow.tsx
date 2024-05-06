@@ -73,7 +73,7 @@ const DiskRow: React.FC<
         className="dropdown-kebab-pf pf-c-table__action"
         id=""
       >
-        <DiskRowActions diskName={obj?.name} pvcResourceExists={isPVCSource} vm={vm} vmi={vmi} />
+        <DiskRowActions diskName={obj?.name} vm={vm} vmi={vmi} />
       </TableData>
     </>
   );
