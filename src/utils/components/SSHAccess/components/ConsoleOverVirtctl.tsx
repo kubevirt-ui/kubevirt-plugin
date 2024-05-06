@@ -1,4 +1,6 @@
 import React, { FC } from 'react';
+import { Trans } from 'react-i18next';
+import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
@@ -23,6 +25,7 @@ type ConsoleOverVirtctlProps = {
 
 const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
+
   return (
     <DescriptionListGroup className="pf-c-description-list__group">
       <DescriptionListTerm className="pf-u-font-size-xs">
@@ -30,11 +33,24 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
         <Popover
           bodyContent={
             <>
-              <div>
-                {t(
-                  'SSH access using the virtctl command is possible only when the API server is reachable.',
-                )}
-              </div>
+              <Trans t={t}>
+                <div>
+                  Open an SSH connection with the VM using the cluster API server. You must be able
+                  to access the API server and have virtctl command line tool installed.
+                </div>
+                <br />
+                <div>
+                  For more details, see{' '}
+                  <Link
+                    to={
+                      'https://docs.openshift.com/container-platform/4.15/virt/getting_started/virt-using-the-cli-tools.html'
+                    }
+                  >
+                    Installing virtctl
+                  </Link>{' '}
+                  in Getting started with OpenShift Virtualization.
+                </div>
+              </Trans>
               <br />
               <Grid>
                 <GridItem span={2}>{t('Example: ')}</GridItem>
