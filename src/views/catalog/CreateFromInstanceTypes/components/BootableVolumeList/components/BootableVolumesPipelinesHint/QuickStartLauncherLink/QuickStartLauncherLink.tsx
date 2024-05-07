@@ -31,9 +31,9 @@ const QuickStartLauncherLink: FC<QuickStartLauncherLinkProps> = ({
   const quickStartLink: GettingStartedLink = quickStartLoaded && {
     id: getName(quickStart),
     onClick: () => {
-      setActiveQuickStart(quickStart.metadata.name, quickStart.spec.tasks.length);
+      setActiveQuickStart(quickStart.metadata.name, quickStart?.spec?.tasks?.length);
     },
-    title: quickStart.spec.displayName,
+    title: quickStart?.spec?.displayName,
   };
 
   const handleClick = quickStartLink.onClick;
