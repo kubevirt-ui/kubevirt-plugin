@@ -52,13 +52,14 @@ const useEnvironments = (
 
   const onEnvironmentAdd = useCallback(() => {
     updateVM((draftVM: V1VirtualMachine) => {
-      if (
-        !draftVM.spec.template?.spec?.domain?.devices?.disks ||
-        !draftVM.spec.template?.spec?.volumes
-      ) {
+      if (!draftVM.spec.template?.spec?.volumes) {
+        ensurePath(draftVM, 'spec.template.spec');
+        draftVM.spec.template.spec.volumes = [];
+      }
+
+      if (!draftVM.spec.template?.spec?.domain?.devices?.disks) {
         ensurePath(draftVM, 'spec.template.spec.domain.devices');
         draftVM.spec.template.spec.domain.devices.disks = [];
-        draftVM.spec.template.spec.volumes = [];
       }
 
       const diskName = `environment-disk-${getRandomChars()}`;
