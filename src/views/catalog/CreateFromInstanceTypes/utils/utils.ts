@@ -127,25 +127,8 @@ export const generateVM = (
       template: {
         spec: {
           domain: {
-            devices: {
-              disks: [
-                {
-                  disk: {
-                    bus: 'virtio',
-                  },
-                  name: ROOTDISK,
-                },
-                {
-                  disk: {
-                    bus: 'virtio',
-                  },
-                  name: 'cloudinitdisk',
-                },
-              ],
-              interfaces: [{ masquerade: {}, name: 'default' }],
-            },
+            devices: {},
           },
-          networks: [{ name: 'default', pod: {} }],
           volumes: [
             {
               dataVolume: { name: `${virtualmachineName}-volume` },
