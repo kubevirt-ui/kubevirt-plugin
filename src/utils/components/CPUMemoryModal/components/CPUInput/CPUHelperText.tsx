@@ -33,9 +33,9 @@ const CPUHelperText: FC<CPUHelperTextProps> = ({ cpu, sockets }) => {
       <Popover
         bodyContent={
           <Stack className="cpu-helper-text__body-content">
-            <StackItem>{t('{{sockets}} sockets', { sockets: sockets })}</StackItem>
-            <StackItem>{t('{{threads}} threads', { threads: threads })}</StackItem>
-            <StackItem>{t('{{cores}} cores', { cores: cores })}</StackItem>
+            <StackItem>{t('{{sockets}} sockets', { sockets })}</StackItem>
+            <StackItem>{t('{{threads}} threads', { threads })}</StackItem>
+            <StackItem>{t('{{cores}} cores', { cores })}</StackItem>
           </Stack>
         }
         hasAutoWidth
