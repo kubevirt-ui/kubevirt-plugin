@@ -19,19 +19,18 @@ import { isHotplugVolume } from './utils/helpers';
 
 type DiskRowActionsProps = {
   diskName: string;
-  pvcResourceExists: boolean;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, pvcResourceExists, vm, vmi }) => {
+const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const isVMRunning = isRunning(vm);
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
-  const isEditDisabled = isVMRunning || pvcResourceExists;
+  const isEditDisabled = isVMRunning;
 
   const { initialDiskSourceState, initialDiskState } =
     !isEditDisabled && getEditDiskStates(vm, diskName, vmi);
@@ -46,11 +45,8 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, pvcResourceExists, 
     if (isVMRunning) {
       return t('Can edit only when VirtualMachine is stopped');
     }
-    if (pvcResourceExists) {
-      return t('Cannot edit resources that already created');
-    }
     return null;
-  }, [isVMRunning, pvcResourceExists, t]);
+  }, [isVMRunning, t]);
 
   const onSubmit = (updatedVM) =>
     k8sUpdate({
