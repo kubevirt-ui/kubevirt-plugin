@@ -10,15 +10,15 @@ type UseBootableVolumeOSes = (bootableVolumes: BootableVolume[]) => {
 };
 
 const useBootableVolumeOSes: UseBootableVolumeOSes = (bootableVolumes) => {
-  const types: string[] = bootableVolumes.reduce((acc, bv) => {
+  const types: Set<OS_NAME_TYPES> = bootableVolumes.reduce((acc, bv) => {
     const operatingSystem = getBootVolumeOS(bv);
-    acc.push(operatingSystem);
+    acc.add(operatingSystem);
     return acc;
-  }, []);
+  }, new Set<OS_NAME_TYPES>());
 
   return {
-    hasRHEL: types.includes(OS_NAME_TYPES.rhel),
-    hasWindows: types.includes(OS_NAME_TYPES.windows),
+    hasRHEL: types.has(OS_NAME_TYPES.rhel),
+    hasWindows: types.has(OS_NAME_TYPES.windows),
     isEmpty: isEmpty(types),
   };
 };
