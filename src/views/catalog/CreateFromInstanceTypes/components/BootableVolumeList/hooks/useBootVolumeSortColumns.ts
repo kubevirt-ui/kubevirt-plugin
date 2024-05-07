@@ -31,6 +31,7 @@ type UseBootVolumeSortColumns = (
 ) => {
   getSortType: (columnIndex: number) => ThSortType;
   sortedData: BootableVolume[];
+  sortedPaginatedData: BootableVolume[];
 };
 
 const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
@@ -98,13 +99,11 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
     return acc;
   };
 
-  const sortedData = unsortedData
-    .sort(sortVolumes)
-    .reduce(arrangeFavorites, [[], []])
-    .flat()
-    .slice(pagination.startIndex, pagination.endIndex);
+  const sortedData = unsortedData.sort(sortVolumes).reduce(arrangeFavorites, [[], []]).flat();
 
-  return { getSortType, sortedData };
+  const sortedPaginatedData = sortedData.slice(pagination.startIndex, pagination.endIndex);
+
+  return { getSortType, sortedData, sortedPaginatedData };
 };
 
 export default useBootVolumeSortColumns;

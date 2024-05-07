@@ -34,14 +34,17 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
   const onSave = () => {
     onSelectCreatedVolume(selectedBootableVolumeState[0], pvcSource, volumeSnapshotSource);
     onClose();
+
+    return Promise.resolve();
   };
+
   return (
     <TabModal
       headerText={t('Available volumes')}
       isOpen={isOpen}
       modalVariant={ModalVariant.large}
       onClose={onClose}
-      onSubmit={onSave as () => Promise<void>}
+      onSubmit={onSave}
       submitBtnText={t('Select')}
     >
       <BootableVolumeList
