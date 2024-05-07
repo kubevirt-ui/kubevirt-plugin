@@ -12,7 +12,7 @@ import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -28,6 +28,7 @@ import './CustomizeITVMFooter.scss';
 const CustomizeITVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const [activeNamespace] = useActiveNamespace();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { instanceTypeVMState, setStartVM, startVM, vm, vmNamespaceTarget } =
@@ -94,7 +95,7 @@ const CustomizeITVMFooter: FC = () => {
             </SplitItem>
             <SplitItem>
               <Button
-                onClick={() => navigate(`/k8s/ns/${vmNamespaceTarget}/catalog`)}
+                onClick={() => navigate(`/k8s/ns/${activeNamespace}/catalog`)}
                 variant={ButtonVariant.link}
               >
                 {t('Cancel')}

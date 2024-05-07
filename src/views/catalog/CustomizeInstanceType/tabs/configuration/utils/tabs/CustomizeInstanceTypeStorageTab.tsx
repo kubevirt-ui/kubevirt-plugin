@@ -4,7 +4,11 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  updateCustomizeInstanceType,
+  updateVMCustomizeIT,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import { Divider, Grid, GridItem, PageSection, PageSectionVariants } from '@patternfly/react-core';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
 
@@ -47,18 +51,7 @@ const CustomizeInstanceTypeStorageTab = () => {
       </GridItem>
       <GridItem>
         <PageSection variant={PageSectionVariants.light}>
-          <EnvironmentForm
-            updateVM={(updatedVM) =>
-              Promise.resolve(
-                updateCustomizeInstanceType([
-                  {
-                    data: updatedVM,
-                  },
-                ]),
-              )
-            }
-            vm={vm}
-          />
+          <EnvironmentForm updateVM={updateVMCustomizeIT} vm={vm} />
         </PageSection>
       </GridItem>
     </Grid>

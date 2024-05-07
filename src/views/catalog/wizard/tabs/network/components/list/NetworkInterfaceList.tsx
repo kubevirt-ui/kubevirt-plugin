@@ -15,10 +15,11 @@ import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
 import NetworkInterfaceRow from './NetworkInterfaceRow';
 
 type NetworkInterfaceListProps = {
+  onUpdateVM?: (updateVM: V1VirtualMachine) => Promise<void>;
   vm: V1VirtualMachine;
 };
 
-const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ vm }) => {
+const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ onUpdateVM, vm }) => {
   const networks = getNetworks(vm);
   const interfaces = getInterfaces(vm);
   const filters = useNetworkRowFilters();
@@ -36,6 +37,7 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ vm }) => {
         loaded
         loadError={false}
         Row={NetworkInterfaceRow}
+        rowData={{ onUpdateVM }}
         unfilteredData={data}
       />
     </>

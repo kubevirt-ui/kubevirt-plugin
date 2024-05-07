@@ -88,7 +88,7 @@ const DiskList: FC<DiskListProps> = ({ onDiskUpdate, vm, vmi }) => {
         loaded={loaded}
         loadError={loadError}
         Row={DiskRow}
-        rowData={{ provisioningPercentages, vm, vmi }}
+        rowData={{ onSubmit, provisioningPercentages, vm, vmi }}
         unfilteredData={data}
       />
     </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import NetworkInterfaceList from '@catalog/wizard/tabs/network/components/list/NetworkInterfaceList';
-import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -31,13 +31,18 @@ const CustomizeInstanceTypeNetworkTab = () => {
       ]),
     );
 
+  const onUpdateVM = (updatedVM: V1VirtualMachine) => {
+    updateCustomizeInstanceType([{ data: updatedVM }]);
+    return Promise.resolve();
+  };
+
   return (
     <PageSection variant={PageSectionVariants.light}>
       <Title headingLevel="h2">
         <SearchItem id="network">{t('Network interfaces')}</SearchItem>
       </Title>
       <AddNetworkInterfaceButton onAddNetworkInterface={onAddNetworkInterface} vm={vm} />
-      <NetworkInterfaceList vm={vm} />
+      <NetworkInterfaceList onUpdateVM={onUpdateVM} vm={vm} />
     </PageSection>
   );
 };

@@ -1,10 +1,9 @@
 import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { updateVMCustomizeIT, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import {
   Grid,
   GridItem,
@@ -24,15 +23,6 @@ const CustomizeInstanceTypeSSHTab = () => {
     return <Loading />;
   }
 
-  const onUpdateVM = (data: V1VirtualMachine) =>
-    Promise.resolve(
-      updateCustomizeInstanceType([
-        {
-          data,
-        },
-      ]),
-    );
-
   return (
     <PageSection variant={PageSectionVariants.light}>
       <Title headingLevel="h2">
@@ -42,7 +32,11 @@ const CustomizeInstanceTypeSSHTab = () => {
         <GridItem>
           <Stack hasGutter>
             <SSHTabSSHAccess vm={vm} />
-            <SSHTabAuthorizedSSHKey onUpdateVM={onUpdateVM} vm={vm} />
+            <SSHTabAuthorizedSSHKey
+              isCustomizeInstanceType
+              onUpdateVM={updateVMCustomizeIT}
+              vm={vm}
+            />
           </Stack>
         </GridItem>
       </Grid>

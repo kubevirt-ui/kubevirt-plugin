@@ -17,12 +17,13 @@ const DiskRow: FC<
   RowProps<
     DiskRowDataLayout,
     {
+      onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
       provisioningPercentages: NameWithPercentages;
       vm: V1VirtualMachine;
       vmi?: V1VirtualMachineInstance;
     }
   >
-> = ({ activeColumnIDs, obj, rowData: { provisioningPercentages, vm, vmi } }) => {
+> = ({ activeColumnIDs, obj, rowData: { onSubmit, provisioningPercentages, vm, vmi } }) => {
   const { t } = useKubevirtTranslation();
 
   const provisioningPercentage = provisioningPercentages?.[obj?.source];
@@ -93,7 +94,7 @@ const DiskRow: FC<
         className="dropdown-kebab-pf pf-v5-c-table__action"
         id=""
       >
-        <DiskRowActions obj={obj} vm={vm} vmi={vmi} />
+        <DiskRowActions obj={obj} onDiskUpdate={onSubmit} vm={vm} vmi={vmi} />
       </TableData>
     </>
   );

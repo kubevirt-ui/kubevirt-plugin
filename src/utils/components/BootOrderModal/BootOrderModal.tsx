@@ -21,7 +21,7 @@ import './boot-order.scss';
 const BootOrderModal: FC<{
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 }> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {

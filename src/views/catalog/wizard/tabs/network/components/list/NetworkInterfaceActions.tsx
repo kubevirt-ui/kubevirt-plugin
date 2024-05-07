@@ -8,6 +8,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import WizardEditNetworkInterfaceModal from '../modal/WizardEditNetworkInterfaceModal';
@@ -15,16 +16,19 @@ import WizardEditNetworkInterfaceModal from '../modal/WizardEditNetworkInterface
 type NetworkInterfaceActionsProps = {
   nicName: string;
   nicPresentation: NetworkPresentation;
+  onUpdateVM?: (updateVM: V1VirtualMachine) => Promise<void>;
 };
 
 const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   nicName,
   nicPresentation,
+  onUpdateVM,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { updateVM, vm } = useWizardVMContext();
+  const { updateVM, vm: vmContext } = useWizardVMContext();
   const { createModal } = useModal();
-
+  const vm = vmSignal.value || vmContext;
+  const onUpdate = onUpdateVM || updateVM;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const label = t('Delete NIC?');
   const editBtnText = t('Edit');
@@ -36,7 +40,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         isOpen={isOpen}
         nicPresentation={nicPresentation}
         onClose={onClose}
-        updateVM={updateVM}
+        updateVM={onUpdate}
         vm={vm}
       />
     ));
@@ -52,8 +56,8 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       draftVM.spec.template.spec.domain.devices.interfaces =
         draftVM.spec.template.spec.domain.devices.interfaces.filter(({ name }) => name !== nicName);
     });
-    return updateVM(updatedVM);
-  }, [nicName, updateVM, vm]);
+    return onUpdate(updatedVM);
+  }, [nicName, onUpdate, vm]);
 
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
