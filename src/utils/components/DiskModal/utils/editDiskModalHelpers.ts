@@ -5,7 +5,7 @@ import {
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { mapSourceTypeToVolumeType, sourceTypes } from '../DiskFormFields/utils/constants';
+import { mapSourceTypeToVolumeType, OTHER, sourceTypes } from '../DiskFormFields/utils/constants';
 import { DiskFormState, DiskSourceState } from '../state/initialState';
 
 import { requiresDataVolume } from './helpers';
@@ -23,6 +23,12 @@ export const updateVolume = (
   const oldVolumeSourceKey = Object.keys(oldVolume).find((key) => key !== 'name');
   const oldVolumeSource = mapSourceTypeToVolumeType[oldVolumeSourceKey];
   const newVolumeSource = mapSourceTypeToVolumeType[diskState.diskSource];
+
+  if (newVolumeSource === OTHER) {
+    updatedVolume[oldVolumeSourceKey] = oldVolume[oldVolumeSourceKey];
+    return updatedVolume;
+  }
+
   if (oldVolumeSource !== newVolumeSource) {
     delete updatedVolume[oldVolumeSource];
   }
@@ -31,11 +37,19 @@ export const updateVolume = (
     updatedVolume.containerDisk = {
       image: diskSourceState.ephemeralSource,
     };
-  } else if (diskState.diskSource === sourceTypes.PVC) {
+
+    return updatedVolume;
+  }
+
+  if (diskState.diskSource === sourceTypes.PVC) {
     updatedVolume.persistentVolumeClaim = {
       claimName: diskSourceState.pvcSourceName,
     };
-  } else if (diskState.diskSource === sourceTypes.UPLOAD) {
+
+    return updatedVolume;
+  }
+
+  if (diskState.diskSource === sourceTypes.UPLOAD) {
     return {
       name: diskState.diskName,
       persistentVolumeClaim: {
@@ -43,6 +57,7 @@ export const updateVolume = (
       },
     };
   }
+
   return updatedVolume;
 };
 
