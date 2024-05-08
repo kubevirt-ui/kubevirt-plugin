@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-card/utils/utils';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
@@ -52,7 +52,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const { t } = useKubevirtTranslation();
   const { instanceTypeVMState, onSelectCreatedVolume } = useInstanceTypeVMStore();
 
-  const { selectedBootableVolume } = instanceTypeVMState;
+  const { pvcSource, selectedBootableVolume, volumeSnapshotSource } = instanceTypeVMState;
   const { bootableVolumes, loaded, pvcSources, volumeSnapshotSources } = bootableVolumesData;
 
   const preferencesMap = useMemo(
@@ -73,7 +73,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   );
 
   const [volumeFavorites, updateFavorites] = favorites;
-  const { getSortType, sortedData } = useBootVolumeSortColumns(
+  const { getSortType, sortedData, sortedPaginatedData } = useBootVolumeSortColumns(
     data,
     volumeFavorites,
     preferencesMap,
@@ -93,14 +93,15 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
 
   const displayVolumes = !isEmpty(bootableVolumes) && loaded && loadedColumns;
 
-  useEffect(() => {
-    if (displayShowAllButton && !isEmpty(selectedBootableVolume)) {
-      const selectedVolumeIndex = bootableVolumes?.findIndex(
-        (volume) => getName(volume) === getName(selectedBootableVolume),
-      );
-      setPagination(getPaginationFromVolumeIndex(selectedVolumeIndex));
-    }
-  }, [selectedBootableVolume, bootableVolumes, displayShowAllButton]);
+  const onModalBootableVolumeSelect = (modelSelectedVolume) => {
+    const selectedVolumeIndex = sortedData?.findIndex(
+      (volume) => getName(volume) === getName(modelSelectedVolume),
+    );
+
+    setPagination(getPaginationFromVolumeIndex(selectedVolumeIndex));
+
+    onSelectCreatedVolume(modelSelectedVolume, pvcSource, volumeSnapshotSource);
+  };
 
   return (
     <>
@@ -159,6 +160,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               <ShowAllBootableVolumesButton
                 bootableVolumesData={bootableVolumesData}
                 favorites={favorites}
+                onSelect={onModalBootableVolumeSelect}
                 preferencesData={preferencesData}
               />
             )}
@@ -187,7 +189,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               </Tr>
             </Thead>
             <Tbody>
-              {sortedData.map((bs) => (
+              {sortedPaginatedData.map((bs) => (
                 <BootableVolumeRow
                   rowData={{
                     bootableVolumeSelectedState: !displayShowAllButton

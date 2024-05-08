@@ -4,6 +4,7 @@ import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { Button, ButtonVariant, SplitItem } from '@patternfly/react-core';
 
 import BootableVolumeListModal from '../BootableVolumeListModal/BootableVolumeListModal';
@@ -11,6 +12,7 @@ import BootableVolumeListModal from '../BootableVolumeListModal/BootableVolumeLi
 type ShowAllBootableVolumesButtonProps = {
   bootableVolumesData: UseBootableVolumesValues;
   favorites: UserSettingFavorites;
+  onSelect: (selectedBootableVolume: BootableVolume) => void;
   preferencesData: V1beta1VirtualMachineClusterPreference[];
 };
 

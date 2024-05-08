@@ -16,6 +16,7 @@ type BootableVolumeListModalProps = {
   favorites: UserSettingFavorites;
   isOpen: boolean;
   onClose: () => void;
+  onSelect: (selectedBootableVolume: BootableVolume) => void;
   preferencesData: V1beta1VirtualMachineClusterPreference[];
 };
 
@@ -23,25 +24,29 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
   favorites,
   isOpen,
   onClose,
+  onSelect,
   ...restProps
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const { instanceTypeVMState, onSelectCreatedVolume } = useInstanceTypeVMStore();
-  const { pvcSource, selectedBootableVolume, volumeSnapshotSource } = instanceTypeVMState;
+  const { instanceTypeVMState } = useInstanceTypeVMStore();
+  const { selectedBootableVolume } = instanceTypeVMState;
   const selectedBootableVolumeState = useState<BootableVolume>(selectedBootableVolume);
 
   const onSave = () => {
-    onSelectCreatedVolume(selectedBootableVolumeState[0], pvcSource, volumeSnapshotSource);
+    onSelect(selectedBootableVolumeState[0]);
     onClose();
+
+    return Promise.resolve();
   };
+
   return (
     <TabModal
       headerText={t('Available volumes')}
       isOpen={isOpen}
       modalVariant={ModalVariant.large}
       onClose={onClose}
-      onSubmit={onSave as () => Promise<void>}
+      onSubmit={onSave}
       submitBtnText={t('Select')}
     >
       <BootableVolumeList
