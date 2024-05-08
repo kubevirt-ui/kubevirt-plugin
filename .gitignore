@@ -21,3 +21,4 @@ console-extensions.md
 .idea/
 scripts/ca.crt
 scripts/console-client-secret
+*.json-*

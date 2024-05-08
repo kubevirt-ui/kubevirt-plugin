@@ -16,8 +16,10 @@ module.exports = {
       try {
         const files = await fs.promises.readdir(directory);
         for (const file of files) {
-          const filePath = path.join(directory, file);
-          argFunction(filePath, packageDir);
+          if (!file.endsWith("-r")) {
+            const filePath = path.join(directory, file);
+            argFunction(filePath, packageDir);
+          }
         }
       } catch (e) {
         console.error(`Failed to parseFolder ${directory}:`, e);
