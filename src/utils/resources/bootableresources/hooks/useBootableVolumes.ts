@@ -10,7 +10,6 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
@@ -68,35 +67,12 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   );
   const pvcSources = useMemo(() => convertResourceArrayToMap(pvcs, true), [pvcs]);
 
-  // getting all underlying PVCs to get size and SC data from
-  const pvcSourcesFromDS: IoK8sApiCoreV1PersistentVolumeClaim[] = useMemo(() => {
-    return readyOrCloningDataSources?.map((ds) => {
-      const { name, namespace: pvcNamespace } = ds?.spec?.source?.pvc || {};
-      if (!isEmpty(pvcSources?.[pvcNamespace]?.[name])) {
-        return pvcSources?.[pvcNamespace]?.[name];
-      }
-    });
-  }, [pvcSources, readyOrCloningDataSources]);
-
-  // getting PVCs with default preference label which doesn't have DS
-  const labeledPVCs = useMemo(
-    () =>
-      pvcs?.filter((pvc) => {
-        if (!isEmpty(pvc?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL])) {
-          const existingPVC = pvcSourcesFromDS?.find((pvcSource) => isEqualObject(pvcSource, pvc));
-          if (!existingPVC) return pvc;
-        }
-      }),
-    [pvcSourcesFromDS, pvcs],
-  );
-
   const bootableVolumes: BootableVolume[] = useMemo(() => {
     const dataSourceVolumes =
       loaded && !isEmpty(readyOrCloningDataSources) ? [...readyOrCloningDataSources] : [];
-    const pvcVolumes = loaded && !isEmpty(labeledPVCs) ? [...labeledPVCs] : [];
 
-    return [...dataSourceVolumes, ...pvcVolumes];
-  }, [labeledPVCs, loaded, readyOrCloningDataSources]);
+    return dataSourceVolumes;
+  }, [loaded, readyOrCloningDataSources]);
 
   const volumeSnapshotSources = useMemo(
     () =>
