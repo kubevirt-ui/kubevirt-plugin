@@ -5,6 +5,7 @@ import {
   V1Devices,
   V1Disk,
   V1DomainSpec,
+  V1Features,
   V1InstancetypeMatcher,
   V1PreferenceMatcher,
   V1VirtualMachine,
@@ -212,6 +213,9 @@ export const getEvictionStrategy = (vm: V1VirtualMachine): string =>
 
 export const getDevices = (vm: V1VirtualMachine): V1Devices =>
   vm?.spec?.template?.spec?.domain?.devices;
+
+export const getDomainFeatures = (vm: V1VirtualMachine): V1Features =>
+  vm?.spec?.template?.spec?.domain?.features;
 
 export const getBootloader = (vm: V1VirtualMachine): V1Bootloader =>
   vm?.spec?.template?.spec?.domain?.firmware?.bootloader;

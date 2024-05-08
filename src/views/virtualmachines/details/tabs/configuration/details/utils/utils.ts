@@ -10,6 +10,7 @@ import {
   getDataVolumeTemplates,
   getDevices,
   getDisks,
+  getDomainFeatures,
   getHostname,
   getInterfaces,
   getMemory,
@@ -35,6 +36,11 @@ export const updateStartStrategy = (checked: boolean, vm: V1VirtualMachine) => {
 
 export const updateBootLoader = (updatedVM: V1VirtualMachine, vm: V1VirtualMachine) => {
   const bootLoaderBeforeUpdate = getBootloader(vm);
+  const isEfiSecure = getBootloader(updatedVM)?.efi?.secureBoot;
+  const domainFeatures = getDomainFeatures(vm);
+
+  const hasSMMFeatureDefined = domainFeatures?.smm !== undefined;
+
   return k8sPatch({
     data: [
       {
@@ -42,6 +48,15 @@ export const updateBootLoader = (updatedVM: V1VirtualMachine, vm: V1VirtualMachi
         path: `/spec/template/spec/domain/firmware`,
         value: { bootloader: getBootloader(updatedVM) },
       },
+      ...(isEfiSecure
+        ? [
+            {
+              op: hasSMMFeatureDefined ? 'replace' : 'add',
+              path: `/spec/template/spec/domain/features/smm`,
+              value: { enabled: true },
+            },
+          ]
+        : []),
     ],
     model: VirtualMachineModel,
     resource: updatedVM,
