@@ -35,17 +35,17 @@ const KubevirtHealthPopup: FC = () => {
           <StackItem>
             <div className="kv-health-popup__alerts-count">
               <RedExclamationCircleIcon className="kv-health-popup__alerts-count--icon" />
-              <Link to={`${ALERTS_BASE_PATH}${HealthImpactLevel.critical}`}>{`${
-                alerts?.[HealthImpactLevel.critical]?.length
-              } Critical`}</Link>
+              <Link replace to={`${ALERTS_BASE_PATH}${HealthImpactLevel.critical}`}>
+                {`${alerts?.[HealthImpactLevel.critical]?.length} Critical`}
+              </Link>
             </div>
           </StackItem>
           <StackItem>
             <div className="kv-health-popup__alerts-count">
               <YellowExclamationTriangleIcon className="kv-health-popup__alerts-count--icon" />{' '}
-              <Link to={`${ALERTS_BASE_PATH}${HealthImpactLevel.warning}`}>{`${
-                alerts?.[AlertType.warning]?.length
-              } Warning`}</Link>
+              <Link replace to={`${ALERTS_BASE_PATH}${HealthImpactLevel.warning}`}>
+                {`${alerts?.[AlertType.warning]?.length} Warning`}
+              </Link>
             </div>
           </StackItem>
         </Stack>
