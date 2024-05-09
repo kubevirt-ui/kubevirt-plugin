@@ -16,12 +16,12 @@ export type HyperConverged = K8sResourceCommon & {
       deployTektonTaskResources?: boolean;
       disableMDevConfiguration?: boolean;
       enableCommonBootImageImport?: boolean;
-      enableHigherDensityWithSwap: boolean;
       nonRoot?: boolean;
       persistentReservation?: boolean;
       root?: boolean;
       withHostPassthroughCPU?: boolean;
     };
+    higherWorkloadDensity: { memoryOvercommitPercentage: number };
     ksmConfiguration: { nodeLabelSelector?: Record<string, never> };
     liveMigrationConfig: V1MigrationConfiguration;
     resourceRequirements: {
