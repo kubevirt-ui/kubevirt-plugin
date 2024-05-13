@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import ExpandSectionWithSwitch from '@kubevirt-utils/components/ExpandSectionWithSwitch/ExpandSectionWithSwitch';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -13,7 +13,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
-import { addLabelsToHyperConvergedCR } from './utils/utils';
+import { addLabelsToHyperConvergedCR, removeLabelsFromHyperConvergedCR } from './utils/utils';
 import ProjectSelectorModal from './ProjectSelectorModal';
 
 import './AutoComputeCPULimits.scss';
@@ -36,6 +36,14 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
   const { featureEnabled: autoComputeCPUPreviewEnabled } = useFeatures(
     AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED,
   );
+
+  useEffect(() => {
+    if (!hco) return null;
+
+    if (!autoComputeCPUEnabled) {
+      removeLabelsFromHyperConvergedCR(hco).catch((err) => setError(err.message));
+    }
+  }, [autoComputeCPUEnabled, hco]);
 
   const handleSubmit = (idLabels: IDLabel[]) => {
     addLabelsToHyperConvergedCR(hco, idLabels).catch((err) => setError(err.message));
