@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { Link } from 'react-router-dom-v5-compat';
 
 import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
@@ -34,17 +35,17 @@ const KubevirtHealthPopup: FC = () => {
           <StackItem>
             <div className="kv-health-popup__alerts-count">
               <RedExclamationCircleIcon className="kv-health-popup__alerts-count--icon" />
-              <a href={`${ALERTS_BASE_PATH}${HealthImpactLevel.critical}`}>
+              <Link to={`${ALERTS_BASE_PATH}${HealthImpactLevel.critical}`}>
                 {`${alerts?.[HealthImpactLevel.critical]?.length} Critical`}
-              </a>
+              </Link>
             </div>
           </StackItem>
           <StackItem>
             <div className="kv-health-popup__alerts-count">
               <YellowExclamationTriangleIcon className="kv-health-popup__alerts-count--icon" />{' '}
-              <a href={`${ALERTS_BASE_PATH}${HealthImpactLevel.warning}`}>
+              <Link to={`${ALERTS_BASE_PATH}${HealthImpactLevel.warning}`}>
                 {`${alerts?.[AlertType.warning]?.length} Warning`}
-              </a>
+              </Link>
             </div>
           </StackItem>
         </Stack>
