@@ -78,7 +78,7 @@ const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, m
       <Form>
         <FormGroup fieldId="migration-policy-name" isRequired label={t('MigrationPolicy name')}>
           <TextInput
-            onChange={setStateField('migrationPolicyName')}
+            onChange={(_, value) => setStateField('migrationPolicyName')(value)}
             value={state?.migrationPolicyName}
           />
           <FormGroupHelperText>{t('Unique name of the MigrationPolicy')}</FormGroupHelperText>
