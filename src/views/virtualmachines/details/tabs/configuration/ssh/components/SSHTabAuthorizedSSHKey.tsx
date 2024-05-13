@@ -20,10 +20,15 @@ import { useDynamicSSHInjection } from '../hooks/useDynamicSSHInjection';
 import DynamicSSHKeyInjectionDescription from './DynamicSSHKeyInjectionDescription';
 
 type SSHTabAuthorizedSSHKeyProps = {
+  isCustomizeInstanceType?: boolean;
   onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
 };
-const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({ onUpdateVM, vm }) => {
+const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
+  isCustomizeInstanceType,
+  onUpdateVM,
+  vm,
+}) => {
   const [isExpanded, setIsExpanded] = useState<boolean>();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -32,6 +37,8 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({ onUpdateVM, v
   const [canUpdateVM] = useAccessReview(accessReview || {});
   const secretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
   const isDynamicSSHInjectionEnabled = useDynamicSSHInjection(vm);
+  const isEditable =
+    ((canUpdateVM && isDynamicSSHInjectionEnabled) || isCustomizeInstanceType) && loaded;
 
   const onSubmit = (updatedVM: V1VirtualMachine) =>
     onUpdateVM
@@ -60,7 +67,7 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({ onUpdateVM, v
                 />
               ))
             }
-            isEditable={canUpdateVM && loaded && isDynamicSSHInjectionEnabled}
+            isEditable={isEditable}
             testId="ssh-tab-edit-authorized"
           >
             {t('Edit')}

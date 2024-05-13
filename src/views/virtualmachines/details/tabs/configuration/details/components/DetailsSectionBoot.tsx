@@ -12,7 +12,10 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
+import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { ExpandableSection, Switch } from '@patternfly/react-core';
+import { printableVMStatus } from '@virtualmachines/utils';
 
 import { getSearchItemsIds } from '../../search/utils/utils';
 import { expandURLHash, getDetailsTabBootIds } from '../../utils/search';
@@ -21,6 +24,7 @@ import { updateBootLoader, updatedBootOrder, updateStartStrategy } from '../util
 type DetailsSectionBootProps = {
   canUpdateVM: boolean;
   instanceTypeVM?: V1VirtualMachine;
+  isCustomizeInstanceType?: boolean;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
@@ -28,6 +32,7 @@ type DetailsSectionBootProps = {
 const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
   canUpdateVM,
   instanceTypeVM,
+  isCustomizeInstanceType,
   vm,
   vmi,
 }) => {
@@ -58,9 +63,17 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
         onEditClick={() =>
           createModal(({ isOpen, onClose }) => (
             <FirmwareBootloaderModal
+              onSubmit={(updatedVM) =>
+                isCustomizeInstanceType
+                  ? Promise.resolve(
+                      updateCustomizeInstanceType([
+                        { data: updatedVM, path: 'spec.template.spec.domain.firmware' },
+                      ]),
+                    )
+                  : updateBootLoader(updatedVM, vm)
+              }
               isOpen={isOpen}
               onClose={onClose}
-              onSubmit={(updatedVM) => updateBootLoader(updatedVM, vm)}
               vm={instanceTypeVM || vm}
               vmi={vmi}
             />
@@ -74,7 +87,27 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
       <VirtualMachineDescriptionItem
         onEditClick={() =>
           createModal((props) => (
-            <BootOrderModal {...props} onSubmit={updatedBootOrder} vm={vm} vmi={vmi} />
+            <BootOrderModal
+              {...props}
+              onSubmit={(updatedVM: V1VirtualMachine) =>
+                isCustomizeInstanceType
+                  ? Promise.resolve(
+                      updateCustomizeInstanceType([
+                        {
+                          data: getDisks(updatedVM),
+                          path: `spec.template.spec.domain.devices.disks`,
+                        },
+                        {
+                          data: getInterfaces(updatedVM),
+                          path: `.spec.template.spec.domain.devices.interfaces`,
+                        },
+                      ]),
+                    )
+                  : updatedBootOrder(updatedVM)
+              }
+              vm={vm}
+              vmi={vmi}
+            />
           ))
         }
         className="DetailsSection-margin__bottom"
@@ -91,7 +124,16 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
           <Switch
             onChange={(_event, checked) => {
               setIsChecked(checked);
-              updateStartStrategy(checked, vm);
+              isCustomizeInstanceType
+                ? Promise.resolve(
+                    updateCustomizeInstanceType([
+                      {
+                        data: checked ? printableVMStatus.Paused : null,
+                        path: `spec.template.spec.startStrategy`,
+                      },
+                    ]),
+                  )
+                : updateStartStrategy(checked, vm);
             }}
             id="start-in-pause-mode"
             isChecked={isChecked}

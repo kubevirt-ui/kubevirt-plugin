@@ -20,11 +20,12 @@ import { isHotplugVolume, isPVCSource, isPVCStatusBound } from './utils/helpers'
 
 type DiskRowActionsProps = {
   obj: DiskRowDataLayout;
+  onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, vm, vmi }) => {
+const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, onDiskUpdate, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -60,7 +61,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, vm, vmi }) => {
         isEditingCreatedDisk={pvcResourceExists}
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={updateDisks}
+        onSubmit={onDiskUpdate || updateDisks}
         vm={vm}
       />
     ));

@@ -37,12 +37,14 @@ export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
   updateValues,
 ): V1VirtualMachine => {
   let vm = vmSignal.value;
+
   updateValues.forEach(({ data, merge = false, path }) => {
     //replace complete vm obj
     if (isEmpty(path)) {
       vm = data;
       return;
     }
+
     vm = produce(vm, (vmDraft) => {
       const pathParts = path.split('.');
       let obj = vmDraft;
@@ -52,11 +54,16 @@ export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
           obj = obj?.[part] ? obj[part] : Object.assign(obj, { [part]: {} })[part];
           return;
         }
+
         obj[part] = merge ? { ...obj[part], ...data } : data;
       });
     });
   });
 
   vmSignal.value = vm;
+
   return vmSignal.value;
 };
+
+export const updateVMCustomizeIT = (vm: V1VirtualMachine) =>
+  Promise.resolve(updateCustomizeInstanceType([{ data: vm }]));

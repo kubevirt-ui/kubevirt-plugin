@@ -33,7 +33,7 @@ const CustomizeInstanceTypeMetadataTab = () => {
       updateCustomizeInstanceType([
         {
           data,
-          path: `spec.template.metadata.${type}`,
+          path: `metadata.${type}`,
         },
       ]),
     );
@@ -61,7 +61,7 @@ const CustomizeInstanceTypeMetadataTab = () => {
             }
             breadcrumb="VirtualMachine.metadata.labels"
             data-test-id={`${getName(vm)}-labels`}
-            descriptionData={<MetadataTabLabels labels={vm?.spec?.template?.metadata?.labels} />}
+            descriptionData={<MetadataTabLabels labels={vm?.metadata?.labels} />}
             descriptionHeader={<SearchItem id="labels">{t('Labels')}</SearchItem>}
             editOnTitleJustify
             isEdit
@@ -73,9 +73,6 @@ const CustomizeInstanceTypeMetadataTab = () => {
             bodyContent={t(
               'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. ',
             )}
-            descriptionData={
-              <MetadataTabAnnotations annotations={vm?.spec?.template?.metadata?.annotations} />
-            }
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <AnnotationsModal
@@ -87,6 +84,7 @@ const CustomizeInstanceTypeMetadataTab = () => {
               ))
             }
             breadcrumb="VirtualMachine.metadata.annotations"
+            descriptionData={<MetadataTabAnnotations annotations={vm?.metadata?.annotations} />}
             descriptionHeader={<SearchItem id="metadata">{t('Annotations')}</SearchItem>}
             isEdit
             isPopover

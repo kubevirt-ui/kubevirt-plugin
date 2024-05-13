@@ -176,7 +176,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
               }
               vm={vm}
             />
-            <DetailsSectionBoot canUpdateVM={canUpdateVM} vm={vm} />
+            <DetailsSectionBoot canUpdateVM={canUpdateVM} isCustomizeInstanceType vm={vm} />
           </DescriptionList>
         </GridItem>
       </Grid>
