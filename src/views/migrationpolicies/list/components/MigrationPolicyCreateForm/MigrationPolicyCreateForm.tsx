@@ -37,13 +37,16 @@ const MigrationPolicyCreateForm: FC = () => {
         </FormGroup>
         <FormGroup fieldId="migration-policy-name" isRequired label={t('MigrationPolicy name')}>
           <TextInput
-            onChange={setStateField('migrationPolicyName')}
+            onChange={(_, value) => setStateField('migrationPolicyName')(value)}
             value={state?.migrationPolicyName}
           />
           <FormGroupHelperText>{t('Unique name of the MigrationPolicy')}</FormGroupHelperText>
         </FormGroup>
         <FormGroup fieldId="migration-policy-description" label={t('Description')}>
-          <TextInput onChange={setStateField('description')} value={state?.description} />
+          <TextInput
+            onChange={(_, value) => setStateField('description')(value)}
+            value={state?.description}
+          />
         </FormGroup>
         <h2>{t('Configurations')}</h2>
         <MigrationPolicyConfigurations
