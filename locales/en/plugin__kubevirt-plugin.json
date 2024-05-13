@@ -607,7 +607,7 @@
   "InstanceTypes": "InstanceTypes",
   "Interested in other <1>Bootable Volumes</1>? Click <4></4> to get started.": "Interested in other <1>Bootable Volumes</1>? Click <4></4> to get started.",
   "Interested in using a <1>RHEL Bootable Volume</1>? Click <4></4> to get started.": "Interested in using a <1>RHEL Bootable Volume</1>? Click <4></4> to get started.",
-  "Interested in using a <1>Windows Bootable Volume</1>? Click <4></4> to get started.To learn more, follow the <7></7> quick start.": "Interested in using a <1>Windows Bootable Volume</1>? Click <4></4> to get started.To learn more, follow the <7></7> quick start.",
+  "Interested in using a <1>Windows Bootable Volume</1>? Click <4></4> to get started. To learn more, follow the <7></7> quick start.": "Interested in using a <1>Windows Bootable Volume</1>? Click <4></4> to get started. To learn more, follow the <7></7> quick start.",
   "Interface": "Interface",
   "Interface Type": "Interface Type",
   "Internal FQDN": "Internal FQDN",

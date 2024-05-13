@@ -47,7 +47,7 @@ const BootableVolumesPipelinesHint: FC<BootableVolumesPipelinesHintProps> = ({
         <img alt="os-icon" className="bootable-volumes-pipelines-hint__icon" src={windowsIcon} />
         <Trans ns="plugin__kubevirt-plugin" t={t}>
           Interested in using a <b>Windows Bootable Volume</b>? Click{' '}
-          <AddBootableVolumeLink loadError={loadError} /> to get started.To learn more, follow the{' '}
+          <AddBootableVolumeLink loadError={loadError} /> to get started. To learn more, follow the{' '}
           <QuickStartLauncherLink
             quickStart={windowsQS}
             quickStartLoaded={windowsQSLoaded}
