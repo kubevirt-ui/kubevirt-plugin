@@ -78,6 +78,7 @@ const useCreateDrawerForm = (
   const [models, modelsLoading] = useK8sModels();
 
   const [processedTemplateAccessReview] = useAccessReview({
+    group: ProcessedTemplatesModel.apiGroup,
     namespace,
     resource: ProcessedTemplatesModel.plural,
     verb: 'create',
