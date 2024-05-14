@@ -65,8 +65,15 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
             'Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.',
           )}
           id={SERVICE_TYPES.NODE_PORT}
-          isDisabled={!nodePortEnabled}
+          isAriaDisabled={!nodePortEnabled}
           value={SERVICE_TYPES.NODE_PORT}
+          {...(!nodePortEnabled && {
+            tooltipProps: {
+              content: t(
+                'NodePort service is disabled. Ask your cluster admin to enable it in cluster settings.',
+              ),
+            },
+          })}
         >
           {serviceTypeTitles.NodePort}
         </SelectOption>
