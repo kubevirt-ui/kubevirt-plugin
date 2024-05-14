@@ -21,3 +21,16 @@ export const addLabelsToHyperConvergedCR = (hcoCR: HyperConverged, idLabels: IDL
     resource: hcoCR,
   });
 };
+
+export const removeLabelsFromHyperConvergedCR = (hcoCR: HyperConverged) => {
+  return k8sPatch<HyperConverged>({
+    data: [
+      {
+        op: 'remove',
+        path: '/spec/resourceRequirements/autoCPULimitNamespaceLabelSelector',
+      },
+    ],
+    model: HyperConvergedModel,
+    resource: hcoCR,
+  });
+};
