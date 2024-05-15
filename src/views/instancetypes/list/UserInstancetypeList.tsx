@@ -35,6 +35,7 @@ const UserInstancetypeList: FC<ListPageProps> = ({
   const [instanceTypes, loaded, loadError] = useVirtualMachineInstanceTypes(
     fieldSelector,
     selector,
+    true,
   );
 
   const { onPaginationChange, pagination } = usePagination();

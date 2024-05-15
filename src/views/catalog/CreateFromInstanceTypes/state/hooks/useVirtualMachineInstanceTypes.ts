@@ -10,22 +10,25 @@ import {
 type UseVirtualMachineInstanceTypes = (
   fieldSelector?: string,
   selector?: Selector,
+  fetchAllProjects?: boolean,
 ) => [instanceTypes: V1beta1VirtualMachineInstancetype[], loaded: boolean, loadError: Error];
 
 const useVirtualMachineInstanceTypes: UseVirtualMachineInstanceTypes = (
   fieldSelector,
   selector,
+  fetchAllProjects,
 ) => {
   const [activeNamespace] = useActiveNamespace();
+  const isAllNamespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY;
   const [instanceTypes, loaded, loadError] = useK8sWatchResource<
     V1beta1VirtualMachineInstancetype[]
   >(
-    activeNamespace !== ALL_NAMESPACES_SESSION_KEY && {
+    (fetchAllProjects || !isAllNamespace) && {
+      fieldSelector,
       groupVersionKind: VirtualMachineInstancetypeModelGroupVersionKind,
       isList: true,
-      ...(activeNamespace !== ALL_NAMESPACES_SESSION_KEY && { namespace: activeNamespace }),
-      fieldSelector,
       selector,
+      ...(!isAllNamespace && { namespace: activeNamespace }),
     },
   );
 
