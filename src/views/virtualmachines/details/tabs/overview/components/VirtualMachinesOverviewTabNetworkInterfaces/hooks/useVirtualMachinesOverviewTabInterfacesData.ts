@@ -1,5 +1,5 @@
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/network/utils';
 
 import { InterfacesData } from '../utils/types';
 
@@ -12,8 +12,7 @@ const useVirtualMachinesOverviewTabInterfacesData: UseVirtualMachinesOverviewTab
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
 ) => {
-  const networks = getNetworks(vm);
-  const interfaces = getInterfaces(vm);
+  const { interfaces, networks } = getInterfacesAndNetworks(vm, vmi);
   const interfacesIPs = vmi?.status?.interfaces?.filter((iface) => !!iface.name) || [];
 
   const networkInterfacesData = interfaces?.map((iface) => {
