@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FlexItem } from '@patternfly/react-core';
+import { FlexItem, Tooltip } from '@patternfly/react-core';
 import { CheckCircleIcon, WarningTriangleIcon } from '@patternfly/react-icons';
 
 import { SERVICE_TYPES } from '../constants';
@@ -23,9 +23,11 @@ const SSHServiceStateIcon: FC<SSHServiceStateIconProps> = ({ sshService, sshServ
   return (
     <FlexItem>
       {!isLoadBalancerBonded(sshService) ? (
-        <div>
-          <WarningTriangleIcon color="var(--pf-global--warning-color--100)" /> {t('Pending')}{' '}
-        </div>
+        <Tooltip content={t('This process can take 1-2 minutes to complete.')}>
+          <div>
+            <WarningTriangleIcon color="var(--pf-global--warning-color--100)" /> {t('In progress')}{' '}
+          </div>
+        </Tooltip>
       ) : (
         <div>
           <CheckCircleIcon color="var(--pf-global--success-color--100)" /> {t('Ready')}{' '}
