@@ -842,6 +842,7 @@
   "Node labels": "Node labels",
   "Node port": "Node port",
   "Node selector": "Node selector",
+  "NodePort service is disabled. Ask your cluster admin to enable it in cluster settings.": "NodePort service is disabled. Ask your cluster admin to enable it in cluster settings.",
   "Nodes": "Nodes",
   "None": "None",
   "Not available": "Not available",
