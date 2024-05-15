@@ -7,6 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { VirtualMachineClusterPreferenceModelRef } from '@kubevirt-utils/models';
+import { ListPageProps } from '@kubevirt-utils/utils/types';
 import {
   ListPageBody,
   useListPageFilter,
@@ -19,12 +20,21 @@ import useClusterPreferenceListColumns from './hooks/useClusterPreferenceListCol
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const ClusterPreferenceList: FC = () => {
+const ClusterPreferenceList: FC<ListPageProps> = ({
+  fieldSelector,
+  hideColumnManagement,
+  hideNameLabelFilters,
+  hideTextFilter,
+  nameFilter,
+  selector,
+}) => {
   const { t } = useKubevirtTranslation();
-  const [preferences, loaded, loadError] = useClusterPreferences();
+  const [preferences, loaded, loadError] = useClusterPreferences(fieldSelector, selector);
 
   const { onPaginationChange, pagination } = usePagination();
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(preferences);
+  const [unfilteredData, data, onFilterChange] = useListPageFilter(preferences, null, {
+    name: { selected: [nameFilter] },
+  });
   const [columns, activeColumns, loadedColumns] = useClusterPreferenceListColumns(pagination, data);
 
   return (
@@ -51,6 +61,9 @@ const ClusterPreferenceList: FC = () => {
             });
           }}
           data={unfilteredData}
+          hideColumnManagement={hideColumnManagement}
+          hideLabelFilter={hideTextFilter}
+          hideNameLabelFilters={hideNameLabelFilters}
           loaded={loaded && loadedColumns}
         />
         <Pagination

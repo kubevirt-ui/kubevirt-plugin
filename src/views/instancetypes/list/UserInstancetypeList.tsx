@@ -7,10 +7,10 @@ import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFi
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
-  useActiveNamespace,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -22,19 +22,34 @@ import useUserInstancetypeListColumns from './hooks/useUserInstancetypeListColum
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const UserInstancetypeList: FC = () => {
+const UserInstancetypeList: FC<ListPageProps> = ({
+  fieldSelector,
+  hideColumnManagement,
+  hideNameLabelFilters,
+  hideTextFilter,
+  nameFilter,
+  namespace,
+  selector,
+}) => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace] = useActiveNamespace();
-  const [instanceTypes, loaded, loadError] = useVirtualMachineInstanceTypes();
+  const [instanceTypes, loaded, loadError] = useVirtualMachineInstanceTypes(
+    fieldSelector,
+    selector,
+  );
+
   const { onPaginationChange, pagination } = usePagination();
+
   const [unfilteredData, data, onFilterChange] = useListPageFilter<
     V1beta1VirtualMachineInstancetype,
     V1beta1VirtualMachineInstancetype
-  >(instanceTypes);
+  >(instanceTypes, null, {
+    name: { selected: [nameFilter] },
+  });
+
   const [columns, activeColumns, loadedColumns] = useUserInstancetypeListColumns(pagination, data);
 
   if (loaded && isEmpty(unfilteredData)) {
-    return <UserInstancetypeEmptyState namespace={activeNamespace} />;
+    return <UserInstancetypeEmptyState namespace={namespace} />;
   }
 
   return (
@@ -61,6 +76,9 @@ const UserInstancetypeList: FC = () => {
             });
           }}
           data={unfilteredData}
+          hideColumnManagement={hideColumnManagement}
+          hideLabelFilter={hideTextFilter}
+          hideNameLabelFilters={hideNameLabelFilters}
           loaded={loaded && loadedColumns}
         />
         {!isEmpty(data) && (

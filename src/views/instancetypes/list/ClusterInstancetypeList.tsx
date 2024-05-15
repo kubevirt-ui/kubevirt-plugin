@@ -7,6 +7,7 @@ import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFi
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { ListPageProps } from '@kubevirt-utils/utils/types';
 import {
   ListPageBody,
   useListPageFilter,
@@ -19,12 +20,21 @@ import useClusterInstancetypeListColumns from './hooks/useClusterInstancetypeLis
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const ClusterInstancetypeList: FC = () => {
+const ClusterInstancetypeList: FC<ListPageProps> = ({
+  fieldSelector,
+  hideColumnManagement,
+  hideNameLabelFilters,
+  hideTextFilter,
+  nameFilter,
+  selector,
+}) => {
   const { t } = useKubevirtTranslation();
-  const [instanceTypes, loaded, loadError] = useClusterInstanceTypes();
+  const [instanceTypes, loaded, loadError] = useClusterInstanceTypes(fieldSelector, selector);
 
   const { onPaginationChange, pagination } = usePagination();
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(instanceTypes);
+  const [unfilteredData, data, onFilterChange] = useListPageFilter(instanceTypes, null, {
+    name: { selected: [nameFilter] },
+  });
   const [columns, activeColumns, loadedColumns] = useClusterInstancetypeListColumns(
     pagination,
     data,
@@ -54,6 +64,9 @@ const ClusterInstancetypeList: FC = () => {
             });
           }}
           data={unfilteredData}
+          hideColumnManagement={hideColumnManagement}
+          hideLabelFilter={hideTextFilter}
+          hideNameLabelFilters={hideNameLabelFilters}
           loaded={loaded && loadedColumns}
         />
         <Pagination
