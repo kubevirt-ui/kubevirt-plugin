@@ -40,6 +40,7 @@ import { useVMListFilters } from '../utils';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
+import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
@@ -108,6 +109,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     V1VirtualMachine
   >(vms, [...filters, ...searchFilters]);
 
+  const selectedFilters = useSelectedFilters(filters, searchFilters);
+
   const [unfilteredData, data] = useMemo(() => {
     if (!featureEnabled || isProxyPodAlive === false) return [unfilterData, dataFilters];
 
@@ -145,7 +148,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     !loadingFeatureProxy &&
     loadedColumns;
 
-  if (loaded && isEmpty(unfilteredData)) {
+  const vmsFilteredWithProxy = isProxyPodAlive && selectedFilters.length > 0;
+
+  const noVMs = isEmpty(unfilteredData) && !vmsFilteredWithProxy;
+
+  if (loaded && noVMs) {
     return <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />;
   }
 
