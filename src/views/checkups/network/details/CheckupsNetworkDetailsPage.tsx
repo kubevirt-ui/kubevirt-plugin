@@ -59,7 +59,11 @@ const CheckupsNetworkDetailsPage = () => {
             <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loading={loading} />
           </PageSection>
         </Tab>
-        <Tab eventKey={1} title={<TabTitleText>{t('YAML')}</TabTitleText>}>
+        <Tab
+          className="CheckupsNetworkDetailsPage--yaml"
+          eventKey={1}
+          title={<TabTitleText>{t('YAML')}</TabTitleText>}
+        >
           <ResourceYAMLEditor initialResource={configMap} />
         </Tab>
       </Tabs>
