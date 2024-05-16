@@ -18,7 +18,7 @@ const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
   const [guestAgentData, loaded] = useGuestOS(vmi);
 
   const { totalBytes = 0, usedBytes = 0 } =
-    removeDuplicatesByName(guestAgentData?.fsInfo?.disks)?.reduce(
+    removeDuplicatesByName(guestAgentData?.fsInfo?.disks, 'diskName')?.reduce(
       (acc, data) => {
         acc.totalBytes += data?.totalBytes;
         acc.usedBytes += data?.usedBytes;
