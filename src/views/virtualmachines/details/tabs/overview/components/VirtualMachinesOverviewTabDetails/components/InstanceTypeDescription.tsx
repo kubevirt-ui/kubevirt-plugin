@@ -29,6 +29,7 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
         descriptionData={
           itMatcher ? (
             <ResourceLink
+              displayName={itMatcher.name}
               groupVersionKind={ControllerRevisionModelGroupVersionKind}
               name={itMatcher.revisionName}
               namespace={getNamespace(vm)}
@@ -48,6 +49,7 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
         descriptionData={
           preferenceMatcher ? (
             <ResourceLink
+              displayName={preferenceMatcher.name}
               groupVersionKind={ControllerRevisionModelGroupVersionKind}
               name={preferenceMatcher.revisionName}
               namespace={getNamespace(vm)}
