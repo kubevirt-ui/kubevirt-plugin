@@ -20,7 +20,7 @@ const VMDetailsSection: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreference
           <DetailsLeftGrid instanceTypesAndPreferencesData={instanceTypesAndPreferencesData} />
         </GridItem>
         <GridItem span={1}>{/* Spacer */}</GridItem>
-        <GridItem span={5}>
+        <GridItem span={6}>
           <DetailsRightGrid />
         </GridItem>
       </Grid>
