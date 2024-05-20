@@ -4,10 +4,13 @@ import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sBasePath } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/k8s';
 
 import { ItemsToFilterProps } from './types';
 
 export const kubevirtConsole = console;
+
+export const clusterBasePath = k8sBasePath.slice(0, k8sBasePath.lastIndexOf('api/kubernetes'));
 
 export const getValidNamespace = (activeNamespace: string) =>
   activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace;
