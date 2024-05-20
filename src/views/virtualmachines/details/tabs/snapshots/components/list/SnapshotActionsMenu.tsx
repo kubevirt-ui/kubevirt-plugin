@@ -30,6 +30,8 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [canClone] = useAccessReview({
+    group: VirtualMachineCloneModel.apiGroup,
+    namespace: snapshot.metadata.namespace,
     resource: VirtualMachineCloneModel.plural,
     verb: 'create',
   });
