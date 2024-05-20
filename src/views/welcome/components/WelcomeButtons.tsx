@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, StackItem } from '@patternfly/react-core';
 
 import { WelcomeModalButtonsData } from '../utils/types';
@@ -12,11 +13,11 @@ type WelcomeButtonsProps = {
 
 const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
   const history = useHistory();
-  const { ns } = useParams<{ ns: string }>();
+  const [activeNamespace] = useActiveNamespace();
 
   return (
     <>
-      {welcomeModalButtons(ns).map((modalButton: WelcomeModalButtonsData) => (
+      {welcomeModalButtons(activeNamespace).map((modalButton: WelcomeModalButtonsData) => (
         <StackItem key={modalButton.name}>
           <Button
             onClick={() => {
