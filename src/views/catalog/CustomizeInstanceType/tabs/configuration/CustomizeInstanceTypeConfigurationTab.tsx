@@ -1,8 +1,9 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
-import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import VirtualMachineConfigurationTabSearch from '@virtualmachines/details/tabs/configuration/search/VirtualMachineConfigurationTabSearch';
 import {
@@ -15,12 +16,13 @@ import { tabs } from './utils/constants';
 import './CustomizeInstanceTypeConfigurationTab.scss';
 
 const CustomizeInstanceTypeConfigurationTab: FC = () => {
-  const { vm } = useInstanceTypeVMStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,
   );
+
+  const vm = vmSignal.value;
 
   const redirectTab = useCallback(
     (name: string) => {
@@ -38,6 +40,10 @@ const CustomizeInstanceTypeConfigurationTab: FC = () => {
     const innerTab = getInnerTabFromPath(location.pathname);
     innerTab && setActiveTabKey(innerTab);
   }, [location.pathname]);
+
+  if (!vm) {
+    return <Loading />;
+  }
 
   return (
     <div className="co-dashboard-body ConfigurationTab">
