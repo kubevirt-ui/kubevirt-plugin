@@ -154,6 +154,7 @@
   "Are you sure you want to leave this page?": "Are you sure you want to leave this page?",
   "Are you sure you want to restore {{vmName}} from snapshot {{snapshotName}}?<6><0>Note: </0>Data from the last snapshot taken will be lost. To prevent losing current data, take another snapshot before restoring from this one.</6>": "Are you sure you want to restore {{vmName}} from snapshot {{snapshotName}}?<6><0>Note: </0>Data from the last snapshot taken will be lost. To prevent losing current data, take another snapshot before restoring from this one.</6>",
   "As new versions of a DataSource become available older versions will be replaced": "As new versions of a DataSource become available older versions will be replaced",
+  "Ask your cluster administrator for access permissions.": "Ask your cluster administrator for access permissions.",
   "Assigns an external IP address to the VirtualMachine. This option requires a LoadBalancer Service backend": "Assigns an external IP address to the VirtualMachine. This option requires a LoadBalancer Service backend",
   "Attach a virtual function network device to the VirtualMachine for high performance": "Attach a virtual function network device to the VirtualMachine for high performance",
   "Attach existing": "Attach existing",
