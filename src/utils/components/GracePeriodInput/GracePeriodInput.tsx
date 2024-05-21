@@ -34,7 +34,11 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
 
   return (
     <StackItem>
-      <Flex alignItems={{ default: 'alignItemsCenter' }} className="grace-period-input">
+      <Flex
+        alignItems={{ default: 'alignItemsCenter' }}
+        className="grace-period-input"
+        spaceItems={{ default: 'spaceItemsXs' }}
+      >
         <FlexItem>
           <Checkbox
             id="grace-period-checkbox"
