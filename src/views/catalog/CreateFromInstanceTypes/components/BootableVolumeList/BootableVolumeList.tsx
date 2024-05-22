@@ -1,5 +1,4 @@
 import React, { FC, useMemo, useState } from 'react';
-import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-card/utils/utils';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
@@ -7,29 +6,23 @@ import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-ap
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
-import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { convertResourceArrayToMap, getLabel, getName } from '@kubevirt-utils/resources/shared';
+import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, Pagination, Split, SplitItem, TextInput } from '@patternfly/react-core';
-import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
+import { FormGroup, Split, SplitItem } from '@patternfly/react-core';
 
-import { DEFAULT_PREFERENCE_LABEL } from '../../utils/constants';
 import BootableVolumeEmptyState from '../BootableVolumeEmptyState/BootableVolumeEmptyState';
 
-import BootableVolumeRow from './components/BootableVolumeRow/BootableVolumeRow';
+import BootableVolumeListNamespaceSelect from './components/BootableVolumeListNamespaceSelect/BootableVolumeListNamespaceSelect';
+import BootableVolumeListPagination from './components/BootableVolumeListPagination/BootableVolumeListPagination';
 import BootableVolumesPipelinesHint from './components/BootableVolumesPipelinesHint/BootableVolumesPipelinesHint';
+import BootableVolumeTable from './components/BootableVolumeTable/BootableVolumeTable';
 import ShowAllBootableVolumesButton from './components/ShowAllBootableVolumesButton/ShowAllBootableVolumesButton';
 import useBootVolumeColumns from './hooks/useBootVolumeColumns';
 import useBootVolumeFilters from './hooks/useBootVolumeFilters';
 import useBootVolumeSortColumns from './hooks/useBootVolumeSortColumns';
-import {
-  paginationDefaultValuesForm,
-  paginationDefaultValuesModal,
-  paginationInitialStateForm,
-  paginationInitialStateModal,
-} from './utils/constants';
+import { paginationInitialStateForm, paginationInitialStateModal } from './utils/constants';
 import { getPaginationFromVolumeIndex } from './utils/utils';
 
 import './BootableVolumeList.scss';
@@ -72,7 +65,8 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal,
   );
 
-  const [volumeFavorites, updateFavorites] = favorites;
+  const [volumeFavorites] = favorites;
+
   const { getSortType, sortedData, sortedPaginatedData } = useBootVolumeSortColumns(
     data,
     volumeFavorites,
@@ -82,25 +76,16 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     pagination,
   );
 
-  const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
-    setPagination(() => ({
-      endIndex,
-      page,
-      perPage,
-      startIndex,
-    }));
-  };
-
   const displayVolumes = !isEmpty(bootableVolumes) && loaded && loadedColumns;
 
-  const onModalBootableVolumeSelect = (modelSelectedVolume) => {
+  const onModalBootableVolumeSelect = (modalSelectedVolume: BootableVolume) => {
     const selectedVolumeIndex = sortedData?.findIndex(
-      (volume) => getName(volume) === getName(modelSelectedVolume),
+      (volume) => getName(volume) === getName(modalSelectedVolume),
     );
 
     setPagination(getPaginationFromVolumeIndex(selectedVolumeIndex));
 
-    onSelectCreatedVolume(modelSelectedVolume, pvcSource, volumeSnapshotSource);
+    onSelectCreatedVolume(modalSelectedVolume, pvcSource, volumeSnapshotSource);
   };
 
   return (
@@ -111,7 +96,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             className="bootable-volume-list-bar__volume-namespace"
             label={t('Volumes project')}
           >
-            <TextInput aria-label="bootable volume list" isDisabled value={getOSImagesNS()} />
+            <BootableVolumeListNamespaceSelect />
           </FormGroup>
         </SplitItem>
 
@@ -139,21 +124,11 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             </SplitItem>
             <SplitItem isFilled />
             <SplitItem className="bootable-volume-list-bar__pagination">
-              <Pagination
-                onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                  onPageChange({ endIndex, page, perPage, startIndex })
-                }
-                onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                  onPageChange({ endIndex, page, perPage, startIndex })
-                }
-                perPageOptions={
-                  displayShowAllButton ? paginationDefaultValuesForm : paginationDefaultValuesModal
-                }
-                isCompact={displayShowAllButton}
-                isLastFullPageShown
-                itemCount={data?.length}
-                page={pagination?.page}
-                perPage={pagination?.perPage}
+              <BootableVolumeListPagination
+                data={data}
+                displayShowAllButton={displayShowAllButton}
+                pagination={pagination}
+                setPagination={setPagination}
               />
             </SplitItem>
             {displayShowAllButton && (
@@ -167,54 +142,21 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           </>
         )}
       </Split>
-
       {displayVolumes ? (
         <>
-          <Table className="BootableVolumeList-table" variant={TableVariant.compact}>
-            <Thead>
-              <Tr>
-                {activeColumns.map((col, columnIndex) => (
-                  <Th
-                    sort={
-                      columnIndex === 0
-                        ? { ...getSortType(columnIndex), isFavorites: true }
-                        : getSortType(columnIndex)
-                    }
-                    id={col?.id}
-                    key={col?.id}
-                  >
-                    {col?.title}
-                  </Th>
-                ))}
-              </Tr>
-            </Thead>
-            <Tbody>
-              {sortedPaginatedData.map((bs) => (
-                <BootableVolumeRow
-                  rowData={{
-                    bootableVolumeSelectedState: !displayShowAllButton
-                      ? selectedBootableVolumeState
-                      : [selectedBootableVolume, onSelectCreatedVolume],
-                    favorites: [
-                      volumeFavorites?.includes(bs?.metadata?.name),
-                      (addTofavorites: boolean) =>
-                        updateFavorites(
-                          addTofavorites
-                            ? [...volumeFavorites, bs?.metadata?.name]
-                            : volumeFavorites.filter((fav: string) => fav !== bs?.metadata?.name),
-                        ),
-                    ],
-                    preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
-                    pvcSource: getBootableVolumePVCSource(bs, pvcSources),
-                    volumeSnapshotSource: volumeSnapshotSources?.[bs?.metadata?.name],
-                  }}
-                  activeColumnIDs={activeColumns?.map((col) => col?.id)}
-                  bootableVolume={bs}
-                  key={getName(bs)}
-                />
-              ))}
-            </Tbody>
-          </Table>
+          <BootableVolumeTable
+            selectedBootableVolumeState={
+              !displayShowAllButton
+                ? selectedBootableVolumeState
+                : [selectedBootableVolume, onSelectCreatedVolume]
+            }
+            activeColumns={activeColumns}
+            bootableVolumesData={bootableVolumesData}
+            favorites={favorites}
+            getSortType={getSortType}
+            preferencesMap={preferencesMap}
+            sortedPaginatedData={sortedPaginatedData}
+          />
           <BootableVolumesPipelinesHint bootableVolumes={bootableVolumes} />
         </>
       ) : (

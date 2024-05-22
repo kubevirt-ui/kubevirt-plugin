@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useState } from 'react';
-import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-card/utils/utils';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
@@ -27,12 +26,12 @@ const CreateFromInstanceType: FC = () => {
   const { t } = useKubevirtTranslation();
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
-  const bootableVolumesData = useBootableVolumes(getOSImagesNS());
+  const { resetInstanceTypeVMState, setVMNamespaceTarget, volumeListNamespace } =
+    useInstanceTypeVMStore();
+  const bootableVolumesData = useBootableVolumes(volumeListNamespace);
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences();
   const [activeNamespace] = useActiveNamespace();
   const [authorizedSSHKeys, , loaded] = useKubevirtUserSettings('ssh');
-
-  const { resetInstanceTypeVMState, setVMNamespaceTarget } = useInstanceTypeVMStore();
 
   useEffect(() => {
     resetInstanceTypeVMState();
