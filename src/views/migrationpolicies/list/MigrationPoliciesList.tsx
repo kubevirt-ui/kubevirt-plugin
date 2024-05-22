@@ -5,6 +5,7 @@ import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
+import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
@@ -18,12 +19,22 @@ import MigrationPoliciesEmptyState from './components/MigrationPoliciesEmptyStat
 import MigrationPoliciesRow from './components/MigrationPoliciesRow/MigrationPoliciesRow';
 import useMigrationPoliciesListColumns from './hooks/useMigrationPoliciesListColumns';
 
-const MigrationPoliciesList: FC = () => {
+const MigrationPoliciesList: FC<ListPageProps> = ({
+  fieldSelector,
+  hideColumnManagement,
+  hideNameLabelFilters,
+  hideTextFilter,
+  nameFilter,
+  selector,
+  showTitle,
+}) => {
   const { t } = useKubevirtTranslation();
-  const [mps, loaded, loadError] = useMigrationPolicies();
+  const [mps, loaded, loadError] = useMigrationPolicies(fieldSelector, selector);
 
   const [columns, activeColumns, loadedColumns] = useMigrationPoliciesListColumns();
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(mps);
+  const [unfilteredData, data, onFilterChange] = useListPageFilter(mps, null, {
+    name: { selected: [nameFilter] },
+  });
 
   if (loaded && isEmpty(unfilteredData)) {
     return <MigrationPoliciesEmptyState />;
@@ -31,7 +42,7 @@ const MigrationPoliciesList: FC = () => {
 
   return (
     <>
-      <ListPageHeader title={t('MigrationPolicies')}>
+      <ListPageHeader title={showTitle && t('MigrationPolicies')}>
         <MigrationPoliciesCreateButton />
       </ListPageHeader>
 
@@ -48,6 +59,9 @@ const MigrationPoliciesList: FC = () => {
             type: t('MigrationPolicy'),
           }}
           data={unfilteredData}
+          hideColumnManagement={hideColumnManagement}
+          hideLabelFilter={hideTextFilter}
+          hideNameLabelFilters={hideNameLabelFilters}
           loaded={loaded && loadedColumns}
           onFilterChange={onFilterChange}
         />
