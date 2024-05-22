@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
-import WizardMetadataLabels from '@catalog/wizard/tabs/metadata/components/WizardMetadataLabels';
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import MetadataLabels from '@kubevirt-utils/components/MetadataLabels/MetadataLabels';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ type LabelsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Labels: React.FC<LabelsProps> = ({ vmi }) => {
+const Labels: FC<LabelsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -24,6 +24,9 @@ const Labels: React.FC<LabelsProps> = ({ vmi }) => {
       bodyContent={t(
         'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.',
       )}
+      descriptionData={
+        <MetadataLabels labels={vmi?.metadata?.labels} model={VirtualMachineInstanceModel} />
+      }
       onEditClick={() =>
         createModal((props) => (
           <LabelsModal
@@ -47,7 +50,6 @@ const Labels: React.FC<LabelsProps> = ({ vmi }) => {
       }
       breadcrumb="VirtualMachineInstance.metadata.labels"
       data-test-id={`${vmi?.metadata?.name}-labels`}
-      descriptionData={<WizardMetadataLabels labels={vmi?.metadata?.labels} />}
       descriptionHeader={t('Labels')}
       isEdit
       isPopover

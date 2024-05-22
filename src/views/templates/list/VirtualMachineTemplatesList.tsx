@@ -4,6 +4,7 @@ import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
@@ -22,10 +23,16 @@ import { useTemplatesWithAvailableSource } from './hooks/useTemplatesWithAvailab
 import useVirtualMachineTemplatesColumns from './hooks/useVirtualMachineTemplatesColumns';
 import useVirtualMachineTemplatesFilters from './hooks/useVirtualMachineTemplatesFilters';
 
-type VirtualMachineTemplatesListProps = {
-  namespace: string;
-};
-const VirtualMachineTemplatesList: FC<VirtualMachineTemplatesListProps> = ({ namespace }) => {
+const VirtualMachineTemplatesList: FC<ListPageProps> = ({
+  fieldSelector,
+  hideColumnManagement,
+  hideNameLabelFilters,
+  hideTextFilter,
+  nameFilter,
+  namespace,
+  selector,
+  showTitle,
+}) => {
   const { t } = useKubevirtTranslation();
   const {
     availableDatasources,
@@ -36,12 +43,17 @@ const VirtualMachineTemplatesList: FC<VirtualMachineTemplatesListProps> = ({ nam
     loaded,
     templates,
   } = useTemplatesWithAvailableSource({
+    fieldSelector,
     namespace,
     onlyAvailable: false,
     onlyDefault: false,
+    selector,
   });
   const filters = useVirtualMachineTemplatesFilters(availableTemplatesUID);
-  const [data, filteredData, onFilterChange] = useListPageFilter(templates, filters);
+  const [data, filteredData, onFilterChange] = useListPageFilter(templates, filters, {
+    name: { selected: [nameFilter] },
+  });
+
   const [columns, activeColumns, loadedColumns] = useVirtualMachineTemplatesColumns(namespace);
 
   const templatesLoaded = loaded && bootSourcesLoaded;
@@ -52,7 +64,7 @@ const VirtualMachineTemplatesList: FC<VirtualMachineTemplatesListProps> = ({ nam
 
   return (
     <>
-      <ListPageHeader title={t('VirtualMachine Templates')}>
+      <ListPageHeader title={!(showTitle === false) && t('VirtualMachine Templates')}>
         <VirtualMachineTemplatesCreateButton namespace={namespace} />
       </ListPageHeader>
       <ListPageBody>
@@ -73,6 +85,9 @@ const VirtualMachineTemplatesList: FC<VirtualMachineTemplatesListProps> = ({ nam
                 type: t('Template'),
               }}
               data={data}
+              hideColumnManagement={hideColumnManagement}
+              hideLabelFilter={hideTextFilter}
+              hideNameLabelFilters={hideNameLabelFilters}
               loaded={templatesLoaded && loadedColumns}
               onFilterChange={onFilterChange}
               rowFilters={filters}

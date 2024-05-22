@@ -14,26 +14,33 @@ import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/ho
 import {
   getGroupVersionKindForModel,
   Operator,
+  Selector,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 type useTemplatesWithAvailableSourceProps = {
+  fieldSelector?: string;
   namespace?: string;
   onlyAvailable: boolean;
   onlyDefault: boolean;
+  selector?: Selector;
 };
 
 export const useTemplatesWithAvailableSource = ({
+  fieldSelector,
   namespace,
   onlyAvailable,
   onlyDefault,
+  selector,
 }: useTemplatesWithAvailableSourceProps): useTemplatesWithAvailableSourceValues => {
   const [templates, loaded, loadError] = useK8sWatchResource<V1Template[]>({
+    fieldSelector,
     groupVersionKind: getGroupVersionKindForModel(TemplateModel),
     isList: true,
     namespace,
     namespaced: true,
     selector: {
+      ...(selector || []),
       matchExpressions: [
         {
           key: TEMPLATE_TYPE_LABEL,

@@ -42,7 +42,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
 
   return (
     <>
-      <ListPageHeader title={showTitle && t('MigrationPolicies')}>
+      <ListPageHeader title={!(showTitle === false) && t('MigrationPolicies')}>
         <MigrationPoliciesCreateButton />
       </ListPageHeader>
 

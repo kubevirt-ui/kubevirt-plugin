@@ -1,6 +1,5 @@
 import React from 'react';
 
-import WizardMetadataLabels from '@catalog/wizard/tabs/metadata/components/WizardMetadataLabels';
 import { DataSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
 import {
@@ -9,6 +8,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import MetadataLabels from '@kubevirt-utils/components/MetadataLabels/MetadataLabels';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
@@ -71,6 +71,12 @@ export const DataImportCronDetailsGrid: React.FC<DataImportCronDetailsGridProps>
             bodyContent={t(
               'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ',
             )}
+            descriptionData={
+              <MetadataLabels
+                labels={dataImportCron?.metadata?.labels}
+                model={DataImportCronModel}
+              />
+            }
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <LabelsModal
@@ -95,7 +101,6 @@ export const DataImportCronDetailsGrid: React.FC<DataImportCronDetailsGridProps>
             }
             breadcrumb="DataImportCron.metadata.labels"
             data-test-id={`${dataImportCron?.metadata?.name}-labels`}
-            descriptionData={<WizardMetadataLabels labels={dataImportCron?.metadata?.labels} />}
             descriptionHeader={t('Labels')}
             isEdit
             isPopover

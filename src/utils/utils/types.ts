@@ -14,5 +14,5 @@ export type ListPageProps = {
   nameFilter?: string;
   namespace?: string;
   selector?: Selector;
-  showTitle?: string;
+  showTitle?: boolean;
 };
