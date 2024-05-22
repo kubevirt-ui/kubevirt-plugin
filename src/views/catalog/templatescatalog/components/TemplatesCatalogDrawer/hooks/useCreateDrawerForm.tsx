@@ -48,7 +48,7 @@ const useCreateDrawerForm = (
   subscriptionData: RHELAutomaticSubscriptionData,
   authorizedSSHKey: string,
 ) => {
-  const { tabsData, updateTabsData, updateVM } = useWizardVMContext();
+  const { updateTabsData, updateVM } = useWizardVMContext();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
@@ -113,10 +113,10 @@ const useCreateDrawerForm = (
 
         draftTemplate.objects = modifiedTemplateObjects;
 
-        if (sshDetails.sshSecretName && sshDetails?.applyKeyToProject) {
+        if (sshDetails?.sshSecretName && sshDetails?.applyKeyToProject) {
           updateAuthorizedSSHKeys({
             ...authorizedSSHKeys,
-            [namespace]: tabsData.authorizedSSHKey,
+            [namespace]: sshDetails?.sshSecretName,
           });
         }
       }
