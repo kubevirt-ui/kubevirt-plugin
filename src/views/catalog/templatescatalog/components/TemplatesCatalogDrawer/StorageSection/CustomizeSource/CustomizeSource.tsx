@@ -133,7 +133,7 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
         sourceLabel={t('Disk source')}
         sourceOptions={DISK_SOURCES_WITH_DEFAULT}
         sourcePopOver={<SelectDiskSourcePopOver />}
-        withSize={!('image' in diskSource)}
+        withSize={diskSource && !('image' in diskSource)}
       />
       <StorageClassSelect
         onStorageClassChange={onStorageClassChange}
