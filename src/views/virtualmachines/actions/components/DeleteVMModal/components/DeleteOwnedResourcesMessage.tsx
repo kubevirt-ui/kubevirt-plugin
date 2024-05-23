@@ -5,26 +5,31 @@ import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/k
 import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Bullseye, Checkbox, StackItem } from '@patternfly/react-core';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { Bullseye, StackItem } from '@patternfly/react-core';
 
 import { findPVCOwner } from '../utils/helpers';
 
+import DeleteVolumeCheckbox from './DeleteVolumeCheckbox';
+
 type DeleteOwnedResourcesMessageProps = {
   dataVolumes: V1beta1DataVolume[];
-  deleteOwnedResource: boolean;
   loaded: boolean;
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  setDeleteOwnedResource: Dispatch<SetStateAction<boolean>>;
+  setVolumesToSave: Dispatch<
+    SetStateAction<(IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume)[]>
+  >;
   snapshots: V1alpha1VirtualMachineSnapshot[];
+  volumesToSave: (IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume)[];
 };
 
 const DeleteOwnedResourcesMessage: FC<DeleteOwnedResourcesMessageProps> = ({
   dataVolumes,
-  deleteOwnedResource,
   loaded,
   pvcs,
-  setDeleteOwnedResource,
+  setVolumesToSave,
   snapshots,
+  volumesToSave,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -36,7 +41,7 @@ const DeleteOwnedResourcesMessage: FC<DeleteOwnedResourcesMessageProps> = ({
     );
   }
 
-  const pvcsWithNoDataVolumes = pvcs?.filter((pvc) => !findPVCOwner(pvc, dataVolumes));
+  const pvcsWithNoDataVolumes = pvcs?.filter((pvc) => !findPVCOwner(pvc, dataVolumes)) || [];
 
   const diskCount = dataVolumes?.length + pvcsWithNoDataVolumes?.length || 0;
   const hasSnapshots = snapshots?.length > 0;
@@ -50,16 +55,16 @@ const DeleteOwnedResourcesMessage: FC<DeleteOwnedResourcesMessageProps> = ({
           )}
         </StackItem>
       )}
-      {!!diskCount && (
-        <StackItem>
-          <Checkbox
-            id="delete-owned-resources"
-            isChecked={deleteOwnedResource}
-            label={t('Delete disks ({{diskCount}}x)', { diskCount })}
-            onChange={(_, checked: boolean) => setDeleteOwnedResource(checked)}
-          />
-        </StackItem>
-      )}
+
+      {[...(dataVolumes || []), ...pvcsWithNoDataVolumes].map((resource) => (
+        <DeleteVolumeCheckbox
+          key={`${resource.kind}-${getName(resource)}`}
+          resource={resource}
+          setVolumesToSave={setVolumesToSave}
+          volumesToSave={volumesToSave}
+        />
+      ))}
+
       {hasSnapshots && (
         <StackItem>
           <strong>{t('Warning')}: </strong>

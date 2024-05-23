@@ -390,7 +390,7 @@
   "Delete Data Volume: {{pvcName}}": "Delete Data Volume: {{pvcName}}",
   "Delete DataImportCron?": "Delete DataImportCron?",
   "Delete DataSource?": "Delete DataSource?",
-  "Delete disks ({{diskCount}}x)": "Delete disks ({{diskCount}}x)",
+  "Delete disk {{resourceName}} ({{kindAbbr}})": "Delete disk {{resourceName}} ({{kindAbbr}})",
   "Delete MigrationPolicy?": "Delete MigrationPolicy?",
   "Delete NIC?": "Delete NIC?",
   "Delete Resource?": "Delete Resource?",
