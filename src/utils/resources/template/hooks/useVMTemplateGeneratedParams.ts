@@ -55,9 +55,13 @@ export default (template: V1Template): [template: V1Template, loading: boolean, 
           parameters: mergedParameters,
         });
         setError(null);
+        setLoading(false);
       })
-      .catch(setError)
-      .finally(() => setLoading(false));
+      .catch((apiError) => {
+        setTemplateWithGeneratedValues(template);
+        setError(apiError);
+        setLoading(false);
+      });
   }, [namespace, template]);
 
   return [templateWithGeneratedValues, loading, error];
