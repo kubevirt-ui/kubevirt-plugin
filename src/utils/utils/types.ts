@@ -10,7 +10,9 @@ export type ListPageProps = {
   hideColumnManagement?: boolean;
   hideNameLabelFilters?: boolean;
   hideTextFilter?: boolean;
+  kind?: string;
   nameFilter?: string;
   namespace?: string;
   selector?: Selector;
+  showTitle?: string;
 };
