@@ -9,7 +9,6 @@ import { isUpstream } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
-  HCO_OPERATORHUB_NAME,
   KUBEVIRT_HYPERCONVERGED,
   OPENSHIFT_CNV,
   OPENSHIFT_OPERATOR_LIFECYCLE_MANAGER_NAMESPACE,
@@ -33,12 +32,18 @@ type UseKubevirtCSVDetails = {
 };
 
 export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
-  const [subscription, loadedSubscription, loadSubscriptionError] =
-    useK8sWatchResource<SubscriptionKind>({
-      groupVersionKind: SubscriptionModelGroupVersionKind,
-      name: HCO_OPERATORHUB_NAME,
-      namespace: isUpstream ? KUBEVIRT_HYPERCONVERGED : OPENSHIFT_CNV,
-    });
+  const [subscriptions, loadedSubscription, loadSubscriptionError] = useK8sWatchResource<
+    SubscriptionKind[]
+  >({
+    groupVersionKind: SubscriptionModelGroupVersionKind,
+    isList: true,
+    namespace: isUpstream ? KUBEVIRT_HYPERCONVERGED : OPENSHIFT_CNV,
+  });
+
+  const subscription = useMemo(
+    () => subscriptions?.find((sub) => sub?.spec?.name.endsWith(KUBEVIRT_HYPERCONVERGED)),
+    [subscriptions],
+  );
 
   const [installedCSV, loadedCSV, loadCSVError] = useK8sWatchResource<ClusterServiceVersionKind>(
     subscription && {
