@@ -1,3 +1,5 @@
+import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-card/utils/utils';
+
 import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 
 import { InstanceTypeVMState, InstanceTypeVMStoreState } from './types';
@@ -20,4 +22,5 @@ export const instanceTypeVMStoreInitialState: InstanceTypeVMStoreState = {
   startVM: true,
   vm: null,
   vmNamespaceTarget: '',
+  volumeListNamespace: getOSImagesNS(),
 };
