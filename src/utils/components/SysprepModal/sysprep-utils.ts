@@ -28,7 +28,7 @@ export const addSysprepConfig = (vm: V1VirtualMachine, newSysprepName: string) =
       configMap: { name: newSysprepName },
     },
   });
-  getDisks(vm).push(sysprepDisk());
+  (getDisks(vm) || []).push(sysprepDisk());
 };
 
 export const removeSysprepConfig = (vm: V1VirtualMachine, sysprepVolumeName: string) => {
