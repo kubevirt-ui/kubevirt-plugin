@@ -4,7 +4,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { compareOwnerReferences, getName } from '@kubevirt-utils/resources/shared';
+import { compareOwnerReferences, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch, K8sResourceCommon, OwnerReference } from '@openshift-console/dynamic-plugin-sdk';
@@ -69,4 +69,7 @@ export const removeDataVolumeTemplatesToVM = (
 export const sameVolume = (
   volumeA: IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume,
   volumeB: IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume,
-) => volumeA.kind === volumeB.kind && getName(volumeA) === volumeB;
+) =>
+  volumeA.kind === volumeB.kind &&
+  getName(volumeA) === getName(volumeB) &&
+  getNamespace(volumeA) === getNamespace(volumeB);
