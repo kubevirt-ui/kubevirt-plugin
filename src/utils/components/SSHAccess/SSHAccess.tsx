@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -14,11 +14,11 @@ type SSHAccessProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const SSHAccess: React.FC<SSHAccessProps> = ({ sshService, sshServiceLoaded, vm, vmi }) => {
+const SSHAccess: FC<SSHAccessProps> = ({ sshService, sshServiceLoaded, vm, vmi }) => {
   return (
     <DescriptionList className="pf-c-description-list">
-      <ConsoleOverVirtctl vm={vm} />
       <SSHCommand sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
+      <ConsoleOverVirtctl vm={vm} />
     </DescriptionList>
   );
 };
