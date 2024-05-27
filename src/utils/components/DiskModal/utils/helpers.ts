@@ -15,7 +15,6 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { buildOwnerReference, getName } from '@kubevirt-utils/resources/shared';
-import { hasTemplateParameter } from '@kubevirt-utils/resources/template';
 import {
   getBootDisk,
   getDataVolumeTemplates,
@@ -27,7 +26,6 @@ import { getDiskDrive, getDiskInterface } from '@kubevirt-utils/resources/vm/uti
 import {
   appendDockerPrefix,
   ensurePath,
-  getRandomChars,
   isEmpty,
   removeDockerPrefix,
 } from '@kubevirt-utils/utils/utils';
@@ -42,13 +40,6 @@ import { DYNAMIC } from '../components/utils/constants';
 
 import { getInitialStateDiskForm, mapSourceTypeToVolumeType } from './constants';
 import { DiskFormState, DiskModalProps, SourceTypes, VolumeTypes } from './types';
-
-const nameWithoutParameter = (name: string, defaultValue?) => {
-  if (hasTemplateParameter(name)) {
-    return defaultValue;
-  }
-  return name;
-};
 
 const getEmptyVMDataVolumeResource = (
   vm: V1VirtualMachine,
@@ -162,10 +153,7 @@ const buildDataVolume = ({
     resultVolume?.persistentVolumeClaim?.claimName ||
     `${vm?.metadata?.name}-${diskState.diskName}`;
 
-  dataVolume.metadata.name = nameWithoutParameter(
-    dvName,
-    `${diskState.diskName}-${getRandomChars()}`,
-  );
+  dataVolume.metadata.name = dvName;
 
   dataVolume.spec.storage.resources.requests.storage = diskState.diskSize;
   dataVolume.spec.storage.storageClassName = diskState.storageClass;
@@ -295,10 +283,7 @@ export const hotplugPromise = (
     );
   }
   if (diskState.diskSource === SourceTypes.UPLOAD) {
-    const pvcName = nameWithoutParameter(
-      `${vmObj?.metadata?.name}-${diskState.diskName}`,
-      `${diskState.diskName}-${getRandomChars()}`,
-    );
+    const pvcName = `${vmObj?.metadata?.name}-${diskState.diskName}`;
     return getPersistentVolumeClaimHotplugPromise(vmObj, pvcName, resultDisk);
   }
   const resultDataVolume = buildDataVolume({
@@ -324,10 +309,7 @@ export const addDisk = async (
 
   if (!isVMRunning) {
     updatedVirtualMachine = produceVMDisks(vm, (vmDraft) => {
-      const dvName = nameWithoutParameter(
-        `${vmName}-${diskName}`,
-        `${diskName}-${getRandomChars()}`,
-      );
+      const dvName = `${vmName}-${diskName}`;
 
       const resultDisk = buildDisk(formData);
       const resultVolume = buildVolume(formData, vmName, dvName);
