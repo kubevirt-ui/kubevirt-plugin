@@ -38,7 +38,9 @@ const WizardYAMLTab: WizardTab = ({ setDisableVmCreate, updateVM, vm }) => {
         </Bullseye>
       }
     >
-      <ResourceYAMLEditor initialResource={vm} onSave={onSave} />
+      <div className="wizard-yaml-body">
+        <ResourceYAMLEditor initialResource={vm} onSave={onSave} />
+      </div>
       {error && (
         <div className="wizard-yaml-alert">
           <Alert

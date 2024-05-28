@@ -1,3 +1,10 @@
-.wizard-yaml-alert {
-  padding: 0 var(--pf-global--spacer--lg);
+.wizard-yaml {
+  &-alert {
+    padding: 0 var(--pf-global--spacer--lg);
+  }
+  &-body {
+    height: 100%;
+    display: flex;
+    padding-bottom: var(--pf-l-stack--m-gutter--MarginBottom);
+  }
 }
