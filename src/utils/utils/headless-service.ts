@@ -2,7 +2,7 @@ import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
-export const HEADLESS_SERVICE_LABEL = 'app.kubernetes.io/name';
+export const HEADLESS_SERVICE_LABEL = 'network.kubevirt.io/headlessService';
 export const HEADLESS_SERVICE_NAME = 'headless';
 export const HEADLESS_SERVICE_PORT = 5434;
 
