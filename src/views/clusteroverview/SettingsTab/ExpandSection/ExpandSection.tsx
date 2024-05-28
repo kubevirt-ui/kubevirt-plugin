@@ -31,7 +31,7 @@ const ExpandSection: FC<ExpandSectionProps> = ({
 
   return (
     <ExpandableSection
-      className={classNames(className, { 'expand-section__disabled': isDisabled })}
+      className={classNames(className, { 'expand-section__disabled': isDisabled }, 'ExpandSection')}
       isExpanded={isExpanded}
       isIndented={isIndented}
       onToggle={(_event, expanded: boolean) => handleToggle(expanded)}

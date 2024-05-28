@@ -1,3 +1,9 @@
 .expand-section__disabled .pf-c-expandable-section__toggle-icon {
   color: var(--pf-global--disabled-color--100);
 }
+
+.ExpandSection {
+  .pf-v5-c-expandable-section__content {
+    padding-left: var(--pf-v5-c-expandable-section--m-display-lg__content--PaddingLeft) !important;
+  }
+}
