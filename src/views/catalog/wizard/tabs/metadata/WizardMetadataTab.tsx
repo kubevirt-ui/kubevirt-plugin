@@ -2,8 +2,10 @@ import * as React from 'react';
 import classnames from 'classnames';
 
 import { WizardTab } from '@catalog/wizard/tabs';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import MetadataLabels from '@kubevirt-utils/components/MetadataLabels/MetadataLabels';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,8 +18,6 @@ import {
 } from '@patternfly/react-core';
 
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
-
-import WizardMetadataLabels from './components/WizardMetadataLabels';
 
 import './wizard-metadata-tab.scss';
 
@@ -41,6 +41,9 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
               )}
             >
               <WizardDescriptionItem
+                description={
+                  <MetadataLabels labels={resource?.metadata?.labels} model={VirtualMachineModel} />
+                }
                 helperPopover={{
                   content: t(
                     'Map of string keys and values that can be used to organize and categorize (scope and select) objects',
@@ -61,7 +64,6 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
                     />
                   ))
                 }
-                description={<WizardMetadataLabels labels={resource?.metadata?.labels} />}
                 isDisabled={!loaded}
                 isEdit
                 showEditOnTitle

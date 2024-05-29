@@ -1,7 +1,6 @@
 import React from 'react';
 import { getDataSourceCronJob } from 'src/views/datasources/utils';
 
-import WizardMetadataLabels from '@catalog/wizard/tabs/metadata/components/WizardMetadataLabels';
 import {
   PersistentVolumeClaimModel,
   VirtualMachineClusterPreferenceModelGroupVersionKind,
@@ -12,6 +11,7 @@ import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import PreferencePopoverContent from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/PreferencePopoverContent';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import MetadataLabels from '@kubevirt-utils/components/MetadataLabels/MetadataLabels';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
@@ -73,6 +73,9 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             bodyContent={t(
               'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ',
             )}
+            descriptionData={
+              <MetadataLabels labels={dataSource?.metadata?.labels} model={DataSourceModel} />
+            }
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <LabelsModal
@@ -97,7 +100,6 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             }
             breadcrumb="DataSource.metadata.labels"
             data-test-id={`${dataSource?.metadata?.name}-labels`}
-            descriptionData={<WizardMetadataLabels labels={dataSource?.metadata?.labels} />}
             descriptionHeader={t('Labels')}
             isEdit
             isPopover

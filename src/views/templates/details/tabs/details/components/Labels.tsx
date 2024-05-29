@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
-import WizardMetadataLabels from '@catalog/wizard/tabs/metadata/components/WizardMetadataLabels';
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import MetadataLabels from '@kubevirt-utils/components/MetadataLabels/MetadataLabels';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +10,7 @@ import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { LabelsAnnotationsType, TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-const Labels: React.FC<TemplateDetailsGridProps> = ({ editable, template }) => {
+const Labels: FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
 
@@ -45,7 +45,7 @@ const Labels: React.FC<TemplateDetailsGridProps> = ({ editable, template }) => {
       )}
       breadcrumb="Template.metadata.labels"
       data-test-id={`${template?.metadata?.name}-labels`}
-      descriptionData={<WizardMetadataLabels labels={template?.metadata?.labels} />}
+      descriptionData={<MetadataLabels labels={template?.metadata?.labels} model={TemplateModel} />}
       descriptionHeader={t('Labels')}
       isEdit={editable}
       isPopover
