@@ -41,6 +41,7 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
     useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
       userName && {
         groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
+        isList: false,
         name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
         namespace: OPENSHIFT_CNV,
       },
