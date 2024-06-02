@@ -26,7 +26,7 @@ const AccessMode: FC = () => {
 
   useEffect(() => {
     if (!allowedAccessModes?.includes(accessMode)) {
-      setValue(accessModeField, allowedAccessModes[0]);
+      setValue(accessModeField, allowedAccessModes?.[0]);
     }
   }, [accessMode, allowedAccessModes, setValue]);
 
