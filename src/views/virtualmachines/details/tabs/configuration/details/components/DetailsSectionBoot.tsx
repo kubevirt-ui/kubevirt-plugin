@@ -65,11 +65,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
             <FirmwareBootloaderModal
               onSubmit={(updatedVM) =>
                 isCustomizeInstanceType
-                  ? Promise.resolve(
-                      updateCustomizeInstanceType([
-                        { data: updatedVM, path: 'spec.template.spec.domain.firmware' },
-                      ]),
-                    )
+                  ? Promise.resolve(updateCustomizeInstanceType([{ data: updatedVM }]))
                   : updateBootLoader(updatedVM, vm)
               }
               isOpen={isOpen}
