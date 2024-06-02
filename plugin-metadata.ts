@@ -59,7 +59,7 @@ const metadata: ConsolePluginBuildMetadata = {
     yamlTemplates: 'src/templates/index.ts',
   },
   name: 'kubevirt-plugin',
-  version: '0.0.0',
+  version: '4.16.0',
 };
 
 export default metadata;
