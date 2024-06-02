@@ -14,6 +14,7 @@ import {
   ChartThreshold,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
+import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
@@ -84,10 +85,20 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
               y: [0, yMax],
             }}
             height={height}
-            padding={35}
+            padding={{ bottom: 35, left: 70, right: 35, top: 35 }}
             scale={{ x: 'time', y: 'linear' }}
             width={width}
           >
+            <ChartAxis
+              style={{
+                grid: {
+                  stroke: chart_color_black_200.value,
+                },
+              }}
+              dependentAxis
+              tickFormat={(tick: number) => xbytes(tick, { fixed: 2, iec: true })}
+              tickValues={[0, yMax]}
+            />
             <ChartAxis
               style={{
                 tickLabels: { padding: 2 },

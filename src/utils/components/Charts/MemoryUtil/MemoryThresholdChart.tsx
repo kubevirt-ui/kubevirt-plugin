@@ -15,6 +15,7 @@ import {
   ChartThreshold,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
+import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
@@ -22,7 +23,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
+import {
+  findMaxYValue,
+  MILLISECONDS_MULTIPLIER,
+  queriesToLink,
+  tickFormat,
+  TICKS_COUNT,
+} from '../utils/utils';
 
 type MemoryThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
@@ -58,6 +65,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
 
   const isReady = !isEmpty(chartData) || !isEmpty(thresholdLine);
   const linkToMetrics = queriesToLink(queries?.MEMORY_USAGE);
+  const yMax = findMaxYValue(thresholdLine);
   return (
     <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
@@ -78,7 +86,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
               x: [currentTime - timespan, currentTime],
             }}
             height={height}
-            padding={35}
+            padding={{ bottom: 35, left: 70, right: 35, top: 35 }}
             scale={{ x: 'time', y: 'linear' }}
             width={width}
           >
@@ -90,6 +98,16 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
               axisComponent={<></>}
               tickCount={TICKS_COUNT}
               tickFormat={tickFormat(duration, currentTime)}
+            />
+            <ChartAxis
+              style={{
+                grid: {
+                  stroke: chart_color_black_200.value,
+                },
+              }}
+              dependentAxis
+              tickFormat={(tick: number) => xbytes(tick, { fixed: 2, iec: true })}
+              tickValues={[0, yMax]}
             />
             <ChartGroup>
               <ChartArea
