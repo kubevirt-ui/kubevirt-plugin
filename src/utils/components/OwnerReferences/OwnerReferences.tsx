@@ -1,7 +1,9 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
+  getGroupVersionKindForResource,
   K8sResourceCommon,
   OwnerReference,
   ResourceLink,
@@ -11,25 +13,24 @@ type OwnerReferencesProps = {
   obj: K8sResourceCommon;
 };
 
-const OwnerReferences: React.FC<OwnerReferencesProps> = ({ obj }) => {
+const OwnerReferences: FC<OwnerReferencesProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
-
   const ownerReferences = (obj?.metadata?.ownerReferences || [])?.map(
     (ownerRef: OwnerReference) => (
       <ResourceLink
+        groupVersionKind={getGroupVersionKindForResource(ownerRef)}
         key={ownerRef?.uid}
-        kind={ownerRef?.kind}
         name={ownerRef?.name}
         namespace={obj?.metadata?.namespace}
       />
     ),
   );
 
-  return ownerReferences?.length ? (
+  return !isEmpty(ownerReferences) ? (
     <div>{ownerReferences}</div>
   ) : (
     <span className="text-muted">{t('No owner')}</span>
   );
 };
 
-export default React.memo(OwnerReferences);
+export default OwnerReferences;
