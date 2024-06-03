@@ -2,17 +2,18 @@ import React from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { DynamicSSHKeyInjection } from '@kubevirt-utils/components/DynamicSSHKeyInjection/DynamicSSHKeyInjection';
 import DynamicSSHKeyInjectionHelpTextIcon from '@kubevirt-utils/components/DynamicSSHKeyInjection/DynamicSSHKeyInjectionHelpTextIcon';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
+import { dataSourceHasDynamicSSHLabel } from '../utils/utils';
+
 const DynamicSSHKeyInjectionInstanceType = () => {
   const { instanceTypeVMState, setInstanceTypeVMState } = useInstanceTypeVMStore();
-  const { sshSecretCredentials } = instanceTypeVMState;
-  const hasDynamicSSHLabel =
-    instanceTypeVMState?.pvcSource?.metadata?.labels?.[DYNAMIC_CREDENTIALS_SUPPORT];
+  const { pvcSource, selectedBootableVolume, sshSecretCredentials } = instanceTypeVMState;
+
+  const hasDynamicSSHLabel = dataSourceHasDynamicSSHLabel(pvcSource, selectedBootableVolume);
   const isDisabled = !sshSecretCredentials?.sshSecretName || !hasDynamicSSHLabel;
 
   return (
