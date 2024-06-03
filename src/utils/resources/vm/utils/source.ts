@@ -6,6 +6,7 @@ import {
   V1beta1DataVolumeSourceRef,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   BOOT_SOURCE,
@@ -26,7 +27,9 @@ export const getPVCSourceOrSourceRef = (
   vm: V1VirtualMachine,
 ): V1beta1DataVolumeSourcePVC | V1beta1DataVolumeSourceRef => {
   const bootDisk = getBootDisk(vm);
-  const volume = getVolumes(vm)?.find((vol) => vol.name === bootDisk?.name);
+  const volume = getVolumes(vm)?.find(
+    (vol) => vol.name === bootDisk?.name || vol.name === ROOTDISK,
+  );
   const dataVolumeTemplate = getDataVolumeTemplates(vm)?.find(
     (dv) => getName(dv) === volume?.dataVolume?.name,
   );

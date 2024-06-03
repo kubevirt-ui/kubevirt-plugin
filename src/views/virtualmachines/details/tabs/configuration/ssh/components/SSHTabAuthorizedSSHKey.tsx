@@ -53,7 +53,9 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
       descriptionData={
         <Stack hasGutter>
           <SecretNameLabel secretName={secretName} />
-          <DynamicSSHKeyInjectionDescription isDynamicSSHInjectionEnabled />
+          <DynamicSSHKeyInjectionDescription
+            isDynamicSSHInjectionEnabled={isDynamicSSHInjectionEnabled}
+          />
         </Stack>
       }
       onEditClick={() =>
