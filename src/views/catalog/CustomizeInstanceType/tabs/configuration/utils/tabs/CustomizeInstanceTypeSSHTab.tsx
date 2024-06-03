@@ -31,7 +31,7 @@ const CustomizeInstanceTypeSSHTab = () => {
       <Grid span={6}>
         <GridItem>
           <Stack hasGutter>
-            <SSHTabSSHAccess vm={vm} />
+            <SSHTabSSHAccess isCustomizeInstanceType vm={vm} />
             <SSHTabAuthorizedSSHKey
               isCustomizeInstanceType
               onUpdateVM={updateVMCustomizeIT}

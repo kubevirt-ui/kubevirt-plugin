@@ -8,18 +8,25 @@ import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMac
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type SSHTabSSHAccessProps = {
+  isCustomizeInstanceType?: boolean;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const SSHTabSSHAccess: FC<SSHTabSSHAccessProps> = ({ vm, vmi }) => {
+const SSHTabSSHAccess: FC<SSHTabSSHAccessProps> = ({ isCustomizeInstanceType, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [sshService, sshServiceLoaded] = useSSHService(vm);
 
   return (
     <VirtualMachineDescriptionItem
       descriptionData={
-        <SSHAccess sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
+        <SSHAccess
+          isCustomizeInstanceType={isCustomizeInstanceType}
+          sshService={sshService}
+          sshServiceLoaded={sshServiceLoaded}
+          vm={vm}
+          vmi={vmi}
+        />
       }
       data-test-id="ssh-access"
       descriptionHeader={<SearchItem id="ssh-access">{t('SSH access')}</SearchItem>}
