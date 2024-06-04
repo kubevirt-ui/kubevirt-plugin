@@ -2,10 +2,10 @@ import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { SYSPREP } from '@kubevirt-utils/components/SysprepModal/consts';
 import {
   AUTOUNATTEND,
   generateNewSysprepConfig,
-  SYSPREP,
   sysprepDisk,
   sysprepVolume,
   UNATTEND,
@@ -59,7 +59,6 @@ export const createSysprepConfigMap = async (
   const configMap = generateNewSysprepConfig({
     data: sysprepData,
     sysprepName: externalSysprepConfig?.metadata?.name,
-    vm,
   });
 
   if (externalSysprepConfig) {

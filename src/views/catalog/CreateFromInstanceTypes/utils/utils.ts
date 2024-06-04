@@ -9,6 +9,7 @@ import {
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { ACTIVATION_KEY } from '@kubevirt-utils/components/CloudinitModal/utils/constants';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
@@ -74,8 +75,14 @@ export const generateVM = (
   subscriptionData: RHELAutomaticSubscriptionData,
   autoUpdateEnabled?: boolean,
 ) => {
-  const { pvcSource, selectedBootableVolume, selectedInstanceType, sshSecretCredentials, vmName } =
-    instanceTypeState;
+  const {
+    pvcSource,
+    selectedBootableVolume,
+    selectedInstanceType,
+    sshSecretCredentials,
+    sysprepConfigMapData,
+    vmName,
+  } = instanceTypeState;
   const { sshSecretName } = sshSecretCredentials;
   const virtualmachineName = vmName ?? generatePrettyName();
 
@@ -91,6 +98,7 @@ export const generateVM = (
     null,
   );
   const isDynamic = instanceTypeState?.isDynamicSSHInjection;
+  const isSysprep = !isEmpty(sysprepConfigMapData?.name);
 
   const emptyVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
@@ -147,7 +155,9 @@ export const generateVM = (
         },
         spec: {
           domain: {
-            devices: {},
+            devices: {
+              ...(isSysprep ? { disks: [sysprepDisk()] } : {}),
+            },
           },
           subdomain: HEADLESS_SERVICE_NAME,
           volumes: [
@@ -155,16 +165,18 @@ export const generateVM = (
               dataVolume: { name: `${virtualmachineName}-volume` },
               name: ROOTDISK,
             },
-            {
-              cloudInitNoCloud: {
-                userData: createPopulatedCloudInitYAML(
-                  selectedPreference,
-                  subscriptionData,
-                  autoUpdateEnabled,
-                ),
-              },
-              name: 'cloudinitdisk',
-            },
+            isSysprep
+              ? sysprepVolume(sysprepConfigMapData?.name)
+              : {
+                  cloudInitNoCloud: {
+                    userData: createPopulatedCloudInitYAML(
+                      selectedPreference,
+                      subscriptionData,
+                      autoUpdateEnabled,
+                    ),
+                  },
+                  name: 'cloudinitdisk',
+                },
           ],
         },
       },

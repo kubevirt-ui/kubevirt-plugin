@@ -3,7 +3,6 @@ import produce from 'immer';
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   addSysprepConfig,
   AUTOUNATTEND,
@@ -93,7 +92,6 @@ export const updateSysprepObject = (
   sysprepConfig: IoK8sApiCoreV1ConfigMap,
   unattend: string,
   autoUnattend: string,
-  vm: V1VirtualMachine,
 ): IoK8sApiCoreV1ConfigMap | undefined => {
   if (!unattend && !autoUnattend) return undefined;
 
@@ -105,6 +103,6 @@ export const updateSysprepObject = (
     });
   } else {
     const data = { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend };
-    return generateNewSysprepConfig({ data, vm });
+    return generateNewSysprepConfig({ data });
   }
 };

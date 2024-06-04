@@ -1,20 +1,20 @@
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import { V1Disk, V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 
-export const SYSPREP = 'sysprep';
+import { SYSPREP } from './consts';
+
 export const AUTOUNATTEND = 'autounattend.xml';
 export const UNATTEND = 'unattend.xml';
 export const WINDOWS = 'windows';
 
 export type SysprepData = { autounattend?: string; unattended?: string };
 
-export const sysprepDisk = () => ({ cdrom: { bus: 'sata' }, name: SYSPREP });
+export const sysprepDisk = (): V1Disk => ({ cdrom: { bus: 'sata' }, name: SYSPREP });
 
-export const sysprepVolume = (sysprepName: string) => ({
+export const sysprepVolume = (sysprepName: string): V1Volume => ({
   name: SYSPREP,
   sysprep: {
     configMap: { name: sysprepName },
@@ -40,28 +40,22 @@ export const removeSysprepConfig = (vm: V1VirtualMachine, sysprepVolumeName: str
   );
 };
 
-type GenerateNewSysprepConfigInputType = {
+export const generateSysprepConfigMapName = () => generatePrettyName('sysprep-config');
+
+type GenerateNewSysprepConfig = {
   data: IoK8sApiCoreV1ConfigMap['data'];
   sysprepName?: string;
-  vm: V1VirtualMachine;
-  withOwnerReference?: boolean;
 };
 
 export const generateNewSysprepConfig = ({
   data,
   sysprepName,
-  vm,
-  withOwnerReference = false,
-}: GenerateNewSysprepConfigInputType): IoK8sApiCoreV1ConfigMap => ({
+}: GenerateNewSysprepConfig): IoK8sApiCoreV1ConfigMap => ({
   apiVersion: ConfigMapModel.apiVersion,
   data,
   kind: ConfigMapModel.kind,
   metadata: {
-    name: sysprepName || `sysprep-config-${vm?.metadata?.name}-${getRandomChars()}`,
-    namespace: vm?.metadata?.namespace,
-    ownerReferences: withOwnerReference
-      ? [buildOwnerReference(vm, { blockOwnerDeletion: false })]
-      : null,
+    name: sysprepName || generateSysprepConfigMapName(),
   },
 });
 
