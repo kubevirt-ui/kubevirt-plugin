@@ -3,7 +3,11 @@ import React from 'react';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { updateVMCustomizeIT, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  updateCustomizeInstanceType,
+  updateVMCustomizeIT,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import {
   DescriptionList,
   Divider,
@@ -30,7 +34,7 @@ const CustomizeInstanceTypeInitialRunTab = () => {
       <DescriptionList className="pf-c-description-list">
         <InitialRunTabCloudinit canUpdateVM onSubmit={updateVMCustomizeIT} vm={vm} />
         <Divider />
-        <InitialRunTabSysprep canUpdateVM vm={vm} />
+        <InitialRunTabSysprep canUpdateVM onSubmit={updateCustomizeInstanceType} vm={vm} />
       </DescriptionList>
     </PageSection>
   );

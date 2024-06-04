@@ -16,6 +16,7 @@ import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepMod
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { UpdateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -23,9 +24,10 @@ import { createSysprepConfigMap, patchVMWithExistingSysprepConfigMap } from '../
 
 type InitialRunTabSysprepProps = {
   canUpdateVM: boolean;
+  onSubmit?: UpdateCustomizeInstanceType;
   vm: V1VirtualMachine;
 };
-const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, vm }) => {
+const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSubmit, vm }) => {
   const { createModal } = useModal();
   const vmVolumes = getVolumes(vm);
 
@@ -44,10 +46,11 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, vm }
 
   const { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend } = externalSysprepConfig?.data || {};
 
-  const onSysprepSelected = (name: string) => patchVMWithExistingSysprepConfigMap(name, vm);
+  const onSysprepSelected = (name: string) =>
+    patchVMWithExistingSysprepConfigMap(name, vm, onSubmit);
 
   const onSysprepCreation = async (unattended: string, autounattend: string): Promise<void> =>
-    createSysprepConfigMap(unattended, autounattend, externalSysprepConfig, vm);
+    createSysprepConfigMap(unattended, autounattend, externalSysprepConfig, vm, onSubmit);
 
   return (
     <VirtualMachineDescriptionItem
