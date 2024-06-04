@@ -38,6 +38,7 @@ export type UseBootableVolumesValues = {
 export type SysprepConfigMapData = {
   data: SysprepData;
   name: string;
+  shouldCreateNewConfigMap: boolean;
 };
 
 export type InstanceTypeVMState = {

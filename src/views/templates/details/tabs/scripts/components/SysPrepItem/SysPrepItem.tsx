@@ -70,7 +70,7 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
   };
 
   const onSysprepCreation = (newUnattended: string, newAutoUnattend: string) => {
-    const newSysPrepObject = updateSysprepObject(sysPrepObject, newUnattended, newAutoUnattend, vm);
+    const newSysPrepObject = updateSysprepObject(sysPrepObject, newUnattended, newAutoUnattend);
     const templateWithSysPrep = newSysPrepObject
       ? replaceTemplateSysprepObject(template, newSysPrepObject, currentVMSysprepName)
       : deleteTemplateSysprepObject(template, currentVMSysprepName);

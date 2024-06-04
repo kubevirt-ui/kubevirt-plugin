@@ -13,7 +13,6 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import {
-  addSysprepConfig,
   AUTOUNATTEND,
   generateNewSysprepConfig,
   UNATTEND,
@@ -111,35 +110,29 @@ const CreateVMFooter: FC = () => {
       data: vmToCreate,
       model: VirtualMachineModel,
     })
-      .then((createdVM) => {
+      .then(async (createdVM) => {
         if (secretOption === SecretSelectionOption.addNew) {
           createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
         }
 
-        // create appropriate ConfigMap and/or add it to the Windows VM if sysprep configured
         if (isWindowsOSVolume) {
-          const { data, name } = sysprepConfigMapData;
+          const { data, name, shouldCreateNewConfigMap } = sysprepConfigMapData;
           const { autounattend, unattended } = data;
 
-          if (!isEmpty(data) && !name) {
-            // the user has chosen to add new ConfigMap with new data
+          if (shouldCreateNewConfigMap) {
             const configMap = generateNewSysprepConfig({
               data: { [AUTOUNATTEND]: autounattend, [UNATTEND]: unattended },
-              vm: createdVM,
+              sysprepName: name,
             });
 
-            k8sCreate({ data: configMap, model: ConfigMapModel });
-            addSysprepConfig(createdVM, configMap.metadata.name); // add ConfigMap and related volume and disk to the new VM
-          }
-
-          if (name) {
-            // if user has chosen some existing ConfigMap from the list
-            addSysprepConfig(createdVM, name);
+            try {
+              await k8sCreate({ data: configMap, model: ConfigMapModel });
+            } catch {}
           }
         }
 
         createHeadlessService(createdVM);
-        navigate(getResourceUrl({ model: VirtualMachineModel, resource: vmToCreate }));
+        navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
       })
       .catch(setError)
       .finally(() => setIsSubmitting(false));
