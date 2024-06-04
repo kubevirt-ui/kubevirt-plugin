@@ -10,7 +10,7 @@ import {
   getPrintableDiskDrive,
   getPrintableDiskInterface,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
-import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { NO_DATA_DASH } from '../constants';
@@ -46,7 +46,9 @@ export const getDiskRowDataLayout = (
     if (device?.pvc) {
       diskRowDataObject.source = device?.pvc?.metadata?.name;
       diskRowDataObject.sourceStatus = device?.pvc?.status?.phase;
-      diskRowDataObject.size = formatBytes(device?.pvc?.spec?.resources?.requests?.storage);
+      diskRowDataObject.size = humanizeBinaryBytes(
+        convertToBaseValue(device?.pvc?.spec?.resources?.requests?.storage),
+      ).string;
       diskRowDataObject.storageClass = device?.pvc?.spec?.storageClassName;
     }
 
