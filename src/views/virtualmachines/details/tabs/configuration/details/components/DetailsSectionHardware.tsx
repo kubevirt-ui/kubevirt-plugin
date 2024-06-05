@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -9,6 +9,7 @@ import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { Bullseye, Divider, ExpandableSection, Flex, Grid, GridItem } from '@patternfly/react-core';
 
@@ -30,7 +31,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const location = useLocation();
-  const [isExpanded, setIsExpanded] = useState<boolean>();
+  const [isExpanded, setIsExpanded] = useToggle('hardware-devices');
   const onSubmit = onSubmitProp || updateHardwareDevices;
   const hostDevices = getHostDevices(vm);
   const gpus = getGPUDevices(vm);
