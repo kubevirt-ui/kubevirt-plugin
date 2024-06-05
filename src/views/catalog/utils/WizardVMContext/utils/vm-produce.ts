@@ -2,7 +2,11 @@ import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
+import {
+  generateSysprepConfigMapName,
+  sysprepDisk,
+  sysprepVolume,
+} from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 export const produceVMNetworks = (
@@ -65,7 +69,7 @@ export const produceVMSysprep = (vm: V1VirtualMachine, sysprepName?: string) => 
     ) {
       vmDraft.spec.template.spec.domain.devices.disks.push(sysprepDisk());
       vmDraft.spec.template.spec.volumes.push(
-        sysprepVolume(sysprepName || `sysprep-config-${vm?.metadata?.name}`),
+        sysprepVolume(sysprepName || generateSysprepConfigMapName()),
       );
     }
   });

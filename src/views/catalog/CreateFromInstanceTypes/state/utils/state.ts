@@ -11,7 +11,7 @@ export const instanceTypeVMInitialState: InstanceTypeVMState = {
   selectedInstanceType: { name: '', namespace: null },
   selectedStorageClass: null,
   sshSecretCredentials: initialSSHCredentials,
-  sysprepConfigMapData: { data: {}, name: '' },
+  sysprepConfigMapData: { data: {}, name: '', shouldCreateNewConfigMap: false },
   vmName: '',
   volumeSnapshotSource: null,
 };
