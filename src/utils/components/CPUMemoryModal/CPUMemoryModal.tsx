@@ -8,9 +8,19 @@ import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/Me
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
-import { getCPUSockets, getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import {
+  getCPU,
+  getCPULimit,
+  getCPURequest,
+  getCPUSockets,
+  getMemory,
+  getMemoryLimit,
+  getMemoryRequest,
+  VM_TEMPLATE_ANNOTATION,
+} from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Alert, Button, ButtonVariant, Modal, ModalVariant } from '@patternfly/react-core';
+import { updateVMResources } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
 import { getMemorySize } from './utils/CpuMemoryUtils';
@@ -59,8 +69,21 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
         'spec.template.spec.domain.memory.guest',
       ]);
 
+      const memoryValue = `${memory}${memoryUnit}`;
+      const numCPUs = cpuSockets * getCPU(vm)?.cores * getCPU(vm)?.threads;
+
       vmDraft.spec.template.spec.domain.cpu.sockets = cpuSockets;
       vmDraft.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit}`;
+
+      if (getMemoryRequest(vmDraft) && getMemoryLimit(vmDraft)) {
+        vmDraft.spec.template.spec.domain.resources.requests['memory'] = memoryValue;
+        vmDraft.spec.template.spec.domain.resources.limits['memory'] = memoryValue;
+      }
+
+      if (getCPURequest(vmDraft) && getCPULimit(vmDraft)) {
+        vmDraft.spec.template.spec.domain.resources.requests['memory'] = numCPUs;
+        vmDraft.spec.template.spec.domain.resources.limits['memory'] = numCPUs;
+      }
     });
 
     return updatedVM;
@@ -80,6 +103,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
     setUpdateError(null);
 
     try {
+      await updateVMResources(updatedVirtualMachine);
       await onSubmit(updatedVirtualMachine);
 
       setUpdateInProcess(false);

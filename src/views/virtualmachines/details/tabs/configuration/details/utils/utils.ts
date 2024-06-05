@@ -170,7 +170,35 @@ export const updateWorkload = (updatedVM: V1VirtualMachine, newWorkload: WORKLOA
   });
 };
 
-export const updatedVirtualMachine = (updatedVM: V1VirtualMachine) =>
+export const updateVMResources = (updatedVM: V1VirtualMachine) =>
+  k8sPatch({
+    data: [
+      {
+        op: 'replace',
+        path: `/spec/template/spec/domain/resources/limits/cpu`,
+        value: getCPUSockets(updatedVM),
+      },
+      {
+        op: 'replace',
+        path: `/spec/template/spec/domain/resources/requests/cpu`,
+        value: getCPUSockets(updatedVM),
+      },
+      {
+        op: 'replace',
+        path: `/spec/template/spec/domain/resources/limits/memory`,
+        value: getMemory(updatedVM),
+      },
+      {
+        op: 'replace',
+        path: `/spec/template/spec/domain/resources/requests/memory`,
+        value: getMemory(updatedVM),
+      },
+    ],
+    model: VirtualMachineModel,
+    resource: updatedVM,
+  });
+
+export const updateVirtualMachine = (updatedVM: V1VirtualMachine) =>
   k8sPatch({
     data: [
       {
@@ -188,7 +216,7 @@ export const updatedVirtualMachine = (updatedVM: V1VirtualMachine) =>
     resource: updatedVM,
   });
 
-export const updatedHostname = (updatedVM: V1VirtualMachine) =>
+export const updateHostname = (updatedVM: V1VirtualMachine) =>
   k8sPatch({
     data: [
       {

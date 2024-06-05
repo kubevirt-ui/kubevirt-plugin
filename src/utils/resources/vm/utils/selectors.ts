@@ -187,8 +187,17 @@ export const getAutoAttachPodInterface = (vm: V1VirtualMachine): boolean =>
 export const getDomain = <T extends Record<string, any>>(obj: T): V1DomainSpec =>
   obj?.spec?.domain || obj?.spec?.template?.spec?.domain;
 
+export const getMemoryLimit = <T>(obj: T): string => getDomain(obj)?.resources?.limits?.['memory'];
+
+export const getMemoryRequest = <T>(obj: T): string =>
+  getDomain(obj)?.resources?.requests?.['memory'];
+
 export const getMemory = <T>(obj: T): string =>
-  getDomain(obj)?.memory?.guest || getDomain(obj)?.resources?.requests?.['memory'];
+  getDomain(obj)?.memory?.guest || getMemoryRequest(obj);
+
+export const getCPULimit = <T>(obj: T): V1CPU => getDomain(obj)?.resources?.limits?.['cpu'];
+
+export const getCPURequest = <T>(obj: T): string => getDomain(obj)?.resources?.requests?.['cpu'];
 
 export const getCPU = <T>(obj: T): V1CPU => getDomain(obj)?.cpu;
 
