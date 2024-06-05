@@ -8,7 +8,7 @@ import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 const DynamicSSHKeyInjectionDescription = ({ isDynamicSSHInjectionEnabled }) => {
   const { t } = useKubevirtTranslation();
 
-  if (!isDynamicSSHInjectionEnabled) return <>{t('Store the key in a project secret.')}</>;
+  if (isDynamicSSHInjectionEnabled) return <>{t('Store the key in a project secret.')}</>;
 
   return (
     <StackItem className="text-muted">
