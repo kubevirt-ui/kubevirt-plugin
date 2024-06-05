@@ -6,6 +6,7 @@ import { effect, signal } from '@preact/signals-react';
 
 import {
   getCustomizeInstanceTypeSessionStorage,
+  mergeData,
   saveCustomizeInstanceTypeSessionStorage,
 } from './customizeInstanceType/utils/utils';
 
@@ -26,7 +27,9 @@ type UpdateCustomizeInstanceTypeArgs = {
   path?: string;
 }[];
 
-type UpdateCustomizeInstanceType = (args: UpdateCustomizeInstanceTypeArgs) => V1VirtualMachine;
+export type UpdateCustomizeInstanceType = (
+  args: UpdateCustomizeInstanceTypeArgs,
+) => V1VirtualMachine;
 
 export const clearCustomizeInstanceType = () => {
   vmSignal.value = null;
@@ -55,7 +58,7 @@ export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
           return;
         }
 
-        obj[part] = merge ? { ...obj[part], ...data } : data;
+        obj[part] = merge ? mergeData(obj[part], data) : data;
       });
     });
   });

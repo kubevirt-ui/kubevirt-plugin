@@ -19,3 +19,9 @@ export const getCustomizeInstanceTypeSessionStorage = (): V1VirtualMachine => {
   }
   return null;
 };
+
+export const mergeData = (seedData, appendData) => {
+  return Array.isArray(seedData) || Array.isArray(appendData)
+    ? [...(seedData || []), ...(appendData || [])]
+    : { ...(seedData || {}), ...(appendData || {}) };
+};
