@@ -11,6 +11,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
@@ -40,7 +41,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
   const { createModal } = useModal();
   const location = useLocation();
   const [isChecked, setIsChecked] = useState<boolean>(!!vm?.spec?.template?.spec?.startStrategy);
-  const [isExpanded, setIsExpanded] = useState<boolean>();
+  const [isExpanded, setIsExpanded] = useToggle('boot-management');
   const vmName = getName(vm);
 
   useEffect(() => {
