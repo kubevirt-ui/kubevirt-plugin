@@ -8,7 +8,11 @@ import {
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import useSysprepConfigMaps from '@kubevirt-utils/components/SysprepModal/hooks/useConfigMaps';
-import { AUTOUNATTEND, UNATTEND } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
+import {
+  AUTOUNATTEND,
+  generateSysprepConfigMapName,
+  UNATTEND,
+} from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -52,7 +56,8 @@ const SysprepDescriptionItem: FC = () => {
         autounattend: autoUnattend,
         unattended: unattend,
       },
-      name: '', // name of new ConfigMap will be generated and attached to VM later on its creation
+      name: generateSysprepConfigMapName(),
+      shouldCreateNewConfigMap: true,
     });
   };
 
@@ -69,6 +74,7 @@ const SysprepDescriptionItem: FC = () => {
         unattended: unattend,
       },
       name,
+      shouldCreateNewConfigMap: false,
     });
   };
 

@@ -3,6 +3,7 @@ import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresou
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { encodeKeyForVirtctlCommand } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 export const getCreateVMVirtctlCommand = (
   vm: V1VirtualMachine,
@@ -17,10 +18,9 @@ export const getCreateVMVirtctlCommand = (
     ? '--volume-clone-pvc='
     : '--volume-datasource=src:';
 
-  const encodedSSHCloudInitUserData = `--cloud-init-user-data ${encodeKeyForVirtctlCommand(
-    vm,
-    sshPubKey,
-  )}`;
+  const hasSSH = !isEmpty(sshPubKey);
+  const encodedSSHCloudInitUserData =
+    hasSSH && `--cloud-init-user-data ${encodeKeyForVirtctlCommand(vm, sshPubKey)}`;
 
   const commandStructure = [
     'virtctl create vm',
@@ -28,7 +28,7 @@ export const getCreateVMVirtctlCommand = (
     `--instancetype=${vm?.spec?.instancetype?.name}`,
     `--preference=${vm?.spec?.preference?.name}`,
     `${source}${sourceMetadata}`,
-    encodedSSHCloudInitUserData,
+    ...(hasSSH ? [encodedSSHCloudInitUserData] : []),
   ];
 
   return commandStructure.filter(Boolean).join(` \\\n`);
