@@ -74,16 +74,18 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
             default: editOnTitleJustify ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
           }}
         >
-          <FlexItem>
-            <DescriptionItemHeader
-              bodyContent={bodyContent}
-              breadcrumb={breadcrumb}
-              descriptionHeader={descriptionHeader}
-              isPopover={isPopover}
-              label={label}
-              moreInfoURL={moreInfoURL}
-            />
-          </FlexItem>
+          {(bodyContent || breadcrumb || descriptionHeader || label || moreInfoURL) && (
+            <FlexItem>
+              <DescriptionItemHeader
+                bodyContent={bodyContent}
+                breadcrumb={breadcrumb}
+                descriptionHeader={descriptionHeader}
+                isPopover={isPopover}
+                label={label}
+                moreInfoURL={moreInfoURL}
+              />
+            </FlexItem>
+          )}
           {isEdit && showEditOnTitle && (
             <FlexItem>
               <Button
