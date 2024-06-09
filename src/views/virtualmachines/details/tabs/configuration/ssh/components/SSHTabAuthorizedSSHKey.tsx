@@ -1,19 +1,18 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useMemo } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SecretNameLabel from '@kubevirt-utils/components/SSHSecretModal/components/SecretNameLabel';
-import EditButtonWithTooltip from '@kubevirt-utils/components/VirtualMachineDescriptionItem/EditButtonWithTooltip';
+import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import VMSSHSecretModal from '@kubevirt-utils/components/VMSSHSecretModal/VMSSHSecretModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
-import { ExpandableSection, Stack } from '@patternfly/react-core';
+import { Stack } from '@patternfly/react-core';
 
 import { useDynamicSSHInjection } from '../hooks/useDynamicSSHInjection';
 
@@ -29,7 +28,6 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
   onUpdateVM,
   vm,
 }) => {
-  const [isExpanded, setIsExpanded] = useState<boolean>();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys, loaded] = useKubevirtUserSettings('ssh');
@@ -51,38 +49,29 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
         });
 
   return (
-    <ExpandableSection
-      toggleContent={
-        <div>
-          <SearchItem id="public-ssh-key">{t('Public SSH key')}</SearchItem> <LinuxLabel />{' '}
-          <EditButtonWithTooltip
-            onEditClick={() =>
-              createModal((modalProps) => (
-                <VMSSHSecretModal
-                  {...modalProps}
-                  authorizedSSHKeys={authorizedSSHKeys}
-                  updateAuthorizedSSHKeys={updateAuthorizedSSHKeys}
-                  updateVM={onSubmit}
-                  vm={vm}
-                />
-              ))
-            }
-            isEditable={isEditable}
-            testId="ssh-tab-edit-authorized"
-          >
-            {t('Edit')}
-          </EditButtonWithTooltip>
-        </div>
+    <VirtualMachineDescriptionItem
+      descriptionData={
+        <Stack hasGutter>
+          <SecretNameLabel secretName={secretName} />
+          <DynamicSSHKeyInjectionDescription isDynamicSSHInjectionEnabled />
+        </Stack>
       }
-      isExpanded={isExpanded}
-      isIndented
-      onToggle={(_event, val) => setIsExpanded(val)}
-    >
-      <Stack hasGutter>
-        <SecretNameLabel secretName={secretName} />
-        <DynamicSSHKeyInjectionDescription isDynamicSSHInjectionEnabled />
-      </Stack>
-    </ExpandableSection>
+      onEditClick={() =>
+        createModal((modalProps) => (
+          <VMSSHSecretModal
+            {...modalProps}
+            authorizedSSHKeys={authorizedSSHKeys}
+            updateAuthorizedSSHKeys={updateAuthorizedSSHKeys}
+            updateVM={onSubmit}
+            vm={vm}
+          />
+        ))
+      }
+      data-test-id="public-ssh-key"
+      descriptionHeader={<SearchItem id="public-ssh-key">{t('Public SSH key')}</SearchItem>}
+      isEdit={isEditable}
+      showEditOnTitle
+    />
   );
 };
 
