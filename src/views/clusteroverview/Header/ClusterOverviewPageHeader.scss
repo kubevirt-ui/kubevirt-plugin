@@ -1,0 +1,9 @@
+.cluster-overview-header {
+  &__virtctl-link {
+    font-size: 14px;
+  }
+
+  &__virtctl-link--help-icon {
+    font-size: var(--pf-global--FontSize--sm);
+  }
+}
