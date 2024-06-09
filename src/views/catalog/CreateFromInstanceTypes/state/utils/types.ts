@@ -80,6 +80,7 @@ export type InstanceTypeVMStoreState = {
   startVM: boolean;
   vm: V1VirtualMachine; // vm object for customization flow
   vmNamespaceTarget: string;
+  volumeListNamespace: string;
 };
 
 type InstanceTypeVMStoreActions = {
@@ -96,6 +97,7 @@ type InstanceTypeVMStoreActions = {
   setStartVM: (checked: boolean) => void;
   setVM: (vm: V1VirtualMachine) => Promise<void>;
   setVMNamespaceTarget: (sshSecretName: string, targetNamespace: string) => void;
+  setVolumeListNamespace: (namespace: string) => void;
 };
 
 export type InstanceTypeVMStore = InstanceTypeVMStoreState & InstanceTypeVMStoreActions;

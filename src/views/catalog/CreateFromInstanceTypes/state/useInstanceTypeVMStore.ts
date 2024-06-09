@@ -81,5 +81,8 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
       get().setIsChangingNamespace();
       get().applySSHFromSettings(sshSecretName, targetNamespace);
     },
+    setVolumeListNamespace: (namespace) => {
+      set({ volumeListNamespace: namespace });
+    },
   };
 });
