@@ -8,6 +8,7 @@ import {
 } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
@@ -126,9 +127,11 @@ const CreateVMFooter: FC = () => {
               sysprepName: name,
             });
 
-            try {
-              await k8sCreate({ data: configMap, model: ConfigMapModel });
-            } catch {}
+            await k8sCreate<IoK8sApiCoreV1ConfigMap>({
+              data: configMap,
+              model: ConfigMapModel,
+              ns: vmNamespaceTarget,
+            });
           }
         }
 
