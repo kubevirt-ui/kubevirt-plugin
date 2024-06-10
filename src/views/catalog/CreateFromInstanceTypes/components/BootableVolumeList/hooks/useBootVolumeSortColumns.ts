@@ -59,13 +59,14 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   };
 
   const sortVolumes = (a: BootableVolume, b: BootableVolume): number => {
-    const aValue = getSortableRowValues(a)[activeSortIndex];
-    const bValue = getSortableRowValues(b)[activeSortIndex];
+    //favorites is column 0, so we need to decrease index by 1
+    const aValue = getSortableRowValues(a)[activeSortIndex - 1];
+    const bValue = getSortableRowValues(b)[activeSortIndex - 1];
 
     if (activeSortDirection === 'asc') {
-      return aValue?.localeCompare(bValue);
+      return aValue?.localeCompare(bValue, undefined, { numeric: true, sensitivity: 'base' });
     }
-    return bValue?.localeCompare(aValue);
+    return bValue?.localeCompare(aValue, undefined, { numeric: true, sensitivity: 'base' });
   };
 
   const getSortType = (columnIndex: number): ThSortType => ({
