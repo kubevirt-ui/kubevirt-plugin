@@ -30,7 +30,11 @@ const SysprepDescriptionItem: FC = () => {
   const [sysprepConfigMaps] = useSysprepConfigMaps(vmNamespaceTarget);
   const sysprepInitialData = instanceTypeVMInitialState.sysprepConfigMapData;
   const { sysprepConfigMapData } = instanceTypeVMState;
-  const { data, name: currentSysprepName } = sysprepConfigMapData || sysprepInitialData;
+  const {
+    data,
+    name: currentSysprepName,
+    shouldCreateNewConfigMap,
+  } = sysprepConfigMapData || sysprepInitialData;
   const [autounattend, setAutounattend] = useState<string>(data?.autounattend || '');
   const [unattended, setUnattended] = useState<string>(data?.unattended || '');
 
@@ -84,6 +88,7 @@ const SysprepDescriptionItem: FC = () => {
         hasAutoUnattend={!!autounattend}
         hasUnattend={!!unattended}
         selectedSysprepName={currentSysprepName}
+        shouldCreateNewConfigMap={shouldCreateNewConfigMap}
       />
     ) : (
       t('Not configured')
