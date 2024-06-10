@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useMemo } from 'react';
 
 import { bytesToDiskSize } from '@catalog/utils/quantity';
+import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 
 import { useProjectsAndPVCs } from '../../hooks/useProjectsAndPVCs';
 
@@ -38,7 +39,7 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
       selectPVCName(selection);
       const selectedPVC = pvcs?.find((pvc) => pvc?.metadata?.name === selection);
       const selectedPVCSize = selectedPVC?.spec?.resources?.requests?.storage;
-      setDiskSize && setDiskSize(bytesToDiskSize(selectedPVCSize));
+      setDiskSize && setDiskSize(removeByteSuffix(bytesToDiskSize(selectedPVCSize)));
     },
     [selectPVCName, pvcs, setDiskSize],
   );
