@@ -24,7 +24,8 @@
   &-table {
     th:first-child {
       padding-right: 0;
-      padding-left: 30px;
+      padding-left: var(--pf-v5-global--spacer--sm);
+      margin-right: var(--pf-v5-global--spacer--sm);
       .pf-c-table__sort-indicator {
         margin: 0;
       }
@@ -32,7 +33,7 @@
     tbody {
       tr {
         td:first-child {
-          padding-left: var(--pf-v5-global--spacer--md);
+          padding-left: 0;
           width: unset;
           display: flex;
           justify-content: center;
