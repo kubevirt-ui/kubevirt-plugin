@@ -45,7 +45,7 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
             namespace: null,
           };
 
-          const osName = getLabel(selectedVolume, DEFAULT_PREFERENCE_LABEL).replaceAll('.', '-');
+          const osName = getLabel(selectedVolume, DEFAULT_PREFERENCE_LABEL)?.replaceAll('.', '-');
           instanceTypeVMState.vmName = generatePrettyName(osName);
         }),
       ),

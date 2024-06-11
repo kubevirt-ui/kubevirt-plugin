@@ -205,9 +205,9 @@ const createPVCBootableVolume = async (
     };
   });
 
+  const createdDS = await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
   await k8sCreate({ data: bootableVolumeToCreate, model: DataVolumeModel });
-
-  return await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+  return createdDS;
 };
 
 export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType = async (
