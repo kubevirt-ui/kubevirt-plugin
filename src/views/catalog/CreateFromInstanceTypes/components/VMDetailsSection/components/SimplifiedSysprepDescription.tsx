@@ -4,21 +4,25 @@ import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-a
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { Stack } from '@patternfly/react-core';
+import { CheckIcon, TimesIcon } from '@patternfly/react-icons';
 
 type SimplifiedSysprepDescriptionProps = {
   hasAutoUnattend: boolean;
   hasUnattend: boolean;
   selectedSysprepName?: string;
+  shouldCreateNewConfigMap: boolean;
 };
 
 const SimplifiedSysprepDescription: FC<SimplifiedSysprepDescriptionProps> = ({
   hasAutoUnattend,
   hasUnattend,
   selectedSysprepName,
+  shouldCreateNewConfigMap,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  if (selectedSysprepName) {
+  if (!shouldCreateNewConfigMap) {
     return (
       <ResourceLink
         groupVersionKind={modelToGroupVersionKind(ConfigMapModel)}
@@ -29,16 +33,16 @@ const SimplifiedSysprepDescription: FC<SimplifiedSysprepDescriptionProps> = ({
   }
 
   return (
-    <>
+    <Stack hasGutter>
       <VirtualMachineDescriptionItem
-        descriptionData={hasAutoUnattend ? t('Available') : t('Not available')}
-        descriptionHeader={t('Autounattend.xml answer file')}
+        descriptionData={hasAutoUnattend ? <CheckIcon /> : <TimesIcon />}
+        descriptionHeader={t('Autounattend.xml')}
       />
       <VirtualMachineDescriptionItem
-        descriptionData={hasUnattend ? t('Available') : t('Not available')}
-        descriptionHeader={t('Unattend.xml answer file')}
+        descriptionData={hasUnattend ? <CheckIcon /> : <TimesIcon />}
+        descriptionHeader={t('Unattend.xml')}
       />
-    </>
+    </Stack>
   );
 };
 
