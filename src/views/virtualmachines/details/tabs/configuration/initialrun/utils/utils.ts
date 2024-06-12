@@ -96,7 +96,7 @@ export const createSysprepConfigMap = async (
     return;
   }
 
-  await k8sCreate({ data: configMap, model: ConfigMapModel });
+  await k8sCreate({ data: configMap, model: ConfigMapModel, ns: vm?.metadata?.namespace });
   onSubmit
     ? onSubmit([
         {
@@ -115,12 +115,12 @@ export const createSysprepConfigMap = async (
           {
             op: 'replace',
             path: `/spec/template/spec/domain/devices/disks`,
-            value: [...vmDisks, sysprepDisk()],
+            value: [...(vmDisks || []), sysprepDisk()],
           },
           {
             op: 'replace',
             path: `/spec/template/spec/volumes`,
-            value: [...vmVolumes, sysprepVolume(configMap.metadata.name)],
+            value: [...(vmVolumes || []), sysprepVolume(configMap.metadata.name)],
           },
         ],
         model: VirtualMachineModel,
