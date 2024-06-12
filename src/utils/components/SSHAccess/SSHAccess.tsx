@@ -8,16 +8,25 @@ import ConsoleOverVirtctl from './components/ConsoleOverVirtctl';
 import SSHCommand from './components/SSHCommand';
 
 type SSHAccessProps = {
+  isCustomizeInstanceType?: boolean;
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded?: boolean;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const SSHAccess: FC<SSHAccessProps> = ({ sshService, sshServiceLoaded, vm, vmi }) => {
+const SSHAccess: FC<SSHAccessProps> = ({
+  isCustomizeInstanceType,
+  sshService,
+  sshServiceLoaded,
+  vm,
+  vmi,
+}) => {
   return (
     <DescriptionList className="pf-c-description-list">
-      <SSHCommand sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
+      {!isCustomizeInstanceType && (
+        <SSHCommand sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
+      )}
       <ConsoleOverVirtctl vm={vm} />
     </DescriptionList>
   );
