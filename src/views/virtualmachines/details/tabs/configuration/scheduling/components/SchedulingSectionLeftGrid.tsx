@@ -7,6 +7,7 @@ import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models'
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
@@ -17,7 +18,6 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
 import Affinity from './Affinity';
-import NodeSelector from './NodeSelector';
 
 type SchedulingSectionLeftGridProps = {
   canUpdateVM: boolean;
@@ -56,6 +56,9 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
     <GridItem span={5}>
       <DescriptionList className="pf-c-description-list">
         <VirtualMachineDescriptionItem
+          descriptionData={
+            <NodeSelectorDetailItem nodeSelector={vm?.spec?.template?.spec?.nodeSelector} />
+          }
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <NodeSelectorModal
@@ -70,7 +73,6 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
             ))
           }
           data-test-id="node-selector"
-          descriptionData={<NodeSelector vm={vm} />}
           descriptionHeader={<SearchItem id="node-selector">{t('Node selector')}</SearchItem>}
           isEdit={canUpdateVM}
         />
