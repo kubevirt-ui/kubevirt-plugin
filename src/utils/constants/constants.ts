@@ -9,9 +9,13 @@ export const OPENSHIFT_MULTUS_NS = 'openshift-multus';
 
 export const VENDOR_LABEL = 'instancetype.kubevirt.io/vendor';
 
-export const AUTO_COMPUTE_CPU_LIMITS_LABEL = 'cpu.autocompute.kubevirt.io=true';
-
 export const ROOTDISK = 'rootdisk';
 
 export const KUBEVIRT_HYPERCONVERGED = 'kubevirt-hyperconverged';
 export const OPENSHIFT_CNV = 'openshift-cnv';
+
+export enum K8S_OPS {
+  ADD = 'add',
+  REMOVE = 'remove',
+  REPLACE = 'replace',
+}
