@@ -1,8 +1,4 @@
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { AUTOCOMPUTE_CPU_LIMITS_LINK } from '@kubevirt-utils/constants/url-constants';
-import { AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type Feature = {
   canEdit: boolean;
@@ -23,26 +19,7 @@ type UsePreviewFeaturesData = () => {
 };
 
 const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
-  const { t } = useKubevirtTranslation();
-
-  const {
-    canEdit: canEditCpuLimits,
-    featureEnabled: isEnabledCpuLimits,
-    loading: loadingCpuLimits,
-    toggleFeature: toggleCpuLimits,
-  } = useFeatures(AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED);
-
-  const features = [
-    {
-      canEdit: canEditCpuLimits,
-      externalLink: AUTOCOMPUTE_CPU_LIMITS_LINK,
-      featureEnabled: isEnabledCpuLimits,
-      id: AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED,
-      label: t('Enable CPU limits'),
-      loading: loadingCpuLimits,
-      toggleFeature: toggleCpuLimits,
-    },
-  ];
+  const features = [];
 
   const allFeatures = features.reduce(
     (acc, feature) => {

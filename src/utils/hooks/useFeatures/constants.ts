@@ -13,8 +13,6 @@ export const AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID = 'automaticSubscriptionOrga
 export const INSTANCE_TYPE_ENABLED = 'instanceTypesEnabled';
 export const KUBEVIRT_APISERVER_PROXY = 'kubevirtApiserverProxy';
 export const LOAD_BALANCER_ENABLED = 'loadBalancerEnabled';
-export const AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED = 'autocomputeCPULimitsPreviewEnabled';
-export const AUTOCOMPUTE_CPU_LIMITS_ENABLED = 'autocomputeCPULimitsEnabled';
 export const NODE_PORT_ADDRESS = 'nodePortAddress';
 export const NODE_PORT_ENABLED = 'nodePortEnabled';
 export const DISABLED_GUEST_SYSTEM_LOGS_ACCESS = 'disabledGuestSystemLogsAccess';
@@ -27,8 +25,6 @@ export const FEATURE_HCO_PERSISTENT_RESERVATION = 'persistentReservationHCO';
 
 export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
   data: {
-    [AUTOCOMPUTE_CPU_LIMITS_ENABLED]: 'false',
-    [AUTOCOMPUTE_CPU_LIMITS_PREVIEW_ENABLED]: 'false',
     [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
     [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
     [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
