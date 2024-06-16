@@ -583,7 +583,7 @@
   "Host devices ({{hostDevicesCount}})": "Host devices ({{hostDevicesCount}})",
   "Hostname": "Hostname",
   "Hot plug is enabled only for \"Bridge\" and \"SR-IOV\" types": "Hot plug is enabled only for \"Bridge\" and \"SR-IOV\" types",
-  "Hot plug is enabled only for \"Disk\" type": "Hot plug is enabled only for \"Disk\" type",
+  "Hot plug is enabled only for \"Disk\" and \"Lun\" types": "Hot plug is enabled only for \"Disk\" and \"Lun\" types",
   "Hot plug is enabled only for \"SCSI\" interface": "Hot plug is enabled only for \"SCSI\" interface",
   "How much time before the check will try to close itself": "How much time before the check will try to close itself",
   "HP series": "HP series",

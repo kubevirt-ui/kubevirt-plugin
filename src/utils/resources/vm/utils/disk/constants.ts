@@ -25,14 +25,12 @@ export type DiskRowDataLayout = {
 export const diskTypes = {
   cdrom: 'cdrom',
   disk: 'disk',
-  floppy: 'floppy',
   lun: 'lun',
 };
 
 export const diskTypesLabels = {
   cdrom: 'CD-ROM',
   disk: 'Disk',
-  floppy: 'Floppy',
   lun: 'LUN',
 };
 

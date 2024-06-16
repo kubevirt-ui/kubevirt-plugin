@@ -25,8 +25,6 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
 
   const [diskInterface, diskSource] = watch([diskInterfaceField, diskSourceField]);
 
-  const typeOptions = Object.values(diskTypes).filter((type) => type !== diskTypes.floppy);
-
   return (
     <Controller
       render={({ field: { onChange, value } }) => (
@@ -47,12 +45,13 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
               }}
               selected={value}
               selectedLabel={diskTypesLabels[value]}
-              toggleProps={{ isDisabled: isVMRunning, isFullWidth: true }}
+              toggleProps={{ isFullWidth: true }}
             >
               <SelectList>
-                {typeOptions.map((type) => (
+                {Object.values(diskTypes).map((type) => (
                   <SelectOption
                     data-test-id={`${diskTypeSelectFieldID}-${type}`}
+                    isDisabled={isVMRunning && type === diskTypes.cdrom}
                     key={type}
                     value={type}
                   >
@@ -62,7 +61,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
               </SelectList>
             </FormPFSelect>
             <FormGroupHelperText>
-              {t('Hot plug is enabled only for "Disk" type')}
+              {t('Hot plug is enabled only for "Disk" and "Lun" types')}
             </FormGroupHelperText>
           </FormGroup>
         </div>
