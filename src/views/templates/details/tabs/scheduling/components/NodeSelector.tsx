@@ -3,26 +3,15 @@ import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/sc
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Label, LabelGroup } from '@patternfly/react-core';
 
 import NodeSelectorModal from './NodeSelectorModal';
 
 const NodeSelector: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const nodeSelector = getNodeSelector(template);
-  const nodeSelectorLabels = !isEmpty(nodeSelector) ? (
-    <LabelGroup defaultIsOpen>
-      {Object.entries(nodeSelector)?.map(([key, value]) => (
-        <Label key={key}>{`${key}=${value}`}</Label>
-      ))}
-    </LabelGroup>
-  ) : (
-    t('No selector')
-  );
 
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
@@ -36,7 +25,7 @@ const NodeSelector: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, tem
 
   return (
     <VirtualMachineDescriptionItem
-      descriptionData={nodeSelectorLabels}
+      descriptionData={<NodeSelectorDetailItem nodeSelector={getNodeSelector(template)} />}
       descriptionHeader={t('Node selector')}
       isEdit={editable}
       onEditClick={onEditClick}

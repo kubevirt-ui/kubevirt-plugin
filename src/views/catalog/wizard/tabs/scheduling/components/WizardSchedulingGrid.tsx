@@ -9,6 +9,7 @@ import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourc
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
 import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/ShowEvictionStrategy';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -22,7 +23,6 @@ import Affinity from './Affinity';
 import DedicatedResources from './DedicatedResources';
 import Descheduler from './Descheduler';
 import DeschedulerPopover from './DeschedulerPopover';
-import NodeSelector from './NodeSelector';
 import Tolerations from './Tolerations';
 
 type WizardSchedulingGridProps = {
@@ -44,6 +44,9 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
       <GridItem rowSpan={4} span={6}>
         <DescriptionList className="pf-c-description-list">
           <WizardDescriptionItem
+            description={
+              <NodeSelectorDetailItem nodeSelector={vm?.spec?.template?.spec?.nodeSelector} />
+            }
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <NodeSelectorModal
@@ -56,7 +59,6 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
                 />
               ))
             }
-            description={<NodeSelector vm={vm} />}
             isEdit
             testId="node-selector"
             title={t('Node selector')}

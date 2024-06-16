@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -15,7 +16,6 @@ import Affinity from './Affinity/Affinity';
 import Descheduler from './Descheduler/Descheduler';
 import DedicatedResources from './DeticatedResources/DedicatedResources';
 import EvictionStrategy from './EvictionStrategy/EvictionStrategy';
-import NodeSelector from './NodeSelector/NodeSelector';
 import Tolerations from './Tolerations/Tolerations';
 
 type VirtualMachinesInstancePageSchedulingTabProps = {
@@ -33,7 +33,7 @@ const VirtualMachinesInstancePageSchedulingTab: FC<
         <GridItem span={6}>
           <DescriptionList className="pf-c-description-list">
             <VirtualMachineDescriptionItem
-              descriptionData={<NodeSelector vmi={vmi} />}
+              descriptionData={<NodeSelectorDetailItem nodeSelector={vmi?.spec?.nodeSelector} />}
               descriptionHeader={t('Node selector')}
             />
             <VirtualMachineDescriptionItem
