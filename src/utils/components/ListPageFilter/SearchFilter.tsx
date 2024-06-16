@@ -25,10 +25,10 @@ const SearchFilter = forwardRef<HTMLInputElement, SearchFilterProps>((props, ref
       }
     };
 
-    document.addEventListener('keydown', onKeyDown);
+    inputRef.current.addEventListener('keydown', onKeyDown);
 
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
+      inputRef.current.removeEventListener('keydown', onKeyDown);
     };
   }, [inputRef]);
 
