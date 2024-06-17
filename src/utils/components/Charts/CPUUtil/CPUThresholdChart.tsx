@@ -17,6 +17,7 @@ import {
   ChartThreshold,
   ChartVoronoiContainer,
 } from '@patternfly/react-charts';
+import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
@@ -24,7 +25,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
+import {
+  findMaxYValue,
+  MILLISECONDS_MULTIPLIER,
+  queriesToLink,
+  tickFormat,
+  TICKS_COUNT,
+} from '../utils/utils';
 
 type CPUThresholdChartProps = {
   pods: K8sResourceCommon[];
@@ -69,7 +76,7 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
 
   const isReady = !isEmpty(chartData) && !isEmpty(thresholdData);
   const linkToMetrics = queriesToLink(queries?.CPU_USAGE);
-
+  const yMax = findMaxYValue(thresholdData);
   return (
     <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
@@ -87,10 +94,20 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
               x: [currentTime - timespan, currentTime],
             }}
             height={height}
-            padding={35}
+            padding={{ bottom: 35, left: 70, right: 35, top: 35 }}
             scale={{ x: 'time', y: 'linear' }}
             width={width}
           >
+            <ChartAxis
+              style={{
+                grid: {
+                  stroke: chart_color_black_200.value,
+                },
+              }}
+              dependentAxis
+              tickFormat={(tick: number) => tick?.toFixed(2)}
+              tickValues={[0, yMax]}
+            />
             <ChartAxis
               style={{
                 tickLabels: { padding: 2 },
