@@ -78,8 +78,8 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
         } catch (e) {
           setError(e);
         }
-        setLoading(false);
       }
+      setLoading(false);
     }
   }, [configMapError?.code, userName, loadedConfigMap]);
 
