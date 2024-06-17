@@ -48,17 +48,19 @@ const ApplyStorageProfileSettings: FC = () => {
         handleChange={handleApplyOptimizedSettingsChange}
         isChecked={storageProfileSettingsApplied}
       />
-      <Flex
-        className="ApplyStorageProfileSettings--volume-access-section"
-        spaceItems={{ default: 'spaceItems3xl' }}
-      >
-        <FlexItem>
-          <AccessMode />
-        </FlexItem>
-        <FlexItem>
-          <VolumeMode />
-        </FlexItem>
-      </Flex>
+      {!storageProfileSettingsApplied && (
+        <Flex
+          className="ApplyStorageProfileSettings--volume-access-section"
+          spaceItems={{ default: 'spaceItems3xl' }}
+        >
+          <FlexItem>
+            <AccessMode />
+          </FlexItem>
+          <FlexItem>
+            <VolumeMode />
+          </FlexItem>
+        </Flex>
+      )}
     </div>
   );
 };
