@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { getOSImagesNS } from 'src/views/clusteroverview/OverviewTab/inventory-card/utils/utils';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
@@ -15,23 +14,16 @@ export type AddBootableVolumeButtonProps = {
 const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { onSelectCreatedVolume, volumeListNamespace } = useInstanceTypeVMStore();
 
-  const sourceNamespace = getOSImagesNS();
-
-  const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(sourceNamespace);
+  const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
   const canCreate = canCreateDS || canCreatePVC;
-
-  const { onSelectCreatedVolume } = useInstanceTypeVMStore();
 
   return (
     <Button
       onClick={() =>
         createModal((props) => (
-          <AddBootableVolumeModal
-            enforceNamespace={sourceNamespace}
-            onCreateVolume={onSelectCreatedVolume}
-            {...props}
-          />
+          <AddBootableVolumeModal onCreateVolume={onSelectCreatedVolume} {...props} />
         ))
       }
       isDisabled={!!loadError || !canCreate}

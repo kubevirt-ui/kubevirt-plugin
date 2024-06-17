@@ -7,8 +7,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
-import { getOSImagesNS } from '../../../../clusteroverview/OverviewTab/inventory-card/utils/utils';
-
 import './AddBootableVolumeLink.scss';
 
 type AddBootableVolumeLinkProps = {
@@ -24,10 +22,9 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { onSelectCreatedVolume } = useInstanceTypeVMStore();
+  const { onSelectCreatedVolume, volumeListNamespace } = useInstanceTypeVMStore();
 
-  const sourceNamespace = getOSImagesNS();
-  const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(sourceNamespace);
+  const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
   const canCreate = canCreateDS || canCreatePVC;
 
   return (
@@ -35,11 +32,7 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
       onClick={() => {
         hidePopover?.();
         createModal((props) => (
-          <AddBootableVolumeModal
-            enforceNamespace={sourceNamespace}
-            onCreateVolume={onSelectCreatedVolume}
-            {...props}
-          />
+          <AddBootableVolumeModal onCreateVolume={onSelectCreatedVolume} {...props} />
         ));
       }}
       className="add-bootable-volume-link__inline-text"
