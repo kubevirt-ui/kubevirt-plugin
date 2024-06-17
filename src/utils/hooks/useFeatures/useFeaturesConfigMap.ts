@@ -1,6 +1,6 @@
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { OPENSHIFT_CNV } from '@kubevirt-utils/constants/constants';
 import {
   getGroupVersionKindForModel,
   useK8sWatchResource,
@@ -23,7 +23,7 @@ const useFeaturesConfigMap: UseFeaturesConfigMap = () => {
     groupVersionKind: getGroupVersionKindForModel(ConfigMapModel),
     isList: false,
     name: FEATURES_CONFIG_MAP_NAME,
-    namespace: DEFAULT_NAMESPACE,
+    namespace: OPENSHIFT_CNV,
   });
   return { featuresConfigMapData: [...featuresConfigMapData], isAdmin };
 };
