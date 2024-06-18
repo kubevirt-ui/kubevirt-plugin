@@ -7,6 +7,7 @@ import {
   SysprepConfigMapData,
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import useSysprepConfigMaps from '@kubevirt-utils/components/SysprepModal/hooks/useConfigMaps';
 import {
   AUTOUNATTEND,
@@ -42,6 +43,11 @@ const SysprepDescriptionItem: FC = () => {
     setInstanceTypeVMState({
       payload: newConfigMapData,
       type: instanceTypeActionType.setSysprepConfigMapData,
+    });
+
+    setInstanceTypeVMState({
+      payload: initialSSHCredentials,
+      type: instanceTypeActionType.setSSHCredentials,
     });
   };
 
