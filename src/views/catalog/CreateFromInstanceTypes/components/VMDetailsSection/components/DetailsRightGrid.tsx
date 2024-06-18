@@ -7,6 +7,7 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
+import { initialSysprepData } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
@@ -46,6 +47,11 @@ const DetailsRightGrid: FC = () => {
     setInstanceTypeVMState({
       payload: { ...credentials, appliedDefaultKey: sshSecretCredentials?.appliedDefaultKey },
       type: instanceTypeActionType.setSSHCredentials,
+    });
+
+    setInstanceTypeVMState({
+      payload: initialSysprepData,
+      type: instanceTypeActionType.setSysprepConfigMapData,
     });
 
     return Promise.resolve();
