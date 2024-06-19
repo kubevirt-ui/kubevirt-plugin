@@ -3,8 +3,7 @@ import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNodeSelector } from '@kubevirt-utils/resources/vm';
@@ -26,7 +25,6 @@ type NodeSelectorModalProps = {
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
 };
 
 const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
@@ -36,7 +34,6 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
   onClose,
   onSubmit,
   vm,
-  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -81,7 +78,6 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
       onSubmit={onSubmit}
     >
       <Form>
-        {vmi && <ModalPendingChangesAlert />}
         <LabelsList
           isEmpty={selectorLabels?.length === 0}
           model={!isEmpty(nodes) && NodeModel}
