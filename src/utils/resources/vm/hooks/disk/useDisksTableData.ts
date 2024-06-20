@@ -7,11 +7,12 @@ import {
   getRunningVMMissingDisksFromVMI,
   getRunningVMMissingVolumesFromVMI,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getBootDisk, getDisks, getVolumes } from '../../utils';
+import { getBootDisk, getDisks, getInstanceTypeMatcher, getVolumes } from '../../utils';
 import { getDiskRowDataLayout } from '../../utils/disk/rowData';
 
 type UseDisksTableDisks = (
@@ -27,6 +28,7 @@ type UseDisksTableDisks = (
  */
 const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
   const isVMRunning = isRunning(vm);
+
   const vmDisks = useMemo(
     () =>
       !isVMRunning
@@ -53,8 +55,14 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
   });
 
   const disks = useMemo(() => {
+    const isInstanceTypeVM = Boolean(getInstanceTypeMatcher(vm));
+
     const diskDevices: DiskRawData[] = (vmVolumes || []).map((volume) => {
-      const disk = vmDisks?.find(({ name }) => name === volume?.name);
+      const disk =
+        isInstanceTypeVM && Boolean(volume.name === ROOTDISK)
+          ? { name: ROOTDISK }
+          : vmDisks?.find(({ name }) => name === volume?.name);
+
       const pvc = pvcs?.find(
         ({ metadata }) =>
           metadata?.name === volume?.persistentVolumeClaim?.claimName ||
