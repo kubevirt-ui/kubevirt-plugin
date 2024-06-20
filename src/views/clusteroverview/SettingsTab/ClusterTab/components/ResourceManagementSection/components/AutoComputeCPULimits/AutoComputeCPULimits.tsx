@@ -1,6 +1,5 @@
 import React, { FC, useState } from 'react';
 
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import NewBadge from '@kubevirt-utils/components/NewBadge/NewBadge';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -36,9 +35,7 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
     <>
       <Split>
         <SplitItem isFilled>
-          {t('Auto-compute CPU limits')}{' '}
-          <HelpTextIcon bodyContent={t('XXXXXXX FILL THIS IN XXXXXXXXX')} />
-          {newBadge && <NewBadge />}
+          {t('Auto-compute CPU and memory limits')} {newBadge && <NewBadge />}
         </SplitItem>
         <SplitItem>
           <Switch
