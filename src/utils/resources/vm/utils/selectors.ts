@@ -12,6 +12,7 @@ import {
   V1VirtualMachineCondition,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
+import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS } from '@kubevirt-utils/resources/template';
@@ -130,12 +131,21 @@ export const getAffinity = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.a
  * @param {V1VirtualMachine} vm the virtual machine
  * @returns the virtual machine boot disk
  */
-export const getBootDisk = (vm: V1VirtualMachine): V1Disk =>
-  (getDisks(vm) || [])
+export const getBootDisk = (vm: V1VirtualMachine): V1Disk => {
+  const disks = getDisks(vm);
+  const isInstanceTypeVM = Boolean(getInstanceTypeMatcher(vm));
+
+  const rootDiskVolume = (getVolumes(vm) || []).find((volume) => volume.name === ROOTDISK);
+
+  const defaultRootDisk =
+    isInstanceTypeVM && Boolean(rootDiskVolume) ? { name: ROOTDISK } : disks?.[0];
+
+  return (disks || [])
     .filter((d) => d.bootOrder)
     .reduce((acc, disk) => {
       return acc.bootOrder < disk.bootOrder ? acc : disk;
-    }, getDisks(vm)?.[0]);
+    }, defaultRootDisk);
+};
 
 /**
  * A selector for the QEMU machine's type
