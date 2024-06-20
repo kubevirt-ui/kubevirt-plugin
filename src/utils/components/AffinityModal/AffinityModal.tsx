@@ -2,9 +2,8 @@ import * as React from 'react';
 import produce from 'immer';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAffinity } from '@kubevirt-utils/resources/vm';
@@ -30,7 +29,6 @@ type AffinityModalProps = {
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
 };
 
 const AffinityModal: React.FC<AffinityModalProps> = ({
@@ -40,7 +38,6 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
   onClose,
   onSubmit,
   vm,
-  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -145,7 +142,6 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
       onSubmit={onSubmit}
       submitBtnText={t('Apply rules')}
     >
-      {vmi && <ModalPendingChangesAlert />}
       {list}
     </TabModal>
   );

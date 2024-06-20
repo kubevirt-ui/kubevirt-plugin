@@ -68,7 +68,6 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
                 onClose={onClose}
                 onSubmit={onSubmit}
                 vm={vm}
-                vmi={vmi}
               />
             ))
           }
@@ -105,7 +104,6 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
                 onClose={onClose}
                 onSubmit={onSubmit}
                 vm={vm}
-                vmi={vmi}
               />
             ))
           }
