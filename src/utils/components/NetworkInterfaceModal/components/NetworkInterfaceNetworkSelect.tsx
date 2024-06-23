@@ -135,6 +135,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
           <Select
             isDisabled={!canCreateNetworkInterface}
             isOpen={isOpen}
+            maxHeight={200}
             menuAppendTo="parent"
             onSelect={handleChange}
             onToggle={setIsOpen}
