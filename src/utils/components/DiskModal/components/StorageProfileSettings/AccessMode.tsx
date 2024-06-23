@@ -17,8 +17,7 @@ const AccessMode: FC = () => {
 
   const { control, setValue, watch } = useFormContext<DiskFormState>();
 
-  const { accessMode, storageClassProvisioner, storageProfileSettingsApplied, volumeMode } =
-    watch();
+  const { accessMode, storageClassProvisioner, volumeMode } = watch();
 
   const allowedAccessModes = useMemo(() => {
     return getAccessModeForProvisioner(storageClassProvisioner, volumeMode as VOLUME_MODES);
@@ -29,10 +28,6 @@ const AccessMode: FC = () => {
       setValue(accessModeField, allowedAccessModes?.[0]);
     }
   }, [accessMode, allowedAccessModes, setValue]);
-
-  if (storageProfileSettingsApplied) {
-    return null;
-  }
 
   return (
     <FormGroup fieldId={accessModeFieldID} label={t('Access Mode')}>
