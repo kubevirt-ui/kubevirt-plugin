@@ -9,7 +9,6 @@ import {
 import {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
-  IoK8sApiRbacV1ClusterRole,
   IoK8sApiRbacV1ClusterRoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -160,38 +159,48 @@ export const createStorageCheckup = async (
   });
 };
 
-const installPermissions = (
+const installPermissions = async (
   namespace: string,
   clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
-) => [
-  k8sCreate({ data: serviceAccountResource(namespace), model: ServiceAccountModel }),
-  k8sCreate({ data: storageClusterRoleBinding(namespace), model: ClusterRoleBindingModel }).catch(
-    () => {
-      const subjectsExist = clusterRoleBinding?.subjects;
-      return k8sPatch({
-        data: [
-          {
-            op: 'add',
-            path: `/subjects${subjectsExist ? '/-' : ''}`,
-            value: subjectsExist
-              ? { kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }
-              : [{ kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }],
-          },
-        ],
-        model: ClusterRoleBindingModel,
-        resource: storageClusterRoleBinding(namespace),
-      });
-    },
-  ),
-  k8sCreate({ data: storageCheckupRole(namespace), model: RoleModel }),
-  k8sCreate({ data: storageCheckupRoleBinding(namespace), model: RoleBindingModel }),
-];
+): Promise<void> => {
+  await Promise.allSettled([
+    k8sCreate({ data: serviceAccountResource(namespace), model: ServiceAccountModel }),
+    k8sCreate({ data: storageCheckupRole(namespace), model: RoleModel }),
+  ]);
+  await k8sCreate({ data: storageCheckupRoleBinding(namespace), model: RoleBindingModel });
+  try {
+    await k8sCreate({
+      data: storageClusterRoleBinding(namespace),
+      model: ClusterRoleBindingModel,
+    });
+  } catch (e) {
+    const subjectsExist = clusterRoleBinding?.subjects;
+    await k8sPatch({
+      data: [
+        {
+          op: 'add',
+          path: `/subjects${subjectsExist ? '/-' : ''}`,
+          value: subjectsExist
+            ? { kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }
+            : [{ kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }],
+        },
+      ],
+      model: ClusterRoleBindingModel,
+      resource: storageClusterRoleBinding(namespace),
+    });
+  }
+};
 
-const removePermissions = (
+const removePermissions = async (
   namespace: string,
   clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
-) => [
-  k8sPatch({
+): Promise<void> => {
+  await Promise.allSettled([
+    k8sDelete({ model: ServiceAccountModel, resource: serviceAccountResource(namespace) }),
+    k8sDelete({ model: RoleModel, resource: storageCheckupRole(namespace) }),
+  ]);
+  await k8sDelete({ model: RoleBindingModel, resource: storageCheckupRoleBinding(namespace) });
+  await k8sPatch({
     data: [
       {
         op: 'replace',
@@ -201,23 +210,18 @@ const removePermissions = (
     ],
     model: ClusterRoleBindingModel,
     resource: storageClusterRoleBinding(namespace),
-  }),
-  k8sDelete({ model: ServiceAccountModel, resource: serviceAccountResource(namespace) }),
-  k8sDelete({ model: RoleModel, resource: storageCheckupRole(namespace) }),
-  k8sDelete({ model: RoleBindingModel, resource: storageCheckupRoleBinding(namespace) }),
-];
+  });
+};
 
 export const installOrRemoveCheckupsStoragePermissions = (
   namespace: string,
   isPermitted: boolean,
   clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
-): Promise<Awaited<IoK8sApiRbacV1ClusterRole | IoK8sApiRbacV1ClusterRoleBinding>[]> => {
+): Promise<Awaited<void>> => {
   try {
-    return Promise.all(
-      isPermitted
-        ? removePermissions(namespace, clusterRoleBinding)
-        : installPermissions(namespace, clusterRoleBinding),
-    );
+    return isPermitted
+      ? removePermissions(namespace, clusterRoleBinding)
+      : installPermissions(namespace, clusterRoleBinding);
   } catch (error) {
     kubevirtConsole.log(error);
     return error;

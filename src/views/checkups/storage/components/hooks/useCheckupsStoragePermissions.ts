@@ -44,9 +44,7 @@ export const useCheckupsStoragePermissions = () => {
     },
   );
 
-  const [clusterRoleBinding, loadingClusterRolesBinding] = useK8sWatchResource<
-    IoK8sApiRbacV1ClusterRoleBinding[]
-  >(
+  const [clusterRoleBinding] = useK8sWatchResource<IoK8sApiRbacV1ClusterRoleBinding[]>(
     !isAllNamespace && {
       groupVersionKind: modelToGroupVersionKind(ClusterRoleBindingModel),
       isList: true,
@@ -83,13 +81,7 @@ export const useCheckupsStoragePermissions = () => {
 
   return {
     clusterRoleBinding: isClusterRoleBinding,
-    isPermitted: Boolean(
-      isServiceAccount && isConfigMapRole && isConfigMapRoleBinding && isClusterRoleBinding,
-    ),
-    loading:
-      !loadingServiceAccounts &&
-      !loadingRoles &&
-      !loadingRolesBinding &&
-      !loadingClusterRolesBinding,
+    isPermitted: Boolean(isServiceAccount && isConfigMapRole && isConfigMapRoleBinding),
+    loading: !loadingServiceAccounts && !loadingRoles && !loadingRolesBinding,
   };
 };
