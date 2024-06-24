@@ -18,15 +18,10 @@ import { useWizardVMContext } from './WizardVMContext';
 type CreateVMArguments = {
   isDisableGuestSystemAccessLog: boolean;
   onFullfilled: (vm: V1VirtualMachine) => void;
-  startVM: boolean;
 };
 
 type UseWizardVmCreateValues = {
-  createVM: ({
-    isDisableGuestSystemAccessLog,
-    onFullfilled,
-    startVM,
-  }: CreateVMArguments) => Promise<void>;
+  createVM: ({ isDisableGuestSystemAccessLog, onFullfilled }: CreateVMArguments) => Promise<void>;
   error: any;
   loaded: boolean;
 };
@@ -39,18 +34,12 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
   const [loaded, setLoaded] = useState<boolean>(true);
   const [error, setError] = useState<any>();
 
-  const createVM = async ({
-    isDisableGuestSystemAccessLog,
-    onFullfilled,
-    startVM,
-  }: CreateVMArguments) => {
+  const createVM = async ({ isDisableGuestSystemAccessLog, onFullfilled }: CreateVMArguments) => {
     try {
       setLoaded(false);
       setError(undefined);
 
       const vmToCrete = produce(vm, (vmDraft) => {
-        vmDraft.spec.running = startVM;
-
         if (isDisableGuestSystemAccessLog) {
           const devices = (<unknown>vmDraft.spec.template.spec.domain.devices) as V1Devices & {
             logSerialConsole: boolean;

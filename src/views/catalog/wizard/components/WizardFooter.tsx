@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
@@ -27,20 +27,12 @@ import { WizardNoBootModal } from './WizardNoBootModal';
 export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const navigate = useNavigate();
   const { t } = useKubevirtTranslation();
-  const {
-    disableVmCreate,
-    loaded: vmContextLoaded,
-    tabsData,
-    updateTabsData,
-  } = useWizardVMContext();
+  const { disableVmCreate, loaded: vmContextLoaded, updateVM, vm } = useWizardVMContext();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVmCreate();
   const { createModal } = useModal();
   const { featureEnabled: isDisableGuestSystemAccessLog } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
-  );
-  const [startVM, setStartVM] = useState<boolean>(
-    isBootSourceAvailable && (tabsData?.startVM ?? true),
   );
 
   const onCreate = () =>
@@ -51,7 +43,6 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
         clearSessionStorageVM();
         navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
       },
-      startVM,
     });
 
   const onSubmit = () => {
@@ -73,23 +64,33 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
 
   const onChangeStartVM = useCallback(
     (checked: boolean) => {
-      setStartVM(checked);
-      updateTabsData((currentTabsData) => {
-        return { ...currentTabsData, startVM: checked };
+      updateVM((draftVM) => {
+        delete draftVM.spec.runStrategy;
+        draftVM.spec.running = checked;
       });
     },
-    [updateTabsData],
+    [updateVM],
   );
+
+  const runStrategy = vm?.spec?.runStrategy;
 
   return (
     <footer className="vm-wizard-footer">
       <Stack hasGutter>
         <StackItem>
           <Checkbox
+            isChecked={
+              vm?.spec?.running || runStrategy === 'Always' || runStrategy === 'RerunOnFailure'
+            }
+            label={
+              runStrategy
+                ? t('Start this VirtualMachine after creation ({{runStrategy}})', {
+                    runStrategy,
+                  })
+                : t('Start this VirtualMachine after creation')
+            }
             id="start-after-create-checkbox"
-            isChecked={startVM}
             isDisabled={!loaded || disableVmCreate || !isBootSourceAvailable}
-            label={t('Start this VirtualMachine after creation')}
             onChange={(_, checked: boolean) => onChangeStartVM(checked)}
           />
         </StackItem>

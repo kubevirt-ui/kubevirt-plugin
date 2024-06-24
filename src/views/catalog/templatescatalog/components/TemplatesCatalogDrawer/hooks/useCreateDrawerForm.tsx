@@ -60,6 +60,7 @@ const useCreateDrawerForm = (
     cdFile,
     diskFile,
     isBootSourceAvailable,
+    setVM,
     sshDetails,
     storageClassName,
     storageClassRequired,
@@ -71,7 +72,6 @@ const useCreateDrawerForm = (
 
   const { nameField, onVMNameChange } = useCreateVMName();
 
-  const [startVM, setStartVM] = useState(true);
   const [isQuickCreating, setIsQuickCreating] = useState(false);
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [createError, setCreateError] = useState(undefined);
@@ -130,7 +130,6 @@ const useCreateDrawerForm = (
           isDisabledGuestSystemLogs,
           name: nameField,
           namespace,
-          startVM,
           subscriptionData,
         },
         template: templateToProcess,
@@ -235,10 +234,12 @@ const useCreateDrawerForm = (
   };
 
   const onChangeStartVM = (checked: boolean) => {
-    setStartVM(checked);
-    updateTabsData((currentTabsData) => {
-      return { ...currentTabsData, startVM: checked };
-    });
+    setVM(
+      produce(vm, (draftVM) => {
+        delete draftVM.spec.runStrategy;
+        draftVM.spec.running = checked;
+      }),
+    );
   };
 
   return {
@@ -259,7 +260,8 @@ const useCreateDrawerForm = (
     onCustomize,
     onQuickCreate,
     onVMNameChange,
-    startVM,
+    runStrategy: vm?.spec?.runStrategy,
+    startVM: vm?.spec?.running,
   };
 };
 
