@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import produce from 'immer';
 import { Updater, useImmer } from 'use-immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -94,9 +95,18 @@ const useDrawer = (template: V1Template) => {
   );
 
   useEffect(() => {
+    if (!templateWithGeneratedParams) return;
+
     updateDefaultDiskSource(getTemplateVirtualMachineObject(templateWithGeneratedParams));
 
-    setCustomizedTemplate(templateWithGeneratedParams);
+    const templateWithRunning = produce(templateWithGeneratedParams, (draftTemplate) => {
+      const draftVM = getTemplateVirtualMachineObject(draftTemplate);
+
+      if (isEmpty(draftVM?.spec?.runStrategy) && draftVM?.spec?.running === undefined)
+        draftVM.spec.running = true;
+    });
+
+    setCustomizedTemplate(templateWithRunning);
   }, [setCustomizedTemplate, templateWithGeneratedParams, updateDefaultDiskSource]);
 
   return {

@@ -1129,6 +1129,7 @@
   "Start": "Start",
   "Start in pause mode": "Start in pause mode",
   "Start this VirtualMachine after creation": "Start this VirtualMachine after creation",
+  "Start this VirtualMachine after creation ({{runStrategy}})": "Start this VirtualMachine after creation ({{runStrategy}})",
   "Start this VirtualMachine in pause mode": "Start this VirtualMachine in pause mode",
   "Start time": "Start time",
   "Start VirtualMachine once created": "Start VirtualMachine once created",
