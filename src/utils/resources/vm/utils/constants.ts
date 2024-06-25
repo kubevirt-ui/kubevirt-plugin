@@ -25,3 +25,7 @@ export const PATHS_TO_HIGHLIGHT = {
 };
 
 export const MIGRATION__PROMETHEUS_DELAY = 15 * MILLISECONDS_TO_SECONDS_MULTIPLIER;
+
+export const DEFAULT_NETWORK_INTERFACE = { masquerade: {}, model: 'virtio', name: 'default' };
+
+export const DEFAULT_NETWORK = { name: 'default', pod: {} };
