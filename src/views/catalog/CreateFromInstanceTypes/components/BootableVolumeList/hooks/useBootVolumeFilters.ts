@@ -1,4 +1,3 @@
-import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -27,10 +26,6 @@ const useBootVolumeFilters = (isModal: boolean): RowFilter<BootableVolume>[] => 
         availableResourceNames?.selected?.includes(obj?.kind),
       filterGroupName: t('Resource'),
       items: [
-        {
-          id: PersistentVolumeClaimModel.kind,
-          title: PersistentVolumeClaimModel.abbr,
-        },
         {
           id: DataSourceModel.kind,
           title: 'DS',
