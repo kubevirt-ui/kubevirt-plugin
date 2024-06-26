@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { DataVolumeModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -30,7 +30,7 @@ const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ buttonText,
   const onCreate = (type: string) => {
     return type === 'form'
       ? createModal((props) => <AddBootableVolumeModal {...props} />)
-      : navigate(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataVolumeModelRef}/~new`);
+      : navigate(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/~new`);
   };
 
   if ((canCreateDS || canCreatePVC) && canListInstanceTypesPreference) {

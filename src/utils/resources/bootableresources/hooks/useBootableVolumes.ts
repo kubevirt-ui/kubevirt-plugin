@@ -43,22 +43,17 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   });
 
   // getting volumesnapshot as this can also be a source of DS
-  const [volumeSnapshots, loadedVolumeSnapshots, loadErrorVolumeSnapshots] = useK8sWatchResource<
-    VolumeSnapshotKind[]
-  >({
+  const [volumeSnapshots] = useK8sWatchResource<VolumeSnapshotKind[]>({
     groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
     isList: true,
     namespace,
   });
 
-  const error = useMemo(
-    () => dataSourcesError || loadErrorPVCs || loadErrorVolumeSnapshots,
-    [dataSourcesError, loadErrorPVCs, loadErrorVolumeSnapshots],
-  );
+  const error = useMemo(() => dataSourcesError || loadErrorPVCs, [dataSourcesError, loadErrorPVCs]);
 
   const loaded = useMemo(
-    () => (error ? true : loadedDataSources && loadedPVCs && loadedVolumeSnapshots),
-    [error, loadedDataSources, loadedPVCs, loadedVolumeSnapshots],
+    () => (error ? true : loadedDataSources && loadedPVCs),
+    [error, loadedDataSources, loadedPVCs],
   );
 
   const readyOrCloningDataSources = useMemo(
