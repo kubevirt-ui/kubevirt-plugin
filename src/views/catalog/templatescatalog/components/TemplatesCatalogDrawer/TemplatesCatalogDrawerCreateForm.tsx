@@ -48,6 +48,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
       onCustomize,
       onQuickCreate,
       onVMNameChange,
+      runStrategy,
       startVM,
     } = useCreateDrawerForm(namespace, subscriptionData, authorizedSSHKey);
 
@@ -86,9 +87,15 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
             <StackItem />
             <StackItem>
               <Checkbox
+                label={
+                  runStrategy
+                    ? t('Start this VirtualMachine after creation ({{runStrategy}})', {
+                        runStrategy,
+                      })
+                    : t('Start this VirtualMachine after creation')
+                }
                 id="start-after-create-checkbox"
-                isChecked={startVM}
-                label={t('Start this VirtualMachine after creation')}
+                isChecked={startVM || runStrategy === 'Always' || runStrategy === 'RerunOnFailure'}
                 onChange={(_, checked: boolean) => onChangeStartVM(checked)}
               />
             </StackItem>

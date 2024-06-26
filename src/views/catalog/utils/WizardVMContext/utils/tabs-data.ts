@@ -17,6 +17,5 @@ export type TabsData = {
       osType?: OS_NAME_TYPES;
     };
   };
-  startVM?: boolean;
   subscriptionData?: RHELAutomaticSubscriptionData;
 };
