@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,12 +10,16 @@ import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 import { STATUS_SUCCEEDED } from '../../utils/utils';
 import { deleteNetworkCheckup, rerunNetworkCheckup } from '../utils/utils';
 
-const CheckupsNetworkActions = ({
-  configMap,
-  isKebab = false,
-}: {
+type CheckupsNetworkActionsProps = {
   configMap: IoK8sApiCoreV1ConfigMap;
   isKebab?: boolean;
+  jobs: IoK8sApiBatchV1Job[];
+};
+
+const CheckupsNetworkActions: FC<CheckupsNetworkActionsProps> = ({
+  configMap,
+  isKebab = false,
+  jobs,
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
@@ -35,7 +39,7 @@ const CheckupsNetworkActions = ({
         <DropdownItem
           onClick={() => {
             setIsActionsOpen(false);
-            deleteNetworkCheckup(configMap);
+            deleteNetworkCheckup(configMap, jobs);
             navigate(`/k8s/ns/${configMap?.metadata?.namespace}/checkups`);
           }}
           key="delete"

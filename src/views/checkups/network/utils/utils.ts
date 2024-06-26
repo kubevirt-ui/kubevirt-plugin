@@ -267,10 +267,21 @@ export const createNetworkCheckup: CreateNetworkCheckupType = async ({
   return await createJob(name, namespace);
 };
 
-export const deleteNetworkCheckup = async (resource: IoK8sApiCoreV1ConfigMap) => {
+export const deleteNetworkCheckup = async (
+  configMap: IoK8sApiCoreV1ConfigMap,
+  jobs: IoK8sApiBatchV1Job[],
+) => {
   try {
-    await k8sDelete({ model: ConfigMapModel, resource });
-    await k8sDelete({ model: JobModel, resource });
+    await k8sDelete({
+      model: ConfigMapModel,
+      resource: configMap,
+    });
+    jobs.map((job) =>
+      k8sDelete({
+        model: JobModel,
+        resource: job,
+      }),
+    );
   } catch (e) {
     kubevirtConsole.log(e?.message);
   }

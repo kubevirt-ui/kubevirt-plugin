@@ -41,7 +41,7 @@ const CheckupsNetworkDetailsPage = () => {
 
   return (
     <PageSection variant={PageSectionVariants.light}>
-      <CheckupsNetworkDetailsPageHeader configMap={configMap} />
+      <CheckupsNetworkDetailsPageHeader configMap={configMap} jobs={jobMatches} />
       <Tabs
         onSelect={(_, tabIndex: number) => {
           setActiveTabKey(tabIndex);
