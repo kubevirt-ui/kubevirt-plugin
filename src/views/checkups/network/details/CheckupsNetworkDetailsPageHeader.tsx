@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -18,10 +18,12 @@ import CheckupsNetworkActions from '../components/CheckupsNetworkActions';
 
 type CheckupsNetworkDetailsPageHeaderProps = {
   configMap: IoK8sApiCoreV1ConfigMap;
+  jobs: IoK8sApiBatchV1Job[];
 };
 
 const CheckupsNetworkDetailsPageHeader: FC<CheckupsNetworkDetailsPageHeaderProps> = ({
   configMap,
+  jobs,
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
@@ -46,7 +48,7 @@ const CheckupsNetworkDetailsPageHeader: FC<CheckupsNetworkDetailsPageHeaderProps
           {configMap?.metadata?.name}
         </Title>
         <FlexItem>
-          <CheckupsNetworkActions configMap={configMap} />
+          <CheckupsNetworkActions configMap={configMap} jobs={jobs} />
         </FlexItem>
       </Flex>
     </>

@@ -75,7 +75,11 @@ const CheckupsNetworkListRow = ({ activeColumnIDs, obj: configMap, rowData: { ge
         className="dropdown-kebab-pf pf-v5-c-table__action"
         id=""
       >
-        <CheckupsNetworkActions configMap={configMap} isKebab />
+        <CheckupsNetworkActions
+          configMap={configMap}
+          isKebab
+          jobs={getJobByName(configMap?.metadata?.name)}
+        />
       </TableData>
     </>
   );
