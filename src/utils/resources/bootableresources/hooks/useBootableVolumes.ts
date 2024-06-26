@@ -11,6 +11,7 @@ import {
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   convertResourceArrayToMap,
@@ -22,12 +23,14 @@ import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin
 type UseBootableVolumes = (namespace?: string) => UseBootableVolumesValues;
 
 const useBootableVolumes: UseBootableVolumes = (namespace) => {
+  const projectsNamespace = namespace === ALL_PROJECTS ? null : namespace;
+
   const [dataSources, loadedDataSources, dataSourcesError] = useK8sWatchResource<
     V1beta1DataSource[]
   >({
     groupVersionKind: DataSourceModelGroupVersionKind,
     isList: true,
-    namespace,
+    namespace: projectsNamespace,
     selector: {
       matchExpressions: [{ key: DEFAULT_PREFERENCE_LABEL, operator: Operator.Exists }],
     },
@@ -39,14 +42,14 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   >({
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
-    namespace,
+    namespace: projectsNamespace,
   });
 
   // getting volumesnapshot as this can also be a source of DS
   const [volumeSnapshots] = useK8sWatchResource<VolumeSnapshotKind[]>({
     groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
     isList: true,
-    namespace,
+    namespace: projectsNamespace,
   });
 
   const error = useMemo(() => dataSourcesError || loadErrorPVCs, [dataSourcesError, loadErrorPVCs]);

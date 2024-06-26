@@ -10,7 +10,7 @@ import {
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { deleteDVAndPVC } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { deleteDVAndRelatedResources } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
@@ -52,7 +52,7 @@ const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
     }
 
     if (deletePVC && sourceExists) {
-      await deleteDVAndPVC(dv, pvc);
+      await deleteDVAndRelatedResources(dv, dataSource, pvc);
     }
   };
 
