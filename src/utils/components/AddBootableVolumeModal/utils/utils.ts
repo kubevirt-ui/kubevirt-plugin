@@ -28,7 +28,6 @@ type createBootableVolumeType = (input: {
   applyStorageProfileSettings: boolean;
   bootableVolume: AddBootableVolumeState;
   claimPropertySets: ClaimPropertySets;
-  namespace: string;
   onCreateVolume: (createdVolume: BootableVolume) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
@@ -39,19 +38,23 @@ export const createBootableVolume: createBootableVolumeType =
     applyStorageProfileSettings,
     bootableVolume,
     claimPropertySets,
-    namespace,
     onCreateVolume,
     sourceType,
     uploadData,
   }) =>
   async (dataSource: V1beta1DataSource) => {
-    const draftDataSource = setDataSourceMetadata(bootableVolume, namespace, dataSource);
+    const { bootableVolumeNamespace } = bootableVolume;
+    const draftDataSource = setDataSourceMetadata(
+      bootableVolume,
+      bootableVolumeNamespace,
+      dataSource,
+    );
 
     const actionBySourceType: Record<string, () => Promise<V1beta1DataSource>> = {
       [DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE]: () =>
         createBootableVolumeFromUpload(
           bootableVolume,
-          namespace,
+          bootableVolumeNamespace,
           applyStorageProfileSettings,
           claimPropertySets,
           draftDataSource,
@@ -60,7 +63,7 @@ export const createBootableVolume: createBootableVolumeType =
       [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: () =>
         createPVCBootableVolume(
           bootableVolume,
-          namespace,
+          bootableVolumeNamespace,
           applyStorageProfileSettings,
           claimPropertySets,
           draftDataSource,

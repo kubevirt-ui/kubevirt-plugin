@@ -28,6 +28,7 @@ export const optionsValueLabelMapper = {
 export type AddBootableVolumeState = {
   annotations: { [key: string]: string };
   bootableVolumeName: string;
+  bootableVolumeNamespace: string;
   cronExpression: string;
   labels: { [key: string]: string };
   pvcName: string;
@@ -51,6 +52,7 @@ export type SetBootableVolumeFieldType = (
 export const initialBootableVolumeState: AddBootableVolumeState = {
   annotations: {},
   bootableVolumeName: null,
+  bootableVolumeNamespace: null,
   cronExpression: null,
   labels: {},
   pvcName: null,

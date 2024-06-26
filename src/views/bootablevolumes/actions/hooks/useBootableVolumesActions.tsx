@@ -5,7 +5,7 @@ import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-ap
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { deleteDVAndPVC } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { deleteDVAndRelatedResources } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { Action, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -63,7 +63,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferen
         createModal(({ isOpen, onClose }) => (
           <DeleteModal
             onDeleteSubmit={async () => {
-              await deleteDVAndPVC(source, source);
+              await deleteDVAndRelatedResources(source, source, source);
             }}
             headerText={t('Delete {{kind}}', { kind: source?.kind })}
             isOpen={isOpen}

@@ -2,6 +2,7 @@ import React, { FC, memo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
+import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -14,8 +15,6 @@ type TemplatesCatalogProjectsDropdownProps = {
   selectedProject: string;
 };
 
-const ALL_PROJECTS_SELECTOR = 'All projects';
-
 export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdownProps> = memo(
   ({ onChange, selectedProject }) => {
     const { t } = useKubevirtTranslation();
@@ -26,7 +25,7 @@ export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdo
     });
 
     const onSelect = (value: string) => {
-      onChange(value === ALL_PROJECTS_SELECTOR ? '' : value);
+      onChange(value === ALL_PROJECTS ? '' : value);
     };
 
     return (
@@ -36,7 +35,7 @@ export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdo
         </Text>
         <InlineFilterSelect
           options={[
-            { children: ALL_PROJECTS_SELECTOR, value: ALL_PROJECTS_SELECTOR },
+            { children: ALL_PROJECTS, value: ALL_PROJECTS },
             ...projects
               .sort((a, b) => getName(a).localeCompare(getName(b)))
               .map((proj) => {
@@ -44,7 +43,7 @@ export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdo
                 return { children: name, value: name };
               }),
           ]}
-          selected={selectedProject || ALL_PROJECTS_SELECTOR}
+          selected={selectedProject || ALL_PROJECTS}
           setSelected={onSelect}
           toggleProps={{ isFullWidth: true }}
         />
