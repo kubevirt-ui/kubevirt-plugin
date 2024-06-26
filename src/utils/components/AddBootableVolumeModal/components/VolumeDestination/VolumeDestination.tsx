@@ -8,6 +8,7 @@ import { FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
 
+import NamespaceDropdown from './components/NamespaceDropdown/NamespaceDropdown';
 import DefaultStorageClassAlert from './StorageClass/DefaultStorageClassAlert';
 import StorageClassSelect from './StorageClass/StorageClassSelect';
 
@@ -29,7 +30,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
   const { t } = useKubevirtTranslation();
   const [showSCAlert, setShowSCAlert] = useState(false);
 
-  const { bootableVolumeName, size, storageClassName } = bootableVolume || {};
+  const { bootableVolumeName, pvcNamespace, size, storageClassName } = bootableVolume || {};
 
   const [applyStorageProfile, setApplyStorageProfile] = applyStorageProfileState;
 
@@ -76,7 +77,10 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
         />
       </FormGroup>
       <FormGroup label={t('Destination project')}>
-        <TextInput id="destination-project" isDisabled type="text" value={namespace} />
+        <NamespaceDropdown
+          namespace={pvcNamespace || namespace}
+          setBootableVolumeField={setBootableVolumeField}
+        />
       </FormGroup>
     </>
   );
