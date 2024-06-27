@@ -58,6 +58,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ obj, onDiskUpdate, vm, vmi })
       <DiskModal
         headerText={t('Edit disk')}
         initialFormData={initialFormState}
+        isEditDisk
         isEditingCreatedDisk={pvcResourceExists}
         isOpen={isOpen}
         onClose={onClose}

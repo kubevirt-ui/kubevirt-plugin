@@ -48,6 +48,7 @@ export const getSelectedDiskSourceComponent = (
 };
 
 export const getImportGroupOptions = (isTemplate: boolean): DiskSourceOptionGroup => ({
+  description: t('URL, Registry or Upload'),
   groupLabel: t('Import'),
   items: [
     {
@@ -60,10 +61,14 @@ export const getImportGroupOptions = (isTemplate: boolean): DiskSourceOptionGrou
       id: SourceTypes.REGISTRY,
       label: optionLabelMapper[SourceTypes.REGISTRY],
     },
-    !isTemplate && {
-      id: SourceTypes.UPLOAD,
-      label: optionLabelMapper[SourceTypes.UPLOAD],
-    },
+    ...(isTemplate
+      ? []
+      : [
+          {
+            id: SourceTypes.UPLOAD,
+            label: optionLabelMapper[SourceTypes.UPLOAD],
+          },
+        ]),
   ],
 });
 
