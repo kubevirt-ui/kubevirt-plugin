@@ -70,9 +70,9 @@ export type DiskModalProps = {
   createOwnerReference?: boolean;
   headerText: string;
   initialFormData?: DiskFormState;
+  isEditDisk?: boolean;
   isEditingCreatedDisk?: boolean;
   isOpen: boolean;
-  isTemplate?: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;

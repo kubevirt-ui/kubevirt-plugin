@@ -5,7 +5,7 @@ import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getBootDisk } from '@kubevirt-utils/resources/vm';
-import { generatePrettyName, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { generatePrettyName, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Form } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -17,7 +17,7 @@ import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckb
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
 import DiskNameInput from './components/DiskNameInput/DiskNameInput';
 import DiskSizeInput from './components/DiskSizeInput/DiskSizeInput';
-import DiskSourceSelect from './components/DiskSourceSelect/DiskSourceSelect';
+import { getSelectedDiskSourceComponent } from './components/DiskSourceSelect/utils/utils';
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
 import StorageClassAndPreallocation from './components/StorageClassAndPreallocation/StorageClassAndPreallocation';
 import { getInitialStateDiskForm } from './utils/constants';
@@ -33,9 +33,9 @@ const DiskModal: FC<DiskModalProps> = ({
   createOwnerReference = true,
   headerText,
   initialFormData = null,
+  isEditDisk = false,
   isEditingCreatedDisk = false,
   isOpen,
-  isTemplate = false,
   onClose,
   onSubmit,
   onUploadedDataVolume,
@@ -58,6 +58,8 @@ const DiskModal: FC<DiskModalProps> = ({
     handleSubmit,
   } = methods;
 
+  const diskSource = initialFormData?.diskSource;
+
   return (
     <FormProvider {...methods}>
       <TabModal
@@ -71,7 +73,7 @@ const DiskModal: FC<DiskModalProps> = ({
           handleSubmit((data) => {
             if (isEditingCreatedDisk) return editVMDisk(vm, initialFormData, data, onSubmit);
 
-            if (!isEmpty(initialFormData))
+            if (isEditDisk)
               return editDisk(initialFormData, data, uploadData, {
                 createOwnerReference,
                 onSubmit,
@@ -105,12 +107,7 @@ const DiskModal: FC<DiskModalProps> = ({
             isDisabled={isVMRunning}
           />
           <DiskNameInput />
-          <DiskSourceSelect
-            isEditingCreatedDisk={isEditingCreatedDisk}
-            isTemplate={isTemplate}
-            relevantUpload={upload}
-            vm={vm}
-          />
+          {getSelectedDiskSourceComponent(vm, upload)[diskSource]}
           <DiskSizeInput isEditingCreatedDisk={isEditingCreatedDisk} />
           <DiskTypeSelect isVMRunning={isVMRunning} />
           <DiskInterfaceSelect isVMRunning={isVMRunning} />

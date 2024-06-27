@@ -1,8 +1,6 @@
 import React, { FC } from 'react';
-import { useFormContext } from 'react-hook-form';
 
-import { DiskFormState, SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
-import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { SelectList, SelectOption } from '@patternfly/react-core';
 
 import { diskSourceFieldID } from '../../utils/constants';
@@ -17,20 +15,15 @@ type DiskSourceSelectOptionsProps = {
 
 const DiskSourceSelectOptions: FC<DiskSourceSelectOptionsProps> = ({
   isEditingCreatedDisk,
-  isTemplate,
+  isTemplate = false,
   isVMRunning,
   items,
 }) => {
-  const { watch } = useFormContext<DiskFormState>();
-
-  const diskType = watch('diskType');
-  const isCDROMType = diskType === diskTypes.cdrom;
   return (
     <SelectList>
       {items.map(({ description, id, label }) => {
         const isDisabled =
           (isVMRunning && id === SourceTypes.EPHEMERAL) ||
-          (isCDROMType && id === SourceTypes.BLANK) ||
           (isTemplate && id === SourceTypes.UPLOAD);
         return (
           <SelectOption

@@ -4,13 +4,16 @@ import { printableVMStatus } from 'src/views/virtualmachines/utils';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
+import { getInitialStateDiskForm } from '@kubevirt-utils/components/DiskModal/utils/constants';
+import { DiskFormState, SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import DiskSourceFlyoutMenu from '@kubevirt-utils/components/DiskSourceFlyoutMenu/DiskSourceFlyoutMenu';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import useProvisioningPercentage from '@kubevirt-utils/resources/vm/hooks/useProvisioningPercentage';
+import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import {
-  ListPageCreateButton,
   ListPageFilter,
   useListPageFilter,
   VirtualizedTable,
@@ -51,22 +54,26 @@ const DiskList: FC<DiskListProps> = ({ onDiskUpdate, vm, vmi }) => {
   return (
     <div className="kv-configuration-vm-disk-list">
       <DiskListTitle />
-      <ListPageCreateButton
-        onClick={() =>
-          createModal(({ isOpen, onClose }) => (
+      <DiskSourceFlyoutMenu
+        onSelect={(diskSource: SourceTypes) => {
+          const diskState: DiskFormState = {
+            ...getInitialStateDiskForm(),
+            diskName: generatePrettyName('disk'),
+            diskSource: diskSource,
+          };
+
+          return createModal(({ isOpen, onClose }) => (
             <DiskModal
               headerText={headerText}
+              initialFormData={diskState}
               isOpen={isOpen}
               onClose={onClose}
               onSubmit={onSubmit}
               vm={vm}
             />
-          ))
-        }
-        className="disk-list-page__list-page-create-button"
-      >
-        {t('Add disk')}
-      </ListPageCreateButton>
+          ));
+        }}
+      />
       <Flex>
         <FlexItem>
           <ListPageFilter
