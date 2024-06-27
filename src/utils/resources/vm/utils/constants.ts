@@ -1,3 +1,5 @@
+import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
+
 export const NO_DATA_DASH = '-';
 
 export const MILLISECONDS_TO_SECONDS_MULTIPLIER = 1000;
@@ -25,3 +27,7 @@ export const PATHS_TO_HIGHLIGHT = {
 };
 
 export const MIGRATION__PROMETHEUS_DELAY = 15 * MILLISECONDS_TO_SECONDS_MULTIPLIER;
+
+export const DEFAULT_NETWORK_INTERFACE: V1Interface = { masquerade: {}, name: 'default' };
+
+export const DEFAULT_NETWORK: V1Network = { name: 'default', pod: {} };
