@@ -29,16 +29,23 @@ const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectH
       selected={selected}
       toggle={SelectToggle({ isExpanded: isOpen, onClick: onToggle, selected })}
     >
-      {DurationOption.getAll().map((durationOption) => {
-        const dropdownLabel = durationOption?.getDropdownLabel() || '';
-        const durationValue = durationOption?.getValue() || '';
+      {[...DurationOption.getAll()]
+        .sort((a, b) =>
+          DurationOption.getMilliseconds(a.getValue()) <
+          DurationOption.getMilliseconds(b.getValue())
+            ? -1
+            : 1,
+        )
+        .map((durationOption) => {
+          const dropdownLabel = durationOption?.getDropdownLabel() || '';
+          const durationValue = durationOption?.getValue() || '';
 
-        return (
-          <SelectOption data-test-id={durationValue} key={durationValue} value={dropdownLabel}>
-            {dropdownLabel}
-          </SelectOption>
-        );
-      })}
+          return (
+            <SelectOption data-test-id={durationValue} key={durationValue} value={dropdownLabel}>
+              {dropdownLabel}
+            </SelectOption>
+          );
+        })}
     </Select>
   );
 };
