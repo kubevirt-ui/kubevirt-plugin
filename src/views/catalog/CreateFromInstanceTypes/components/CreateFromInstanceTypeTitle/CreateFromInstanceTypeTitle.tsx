@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
+import { Link } from 'react-router-dom-v5-compat';
 
 import { UseInstanceTypeAndPreferencesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Popover, PopoverPosition } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
@@ -18,7 +18,6 @@ const CreateFromInstanceTypeTitle: FC<CreateFromInstanceTypeTitleProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  // TODO: Turn ExternalLink into quick start launcher link
   return (
     <>
       {t('Select volume to boot from')}{' '}
@@ -37,10 +36,9 @@ const CreateFromInstanceTypeTitle: FC<CreateFromInstanceTypeTitleProps> = ({
               </div>
               <div>
                 Learn how to{' '}
-                <ExternalLink
-                  href=""
-                  text="create a bootable volume automatically by using Pipelines"
-                />
+                <Link to="/quickstart?quickstart=windows-bootsource-pipeline">
+                  create a bootable volume automatically by using pipelines
+                </Link>
               </div>
             </Trans>
           </>
