@@ -17,7 +17,7 @@ import {
 
 import useNetworkColumns from '../../hooks/useNetworkColumns';
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
-import { isPendingHotPlugNIC } from '../../utils/utils';
+import { isPendingHotPlugNIC, isPendingRemoval } from '../../utils/utils';
 
 import AutoAttachedNetworkEmptyState from './AutoAttachedNetworkEmptyState';
 import NetworkInterfaceRow from './NetworkInterfaceRow';
@@ -41,7 +41,8 @@ const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm, vmi }) => {
 
   const autoattachPodInterface = getAutoAttachPodInterface(vm) !== false;
 
-  const isPending = (network: V1Network): boolean => isPendingHotPlugNIC(vm, vmi, network?.name);
+  const isPending = (network: V1Network): boolean =>
+    isPendingHotPlugNIC(vm, vmi, network?.name) || isPendingRemoval(vm, vmi, network?.name);
 
   return (
     <>

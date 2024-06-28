@@ -4,12 +4,16 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import {
+  getAutoAttachPodInterface,
+  getInterfaces,
+  getNetworks,
+} from '@kubevirt-utils/resources/vm';
 import {
   interfacesTypes,
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ABSENT } from '@virtualmachines/details/tabs/configuration/network/utils/constants';
 import { isStopped } from '@virtualmachines/utils';
@@ -46,6 +50,15 @@ export const updateVMNetworkInterfaces = (
         path: '/spec/template/spec/domain/devices/interfaces',
         value: updatedInterfaces,
       },
+      ...(isEmpty(updatedInterfaces)
+        ? [
+            {
+              op: getAutoAttachPodInterface(vm) === undefined ? 'add' : 'replace',
+              path: '/spec/template/spec/domain/devices/autoattachPodInterface',
+              value: false,
+            },
+          ]
+        : []),
     ],
     model: VirtualMachineModel,
     resource: vm,
@@ -74,11 +87,11 @@ const removeInterfaceToBeDeleted = (nicName: string, vm: V1VirtualMachine): V1In
   getInterfaces(vm)?.filter(({ name }) => name !== nicName);
 
 export const updateInterfacesForDeletion = (
-  isHotPlug: boolean,
   nicName: string,
   vm: V1VirtualMachine,
+  canBeMarkedAbsent: boolean,
 ): V1Interface[] => {
-  return isHotPlug && !isStopped(vm)
+  return canBeMarkedAbsent
     ? markInterfaceAbsent(getInterfaces(vm), nicName)
     : removeInterfaceToBeDeleted(nicName, vm);
 };
@@ -87,11 +100,11 @@ const removeNetworkToBeDeleted = (nicName: string, vm: V1VirtualMachine): V1Netw
   getNetworks(vm)?.filter(({ name }) => name !== nicName);
 
 export const updateNetworksForDeletion = (
-  isHotPlug: boolean,
   nicName: string,
   vm: V1VirtualMachine,
+  canBeMarkedAbsent: boolean,
 ): V1Network[] => {
-  return isHotPlug && !isStopped(vm) ? getNetworks(vm) : removeNetworkToBeDeleted(nicName, vm);
+  return canBeMarkedAbsent ? getNetworks(vm) : removeNetworkToBeDeleted(nicName, vm);
 };
 
 export const createNetwork = (nicName: string, networkName: string): V1Network => {
@@ -138,9 +151,15 @@ export const deleteNetworkInterface = (
   nicName: string,
   nicPresentation: NetworkPresentation,
 ) => {
+  const vmInterfaces = getInterfaces(vm);
+  const noAutoAttachPodInterface = getAutoAttachPodInterface(vm) === false;
+  const isDefaultInterface = noAutoAttachPodInterface && vmInterfaces?.[0]?.name === nicName;
+
   const isHotPlug = Boolean(nicPresentation?.iface?.bridge);
-  const networks = updateNetworksForDeletion(isHotPlug, nicName, vm);
-  const interfaces = updateInterfacesForDeletion(isHotPlug, nicName, vm);
+
+  const canBeMarkedAbsent = isHotPlug && !isStopped(vm) && !isDefaultInterface;
+  const networks = updateNetworksForDeletion(nicName, vm, canBeMarkedAbsent);
+  const interfaces = updateInterfacesForDeletion(nicName, vm, canBeMarkedAbsent);
 
   return updateVMNetworkInterfaces(vm, networks, interfaces);
 };

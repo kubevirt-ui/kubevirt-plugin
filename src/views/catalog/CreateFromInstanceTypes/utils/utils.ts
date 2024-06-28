@@ -15,6 +15,10 @@ import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAuto
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES, OS_NAME_TYPES_NOT_SUPPORTED } from '@kubevirt-utils/resources/template';
+import {
+  DEFAULT_NETWORK,
+  DEFAULT_NETWORK_INTERFACE,
+} from '@kubevirt-utils/resources/vm/utils/constants';
 import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import {
   HEADLESS_SERVICE_LABEL,
@@ -162,9 +166,12 @@ export const generateVM = (
         spec: {
           domain: {
             devices: {
+              autoattachPodInterface: false,
+              interfaces: [DEFAULT_NETWORK_INTERFACE],
               ...(isSysprep ? { disks: [sysprepDisk()] } : {}),
             },
           },
+          networks: [DEFAULT_NETWORK],
           subdomain: HEADLESS_SERVICE_NAME,
           volumes: [
             {

@@ -7,8 +7,10 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import WizardEditNetworkInterfaceModal from '../modal/WizardEditNetworkInterfaceModal';
@@ -50,11 +52,18 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
 
   const onDelete = useCallback(() => {
     const updatedVM = produceVMNetworks(vm, (draftVM) => {
-      draftVM.spec.template.spec.networks = draftVM.spec.template.spec.networks.filter(
+      const vmInterfaces = getInterfaces(draftVM);
+      if (isEmpty(vmInterfaces)) {
+        draftVM.spec.template.spec.domain.devices.autoattachPodInterface = false;
+        return;
+      }
+
+      draftVM.spec.template.spec.networks = getNetworks(draftVM)?.filter(
         ({ name }) => name !== nicName,
       );
-      draftVM.spec.template.spec.domain.devices.interfaces =
-        draftVM.spec.template.spec.domain.devices.interfaces.filter(({ name }) => name !== nicName);
+      draftVM.spec.template.spec.domain.devices.interfaces = vmInterfaces?.filter(
+        ({ name }) => name !== nicName,
+      );
     });
     return onUpdate(updatedVM);
   }, [nicName, onUpdate, vm]);

@@ -37,6 +37,7 @@ import {
   getTolerations,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
+import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   DESCHEDULER_EVICT_LABEL,
   getEvictionStrategy as getVMIEvictionStrategy,
@@ -50,7 +51,11 @@ import {
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isPendingHotPlugNIC } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
-import { getBootloader, getDisks } from '../../../resources/vm/utils/selectors';
+import {
+  getAutoAttachPodInterface,
+  getBootloader,
+  getDisks,
+} from '../../../resources/vm/utils/selectors';
 
 import { PendingChange } from './types';
 
@@ -150,11 +155,13 @@ export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
   const vmNICsNames = vmInterfaces?.map((nic) => nic?.name) || [];
   const vmiNICsNames = vmiInterfaces?.map((nic) => nic?.name) || [];
 
+  const autoAttachPodInterface = getAutoAttachPodInterface(vm) !== false;
   if (
-    vmiInterfaces?.find((nic) => nic.name === 'default' && nic.masquerade) &&
-    !vmNICsNames.includes('default')
+    autoAttachPodInterface &&
+    vmiInterfaces?.find((nic) => nic.name === DEFAULT_NETWORK_INTERFACE.name) &&
+    !vmNICsNames.includes(DEFAULT_NETWORK_INTERFACE.name)
   ) {
-    vmNICsNames.push('default');
+    vmNICsNames.push(DEFAULT_NETWORK_INTERFACE.name);
   }
 
   const unchangedNICs = vmNICsNames?.filter((vmNicName) =>
