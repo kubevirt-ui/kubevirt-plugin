@@ -151,7 +151,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
             this.sendKey(char.charCodeAt(0));
             shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
             i === lastItem &&
-              clipboardText.charCodeAt(lastItem) === 13 &&
+              clipboardText?.charCodeAt(lastItem) === 13 &&
               this.sendKey(KeyTable.XK_KP_Enter);
           }
         };
