@@ -17,7 +17,8 @@ const useSimplifiedAlerts: UseSimplifiedAlerts = () => {
   const [alerts] = useKubevirtAlerts();
 
   return React.useMemo(() => {
-    const data = { critical: [], info: [], warning: [] };
+    // eslint-disable-next-line perfectionist/sort-objects
+    const data = { critical: [], warning: [], info: [] };
     return (
       alerts.reduce((acc, alert) => {
         acc[alert?.labels?.severity] = [

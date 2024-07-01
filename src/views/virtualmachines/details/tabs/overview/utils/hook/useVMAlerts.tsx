@@ -21,7 +21,8 @@ const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
   });
 
   const vmAlerts = React.useMemo(() => {
-    const data = { critical: [], info: [], warning: [] };
+    // eslint-disable-next-line perfectionist/sort-objects
+    const data = { critical: [], warning: [], info: [] };
     const vmName = vm?.metadata?.name;
     return (
       (query as PrometheusRulesResponse)?.data?.groups?.reduce((acc, ruleGroup) => {
