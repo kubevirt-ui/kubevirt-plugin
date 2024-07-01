@@ -36,10 +36,10 @@ import DetailsSectionBoot from './components/DetailsSectionBoot';
 import DetailsSectionHardware from './components/DetailsSectionHardware';
 import {
   updateDescription,
-  updatedHostname,
-  updatedVirtualMachine,
   updateGuestSystemAccessLog,
   updateHeadlessMode,
+  updateHostname,
+  updateVirtualMachine,
   updateWorkload,
 } from './utils/utils';
 
@@ -141,7 +141,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) =>
                   <CPUMemoryModal
                     isOpen={isOpen}
                     onClose={onClose}
-                    onSubmit={updatedVirtualMachine}
+                    onSubmit={updateVirtualMachine}
                     vm={vm}
                   />
                 ))
@@ -160,7 +160,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) =>
                   <HostnameModal
                     isOpen={isOpen}
                     onClose={onClose}
-                    onSubmit={updatedHostname}
+                    onSubmit={updateHostname}
                     vm={vm}
                     vmi={vmi}
                   />
