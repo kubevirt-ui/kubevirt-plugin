@@ -74,8 +74,8 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdat
         createOwnerReference={false}
         headerText={t('Edit disk')}
         initialFormData={initialFormState}
+        isEditDisk
         isOpen={isOpen}
-        isTemplate
         onClose={onClose}
         onSubmit={onUpdate}
         vm={vm}

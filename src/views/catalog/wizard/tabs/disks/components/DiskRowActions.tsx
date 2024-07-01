@@ -97,6 +97,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
         createOwnerReference={false}
         headerText={t('Edit disk')}
         initialFormData={initialFormState}
+        isEditDisk
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={updateVM}

@@ -4,18 +4,21 @@ import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
+import { getInitialStateDiskForm } from '@kubevirt-utils/components/DiskModal/utils/constants';
+import { DiskFormState, SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import DiskSourceFlyoutMenu from '@kubevirt-utils/components/DiskSourceFlyoutMenu/DiskSourceFlyoutMenu';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { replaceTemplateVM } from '@kubevirt-utils/resources/template';
+import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import {
   k8sUpdate,
-  ListPageBody,
   ListPageFilter,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Button } from '@patternfly/react-core';
+import { PageSection, PageSectionVariants } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -62,30 +65,32 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
 
   return (
     <div className="template-disks-page">
-      <ListPageBody>
+      <PageSection variant={PageSectionVariants.light}>
         <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
           <DiskListTitle />
+          <DiskSourceFlyoutMenu
+            onSelect={(diskSource: SourceTypes) => {
+              const diskState: DiskFormState = {
+                ...getInitialStateDiskForm(),
+                diskName: generatePrettyName('disk'),
+                diskSource: diskSource,
+              };
 
-          <Button
-            onClick={() =>
-              createModal(({ isOpen, onClose }) => (
+              return createModal(({ isOpen, onClose }) => (
                 <DiskModal
                   createOwnerReference={false}
                   headerText={t('Add disk')}
+                  initialFormData={diskState}
                   isOpen={isOpen}
-                  isTemplate
                   onClose={onClose}
                   onSubmit={onUpdate}
                   vm={vm}
                 />
-              ))
-            }
-            className="template-disks-page__button"
-            isDisabled={!isTemplateEditable}
-          >
-            {t('Add disk')}
-          </Button>
-
+              ));
+            }}
+            className="list-page-create-button-margin"
+            isTemplate
+          />
           <ListPageFilter
             data={data}
             hideLabelFilter
@@ -103,7 +108,7 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
             unfilteredData={data}
           />
         </SidebarEditor>
-      </ListPageBody>
+      </PageSection>
     </div>
   );
 };

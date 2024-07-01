@@ -2,15 +2,17 @@ import React from 'react';
 
 import { WizardTab } from '@catalog/wizard/tabs';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
+import { getInitialStateDiskForm } from '@kubevirt-utils/components/DiskModal/utils/constants';
+import { DiskFormState, SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import DiskSourceFlyoutMenu from '@kubevirt-utils/components/DiskSourceFlyoutMenu/DiskSourceFlyoutMenu';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { ensurePath, generatePrettyName } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
-  ListPageCreateButton,
   ListPageFilter,
   useListPageFilter,
   VirtualizedTable,
@@ -24,7 +26,7 @@ import useWizardDisksTableData from './hooks/useWizardDisksTableData';
 
 import './wizard-disk-tab.scss';
 
-const WizardDisksTab: WizardTab = ({ loaded, tabsData, updateTabsData, updateVM, vm }) => {
+const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
@@ -40,9 +42,15 @@ const WizardDisksTab: WizardTab = ({ loaded, tabsData, updateTabsData, updateVM,
           pathsToHighlight={PATHS_TO_HIGHLIGHT.DISKS_TAB}
           resource={vm}
         >
-          <ListPageCreateButton
-            onClick={() =>
-              createModal(({ isOpen, onClose }) => (
+          <DiskSourceFlyoutMenu
+            onSelect={(diskSource: SourceTypes) => {
+              const diskState: DiskFormState = {
+                ...getInitialStateDiskForm(),
+                diskName: generatePrettyName('disk'),
+                diskSource: diskSource,
+              };
+
+              return createModal(({ isOpen, onClose }) => (
                 <DiskModal
                   onUploadedDataVolume={(dataVolume) =>
                     updateTabsData((draft) => {
@@ -57,19 +65,16 @@ const WizardDisksTab: WizardTab = ({ loaded, tabsData, updateTabsData, updateVM,
                   }
                   createOwnerReference={false}
                   headerText={t('Add disk')}
+                  initialFormData={diskState}
                   isOpen={isOpen}
                   onClose={onClose}
                   onSubmit={updateVM}
                   vm={vm}
                 />
-              ))
-            }
+              ));
+            }}
             className="list-page-create-button-margin"
-            isDisabled={!loaded}
-          >
-            {t('Add disk')}
-          </ListPageCreateButton>
-
+          />
           <Flex>
             <FlexItem>
               <ListPageFilter
