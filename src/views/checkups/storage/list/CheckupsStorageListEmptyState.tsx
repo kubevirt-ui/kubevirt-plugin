@@ -39,7 +39,7 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const [namespace] = useActiveNamespace();
-  const [isLoading, setIsLoading] = useState<boolean>(loadingPermissions);
+  const [isLoading, setIsLoading] = useState<boolean>();
 
   return (
     <EmptyState variant={EmptyStateVariant.lg}>
@@ -76,8 +76,8 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
                 setIsLoading(false);
               }
             }}
-            isDisabled={isLoading || namespace === ALL_NAMESPACES_SESSION_KEY}
-            isLoading={isLoading}
+            isDisabled={isLoading || loadingPermissions || namespace === ALL_NAMESPACES_SESSION_KEY}
+            isLoading={isLoading || loadingPermissions}
             variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
           >
             {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
