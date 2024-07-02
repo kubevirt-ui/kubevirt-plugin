@@ -43,10 +43,7 @@ const BootableVolumesEmptyState: FC<BootableVolumesEmptyStateProps> = ({ namespa
 
           <EmptyStateFooter>
             <EmptyStateActions>
-              <BootableVolumeAddButton
-                buttonText={t('Add bootable volume')}
-                namespace={namespace}
-              />
+              <BootableVolumeAddButton buttonText={t('Add volume')} namespace={namespace} />
             </EmptyStateActions>
           </EmptyStateFooter>
         </EmptyState>

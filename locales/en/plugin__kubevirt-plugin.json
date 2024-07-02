@@ -81,7 +81,6 @@
   "Activity": "Activity",
   "Add a NetworkAttachmentDefinition to this namespace in order to use checkups": "Add a NetworkAttachmentDefinition to this namespace in order to use checkups",
   "Add affinity rule": "Add affinity rule",
-  "Add bootable volume": "Add bootable volume",
   "Add Config Map, Secret or Service Account": "Add Config Map, Secret or Service Account",
   "Add configuration": "Add configuration",
   "Add disk": "Add disk",
