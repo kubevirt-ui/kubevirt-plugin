@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/nodejs-16 AS builder
+FROM registry.access.redhat.com/ubi8/nodejs-18 AS builder
 USER root
 RUN command -v yarn || npm i -g yarn
 

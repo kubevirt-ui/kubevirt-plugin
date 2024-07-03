@@ -76,7 +76,7 @@
     "eslint-plugin-chai-friendly": "^0.7.2",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-jsdoc": "^37.9.7",
+    "eslint-plugin-jsdoc": "^48.5.0",
     "eslint-plugin-perfectionist": "^1.1.2",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.29.3",
@@ -109,6 +109,9 @@
     "webpack-cli": "4.10.x",
     "webpack-dev-server": "^4.7.4",
     "yarn": "^1.22.18"
+  },
+  "engines": {
+    "node": ">=18.x"
   },
   "lint-staged": {
     "*.{js,ts,tsx,jsx,json}": [
@@ -145,9 +148,9 @@
     "start-console-with-monitoring": "./start-console.sh monitoring-plugin",
     "test": "jest",
     "test-cov": "jest --coverage",
-    "test-cypress": "cd cypress && $(npm bin)/cypress open --config-file ./cypress.json --env openshift=true",
-    "test-cypress-docker": "echo 'visit http://localhost:10000' && cd cypress && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 $(npm bin)/cypress open --config-file ./cypress.json --env openshift=true",
-    "test-cypress-headless": "cd cypress && node --max-old-space-size=4096 $(npm bin)/cypress run --config-file ./cypress.json --env openshift=true --headless",
+    "test-cypress": "cd cypress && npx cypress open --config-file ./cypress.json --env openshift=true",
+    "test-cypress-docker": "echo 'visit http://localhost:10000' && cd cypress && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0  npx cypress open --config-file ./cypress.json --env openshift=true",
+    "test-cypress-headless": "cd cypress && npx --max-old-space-size=4096 cypress run --config-file ./cypress.json --env openshift=true --headless",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'"
   },
   "version": "0.0.1"
