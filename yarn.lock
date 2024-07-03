@@ -857,10 +857,10 @@
     redux "4.0.1"
     redux-thunk "2.4.0"
 
-"@openshift-console/dynamic-plugin-sdk-webpack@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-webpack/-/dynamic-plugin-sdk-webpack-1.0.1.tgz#0dbb0cf2f10526439249888c10c25223571f918a"
-  integrity sha512-xUv6obNPSp0T1Nc+ywywobQMvfxxsySraIejwnrjxBYelFMuMp3Tn/4c4ziUp/mftBTxPy0T4Nx4sLRB4gAPsw==
+"@openshift-console/dynamic-plugin-sdk-webpack@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-webpack/-/dynamic-plugin-sdk-webpack-1.1.1.tgz#349326366f84defa8c81baa8be411257d0b1e954"
+  integrity sha512-1m1iBpdj0HNWQIEFAhMlI5pmigyN5B/Eqcb2nGAI2n030hOOxAalxySO95dvEFa2hiyXMUt4z/Tyq4fDYKZ2nw==
   dependencies:
     "@openshift/dynamic-plugin-sdk-webpack" "^4.0.2"
     ajv "^6.12.3"
@@ -873,10 +873,10 @@
     semver "6.x"
     webpack "5.75.0"
 
-"@openshift-console/dynamic-plugin-sdk@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-1.1.0.tgz#63b525aba54f01231921af23939cae0059e02eaf"
-  integrity sha512-gaNqhGq7nne+cC3QaCxuyK+SPvuC/K5Ww5tV2FabIepgbl3qKkUePrejPgvBJ52tMID1sn8prdW/rImYma6NwQ==
+"@openshift-console/dynamic-plugin-sdk@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-1.4.0.tgz#802c1225f22a6d59b16b5b47f0ff81f176f2db72"
+  integrity sha512-LcwNqG2ZzMKLiSQNpHBwAtzALQghUngILhdijndpIklSH0Dsqi05nhwAJPyuFrpwywZIj6BxE1tmaBzR5gUfcA==
   dependencies:
     classnames "2.x"
     immutable "3.x"
