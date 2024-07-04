@@ -68,7 +68,7 @@ export const addInstallationCDRom = (
     draftVM.spec.template.spec.domain.devices.disks =
       draftVM.spec.template.spec.domain.devices.disks.map((disk, index) => ({
         ...disk,
-        bootOrder: 2 + index,
+        bootOrder: disk.name === INSTALLATION_CDROM_NAME ? 1 : 2 + index,
       }));
 
     if (!getDisks(draftVM)?.find((disk) => disk.name === INSTALLATION_CDROM_NAME))
