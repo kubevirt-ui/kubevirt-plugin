@@ -125,6 +125,7 @@ const useCreateDrawerForm = (
           uploadFiles({
             cdFile,
             diskFile,
+            namespace,
             updateTabsData,
             uploadCDData,
             uploadDiskData,
@@ -158,6 +159,7 @@ const useCreateDrawerForm = (
       const vmObject = await uploadFiles({
         cdFile,
         diskFile,
+        namespace,
         updateTabsData,
         uploadCDData,
         uploadDiskData,

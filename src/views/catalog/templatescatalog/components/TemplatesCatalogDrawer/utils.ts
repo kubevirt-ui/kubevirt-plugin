@@ -11,7 +11,7 @@ import {
   DEFAULT_CDROM_DISK_SIZE,
   DEFAULT_DISK_SIZE,
 } from '@kubevirt-utils/components/DiskModal/state/initialState';
-import { DEFAULT_NAMESPACE, ROOTDISK } from '@kubevirt-utils/constants/constants';
+import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import {
   getTemplateParameterValue,
@@ -118,15 +118,12 @@ export const uploadFile = async (
   uploadData: (data: UploadDataProps) => Promise<void>,
   storage: string,
   dataVolumeName: string,
+  namespace: string,
   updateTabsData?: Updater<TabsData>,
 ): Promise<V1Volume | void> => {
   if (!storage || !file) return Promise.resolve();
 
-  const uploadDV = getUploadDataVolume(
-    dataVolumeName,
-    vm.metadata.namespace || DEFAULT_NAMESPACE,
-    storage,
-  );
+  const uploadDV = getUploadDataVolume(dataVolumeName, namespace, storage);
 
   await uploadData({ dataVolume: uploadDV, file: file as File });
 
@@ -162,6 +159,7 @@ const replaceVolume = (vm: V1VirtualMachine, oldDVName: string, volume: V1Volume
 type UploadFiles = (input: {
   cdFile?: File | string;
   diskFile?: File | string;
+  namespace: string;
   updateTabsData?: Updater<TabsData>;
   uploadCDData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
   uploadDiskData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
@@ -171,6 +169,7 @@ type UploadFiles = (input: {
 export const uploadFiles: UploadFiles = ({
   cdFile,
   diskFile,
+  namespace,
   updateTabsData,
   uploadCDData,
   uploadDiskData,
@@ -192,6 +191,7 @@ export const uploadFiles: UploadFiles = ({
       uploadDiskData,
       dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage || DEFAULT_DISK_SIZE,
       diskDVName,
+      namespace,
       updateTabsData,
     ),
     uploadFile(
@@ -200,6 +200,7 @@ export const uploadFiles: UploadFiles = ({
       uploadCDData,
       cdDataVolumeTemplate?.spec?.storage?.resources?.requests?.storage || DEFAULT_CDROM_DISK_SIZE,
       cdDVName,
+      namespace,
       updateTabsData,
     ),
   ]).then(([newDiskVolume, newCDVolume]) => {
