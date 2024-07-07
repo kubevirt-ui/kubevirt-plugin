@@ -55,7 +55,7 @@ OC_PASS=<password>
 ### Option 3:
 
 1. Set up [Console](https://github.com/openshift/console) and See the plugin development section in [Console Dynamic Plugins README](https://github.com/openshift/console/blob/master/frontend/packages/console-dynamic-plugin-sdk/README.md) for details on how to run OpenShift console using local plugins.
-2. Run bridge with `-plugins kubevirt-plugin=http://localhost:9001`
+2. Run bridge with `-plugins kubevirt-plugin=http://localhost:9001/ -i18n-namespaces=plugin__kubevirt-plugin`
 3. Run `yarn dev` inside the plugin.
 
 ---
