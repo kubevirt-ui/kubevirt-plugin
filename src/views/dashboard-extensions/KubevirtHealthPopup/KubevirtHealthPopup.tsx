@@ -9,6 +9,7 @@ import { YellowExclamationTriangleIcon } from '@openshift-console/dynamic-plugin
 import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/icons';
 import { Grid, GridItem, Stack, StackItem } from '@patternfly/react-core';
 
+import Conditions from './components/Conditions/Conditions';
 import EmptyStateNoAlerts from './components/EmptyStateNoAlerts';
 import HealthPopupChart from './components/HealthPopupChart';
 import { HealthImpactLevel } from './utils/types';
@@ -30,7 +31,7 @@ const KubevirtHealthPopup: FC = () => {
       <GridItem span={4}>
         <Stack>
           <StackItem>
-            <div className="kv-health-popup__alerts-title">Alerts</div>
+            <div className="kv-health-popup__title">Alerts</div>
           </StackItem>
           <StackItem>
             <div className="kv-health-popup__alerts-count">
@@ -48,6 +49,8 @@ const KubevirtHealthPopup: FC = () => {
               } Warning`}</Link>
             </div>
           </StackItem>
+
+          <Conditions />
         </Stack>
       </GridItem>
       <GridItem span={8}>
