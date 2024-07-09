@@ -12,11 +12,10 @@ import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/util
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getVolumeSnapshotSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { DescriptionList } from '@patternfly/react-core';
 
+import DiskSize from './DiskSize';
 import DynamicSSHKeyInjectionInstanceType from './DynamicSSHKeyInjectionInstanceType';
 import SysprepDescriptionItem from './SysprepDescriptionItem';
 
@@ -37,11 +36,7 @@ const DetailsRightGrid: FC = () => {
     vmNamespaceTarget,
   } = useInstanceTypeVMStore();
 
-  const { pvcSource, sshSecretCredentials, volumeSnapshotSource } = instanceTypeVMState;
-
-  const pvcDiskSize =
-    pvcSource?.spec?.resources?.requests?.storage || getVolumeSnapshotSize(volumeSnapshotSource);
-  const sizeData = formatBytes(pvcDiskSize);
+  const { pvcSource, sshSecretCredentials } = instanceTypeVMState;
 
   const setSSHCredentials = (credentials: SSHSecretDetails) => {
     setInstanceTypeVMState({
@@ -64,7 +59,7 @@ const DetailsRightGrid: FC = () => {
         descriptionHeader={t('Project')}
       />
       <VirtualMachineDescriptionItem
-        descriptionData={pvcDiskSize && sizeData}
+        descriptionData={<DiskSize />}
         descriptionHeader={t('Boot disk size')}
       />
       <VirtualMachineDescriptionItem

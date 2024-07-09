@@ -50,6 +50,12 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
         }),
       ),
     resetInstanceTypeVMState: () => set(instanceTypeVMStoreInitialState),
+    setCustomDiskSize: (diskSize: null | string) =>
+      set(
+        produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
+          instanceTypeVMState.customDiskSize = diskSize;
+        }),
+      ),
     setInstanceTypeVMState: ({ payload, type }) =>
       set(
         produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
