@@ -78,7 +78,13 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   }, [isPodNetworkingOptionExists, nads, podNetworkingText]);
 
   useEffect(() => {
-    loaded && setInterfaceType(getNadType(nads?.[0]));
+    if (!loaded) return;
+
+    const initialInterfaceType = getNadType(nads?.[0]);
+
+    if (!initialInterfaceType) return;
+
+    setInterfaceType(initialInterfaceType);
   }, [loaded, nads, setInterfaceType]);
 
   const validated =
