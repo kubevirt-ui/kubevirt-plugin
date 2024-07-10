@@ -18,7 +18,7 @@ import { CAPACITY_UNITS, removeByteSuffix } from './utils';
 
 type CapacityInputProps = {
   isEditingCreatedDisk?: boolean;
-  label: string;
+  label?: string;
   onChange: (quantity: string) => void;
   size: string;
 };

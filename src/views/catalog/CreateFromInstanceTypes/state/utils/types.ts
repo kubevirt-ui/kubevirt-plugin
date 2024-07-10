@@ -42,6 +42,7 @@ export type SysprepConfigMapData = {
 };
 
 export type InstanceTypeVMState = {
+  customDiskSize: string;
   isDynamicSSHInjection: boolean;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   selectedBootableVolume: BootableVolume;
@@ -91,6 +92,7 @@ type InstanceTypeVMStoreActions = {
     volumeSnapshotSource: VolumeSnapshotKind,
   ) => void;
   resetInstanceTypeVMState: () => void;
+  setCustomDiskSize: (diskSize: null | string) => void;
   setInstanceTypeVMState: Dispatch<InstanceTypeAction>;
   setIsChangingNamespace: () => void;
   setSelectedStorageClass: (storageClass: string) => void;

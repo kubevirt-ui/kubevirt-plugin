@@ -197,6 +197,14 @@ export const generateVM = (
     },
   };
 
+  if (instanceTypeState.customDiskSize) {
+    emptyVM.spec.dataVolumeTemplates[0].spec.storage.resources = {
+      requests: {
+        storage: instanceTypeState.customDiskSize,
+      },
+    };
+  }
+
   return sshSecretName ? addSecretToVM(emptyVM, sshSecretName, isDynamic) : emptyVM;
 };
 
