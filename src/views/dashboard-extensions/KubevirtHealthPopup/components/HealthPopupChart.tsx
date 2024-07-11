@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { AlertsByHealthImpact } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -6,11 +6,14 @@ import { ChartDonut } from '@patternfly/react-charts';
 
 import { alertTypeToColorMap } from '../utils/utils';
 
+import EmptyStateNoAlerts from './EmptyStateNoAlerts';
+
 type HealthPopupChartProps = {
   alerts: AlertsByHealthImpact;
+  numberOfAlerts?: number;
 };
 
-const HealthPopupChart: React.FC<HealthPopupChartProps> = ({ alerts }) => {
+const HealthPopupChart: FC<HealthPopupChartProps> = ({ alerts, numberOfAlerts }) => {
   const totalNumberAlerts = useMemo(
     () => Object.values(alerts)?.reduce((acc, alertType) => acc + (alertType?.length || 0), 0),
     [alerts],
@@ -30,6 +33,9 @@ const HealthPopupChart: React.FC<HealthPopupChartProps> = ({ alerts }) => {
       }, []),
     [alerts, totalNumberAlerts],
   );
+
+  if (numberOfAlerts === 0)
+    return <EmptyStateNoAlerts classname="kv-health-popup__empty-state--no-alerts" />;
 
   return (
     <div>
