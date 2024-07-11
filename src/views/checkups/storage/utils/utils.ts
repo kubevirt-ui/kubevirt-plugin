@@ -217,13 +217,12 @@ export const installOrRemoveCheckupsStoragePermissions = (
   namespace: string,
   isPermitted: boolean,
   clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
-): Promise<Awaited<void>> => {
+): Promise<void> => {
   try {
     return isPermitted
       ? removePermissions(namespace, clusterRoleBinding)
       : installPermissions(namespace, clusterRoleBinding);
   } catch (error) {
-    kubevirtConsole.log(error);
     return error;
   }
 };
