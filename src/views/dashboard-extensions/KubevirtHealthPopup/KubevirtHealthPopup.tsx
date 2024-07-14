@@ -10,7 +10,6 @@ import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk/
 import { Grid, GridItem, Stack, StackItem } from '@patternfly/react-core';
 
 import Conditions from './components/Conditions/Conditions';
-import EmptyStateNoAlerts from './components/EmptyStateNoAlerts';
 import HealthPopupChart from './components/HealthPopupChart';
 import { HealthImpactLevel } from './utils/types';
 import { ALERTS_BASE_PATH } from './utils/utils';
@@ -23,6 +22,9 @@ const KubevirtHealthPopup: FC = () => {
     'You can host and manage virtualized workloads on the same platform as container-based workloads.',
   );
 
+  const numCriticalAlerts = alerts?.[HealthImpactLevel.critical]?.length;
+  const numWarningAlerts = alerts?.[AlertType.warning]?.length;
+
   return (
     <Grid className="kv-health-popup">
       <GridItem className="kv-health-popup__description" span={12}>
@@ -31,34 +33,37 @@ const KubevirtHealthPopup: FC = () => {
       <GridItem span={4}>
         <Stack>
           <StackItem>
-            <div className="kv-health-popup__title">Alerts</div>
+            <div className="kv-health-popup__title">{t('Alerts')}</div>
           </StackItem>
-          <StackItem>
-            <div className="kv-health-popup__alerts-count">
-              <RedExclamationCircleIcon className="kv-health-popup__alerts-count--icon" />
-              <Link to={`${ALERTS_BASE_PATH}${HealthImpactLevel.critical}`}>{`${
-                alerts?.[HealthImpactLevel.critical]?.length
-              } Critical`}</Link>
-            </div>
-          </StackItem>
-          <StackItem>
-            <div className="kv-health-popup__alerts-count">
-              <YellowExclamationTriangleIcon className="kv-health-popup__alerts-count--icon" />{' '}
-              <Link to={`${ALERTS_BASE_PATH}${HealthImpactLevel.warning}`}>{`${
-                alerts?.[AlertType.warning]?.length
-              } Warning`}</Link>
-            </div>
-          </StackItem>
+          {numCriticalAlerts > 0 && (
+            <StackItem>
+              <div className="kv-health-popup__alerts-count">
+                <RedExclamationCircleIcon className="kv-health-popup__alerts-count--icon" />
+                <Link to={`${ALERTS_BASE_PATH}${HealthImpactLevel.critical}`}>
+                  {numCriticalAlerts} {t('Critical')}
+                </Link>
+              </div>
+            </StackItem>
+          )}
+          {numWarningAlerts > 0 && (
+            <StackItem>
+              <div className="kv-health-popup__alerts-count">
+                <YellowExclamationTriangleIcon className="kv-health-popup__alerts-count--icon" />{' '}
+                <Link to={`${ALERTS_BASE_PATH}${HealthImpactLevel.warning}`}>
+                  {numWarningAlerts} {t('Warning')}
+                </Link>
+              </div>
+            </StackItem>
+          )}
 
           <Conditions />
         </Stack>
       </GridItem>
       <GridItem span={8}>
-        {!loaded && <LoadingEmptyState />}
-        {loaded && numberOfAlerts > 0 ? (
-          <HealthPopupChart alerts={alerts} />
+        {loaded ? (
+          <HealthPopupChart alerts={alerts} numberOfAlerts={numberOfAlerts} />
         ) : (
-          <EmptyStateNoAlerts classname="kv-health-popup__empty-state--no-alerts" />
+          <LoadingEmptyState />
         )}
       </GridItem>
     </Grid>
