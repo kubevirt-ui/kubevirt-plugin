@@ -3,9 +3,9 @@ import { Helmet } from 'react-helmet';
 
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { HorizontalNav, NavPage } from '@openshift-console/dynamic-plugin-sdk';
 
+import GuidedTour from '../../utils/components/GuidedTour/GuidedTour';
 import WelcomeModal from '../welcome/WelcomeModal';
 
 import ClusterOverviewPageHeader from './Header/ClusterOverviewPageHeader';
@@ -17,7 +17,6 @@ import TopConsumersTab from './TopConsumersTab/TopConsumersTab';
 const ClusterOverviewPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
-  const [quickStarts, , loaded] = useKubevirtUserSettings('quickStart');
 
   const overviewTabs: NavPage[] = useMemo(() => {
     const adminPages: NavPage[] = [
@@ -53,9 +52,10 @@ const ClusterOverviewPage: FC = () => {
       <Helmet>
         <title>{t('Virtualization')}</title>
       </Helmet>
-      {loaded && !quickStarts?.dontShowWelcomeModal && <WelcomeModal />}
+      <WelcomeModal />
       <ClusterOverviewPageHeader />
       <HorizontalNav pages={overviewTabs} />
+      <GuidedTour />
     </>
   );
 };

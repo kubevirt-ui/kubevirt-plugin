@@ -1,0 +1,28 @@
+.kv-tour-popover {
+  background-color: var(--pf-v5-c-popover__content--BackgroundColor);
+
+  &__header {
+    font-size: var(--pf-v5-c-popover__title-text--FontSize);
+    font-weight: var(--pf-v5-global--FontWeight--bold);
+    padding-top: var(--pf-v5-global--spacer--md);
+    padding-left: var(--pf-v5-global--spacer--md);
+  }
+
+  &__buttons-footer {
+    margin: var(--pf-v5-global--spacer--md);
+  }
+
+  &__previous,
+  &__next {
+    margin-bottom: var(--pf-v5-global--spacer--md);
+  }
+
+  &__step-counter {
+    padding: var(--pf-v5-global--spacer--xs);
+  }
+
+  &__feedback-footer {
+    background-color: var(--pf-v5-global--BackgroundColor--200);
+    padding: var(--pf-v5-global--spacer--md);
+  }
+}

@@ -2,9 +2,9 @@ import React, { FC } from 'react';
 
 import { Divider } from '@patternfly/react-core';
 
+import GettingStartedSection from './components/GettingStartedSection/GettingStartedSection';
 import ManageSSHKeySection from './components/ManageSSHKeySection/ManageSSHKeySection';
 import TaskPermissionsSection from './components/TaskPermissionsSection/TaskPermissionsSection';
-import WelcomeSection from './components/WelcomeSection/WelcomeSection';
 
 import './user-tab.scss';
 
@@ -15,7 +15,7 @@ const UserTab: FC = () => {
       <Divider className="section-divider" />
       <TaskPermissionsSection />
       <Divider className="section-divider" />
-      <WelcomeSection />
+      <GettingStartedSection />
     </>
   );
 };

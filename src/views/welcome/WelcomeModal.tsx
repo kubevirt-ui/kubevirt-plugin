@@ -2,6 +2,7 @@ import React, { FC, useCallback, useState } from 'react';
 import { Trans } from 'react-i18next';
 import openCulture from 'images/openCulture.svg';
 
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import {
@@ -23,9 +24,11 @@ import './WelcomeModal.scss';
 const WelcomeModal: FC = () => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(true);
-  const [quickStarts, setQuickStarts] = useKubevirtUserSettings('quickStart');
+  const [quickStarts, setQuickStarts, loaded] = useKubevirtUserSettings('quickStart');
 
   const onClose = useCallback(() => setIsOpen(false), []);
+
+  if (runningTourSignal.value || !loaded || quickStarts?.dontShowWelcomeModal) return null;
 
   return (
     <Modal
@@ -47,8 +50,7 @@ const WelcomeModal: FC = () => {
 
               <Text className="text-muted WelcomeModal__text" component={TextVariants.p}>
                 Use OpenShift Virtualization to run and manage virtualized workloads alongside
-                container workloads. You can use it to manage both Linux and Windows virtual
-                machines.
+                container workloads. You can manage both Linux and Windows virtual machines.
               </Text>
 
               <Title headingLevel="h3">What do you want to do next?</Title>
@@ -62,7 +64,7 @@ const WelcomeModal: FC = () => {
                 className="WelcomeModal__checkbox"
                 id="welcome-modal-checkbox"
                 isChecked={quickStarts?.dontShowWelcomeModal}
-                label={'Do not show this again'}
+                label={t('Do not show this again')}
               />
             </Trans>
           </Stack>

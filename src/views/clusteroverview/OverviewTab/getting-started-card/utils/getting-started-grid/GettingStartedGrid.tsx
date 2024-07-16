@@ -31,7 +31,7 @@ export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children }) =>
     <Card className="kv-getting-started-grid" data-test="getting-started">
       <ExpandableSection
         toggleContent={
-          <Title data-test="title" headingLevel="h2" size={TitleSizes.lg}>
+          <Title data-test="title" headingLevel="h2" id="tour-step-resources" size={TitleSizes.lg}>
             {title}{' '}
             <Tooltip className="kv-getting-started-grid__tooltip" content={titleTooltip}>
               <span

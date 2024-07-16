@@ -95,7 +95,10 @@ const CustomizeITVMFooter: FC = () => {
             </SplitItem>
             <SplitItem>
               <Button
-                onClick={() => navigate(`/k8s/ns/${activeNamespace}/catalog`)}
+                onClick={() => {
+                  clearCustomizeInstanceType();
+                  navigate(`/k8s/ns/${activeNamespace}/catalog`);
+                }}
                 variant={ButtonVariant.link}
               >
                 {t('Cancel')}

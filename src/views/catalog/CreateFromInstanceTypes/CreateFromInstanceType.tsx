@@ -2,6 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
+import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -61,6 +62,7 @@ const CreateFromInstanceType: FC = () => {
 
   return (
     <>
+      <GuidedTour />
       <Grid className="co-dashboard-body">
         <GridItem>
           <Card>
