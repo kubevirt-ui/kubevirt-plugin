@@ -1,19 +1,25 @@
 import { useMemo } from 'react';
 import { isRunning } from 'src/views/virtualmachines/utils';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   getRunningVMMissingDisksFromVMI,
   getRunningVMMissingVolumesFromVMI,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
-import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getBootDisk, getDisks, getInstanceTypeMatcher, getVolumes } from '../../utils';
+import {
+  getBootDisk,
+  getDataVolumeTemplates,
+  getDisks,
+  getInstanceTypeMatcher,
+  getVolumes,
+} from '../../utils';
 import { getDiskRowDataLayout } from '../../utils/disk/rowData';
+
+import useDisksSources from './useDisksSources';
 
 type UseDisksTableDisks = (
   vm: V1VirtualMachine,
@@ -47,12 +53,7 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
     [vm, vmi, isVMRunning],
   );
 
-  const [pvcs, loaded, loadingError] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>({
-    isList: true,
-    kind: PersistentVolumeClaimModel.kind,
-    namespace: vm?.metadata?.namespace,
-    namespaced: true,
-  });
+  const { dataSources, loaded, loadingError, pvcs } = useDisksSources(vm);
 
   const disks = useMemo(() => {
     const isInstanceTypeVM = Boolean(getInstanceTypeMatcher(vm));
@@ -63,16 +64,29 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
           ? { name: ROOTDISK }
           : vmDisks?.find(({ name }) => name === volume?.name);
 
+      const dataVolumeTemplate = volume?.dataVolume?.name
+        ? getDataVolumeTemplates(vm)?.find((dv) => getName(dv) === volume.dataVolume.name)
+        : null;
+
+      const sourceRef = dataVolumeTemplate?.spec?.sourceRef;
+
+      const dataSource = dataSources.find(
+        (ds) => getName(ds) === sourceRef?.name && getNamespace(ds) === sourceRef?.namespace,
+      );
+
       const pvc = pvcs?.find(
         ({ metadata }) =>
           metadata?.name === volume?.persistentVolumeClaim?.claimName ||
-          metadata?.name === volume?.dataVolume?.name,
+          metadata?.name === volume?.dataVolume?.name ||
+          (dataSource?.spec?.source?.pvc?.name === metadata?.name &&
+            dataSource?.spec?.source?.pvc?.namespace === metadata?.namespace),
       );
-      return { disk, pvc, volume };
+
+      return { dataVolumeTemplate, disk, pvc, volume };
     });
 
     return getDiskRowDataLayout(diskDevices, getBootDisk(vm));
-  }, [vmVolumes, vm, vmDisks, pvcs]);
+  }, [vm, vmVolumes, vmDisks, pvcs, dataSources]);
 
   return [disks || [], loaded, loadingError, isVMRunning ? vmi : null];
 };

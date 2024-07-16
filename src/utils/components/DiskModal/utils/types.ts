@@ -68,6 +68,7 @@ export type DiskFormState = {
 
 export type DiskModalProps = {
   createOwnerReference?: boolean;
+  customize?: boolean;
   headerText: string;
   initialFormData?: DiskFormState;
   isEditDisk?: boolean;
