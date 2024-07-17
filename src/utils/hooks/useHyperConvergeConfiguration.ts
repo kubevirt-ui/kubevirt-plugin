@@ -8,6 +8,7 @@ import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynam
 
 export type HyperConverged = K8sResourceCommon & {
   spec: {
+    commonBootImageNamespace?: string;
     commonTemplatesNamespace?: string;
     dataImportCronTemplates: K8sResourceCommon[];
     evictionStrategy?: string;
