@@ -32,6 +32,7 @@ export const optionLabelMapper: { [key in SourceTypes]: string } = {
 };
 
 export const attachExistingGroupOptions: DiskSourceOptionGroup = {
+  description: t('Container image or PVC'),
   groupLabel: t('Attach existing'),
   items: [
     {
