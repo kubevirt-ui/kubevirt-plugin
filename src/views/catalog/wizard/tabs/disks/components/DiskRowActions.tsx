@@ -5,7 +5,6 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
-import { getEditDiskState } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
@@ -24,8 +23,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const deleteBtnText = t('Detach');
-
-  const initialFormState = getEditDiskState(vm, diskName);
 
   const onDelete = useCallback(() => {
     const volumeToDelete = vm.spec.template.spec.volumes.find((volume) => volume.name === diskName);
@@ -91,10 +88,8 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
             }
           })
         }
-        createOwnerReference={false}
-        headerText={t('Edit disk')}
-        initialFormData={initialFormState}
-        isEditDisk
+        editDiskName={diskName}
+        isCreated={false}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={updateVM}

@@ -1,5 +1,14 @@
+/* eslint-disable require-jsdoc */
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
+import BlankDiskModal from '../BlankDiskModal';
+import ClonePVCDiskModal from '../ClonePVCDiskModal';
+import ContainerDiskModal from '../ContainerDiskModal';
+import HTTPDiskModal from '../HTTPDiskModal';
+import OtherDiskModal from '../OtherDiskModal';
+import PVCDiskModal from '../PVCDiskModal';
+import RegistryDiskModal from '../RegistryDiskModal';
+import UploadDiskModal from '../UploadDiskModal';
 import { DiskFormState, InterfaceTypes, SourceTypes, VolumeTypes } from '../utils/types';
 
 export const DEFAULT_DISK_SIZE = '30Gi';
@@ -38,3 +47,19 @@ export const mapSourceTypeToVolumeType = {
   [VolumeTypes.SECRET]: SourceTypes.OTHER,
   [VolumeTypes.SERVICE_ACCOUNT]: SourceTypes.OTHER,
 };
+
+export const DiskModalBySource = {
+  [SourceTypes.BLANK]: BlankDiskModal,
+  [SourceTypes.CLONE_PVC]: ClonePVCDiskModal,
+  [SourceTypes.EPHEMERAL]: ContainerDiskModal,
+  [SourceTypes.HTTP]: HTTPDiskModal,
+  [SourceTypes.PVC]: PVCDiskModal,
+  [SourceTypes.REGISTRY]: RegistryDiskModal,
+  [SourceTypes.UPLOAD]: UploadDiskModal,
+};
+
+export const modalsBySource = new Proxy(DiskModalBySource, {
+  get(target, prop) {
+    return target[prop] ?? OtherDiskModal;
+  },
+});

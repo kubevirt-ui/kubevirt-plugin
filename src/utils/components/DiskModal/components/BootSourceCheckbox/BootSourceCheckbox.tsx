@@ -1,8 +1,10 @@
 import React, { FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getBootDisk } from '@kubevirt-utils/resources/vm';
 import {
   Alert,
   AlertVariant,
@@ -13,21 +15,26 @@ import {
   Stack,
 } from '@patternfly/react-core';
 
-import { DiskFormState } from '../../utils/types';
-import { isBootSourceField } from '../utils/constants';
+import { V1DiskFormState } from '../../utils/types';
+import { IS_BOOT_SOURCE_FIELD } from '../utils/constants';
 
 import './BootSourceCheckbox.scss';
 
 type BootSourceCheckboxProps = {
-  initialBootDiskName?: string;
+  editDiskName?: string;
   isDisabled?: boolean;
+  vm: V1VirtualMachine;
 };
 
-const BootSourceCheckbox: FC<BootSourceCheckboxProps> = ({ initialBootDiskName, isDisabled }) => {
+const BootSourceCheckbox: FC<BootSourceCheckboxProps> = ({ editDiskName, isDisabled, vm }) => {
+  const initialBootDiskName = getBootDisk(vm)?.name;
+
+  const isInitialBootDisk = initialBootDiskName === editDiskName;
+
   const { t } = useKubevirtTranslation();
-  const { control, watch } = useFormContext<DiskFormState>();
-  const isBootSource = watch(isBootSourceField);
-  const showOverrideAlert = !isDisabled && isBootSource && initialBootDiskName;
+  const { control, watch } = useFormContext<V1DiskFormState>();
+  const isBootSource = watch(IS_BOOT_SOURCE_FIELD);
+  const showOverrideAlert = !isDisabled && isBootSource && !isInitialBootDisk;
 
   return (
     <FormGroup fieldId="enable-bootsource">
@@ -44,7 +51,7 @@ const BootSourceCheckbox: FC<BootSourceCheckboxProps> = ({ initialBootDiskName, 
               />
             )}
             control={control}
-            name={isBootSourceField}
+            name={IS_BOOT_SOURCE_FIELD}
           />
           <HelpTextIcon
             bodyContent={t(

@@ -1,52 +1,56 @@
 import React, { FC, useEffect, useMemo } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 
+import { V1beta1StorageSpecVolumeModeEnum } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
-import { DiskFormState } from '../../utils/types';
-import { accessModeField, accessModeFieldID } from '../utils/constants';
+import { V1DiskFormState } from '../../utils/types';
 import {
-  ACCESS_MODE_RADIO_OPTIONS,
-  getAccessModeForProvisioner,
-  VOLUME_MODES,
-} from '../utils/modesMapping';
+  ACCESS_MODE_FIELD,
+  ACCESS_MODE_FIELDID,
+  STORAGE_CLASS_PROVIDER_FIELD,
+  VOLUME_MODE_FIELD,
+} from '../utils/constants';
+import { ACCESS_MODE_RADIO_OPTIONS, getAccessModeForProvisioner } from '../utils/modesMapping';
 
 const AccessMode: FC = () => {
   const { t } = useKubevirtTranslation();
 
-  const { control, setValue, watch } = useFormContext<DiskFormState>();
+  const { setValue, watch } = useFormContext<V1DiskFormState>();
 
-  const { accessMode, storageClassProvisioner, volumeMode } = watch();
+  const [storageClassProvisioner, accessModes, volumeMode] = watch([
+    STORAGE_CLASS_PROVIDER_FIELD,
+    ACCESS_MODE_FIELD,
+    VOLUME_MODE_FIELD,
+  ]);
+
+  const accessMode = accessModes?.[0];
 
   const allowedAccessModes = useMemo(() => {
-    return getAccessModeForProvisioner(storageClassProvisioner, volumeMode as VOLUME_MODES);
+    return getAccessModeForProvisioner(
+      storageClassProvisioner,
+      volumeMode as V1beta1StorageSpecVolumeModeEnum,
+    );
   }, [storageClassProvisioner, volumeMode]);
 
   useEffect(() => {
     if (!allowedAccessModes?.includes(accessMode)) {
-      setValue(accessModeField, allowedAccessModes?.[0]);
+      setValue(ACCESS_MODE_FIELD, [allowedAccessModes?.[0]]);
     }
   }, [accessMode, allowedAccessModes, setValue]);
 
   return (
-    <FormGroup fieldId={accessModeFieldID} label={t('Access Mode')}>
+    <FormGroup fieldId={ACCESS_MODE_FIELDID} label={t('Access Mode')}>
       {ACCESS_MODE_RADIO_OPTIONS.map(({ label, value }) => (
-        <Controller
-          render={({ field: { onChange } }) => (
-            <Radio
-              id={value}
-              isChecked={value === accessMode}
-              isDisabled={!allowedAccessModes?.includes(value)}
-              key={value}
-              label={label}
-              name={accessModeField}
-              onChange={() => onChange(value)}
-            />
-          )}
-          control={control}
+        <Radio
+          id={value}
+          isChecked={value === accessMode}
+          isDisabled={!allowedAccessModes?.includes(value)}
           key={value}
-          name={accessModeField}
+          label={label}
+          name={ACCESS_MODE_FIELD}
+          onChange={() => setValue(ACCESS_MODE_FIELD, [value])}
         />
       ))}
     </FormGroup>

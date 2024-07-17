@@ -1,38 +1,45 @@
 import React, { FC, useEffect, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import { V1beta1StorageSpecVolumeModeEnum } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
-import { DiskFormState } from '../../utils/types';
-import { volumeModeField, volumeModeFieldID } from '../utils/constants';
+import { V1DiskFormState } from '../../utils/types';
+import {
+  ACCESS_MODE_FIELD,
+  STORAGE_CLASS_PROVIDER_FIELD,
+  VOLUME_MODE_FIELD,
+  VOLUMEMODE_FIELDID,
+} from '../utils/constants';
 import {
   ACCESS_MODES,
   getVolumeModeForProvisioner,
   VOLUME_MODE_RADIO_OPTIONS,
-  VOLUME_MODES,
 } from '../utils/modesMapping';
 
 const VolumeMode: FC = () => {
   const { t } = useKubevirtTranslation();
 
-  const { control, setValue, watch } = useFormContext<DiskFormState>();
+  const { control, setValue, watch } = useFormContext<V1DiskFormState>();
 
-  const { accessMode, storageClassProvisioner, volumeMode } = watch();
+  const volumeMode = watch(VOLUME_MODE_FIELD);
+  const accessModes = watch(ACCESS_MODE_FIELD) as ACCESS_MODES[];
+  const storageClassProvisioner = watch(STORAGE_CLASS_PROVIDER_FIELD);
 
   const allowedVolumeModes = useMemo(
-    () => getVolumeModeForProvisioner(storageClassProvisioner, accessMode as ACCESS_MODES),
-    [accessMode, storageClassProvisioner],
+    () => getVolumeModeForProvisioner(storageClassProvisioner, accessModes?.[0]),
+    [accessModes, storageClassProvisioner],
   );
 
   useEffect(() => {
-    if (!allowedVolumeModes?.includes(volumeMode as VOLUME_MODES)) {
-      setValue(volumeModeField, allowedVolumeModes[0]);
+    if (!allowedVolumeModes?.includes(volumeMode as V1beta1StorageSpecVolumeModeEnum)) {
+      setValue(VOLUME_MODE_FIELD, allowedVolumeModes[0]);
     }
   }, [allowedVolumeModes, volumeMode, setValue]);
 
   return (
-    <FormGroup fieldId={volumeModeFieldID} label={t('Volume Mode')}>
+    <FormGroup fieldId={VOLUMEMODE_FIELDID} label={t('Volume Mode')}>
       {VOLUME_MODE_RADIO_OPTIONS.map(({ label, value }) => (
         <Controller
           render={({ field: { onChange } }) => (
@@ -42,13 +49,13 @@ const VolumeMode: FC = () => {
               isDisabled={!allowedVolumeModes?.includes(value)}
               key={value}
               label={label}
-              name={volumeModeField}
+              name={VOLUME_MODE_FIELD}
               onChange={() => onChange(value)}
             />
           )}
           control={control}
           key={value}
-          name={volumeModeField}
+          name={VOLUME_MODE_FIELD}
         />
       ))}
     </FormGroup>

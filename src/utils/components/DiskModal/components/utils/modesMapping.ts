@@ -1,3 +1,4 @@
+import { V1beta1StorageSpecVolumeModeEnum } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export enum ACCESS_MODES {
@@ -6,20 +7,18 @@ export enum ACCESS_MODES {
   RWX = 'ReadWriteMany',
 }
 
-export enum VOLUME_MODES {
-  BLOCK = 'Block',
-  FILESYSTEM = 'Filesystem',
-}
-
 export const initialAccessModes: ACCESS_MODES[] = [
   ACCESS_MODES.RWX,
   ACCESS_MODES.RWO,
   ACCESS_MODES.ROX,
 ];
-export const initialVolumeModes: VOLUME_MODES[] = [VOLUME_MODES.FILESYSTEM, VOLUME_MODES.BLOCK];
+export const initialVolumeModes: V1beta1StorageSpecVolumeModeEnum[] = [
+  V1beta1StorageSpecVolumeModeEnum.Filesystem,
+  V1beta1StorageSpecVolumeModeEnum.Block,
+];
 
 type ModeMapping = {
-  [volumeMode in VOLUME_MODES]?: ACCESS_MODES[];
+  [volumeMode in V1beta1StorageSpecVolumeModeEnum]?: ACCESS_MODES[];
 };
 
 type ProvisionerAccessModeMapping = {
@@ -29,84 +28,124 @@ type ProvisionerAccessModeMapping = {
 // See https://kubernetes.io/docs/concepts/storage/persistent-volumes/#types-of-persistent-volumes for more details
 export const provisionerAccessModeMapping: ProvisionerAccessModeMapping = {
   'cinder.csi.openstack.org': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO],
   },
   'csi.ovirt.org': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO],
   },
   'ebs.csi.aws.com': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO],
   },
   'kubernetes.io/aws-ebs': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO],
   },
   'kubernetes.io/azure-disk': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO],
   },
   'kubernetes.io/azure-file': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX, ACCESS_MODES.ROX],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [
+      ACCESS_MODES.RWO,
+      ACCESS_MODES.RWX,
+      ACCESS_MODES.ROX,
+    ],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [
+      ACCESS_MODES.RWO,
+      ACCESS_MODES.RWX,
+      ACCESS_MODES.ROX,
+    ],
   },
   'kubernetes.io/cinder': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO],
   },
   'kubernetes.io/gce-pd': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
   },
   'kubernetes.io/glusterfs': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX, ACCESS_MODES.ROX],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [
+      ACCESS_MODES.RWO,
+      ACCESS_MODES.RWX,
+      ACCESS_MODES.ROX,
+    ],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [
+      ACCESS_MODES.RWO,
+      ACCESS_MODES.RWX,
+      ACCESS_MODES.ROX,
+    ],
   },
   'kubernetes.io/no-provisioner': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO],
   },
   'kubernetes.io/portworx-volume': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX],
   },
   'kubernetes.io/quobyte': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX, ACCESS_MODES.ROX],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [
+      ACCESS_MODES.RWO,
+      ACCESS_MODES.RWX,
+      ACCESS_MODES.ROX,
+    ],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [
+      ACCESS_MODES.RWO,
+      ACCESS_MODES.RWX,
+      ACCESS_MODES.ROX,
+    ],
   },
   'kubernetes.io/rbd': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
   },
   'kubernetes.io/scaleio': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
   },
   'kubernetes.io/storageos': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO],
   },
   'kubernetes.io/vsphere-volume': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX],
   },
   // Since 4.6 new provisioners names will be without the 'kubernetes.io/' prefix.
   'manila.csi.openstack.org': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX, ACCESS_MODES.ROX],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [
+      ACCESS_MODES.RWO,
+      ACCESS_MODES.RWX,
+      ACCESS_MODES.ROX,
+    ],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [
+      ACCESS_MODES.RWO,
+      ACCESS_MODES.RWX,
+      ACCESS_MODES.ROX,
+    ],
   },
   'openshift-storage.cephfs.csi.ceph.com': {
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [
+      ACCESS_MODES.RWO,
+      ACCESS_MODES.RWX,
+      ACCESS_MODES.ROX,
+    ],
   },
   'openshift-storage.rbd.csi.ceph.com': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO, ACCESS_MODES.RWX, ACCESS_MODES.ROX],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [
+      ACCESS_MODES.RWO,
+      ACCESS_MODES.RWX,
+      ACCESS_MODES.ROX,
+    ],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO, ACCESS_MODES.ROX],
   },
   'pd.csi.storage.gke.io': {
-    [VOLUME_MODES.BLOCK]: [ACCESS_MODES.RWO],
-    [VOLUME_MODES.FILESYSTEM]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Block]: [ACCESS_MODES.RWO],
+    [V1beta1StorageSpecVolumeModeEnum.Filesystem]: [ACCESS_MODES.RWO],
   },
 };
 
@@ -128,15 +167,18 @@ export const ACCESS_MODE_RADIO_OPTIONS = [
 export const VOLUME_MODE_RADIO_OPTIONS = [
   {
     label: t('Filesystem'),
-    value: VOLUME_MODES.FILESYSTEM,
+    value: V1beta1StorageSpecVolumeModeEnum.Filesystem,
   },
   {
     label: t('Block'),
-    value: VOLUME_MODES.BLOCK,
+    value: V1beta1StorageSpecVolumeModeEnum.Block,
   },
 ];
 
-export const getAccessModeForProvisioner = (provisioner: string, volumeMode: VOLUME_MODES) => {
+export const getAccessModeForProvisioner = (
+  provisioner: string,
+  volumeMode: V1beta1StorageSpecVolumeModeEnum,
+) => {
   const modeMap = provisionerAccessModeMapping[provisioner] || {};
 
   const volumeModes = Object.keys(modeMap) as ACCESS_MODES[];
@@ -150,7 +192,7 @@ export const getAccessModeForProvisioner = (provisioner: string, volumeMode: VOL
 export const getVolumeModeForProvisioner = (provisioner: string, accessMode: ACCESS_MODES) => {
   const modeMap = provisionerAccessModeMapping[provisioner] || {};
 
-  const volumeModes = Object.keys(modeMap) as VOLUME_MODES[];
+  const volumeModes = Object.keys(modeMap) as V1beta1StorageSpecVolumeModeEnum[];
   if (volumeModes?.length > 0) {
     return accessMode
       ? volumeModes.filter((vMode) => modeMap[vMode].includes(accessMode))

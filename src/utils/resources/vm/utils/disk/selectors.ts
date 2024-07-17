@@ -1,15 +1,18 @@
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 
-import { diskTypes, diskTypesLabels } from './constants';
+import { DiskType, diskTypes, diskTypesLabels } from './constants';
 
 /**
  * returns a drive type from a disk
  * @param {V1Disk} disk disk
  * @returns drive type
  */
-export const getDiskDrive = (disk: V1Disk): string => {
-  const drive = Object.keys(diskTypesLabels).find((driveType: string) => disk?.[driveType]);
+export const getDiskDrive = (disk: V1Disk): DiskType => {
+  const drive = Object.keys(diskTypesLabels).find(
+    (driveType: string) => disk?.[driveType],
+  ) as DiskType;
+
   return drive ?? diskTypes.disk;
 };
 

@@ -7,7 +7,7 @@ import {
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
-import { DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -17,12 +17,13 @@ import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/sh
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
-import { diskSizeField } from '../../../utils/constants';
 import {
-  clonePVCNameField,
-  clonePVCNamespaceField,
-  diskSourcePVCNameFieldID,
-} from '../../utils/constants';
+  DATAVOLUME_PVC_NAME,
+  DATAVOLUME_PVC_NAMESPACE,
+  DISK_SIZE_FIELD,
+} from '../../../utils/constants';
+import { getErrorPVCName } from '../../../utils/selectors';
+import { diskSourcePVCNameFieldID } from '../../utils/constants';
 
 const DiskSourceClonePVCSelectName: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -31,9 +32,9 @@ const DiskSourceClonePVCSelectName: FC = () => {
     formState: { errors },
     setValue,
     watch,
-  } = useFormContext<DiskFormState>();
+  } = useFormContext<V1DiskFormState>();
 
-  const namespace = watch(clonePVCNamespaceField);
+  const namespace = watch(DATAVOLUME_PVC_NAMESPACE);
 
   const [pvcs, pvcsLoaded] = usePVCs(namespace);
 
@@ -42,7 +43,7 @@ const DiskSourceClonePVCSelectName: FC = () => {
   const pvcMapper = convertResourceArrayToMap(pvcs);
   if (!pvcsLoaded) return <Loading />;
 
-  const error = errors?.pvc?.pvcName;
+  const error = getErrorPVCName(errors);
 
   return (
     <Controller
@@ -63,7 +64,7 @@ const DiskSourceClonePVCSelectName: FC = () => {
               onChange(pvcName);
               const selectedPVC = pvcMapper[pvcName];
               const selectedPVCSize = selectedPVC?.spec?.resources?.requests?.storage;
-              setValue(diskSizeField, removeByteSuffix(bytesToDiskSize(selectedPVCSize)));
+              setValue(DISK_SIZE_FIELD, removeByteSuffix(bytesToDiskSize(selectedPVCSize)));
             }}
             toggleProps={{
               isDisabled: isEmpty(namespace),
@@ -83,7 +84,7 @@ const DiskSourceClonePVCSelectName: FC = () => {
         required: t('PersistentVolumeClaim is required.'),
       }}
       control={control}
-      name={clonePVCNameField}
+      name={DATAVOLUME_PVC_NAME}
     />
   );
 };

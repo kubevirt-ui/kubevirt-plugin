@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
-import { DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -10,11 +10,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
-import {
-  clonePVCNameField,
-  clonePVCNamespaceField,
-  diskSourcePVCNamespaceFieldID,
-} from '../../utils/constants';
+import { DATAVOLUME_PVC_NAME, DATAVOLUME_PVC_NAMESPACE } from '../../../utils/constants';
+import { diskSourcePVCNamespaceFieldID } from '../../utils/constants';
 
 const DiskSourcePVCSelectNamespace: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -22,12 +19,12 @@ const DiskSourcePVCSelectNamespace: FC = () => {
     control,
     formState: { errors },
     setValue,
-  } = useFormContext<DiskFormState>();
+  } = useFormContext<V1DiskFormState>();
   const [projectNames, projectsLoaded] = useProjects();
 
   if (!projectsLoaded) return <Loading />;
 
-  const error = errors?.pvc?.pvcNamespace;
+  const error = errors?.dataVolumeTemplate?.spec?.source?.pvc?.namespace;
 
   return (
     <Controller
@@ -46,7 +43,9 @@ const DiskSourcePVCSelectNamespace: FC = () => {
             }))}
             setSelected={(val) => {
               onChange(val);
-              setValue<FieldPath<DiskFormState>>(clonePVCNameField, null, { shouldValidate: true });
+              setValue<FieldPath<V1DiskFormState>>(DATAVOLUME_PVC_NAME, null, {
+                shouldValidate: true,
+              });
             }}
             toggleProps={{
               isFullWidth: true,
@@ -62,7 +61,7 @@ const DiskSourcePVCSelectNamespace: FC = () => {
         </FormGroup>
       )}
       control={control}
-      name={clonePVCNamespaceField}
+      name={DATAVOLUME_PVC_NAMESPACE}
       rules={{ required: t('Project is required.') }}
     />
   );

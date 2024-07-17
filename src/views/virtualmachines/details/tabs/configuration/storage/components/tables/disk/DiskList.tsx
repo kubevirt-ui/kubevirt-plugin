@@ -1,18 +1,14 @@
 import React, { FC } from 'react';
-import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
-import { getInitialStateDiskForm } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import { DiskFormState, SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import DiskSourceFlyoutMenu from '@kubevirt-utils/components/DiskSourceFlyoutMenu/DiskSourceFlyoutMenu';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import useProvisioningPercentage from '@kubevirt-utils/resources/vm/hooks/useProvisioningPercentage';
-import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import {
   ListPageFilter,
   useListPageFilter,
@@ -36,7 +32,6 @@ type DiskListProps = {
 };
 
 const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi }) => {
-  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
   const [disks, loaded, loadError] = useDisksTableData(vm, vmi);
@@ -45,11 +40,6 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
 
   const { percentages: provisioningPercentages } = useProvisioningPercentage(vm);
 
-  const headerText =
-    vm?.status?.printableStatus === printableVMStatus.Running
-      ? t('Add disk (hot plugged)')
-      : t('Add disk');
-
   const onSubmit = onDiskUpdate || updateDisks;
 
   return (
@@ -57,19 +47,12 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
       <DiskListTitle />
       <DiskSourceFlyoutMenu
         onSelect={(diskSource: SourceTypes) => {
-          const diskState: DiskFormState = {
-            ...getInitialStateDiskForm(),
-            diskName: generatePrettyName('disk'),
-            diskSource: diskSource,
-          };
-
           return createModal(({ isOpen, onClose }) => (
             <DiskModal
-              headerText={headerText}
-              initialFormData={diskState}
+              createDiskSource={diskSource}
               isOpen={isOpen}
               onClose={onClose}
-              onSubmit={onSubmit}
+              onSubmit={onDiskUpdate || updateDisks}
               vm={vm}
             />
           ));
