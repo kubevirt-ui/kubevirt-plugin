@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -17,7 +18,6 @@ import {
   Label,
 } from '@patternfly/react-core';
 
-import SnapshotModal from '../../../snapshots/components/modal/SnapshotModal';
 import useSnapshotData from '../../../snapshots/hooks/useSnapshotData';
 import { createURL } from '../../utils/utils';
 
