@@ -4,6 +4,7 @@ import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/u
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -14,7 +15,6 @@ import { FormGroup, Split, SplitItem } from '@patternfly/react-core';
 
 import BootableVolumeEmptyState from '../BootableVolumeEmptyState/BootableVolumeEmptyState';
 
-import BootableVolumeListNamespaceSelect from './components/BootableVolumeListNamespaceSelect/BootableVolumeListNamespaceSelect';
 import BootableVolumeListPagination from './components/BootableVolumeListPagination/BootableVolumeListPagination';
 import BootableVolumesPipelinesHint from './components/BootableVolumesPipelinesHint/BootableVolumesPipelinesHint';
 import BootableVolumeTable from './components/BootableVolumeTable/BootableVolumeTable';
@@ -43,7 +43,12 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   selectedBootableVolumeState,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { instanceTypeVMState, onSelectCreatedVolume } = useInstanceTypeVMStore();
+  const {
+    instanceTypeVMState,
+    onSelectCreatedVolume,
+    setVolumeListNamespace,
+    volumeListNamespace,
+  } = useInstanceTypeVMStore();
 
   const { pvcSource, selectedBootableVolume, volumeSnapshotSource } = instanceTypeVMState;
   const { bootableVolumes, loaded, pvcSources, volumeSnapshotSources } = bootableVolumesData;
@@ -96,7 +101,10 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             className="bootable-volume-list-bar__volume-namespace"
             label={t('Volumes project')}
           >
-            <BootableVolumeListNamespaceSelect />
+            <ProjectDropdown
+              onChange={setVolumeListNamespace}
+              selectedProject={volumeListNamespace}
+            />
           </FormGroup>
         </SplitItem>
 
