@@ -49,7 +49,6 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
 
   const onSelect = (_event: React.MouseEvent<Element, MouseEvent> | undefined, value: string) => {
     if (value && value !== NO_RESULTS) {
-      setSelected(value);
       setFilterValue('');
     }
     setIsOpen(false);

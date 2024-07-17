@@ -2,11 +2,14 @@ import React, { FC } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
+import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
 import AutomaticImagesDownload from './AutomaticImagesDownload/AutomaticImagesDownload';
+import BootableVolumeProjectSection from './BootableVolumeProjectSection/BootableVolumeProjectSection';
 import LiveMigrationSection from './LiveMigrationSection/LiveMigrationSection';
 import MemoryDensity from './MemoryDensity/MemoryDensity';
 import SSHConfiguration from './SSHConfiguration/SSHConfiguration';
@@ -19,6 +22,10 @@ type GeneralSettingsProps = {
 
 const GeneralSettings: FC<GeneralSettingsProps> = ({ hyperConvergeConfiguration, newBadge }) => {
   const { t } = useKubevirtTranslation();
+  const projectsData = useK8sWatchResource<K8sResourceCommon[]>({
+    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    isList: true,
+  });
 
   return (
     <ExpandSection toggleText={t('General settings')}>
@@ -30,7 +37,16 @@ const GeneralSettings: FC<GeneralSettingsProps> = ({ hyperConvergeConfiguration,
           <SSHConfiguration newBadge={newBadge} />
         </StackItem>
         <StackItem isFilled>
-          <TemplatesProjectSection hyperConvergeConfiguration={hyperConvergeConfiguration} />
+          <TemplatesProjectSection
+            hyperConvergeConfiguration={hyperConvergeConfiguration}
+            projectsData={projectsData}
+          />
+        </StackItem>
+        <StackItem isFilled>
+          <BootableVolumeProjectSection
+            hyperConvergeConfiguration={hyperConvergeConfiguration}
+            projectsData={projectsData}
+          />
         </StackItem>
         <StackItem isFilled>
           <MemoryDensity
