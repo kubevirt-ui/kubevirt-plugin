@@ -17,7 +17,7 @@ import {
 import { buildOwnerReference, getName } from '@kubevirt-utils/resources/shared';
 import { hasTemplateParameter } from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
-import { ensurePath, getRandomChars } from '@kubevirt-utils/utils/utils';
+import { ensurePath, generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -155,12 +155,12 @@ export const getDataVolumeFromState = ({
   const dvName =
     resultVolume?.dataVolume?.name ||
     resultVolume?.persistentVolumeClaim?.claimName ||
-    `${vm?.metadata?.name}-${diskState.diskName}`;
+    nameWithoutParameter(
+      `${vm?.metadata?.name}-${diskState.diskName}`,
+      generatePrettyName('volume'),
+    );
 
-  dataVolume.metadata.name = nameWithoutParameter(
-    dvName,
-    `${diskState.diskName}-${getRandomChars()}`,
-  );
+  dataVolume.metadata.name = dvName;
 
   dataVolume.spec.storage.resources.requests.storage = diskState.diskSize;
   dataVolume.spec.storage.storageClassName = diskState.storageClass;
