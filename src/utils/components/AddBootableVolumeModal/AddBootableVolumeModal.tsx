@@ -4,14 +4,12 @@ import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useStorageProfileClaimPropertySets from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { getValidNamespace, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
 
@@ -34,7 +32,6 @@ import { createBootableVolume } from './utils/utils';
 import './AddBootableVolumeModal.scss';
 
 type AddBootableVolumeModalProps = {
-  enforceNamespace?: string;
   isOpen: boolean;
   onClose: () => void;
   onCreateVolume?: (
@@ -45,23 +42,23 @@ type AddBootableVolumeModalProps = {
 };
 
 const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
-  enforceNamespace,
   isOpen,
   onClose,
   onCreateVolume,
 }) => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
-  const selectedNamespace =
-    activeNamespace === ALL_NAMESPACES_SESSION_KEY ? undefined : activeNamespace;
-  const namespace = enforceNamespace ?? selectedNamespace ?? DEFAULT_NAMESPACE;
+  const namespace = getValidNamespace(activeNamespace);
 
-  const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>(
-    initialBootableVolumeState,
-  );
+  const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>({
+    ...initialBootableVolumeState,
+    bootableVolumeNamespace: namespace,
+  });
+
   const [sourceType, setSourceType] = useState<DROPDOWN_FORM_SELECTION>(
     DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE,
   );
+
   const applyStorageProfileState = useState<boolean>(true);
 
   const { upload, uploadData } = useCDIUpload();
@@ -103,7 +100,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         applyStorageProfileSettings: applyStorageProfileState[0],
         bootableVolume,
         claimPropertySets: claimPropertySetsData?.claimPropertySets,
-        namespace,
         onCreateVolume,
         sourceType,
         uploadData,
@@ -137,7 +133,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           applyStorageProfileState={applyStorageProfileState}
           bootableVolume={bootableVolume}
           claimPropertySetsData={claimPropertySetsData}
-          namespace={namespace}
           setBootableVolumeField={setBootableVolumeField}
         />
 

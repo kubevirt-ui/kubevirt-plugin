@@ -2,6 +2,7 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import ApplyStorageProfileSettingsCheckbox from '@kubevirt-utils/components/ApplyStorageProfileSettingsCheckbox/ApplyStorageProfileSettingsCheckbox';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
+import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UseStorageProfileClaimPropertySetsValue } from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
 import { FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
@@ -15,7 +16,6 @@ type VolumeDestinationProps = {
   applyStorageProfileState: [boolean, Dispatch<SetStateAction<boolean>>];
   bootableVolume: AddBootableVolumeState;
   claimPropertySetsData: UseStorageProfileClaimPropertySetsValue;
-  namespace: string;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
@@ -23,13 +23,13 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
   applyStorageProfileState,
   bootableVolume,
   claimPropertySetsData,
-  namespace,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
   const [showSCAlert, setShowSCAlert] = useState(false);
 
-  const { bootableVolumeName, size, storageClassName } = bootableVolume || {};
+  const { bootableVolumeName, bootableVolumeNamespace, size, storageClassName } =
+    bootableVolume || {};
 
   const [applyStorageProfile, setApplyStorageProfile] = applyStorageProfileState;
 
@@ -76,7 +76,11 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
         />
       </FormGroup>
       <FormGroup label={t('Destination project')}>
-        <TextInput id="destination-project" isDisabled type="text" value={namespace} />
+        <ProjectDropdown
+          includeAllProjects={false}
+          onChange={setBootableVolumeField('bootableVolumeNamespace')}
+          selectedProject={bootableVolumeNamespace}
+        />
       </FormGroup>
     </>
   );
