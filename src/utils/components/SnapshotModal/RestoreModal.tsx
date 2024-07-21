@@ -10,7 +10,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getVMRestoreSnapshotResource } from '../../utils/helpers';
+import { getVMRestoreSnapshotResource } from '../../../views/virtualmachines/details/tabs/snapshots/utils/helpers';
 
 import './restore-modal.scss';
 

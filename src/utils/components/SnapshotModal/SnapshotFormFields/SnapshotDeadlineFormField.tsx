@@ -12,8 +12,8 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
-import { deadlineUnits } from '../../../utils/consts';
-import { validateSnapshotDeadline } from '../../../utils/helpers';
+import { deadlineUnits } from '../../../../views/virtualmachines/details/tabs/snapshots/utils/consts';
+import { validateSnapshotDeadline } from '../../../../views/virtualmachines/details/tabs/snapshots/utils/helpers';
 
 type SnapshotDeadlineFormFieldProps = {
   deadline: string;

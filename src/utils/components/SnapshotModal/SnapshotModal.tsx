@@ -13,12 +13,12 @@ import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, TextArea, TextInput } from '@patternfly/react-core';
 
-import { printableVMStatus } from '../../../../../utils';
-import { deadlineUnits } from '../../utils/consts';
+import { deadlineUnits } from '../../../views/virtualmachines/details/tabs/snapshots/utils/consts';
 import {
   getEmptyVMSnapshotResource,
   getVolumeSnapshotStatusesPartition,
-} from '../../utils/helpers';
+} from '../../../views/virtualmachines/details/tabs/snapshots/utils/helpers';
+import { printableVMStatus } from '../../../views/virtualmachines/utils';
 
 import SupportedVolumesAlert from './alerts/SupportedVolumesAlert';
 import UnsupportedVolumesAlert from './alerts/UnsupportedVolumesAlert';

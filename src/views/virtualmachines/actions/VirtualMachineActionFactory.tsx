@@ -3,6 +3,7 @@ import React from 'react';
 import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
 import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
@@ -11,6 +12,7 @@ import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/An
 import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
@@ -74,7 +76,6 @@ export const VirtualMachineActionFactory = {
       label: t('Clone'),
     };
   },
-  // },
   copySSHCommand: (vm: V1VirtualMachine, command: string): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
@@ -86,7 +87,6 @@ export const VirtualMachineActionFactory = {
       label: t('Copy SSH command'),
     };
   },
-
   delete: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'delete'),
@@ -99,6 +99,7 @@ export const VirtualMachineActionFactory = {
       label: t('Delete'),
     };
   },
+
   editAnnotations: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
@@ -193,6 +194,17 @@ export const VirtualMachineActionFactory = {
       label: t('Pause'),
     };
   },
+  restart: (vm: V1VirtualMachine): Action => {
+    return {
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      cta: () => restartVM(vm),
+      disabled: [Migrating, Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
+        vm?.status?.printableStatus,
+      ),
+      id: 'vm-action-restart',
+      label: t('Restart'),
+    };
+  },
   // console component is needed to allow openConsole action
   // openConsole: (vm: V1VirtualMachine): Action => {
   //   return {
@@ -205,16 +217,12 @@ export const VirtualMachineActionFactory = {
   //         `${vm?.metadata?.name}-console}`,
   //         'modal=yes,alwaysRaised=yes,location=yes,width=1024,height=768',
   //       ),
-  //   };
-  restart: (vm: V1VirtualMachine): Action => {
+  snapshot: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-      cta: () => restartVM(vm),
-      disabled: [Migrating, Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
-        vm?.status?.printableStatus,
-      ),
-      id: 'vm-action-restart',
-      label: t('Restart'),
+      accessReview: asAccessReview(VirtualMachineSnapshotModel, vm, 'create'),
+      cta: () => createModal((props) => <SnapshotModal vm={vm} {...props} />),
+      id: 'vm-action-snapshot',
+      label: t('Take snapshot'),
     };
   },
   start: (vm: V1VirtualMachine): Action => {

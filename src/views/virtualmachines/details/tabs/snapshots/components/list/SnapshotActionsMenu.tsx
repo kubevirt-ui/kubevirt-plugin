@@ -6,13 +6,12 @@ import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevi
 import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import RestoreModal from '@kubevirt-utils/components/SnapshotModal/RestoreModal';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sDelete, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
-
-import RestoreModal from '../modal/RestoreModal';
 
 type SnapshotActionsMenuProps = {
   isRestoreDisabled: boolean;

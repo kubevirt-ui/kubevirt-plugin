@@ -6,6 +6,7 @@ import {
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import RestoreModal from '@kubevirt-utils/components/SnapshotModal/RestoreModal';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
@@ -23,7 +24,6 @@ import {
 
 import { printableVMStatus } from '../../../../../utils';
 import IndicationLabelList from '../../../snapshots/components/IndicationLabel/IndicationLabelList';
-import RestoreModal from '../../../snapshots/components/modal/RestoreModal';
 
 import SnapshotDeleteModal from './component/SnapshotDeleteModal';
 import { icon } from './utils/snapshotStatus';

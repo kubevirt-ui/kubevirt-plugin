@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
 import { Title } from '@patternfly/react-core';
@@ -9,7 +10,6 @@ import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 import { printableVMStatus } from '../../../utils';
 
 import SnapshotList from './components/list/SnapshotList';
-import SnapshotModal from './components/modal/SnapshotModal';
 import useSnapshotData from './hooks/useSnapshotData';
 
 import './SnapshotListPage.scss';
