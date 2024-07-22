@@ -18,7 +18,7 @@ import {
 
 import './TabModal.scss';
 
-type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
+export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   children: ReactNode;
   closeOnSubmit?: boolean;
   headerText: string;

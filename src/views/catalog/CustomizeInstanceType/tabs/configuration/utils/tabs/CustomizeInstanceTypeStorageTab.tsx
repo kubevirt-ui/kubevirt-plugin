@@ -42,6 +42,7 @@ const CustomizeInstanceTypeStorageTab = () => {
 
               return Promise.resolve(vmModified);
             }}
+            customize
             vm={vm}
           />
         </PageSection>

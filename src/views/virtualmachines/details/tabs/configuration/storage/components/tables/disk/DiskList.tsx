@@ -29,12 +29,13 @@ import DiskRow from './DiskRow';
 import './disklist.scss';
 
 type DiskListProps = {
+  customize?: boolean;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskList: FC<DiskListProps> = ({ onDiskUpdate, vm, vmi }) => {
+const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
@@ -95,7 +96,7 @@ const DiskList: FC<DiskListProps> = ({ onDiskUpdate, vm, vmi }) => {
         loaded={loaded}
         loadError={loadError}
         Row={DiskRow}
-        rowData={{ onSubmit, provisioningPercentages, vm, vmi }}
+        rowData={{ customize, onSubmit, provisioningPercentages, vm, vmi }}
         unfilteredData={data}
       />
     </div>

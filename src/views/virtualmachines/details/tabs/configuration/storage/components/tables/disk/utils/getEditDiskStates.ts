@@ -12,15 +12,17 @@ import {
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { DiskFormState, SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { getBootDisk, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 type UseEditDiskStates = (
   vm: V1VirtualMachine,
-  diskName: string,
+  diskObj: DiskRowDataLayout,
   vmi?: V1VirtualMachineInstance,
 ) => DiskFormState;
 
-export const getEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
+export const getEditDiskStates: UseEditDiskStates = (vm, diskObj, vmi) => {
+  const diskName = diskObj?.name;
   const state = produce(getInitialStateDiskForm(), (draftState) => {
     draftState.isBootSource = getBootDisk(vm)?.name === diskName;
 
@@ -48,6 +50,8 @@ export const getEditDiskStates: UseEditDiskStates = (vm, diskName, vmi) => {
     }
 
     setOtherSource(draftState);
+
+    if (diskObj.size) draftState.diskSize = diskObj.size;
   });
 
   return { ...state, diskName };

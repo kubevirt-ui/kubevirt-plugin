@@ -458,7 +458,7 @@ const updateVMDataVolumeTemplates = (
   );
 };
 
-export const editDisk = async (
+export const editCreatedDisk = async (
   initialFormData: DiskFormState,
   formData: DiskFormState,
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
@@ -648,7 +648,7 @@ export const getEditDiskState = (vm: V1VirtualMachine, diskName: string): DiskFo
   };
 };
 
-export const editVMDisk = (
+export const editDraftDisk = (
   vm: V1VirtualMachine,
   initialDiskFormState: DiskFormState,
   newDiskFormState: DiskFormState,
@@ -674,6 +674,20 @@ export const editVMDisk = (
 
     if (!newDiskFormState.isBootSource && initialDiskFormState.isBootSource) {
       delete vmDisks[diskIndexEdited].bootOrder;
+    }
+
+    if (
+      initialDiskFormState.diskSize !== newDiskFormState.diskSize &&
+      newDiskFormState.diskSource === SourceTypes.OTHER
+    ) {
+      const sourceDataVolume = getDataVolumeTemplates(vmDraft)?.find(
+        (dv) => getName(dv) === volumeEdited?.dataVolume?.name,
+      );
+
+      if (sourceDataVolume)
+        sourceDataVolume.spec.storage = {
+          resources: { requests: { storage: newDiskFormState.diskSize } },
+        };
     }
 
     return vmDraft;

@@ -24,13 +24,14 @@ import { getInitialStateDiskForm } from './utils/constants';
 import {
   addDisk,
   checkDifferentStorageClassFromBootPVC,
-  editDisk,
-  editVMDisk,
+  editCreatedDisk,
+  editDraftDisk,
 } from './utils/helpers';
 import { DiskFormState, DiskModalProps } from './utils/types';
 
 const DiskModal: FC<DiskModalProps> = ({
   createOwnerReference = true,
+  customize = false,
   headerText,
   initialFormData = null,
   isEditDisk = false,
@@ -71,10 +72,11 @@ const DiskModal: FC<DiskModalProps> = ({
         }}
         onSubmit={() =>
           handleSubmit((data) => {
-            if (isEditingCreatedDisk) return editVMDisk(vm, initialFormData, data, onSubmit);
+            if (isEditingCreatedDisk || customize)
+              return editDraftDisk(vm, initialFormData, data, onSubmit);
 
             if (isEditDisk)
-              return editDisk(initialFormData, data, uploadData, {
+              return editCreatedDisk(initialFormData, data, uploadData, {
                 createOwnerReference,
                 onSubmit,
                 onUploadedDataVolume,
