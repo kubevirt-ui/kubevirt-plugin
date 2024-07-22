@@ -16,7 +16,7 @@ import VirtualMachineLogViewer from './VirtualMachineLogViewer/VirtualMachineLog
 
 import './virtual-machine-diagnostic-tab.scss';
 
-const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ vm }) => {
+const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useKubevirtTranslation();

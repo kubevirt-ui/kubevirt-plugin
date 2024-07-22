@@ -19,7 +19,7 @@ import { printableVMStatus } from '../../../utils';
 
 import VirtualMachineConsolePageTitle from './components/VirtualMachineConsolePageTitle';
 
-const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ vm }) => {
+const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const [vmi, vmiLoaded] = useK8sWatchResource<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,

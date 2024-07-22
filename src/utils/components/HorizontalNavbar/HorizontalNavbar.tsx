@@ -1,10 +1,13 @@
-import React, { FC, useState } from 'react';
-import { NavLink, Route, Routes, useLocation } from 'react-router-dom-v5-compat';
+import React, { FC, useEffect, useMemo, useState } from 'react';
+import { NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
+import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Nav, NavList } from '@patternfly/react-core';
 
+import useDynamicPages from './utils/useDynamicPages';
 import { NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
 
 import './horizontal-nav-bar.scss';
@@ -18,20 +21,33 @@ type HorizontalNavbarProps = {
 const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec, pages, vm }) => {
   const location = useLocation();
 
-  const initialActiveTab =
-    pages.find(({ name = '' }) => location?.pathname.includes('/' + name.toLowerCase())) ||
-    pages?.[0];
+  const params = useParams();
 
-  const [activeItem, setActiveItem] = useState<number | string>(
-    initialActiveTab?.name?.toLowerCase(),
+  const dynamicPluginPages = useDynamicPages(VirtualMachineModel);
+
+  const allPages = useMemo(
+    () => [...pages, ...(dynamicPluginPages || [])] as NavPageKubevirt[],
+    [pages, dynamicPluginPages],
   );
-  const paths = pages.map((page) => page.href);
 
+  const paths = allPages.map((page) => page.href);
+
+  useEffect(() => {
+    const defaultPage = allPages.find(({ href }) => isEmpty(href));
+
+    const initialActiveTab =
+      allPages.find(({ href }) => !isEmpty(href) && location?.pathname.includes('/' + href)) ||
+      defaultPage;
+
+    setActiveItem(initialActiveTab?.name?.toLowerCase());
+  }, [allPages, location?.pathname]);
+
+  const [activeItem, setActiveItem] = useState<number | string>();
   return (
     <>
       <Nav variant="horizontal">
         <NavList className="co-m-horizontal-nav__menu horizontal-nav-bar__list">
-          {pages.map((item) => {
+          {allPages.map((item) => {
             if (item?.isHidden) return null;
 
             return (
@@ -52,12 +68,17 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec,
         </NavList>
       </Nav>
       <Routes>
-        {pages.map((page) => {
+        {allPages.map((page) => {
           const Component = page.component;
           return (
             <Route
               Component={(props) => (
-                <Component instanceTypeExpandedSpec={instanceTypeExpandedSpec} vm={vm} {...props} />
+                <Component
+                  instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+                  obj={vm}
+                  params={params}
+                  {...props}
+                />
               )}
               key={page.href}
               path={page.href}
