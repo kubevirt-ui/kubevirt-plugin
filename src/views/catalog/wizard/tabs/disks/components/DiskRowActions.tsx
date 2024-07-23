@@ -72,10 +72,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
-        <ConfirmActionMessage
-          action="detach"
-          obj={{ metadata: { name: diskName, namespace: vm?.metadata?.namespace } }}
-        />
+        <ConfirmActionMessage action="detach" obj={{ metadata: { name: diskName } }} />
       </TabModal>
     ));
   };
