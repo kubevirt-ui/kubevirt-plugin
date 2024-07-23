@@ -108,7 +108,7 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({ isOpen, onClose, vm, volume
         <StackItem>
           <ConfirmActionMessage
             obj={{
-              metadata: { name: diskName, namespace: updatedVirtualMachine?.metadata?.namespace },
+              metadata: { name: diskName },
             }}
             action="detach"
           />
