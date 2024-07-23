@@ -2,6 +2,11 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { useLocation } from 'react-router-dom-v5-compat';
 
+import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
+import {
+  runningTourSignal,
+  tourGuideVM,
+} from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
@@ -16,9 +21,11 @@ import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/ut
 
 import './virtual-machine-configuration-tab.scss';
 
-const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ vm }) => {
+const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ vm: obj }) => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const vm = runningTourSignal.value ? tourGuideVM : obj;
   const { vmi } = useVMI(getName(vm), getNamespace(vm));
   const [instanceTypeVM] = useInstanceTypeExpandSpec(vm);
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
@@ -62,6 +69,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ vm }) => {
           ))}
         </Tabs>
       </div>
+      <GuidedTour />
     </div>
   );
 };

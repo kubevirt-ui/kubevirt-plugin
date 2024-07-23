@@ -112,7 +112,7 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
                 </MenuItem>
               ))}
               {isEmpty(autocompleteOptions) && (
-                <Bullseye className="VirtualMachineConfigurationTanSearch--main__no-results">
+                <Bullseye className="VirtualMachineConfigurationTabSearch--main__no-results">
                   <Icon color="grey" size="xl">
                     <SearchIcon />
                   </Icon>
@@ -127,8 +127,8 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
       }
       trigger={
         <SearchInput
-          className="VirtualMachineConfigurationTanSearch--main"
-          id="VirtualMachineConfigurationTanSearch-autocomplete-search"
+          className="VirtualMachineConfigurationTabSearch--main"
+          id="VirtualMachineConfigurationTabSearch-autocomplete-search"
           onChange={onChange}
           onClear={onClear}
           value={value}

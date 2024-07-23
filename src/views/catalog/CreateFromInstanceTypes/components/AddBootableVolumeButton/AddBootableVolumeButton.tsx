@@ -26,6 +26,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
           <AddBootableVolumeModal onCreateVolume={onSelectCreatedVolume} {...props} />
         ))
       }
+      id="tour-step-add-volume"
       isDisabled={!!loadError || !canCreate}
       variant={ButtonVariant.secondary}
     >

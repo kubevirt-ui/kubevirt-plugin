@@ -105,7 +105,7 @@ const DetailsRightGrid: FC = () => {
                 />
               ))
             }
-            descriptionHeader={t('Public SSH key')}
+            descriptionHeader={<span id="tour-step-ssh">{t('Public SSH key')}</span>}
             isEdit={!isChangingNamespace}
           />
           <DynamicSSHKeyInjectionInstanceType />
