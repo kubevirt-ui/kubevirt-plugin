@@ -14,7 +14,7 @@ import useSnapshotData from './hooks/useSnapshotData';
 
 import './SnapshotListPage.scss';
 
-const SnapshotListPage: FC<NavPageComponentProps> = ({ vm }) => {
+const SnapshotListPage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { error, loaded, restoresMap, snapshots } = useSnapshotData(

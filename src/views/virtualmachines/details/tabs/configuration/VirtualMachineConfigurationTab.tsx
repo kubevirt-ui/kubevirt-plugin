@@ -21,7 +21,7 @@ import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/ut
 
 import './virtual-machine-configuration-tab.scss';
 
-const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ vm: obj }) => {
+const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
   const navigate = useNavigate();
   const location = useLocation();
 

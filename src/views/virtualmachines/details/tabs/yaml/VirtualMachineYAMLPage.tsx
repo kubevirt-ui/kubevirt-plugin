@@ -7,7 +7,9 @@ import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import './virtual-machine-yaml-page.scss';
 
-const VirtualMachineYAMLPage: FC<NavPageComponentProps> = ({ vm }) => {
+const VirtualMachineYAMLPage: FC<NavPageComponentProps> = (props) => {
+  const { obj: vm } = props;
+
   const loading = (
     <Bullseye>
       <Loading />

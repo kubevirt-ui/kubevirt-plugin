@@ -20,7 +20,7 @@ import useVMAlerts from './utils/hook/useVMAlerts';
 
 const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
   instanceTypeExpandedSpec,
-  vm,
+  obj: vm,
 }) => {
   const vmAlerts = useVMAlerts(vm);
   const { error, loaded, pods, vmi } = useVMIAndPodsForVM(

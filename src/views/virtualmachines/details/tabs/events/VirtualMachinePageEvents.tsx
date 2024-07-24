@@ -8,7 +8,7 @@ import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import './VirtualMachinePageEventsTab.scss';
 
-const VirtualMachinePageEventsTab: FC<NavPageComponentProps> = ({ vm }) => {
+const VirtualMachinePageEventsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
 
   return (
