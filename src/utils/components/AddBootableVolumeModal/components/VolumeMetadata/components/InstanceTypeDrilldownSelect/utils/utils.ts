@@ -13,6 +13,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   initialMenuItems,
   INSTANCETYPE_CLASS_ANNOTATION,
+  INSTANCETYPE_CLASS_DISPLAY_NAME,
   INSTANCETYPE_DESCRIPTION_ANNOTATION,
   instanceTypeSeriesNameMapper,
   REDHAT_COM,
@@ -25,6 +26,7 @@ const getRedHatInstanceTypeSeriesAndSize = (
   const [seriesName, sizeLabel] = getName(instanceType).split('.');
   const cpus = instanceType?.spec?.cpu?.guest;
   const memory = readableSizeUnit(instanceType?.spec?.memory?.guest);
+  const classAnnotation = getAnnotation(instanceType, INSTANCETYPE_CLASS_ANNOTATION, seriesName);
 
   const size: InstanceTypeSize = {
     cpus,
@@ -34,7 +36,12 @@ const getRedHatInstanceTypeSeriesAndSize = (
 
   return {
     redHatITSeries: {
-      classAnnotation: getAnnotation(instanceType, INSTANCETYPE_CLASS_ANNOTATION, seriesName),
+      classAnnotation,
+      classDisplayNameAnnotation: getAnnotation(
+        instanceType,
+        INSTANCETYPE_CLASS_DISPLAY_NAME,
+        classAnnotation,
+      ),
       descriptionAnnotation: getAnnotation(instanceType, INSTANCETYPE_DESCRIPTION_ANNOTATION),
       seriesName,
       sizes: [size],

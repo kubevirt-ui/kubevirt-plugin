@@ -10,7 +10,6 @@ import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   Card,
   CardBody,
-  CardFooter,
   Menu,
   MenuContent,
   MenuList,
@@ -41,7 +40,8 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
     instanceTypeVMState: { selectedInstanceType },
   } = useInstanceTypeVMStore();
 
-  const { classAnnotation, descriptionAnnotation, seriesName, sizes } = rhSeriesItem;
+  const { classAnnotation, classDisplayNameAnnotation, descriptionAnnotation, seriesName, sizes } =
+    rhSeriesItem;
 
   const { Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
 
@@ -68,14 +68,16 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
     <Card className="instance-type-series-menu-card__toggle-card">
       <div className="instance-type-series-menu-card__card-icon">{Icon && <Icon />}</div>
       <CardBody>
-        <div className="instance-type-series-menu-card__card-title">{classAnnotation}</div>
+        <div className="instance-type-series-menu-card__card-title">
+          {classDisplayNameAnnotation}
+        </div>
         <div className="instance-type-series-menu-card__card-toggle-text">
           {seriesLabel || classAnnotation} <AngleDownIcon />
         </div>
+        <div className="instance-type-series-menu-card__card-footer">
+          {isSelectedMenu && selectedITLabel}
+        </div>
       </CardBody>
-      <CardFooter className="instance-type-series-menu-card__card-footer">
-        {isSelectedMenu && selectedITLabel}
-      </CardFooter>
     </Card>
   );
   return (
