@@ -12,6 +12,7 @@ import {
   getTemplateVirtualMachineObject,
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
+  TEMPLATE_DEFAULT_VARIANT_LABEL,
   TEMPLATE_TYPE_VM,
   TEMPLATE_VERSION_LABEL,
 } from '@kubevirt-utils/resources/template';
@@ -75,6 +76,7 @@ const CloneTemplateModal: React.FC<CloneTemplateModalProps> = ({
       draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = templateName;
       draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedProject;
       delete draftVM.metadata.labels[TEMPLATE_VERSION_LABEL];
+      delete draftTemplate.metadata.labels[TEMPLATE_DEFAULT_VARIANT_LABEL];
     });
 
     if (isCloneStorageEnabled) {

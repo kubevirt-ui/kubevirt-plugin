@@ -4,6 +4,7 @@ import {
   getTemplateName,
   isCommonTemplate,
   isDeprecatedTemplate,
+  TEMPLATE_DEFAULT_VARIANT_LABEL,
   TEMPLATE_WORKLOAD_LABEL,
 } from '@kubevirt-utils/resources/template';
 import { findKeySuffixValue } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
@@ -12,7 +13,7 @@ import { WatchK8sResultsObject } from '@openshift-console/dynamic-plugin-sdk';
 
 import { K8sResourceKind } from '../../../utils/types';
 
-import { DEFAULT_OS_VARIANT, TEMPLATE_CUSTOMIZED_ANNOTATION } from './constants';
+import { TEMPLATE_CUSTOMIZED_ANNOTATION } from './constants';
 import {
   Flatten,
   TemplateItem,
@@ -49,7 +50,7 @@ export const filterTemplates = (templates: V1Template[]): TemplateItem[] => {
     .reduce((acc, t) => {
       const name = getTemplateName(t);
       if (acc[name]) {
-        const isRecommended = t.metadata.labels?.[DEFAULT_OS_VARIANT] === 'true';
+        const isRecommended = t.metadata.labels?.[TEMPLATE_DEFAULT_VARIANT_LABEL] === 'true';
         if (isRecommended) {
           acc[name].metadata = {
             name: t.metadata.name,
