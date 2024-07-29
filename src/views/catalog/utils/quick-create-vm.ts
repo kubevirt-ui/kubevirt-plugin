@@ -24,7 +24,6 @@ type QuickCreateVMType = (inputs: {
     isDisabledGuestSystemLogs: boolean;
     name: string;
     namespace: string;
-    startVM: boolean;
     subscriptionData: RHELAutomaticSubscriptionData;
   };
   template: V1Template;
@@ -38,7 +37,6 @@ export const quickCreateVM: QuickCreateVMType = async ({
     isDisabledGuestSystemLogs,
     name,
     namespace = DEFAULT_NAMESPACE,
-    startVM,
     subscriptionData,
   },
   template,
@@ -61,9 +59,6 @@ export const quickCreateVM: QuickCreateVMType = async ({
 
     draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
     draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
-    if (startVM) {
-      draftVM.spec.running = true;
-    }
 
     if (isDisabledGuestSystemLogs) {
       const devices = (<unknown>draftVM.spec.template.spec.domain.devices) as V1Devices & {
