@@ -2,7 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
-  V1alpha1VirtualMachineSnapshot,
+  V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -60,9 +60,9 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   }, [deadline, deadlineUnit, description, snapshotName, vm]);
 
   return (
-    <TabModal<V1alpha1VirtualMachineSnapshot>
+    <TabModal<V1beta1VirtualMachineSnapshot>
       onSubmit={(obj) =>
-        k8sCreate<V1alpha1VirtualMachineSnapshot>({
+        k8sCreate<V1beta1VirtualMachineSnapshot>({
           data: obj,
           model: VirtualMachineSnapshotModel,
         })

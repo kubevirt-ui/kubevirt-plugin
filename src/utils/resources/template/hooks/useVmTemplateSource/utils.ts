@@ -9,11 +9,11 @@ import {
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
-  V1alpha1PersistentVolumeClaim,
   V1beta1DataVolumeSourceHTTP,
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSourceRef,
   V1beta1DataVolumeSourceRegistry,
+  V1beta1PersistentVolumeClaim,
   V1ContainerDiskSource,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getBootDisk, getVolumes } from '@kubevirt-utils/resources/vm';
@@ -35,9 +35,9 @@ export type TemplateBootSource = {
   sourceValue?: {
     containerDisk?: V1ContainerDiskSource;
     http?: V1beta1DataVolumeSourceHTTP;
-    pvc?: V1alpha1PersistentVolumeClaim;
+    pvc?: V1beta1PersistentVolumeClaim;
     registry?: V1beta1DataVolumeSourceRegistry;
-    sourceRef?: V1alpha1PersistentVolumeClaim;
+    sourceRef?: V1beta1PersistentVolumeClaim;
   };
   storageClassName?: string;
   type: BOOT_SOURCE;

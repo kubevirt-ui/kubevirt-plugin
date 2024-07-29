@@ -7,7 +7,7 @@ import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/model
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import {
-  V1alpha1VirtualMachineSnapshot,
+  V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
@@ -20,7 +20,7 @@ type UseDeleteVMResources = (vm: V1VirtualMachine) => {
   error: any;
   loaded: boolean;
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  snapshots: V1alpha1VirtualMachineSnapshot[];
+  snapshots: V1beta1VirtualMachineSnapshot[];
 };
 
 const useDeleteVMResources: UseDeleteVMResources = (vm) => {
@@ -55,7 +55,7 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
     : [];
 
   const [snapshots, snapshotsLoaded, snapshotsLoadError] = useK8sWatchResource<
-    V1alpha1VirtualMachineSnapshot[]
+    V1beta1VirtualMachineSnapshot[]
   >({
     groupVersionKind: modelToGroupVersionKind(VirtualMachineSnapshotModel),
     isList: true,
