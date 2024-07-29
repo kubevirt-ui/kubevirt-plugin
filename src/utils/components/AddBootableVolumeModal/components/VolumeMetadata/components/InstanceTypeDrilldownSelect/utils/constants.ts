@@ -113,3 +113,4 @@ export const instanceTypeSeriesNameMapper: {
 export const REDHAT_COM = 'redhat.com';
 export const INSTANCETYPE_CLASS_ANNOTATION = 'instancetype.kubevirt.io/class';
 export const INSTANCETYPE_DESCRIPTION_ANNOTATION = 'instancetype.kubevirt.io/description';
+export const INSTANCETYPE_CLASS_DISPLAY_NAME = 'instancetype.kubevirt.io/displayName';

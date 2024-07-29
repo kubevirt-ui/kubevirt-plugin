@@ -10,14 +10,14 @@
   }
 
   &__toggle-card {
-    min-height: 305px;
+    min-height: 200px;
     box-shadow: none;
     color: var(--pf-global--Color--100);
   }
 
   &__card-icon {
     font-size: var(--pf-global--FontSize--3xl);
-    margin-top: var(--pf-global--spacer--md);
+    margin-top: var(--pf-global--spacer--sm);
   }
 
   &__card-title,
@@ -26,9 +26,12 @@
     font-size: var(--pf-global--FontSize--lg);
   }
 
+  &__card-footer {
+    margin-top: var(--pf-global--spacer--sm);
+  }
+
   &__card-title {
-    margin: var(--pf-global--spacer--sm) 0 var(--pf-global--spacer--md);
-    min-height: 65px;
+    margin: var(--pf-global--spacer--sm) 0;
   }
 
   &__card-toggle-text {

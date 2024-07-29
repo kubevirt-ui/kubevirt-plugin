@@ -8,6 +8,7 @@ export type InstanceTypeSize = {
 
 export type RedHatInstanceTypeSeries = {
   classAnnotation: string;
+  classDisplayNameAnnotation: string;
   descriptionAnnotation: string;
   seriesName: string;
   sizes: InstanceTypeSize[];
